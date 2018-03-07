@@ -15,7 +15,7 @@ import (
 var (
 	IrisCmd = &cobra.Command{
 		Use:   "iris",
-		Short: "IRIS Hub - a regional Cosmos Hub with a powerful iService infrastructure",
+		Short: "Iris Hub - a regional Cosmos Hub with a powerful iService infrastructure",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
