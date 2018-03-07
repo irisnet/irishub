@@ -18,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/state"
 
 	"github.com/cosmos/gaia/modules/stake"
-	"github.com/irisnet/iris-hub/modules/iservice"
 )
 
 // nodeCmd is the entry point for this binary
@@ -49,7 +48,6 @@ func prepareNodeCommands() {
 			stack.WrapHandler(roles.NewHandler()),
 			stack.WrapHandler(ibc.NewHandler()),
 			stake.NewHandler(),
-			iservice.NewHandler(),
 		)
 
 	nodeCmd.AddCommand(
