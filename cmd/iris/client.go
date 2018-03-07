@@ -19,7 +19,6 @@ import (
 	rolecmd "github.com/cosmos/cosmos-sdk/modules/roles/commands"
 
 	stakecmd "github.com/cosmos/gaia/modules/stake/commands"
-	iservicecmd "github.com/irisnet/iris-hub/modules/iservice/commands"
 )
 
 // clientCmd is the entry point for this binary
@@ -49,8 +48,6 @@ func prepareClientCommands() {
 		stakecmd.CmdQueryCandidate,
 		stakecmd.CmdQueryDelegatorBond,
 		stakecmd.CmdQueryDelegatorCandidates,
-
-		iservicecmd.CmdQueryServiceDefinition,
 	)
 
 	// set up the middleware
@@ -79,8 +76,6 @@ func prepareClientCommands() {
 		stakecmd.CmdEditCandidacy,
 		stakecmd.CmdDelegate,
 		stakecmd.CmdUnbond,
-
-		iservicecmd.CmdDefineService,
 	)
 
 	clientCmd.AddCommand(
