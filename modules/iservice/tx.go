@@ -56,7 +56,7 @@ func (tx TxDefineService) ValidateBasic() error {
 		return errServiceMethods
 	}
 
-	var mthId = make(map[int64]bool)
+	var mthId = make(map[int]bool)
 	var mthNm = make(map[string]bool)
 
 	for _,method := range tx.Methods {
