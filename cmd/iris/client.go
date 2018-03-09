@@ -80,7 +80,7 @@ func prepareClientCommands() {
 		stakecmd.CmdDelegate,
 		stakecmd.CmdUnbond,
 
-		iservicecmd.CmdDefineService,
+		iservicecmd.CmdCreateServiceDefinitionTx,
 	)
 
 	clientCmd.AddCommand(

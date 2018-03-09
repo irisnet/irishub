@@ -31,8 +31,10 @@ func newDeliver(sender sdk.Actor, accStore map[string]int64) deliver {
 // newTxDefineService - new TxDefineService
 func newTxDefineService(name string, description string) TxDefineService {
 	return TxDefineService{
-		Name:        name,
-		Description: description,
+		ServiceDefinition{
+			Name:name,
+			Description:description,
+		},
 	}
 }
 

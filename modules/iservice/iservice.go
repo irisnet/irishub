@@ -32,8 +32,7 @@ func saveParams(store state.SimpleDB, params Params) {
 	store.Set(ParamKey, b)
 }
 
-func saveService(store state.SimpleDB, service *ServiceDefinition) {
-
+func saveService(store state.SimpleDB, service *TxDefineService) {
 	b := wire.BinaryBytes(*service)
 	store.Set(GetServiceDefinitionKey(service.Name), b)
 }

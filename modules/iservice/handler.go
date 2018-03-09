@@ -100,7 +100,7 @@ func (h Handler) CheckTx(ctx sdk.Context, store state.SimpleDB,
 	switch txInner := tx.Unwrap().(type) {
 	case TxDefineService:
 		return sdk.NewCheck(params.GasDefineService, ""),
-			checker.defineService(txInner)
+			checker.checkService(txInner)
 	}
 
 	return res, errors.ErrUnknownTxType(tx)
@@ -154,7 +154,10 @@ type check struct {
 	sender sdk.Actor
 }
 
-func (c check) defineService(tx TxDefineService) error {
+func (c check) checkService(tx TxDefineService) error {
+	if c.store.Has([]byte(tx.Name)) {
+		return ErrServiceExists()
+	}
 	return nil
 }
 
@@ -165,17 +168,7 @@ type deliver struct {
 }
 
 func (d deliver) defineService(tx TxDefineService) error {
-
-	if d.store.Has([]byte(tx.Name)) {
-		return ErrServiceExists()
-	}
-
-	service := ServiceDefinition{
-		Name:        tx.Name,
-		Description: tx.Description,
-	}
-	saveService(d.store, &service)
-
+	saveService(d.store, &tx)
 	return nil
 }
 

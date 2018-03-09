@@ -13,7 +13,22 @@ func defaultParams() Params {
 
 //_________________________________________________________________________
 
-type ServiceDefinition struct {
-	Name        string
-	Description string
+type ServiceDefinition struct{
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Tags        string `json:"tags"` // ('k1'='v1','k2'='v2')
+	Creator     string `json:"creator"`
+	ChainID     string `json:"chainID"`
+	Messaging   string `json:"messaging"`
+	Methods     []ServiceMethod `json:"methods"`
+}
+
+type ServiceMethod struct {
+	ID            int64 `json:"id"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	Input         string `json:"input"`
+	Output        string `json:"output"`
+	Error         string `json:"error"`
+	OutputPrivacy string `json:"outputPrivacy"`
 }
