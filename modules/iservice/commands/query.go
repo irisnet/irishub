@@ -11,6 +11,7 @@ import (
 	"errors"
 	is "github.com/irisnet/iris-hub/modules/iservice"
 	"strings"
+	"log"
 )
 
 //nolint
@@ -22,7 +23,7 @@ var (
 	}
 
 	FlagServiceName   = "svc-name"
-	FlagChainId       = "chain-id"
+	FlagChainId       = "chainID"
 	FlagMessagingType = "msg-type"
 	FlagAddress       = "address"
 	FlagSvTags        = "svc-tags"
@@ -66,15 +67,18 @@ func cmdQueryServiceDefinition(cmd *cobra.Command, args []string) error {
 	}
 
 	tags := viper.GetString(FlagSvTags)
-	tx_tags := strings.Split(tags, ",")
-	for _, tag := range tx_tags {
-		kv := strings.Split(tag, "=")
-		if len(kv) == 2 {
-			queries = append(queries, is.QKVTag(kv[0], kv[1]))
-		} else {
-			queries = append(queries, is.QKeyTag(kv[0]))
+	if tags != "" {
+		tx_tags := strings.Split(tags, ",")
+		for _, tag := range tx_tags {
+			kv := strings.Split(tag, "=")
+			if len(kv) == 2 {
+				queries = append(queries, is.QKVTag(kv[0], kv[1]))
+			} else if len(kv) == 1 && kv[0] != "" {
+				queries = append(queries, is.QKeyTag(kv[0]))
+			}
 		}
 	}
+
 
 	all, err := findAnyTx(prove, queries)
 	output, err := search.FormatSearch(all, is.ExtractSvDefineTx)
@@ -89,6 +93,7 @@ func findAnyTx(prove bool, queries []string) ([]*ctypes.ResultTx, error) {
 	var all []*ctypes.ResultTx
 	// combine all requests
 	for _, q := range queries {
+		log.Printf("query:%s",q)
 		txs, err := search.FindTx(q, prove)
 		if err != nil {
 			return nil, err

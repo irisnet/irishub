@@ -141,22 +141,25 @@ func (h Handler) sendTxDefineService(ctx sdk.Context, store state.SimpleDB,
 		params: params,
 	}
 
-	tx_tags := strings.Split(tx.Tags, ",")
-	tags := make([]cmn.KVPair, 0, 4+len(tx_tags))
-
+	tags := make([]cmn.KVPair, 0, 5)
 	tags = append(tags, IndexHeight(ctx.BlockHeight()))
 	tags = append(tags, IndexServiceName(tx.Name))
 	tags = append(tags, IndexChainId(tx.ChainID))
 	tags = append(tags, IndexMessagingType(tx.Messaging))
 	tags = append(tags, IndexSender(sender.Address))
-	for _, tag := range tx_tags {
-		kv := strings.Split(tag, "=")
-		if len(kv) == 2 {
-			tags = append(tags, IndexKVTag(kv[0], kv[1]))
-		} else {
-			tags = append(tags, IndexKeyTag(kv[0]))
+
+	if tx.Tags != "" {
+		tx_tags := strings.Split(tx.Tags, ",")
+		for _, tag := range tx_tags {
+			kv := strings.Split(tag, "=")
+			if len(kv) == 2 {
+				tags = append(tags, IndexKVTag(kv[0], kv[1]))
+			} else if len(kv) == 1 && kv[0] != "" {
+				tags = append(tags, IndexKeyTag(kv[0]))
+			}
 		}
 	}
+
 	// a-ok!
 	return sdk.DeliverResult{Tags: tags}, deliverer.defineService(tx)
 }
@@ -178,9 +181,9 @@ type check struct {
 }
 
 func (c check) checkService(tx TxDefineService) error {
-	if c.store.Has([]byte(tx.Name)) {
-		return ErrServiceExists()
-	}
+	//if c.store.Has([]byte(tx.Name)) {
+	//	return ErrServiceExists()
+	//}
 	return nil
 }
 

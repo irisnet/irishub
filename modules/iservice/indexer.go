@@ -3,6 +3,7 @@ package iservice
 import (
 	"fmt"
 	cmn "github.com/tendermint/tmlibs/common"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -43,29 +44,44 @@ func IndexSender(address []byte) cmn.KVPair{
 }
 
 func Qheight(heigth int64) string{
-	return fmt.Sprintf("%s=%d", Tag_heigth,heigth)
+	return FmtQuery(Tag_heigth,heigth)
 }
 
 func QServiceName(name string) string{
-	return fmt.Sprintf("%s='%s'", Tag_Service_name,name)
+	return FmtQuery(Tag_Service_name,name)
 }
 
 func QChainId(chainId string) string{
-	return fmt.Sprintf("%s='%s'", Tag_chain_id,chainId)
+	return FmtQuery(Tag_chain_id,chainId)
 }
 
 func QMessagingType(msgtype string) string{
-	return fmt.Sprintf("%s='%s'", Tag_messaging_type,msgtype)
+	return FmtQuery(Tag_messaging_type,msgtype)
 }
 
 func QKVTag(key string,value string) string{
-	return fmt.Sprintf("%s='%s'", key,value)
+	return FmtQuery(key,value)
 }
 
 func QKeyTag(key string) string{
-	return fmt.Sprintf("%s='%s'", Tag_key,key)
+	return FmtQuery(Tag_key,key)
 }
 
 func QSender(sender string) string{
-	return fmt.Sprintf("%s='%s'", Tag_sender,sender)
+	return FmtQuery(Tag_sender,sender)
+}
+
+func FmtQuery(key string,value interface{}) string{
+	switch value.(type) {
+		case string:
+			return fmt.Sprintf("%s='%s'", key,value)
+		case int64:{
+			return fmt.Sprintf("%s=%d", key,value)
+		}
+		case []byte:{
+			return fmt.Sprintf("%s='%s'", key,value)
+		}
+
+	}
+	panic(errors.New("unsupport tags type"))
 }

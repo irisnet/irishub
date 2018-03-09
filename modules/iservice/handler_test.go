@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk"
 	"github.com/cosmos/cosmos-sdk/state"
 	"github.com/stretchr/testify/assert"
+	"fmt"
 )
 
 //______________________________________________________________________
@@ -49,4 +50,9 @@ func TestTxDefineService(t *testing.T) {
 	deliverer.sender = sender
 	got := deliverer.defineService(txDefineService)
 	require.NoError(got, "expected tx to be ok, got %v", got)
+}
+
+func TestFmtQuery(t *testing.T) {
+	fmt.Println(Qheight(123))
+	fmt.Println(QServiceName("svc"))
 }
