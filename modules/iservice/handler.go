@@ -5,12 +5,13 @@ import (
 	"strconv"
 
 	"github.com/tendermint/tmlibs/log"
-
+	cmn "github.com/tendermint/tmlibs/common"
 	"github.com/cosmos/cosmos-sdk"
 	"github.com/cosmos/cosmos-sdk/errors"
 	"github.com/cosmos/cosmos-sdk/modules/auth"
 	"github.com/cosmos/cosmos-sdk/stack"
 	"github.com/cosmos/cosmos-sdk/state"
+	"strings"
 )
 
 // nolint
@@ -117,6 +118,17 @@ func (h Handler) DeliverTx(ctx sdk.Context, store state.SimpleDB,
 		return
 	}
 
+	// Run the transaction
+	switch _tx := tx.Unwrap().(type) {
+	case TxDefineService:
+		return h.sendTxDefineService(ctx, store, _tx, dispatch)
+	}
+	return
+}
+
+func (h Handler) sendTxDefineService(ctx sdk.Context, store state.SimpleDB,
+	tx TxDefineService, dispatch sdk.Deliver) (res sdk.DeliverResult, err error) {
+
 	sender, err := getTxSender(ctx)
 	if err != nil {
 		return
@@ -129,13 +141,24 @@ func (h Handler) DeliverTx(ctx sdk.Context, store state.SimpleDB,
 		params: params,
 	}
 
-	// Run the transaction
-	switch _tx := tx.Unwrap().(type) {
-	case TxDefineService:
-		res.GasUsed = params.GasDefineService
-		return res, deliverer.defineService(_tx)
+	tx_tags := strings.Split(tx.Tags, ",")
+	tags := make([]cmn.KVPair, 0, 4+len(tx_tags))
+
+	tags = append(tags, IndexHeight(ctx.BlockHeight()))
+	tags = append(tags, IndexServiceName(tx.Name))
+	tags = append(tags, IndexChainId(tx.ChainID))
+	tags = append(tags, IndexMessagingType(tx.Messaging))
+	tags = append(tags, IndexSender(sender.Address))
+	for _, tag := range tx_tags {
+		kv := strings.Split(tag, "=")
+		if len(kv) == 2 {
+			tags = append(tags, IndexKVTag(kv[0], kv[1]))
+		} else {
+			tags = append(tags, IndexKeyTag(kv[0]))
+		}
 	}
-	return
+	// a-ok!
+	return sdk.DeliverResult{Tags: tags}, deliverer.defineService(tx)
 }
 
 // get the sender from the ctx and ensure it matches the tx pubkey
@@ -168,7 +191,7 @@ type deliver struct {
 }
 
 func (d deliver) defineService(tx TxDefineService) error {
-	saveService(d.store, &tx)
+	//saveService(d.store, &tx)
 	return nil
 }
 

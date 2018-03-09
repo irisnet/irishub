@@ -13,6 +13,10 @@ import (
 const (
 	ByteTxDefineService = 0x59
 	TypeTxDefineService = iserviceModuleName + "/defineService"
+	Unicast = "Unicast"
+	Multicast = "Multicast"
+	NoPrivacy = "NoPrivacy"
+	PubKeyEncryption = "PubKeyEncryption"
 )
 
 func init() {
@@ -49,7 +53,7 @@ func (tx TxDefineService) ValidateBasic() error {
 	if tx.ChainID == "" {
 		return errServiceChainID
 	}
-	if tx.Messaging != "Unicast" || tx.Messaging != "Multicast" {
+	if tx.Messaging != Unicast && tx.Messaging != Multicast {
 		return errServiceMessaging
 	}
 	if len(tx.Methods) < 0 {
@@ -85,7 +89,7 @@ func (tx TxDefineService) ValidateBasic() error {
 		if method.Output == "" {
 			return errServiceMethodOutput
 		}
-		if method.OutputPrivacy != "NoPrivacy" || method.OutputPrivacy != "PubKeyEncryption"{
+		if method.OutputPrivacy != NoPrivacy && method.OutputPrivacy != PubKeyEncryption{
 			return errServiceMethodOutputPrivacy
 		}
 	}
