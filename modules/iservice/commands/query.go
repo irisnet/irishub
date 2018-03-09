@@ -11,7 +11,6 @@ import (
 	"errors"
 	is "github.com/irisnet/iris-hub/modules/iservice"
 	"strings"
-	"log"
 )
 
 //nolint
@@ -93,7 +92,6 @@ func findAnyTx(prove bool, queries []string) ([]*ctypes.ResultTx, error) {
 	var all []*ctypes.ResultTx
 	// combine all requests
 	for _, q := range queries {
-		log.Printf("query:%s",q)
 		txs, err := search.FindTx(q, prove)
 		if err != nil {
 			return nil, err

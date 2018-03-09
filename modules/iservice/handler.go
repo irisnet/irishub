@@ -146,7 +146,9 @@ func (h Handler) sendTxDefineService(ctx sdk.Context, store state.SimpleDB,
 	tags = append(tags, IndexServiceName(tx.Name))
 	tags = append(tags, IndexChainId(tx.ChainID))
 	tags = append(tags, IndexMessagingType(tx.Messaging))
-	tags = append(tags, IndexSender(sender.Address))
+
+	addr := fmt.Sprintf("%s",sender.Address)
+	tags = append(tags, IndexSender(addr))
 
 	if tx.Tags != "" {
 		tx_tags := strings.Split(tx.Tags, ",")

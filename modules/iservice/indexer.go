@@ -39,8 +39,8 @@ func IndexKeyTag(key string) cmn.KVPair{
 	return cmn.KVPair{[]byte(Tag_key), []byte(key)}
 }
 
-func IndexSender(address []byte) cmn.KVPair{
-	return cmn.KVPair{[]byte(Tag_sender), address}
+func IndexSender(address string) cmn.KVPair{
+	return cmn.KVPair{[]byte(Tag_sender), []byte(address)}
 }
 
 func Qheight(heigth int64) string{
