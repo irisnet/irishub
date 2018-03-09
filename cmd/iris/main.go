@@ -8,7 +8,7 @@ import (
 	"github.com/tendermint/tmlibs/cli"
 
 	basecmd "github.com/cosmos/cosmos-sdk/server/commands"
-	"github.com/cosmos/gaia/version"
+	"github.com/irisnet/iris-hub/version"
 )
 
 // IrisCmd is the entry point for this binary
