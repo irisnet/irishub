@@ -27,8 +27,8 @@ Now initialize a iris-hub chain:
 iris node init $MYADDR --home=$HOME/.iris1 --chain-id=test 
 ```
 
-This will create all the files necessary to run a single node chain in `$HOME/.iris1`:
-a `config/priv_validator.json` file with the validators private key, and a `config/genesis.json` file 
+This will create all the files necessary to run a single node chain in `$HOME/.iris1／config`:
+a `priv_validator.json` file with the validators private key, and a `genesis.json` file 
 with the list of validators and accounts. In this case, we have one random validator,
 and `$MYADDR` is an independent account that has a bunch of coins.
 
