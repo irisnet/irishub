@@ -79,7 +79,7 @@ iris client init --chain-id=test --node=tcp://localhost:46657
 iris client query account $MYADDR
 ```
 
-Nice. We can also lookup the candidate set:
+Nice. We can also lookup the candidate/validator set:
 
 ```
 iris client query candidates
@@ -96,13 +96,13 @@ curl localhost:46657/validators
 Ok, let's add the second node as a validator. First, we need the pubkey data:
 
 ```
-cat $HOME/.iris2/priv_validator.json 
+cat $HOME/.iris2/config/priv_validator.json 
 ```
 
 If you have a json parser like `jq`, you can get just the pubkey:
 
 ```
-cat $HOME/.iris2/priv_validator.json | jq .pub_key.data
+cat $HOME/.iris2/config/priv_validator.json | jq .pub_key.data
 ```
 
 Now we can delegate some coins to that pubkey:
