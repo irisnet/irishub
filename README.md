@@ -171,12 +171,12 @@ iris client query account $MYADDR
 
 ```
 MYNAME1=<your name>
-gaia client keys new $MYNAME1
-gaia client keys list
+iris client keys new $MYNAME1
+iris client keys list
 MYADDR1=<your newly generated address>
-gaia client tx send --amount=1000fermion --to=$MYADDR1 --name=$MYNAME
-gaia client query $MYADDR1
-gaia client query $MYADDR
+iris client tx send --amount=1000fermion --to=$MYADDR1 --name=$MYNAME
+iris client query $MYADDR1
+iris client query $MYADDR
 ```
 
 也可以查询 candidate列表:
@@ -217,7 +217,7 @@ iris client query candidates
 也可以查询具体的validator信息
 
 ```
-gaia client query candidate --pubkey=<validator pubkey>
+iris client query candidate --pubkey=<validator pubkey>
 ```
 
 查询初始账户的变化，candidates页有变化：
@@ -229,7 +229,7 @@ iris client query candidates
 
 通过以下命令可以修改绑定的金额
 ```
-gaia client tx edit-candidacy --pubkey=<validator pubkey> --moniker=<new moniker> --name=$MYNAME
+iris client tx edit-candidacy --pubkey=<validator pubkey> --moniker=<new moniker> --name=$MYNAME
 ```
 通过unbond可将抵押的代币收回，你会发现账户余额增加了。
 
