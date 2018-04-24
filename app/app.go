@@ -17,10 +17,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
-	"github.com/irisnet/iris-hub/types"
 	"github.com/irisnet/iris-hub/modules/cool"
+	"github.com/irisnet/iris-hub/modules/iservice"
+	"github.com/irisnet/iris-hub/modules/iservice/bind"
+	"github.com/irisnet/iris-hub/modules/iservice/call"
+	"github.com/irisnet/iris-hub/modules/iservice/def"
 	"github.com/irisnet/iris-hub/modules/pow"
 	"github.com/irisnet/iris-hub/modules/sketchy"
+	"github.com/irisnet/iris-hub/types"
 )
 
 const (
@@ -38,7 +42,7 @@ type IrisApp struct {
 	capKeyPowStore     *sdk.KVStoreKey
 	capKeyIBCStore     *sdk.KVStoreKey
 	capKeyStakingStore *sdk.KVStoreKey
-	capKeyIrisStore *sdk.KVStoreKey
+	capKeyIrisStore    *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper sdk.AccountMapper
@@ -54,7 +58,7 @@ func NewIrisApp(logger log.Logger, dbs map[string]dbm.DB) *IrisApp {
 		capKeyPowStore:     sdk.NewKVStoreKey("pow"),
 		capKeyIBCStore:     sdk.NewKVStoreKey("ibc"),
 		capKeyStakingStore: sdk.NewKVStoreKey("stake"),
-		capKeyIrisStore: 	sdk.NewKVStoreKey("iris"),
+		capKeyIrisStore:    sdk.NewKVStoreKey("iris"),
 	}
 
 	// define the accountMapper
@@ -69,13 +73,16 @@ func NewIrisApp(logger log.Logger, dbs map[string]dbm.DB) *IrisApp {
 	powKeeper := pow.NewKeeper(app.capKeyPowStore, pow.NewPowConfig("pow", int64(1)), coinKeeper)
 	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
+
+	serviceRoute := iservice.NewIServiceRoute(app.capKeyIrisStore, coinKeeper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
 		AddRoute("cool", cool.NewHandler(coolKeeper)).
 		AddRoute("pow", powKeeper.Handler).
 		AddRoute("sketchy", sketchy.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
-		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper))
+		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper)).
+		AddRoute("iservice", iservice.NewIServiceHander(serviceRoute))
 
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
@@ -109,6 +116,9 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x7
 	const msgTypeBondMsg = 0x8
 	const msgTypeUnbondMsg = 0x9
+	const msgTypeSvcDef = 0x10
+	const msgTypeSvcBind = 0x11
+	const msgTypeSvcCall = 0x12
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -120,6 +130,9 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{ibc.IBCReceiveMsg{}, msgTypeIBCReceiveMsg},
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
+		oldwire.ConcreteType{def.SvcDefMsg{}, msgTypeSvcDef},
+		oldwire.ConcreteType{bind.SvcBindMsg{}, msgTypeSvcBind},
+		oldwire.ConcreteType{call.SvcReqMsg{}, msgTypeSvcCall},
 	)
 
 	const accTypeApp = 0x1

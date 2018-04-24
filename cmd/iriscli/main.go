@@ -13,21 +13,22 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 
-	"github.com/cosmos/cosmos-sdk/version"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/commands"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/commands"
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/commands"
 	simplestakingcmd "github.com/cosmos/cosmos-sdk/x/simplestake/commands"
 
 	"github.com/irisnet/iris-hub/app"
+	"github.com/irisnet/iris-hub/modules/iservice"
 	"github.com/irisnet/iris-hub/types"
+	"github.com/irisnet/iris-hub/version"
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
 		Use:   "iris_cli",
-		Short: "Democoin light-client",
+		Short: "iris-hub light-client",
 	}
 )
 
@@ -49,6 +50,7 @@ func main() {
 	rootCmd.AddCommand(client.LineBreak)
 
 	// add query/post commands (custom to binary)
+
 	// start with commands common to basecoin
 	rootCmd.AddCommand(
 		client.GetCommands(
@@ -79,10 +81,10 @@ func main() {
 		keys.Commands(),
 		client.LineBreak,
 		version.VersionCmd,
+		iservice.Commands(cdc),
 	)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "BC", os.ExpandEnv("$HOME/.iris-hub_cli"))
 	executor.Execute()
 }
-

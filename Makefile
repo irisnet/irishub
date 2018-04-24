@@ -1,4 +1,4 @@
-all: get_vendor_deps install test
+all: get_vendor_deps install
 
 get_vendor_deps:
 	@rm -rf vendor/
@@ -7,11 +7,7 @@ get_vendor_deps:
 	
 install:
 	go install ./cmd/iris
-
-test:
-	@go test `glide novendor`
-test_cli:
-	bash ./cmd/iris/sh_tests/stake.sh
+	go build ./cmd/iriscli
 
 build_linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \

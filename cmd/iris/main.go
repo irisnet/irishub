@@ -72,11 +72,11 @@ func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
 		return nil, err
 	}
 	dbs := map[string]dbm.DB{
-		"main":    dbMain,
-		"acc":     dbAcc,
-		"pow":     dbPow,
-		"ibc":     dbIBC,
-		"staking": dbStaking,
+		"main":     dbMain,
+		"acc":      dbAcc,
+		"pow":      dbPow,
+		"ibc":      dbIBC,
+		"staking":  dbStaking,
 		"iservice": dbIris,
 	}
 	bapp := app.NewIrisApp(logger, dbs)
