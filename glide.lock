@@ -46,8 +46,8 @@ imports:
   - stack
   - state
   - version
-- name: github.com/cosmos/gaia
-  version: 2ac7ed920446ef8edf582c2b3e890cb7676a7d77
+- name: github.com/MrXJC/gaia
+  version: develop
   subpackages:
   - modules/stake
   - modules/stake/commands

@@ -1,6 +1,6 @@
 package: github.com/irisnet/iris-hub
 import:
-- package: github.com/cosmos/gaia
+- package: github.com/MrXJC/gaia
   version: develop
 - package: github.com/cosmos/cosmos-sdk
   version: tm-develop
