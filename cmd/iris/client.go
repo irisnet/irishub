@@ -18,7 +18,7 @@ import (
 	noncecmd "github.com/cosmos/cosmos-sdk/modules/nonce/commands"
 	rolecmd "github.com/cosmos/cosmos-sdk/modules/roles/commands"
 
-	stakecmd "github.com/cosmos/gaia/modules/stake/commands"
+	stakecmd "github.com/MrXJC/gaia/modules/stake/commands"
 )
 
 // clientCmd is the entry point for this binary

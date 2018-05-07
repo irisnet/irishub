@@ -17,7 +17,7 @@ import (
 	noncerest "github.com/cosmos/cosmos-sdk/modules/nonce/rest"
 	rolerest "github.com/cosmos/cosmos-sdk/modules/roles/rest"
 
-	stakerest "github.com/cosmos/gaia/modules/stake/rest"
+	stakerest "github.com/MrXJC/gaia/modules/stake/rest"
 )
 
 const defaultAlgo = "ed25519"
