@@ -17,7 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/stack"
 	"github.com/cosmos/cosmos-sdk/state"
 
-	"github.com/cosmos/gaia/modules/stake"
+	"github.com/MrXJC/gaia/modules/stake"
 )
 
 // nodeCmd is the entry point for this binary
