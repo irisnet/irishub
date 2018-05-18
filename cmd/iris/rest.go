@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/commands"
 	rest "github.com/cosmos/cosmos-sdk/client/rest"
+	restTxs "github.com/irisnet/iris-hub/module/rest-txs"
 	byteTx "github.com/irisnet/iris-hub/rest"
 	coinrest "github.com/cosmos/cosmos-sdk/modules/coin/rest"
 	noncerest "github.com/cosmos/cosmos-sdk/modules/nonce/rest"
@@ -48,7 +49,7 @@ func cmdRestServer(cmd *cobra.Command, args []string) error {
 	keyMan := client.GetKeyManager(rootDir)
 	serviceKeys := rest.NewServiceKeys(keyMan)
 	serviceByteTx := byteTx.NewServiceByteTx(keyMan)
-	serviceTxs := rest.NewServiceTxs(commands.GetNode())
+	serviceTxs := restTxs.NewServiceTxs(commands.GetNode())
 
 	routeRegistrars := []func(*mux.Router) error{
 		// rest.Keys handlers
