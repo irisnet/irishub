@@ -24,17 +24,33 @@
   packages = [
     "baseapp",
     "client",
+    "client/context",
     "client/keys",
+    "client/lcd",
+    "client/rpc",
+    "client/tx",
+    "cmd/gaia/app",
     "server",
     "store",
+    "tests",
     "types",
     "version",
     "wire",
     "x/auth",
+    "x/auth/client/cli",
+    "x/auth/client/rest",
     "x/bank",
+    "x/bank/client",
+    "x/bank/client/cli",
+    "x/bank/client/rest",
     "x/ibc",
+    "x/ibc/client/cli",
+    "x/ibc/client/rest",
     "x/slashing",
-    "x/stake"
+    "x/slashing/client/cli",
+    "x/stake",
+    "x/stake/client/cli",
+    "x/stake/client/rest"
   ]
   revision = "c6711810a86f09457481a8dadae899681a9d77ab"
   version = "v0.19.0"
@@ -484,6 +500,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8bb2c430ca1f86651661bfccd474cff8b594876be7268465f2b824ca0bc39928"
+  inputs-digest = "3e90727f4dd22c1de13c7e6e4ee0ab208aecde458013a8007e7d5bbddb242d50"
   solver-name = "gps-cdcl"
   solver-version = 1
