@@ -1,4 +1,4 @@
-package cmd
+package app
 
 import (
 	"encoding/json"
@@ -21,17 +21,17 @@ import (
 )
 
 const (
-	appName = "GaiaApp"
+	appName = "IrisApp"
 )
 
 // default home directories for expected binaries
 var (
-	DefaultCLIHome  = os.ExpandEnv("$HOME/.gaiacli")
-	DefaultNodeHome = os.ExpandEnv("$HOME/.gaiad")
+	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 )
 
 // Extended ABCI application
-type GaiaApp struct {
+type IrisApp struct {
 	*bam.BaseApp
 	cdc *wire.Codec
 
@@ -51,11 +51,11 @@ type GaiaApp struct {
 	slashingKeeper      slashing.Keeper
 }
 
-func NewGaiaApp(logger log.Logger, db dbm.DB) *GaiaApp {
+func NewIrisApp(logger log.Logger, db dbm.DB) *IrisApp {
 	cdc := MakeCodec()
 
 	// create your application object
-	var app = &GaiaApp{
+	var app = &IrisApp{
 		BaseApp:     bam.NewBaseApp(appName, cdc, logger, db),
 		cdc:         cdc,
 		keyMain:     sdk.NewKVStoreKey("main"),
@@ -113,7 +113,7 @@ func MakeCodec() *wire.Codec {
 }
 
 // application updates every end block
-func (app *GaiaApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
 
 	return abci.ResponseBeginBlock{
@@ -122,7 +122,7 @@ func (app *GaiaApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 }
 
 // application updates every end block
-func (app *GaiaApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
 	return abci.ResponseEndBlock{
@@ -131,7 +131,7 @@ func (app *GaiaApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 }
 
 // custom logic for gaia initialization
-func (app *GaiaApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 	// TODO is this now the whole genesis file?
 
@@ -156,7 +156,7 @@ func (app *GaiaApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 }
 
 // export the state of gaia for a genesis file
-func (app *GaiaApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
 
 	// iterate to get the accounts

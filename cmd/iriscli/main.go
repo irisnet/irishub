@@ -14,7 +14,7 @@ import (
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
-	app "github.com/irisnet/iris-hub/cmd"
+	"github.com/irisnet/iris-hub/app"
 	"github.com/irisnet/iris-hub/version"
 )
 
