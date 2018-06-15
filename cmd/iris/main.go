@@ -10,9 +10,8 @@ import (
 	"github.com/tendermint/tmlibs/cli"
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
-
 	"github.com/cosmos/cosmos-sdk/server"
-	app "github.com/irisnet/iris-hub/cmd"
+	"github.com/irisnet/iris-hub/app"
 )
 
 func main() {
@@ -20,25 +19,25 @@ func main() {
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
-		Use:               "gaiad",
-		Short:             "Gaia Daemon (server)",
+		Use:               "iris",
+		Short:             "iris Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
 	server.AddCommands(ctx, cdc, rootCmd, app.GaiaAppInit(),
-		server.ConstructAppCreator(newApp, "gaia"),
-		server.ConstructAppExporter(exportAppStateAndTMValidators, "gaia"))
+		server.ConstructAppCreator(newApp, "iris"),
+		server.ConstructAppExporter(exportAppStateAndTMValidators, "iris"))
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "GA", app.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	executor.Execute()
 }
 
 func newApp(logger log.Logger, db dbm.DB) abci.Application {
-	return app.NewGaiaApp(logger, db)
+	return app.NewIrisApp(logger, db)
 }
 
 func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	gapp := app.NewGaiaApp(logger, db)
-	return gapp.ExportAppStateAndValidators()
+	irisApp := app.NewIrisApp(logger, db)
+	return irisApp.ExportAppStateAndValidators()
 }
