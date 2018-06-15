@@ -54,10 +54,13 @@ var (
 	flagName       = "name"
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
+	denom          = "iris"
+
 
 	// bonded tokens given to genesis validators/accounts
 	freeFermionVal  = int64(100)
-	freeFermionsAcc = int64(50)
+
+	totalTokenAmt 	= int64(200000000)
 )
 
 // get app init parameters for server init command
@@ -73,8 +76,8 @@ func GaiaAppInit() server.AppInit {
 	return server.AppInit{
 		FlagsAppGenState: fsAppGenState,
 		FlagsAppGenTx:    fsAppGenTx,
-		AppGenTx:         GaiaAppGenTx,
-		AppGenState:      GaiaAppGenStateJSON,
+		AppGenTx:         IrisAppGenTx,
+		AppGenState:      IrisAppGenStateJSON,
 	}
 }
 
@@ -86,7 +89,7 @@ type GaiaGenTx struct {
 }
 
 // Generate a gaia genesis transaction with flags
-func GaiaAppGenTx(cdc *wire.Codec, pk crypto.PubKey) (
+func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 	clientRoot := viper.GetString(flagClientHome)
 	overwrite := viper.GetBool(flagOWK)
@@ -108,12 +111,12 @@ func GaiaAppGenTx(cdc *wire.Codec, pk crypto.PubKey) (
 		return
 	}
 	cliPrint = json.RawMessage(bz)
-	appGenTx,_,validator,err = GaiaAppGenTxNF(cdc, pk, addr, name, overwrite)
+	appGenTx,_,validator,err = IrisAppGenTxNF(cdc, pk, addr, name, overwrite)
 	return
 }
 
 // Generate a gaia genesis transaction without flags
-func GaiaAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.Address, name string, overwrite bool) (
+func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.Address, name string, overwrite bool) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	var bz []byte
@@ -137,7 +140,7 @@ func GaiaAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.Address, name st
 
 // Create the core parameters for genesis initialization for gaia
 // note that the pubkey input is this machines pubkey
-func GaiaAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState GenesisState, err error) {
+func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState GenesisState, err error) {
 
 	if len(appGenTxs) == 0 {
 		err = errors.New("must provide at least genesis transaction")
@@ -145,7 +148,8 @@ func GaiaAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 	}
 
 	// start with the default staking genesis state
-	stakeData := stake.DefaultGenesisState()
+	//stakeData := stake.DefaultGenesisState()
+	stakeData := createGenesisState()
 
 	// get genesis flag account information
 	genaccs := make([]GenesisAccount, len(appGenTxs))
@@ -160,12 +164,11 @@ func GaiaAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		// create the genesis account, give'm few steaks and a buncha token with there name
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
-			{genTx.Name + "Token", 1000},
-			{"steak", freeFermionsAcc},
+			{denom, totalTokenAmt},
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
-		stakeData.Pool.LooseUnbondedTokens += freeFermionsAcc // increase the supply
+		stakeData.Pool.LooseUnbondedTokens += totalTokenAmt // increase the supply
 
 		// add the validator
 		if len(genTx.Name) > 0 {
@@ -188,14 +191,41 @@ func GaiaAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 	return
 }
 
-// GaiaAppGenState but with JSON
-func GaiaAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
+// IrisAppGenState but with JSON
+func IrisAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
 
 	// create the final app state
-	genesisState, err := GaiaAppGenState(cdc, appGenTxs)
+	genesisState, err := IrisAppGenState(cdc, appGenTxs)
 	if err != nil {
 		return nil, err
 	}
 	appState, err = wire.MarshalJSONIndent(cdc, genesisState)
 	return
+}
+
+// TODO
+func createGenesisState() stake.GenesisState{
+	return stake.GenesisState{
+		Pool:   stake.Pool{
+			LooseUnbondedTokens:     0,
+			BondedTokens:            0,
+			UnbondingTokens:         0,
+			UnbondedTokens:          0,
+			BondedShares:            sdk.ZeroRat(),
+			UnbondingShares:         sdk.ZeroRat(),
+			UnbondedShares:          sdk.ZeroRat(),
+			InflationLastTime:       0,
+			Inflation:               sdk.NewRat(7, 100),
+			DateLastCommissionReset: 0,
+			PrevBondedShares:        sdk.ZeroRat(),
+		},
+		Params: stake.Params{
+			InflationRateChange: sdk.NewRat(13, 100),
+			InflationMax:        sdk.NewRat(20, 100),
+			InflationMin:        sdk.NewRat(7, 100),
+			GoalBonded:          sdk.NewRat(67, 100),
+			MaxValidators:       100,
+			BondDenom:           denom,
+		},
+	}
 }

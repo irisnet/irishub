@@ -15,4 +15,4 @@ build_linux:
 
 build_cur:
 	go build -o build/iris ./cmd/iris  && \
-	go build -o build/iris_cli ./cmd/iriscli
+	go build -o build/iriscli ./cmd/iriscli

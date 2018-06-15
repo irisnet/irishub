@@ -21,7 +21,7 @@ import (
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "iris_cli",
+		Use:   "iriscli",
 		Short: "iris-hub light-client",
 	}
 )
@@ -117,6 +117,6 @@ func main() {
 	)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "IRIS", app.DefaultCLIHome)
 	executor.Execute()
 }
