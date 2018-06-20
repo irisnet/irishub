@@ -1,8 +1,8 @@
-# Iris-Hub
+# irishub
 Iris Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 ## 下载发行版安装
- * 进入下载页: https://github.com/irisnet/iris-hub/releases/tag/0.1.0
+ * 进入下载页: https://github.com/irisnet/irishub/releases/tag/0.1.0
  * 下载对应版本的可执行文件
  * 解压缩`tar -C /usr/local -xzf iris$VERSION.$OS-$ARCH.zip`
  * 拷贝到`/usr/local/`目录下
@@ -85,8 +85,8 @@ hello
 
 ## 安装步骤
 ```
-go get github.com/irisnet/iris-hub
-cd $GOPATH/src/github.com/irisnet/iris-hub
+go get github.com/irisnet/irishub
+cd $GOPATH/src/github.com/irisnet/irishub
 make all
 iris version
 ```
@@ -105,7 +105,7 @@ iris client keys new $MYNAME
 iris client keys list
 MYADDR=<your newly generated address>
 ```
-2. 初始化iris-hub:
+2. 初始化irishub:
 
 ```
 iris node init $MYADDR --home=$HOME/.iris1 --chain-id=test 

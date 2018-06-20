@@ -13,15 +13,15 @@ import (
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
-	"github.com/irisnet/iris-hub/app"
-	"github.com/irisnet/iris-hub/version"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/version"
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
 		Use:   "iriscli",
-		Short: "iris-hub light-client",
+		Short: "irishub light-client",
 	}
 )
 
