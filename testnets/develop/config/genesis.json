@@ -1,38 +1,8 @@
 {
-  "chain_id": "fuxi-develop",
-  "genesis_time": "2018-06-20T22:39:44.742488+08:00",
-  "consensus_params": {
-    "block_size_params": {
-      "max_bytes": 22020096,
-      "max_txs": 100000,
-      "max_gas": -1
-    },
-    "tx_size_params": {
-      "max_bytes": 10240,
-      "max_gas": -1
-    },
-    "block_gossip_params": {
-      "block_part_size_bytes": 65536
-    },
-    "evidence_params": {
-      "max_age": 100000
-    }
-  },
-  "validators": [
-    {
-      "pub_key": {
-        "type": "AC26791624DE60",
-        "value": "zh8afqExhzuqUeSqd8APwGnYYgOiQ0kLMCT53acKwoQ="
-      },
-      "power": 100,
-      "name": ""
-    }
-  ],
-  "app_hash": "",
   "app_state": {
     "accounts": [
       {
-        "address": "811410FC668643F7CBB1ED544DB0FB8738F57BEA",
+        "address": "7E8CDBA5F5973D6996DF39C84D3A82A6A11CCEFB",
         "coins": [
           {
             "denom": "iris",
@@ -69,10 +39,10 @@
       },
       "validators": [
         {
-          "owner": "811410FC668643F7CBB1ED544DB0FB8738F57BEA",
+          "owner": "7E8CDBA5F5973D6996DF39C84D3A82A6A11CCEFB",
           "pub_key": {
             "type": "AC26791624DE60",
-            "value": "zh8afqExhzuqUeSqd8APwGnYYgOiQ0kLMCT53acKwoQ="
+            "value": "DOF6e3lo7XwtGzGZs0RVQTkrPg2i19NiCdkoQg3wxDs="
           },
           "revoked": false,
           "pool_shares": {
@@ -98,5 +68,35 @@
       ],
       "bonds": null
     }
-  }
+  },
+  "chain_id": "fuxi-develop",
+  "consensus_params": {
+    "block_size_params": {
+      "max_bytes": 22020096,
+      "max_txs": 100000,
+      "max_gas": -1
+    },
+    "tx_size_params": {
+      "max_bytes": 10240,
+      "max_gas": -1
+    },
+    "block_gossip_params": {
+      "block_part_size_bytes": 65536
+    },
+    "evidence_params": {
+      "max_age": 100000
+    }
+  },
+  "validators": [
+    {
+      "pub_key": {
+        "type": "AC26791624DE60",
+        "value": "DOF6e3lo7XwtGzGZs0RVQTkrPg2i19NiCdkoQg3wxDs="
+      },
+      "power": 100,
+      "name": ""
+    }
+  ],
+  "app_hash": "",
+  "genesis_time": "2018-06-20T22:52:04.66882+08:00"
 }
