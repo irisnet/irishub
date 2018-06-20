@@ -7,7 +7,7 @@ get_vendor_deps:
 
 install:
 	go install ./cmd/iris
-	go build ./cmd/iriscli
+	go install ./cmd/iriscli
 
 build_linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
