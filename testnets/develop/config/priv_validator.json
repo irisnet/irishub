@@ -1,14 +1,14 @@
 {
-  "address": "0760AE8E77A592F25216BE02D25DBAEDAB0F3B8D",
+  "address": "ED090454E2F2C9162BFEC8DF5575A36669FE8795",
   "pub_key": {
     "type": "AC26791624DE60",
-    "value": "26EDlJj+Jie78gtKZZrqgU1kXPbyUJh4ISuq42OSpEs="
+    "value": "uEPy5Z/i0Pex4fI/2b/O+pM8ABzAx9WNXCxWzfUqiGI="
   },
   "last_height": 0,
   "last_round": 0,
   "last_step": 0,
   "priv_key": {
     "type": "954568A3288910",
-    "value": "PXeMbgX6/atwu2XSpwi9Avtzlh2x7b4kzS9YIc4OqtTboQOUmP4mJ7vyC0plmuqBTWRc9vJQmHghK6rjY5KkSw=="
+    "value": "Aztt+aKxxGEZuyS3W5g1qXpbAYt5b2N82r8KhXkSi0y4Q/Lln+LQ97Hh8j/Zv876kzwAHMDH1Y1cLFbN9SqIYg=="
   }
 }
