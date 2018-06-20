@@ -1,6 +1,6 @@
 {
   "app_hash": "",
-  "genesis_time": "2018-06-20T23:18:44.402001+08:00",
+  "genesis_time": "2018-06-20T23:34:15.721008+08:00",
   "chain_id": "fuxi-develop",
   "consensus_params": {
     "block_size_params": {
@@ -19,20 +19,10 @@
       "max_age": 100000
     }
   },
-  "validators": [
-    {
-      "pub_key": {
-        "type": "AC26791624DE60",
-        "value": "uEPy5Z/i0Pex4fI/2b/O+pM8ABzAx9WNXCxWzfUqiGI="
-      },
-      "power": 100,
-      "name": ""
-    }
-  ],
   "app_state": {
     "accounts": [
       {
-        "address": "D16CD25DB283833178E39CDA54D6C949E9A25554",
+        "address": "507405661F2DB1940941FA0A6B3642015A015387",
         "coins": [
           {
             "denom": "iris",
@@ -69,10 +59,10 @@
       },
       "validators": [
         {
-          "owner": "D16CD25DB283833178E39CDA54D6C949E9A25554",
+          "owner": "507405661F2DB1940941FA0A6B3642015A015387",
           "pub_key": {
             "type": "AC26791624DE60",
-            "value": "uEPy5Z/i0Pex4fI/2b/O+pM8ABzAx9WNXCxWzfUqiGI="
+            "value": "CJj2r5sGJ0jn8maLpEiFYeYctyjGNskD4tW6Daz/fVk="
           },
           "revoked": false,
           "pool_shares": {
@@ -98,5 +88,15 @@
       ],
       "bonds": null
     }
-  }
+  },
+  "validators": [
+    {
+      "pub_key": {
+        "type": "AC26791624DE60",
+        "value": "CJj2r5sGJ0jn8maLpEiFYeYctyjGNskD4tW6Daz/fVk="
+      },
+      "power": 100,
+      "name": ""
+    }
+  ]
 }
