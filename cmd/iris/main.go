@@ -11,7 +11,7 @@ import (
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/irisnet/iris-hub/app"
+	"github.com/irisnet/irishub/app"
 )
 
 func main() {
