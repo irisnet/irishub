@@ -11,7 +11,8 @@ import (
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/irisnet/iris-hub/app"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/version"
 )
 
 func main() {
@@ -28,6 +29,8 @@ func main() {
 		server.ConstructAppCreator(newApp, "iris"),
 		server.ConstructAppExporter(exportAppStateAndTMValidators, "iris"))
 
+
+	rootCmd.AddCommand(version.VersionCmd)
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	executor.Execute()
