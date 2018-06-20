@@ -10,6 +10,7 @@ import (
 	"github.com/tendermint/tmlibs/cli"
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
@@ -25,12 +26,29 @@ func main() {
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
-	server.AddCommands(ctx, cdc, rootCmd, app.GaiaAppInit(),
-		server.ConstructAppCreator(newApp, "iris"),
-		server.ConstructAppExporter(exportAppStateAndTMValidators, "iris"))
+	rootCmd.PersistentFlags().String("log_level", ctx.Config.LogLevel, "Log level")
 
+	tendermintCmd := &cobra.Command{
+		Use:   "tendermint",
+		Short: "Tendermint subcommands",
+	}
 
-	rootCmd.AddCommand(version.VersionCmd)
+	tendermintCmd.AddCommand(
+		server.ShowNodeIDCmd(ctx),
+		server.ShowValidatorCmd(ctx),
+	)
+
+	rootCmd.AddCommand(
+		server.InitCmd(ctx, cdc, app.GaiaAppInit()),
+		server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris")),
+		server.UnsafeResetAllCmd(ctx),
+		client.LineBreak,
+		tendermintCmd,
+		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
+		client.LineBreak,
+		version.VersionCmd,
+	)
+
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	executor.Execute()
