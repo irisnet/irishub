@@ -2,7 +2,7 @@
   "app_state": {
     "accounts": [
       {
-        "address": "7E8CDBA5F5973D6996DF39C84D3A82A6A11CCEFB",
+        "address": "167BCF028628A90E4DAC4CCF7F346782F1FD8995",
         "coins": [
           {
             "denom": "iris",
@@ -39,10 +39,10 @@
       },
       "validators": [
         {
-          "owner": "7E8CDBA5F5973D6996DF39C84D3A82A6A11CCEFB",
+          "owner": "167BCF028628A90E4DAC4CCF7F346782F1FD8995",
           "pub_key": {
             "type": "AC26791624DE60",
-            "value": "DOF6e3lo7XwtGzGZs0RVQTkrPg2i19NiCdkoQg3wxDs="
+            "value": "26EDlJj+Jie78gtKZZrqgU1kXPbyUJh4ISuq42OSpEs="
           },
           "revoked": false,
           "pool_shares": {
@@ -91,12 +91,12 @@
     {
       "pub_key": {
         "type": "AC26791624DE60",
-        "value": "DOF6e3lo7XwtGzGZs0RVQTkrPg2i19NiCdkoQg3wxDs="
+        "value": "26EDlJj+Jie78gtKZZrqgU1kXPbyUJh4ISuq42OSpEs="
       },
       "power": 100,
       "name": ""
     }
   ],
   "app_hash": "",
-  "genesis_time": "2018-06-20T22:52:04.66882+08:00"
+  "genesis_time": "2018-06-20T23:13:03.472182+08:00"
 }
