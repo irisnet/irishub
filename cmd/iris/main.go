@@ -1,50 +1,43 @@
 package main
 
 import (
-	"os"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 
+	abci "github.com/tendermint/abci/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/tendermint/tmlibs/cli"
-
-	basecmd "github.com/cosmos/cosmos-sdk/server/commands"
-	"github.com/irisnet/iris-hub/version"
-)
-
-// IrisCmd is the entry point for this binary
-var (
-	IrisCmd = &cobra.Command{
-		Use:   "iris",
-		Short: "IRIS Hub - a regional Cosmos Hub with a powerful iService infrastructure",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
-		},
-	}
-
-	lineBreak = &cobra.Command{Run: func(*cobra.Command, []string) {}}
+	dbm "github.com/tendermint/tmlibs/db"
+	"github.com/tendermint/tmlibs/log"
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/iris-hub/app"
 )
 
 func main() {
-	// disable sorting
+	cdc := app.MakeCodec()
+	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
+	rootCmd := &cobra.Command{
+		Use:               "iris",
+		Short:             "iris Daemon (server)",
+		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
+	}
 
-	// add commands
-	prepareNodeCommands()
-	prepareRestServerCommands()
-	prepareClientCommands()
-
-	IrisCmd.AddCommand(
-		nodeCmd,
-		restServerCmd,
-		clientCmd,
-
-		lineBreak,
-		version.VersionCmd,
-		//auto.AutoCompleteCmd,
-	)
+	server.AddCommands(ctx, cdc, rootCmd, app.GaiaAppInit(),
+		server.ConstructAppCreator(newApp, "iris"),
+		server.ConstructAppExporter(exportAppStateAndTMValidators, "iris"))
 
 	// prepare and add flags
-	basecmd.SetUpRoot(IrisCmd)
-	executor := cli.PrepareMainCmd(IrisCmd, "GA", os.ExpandEnv("$HOME/.iris-cli"))
+	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	executor.Execute()
+}
+
+func newApp(logger log.Logger, db dbm.DB) abci.Application {
+	return app.NewIrisApp(logger, db)
+}
+
+func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB) (json.RawMessage, []tmtypes.GenesisValidator, error) {
+	irisApp := app.NewIrisApp(logger, db)
+	return irisApp.ExportAppStateAndValidators()
 }
