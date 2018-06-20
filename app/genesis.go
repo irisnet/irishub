@@ -149,7 +149,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 	// start with the default staking genesis state
 	//stakeData := stake.DefaultGenesisState()
-	stakeData := createGenesisState()
+	stakeData := stake.DefaultGenesisState()
 
 	// get genesis flag account information
 	genaccs := make([]GenesisAccount, len(appGenTxs))
@@ -165,10 +165,11 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
 			{denom, totalTokenAmt},
+			{"steak", freeFermionVal},
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
-		stakeData.Pool.LooseUnbondedTokens += totalTokenAmt // increase the supply
+		stakeData.Pool.LooseUnbondedTokens += freeFermionVal // increase the supply
 
 		// add the validator
 		if len(genTx.Name) > 0 {
@@ -225,7 +226,7 @@ func createGenesisState() stake.GenesisState{
 			InflationMin:        sdk.NewRat(7, 100),
 			GoalBonded:          sdk.NewRat(67, 100),
 			MaxValidators:       100,
-			BondDenom:           denom,
+			BondDenom:           "steak",
 		},
 	}
 }
