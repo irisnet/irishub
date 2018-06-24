@@ -11,6 +11,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/tendermint/go-crypto"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/pkg/errors"
 )
 
 
@@ -20,7 +23,8 @@ func RegisterRoutes(ctx context.CoreContext, r *mux.Router, cdc *wire.Codec, kb 
 
 
 type sendTx struct {
-	Msg        bank.MsgSend    `json:"msg"`
+	Msg        string    	   `json:"msg"`
+	MsgType    string          `json:"type"`
 	Fee        auth.StdFee     `json:"fee"`
 	Signatures []StdSignature  `json:"signatures"`
 }
@@ -55,8 +59,16 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx context.CoreCo
 			sig[index].AccountNumber =s.AccountNumber
 			sig[index].Sequence = s.Sequence
 		}
+
+		msg,err := convertMsg(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
 		var stdTx = auth.StdTx{
-			Msg:tx.Msg,
+			Msg:msg,
 			Fee:tx.Fee,
 			Signatures:sig,
 		}
@@ -78,4 +90,31 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx context.CoreCo
 
 		w.Write(output)
 	}
+}
+
+func convertMsg(tx sendTx) (sdk.Msg,error){
+	data := []byte(tx.Msg)
+	switch tx.MsgType {
+	case "transfer":{
+		var msg bank.MsgSend
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil,err
+		}
+		return msg,nil
+	}
+	case "delegate":
+		var msg stake.MsgDelegate
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil,err
+		}
+		return msg,nil
+	case "unbond":
+		var msg stake.MsgUnbond
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil,err
+		}
+		return msg,nil
+	}
+
+	return nil,errors.New("invalid message type")
 }
