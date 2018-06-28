@@ -39,7 +39,7 @@ func main() {
 	)
 
 	rootCmd.AddCommand(
-		server.InitCmd(ctx, cdc, app.GaiaAppInit()),
+		server.InitCmd(ctx, cdc, app.IrisAppInit()),
 		server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris")),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,

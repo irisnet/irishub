@@ -64,7 +64,7 @@ var (
 )
 
 // get app init parameters for server init command
-func GaiaAppInit() server.AppInit {
+func IrisAppInit() server.AppInit {
 	fsAppGenState := pflag.NewFlagSet("", pflag.ContinueOnError)
 
 	fsAppGenTx := pflag.NewFlagSet("", pflag.ContinueOnError)
@@ -82,7 +82,7 @@ func GaiaAppInit() server.AppInit {
 }
 
 // simple genesis tx
-type GaiaGenTx struct {
+type IrisGenTx struct {
 	Name    string        `json:"name"`
 	Address sdk.Address   `json:"address"`
 	PubKey  crypto.PubKey `json:"pub_key"`
@@ -120,7 +120,7 @@ func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.Address, name st
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	var bz []byte
-	gaiaGenTx := GaiaGenTx{
+	gaiaGenTx := IrisGenTx{
 		Name:    name,
 		Address: addr,
 		PubKey:  pk,
@@ -155,7 +155,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 	genaccs := make([]GenesisAccount, len(appGenTxs))
 	for i, appGenTx := range appGenTxs {
 
-		var genTx GaiaGenTx
+		var genTx IrisGenTx
 		err = cdc.UnmarshalJSON(appGenTx, &genTx)
 		if err != nil {
 			return
