@@ -17,7 +17,7 @@ import (
 	keys "github.com/cosmos/cosmos-sdk/client/keys"
 	rpc "github.com/cosmos/cosmos-sdk/client/rpc"
 	tx "github.com/cosmos/cosmos-sdk/client/tx"
-	version "github.com/cosmos/cosmos-sdk/version"
+	version "github.com/irisnet/irishub/version"
 	"github.com/cosmos/cosmos-sdk/wire"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
