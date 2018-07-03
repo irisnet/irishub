@@ -4,7 +4,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"encoding/json"
 	"github.com/tendermint/go-crypto/keys"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"net/http"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -14,12 +13,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/pkg/errors"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/irisnet/irishub/app"
 )
 
 
-func RegisterRoutes(ctx context.CoreContext, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
+func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
 	r.HandleFunc("/tx/send", SendTxRequestHandlerFn(cdc, kb, ctx)).Methods("POST")
 }
 
@@ -39,7 +37,7 @@ type StdSignature struct {
 }
 
 //send traction(sign with rainbow) to irishub
-func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx context.CoreContext) http.HandlerFunc {
+func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var tx sendTx
 		body, err := ioutil.ReadAll(r.Body)
@@ -76,7 +74,7 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx context.CoreCo
 		}
 		txByte,_ := cdc.MarshalBinary(stdTx)
 		// send
-		res, err := BroadcastTxAsync(ctx,txByte)
+		res, err := ctx.BroadcastTxAsync(txByte)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -119,22 +117,4 @@ func convertMsg(tx sendTx) (sdk.Msg,error){
 	}
 
 	return nil,errors.New("invalid message type")
-}
-
-func BroadcastTxAsync(ctx context.CoreContext,tx []byte)(*ctypes.ResultBroadcastTx, error) {
-	nodeURI := ctx.NodeURI
-	if nodeURI == "" {
-		return nil, errors.New("rpc url is empty")
-	}
-
-	var rpc rpcclient.Client
-	if nodeURI != "" {
-		rpc = rpcclient.NewHTTP(nodeURI, "/websocket")
-	}
-
-	res, err := rpc.BroadcastTxAsync(tx)
-	if err != nil {
-		return res, err
-	}
-	return res, err
 }
