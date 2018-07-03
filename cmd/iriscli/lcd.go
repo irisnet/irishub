@@ -12,17 +12,17 @@ import (
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
 	cmn "github.com/tendermint/tmlibs/common"
 
-	client "github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	keys "github.com/cosmos/cosmos-sdk/client/keys"
-	rpc "github.com/cosmos/cosmos-sdk/client/rpc"
-	tx "github.com/cosmos/cosmos-sdk/client/tx"
-	version "github.com/irisnet/irishub/version"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/irisnet/irishub/version"
 	"github.com/cosmos/cosmos-sdk/wire"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/client/rest"
 	stake "github.com/cosmos/cosmos-sdk/x/stake/client/rest"
+	"github.com/irisnet/irishub/app"
 )
 
 // ServeCommand will generate a long-running rest server
@@ -70,16 +70,16 @@ func createHandler(cdc *wire.Codec) http.Handler {
 		panic(err)
 	}
 
-	ctx := context.NewCoreContextFromViper()
+	ctx := app.NewContext()
 
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)
 	keys.RegisterRoutes(r)
-	rpc.RegisterRoutes(ctx, r)
-	tx.RegisterRoutes(ctx, r, cdc)
-	auth.RegisterRoutes(ctx, r, cdc, "acc")
-	bank.RegisterRoutes(ctx, r, cdc, kb)
-	ibc.RegisterRoutes(ctx, r, cdc, kb)
-	stake.RegisterRoutes(ctx, r, cdc, kb)
+	rpc.RegisterRoutes(ctx.GetCosmosCtx(), r)
+	tx.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc)
+	auth.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, "acc")
+	bank.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
+	ibc.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
+	stake.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
 	RegisterRoutes(ctx,r,cdc,kb)
 	return r
 }
