@@ -13,6 +13,10 @@ func (c Context) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx, error) 
 	return c.ctx.Client.BroadcastTxAsync(tx)
 }
 
+func (c Context) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
+	return c.ctx.Client.BroadcastTxSync(tx)
+}
+
 func (c Context) GetCosmosCtx() (context.CoreContext) {
 	return c.ctx
 }
