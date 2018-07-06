@@ -15,6 +15,7 @@ import (
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
+	"github.com/irisnet/irishub/tools/prometheus"
 )
 
 // rootCmd is the entry point for this binary
@@ -114,6 +115,8 @@ func main() {
 		client.LineBreak,
 		version.VersionCmd,
 	)
+
+	rootCmd.AddCommand(prometheus.MonitorCommand("stake", cdc))
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "IRIS", app.DefaultCLIHome)
