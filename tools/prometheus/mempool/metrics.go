@@ -4,6 +4,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	tools "github.com/irisnet/irishub/tools"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -22,4 +23,9 @@ func PrometheusMetrics() *Metrics {
 			Help:      "Size of the mempool (number of uncommitted transactions).",
 		}, []string{}),
 	}
+}
+
+func (m *Metrics )Monitor(rpc tools.Context){
+	result := rpc.NumUnconfirmedTxs()
+	m.Size.Set(float64(result.N))
 }
