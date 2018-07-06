@@ -4,6 +4,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	tools "github.com/irisnet/irishub/tools"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -21,4 +22,9 @@ func PrometheusMetrics() *Metrics {
 			Help:      "Number of peers.",
 		}, []string{}),
 	}
+}
+
+func (m *Metrics) Monitor(ctx tools.Context){
+	result := ctx.NetInfo()
+	m.Peers.Set(float64(result.NPeers))
 }
