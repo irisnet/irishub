@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
 	"github.com/irisnet/irishub/tools/prometheus/consensus"
+	sys "github.com/programokey/irishub/tools/prometheus/system"
 )
 
 
@@ -18,11 +19,15 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//TODO
-			csMetrics,_,_ := DefaultMetricsProvider()
+			csMetrics,_,_ , sysMertrics:= DefaultMetricsProvider()
 			ctx := context.NewCoreContextFromViper()
 
 			//监控共识参数
 			consensus.Monitor(ctx,*csMetrics,cdc,storeName)
+
+			//monitor system info, first parameter is the command of the process to be monitor
+			// and the second parameter is the directory that you want to get total size of its' files
+			sys.Monitor("irishub", "/", sysMertrics)
 
 			srv := &http.Server{
 				Addr:    ":26660",
