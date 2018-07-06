@@ -14,22 +14,26 @@ import ("testing"
 	"log"
 	"os"
 	"encoding/hex"
+	"github.com/irisnet/irishub/tools/prometheus"
 )
 
 func TestRestServer(t *testing.T) {
 	cdc := app.MakeCodec()
 	comm := ServeCommand(cdc)
 	viper.Set("chain-id","fuxi")
-	viper.Set("node","tcp://localhost:46657")
+	viper.Set("node","tcp://localhost:26657")
 	viper.Set("laddr","tcp://localhost:1317")
 
 	comm.ExecuteC()
 }
-//var cdc = wire.NewCodec()
-//
-//func init()  {
-//	cdc.RegisterConcrete(person{},"person",nil)
-//}
+
+func TestMetricsCmd(t *testing.T){
+	cdc := app.MakeCodec()
+	comm := prometheus.MonitorCommand("stake",cdc)
+	viper.Set("node","tcp://0.0.0.0:46657")
+	viper.Set("chain-id","fuxi")
+	comm.ExecuteC()
+}
 
 func TestAmino(t *testing.T) {
 	var cdc = amino.NewCodec()
@@ -261,5 +265,7 @@ func TestBech32(t *testing.T){
 	addr,_ := types.GetAccAddressBech32("cosmosaccaddr1wp4shn6zzv0l52hfat9c2ryu0gvwa4h3dj2k92")
 	fmt.Print(hex.EncodeToString(addr))
 }
+
+
 
 
