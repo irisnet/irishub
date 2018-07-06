@@ -27,7 +27,7 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			//monitor system info, first parameter is the command of the process to be monitor
 			// and the second parameter is the directory that you want to get total size of its' files
-			sys.Monitor("irishub", "/", sysMertrics)
+			sys.Monitor(sysMertrics)
 
 			srv := &http.Server{
 				Addr:    ":26660",
