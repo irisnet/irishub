@@ -5,7 +5,6 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/tendermint/tendermint/types"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
 	"fmt"
@@ -14,6 +13,7 @@ import (
 	"time"
 	"log"
 	cctx "context"
+	tools "github.com/irisnet/irishub/tools"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -118,8 +118,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-
-func Monitor(ctx context.CoreContext,csMetrics Metrics,cdc *wire.Codec,storeName string){
+func (cs *Metrics)Monitor(ctx tools.Context,cdc *wire.Codec,storeName string){
 	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
 
 	var client = ctx.Client
@@ -137,17 +136,18 @@ func Monitor(ctx context.CoreContext,csMetrics Metrics,cdc *wire.Codec,storeName
 	go func() {
 		for e := range blockC {
 			block := e.(types.TMEventData).(types.EventDataNewBlock)
-			csMetrics.RecordMetrics(ctx,cdc,block.Block,storeName)
+			cs.RecordMetrics(ctx,cdc,block.Block,storeName)
 		}
 	}()
 }
 
-func (cs Metrics) RecordMetrics(ctx context.CoreContext,cdc *wire.Codec,block *types.Block,storeName string) {
+func (cs Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.Block,storeName string) {
 	cs.Height.Set(float64(block.Height))
 	cs.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
 
 	missingValidators := 0
 	missingValidatorsPower := int64(0)
+	validatorsPower := int64(0)
 	validators := getValidators(cdc,ctx,storeName)
 
 	valMap := make(map[string]stake.Validator,len(validators))
@@ -162,10 +162,12 @@ func (cs Metrics) RecordMetrics(ctx context.CoreContext,cdc *wire.Codec,block *t
 		}
 
 		valMap[val.Owner.String()] = val
+		validatorsPower += val.GetPower().Evaluate()
 	}
 
 	cs.MissingValidators.Set(float64(missingValidators))
 	cs.MissingValidatorsPower.Set(float64(missingValidatorsPower))
+	cs.ValidatorsPower.Set(float64(validatorsPower))
 
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {
@@ -178,9 +180,9 @@ func (cs Metrics) RecordMetrics(ctx context.CoreContext,cdc *wire.Codec,block *t
 
 	if block.Height > 1 {
 		lastBlockHight := block.Height -1
-		resultBlock,_ := ctx.Client.Block(&lastBlockHight)
+		lastBlock,_ := ctx.Client.Block(&lastBlockHight)
 		cs.BlockIntervalSeconds.Observe(
-			block.Time.Sub(resultBlock.BlockMeta.Header.Time).Seconds(),
+			block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds(),
 		)
 	}
 
@@ -192,7 +194,7 @@ func (cs Metrics) RecordMetrics(ctx context.CoreContext,cdc *wire.Codec,block *t
 }
 
 
-func getValidators(cdc *wire.Codec,ctx context.CoreContext,storeName string) (validators []stake.Validator){
+func getValidators(cdc *wire.Codec,ctx tools.Context,storeName string) (validators []stake.Validator){
 	key := stake.ValidatorsKey
 	resKVs, err := ctx.QuerySubspace(cdc, key, storeName)
 	if err != nil {
