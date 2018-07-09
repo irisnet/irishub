@@ -17,6 +17,7 @@ import ("testing"
 	"github.com/irisnet/irishub/tools/prometheus"
 )
 
+
 func TestRestServer(t *testing.T) {
 	cdc := app.MakeCodec()
 	comm := ServeCommand(cdc)
@@ -30,8 +31,15 @@ func TestRestServer(t *testing.T) {
 func TestMetricsCmd(t *testing.T){
 	cdc := app.MakeCodec()
 	comm := prometheus.MonitorCommand("stake",cdc)
-	viper.Set("node","tcp://0.0.0.0:46657")
+	viper.Set("node","tcp://0.0.0.0:26657")
 	viper.Set("chain-id","fuxi")
+	viper.Set("commands","iris start ;htop")
+	/*
+	viper.Set("paths","/etc ;/home/")
+	viper.Set("recursively", false)
+	 */
+	viper.Set("paths","/etc ;")
+	viper.Set("recursively", true)
 	comm.ExecuteC()
 }
 
