@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	tools "github.com/irisnet/irishub/tools"
+	"time"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -25,6 +26,11 @@ func PrometheusMetrics() *Metrics {
 }
 
 func (m *Metrics) Monitor(ctx tools.Context){
-	result := ctx.NetInfo()
-	m.Peers.Set(float64(result.NPeers))
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			result := ctx.NetInfo()
+			m.Peers.Set(float64(result.NPeers))
+		}
+	}()
 }

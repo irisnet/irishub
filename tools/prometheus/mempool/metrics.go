@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	tools "github.com/irisnet/irishub/tools"
+	"time"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -26,6 +27,12 @@ func PrometheusMetrics() *Metrics {
 }
 
 func (m *Metrics )Monitor(rpc tools.Context){
-	result := rpc.NumUnconfirmedTxs()
-	m.Size.Set(float64(result.N))
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			result := rpc.NumUnconfirmedTxs()
+			m.Size.Set(float64(result.N))
+		}
+	}()
+
 }
