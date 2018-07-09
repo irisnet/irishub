@@ -38,7 +38,7 @@ func TestMetricsCmd(t *testing.T){
 	viper.Set("paths","/etc ;/home/")
 	viper.Set("recursively", false)
 	 */
-	viper.Set("paths","/etc ;/home/lmf/GoPath/src/github.com/programokey/irishub/")
+	viper.Set("paths","/etc ;")
 	viper.Set("recursively", true)
 	comm.ExecuteC()
 }
