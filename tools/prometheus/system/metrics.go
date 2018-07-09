@@ -90,21 +90,17 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func Monitor(metrics *Metrics) error {
-	pid, err := getPid(command)
-	if err != nil {
-		return err
-	}
+func (metrics *Metrics) Monitor() error {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
-			metrics.RecordMetrics(int32(pid), dir_path)
+			metrics.RecordMetrics()
 		}
 	}()
 	return nil
 }
 
-func (metrics Metrics) RecordMetrics(pid int32, dir_path string) {
+func (metrics Metrics) RecordMetrics() {
 
 	for i, process := range(metrics.processes){
 		if cpu_util, err := process.CPUPercent(); err != nil {
