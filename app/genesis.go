@@ -56,11 +56,10 @@ var (
 	flagOWK        = "owk"
 	denom          = "iris"
 
-
 	// bonded tokens given to genesis validators/accounts
-	freeFermionVal  = int64(100)
+	freeFermionVal = int64(100)
 
-	totalTokenAmt 	= int64(200000000)
+	totalTokenAmt = int64(200000000)
 )
 
 // get app init parameters for server init command
@@ -111,7 +110,7 @@ func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey) (
 		return
 	}
 	cliPrint = json.RawMessage(bz)
-	appGenTx,_,validator,err = IrisAppGenTxNF(cdc, pk, addr, name, overwrite)
+	appGenTx, _, validator, err = IrisAppGenTxNF(cdc, pk, addr, name, overwrite)
 	return
 }
 
@@ -205,9 +204,9 @@ func IrisAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState
 }
 
 // TODO
-func createGenesisState() stake.GenesisState{
+func createGenesisState() stake.GenesisState {
 	return stake.GenesisState{
-		Pool:   stake.Pool{
+		Pool: stake.Pool{
 			LooseUnbondedTokens:     0,
 			BondedTokens:            0,
 			UnbondingTokens:         0,

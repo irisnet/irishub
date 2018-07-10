@@ -5,15 +5,15 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/version"
 	abci "github.com/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/tendermint/tmlibs/cli"
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/version"
 )
 
 func main() {
