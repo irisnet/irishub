@@ -1,19 +1,19 @@
 package consensus
 
 import (
+	cctx "context"
+	"encoding/hex"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
+	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
+	tools "github.com/irisnet/irishub/tools"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/tendermint/tendermint/types"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
-	"fmt"
-	"strings"
-	"encoding/hex"
-	"time"
 	"log"
-	cctx "context"
-	tools "github.com/irisnet/irishub/tools"
+	"strings"
+	"time"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -127,7 +127,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (cs *Metrics)Monitor(ctx tools.Context,cdc *wire.Codec,storeName string){
+func (cs *Metrics) Monitor(ctx tools.Context, cdc *wire.Codec, storeName string) {
 	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
 
 	var client = ctx.Client
@@ -145,24 +145,24 @@ func (cs *Metrics)Monitor(ctx tools.Context,cdc *wire.Codec,storeName string){
 	go func() {
 		for e := range blockC {
 			block := e.(types.TMEventData).(types.EventDataNewBlock)
-			cs.RecordMetrics(ctx,cdc,block.Block,storeName)
+			cs.RecordMetrics(ctx, cdc, block.Block, storeName)
 		}
 	}()
 }
 
-func (cs *Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.Block,storeName string){
+func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *types.Block, storeName string) {
 	cs.Height.Set(float64(block.Height))
 	cs.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
 
 	missingValidators := 0
 	missingValidatorsPower := int64(0)
 	validatorsPower := int64(0)
-	resultValidators,err := ctx.Client.Validators(&block.Height)
+	resultValidators, err := ctx.Client.Validators(&block.Height)
 	if err != nil {
 		panic(err)
 	}
 	validators := resultValidators.Validators
-	valMap := make(map[string]types.Validator,len(validators))
+	valMap := make(map[string]types.Validator, len(validators))
 	for i, val := range validators {
 		var vote *types.Vote
 		if i < len(block.LastCommit.Precommits) {
@@ -176,7 +176,7 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
-	cs.Candidates.Set(float64(getCandidatesNum(cdc,ctx,storeName)))
+	cs.Candidates.Set(float64(getCandidatesNum(cdc, ctx, storeName)))
 	cs.MissingValidators.Set(float64(missingValidators))
 	cs.MissingValidatorsPower.Set(float64(missingValidatorsPower))
 	cs.ValidatorsPower.Set(float64(validatorsPower))
@@ -185,17 +185,17 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {
 		addr := strings.ToUpper(hex.EncodeToString(ev.Address()))
-		if val,ok := valMap[addr]; ok {
+		if val, ok := valMap[addr]; ok {
 			byzantineValidatorsPower += val.VotingPower
 		}
 	}
 	cs.ByzantineValidatorsPower.Set(float64(byzantineValidatorsPower))
 
 	if block.Height > 1 {
-		lastBlockHight := block.Height -1
-		lastBlock,_ := ctx.Client.Block(&lastBlockHight)
+		lastBlockHight := block.Height - 1
+		lastBlock, _ := ctx.Client.Block(&lastBlockHight)
 		interval := block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds()
-		cs.BlockIntervalSeconds.Observe(interval,)
+		cs.BlockIntervalSeconds.Observe(interval)
 	}
 
 	cs.NumTxs.Set(float64(block.NumTxs))
@@ -205,8 +205,7 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.
 	cs.BlockSizeBytes.Set(float64(len(bz)))
 }
 
-
-func getCandidatesNum(cdc *wire.Codec,ctx tools.Context,storeName string) (int){
+func getCandidatesNum(cdc *wire.Codec, ctx tools.Context, storeName string) int {
 	key := stake.ValidatorsKey
 	resKVs, err := ctx.QuerySubspace(cdc, key, storeName)
 	if err != nil {
