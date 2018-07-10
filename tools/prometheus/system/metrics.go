@@ -253,7 +253,7 @@ func (metrics Metrics) RecordMetrics() {
 	for _, percent := range percents {
 		CPUUsedPercent += percent
 	}
-	metrics.CPUUtilization.Set(CPUUsedPercent / 4)
+	metrics.CPUUtilization.Set(CPUUsedPercent / float64(len(percents)))
 }
 
 //-----------------help functions-------------------------------
