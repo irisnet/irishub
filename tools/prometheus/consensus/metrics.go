@@ -26,6 +26,8 @@ type Metrics struct {
 
 	// Number of validators.
 	Validators metrics.Gauge
+	// Number of Candidates
+	Candidates metrics.Gauge
 	// Total power of all validators.
 	ValidatorsPower metrics.Gauge
 	// Number of validators who did not sign.
@@ -67,6 +69,13 @@ func PrometheusMetrics() *Metrics {
 			Name:      "validators",
 			Help:      "Number of validators.",
 		}, []string{}),
+
+		Candidates: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "consensus",
+			Name:      "candidates",
+			Help:      "Number of Candidates.",
+		}, []string{}),
+
 		ValidatorsPower: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
 			Name:      "validators_power",
@@ -141,16 +150,19 @@ func (cs *Metrics)Monitor(ctx tools.Context,cdc *wire.Codec,storeName string){
 	}()
 }
 
-func (cs Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.Block,storeName string) {
+func (cs *Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.Block,storeName string){
 	cs.Height.Set(float64(block.Height))
 	cs.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
 
 	missingValidators := 0
 	missingValidatorsPower := int64(0)
 	validatorsPower := int64(0)
-	validators := getValidators(cdc,ctx,storeName)
-
-	valMap := make(map[string]stake.Validator,len(validators))
+	resultValidators,err := ctx.Client.Validators(&block.Height)
+	if err != nil {
+		panic(err)
+	}
+	validators := resultValidators.Validators
+	valMap := make(map[string]types.Validator,len(validators))
 	for i, val := range validators {
 		var vote *types.Vote
 		if i < len(block.LastCommit.Precommits) {
@@ -158,22 +170,23 @@ func (cs Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.B
 		}
 		if vote == nil {
 			missingValidators++
-			missingValidatorsPower += val.GetPower().Evaluate()
+			missingValidatorsPower += val.VotingPower
 		}
 
-		valMap[val.Owner.String()] = val
-		validatorsPower += val.GetPower().Evaluate()
+		valMap[val.Address.String()] = *val
+		validatorsPower += val.VotingPower
 	}
-
+	cs.Candidates.Set(float64(getCandidatesNum(cdc,ctx,storeName)))
 	cs.MissingValidators.Set(float64(missingValidators))
 	cs.MissingValidatorsPower.Set(float64(missingValidatorsPower))
 	cs.ValidatorsPower.Set(float64(validatorsPower))
+	cs.Validators.Set(float64(len(validators)))
 
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {
 		addr := strings.ToUpper(hex.EncodeToString(ev.Address()))
 		if val,ok := valMap[addr]; ok {
-			byzantineValidatorsPower += val.GetPower().Evaluate()
+			byzantineValidatorsPower += val.VotingPower
 		}
 	}
 	cs.ByzantineValidatorsPower.Set(float64(byzantineValidatorsPower))
@@ -181,9 +194,8 @@ func (cs Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.B
 	if block.Height > 1 {
 		lastBlockHight := block.Height -1
 		lastBlock,_ := ctx.Client.Block(&lastBlockHight)
-		cs.BlockIntervalSeconds.Observe(
-			block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds(),
-		)
+		interval := block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds()
+		cs.BlockIntervalSeconds.Observe(interval,)
 	}
 
 	cs.NumTxs.Set(float64(block.NumTxs))
@@ -194,17 +206,11 @@ func (cs Metrics) RecordMetrics(ctx tools.Context,cdc *wire.Codec,block *types.B
 }
 
 
-func getValidators(cdc *wire.Codec,ctx tools.Context,storeName string) (validators []stake.Validator){
+func getCandidatesNum(cdc *wire.Codec,ctx tools.Context,storeName string) (int){
 	key := stake.ValidatorsKey
 	resKVs, err := ctx.QuerySubspace(cdc, key, storeName)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	for _, KV := range resKVs {
-		var validator stake.Validator
-		cdc.MustUnmarshalBinary(KV.Value, &validator)
-		validators = append(validators, validator)
-	}
-	return validators
+	return len(resKVs)
 }
