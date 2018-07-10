@@ -3,8 +3,8 @@ package mempool
 import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	tools "github.com/irisnet/irishub/tools"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"time"
 )
 
@@ -26,7 +26,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics )Monitor(rpc tools.Context){
+func (m *Metrics) Monitor(rpc tools.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
