@@ -1,14 +1,13 @@
 package tools
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
-	"strings"
-	"net/http"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/client/context"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 type Context struct {
@@ -27,7 +26,7 @@ type JsonRpc interface {
 	NumUnconfirmedTxs() *ctypes.ResultUnconfirmedTxs
 }
 
-func (rpc Context) NetInfo() *ctypes.ResultNetInfo{
+func (rpc Context) NetInfo() *ctypes.ResultNetInfo {
 	client := &http.Client{}
 
 	reqUri := tcpToHttpUrl(rpc.NodeURI) + "/net_info"
@@ -44,18 +43,18 @@ func (rpc Context) NetInfo() *ctypes.ResultNetInfo{
 	}
 
 	var res = struct {
-		JsonRpc string 				 `json:"jsonrpc"`
-		Id 		string 				 `json:"id"`
-		Result 	ctypes.ResultNetInfo `json:"result"`
+		JsonRpc string               `json:"jsonrpc"`
+		Id      string               `json:"id"`
+		Result  ctypes.ResultNetInfo `json:"result"`
 	}{}
-	if err := json.Unmarshal(body,&res); err != nil {
+	if err := json.Unmarshal(body, &res); err != nil {
 		fmt.Println(err)
 	}
 
 	return &res.Result
 }
 
-func (rpc Context) NumUnconfirmedTxs() *ctypes.ResultUnconfirmedTxs{
+func (rpc Context) NumUnconfirmedTxs() *ctypes.ResultUnconfirmedTxs {
 	client := &http.Client{}
 	reqUri := tcpToHttpUrl(rpc.NodeURI) + "/num_unconfirmed_txs"
 
@@ -71,20 +70,18 @@ func (rpc Context) NumUnconfirmedTxs() *ctypes.ResultUnconfirmedTxs{
 	}
 
 	var res = struct {
-		JsonRpc string 						`json:"jsonrpc"`
-		Id 		string 						`json:"id"`
-		Result 	ctypes.ResultUnconfirmedTxs `json:"result"`
+		JsonRpc string                      `json:"jsonrpc"`
+		Id      string                      `json:"id"`
+		Result  ctypes.ResultUnconfirmedTxs `json:"result"`
 	}{}
-	if err := json.Unmarshal(body,&res); err != nil {
+	if err := json.Unmarshal(body, &res); err != nil {
 		fmt.Println(err)
 	}
 
 	return &res.Result
 }
 
-func tcpToHttpUrl(url string) string{
-	urls := strings.Replace(url,"tcp","http",1)
+func tcpToHttpUrl(url string) string {
+	urls := strings.Replace(url, "tcp", "http", 1)
 	return urls
 }
-
-

@@ -14,8 +14,8 @@ import (
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/version"
 	"github.com/irisnet/irishub/tools/prometheus"
+	"github.com/irisnet/irishub/version"
 )
 
 // rootCmd is the entry point for this binary

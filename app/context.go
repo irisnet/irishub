@@ -17,7 +17,7 @@ func (c Context) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
 	return c.ctx.Client.BroadcastTxSync(tx)
 }
 
-func (c Context) GetCosmosCtx() (context.CoreContext) {
+func (c Context) GetCosmosCtx() context.CoreContext {
 	return c.ctx
 }
 
