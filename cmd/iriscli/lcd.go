@@ -16,13 +16,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/irisnet/irishub/version"
 	"github.com/cosmos/cosmos-sdk/wire"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/client/rest"
 	stake "github.com/cosmos/cosmos-sdk/x/stake/client/rest"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/version"
 )
 
 // ServeCommand will generate a long-running rest server
@@ -80,6 +80,6 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	bank.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
 	ibc.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
 	stake.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
-	RegisterRoutes(ctx,r,cdc,kb)
+	RegisterRoutes(ctx, r, cdc, kb)
 	return r
 }
