@@ -148,7 +148,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 	// start with the default staking genesis state
 	//stakeData := stake.DefaultGenesisState()
-	stakeData := stake.DefaultGenesisState()
+	stakeData := createGenesisState()
 
 	// get genesis flag account information
 	genaccs := make([]GenesisAccount, len(appGenTxs))
@@ -164,7 +164,6 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
 			{denom, totalTokenAmt},
-			{"steak", freeFermionVal},
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
@@ -203,7 +202,6 @@ func IrisAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState
 	return
 }
 
-// TODO
 func createGenesisState() stake.GenesisState {
 	return stake.GenesisState{
 		Pool: stake.Pool{
