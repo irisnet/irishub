@@ -1,18 +1,17 @@
-all: get_vendor_deps install
+all: get_vendor_deps install test
 
 get_vendor_deps:
-	@rm -rf vendor/
-	@echo "--> Running dep ensure"
-	@dep ensure -v
-
+	go get github.com/Masterminds/glide
+	glide install
+	
 install:
 	go install ./cmd/iris
-	go install ./cmd/iriscli
 
 build_linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris
 
-build_cur:
-	go build -o build/iris ./cmd/iris  && \
-	go build -o build/iriscli ./cmd/iriscli
+test:
+	@go test `glide novendor`
+
+test_cli:
+	bash ./cmd/iris/sh_tests/stake.sh

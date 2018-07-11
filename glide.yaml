@@ -1,0 +1,17 @@
+package: github.com/irisnet/iris-hub
+import:
+- package: github.com/MrXJC/gaia
+  version: develop
+- package: github.com/cosmos/cosmos-sdk
+  version: tm-develop
+- package: google.golang.org/grpc
+  repo: https://github.com/grpc/grpc-go
+  vcs: git
+- package: google.golang.org/genproto
+  repo: https://github.com/google/go-genproto
+  vcs: git
+testImport:
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
+  - require
