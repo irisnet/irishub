@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"net/http"
 )
 
 // Version - Iris Version
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 // VersionCmd - The version of gaia
 var VersionCmd = &cobra.Command{
@@ -16,4 +17,9 @@ var VersionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("v%s\n", Version)
 	},
+}
+
+// version REST handler endpoint
+func RequestHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(Version))
 }
