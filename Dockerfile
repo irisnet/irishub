@@ -1,38 +1,29 @@
-
 # Simple usage with a mounted data directory:
-# > docker build -t irishub .
-# > docker run -v $HOME/.iris:/root/.iris iris init
-# > docker run -v $HOME/.iris:/root/.iris iris start
+# > docker build -t iris .
+# > docker run -it --rm -v "/mnt/volumes/pangu:/iris" iris init [address]--home=/iris
+# > docker run -it --rm -v "/mnt/volumes/pangu:/iris" iris start --home=/iris
 
 FROM alpine:edge
 
-# Set up dependencies
-ENV PACKAGES go make git libc-dev bash
+ADD ./build/ /usr/local/bin/
 
-# Set up GOPATH & PATH
+ENV DATA_ROOT /iris
 
-ENV GOPATH       /root/go
-ENV BASE_PATH    $GOPATH/src/github.com/irisnet
-ENV REPO_PATH    $BASE_PATH/irishub
-ENV PATH         $GOPATH/bin:$PATH
+# Set user right away for determinism
+RUN addgroup gaiauser && \
+    adduser -S -G gaiauser gaiauser
+
+# Create directory for persistence and give our user ownership
+RUN mkdir -p $DATA_ROOT && \
+    chown -R gaiauser:gaiauser $DATA_ROOT
+
+VOLUME $DATA_ROOT
 
 # p2p port
 EXPOSE 46656
 # rpc port
 EXPOSE 46657
 
-# Add source files
-COPY . $REPO_PATH/
+WORKDIR /bianjie/
 
-# Install minimum necessary dependencies, build Cosmos SDK, remove packages
-RUN cd $REPO_PATH && \
-    apk add --no-cache $PACKAGES && \
-    go get github.com/golang/dep/cmd/dep && \
-    make get_vendor_deps && \
-    make build_linux && \
-    cp build/* /usr/local/bin/ && \
-    cd / && \
-    apk del $PACKAGES && \
-    rm -rf $GOPATH/ && \
-    rm -rf /root/.cache/
-
+ENTRYPOINT ["iris"]
