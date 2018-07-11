@@ -1,39 +1,37 @@
 package main
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
 	"encoding/json"
-	"github.com/tendermint/go-crypto/keys"
-	"net/http"
-	"github.com/gorilla/mux"
-	"io/ioutil"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/tendermint/go-crypto"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/pkg/errors"
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app"
+	"github.com/pkg/errors"
+	"github.com/tendermint/go-crypto"
+	"github.com/tendermint/go-crypto/keys"
+	"io/ioutil"
+	"net/http"
 )
-
 
 func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
 	r.HandleFunc("/tx/send", SendTxRequestHandlerFn(cdc, kb, ctx)).Methods("POST")
 }
 
-
 type sendTx struct {
-	Msg        string    	   `json:"msg"`
-	MsgType    string          `json:"type"`
-	Fee        auth.StdFee     `json:"fee"`
-	Signatures []StdSignature  `json:"signatures"`
+	Msg        string         `json:"msg"`
+	MsgType    string         `json:"type"`
+	Fee        auth.StdFee    `json:"fee"`
+	Signatures []StdSignature `json:"signatures"`
 }
 
 type StdSignature struct {
-	PubKey    		 crypto.PubKeyEd25519	`json:"pub_key"` // optional
-	Signature 		 crypto.SignatureEd25519	`json:"signature"`
-	AccountNumber    int64 		`json:"account_number"`
-	Sequence         int64 		`json:"sequence"`
+	PubKey        crypto.PubKeyEd25519    `json:"pub_key"` // optional
+	Signature     crypto.SignatureEd25519 `json:"signature"`
+	AccountNumber int64                   `json:"account_number"`
+	Sequence      int64                   `json:"sequence"`
 }
 
 //send traction(sign with rainbow) to irishub
@@ -52,15 +50,15 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 			w.Write([]byte(err.Error()))
 			return
 		}
-		var sig = make([]auth.StdSignature,len(tx.Signatures))
-		for index,s := range tx.Signatures {
+		var sig = make([]auth.StdSignature, len(tx.Signatures))
+		for index, s := range tx.Signatures {
 			sig[index].PubKey = s.PubKey
 			sig[index].Signature = s.Signature
-			sig[index].AccountNumber =s.AccountNumber
+			sig[index].AccountNumber = s.AccountNumber
 			sig[index].Sequence = s.Sequence
 		}
 
-		msg,err := convertMsg(tx)
+		msg, err := convertMsg(tx)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -68,11 +66,11 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 		}
 
 		var stdTx = auth.StdTx{
-			Msg:msg,
-			Fee:tx.Fee,
-			Signatures:sig,
+			Msg:        msg,
+			Fee:        tx.Fee,
+			Signatures: sig,
 		}
-		txByte,_ := cdc.MarshalBinary(stdTx)
+		txByte, _ := cdc.MarshalBinary(stdTx)
 		// send
 		res, err := ctx.BroadcastTxSync(txByte)
 		if err != nil {
@@ -92,29 +90,30 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 	}
 }
 
-func convertMsg(tx sendTx) (sdk.Msg,error){
+func convertMsg(tx sendTx) (sdk.Msg, error) {
 	data := []byte(tx.Msg)
 	switch tx.MsgType {
-	case "transfer":{
-		var msg bank.MsgSend
-		if err := json.Unmarshal(data, &msg); err != nil {
-			return nil,err
+	case "transfer":
+		{
+			var msg bank.MsgSend
+			if err := json.Unmarshal(data, &msg); err != nil {
+				return nil, err
+			}
+			return msg, nil
 		}
-		return msg,nil
-	}
 	case "delegate":
 		var msg stake.MsgDelegate
 		if err := json.Unmarshal(data, &msg); err != nil {
-			return nil,err
+			return nil, err
 		}
-		return msg,nil
+		return msg, nil
 	case "unbond":
 		var msg stake.MsgUnbond
 		if err := json.Unmarshal(data, &msg); err != nil {
-			return nil,err
+			return nil, err
 		}
-		return msg,nil
+		return msg, nil
 	}
 
-	return nil,errors.New("invalid message type")
+	return nil, errors.New("invalid message type")
 }

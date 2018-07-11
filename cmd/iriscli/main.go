@@ -14,6 +14,7 @@ import (
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -114,6 +115,8 @@ func main() {
 		client.LineBreak,
 		version.VersionCmd,
 	)
+
+	rootCmd.AddCommand(prometheus.MonitorCommand("stake", cdc))
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "IRIS", app.DefaultCLIHome)
