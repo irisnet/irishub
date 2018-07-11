@@ -1,64 +1,50 @@
 package main
 
 import (
-	"encoding/json"
+	"os"
 
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/version"
-	abci "github.com/tendermint/abci/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/tendermint/tmlibs/cli"
-	dbm "github.com/tendermint/tmlibs/db"
-	"github.com/tendermint/tmlibs/log"
+
+	basecmd "github.com/cosmos/cosmos-sdk/server/commands"
+	"github.com/irisnet/iris-hub/version"
+)
+
+// IrisCmd is the entry point for this binary
+var (
+	IrisCmd = &cobra.Command{
+		Use:   "iris",
+		Short: "IRIS Hub - a regional Cosmos Hub with a powerful iService infrastructure",
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Help()
+		},
+	}
+
+	lineBreak = &cobra.Command{Run: func(*cobra.Command, []string) {}}
 )
 
 func main() {
-	cdc := app.MakeCodec()
-	ctx := server.NewDefaultContext()
+	// disable sorting
 	cobra.EnableCommandSorting = false
-	rootCmd := &cobra.Command{
-		Use:               "iris",
-		Short:             "iris Daemon (server)",
-		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
-	}
 
-	rootCmd.PersistentFlags().String("log_level", ctx.Config.LogLevel, "Log level")
+	// add commands
+	prepareNodeCommands()
+	prepareRestServerCommands()
+	prepareClientCommands()
 
-	tendermintCmd := &cobra.Command{
-		Use:   "tendermint",
-		Short: "Tendermint subcommands",
-	}
+	IrisCmd.AddCommand(
+		nodeCmd,
+		restServerCmd,
+		clientCmd,
 
-	tendermintCmd.AddCommand(
-		server.ShowNodeIDCmd(ctx),
-		server.ShowValidatorCmd(ctx),
-	)
-
-	rootCmd.AddCommand(
-		server.InitCmd(ctx, cdc, app.IrisAppInit()),
-		server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris")),
-		server.UnsafeResetAllCmd(ctx),
-		client.LineBreak,
-		tendermintCmd,
-		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
-		client.LineBreak,
+		lineBreak,
 		version.VersionCmd,
+		//auto.AutoCompleteCmd,
 	)
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
+	basecmd.SetUpRoot(IrisCmd)
+	executor := cli.PrepareMainCmd(IrisCmd, "GA", os.ExpandEnv("$HOME/.iris-cli"))
 	executor.Execute()
-}
-
-func newApp(logger log.Logger, db dbm.DB) abci.Application {
-	return app.NewIrisApp(logger, db)
-}
-
-func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	irisApp := app.NewIrisApp(logger, db)
-	return irisApp.ExportAppStateAndValidators()
 }
