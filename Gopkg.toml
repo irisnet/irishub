@@ -32,9 +32,10 @@
   name = "github.com/spf13/viper"
   version = "~1.0.0"
 
-[[constraint]]
+[[override]]
   name = "github.com/cosmos/cosmos-sdk"
-  version = "v0.19.1-rc1"
+  version = "v0.19.1-rc2"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[constraint]]
   name = "github.com/tendermint/abci"
