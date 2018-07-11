@@ -1,0 +1,42 @@
+# Using cache for development
+# Simple usage with a mounted data directory:
+# > docker build -t irishub:develop -f Dockerfile-dev .
+# > docker run -v $HOME/.iris:/root/.iris iris init
+# > docker run -v $HOME/.iris:/root/.iris iris start
+
+FROM alpine:edge
+
+# Set up dependencies
+ENV PACKAGES go glide make git libc-dev bash
+
+# Set up GOPATH & PATH
+
+ENV GOPATH       /root/go
+ENV BASE_PATH    $GOPATH/src/github.com/irisnet
+ENV REPO_PATH    $BASE_PATH/irishub
+ENV PATH         $GOPATH/bin:$PATH
+
+# Link expected Go repo path
+
+RUN mkdir -p $WORKDIR $GOPATH/pkg $GOPATH/bin $BASE_PATH && \
+    apk add --no-cache $PACKAGES && \
+    go get github.com/golang/dep/cmd/dep
+    
+# List project dependencies with Gopkg.toml and Gopkg.lock
+# These layers are only re-built when Gopkg files are updated
+COPY Gopkg.lock Gopkg.toml $REPO_PATH/
+
+WORKDIR $REPO_PATH
+
+RUN dep ensure -vendor-only
+
+# p2p port
+EXPOSE 46656
+# rpc port
+EXPOSE 46657
+
+# Add source files
+COPY . $REPO_PATH/
+
+RUN make build_linux && \
+    mv build/* /usr/local/bin/
