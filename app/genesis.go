@@ -223,7 +223,7 @@ func createGenesisState() stake.GenesisState {
 			InflationMin:        sdk.NewRat(7, 100),
 			GoalBonded:          sdk.NewRat(67, 100),
 			MaxValidators:       100,
-			BondDenom:           "steak",
+			BondDenom:           denom,
 		},
 	}
 }
