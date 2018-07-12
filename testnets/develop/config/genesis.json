@@ -27,10 +27,6 @@
           {
             "denom": "iris",
             "amount": 200000000
-          },
-          {
-            "denom": "steak",
-            "amount": 100
           }
         ]
       }
@@ -55,7 +51,7 @@
         "inflation_min": "7/100",
         "goal_bonded": "67/100",
         "max_validators": 100,
-        "bond_denom": "steak"
+        "bond_denom": "iris"
       },
       "validators": [
         {
