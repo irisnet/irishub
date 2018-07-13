@@ -17,17 +17,9 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			csMetrics, p2pMetrics, memMetrics, sysMetrics := DefaultMetricsProvider()
-			ctx := tools.NewContext()
-
-			//监控共识指标
-			csMetrics.Monitor(ctx, cdc, storeName)
-			//监控p2p指标
-			p2pMetrics.Monitor(ctx)
-			//监控mempool指标
-			memMetrics.Monitor(ctx)
-			//监控系统指标
-			sysMetrics.Monitor()
+			ctx := tools.NewContext(storeName,cdc)
+			monitor := DefaultMonitor(ctx)
+			monitor.Start()
 
 			srv := &http.Server{
 				Addr:    ":26660",

@@ -25,7 +25,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics) Monitor(ctx tools.Context) {
+func (m *Metrics) Start(ctx tools.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)

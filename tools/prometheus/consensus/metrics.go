@@ -127,7 +127,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (cs *Metrics) Monitor(ctx tools.Context, cdc *wire.Codec, storeName string) {
+func (cs *Metrics) Start(ctx tools.Context) {
 	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
 
 	var client = ctx.Client
@@ -145,7 +145,7 @@ func (cs *Metrics) Monitor(ctx tools.Context, cdc *wire.Codec, storeName string)
 	go func() {
 		for e := range blockC {
 			block := e.(types.TMEventData).(types.EventDataNewBlock)
-			cs.RecordMetrics(ctx, cdc, block.Block, storeName)
+			cs.RecordMetrics(ctx, ctx.Cdc, block.Block, ctx.StoreName)
 		}
 	}()
 }
