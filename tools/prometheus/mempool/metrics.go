@@ -26,7 +26,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics) Monitor(rpc tools.Context) {
+func (m *Metrics) Start(rpc tools.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
