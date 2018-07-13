@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"github.com/cosmos/cosmos-sdk/wire"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -12,12 +13,14 @@ import (
 
 type Context struct {
 	context.CoreContext
+	StoreName string
+	Cdc *wire.Codec
 }
 
-func NewContext() Context {
+func NewContext(storeName string,cdc *wire.Codec) Context {
 	ctx := context.NewCoreContextFromViper()
 	return Context{
-		ctx,
+		ctx,storeName,cdc,
 	}
 }
 
