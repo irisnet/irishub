@@ -33,6 +33,10 @@ type Metrics struct {
 	ProcOpenedFilesNum  []metrics.Gauge
 	processes           []process.Process
 
+	//cmd related monitor term
+	cmd     []string
+	ProcNum []metrics.Gauge
+
 	//storage related monitor term
 	DiskUsedPercentage []metrics.Gauge
 	DiskFreeSpace      []metrics.Gauge
@@ -67,10 +71,14 @@ func PrometheusMetrics() *Metrics {
 		FileSize:            make([]metrics.Gauge, 0),
 		DirectorySize:       make([]metrics.Gauge, 0),
 		processes:           make([]process.Process, 0),
-		recursively:         false,
-		disks:               make([]string, 0),
-		filePaths:           make([]string, 0),
-		dirPaths:            make([]string, 0),
+
+		ProcNum: make([]metrics.Gauge, 0),
+		cmd:     make([]string, 0),
+
+		recursively: false,
+		disks:       make([]string, 0),
+		filePaths:   make([]string, 0),
+		dirPaths:    make([]string, 0),
 	}
 }
 
@@ -150,6 +158,15 @@ func (metrics *Metrics) add() {
 }
 
 func (metrics *Metrics) addProcess(command string) {
+	name_command := getPathName(command)
+
+	metrics.cmd = append(metrics.cmd, command)
+
+	metrics.ProcNum = append(metrics.ProcNum, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		Subsystem: "system",
+		Name:      fmt.Sprintf("process_number_%s", name_command),
+		Help:      fmt.Sprintf("Process number of processes started by command %s", command),
+	}, []string{}))
 
 	pid, err := getPid(command)
 	if err != nil {
@@ -165,19 +182,19 @@ func (metrics *Metrics) addProcess(command string) {
 
 	metrics.ProcCPUUtilization = append(metrics.ProcCPUUtilization, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 		Subsystem: "system",
-		Name:      fmt.Sprintf("cpu_percent_%d", pid),
+		Name:      fmt.Sprintf("cpu_percent_%s", name_command),
 		Help:      fmt.Sprintf("CPU Utilization Percantage of processes with pid %d, started by command %s", pid, cmd),
 	}, []string{}))
 
 	metrics.ProcMemoUtilization = append(metrics.ProcMemoUtilization, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 		Subsystem: "system",
-		Name:      fmt.Sprintf("memo_percent_%d", pid),
+		Name:      fmt.Sprintf("memo_percent_%s", name_command),
 		Help:      fmt.Sprintf("Memory Utilization Percantage of processes with pid %d, started by command %s", pid, cmd),
 	}, []string{}))
 
 	metrics.ProcOpenedFilesNum = append(metrics.ProcOpenedFilesNum, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 		Subsystem: "system",
-		Name:      fmt.Sprintf("opened_files_number_%d", pid),
+		Name:      fmt.Sprintf("opened_files_number_%s", name_command),
 		Help:      fmt.Sprintf("Number of Opened Files of processes with pid %d, started by command %s", pid, cmd),
 	}, []string{}))
 
@@ -198,6 +215,14 @@ func (metrics *Metrics) Start(ctx tools.Context) {
 }
 
 func (metrics Metrics) RecordMetrics() {
+
+	for i, cmd := range metrics.cmd {
+		if num, err := getProcessNum(cmd); err != nil {
+			metrics.ProcNum[i].Set(float64(-1))
+		} else {
+			metrics.ProcNum[i].Set(float64(num))
+		}
+	}
 
 	for i, process := range metrics.processes {
 		if cpuUtil, err := process.CPUPercent(); err != nil {
@@ -221,10 +246,10 @@ func (metrics Metrics) RecordMetrics() {
 
 	for i, diskPath := range metrics.disks {
 		if usage, err := disk.Usage(diskPath); err != nil {
-			metrics.DirectorySize[i].Set(float64(-1))
+			metrics.DiskUsedPercentage[i].Set(float64(-1))
 			metrics.DiskFreeSpace[i].Set(float64(-1))
 		} else {
-			metrics.DirectorySize[i].Set(usage.UsedPercent)
+			metrics.DiskUsedPercentage[i].Set(usage.UsedPercent)
 			metrics.DiskFreeSpace[i].Set(float64(usage.Free))
 		}
 	}
@@ -258,7 +283,40 @@ func (metrics Metrics) RecordMetrics() {
 
 //-----------------help functions-------------------------------
 
-//get the pid of process that start by the given command
+//get the number of process that started by the given command
+func getProcessNum(command string) (num int, err error) {
+	commandStr := fmt.Sprintf("ps -aux|grep '%s'|grep -v 'grep'|wc -l", command)
+	cmd := exec.Command("/bin/bash", "-c", commandStr)
+
+	stdout, err := cmd.StdoutPipe()
+
+	if err != nil {
+		fmt.Printf("Error:can not obtain stdout pipe for command:%s\n", err)
+		return 0, err
+	}
+
+	if err := cmd.Start(); err != nil {
+		fmt.Println("Error:Invalid command,", err)
+		return 0, err
+	}
+
+	bytes, err := ioutil.ReadAll(stdout)
+	if err != nil {
+		fmt.Println("ReadAll Stdout:", err.Error())
+		return 0, err
+	}
+	str := string(bytes)
+	str = str[:len(str) - 1]
+	num, err = strconv.Atoi(str)
+
+	if err == nil {
+		return num, nil
+	} else {
+		return 0, err
+	}
+}
+
+//get the pid of process that started by the given command
 //the first pid return by "ps -aux|grep <command>",
 // the process whose command contains "grep" is omitted
 func getPid(command string) (pid int, err error) {
