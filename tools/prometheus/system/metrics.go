@@ -157,7 +157,6 @@ func (metrics *Metrics) add() {
 }
 
 func (metrics *Metrics) addProcess(command string) {
-	//if num, err := getProcessNum()
 	name_command := getPathName(command)
 
 	metrics.cmd = append(metrics.cmd, command)
