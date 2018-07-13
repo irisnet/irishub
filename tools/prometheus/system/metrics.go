@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"github.com/irisnet/irishub/tools"
 )
 
 type Metrics struct {
@@ -203,7 +204,7 @@ func (metrics *Metrics) SetRecursively(recursively bool) {
 	metrics.recursively = recursively
 }
 
-func (metrics *Metrics) Monitor() error {
+func (metrics *Metrics) Start(ctx tools.Context) {
 	metrics.add()
 	go func() {
 		for {
@@ -211,7 +212,6 @@ func (metrics *Metrics) Monitor() error {
 			metrics.RecordMetrics()
 		}
 	}()
-	return nil
 }
 
 func (metrics Metrics) RecordMetrics() {
