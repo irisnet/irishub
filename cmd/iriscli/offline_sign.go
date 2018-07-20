@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -10,8 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app"
 	"github.com/pkg/errors"
-	"github.com/tendermint/go-crypto"
-	"github.com/tendermint/go-crypto/keys"
+	"github.com/tendermint/tendermint/crypto"
 	"io/ioutil"
 	"net/http"
 )
@@ -66,7 +66,7 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 		}
 
 		var stdTx = auth.StdTx{
-			Msg:        msg,
+			Msgs:       []sdk.Msg{msg},
 			Fee:        tx.Fee,
 			Signatures: sig,
 		}
@@ -107,12 +107,12 @@ func convertMsg(tx sendTx) (sdk.Msg, error) {
 			return nil, err
 		}
 		return msg, nil
-	case "unbond":
-		var msg stake.MsgUnbond
-		if err := json.Unmarshal(data, &msg); err != nil {
-			return nil, err
-		}
-		return msg, nil
+		//case "unbond":
+		//	var msg stake.MsgUnbond
+		//	if err := json.Unmarshal(data, &msg); err != nil {
+		//		return nil, err
+		//	}
+		//	return msg, nil
 	}
 
 	return nil, errors.New("invalid message type")
