@@ -1,36 +1,31 @@
 package p2p
 
 import (
-	"github.com/go-kit/kit/metrics"
-	"github.com/go-kit/kit/metrics/prometheus"
-	tools "github.com/irisnet/irishub/tools"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/irisnet/irishub/app"
+	"github.com/tendermint/tendermint/p2p"
 	"time"
 )
 
 // Metrics contains metrics exposed by this package.
 type Metrics struct {
 	// Number of peers.
-	Peers metrics.Gauge
+	TmMetrics 	p2p.Metrics
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
+	tmMetrics := *p2p.PrometheusMetrics()
 	return &Metrics{
-		Peers: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "p2p",
-			Name:      "peers",
-			Help:      "Number of peers.",
-		}, []string{}),
+		tmMetrics,
 	}
 }
 
-func (m *Metrics) Start(ctx tools.Context) {
+func (m *Metrics) Start(ctx app.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
 			result := ctx.NetInfo()
-			m.Peers.Set(float64(result.NPeers))
+			m.TmMetrics.Peers.Set(float64(result.NPeers))
 		}
 	}()
 }

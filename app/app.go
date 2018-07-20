@@ -2,19 +2,21 @@ package app
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 
-	abci "github.com/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	cmn "github.com/tendermint/tmlibs/common"
-	dbm "github.com/tendermint/tmlibs/db"
-	"github.com/tendermint/tmlibs/log"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
@@ -36,11 +38,13 @@ type IrisApp struct {
 	cdc *wire.Codec
 
 	// keys to access the substores
-	keyMain     *sdk.KVStoreKey
-	keyAccount  *sdk.KVStoreKey
-	keyIBC      *sdk.KVStoreKey
-	keyStake    *sdk.KVStoreKey
-	keySlashing *sdk.KVStoreKey
+	keyMain          *sdk.KVStoreKey
+	keyAccount       *sdk.KVStoreKey
+	keyIBC           *sdk.KVStoreKey
+	keyStake         *sdk.KVStoreKey
+	keySlashing      *sdk.KVStoreKey
+	keyGov           *sdk.KVStoreKey
+	keyFeeCollection *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -49,27 +53,33 @@ type IrisApp struct {
 	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
+	govKeeper           gov.Keeper
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
 	cdc := MakeCodec()
+
+	bApp := bam.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
+	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:     bam.NewBaseApp(appName, cdc, logger, db),
-		cdc:         cdc,
-		keyMain:     sdk.NewKVStoreKey("main"),
-		keyAccount:  sdk.NewKVStoreKey("acc"),
-		keyIBC:      sdk.NewKVStoreKey("ibc"),
-		keyStake:    sdk.NewKVStoreKey("stake"),
-		keySlashing: sdk.NewKVStoreKey("slashing"),
+		BaseApp:          bam.NewBaseApp(appName, cdc, logger, db),
+		cdc:              cdc,
+		keyMain:          sdk.NewKVStoreKey("main"),
+		keyAccount:       sdk.NewKVStoreKey("acc"),
+		keyIBC:           sdk.NewKVStoreKey("ibc"),
+		keyStake:         sdk.NewKVStoreKey("stake"),
+		keySlashing:      sdk.NewKVStoreKey("slashing"),
+		keyGov:           sdk.NewKVStoreKey("gov"),
+		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 	}
 
 	// define the accountMapper
 	app.accountMapper = auth.NewAccountMapper(
 		app.cdc,
-		app.keyAccount,      // target store
-		&auth.BaseAccount{}, // prototype
+		app.keyAccount,        // target store
+		auth.ProtoBaseAccount, // prototype
 	)
 
 	// add handlers
@@ -77,20 +87,23 @@ func NewIrisApp(logger log.Logger, db dbm.DB) *IrisApp {
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 
 	// register message routes
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
 		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", slashing.NewHandler(app.slashingKeeper))
+		AddRoute("slashing", slashing.NewHandler(app.slashingKeeper)).
+		AddRoute("gov", gov.NewHandler(app.govKeeper))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection)
 	err := app.LoadLatestVersion(app.keyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -106,6 +119,7 @@ func MakeCodec() *wire.Codec {
 	bank.RegisterWire(cdc)
 	stake.RegisterWire(cdc)
 	slashing.RegisterWire(cdc)
+	gov.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
@@ -125,21 +139,22 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
+	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
+
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
+		Tags:             tags,
 	}
 }
 
 // custom logic for gaia initialization
 func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
-	// TODO is this now the whole genesis file?
 
 	var genesisState GenesisState
 	err := app.cdc.UnmarshalJSON(stateJSON, &genesisState)
 	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-		// return sdk.ErrGenesisParse("").TraceCause(err, "")
+		panic(err)
 	}
 
 	// load the accounts
@@ -150,7 +165,13 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	// load the initial stake information
-	stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
+	err = stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
+	if err != nil {
+		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
+		// return sdk.ErrGenesisParse("").TraceCause(err, "")
+	}
+
+	gov.InitGenesis(ctx, app.govKeeper, gov.DefaultGenesisState())
 
 	return abci.ResponseInitChain{}
 }
