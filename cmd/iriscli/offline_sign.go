@@ -7,13 +7,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app"
-	"github.com/pkg/errors"
 	"github.com/tendermint/tendermint/crypto"
 	"io/ioutil"
 	"net/http"
+	"fmt"
 )
 
 func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
@@ -21,18 +20,21 @@ func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Key
 }
 
 type sendTx struct {
-	Msg        string         `json:"msg"`
+	Msgs       []string       `json:"msgs"`
 	MsgType    string         `json:"type"`
 	Fee        auth.StdFee    `json:"fee"`
 	Signatures []StdSignature `json:"signatures"`
+	Memo       string         `json:"memo"`
 }
 
 type StdSignature struct {
-	PubKey        crypto.PubKeyEd25519    `json:"pub_key"` // optional
-	Signature     crypto.SignatureEd25519 `json:"signature"`
-	AccountNumber int64                   `json:"account_number"`
-	Sequence      int64                   `json:"sequence"`
+	PubKey        []byte `json:"pub_key"` // optional
+	Signature     []byte `json:"signature"`
+	AccountNumber int64  `json:"account_number"`
+	Sequence      int64  `json:"sequence"`
 }
+
+type Msgs = []sdk.Msg
 
 //send traction(sign with rainbow) to irishub
 func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) http.HandlerFunc {
@@ -52,13 +54,22 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 		}
 		var sig = make([]auth.StdSignature, len(tx.Signatures))
 		for index, s := range tx.Signatures {
-			sig[index].PubKey = s.PubKey
-			sig[index].Signature = s.Signature
+			var pubkey crypto.PubKey
+			if err := cdc.UnmarshalBinaryBare(s.PubKey, &pubkey); err != nil {
+				panic(err)
+			}
+			sig[index].PubKey = pubkey
+
+			var signature crypto.Signature
+			if err := cdc.UnmarshalBinaryBare(s.Signature, &signature); err != nil {
+				panic(err)
+			}
+			sig[index].Signature = signature
 			sig[index].AccountNumber = s.AccountNumber
 			sig[index].Sequence = s.Sequence
 		}
 
-		msg, err := convertMsg(tx)
+		msgs, err := convertMsg(tx)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -66,11 +77,13 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 		}
 
 		var stdTx = auth.StdTx{
-			Msgs:       []sdk.Msg{msg},
+			Msgs:       msgs,
 			Fee:        tx.Fee,
 			Signatures: sig,
+			Memo:       tx.Memo,
 		}
 		txByte, _ := cdc.MarshalBinary(stdTx)
+		fmt.Println(txByte)
 		// send
 		res, err := ctx.BroadcastTxSync(txByte)
 		if err != nil {
@@ -90,30 +103,33 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 	}
 }
 
-func convertMsg(tx sendTx) (sdk.Msg, error) {
-	data := []byte(tx.Msg)
-	switch tx.MsgType {
-	case "transfer":
-		{
-			var msg bank.MsgSend
-			if err := json.Unmarshal(data, &msg); err != nil {
-				return nil, err
-			}
-			return msg, nil
-		}
-	case "delegate":
-		var msg stake.MsgDelegate
-		if err := json.Unmarshal(data, &msg); err != nil {
-			return nil, err
-		}
-		return msg, nil
-		//case "unbond":
-		//	var msg stake.MsgUnbond
-		//	if err := json.Unmarshal(data, &msg); err != nil {
-		//		return nil, err
-		//	}
-		//	return msg, nil
-	}
+func convertMsg(tx sendTx) (Msgs, error) {
+	var msgs Msgs
+	for _, msgS := range tx.Msgs {
 
-	return nil, errors.New("invalid message type")
+		switch tx.MsgType {
+		case "transfer":
+			{
+				var msg bank.MsgSend
+				var data = []byte(msgS)
+				if err := json.Unmarshal(data, &msg); err != nil {
+					return nil, err
+				}
+				msgs = append(msgs, msg)
+			}
+		case "delegate":
+			//var msg stake.MsgDelegate
+			//if err := json.Unmarshal(data, &msg); err != nil {
+			//	return nil, err
+			//}
+			//return msg, nil
+			//case "unbond":
+			//	var msg stake.MsgUnbond
+			//	if err := json.Unmarshal(data, &msg); err != nil {
+			//		return nil, err
+			//	}
+			//	return msg, nil
+		}
+	}
+	return msgs, nil
 }
