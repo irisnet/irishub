@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 )
 
 func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
@@ -106,29 +107,38 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 func convertMsg(tx sendTx) (Msgs, error) {
 	var msgs Msgs
 	for _, msgS := range tx.Msgs {
+		var data = []byte(msgS)
 
 		switch tx.MsgType {
 		case "transfer":
 			{
 				var msg bank.MsgSend
-				var data = []byte(msgS)
 				if err := json.Unmarshal(data, &msg); err != nil {
 					return nil, err
 				}
 				msgs = append(msgs, msg)
 			}
 		case "delegate":
-			//var msg stake.MsgDelegate
-			//if err := json.Unmarshal(data, &msg); err != nil {
-			//	return nil, err
-			//}
-			//return msg, nil
-			//case "unbond":
-			//	var msg stake.MsgUnbond
-			//	if err := json.Unmarshal(data, &msg); err != nil {
-			//		return nil, err
-			//	}
-			//	return msg, nil
+			{
+				var msg stake.MsgDelegate
+				if err := json.Unmarshal(data, &msg); err != nil {
+					return nil, err
+				}
+			}
+		case "beginUnbond":
+			{
+				var msg stake.MsgBeginUnbonding
+				if err := json.Unmarshal(data, &msg); err != nil {
+					return nil, err
+				}
+			}
+		case "completeUnbond":
+			{
+				var msg stake.MsgCompleteUnbonding
+				if err := json.Unmarshal(data, &msg); err != nil {
+					return nil, err
+				}
+			}
 		}
 	}
 	return msgs, nil
