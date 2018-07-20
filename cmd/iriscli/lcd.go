@@ -7,10 +7,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/tendermint/tendermint/libs/log"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
-	cmn "github.com/tendermint/tmlibs/common"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
@@ -31,6 +31,7 @@ import (
 func ServeCommand(cdc *wire.Codec) *cobra.Command {
 	flagListenAddr := "laddr"
 	flagCORS := "cors"
+	flagMaxOpenConnections := "max-open"
 
 	cmd := &cobra.Command{
 		Use:   "rest-server",
@@ -38,9 +39,13 @@ func ServeCommand(cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listenAddr := viper.GetString(flagListenAddr)
 			handler := createHandler(cdc)
-			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).
-				With("module", "rest-server")
-			listener, err := tmserver.StartHTTPServer(listenAddr, handler, logger)
+			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "rest-server")
+			maxOpen := viper.GetInt(flagMaxOpenConnections)
+
+			listener, err := tmserver.StartHTTPServer(
+				listenAddr, handler, logger,
+				tmserver.Config{MaxOpenConnections: maxOpen},
+			)
 			if err != nil {
 				return err
 			}
@@ -74,12 +79,12 @@ func createHandler(cdc *wire.Codec) http.Handler {
 
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)
 	keys.RegisterRoutes(r)
-	rpc.RegisterRoutes(ctx.GetCosmosCtx(), r)
-	tx.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc)
-	auth.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, "acc")
-	bank.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
-	ibc.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
-	stake.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
+	rpc.RegisterRoutes(ctx.Ctx, r)
+	tx.RegisterRoutes(ctx.Ctx, r, cdc)
+	auth.RegisterRoutes(ctx.Ctx, r, cdc, "acc")
+	bank.RegisterRoutes(ctx.Ctx, r, cdc, kb)
+	ibc.RegisterRoutes(ctx.Ctx, r, cdc, kb)
+	stake.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	RegisterRoutes(ctx, r, cdc, kb)
 	return r
 }

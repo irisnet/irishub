@@ -5,11 +5,11 @@ import (
 	"errors"
 
 	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
-	crypto "github.com/tendermint/go-crypto"
+	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -24,8 +24,8 @@ type GenesisState struct {
 
 // GenesisAccount doesn't need pubkey or sequence
 type GenesisAccount struct {
-	Address sdk.Address `json:"address"`
-	Coins   sdk.Coins   `json:"coins"`
+	Address sdk.AccAddress `json:"address"`
+	Coins   sdk.Coins      `json:"coins"`
 }
 
 func NewGenesisAccount(acc *auth.BaseAccount) GenesisAccount {
@@ -59,8 +59,10 @@ var (
 	// bonded tokens given to genesis validators/accounts
 	freeFermionVal = int64(100)
 
-	totalTokenAmt = int64(200000000)
+	totalTokenAmt = sdk.NewInt(200000000)
 )
+
+const defaultUnbondingTime int64 = 60 * 60 * 24 * 3
 
 // get app init parameters for server init command
 func IrisAppInit() server.AppInit {
@@ -82,24 +84,22 @@ func IrisAppInit() server.AppInit {
 
 // simple genesis tx
 type IrisGenTx struct {
-	Name    string        `json:"name"`
-	Address sdk.Address   `json:"address"`
-	PubKey  crypto.PubKey `json:"pub_key"`
+	Name    string         `json:"name"`
+	Address sdk.AccAddress `json:"address"`
+	PubKey  string         `json:"pub_key"`
 }
 
 // Generate a gaia genesis transaction with flags
-func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey) (
+func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
-	clientRoot := viper.GetString(flagClientHome)
-	overwrite := viper.GetBool(flagOWK)
-	name := viper.GetString(flagName)
-	if name == "" {
+
+	if genTxConfig.Name == "" {
 		return nil, nil, tmtypes.GenesisValidator{}, errors.New("Must specify --name (validator moniker)")
 	}
 
-	var addr sdk.Address
+	var addr sdk.AccAddress
 	var secret string
-	addr, secret, err = server.GenerateSaveCoinKey(clientRoot, name, "1234567890", overwrite)
+	addr, secret, err = server.GenerateSaveCoinKey(genTxConfig.CliRoot, genTxConfig.Name, "1234567890", genTxConfig.Overwrite)
 	if err != nil {
 		return
 	}
@@ -110,19 +110,19 @@ func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey) (
 		return
 	}
 	cliPrint = json.RawMessage(bz)
-	appGenTx, _, validator, err = IrisAppGenTxNF(cdc, pk, addr, name, overwrite)
+	appGenTx, _, validator, err = IrisAppGenTxNF(cdc, pk, addr, genTxConfig.Name)
 	return
 }
 
 // Generate a gaia genesis transaction without flags
-func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.Address, name string, overwrite bool) (
+func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name string) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	var bz []byte
 	gaiaGenTx := IrisGenTx{
 		Name:    name,
 		Address: addr,
-		PubKey:  pk,
+		PubKey:  sdk.MustBech32ifyAccPub(pk),
 	}
 	bz, err = wire.MarshalJSONIndent(cdc, gaiaGenTx)
 	if err != nil {
@@ -167,18 +167,30 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
-		stakeData.Pool.LooseUnbondedTokens += freeFermionVal // increase the supply
+		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRat(freeFermionVal)) // increase the supply
 
 		// add the validator
 		if len(genTx.Name) > 0 {
 			desc := stake.NewDescription(genTx.Name, "", "", "")
-			validator := stake.NewValidator(genTx.Address, genTx.PubKey, desc)
-			validator.PoolShares = stake.NewBondedShares(sdk.NewRat(freeFermionVal))
+			validator := stake.NewValidator(genTx.Address,
+				sdk.MustGetAccPubKeyBech32(genTx.PubKey), desc)
+
+			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRat(freeFermionVal))
+
+			// add some new shares to the validator
+			var issuedDelShares sdk.Rat
+			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, freeFermionVal)
 			stakeData.Validators = append(stakeData.Validators, validator)
 
-			// pool logic
-			stakeData.Pool.BondedTokens += freeFermionVal
-			stakeData.Pool.BondedShares = sdk.NewRat(stakeData.Pool.BondedTokens)
+			// create the self-delegation from the issuedDelShares
+			delegation := stake.Delegation{
+				DelegatorAddr: validator.Owner,
+				ValidatorAddr: validator.Owner,
+				Shares:        issuedDelShares,
+				Height:        0,
+			}
+
+			stakeData.Bonds = append(stakeData.Bonds, delegation)
 		}
 	}
 
@@ -205,13 +217,8 @@ func IrisAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState
 func createGenesisState() stake.GenesisState {
 	return stake.GenesisState{
 		Pool: stake.Pool{
-			LooseUnbondedTokens:     0,
-			BondedTokens:            0,
-			UnbondingTokens:         0,
-			UnbondedTokens:          0,
-			BondedShares:            sdk.ZeroRat(),
-			UnbondingShares:         sdk.ZeroRat(),
-			UnbondedShares:          sdk.ZeroRat(),
+			LooseTokens:             sdk.ZeroRat(),
+			BondedTokens:            sdk.ZeroRat(),
 			InflationLastTime:       0,
 			Inflation:               sdk.NewRat(7, 100),
 			DateLastCommissionReset: 0,
@@ -222,6 +229,7 @@ func createGenesisState() stake.GenesisState {
 			InflationMax:        sdk.NewRat(20, 100),
 			InflationMin:        sdk.NewRat(7, 100),
 			GoalBonded:          sdk.NewRat(67, 100),
+			UnbondingTime:       defaultUnbondingTime,
 			MaxValidators:       100,
 			BondDenom:           denom,
 		},
