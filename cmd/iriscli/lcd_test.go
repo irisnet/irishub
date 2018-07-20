@@ -19,16 +19,7 @@ func TestRestServer(t *testing.T) {
 
 func TestMetricsCmd(t *testing.T) {
 	cdc := app.MakeCodec()
-	comm := prometheus.MonitorCommand("stake", cdc)
-	viper.Set("node", "tcp://0.0.0.0:46657")
-	viper.Set("chain-id", "fuxi")
-	viper.Set("commands", "iris start ;htop")
-	/*
-		viper.Set("paths","/etc ;/home/")
-		viper.Set("recursively", false)
-	*/
-	viper.Set("paths", "/Users/zhangzhiqiang/.iris")
-	viper.Set("disks", "/")
-	viper.Set("recursively", true)
+	comm := prometheus.MonitorCommand(cdc)
+	viper.Set("node", "tcp://0.0.0.0:26657")
 	comm.ExecuteC()
 }
