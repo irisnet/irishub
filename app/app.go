@@ -147,7 +147,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 	}
 }
 
-// custom logic for gaia initialization
+// custom logic for iris initialization
 func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
@@ -176,7 +176,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	return abci.ResponseInitChain{}
 }
 
-// export the state of gaia for a genesis file
+// export the state of iris for a genesis file
 func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
 
