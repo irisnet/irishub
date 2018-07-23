@@ -124,6 +124,7 @@ func convertMsg(tx sendTx) (Msgs, error) {
 				if err := json.Unmarshal(data, &msg); err != nil {
 					return nil, err
 				}
+				msgs = append(msgs, msg)
 			}
 		case "beginUnbond":
 			{
@@ -131,6 +132,7 @@ func convertMsg(tx sendTx) (Msgs, error) {
 				if err := json.Unmarshal(data, &msg); err != nil {
 					return nil, err
 				}
+				msgs = append(msgs, msg)
 			}
 		case "completeUnbond":
 			{
@@ -138,6 +140,7 @@ func convertMsg(tx sendTx) (Msgs, error) {
 				if err := json.Unmarshal(data, &msg); err != nil {
 					return nil, err
 				}
+				msgs = append(msgs, msg)
 			}
 		}
 	}
