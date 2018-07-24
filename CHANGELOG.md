@@ -11,7 +11,7 @@ BREAKING CHANGES:
 
 FEATURES:
 
-- [lcd] code rego
+- [lcd] code refactor
 
 - [cli] improve sendingand querying the  transactions 
 
