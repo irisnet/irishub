@@ -7,7 +7,7 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 * 源码：https://github.com/irisnet/irishub
 * 浏览器：http://testnet.irisplorer.io 
 * 水龙头：http://testnet.irisplorer.io/#/faucet
-* 文档：https://github.com/irisnet/testnets
+* 文档：https://github.com/irisnet/testnets/tree/master/testnets
 
 
 
