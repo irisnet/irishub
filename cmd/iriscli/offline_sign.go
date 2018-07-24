@@ -6,14 +6,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/crypto"
 	"io/ioutil"
 	"net/http"
-	"fmt"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 )
 
 func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
@@ -22,7 +19,6 @@ func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Key
 
 type sendTx struct {
 	Msgs       []string       `json:"msgs"`
-	MsgType    string         `json:"type"`
 	Fee        auth.StdFee    `json:"fee"`
 	Signatures []StdSignature `json:"signatures"`
 	Memo       string         `json:"memo"`
@@ -34,8 +30,6 @@ type StdSignature struct {
 	AccountNumber int64  `json:"account_number"`
 	Sequence      int64  `json:"sequence"`
 }
-
-type Msgs = []sdk.Msg
 
 //send traction(sign with rainbow) to irishub
 func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) http.HandlerFunc {
@@ -70,11 +64,16 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 			sig[index].Sequence = s.Sequence
 		}
 
-		msgs, err := convertMsg(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
+		var msgs = make([]sdk.Msg, len(tx.Msgs))
+		for index, msgS := range tx.Msgs {
+			var data = []byte(msgS)
+			var msg sdk.Msg
+			if err := cdc.UnmarshalJSON(data, &msg); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+				return
+			}
+			msgs[index] = msg
 		}
 
 		var stdTx = auth.StdTx{
@@ -84,7 +83,6 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 			Memo:       tx.Memo,
 		}
 		txByte, _ := cdc.MarshalBinary(stdTx)
-		fmt.Println(txByte)
 		// send
 		res, err := ctx.BroadcastTxSync(txByte)
 		if err != nil {
@@ -102,47 +100,4 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 
 		w.Write(output)
 	}
-}
-
-func convertMsg(tx sendTx) (Msgs, error) {
-	var msgs Msgs
-	for _, msgS := range tx.Msgs {
-		var data = []byte(msgS)
-
-		switch tx.MsgType {
-		case "transfer":
-			{
-				var msg bank.MsgSend
-				if err := json.Unmarshal(data, &msg); err != nil {
-					return nil, err
-				}
-				msgs = append(msgs, msg)
-			}
-		case "delegate":
-			{
-				var msg stake.MsgDelegate
-				if err := json.Unmarshal(data, &msg); err != nil {
-					return nil, err
-				}
-				msgs = append(msgs, msg)
-			}
-		case "beginUnbond":
-			{
-				var msg stake.MsgBeginUnbonding
-				if err := json.Unmarshal(data, &msg); err != nil {
-					return nil, err
-				}
-				msgs = append(msgs, msg)
-			}
-		case "completeUnbond":
-			{
-				var msg stake.MsgCompleteUnbonding
-				if err := json.Unmarshal(data, &msg); err != nil {
-					return nil, err
-				}
-				msgs = append(msgs, msg)
-			}
-		}
-	}
-	return msgs, nil
 }
