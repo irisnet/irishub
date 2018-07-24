@@ -21,6 +21,8 @@ import (
 	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/client/rest"
 	stake "github.com/cosmos/cosmos-sdk/x/stake/client/rest"
+	gov "github.com/cosmos/cosmos-sdk/x/gov/client/rest"
+	slashing "github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
 )
@@ -86,5 +88,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	ibc.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	stake.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	RegisterRoutes(ctx, r, cdc, kb)
+	gov.RegisterRoutes(ctx.Ctx, r, cdc)
+	slashing.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	return r
 }
