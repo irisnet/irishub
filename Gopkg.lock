@@ -70,8 +70,6 @@
     "x/bank/client",
     "x/bank/client/cli",
     "x/bank/client/rest",
-    "x/gov",
-    "x/gov/client/cli",
     "x/ibc",
     "x/ibc/client/cli",
     "x/ibc/client/rest",
@@ -197,7 +195,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -591,6 +588,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bb22c0659bd3b2390d6091cf675f814d227c4f49b160b0b73b8797071d13977c"
+  inputs-digest = "b0ef09429f348f44e6cfc5f8467fd9eb2dc9130f8fce3184b724f986829aaf50"
   solver-name = "gps-cdcl"
   solver-version = 1

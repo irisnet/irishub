@@ -55,3 +55,7 @@ type MsgSwitch struct {
 | VersionKey | Version | Version    | v/%010d/     |  v/proposalId  |
 | VersionListKey | ListOfVersionKey | [][]byte{}    | l/     |  list of the version_key ordered by proposalId  |
 | SwitchKey | MsgSwitch | MsgSwitch    | s/%010d/%d/     | s/proposalId/switchVoterAddress | 
+
+
+
+

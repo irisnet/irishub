@@ -29,3 +29,11 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 		Log:  fmt.Sprintf("Switch %s by %s", msgSwitch.Title, msgSwitch.Voter.String()),
 	}
 }
+
+
+// do switch
+func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags){
+	//
+	tags = sdk.NewTags()
+	return tags
+}
