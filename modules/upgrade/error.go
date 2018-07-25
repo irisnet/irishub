@@ -8,6 +8,7 @@ const (
 	DefaultCodespace sdk.CodespaceType = 1
 
 	CodeInvalidMsgType			sdk.CodeType = 200
+	CodeUnSupportedMsgType		sdk.CodeType = 201
 	CodeUnknownRequest  		sdk.CodeType = sdk.CodeUnknownRequest
 )
 
@@ -15,6 +16,8 @@ func codeToDefaultMsg(code sdk.CodeType) string {
 	switch code {
 	case CodeInvalidMsgType:
 		return "Invalid msg type"
+	case CodeUnSupportedMsgType:
+		return "Current version software doesn't support the msg type"
 	default:
 		return sdk.CodeToDefaultMsg(code)
 	}
