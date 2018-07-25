@@ -24,3 +24,10 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper) Keeper {
 var (
 	defaultSwichPeriod     int64 = 200
 )
+
+func (k Keeper) SetVersionList(version Version){
+
+}
+func (k Keeper) GetVersionList() VersionList{
+	return  nil
+}

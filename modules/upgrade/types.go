@@ -23,7 +23,7 @@ func NewModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreK
 type ModulesLifeTime []ModuleLifeTime
 
 func NewModulesLifeTime() ModulesLifeTime {
-    return ModulesLifeTime{ModuleLifeTime{}}
+    return ModulesLifeTime{}
 }
 
 func (m ModulesLifeTime) AddModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreKey){
@@ -37,11 +37,12 @@ type Version struct {
     Votes       []sdk.AccAddress
     ModuleList	ModulesLifeTime
 }
+
 func NewVersion(id int64,start int64,moduleList ModulesLifeTime) Version{
     return Version{
         Id:id,
         Start:start,
-        Votes:[]sdk.AccAddress{}
+        Votes:[]sdk.AccAddress{},
         ModuleList:moduleList,
     }
 }
@@ -50,7 +51,14 @@ func (v Version) getMsgType() string{
 	return " "
 }
 
-// run when app start
-func (v Version) updateCurrentVersion(){
+// run when app star
+func (v Version) updateCurrentVersion(moduleList ModulesLifeTime){
 
+}
+
+
+type VersionList []Version
+
+func NewVersionList() VersionList {
+	return VersionList{}
 }
