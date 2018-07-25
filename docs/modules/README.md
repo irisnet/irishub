@@ -24,7 +24,7 @@ key point：
 type ModuleLifeTime struct {
 	Start	int64
 	End	int64
-        Handler sdk.Handler
+    Handler string//返回handle的type,最后路由交给baseapp
 	store	sdk.KVStoreKey
 }
 
@@ -55,3 +55,11 @@ type MsgSwitch struct {
 | VersionKey | Version | Version    | v/%010d/     |  v/proposalId  |
 | VersionListKey | ListOfVersionKey | [][]byte{}    | l/     |  list of the version_key ordered by proposalId  |
 | SwitchKey | MsgSwitch | MsgSwitch    | s/%010d/%d/     | s/proposalId/switchVoterAddress | 
+
+## Yellow Feature
+
+1.现在，governance处理完一个proposal至少两周或者更长，导致了升级或者bugfix的延迟很大，可以考虑设计一个优先级较高的提议流程。
+
+
+
+
