@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/upgrade"
 )
 
 // Governance Keeper
@@ -17,8 +18,12 @@ type Keeper struct {
 	// The reference to the DelegationSet to get information about delegators
 	ds sdk.DelegationSet
 
+
+	uk upgrade.Keeper
+
 	// The (unexposed) keys used to access the stores from the Context.
 	storeKey sdk.StoreKey
+
 
 	// The wire codec for binary encoding/decoding.
 	cdc *wire.Codec
@@ -410,4 +415,8 @@ func (keeper Keeper) InactiveProposalQueuePop(ctx sdk.Context) Proposal {
 func (keeper Keeper) InactiveProposalQueuePush(ctx sdk.Context, proposal Proposal) {
 	proposalQueue := append(keeper.getInactiveProposalQueue(ctx), proposal.GetProposalID())
 	keeper.setInactiveProposalQueue(ctx, proposalQueue)
+}
+
+func (keeper Keeper) SetCurrentVersion(ctx sdk.Context, proposal Proposal){
+
 }
