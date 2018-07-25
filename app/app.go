@@ -11,7 +11,6 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -20,6 +19,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/upgrade"
+	"fmt"
+	"strings"
 )
 
 const (
@@ -34,7 +36,7 @@ var (
 
 // Extended ABCI application
 type IrisApp struct {
-	*bam.BaseApp
+	*BaseApp
 	cdc *wire.Codec
 
 	// keys to access the substores
@@ -45,6 +47,7 @@ type IrisApp struct {
 	keySlashing      *sdk.KVStoreKey
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
+	keyUpgrade 		 *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -54,17 +57,18 @@ type IrisApp struct {
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	govKeeper           gov.Keeper
+	upgradeKeeper		upgrade.Keeper
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := bam.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
+	bApp := NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:          bam.NewBaseApp(appName, cdc, logger, db),
+		BaseApp:          NewBaseApp(appName, cdc, logger, db),
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
@@ -73,6 +77,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
+		keyUpgrade: 	  sdk.NewKVStoreKey("upgrade"),
 	}
 
 	// define the accountMapper
@@ -89,6 +94,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.coinKeeper, app.stakeKeeper)
 
 	// register message routes
 	app.Router().
@@ -121,6 +127,7 @@ func MakeCodec() *wire.Codec {
 	slashing.RegisterWire(cdc)
 	gov.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
+	upgrade.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
@@ -199,4 +206,56 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 	}
 	validators = stake.WriteValidators(ctx, app.stakeKeeper)
 	return appState, validators, nil
+}
+
+// Iterates through msgs and executes them
+func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result) {
+	// accumulate results
+	logs := make([]string, 0, len(msgs))
+	var data []byte   // NOTE: we just append them all (?!)
+	var tags sdk.Tags // also just append them all
+	var code sdk.ABCICodeType
+	for msgIdx, msg := range msgs {
+		// Match route.
+		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(msg)
+		if err != nil {
+			return err.Result()
+		}
+
+		handler := app.router.Route(msgType)
+		if handler == nil {
+			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
+		}
+
+		msgResult := handler(ctx, msg)
+
+		// NOTE: GasWanted is determined by ante handler and
+		// GasUsed by the GasMeter
+
+		// Append Data and Tags
+		data = append(data, msgResult.Data...)
+		tags = append(tags, msgResult.Tags...)
+
+		// Stop execution and return on first failed message.
+		if !msgResult.IsOK() {
+			logs = append(logs, fmt.Sprintf("Msg %d failed: %s", msgIdx, msgResult.Log))
+			code = msgResult.Code
+			break
+		}
+
+		// Construct usable logs in multi-message transactions.
+		logs = append(logs, fmt.Sprintf("Msg %d: %s", msgIdx, msgResult.Log))
+	}
+
+	// Set the final gas values.
+	result = sdk.Result{
+		Code:    code,
+		Data:    data,
+		Log:     strings.Join(logs, "\n"),
+		GasUsed: ctx.GasMeter().GasConsumed(),
+		// TODO: FeeAmount/FeeDenom
+		Tags: tags,
+	}
+
+	return result
 }
