@@ -31,6 +31,25 @@ func (msg MsgSwitch) GetSignBytes() []byte {
 }
 
 func (msg MsgSwitch) ValidateBasic() sdk.Error {
+	if len(msg.Title) == 0 {
+		return ErrInvalidTitle(DefaultCodespace, msg.Title) // TODO: Proper Error
+	}
+	if len(msg.Description) == 0 {
+		return ErrInvalidDescription(DefaultCodespace, msg.Description) // TODO: Proper Error
+	}
+	if !validProposalType(msg.ProposalType) {
+		return ErrInvalidProposalType(DefaultCodespace, msg.ProposalType)
+	}
+	if len(msg.Proposer) == 0 {
+		return sdk.ErrInvalidAddress(msg.Proposer.String())
+	}
+	if !msg.InitialDeposit.IsValid() {
+		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
+	}
+	if !msg.InitialDeposit.IsNotNegative() {
+		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
+	}
+	return nil
 	return nil
 }
 

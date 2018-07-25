@@ -34,12 +34,14 @@ func (m ModulesLifeTime) AddModuleLifeTime(start int64, end	int64, handler strin
 type Version struct {
     Id			int64		// should be equal with corresponding upgradeProposalID
     Start		int64
+    Votes       []sdk.AccAddress
     ModuleList	ModulesLifeTime
 }
 func NewVersion(id int64,start int64,moduleList ModulesLifeTime) Version{
     return Version{
         Id:id,
         Start:start,
+        Votes:[]sdk.AccAddress{}
         ModuleList:moduleList,
     }
 }
@@ -49,6 +51,6 @@ func (v Version) getMsgType() string{
 }
 
 // run when app start
-func (v Version) updateVersion(){
+func (v Version) updateCurrentVersion(){
 
 }
