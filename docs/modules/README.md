@@ -56,6 +56,38 @@ type MsgSwitch struct {
 | VersionListKey | ListOfVersionKey | [][]byte{}    | l/     |  list of the version_key ordered by proposalId  |
 | SwitchKey | MsgSwitch | MsgSwitch    | s/%010d/%d/     | s/proposalId/switchVoterAddress | 
 
+## Gov Propsal 设计
+### add the module
+Title:ADD
 
+Description:"NEW MODULE NAME"
+### change the module
+Title:CHANGE
 
+Description:"NEW MODULE NAME:OLD MOUDLE NAME"
+
+### bugfix
+Title:BUG
+
+Description:"Bug MODULE NAME"
+
+## 不同阶段对store数据结构的读写
+### store存储数据
+* currentVersion 当前版本
+* versionList 按时间顺序排列的versionID的list
+* version 各个版本信息
+* upgradeproposalID 当前升级的proposalID
+
+### 创世阶段
+1. 创建第一个version ，设置为currentVersion（id=0）
+2. 创建第一个versionList=[0]
+3. 保存currentVersion，versionList，version，upgradeproposalID（-1）
+
+### gov proposal 通过阶段
+1. 把当前升级的proposalID 写入 upgradeproposalID
+
+### MsgSwitch阶段
+1. 判断voter是否为validator
+2. 判断当前proposalID 是否为 upgradeproposalID
+3. 1，2都成立，则把投票信息写入DB
 
