@@ -6,31 +6,47 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 )
 
-type ModuleLifeTime struct {
-	Start		int64
-	End			int64
-	Handler 	sdk.Handler
-	store		sdk.KVStoreKey
-}
-
-type Version struct {
-	Id			int		// should be equal with corresponding upgradeProposalID
-	Start		int64
-	ModuleList	[]ModuleLifeTime
-}
-
 type Keeper struct {
 	storeKey   		sdk.StoreKey
 	cdc        		*wire.Codec
 	coinKeeper 		bank.Keeper
+	// The ValidatorSet to get information about validators
+	vs              sdk.ValidatorSet
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet) Keeper {
 	keeper := Keeper {
 		storeKey:   key,
 		cdc:        cdc,
 		coinKeeper: ck,
+		vs:        ds.GetValidatorSet(),
 	}
 	return keeper
 }
 
+var (
+	defaultSwichPeriod     int64 = 200
+)
+
+
+func (k Keeper) SetCurrentVersion(version Version){
+
+}
+
+func (k Keeper) GetCurrentVersion() VersionList{
+	return  nil
+}
+
+func (k Keeper) SetVersion(version Version){
+
+}
+func (k Keeper) GetVersion() VersionList{
+	return  nil
+}
+
+func (k Keeper) SetVersionList(versionList VersionList){
+
+}
+func (k Keeper) GetVersionList() VersionList{
+	return  nil
+}
