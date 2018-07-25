@@ -6,19 +6,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 )
 
-type ModuleLifeTime struct {
-	Start		int64
-	End			int64
-	Handler 	sdk.Handler
-	store		sdk.KVStoreKey
-}
-
-type Version struct {
-	Id			int		// should be equal with corresponding upgradeProposalID
-	Start		int64
-	ModuleList	[]ModuleLifeTime
-}
-
 type Keeper struct {
 	storeKey   		sdk.StoreKey
 	cdc        		*wire.Codec
@@ -34,3 +21,6 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper) Keeper {
 	return keeper
 }
 
+var (
+	defaultSwichPeriod     int64 = 200
+)
