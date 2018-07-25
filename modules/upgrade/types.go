@@ -22,7 +22,7 @@ func NewModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreK
 
 type ModuleLifeTimeList []ModuleLifeTime
 
-func NewModulesLifeTime() ModuleLifeTimeList {
+func NewModuleLifeTimeList() ModuleLifeTimeList {
     return ModuleLifeTimeList{}
 }
 
