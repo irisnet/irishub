@@ -4,7 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/gov"
 )
 
 type Keeper struct {
@@ -30,7 +29,7 @@ var (
 )
 
 
-func (k Keeper) SetCurrentVersion(version Version,proposal gov.Proposal){
+func (k Keeper) SetCurrentVersion(version Version){
 
 }
 
