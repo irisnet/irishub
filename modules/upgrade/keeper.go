@@ -28,13 +28,23 @@ var (
 	defaultSwichPeriod     int64 = 57600	// 2 days
 )
 
+func (k Keeper) GetCurrentVersionID() int64 {
+	return -1	// return -1 if current version not found
+}
+
+func (k Keeper) IncreaseCurrentVersionID() int64 {
+	return 0
+}
+
 func (k Keeper) GetCurrentVersion() Version {
 	return  Version{}
 }
 
 func (k Keeper) AddNewVersion(version Version) {
+	version.Id = k.IncreaseCurrentVersionID()
 
 }
+
 func (k Keeper) GetVersion(blockHeight int64) Version {
 	return  Version{}
 }
