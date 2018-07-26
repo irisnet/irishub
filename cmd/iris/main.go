@@ -42,9 +42,11 @@ func main() {
 		server.ShowValidatorCmd(ctx),
 	)
 
+	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
+	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
 		server.InitCmd(ctx, cdc, app.IrisAppInit()),
-		server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris")),
+		startCmd,
 		server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
