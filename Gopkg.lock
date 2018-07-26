@@ -416,6 +416,7 @@
   version = "v0.9.2"
 
 [[projects]]
+  branch = "haoyang/replay-state"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -472,8 +473,8 @@
     "types",
     "version"
   ]
-  revision = "5ff65274b84ea905787a48512cc3124385bddf2f"
-  version = "v0.22.2"
+  revision = "0a4180d2a42c5475d84342c20a73937627f8e3f9"
+  source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -588,6 +589,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b0ef09429f348f44e6cfc5f8467fd9eb2dc9130f8fce3184b724f986829aaf50"
+  inputs-digest = "dcb7aa1d9665a9f6a64d02b56f0c191ac2a33ffe02ceab4e2675016ed3b2ade1"
   solver-name = "gps-cdcl"
   solver-version = 1
