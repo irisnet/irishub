@@ -28,6 +28,7 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	"github.com/spf13/viper"
 	"errors"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
 )
 
 const (
@@ -281,7 +282,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 
 func (app *IrisApp) replay() int64   {
 	ctx := server.NewDefaultContext()
-	ctx.Config.RootDir = DefaultNodeHome
+	ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
 	dbContext := node.DBContext{"state", ctx.Config}
 	dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
 	stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
