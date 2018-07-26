@@ -114,7 +114,7 @@ func isSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, proposal Proposal
 
 func runSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, proposal Proposal){
 	proposalID := keeper.uk.GetCurrentProposalID()
-	if proposalID !=-1{
+	if proposalID ==-1{
 		keeper.uk.SetCurrentProposalID(proposal.GetProposalID())
 	} else{
 		fmt.Println("One SoftwareUpgradeProposal is in process, proposalID = ",proposalID)
