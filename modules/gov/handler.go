@@ -115,9 +115,18 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags, nonVotingVals []
 		activeProposal := keeper.ActiveProposalQueuePop(ctx)
 
 		if ctx.BlockHeight() >= activeProposal.GetVotingStartBlock()+keeper.GetVotingProcedure().VotingPeriod {
-			passes, nonVotingVals = tally(ctx, keeper, activeProposal)
+
+			nonVotingVals = []sdk.AccAddress{}
+
+			passes = isSoftwareUpgradeProposal(ctx,keeper,activeProposal)
+
+
+			//passes, nonVotingVals = tally(ctx, keeper, activeProposal)
+
+
 			proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(activeProposal.GetProposalID())
 			if passes {
+				runSoftwareUpgradeProposal(ctx,keeper,activeProposal)
 				keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 				activeProposal.SetStatus(StatusPassed)
 				tags.AppendTag("action", []byte("proposalPassed"))

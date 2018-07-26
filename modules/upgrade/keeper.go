@@ -53,6 +53,14 @@ func (k Keeper) GetVersionList() VersionList {
 	return  nil
 }
 
+func (k Keeper) GetCurrentProposalID() int64 {
+	return -1
+}
+
+func (k Keeper) SetCurrentProposalID(proposalID int64) {
+
+}
+
 func (k Keeper) GetMsgTypeInCurrentVersion(msg sdk.Msg) (string, sdk.Error) {
 	currentVersion := k.GetCurrentVersion()
 	return currentVersion.getMsgType(msg)
