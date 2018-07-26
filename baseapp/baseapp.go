@@ -1,4 +1,4 @@
-package app
+package baseapp
 
 import (
 	"fmt"
@@ -19,8 +19,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-
-	"github.com/cosmos/cosmos-sdk/baseapp"
 )
 
 // Key to store the header in the DB itself.
@@ -49,7 +47,7 @@ type BaseApp struct {
 	cdc        *wire.Codec          // Amino codec
 	db         dbm.DB               // common DB backend
 	cms        sdk.CommitMultiStore // Main (uncached) state
-	router     baseapp.Router               // handle any kind of message
+	router     Router               // handle any kind of message
 	codespacer *sdk.Codespacer      // handle module codespacing
 
 	// must be set
@@ -90,7 +88,7 @@ func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, opti
 		cdc:        cdc,
 		db:         db,
 		cms:        store.NewCommitMultiStore(db),
-		router:     baseapp.NewRouter(),
+		router:     NewRouter(),
 		codespacer: sdk.NewCodespacer(),
 		txDecoder:  defaultTxDecoder(cdc),
 	}
@@ -185,7 +183,7 @@ func (app *BaseApp) SetAddrPeerFilter(pf sdk.PeerFilter) {
 func (app *BaseApp) SetPubKeyPeerFilter(pf sdk.PeerFilter) {
 	app.pubkeyPeerFilter = pf
 }
-func (app *BaseApp) Router() baseapp.Router { return app.router }
+func (app *BaseApp) Router() Router { return app.router }
 
 // load latest application version
 func (app *BaseApp) LoadLatestVersion(mainKey sdk.StoreKey) error {
