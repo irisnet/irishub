@@ -23,10 +23,16 @@ import (
 	"github.com/irisnet/irishub/baseapp"
 	"fmt"
 	"strings"
+	"github.com/tendermint/tendermint/node"
+	"github.com/cosmos/cosmos-sdk/server"
+	sm "github.com/tendermint/tendermint/state"
+	"github.com/spf13/viper"
+	"errors"
 )
 
 const (
 	appName = "IrisApp"
+	FlagReplay  = "replay"
 )
 
 // default home directories for expected binaries
@@ -81,6 +87,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyUpgrade: 	  sdk.NewKVStoreKey("upgrade"),
 	}
 
+	var lastHeight int64
+	if viper.GetBool(FlagReplay) {
+		lastHeight = app.replay()
+	}
+
 	// define the accountMapper
 	app.accountMapper = auth.NewAccountMapper(
 		app.cdc,
@@ -111,7 +122,12 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyUpgrade)
-	err := app.LoadLatestVersion(app.keyMain)
+	var err error
+	if viper.GetBool(FlagReplay) {
+		err = app.LoadVersion(lastHeight, app.keyMain)
+	} else {
+		err = app.LoadLatestVersion(app.keyMain)
+	}
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
@@ -261,4 +277,22 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	}
 
 	return result
+}
+
+func (app *IrisApp) replay() int64   {
+	ctx := server.NewDefaultContext()
+	ctx.Config.RootDir = DefaultNodeHome
+	dbContext := node.DBContext{"state", ctx.Config}
+	dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
+	stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
+
+	preState := sm.LoadPreState(stateDB)
+	if preState.LastBlockHeight == 0 {
+		panic(errors.New("can't replay the last block, last block height is 0"))
+	}
+
+	sm.SaveState(stateDB,preState)
+	stateDB.Close()
+
+	return preState.LastBlockHeight
 }
