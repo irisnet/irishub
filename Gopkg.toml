@@ -58,7 +58,8 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  version = "=0.22.2"
+  branch = "haoyang/replay-state"
+  source = "https://github.com/irisnet/tendermint.git"
 
 
 [prune]
