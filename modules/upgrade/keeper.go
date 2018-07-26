@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 )
 
 type Keeper struct {
@@ -11,15 +12,15 @@ type Keeper struct {
 	cdc        		*wire.Codec
 	coinKeeper 		bank.Keeper
 	// The ValidatorSet to get information about validators
-	vs              sdk.ValidatorSet
+	sk              stake.Keeper
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, sk stake.Keeper) Keeper {
 	keeper := Keeper {
 		storeKey:   key,
 		cdc:        cdc,
 		coinKeeper: ck,
-		vs:        ds.GetValidatorSet(),
+		sk:        sk,
 	}
 	return keeper
 }
@@ -64,4 +65,12 @@ func (k Keeper) SetCurrentProposalID(proposalID int64) {
 func (k Keeper) GetMsgTypeInCurrentVersion(msg sdk.Msg) (string, sdk.Error) {
 	currentVersion := k.GetCurrentVersion()
 	return currentVersion.getMsgType(msg)
+}
+
+func (k Keeper) SetSwitch(propsalID int64, address sdk.AccAddress,cmsg MsgSwitch) {
+
+}
+
+func (k Keeper) GetSwitch(propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
+	return MsgSwitch{}, true
 }
