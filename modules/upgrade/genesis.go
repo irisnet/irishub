@@ -18,6 +18,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, router baseapp.Router) {
 	}
 
 	genesisVersion := NewVersion(0, 0, modulelist)
-	k.AddNewVersion(genesisVersion)
+	k.AddNewVersion(ctx, genesisVersion)
 
 }
