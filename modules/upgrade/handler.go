@@ -19,10 +19,32 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
+
 	msgSwitch, ok := msg.(MsgSwitch)
 	if !ok {
 		return NewError(DefaultCodespace, CodeInvalidMsgType, "Handler should only receive MsgSwitch").Result()
 	}
+
+	proposalID := msgSwitch.ProposalID
+	CurrentProposalID := k.GetCurrentProposalID()
+
+	if proposalID != CurrentProposalID {
+
+		return NewError(DefaultCodespace, CodeNotCurrentProposal, "It isn't the current SoftwareUpgradeProposal").Result()
+
+	}
+
+	voter := msgSwitch.Voter
+
+	if _,ok := k.sk.GetValidator(ctx,voter);!ok{
+		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
+	}
+
+	if _,ok := k.GetSwitch(proposalID,voter);ok{
+		return NewError(DefaultCodespace, CodeDoubleSwitch, "You have sent the switch msg").Result()
+	}
+
+	k.SetSwitch(proposalID,voter,msgSwitch)
 
 	return sdk.Result{
 		Code: 0,
