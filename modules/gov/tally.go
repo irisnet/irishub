@@ -2,6 +2,7 @@ package gov
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"fmt"
 )
 
 // validatorGovInfo used for tallying
@@ -99,3 +100,23 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, nonV
 	return false, nonVoting
 }
 
+var (
+   upgradeproposal = map[string]int64{ "ADD": 1, "CHANGE": 2, "BUGFIX": 3,}
+)
+
+func isSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, proposal Proposal) bool {
+	title := proposal.GetTitle()
+	if _,ok := upgradeproposal[title]; ok{
+		return true
+	}
+	return false
+}
+
+func runSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, proposal Proposal){
+	proposalID := keeper.uk.GetCurrentProposalID()
+	if proposalID !=-1{
+		keeper.uk.SetCurrentProposalID(proposal.GetProposalID())
+	} else{
+		fmt.Println("One SoftwareUpgradeProposal is in process, proposalID = ",proposalID)
+	}
+}
