@@ -3,27 +3,39 @@ package upgrade
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strconv"
 )
 
 var (
-	CurrentVersionIDKey	= []byte("c/")
-	VersionKey 			= "v/%010d/"		// v/<proposalId>
-	SwitchKey			= "s/%010d/%d/"		// s/<proposalId>/<switchVoterAddress>
-	VersionListKey      = []byte("l/")		// list of the version_key ordered by proposalId
+	currentProposalId   = []byte("c/proposalId")
+	currentVersionKey	= []byte("c/version")
+	versionKey 			= "v/%s"		// v/<versionId>
+	proposalIDKey 		= "p/%s"		// p/<proposalId>
+	startHeightKey		= "h/%s"		// h/<height>
+	switchKey			= "s/%s/%s"		// s/<proposalId>/<switchVoterAddress>
 )
 
-func GetCurrentVersionIDKey() []byte {
-	return CurrentVersionIDKey
+func GetCurrentProposalIdKey() []byte {
+	return currentProposalId
 }
 
-func GetVersionKey(proposalID int64) []byte {
-	return []byte(fmt.Sprintf(VersionKey, proposalID))
+func GetCurrentVersionKey() []byte {
+	return currentVersionKey
+}
+
+func GetVersionIDKey(proposalID int64) []byte {
+	return []byte(fmt.Sprintf(versionKey, strconv.FormatInt(proposalID, 16)))
+}
+
+func GetProposalIDKey(proposalID int64) []byte {
+	return []byte(fmt.Sprintf(proposalIDKey, strconv.FormatInt(proposalID, 16)))
+}
+
+func GetStartHeightKey(height int64) []byte {
+	return []byte(fmt.Sprintf(startHeightKey, strconv.FormatInt(height, 16)))
 }
 
 func GetSwitchKey(proposalID int64, switchVoterAddr sdk.AccAddress) []byte {
-	return []byte(fmt.Sprintf(SwitchKey, proposalID, switchVoterAddr))
+	return []byte(fmt.Sprintf(switchKey, strconv.FormatInt(proposalID, 16), switchVoterAddr.String()))
 }
 
-func GetVersionListKey() []byte {
-	return VersionListKey
-}

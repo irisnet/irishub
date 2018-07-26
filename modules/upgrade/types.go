@@ -64,12 +64,12 @@ func (v Version) updateCurrentVersion(moduleList ModuleLifeTimeList) {
 }
 
 
-type VersionList []int64
+type VersionList []Version
 
 func NewVersionList() VersionList {
 	return VersionList{}
 }
 
-func (m VersionList) AddVersion(v int64) {
+func (m VersionList) AddVersion(v Version) {
 	m = append(m,v)
 }
