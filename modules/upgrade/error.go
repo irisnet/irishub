@@ -10,6 +10,9 @@ const (
 	CodeInvalidMsgType			sdk.CodeType = 200
 	CodeUnSupportedMsgType		sdk.CodeType = 201
 	CodeUnknownRequest  		sdk.CodeType = sdk.CodeUnknownRequest
+	CodeNotCurrentProposal      sdk.CodeType = 203
+	CodeNotValidator            sdk.CodeType = 204
+	CodeDoubleSwitch            sdk.CodeType = 205
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
