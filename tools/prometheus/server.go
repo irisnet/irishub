@@ -2,13 +2,14 @@ package prometheus
 
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/tools"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	cmn "github.com/tendermint/tmlibs/common"
 	"log"
 	"net/http"
-	"github.com/irisnet/irishub/app"
+	"fmt"
 )
 
 func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
@@ -17,7 +18,7 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			ctx := tools.NewContext(storeName,cdc)
+			ctx := tools.NewContext(storeName, cdc)
 			monitor := DefaultMonitor(ctx)
 			monitor.Start()
 
@@ -41,6 +42,12 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 	}
 	cmd.Flags().StringP("node", "n", "tcp://localhost:46657", "Node to connect to")
 	cmd.Flags().String("chain-id", "fuxi", "Chain ID of tendermint node")
+	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
+monitor`)
+
+	cmd.Flags().String("home", app.DefaultNodeHome, fmt.Sprintf("your iris home, %s by default",
+		app.DefaultNodeHome))
+
 	cmd.Flags().StringP("commands", "c", "iris start", `the processes you want to monitor that started 
 by these commands, separated by semicolons ';'. 
 eg: --commands="command 0;command 1;command 2", --commands=iris by default`)
@@ -48,7 +55,7 @@ eg: --commands="command 0;command 1;command 2", --commands=iris by default`)
 eg: --disks="/;/mnt1;/mnt2"`)
 	cmd.Flags().StringP("paths", "p", app.DefaultNodeHome, `path to config and data files/directories, separated by semicolons ';'.
 cannot use ~ and environment variables. eg: --paths="/etc;/home;
-size of files in sub-directories is excluded. to compute the size recursively, you can use --recursively=true"`)
+size of files in sub-directories is excluded. to compute the size recursively, you can use --recursively=true`)
 	cmd.Flags().BoolP("recursively", "r", false, `specify whether the files in sub-directories is included, 
 excluded by default. If there are many files & sub-directory in given directories, this program may be very slow!`)
 	return cmd
