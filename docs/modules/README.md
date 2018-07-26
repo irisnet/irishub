@@ -67,7 +67,7 @@ Title:CHANGE
 Description:"NEW MODULE NAME:OLD MOUDLE NAME"
 
 ### bugfix
-Title:BUG
+Title:BUGFIX
 
 Description:"Bug MODULE NAME"
 
@@ -80,7 +80,7 @@ Description:"Bug MODULE NAME"
 
 ### 创世阶段
 1. 创建第一个version ，设置为currentVersion（id=0）
-2. 创建第一个versionList=[0]
+2. 创建一个versionList=[0]
 3. 保存currentVersion，versionList，version，upgradeproposalID（-1）
 
 ### gov proposal 通过阶段

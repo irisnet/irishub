@@ -25,28 +25,25 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.Delegat
 }
 
 var (
-	defaultSwichPeriod     int64 = 200
+	defaultSwichPeriod     int64 = 57600	// 2 days
 )
 
-
-func (k Keeper) SetCurrentVersion(version Version){
-
+func (k Keeper) GetCurrentVersion() Version {
+	return  Version{}
 }
 
-func (k Keeper) GetCurrentVersion() VersionList{
+func (k Keeper) AddNewVersion(version Version) {
+
+}
+func (k Keeper) GetVersion(blockHeight int64) Version {
+	return  Version{}
+}
+
+func (k Keeper) GetVersionList() VersionList {
 	return  nil
 }
 
-func (k Keeper) SetVersion(version Version){
-
-}
-func (k Keeper) GetVersion() VersionList{
-	return  nil
-}
-
-func (k Keeper) SetVersionList(versionList VersionList){
-
-}
-func (k Keeper) GetVersionList() VersionList{
-	return  nil
+func (k Keeper) GetMsgTypeInCurrentVersion(msg sdk.Msg) (string, sdk.Error) {
+	currentVersion := k.GetCurrentVersion()
+	return currentVersion.getMsgType(msg)
 }
