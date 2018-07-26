@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -60,7 +59,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewIrisApp(logger, db, traceStore, baseapp.SetPruning(viper.GetString("pruning")))
+	return app.NewIrisApp(logger, db, traceStore, app.SetPruning(viper.GetString("pruning")))
 }
 
 func exportAppStateAndTMValidators(

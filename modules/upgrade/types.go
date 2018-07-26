@@ -26,7 +26,7 @@ func NewModuleLifeTimeList() ModuleLifeTimeList {
     return ModuleLifeTimeList{}
 }
 
-func (m ModuleLifeTimeList) AddModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreKey){
+func (m ModuleLifeTimeList) AddModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreKey) {
     m = append(m,NewModuleLifeTime(start, end, handler,store))
 }
 
@@ -37,7 +37,7 @@ type Version struct {
     ModuleList	ModuleLifeTimeList
 }
 
-func NewVersion(id int64,start int64,moduleList ModuleLifeTimeList) Version{
+func NewVersion(id int64,start int64,moduleList ModuleLifeTimeList) Version {
     return Version{
         Id:id,
         Start:start,
@@ -45,12 +45,20 @@ func NewVersion(id int64,start int64,moduleList ModuleLifeTimeList) Version{
     }
 }
 
-func (v Version) getMsgType() string{
-	return " "
+func (v Version) getMsgType(msg sdk.Msg) (string, sdk.Error) {
+    msgType := msg.Type()
+
+    for _, module := range v.ModuleList {
+        if msgType == module.Handler {
+            return msgType, nil
+        }
+    }
+
+    return "", NewError(DefaultCodespace, CodeUnSupportedMsgType, "")
 }
 
 // run when app star
-func (v Version) updateCurrentVersion(moduleList ModuleLifeTimeList){
+func (v Version) updateCurrentVersion(moduleList ModuleLifeTimeList) {
 
 }
 
