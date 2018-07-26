@@ -1,22 +1,23 @@
 package upgrade
 
 import (
-sdk "github.com/cosmos/cosmos-sdk/types"
+    sdk "github.com/cosmos/cosmos-sdk/types"
+    "math"
 )
 
 type ModuleLifeTime struct {
     Start		int64
     End			int64
     Handler 	string
-    Store		sdk.KVStoreKey
+    Store		string
 }
 
-func NewModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreKey) ModuleLifeTime {
+func NewModuleLifeTime(start int64, end	int64, handler string, store string) ModuleLifeTime {
     return ModuleLifeTime{
-        Start:start,
-        End:end,
-        Handler:handler,
-        Store:store,
+        Start:      start,
+        End:        end,
+        Handler:    handler,
+        Store:      store,
     }
 }
 
@@ -26,22 +27,22 @@ func NewModuleLifeTimeList() ModuleLifeTimeList {
     return ModuleLifeTimeList{}
 }
 
-func (m ModuleLifeTimeList) AddModuleLifeTime(start int64, end	int64, handler string,store sdk.KVStoreKey) {
-    m = append(m,NewModuleLifeTime(start, end, handler,store))
+func (mlist ModuleLifeTimeList) BuildModuleLifeTime(start int64, handler string, store string) ModuleLifeTimeList {
+    return append(mlist, NewModuleLifeTime(start, math.MaxInt64, handler, store))
 }
 
-
 type Version struct {
-    Id			int64		// should be equal with corresponding upgradeProposalID
+    Id			int64
+    proposalID  int64
     Start		int64
     ModuleList	ModuleLifeTimeList
 }
 
-func NewVersion(id int64,start int64,moduleList ModuleLifeTimeList) Version {
+func NewVersion(id int64, start int64, moduleList ModuleLifeTimeList) Version {
     return Version{
-        Id:id,
-        Start:start,
-        ModuleList:moduleList,
+        Id:         id,
+        Start:      start,
+        ModuleList: moduleList,
     }
 }
 
