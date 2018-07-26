@@ -12,7 +12,7 @@ import (
 )
 
 type ExRateResponse struct {
-	ExRate string `json:"token_shares_rate"`
+	ExRate float64 `json:"token_shares_rate"`
 }
 
 
@@ -39,6 +39,11 @@ func GetValidatorExRate(ctx context.CoreContext, cdc *wire.Codec) http.HandlerFu
 			return
 		}
 
+		//poolShares, _ := validator.PoolShares.Amount.Float64()
+		//delegatorShares, _ := validator.DelegatorShares.Float64()
+		//fmt.Printf("validator address is %v, poolShares is %v, delegator shares is %v\n",
+		//	validator.Owner.String(), poolShares, delegatorShares)
+
 		// get pool
 		pool, err := getPool(ctx, cdc)
 		if err != nil {
@@ -53,11 +58,22 @@ func GetValidatorExRate(ctx context.CoreContext, cdc *wire.Codec) http.HandlerFu
 		// pool exRate
 		poolExRate := bondedShareExRate(pool)
 
+
 		exRate := poolExRate.Mul(valExRate)
 
+
+
+		//floatValRate, _ := valExRate.Float64()
+		//floatPoolExRate, _ := poolExRate.Float64()
+		//fmt.Printf("valRate is %v, poolRate is %v\n", floatValRate, floatPoolExRate)
+
+
+		floatExRate, _ := exRate.Float64()
 		res := ExRateResponse{
-			ExRate: exRate.String(),
+			ExRate: floatExRate,
 		}
+
+		//fmt.Printf("exRate is %v\n", floatExRate)
 
 		resRaw, err := json.Marshal(res)
 
