@@ -20,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/baseapp"
 	"fmt"
 	"strings"
 	"github.com/tendermint/tendermint/node"
@@ -42,7 +43,7 @@ var (
 
 // Extended ABCI application
 type IrisApp struct {
-	*BaseApp
+	*baseapp.BaseApp
 	cdc *wire.Codec
 
 	// keys to access the substores
@@ -66,15 +67,15 @@ type IrisApp struct {
 	upgradeKeeper		upgrade.Keeper
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*baseapp.BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
+	bApp := baseapp.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:          NewBaseApp(appName, cdc, logger, db),
+		BaseApp:          baseapp.NewBaseApp(appName, cdc, logger, db),
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
@@ -109,18 +110,18 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	// register message routes
 	app.Router().
-		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
-		AddRoute("stake", stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", gov.NewHandler(app.govKeeper))
+		AddRoute("bank", app.keyAccount, bank.NewHandler(app.coinKeeper)).
+		AddRoute("ibc", app.keyIBC, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("stake", app.keyStake, stake.NewHandler(app.stakeKeeper)).
+		AddRoute("slashing", app.keySlashing, slashing.NewHandler(app.slashingKeeper)).
+		AddRoute("gov", app.keyGov, gov.NewHandler(app.govKeeper))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyUpgrade)
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain)
@@ -196,6 +197,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.DefaultGenesisState())
 
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+
 	return abci.ResponseInitChain{}
 }
 
@@ -238,7 +241,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 			return err.Result()
 		}
 
-		handler := app.router.Route(msgType)
+		handler := app.Router().Route(msgType)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
 		}
