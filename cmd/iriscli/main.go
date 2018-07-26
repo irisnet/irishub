@@ -17,6 +17,7 @@ import (
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
+	c "github.com/irisnet/irishub/client"
 )
 
 // rootCmd is the entry point for this binary
@@ -68,7 +69,7 @@ func main() {
 	advancedCmd.AddCommand(
 		tendermintCmd,
 		ibcCmd,
-		ServeCommand(cdc),
+		c.ServeCommand(cdc),
 	)
 	rootCmd.AddCommand(
 		advancedCmd,
