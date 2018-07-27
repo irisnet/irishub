@@ -33,14 +33,15 @@ func (mlist ModuleLifeTimeList) BuildModuleLifeTime(start int64, handler string,
 
 type Version struct {
     Id			int64
-    proposalID  int64
+    ProposalID  int64
     Start		int64
     ModuleList	ModuleLifeTimeList
 }
 
-func NewVersion(id int64, start int64, moduleList ModuleLifeTimeList) Version {
+func NewVersion(id int64, proposalID int64, start int64, moduleList ModuleLifeTimeList) Version {
     return Version{
         Id:         id,
+        ProposalID: proposalID,
         Start:      start,
         ModuleList: moduleList,
     }
@@ -64,12 +65,12 @@ func (v Version) updateCurrentVersion(moduleList ModuleLifeTimeList) {
 }
 
 
-type VersionList []int64
+type VersionList []Version
 
 func NewVersionList() VersionList {
 	return VersionList{}
 }
 
-func (m VersionList) AddVersion(v int64) {
+func (m VersionList) AddVersion(v Version) {
 	m = append(m,v)
 }
