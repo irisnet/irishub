@@ -81,5 +81,6 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	ibc.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
 	stake.RegisterRoutes(ctx.GetCosmosCtx(), r, cdc, kb)
 	RegisterRoutes(ctx, r, cdc, kb)
+	RegisterStakeExRate(ctx.GetCosmosCtx(), r, cdc)
 	return r
 }
