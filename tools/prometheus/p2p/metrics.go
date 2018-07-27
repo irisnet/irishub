@@ -77,14 +77,14 @@ func (m *Metrics) setP2PPersistentPeers(homeDir string) {
 }
 
 func (m *Metrics) Start(ctx tools.Context) {
-	m.setP2PPersistentPeers(viper.GetString("home"))
+	m.setP2PPersistentPeers(viper.GetString("irishome"))
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
 			result := ctx.NetInfo()
 			connected := 0
 			for _, peer := range result.Peers {
-				if listenAddr, exist := m.persistent_peers[string(peer.ID)]; exist && listenAddr == peer.ListenAddr {
+				if _, exist := m.persistent_peers[string(peer.ID)]; exist {
 					connected += 1
 				}
 			}

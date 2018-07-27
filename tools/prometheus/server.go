@@ -45,7 +45,7 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
 monitor`)
 
-	cmd.Flags().String("home", app.DefaultNodeHome, fmt.Sprintf("your iris home, %s by default",
+	cmd.Flags().String("irishome", app.DefaultNodeHome, fmt.Sprintf("your iris home, %s by default",
 		app.DefaultNodeHome))
 
 	cmd.Flags().StringP("commands", "c", "iris start", `the processes you want to monitor that started 

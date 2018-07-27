@@ -56,11 +56,19 @@ type Metrics struct {
 	AvgBlockIntervalSeconds metrics.Gauge
 	//block info
 	blockInfo *list.List// queue of BlockInfo
-	// missed prevote ratio in last 100 blocks (in seconds)
-	MissedPrevotesRatio metrics.Gauge
+
+	//Voting Power of the validator
+	VotingPower metrics.Gauge
+	//ratio of Voting Power of the validator to total voting power
+	VotingPowerRatio metrics.Gauge
+	// ratio of signed blocks in last 100 blocks
+	UpTime metrics.Gauge
+	// missed precommited since monitor up
+	MissedPrecommits metrics.Gauge
 	// given address
 	Address types.Address
 	SignedCount int
+	MissedCount int
 
 
 	// Number of transactions.
@@ -135,13 +143,29 @@ func PrometheusMetrics() *Metrics {
 			Help:      "average block interval of last 100 blocks (in seconds).",
 		}, []string{}),
 		blockInfo:list.New(),
-		MissedPrevotesRatio:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		UpTime:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "missed_precommits_ratio",
-			Help:      "missed precommits ratio of last 100 blocks.",
+			Name:      "missed_up_time",
+			Help:      "ratio of signed blocks in last 100 blocks.",
+		}, []string{}),
+		MissedPrecommits:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "consensus",
+			Name:      "missed_precommits_count",
+			Help:      "missed precommited since monitor up.",
+		}, []string{}),
+		VotingPower:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "consensus",
+			Name:      "voting_power",
+			Help:      "voting power of the validator",
+		}, []string{}),
+		VotingPowerRatio:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "consensus",
+			Name:      "voting_power_ratio",
+			Help:      "ratio of voting power of the validator to total voting power",
 		}, []string{}),
 		Address:make([]byte, 0),
 		SignedCount:0,
+		MissedCount:0,
 
 		NumTxs: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
@@ -214,6 +238,7 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *type
 	}
 	validators := resultValidators.Validators
 	valMap := make(map[string]types.Validator, len(validators))
+	var votingPower int64
 	for i, val := range validators {
 		var vote *types.Vote
 		if i < len(block.LastCommit.Precommits) {
@@ -223,7 +248,9 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *type
 			missingValidators++
 			missingValidatorsPower += val.VotingPower
 		}
-
+		if bytes.Equal(cs.Address, val.Address){
+			votingPower = val.VotingPower
+		}
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
@@ -232,6 +259,9 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *type
 	cs.MissingValidatorsPower.Set(float64(missingValidatorsPower))
 	cs.ValidatorsPower.Set(float64(validatorsPower))
 	cs.Validators.Set(float64(len(validators)))
+
+	cs.VotingPower.Set(float64(votingPower))
+	cs.VotingPowerRatio.Set(float64(votingPower)/float64(validatorsPower))
 
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {
@@ -257,15 +287,20 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *type
 				break
 			}
 		}
+		cs.MissedCount += 1- signed
+		cs.SignedCount += signed
+
 		cs.blockInfo.PushBack(BlockInfo{Height:block.Height, Time:block.Time, signed:signed})
 		firstBlock := cs.blockInfo.Front().Value.(BlockInfo)
 		if cs.blockInfo.Len() > 100{
 			cs.blockInfo.Remove(cs.blockInfo.Front())
+			cs.SignedCount -= firstBlock.signed
 		}
-		cs.SignedCount += firstBlock.signed
+
 		avgInterval := time.Now().Sub(firstBlock.Time).Seconds()/float64(cs.blockInfo.Len())
 		cs.AvgBlockIntervalSeconds.Set(avgInterval)
-		cs.MissedPrevotesRatio.Set(1 - float64(cs.SignedCount)/float64(cs.blockInfo.Len()))
+		cs.UpTime.Set(float64(cs.SignedCount)/float64(cs.blockInfo.Len()))
+		cs.MissedPrecommits.Set(float64(cs.MissedCount))
 	}
 
 	cs.NumTxs.Set(float64(block.NumTxs))
