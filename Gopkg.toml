@@ -28,7 +28,8 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  version = "v0.22.0"
+  branch = "irishub/cosmos-sdk"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 
 [[override]]
