@@ -84,6 +84,7 @@
     "x/stake/types"
   ]
   revision = "9f2b83cbe9e1b35b350703366b5e7f5806c5547e"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
   version = "v0.22.0"
 
 [[projects]]
@@ -589,6 +590,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "21914a0d399d4ebf36fefd180608b411da704919163cd8933c246a6ba8f2426b"
+  inputs-digest = "628e72c4536462c874509bd8353092e223ae4d663e2bde081ad02662c29cc646"
   solver-name = "gps-cdcl"
   solver-version = 1
