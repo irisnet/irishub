@@ -74,3 +74,11 @@ func (k Keeper) SetSwitch(propsalID int64, address sdk.AccAddress,cmsg MsgSwitch
 func (k Keeper) GetSwitch(propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
 	return MsgSwitch{}, true
 }
+
+func (k Keeper) SetCurrentProposalAcceptHeight(height int64) {
+
+}
+
+func (k Keeper) GetCurrentProposalAcceptHeight() int64 {
+	return -1
+}
