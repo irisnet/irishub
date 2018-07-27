@@ -19,7 +19,7 @@ func NewMsgSwitch( title string, proposalID int64,voter sdk.AccAddress) MsgSwitc
 }
 
 func (msg MsgSwitch) Type() string {
-	return "record"
+	return "upgrade"
 }
 
 func (msg MsgSwitch) GetSignBytes() []byte {
