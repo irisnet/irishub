@@ -23,8 +23,8 @@ func GetCurrentVersionKey() []byte {
 	return currentVersionKey
 }
 
-func GetVersionIDKey(proposalID int64) []byte {
-	return []byte(fmt.Sprintf(versionKey, strconv.FormatInt(proposalID, 16)))
+func GetVersionIDKey(versionID int64) []byte {
+	return []byte(fmt.Sprintf(versionKey, strconv.FormatInt(versionID, 16)))
 }
 
 func GetProposalIDKey(proposalID int64) []byte {

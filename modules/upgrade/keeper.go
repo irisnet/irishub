@@ -33,8 +33,10 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, sk stake.Keepe
 
 func (k Keeper) GetCurrentVersion(ctx sdk.Context) *Version {
 	kvStore := ctx.KVStore(k.storeKey)
-	curVersionBytes := kvStore.Get(GetCurrentVersionKey())
-	if curVersionBytes != nil {
+	versionIDBytes := kvStore.Get(GetCurrentVersionKey())
+	if versionIDBytes != nil {
+		versionID := int64(binary.BigEndian.Uint64(versionIDBytes))
+		curVersionBytes := kvStore.Get(GetVersionIDKey(versionID))
 		var version Version
 		err := k.cdc.UnmarshalBinary(curVersionBytes,&version)
 		if err != nil {
@@ -49,15 +51,27 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 	kvStore := ctx.KVStore(k.storeKey)
 	curVersion := k.GetCurrentVersion(ctx)
 
-	version.Id = curVersion.Id + 1
+	if curVersion == nil {
+		version.Id =0
+	} else {
+		version.Id = curVersion.Id + 1
+		if version.proposalID == curVersion.proposalID {
+			return
+		}
+	}
 	versionBytes,err := k.cdc.MarshalBinary(version)
 	if err != nil {
 		panic(err)
 	}
 
 	kvStore.Set(GetVersionIDKey(version.Id),versionBytes)
-	kvStore.Set(GetProposalIDKey(version.proposalID),versionBytes)
-	kvStore.Set(GetStartHeightKey(version.Start),versionBytes)
+
+	versionIDBytes := make([]byte,16)
+	binary.BigEndian.PutUint64(versionIDBytes,uint64(version.Id))
+
+	kvStore.Set(GetCurrentVersionKey(),versionIDBytes)
+	kvStore.Set(GetProposalIDKey(version.proposalID),versionIDBytes)
+	kvStore.Set(GetStartHeightKey(version.Start),versionIDBytes)
 }
 
 func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version {
@@ -66,7 +80,9 @@ func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version 
 	defer iterator.Close()
 
 	if iterator.Valid() {
-		versionBytes := iterator.Value()
+		versionIDBytes := iterator.Value()
+		versionID := int64(binary.BigEndian.Uint64(versionIDBytes))
+		versionBytes := kvStore.Get(GetVersionIDKey(versionID))
 		var version Version
 		err := k.cdc.UnmarshalBinary(versionBytes,&version)
 		if err != nil {
@@ -79,10 +95,12 @@ func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version 
 
 func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId int64) *Version {
 	kvStore := ctx.KVStore(k.storeKey)
-	curVersionBytes := kvStore.Get(GetProposalIDKey(proposalId))
-	if curVersionBytes != nil {
+	versionIDBytes := kvStore.Get(GetProposalIDKey(proposalId))
+	versionID := int64(binary.BigEndian.Uint64(versionIDBytes))
+	versionBytes := kvStore.Get(GetVersionIDKey(versionID))
+	if versionBytes != nil {
 		var version Version
-		err := k.cdc.UnmarshalBinary(curVersionBytes,&version)
+		err := k.cdc.UnmarshalBinary(versionBytes,&version)
 		if err != nil {
 			panic(err)
 		}
@@ -107,12 +125,13 @@ func (k Keeper) GetVersionByVersionId(ctx sdk.Context, versionId int64) *Version
 
 func (k Keeper) GetVersionList(ctx sdk.Context) VersionList {
 	kvStore := ctx.KVStore(k.storeKey)
-	iterator := kvStore.Iterator(GetProposalIDKey(0),GetProposalIDKey(math.MaxInt64))
+	iterator := kvStore.Iterator(GetVersionIDKey(0),GetVersionIDKey(math.MaxInt64))
 	defer iterator.Close()
 
 	var versionList VersionList
 	if iterator.Valid() {
 		versionBytes := iterator.Value()
+		iterator.Next()
 		var version Version
 		err := k.cdc.UnmarshalBinary(versionBytes,&version)
 		if err != nil {
