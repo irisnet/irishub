@@ -1,20 +1,23 @@
 package main
 
 import (
+	"github.com/spf13/cobra"
+
+	"github.com/tendermint/tendermint/libs/cli"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tmlibs/cli"
-
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
+	c "github.com/irisnet/irishub/client"
 )
 
 // rootCmd is the entry point for this binary
@@ -66,7 +69,7 @@ func main() {
 	advancedCmd.AddCommand(
 		tendermintCmd,
 		ibcCmd,
-		ServeCommand(cdc),
+		c.ServeCommand(cdc),
 	)
 	rootCmd.AddCommand(
 		advancedCmd,
@@ -91,11 +94,32 @@ func main() {
 			stakecmd.GetCmdCreateValidator(cdc),
 			stakecmd.GetCmdEditValidator(cdc),
 			stakecmd.GetCmdDelegate(cdc),
-			stakecmd.GetCmdUnbond(cdc),
+			stakecmd.GetCmdUnbond("stake", cdc),
+			stakecmd.GetCmdRedelegate("stake", cdc),
 			slashingcmd.GetCmdUnrevoke(cdc),
 		)...)
 	rootCmd.AddCommand(
 		stakeCmd,
+	)
+
+	//Add stake commands
+	govCmd := &cobra.Command{
+		Use:   "gov",
+		Short: "Governance and voting subcommands",
+	}
+	govCmd.AddCommand(
+		client.GetCommands(
+			govcmd.GetCmdQueryProposal("gov", cdc),
+			govcmd.GetCmdQueryVote("gov", cdc),
+		)...)
+	govCmd.AddCommand(
+		client.PostCommands(
+			govcmd.GetCmdSubmitProposal(cdc),
+			govcmd.GetCmdDeposit(cdc),
+			govcmd.GetCmdVote(cdc),
+		)...)
+	rootCmd.AddCommand(
+		govCmd,
 	)
 
 	//Add auth and bank commands
@@ -116,6 +140,10 @@ func main() {
 	)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "IRIS", app.DefaultCLIHome)
-	executor.Execute()
+	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
+	err := executor.Execute()
+	if err != nil {
+		// handle with #870
+		panic(err)
+	}
 }

@@ -2,18 +2,23 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 
 	"github.com/spf13/cobra"
 
-	abci "github.com/tendermint/abci/types"
-	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/tendermint/tmlibs/cli"
-	dbm "github.com/tendermint/tmlibs/db"
-	"github.com/tendermint/tmlibs/log"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
+
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/spf13/viper"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/cli"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
+	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/tools/prometheus"
 )
 
 func main() {
@@ -41,6 +46,7 @@ func main() {
 	rootCmd.AddCommand(
 		server.InitCmd(ctx, cdc, app.IrisAppInit()),
 		server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris")),
+		server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
@@ -49,16 +55,20 @@ func main() {
 		version.VersionCmd,
 	)
 
+	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
+
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	executor.Execute()
 }
 
-func newApp(logger log.Logger, db dbm.DB) abci.Application {
-	return app.NewIrisApp(logger, db)
+func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
+	return app.NewIrisApp(logger, db, traceStore, baseapp.SetPruning(viper.GetString("pruning")))
 }
 
-func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	irisApp := app.NewIrisApp(logger, db)
-	return irisApp.ExportAppStateAndValidators()
+func exportAppStateAndTMValidators(
+	logger log.Logger, db dbm.DB, traceStore io.Writer,
+) (json.RawMessage, []tmtypes.GenesisValidator, error) {
+	gApp := app.NewIrisApp(logger, db, traceStore)
+	return gApp.ExportAppStateAndValidators()
 }
