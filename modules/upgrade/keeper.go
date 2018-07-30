@@ -186,21 +186,20 @@ func (k Keeper) SetSwitch(ctx sdk.Context ,propsalID int64, address sdk.AccAddre
 		panic(err)
 	}
 	kvStore.Set(GetSwitchKey(propsalID,address),cmsgBytes)
-
 }
 
 func (k Keeper) GetSwitch(ctx sdk.Context ,propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
 	kvStore := ctx.KVStore(k.storeKey)
-	versionIDBytes := kvStore.Get(GetSwitchKey(propsalID,address))
-	if versionIDBytes != nil {
-		var cmsgBytes MsgSwitch
-		err := k.cdc.UnmarshalBinary(cmsgBytes,&version)
+	cmsgBytes := kvStore.Get(GetSwitchKey(propsalID,address))
+	if cmsgBytes != nil {
+		var cmsg MsgSwitch
+		err := k.cdc.UnmarshalBinary(cmsgBytes,&cmsg)
 		if err != nil {
 			panic(err)
 		}
-		return &version
+		return cmsg, true
 	}
-	return MsgSwitch{}, true
+	return MsgSwitch{}, false
 }
 
 func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {

@@ -31,7 +31,6 @@ func (msg MsgSwitch) GetSignBytes() []byte {
 }
 
 func (msg MsgSwitch) ValidateBasic() sdk.Error {
-
 	return nil
 }
 

@@ -55,10 +55,10 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 
 // do switch
 func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
-	//
+
     if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() >= keeper.GetCurrentProposalAcceptHeight(ctx) + defaultSwichPeriod) {
 
-		passes := tally(ctx,keeper)
+		passes := tally(ctx, keeper)
 
 		if passes {
 			//TODO:do switch
