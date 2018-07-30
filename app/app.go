@@ -199,7 +199,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	gov.InitGenesis(ctx, app.govKeeper, gov.DefaultGenesisState())
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
-
+    upgrade.InitGenesis_commitID(ctx,app.upgradeKeeper)
 	return abci.ResponseInitChain{}
 }
 
@@ -237,7 +237,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	var code sdk.ABCICodeType
 	for msgIdx, msg := range msgs {
 		// Match route.
-		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(msg)
+		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx,msg)
 		if err != nil {
 			return err.Result()
 		}
