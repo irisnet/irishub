@@ -8,13 +8,18 @@ import (
 )
 
 var (
-	currentProposalId   = []byte("c/proposalId")
-	currentVersionKey	= []byte("c/version")
-	versionIDKey 		= "v/%s"		// v/<versionId>
-	proposalIDKey 		= "p/%s"		// p/<proposalId>
-	startHeightKey		= "h/%s"		// h/<height>
-	switchKey			= "s/%s/%s"		// s/<proposalId>/<switchVoterAddress>
+	CurrentProposalAcceptHeight = []byte("c/proposalAcceptHeight")
+	currentProposalId           = []byte("c/proposalId")
+	currentVersionKey	        = []byte("c/version")
+	versionIDKey 		        = "v/%s"		// v/<versionId>
+	proposalIDKey 		        = "p/%s"		// p/<proposalId>
+	startHeightKey		        = "h/%s"		// h/<height>
+	switchKey			        = "s/%s/%s"		// s/<proposalId>/<switchVoterAddress>
 )
+
+func GetCurrentProposalAcceptHeightKey() []byte {
+	return CurrentProposalAcceptHeight
+}
 
 func GetCurrentProposalIdKey() []byte {
 	return currentProposalId

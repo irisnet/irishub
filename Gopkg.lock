@@ -44,6 +44,7 @@
   revision = "ab6388e0c60ae4834a1f57511e20c17b5f78be4b"
 
 [[projects]]
+  branch = "irishub/cosmos-sdk"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -83,9 +84,8 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "9f2b83cbe9e1b35b350703366b5e7f5806c5547e"
+  revision = "148d01a8aad76f3aebd5c7d52f7663522e493285"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.22.0"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
