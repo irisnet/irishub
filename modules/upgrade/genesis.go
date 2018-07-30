@@ -2,12 +2,12 @@ package upgrade
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/baseapp"
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"strings"
 )
 
 // InitGenesis - build the genesis version For first Version
-func InitGenesis(ctx sdk.Context, k Keeper, router baseapp.Router) {
+func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router) {
 	modulelist := NewModuleLifeTimeList()
 	handlerList := router.RouteTable()
 
