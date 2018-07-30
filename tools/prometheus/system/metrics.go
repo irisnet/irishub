@@ -306,7 +306,12 @@ func getProcessNum(command string) (num int, err error) {
 		return 0, err
 	}
 	str := string(bytes)
-	str = str[:len(str) - 1]
+	if len(str) == 0{
+		return 0, err
+	}else{
+		str = str[:len(str) - 1]
+	}
+
 	num, err = strconv.Atoi(str)
 
 	if err == nil {
