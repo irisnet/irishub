@@ -179,18 +179,41 @@ func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string
 	return currentVersion.getMsgType(msg)
 }
 
-func (k Keeper) SetSwitch(propsalID int64, address sdk.AccAddress,cmsg MsgSwitch) {
-
+func (k Keeper) SetSwitch(ctx sdk.Context ,propsalID int64, address sdk.AccAddress,cmsg MsgSwitch) {
+	kvStore := ctx.KVStore(k.storeKey)
+	cmsgBytes,err := k.cdc.MarshalBinary(cmsg)
+	if err != nil {
+		panic(err)
+	}
+	kvStore.Set(GetSwitchKey(propsalID,address),cmsgBytes)
 }
 
-func (k Keeper) GetSwitch(propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
-	return MsgSwitch{}, true
+func (k Keeper) GetSwitch(ctx sdk.Context ,propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+	cmsgBytes := kvStore.Get(GetSwitchKey(propsalID,address))
+	if cmsgBytes != nil {
+		var cmsg MsgSwitch
+		err := k.cdc.UnmarshalBinary(cmsgBytes,&cmsg)
+		if err != nil {
+			panic(err)
+		}
+		return cmsg, true
+	}
+	return MsgSwitch{}, false
 }
 
-func (k Keeper) SetCurrentProposalAcceptHeight(height int64) {
-
+func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
+	kvStore := ctx.KVStore(k.storeKey)
+	bytes := make([]byte,16)
+	binary.BigEndian.PutUint64(bytes,uint64(height))
+	kvStore.Set(GetCurrentProposalAcceptHeightKey(),bytes)
 }
 
-func (k Keeper) GetCurrentProposalAcceptHeight() int64 {
+func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
+	kvStore := ctx.KVStore(k.storeKey)
+	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
+	if proposalAcceptHeightBytes != nil {
+		return int64(binary.BigEndian.Uint64(proposalAcceptHeightBytes))
+	}
 	return -1
 }
