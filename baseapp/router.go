@@ -58,7 +58,7 @@ func (rtr *router) Route(path string) (h sdk.Handler) {
 
 func (rtr *router) RouteTable() (table []string) {
 	for _, route := range rtr.routes {
-		table = append(table, route.r + "/" + route.s.String())
+		table = append(table, route.r + "/" + route.s.Name())
 	}
 	return
 }

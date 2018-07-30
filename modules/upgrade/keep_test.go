@@ -5,7 +5,8 @@ import (
 	"strings"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/baseapp"
-	)
+	"fmt"
+)
 
 
 func TestUpdateKeeper(t *testing.T) {
@@ -79,6 +80,7 @@ func TestUpdateKeeper(t *testing.T) {
 }
 
 func getModuleList(router baseapp.Router) ModuleLifeTimeList {
+
 	modulelist := NewModuleLifeTimeList()
 	handlerList := router.RouteTable()
 
@@ -86,5 +88,28 @@ func getModuleList(router baseapp.Router) ModuleLifeTimeList {
 		hs := strings.Split(handler, "/")
 		modulelist = modulelist.BuildModuleLifeTime(0, hs[0], hs[1])
 	}
+
 	return modulelist
+}
+
+
+func TestKeeper_InitGenesis_commidID(t *testing.T) {
+	ctx, keeper := createTestInput(t)
+	router := baseapp.NewRouter()
+	router.AddRoute("main",sdk.NewKVStoreKey("main"),nil)
+	router.AddRoute("acc",sdk.NewKVStoreKey("acc"),nil)
+	router.AddRoute("ibc",sdk.NewKVStoreKey("ibc"),nil)
+	router.AddRoute("stake",sdk.NewKVStoreKey("stake"),nil)
+	router.AddRoute("upgrade",sdk.NewKVStoreKey("upgrade"),nil)
+	router.AddRoute("upgradeI",sdk.NewKVStoreKey("upgrade"),nil)
+
+	moduleList := getModuleList(router)
+
+	genesisVersion := NewVersion(0, 10,0, moduleList)
+	keeper.AddNewVersion(ctx, genesisVersion)
+	InitGenesis_commitID(ctx,keeper)
+	fmt.Println(keeper.GetKVStoreKeylist(ctx))
+
+	keeper.SetCurrentProposalAcceptHeight(ctx,1234234000)
+	fmt.Println(keeper.GetCurrentProposalAcceptHeight(ctx))
 }
