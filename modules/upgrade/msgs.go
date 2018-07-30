@@ -10,7 +10,7 @@ type MsgSwitch struct {
 	Voter		sdk.AccAddress
 }
 
-func NewMsgSwitch( title string, proposalID int64,voter sdk.AccAddress) MsgSwitch {
+func NewMsgSwitch( title string, proposalID int64, voter sdk.AccAddress) MsgSwitch {
 	return MsgSwitch{
 		Title:title,
 		ProposalID: proposalID,
