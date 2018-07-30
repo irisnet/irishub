@@ -10,6 +10,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -20,7 +21,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/baseapp"
+
 	"fmt"
 	"strings"
 	"github.com/tendermint/tendermint/node"
@@ -44,7 +45,7 @@ var (
 
 // Extended ABCI application
 type IrisApp struct {
-	*baseapp.BaseApp
+	*bam.BaseApp
 	cdc *wire.Codec
 
 	// keys to access the substores
@@ -68,15 +69,15 @@ type IrisApp struct {
 	upgradeKeeper		upgrade.Keeper
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*baseapp.BaseApp)) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := baseapp.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
+	bApp := bam.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:          baseapp.NewBaseApp(appName, cdc, logger, db),
+		BaseApp:          bam.NewBaseApp(appName, cdc, logger, db),
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
@@ -237,7 +238,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	var code sdk.ABCICodeType
 	for msgIdx, msg := range msgs {
 		// Match route.
-		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(msg)
+		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
 		if err != nil {
 			return err.Result()
 		}
