@@ -60,3 +60,15 @@ size of files in sub-directories is excluded. to compute the size recursively, y
 excluded by default. If there are many files & sub-directory in given directories, this program may be very slow!`)
 	return cmd
 }
+/*
+TODO:
+1.  修改连接不上远程node时程序崩溃的问题
+2.  使用prometheus的{}中的选项
+3.  监控round
+
+1. 将数据轮询间隔做成可配置的
+2. 将数据轮询间隔做成可配置的
+
+如果有出块奖励的话：
+	1.    监控上一个块的出块人
+*/
