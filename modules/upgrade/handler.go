@@ -70,7 +70,8 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 		}
 	}
 
-	if keeper.GetDoingSwitch(ctx) && ctx.BlockHeader().GetNumTxs() == 0 {
+	blockHeader := ctx.BlockHeader()
+	if keeper.GetDoingSwitch(ctx) && (&blockHeader).GetNumTxs() == 0 {
 		tags.AppendTag("action", []byte("readyToDoSwitch"))
 
 		keeper.DoSwitchEnd(ctx)
