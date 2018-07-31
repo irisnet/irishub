@@ -145,7 +145,7 @@ func PrometheusMetrics() *Metrics {
 		blockInfo:list.New(),
 		UpTime:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "missed_up_time",
+			Name:      "up_time",
 			Help:      "ratio of signed blocks in last 100 blocks.",
 		}, []string{}),
 		MissedPrecommits:prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
