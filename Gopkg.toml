@@ -45,10 +45,6 @@
   name = "github.com/spf13/viper"
   version = "~1.0.0"
 
-[[constraint]]
-  name = "github.com/pkg/errors"
-  version = "=0.8.0"
-
 [[override]]
   name = "github.com/tendermint/go-amino"
   version = "=0.10.1"
