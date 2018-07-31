@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -20,7 +21,6 @@ import (
 	"strings"
 	"time"
 	"unicode"
-	"github.com/irisnet/irishub/tools"
 )
 
 type Metrics struct {
@@ -204,7 +204,7 @@ func (metrics *Metrics) SetRecursively(recursively bool) {
 	metrics.recursively = recursively
 }
 
-func (metrics *Metrics) Start(ctx tools.Context) {
+func (metrics *Metrics) Start(ctx app.Context) {
 	metrics.add()
 	go func() {
 		for {
@@ -311,7 +311,6 @@ func getProcessNum(command string) (num int, err error) {
 	}else{
 		str = str[:len(str) - 1]
 	}
-
 	num, err = strconv.Atoi(str)
 
 	if err == nil {

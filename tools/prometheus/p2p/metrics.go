@@ -3,7 +3,7 @@ package p2p
 import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
-	"github.com/irisnet/irishub/tools"
+	"github.com/irisnet/irishub/app"
 	"github.com/pelletier/go-toml"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"io/ioutil"
@@ -14,8 +14,34 @@ import (
 	"github.com/spf13/viper"
 )
 
+/*
 // Metrics contains metrics exposed by this package.
 type Metrics struct {
+  TmMetrics 	p2p.Metrics
+}
+
+
+// PrometheusMetrics returns Metrics build using Prometheus client library.
+func PrometheusMetrics() *Metrics {
+	tmMetrics := *p2p.PrometheusMetrics()
+	return &Metrics{
+		tmMetrics,
+	}
+}
+
+func (m *Metrics) Start(ctx app.Context) {
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			result := ctx.NetInfo()
+			m.TmMetrics.Peers.Set(float64(result.NPeers))
+		}
+	}()
+}
+*/
+
+type Metrics struct {
+
 	// Number of peers.
 	Peers metrics.Gauge
 	// Number of connected persistent peers.
@@ -25,7 +51,6 @@ type Metrics struct {
 	persistent_peers          map[string]string
 }
 
-// PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
 	return &Metrics{
 		Peers: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
@@ -45,6 +70,26 @@ func PrometheusMetrics() *Metrics {
 		}, []string{}),
 		persistent_peers: make(map[string]string),
 	}
+}
+
+func (m *Metrics) Start(ctx app.Context) {
+	//func (m *Metrics) Start(ctx tools.Context) {
+	m.setP2PPersistentPeers(viper.GetString("irishome"))
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			result := ctx.NetInfo()
+			connected := 0
+			for _, peer := range result.Peers {
+				if _, exist := m.persistent_peers[string(peer.ID)]; exist {
+					connected += 1
+				}
+			}
+			m.Peers.Set(float64(result.NPeers))
+			m.ConnectedPersistentPeers.Set(float64(connected))
+			m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
+		}
+	}()
 }
 
 //set the p2p persistent peers by given home dir of iris config file
@@ -69,28 +114,11 @@ func (m *Metrics) setP2PPersistentPeers(homeDir string) {
 		} else {
 			persistent_peers := config.Get("p2p.persistent_peers").(string)
 			for _, peer := range strings.Split(persistent_peers, ",") {
-				splited := strings.Split(peer, "@")
-				m.persistent_peers[splited[0]] = splited[1]
+				if peer != ""{
+					splited := strings.Split(peer, "@")
+					m.persistent_peers[splited[0]] = splited[1]
+				}
 			}
 		}
 	}
-}
-
-func (m *Metrics) Start(ctx tools.Context) {
-	m.setP2PPersistentPeers(viper.GetString("irishome"))
-	go func() {
-		for {
-			time.Sleep(1 * time.Second)
-			result := ctx.NetInfo()
-			connected := 0
-			for _, peer := range result.Peers {
-				if _, exist := m.persistent_peers[string(peer.ID)]; exist {
-					connected += 1
-				}
-			}
-			m.Peers.Set(float64(result.NPeers))
-			m.ConnectedPersistentPeers.Set(float64(connected))
-			m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
-		}
-	}()
 }
