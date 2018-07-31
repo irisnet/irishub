@@ -3,7 +3,6 @@ package upgrade
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"math"
 )
@@ -15,16 +14,14 @@ const (
 type Keeper struct {
 	storeKey   		sdk.StoreKey
 	cdc        		*wire.Codec
-	coinKeeper 		bank.Keeper
 	// The ValidatorSet to get information about validators
 	sk              stake.Keeper
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, sk stake.Keeper) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
 	keeper := Keeper {
 		storeKey:   key,
 		cdc:        cdc,
-		coinKeeper: ck,
 		sk:        sk,
 	}
 	return keeper
@@ -243,39 +240,4 @@ func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 		return proposalAcceptHeight
 	}
 	return -1
-}
-
-func (k Keeper) SetDoingSwitch(ctx sdk.Context, doing bool) {
-	kvStore := ctx.KVStore(k.storeKey)
-
-	var bytes []byte
-	if doing {
-		bytes = []byte{byte(1)}
-	} else {
-		bytes = []byte{byte(0)}
-	}
-	kvStore.Set(GetDoingSwitchKey(), bytes)
-}
-
-func (k Keeper) GetDoingSwitch(ctx sdk.Context) (bool) {
-	kvStore := ctx.KVStore(k.storeKey)
-
-	bytes := kvStore.Get(GetDoingSwitchKey())
-	if len(bytes) == 1 {
-		return bytes[0] == byte(1)
-	}
-
-	return false
-}
-
-func (k Keeper) DoSwitchBegin(ctx sdk.Context) {
-	k.SetDoingSwitch(ctx, true)
-
-}
-
-func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
-	k.SetDoingSwitch(ctx, false)
-	k.SetCurrentProposalID(ctx, -1)
-
-
 }

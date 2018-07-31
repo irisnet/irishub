@@ -108,7 +108,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.coinKeeper, app.stakeKeeper)
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 
 	// register message routes
 	app.Router().
@@ -124,6 +124,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyUpgrade)
+
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain)
@@ -155,6 +156,10 @@ func MakeCodec() *wire.Codec {
 // application updates every end block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
+
+	if app.upgradeKeeper.GetVersionToBeSwitched().Id == 0 {
+		app.upgradeKeeper.RegisterVersionToBeSwitched(ctx, app.Router())
+	}
 
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
