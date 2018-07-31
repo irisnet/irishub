@@ -6,8 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"math"
-	"encoding/binary"
-		)
+)
 
 const (
 	defaultSwichPeriod     int64 = 57600	// 2 days
@@ -35,13 +34,17 @@ func (k Keeper) GetCurrentVersion(ctx sdk.Context) *Version {
 	kvStore := ctx.KVStore(k.storeKey)
 	versionIDBytes := kvStore.Get(GetCurrentVersionKey())
 	if versionIDBytes != nil {
-		versionID := int64(binary.BigEndian.Uint64(versionIDBytes))
+		var versionID int64
+		err := k.cdc.UnmarshalBinary(versionIDBytes,&versionID)
+		if err != nil {
+			panic(err)
+		}
 		curVersionBytes := kvStore.Get(GetVersionIDKey(versionID))
 		if curVersionBytes == nil {
 			return nil
 		}
 		var version Version
-		err := k.cdc.UnmarshalBinary(curVersionBytes,&version)
+		err = k.cdc.UnmarshalBinary(curVersionBytes,&version)
 		if err != nil {
 			panic(err)
 		}
@@ -69,8 +72,10 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 
 	kvStore.Set(GetVersionIDKey(version.Id),versionBytes)
 
-	versionIDBytes := make([]byte,20)
-	binary.BigEndian.PutUint64(versionIDBytes,uint64(version.Id))
+	versionIDBytes, err := k.cdc.MarshalBinary(version.Id)
+	if err != nil {
+		panic(err)
+	}
 
 	kvStore.Set(GetCurrentVersionKey(),versionIDBytes)
 	kvStore.Set(GetProposalIDKey(version.ProposalID),versionIDBytes)
@@ -87,13 +92,17 @@ func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version 
 		if versionIDBytes == nil {
 			return nil
 		}
-		versionID := int64(binary.BigEndian.Uint64(versionIDBytes))
+		var versionID int64
+		err := k.cdc.UnmarshalBinary(versionIDBytes,&versionID)
+		if err != nil {
+			panic(err)
+		}
 		versionBytes := kvStore.Get(GetVersionIDKey(versionID))
 		if versionBytes == nil  {
 			return nil
 		}
 		var version Version
-		err := k.cdc.UnmarshalBinary(versionBytes,&version)
+		err = k.cdc.UnmarshalBinary(versionBytes,&version)
 		if err != nil {
 			panic(err)
 		}
@@ -108,7 +117,11 @@ func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId int64) *Versi
 	if versionIDBytes == nil  {
 		return nil
 	}
-	versionID := int64(binary.BigEndian.Uint64(versionIDBytes))
+	var versionID int64
+	err := k.cdc.UnmarshalBinary(versionIDBytes,&versionID)
+	if err != nil {
+		panic(err)
+	}
 	versionBytes := kvStore.Get(GetVersionIDKey(versionID))
 	if versionBytes != nil {
 		var version Version
@@ -162,16 +175,23 @@ func (k Keeper) GetCurrentProposalID(ctx sdk.Context) int64 {
 	kvStore := ctx.KVStore(k.storeKey)
 	proposalIdBytes := kvStore.Get(GetCurrentProposalIdKey())
 	if proposalIdBytes != nil {
-		return int64(binary.BigEndian.Uint64(proposalIdBytes))
+		var proposalId int64
+		err := k.cdc.UnmarshalBinary(proposalIdBytes,&proposalId)
+		if err != nil {
+			panic(err)
+		}
+		return proposalId
 	}
 	return -1
 }
 
 func (k Keeper) SetCurrentProposalID(ctx sdk.Context, proposalID int64) {
 	kvStore := ctx.KVStore(k.storeKey)
-	bytes := make([]byte,16)
-	binary.BigEndian.PutUint64(bytes,uint64(proposalID))
-	kvStore.Set(GetCurrentProposalIdKey(),bytes)
+	proposalIDBytes, err := k.cdc.MarshalBinary(proposalID)
+	if err != nil {
+		panic(err)
+	}
+	kvStore.Set(GetCurrentProposalIdKey(),proposalIDBytes)
 }
 
 func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string, sdk.Error) {
@@ -204,16 +224,23 @@ func (k Keeper) GetSwitch(ctx sdk.Context ,propsalID int64, address sdk.AccAddre
 
 func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
 	kvStore := ctx.KVStore(k.storeKey)
-	bytes := make([]byte,16)
-	binary.BigEndian.PutUint64(bytes,uint64(height))
-	kvStore.Set(GetCurrentProposalAcceptHeightKey(),bytes)
+	heightBytes, err := k.cdc.MarshalBinary(height)
+	if err != nil {
+		panic(err)
+	}
+	kvStore.Set(GetCurrentProposalAcceptHeightKey(),heightBytes)
 }
 
 func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 	kvStore := ctx.KVStore(k.storeKey)
 	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
 	if proposalAcceptHeightBytes != nil {
-		return int64(binary.BigEndian.Uint64(proposalAcceptHeightBytes))
+		var proposalAcceptHeight int64
+		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes,&proposalAcceptHeight)
+		if err != nil {
+			panic(err)
+		}
+		return proposalAcceptHeight
 	}
 	return -1
 }
