@@ -166,6 +166,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
 	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
+	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
 
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
