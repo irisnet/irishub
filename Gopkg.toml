@@ -59,7 +59,7 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  branch = "haoyang/replay-state"
+  branch = "irisnet/feature_upgrade"
   source = "https://github.com/irisnet/tendermint.git"
 
 
