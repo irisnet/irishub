@@ -62,7 +62,7 @@ var (
 	totalTokenAmt = sdk.NewInt(200000000)
 )
 
-const defaultUnbondingTime int64 = 60 * 60 * 24 * 3
+const defaultUnbondingTime int64 = 60 * 10
 
 // get app init parameters for server init command
 func IrisAppInit() server.AppInit {
