@@ -15,6 +15,7 @@ var (
 	proposalIDKey 		        = "p/%s"		// p/<proposalId>
 	startHeightKey		        = "h/%s"		// h/<height>
 	switchKey			        = "s/%s/%s"		// s/<proposalId>/<switchVoterAddress>
+	DoingSwitchKey				= []byte("d")		// whether system is doing switch
 )
 
 func GetCurrentProposalAcceptHeightKey() []byte {
@@ -53,4 +54,8 @@ func ToHexString(i int64) string {
 	}
 	stringBuild.Write([]byte(hex))
 	return stringBuild.String()
+}
+
+func GetDoingSwitchKey() []byte {
+	return DoingSwitchKey
 }
