@@ -272,3 +272,10 @@ func (k Keeper) DoSwitchBegin(ctx sdk.Context) {
 	k.SetDoingSwitch(ctx, true)
 
 }
+
+func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
+	k.SetDoingSwitch(ctx, false)
+	k.SetCurrentProposalID(ctx, -1)
+
+
+}
