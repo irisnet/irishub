@@ -1,7 +1,10 @@
 package p2p
 
 import (
-	"github.com/go-kit/kit/metrics"
+	"github.com/irisnet/irishub/app"
+	"github.com/tendermint/tendermint/p2p"
+	/*
+  "github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/tools"
 	"github.com/pelletier/go-toml"
@@ -10,24 +13,35 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
+  */
 	"time"
 	"github.com/spf13/viper"
 )
 
 // Metrics contains metrics exposed by this package.
 type Metrics struct {
-	// Number of peers.
+  TmMetrics 	p2p.Metrics
+  /*
+  // Number of peers.
 	Peers metrics.Gauge
 	// Number of connected persistent peers.
 	ConnectedPersistentPeers metrics.Gauge
 	// Number of unconnected persistent peers.
 	UnonnectedPersistentPeers metrics.Gauge
 	persistent_peers          map[string]string
+  */
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
+	tmMetrics := *p2p.PrometheusMetrics()
 	return &Metrics{
+		tmMetrics,
+	}
+}
+
+func (m *Metrics) Start(ctx app.Context) {
+  /*
 		Peers: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "p2p",
 			Name:      "peers",
@@ -46,6 +60,32 @@ func PrometheusMetrics() *Metrics {
 		persistent_peers: make(map[string]string),
 	}
 }
+
+
+
+func (m *Metrics) Start(ctx tools.Context) {
+	m.setP2PPersistentPeers(viper.GetString("home"))
+  */
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			result := ctx.NetInfo()
+      m.TmMetrics.Peers.Set(float64(result.NPeers))
+      /*
+			connected := 0
+			for _, peer := range result.Peers {
+				if listenAddr, exist := m.persistent_peers[string(peer.ID)]; exist && listenAddr == peer.ListenAddr {
+					connected += 1
+				}
+			}
+			m.Peers.Set(float64(result.NPeers))
+			m.ConnectedPersistentPeers.Set(float64(connected))
+			m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
+      */
+		}
+	}()
+}
+
 
 //set the p2p persistent peers by given home dir of iris config file
 func (m *Metrics) setP2PPersistentPeers(homeDir string) {
@@ -74,23 +114,4 @@ func (m *Metrics) setP2PPersistentPeers(homeDir string) {
 			}
 		}
 	}
-}
-
-func (m *Metrics) Start(ctx tools.Context) {
-	m.setP2PPersistentPeers(viper.GetString("home"))
-	go func() {
-		for {
-			time.Sleep(1 * time.Second)
-			result := ctx.NetInfo()
-			connected := 0
-			for _, peer := range result.Peers {
-				if listenAddr, exist := m.persistent_peers[string(peer.ID)]; exist && listenAddr == peer.ListenAddr {
-					connected += 1
-				}
-			}
-			m.Peers.Set(float64(result.NPeers))
-			m.ConnectedPersistentPeers.Set(float64(connected))
-			m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
-		}
-	}()
 }

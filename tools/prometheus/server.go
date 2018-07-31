@@ -3,27 +3,29 @@ package prometheus
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/tools"
+  //"github.com/irisnet/irishub/tools"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
-	cmn "github.com/tendermint/tmlibs/common"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"log"
 	"net/http"
+  "github.com/spf13/viper"
 	"fmt"
 )
 
-func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
+func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "monitor",
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			ctx := tools.NewContext(storeName, cdc)
+			ctx := app.NewContext().WithCodeC(cdc)
+      //ctx := tools.NewContext(storeName, cdc)
 			monitor := DefaultMonitor(ctx)
 			monitor.Start()
 
+			port := viper.GetInt("port")
 			srv := &http.Server{
-				Addr:    ":26660",
+				Addr:    fmt.Sprintf(":%d", port),
 				Handler: promhttp.Handler(),
 			}
 			go func() {
@@ -33,13 +35,13 @@ func MonitorCommand(storeName string, cdc *wire.Codec) *cobra.Command {
 			}()
 
 			cmn.TrapSignal(func() {
-				ctx.Client.Stop()
 				srv.Close()
 			})
 
 			return nil
 		},
 	}
+	cmd.Flags().Int("port",  36660, "port to connect to")
 	cmd.Flags().StringP("node", "n", "tcp://localhost:46657", "Node to connect to")
 	cmd.Flags().String("chain-id", "fuxi", "Chain ID of tendermint node")
 	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
