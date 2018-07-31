@@ -18,6 +18,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/tools/prometheus"
 )
 
 func main() {
@@ -55,6 +56,8 @@ func main() {
 		client.LineBreak,
 		version.VersionCmd,
 	)
+
+	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
