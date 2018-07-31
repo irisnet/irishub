@@ -23,19 +23,19 @@ func (keeper Keeper) GetKVStoreKeylist(ctx sdk.Context) string {
 func (keeper Keeper) SetKVStoreKeylist(ctx sdk.Context) {
 	store := ctx.KVStore(keeper.storeKey)
 
-	version :=keeper.GetCurrentVersion(ctx)
+	version := keeper.GetCurrentVersion(ctx)
 
 	storeSet := make(map[string]bool)
-	for _,x :=range version.ModuleList{
+	for _, x :=range version.ModuleList{
 		storeSet[x.Store] = true
 	}
 
 	var KVStoreKeyList string
-	for key,_ :=range storeSet{
+	for key,_ := range storeSet{
 		if KVStoreKeyList == "" {
-			KVStoreKeyList+=key
+			KVStoreKeyList += key
 		}else{
-			KVStoreKeyList+=(":"+key)
+			KVStoreKeyList += (":"+key)
 		}
 	}
 
