@@ -244,3 +244,24 @@ func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 	}
 	return -1
 }
+
+func (k Keeper) SetDoingSwitch(ctx sdk.Context, doing bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+
+	bytes := k.cdc.MustMarshalBinary(doing)
+	kvStore.Set(GetDoingSwitchKey(), bytes)
+}
+
+func (k Keeper) GetDoingSwitch(ctx sdk.Context) (doing bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+
+	bytes := kvStore.Get(GetDoingSwitchKey())
+	k.cdc.MustUnmarshalBinary(bytes, doing)
+
+	return
+}
+
+func (k Keeper) DoSwitchBegin(ctx sdk.Context) {
+	k.SetDoingSwitch(ctx, true)
+
+}
