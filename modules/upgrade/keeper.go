@@ -236,7 +236,7 @@ func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
 	if proposalAcceptHeightBytes != nil {
 		var proposalAcceptHeight int64
-		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes,&proposalAcceptHeight)
+		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes, &proposalAcceptHeight)
 		if err != nil {
 			panic(err)
 		}
@@ -248,17 +248,24 @@ func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 func (k Keeper) SetDoingSwitch(ctx sdk.Context, doing bool) {
 	kvStore := ctx.KVStore(k.storeKey)
 
-	bytes := k.cdc.MustMarshalBinary(doing)
+	var bytes []byte
+	if doing {
+		bytes = []byte{byte(1)}
+	} else {
+		bytes = []byte{byte(0)}
+	}
 	kvStore.Set(GetDoingSwitchKey(), bytes)
 }
 
-func (k Keeper) GetDoingSwitch(ctx sdk.Context) (doing bool) {
+func (k Keeper) GetDoingSwitch(ctx sdk.Context) (bool) {
 	kvStore := ctx.KVStore(k.storeKey)
 
 	bytes := kvStore.Get(GetDoingSwitchKey())
-	k.cdc.MustUnmarshalBinary(bytes, doing)
+	if len(bytes) == 1 {
+		return bytes[0] == byte(1)
+	}
 
-	return
+	return false
 }
 
 func (k Keeper) DoSwitchBegin(ctx sdk.Context) {
