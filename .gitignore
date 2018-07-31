@@ -1,4 +1,6 @@
 vendor
 .DS_Store
 .idea
-build
+build/
+*.out
+iris*

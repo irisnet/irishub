@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "f673a4b563b57b9a95832545c878669a7fa801d9"
+  revision = "9a2f9524024889e129a5422aca2cff73cb3eabf6"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -43,7 +43,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "silei/cosmos-sdk"
+  branch = "irisnet/feature_upgrade"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -70,12 +70,15 @@
     "x/bank/client",
     "x/bank/client/cli",
     "x/bank/client/rest",
+    "x/gov",
+    "x/gov/client/rest",
     "x/ibc",
     "x/ibc/client/cli",
     "x/ibc/client/rest",
     "x/mock",
     "x/slashing",
     "x/slashing/client/cli",
+    "x/slashing/client/rest",
     "x/stake",
     "x/stake/client/cli",
     "x/stake/client/rest",
@@ -83,8 +86,8 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "228a73bde206238f4d2e2f6c179ad8de3a2604bc"
-  source = "https://github.com/wukongcheng/cosmos-sdk.git"
+  revision = "71b60ada06d38743cfb2e3dd15b9d56f137d3d6f"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -194,6 +197,7 @@
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -296,7 +300,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "ae68e2d4c00fed4943b5f6698d504a5fe083da8a"
+  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
 
 [[projects]]
   name = "github.com/rcrowley/go-metrics"
@@ -499,7 +503,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "a2144134853fc9a27a7b1e3eb4f19f1a76df13c9"
+  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -522,7 +526,7 @@
     "unix",
     "windows"
   ]
-  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
+  revision = "bd9dbc187b6e1dacfdd2722a87e83093c2d7bd6e"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -549,7 +553,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "fedd2861243fd1a8152376292b921b394c7bef7e"
+  revision = "2a72893556e4d1f6c795a4c039314c9fa751eedb"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -592,6 +596,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ed84bb2a69db5b54b8469264c1765c822fbb5b2f6b082a204f88c20e97210885"
+  inputs-digest = "6e7821c3e180124b1f400cf2cc2f5bd754a918be084bce18d878d99ec95cd72e"
   solver-name = "gps-cdcl"
   solver-version = 1
