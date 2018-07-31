@@ -28,7 +28,8 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  version = "v0.22.0"
+  version = "=v0.23.0-iris"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 
 [[override]]
@@ -54,7 +55,7 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  version = "=0.22.2"
+  version = "=v0.22.6"
 
 
 [prune]
