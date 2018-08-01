@@ -58,12 +58,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 
     if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() == keeper.GetCurrentProposalAcceptHeight(ctx) + defaultSwichPeriod) {
-		passes := tally(ctx, keeper)
-		if passes {
+		switchPasses := tally(ctx, keeper)
+		if switchPasses {
 			tags.AppendTag("action", []byte("switchPassed"))
 
 			keeper.DoSwitchBegin(ctx)
-		}else{
+		} else {
 			tags.AppendTag("action", []byte("switchDropped"))
 
 			keeper.SetCurrentProposalID(ctx, -1)
