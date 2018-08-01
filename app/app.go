@@ -135,6 +135,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		cmn.Exit(err.Error())
 	}
 
+	app.PrepareNewVersion()
+
 	return app
 }
 
@@ -153,13 +155,14 @@ func MakeCodec() *wire.Codec {
 	return cdc
 }
 
+func (app *IrisApp) PrepareNewVersion() {
+	store := app.GetKVStore(app.keyUpgrade)
+	app.upgradeKeeper.RegisterVersionToBeSwitched(store, app.Router())
+}
+
 // application updates every end block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
-
-	if app.upgradeKeeper.GetVersionToBeSwitched().Id == 0 {
-		app.upgradeKeeper.RegisterVersionToBeSwitched(ctx, app.Router())
-	}
 
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
