@@ -24,12 +24,9 @@ func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
 		// If more than 95% of validator update , do switch
 		if switchVotingPower.Quo(totalVotingPower).GT(Threshold) {
-			k.SetCurrentProposalID(ctx,-1)
 			return true
 		}
 
 	}
-
-	k.SetCurrentProposalID(ctx,-1)
 	return  false
 }
