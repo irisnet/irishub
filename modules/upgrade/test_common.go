@@ -72,6 +72,6 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	ck := bank.NewKeeper(accountMapper)
 	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
 
-	keeper := NewKeeper(cdc, keyUpdate, ck, sk)
+	keeper := NewKeeper(cdc, keyUpdate, sk)
 	return ctx, keeper
 }

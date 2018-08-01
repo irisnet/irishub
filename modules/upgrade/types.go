@@ -59,12 +59,6 @@ func (v Version) getMsgType(msg sdk.Msg) (string, sdk.Error) {
     return "", NewError(DefaultCodespace, CodeUnSupportedMsgType, "")
 }
 
-// run when app star
-func (v Version) updateCurrentVersion(moduleList ModuleLifeTimeList) {
-
-}
-
-
 type VersionList []Version
 
 func NewVersionList() VersionList {
