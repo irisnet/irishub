@@ -14,8 +14,8 @@ func (keeper Keeper) GetVersionToBeSwitched() *Version {
 	return &VersionToBeSwitched
 }
 
-func (keeper Keeper) RegisterVersionToBeSwitched(ctx sdk.Context, router bam.Router) {
-	currentVersion := keeper.GetCurrentVersion(ctx)
+func (keeper Keeper) RegisterVersionToBeSwitched(store sdk.KVStore, router bam.Router) {
+	currentVersion := keeper.GetCurrentVersionByStore(store)
 
 	if currentVersion == nil {	// waiting to create the genesis version
 		return
@@ -32,7 +32,6 @@ func (keeper Keeper) RegisterVersionToBeSwitched(ctx sdk.Context, router bam.Rou
 	VersionToBeSwitched = NewVersion(currentVersion.Id + 1, 0,0, modulelist)
 }
 
-
 func (k Keeper) SetDoingSwitch(ctx sdk.Context, doing bool) {
 	kvStore := ctx.KVStore(k.storeKey)
 
@@ -44,7 +43,6 @@ func (k Keeper) SetDoingSwitch(ctx sdk.Context, doing bool) {
 	}
 	kvStore.Set(GetDoingSwitchKey(), bytes)
 }
-
 
 func (k Keeper) GetDoingSwitch(ctx sdk.Context) bool {
 	kvStore := ctx.KVStore(k.storeKey)
