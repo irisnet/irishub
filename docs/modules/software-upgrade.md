@@ -13,7 +13,7 @@ key point：
 * 发生老版本AppHash冲突:
    1. 检查自己是否在switch voter list中，否则reset rootMultiStore到上一个commit
    2. 下载新版本，运行iris start --replay命令启动节点
-   3. replay子命令在完成app的setup后，需要阻止tendermint进行block sync，并用本地tendermint中的last block进行replay，更新ABCI App store到正确的App Hash
+   3. --replay在完成app的setup后，start子命令会先回滚tendermint的statedb到上一高度。如果revert前的statedb对于的高度为H，那么现在state db高度为H-1。然后对于ABCI App store，只load到H-1的高度。然后就是正常启动节点，节点再检测到state db的高度和app store的高度都比block store低一个高度，就会自动replay最后一个block
    4. 开启tendermint的block sync，进行正常的区块追赶
 * 新增Module的升级方式（现有Module逻辑修改也通过新Module完成），新老版本的Module共享同一个store，对于查询需要iriscli提供不同版本的数据解析能力
 * Hardcord的升级方式（bug fix），Upgrade Module提供便利函数来决定指定的代码段在当前区块高度是否执行
