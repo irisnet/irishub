@@ -55,17 +55,27 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 
 // do switch
 func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
+	tags = sdk.NewTags()
 
-    if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() >= keeper.GetCurrentProposalAcceptHeight(ctx) + defaultSwichPeriod) {
-
+    if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() == keeper.GetCurrentProposalAcceptHeight(ctx) + defaultSwichPeriod) {
 		passes := tally(ctx, keeper)
-
 		if passes {
-			//TODO:do switch
+			tags.AppendTag("action", []byte("switchPassed"))
+
+			keeper.DoSwitchBegin(ctx)
 		}else{
-			//TODO:don't switch
+			tags.AppendTag("action", []byte("switchDropped"))
+
+			keeper.SetCurrentProposalID(ctx, -1)
 		}
 	}
-	tags = sdk.NewTags()
+
+	blockHeader := ctx.BlockHeader()
+	if keeper.GetDoingSwitch(ctx) && (&blockHeader).GetNumTxs() == 0 {
+		tags.AppendTag("action", []byte("readyToDoSwitch"))
+
+		keeper.DoSwitchEnd(ctx)
+	}
+
 	return tags
 }
