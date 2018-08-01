@@ -99,4 +99,4 @@ Description:"Bug MODULE NAME"
 
 ### 升级版本
 
-新版本代码中预定义了改版本的version信息,将其设置为当前版本
+新版本代码中预定义了改版本的version信息,将其设置为当前版本。对于新增Module来覆盖老版本已有Module，来实现对老版本Module进行升级的模式，新版本Module的msgType名字为老版本名字+版本号。例如需要对gov进行升级，原版本gov的msgType为“gov”，新版本为“gov-1”
