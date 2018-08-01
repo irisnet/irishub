@@ -86,7 +86,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "71b60ada06d38743cfb2e3dd15b9d56f137d3d6f"
+  revision = "74e1a30395f0ea58f346eb54b78be85043343c10"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -197,7 +197,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
