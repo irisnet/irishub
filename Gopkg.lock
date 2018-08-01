@@ -86,7 +86,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "74e1a30395f0ea58f346eb54b78be85043343c10"
+  revision = "1061923645480453b229049fed38de93f754281f"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -197,6 +197,7 @@
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -552,7 +553,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "2a72893556e4d1f6c795a4c039314c9fa751eedb"
+  revision = "daca94659cb50e9f37c1b834680f2e46358f10b0"
 
 [[projects]]
   name = "google.golang.org/grpc"
