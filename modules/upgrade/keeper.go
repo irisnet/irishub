@@ -29,10 +29,14 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
 
 func (k Keeper) GetCurrentVersion(ctx sdk.Context) *Version {
 	kvStore := ctx.KVStore(k.storeKey)
+	return k.GetCurrentVersionByStore(kvStore)
+}
+
+func (k Keeper) GetCurrentVersionByStore(kvStore sdk.KVStore) *Version {
 	versionIDBytes := kvStore.Get(GetCurrentVersionKey())
 	if versionIDBytes != nil {
 		var versionID int64
-		err := k.cdc.UnmarshalBinary(versionIDBytes,&versionID)
+		err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
 		if err != nil {
 			panic(err)
 		}
@@ -41,7 +45,7 @@ func (k Keeper) GetCurrentVersion(ctx sdk.Context) *Version {
 			return nil
 		}
 		var version Version
-		err = k.cdc.UnmarshalBinary(curVersionBytes,&version)
+		err = k.cdc.UnmarshalBinary(curVersionBytes, &version)
 		if err != nil {
 			panic(err)
 		}
@@ -49,6 +53,7 @@ func (k Keeper) GetCurrentVersion(ctx sdk.Context) *Version {
 	}
 	return nil
 }
+
 
 func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 	kvStore := ctx.KVStore(k.storeKey)
