@@ -3,14 +3,14 @@ package prometheus
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
-  //"github.com/irisnet/irishub/tools"
+	//"github.com/irisnet/irishub/tools"
+	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"log"
 	"net/http"
-  "github.com/spf13/viper"
-	"fmt"
 )
 
 func MonitorCommand(cdc *wire.Codec) *cobra.Command {
@@ -19,7 +19,7 @@ func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := app.NewContext().WithCodeC(cdc)
-      //ctx := tools.NewContext(storeName, cdc)
+			//ctx := tools.NewContext(storeName, cdc)
 			monitor := DefaultMonitor(ctx)
 			monitor.Start()
 
@@ -41,9 +41,9 @@ func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().Int("port",  36660, "port to connect to")
+	cmd.Flags().Int("port", 36660, "port to connect to")
 	cmd.Flags().StringP("node", "n", "tcp://localhost:46657", "Node to connect to")
-	cmd.Flags().StringP("chain-id", "c","fuxi", "Chain ID of tendermint node")
+	cmd.Flags().StringP("chain-id", "c", "fuxi", "Chain ID of tendermint node")
 	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
 monitor`)
 
@@ -51,6 +51,7 @@ monitor`)
 excluded by default. If there are many files & sub-directory in home directories, this program may be very slow!`)
 	return cmd
 }
+
 /*
 TODO:
 1. 将数据轮询间隔做成可配置的
