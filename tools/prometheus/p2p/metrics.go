@@ -6,12 +6,12 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/pelletier/go-toml"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strings"
 	"time"
-	"github.com/spf13/viper"
 )
 
 /*
@@ -79,7 +79,7 @@ func (m *Metrics) Start(ctx app.Context) {
 		for {
 			time.Sleep(1 * time.Second)
 			result := ctx.NetInfo()
-			if result != nil{
+			if result != nil {
 				connected := 0
 				for _, peer := range result.Peers {
 					if _, exist := m.persistent_peers[string(peer.ID)]; exist {
@@ -116,7 +116,7 @@ func (m *Metrics) setP2PPersistentPeers(homeDir string) {
 		} else {
 			persistent_peers := config.Get("p2p.persistent_peers").(string)
 			for _, peer := range strings.Split(persistent_peers, ",") {
-				if peer != ""{
+				if peer != "" {
 					splited := strings.Split(peer, "@")
 					m.persistent_peers[splited[0]] = splited[1]
 				}
