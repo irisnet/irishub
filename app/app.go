@@ -5,36 +5,31 @@ import (
 	"io"
 	"os"
 
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 
 	"fmt"
-	"strings"
-	"github.com/tendermint/tendermint/node"
-	"github.com/cosmos/cosmos-sdk/server"
-	sm "github.com/tendermint/tendermint/state"
 	"github.com/spf13/viper"
-	"errors"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
+	"strings"
 )
 
 const (
-	appName = "IrisApp"
-	FlagReplay  = "replay"
+	appName    = "IrisApp"
+	FlagReplay = "replay"
 )
 
 // default home directories for expected binaries
@@ -56,7 +51,7 @@ type IrisApp struct {
 	keySlashing      *sdk.KVStoreKey
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
-	keyUpgrade 		 *sdk.KVStoreKey
+	keyUpgrade       *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -66,7 +61,7 @@ type IrisApp struct {
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	govKeeper           gov.Keeper
-	upgradeKeeper		upgrade.Keeper
+	upgradeKeeper       upgrade.Keeper
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -86,7 +81,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
-		keyUpgrade: 	  sdk.NewKVStoreKey("upgrade"),
+		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 	}
 
 	var lastHeight int64
@@ -112,11 +107,12 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	// register message routes
 	app.Router().
-		AddRoute("bank", app.keyAccount, bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", app.keyIBC, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
-		AddRoute("stake", app.keyStake, stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", app.keySlashing, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", app.keyGov, gov.NewHandler(app.govKeeper))
+		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
+		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
+		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
+		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper)).
+		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
@@ -290,20 +286,22 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	return result
 }
 
-func (app *IrisApp) replay() int64   {
-	ctx := server.NewDefaultContext()
-	ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
-	dbContext := node.DBContext{"state", ctx.Config}
-	dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
-	stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
+func (app *IrisApp) replay() int64 {
+	//ctx := server.NewDefaultContext()
+	//ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
+	//dbContext := node.DBContext{"state", ctx.Config}
+	//dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
+	//stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
+	//
+	//preState := sm.LoadPreState(stateDB)
+	//if preState.LastBlockHeight == 0 {
+	//	panic(errors.New("can't replay the last block, last block height is 0"))
+	//}
+	//
+	//sm.SaveState(stateDB,preState)
+	//stateDB.Close()
+	//
+	//return preState.LastBlockHeight
 
-	preState := sm.LoadPreState(stateDB)
-	if preState.LastBlockHeight == 0 {
-		panic(errors.New("can't replay the last block, last block height is 0"))
-	}
-
-	sm.SaveState(stateDB,preState)
-	stateDB.Close()
-
-	return preState.LastBlockHeight
+	return 0
 }

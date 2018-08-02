@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "9a2f9524024889e129a5422aca2cff73cb3eabf6"
+  revision = "f5e261fc9ec3437697fb31d8b38453c293204b29"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -86,7 +86,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "1061923645480453b229049fed38de93f754281f"
+  revision = "b803861a4874dd69d10e5cd2ba925d2147027812"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -289,7 +289,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
+  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
 
 [[projects]]
   branch = "master"
@@ -318,8 +318,8 @@
     "net",
     "process"
   ]
-  revision = "4a180b209f5f494e5923cfce81ea30ba23915877"
-  version = "v2.18.06"
+  revision = "8048a2e9c5773235122027dd585cf821b2af1249"
+  version = "v2.18.07"
 
 [[projects]]
   branch = "master"
@@ -417,7 +417,6 @@
   version = "v0.9.2"
 
 [[projects]]
-  branch = "irisnet/feature_upgrade"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -479,8 +478,8 @@
     "types",
     "version"
   ]
-  revision = "74e4431764f493cad582aa8412ff5c12f5cedd95"
-  source = "https://github.com/irisnet/tendermint.git"
+  revision = "5fdbcd70df57b71ffba71e1ff5f00d617852a9c0"
+  version = "v0.22.6"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -526,7 +525,7 @@
     "unix",
     "windows"
   ]
-  revision = "bd9dbc187b6e1dacfdd2722a87e83093c2d7bd6e"
+  revision = "3dc4335d56c789b04b0ba99b7a37249d9b614314"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -596,6 +595,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6e7821c3e180124b1f400cf2cc2f5bd754a918be084bce18d878d99ec95cd72e"
+  inputs-digest = "599fe3493ec8a1f516bf6a2c450cd5afb5b8432098424c2e2e3e53975ce2592e"
   solver-name = "gps-cdcl"
   solver-version = 1
