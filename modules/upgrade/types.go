@@ -9,10 +9,10 @@ type ModuleLifeTime struct {
     Start		int64
     End			int64
     Handler 	string
-    Store		string
+    Store		[]string
 }
 
-func NewModuleLifeTime(start int64, end	int64, handler string, store string) ModuleLifeTime {
+func NewModuleLifeTime(start int64, end	int64, handler string, store []string) ModuleLifeTime {
     return ModuleLifeTime{
         Start:      start,
         End:        end,
@@ -27,7 +27,7 @@ func NewModuleLifeTimeList() ModuleLifeTimeList {
     return ModuleLifeTimeList{}
 }
 
-func (mlist ModuleLifeTimeList) BuildModuleLifeTime(start int64, handler string, store string) ModuleLifeTimeList {
+func (mlist ModuleLifeTimeList) BuildModuleLifeTime(start int64, handler string, store []string) ModuleLifeTimeList {
     return append(mlist, NewModuleLifeTime(start, math.MaxInt64, handler, store))
 }
 
