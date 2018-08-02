@@ -1,9 +1,9 @@
 package upgrade
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"reflect"
-	"fmt"
 )
 
 func NewHandler(k Keeper) sdk.Handler {
@@ -36,15 +36,15 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 
 	voter := msgSwitch.Voter
 
-	if _,ok := k.sk.GetValidator(ctx,voter); !ok {
+	if _, ok := k.sk.GetValidator(ctx, voter); !ok {
 		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
 	}
 
-	if _,ok := k.GetSwitch(ctx,proposalID,voter); ok {
+	if _, ok := k.GetSwitch(ctx, proposalID, voter); ok {
 		return NewError(DefaultCodespace, CodeDoubleSwitch, "You have sent the switch msg").Result()
 	}
 
-	k.SetSwitch(ctx,proposalID,voter,msgSwitch)
+	k.SetSwitch(ctx, proposalID, voter, msgSwitch)
 
 	return sdk.Result{
 		Code: 0,
@@ -52,12 +52,11 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 	}
 }
 
-
 // do switch
 func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 
-    if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() == keeper.GetCurrentProposalAcceptHeight(ctx) + defaultSwichPeriod) {
+	if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() == keeper.GetCurrentProposalAcceptHeight(ctx)+defaultSwichPeriod) {
 		switchPasses := tally(ctx, keeper)
 		if switchPasses {
 			tags.AppendTag("action", []byte("switchPassed"))
