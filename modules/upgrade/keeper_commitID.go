@@ -1,10 +1,11 @@
 package upgrade
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var(
+var (
 	KVStoreKeyListKey = []byte("k/")
 )
 
@@ -26,19 +27,25 @@ func (keeper Keeper) SetKVStoreKeylist(ctx sdk.Context) {
 
 	version := keeper.GetCurrentVersion(ctx)
 
+	fmt.Printf("SetKVStoreKeylist ======   modulelist len:  %d\n", len(version.ModuleList))
 	storeSet := make(map[string]bool)
-	for _, x :=range version.ModuleList {
-		storeSet[x.Store] = true
+	for _, module := range version.ModuleList {
+		for _, store := range module.Store {
+			storeSet[store] = true
+		}
 	}
 
 	var KVStoreKeyList string
-	for key,_ := range storeSet {
+	for key, _ := range storeSet {
 		if KVStoreKeyList == "" {
 			KVStoreKeyList += key
 		} else {
-			KVStoreKeyList += (":"+key)
+			KVStoreKeyList += (":" + key)
 		}
 	}
+	KVStoreKeyList += (":main:fee")
+
+	fmt.Println("SetKVStoreKeylist ======  KVStoreKeyList: " + KVStoreKeyList)
 
 	bz := []byte(KVStoreKeyList)
 	store.Set(KVStoreKeyListKey, bz)

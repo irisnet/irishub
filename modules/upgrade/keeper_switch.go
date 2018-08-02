@@ -1,13 +1,13 @@
 package upgrade
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strings"
 )
 
 var (
-	VersionToBeSwitched 	Version
+	VersionToBeSwitched Version
 )
 
 func (keeper Keeper) GetVersionToBeSwitched() *Version {
@@ -17,7 +17,7 @@ func (keeper Keeper) GetVersionToBeSwitched() *Version {
 func (keeper Keeper) RegisterVersionToBeSwitched(store sdk.KVStore, router bam.Router) {
 	currentVersion := keeper.GetCurrentVersionByStore(store)
 
-	if currentVersion == nil {	// waiting to create the genesis version
+	if currentVersion == nil { // waiting to create the genesis version
 		return
 	}
 
@@ -26,10 +26,12 @@ func (keeper Keeper) RegisterVersionToBeSwitched(store sdk.KVStore, router bam.R
 
 	for _, handler := range handlerList {
 		hs := strings.Split(handler, "/")
-		modulelist = modulelist.BuildModuleLifeTime(0, hs[0], hs[1])
+
+		stores := strings.Split(hs[1], ":")
+		modulelist = modulelist.BuildModuleLifeTime(0, hs[0], stores)
 	}
 
-	VersionToBeSwitched = NewVersion(currentVersion.Id + 1, 0,0, modulelist)
+	VersionToBeSwitched = NewVersion(currentVersion.Id+1, 0, 0, modulelist)
 }
 
 func (k Keeper) SetDoingSwitch(ctx sdk.Context, doing bool) {
