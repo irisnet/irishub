@@ -1,6 +1,8 @@
 package consensus
 
 import (
+	"bytes"
+	"container/list"
 	cctx "context"
 	"encoding/hex"
 	"fmt"
@@ -10,14 +12,12 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/consensus"
 	"github.com/tendermint/tendermint/types"
-	"bytes"
-	"container/list"
 	"log"
 	"strings"
 	"time"
-	"github.com/spf13/viper"
 )
 
 // TODO
@@ -212,27 +212,27 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	cs.TmMetrics.NumTxs.Set(float64(block.NumTxs))
 	cs.TmMetrics.TotalTxs.Set(float64(block.TotalTxs))
 
-	if block.Height > 0{
+	if block.Height > 0 {
 		signed := 0
-		for _, vote := range block.LastCommit.Precommits{
-			if bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()){
+		for _, vote := range block.LastCommit.Precommits {
+			if bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
 				signed = 1
 				break
 			}
 		}
-		cs.IrisMetrics.MissedCount += 1- signed
+		cs.IrisMetrics.MissedCount += 1 - signed
 		cs.IrisMetrics.SignedCount += signed
 
-		cs.IrisMetrics.blockInfo.PushBack(BlockInfo{Height:block.Height, Time:block.Time, signed:signed})
+		cs.IrisMetrics.blockInfo.PushBack(BlockInfo{Height: block.Height, Time: block.Time, signed: signed})
 		firstBlock := cs.IrisMetrics.blockInfo.Front().Value.(BlockInfo)
-		if cs.IrisMetrics.blockInfo.Len() > 100{
+		if cs.IrisMetrics.blockInfo.Len() > 100 {
 			cs.IrisMetrics.blockInfo.Remove(cs.IrisMetrics.blockInfo.Front())
 			cs.IrisMetrics.SignedCount -= firstBlock.signed
 		}
 
-		avgInterval := time.Now().Sub(firstBlock.Time).Seconds()/float64(cs.IrisMetrics.blockInfo.Len())
+		avgInterval := time.Now().Sub(firstBlock.Time).Seconds() / float64(cs.IrisMetrics.blockInfo.Len())
 		cs.IrisMetrics.AvgBlockIntervalSeconds.Set(avgInterval)
-		cs.IrisMetrics.UpTime.Set(float64(cs.IrisMetrics.SignedCount)/float64(cs.IrisMetrics.blockInfo.Len()))
+		cs.IrisMetrics.UpTime.Set(float64(cs.IrisMetrics.SignedCount) / float64(cs.IrisMetrics.blockInfo.Len()))
 		cs.IrisMetrics.MissedPrecommits.Set(float64(cs.IrisMetrics.MissedCount))
 	}
 	bz, _ := cdc.MarshalBinaryBare(block)
