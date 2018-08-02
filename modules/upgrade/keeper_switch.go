@@ -69,4 +69,5 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 
 	k.SetDoingSwitch(ctx, false)
 	k.SetCurrentProposalID(ctx, -1)
+	k.SetKVStoreKeylist(ctx)
 }
