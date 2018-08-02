@@ -74,20 +74,22 @@ func PrometheusMetrics() *Metrics {
 
 func (m *Metrics) Start(ctx app.Context) {
 	//func (m *Metrics) Start(ctx tools.Context) {
-	m.setP2PPersistentPeers(viper.GetString("irishome"))
+	m.setP2PPersistentPeers(viper.GetString("home"))
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
 			result := ctx.NetInfo()
-			connected := 0
-			for _, peer := range result.Peers {
-				if _, exist := m.persistent_peers[string(peer.ID)]; exist {
-					connected += 1
+			if result != nil{
+				connected := 0
+				for _, peer := range result.Peers {
+					if _, exist := m.persistent_peers[string(peer.ID)]; exist {
+						connected += 1
+					}
 				}
+				m.Peers.Set(float64(result.NPeers))
+				m.ConnectedPersistentPeers.Set(float64(connected))
+				m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
 			}
-			m.Peers.Set(float64(result.NPeers))
-			m.ConnectedPersistentPeers.Set(float64(connected))
-			m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
 		}
 	}()
 }
