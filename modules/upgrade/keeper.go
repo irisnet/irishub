@@ -60,7 +60,7 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 	curVersion := k.GetCurrentVersion(ctx)
 
 	if curVersion == nil {
-		version.Id =0
+		version.Id = 0
 	} else {
 		version.Id = curVersion.Id + 1
 		if version.ProposalID == curVersion.ProposalID {
