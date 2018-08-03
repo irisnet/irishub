@@ -54,7 +54,7 @@ var (
 	flagName       = "name"
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
-	denom          = "iris"
+	denom          = "basecoin"
 
 	// bonded tokens given to genesis validators/accounts
 	freeFermionVal = int64(100)
@@ -65,7 +65,7 @@ var (
 const defaultUnbondingTime int64 = 60 * 10
 
 // get app init parameters for server init command
-func IrisAppInit() server.AppInit {
+func BasecoinAppInit() server.AppInit {
 	fsAppGenState := pflag.NewFlagSet("", pflag.ContinueOnError)
 
 	fsAppGenTx := pflag.NewFlagSet("", pflag.ContinueOnError)
@@ -77,20 +77,20 @@ func IrisAppInit() server.AppInit {
 	return server.AppInit{
 		FlagsAppGenState: fsAppGenState,
 		FlagsAppGenTx:    fsAppGenTx,
-		AppGenTx:         IrisAppGenTx,
-		AppGenState:      IrisAppGenStateJSON,
+		AppGenTx:         BasecoinAppGenTx,
+		AppGenState:      BasecoinAppGenStateJSON,
 	}
 }
 
 // simple genesis tx
-type IrisGenTx struct {
+type BasecoinGenTx struct {
 	Name    string         `json:"name"`
 	Address sdk.AccAddress `json:"address"`
 	PubKey  string         `json:"pub_key"`
 }
 
 // Generate a gaia genesis transaction with flags
-func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
+func BasecoinAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	if genTxConfig.Name == "" {
@@ -110,16 +110,16 @@ func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 		return
 	}
 	cliPrint = json.RawMessage(bz)
-	appGenTx, _, validator, err = IrisAppGenTxNF(cdc, pk, addr, genTxConfig.Name)
+	appGenTx, _, validator, err = BasecoinAppGenTxNF(cdc, pk, addr, genTxConfig.Name)
 	return
 }
 
 // Generate a gaia genesis transaction without flags
-func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name string) (
+func BasecoinAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name string) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	var bz []byte
-	gaiaGenTx := IrisGenTx{
+	gaiaGenTx := BasecoinGenTx{
 		Name:    name,
 		Address: addr,
 		PubKey:  sdk.MustBech32ifyAccPub(pk),
@@ -139,7 +139,7 @@ func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name
 
 // Create the core parameters for genesis initialization for gaia
 // note that the pubkey input is this machines pubkey
-func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState GenesisState, err error) {
+func BasecoinAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState GenesisState, err error) {
 
 	if len(appGenTxs) == 0 {
 		err = errors.New("must provide at least genesis transaction")
@@ -154,7 +154,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 	genaccs := make([]GenesisAccount, len(appGenTxs))
 	for i, appGenTx := range appGenTxs {
 
-		var genTx IrisGenTx
+		var genTx BasecoinGenTx
 		err = cdc.UnmarshalJSON(appGenTx, &genTx)
 		if err != nil {
 			return
@@ -202,11 +202,11 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 	return
 }
 
-// IrisAppGenState but with JSON
-func IrisAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
+// BasecoinAppGenState but with JSON
+func BasecoinAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
 
 	// create the final app state
-	genesisState, err := IrisAppGenState(cdc, appGenTxs)
+	genesisState, err := BasecoinAppGenState(cdc, appGenTxs)
 	if err != nil {
 		return nil, err
 	}

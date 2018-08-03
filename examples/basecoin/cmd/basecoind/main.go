@@ -27,7 +27,7 @@ func main() {
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
 		Use:               "basecoind",
-		Short:             "iris Daemon (server)",
+		Short:             "basecoin Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
@@ -43,16 +43,16 @@ func main() {
 		server.ShowValidatorCmd(ctx),
 	)
 
-	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
+	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "basecoin"))
 	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
-		server.InitCmd(ctx, cdc, app.IrisAppInit()),
+		server.InitCmd(ctx, cdc, app.BasecoinAppInit()),
 		startCmd,
-		server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
+		server.TestnetFilesCmd(ctx, cdc, app.BasecoinAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
-		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
+		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "basecoin")),
 		client.LineBreak,
 		version.VersionCmd,
 	)
@@ -60,17 +60,17 @@ func main() {
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "BASECOIN", app.DefaultNodeHome)
 	executor.Execute()
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewIrisApp(logger, db, traceStore, bam.SetPruning(viper.GetString("pruning")))
+	return app.NewBasecoinApp(logger, db, traceStore, bam.SetPruning(viper.GetString("pruning")))
 }
 
 func exportAppStateAndTMValidators(
 	logger log.Logger, db dbm.DB, traceStore io.Writer,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	gApp := app.NewIrisApp(logger, db, traceStore)
+	gApp := app.NewBasecoinApp(logger, db, traceStore)
 	return gApp.ExportAppStateAndValidators()
 }
