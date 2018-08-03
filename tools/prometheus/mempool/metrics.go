@@ -4,6 +4,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/mempool"
 	"time"
+	"github.com/prometheus/common/log"
 )
 
 // Metrics contains metrics exposed by this package.
@@ -24,8 +25,11 @@ func (m *Metrics) Start(rpc app.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
-			result := rpc.NumUnconfirmedTxs()
-			m.TmMetrics.Size.Set(float64(result.N))
+			if result, err := rpc.NumUnconfirmedTxs(); err == nil{
+				m.TmMetrics.Size.Set(float64(result.N))
+			}else {
+				log.Error(err)
+			}
 		}
 	}()
 

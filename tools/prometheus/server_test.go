@@ -79,7 +79,3 @@ func RecordMetrics(CPUUtilization (metrics.Gauge)) {
 	defer lock.RUnlock()
 	CPUUtilization.Set(CPUUsedPercent)
 }
-
-func TestCond(t *testing.T){
-	lock := new(sync.Once)
-}
