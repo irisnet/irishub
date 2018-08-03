@@ -28,7 +28,7 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  branch = "irisnet/feature_upgrade"
+  branch = "irisnet/develop"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[override]]
