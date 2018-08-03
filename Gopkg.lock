@@ -43,7 +43,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/feature_upgrade"
+  branch = "irisnet/develop"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -86,7 +86,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "b803861a4874dd69d10e5cd2ba925d2147027812"
+  revision = "b481cfdc58d1c4ad3c84078050c0ac1247a72b42"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -197,7 +197,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -595,6 +594,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "599fe3493ec8a1f516bf6a2c450cd5afb5b8432098424c2e2e3e53975ce2592e"
+  inputs-digest = "a1c5d94a1980638e85f3d72fc6d9b89efeb1c9ee1352fbe569deea6a1943ced3"
   solver-name = "gps-cdcl"
   solver-version = 1
