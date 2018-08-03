@@ -23,7 +23,7 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "basecli",
-		Short: "irishub light-client",
+		Short: "basecoin light-client",
 	}
 )
 
