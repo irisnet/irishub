@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// Version - Iris Version
+// Version - Basecoin Version
 const Version = "0.1.0"
 
 // VersionCmd - The version of gaia
