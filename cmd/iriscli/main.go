@@ -131,6 +131,7 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+			upgradecmd.GetCmdInfo("upgrade",cdc),
 		)...)
 	upgradeCmd.AddCommand(
 		client.PostCommands(
