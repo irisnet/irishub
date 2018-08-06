@@ -88,7 +88,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "4cc21d0fc51349eb166fd3f075a65fe3b9095197"
+  revision = "14c32132ab488544fdcec15d4dbc41ac9db8a2a2"
   source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
 
 [[projects]]
