@@ -78,8 +78,7 @@ func (m *Metrics) Start(ctx app.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
-			result := ctx.NetInfo()
-			if result != nil {
+			if result, err := ctx.NetInfo(); err == nil {
 				connected := 0
 				for _, peer := range result.Peers {
 					if _, exist := m.persistent_peers[string(peer.ID)]; exist {
@@ -89,6 +88,8 @@ func (m *Metrics) Start(ctx app.Context) {
 				m.Peers.Set(float64(result.NPeers))
 				m.ConnectedPersistentPeers.Set(float64(connected))
 				m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
+			}else {
+				log.Fatal(err)
 			}
 		}
 	}()

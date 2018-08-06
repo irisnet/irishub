@@ -10,7 +10,7 @@ import (
 
 type Monitor struct {
 	providers []MetricsProvider
-	ctx 	  app.Context
+	ctx       app.Context
 }
 
 func DefaultMonitor(ctx app.Context) *Monitor {
