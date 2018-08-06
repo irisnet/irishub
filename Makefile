@@ -16,3 +16,13 @@ build_linux:
 build_cur:
 	go build -o build/iris ./cmd/iris  && \
 	go build -o build/iriscli ./cmd/iriscli
+
+build_example:
+	go build  -o build/basecoind ./examples/basecoin/cmd/basecoind
+	go build  -o build/basecli ./examples/basecoin/cmd/basecli
+
+install_examples:
+	go install ./examples/basecoin/cmd/basecoind
+	go install ./examples/basecoin/cmd/basecli
+	go install ./examples/basecoin1/cmd/basecoind1
+	go install ./examples/basecoin1/cmd/basecli1

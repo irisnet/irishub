@@ -16,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov"
@@ -28,25 +27,24 @@ import (
 )
 
 const (
-	appName    = "IrisApp"
+	appName    = "BasecoinApp"
 	FlagReplay = "replay"
 )
 
 // default home directories for expected binaries
 var (
-	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
-	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
+	DefaultCLIHome  = os.ExpandEnv("$HOME/.basecli")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.basecoin")
 )
 
 // Extended ABCI application
-type IrisApp struct {
+type BasecoinApp struct {
 	*bam.BaseApp
 	cdc *wire.Codec
 
 	// keys to access the substores
 	keyMain          *sdk.KVStoreKey
 	keyAccount       *sdk.KVStoreKey
-	keyIBC           *sdk.KVStoreKey
 	keyStake         *sdk.KVStoreKey
 	keySlashing      *sdk.KVStoreKey
 	keyGov           *sdk.KVStoreKey
@@ -57,26 +55,24 @@ type IrisApp struct {
 	accountMapper       auth.AccountMapper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	coinKeeper          bank.Keeper
-	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
+func NewBasecoinApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *BasecoinApp {
 	cdc := MakeCodec()
 
 	bApp := bam.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
-	var app = &IrisApp{
+	var app = &BasecoinApp{
 		BaseApp:          bam.NewBaseApp(appName, cdc, logger, db),
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
-		keyIBC:           sdk.NewKVStoreKey("ibc"),
 		keyStake:         sdk.NewKVStoreKey("stake"),
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
@@ -98,18 +94,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	// add handlers
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
-	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.upgradeKeeper,app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper,app.upgradeKeeper,app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 
 
 	// register message routes
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper)).
@@ -120,7 +114,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyUpgrade)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyUpgrade)
 
 	var err error
 	if viper.GetBool(FlagReplay) {
@@ -140,7 +134,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 // custom tx codec
 func MakeCodec() *wire.Codec {
 	var cdc = wire.NewCodec()
-	ibc.RegisterWire(cdc)
 	bank.RegisterWire(cdc)
 	stake.RegisterWire(cdc)
 	slashing.RegisterWire(cdc)
@@ -152,13 +145,13 @@ func MakeCodec() *wire.Codec {
 	return cdc
 }
 
-func (app *IrisApp) PrepareNewVersion() {
+func (app *BasecoinApp) PrepareNewVersion() {
 	store := app.GetKVStore(app.keyUpgrade)
 	app.upgradeKeeper.RegisterVersionToBeSwitched(store, app.Router())
 }
 
 // application updates every end block
-func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *BasecoinApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
 
 	return abci.ResponseBeginBlock{
@@ -167,7 +160,7 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 }
 
 // application updates every end block
-func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *BasecoinApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
 	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
@@ -180,7 +173,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 }
 
 // custom logic for iris initialization
-func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *BasecoinApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	var genesisState GenesisState
@@ -211,7 +204,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 }
 
 // export the state of iris for a genesis file
-func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *BasecoinApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
 
 	// iterate to get the accounts
@@ -236,7 +229,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 }
 
 // Iterates through msgs and executes them
-func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result) {
+func (app *BasecoinApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result) {
 	// accumulate results
 	logs := make([]string, 0, len(msgs))
 	var data []byte   // NOTE: we just append them all (?!)
@@ -287,7 +280,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	return result
 }
 
-func (app *IrisApp) replay() int64 {
+func (app *BasecoinApp) replay() int64 {
 	//ctx := server.NewDefaultContext()
 	//ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
 	//dbContext := node.DBContext{"state", ctx.Config}
