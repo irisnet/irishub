@@ -88,6 +88,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	ibc.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	stake.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	RegisterRoutes(ctx, r, cdc, kb)
+	RegisterStakeExRate(ctx.Ctx, r, cdc)
 	gov.RegisterRoutes(ctx.Ctx, r, cdc)
 	slashing.RegisterRoutes(ctx.Ctx, r, cdc, kb)
 	return r
