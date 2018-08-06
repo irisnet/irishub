@@ -106,13 +106,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 
 	// register message routes
+	// need to update each module's msg type
 	app.Router().
-		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
+		AddRoute("bank-0", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
+		AddRoute("ibc-0", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("stake-0", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
+		AddRoute("slashing-0", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
+		AddRoute("gov-0", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper)).
+		AddRoute("upgrade-0", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
@@ -131,7 +132,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		cmn.Exit(err.Error())
 	}
 
-	app.PrepareNewVersion()
+	upgrade.RegisterModuleList(app.Router())
 
 	return app
 }
@@ -149,13 +150,6 @@ func MakeCodec() *wire.Codec {
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
-}
-
-func (app *IrisApp) PrepareNewVersion() {
-	upgrade.RegisterModuleList(app.Router())
-
-	store := app.GetKVStore(app.keyUpgrade)
-	app.upgradeKeeper.RegisterVersionToBeSwitched(store, app.Router())
 }
 
 // application updates every end block
