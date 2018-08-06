@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "9a2f9524024889e129a5422aca2cff73cb3eabf6"
+  revision = "f5e261fc9ec3437697fb31d8b38453c293204b29"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -43,6 +43,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
+  branch = "irisnet/develop"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -70,7 +71,6 @@
     "x/bank/client/cli",
     "x/bank/client/rest",
     "x/gov",
-    "x/gov/client/cli",
     "x/gov/client/rest",
     "x/ibc",
     "x/ibc/client/cli",
@@ -86,9 +86,8 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "ad65531bc2c204d81b61adf1559f2594c35b71b0"
+  revision = "b481cfdc58d1c4ad3c84078050c0ac1247a72b42"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.23.0-iris"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -289,7 +288,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
+  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
 
 [[projects]]
   branch = "master"
@@ -318,8 +317,8 @@
     "net",
     "process"
   ]
-  revision = "4a180b209f5f494e5923cfce81ea30ba23915877"
-  version = "v2.18.06"
+  revision = "8048a2e9c5773235122027dd585cf821b2af1249"
+  version = "v2.18.07"
 
 [[projects]]
   branch = "master"
@@ -525,7 +524,7 @@
     "unix",
     "windows"
   ]
-  revision = "bd9dbc187b6e1dacfdd2722a87e83093c2d7bd6e"
+  revision = "3dc4335d56c789b04b0ba99b7a37249d9b614314"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -552,7 +551,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "2a72893556e4d1f6c795a4c039314c9fa751eedb"
+  revision = "daca94659cb50e9f37c1b834680f2e46358f10b0"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -595,6 +594,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6656d188f89610f47c383af201af4c47dffbdf8241b372720fe66aa614a5a426"
+  inputs-digest = "a1c5d94a1980638e85f3d72fc6d9b89efeb1c9ee1352fbe569deea6a1943ced3"
   solver-name = "gps-cdcl"
   solver-version = 1
