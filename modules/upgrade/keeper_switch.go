@@ -3,14 +3,14 @@ package upgrade
 import (
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 var (
 	VersionToBeSwitched Version
 	ModuleList          ModuleLifeTimeList
-	ModuleListBucket	map[int] ModuleLifeTimeList
+	ModuleListBucket    map[int]ModuleLifeTimeList
 )
 
 func (keeper Keeper) GetVersionToBeSwitched() *Version {
@@ -32,8 +32,9 @@ func RegisterModuleList(router bam.Router) {
 }
 
 func buildModuleListBucket() {
+	ModuleListBucket = make(map[int]ModuleLifeTimeList)
 
-	for _, module := range ModuleList {
+	for _, module := range ModuleList {		// bucket the module list by the introduced version id
 		verstr := strings.Split(module.Handler, "-")
 		ver, err := strconv.Atoi(verstr[1])
 		if err != nil {
@@ -42,12 +43,56 @@ func buildModuleListBucket() {
 
 		bucket, ok := ModuleListBucket[ver]
 		if ok {
-			ModuleListBucket[ver] = bucket.BuildModuleLifeTime(0, verstr[0], module.Store)
+			ModuleListBucket[ver] = append(bucket, module)
 		} else {
 			modulelist := NewModuleLifeTimeList()
-			ModuleListBucket[ver] = modulelist.BuildModuleLifeTime(0, verstr[0], module.Store)
+			ModuleListBucket[ver] = append(modulelist, module)
 		}
 	}
+
+	for version := 1; ; version++ {
+		bucket, ok := ModuleListBucket[version]
+		if !ok {
+			break
+		}
+
+		modules := make(map[string]bool)	// current module set(only include new version module)
+		for _, module := range bucket {
+			verstr := strings.Split(module.Handler, "-")
+			modules[verstr[0]] = true
+		}
+
+		preBucket := ModuleListBucket[version-1]
+		for _, module := range preBucket {		// reuse the pre version module if no update in the new version
+			verstr := strings.Split(module.Handler, "-")
+			if _, ok := modules[verstr[0]]; !ok {
+				bucket = append(bucket, module)
+			}
+		}
+
+		ModuleListBucket[version] = bucket
+	}
+}
+
+func GetModuleListFromBucket(verId int) ModuleLifeTimeList {
+	moduleList, ok := ModuleListBucket[verId]
+	if !ok {
+		panic("No info found for the specified version module list")
+	}
+
+	return moduleList
+}
+
+func GetModuleFromBucket(verId int, handler string) ModuleLifeTime {
+	moduleList := GetModuleListFromBucket(verId)
+	for _, module := range moduleList {
+		verstr := strings.Split(module.Handler, "-")
+		if verstr[0] == handler {
+			return module
+		}
+	}
+
+	return ModuleLifeTime{}
 }
 
 func (keeper Keeper) RegisterVersionToBeSwitched(store sdk.KVStore, router bam.Router) {

@@ -8,6 +8,9 @@ import (
 
 // InitGenesis - build the genesis version For first Version
 func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router) {
+
+	RegisterModuleList(router)
+
 	modulelist := NewModuleLifeTimeList()
 	handlerList := router.RouteTable()
 

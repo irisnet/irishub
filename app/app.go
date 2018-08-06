@@ -152,6 +152,8 @@ func MakeCodec() *wire.Codec {
 }
 
 func (app *IrisApp) PrepareNewVersion() {
+	upgrade.RegisterModuleList(app.Router())
+
 	store := app.GetKVStore(app.keyUpgrade)
 	app.upgradeKeeper.RegisterVersionToBeSwitched(store, app.Router())
 }

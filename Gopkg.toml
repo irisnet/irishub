@@ -28,8 +28,10 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  branch = "irisnet/develop"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
+#  branch = "irisnet/develop"
+#  source = "https://github.com/irisnet/cosmos-sdk.git"
+  branch = "silei/cosmos-sdk"
+  source = "https://github.com/wukongcheng/cosmos-sdk.git"
 
 [[override]]
   name = "github.com/golang/protobuf"
