@@ -15,6 +15,7 @@ import (
 	ibccmd "github.com/irisnet/irishub/examples/basecoin1/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
+	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
 	"github.com/irisnet/irishub/examples/basecoin1/app"
 	"github.com/irisnet/irishub/examples/basecoin1/version"
 	c "github.com/irisnet/irishub/client"
@@ -122,6 +123,23 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		govCmd,
+	)
+	//Add upgrade commands
+	upgradeCmd := &cobra.Command{
+		Use:   "upgrade",
+		Short: "Software Upgrade subcommands",
+	}
+	upgradeCmd.AddCommand(
+		client.GetCommands(
+			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+			upgradecmd.GetCmdInfo("upgrade",cdc),
+		)...)
+	upgradeCmd.AddCommand(
+		client.PostCommands(
+			upgradecmd.GetCmdSubmitSwitch(cdc),
+		)...)
+	rootCmd.AddCommand(
+		upgradeCmd,
 	)
 
 	//Add auth and bank commands
