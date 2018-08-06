@@ -4,14 +4,50 @@ import (
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strings"
+	"strconv"
 )
 
 var (
 	VersionToBeSwitched Version
+	ModuleList          ModuleLifeTimeList
+	ModuleListBucket	map[int] ModuleLifeTimeList
 )
 
 func (keeper Keeper) GetVersionToBeSwitched() *Version {
 	return &VersionToBeSwitched
+}
+
+func RegisterModuleList(router bam.Router) {
+	ModuleList = NewModuleLifeTimeList()
+	handlerList := router.RouteTable()
+
+	for _, handler := range handlerList {
+		hs := strings.Split(handler, "/")
+
+		stores := strings.Split(hs[1], ":")
+		ModuleList = ModuleList.BuildModuleLifeTime(0, hs[0], stores)
+	}
+
+	buildModuleListBucket()
+}
+
+func buildModuleListBucket() {
+
+	for _, module := range ModuleList {
+		verstr := strings.Split(module.Handler, "-")
+		ver, err := strconv.Atoi(verstr[1])
+		if err != nil {
+			panic(err)
+		}
+
+		bucket, ok := ModuleListBucket[ver]
+		if ok {
+			ModuleListBucket[ver] = bucket.BuildModuleLifeTime(0, verstr[0], module.Store)
+		} else {
+			modulelist := NewModuleLifeTimeList()
+			ModuleListBucket[ver] = modulelist.BuildModuleLifeTime(0, verstr[0], module.Store)
+		}
+	}
 }
 
 func (keeper Keeper) RegisterVersionToBeSwitched(store sdk.KVStore, router bam.Router) {

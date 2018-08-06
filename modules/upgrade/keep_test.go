@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 )
@@ -76,6 +77,41 @@ func TestUpdateKeeper(t *testing.T) {
 		t.FailNow()
 	}
 
+}
+
+func TestSwitchKeeper(t *testing.T) {
+	//ctx, keeper := createTestInput(t)
+
+	router := baseapp.NewRouter()
+	router.AddRoute("main-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
+	router.AddRoute("acc-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("acc")}, nil)
+	router.AddRoute("gov-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	router.AddRoute("stake-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
+	router.AddRoute("upgrade-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
+
+	RegisterModuleList(router)
+	require.Equal(t, len(ModuleList), 5)
+	require.Equal(t, len(ModuleListBucket[0]), 5)
+
+	router.AddRoute("gov-1", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	RegisterModuleList(router)
+	require.Equal(t, len(ModuleList), 6)
+	require.Equal(t, len(ModuleListBucket[1]), 1)
+
+	router.AddRoute("gov-2", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	RegisterModuleList(router)
+	require.Equal(t, len(ModuleList), 7)
+	require.Equal(t, len(ModuleListBucket[2]), 1)
+
+	router.AddRoute("gov-3", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	RegisterModuleList(router)
+	require.Equal(t, len(ModuleList), 8)
+	require.Equal(t, len(ModuleListBucket[3]), 1)
+
+	router.AddRoute("stake-3", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
+	RegisterModuleList(router)
+	require.Equal(t, len(ModuleList), 9)
+	require.Equal(t, len(ModuleListBucket[3]), 2)
 }
 
 func getModuleList(router baseapp.Router) ModuleLifeTimeList {
