@@ -198,7 +198,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -596,6 +595,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "faea5e0943a8cfc0fd6185c9c6d45fb254f81e5c5d0f67553b185e5e7e60bf40"
+  inputs-digest = "6656d188f89610f47c383af201af4c47dffbdf8241b372720fe66aa614a5a426"
   solver-name = "gps-cdcl"
   solver-version = 1
