@@ -11,21 +11,20 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
+	govcmd "github.com/irisnet/irishub/modules/gov/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
-	"github.com/irisnet/irishub/app"
-	c "github.com/irisnet/irishub/client"
-	govcmd "github.com/irisnet/irishub/modules/gov/client/cli"
 	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
-	"github.com/irisnet/irishub/version"
+	"github.com/irisnet/irishub/examples/basecoin/app"
+	"github.com/irisnet/irishub/examples/basecoin/version"
+	c "github.com/irisnet/irishub/client"
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "iriscli",
-		Short: "irishub light-client",
+		Use:   "basecli",
+		Short: "basecoin light-client",
 	}
 )
 
@@ -51,17 +50,6 @@ func main() {
 	)
 	tx.AddCommands(tendermintCmd, cdc)
 
-	//Add IBC commands
-	ibcCmd := &cobra.Command{
-		Use:   "ibc",
-		Short: "Inter-Blockchain Communication subcommands",
-	}
-	ibcCmd.AddCommand(
-		client.PostCommands(
-			ibccmd.IBCTransferCmd(cdc),
-			ibccmd.IBCRelayCmd(cdc),
-		)...)
-
 	advancedCmd := &cobra.Command{
 		Use:   "advanced",
 		Short: "Advanced subcommands",
@@ -69,9 +57,9 @@ func main() {
 
 	advancedCmd.AddCommand(
 		tendermintCmd,
-		ibcCmd,
 		c.ServeCommand(cdc),
 	)
+
 	rootCmd.AddCommand(
 		advancedCmd,
 		client.LineBreak,
@@ -103,7 +91,7 @@ func main() {
 		stakeCmd,
 	)
 
-	//Add gov commands
+	//Add stake commands
 	govCmd := &cobra.Command{
 		Use:   "gov",
 		Short: "Governance and voting subcommands",
@@ -122,7 +110,6 @@ func main() {
 	rootCmd.AddCommand(
 		govCmd,
 	)
-
 	//Add upgrade commands
 	upgradeCmd := &cobra.Command{
 		Use:   "upgrade",
