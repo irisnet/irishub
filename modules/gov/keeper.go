@@ -33,13 +33,14 @@ type Keeper struct {
 }
 
 // NewGovernanceMapper returns a mapper that uses go-wire to (binary) encode and decode gov types.
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper,uk upgrade.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
 		ck:        ck,
 		ds:        ds,
 		vs:        ds.GetValidatorSet(),
 		cdc:       cdc,
+		uk:        uk,
 		codespace: codespace,
 	}
 }
@@ -135,14 +136,16 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 
 var (
 	defaultMinDeposit       int64 = 10
-	defaultMaxDepositPeriod int64 = 10000
-	defaultVotingPeriod     int64 = 10000
+	//defaultMaxDepositPeriod int64 = 10000
+	//defaultVotingPeriod     int64 = 10000
+	defaultMaxDepositPeriod int64 = 2 // for test
+	defaultVotingPeriod     int64 = 2 // for test
 )
 
 // Gets procedure from store. TODO: move to global param store and allow for updating of this
 func (keeper Keeper) GetDepositProcedure() DepositProcedure {
 	return DepositProcedure{
-		MinDeposit:       sdk.Coins{sdk.NewCoin("steak", defaultMinDeposit)},
+		MinDeposit:       sdk.Coins{sdk.NewCoin("iris", defaultMinDeposit)},
 		MaxDepositPeriod: defaultMaxDepositPeriod,
 	}
 }
