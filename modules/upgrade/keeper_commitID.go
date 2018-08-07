@@ -3,6 +3,7 @@ package upgrade
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"sort"
 )
 
 var (
@@ -35,8 +36,15 @@ func (keeper Keeper) SetKVStoreKeylist(ctx sdk.Context) {
 		}
 	}
 
-	var KVStoreKeyList string
+	var list []string
 	for key, _ := range storeSet {
+		list = append(list, key)
+	}
+
+	sort.Sort(sort.StringSlice(list))
+
+	var KVStoreKeyList string
+	for _, key := range list {
 		if KVStoreKeyList == "" {
 			KVStoreKeyList += key
 		} else {
