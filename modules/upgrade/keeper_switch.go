@@ -3,8 +3,8 @@ package upgrade
 import (
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strconv"
 	"strings"
+	"strconv"
 )
 
 var (
@@ -35,9 +35,15 @@ func buildModuleListBucket(moduleList ModuleLifeTimeList) {
 
 	for _, module := range moduleList { // bucket the module list by the introduced version id
 		verstr := strings.Split(module.Handler, "-")
-		ver, err := strconv.Atoi(verstr[1])
-		if err != nil {
-			panic(err)
+		var ver int
+		var err error
+		if len(verstr) == 1 {
+			ver = 0
+		} else {
+			ver, err = strconv.Atoi(verstr[1])
+			if err != nil {
+				panic(err)
+			}
 		}
 
 		bucket, ok := ModuleListBucket[int64(ver)]
