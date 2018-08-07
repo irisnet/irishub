@@ -81,7 +81,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
-		//keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
+		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 	}
 
 	var lastHeight int64
@@ -101,7 +101,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
-	//app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.upgradeKeeper,app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 
@@ -112,16 +112,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper))
-		//AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
+		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper)).
+		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	//app.SetRunMsg(app.runMsgs)
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection/*, app.keyUpgrade*/)
+	app.SetRunMsg(app.runMsgs)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyUpgrade)
 
 	var err error
 	if viper.GetBool(FlagReplay) {
@@ -133,7 +133,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		cmn.Exit(err.Error())
 	}
 
-	//app.PrepareNewVersion()
+	app.PrepareNewVersion()
 
 	return app
 }
@@ -147,7 +147,7 @@ func MakeCodec() *wire.Codec {
 	slashing.RegisterWire(cdc)
 	gov.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
-	//upgrade.RegisterWire(cdc)
+	upgrade.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
@@ -172,7 +172,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
 	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
-	//tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
+	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
 
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
@@ -206,7 +206,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.DefaultGenesisState())
 
-	//upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
 
 	return abci.ResponseInitChain{}
 }
