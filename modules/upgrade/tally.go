@@ -14,14 +14,12 @@ func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
 		totalVotingPower := sdk.ZeroRat()
 		switchVotingPower:= sdk.ZeroRat()
-
 	    for _,validator :=range k.sk.GetAllValidators(ctx) {
-			totalVotingPower.Add(validator.GetPower())
+			totalVotingPower = totalVotingPower.Add(validator.GetPower())
 	   	    if _,ok := k.GetSwitch(ctx,proposalID,validator.Owner);ok {
-				switchVotingPower.Add(validator.GetPower())
+				switchVotingPower = switchVotingPower.Add(validator.GetPower())
 		    }
 	    }
-
 		// If more than 95% of validator update , do switch
 		if switchVotingPower.Quo(totalVotingPower).GT(Threshold) {
 			return true

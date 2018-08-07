@@ -136,8 +136,10 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 
 var (
 	defaultMinDeposit       int64 = 10
-	defaultMaxDepositPeriod int64 = 10
-	defaultVotingPeriod     int64 = 10
+	//defaultMaxDepositPeriod int64 = 10000
+	//defaultVotingPeriod     int64 = 10000
+	defaultMaxDepositPeriod int64 = 2 // for test
+	defaultVotingPeriod     int64 = 2 // for test
 )
 
 // Gets procedure from store. TODO: move to global param store and allow for updating of this
