@@ -54,7 +54,7 @@ var (
 	flagName       = "name"
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
-	denom          = "basecoin"
+	denom          = "iris"
 
 	// bonded tokens given to genesis validators/accounts
 	freeFermionVal = int64(100)
