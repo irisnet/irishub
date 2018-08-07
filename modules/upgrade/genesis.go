@@ -13,5 +13,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router) {
 	genesisVersion := NewVersion(0, 0, 0, GetModuleListFromBucket(0))
 	k.AddNewVersion(ctx, genesisVersion)
 
+	k.SetCurrentProposalAcceptHeight(ctx,-1)
+	k.SetCurrentProposalID(ctx,-1)
 	InitGenesis_commitID(ctx, k)
 }
