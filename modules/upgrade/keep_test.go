@@ -124,6 +124,20 @@ func TestSwitchKeeper(t *testing.T) {
 	require.Equal(t, GetModuleFromBucket(3, "stake").Handler, "stake-3")
 }
 
+func TestSetKVStoreKeylist(t *testing.T) {
+	ctx, keeper := createTestInput(t)
+
+	router := baseapp.NewRouter()
+	router.AddRoute("main-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
+	router.AddRoute("acc-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("acc")}, nil)
+	router.AddRoute("gov-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	router.AddRoute("stake-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
+	router.AddRoute("upgrade-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
+
+	InitGenesis(ctx, keeper, router)
+	keeper.SetKVStoreKeylist(ctx)
+}
+
 func getModuleList(router baseapp.Router) ModuleLifeTimeList {
 
 	modulelist := NewModuleLifeTimeList()
