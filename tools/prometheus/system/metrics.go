@@ -1,7 +1,6 @@
 package system
 
 import (
-	"bytes"
 	"container/list"
 	"errors"
 	"fmt"
@@ -9,6 +8,7 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"log"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
@@ -17,10 +17,10 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 )
 
 type Metrics struct {
@@ -28,26 +28,24 @@ type Metrics struct {
 	MemoUtilization metrics.Gauge
 
 	//processes related monitor term
-	ProcCPUUtilization  []metrics.Gauge
-	ProcMemoUtilization []metrics.Gauge
-	ProcOpenedFilesNum  []metrics.Gauge
-	processes           []process.Process
-
+	ProcCPUUtilization  metrics.Gauge
+	ProcMemoUtilization metrics.Gauge
+	ProcOpenedFilesNum  metrics.Gauge
+	processes           process.Process
+	ProcNum             metrics.Gauge
 	//cmd related monitor term
-	cmd     []string
-	ProcNum []metrics.Gauge
-
+	cmd string
 	//storage related monitor term
-	DiskUsedPercentage []metrics.Gauge
-	DiskFreeSpace      []metrics.Gauge
-	disks              []string
+	DiskUsedPercentage metrics.Gauge
+	DiskFreeSpace      metrics.Gauge
+	disks              string
 
 	//file related monitor term
-	FileSize      []metrics.Gauge
-	filePaths     []string
+	FileSize      metrics.Gauge
+	filePaths     string
 	recursively   bool //whether compute directories size recursively
-	DirectorySize []metrics.Gauge
-	dirPaths      []string
+	DirectorySize metrics.Gauge
+	dirPath       string
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -63,145 +61,94 @@ func PrometheusMetrics() *Metrics {
 			Name:      "memo_percent",
 			Help:      "Memo Utilization Percantage",
 		}, []string{}),
-		ProcCPUUtilization:  make([]metrics.Gauge, 0),
-		ProcMemoUtilization: make([]metrics.Gauge, 0),
-		ProcOpenedFilesNum:  make([]metrics.Gauge, 0),
-		DiskUsedPercentage:  make([]metrics.Gauge, 0),
-		DiskFreeSpace:       make([]metrics.Gauge, 0),
-		FileSize:            make([]metrics.Gauge, 0),
-		DirectorySize:       make([]metrics.Gauge, 0),
-		processes:           make([]process.Process, 0),
-
-		ProcNum: make([]metrics.Gauge, 0),
-		cmd:     make([]string, 0),
-
-		recursively: false,
-		disks:       make([]string, 0),
-		filePaths:   make([]string, 0),
-		dirPaths:    make([]string, 0),
+		ProcCPUUtilization: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "process_cpu_percent",
+			Help:      "CPU Utilization Percantage of the processes iris start",
+		}, []string{}),
+		ProcMemoUtilization: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "process_memo_percent",
+			Help:      "Memory Utilization Percantage of processes iris start",
+		}, []string{}),
+		ProcOpenedFilesNum: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "opened_files_number",
+			Help:      "Number of Opened Files of processes iris start",
+		}, []string{}),
+		DiskUsedPercentage: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "disk_used_percentage",
+			Help:      "Used Percentage of disk",
+		}, []string{}),
+		DiskFreeSpace: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "disk_free_space",
+			Help:      "Free space of disk",
+		}, []string{}),
+		DirectorySize: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "direcotry_size",
+			Help:      "total Size of files in home direcotry",
+		}, []string{}),
+		ProcNum: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "system",
+			Name:      "process_number",
+			Help:      "Process number of processes iris start",
+		}, []string{}),
+		recursively: true,
+		/*
+			FileSize:            make([]metrics.Gauge, 0),
+			cmd:     make([]string, 0),
+			filePaths:   make([]string, 0),
+			dirPaths:    make([]string, 0),
+			dirPath: nil,
+			disks: nil,
+		*/
 	}
 }
 
-func (metrics *Metrics) addDisk(diskPath string) {
-	metrics.disks = append(metrics.disks, diskPath)
-
-	name := fmt.Sprintf("disk_used_percentage_%s", getPathName(diskPath))
-	help := fmt.Sprintf("Used Percentage of disk mount on path: %s", diskPath)
-	metrics.DiskUsedPercentage = append(metrics.DiskUsedPercentage, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Subsystem: "system",
-		Name:      name,
-		Help:      help,
-	}, []string{}))
-
-	name = fmt.Sprintf("disk_free_space_%s", getPathName(diskPath))
-	help = fmt.Sprintf("Free space of disk mount on path: %s", diskPath)
-	metrics.DiskFreeSpace = append(metrics.DiskFreeSpace, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Subsystem: "system",
-		Name:      name,
-		Help:      help,
-	}, []string{}))
-
-}
-
-func (metrics *Metrics) addPath(path string) {
-	if fileInfo, err := os.Stat(path); err != nil {
-		fmt.Println(err.Error())
-		return
-	} else {
-		if fileInfo.IsDir() {
-			metrics.dirPaths = append(metrics.dirPaths, path)
-			name := fmt.Sprintf("direcotry_size_%s", getPathName(path))
-			help := fmt.Sprintf("total Size of files in %s", path)
-			metrics.DirectorySize = append(metrics.DirectorySize, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-				Subsystem: "system",
-				Name:      name,
-				Help:      help,
-			}, []string{}))
+func (metrics *Metrics) setPath(path string) {
+	if !filepath.IsAbs(path) {
+		if absPath, err := filepath.Abs(path); err != nil {
+			log.Println(err.Error())
 		} else {
-			metrics.filePaths = append(metrics.filePaths, path)
-			name := fmt.Sprintf("file_size_%s", getPathName(path))
-			help := fmt.Sprintf("size of files: %s", path)
-			metrics.FileSize = append(metrics.FileSize, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-				Subsystem: "system",
-				Name:      name,
-				Help:      help,
-			}, []string{}))
+			path = absPath
 		}
+	}
+	if fileInfo, err := os.Stat(path); err != nil {
+		log.Println(err.Error())
+	} else {
+		if !fileInfo.IsDir() {
+			log.Println("\"" + path + "\" is not a directory!")
+		}
+		metrics.dirPath = path
+		metrics.disks = path
 	}
 }
 
 func (metrics *Metrics) add() {
-	commands := viper.GetString("commands")
-	for _, command := range strings.Split(commands, ";") {
-		if strings.TrimSpace(command) != "" {
-			metrics.addProcess(strings.TrimSpace(command))
-		}
-	}
-
-	disks := viper.GetString("disks")
-	for _, diskPath := range strings.Split(disks, ";") {
-		if strings.TrimSpace(diskPath) != "" {
-			metrics.addDisk(strings.TrimSpace(diskPath))
-		}
-	}
-
-	paths := viper.GetString("paths")
-	for _, path := range strings.Split(paths, ";") {
-		if strings.TrimSpace(path) != "" {
-			metrics.addPath(strings.TrimSpace(path))
-		}
-	}
-
+	metrics.setProcess("iris start")
+	home_path := viper.GetString("home")
+	metrics.setPath(home_path)
 	recursively := viper.GetBool("recursively")
-	metrics.SetRecursively(recursively)
-
+	metrics.recursively = recursively
 }
 
-func (metrics *Metrics) addProcess(command string) {
-	name_command := getPathName(command)
+func (metrics *Metrics) setProcess(command string) {
 
-	metrics.cmd = append(metrics.cmd, command)
-
-	metrics.ProcNum = append(metrics.ProcNum, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Subsystem: "system",
-		Name:      fmt.Sprintf("process_number_%s", name_command),
-		Help:      fmt.Sprintf("Process number of processes started by command %s", command),
-	}, []string{}))
-
+	metrics.cmd = command
 	pid, err := getPid(command)
 	if err != nil {
 		return
 	}
 	process := process.Process{Pid: int32(pid)}
-	cmd, err := process.Cmdline()
+	_, err = process.Cmdline()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	metrics.processes = append(metrics.processes, process)
-
-	metrics.ProcCPUUtilization = append(metrics.ProcCPUUtilization, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Subsystem: "system",
-		Name:      fmt.Sprintf("cpu_percent_%s", name_command),
-		Help:      fmt.Sprintf("CPU Utilization Percantage of processes with pid %d, started by command %s", pid, cmd),
-	}, []string{}))
-
-	metrics.ProcMemoUtilization = append(metrics.ProcMemoUtilization, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Subsystem: "system",
-		Name:      fmt.Sprintf("memo_percent_%s", name_command),
-		Help:      fmt.Sprintf("Memory Utilization Percantage of processes with pid %d, started by command %s", pid, cmd),
-	}, []string{}))
-
-	metrics.ProcOpenedFilesNum = append(metrics.ProcOpenedFilesNum, prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Subsystem: "system",
-		Name:      fmt.Sprintf("opened_files_number_%s", name_command),
-		Help:      fmt.Sprintf("Number of Opened Files of processes with pid %d, started by command %s", pid, cmd),
-	}, []string{}))
-
-}
-
-func (metrics *Metrics) SetRecursively(recursively bool) {
-	metrics.recursively = recursively
+	metrics.processes = process
 }
 
 func (metrics *Metrics) Start(ctx app.Context) {
@@ -215,59 +162,50 @@ func (metrics *Metrics) Start(ctx app.Context) {
 }
 
 func (metrics Metrics) RecordMetrics() {
-
-	for i, cmd := range metrics.cmd {
-		if num, err := getProcessNum(cmd); err != nil {
-			metrics.ProcNum[i].Set(float64(-1))
-		} else {
-			metrics.ProcNum[i].Set(float64(num))
-		}
+	if num, err := getProcessNum(metrics.cmd); err != nil {
+		metrics.ProcNum.Set(float64(-1))
+	} else {
+		metrics.ProcNum.Set(float64(num))
 	}
 
-	for i, process := range metrics.processes {
-		if cpuUtil, err := process.CPUPercent(); err != nil {
-			metrics.ProcCPUUtilization[i].Set(float64(-1))
-		} else {
-			metrics.ProcCPUUtilization[i].Set(cpuUtil)
-		}
-
-		if memoUtil, err := process.MemoryPercent(); err != nil {
-			metrics.ProcMemoUtilization[i].Set(float64(-1))
-		} else {
-			metrics.ProcMemoUtilization[i].Set(float64(memoUtil))
-		}
-
-		if files, err := process.OpenFiles(); err != nil {
-			metrics.ProcOpenedFilesNum[i].Set(float64(-1))
-		} else {
-			metrics.ProcOpenedFilesNum[i].Set(float64(len(files)))
-		}
+	if cpuUtil, err := metrics.processes.CPUPercent(); err != nil {
+		metrics.ProcCPUUtilization.Set(float64(-1))
+	} else {
+		metrics.ProcCPUUtilization.Set(float64(cpuUtil))
 	}
 
-	for i, diskPath := range metrics.disks {
-		if usage, err := disk.Usage(diskPath); err != nil {
-			metrics.DiskUsedPercentage[i].Set(float64(-1))
-			metrics.DiskFreeSpace[i].Set(float64(-1))
-		} else {
-			metrics.DiskUsedPercentage[i].Set(usage.UsedPercent)
-			metrics.DiskFreeSpace[i].Set(float64(usage.Free))
-		}
+	if memoUtil, err := metrics.processes.MemoryPercent(); err != nil {
+		metrics.ProcMemoUtilization.Set(float64(-1))
+	} else {
+		metrics.ProcMemoUtilization.Set(float64(memoUtil))
 	}
 
-	for i, filePath := range metrics.filePaths {
-		if fileInfo, err := os.Stat(filePath); err != nil {
-			metrics.FileSize[i].Set(float64(-1))
-		} else {
-			metrics.FileSize[i].Set(float64(fileInfo.Size()))
-		}
+	if files, err := metrics.processes.OpenFiles(); err != nil {
+		metrics.ProcOpenedFilesNum.Set(float64(-1))
+	} else {
+		metrics.ProcOpenedFilesNum.Set(float64(len(files)))
 	}
 
-	for i, dirPath := range metrics.dirPaths {
-		if size, err := getDirSize(dirPath, metrics.recursively); err != nil {
-			metrics.DirectorySize[i].Set(float64(-1))
+	if usage, err := disk.Usage(metrics.disks); err != nil {
+		metrics.DiskUsedPercentage.Set(float64(-1))
+		metrics.DiskFreeSpace.Set(float64(-1))
+	} else {
+		metrics.DiskUsedPercentage.Set(usage.UsedPercent)
+		metrics.DiskFreeSpace.Set(float64(usage.Free))
+	}
+
+	/*
+		if fileInfo, err := os.Stat(metrics.filePaths); err != nil {
+			metrics.FileSize.Set(float64(-1))
 		} else {
-			metrics.DirectorySize[i].Set(float64(size))
+			metrics.FileSize.Set(float64(fileInfo.Size()))
 		}
+	*/
+
+	if size, err := getDirSize(metrics.dirPath, metrics.recursively); err != nil {
+		metrics.DirectorySize.Set(float64(-1))
+	} else {
+		metrics.DirectorySize.Set(float64(size))
 	}
 
 	vMemoStat, _ := mem.VirtualMemory()
@@ -278,7 +216,7 @@ func (metrics Metrics) RecordMetrics() {
 	for _, percent := range percents {
 		CPUUsedPercent += percent
 	}
-	metrics.CPUUtilization.Set(CPUUsedPercent / float64(len(percents)))
+	metrics.CPUUtilization.Set(CPUUsedPercent)
 }
 
 //-----------------help functions-------------------------------
@@ -306,7 +244,11 @@ func getProcessNum(command string) (num int, err error) {
 		return 0, err
 	}
 	str := string(bytes)
-	str = str[:len(str)-1]
+	if len(str) == 0 {
+		return 0, err
+	} else {
+		str = str[:len(str)-1]
+	}
 	num, err = strconv.Atoi(str)
 
 	if err == nil {
@@ -380,21 +322,4 @@ func getDirSize(path string, recursively bool) (int64, error) {
 		}
 	}
 	return size, nil
-}
-
-//conver a path to a valid Gauge monitor term name
-func getPathName(path string) string {
-	var buffer bytes.Buffer
-
-	for i, ch := range path {
-		if i == 0 && unicode.IsDigit(ch) {
-			buffer.WriteString("_")
-		}
-		if unicode.IsDigit(ch) || unicode.IsLetter(ch) {
-			buffer.WriteByte(byte(ch))
-		} else {
-			buffer.WriteByte(byte('_'))
-		}
-	}
-	return buffer.String()
 }
