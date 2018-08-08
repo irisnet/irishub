@@ -58,7 +58,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/feature_upgrade"
+  branch = "irisnet/develop"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -91,6 +91,7 @@
     "x/ibc/client/cli",
     "x/ibc/client/rest",
     "x/mock",
+    "x/params",
     "x/slashing",
     "x/slashing/client/cli",
     "x/slashing/client/rest",
@@ -101,7 +102,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "d1523532296d75efcbc8e122df4fbd7635f0530e"
+  revision = "91d1a66d3318ee647c49fc88d96fb870c1b571b4"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -524,7 +525,7 @@
     "salsa20/salsa",
     "ssh/terminal"
   ]
-  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
+  revision = "f027049dab0ad238e394a753dba2d14753473a04"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -549,7 +550,7 @@
     "windows/registry",
     "windows/svc/eventlog"
   ]
-  revision = "3dc4335d56c789b04b0ba99b7a37249d9b614314"
+  revision = "acbc56fc7007d2a01796d5bde54f39e3b3e95945"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -625,6 +626,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a4f8383587dad4a29ba2dfa7bc7a81577e9e4a57f4dba6080ea67653f790f337"
+  inputs-digest = "49e8d56d3f0b44eca97dad3bcfca757766dfaeb08168ca06b858376ecfff6517"
   solver-name = "gps-cdcl"
   solver-version = 1
