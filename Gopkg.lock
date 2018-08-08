@@ -9,6 +9,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/alecthomas/template"
+  packages = [
+    ".",
+    "parse"
+  ]
+  revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/alecthomas/units"
+  packages = ["."]
+  revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/bartekn/go-bip39"
   packages = ["."]
   revision = "a05967ea095d81c8fe4833776774cfaff8e5036c"
@@ -35,7 +50,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "cf05f92c3f815bbd5091ed6c73eff51f7b1945e8"
+  revision = "f5e261fc9ec3437697fb31d8b38453c293204b29"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -71,7 +86,6 @@
     "x/bank/client/cli",
     "x/bank/client/rest",
     "x/gov",
-    "x/gov/client/cli",
     "x/gov/client/rest",
     "x/ibc",
     "x/ibc/client/cli",
@@ -88,7 +102,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "14c32132ab488544fdcec15d4dbc41ac9db8a2a2"
+  revision = "8510b38d2bfaa5fa6cd43c20279c9c60b32d9ed9"
   source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
 
 [[projects]]
@@ -288,6 +302,7 @@
   packages = [
     "expfmt",
     "internal/bitbucket.org/ww/goautoneg",
+    "log",
     "model"
   ]
   revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
@@ -327,6 +342,12 @@
   name = "github.com/shirou/w32"
   packages = ["."]
   revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
+
+[[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
+  version = "v1.0.6"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -418,6 +439,7 @@
   version = "v0.9.2"
 
 [[projects]]
+  branch = "irisnet/feature_upgrade"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -479,8 +501,8 @@
     "types",
     "version"
   ]
-  revision = "5fdbcd70df57b71ffba71e1ff5f00d617852a9c0"
-  version = "v0.22.6"
+  revision = "f82dd7ace613c87a6bed765e834b63850c996637"
+  source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -501,9 +523,10 @@
     "pbkdf2",
     "poly1305",
     "ripemd160",
-    "salsa20/salsa"
+    "salsa20/salsa",
+    "ssh/terminal"
   ]
-  revision = "56440b844dfe139a8ac053f4ecac0b20b79058f4"
+  revision = "f027049dab0ad238e394a753dba2d14753473a04"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -524,9 +547,11 @@
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
+    "windows/registry",
+    "windows/svc/eventlog"
   ]
-  revision = "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe"
+  revision = "acbc56fc7007d2a01796d5bde54f39e3b3e95945"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -588,6 +613,12 @@
   version = "v1.13.0"
 
 [[projects]]
+  name = "gopkg.in/alecthomas/kingpin.v2"
+  packages = ["."]
+  revision = "947dcec5ba9c011838740e680966fd7087a71d0d"
+  version = "v2.2.6"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
@@ -596,6 +627,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "391b6dadedbcac1cc92e45f73e1dcba8b8f424c9dfa71f41cc6ffd6e0ede3969"
+  inputs-digest = "4dc1952b3538604f984cbe971f286a4e54a853908ccd4cb85c54509fc93e6624"
   solver-name = "gps-cdcl"
   solver-version = 1
