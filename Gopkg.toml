@@ -54,6 +54,8 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
+#  branch = "irisnet/feature_upgrade"
+#  source = "https://github.com/irisnet/tendermint.git"
   version = "=v0.22.6"
 
 
