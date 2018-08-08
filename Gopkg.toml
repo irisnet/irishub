@@ -28,8 +28,8 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  branch = "irisnet/feature_fee_token"
-  source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
+  branch = "irisnet/develop"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[override]]
   name = "github.com/golang/protobuf"
@@ -54,8 +54,7 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  branch = "irisnet/feature_upgrade"
-  source = "https://github.com/irisnet/tendermint.git"
+  version = "=v0.22.6"
 
 
 [prune]
