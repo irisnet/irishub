@@ -31,7 +31,6 @@
   branch = "irisnet/feature_fee_token"
   source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
 
-
 [[override]]
   name = "github.com/golang/protobuf"
   version = "=1.1.0"
@@ -55,7 +54,8 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  version = "=0.22.6"
+  branch = "irisnet/feature_upgrade"
+  source = "https://github.com/irisnet/tendermint.git"
 
 
 [prune]

@@ -9,7 +9,7 @@ import (
 // Metrics contains metrics exposed by this package.
 // see MetricsProvider for descriptions.
 type Metrics struct {
-	TmMetrics 	mempool.Metrics
+	TmMetrics mempool.Metrics
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
