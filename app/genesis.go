@@ -59,7 +59,7 @@ var (
 	// bonded tokens given to genesis validators/accounts
 	freeFermionVal = int64(100)
 
-	totalTokenAmt = sdk.NewInt(200000000)
+	totalTokenAmt = sdk.NewInt(100)
 )
 
 const defaultUnbondingTime int64 = 60 * 10
