@@ -11,13 +11,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/version"
 	c "github.com/irisnet/irishub/client"
+	govcmd "github.com/irisnet/irishub/modules/gov/client/cli"
+	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
+	"github.com/irisnet/irishub/version"
 )
 
 // rootCmd is the entry point for this binary
@@ -102,7 +103,7 @@ func main() {
 		stakeCmd,
 	)
 
-	//Add stake commands
+	//Add gov commands
 	govCmd := &cobra.Command{
 		Use:   "gov",
 		Short: "Governance and voting subcommands",
@@ -120,6 +121,24 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		govCmd,
+	)
+
+	//Add upgrade commands
+	upgradeCmd := &cobra.Command{
+		Use:   "upgrade",
+		Short: "Software Upgrade subcommands",
+	}
+	upgradeCmd.AddCommand(
+		client.GetCommands(
+			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+			upgradecmd.GetCmdInfo("upgrade",cdc),
+		)...)
+	upgradeCmd.AddCommand(
+		client.PostCommands(
+			upgradecmd.GetCmdSubmitSwitch(cdc),
+		)...)
+	rootCmd.AddCommand(
+		upgradeCmd,
 	)
 
 	//Add auth and bank commands
