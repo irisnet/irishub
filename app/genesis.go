@@ -59,7 +59,8 @@ var (
 	// bonded tokens given to genesis validators/accounts
 	freeFermionVal = int64(100)
 
-	totalTokenAmt = sdk.NewInt(100)
+	// loose tokens given to genesis validators/accounts
+        freeIrisAcc = sdk.NewInt(100)
 )
 
 const defaultUnbondingTime int64 = 60 * 10
@@ -163,7 +164,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		// create the genesis account, give'm few steaks and a buncha token with there name
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
-			{denom, totalTokenAmt},
+			{denom, freeIrisAcc},
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
