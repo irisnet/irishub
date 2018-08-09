@@ -50,7 +50,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "f5e261fc9ec3437697fb31d8b38453c293204b29"
+  revision = "cf05f92c3f815bbd5091ed6c73eff51f7b1945e8"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -58,7 +58,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/develop"
+  branch = "irisnet/feature_upgrade"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -102,7 +102,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "91d1a66d3318ee647c49fc88d96fb870c1b571b4"
+  revision = "0d90baccd0b7b91449ee8807cf82ef9f68be543c"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -213,6 +213,7 @@
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -525,7 +526,7 @@
     "salsa20/salsa",
     "ssh/terminal"
   ]
-  revision = "f027049dab0ad238e394a753dba2d14753473a04"
+  revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -550,7 +551,7 @@
     "windows/registry",
     "windows/svc/eventlog"
   ]
-  revision = "acbc56fc7007d2a01796d5bde54f39e3b3e95945"
+  revision = "904bdc257025c7b3f43c19360ad3ab85783fad78"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -577,7 +578,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "daca94659cb50e9f37c1b834680f2e46358f10b0"
+  revision = "383e8b2c3b9e36c4076b235b32537292176bae20"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -626,6 +627,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "49e8d56d3f0b44eca97dad3bcfca757766dfaeb08168ca06b858376ecfff6517"
+  inputs-digest = "1f6bae2de94601cc5235b333aa37a96eae96a82d8142b03836e3537be98a10d7"
   solver-name = "gps-cdcl"
   solver-version = 1
