@@ -235,7 +235,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	if block.Height > 0 {
 		signed := 0
 		for _, vote := range block.LastCommit.Precommits {
-			if bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
+			if vote != nil && bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
 				signed = 1
 				break
 			}
