@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"strings"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
@@ -52,6 +53,7 @@ type BasecoinApp struct {
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
+	keyParams        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -60,6 +62,7 @@ type BasecoinApp struct {
 	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
+	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
 }
@@ -97,19 +100,20 @@ func NewBasecoinApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppO
 	)
 
 	// add handlers
+	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper,app.upgradeKeeper,app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
-	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
+	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection, app.paramsKeeper.Getter())
 
 
 	// register message routes
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("ibc-1", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake}, gov.NewHandler(app.govKeeper)).
@@ -133,7 +137,7 @@ func NewBasecoinApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppO
 		cmn.Exit(err.Error())
 	}
 
-	app.PrepareNewVersion()
+	upgrade.RegisterModuleList(app.Router())
 
 	return app
 }
@@ -151,11 +155,6 @@ func MakeCodec() *wire.Codec {
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
-}
-
-func (app *BasecoinApp) PrepareNewVersion() {
-	store := app.GetKVStore(app.keyUpgrade)
-	app.upgradeKeeper.RegisterVersionToBeSwitched(store, app.Router())
 }
 
 // application updates every end block
