@@ -71,7 +71,7 @@ type IBCTransferMsg struct {
 }
 
 // nolint
-func (msg IBCTransferMsg) Type() string { return "ibc" }
+func (msg IBCTransferMsg) Type() string { return "ibc-1" }
 
 // x/bank/tx.go MsgSend.GetSigners()
 func (msg IBCTransferMsg) GetSigners() []sdk.AccAddress { return []sdk.AccAddress{msg.SrcAddr} }
@@ -99,7 +99,7 @@ type IBCReceiveMsg struct {
 }
 
 // nolint
-func (msg IBCReceiveMsg) Type() string             { return "ibc" }
+func (msg IBCReceiveMsg) Type() string             { return "ibc-1" }
 func (msg IBCReceiveMsg) ValidateBasic() sdk.Error { return msg.IBCPacket.ValidateBasic() }
 
 // x/bank/tx.go MsgSend.GetSigners()
@@ -134,7 +134,7 @@ func NewIBCSetMsg(addr sdk.AccAddress) IBCSetMsg {
 }
 
 func (msg  IBCSetMsg) Type() string {
-	return "ibc"
+	return "ibc-1"
 }
 
 func (msg  IBCSetMsg) GetSignBytes() []byte {
@@ -164,7 +164,7 @@ func NewIBCGetMsg(addr sdk.AccAddress) IBCGetMsg {
 }
 
 func (msg  IBCGetMsg) Type() string {
-	return "ibc"
+	return "ibc-1"
 }
 
 func (msg  IBCGetMsg) GetSignBytes() []byte {
