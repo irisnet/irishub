@@ -131,7 +131,7 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-			upgradecmd.GetCmdInfo("upgrade",cdc),
+			upgradecmd.GetCmdInfo("upgrade", cdc),
 		)...)
 	upgradeCmd.AddCommand(
 		client.PostCommands(
@@ -155,8 +155,11 @@ func main() {
 	rootCmd.AddCommand(
 		keys.Commands(),
 		client.LineBreak,
-		version.VersionCmd,
 	)
+	rootCmd.AddCommand(
+		client.GetCommands(
+			version.GetCmdVersion("upgrade", cdc),
+		)...)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
