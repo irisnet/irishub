@@ -8,7 +8,6 @@ import (
 	"fmt"
 )
 
-// Command to Get a Switch Information
 func GetCmdInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "info",
