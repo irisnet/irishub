@@ -8,7 +8,7 @@ import (
 )
 
 // Version - Iris Version
-const Version = "0.3.3"
+const Version = "0.3.4"
 
 // VersionCmd - The version of gaia
 var VersionCmd = &cobra.Command{
