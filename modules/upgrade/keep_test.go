@@ -83,35 +83,44 @@ func TestSwitchKeeper(t *testing.T) {
 	//ctx, keeper := createTestInput(t)
 
 	router := baseapp.NewRouter()
-	router.AddRoute("main-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
-	router.AddRoute("acc-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("acc")}, nil)
-	router.AddRoute("gov-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
-	router.AddRoute("stake-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
-	router.AddRoute("upgrade-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
+	router.AddRoute("main", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
+	router.AddRoute("acc", []*sdk.KVStoreKey{sdk.NewKVStoreKey("acc")}, nil)
+	router.AddRoute("gov", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	router.AddRoute("stake", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
+	router.AddRoute("upgrade", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
 
 	RegisterModuleList(router)
-	require.Equal(t, len(ModuleList), 5)
 	require.Equal(t, len(ModuleListBucket[0]), 5)
+	require.Equal(t, "gov", GetModuleFromBucket(0, "gov").Handler)
+	require.Equal(t, "stake", GetModuleFromBucket(0, "stake").Handler)
 
 	router.AddRoute("gov-1", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	Inited = false
 	RegisterModuleList(router)
-	require.Equal(t, len(ModuleList), 6)
-	require.Equal(t, len(ModuleListBucket[1]), 1)
+	require.Equal(t, len(ModuleListBucket[1]), 5)
+	require.Equal(t, GetModuleFromBucket(1, "gov").Handler, "gov-1")
+	require.Equal(t, GetModuleFromBucket(1, "stake").Handler, "stake")
 
 	router.AddRoute("gov-2", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	Inited = false
 	RegisterModuleList(router)
-	require.Equal(t, len(ModuleList), 7)
-	require.Equal(t, len(ModuleListBucket[2]), 1)
+	require.Equal(t, len(ModuleListBucket[2]), 5)
+	require.Equal(t, GetModuleFromBucket(2, "gov").Handler, "gov-2")
+	require.Equal(t, GetModuleFromBucket(2, "stake").Handler, "stake")
 
 	router.AddRoute("gov-3", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
+	Inited = false
 	RegisterModuleList(router)
-	require.Equal(t, len(ModuleList), 8)
-	require.Equal(t, len(ModuleListBucket[3]), 1)
+	require.Equal(t, len(ModuleListBucket[3]), 5)
+	require.Equal(t, GetModuleFromBucket(3, "gov").Handler, "gov-3")
+	require.Equal(t, GetModuleFromBucket(3, "stake").Handler, "stake")
 
 	router.AddRoute("stake-3", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
+	Inited = false
 	RegisterModuleList(router)
-	require.Equal(t, len(ModuleList), 9)
-	require.Equal(t, len(ModuleListBucket[3]), 2)
+	require.Equal(t, len(ModuleListBucket[3]), 5)
+	require.Equal(t, GetModuleFromBucket(3, "gov").Handler, "gov-3")
+	require.Equal(t, GetModuleFromBucket(3, "stake").Handler, "stake-3")
 }
 
 func TestSetKVStoreKeylist(t *testing.T) {
