@@ -18,13 +18,13 @@ build_cur:
 	go build -o build/iriscli ./cmd/iriscli
 
 build_example:
-	go build  -o build/basecoind ./examples/basecoin/cmd/basecoind
-	go build  -o build/basecli ./examples/basecoin/cmd/basecli
-	go build  -o build/basecoind1 ./examples/basecoin1/cmd/basecoind1
-	go build  -o build/basecli1 ./examples/basecoin1/cmd/basecli1
+	go build  -o build/iris1 ./examples/irishub1/cmd/iris1
+	go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
+	go build  -o build/iris2 ./examples/irishub2/cmd/iris2
+	go build  -o build/iriscli2 ./examples/irishub2/cmd/iriscli2
 
 install_examples:
-	go install ./examples/basecoin/cmd/basecoind
-	go install ./examples/basecoin/cmd/basecli
-	go install ./examples/basecoin1/cmd/basecoind1
-	go install ./examples/basecoin1/cmd/basecli1
+	go install ./examples/irishub1/cmd/iris1
+	go install ./examples/irishub1/cmd/iriscli1
+	go install ./examples/irishub2/cmd/iris2
+	go install ./examples/irishub2/cmd/iriscli2
