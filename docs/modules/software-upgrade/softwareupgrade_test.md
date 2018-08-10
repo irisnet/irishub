@@ -1,56 +1,94 @@
 #软件升级测试
 
 ## 单节点成功升级CASE
-### 运行旧软件
+### 第一次升级
+#### 运行旧软件
 ```
-rm -rf basecoin1
-rm -rf .basecli
-basecoind init gen-tx --name=x --home=basecoin1
-basecoind init --gen-txs --chain-id=upgrade-test -o --home=basecoin1
-basecoind start --home=basecoin1
+rm -rf iris
+rm -rf .iriscli
+iris init gen-tx --name=x --home=iris
+iris init --gen-txs --chain-id=upgrade-test -o --home=iris
+iris start --home=iris
 ```
 
 ```
-basecli keys list
+iriscli keys list
 VADDR=验证人的地址
 ```
 
-### 发送升级提议（直接通过，2个区块高度后）
+#### 发送升级提议（直接通过，2个区块高度后）
 ```
-basecli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test 
-```
-
-### 查询提议内容
-```
-basecli gov query-proposal --proposalID=1        
+iriscli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
 ```
 
-### 查询升级的版本信息
+#### 查询提议内容
 ```
-basecli upgrade info
+iriscli gov query-proposal --proposalID=1        
+```
+
+#### 查询升级的版本信息
+```
+iriscli upgrade info
 ```
 
 #### 运行新软件
 ```
-basecoind1 start --home=basecoin1
+iris1 start --home=iris5
 ```
 
-### 发送消息自己已运行新软件
+#### 发送消息自己已运行新软件
 ```
-basecli  upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain
--id=upgrade-test
-```
-
-### 查询switch信息
-```
-basecli upgrade query-switch --voter=$VADDR --proposalID=1
+iriscli  upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=20000000000000000iris
 ```
 
-### 使用新功能（无报错）
+#### 查询switch信息
 ```
-basecli1 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true
-basecli1 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true
+iriscli upgrade query-switch --voter=$VADDR --proposalID=1
 ```
+
+#### 使用新功能（无报错）
+```
+iriscli1 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
+iriscli1 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
+```
+
+### 第二次升级
+#### 发送升级提议第二次升级（直接通过，2个区块高度后）
+```
+iriscli1 gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
+```
+
+#### 查询提议内容
+```
+iriscli gov query-proposal --proposalID=1        
+```
+
+#### 查询升级的版本信息
+```
+iriscli upgrade info
+```
+
+#### 运行新软件
+```
+iris2 start --home=iris
+```
+
+#### 发送消息自己已运行新软件
+```
+iriscli2  upgrade submit-switch --name=x --from=$VADDR --proposalID=2 --chain-id=upgrade-test --fee=20000000000000000iris
+```
+
+#### 查询switch信息
+```
+iriscli2 upgrade query-switch --voter=$VADDR --proposalID=1
+```
+
+#### 使用新功能（无报错）
+```
+iriscli2 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
+iriscli2 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
+```
+
 ## 多节点成功升级测试
 ```
 rm -rf basecoin1
@@ -98,7 +136,7 @@ VADDR4=
 
 ### 发送升级提议
 ```
-basecli gov submit-proposal --name=x1 --proposer=$VADDR1 --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test 
+basecli gov submit-proposal --name=x1 --proposer=$VADDR1 --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test fee=20000000000000000iris
 ```
 
 ### 查询提议内容
@@ -149,17 +187,19 @@ iris init gen-tx --name=x --home=iris1
 iris init --gen-txs --chain-id=upgrade-test -o --home=iris1
 iris start --home=iris1
 iriscli keys list
-iriscli gov  submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test 
-iriscli gov deposit --depositer=$VADDR  --deposit=1iris --name=x --proposalID=1 --chain-id=upgrade-test
+iriscli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=SoftwareUpgrade --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
+iriscli gov deposit --depositer=$VADDR  --deposit=1iris --name=x --proposalID=1 --chain-id=upgrade-test  --fee=???
+iriscli gov  vote --name=x --voter=$VADDR --proposalID=1 --option=Yes --chain-id=upgrade-test --fee=200000000000000iris
+
 iriscli gov query-proposal --proposalID=1
 iriscli upgrade info
-iriscli  upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test
+iriscli  upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=200000000000000iris
 iriscli upgrade query-switch --voter=$VADDR --proposalID=1
 ```
-##
+
 ```
-basecoind unsafe_reset_all --home=basecoin1
-basecoind unsafe_reset_all --home=basecoin2
-basecoind unsafe_reset_all --home=basecoin3
-basecoind unsafe_reset_all --home=basecoin4
+iris unsafe_reset_all --home=basecoin1
+iris unsafe_reset_all --home=basecoin2
+iris unsafe_reset_all --home=basecoin3
+iris unsafe_reset_all --home=basecoin4
 ```
