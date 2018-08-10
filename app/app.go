@@ -17,14 +17,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 
+	"errors"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/spf13/viper"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
+	"github.com/tendermint/tendermint/node"
+	sm "github.com/tendermint/tendermint/state"
 	"strings"
 )
 
@@ -108,9 +113,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection, app.paramsKeeper.Getter())
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.upgradeKeeper,app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.upgradeKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
-
 
 	// register message routes
 	// need to update each module's msg type
@@ -209,7 +213,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	gov.InitGenesis(ctx, app.govKeeper, gov.DefaultGenesisState())
 
 	feeTokenGensisConfig := auth.GenesisState{
-		FeeTokenNative: "iris",
+		FeeTokenNative:    "iris",
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
@@ -298,21 +302,19 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 }
 
 func (app *IrisApp) replay() int64 {
-	//ctx := server.NewDefaultContext()
-	//ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
-	//dbContext := node.DBContext{"state", ctx.Config}
-	//dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
-	//stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
-	//
-	//preState := sm.LoadPreState(stateDB)
-	//if preState.LastBlockHeight == 0 {
-	//	panic(errors.New("can't replay the last block, last block height is 0"))
-	//}
-	//
-	//sm.SaveState(stateDB,preState)
-	//stateDB.Close()
-	//
-	//return preState.LastBlockHeight
+	ctx := server.NewDefaultContext()
+	ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
+	dbContext := node.DBContext{"state", ctx.Config}
+	dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
+	stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
 
-	return 0
+	preState := sm.LoadPreState(stateDB)
+	if preState.LastBlockHeight == 0 {
+		panic(errors.New("can't replay the last block, last block height is 0"))
+	}
+
+	sm.SaveState(stateDB, preState)
+	stateDB.Close()
+
+	return preState.LastBlockHeight
 }
