@@ -10,7 +10,12 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router) {
 
 	RegisterModuleList(router)
 
-	genesisVersion := NewVersion(0, 0, 0, GetModuleListFromBucket(0))
+	moduleList, found := GetModuleListFromBucket(0)
+	if !found {
+		panic("No module list info found for genesis version")
+	}
+
+	genesisVersion := NewVersion(0, 0, 0, moduleList)
 	k.AddNewVersion(ctx, genesisVersion)
 
 	k.SetCurrentProposalAcceptHeight(ctx,-1)

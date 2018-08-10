@@ -68,6 +68,11 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 			return
 		}
 	}
+
+	for _, module := range version.ModuleList {
+		module.Start = version.Start
+	}
+
 	versionBytes,err := k.cdc.MarshalBinary(version)
 	if err != nil {
 		panic(err)
