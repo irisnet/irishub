@@ -58,7 +58,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/feature_upgrade"
+  branch = "irisnet/develop"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -102,7 +102,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "0d90baccd0b7b91449ee8807cf82ef9f68be543c"
+  revision = "d412a0e7c4777d04ddef8f07240562cc3f80d8b0"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -213,7 +213,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -440,6 +439,7 @@
   version = "v0.9.2"
 
 [[projects]]
+  branch = "irisnet/develop"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -501,8 +501,8 @@
     "types",
     "version"
   ]
-  revision = "5fdbcd70df57b71ffba71e1ff5f00d617852a9c0"
-  version = "v0.22.6"
+  revision = "65e95fb2fe92f712541a2351b4142c5d4739e75c"
+  source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -627,6 +627,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1f6bae2de94601cc5235b333aa37a96eae96a82d8142b03836e3537be98a10d7"
+  inputs-digest = "3fc02ad35094796b4cdec49fa7db6f6a68992363cf3bb1fc9483cd16242c91ae"
   solver-name = "gps-cdcl"
   solver-version = 1
