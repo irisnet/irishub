@@ -3,13 +3,13 @@ package upgrade
 import (
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 var (
-	Inited              bool
-	ModuleListBucket    map[int64]ModuleLifeTimeList
+	Inited           bool
+	ModuleListBucket map[int64]ModuleLifeTimeList
 )
 
 func RegisterModuleList(router bam.Router) {
@@ -81,21 +81,24 @@ func buildModuleListBucket(moduleList ModuleLifeTimeList) {
 	Inited = true
 }
 
-func GetModuleListFromBucket(verId int64) ModuleLifeTimeList {
+func GetModuleListFromBucket(verId int64) (ModuleLifeTimeList, bool) {
 	moduleList, ok := ModuleListBucket[verId]
 	if !ok {
-		panic("No info found for the specified version module list")
+		return nil, false
 	}
 
-	return moduleList
+	return moduleList, true
 }
 
 func GetModuleFromBucket(verId int64, handler string) ModuleLifeTime {
-	moduleList := GetModuleListFromBucket(verId)
-	for _, module := range moduleList {
-		verstr := strings.Split(module.Handler, "-")
-		if verstr[0] == handler {
-			return module
+	moduleList, found := GetModuleListFromBucket(verId)
+
+	if found {
+		for _, module := range moduleList {
+			verstr := strings.Split(module.Handler, "-")
+			if verstr[0] == handler {
+				return module
+			}
 		}
 	}
 
@@ -135,7 +138,12 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 		panic("No current version info found")
 	}
 
-	VersionToBeSwitched := NewVersion(currentVersion.Id+1, 0, 0, GetModuleListFromBucket(currentVersion.Id+1))
+	moduleList, found := GetModuleListFromBucket(currentVersion.Id+1)
+	if !found {									// reuse current version's modulelist for the bug fix upgrade
+		moduleList = currentVersion.ModuleList
+	}
+
+	VersionToBeSwitched := NewVersion(currentVersion.Id+1, 0, 0, moduleList)
 	VersionToBeSwitched.ProposalID = k.GetCurrentProposalID(ctx)
 	VersionToBeSwitched.Start = ctx.BlockHeight()
 
@@ -144,4 +152,13 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 	k.SetDoingSwitch(ctx, false)
 	k.SetCurrentProposalID(ctx, -1)
 	k.SetKVStoreKeylist(ctx)
+}
+
+func (k Keeper) OnlyRunAfterVersionId(ctx sdk.Context, versionId int64) bool {
+	version := k.GetVersionByVersionId(ctx, versionId)
+	if version == nil {
+		return false
+	}
+
+	return ctx.BlockHeight() >= version.Start
 }

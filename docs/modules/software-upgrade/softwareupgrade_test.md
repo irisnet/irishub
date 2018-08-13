@@ -18,7 +18,7 @@ VADDR=验证人的地址
 
 #### 发送升级提议（直接通过，2个区块高度后）
 ```
-iriscli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
+iriscli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description="I am crazy" --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
 ```
 
 #### 查询提议内容
