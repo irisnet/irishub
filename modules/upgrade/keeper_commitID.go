@@ -51,7 +51,7 @@ func (keeper Keeper) SetKVStoreKeylist(ctx sdk.Context) {
 			KVStoreKeyList += (":" + key)
 		}
 	}
-	KVStoreKeyList += (":main:fee:params")
+	KVStoreKeyList += (":main:fee")
 
 	fmt.Println("SetKVStoreKeylist ======  KVStoreKeyList: " + KVStoreKeyList)
 
