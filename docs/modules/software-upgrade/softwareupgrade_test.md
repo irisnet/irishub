@@ -1,4 +1,4 @@
-#软件升级测试
+# 软件升级测试
 
 ## 单节点成功升级CASE
 ### 第一次升级
@@ -89,41 +89,62 @@ iriscli2 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --seque
 iriscli2 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
 ```
 
-## 多节点成功升级测试
+## 多节点连续升级测试
+
+### version 0
+
 ```
-rm -rf basecoin1
-rm -rf .basecli
-rm -rf basecoin2
-rm -rf .basecli
-rm -rf basecoin3
-rm -rf .basecli
-rm -rf basecoin4
-rm -rf .basecli
+iris start --home /data/iris > /data/iris/log.txt &
+(run in all the nodes)
 
-basecoind init gen-tx --name=x1 --home=basecoin1
-basecoind init gen-tx --name=x2 --home=basecoin2
-basecoind init gen-tx --name=x3 --home=basecoin3
-basecoind init gen-tx --name=x4 --home=basecoin4
+iriscli gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+(run in node1)
 
-cp basecoin2/config/gentx/gentx-XXXX.json basecoin1/config/gentx/
-cp basecoin3/config/gentx/gentx-XXXX.json basecoin1/config/gentx/
-cp basecoin4/config/gentx/gentx-XXXX.json basecoin1/config/gentx/
+iriscli gov query-proposal --proposalID=1
 
-basecoind init --gen-txs --chain-id=upgrade-test -o --home=basecoin1
+```
 
-cp ~/basecoin1/config/genesis.json ~/basecoin2/config/
-cp ~/basecoin1/config/genesis.json ~/basecoin3/config/
-cp ~/basecoin1/config/genesis.json ~/basecoin4/config/
+### version 1
 
-vi basecoin2/config/config.toml
-vi basecoin3/config/config.toml
-vi basecoin4/config/config.toml
-6628995f6eae0c7d810867e467f23530c55b1232@localhost:26656
+```
 
-basecoind start --home=basecoin1
-basecoind start --home=basecoin2
-basecoind start --home=basecoin3
-basecoind start --home=basecoin4
+kill iris   (run in all the nodes)
+
+iris1 start --home /data/iris > /data/iris/log.txt &   (run in all the nodes)
+
+iriscli1 upgrade submit-switch --name=silei --from=$VADDR --proposalID=1 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+(run in all the nodes)
+
+iriscli1 upgrade info
+
+iriscli1 advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli1 advanced ibc get --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli1 gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+(run in node1)
+
+iriscli1 gov query-proposal --proposalID=2
+
+```
+
+### version 2
+
+```
+
+kill iris1   (run in all the nodes)
+
+iris2 start --home /data/iris > /data/iris/log.txt &   (run in all the nodes)
+
+iriscli2 upgrade submit-switch --name=silei --from=$VADDR --proposalID=1 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+(run in all the nodes)
+
+iriscli2 upgrade info
+
+iriscli2 advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli2 advanced ibc get --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+
 ```
 
 ### 地址赋值
