@@ -2,8 +2,8 @@
 
 ## Previous implementation in Cosmos-SDK
 
-* There is no any constrain to fee token, just ensure gas is enough. Gas has no explicit connection with fee.
-* All fee will be deduct 
+* There is no any constrain to fee token, just ensure gas is enough. Gas has no explicit connection with fee token.
+* All fee token will be deducted
 
 ## Current implementation in Cosmos-SDK
 
@@ -18,8 +18,8 @@ Now we must specify fee for each transaction properly. Otherwise, your transacti
 
 For command Line:
 ```
-iriscli send --to=faa1ze87hkku6vgnqp7gqkn528d60ttr06xuudx0k9 --name=moniker --chain-id=test-chain-UieBV2 --amount=100000000000000000iris --node=tcp://116.62.62.39:26657 \
---gas=10000 --fee=2000000000000000steak
+iriscli send --to=faa1ze87hkku6vgnqp7gqkn528d60ttr06xuudx0k9 --name=moniker --chain-id=test-chain-UieBV2 --amount=100000000000000000iris --node=tcp://localhost:26657 \
+--gas=10000 --fee=2000000000000000iris
 ```
 In command line, we specify gas and fee token by two option: "--gas" and "--fee". The "--gas" option can be omitted. Because gas has default value: 200000. However, the "--fee" option can't be omitted. Because its default value is empty.
    
@@ -33,12 +33,12 @@ For rest API:
 	"sequence":"9",
 	"account_number":"0",
 	"gas":"10000",
-	"fee":"200000000000000steak"
+	"fee":"200000000000000iris"
 }
 ```
 In rest API, the gas and fee token are specified by gas field and fee field in json body. Both of them can't be omitted. 
 
-The transaction senders should ensure the gas is enough for transaction execution and the gasPrice is no less than gasPriceThreshold. In addition, only specify supported fee token. Unsupported fee token will be ignored. 
+The transaction senders should ensure the gas is enough for transaction execution and the gasPrice is no less than gasPriceThreshold. In addition, only specify iris as fee token. Other token will be ignored. 
 
 ## Suggestions for test
 
@@ -54,4 +54,5 @@ For both command line and rest API:
 
 * Fee token whitelist will be brought in. All tokens in the whitelist can be used as fee token. The whitelist can be modified by governance.
 * Currently, the transaction senders have no motivation to pay more fee, just ensure the gasPrice is no less than the gasPriceThreshold. Next new mechanisms will be brought in to encourage users to pay more fee. For example, proposals will tender to include transactions with higher gasPrice. Transactions with lower gasPrice have to wait for more time.
-* Block gas limit is also necessary. When a proposal make a block, it should check whether the sum of all transaction gas is greater than the block gas limit. If so, remove some transactions the accommodate this rule.   
+* When a proposal builds a block, it should check whether the sum of all transaction gas is greater than blockGasLimit. If so, remove some transactions the accommodate this rule. With blockGasLimit, transactions which will consumed too much resource, such as memory , disk space and execution time, will be rejected. These special transaction may cause crash or consensus failure.
+* Consider to charge fee even if the transactions encounter execution failure. This is helpful for defencing DDos attack.
