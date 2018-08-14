@@ -162,6 +162,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 // custom tx codec
 func MakeCodec() *wire.Codec {
 	var cdc = wire.NewCodec()
+	ibc.RegisterWire(cdc)
+	ibc1.RegisterWire(cdc)
 	ibc2.RegisterWire(cdc)
 	bank.RegisterWire(cdc)
 	stake.RegisterWire(cdc)
@@ -269,6 +271,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
+		fmt.Println("============ runMsgs() ===========  " + msgType)
 		if err != nil {
 			return err.Result()
 		}
