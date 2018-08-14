@@ -16,7 +16,7 @@ import (
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/examples/irishub1/app"
 	c "github.com/irisnet/irishub/client"
-	govcmd "github.com/irisnet/irishub/modules/gov/client/cli"
+	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
 	"github.com/irisnet/irishub/version"
 )
