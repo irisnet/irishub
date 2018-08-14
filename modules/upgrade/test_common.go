@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -57,12 +58,14 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	keyAcc := sdk.NewKVStoreKey("acc")
 	keyStake := sdk.NewKVStoreKey("stake")
 	keyUpdate := sdk.NewKVStoreKey("update")
+	keyParams := sdk.NewKVStoreKey("params")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
+    ms.MountStoreWithDB(keyParams,sdk.StoreTypeIAVL, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
@@ -71,7 +74,7 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	accountMapper := auth.NewAccountMapper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewKeeper(accountMapper)
 	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
-
-	keeper := NewKeeper(cdc, keyUpdate, sk)
+    pk := params.NewKeeper(cdc,keyParams)
+	keeper := NewKeeper(cdc, keyUpdate, sk,pk.Setter())
 	return ctx, keeper
 }
