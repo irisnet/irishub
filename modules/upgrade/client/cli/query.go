@@ -8,7 +8,6 @@ import (
 	"fmt"
 )
 
-// Command to Get a Switch Information
 func GetCmdInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "info",
@@ -16,8 +15,8 @@ func GetCmdInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			ctx := context.NewCoreContextFromViper()
-			res_height, _ := ctx.QueryStore(upgrade.GetCurrentProposalAcceptHeightKey(), storeName)
-            res_proposalID, _ := ctx.QueryStore(upgrade.GetCurrentProposalIdKey(),storeName)
+			res_height, _ := ctx.QueryStore([]byte("gov/"+upgrade.GetCurrentProposalAcceptHeightKey()), "params")
+            res_proposalID, _ := ctx.QueryStore([]byte("gov/"+upgrade.GetCurrentProposalIdKey()),"params")
 			var height int64
 			var proposalID int64
 			cdc.MustUnmarshalBinary(res_height, &height)
