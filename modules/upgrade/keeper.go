@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"math"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
@@ -16,14 +17,16 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *wire.Codec
 	// The ValidatorSet to get information about validators
-	sk stake.Keeper
+	sk       stake.Keeper
+	ps       params.SetterProxy
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps params.SetterProxy) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
 		sk:       sk,
+		ps:       ps,
 	}
 	return keeper
 }
@@ -178,28 +181,6 @@ func (k Keeper) GetVersionList(ctx sdk.Context) VersionList {
 	return versionList
 }
 
-func (k Keeper) GetCurrentProposalID(ctx sdk.Context) int64 {
-	kvStore := ctx.KVStore(k.storeKey)
-	proposalIdBytes := kvStore.Get(GetCurrentProposalIdKey())
-	if proposalIdBytes != nil {
-		var proposalId int64
-		err := k.cdc.UnmarshalBinary(proposalIdBytes, &proposalId)
-		if err != nil {
-			panic(err)
-		}
-		return proposalId
-	}
-	return -1
-}
-
-func (k Keeper) SetCurrentProposalID(ctx sdk.Context, proposalID int64) {
-	kvStore := ctx.KVStore(k.storeKey)
-	proposalIDBytes, err := k.cdc.MarshalBinary(proposalID)
-	if err != nil {
-		panic(err)
-	}
-	kvStore.Set(GetCurrentProposalIdKey(), proposalIDBytes)
-}
 
 func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string, sdk.Error) {
 	currentVersion := k.GetCurrentVersion(ctx)
@@ -229,25 +210,25 @@ func (k Keeper) GetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddre
 	return MsgSwitch{}, false
 }
 
-func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
-	kvStore := ctx.KVStore(k.storeKey)
-	heightBytes, err := k.cdc.MarshalBinary(height)
-	if err != nil {
-		panic(err)
-	}
-	kvStore.Set(GetCurrentProposalAcceptHeightKey(), heightBytes)
-}
-
-func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
-	kvStore := ctx.KVStore(k.storeKey)
-	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
-	if proposalAcceptHeightBytes != nil {
-		var proposalAcceptHeight int64
-		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes, &proposalAcceptHeight)
-		if err != nil {
-			panic(err)
-		}
-		return proposalAcceptHeight
-	}
-	return -1
-}
+//func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
+//	kvStore := ctx.KVStore(k.storeKey)
+//	heightBytes, err := k.cdc.MarshalBinary(height)
+//	if err != nil {
+//		panic(err)
+//	}
+//	kvStore.Set(GetCurrentProposalAcceptHeightKey(), heightBytes)
+//}
+//
+//func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
+//	kvStore := ctx.KVStore(k.storeKey)
+//	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
+//	if proposalAcceptHeightBytes != nil {
+//		var proposalAcceptHeight int64
+//		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes, &proposalAcceptHeight)
+//		if err != nil {
+//			panic(err)
+//		}
+//		return proposalAcceptHeight
+//	}
+//	return -1
+//}
