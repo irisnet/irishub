@@ -16,9 +16,13 @@ iriscli keys list
 VADDR=验证人的地址
 ```
 
-#### 发送升级提议（直接通过，2个区块高度后）
+#### 发送升级提议
 ```
-iriscli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description="I am crazy" --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
+iriscli gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description="I am crazy" --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris
+```
+#### 发送升级协议的YES投票
+```
+iriscli gov  vote --name=x --voter=$VADDR --proposalID=1 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris
 ```
 
 #### 查询提议内容
@@ -33,7 +37,7 @@ iriscli upgrade info
 
 #### 运行新软件
 ```
-iris1 start --home=iris5
+iris1 start --home=iris
 ```
 
 #### 发送消息自己已运行新软件
@@ -48,19 +52,23 @@ iriscli upgrade query-switch --voter=$VADDR --proposalID=1
 
 #### 使用新功能（无报错）
 ```
-iriscli1 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
+iriscli1 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --print-response true --fee=20000000000000000iris
 iriscli1 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
 ```
 
 ### 第二次升级
-#### 发送升级提议第二次升级（直接通过，2个区块高度后）
+#### 发送升级提议第二次升级
 ```
-iriscli1 gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris
+iriscli1 gov submit-proposal --name=x --proposer=$VADDR --title=ADD --description=“I am crazy” --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris
+```
+#### 发送升级协议的YES投票
+```
+iriscli gov  vote --name=x --voter=$VADDR --proposalID=2 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris
 ```
 
 #### 查询提议内容
 ```
-iriscli gov query-proposal --proposalID=1        
+iriscli gov query-proposal --proposalID=2        
 ```
 
 #### 查询升级的版本信息
@@ -85,8 +93,8 @@ iriscli2 upgrade query-switch --voter=$VADDR --proposalID=1
 
 #### 使用新功能（无报错）
 ```
-iriscli2 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
-iriscli2 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris
+iriscli2 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --print-response true --fee=20000000000000000iris
+iriscli2 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --print-response true --fee=20000000000000000iris
 ```
 
 ## 多节点连续升级测试
