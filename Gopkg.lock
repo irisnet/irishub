@@ -102,7 +102,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "91d1a66d3318ee647c49fc88d96fb870c1b571b4"
+  revision = "473c63a04e250a03f83ce8abd1ed5b32929e7c51"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
