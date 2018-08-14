@@ -75,6 +75,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 
 		keeper.DoSwitchEnd(ctx)
 	}
-
+    fmt.Println(keeper.GetCurrentVersion(ctx))
 	return tags
 }
