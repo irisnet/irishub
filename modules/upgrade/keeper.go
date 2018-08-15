@@ -10,7 +10,7 @@ import (
 
 const (
 	//defaultSwitchPeriod     int64 = 57600	// 2 days
-	defaultSwitchPeriod int64 = 50 // for test (4 minutes)
+	defaultSwitchPeriod int64 = 30 // for test (4 minutes)
 )
 
 type Keeper struct {
