@@ -199,7 +199,7 @@ VADDR4=
 
 ### 发送升级提议
 ```
-iriscli1 gov submit-proposal --name=x1 --proposer=$VADDR1 --title=ADD --description=“I am crazy” --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000i000000iris
+iriscli gov submit-proposal --name=x1 --proposer=$VADDR1 --title=ADD --description=“I am crazy” --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris
 ```
 ### 投票
 ```
