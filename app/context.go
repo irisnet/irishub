@@ -1,12 +1,13 @@
 package app
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/wire"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"io/ioutil"
-	"strings"
 	"net/http"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"strings"
 )
 
 type Context struct {
@@ -14,14 +15,13 @@ type Context struct {
 	Cdc *wire.Codec
 }
 
-
 func NewContext() Context {
 	return Context{
-		Ctx:context.NewCoreContextFromViper(),
+		Ctx: context.NewCoreContextFromViper(),
 	}
 }
 
-func (c Context) WithCodeC(cdc *wire.Codec)  Context{
+func (c Context) WithCodeC(cdc *wire.Codec) Context {
 	c.Cdc = cdc
 	return c
 }

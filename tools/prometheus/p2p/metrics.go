@@ -70,6 +70,7 @@ func (m *Metrics) Start(ctx app.Context) {
 	}()
 }
 
+
 //set the p2p persistent peers by given home dir of iris config file
 func (m *Metrics) setP2PPersistentPeers(homeDir string) {
 	if !filepath.IsAbs(homeDir) {

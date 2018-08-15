@@ -18,6 +18,7 @@ func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := app.NewContext().WithCodeC(cdc)
+			//ctx := tools.NewContext(storeName, cdc)
 			monitor := DefaultMonitor(ctx)
 			monitor.Start()
 
@@ -49,3 +50,9 @@ monitor`)
 included by default. If there are many files & sub-directories in home directory, this program may be very slow!`)
 	return cmd
 }
+
+/*
+TODO:
+1. 将数据轮询间隔做成可配置的
+2. 监控上一个块的出块人
+*/
