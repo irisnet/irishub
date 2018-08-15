@@ -3,4 +3,4 @@ vendor
 .idea
 build/
 *.out
-iris*
+Gopkg.lock
