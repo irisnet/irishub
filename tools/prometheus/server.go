@@ -3,7 +3,6 @@ package prometheus
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
-	//"github.com/irisnet/irishub/tools"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -55,7 +54,5 @@ included by default. If there are many files & sub-directories in home directory
 /*
 TODO:
 1. 将数据轮询间隔做成可配置的
-2. 修改连接不上远程node时程序崩溃的问题
-3. 监控round
-4. 监控上一个块的出块人
+2. 监控上一个块的出块人
 */
