@@ -14,31 +14,6 @@ import (
 	"time"
 )
 
-/*
-// Metrics contains metrics exposed by this package.
-type Metrics struct {
-  TmMetrics 	p2p.Metrics
-}
-
-
-// PrometheusMetrics returns Metrics build using Prometheus client library.
-func PrometheusMetrics() *Metrics {
-	tmMetrics := *p2p.PrometheusMetrics()
-	return &Metrics{
-		tmMetrics,
-	}
-}
-
-func (m *Metrics) Start(ctx app.Context) {
-	go func() {
-		for {
-			time.Sleep(1 * time.Second)
-			result := ctx.NetInfo()
-			m.TmMetrics.Peers.Set(float64(result.NPeers))
-		}
-	}()
-}
-*/
 
 type Metrics struct {
 
@@ -89,11 +64,12 @@ func (m *Metrics) Start(ctx app.Context) {
 				m.ConnectedPersistentPeers.Set(float64(connected))
 				m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
 			}else {
-				log.Fatal(err)
+				log.Println(err)
 			}
 		}
 	}()
 }
+
 
 //set the p2p persistent peers by given home dir of iris config file
 func (m *Metrics) setP2PPersistentPeers(homeDir string) {

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -82,8 +81,9 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
 		Id      string                      `json:"id"`
 		Result  ctypes.ResultUnconfirmedTxs `json:"result"`
 	}{}
+
 	if err := c.Cdc.UnmarshalJSON(body, &res); err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	return &res.Result, nil
