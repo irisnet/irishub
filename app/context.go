@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
