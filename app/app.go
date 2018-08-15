@@ -214,10 +214,10 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		StartingProposalID: 1,
 		DepositProcedure: gov.DepositProcedure{
 			MinDeposit:       sdk.Coins{sdk.Coin{Denom: "iris", Amount: sdk.NewInt(int64(10)).Mul(gov.Pow10(18))}},
-			MaxDepositPeriod: 10,
+			MaxDepositPeriod: 1440,
 		},
 		VotingProcedure: gov.VotingProcedure{
-			VotingPeriod: 20,
+			VotingPeriod: 50,
 		},
 		TallyingProcedure: gov.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
