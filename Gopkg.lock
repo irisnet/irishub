@@ -58,7 +58,6 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/develop"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -104,8 +103,9 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "de32d8602824c3e918642254793d747cb82d3690"
+  revision = "c69a00d827e16cf91b35ac533cadfff7ee454519"
   source = "https://github.com/irisnet/cosmos-sdk.git"
+  version = "v0.23.0-iris1"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -441,7 +441,6 @@
   version = "v0.9.2"
 
 [[projects]]
-  branch = "irisnet/develop"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -503,8 +502,9 @@
     "types",
     "version"
   ]
-  revision = "65e95fb2fe92f712541a2351b4142c5d4739e75c"
+  revision = "fb697db81e3f0b04fb9c6f393ce9a09b984a4687"
   source = "https://github.com/irisnet/tendermint.git"
+  version = "v0.22.6-iris1"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -553,7 +553,7 @@
     "windows/registry",
     "windows/svc/eventlog"
   ]
-  revision = "4e1fef5609515ec7a2cee7b5de30ba6d9b438cbf"
+  revision = "14742f9018cd6651ec7364dc6ee08af0baaa1031"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -629,6 +629,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "860660e13d17866c81fb28340e7988b29eeb6d7176e986ca6dc3b89e2f30d9f0"
+  inputs-digest = "1f9ceae1c3742a3de49739e5015cdc898f3b3d6321515096024ecf26f8bd2dfa"
   solver-name = "gps-cdcl"
   solver-version = 1
