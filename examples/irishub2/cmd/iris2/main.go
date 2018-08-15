@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/examples/irishub2/app"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/irisnet/irishub/version"
 
@@ -26,8 +26,8 @@ func main() {
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
-		Use:               "iris",
-		Short:             "iris Daemon (server)",
+		Use:               "iris2",
+		Short:             "iris2 Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
@@ -54,12 +54,8 @@ func main() {
 		tendermintCmd,
 		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
 		client.LineBreak,
+		version.GetCmdVersion("upgrade", cdc),
 	)
-
-	rootCmd.AddCommand(
-		client.GetCommands(
-			version.GetCmdVersion("upgrade", cdc),
-		)...)
 
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 
