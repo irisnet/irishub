@@ -111,13 +111,13 @@ func PrometheusMetrics() *Metrics {
 func (metrics *Metrics) setPath(path string) {
 	if !filepath.IsAbs(path) {
 		if absPath, err := filepath.Abs(path); err != nil {
-			log.Println(err.Error())
+      log.Println(err.Error())
 		} else {
 			path = absPath
 		}
 	}
 	if fileInfo, err := os.Stat(path); err != nil {
-		log.Println(err.Error())
+    log.Println(err.Error())
 	} else {
 		if !fileInfo.IsDir() {
 			log.Println("\"" + path + "\" is not a directory!")

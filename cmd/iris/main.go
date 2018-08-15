@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/irisnet/irishub/version"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -43,17 +43,23 @@ func main() {
 		server.ShowValidatorCmd(ctx),
 	)
 
+	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
+	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
 		server.InitCmd(ctx, cdc, app.IrisAppInit()),
-		server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris")),
+		startCmd,
 		server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
 		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
 		client.LineBreak,
-		version.VersionCmd,
 	)
+
+	rootCmd.AddCommand(
+		client.GetCommands(
+			version.GetCmdVersion("upgrade", cdc),
+		)...)
 
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 
@@ -63,7 +69,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewIrisApp(logger, db, traceStore, baseapp.SetPruning(viper.GetString("pruning")))
+	return app.NewIrisApp(logger, db, traceStore, bam.SetPruning(viper.GetString("pruning")))
 }
 
 func exportAppStateAndTMValidators(
