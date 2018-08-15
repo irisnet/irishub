@@ -1,6 +1,6 @@
 #Running a Validator Node
 
-Validators are responsible for committing new blocks to the blockchain through voting. A validator's stake is slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about [Sentry Node Architecture](https://github.com/kidinamoto01/testnets-1/blob/master/testnets/docs/Setup%20A%20Sentry%20Node.md) to protect your node from DDOS attacks and to ensure high-availability.
+Validators are responsible for committing new blocks to the blockchain through voting. A validator's stake is slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
 ### Create A Validator
 
