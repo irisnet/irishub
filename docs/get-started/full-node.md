@@ -1,6 +1,6 @@
 # Setup A Full-node
 
-Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](https://github.com/irisnet/testnets/blob/master/testnets/docs/install%20iris.md)
+Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](install-iris.md)
 
 ### Step 2: Setting Up Your Node
 
@@ -33,9 +33,8 @@ Your full node has been initialized!
 
 ### Get Configuration Files
 
-If you want to be part of the genesis file geneartion process, please follow this [guide](https://github.com/kidinamoto01/testnets-1/blob/master/testnets/docs/Genesis%20Generation%20Process.md) to sumbmit a json file. Otherwise, you could always send related transaction to become a validator later.
 
-After the genesis file generation process is finished, please download the genesis and the default config file.
+After the genesis file is ready, please download the genesis and the default config file.
 
 ```
 cd $IRISHOME/config/
