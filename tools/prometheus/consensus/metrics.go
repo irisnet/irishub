@@ -122,11 +122,12 @@ func (cs *Metrics) SetAddress(addr_str string) {
 	if addr, err := hex.DecodeString(addr_str); err != nil {
 		log.Println("parse validator address falid ", err)
 	} else {
-		if len(addr) == 0{
+		if len(addr) == 0 {
 			log.Println("validator address is null ")
-		}else {
+		} else {
 			cs.IrisMetrics.Address = addr
 		}
+	}
 }
 
 func (cs *Metrics) Start(ctx app.Context) {
