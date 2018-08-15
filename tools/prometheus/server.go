@@ -3,7 +3,6 @@ package prometheus
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
-	//"github.com/irisnet/irishub/tools"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -42,20 +41,18 @@ func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().Int("port", 36660, "port to connect to")
-	cmd.Flags().StringP("node", "n", "tcp://localhost:46657", "Node to connect to")
+	cmd.Flags().StringP("node", "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().StringP("chain-id", "c", "fuxi", "Chain ID of tendermint node")
 	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
 monitor`)
 
-	cmd.Flags().BoolP("recursively", "r", true, `specify whether the files in sub-directories is included, 
-excluded by default. If there are many files & sub-directory in home directories, this program may be very slow!`)
+	cmd.Flags().BoolP("recursively", "r", true, `specify whether the files in sub-directory is included, 
+included by default. If there are many files & sub-directories in home directory, this program may be very slow!`)
 	return cmd
 }
 
 /*
 TODO:
 1. 将数据轮询间隔做成可配置的
-2. 修改连接不上远程node时程序崩溃的问题
-3. 监控round
-4. 监控上一个块的出块人
+2. 监控上一个块的出块人
 */
