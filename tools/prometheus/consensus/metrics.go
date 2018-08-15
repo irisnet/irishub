@@ -127,8 +127,6 @@ func (cs *Metrics) SetAddress(addr_str string) {
 		}else {
 			cs.IrisMetrics.Address = addr
 		}
-
-	}
 }
 
 func (cs *Metrics) Start(ctx app.Context) {
