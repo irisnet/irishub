@@ -120,9 +120,13 @@ func PrometheusMetrics() *Metrics {
 
 func (cs *Metrics) SetAddress(addr_str string) {
 	if addr, err := hex.DecodeString(addr_str); err != nil {
-		log.Println("parse address falid ", err)
+		log.Println("parse validator address falid ", err)
 	} else {
-		cs.IrisMetrics.Address = addr
+		if len(addr) == 0 {
+			log.Println("validator address is null ")
+		} else {
+			cs.IrisMetrics.Address = addr
+		}
 	}
 }
 
@@ -143,12 +147,27 @@ func (cs *Metrics) Start(ctx app.Context) {
 
 	if err != nil {
 		log.Println("got ", err)
+		return
 	}
 
 	go func() {
 		for e := range blockC {
 			block := e.(types.TMEventData).(types.EventDataNewBlock)
 			cs.RecordMetrics(ctx, ctx.Cdc, block.Block)
+		}
+	}()
+
+	roundC := make(chan interface{})
+	err = client.Subscribe(context, "monitor", types.EventQueryNewRound, roundC)
+	if err != nil {
+		log.Println("got ", err)
+		return
+	}
+
+	go func() {
+		for e := range roundC {
+			round := e.(types.TMEventData).(types.EventDataRoundState)
+			cs.TmMetrics.Rounds.Set(float64(round.Round))
 		}
 	}()
 }
@@ -215,7 +234,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	if block.Height > 0 {
 		signed := 0
 		for _, vote := range block.LastCommit.Precommits {
-			if bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
+			if vote != nil && bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
 				signed = 1
 				break
 			}
