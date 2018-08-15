@@ -52,7 +52,9 @@
 
 [[override]]
   name = "github.com/tendermint/iavl"
-  version = "=v0.9.2"
+#  version = "=v0.9.2"
+  branch = "feature/software-upgrade"
+  source = "https://github.com/HaoyangLiu/iavl.git"
 
 [[override]]
   name = "github.com/tendermint/tendermint"

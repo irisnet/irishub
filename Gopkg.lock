@@ -434,10 +434,11 @@
   version = "0.10.1"
 
 [[projects]]
+  branch = "feature/software-upgrade"
   name = "github.com/tendermint/iavl"
   packages = ["."]
-  revision = "35f66e53d9b01e83b30de68b931f54b2477a94c9"
-  version = "v0.9.2"
+  revision = "a50816b2ed6bcd8b6319dceb0c9336d9e6aa17e9"
+  source = "https://github.com/HaoyangLiu/iavl.git"
 
 [[projects]]
   branch = "irisnet/develop"
@@ -628,6 +629,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "148f97583fa8735a791ece2709909e7c22683da811cb26e39e731ae4289ba684"
+  inputs-digest = "ead7852c575f36ce50acf21c711efdd92cb9169d26dc06d0b664d55ea6ca28c1"
   solver-name = "gps-cdcl"
   solver-version = 1
