@@ -11,10 +11,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
+	ibccmd "github.com/irisnet/irishub/examples/irishub2/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/examples/irishub2/app"
 	c "github.com/irisnet/irishub/client"
 	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
@@ -24,8 +24,8 @@ import (
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "iriscli",
-		Short: "irishub light-client",
+		Use:   "iriscli2",
+		Short: "irishub2 light-client",
 	}
 )
 
@@ -60,6 +60,8 @@ func main() {
 		client.PostCommands(
 			ibccmd.IBCTransferCmd(cdc),
 			ibccmd.IBCRelayCmd(cdc),
+			ibccmd.IBCSetCmd(cdc),
+			ibccmd.IBCGetCmd(cdc),
 		)...)
 
 	advancedCmd := &cobra.Command{
