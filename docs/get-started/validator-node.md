@@ -15,7 +15,7 @@ Next, craft your `iriscli stake create-validator` command:
 You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). Please don't abuse it.
 
 ```
-iriscli stake create-validator --amount=100iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --chain-id=fuxi-2000 --name=<name>
+iriscli stake create-validator --amount=10iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --chain-id=fuxi-2000 --name=<name>
 ```
 
 ### Edit Validator Description
