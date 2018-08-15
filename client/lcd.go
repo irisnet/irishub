@@ -70,7 +70,6 @@ func ServeCommand(cdc *wire.Codec) *cobra.Command {
 
 func createHandler(cdc *wire.Codec) http.Handler {
 	r := mux.NewRouter()
-	r.HandleFunc("/version", version.RequestHandler).Methods("GET")
 
 	kb, err := keys.GetKeyBase() //XXX
 	if err != nil {
@@ -79,6 +78,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 
 	ctx := app.NewContext()
 
+	r.HandleFunc("/version", version.VersionHandlerFn(ctx.Ctx, cdc)).Methods("GET")
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)
 	keys.RegisterRoutes(r)
 	rpc.RegisterRoutes(ctx.Ctx, r)
