@@ -3,4 +3,3 @@ vendor
 .idea
 build/
 *.out
-iris*
