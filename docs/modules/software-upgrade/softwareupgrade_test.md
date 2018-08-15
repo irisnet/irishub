@@ -155,7 +155,30 @@ iriscli2 advanced ibc get --name=silei --from=$VADDR --chain-id=upgrade-test --s
 
 ```
 
-## 多节点成功升级测试(非docker)
+### bug fix upgrade from version 1
+
+```
+
+iriscli1 gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli1 gov vote --name=silei --voter=$VADDR --proposalID=2 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli1 gov query-proposal --proposalID=2
+
+iris2-bugfix start --home /data/iris
+
+
+iriscli2-bugfix upgrade submit-switch --name=silei --from=$VADDR --proposalID=2 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli2-bugfix upgrade query-switch --voter=$VADDR --proposalID=3 --home=/data/iriscli
+
+iriscli2-bugfix upgrade info
+
+iriscli2-bugfix advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+
+```
+
+## 多节点升级测试(非docker)
 ```
 rm -rf iris1
 rm -rf iris2
