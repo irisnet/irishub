@@ -20,17 +20,27 @@ func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 		Short: "Show version info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			fmt.Printf("v%s\n", Version)
+
 			ctx := context.NewCoreContextFromViper()
 
-			res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
+			var res_versionID []byte
+			var err error
+			res_versionID, err = ctx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
+			if err!=nil{
+				return  nil
+			}
 			var versionID int64
 			cdc.MustUnmarshalBinary(res_versionID, &versionID)
 
-			res_version, _ := ctx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
+			var res_version []byte
+			res_version, err  = ctx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
+			if err!=nil{
+				return  nil
+			}
 			var version upgrade.Version
 			cdc.MustUnmarshalBinary(res_version, &version)
 
-			fmt.Printf("v%s\n", Version)
 			fmt.Println(version.Id)
 			fmt.Println("Current version: Start Height    = ", version.Start)
 			fmt.Println("Current version: Proposal Id     = ", version.ProposalID)
