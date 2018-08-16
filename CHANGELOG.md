@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.4.0
+
+*August 16th, 2018*
+
+BREAKING CHANGES:
+
+- [cosmos-sdk] Upgrade to cosmos-sdk v0.23.0
+    - Change the address prefix format:
+      - cosmosaccaddr --> faa
+      - cosmosaccaddr --> fap
+      - cosmosvaladdr --> fva
+      - cosmosvalpub --> fvp
+    - Adjust the Route & rootMultiStore Commit for software upgrade
+    - Must specify gas and fee in both command line and rest api
+    - The fee should be iris token and the token amount should be no less than 2*(10^10)*gas
+
+FEATURES:
+
+- [tendermint] Upgrade to Tendermint v0.22.6
+    - Store the pre-state to support the replay function in software upgrade
+- [cosmos-sdk] Upgrade to cosmos-sdk v0.23.0
+    - Add the paramProposal and softwareUpgradeProposal in gov module
+    - Improve fee token mechanism to more reasonably deduct transaction fee and achieve more ability to defent DDOS attack.
+    - Introduce the global parameter module
+- [irishub] Add the upgrade module and example apps for the async software upgrade
+
+
 ## 0.3.0
 
 *July 30th, 2018*
