@@ -344,7 +344,7 @@ func (app *IrisApp) replay() int64 {
 	} else if blockStore.Height() == curState.LastBlockHeight+1 {
 		loadHeight = curState.LastBlockHeight
 	} else {
-		panic(errors.New("block store should be at most one ahead of the state"))
+		panic(errors.New("tendermint block store height should be at most one ahead of the its state height"))
 	}
 
 	return loadHeight
