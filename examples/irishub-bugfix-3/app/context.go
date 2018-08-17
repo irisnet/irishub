@@ -2,11 +2,12 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/wire"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"fmt"
 	"io/ioutil"
-	"net/http"
 	"strings"
+	"net/http"
+	"github.com/cosmos/cosmos-sdk/wire"
 )
 
 type Context struct {
@@ -14,13 +15,14 @@ type Context struct {
 	Cdc *wire.Codec
 }
 
+
 func NewContext() Context {
 	return Context{
-		Ctx: context.NewCoreContextFromViper(),
+		Ctx:context.NewCoreContextFromViper(),
 	}
 }
 
-func (c Context) WithCodeC(cdc *wire.Codec) Context {
+func (c Context) WithCodeC(cdc *wire.Codec)  Context{
 	c.Cdc = cdc
 	return c
 }
@@ -33,20 +35,20 @@ func (c Context) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
 	return c.Ctx.Client.BroadcastTxSync(tx)
 }
 
-func (c Context) NetInfo() (*ctypes.ResultNetInfo, error) {
+func (c Context) NetInfo() *ctypes.ResultNetInfo {
 	client := &http.Client{}
 
 	reqUri := tcpToHttpUrl(c.Ctx.NodeURI) + "/net_info"
 
 	resp, err := client.Get(reqUri)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
 
 	var res = struct {
@@ -54,26 +56,26 @@ func (c Context) NetInfo() (*ctypes.ResultNetInfo, error) {
 		Id      string               `json:"id"`
 		Result  ctypes.ResultNetInfo `json:"result"`
 	}{}
-	if err := c.Cdc.UnmarshalJSON(body, &res); err != nil {
-		return nil, err
+	if err := c.Cdc.UnmarshalJSON(body,&res); err != nil {
+		fmt.Println(err)
 	}
 
-	return &res.Result, nil
+	return &res.Result
 }
 
-func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
+func (c Context) NumUnconfirmedTxs() *ctypes.ResultUnconfirmedTxs {
 	client := &http.Client{}
 	reqUri := tcpToHttpUrl(c.Ctx.NodeURI) + "/num_unconfirmed_txs"
 
 	resp, err := client.Get(reqUri)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
 
 	var res = struct {
@@ -81,12 +83,11 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
 		Id      string                      `json:"id"`
 		Result  ctypes.ResultUnconfirmedTxs `json:"result"`
 	}{}
-
-	if err := c.Cdc.UnmarshalJSON(body, &res); err != nil {
-		return nil, err
+	if err := c.Cdc.UnmarshalJSON(body,&res); err != nil {
+		fmt.Println(err)
 	}
 
-	return &res.Result, nil
+	return &res.Result
 }
 
 func tcpToHttpUrl(url string) string {

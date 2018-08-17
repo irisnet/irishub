@@ -21,8 +21,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	ibc1 "github.com/irisnet/irishub/examples/irishub1/ibc"
-	ibc2 "github.com/irisnet/irishub/examples/irishub2/ibc"
+	ibcbugfix "github.com/irisnet/irishub/examples/irishub-bugfix-3/ibc"
 	"github.com/irisnet/irishub/modules/upgrade"
 
 	"errors"
@@ -67,8 +66,7 @@ type IrisApp struct {
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	coinKeeper          bank.Keeper
 	ibcMapper           ibc.Mapper
-	ibc1Mapper          ibc1.Mapper
-	ibc2Mapper          ibc2.Mapper
+	ibc1Mapper          ibcbugfix.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	govKeeper           gov.Keeper
@@ -114,8 +112,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
-	app.ibc1Mapper = ibc1.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc1.DefaultCodespace))
-	app.ibc2Mapper = ibc2.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc1.DefaultCodespace))
+	app.ibc1Mapper = ibcbugfix.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibcbugfix.DefaultCodespace))
 
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
@@ -129,8 +126,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
-		AddRoute("ibc-1", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc1.NewHandler(app.ibc1Mapper, app.coinKeeper)).
-		AddRoute("ibc-2", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc2.NewHandler(app.ibc2Mapper, app.coinKeeper)).
+		AddRoute("ibc-1", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibcbugfix.NewHandler(app.ibc1Mapper, app.coinKeeper, app.upgradeKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
@@ -163,8 +159,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 func MakeCodec() *wire.Codec {
 	var cdc = wire.NewCodec()
 	ibc.RegisterWire(cdc)
-	ibc1.RegisterWire(cdc)
-	ibc2.RegisterWire(cdc)
+	ibcbugfix.RegisterWire(cdc)
 	bank.RegisterWire(cdc)
 	stake.RegisterWire(cdc)
 	slashing.RegisterWire(cdc)
