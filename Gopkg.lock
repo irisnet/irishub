@@ -413,10 +413,11 @@
   version = "0.10.1"
 
 [[projects]]
+  branch = "irisnet/feature_upgrade"
   name = "github.com/tendermint/iavl"
   packages = ["."]
-  revision = "35f66e53d9b01e83b30de68b931f54b2477a94c9"
-  version = "v0.9.2"
+  revision = "849c21e8f93ce782cb9f9f64fabcccb5580b4f90"
+  source = "https://github.com/irisnet/iavl.git"
 
 [[projects]]
   name = "github.com/tendermint/tendermint"
