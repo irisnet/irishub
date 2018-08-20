@@ -31,6 +31,7 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
+	bc "github.com/tendermint/tendermint/blockchain"
 	"strings"
 )
 
@@ -330,13 +331,29 @@ func (app *IrisApp) replay() int64 {
 	dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
 	stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
 
+	blockDBContext := node.DBContext{"blockstore", ctx.Config}
+	blockStoreDB := dbm.NewDB(blockDBContext.ID, dbType, dbContext.Config.DBDir())
+	blockStore := bc.NewBlockStore(blockStoreDB)
+
+	defer func() {
+		stateDB.Close()
+		blockStoreDB.Close()
+	} ()
+
+	curState := sm.LoadState(stateDB)
 	preState := sm.LoadPreState(stateDB)
-	if preState.LastBlockHeight == 0 {
-		panic(errors.New("can't replay the last block, last block height is 0"))
+	if curState.LastBlockHeight == preState.LastBlockHeight {
+		panic(errors.New("there is no block now, can't replay"))
+	}
+	var loadHeight int64
+	if blockStore.Height() == curState.LastBlockHeight {
+		sm.SaveState(stateDB, preState)
+		loadHeight = preState.LastBlockHeight
+	} else if blockStore.Height() == curState.LastBlockHeight+1 {
+		loadHeight = curState.LastBlockHeight
+	} else {
+		panic(errors.New("tendermint block store height should be at most one ahead of the its state height"))
 	}
 
-	sm.SaveState(stateDB, preState)
-	stateDB.Close()
-
-	return preState.LastBlockHeight
+	return loadHeight
 }
