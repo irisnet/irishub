@@ -17,7 +17,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	c "github.com/irisnet/irishub/client"
 	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	paramcmd "github.com/cosmos/cosmos-sdk/x/params/client/cli"
 	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
 	"github.com/irisnet/irishub/version"
 )
@@ -166,11 +165,6 @@ func main() {
 		Use:   "params",
 		Short: "Governance and voting subcommands",
 	}
-
-	paramsCmd.AddCommand(
-		client.GetCommands(
-			paramcmd.ExportCmd("params",cdc),
-		)...)
 
 	rootCmd.AddCommand(paramsCmd)
 
