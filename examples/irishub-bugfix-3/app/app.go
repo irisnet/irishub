@@ -21,7 +21,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	ibcbugfix "github.com/irisnet/irishub/examples/irishub-bugfix-2/ibc"
+	ibcbugfix "github.com/irisnet/irishub/examples/irishub-bugfix-3/ibc"
 	"github.com/irisnet/irishub/modules/upgrade"
 
 	"errors"
