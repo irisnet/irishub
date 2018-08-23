@@ -42,6 +42,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
+  branch = "irisnet/refactor"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -90,8 +91,8 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "d5652d96764072c7fc57daa4bf8d79ea1eb61f12"
-  version = "v0.24.0"
+  revision = "e6c8e57c9109a769e42dc3794f218bc13704a4f5"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -604,6 +605,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c0ae48162b3be1f3193692c381852ca838f404f2f39bc9bf21bc43bcdbb94c25"
+  inputs-digest = "41ae9f8dc7938723eaeabdb79ba1e5dc42c3a5bf418ccd1ef5e77452d52ad8ef"
   solver-name = "gps-cdcl"
   solver-version = 1
