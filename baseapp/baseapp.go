@@ -18,8 +18,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/types"
 )
 
 // Key to store the header in the DB itself.
@@ -40,7 +40,7 @@ const (
 	runTxModeDeliver runTxMode = iota
 )
 
-type RunMsg func(ctx sdk.Context, msgs []types.Msg) types.Result
+type RunMsg func(ctx sdk.Context, msgs []sdk.Msg) sdk.Result
 
 // BaseApp reflects the ABCI application implementation.
 type BaseApp struct {
@@ -52,9 +52,9 @@ type BaseApp struct {
 	cms        sdk.CommitMultiStore // Main (uncached) state
 	router     Router               // handle any kind of message
 	codespacer *sdk.Codespacer      // handle module codespacing
-	txDecoder  types.TxDecoder        // unmarshal []byte into sdk.Tx
+	txDecoder  sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
-	anteHandler types.AnteHandler // ante handler for fee and auth
+	anteHandler sdk.AnteHandler // ante handler for fee and auth
 	feeRefundHandler types.FeeRefundHandler // fee handler for fee refund
 
 	// may be nil
@@ -89,7 +89,7 @@ var _ abci.Application = (*BaseApp)(nil)
 // NOTE: The db is used to store the version number for now.
 // Accepts a user-defined txDecoder
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
-func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, txDecoder types.TxDecoder, options ...func(*BaseApp)) *BaseApp {
+func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
 		Logger:     logger,
 		name:       name,
@@ -163,7 +163,7 @@ func defaultTxDecoder(cdc *wire.Codec) sdk.TxDecoder {
 			return nil, sdk.ErrTxDecode("txBytes are empty")
 		}
 
-		// StdTx.Msg is an interface. The concrete types
+		// StdTx.Msg is an interface. The concrete sdk
 		// are registered by MakeTxCodec
 		err := cdc.UnmarshalBinary(txBytes, &tx)
 		if err != nil {
@@ -341,7 +341,7 @@ func (app *BaseApp) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 
 func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abci.ResponseQuery) {
 	if len(path) >= 2 {
-		var result types.Result
+		var result sdk.Result
 		switch path[1] {
 		case "simulate":
 			txBytes := req.Data
@@ -357,7 +357,7 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 				Value: []byte(version.GetVersion()),
 			}
 		default:
-			result = types.ErrUnknownRequest(fmt.Sprintf("Unknown query: %s", path)).Result()
+			result = sdk.ErrUnknownRequest(fmt.Sprintf("Unknown query: %s", path)).Result()
 		}
 
 		// Encode with json
@@ -441,7 +441,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 // Msg handler function(s).
 func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	// Decode the Tx.
-	var result types.Result
+	var result sdk.Result
 
 	////////////////////  iris/cosmos-sdk begin ///////////////////////////
 
@@ -453,7 +453,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 		if ok {
 			bz := kvStore.Get([]byte("d"))
 			if len(bz) == 1 && bz[0] == byte(1) {
-				result = types.NewError(types.CodespaceUndefined, types.CodeOutOfService, "").Result()
+				result = sdk.NewError(sdk.CodespaceUndefined, sdk.CodeOutOfService, "").Result()
 
 				return abci.ResponseCheckTx{
 					Code:      uint32(result.Code),
@@ -499,7 +499,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 // Implements ABCI
 func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	// Decode the Tx.
-	var result types.Result
+	var result sdk.Result
 	var tx, err = app.txDecoder(txBytes)
 	if err != nil {
 		result = err.Result()
@@ -526,17 +526,17 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 }
 
 // Basic validator for msgs
-func validateBasicTxMsgs(msgs []types.Msg) types.Error {
+func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 	if msgs == nil || len(msgs) == 0 {
 		// TODO: probably shouldn't be ErrInternal. Maybe new ErrInvalidMessage, or ?
-		return types.ErrInternal("Tx.GetMsgs() must return at least one message in list")
+		return sdk.ErrInternal("Tx.GetMsgs() must return at least one message in list")
 	}
 
 	for _, msg := range msgs {
 		// Validate the Msg.
 		err := msg.ValidateBasic()
 		if err != nil {
-			err = err.WithDefaultCodespace(types.CodespaceRoot)
+			err = err.WithDefaultCodespace(sdk.CodespaceRoot)
 			return err
 		}
 	}
@@ -557,7 +557,7 @@ func (app *BaseApp) getContextForAnte(mode runTxMode, txBytes []byte) (ctx sdk.C
 }
 
 // Iterates through msgs and executes them
-func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []types.Msg, mode runTxMode) (result types.Result) {
+func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode runTxMode) (result sdk.Result) {
 	if app.runMsg != nil {
 		return app.runMsg(ctx, msgs)
 	}
@@ -565,17 +565,17 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []types.Msg, mode runTxMode) (
 	// accumulate results
 	logs := make([]string, 0, len(msgs))
 	var data []byte   // NOTE: we just append them all (?!)
-	var tags types.Tags // also just append them all
-	var code types.ABCICodeType
+	var tags sdk.Tags // also just append them all
+	var code sdk.ABCICodeType
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgType := msg.Type()
 		handler := app.router.Route(msgType)
 		if handler == nil {
-			return types.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
+			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
 		}
 
-		var msgResult types.Result
+		var msgResult sdk.Result
 		// Skip actual execution for CheckTx
 		if mode != runTxModeCheck {
 			msgResult = handler(ctx, msg)
@@ -600,7 +600,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []types.Msg, mode runTxMode) (
 	}
 
 	// Set the final gas values.
-	result = types.Result{
+	result = sdk.Result{
 		Code:    code,
 		Data:    data,
 		Log:     strings.Join(logs, "\n"),
@@ -625,7 +625,7 @@ func getState(app *BaseApp, mode runTxMode) *state {
 // runTx processes a transaction. The transactions is proccessed via an
 // anteHandler. txBytes may be nil in some cases, eg. in tests. Also, in the
 // future we may support "internal" transactions.
-func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx types.Tx) (result types.Result) {
+func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk.Result) {
 	// NOTE: GasWanted should be returned by the AnteHandler. GasUsed is
 	// determined by the GasMeter. We need access to the context to get the gas
 	// meter so we initialize upfront.
@@ -639,10 +639,10 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx types.Tx) (result t
 			switch rType := r.(type) {
 			case sdk.ErrorOutOfGas:
 				log := fmt.Sprintf("out of gas in location: %v", rType.Descriptor)
-				result = types.ErrOutOfGas(log).Result()
+				result = sdk.ErrOutOfGas(log).Result()
 			default:
 				log := fmt.Sprintf("recovered: %v\nstack:\n%v", r, string(debug.Stack()))
-				result = types.ErrInternal(log).Result()
+				result = sdk.ErrInternal(log).Result()
 			}
 		}
 
@@ -655,7 +655,7 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx types.Tx) (result t
 		if app.feeRefundHandler != nil {
 			resultRefund, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
 			if err != nil {
-				result = types.ErrInternal(err.Error()).Result()
+				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
 				result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
 				result.FeeAmount = feeAmount
