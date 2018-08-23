@@ -56,6 +56,7 @@ type BaseApp struct {
 
 	anteHandler sdk.AnteHandler // ante handler for fee and auth
 	feeRefundHandler types.FeeRefundHandler // fee handler for fee refund
+	feePreprocessHandler types.FeePreprocessHandler // fee handler for fee preprocessor
 
 	// may be nil
 	initChainer      sdk.InitChainer  // initialize state with validators and state blob
@@ -461,10 +462,6 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 					Log:       result.Log,
 					GasWanted: result.GasWanted,
 					GasUsed:   result.GasUsed,
-					Fee: cmn.KI64Pair{
-						[]byte(result.FeeDenom),
-						result.FeeAmount,
-					},
 					Tags: result.Tags,
 				}
 			}
@@ -488,10 +485,6 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 		Log:       result.Log,
 		GasWanted: result.GasWanted,
 		GasUsed:   result.GasUsed,
-		Fee: cmn.KI64Pair{
-			[]byte(result.FeeDenom),
-			result.FeeAmount,
-		},
 		Tags: result.Tags,
 	}
 }
@@ -517,10 +510,6 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 		Log:       result.Log,
 		GasWanted: result.GasWanted,
 		GasUsed:   result.GasUsed,
-		Fee: cmn.KI64Pair{
-			[]byte(result.FeeDenom),
-			result.FeeAmount,
-		},
 		Tags:      result.Tags,
 	}
 }
@@ -630,8 +619,6 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// determined by the GasMeter. We need access to the context to get the gas
 	// meter so we initialize upfront.
 	var gasWanted int64
-	var feeAmount int64
-	var feeDenom string
 	ctx := app.getContextForAnte(mode, txBytes)
 	ctxWithNoCache := ctx
 	defer func() {
@@ -648,20 +635,15 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 		result.GasWanted = gasWanted
 		result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
-		result.FeeAmount = feeAmount
-		result.FeeDenom = feeDenom
 
 		// Refund unspent fee
 		if app.feeRefundHandler != nil {
-			resultRefund, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
+			refundCoin, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
 				result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
-				result.FeeAmount = feeAmount
-				result.FeeDenom = feeDenom
-			} else {
-				result.FeeAmount = resultRefund.FeeAmount
+				result.Tags.AppendTag("consumedTxFee-" + refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
 			}
 		}
 	}()
@@ -671,6 +653,13 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	err := validateBasicTxMsgs(msgs)
 	if err != nil {
 		return err.Result()
+	}
+
+	if app.feePreprocessHandler != nil {
+		err := app.feePreprocessHandler(ctx, tx)
+		if err != nil {
+			sdk.ErrInvalidCoins(err.Error()).Result()
+		}
 	}
 
 	// run the ante handler
@@ -685,8 +674,6 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 
 		gasWanted = anteResult.GasWanted
-		feeDenom = anteResult.FeeDenom
-		feeAmount = anteResult.FeeAmount
 	}
 
 	// Keep the state in a transient CacheWrap in case processing the messages
