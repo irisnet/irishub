@@ -170,19 +170,12 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 	return nil
 }
 
-type FeeGenesisState struct {
+type FeeGenesisStateConfig struct {
 	FeeTokenNative string `json:"fee_token_native"`
 	GasPriceThreshold int64 `json:"gas_price_threshold"`
 }
 
-func DefaultFeeGenesisState() FeeGenesisState {
-	return FeeGenesisState{
-		FeeTokenNative: "iris-atto",
-		GasPriceThreshold: 20000000000, //2*10^10
-	}
-}
-
-func InitGenesis(ctx sdk.Context, setter iparams.SetterProxy, data FeeGenesisState) {
+func InitGenesis(ctx sdk.Context, setter iparams.SetterProxy, data FeeGenesisStateConfig) {
 	setter.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
 	setter.GovSetter().SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
 }
