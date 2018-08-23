@@ -10,13 +10,13 @@ import (
 )
 
 type Context struct {
-	Ctx context.CoreContext
+	Ctx context.CLIContext
 	Cdc *wire.Codec
 }
 
 func NewContext() Context {
 	return Context{
-		Ctx: context.NewCoreContextFromViper(),
+		Ctx: context.NewCLIContext(),
 	}
 }
 

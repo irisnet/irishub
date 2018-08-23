@@ -78,6 +78,7 @@
     "x/ibc/client/cli",
     "x/ibc/client/rest",
     "x/mock",
+    "x/mock/simulation",
     "x/params",
     "x/slashing",
     "x/slashing/client/cli",
@@ -200,7 +201,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -604,6 +604,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bec17d2fd7343177486276458f17b3204db334ff83686b230a0e2c3ee014fee8"
+  inputs-digest = "c0ae48162b3be1f3193692c381852ca838f404f2f39bc9bf21bc43bcdbb94c25"
   solver-name = "gps-cdcl"
   solver-version = 1
