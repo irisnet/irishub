@@ -78,7 +78,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 
 	ctx := app.NewContext()
 
-	r.HandleFunc("/version", version.VersionHandlerFn(ctx.Get(), cdc)).Methods("GET")
+	r.HandleFunc("/version", version.VersionHandlerFn(ctx, cdc)).Methods("GET")
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)
 	keys.RegisterRoutes(r)
 	rpc.RegisterRoutes(ctx.Get(), r)
