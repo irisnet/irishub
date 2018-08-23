@@ -34,7 +34,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "f899737d7f2764dc13e4d01ff00108ec58f766a9"
+  revision = "d81d8877b8f327112e94e814937143a71d1692a7"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -202,6 +202,7 @@
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
