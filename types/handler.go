@@ -10,4 +10,5 @@ type Handler func(ctx sdk.Context, msg sdk.Msg) sdk.Result
 // AnteHandler authenticates transactions, before their internal messages are handled.
 // If newCtx.IsZero(), ctx is used instead.
 type AnteHandler func(ctx sdk.Context, tx sdk.Tx) (newCtx sdk.Context, result sdk.Result, abort bool)
-type FeeRefundHandler func(ctx sdk.Context, tx sdk.Tx, result sdk.Result) (sdk.Result, error)
+type FeePreprocessHandler func(ctx sdk.Context, tx sdk.Tx) error
+type FeeRefundHandler func(ctx sdk.Context, tx sdk.Tx, result sdk.Result) (sdk.Coin, error)
