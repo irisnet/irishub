@@ -1,4 +1,4 @@
-package cli
+package upgrade
 
 import (
 	"github.com/spf13/cobra"
@@ -8,9 +8,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/pkg/errors"
 	"fmt"
+	"os"
+	"github.com/cosmos/cosmos-sdk/client/utils"
 )
 
 const (
@@ -28,10 +31,14 @@ func GetCmdSubmitSwitch(cdc *wire.Codec) *cobra.Command {
 			title := viper.GetString(flagTitle)
 			proposalID := viper.GetInt64(flagProposalID)
 
-			ctx := context.NewCoreContextFromViper().WithDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
 			// get the from/to address
-			from, err := ctx.GetFromAddress()
+			from, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
@@ -41,11 +48,8 @@ func GetCmdSubmitSwitch(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			err = ctx.EnsureSignBuildBroadcast(ctx.FromAddressName, []sdk.Msg{msg}, cdc)
-			if err != nil {
-				return err
-			}
-			return nil
+			cliCtx.PrintResponse = true
+			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -69,9 +73,12 @@ func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			ctx := context.NewCoreContextFromViper()
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			res, err := ctx.QueryStore(upgrade.GetSwitchKey(proposalID, voter), storeName)
+			res, err := cliCtx.QueryStore(upgrade.GetSwitchKey(proposalID, voter), storeName)
 			if len(res) == 0 || err != nil {
 				return errors.Errorf("proposalID [%d] is not existed", proposalID)
 			}
