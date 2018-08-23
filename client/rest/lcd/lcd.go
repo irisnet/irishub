@@ -78,18 +78,18 @@ func createHandler(cdc *wire.Codec) http.Handler {
 
 	ctx := app.NewContext()
 
-	r.HandleFunc("/version", version.VersionHandlerFn(ctx.Ctx, cdc)).Methods("GET")
+	r.HandleFunc("/version", version.VersionHandlerFn(ctx.Get(), cdc)).Methods("GET")
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)
 	keys.RegisterRoutes(r)
-	rpc.RegisterRoutes(ctx.Ctx, r)
-	tx.RegisterRoutes(ctx.Ctx, r, cdc)
-	auth.RegisterRoutes(ctx.Ctx, r, cdc, "acc")
-	bank.RegisterRoutes(ctx.Ctx, r, cdc, kb)
-	ibc.RegisterRoutes(ctx.Ctx, r, cdc, kb)
-	stake.RegisterRoutes(ctx.Ctx, r, cdc, kb)
+	rpc.RegisterRoutes(ctx.Get(), r)
+	tx.RegisterRoutes(ctx.Get(), r, cdc)
+	auth.RegisterRoutes(ctx.Get(), r, cdc, "acc")
+	bank.RegisterRoutes(ctx.Get(), r, cdc, kb)
+	ibc.RegisterRoutes(ctx.Get(), r, cdc, kb)
+	stake.RegisterRoutes(ctx.Get(), r, cdc, kb)
 	RegisterRoutes(ctx, r, cdc, kb)
-	RegisterStakeExRate(ctx.Ctx, r, cdc)
-	gov.RegisterRoutes(ctx.Ctx, r, cdc)
-	slashing.RegisterRoutes(ctx.Ctx, r, cdc, kb)
+	RegisterStakeExRate(ctx.Get(), r, cdc)
+	gov.RegisterRoutes(ctx.Get(), r, cdc)
+	slashing.RegisterRoutes(ctx.Get(), r, cdc, kb)
 	return r
 }
