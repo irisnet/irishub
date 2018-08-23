@@ -16,9 +16,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
@@ -58,7 +58,7 @@ type IrisApp struct {
 	keySlashing      *sdk.KVStoreKey
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
-	keyParams        *sdk.KVStoreKey
+	keyIparams        *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -69,7 +69,7 @@ type IrisApp struct {
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	govKeeper           gov.Keeper
-	paramsKeeper        params.Keeper
+	paramsKeeper        iparams.Keeper
 	upgradeKeeper       upgrade.Keeper
 }
 
@@ -90,7 +90,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
-		keyParams:        sdk.NewKVStoreKey("params"),
+		keyIparams:        sdk.NewKVStoreKey("iparams"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 	}
 
@@ -107,15 +107,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	)
 
 	// add handlers
-	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
+	app.paramsKeeper = iparams.NewKeeper(app.cdc, app.keyIparams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
-	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
+	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.OriginGetter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.paramsKeeper.Setter())
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
-	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -124,7 +123,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
+		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyIparams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
 	// initialize BaseApp
@@ -133,7 +132,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	//app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyIparams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
 	var err error
 	if viper.GetBool(FlagReplay) {
@@ -178,7 +177,7 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
-	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
+	tags := gov.EndBlocker(ctx, app.govKeeper)
 	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
 
 	return abci.ResponseEndBlock{
@@ -205,7 +204,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	// load the initial stake information
-	err = stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
+	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
 	if err != nil {
 		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
 		// return sdk.ErrGenesisParse("").TraceCause(err, "")
@@ -214,7 +213,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
 		DepositProcedure: gov.DepositProcedure{
-			MinDeposit:       sdk.Coins{sdk.Coin{Denom: "iris", Amount: sdk.NewInt(int64(10)).Mul(gov.Pow10(18))}},
+			MinDeposit:       sdk.Coins{sdk.Coin{Denom: "iris", Amount: sdk.NewInt(10)}},
 			MaxDepositPeriod: 1440,
 		},
 		VotingProcedure: gov.VotingProcedure{
@@ -227,16 +226,18 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		},
 	})
 
-	feeTokenGensisConfig := auth.GenesisState{
-		FeeTokenNative:    "iris",
-		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
+	//feeTokenGensisConfig := auth.GenesisState{
+	//	FeeTokenNative:    "iris",
+	//	GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
+	//}
+
+	//auth.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
+
+	//upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+
+	return abci.ResponseInitChain{
+		Validators: validators,
 	}
-
-	auth.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
-
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
-
-	return abci.ResponseInitChain{}
 }
 
 // export the state of iris for a genesis file
