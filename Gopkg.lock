@@ -34,7 +34,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "f899737d7f2764dc13e4d01ff00108ec58f766a9"
+  revision = "d81d8877b8f327112e94e814937143a71d1692a7"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -91,7 +91,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "374995aa72c58cfdc2c05f6cf74c583a8bd994ae"
+  revision = "df3b3a9efe7d6ec91cb6cf71905c14f49ed617a4"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -202,6 +202,7 @@
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -484,7 +485,7 @@
     "types",
     "version"
   ]
-  revision = "f99525233cbcd9ef1d3d0585eab5b215068c4003"
+  revision = "c7737b350a9453bab6571d8d5f489a590609d6f2"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
