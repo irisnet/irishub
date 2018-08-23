@@ -55,11 +55,12 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 			}
 			sig[index].PubKey = pubkey
 
-			var signature crypto.Signature
-			if err := cdc.UnmarshalBinaryBare(s.Signature, &signature); err != nil {
-				panic(err)
-			}
-			sig[index].Signature = signature
+			//TODO
+			//var signature crypto.Signature
+			//if err := cdc.UnmarshalBinaryBare(s.Signature, &signature); err != nil {
+			//	panic(err)
+			//}
+			//sig[index].Signature = signature
 			sig[index].AccountNumber = s.AccountNumber
 			sig[index].Sequence = s.Sequence
 		}

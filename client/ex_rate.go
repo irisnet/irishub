@@ -16,11 +16,11 @@ type ExRateResponse struct {
 	ExRate float64 `json:"token_shares_rate"`
 }
 
-func RegisterStakeExRate(ctx context.CoreContext, r *mux.Router, cdc *wire.Codec) {
+func RegisterStakeExRate(ctx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
 	r.HandleFunc("/stake/validator/{valAddr}/exRate", GetValidatorExRate(ctx, cdc)).Methods("GET")
 }
 
-func GetValidatorExRate(ctx context.CoreContext, cdc *wire.Codec) http.HandlerFunc {
+func GetValidatorExRate(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		valAddr := vars["valAddr"]
@@ -59,7 +59,7 @@ func GetValidatorExRate(ctx context.CoreContext, cdc *wire.Codec) http.HandlerFu
 	}
 }
 
-func getValidator(address sdk.AccAddress, ctx context.CoreContext, cdc *wire.Codec) (stake.Validator, error)  {
+func getValidator(address sdk.AccAddress, ctx context.CLIContext, cdc *wire.Codec) (stake.Validator, error)  {
 	var (
 		res []byte
 		validator stake.Validator
@@ -74,7 +74,7 @@ func getValidator(address sdk.AccAddress, ctx context.CoreContext, cdc *wire.Cod
 	return validator, err
 }
 
-func query(ctx context.CoreContext, key cmn.HexBytes) ([]byte, error) {
+func query(ctx context.CLIContext, key cmn.HexBytes) ([]byte, error) {
 	res, err := ctx.QueryStore(key, "stake")
 	return res, err
 }
