@@ -76,12 +76,12 @@ type IrisApp struct {
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := bam.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
+	bApp := bam.NewBaseApp(appName, cdc, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:          bam.NewBaseApp(appName, cdc, logger, db),
+		BaseApp:          bApp,
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),

@@ -52,9 +52,8 @@ type BaseApp struct {
 	cms        sdk.CommitMultiStore // Main (uncached) state
 	router     Router               // handle any kind of message
 	codespacer *sdk.Codespacer      // handle module codespacing
+	txDecoder  sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
-	// must be set
-	txDecoder   sdk.TxDecoder   // unmarshal []byte into sdk.Tx
 	anteHandler sdk.AnteHandler // ante handler for fee and auth
 	feeRefundHandler types.FeeRefundHandler // fee handler for fee refund
 
@@ -74,6 +73,9 @@ type BaseApp struct {
 	checkState       *state                  // for CheckTx
 	deliverState     *state                  // for DeliverTx
 	signedValidators []abci.SigningValidator // absent validators from begin block
+
+	// flag for sealing
+	sealed bool
 }
 
 var _ abci.Application = (*BaseApp)(nil)
@@ -85,8 +87,9 @@ var _ abci.Application = (*BaseApp)(nil)
 // (e.g. functional options).
 //
 // NOTE: The db is used to store the version number for now.
+// Accepts a user-defined txDecoder
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
-func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, options ...func(*BaseApp)) *BaseApp {
+func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
 		Logger:     logger,
 		name:       name,
@@ -95,7 +98,7 @@ func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, opti
 		cms:        store.NewCommitMultiStore(db),
 		router:     NewRouter(),
 		codespacer: sdk.NewCodespacer(),
-		txDecoder:  defaultTxDecoder(cdc),
+		txDecoder:  txDecoder,
 	}
 
 	// Register the undefined & root codespaces, which should not be used by
@@ -144,13 +147,7 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
 }
-
 ////////////////////  iris/cosmos-sdk end  ///////////////////////////
-
-// Set the txDecoder function
-func (app *BaseApp) SetTxDecoder(txDecoder sdk.TxDecoder) {
-	app.txDecoder = txDecoder
-}
 
 // default custom logic for transaction decoding
 // TODO: remove auth and wire dependencies from baseapp
@@ -166,7 +163,7 @@ func defaultTxDecoder(cdc *wire.Codec) sdk.TxDecoder {
 			return nil, sdk.ErrTxDecode("txBytes are empty")
 		}
 
-		// StdTx.Msg is an interface. The concrete types
+		// StdTx.Msg is an interface. The concrete sdk
 		// are registered by MakeTxCodec
 		err := cdc.UnmarshalBinary(txBytes, &tx)
 		if err != nil {
@@ -175,30 +172,6 @@ func defaultTxDecoder(cdc *wire.Codec) sdk.TxDecoder {
 		return tx, nil
 	}
 }
-
-// nolint - Set functions
-func (app *BaseApp) SetInitChainer(initChainer sdk.InitChainer) {
-	app.initChainer = initChainer
-}
-func (app *BaseApp) SetBeginBlocker(beginBlocker sdk.BeginBlocker) {
-	app.beginBlocker = beginBlocker
-}
-func (app *BaseApp) SetEndBlocker(endBlocker sdk.EndBlocker) {
-	app.endBlocker = endBlocker
-}
-func (app *BaseApp) SetAnteHandler(ah sdk.AnteHandler) {
-	app.anteHandler = ah
-}
-func (app *BaseApp) SetFeeRefundHandler(fh types.FeeRefundHandler) {
-	app.feeRefundHandler = fh
-}
-func (app *BaseApp) SetAddrPeerFilter(pf sdk.PeerFilter) {
-	app.addrPeerFilter = pf
-}
-func (app *BaseApp) SetPubKeyPeerFilter(pf sdk.PeerFilter) {
-	app.pubkeyPeerFilter = pf
-}
-func (app *BaseApp) Router() Router { return app.router }
 
 func (app *BaseApp) SetRunMsg(runMsg RunMsg) {
 	app.runMsg = runMsg
@@ -234,13 +207,16 @@ func (app *BaseApp) LastBlockHeight() int64 {
 
 // initializes the remaining logic from app.cms
 func (app *BaseApp) initFromStore(mainKey sdk.StoreKey) error {
-
 	// main store should exist.
 	// TODO: we don't actually need the main store here
 	main := app.cms.GetKVStore(mainKey)
 	if main == nil {
 		return errors.New("baseapp expects MultiStore with 'main' KVStore")
 	}
+	// Needed for `gaiad export`, which inits from store but never calls initchain
+	app.setCheckState(abci.Header{})
+
+	app.Seal()
 
 	return nil
 }
@@ -309,7 +285,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	if app.initChainer == nil {
 		return
 	}
-	app.initChainer(app.deliverState.ctx, req) // no error
+	res = app.initChainer(app.deliverState.ctx, req)
 
 	// NOTE: we don't commit, but BeginBlock for block 1
 	// starts from this deliverState
@@ -383,7 +359,9 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 		default:
 			result = sdk.ErrUnknownRequest(fmt.Sprintf("Unknown query: %s", path)).Result()
 		}
-		value := app.cdc.MustMarshalBinary(result)
+
+		// Encode with json
+		value := wire.Cdc.MustMarshalBinary(result)
 		return abci.ResponseQuery{
 			Code:  uint32(sdk.ABCICodeOK),
 			Value: value,
@@ -443,7 +421,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	} else {
 		// In the first block, app.deliverState.ctx will already be initialized
 		// by InitChain. Context is now updated with Header information.
-		app.deliverState.ctx = app.deliverState.ctx.WithBlockHeader(req.Header)
+		app.deliverState.ctx = app.deliverState.ctx.WithBlockHeader(req.Header).WithBlockHeight(req.Header.Height)
 	}
 
 	if app.beginBlocker != nil {
@@ -451,13 +429,18 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	}
 
 	// set the signed validators for addition to context in deliverTx
-	app.signedValidators = req.Validators
+	// TODO: communicate this result to the address to pubkey map in slashing
+	app.signedValidators = req.LastCommitInfo.GetValidators()
 	return
 }
 
-// Implements ABCI
+// CheckTx implements ABCI
+// CheckTx runs the "basic checks" to see whether or not a transaction can possibly be executed,
+// first decoding, then the ante handler (which checks signatures/fees/ValidateBasic),
+// then finally the route match to see whether a handler exists. CheckTx does not run the actual
+// Msg handler function(s).
 func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
-
+	// Decode the Tx.
 	var result sdk.Result
 
 	////////////////////  iris/cosmos-sdk begin ///////////////////////////
@@ -470,7 +453,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 		if ok {
 			bz := kvStore.Get([]byte("d"))
 			if len(bz) == 1 && bz[0] == byte(1) {
-				result = types.NewError(types.CodespaceUndefined, types.CodeOutOfService, "").Result()
+				result = sdk.NewError(sdk.CodespaceUndefined, sdk.CodeOutOfService, "").Result()
 
 				return abci.ResponseCheckTx{
 					Code:      uint32(result.Code),
@@ -570,16 +553,11 @@ func (app *BaseApp) getContextForAnte(mode runTxMode, txBytes []byte) (ctx sdk.C
 		ctx = ctx.WithSigningValidators(app.signedValidators)
 	}
 
-	// Simulate a DeliverTx for gas calculation
-	if mode == runTxModeSimulate {
-		ctx = ctx.WithIsCheckTx(false)
-	}
-
 	return
 }
 
 // Iterates through msgs and executes them
-func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result) {
+func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode runTxMode) (result sdk.Result) {
 	if app.runMsg != nil {
 		return app.runMsg(ctx, msgs)
 	}
@@ -597,7 +575,11 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
 		}
 
-		msgResult := handler(ctx, msg)
+		var msgResult sdk.Result
+		// Skip actual execution for CheckTx
+		if mode != runTxModeCheck {
+			msgResult = handler(ctx, msg)
+		}
 
 		// NOTE: GasWanted is determined by ante handler and
 		// GasUsed by the GasMeter
@@ -717,7 +699,8 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	ctx = ctx.WithMultiStore(msCache)
-	result = app.runMsgs(ctx, msgs)
+	result = app.runMsgs(ctx, msgs, mode)
+	result.GasWanted = gasWanted
 
 	// only update state if all messages pass and we're not in a simulation
 	if result.IsOK() && mode != runTxModeSimulate {
