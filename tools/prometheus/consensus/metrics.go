@@ -136,7 +136,7 @@ func (cs *Metrics) Start(ctx app.Context) {
 	cs.SetAddress(validaor_addr)
 
 	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
-	var client = ctx.Ctx.Client
+	var client = ctx.Client
 
 	//开启监听事件
 	client.Start()
@@ -173,7 +173,7 @@ func (cs *Metrics) Start(ctx app.Context) {
 }
 
 func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.Block) {
-	var client = ctx.Ctx.Client
+	var client = ctx.Client
 
 	cs.TmMetrics.Height.Set(float64(block.Height))
 	cs.TmMetrics.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
@@ -260,7 +260,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 
 func getCandidatesNum(ctx app.Context) int {
 	key := stake.ValidatorsKey
-	resKVs, err := ctx.Ctx.QuerySubspace(key, keyStoreStake)
+	resKVs, err := ctx.QuerySubspace(key, keyStoreStake)
 	if err != nil {
 		fmt.Println(err)
 	}
