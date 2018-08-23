@@ -97,86 +97,149 @@ iriscli2 advanced ibc set --name=x --from=$VADDR --chain-id=upgrade-test --print
 iriscli2 advanced ibc get --name=x --from=$VADDR --chain-id=upgrade-test --print-response true --fee=20000000000000000iris
 ```
 
-## 多节点连续升级测试
+## 多节点连续升级测试 (以4个节点为例)
 
-### version 0
+### version 0 （运行0号版本，并提交软件升级提议）
 
+在4个节点分别运行iris：
 ```
 iris start --home /data/iris > /data/iris/log.txt &
-(run in all the nodes)
-
+```
+1号节点发起软件升级提议：
+```
 iriscli gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
-(run in node1)
-
+```
+各节点投票通过该提议：
+```
+iriscli gov vote --name=silei --voter=$VADDR --proposalID=1 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+```
+查询软件升级提议：
+```
 iriscli gov query-proposal --proposalID=1
-
 ```
 
-### version 1
 
+### version 1 (升级到1号版本)
+
+各节点退出iris，下载并启动iris1
 ```
+kill iris
 
-kill iris   (run in all the nodes)
-
-iris1 start --home /data/iris > /data/iris/log.txt &   (run in all the nodes)
-
+iris1 start --home /data/iris > /data/iris/log.txt & 
+```
+各节点发送切换到新版本消息：
+```
 iriscli1 upgrade submit-switch --name=silei --from=$VADDR --proposalID=1 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
-(run in all the nodes)
-
+```
+查询软件升级信息：
+```
 iriscli1 upgrade info
+```
 
+运行新版本特有命令，检查升级结果：
+```
 iriscli1 advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
 
 iriscli1 advanced ibc get --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+```
 
+1号节点发起软件升级提议, 提议升级到2号版本：
+```
 iriscli1 gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=Text --deposit=10iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
-(run in node1)
 
 iriscli1 gov query-proposal --proposalID=2
 
 ```
 
-### version 2
-
+各节点投票通过该提议：
+```
+iriscli1 gov vote --name=silei --voter=$VADDR --proposalID=2 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
 ```
 
-kill iris1   (run in all the nodes)
+### version 2  (从1号版本升级到2号版本)
 
-iris2 start --home /data/iris > /data/iris/log.txt &   (run in all the nodes)
+各节点退出iris1，下载并启动iris2
+```
+kill iris1 
 
+iris2 start --home /data/iris > /data/iris/log.txt & 
+```
+各节点发送切换到新版本消息：
+```
 iriscli2 upgrade submit-switch --name=silei --from=$VADDR --proposalID=1 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
-(run in all the nodes)
 
 iriscli2 upgrade info
-
+```
+运行新版本特有命令，检查升级结果：
+```
 iriscli2 advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
 
 iriscli2 advanced ibc get --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
 
 ```
 
-### bug fix upgrade from version 1
+### bug fix upgrade from version 1 (基于1号版本进行bug fix的软件升级)
 
+1号节点发起软件升级提议, 提议进行bug-fix升级：
+```
+iriscli1 gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
 ```
 
-iriscli1 gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
-
+各节点投票通过该提议：
+```
 iriscli1 gov vote --name=silei --voter=$VADDR --proposalID=2 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
 
 iriscli1 gov query-proposal --proposalID=2
+```
 
+各节点退出iris1，下载并启动iris2-bugfix:
+```
 iris2-bugfix start --home /data/iris
-
-
+```
+各节点发送切换到新版本消息：
+```
 iriscli2-bugfix upgrade submit-switch --name=silei --from=$VADDR --proposalID=2 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
 
 iriscli2-bugfix upgrade query-switch --voter=$VADDR --proposalID=3 --home=/data/iriscli
 
 iriscli2-bugfix upgrade info
-
-iriscli2-bugfix advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
-
 ```
+运行新版本特有命令，检查升级结果：
+```
+iriscli2-bugfix advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+```
+
+### bug fix upgrade from version iris2-bugfix (基于iris2-bugfix版本继续进行bug-fix的软件升级)
+
+1号节点发起软件升级提议, 提议进行bug-fix升级：
+```
+iriscli2-bugfix gov submit-proposal --name=silei --proposer=$VADDR --title=ADD --description="I am crazy" --type=SoftwareUpgrade --deposit=10000000000000000000iris --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+```
+
+各节点投票通过该提议：
+```
+iriscli2-bugfix gov vote --name=silei --voter=$VADDR --proposalID=3 --option=Yes --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli2-bugfix gov query-proposal --proposalID=3
+```
+
+各节点退出iris2-bugfix，下载并启动iris3-bugfix:
+```
+iris3-bugfix start --home /data/iris
+```
+各节点发送切换到新版本消息：
+```
+iriscli3-bugfix upgrade submit-switch --name=silei --from=$VADDR --proposalID=3 --title=test --chain-id=upgrade-test --fee=20000000000000000iris --home=/data/iriscli
+
+iriscli3-bugfix upgrade query-switch --voter=$VADDR --proposalID=3 --home=/data/iriscli
+
+iriscli3-bugfix upgrade info
+```
+运行新版本特有命令，检查升级结果：
+```
+iriscli3-bugfix advanced ibc set --name=silei --from=$VADDR --chain-id=upgrade-test --sequence=0 --print-response true --fee=20000000000000000iris --home=/data/iriscli
+```
+
 
 ## 多节点升级测试(非docker)
 ```
