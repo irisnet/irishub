@@ -32,6 +32,7 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	bc "github.com/tendermint/tendermint/blockchain"
 	"strings"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
@@ -58,7 +59,8 @@ type IrisApp struct {
 	keySlashing      *sdk.KVStoreKey
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
-	keyIparams        *sdk.KVStoreKey
+	keyParams        *sdk.KVStoreKey
+	keyIparams       *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -68,8 +70,9 @@ type IrisApp struct {
 	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
+	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
-	paramsKeeper        iparams.Keeper
+	iparamsKeeper        iparams.Keeper
 	upgradeKeeper       upgrade.Keeper
 }
 
@@ -90,6 +93,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
+		keyParams:        sdk.NewKVStoreKey("params"),
 		keyIparams:        sdk.NewKVStoreKey("iparams"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 	}
@@ -107,14 +111,15 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	)
 
 	// add handlers
-	app.paramsKeeper = iparams.NewKeeper(app.cdc, app.keyIparams)
+	app.paramsKeeper = params.NewKeeper(cdc,app.keyParams)
+	app.iparamsKeeper = iparams.NewKeeper(app.cdc, app.keyIparams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
-	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.OriginGetter(), app.RegisterCodespace(slashing.DefaultCodespace))
+	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.paramsKeeper.Setter())
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.iparamsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -132,7 +137,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	//app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyIparams, app.keyUpgrade)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyIparams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
 	var err error
 	if viper.GetBool(FlagReplay) {
