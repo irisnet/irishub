@@ -4,7 +4,6 @@ import (
 	"testing"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -17,6 +16,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"encoding/hex"
+	"github.com/irisnet/irishub/modules/iparams"
 )
 
 var (
@@ -74,7 +74,7 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	accountMapper := auth.NewAccountMapper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewKeeper(accountMapper)
 	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
-    pk := params.NewKeeper(cdc,keyParams)
+    pk := iparams.NewKeeper(cdc,keyParams)
 	keeper := NewKeeper(cdc, keyUpdate, sk,pk.Setter())
 	return ctx, keeper
 }
