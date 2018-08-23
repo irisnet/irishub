@@ -5,9 +5,6 @@ import (
 	"log"
 	"sort"
 	"testing"
-
-	"github.com/cosmos/cosmos-sdk/x/params"
-
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -17,6 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/iparams"
 )
 
 // initialize the mock application for this module
@@ -30,7 +28,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	keyStake := sdk.NewKVStoreKey("stake")
 	keyGov := sdk.NewKVStoreKey("gov")
 
-	pk := params.NewKeeper(mapp.Cdc, keyGlobalParams)
+	pk := iparams.NewKeeper(mapp.Cdc, keyGlobalParams)
 	ck := bank.NewKeeper(mapp.AccountMapper)
 	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
 	keeper := NewKeeper(mapp.Cdc, keyGov, pk.Setter(), ck, sk, DefaultCodespace)
