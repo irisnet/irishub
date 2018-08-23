@@ -233,7 +233,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	//auth.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
-	//upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
 
 	return abci.ResponseInitChain{
 		Validators: validators,
