@@ -1,7 +1,7 @@
 package upgrade
 
 import (
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	bam "github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"fmt"
 )
