@@ -1,4 +1,4 @@
-package client
+package lcd
 
 import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
