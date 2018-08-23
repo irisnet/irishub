@@ -232,12 +232,12 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		},
 	})
 
-	//feeTokenGensisConfig := auth.GenesisState{
-	//	FeeTokenNative:    "iris",
-	//	GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
-	//}
+	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+		FeeTokenNative:    "iris-atto",
+		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
+	}
 
-	//auth.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
 	//upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
 
