@@ -203,7 +203,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
-	cs.IrisMetrics.Candidates.Set(float64(getCandidatesNum(cdc, ctx)))
+	cs.IrisMetrics.Candidates.Set(float64(getCandidatesNum(ctx)))
 	cs.TmMetrics.MissingValidators.Set(float64(missingValidators))
 	cs.TmMetrics.MissingValidatorsPower.Set(float64(missingValidatorsPower))
 	cs.TmMetrics.ValidatorsPower.Set(float64(validatorsPower))
@@ -258,9 +258,9 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 
-func getCandidatesNum(cdc *wire.Codec, ctx app.Context) int {
+func getCandidatesNum(ctx app.Context) int {
 	key := stake.ValidatorsKey
-	resKVs, err := ctx.Ctx.QuerySubspace(cdc, key, keyStoreStake)
+	resKVs, err := ctx.Ctx.QuerySubspace(key, keyStoreStake)
 	if err != nil {
 		fmt.Println(err)
 	}
