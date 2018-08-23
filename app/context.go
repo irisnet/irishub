@@ -7,17 +7,22 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Context struct {
-	Ctx context.CLIContext
+	context.CLIContext
 	Cdc *wire.Codec
 }
 
 func NewContext() Context {
 	return Context{
-		Ctx: context.NewCLIContext(),
+		CLIContext:context.NewCLIContext(),
 	}
+}
+func (c Context) Get() context.CLIContext {
+	return c.CLIContext
 }
 
 func (c Context) WithCodeC(cdc *wire.Codec) Context {
@@ -26,17 +31,17 @@ func (c Context) WithCodeC(cdc *wire.Codec) Context {
 }
 
 func (c Context) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
-	return c.Ctx.Client.BroadcastTxAsync(tx)
+	return c.Client.BroadcastTxAsync(tx)
 }
 
 func (c Context) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
-	return c.Ctx.Client.BroadcastTxSync(tx)
+	return c.Client.BroadcastTxSync(tx)
 }
 
 func (c Context) NetInfo() (*ctypes.ResultNetInfo, error) {
 	client := &http.Client{}
 
-	reqUri := tcpToHttpUrl(c.Ctx.NodeURI) + "/net_info"
+	reqUri := tcpToHttpUrl(c.NodeURI) + "/net_info"
 
 	resp, err := client.Get(reqUri)
 	if err != nil {
@@ -63,7 +68,7 @@ func (c Context) NetInfo() (*ctypes.ResultNetInfo, error) {
 
 func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
 	client := &http.Client{}
-	reqUri := tcpToHttpUrl(c.Ctx.NodeURI) + "/num_unconfirmed_txs"
+	reqUri := tcpToHttpUrl(c.NodeURI) + "/num_unconfirmed_txs"
 
 	resp, err := client.Get(reqUri)
 	if err != nil {
@@ -87,6 +92,56 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
 	}
 
 	return &res.Result, nil
+}
+
+func (c Context) GetCoinType(coinName string, cdc *wire.Codec) (types.CoinType, error) {
+	var coinType types.CoinType
+	if strings.ToLower(coinName) == denom {
+		coinType = types.NewDefaultCoinType(denom)
+	}else{
+		key := types.CoinTypeKey(coinName)
+		bz,err := c.QueryStore([]byte(key),"iparams")
+		if err != nil {
+			return coinType,err
+		}
+
+		if err = cdc.UnmarshalBinary(bz,&coinType);err != nil {
+			return coinType,err
+		}
+	}
+
+	return coinType, nil
+}
+
+func (c Context) ParseCoin(coinStr string, cdc *wire.Codec) (sdk.Coin, error) {
+	mainUnit,err := types.GetCoinName(coinStr)
+	coinType,err := c.GetCoinType(mainUnit,cdc)
+	if err != nil {
+		return sdk.Coin{},err
+	}
+
+	coin,err:=coinType.ConvertToMinCoin(coinStr)
+	if err != nil {
+		return sdk.Coin{},err
+	}
+	return coin,nil
+}
+
+func (c Context) ParseCoins(coinsStr string, cdc *wire.Codec) (coins sdk.Coins, err error) {
+	coinsStr = strings.TrimSpace(coinsStr)
+	if len(coinsStr) == 0 {
+		return coins, nil
+	}
+
+	coinStrs := strings.Split(coinsStr, ",")
+	for _, coinStr := range coinStrs {
+		coin, err := c.ParseCoin(coinStr,cdc)
+		if err != nil {
+			return coins, err
+		}
+		coins = append(coins, coin)
+	}
+	return coins,nil
 }
 
 func tcpToHttpUrl(url string) string {
