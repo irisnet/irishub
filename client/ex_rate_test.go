@@ -18,7 +18,7 @@ func Test_getValidator(t *testing.T) {
 
 	type args struct {
 		address sdk.AccAddress
-		ctx     context.CoreContext
+		ctx     context.CLIContext
 		cdc     *wire.Codec
 	}
 	tests := []struct {
