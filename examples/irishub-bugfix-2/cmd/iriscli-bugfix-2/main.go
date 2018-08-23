@@ -24,7 +24,7 @@ import (
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "iriscli-bugfix-2",
+		Use:   "iriscli-bugfix-3",
 		Short: "irishub2 light-client",
 	}
 )
