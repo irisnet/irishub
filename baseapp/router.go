@@ -5,15 +5,14 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strings"
-	"github.com/irisnet/irishub/types"
 )
 
 // Router provides handlers for each transaction type.
 type Router interface {
 
 	////////////////////  iris/cosmos-sdk begin  ///////////////////////////
-	AddRoute(r string, s []*sdk.KVStoreKey, h types.Handler) (rtr Router)
-	Route(path string) (h types.Handler)
+	AddRoute(r string, s []*sdk.KVStoreKey, h sdk.Handler) (rtr Router)
+	Route(path string) (h sdk.Handler)
 	RouteTable() (table []string)
 	////////////////////  iris/cosmos-sdk end  ///////////////////////////
 }
@@ -24,7 +23,7 @@ type route struct {
 	////////////////////  iris/cosmos-sdk begin  ///////////////////////////
 	s []*sdk.KVStoreKey
 	////////////////////  iris/cosmos-sdk end  ///////////////////////////
-	h types.Handler
+	h sdk.Handler
 }
 
 type router struct {
@@ -44,7 +43,7 @@ var isAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 
 // AddRoute - TODO add description
 ////////////////////  iris/cosmos-sdk begin  ///////////////////////////
-func (rtr *router) AddRoute(r string, s []*sdk.KVStoreKey, h types.Handler) Router {
+func (rtr *router) AddRoute(r string, s []*sdk.KVStoreKey, h sdk.Handler) Router {
 	rstrs := strings.Split(r, "-")
 
 	if !isAlpha(rstrs[0]) {
@@ -59,7 +58,7 @@ func (rtr *router) AddRoute(r string, s []*sdk.KVStoreKey, h types.Handler) Rout
 
 // Route - TODO add description
 // TODO handle expressive matches.
-func (rtr *router) Route(path string) (h types.Handler) {
+func (rtr *router) Route(path string) (h sdk.Handler) {
 	for _, route := range rtr.routes {
 		if route.r == path {
 			return route.h
