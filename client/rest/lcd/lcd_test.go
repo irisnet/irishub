@@ -1,4 +1,4 @@
-package client
+package lcd
 
 import (
 	"github.com/irisnet/irishub/app"
