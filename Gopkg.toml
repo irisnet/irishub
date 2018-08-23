@@ -28,7 +28,8 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  version = "=v0.24.0"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
+  branch = "irisnet/refactor"
 
 [[override]]
   name = "github.com/golang/protobuf"
