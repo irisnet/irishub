@@ -85,7 +85,8 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 
 func (c Context) GetCoinType(coinName string) (types.CoinType, error) {
 	var coinType types.CoinType
-	if strings.ToLower(coinName) == denom {
+	coinName = strings.ToLower(coinName)
+	if coinName == denom {
 		coinType = IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)
