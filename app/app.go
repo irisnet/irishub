@@ -243,6 +243,9 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	bam.InitGenesis(ctx, app.iparamsKeeper.Setter(), feeTokenGensisConfig)
 
+	// load the address to pubkey map
+	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
+
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
 
 	return abci.ResponseInitChain{
