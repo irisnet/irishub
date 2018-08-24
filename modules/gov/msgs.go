@@ -20,13 +20,14 @@ type MsgSubmitProposal struct {
 	Params         Params
 }
 
-func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins) MsgSubmitProposal {
+func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins,params Params) MsgSubmitProposal {
 	return MsgSubmitProposal{
 		Title:          title,
 		Description:    description,
 		ProposalType:   proposalType,
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
+		Params:			params,
 	}
 }
 

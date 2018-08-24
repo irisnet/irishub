@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -8,6 +9,7 @@ import (
 	txcxt "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+	client2 "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"io/ioutil"
 	"net/http"
@@ -47,45 +49,15 @@ func (c Context) WithTxContext(ctx txcxt.TxContext) Context {
 	return c
 }
 
-func (c Context) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
-	return c.Client.BroadcastTxAsync(tx)
-}
-
-func (c Context) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
-	return c.Client.BroadcastTxSync(tx)
-}
-
 func (c Context) NetInfo() (*ctypes.ResultNetInfo, error) {
-	client := &http.Client{}
-
-	reqUri := tcpToHttpUrl(c.NodeURI) + "/net_info"
-
-	resp, err := client.Get(reqUri)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var res = struct {
-		JsonRpc string               `json:"jsonrpc"`
-		Id      string               `json:"id"`
-		Result  ctypes.ResultNetInfo `json:"result"`
-	}{}
-	if err := c.Cdc.UnmarshalJSON(body, &res); err != nil {
-		return nil, err
-	}
-
-	return &res.Result, nil
+	client := c.Client.(*client2.HTTP)
+	return client.NetInfo()
 }
 
 func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 	client := &http.Client{}
-	reqUri := tcpToHttpUrl(c.NodeURI) + "/num_unconfirmed_txs"
+	url := strings.Replace(c.NodeURI, "tcp", "http", 1)
+	reqUri := fmt.Sprintf("%s/%s", url, "num_unconfirmed_txs")
 
 	resp, err := client.Get(reqUri)
 	if err != nil {
@@ -114,7 +86,7 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 func (c Context) GetCoinType(coinName string) (types.CoinType, error) {
 	var coinType types.CoinType
 	if strings.ToLower(coinName) == denom {
-		coinType = types.NewDefaultCoinType(denom)
+		coinType = IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)
 		bz, err := c.QueryStore([]byte(key), "iparams")
@@ -186,11 +158,6 @@ func (c Context) Build(msgs []sdk.Msg) (auth.StdSignMsg, error) {
 		Sequence:      ctx.Sequence,
 		Memo:          ctx.Memo,
 		Msgs:          msgs,
-		Fee: auth.NewStdFee(ctx.Gas, fee),
+		Fee:           auth.NewStdFee(ctx.Gas, fee),
 	}, nil
-}
-
-func tcpToHttpUrl(url string) string {
-	urls := strings.Replace(url, "tcp", "http", 1)
-	return urls
 }
