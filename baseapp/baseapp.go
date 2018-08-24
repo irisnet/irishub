@@ -217,7 +217,7 @@ func (app *BaseApp) initFromStore(mainKey sdk.StoreKey) error {
 	// Needed for `gaiad export`, which inits from store but never calls initchain
 	app.setCheckState(abci.Header{})
 
-	//app.Seal()
+	app.Seal()
 
 	return nil
 }
