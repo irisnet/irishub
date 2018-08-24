@@ -58,12 +58,9 @@ var (
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
 	denom          = "iris"
-	precision	   = 18
 	feeAmt   = int64(100)
-	totalAmt = int64(200000000)
 	IrisCt = types.NewDefaultCoinType(denom)
 	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
-	totalTokenAmt ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",totalAmt,denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
@@ -163,7 +160,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		// create the genesis account, give'm few steaks and a buncha token with there name
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
-			totalTokenAmt,
+			freeFermionVal,
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
