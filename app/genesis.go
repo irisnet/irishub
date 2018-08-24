@@ -170,7 +170,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		// create the genesis account, give'm few steaks and a buncha token with there name
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
-			{denom, totalTokenAmt.Mul(sdk.NewInt(precisionInt64))},
+			{denom, sdk.NewInt(freeFermionVal).Mul(sdk.NewInt(precisionInt64))},
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
