@@ -14,7 +14,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"math"
+	"time"
+	"github.com/irisnet/irishub/types"
+	"fmt"
 )
 
 // State to Unmarshal
@@ -57,13 +59,14 @@ var (
 	flagOWK        = "owk"
 	denom          = "iris"
 	precision	   = 18
-	// bonded tokens given to genesis validators/accounts
-	freeFermionVal = int64(100)
-
-	totalTokenAmt = sdk.NewInt(200000000)
+	feeAmt   = int64(100)
+	totalAmt = int64(200000000)
+	IrisCt = types.NewDefaultCoinType(denom)
+	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
+	totalTokenAmt ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",totalAmt,denom))
 )
 
-const defaultUnbondingTime int64 = 60 * 10
+const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
 
 // get app init parameters for server init command
 func IrisAppInit() server.AppInit {
@@ -133,7 +136,7 @@ func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name
 
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
-		Power:  freeFermionVal,
+		Power:  feeAmt,
 	}
 	return
 }
@@ -147,17 +150,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		return
 	}
 
-	// start with the default staking genesis state
-	//stakeData := stake.DefaultGenesisState()
 	stakeData := createGenesisState()
-
-	precisionNumber := math.Pow10(int(stakeData.Params.DenomPrecision))
-	if precisionNumber > math.MaxInt64 {
-		panic(errors.New("precision is too high, int64 is overflow"))
-	}
-	precisionInt64 := int64(precisionNumber)
-	tokenPrecision := sdk.NewRat(precisionInt64)
-	// get genesis flag account information
 	genaccs := make([]GenesisAccount, len(appGenTxs))
 	for i, appGenTx := range appGenTxs {
 
@@ -170,11 +163,11 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		// create the genesis account, give'm few steaks and a buncha token with there name
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
-			{denom, totalTokenAmt.Mul(sdk.NewInt(precisionInt64))},
+			totalTokenAmt,
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
-		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRat(freeFermionVal).Mul(tokenPrecision)) // increase the supply
+		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRatFromInt(freeFermionVal.Amount)) // increase the supply
 
 		// add the validator
 		if len(genTx.Name) > 0 {
@@ -182,12 +175,12 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 			validator := stake.NewValidator(genTx.Address,
 				sdk.MustGetAccPubKeyBech32(genTx.PubKey), desc)
 
-			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRat(freeFermionVal).Mul(tokenPrecision))
+			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRatFromInt(freeFermionVal.Amount))
 
 			// add some new shares to the validator
 			var issuedDelShares sdk.Rat
-			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, sdk.NewInt(freeFermionVal).Mul(sdk.NewInt(precisionInt64)))
-			validator.TokenPrecision = stakeData.Params.DenomPrecision
+			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, feeAmt)
+			//validator.TokenPrecision = stakeData.Params.DenomPrecision
 			stakeData.Validators = append(stakeData.Validators, validator)
 
 			// create the self-delegation from the issuedDelShares
@@ -227,7 +220,7 @@ func createGenesisState() stake.GenesisState {
 		Pool: stake.Pool{
 			LooseTokens:             sdk.ZeroRat(),
 			BondedTokens:            sdk.ZeroRat(),
-			InflationLastTime:       0,
+			InflationLastTime:       time.Unix(0, 0),
 			Inflation:               sdk.NewRat(7, 100),
 			DateLastCommissionReset: 0,
 			PrevBondedShares:        sdk.ZeroRat(),
@@ -240,7 +233,6 @@ func createGenesisState() stake.GenesisState {
 			UnbondingTime:       defaultUnbondingTime,
 			MaxValidators:       100,
 			BondDenom:           denom,
-			DenomPrecision:      int8(precision),
 		},
 	}
 }

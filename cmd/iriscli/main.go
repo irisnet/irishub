@@ -10,15 +10,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	bankcmd "github.com/irisnet/irishub/client/cli/bank"
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	c "github.com/irisnet/irishub/client"
+	c "github.com/irisnet/irishub/client/rest/lcd"
 	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	paramcmd "github.com/cosmos/cosmos-sdk/x/params/client/cli"
-	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
+	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -166,11 +165,6 @@ func main() {
 		Use:   "params",
 		Short: "Governance and voting subcommands",
 	}
-
-	paramsCmd.AddCommand(
-		client.GetCommands(
-			paramcmd.ExportCmd("params",cdc),
-		)...)
 
 	rootCmd.AddCommand(paramsCmd)
 
