@@ -3,16 +3,16 @@ package bank
 import (
 	"os"
 
-	"github.com/irisnet/irishub/client/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/bank/client"
+	"github.com/irisnet/irishub/client/utils"
 
+	"github.com/irisnet/irishub/app"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/app"
 )
 
 const (
@@ -27,11 +27,8 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 		Short: "Create and sign a send tx",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := app.NewContext().WithCodeC(cdc)
-
-			cliCtx := ctx.WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-
-			ctx = ctx.WithCLIContext(cliCtx)
+			ctx = ctx.WithCLIContext(ctx.WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc)))
 
 			if err := ctx.EnsureAccountExists(); err != nil {
 				return err
@@ -51,12 +48,12 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			from, err := cliCtx.GetFromAddress()
+			from, err := ctx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
-			account, err := cliCtx.GetAccount(from)
+			account, err := ctx.GetAccount(from)
 			if err != nil {
 				return err
 			}
