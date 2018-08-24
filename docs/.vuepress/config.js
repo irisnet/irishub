@@ -1,7 +1,7 @@
 module.exports = {
   title: 'IRIShub Document',
   description: '',
-  base: "/",
+  base: "/docs",
   themeConfig: {
     displayAllHeaders: false,
     nav: [
