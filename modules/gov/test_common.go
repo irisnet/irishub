@@ -15,6 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/irisnet/irishub/types"
+	"fmt"
 )
 
 // initialize the mock application for this module
@@ -68,7 +70,23 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		if err != nil {
 			panic(err)
 		}
-		InitGenesis(ctx, keeper, DefaultGenesisState())
+		ct := types.NewDefaultCoinType("iris")
+		minDeposit,_ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s",10,"iris"))
+		InitGenesis(ctx, keeper, GenesisState{
+			StartingProposalID: 1,
+			DepositProcedure: DepositProcedure{
+				MinDeposit:       sdk.Coins{minDeposit},
+				MaxDepositPeriod: 1440,
+			},
+			VotingProcedure: VotingProcedure{
+				VotingPeriod: 30,
+			},
+			TallyingProcedure: TallyingProcedure{
+				Threshold:         sdk.NewRat(1, 2),
+				Veto:              sdk.NewRat(1, 3),
+				GovernancePenalty: sdk.NewRat(1, 100),
+			},
+		})
 		return abci.ResponseInitChain{
 			Validators: validators,
 		}

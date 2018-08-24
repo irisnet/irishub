@@ -82,9 +82,6 @@ func (app *BaseApp) SetPubKeyPeerFilter(pf sdk.PeerFilter) {
 	app.pubkeyPeerFilter = pf
 }
 func (app *BaseApp) Router() Router {
-	//if app.sealed {
-	//	panic("Router() on sealed BaseApp")
-	//}
 	return app.router
 }
 func (app *BaseApp) Seal()          { app.sealed = true }

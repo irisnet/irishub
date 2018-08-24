@@ -2,31 +2,48 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/context"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	txcxt "github.com/cosmos/cosmos-sdk/x/auth/client/context"
+	"github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"github.com/irisnet/irishub/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Context struct {
 	context.CLIContext
-	Cdc *wire.Codec
+	txCtx txcxt.TxContext
+	Cdc   *wire.Codec
 }
 
 func NewContext() Context {
 	return Context{
-		CLIContext:context.NewCLIContext(),
+		CLIContext: context.NewCLIContext(),
+		txCtx:      txcxt.NewTxContextFromCLI(),
 	}
 }
 func (c Context) Get() context.CLIContext {
-	return c.CLIContext
+	return c.CLIContext.WithCodec(c.Cdc)
+}
+
+func (c Context) GetTxCxt() txcxt.TxContext {
+	return c.txCtx.WithCodec(c.Cdc)
 }
 
 func (c Context) WithCodeC(cdc *wire.Codec) Context {
 	c.Cdc = cdc
+	return c
+}
+func (c Context) WithCLIContext(ctx context.CLIContext) Context {
+	c.CLIContext = ctx
+	return c
+}
+func (c Context) WithTxContext(ctx txcxt.TxContext) Context {
+	c.txCtx = ctx
 	return c
 }
 
@@ -66,7 +83,7 @@ func (c Context) NetInfo() (*ctypes.ResultNetInfo, error) {
 	return &res.Result, nil
 }
 
-func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
+func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 	client := &http.Client{}
 	reqUri := tcpToHttpUrl(c.NodeURI) + "/num_unconfirmed_txs"
 
@@ -94,40 +111,40 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error){
 	return &res.Result, nil
 }
 
-func (c Context) GetCoinType(coinName string, cdc *wire.Codec) (types.CoinType, error) {
+func (c Context) GetCoinType(coinName string) (types.CoinType, error) {
 	var coinType types.CoinType
 	if strings.ToLower(coinName) == denom {
 		coinType = types.NewDefaultCoinType(denom)
-	}else{
+	} else {
 		key := types.CoinTypeKey(coinName)
-		bz,err := c.QueryStore([]byte(key),"iparams")
+		bz, err := c.QueryStore([]byte(key), "iparams")
 		if err != nil {
-			return coinType,err
+			return coinType, err
 		}
 
-		if err = cdc.UnmarshalBinary(bz,&coinType);err != nil {
-			return coinType,err
+		if err = c.Cdc.UnmarshalBinary(bz, &coinType); err != nil {
+			return coinType, err
 		}
 	}
 
 	return coinType, nil
 }
 
-func (c Context) ParseCoin(coinStr string, cdc *wire.Codec) (sdk.Coin, error) {
-	mainUnit,err := types.GetCoinName(coinStr)
-	coinType,err := c.GetCoinType(mainUnit,cdc)
+func (c Context) ParseCoin(coinStr string) (sdk.Coin, error) {
+	mainUnit, err := types.GetCoinName(coinStr)
+	coinType, err := c.GetCoinType(mainUnit)
 	if err != nil {
-		return sdk.Coin{},err
+		return sdk.Coin{}, err
 	}
 
-	coin,err:=coinType.ConvertToMinCoin(coinStr)
+	coin, err := coinType.ConvertToMinCoin(coinStr)
 	if err != nil {
-		return sdk.Coin{},err
+		return sdk.Coin{}, err
 	}
-	return coin,nil
+	return coin, nil
 }
 
-func (c Context) ParseCoins(coinsStr string, cdc *wire.Codec) (coins sdk.Coins, err error) {
+func (c Context) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
 	coinsStr = strings.TrimSpace(coinsStr)
 	if len(coinsStr) == 0 {
 		return coins, nil
@@ -135,13 +152,42 @@ func (c Context) ParseCoins(coinsStr string, cdc *wire.Codec) (coins sdk.Coins, 
 
 	coinStrs := strings.Split(coinsStr, ",")
 	for _, coinStr := range coinStrs {
-		coin, err := c.ParseCoin(coinStr,cdc)
+		coin, err := c.ParseCoin(coinStr)
 		if err != nil {
 			return coins, err
 		}
 		coins = append(coins, coin)
 	}
-	return coins,nil
+	return coins, nil
+}
+
+// Build builds a single message to be signed from a TxContext given a set of
+// messages. It returns an error if a fee is supplied but cannot be parsed.
+func (c Context) Build(msgs []sdk.Msg) (auth.StdSignMsg, error) {
+	ctx := c.txCtx
+	chainID := ctx.ChainID
+	if chainID == "" {
+		return auth.StdSignMsg{}, errors.Errorf("chain ID required but not specified")
+	}
+
+	fee := sdk.Coin{}
+	if ctx.Fee != "" {
+		parsedFee, err := c.ParseCoin(ctx.Fee)
+		if err != nil {
+			return auth.StdSignMsg{}, err
+		}
+
+		fee = parsedFee
+	}
+
+	return auth.StdSignMsg{
+		ChainID:       ctx.ChainID,
+		AccountNumber: ctx.AccountNumber,
+		Sequence:      ctx.Sequence,
+		Memo:          ctx.Memo,
+		Msgs:          msgs,
+		Fee: auth.NewStdFee(ctx.Gas, fee),
+	}, nil
 }
 
 func tcpToHttpUrl(url string) string {
