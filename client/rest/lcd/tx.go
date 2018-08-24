@@ -85,7 +85,7 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 		}
 		txByte, _ := cdc.MarshalBinary(stdTx)
 		// send
-		res, err := ctx.BroadcastTxSync(txByte)
+		res, err := ctx.Get().BroadcastTxAsync(txByte)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
