@@ -216,14 +216,18 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the initial stake information
 	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
 	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-		// return sdk.ErrGenesisParse("").TraceCause(err, "")
+		panic(err)
+	}
+
+	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10,denom))
+	if err != nil {
+		panic(err)
 	}
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
 		DepositProcedure: gov.DepositProcedure{
-			MinDeposit:       sdk.Coins{sdk.Coin{Denom: "iris", Amount: sdk.NewInt(10)}},
+			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 1440,
 		},
 		VotingProcedure: gov.VotingProcedure{
@@ -237,7 +241,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	})
 
 	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
-		FeeTokenNative:    "iris-atto",
+		FeeTokenNative:    IrisCt.MinUnit.Denom,
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 

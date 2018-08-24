@@ -211,6 +211,7 @@ func GetCoin(coinStr string) (denom, amount string, err error) {
 func parseCoin(coinStr string) (coin sdk.Coin, err error) {
 	if denom, amount, err := GetCoin(coinStr); err == nil {
 		if amt, ok := sdk.NewIntFromString(amount); ok {
+			denom = strings.ToLower(denom)
 			coin := sdk.NewCoin(denom, amt)
 			return coin, err
 		}
@@ -224,5 +225,6 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 		return coinName, err
 	}
 	coinName = strings.Split(denom, "-")[0]
+	coinName = strings.ToLower(coinName)
 	return coinName, nil
 }

@@ -15,6 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"time"
+	"github.com/irisnet/irishub/types"
+	"fmt"
 )
 
 // State to Unmarshal
@@ -56,11 +58,9 @@ var (
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
 	denom          = "iris"
-	precision	   = 18
-	// bonded tokens given to genesis validators/accounts
-	freeFermionVal = int64(100)
-
-	totalTokenAmt = sdk.NewInt(200000000)
+	feeAmt   = int64(100)
+	IrisCt = types.NewDefaultCoinType(denom)
+	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
@@ -133,7 +133,7 @@ func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name
 
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
-		Power:  freeFermionVal,
+		Power:  feeAmt,
 	}
 	return
 }
@@ -147,17 +147,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		return
 	}
 
-	// start with the default staking genesis state
-	//stakeData := stake.DefaultGenesisState()
 	stakeData := createGenesisState()
-
-	//precisionNumber := math.Pow10(int(stakeData.Params.DenomPrecision))
-	//if precisionNumber > math.MaxInt64 {
-	//	panic(errors.New("precision is too high, int64 is overflow"))
-	//}
-	//precisionInt64 := int64(precisionNumber)
-	//tokenPrecision := sdk.NewRat(precisionInt64)
-	// get genesis flag account information
 	genaccs := make([]GenesisAccount, len(appGenTxs))
 	for i, appGenTx := range appGenTxs {
 
@@ -170,11 +160,11 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 		// create the genesis account, give'm few steaks and a buncha token with there name
 		accAuth := auth.NewBaseAccountWithAddress(genTx.Address)
 		accAuth.Coins = sdk.Coins{
-			{denom, sdk.NewInt(freeFermionVal)},
+			freeFermionVal,
 		}
 		acc := NewGenesisAccount(&accAuth)
 		genaccs[i] = acc
-		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRat(freeFermionVal)) // increase the supply
+		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRatFromInt(freeFermionVal.Amount)) // increase the supply
 
 		// add the validator
 		if len(genTx.Name) > 0 {
@@ -182,11 +172,11 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 			validator := stake.NewValidator(genTx.Address,
 				sdk.MustGetAccPubKeyBech32(genTx.PubKey), desc)
 
-			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRat(freeFermionVal))
+			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewRatFromInt(freeFermionVal.Amount))
 
 			// add some new shares to the validator
 			var issuedDelShares sdk.Rat
-			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, freeFermionVal)
+			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, feeAmt)
 			//validator.TokenPrecision = stakeData.Params.DenomPrecision
 			stakeData.Validators = append(stakeData.Validators, validator)
 
