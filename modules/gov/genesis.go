@@ -21,27 +21,8 @@ func NewGenesisState(startingProposalID int64, dp DepositProcedure, vp VotingPro
 	}
 }
 
-// get raw genesis raw message for testing
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		StartingProposalID: 1,
-		DepositProcedure: DepositProcedure{
-			MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 10)},
-			MaxDepositPeriod: 200,
-		},
-		VotingProcedure: VotingProcedure{
-			VotingPeriod: 200,
-		},
-		TallyingProcedure: TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
-		},
-	}
-}
-
 // InitGenesis - store genesis parameters
-func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, k Keeper,data GenesisState) {
 	err := k.setInitialProposalID(ctx, data.StartingProposalID)
 	if err != nil {
 		// TODO: Handle this with #870
