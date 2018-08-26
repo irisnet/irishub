@@ -16,6 +16,7 @@ import (
 	"strings"
 )
 
+//TODO 以后需要重构，现在有点乱
 type Context struct {
 	context.CLIContext
 	txCtx txcxt.TxContext
@@ -38,6 +39,7 @@ func (c Context) GetTxCxt() txcxt.TxContext {
 
 func (c Context) WithCodeC(cdc *wire.Codec) Context {
 	c.Cdc = cdc
+	c.CLIContext = c.CLIContext.WithCodec(cdc)
 	return c
 }
 func (c Context) WithCLIContext(ctx context.CLIContext) Context {
