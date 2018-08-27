@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'IRIShub Document',
+  title: 'IRISnet Document',
   description: '',
   base: "/docs/",
   themeConfig: {
