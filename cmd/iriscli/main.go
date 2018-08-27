@@ -19,6 +19,8 @@ import (
 	govcmd "github.com/irisnet/irishub/client/cli/gov"
 	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
 	"github.com/irisnet/irishub/version"
+	"github.com/irisnet/irishub/client/cli/coin"
+	"github.com/irisnet/irishub/client/cli/auth"
 )
 
 // rootCmd is the entry point for this binary
@@ -111,7 +113,10 @@ func main() {
 	govCmd.AddCommand(
 		client.GetCommands(
 			govcmd.GetCmdQueryProposal("gov", cdc),
+			govcmd.GetCmdQueryProposals("gov", cdc),
 			govcmd.GetCmdQueryVote("gov", cdc),
+			govcmd.GetCmdQueryVotes("gov", cdc),
+			govcmd.GetCmdQueryConfig("iparams", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -144,7 +149,7 @@ func main() {
 	//Add auth and bank commands
 	rootCmd.AddCommand(
 		client.GetCommands(
-			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			auth.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
 		)...)
 	rootCmd.AddCommand(
 		client.PostCommands(
@@ -161,12 +166,16 @@ func main() {
 			version.GetCmdVersion("upgrade", cdc),
 		)...)
 
-	paramsCmd := &cobra.Command{
-		Use:   "params",
-		Short: "Governance and voting subcommands",
+	coinCmd := &cobra.Command{
+		Use:   "coin",
+		Short: "Coin and CoinType",
 	}
+	coinCmd.AddCommand(
+		client.GetCommands(
+			coin.GetCmdQueryCoinType(cdc),
+		)...)
 
-	rootCmd.AddCommand(paramsCmd)
+	rootCmd.AddCommand(coinCmd)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
