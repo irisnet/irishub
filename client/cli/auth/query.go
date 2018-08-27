@@ -43,12 +43,15 @@ func GetAccountCmd(storeName string, cdc *wire.Codec, decoder auth.AccountDecode
 			var coins_str []string
 			for _, coin := range coins {
 				coinName ,_ := types.GetCoinName(coin.String())
-				if ct, err := ctx.GetCoinType(coinName); err == nil {
-					mainCoin, err := ct.Convert(coin.String(), ct.Name)
-					if err == nil {
-						coins_str = append(coins_str, mainCoin)
-					}
+				ct, err := ctx.GetCoinType(coinName)
+				if err != nil {
+					return err
 				}
+				mainCoin, err := ct.Convert(coin.String(), ct.Name)
+				if err != nil {
+					return err
+				}
+				coins_str = append(coins_str, mainCoin)
 			}
 			acct := account{
 				Address:       acc.GetAddress(),
