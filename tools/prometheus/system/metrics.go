@@ -8,13 +8,13 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"log"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
 	"github.com/spf13/viper"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -111,13 +111,13 @@ func PrometheusMetrics() *Metrics {
 func (metrics *Metrics) setPath(path string) {
 	if !filepath.IsAbs(path) {
 		if absPath, err := filepath.Abs(path); err != nil {
-      log.Println(err.Error())
+			log.Println(err.Error())
 		} else {
 			path = absPath
 		}
 	}
 	if fileInfo, err := os.Stat(path); err != nil {
-    log.Println(err.Error())
+		log.Println(err.Error())
 	} else {
 		if !fileInfo.IsDir() {
 			log.Println("\"" + path + "\" is not a directory!")

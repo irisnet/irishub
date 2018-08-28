@@ -53,6 +53,8 @@ type IrisMetrics struct {
 	VotingPower metrics.Gauge
 	//ratio of Voting Power of the validator to total voting power
 	VotingPowerRatio metrics.Gauge
+	//Voting Power ratio of the validator who has maximum voting power
+	MaximumVotingPowerRatio metrics.Gauge
 	// ratio of signed blocks in last 100 blocks
 	UpTime metrics.Gauge
 	// missed precommited since monitor up
@@ -96,6 +98,11 @@ func NewIrisMetrics() IrisMetrics {
 			Subsystem: "consensus",
 			Name:      "voting_power_ratio",
 			Help:      "ratio of voting power of the validator to total voting power",
+		}, []string{}),
+		MaximumVotingPowerRatio: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "consensus",
+			Name:      "maximum_voting_power_ratio",
+			Help:      "Voting Power ratio of the validator who has maximum voting power",
 		}, []string{}),
 		Address:     make([]byte, 0),
 		SignedCount: 0,
@@ -181,6 +188,8 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	missingValidators := 0
 	missingValidatorsPower := int64(0)
 	validatorsPower := int64(0)
+	mostPowerful := int64(0)
+
 	resultValidators, err := client.Validators(&block.Height)
 	if err != nil {
 		panic(err)
@@ -200,6 +209,9 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 		if bytes.Equal(cs.IrisMetrics.Address, val.Address) {
 			votingPower = val.VotingPower
 		}
+		if val.VotingPower > mostPowerful {
+			mostPowerful = val.VotingPower
+		}
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
@@ -211,6 +223,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 
 	cs.IrisMetrics.VotingPower.Set(float64(votingPower))
 	cs.IrisMetrics.VotingPowerRatio.Set(float64(votingPower) / float64(validatorsPower))
+	cs.IrisMetrics.MaximumVotingPowerRatio.Set(float64(mostPowerful) / float64(validatorsPower))
 
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {

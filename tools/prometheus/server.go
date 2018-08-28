@@ -46,6 +46,9 @@ func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
 monitor`)
 
+	cmd.Flags().StringP("account-address", "", "", `bech32 encoding account address that you want to 
+monitor. (faa ....)`)
+
 	cmd.Flags().BoolP("recursively", "r", true, `specify whether the files in sub-directory is included, 
 included by default. If there are many files & sub-directories in home directory, this program may be very slow!`)
 	return cmd

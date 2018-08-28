@@ -14,7 +14,6 @@ import (
 	"time"
 )
 
-
 type Metrics struct {
 
 	// Number of peers.
@@ -63,13 +62,12 @@ func (m *Metrics) Start(ctx app.Context) {
 				m.Peers.Set(float64(result.NPeers))
 				m.ConnectedPersistentPeers.Set(float64(connected))
 				m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
-			}else {
+			} else {
 				log.Println(err)
 			}
 		}
 	}()
 }
-
 
 //set the p2p persistent peers by given home dir of iris config file
 func (m *Metrics) setP2PPersistentPeers(homeDir string) {
