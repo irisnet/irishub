@@ -6,6 +6,7 @@ import (
 	mempl "github.com/irisnet/irishub/tools/prometheus/mempool"
 	"github.com/irisnet/irishub/tools/prometheus/p2p"
 	sys "github.com/irisnet/irishub/tools/prometheus/system"
+	gov "github.com/irisnet/irishub/tools/prometheus/governance"
 )
 
 type Monitor struct {
@@ -22,7 +23,8 @@ func DefaultMonitor(ctx app.Context) *Monitor {
 	monitor.AddMetricsProvider(cs.PrometheusMetrics()).
 		AddMetricsProvider(p2p.PrometheusMetrics()).
 		AddMetricsProvider(mempl.PrometheusMetrics()).
-		AddMetricsProvider(sys.PrometheusMetrics())
+		AddMetricsProvider(sys.PrometheusMetrics()).
+		AddMetricsProvider(gov.PrometheusMetrics())
 	return monitor
 }
 
