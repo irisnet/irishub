@@ -16,21 +16,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/irisnet/irishub/modules/upgrade"
-
 	"errors"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/spf13/viper"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
-	"strings"
 )
 
 const (
@@ -52,24 +47,20 @@ type IrisApp struct {
 	// keys to access the substores
 	keyMain          *sdk.KVStoreKey
 	keyAccount       *sdk.KVStoreKey
-	keyIBC           *sdk.KVStoreKey
 	keyStake         *sdk.KVStoreKey
 	keySlashing      *sdk.KVStoreKey
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
-	keyUpgrade       *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	coinKeeper          bank.Keeper
-	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	govKeeper           gov.Keeper
 	paramsKeeper        params.Keeper
-	upgradeKeeper       upgrade.Keeper
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -84,18 +75,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
-		keyIBC:           sdk.NewKVStoreKey("ibc"),
 		keyStake:         sdk.NewKVStoreKey("stake"),
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 		keyParams:        sdk.NewKVStoreKey("params"),
-		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
-	}
-
-	var lastHeight int64
-	if viper.GetBool(FlagReplay) {
-		lastHeight = app.replay()
 	}
 
 	// define the accountMapper
@@ -108,11 +92,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// add handlers
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
-	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection, app.paramsKeeper.Getter())
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.paramsKeeper.Setter())
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
@@ -120,11 +102,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// need to update each module's msg type
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
+		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
@@ -132,19 +112,12 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade)
-	app.SetRunMsg(app.runMsgs)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams)
 	var err error
-	if viper.GetBool(FlagReplay) {
-		err = app.LoadVersion(lastHeight, app.keyMain)
-	} else {
-		err = app.LoadLatestVersion(app.keyMain)
-	}
+	err = app.LoadLatestVersion(app.keyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-
-	upgrade.RegisterModuleList(app.Router())
 
 	return app
 }
@@ -152,13 +125,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 // custom tx codec
 func MakeCodec() *wire.Codec {
 	var cdc = wire.NewCodec()
-	ibc.RegisterWire(cdc)
 	bank.RegisterWire(cdc)
 	stake.RegisterWire(cdc)
 	slashing.RegisterWire(cdc)
 	gov.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
-	upgrade.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
@@ -177,9 +148,7 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
-	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
-	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
-
+	tags,_ := gov.EndBlocker(ctx, app.govKeeper)
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
@@ -214,10 +183,10 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		StartingProposalID: 1,
 		DepositProcedure: gov.DepositProcedure{
 			MinDeposit:       sdk.Coins{sdk.Coin{Denom: "iris", Amount: sdk.NewInt(int64(10)).Mul(gov.Pow10(18))}},
-			MaxDepositPeriod: 1440,
+			MaxDepositPeriod: 40,
 		},
 		VotingProcedure: gov.VotingProcedure{
-			VotingPeriod: 30,
+			VotingPeriod: 40,
 		},
 		TallyingProcedure: gov.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
@@ -233,7 +202,6 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	auth.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
 
 	return abci.ResponseInitChain{}
 }
@@ -261,58 +229,6 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 	}
 	validators = stake.WriteValidators(ctx, app.stakeKeeper)
 	return appState, validators, nil
-}
-
-// Iterates through msgs and executes them
-func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result) {
-	// accumulate results
-	logs := make([]string, 0, len(msgs))
-	var data []byte   // NOTE: we just append them all (?!)
-	var tags sdk.Tags // also just append them all
-	var code sdk.ABCICodeType
-	for msgIdx, msg := range msgs {
-		// Match route.
-		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
-		if err != nil {
-			return err.Result()
-		}
-
-		handler := app.Router().Route(msgType)
-		if handler == nil {
-			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
-		}
-
-		msgResult := handler(ctx, msg)
-
-		// NOTE: GasWanted is determined by ante handler and
-		// GasUsed by the GasMeter
-
-		// Append Data and Tags
-		data = append(data, msgResult.Data...)
-		tags = append(tags, msgResult.Tags...)
-
-		// Stop execution and return on first failed message.
-		if !msgResult.IsOK() {
-			logs = append(logs, fmt.Sprintf("Msg %d failed: %s", msgIdx, msgResult.Log))
-			code = msgResult.Code
-			break
-		}
-
-		// Construct usable logs in multi-message transactions.
-		logs = append(logs, fmt.Sprintf("Msg %d: %s", msgIdx, msgResult.Log))
-	}
-
-	// Set the final gas values.
-	result = sdk.Result{
-		Code:    code,
-		Data:    data,
-		Log:     strings.Join(logs, "\n"),
-		GasUsed: ctx.GasMeter().GasConsumed(),
-		// TODO: FeeAmount/FeeDenom
-		Tags: tags,
-	}
-
-	return result
 }
 
 func (app *IrisApp) replay() int64 {
