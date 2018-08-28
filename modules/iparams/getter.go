@@ -1,27 +1,56 @@
 package iparams
 
 import (
-
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strings"
 )
 
+type Getter interface {
+	Get(ctx sdk.Context, key string, ptr interface{}) error
+	GetRaw(ctx sdk.Context, key string) []byte
+	GetString(ctx sdk.Context, key string) (res string, err error)
+	GetBoolWithDefault(ctx sdk.Context, key string, def bool) (res bool)
+}
+
 // Getter exposes methods related with only getting params
-type Getter struct {
+type GlobalGetter struct {
 	k Keeper
 }
 
+type GovGetter struct {
+	k Keeper
+}
+
+func getGlobalStoreKey(key string) string {
+	if strings.HasPrefix(key, Global+"/") {
+		return key
+	}
+	return fmt.Sprintf("%s/%s", Global, key)
+}
+
+func getGovStoreKey(key string) string {
+	if strings.HasPrefix(key, Gov+"/") {
+		return key
+	}
+	return fmt.Sprintf("%s/%s", Gov, key)
+}
+
 // Get exposes get
-func (k Getter) Get(ctx sdk.Context, key string, ptr interface{}) error {
+func (k GlobalGetter) Get(ctx sdk.Context, key string, ptr interface{}) error {
+	key = getGlobalStoreKey(key)
 	return k.k.get(ctx, key, ptr)
 }
 
 // GetRaw exposes getRaw
-func (k Getter) GetRaw(ctx sdk.Context, key string) []byte {
+func (k GlobalGetter) GetRaw(ctx sdk.Context, key string) []byte {
+	key = getGlobalStoreKey(key)
 	return k.k.getRaw(ctx, key)
 }
 
 // GetString is helper function for string params
-func (k Getter) GetString(ctx sdk.Context, key string) (res string, err error) {
+func (k GlobalGetter) GetString(ctx sdk.Context, key string) (res string, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -29,7 +58,8 @@ func (k Getter) GetString(ctx sdk.Context, key string) (res string, err error) {
 }
 
 // GetBool is helper function for bool params
-func (k Getter) GetBool(ctx sdk.Context, key string) (res bool, err error) {
+func (k GlobalGetter) GetBool(ctx sdk.Context, key string) (res bool, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -37,7 +67,8 @@ func (k Getter) GetBool(ctx sdk.Context, key string) (res bool, err error) {
 }
 
 // GetInt16 is helper function for int16 params
-func (k Getter) GetInt16(ctx sdk.Context, key string) (res int16, err error) {
+func (k GlobalGetter) GetInt16(ctx sdk.Context, key string) (res int16, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -45,7 +76,8 @@ func (k Getter) GetInt16(ctx sdk.Context, key string) (res int16, err error) {
 }
 
 // GetInt32 is helper function for int32 params
-func (k Getter) GetInt32(ctx sdk.Context, key string) (res int32, err error) {
+func (k GlobalGetter) GetInt32(ctx sdk.Context, key string) (res int32, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -53,7 +85,8 @@ func (k Getter) GetInt32(ctx sdk.Context, key string) (res int32, err error) {
 }
 
 // GetInt64 is helper function for int64 params
-func (k Getter) GetInt64(ctx sdk.Context, key string) (res int64, err error) {
+func (k GlobalGetter) GetInt64(ctx sdk.Context, key string) (res int64, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -61,7 +94,8 @@ func (k Getter) GetInt64(ctx sdk.Context, key string) (res int64, err error) {
 }
 
 // GetUint16 is helper function for uint16 params
-func (k Getter) GetUint16(ctx sdk.Context, key string) (res uint16, err error) {
+func (k GlobalGetter) GetUint16(ctx sdk.Context, key string) (res uint16, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -69,7 +103,8 @@ func (k Getter) GetUint16(ctx sdk.Context, key string) (res uint16, err error) {
 }
 
 // GetUint32 is helper function for uint32 params
-func (k Getter) GetUint32(ctx sdk.Context, key string) (res uint32, err error) {
+func (k GlobalGetter) GetUint32(ctx sdk.Context, key string) (res uint32, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -77,7 +112,8 @@ func (k Getter) GetUint32(ctx sdk.Context, key string) (res uint32, err error) {
 }
 
 // GetUint64 is helper function for uint64 params
-func (k Getter) GetUint64(ctx sdk.Context, key string) (res uint64, err error) {
+func (k GlobalGetter) GetUint64(ctx sdk.Context, key string) (res uint64, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -85,7 +121,8 @@ func (k Getter) GetUint64(ctx sdk.Context, key string) (res uint64, err error) {
 }
 
 // GetInt is helper function for sdk.Int params
-func (k Getter) GetInt(ctx sdk.Context, key string) (res sdk.Int, err error) {
+func (k GlobalGetter) GetInt(ctx sdk.Context, key string) (res sdk.Int, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -93,7 +130,8 @@ func (k Getter) GetInt(ctx sdk.Context, key string) (res sdk.Int, err error) {
 }
 
 // GetUint is helper function for sdk.Uint params
-func (k Getter) GetUint(ctx sdk.Context, key string) (res sdk.Uint, err error) {
+func (k GlobalGetter) GetUint(ctx sdk.Context, key string) (res sdk.Uint, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -101,7 +139,8 @@ func (k Getter) GetUint(ctx sdk.Context, key string) (res sdk.Uint, err error) {
 }
 
 // GetRat is helper function for rat params
-func (k Getter) GetRat(ctx sdk.Context, key string) (res sdk.Rat, err error) {
+func (k GlobalGetter) GetRat(ctx sdk.Context, key string) (res sdk.Rat, err error) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	err = k.k.cdc.UnmarshalBinary(bz, &res)
@@ -109,7 +148,8 @@ func (k Getter) GetRat(ctx sdk.Context, key string) (res sdk.Rat, err error) {
 }
 
 // GetStringWithDefault is helper function for string params with default value
-func (k Getter) GetStringWithDefault(ctx sdk.Context, key string, def string) (res string) {
+func (k GlobalGetter) GetStringWithDefault(ctx sdk.Context, key string, def string) (res string) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -120,7 +160,8 @@ func (k Getter) GetStringWithDefault(ctx sdk.Context, key string, def string) (r
 }
 
 // GetBoolWithDefault is helper function for bool params with default value
-func (k Getter) GetBoolWithDefault(ctx sdk.Context, key string, def bool) (res bool) {
+func (k GlobalGetter) GetBoolWithDefault(ctx sdk.Context, key string, def bool) (res bool) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -131,7 +172,8 @@ func (k Getter) GetBoolWithDefault(ctx sdk.Context, key string, def bool) (res b
 }
 
 // GetInt16WithDefault is helper function for int16 params with default value
-func (k Getter) GetInt16WithDefault(ctx sdk.Context, key string, def int16) (res int16) {
+func (k GlobalGetter) GetInt16WithDefault(ctx sdk.Context, key string, def int16) (res int16) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -142,7 +184,8 @@ func (k Getter) GetInt16WithDefault(ctx sdk.Context, key string, def int16) (res
 }
 
 // GetInt32WithDefault is helper function for int32 params with default value
-func (k Getter) GetInt32WithDefault(ctx sdk.Context, key string, def int32) (res int32) {
+func (k GlobalGetter) GetInt32WithDefault(ctx sdk.Context, key string, def int32) (res int32) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -153,7 +196,8 @@ func (k Getter) GetInt32WithDefault(ctx sdk.Context, key string, def int32) (res
 }
 
 // GetInt64WithDefault is helper function for int64 params with default value
-func (k Getter) GetInt64WithDefault(ctx sdk.Context, key string, def int64) (res int64) {
+func (k GlobalGetter) GetInt64WithDefault(ctx sdk.Context, key string, def int64) (res int64) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -164,7 +208,8 @@ func (k Getter) GetInt64WithDefault(ctx sdk.Context, key string, def int64) (res
 }
 
 // GetUint16WithDefault is helper function for uint16 params with default value
-func (k Getter) GetUint16WithDefault(ctx sdk.Context, key string, def uint16) (res uint16) {
+func (k GlobalGetter) GetUint16WithDefault(ctx sdk.Context, key string, def uint16) (res uint16) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -175,7 +220,8 @@ func (k Getter) GetUint16WithDefault(ctx sdk.Context, key string, def uint16) (r
 }
 
 // GetUint32WithDefault is helper function for uint32 params with default value
-func (k Getter) GetUint32WithDefault(ctx sdk.Context, key string, def uint32) (res uint32) {
+func (k GlobalGetter) GetUint32WithDefault(ctx sdk.Context, key string, def uint32) (res uint32) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -186,7 +232,8 @@ func (k Getter) GetUint32WithDefault(ctx sdk.Context, key string, def uint32) (r
 }
 
 // GetUint64WithDefault is helper function for uint64 params with default value
-func (k Getter) GetUint64WithDefault(ctx sdk.Context, key string, def uint64) (res uint64) {
+func (k GlobalGetter) GetUint64WithDefault(ctx sdk.Context, key string, def uint64) (res uint64) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -197,7 +244,8 @@ func (k Getter) GetUint64WithDefault(ctx sdk.Context, key string, def uint64) (r
 }
 
 // GetIntWithDefault is helper function for sdk.Int params with default value
-func (k Getter) GetIntWithDefault(ctx sdk.Context, key string, def sdk.Int) (res sdk.Int) {
+func (k GlobalGetter) GetIntWithDefault(ctx sdk.Context, key string, def sdk.Int) (res sdk.Int) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -208,7 +256,8 @@ func (k Getter) GetIntWithDefault(ctx sdk.Context, key string, def sdk.Int) (res
 }
 
 // GetUintWithDefault is helper function for sdk.Uint params with default value
-func (k Getter) GetUintWithDefault(ctx sdk.Context, key string, def sdk.Uint) (res sdk.Uint) {
+func (k GlobalGetter) GetUintWithDefault(ctx sdk.Context, key string, def sdk.Uint) (res sdk.Uint) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {
@@ -219,7 +268,251 @@ func (k Getter) GetUintWithDefault(ctx sdk.Context, key string, def sdk.Uint) (r
 }
 
 // GetRatWithDefault is helper function for sdk.Rat params with default value
-func (k Getter) GetRatWithDefault(ctx sdk.Context, key string, def sdk.Rat) (res sdk.Rat) {
+func (k GlobalGetter) GetRatWithDefault(ctx sdk.Context, key string, def sdk.Rat) (res sdk.Rat) {
+	key = getGlobalStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// Get exposes get
+func (k GovGetter) Get(ctx sdk.Context, key string, ptr interface{}) error {
+	key = getGovStoreKey(key)
+	return k.k.get(ctx, key, ptr)
+}
+
+// GetRaw exposes getRaw
+func (k GovGetter) GetRaw(ctx sdk.Context, key string) []byte {
+	key = getGovStoreKey(key)
+	return k.k.getRaw(ctx, key)
+}
+
+// GetString is helper function for string params
+func (k GovGetter) GetString(ctx sdk.Context, key string) (res string, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetBool is helper function for bool params
+func (k GovGetter) GetBool(ctx sdk.Context, key string) (res bool, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt16 is helper function for int16 params
+func (k GovGetter) GetInt16(ctx sdk.Context, key string) (res int16, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt32 is helper function for int32 params
+func (k GovGetter) GetInt32(ctx sdk.Context, key string) (res int32, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt64 is helper function for int64 params
+func (k GovGetter) GetInt64(ctx sdk.Context, key string) (res int64, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint16 is helper function for uint16 params
+func (k GovGetter) GetUint16(ctx sdk.Context, key string) (res uint16, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint32 is helper function for uint32 params
+func (k GovGetter) GetUint32(ctx sdk.Context, key string) (res uint32, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint64 is helper function for uint64 params
+func (k GovGetter) GetUint64(ctx sdk.Context, key string) (res uint64, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt is helper function for sdk.Int params
+func (k GovGetter) GetInt(ctx sdk.Context, key string) (res sdk.Int, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint is helper function for sdk.Uint params
+func (k GovGetter) GetUint(ctx sdk.Context, key string) (res sdk.Uint, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetRat is helper function for rat params
+func (k GovGetter) GetRat(ctx sdk.Context, key string) (res sdk.Rat, err error) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	err = k.k.cdc.UnmarshalBinary(bz, &res)
+	return
+}
+
+// GetStringWithDefault is helper function for string params with default value
+func (k GovGetter) GetStringWithDefault(ctx sdk.Context, key string, def string) (res string) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetBoolWithDefault is helper function for bool params with default value
+func (k GovGetter) GetBoolWithDefault(ctx sdk.Context, key string, def bool) (res bool) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt16WithDefault is helper function for int16 params with default value
+func (k GovGetter) GetInt16WithDefault(ctx sdk.Context, key string, def int16) (res int16) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt32WithDefault is helper function for int32 params with default value
+func (k GovGetter) GetInt32WithDefault(ctx sdk.Context, key string, def int32) (res int32) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetInt64WithDefault is helper function for int64 params with default value
+func (k GovGetter) GetInt64WithDefault(ctx sdk.Context, key string, def int64) (res int64) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint16WithDefault is helper function for uint16 params with default value
+func (k GovGetter) GetUint16WithDefault(ctx sdk.Context, key string, def uint16) (res uint16) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint32WithDefault is helper function for uint32 params with default value
+func (k GovGetter) GetUint32WithDefault(ctx sdk.Context, key string, def uint32) (res uint32) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUint64WithDefault is helper function for uint64 params with default value
+func (k GovGetter) GetUint64WithDefault(ctx sdk.Context, key string, def uint64) (res uint64) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetIntWithDefault is helper function for sdk.Int params with default value
+func (k GovGetter) GetIntWithDefault(ctx sdk.Context, key string, def sdk.Int) (res sdk.Int) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetUintWithDefault is helper function for sdk.Uint params with default value
+func (k GovGetter) GetUintWithDefault(ctx sdk.Context, key string, def sdk.Uint) (res sdk.Uint) {
+	key = getGovStoreKey(key)
+	store := ctx.KVStore(k.k.key)
+	bz := store.Get([]byte(key))
+	if bz == nil {
+		return def
+	}
+	k.k.cdc.MustUnmarshalBinary(bz, &res)
+	return
+}
+
+// GetRatWithDefault is helper function for sdk.Rat params with default value
+func (k GovGetter) GetRatWithDefault(ctx sdk.Context, key string, def sdk.Rat) (res sdk.Rat) {
+	key = getGlobalStoreKey(key)
 	store := ctx.KVStore(k.k.key)
 	bz := store.Get([]byte(key))
 	if bz == nil {

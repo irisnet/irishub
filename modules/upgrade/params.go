@@ -19,7 +19,7 @@ func GetCurrentProposalIdKey() string {
 
 func (k Keeper) GetCurrentProposalID(ctx sdk.Context) int64 {
 	var proposalID int64
-	err := k.ps.GovGetter().Get(ctx, GetCurrentProposalIdKey(), &proposalID)
+	err := k.params.Get(ctx, GetCurrentProposalIdKey(), &proposalID)
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func (k Keeper) GetCurrentProposalID(ctx sdk.Context) int64 {
 
 func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 	var height int64
-	err := k.ps.GovGetter().Get(ctx, GetCurrentProposalAcceptHeightKey(), &height)
+	err := k.params.Get(ctx, GetCurrentProposalAcceptHeightKey(), &height)
 	if err != nil {
 		panic(err)
 	}
@@ -36,9 +36,9 @@ func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
 }
 
 func (k Keeper) SetCurrentProposalID(ctx sdk.Context, proposalID int64) {
-	k.ps.GovSetter().Set(ctx, GetCurrentProposalIdKey(), proposalID)
+	k.params.Set(ctx, GetCurrentProposalIdKey(), proposalID)
 }
 
 func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
-	k.ps.GovSetter().Set(ctx, GetCurrentProposalAcceptHeightKey(), height)
+	k.params.Set(ctx, GetCurrentProposalAcceptHeightKey(), height)
 }
