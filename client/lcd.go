@@ -21,10 +21,9 @@ import (
 	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/client/rest"
 	stake "github.com/cosmos/cosmos-sdk/x/stake/client/rest"
-	gov "github.com/cosmos/cosmos-sdk/x/gov/client/rest"
+	gov "github.com/irisnet/irishub/modules/gov/client/rest"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/version"
 )
 
 // ServeCommand will generate a long-running rest server
@@ -78,7 +77,6 @@ func createHandler(cdc *wire.Codec) http.Handler {
 
 	ctx := app.NewContext()
 
-	r.HandleFunc("/version", version.VersionHandlerFn(ctx.Ctx, cdc)).Methods("GET")
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)
 	keys.RegisterRoutes(r)
 	rpc.RegisterRoutes(ctx.Ctx, r)
