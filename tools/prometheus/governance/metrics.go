@@ -37,7 +37,7 @@ func NewGovMetrics() GovMetrics {
 
 		needToVoteActiveProposalNum: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "governance",
-			Name:      "voted_active_proposal_num",
+			Name:      "need_voted_active_proposal_num",
 			Help:      "Number of active proposals that need to vote.",
 		}, []string{}),
 		Address:     make([]byte, 0),
@@ -89,9 +89,8 @@ func (gov *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec) {
 	}else{
 		count = len(active_proposals)
 		for _, proposal_id := range active_proposals{
-			fmt.Printf("%d\n", proposal_id)
 			if _, err := getVote(proposal_id, gov.govMetrics.Address, cdc, ctx);
-			err == nil{
+			err != nil{
 				need_to_vote++
 			}
 		}
@@ -106,7 +105,7 @@ func getAllInactiveProposalsID(cdc *wire.Codec, ctx app.Context) (proposals gov.
 	if res, err := ctx.Ctx.QueryStore(gov.KeyInactiveProposalQueue, "gov"); err != nil{
 		return gov.ProposalQueue{}, err
 	}else {
-		err = cdc.UnmarshalBinaryBare(res, &proposals)
+		err = cdc.UnmarshalBinary(res, &proposals)
 		return proposals, err
 	}
 }
@@ -115,7 +114,7 @@ func getAllActiveProposalsID(cdc *wire.Codec, ctx app.Context) (proposals gov.Pr
 	if res, err := ctx.Ctx.QueryStore(gov.KeyActiveProposalQueue, "gov"); err != nil{
 		return gov.ProposalQueue{}, err
 	}else {
-		err = cdc.UnmarshalBinaryBare(res, &proposals)
+		err = cdc.UnmarshalBinary(res, &proposals)
 		return proposals, err
 	}
 
