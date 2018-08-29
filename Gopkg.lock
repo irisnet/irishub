@@ -70,6 +70,8 @@
     "x/bank/client",
     "x/bank/client/cli",
     "x/bank/client/rest",
+    "x/gov",
+    "x/gov/client/cli",
     "x/ibc",
     "x/ibc/client/rest",
     "x/mock",
@@ -85,7 +87,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "36714d636efd966d1e82101941642d0252df61e5"
+  revision = "cc085aadae6d02c812a57f52bbdc434632c4d2e9"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -196,7 +198,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -595,6 +596,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dea2f237f5ae0b4e204b36817c92f5eae7e868e59563f8fe9060414e46c85da3"
+  inputs-digest = "c31f74b2ec6827be26f6f1668cdffae6693526d2e7dd2a9907efe6ab027e6351"
   solver-name = "gps-cdcl"
   solver-version = 1
