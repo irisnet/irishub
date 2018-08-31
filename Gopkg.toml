@@ -31,7 +31,7 @@
 #  source = "https://github.com/irisnet/cosmos-sdk.git"
 #  version = "=v0.23.0-iris1"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  branch = "irisnet/hotfix-v0.23.0-iris2"
+  branch = "irisnet/gog"
 
 [[override]]
   name = "github.com/golang/protobuf"

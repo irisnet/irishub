@@ -105,6 +105,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags, nonVotingVals []
 		inactiveProposal := keeper.InactiveProposalQueuePop(ctx)
 		if inactiveProposal.GetStatus() == StatusDepositPeriod {
 			proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(inactiveProposal.GetProposalID())
+			keeper.RefundDeposits(ctx, inactiveProposal.GetProposalID())
 			keeper.DeleteProposal(ctx, inactiveProposal)
 			tags.AppendTag("action", []byte("proposalDropped"))
 			tags.AppendTag("proposalId", proposalIDBytes)
