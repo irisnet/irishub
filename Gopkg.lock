@@ -43,7 +43,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/hotfix-v0.23.0-iris2"
+  branch = "irisnet/gog"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -87,7 +87,7 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "cc085aadae6d02c812a57f52bbdc434632c4d2e9"
+  revision = "1ced173a190c942860c16bfb7db57ee77c8ba61b"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -596,6 +596,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c31f74b2ec6827be26f6f1668cdffae6693526d2e7dd2a9907efe6ab027e6351"
+  inputs-digest = "c4bb0a4f93ece651165c8890bbe87e01c633c88e8d17ac165d16016f83dae7e6"
   solver-name = "gps-cdcl"
   solver-version = 1
