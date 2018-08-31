@@ -88,9 +88,9 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "c69a00d827e16cf91b35ac533cadfff7ee454519"
+  revision = "bd1cb52b2d2e04230ff43d10514b5e988f2038cb"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.23.0-iris1"
+  version = "v0.23.0-iris2"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -237,8 +237,8 @@
 [[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
-  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
-  version = "v0.0.3"
+  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
+  version = "v0.0.4"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -506,7 +506,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
+  revision = "182538f80094b6a8efaade63a8fd8e0d9d5843dd"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -529,7 +529,7 @@
     "unix",
     "windows"
   ]
-  revision = "4910a1d54f876d7b22162a85f4d066d3ee649450"
+  revision = "49385e6e15226593f68b26af201feec29d5bba22"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -599,6 +599,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "44386e4006f0acb8e013d69639b86f5d8c6440153a5069dbccc833739bc048e9"
+  inputs-digest = "eae5b968041df919006f5d21e35b282a5b20e164c2c974957b2e0d816693b6f5"
   solver-name = "gps-cdcl"
   solver-version = 1
