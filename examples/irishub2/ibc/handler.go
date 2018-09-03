@@ -66,7 +66,7 @@ func handleIBCReceiveMsg(ctx sdk.Context, ibcm Mapper, ck bank.Keeper, msg IBCRe
 // IBCTransferMsg deducts coins from the account and creates an egress IBC packet.
 func handleIBCSetMsg(ctx sdk.Context, ibcm Mapper, ck bank.Keeper, msg IBCSetMsg) sdk.Result {
 	ibcm.Set(ctx,msg.Addr.String()+":ibc-2")
-	return sdk.Result{Log:"This is new module!!"}
+	return sdk.Result{Log:"This is new module - ibc2 !!"}
 }
 
 // IBCReceiveMsg adds coins to the destination address and creates an ingress IBC packet.

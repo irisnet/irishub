@@ -5,12 +5,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"math"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/iparams"
 )
 
 const (
 	//defaultSwitchPeriod     int64 = 57600	// 2 days
-	defaultSwitchPeriod int64 = 50 // for test (4 minutes)
+	defaultSwitchPeriod int64 = 30 // for test (4 minutes)
 )
 
 type Keeper struct {
@@ -18,10 +18,10 @@ type Keeper struct {
 	cdc      *wire.Codec
 	// The ValidatorSet to get information about validators
 	sk       stake.Keeper
-	ps       params.SetterProxy
+	ps       iparams.SetterProxy
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps params.SetterProxy) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps iparams.SetterProxy) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,

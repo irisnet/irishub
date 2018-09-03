@@ -120,9 +120,13 @@ func PrometheusMetrics() *Metrics {
 
 func (cs *Metrics) SetAddress(addr_str string) {
 	if addr, err := hex.DecodeString(addr_str); err != nil {
-		log.Println("parse address falid ", err)
+		log.Println("parse validator address falid ", err)
 	} else {
-		cs.IrisMetrics.Address = addr
+		if len(addr) == 0 {
+			log.Println("validator address is null ")
+		} else {
+			cs.IrisMetrics.Address = addr
+		}
 	}
 }
 
@@ -132,7 +136,7 @@ func (cs *Metrics) Start(ctx app.Context) {
 	cs.SetAddress(validaor_addr)
 
 	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
-	var client = ctx.Ctx.Client
+	var client = ctx.Client
 
 	//开启监听事件
 	client.Start()
@@ -143,6 +147,7 @@ func (cs *Metrics) Start(ctx app.Context) {
 
 	if err != nil {
 		log.Println("got ", err)
+		return
 	}
 
 	go func() {
@@ -151,10 +156,24 @@ func (cs *Metrics) Start(ctx app.Context) {
 			cs.RecordMetrics(ctx, ctx.Cdc, block.Block)
 		}
 	}()
+
+	roundC := make(chan interface{})
+	err = client.Subscribe(context, "monitor", types.EventQueryNewRound, roundC)
+	if err != nil {
+		log.Println("got ", err)
+		return
+	}
+
+	go func() {
+		for e := range roundC {
+			round := e.(types.TMEventData).(types.EventDataRoundState)
+			cs.TmMetrics.Rounds.Set(float64(round.Round))
+		}
+	}()
 }
 
 func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.Block) {
-	var client = ctx.Ctx.Client
+	var client = ctx.Client
 
 	cs.TmMetrics.Height.Set(float64(block.Height))
 	cs.TmMetrics.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
@@ -184,7 +203,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
-	cs.IrisMetrics.Candidates.Set(float64(getCandidatesNum(cdc, ctx)))
+	cs.IrisMetrics.Candidates.Set(float64(getCandidatesNum(ctx)))
 	cs.TmMetrics.MissingValidators.Set(float64(missingValidators))
 	cs.TmMetrics.MissingValidatorsPower.Set(float64(missingValidatorsPower))
 	cs.TmMetrics.ValidatorsPower.Set(float64(validatorsPower))
@@ -215,7 +234,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	if block.Height > 0 {
 		signed := 0
 		for _, vote := range block.LastCommit.Precommits {
-			if bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
+			if vote != nil && bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
 				signed = 1
 				break
 			}
@@ -239,9 +258,9 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 
-func getCandidatesNum(cdc *wire.Codec, ctx app.Context) int {
+func getCandidatesNum(ctx app.Context) int {
 	key := stake.ValidatorsKey
-	resKVs, err := ctx.Ctx.QuerySubspace(cdc, key, keyStoreStake)
+	resKVs, err := ctx.QuerySubspace(key, keyStoreStake)
 	if err != nil {
 		fmt.Println(err)
 	}

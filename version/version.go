@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/spf13/cobra"
 	"net/http"
+	"github.com/irisnet/irishub/app"
 )
 
 // Version - Iris Version
@@ -20,17 +20,27 @@ func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 		Short: "Show version info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			ctx := context.NewCoreContextFromViper()
+			fmt.Printf("v%s\n", Version)
 
-			res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
+			ctx := app.NewContext()
+
+			var res_versionID []byte
+			var err error
+			res_versionID, err = ctx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
+			if err!=nil{
+				return  nil
+			}
 			var versionID int64
 			cdc.MustUnmarshalBinary(res_versionID, &versionID)
 
-			res_version, _ := ctx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
+			var res_version []byte
+			res_version, err  = ctx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
+			if err!=nil{
+				return  nil
+			}
 			var version upgrade.Version
 			cdc.MustUnmarshalBinary(res_version, &version)
 
-			fmt.Printf("v%s\n", Version)
 			fmt.Println(version.Id)
 			fmt.Println("Current version: Start Height    = ", version.Start)
 			fmt.Println("Current version: Proposal Id     = ", version.ProposalID)
@@ -47,9 +57,9 @@ type VersionInfo struct {
 	ProposalId     int64  `json:"proposal_id"`
 }
 
-func VersionHandlerFn(ctx context.CoreContext, cdc *wire.Codec) http.HandlerFunc {
+func VersionHandlerFn(ctx app.Context, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.NewCoreContextFromViper()
+		ctx := app.NewContext()
 
 		res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), "upgrade")
 		var versionID int64

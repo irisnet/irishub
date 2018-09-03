@@ -15,16 +15,16 @@ import (
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/examples/irishub2/app"
-	c "github.com/irisnet/irishub/client"
+	c "github.com/irisnet/irishub/client/rest/lcd"
 	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
+	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
 	"github.com/irisnet/irishub/version"
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "iriscli2",
+		Use:   "iriscli-bugfix-3",
 		Short: "irishub2 light-client",
 	}
 )
@@ -59,7 +59,6 @@ func main() {
 	ibcCmd.AddCommand(
 		client.PostCommands(
 			ibccmd.IBCTransferCmd(cdc),
-			ibccmd.IBCRelayCmd(cdc),
 			ibccmd.IBCSetCmd(cdc),
 			ibccmd.IBCGetCmd(cdc),
 		)...)

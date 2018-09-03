@@ -34,3 +34,7 @@ build_example_linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2 ./examples/irishub2/cmd/iris2
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli2 ./examples/irishub2/cmd/iriscli2
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris-bugfix-2
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli-bugfix-2
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris3-bugfix ./examples/irishub-bugfix-3/cmd/iris-bugfix-3
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli3-bugfix ./examples/irishub-bugfix-3/cmd/iriscli-bugfix-3

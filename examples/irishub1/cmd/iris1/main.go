@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/examples/irishub1/app"
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/version"
 
 	"github.com/spf13/viper"
