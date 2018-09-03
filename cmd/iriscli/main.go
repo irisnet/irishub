@@ -15,7 +15,7 @@ import (
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	c "github.com/irisnet/irishub/client/rest/lcd"
+	c "github.com/irisnet/irishub/lcd"
 	govcmd "github.com/irisnet/irishub/client/cli/gov"
 	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
 	"github.com/irisnet/irishub/version"
