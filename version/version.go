@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/modules/upgrade"
+	//"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/spf13/cobra"
 	"net/http"
 )
@@ -22,28 +22,28 @@ func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			fmt.Printf("v%s\n", Version)
 
-			ctx := context.NewCoreContextFromViper()
-
-			var res_versionID []byte
-			var err error
-			res_versionID, err = ctx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
-			if err!=nil{
-				return  nil
-			}
-			var versionID int64
-			cdc.MustUnmarshalBinary(res_versionID, &versionID)
-
-			var res_version []byte
-			res_version, err  = ctx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
-			if err!=nil{
-				return  nil
-			}
-			var version upgrade.Version
-			cdc.MustUnmarshalBinary(res_version, &version)
-
-			fmt.Println(version.Id)
-			fmt.Println("Current version: Start Height    = ", version.Start)
-			fmt.Println("Current version: Proposal Id     = ", version.ProposalID)
+			//ctx := context.NewCoreContextFromViper()
+			//
+			//var res_versionID []byte
+			//var err error
+			//res_versionID, err = ctx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
+			//if err!=nil{
+			//	return  nil
+			//}
+			//var versionID int64
+			//cdc.MustUnmarshalBinary(res_versionID, &versionID)
+			//
+			//var res_version []byte
+			//res_version, err  = ctx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
+			//if err!=nil{
+			//	return  nil
+			//}
+			//var version upgrade.Version
+			//cdc.MustUnmarshalBinary(res_version, &version)
+			//
+			//fmt.Println(version.Id)
+			//fmt.Println("Current version: Start Height    = ", version.Start)
+			//fmt.Println("Current version: Proposal Id     = ", version.ProposalID)
 			return nil
 		},
 	}
@@ -59,24 +59,24 @@ type VersionInfo struct {
 
 func VersionHandlerFn(ctx context.CoreContext, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.NewCoreContextFromViper()
+		//ctx := context.NewCoreContextFromViper()
+		//
+		//res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), "upgrade")
+		//var versionID int64
+		//cdc.MustUnmarshalBinary(res_versionID, &versionID)
+		//
+		//res_version, _ := ctx.QueryStore(upgrade.GetVersionIDKey(versionID), "upgrade")
+		//var version upgrade.Version
+		//cdc.MustUnmarshalBinary(res_version, &version)
+		//
+		//versionInfo := VersionInfo{
+		//	IrisVersion:    Version,
+		//	UpgradeVersion: version.Id,
+		//	StartHeight:    version.Start,
+		//	ProposalId:     version.ProposalID,
+		//}
 
-		res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), "upgrade")
-		var versionID int64
-		cdc.MustUnmarshalBinary(res_versionID, &versionID)
-
-		res_version, _ := ctx.QueryStore(upgrade.GetVersionIDKey(versionID), "upgrade")
-		var version upgrade.Version
-		cdc.MustUnmarshalBinary(res_version, &version)
-
-		versionInfo := VersionInfo{
-			IrisVersion:    Version,
-			UpgradeVersion: version.Id,
-			StartHeight:    version.Start,
-			ProposalId:     version.ProposalID,
-		}
-
-		output, err := json.MarshalIndent(versionInfo, "", "  ")
+		output, err := json.MarshalIndent(Version, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))

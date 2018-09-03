@@ -18,7 +18,7 @@ import (
 	c "github.com/irisnet/irishub/client"
 	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	paramcmd "github.com/cosmos/cosmos-sdk/x/params/client/cli"
-	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
+	//upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -124,23 +124,23 @@ func main() {
 		govCmd,
 	)
 
-	//Add upgrade commands
-	upgradeCmd := &cobra.Command{
-		Use:   "upgrade",
-		Short: "Software Upgrade subcommands",
-	}
-	upgradeCmd.AddCommand(
-		client.GetCommands(
-			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-			upgradecmd.GetCmdInfo("upgrade", cdc),
-		)...)
-	upgradeCmd.AddCommand(
-		client.PostCommands(
-			upgradecmd.GetCmdSubmitSwitch(cdc),
-		)...)
-	rootCmd.AddCommand(
-		upgradeCmd,
-	)
+	////Add upgrade commands
+	//upgradeCmd := &cobra.Command{
+	//	Use:   "upgrade",
+	//	Short: "Software Upgrade subcommands",
+	//}
+	//upgradeCmd.AddCommand(
+	//	client.GetCommands(
+	//		upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+	//		upgradecmd.GetCmdInfo("upgrade", cdc),
+	//	)...)
+	//upgradeCmd.AddCommand(
+	//	client.PostCommands(
+	//		upgradecmd.GetCmdSubmitSwitch(cdc),
+	//	)...)
+	//rootCmd.AddCommand(
+	//	upgradeCmd,
+	//)
 
 	//Add auth and bank commands
 	rootCmd.AddCommand(
