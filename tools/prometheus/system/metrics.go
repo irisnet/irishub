@@ -237,6 +237,7 @@ func getProcessNum(command string) (num int, err error) {
 		fmt.Println("Error:Invalid command,", err)
 		return 0, err
 	}
+	defer cmd.Wait()
 
 	bytes, err := ioutil.ReadAll(stdout)
 	if err != nil {
@@ -276,6 +277,7 @@ func getPid(command string) (pid int, err error) {
 		fmt.Println("Error:Invalid command,", err)
 		return 0, err
 	}
+	defer cmd.Wait()
 
 	bytes, err := ioutil.ReadAll(stdout)
 	if err != nil {
