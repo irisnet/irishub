@@ -10,16 +10,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	bankcmd "github.com/irisnet/irishub/client/cli/bank"
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	c "github.com/irisnet/irishub/client"
-	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	paramcmd "github.com/cosmos/cosmos-sdk/x/params/client/cli"
-	upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
+	c "github.com/irisnet/irishub/client/rest/lcd"
+	govcmd "github.com/irisnet/irishub/client/cli/gov"
+	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
 	"github.com/irisnet/irishub/version"
+	"github.com/irisnet/irishub/client/cli/coin"
+	"github.com/irisnet/irishub/client/cli/auth"
 )
 
 // rootCmd is the entry point for this binary
@@ -112,7 +113,10 @@ func main() {
 	govCmd.AddCommand(
 		client.GetCommands(
 			govcmd.GetCmdQueryProposal("gov", cdc),
+			govcmd.GetCmdQueryProposals("gov", cdc),
 			govcmd.GetCmdQueryVote("gov", cdc),
+			govcmd.GetCmdQueryVotes("gov", cdc),
+			govcmd.GetCmdQueryConfig("iparams", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -145,7 +149,7 @@ func main() {
 	//Add auth and bank commands
 	rootCmd.AddCommand(
 		client.GetCommands(
-			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			auth.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
 		)...)
 	rootCmd.AddCommand(
 		client.PostCommands(
@@ -162,17 +166,16 @@ func main() {
 			version.GetCmdVersion("upgrade", cdc),
 		)...)
 
-	paramsCmd := &cobra.Command{
-		Use:   "params",
-		Short: "Governance and voting subcommands",
+	coinCmd := &cobra.Command{
+		Use:   "coin",
+		Short: "Coin and CoinType",
 	}
-
-	paramsCmd.AddCommand(
+	coinCmd.AddCommand(
 		client.GetCommands(
-			paramcmd.ExportCmd("params",cdc),
+			coin.GetCmdQueryCoinType(cdc),
 		)...)
 
-	rootCmd.AddCommand(paramsCmd)
+	rootCmd.AddCommand(coinCmd)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
