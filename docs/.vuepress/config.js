@@ -27,16 +27,16 @@ module.exports = {
         title: 'Modules',
         collapsable: false,
         children: [
+          ['/modules/coin/coin_type.md', 'Coin Type'],
           ['/modules/fee-token/feeToken.md', 'Fee Token'],
-          ['/modules/gov/gov_spec.md', 'Governance'],
-          ['/modules/software-upgrade/software-upgrade.md', 'Software Upgrade']
+          ['/modules/gov/gov_spec.md', 'Governance']
         ]
       },{
         title: 'Validators',
         collapsable: false,
         children: [
           ['/validators/overview.md', 'Overview'],
-          ['/validators/Setup A Sentry Node.md', 'Setup a Sentry Node']          
+          ['/validators/Setup A Sentry Node.md', 'Setup a Sentry Node']
         ]
       }
     ]
