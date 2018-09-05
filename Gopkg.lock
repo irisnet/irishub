@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "79e00513b1011888b1e675157ab89f527f901cae"
+  revision = "cff30e1d23fc9e800b2b5b4b41ef1817dda07e9f"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -88,9 +88,9 @@
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "bd1cb52b2d2e04230ff43d10514b5e988f2038cb"
+  revision = "ee0aed6ca28dbf3e4b90a6ea4c420172b8f2d85d"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.23.0-iris2"
+  version = "v0.23.0-iris3"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -506,7 +506,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "182538f80094b6a8efaade63a8fd8e0d9d5843dd"
+  revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -529,7 +529,7 @@
     "unix",
     "windows"
   ]
-  revision = "49385e6e15226593f68b26af201feec29d5bba22"
+  revision = "ebe1bf3edb3325c393447059974de898d5133eb8"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -556,7 +556,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "c66870c02cf823ceb633bcd05be3c7cda29976f4"
+  revision = "11092d34479b07829b72e10713b159248caf5dad"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -599,6 +599,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "eae5b968041df919006f5d21e35b282a5b20e164c2c974957b2e0d816693b6f5"
+  inputs-digest = "229f9905857cf4f1f368b1dea33748c0765e9437b728db927dbf3a6daf69c5f2"
   solver-name = "gps-cdcl"
   solver-version = 1
