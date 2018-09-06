@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/iparams"
 	"math"
-	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
@@ -17,16 +17,16 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *wire.Codec
 	// The ValidatorSet to get information about validators
-	sk       stake.Keeper
-	ps       params.SetterProxy
+	sk     stake.Keeper
+	params iparams.GovSetter
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps params.SetterProxy) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps iparams.GovSetter) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
 		sk:       sk,
-		ps:       ps,
+		params:   ps,
 	}
 	return keeper
 }
@@ -180,7 +180,6 @@ func (k Keeper) GetVersionList(ctx sdk.Context) VersionList {
 
 	return versionList
 }
-
 
 func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string, sdk.Error) {
 	currentVersion := k.GetCurrentVersion(ctx)

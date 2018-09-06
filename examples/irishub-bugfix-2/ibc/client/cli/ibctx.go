@@ -13,7 +13,10 @@ import (
 	wire "github.com/cosmos/cosmos-sdk/wire"
 
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"os"
+	"github.com/cosmos/cosmos-sdk/client/utils"
 )
 
 const (
@@ -27,10 +30,14 @@ func IBCTransferCmd(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "transfer",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper().WithDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
 			// get the from address
-			from, err := ctx.GetFromAddress()
+			from, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
@@ -41,12 +48,8 @@ func IBCTransferCmd(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			// get password
-			err = ctx.EnsureSignBuildBroadcast(ctx.FromAddressName, []sdk.Msg{msg}, cdc)
-			if err != nil {
-				return err
-			}
-			return nil
+			cliCtx.PrintResponse = true
+			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 

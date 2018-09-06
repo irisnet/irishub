@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	bam "github.com/irisnet/irishub/baseapp"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -33,6 +33,7 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	bc "github.com/tendermint/tendermint/blockchain"
 	"strings"
+	"github.com/irisnet/irishub/modules/iparams"
 )
 
 const (
@@ -73,17 +74,22 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
+	iparamsKeeper       iparams.Keeper
+
+
+	// fee manager
+	feeManager  bam.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := bam.NewBaseApp(appName, cdc, logger, db, baseAppOptions...)
+	bApp := bam.NewBaseApp(appName, cdc, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:          bam.NewBaseApp(appName, cdc, logger, db),
+		BaseApp:          bApp,
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
@@ -116,9 +122,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.ibc1Mapper = ibcbugfix.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibcbugfix.DefaultCodespace))
 
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
-	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.RegisterCodespace(slashing.DefaultCodespace))
-	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection, app.paramsKeeper.Getter())
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.paramsKeeper.Setter())
+	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
+	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.iparamsKeeper.Setter())
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
@@ -133,12 +139,15 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
+	app.feeManager = bam.NewFeeManager(app.iparamsKeeper.Getter())
+
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper))
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
+	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
 	var err error
@@ -185,7 +194,7 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 
-	tags, _ := gov.EndBlocker(ctx, app.govKeeper)
+	tags := gov.EndBlocker(ctx, app.govKeeper)
 	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
 
 	return abci.ResponseEndBlock{
@@ -212,16 +221,20 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	// load the initial stake information
-	err = stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
+	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
 	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-		// return sdk.ErrGenesisParse("").TraceCause(err, "")
+		panic(err)
+	}
+
+	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10,denom))
+	if err != nil {
+		panic(err)
 	}
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
 		DepositProcedure: gov.DepositProcedure{
-			MinDeposit:       sdk.Coins{sdk.Coin{Denom: "iris", Amount: sdk.NewInt(int64(10)).Mul(gov.Pow10(18))}},
+			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 1440,
 		},
 		VotingProcedure: gov.VotingProcedure{
@@ -234,16 +247,21 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		},
 	})
 
-	feeTokenGensisConfig := auth.GenesisState{
-		FeeTokenNative:    "iris",
+	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+		FeeTokenNative:    IrisCt.MinUnit.Denom,
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	auth.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.iparamsKeeper.Setter(), feeTokenGensisConfig)
+
+	// load the address to pubkey map
+	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
 
-	return abci.ResponseInitChain{}
+	return abci.ResponseInitChain{
+		Validators: validators,
+	}
 }
 
 // export the state of iris for a genesis file
