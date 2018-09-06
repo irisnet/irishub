@@ -42,13 +42,13 @@ func (pp *ParameterProposal) Execute(ctx sdk.Context, k Keeper) (err error) {
 			continue
 		}
 		if data.Op == Add {
-			k.ps.GovSetter().Set(ctx, data.Key, data.Value)
+			k.ps.Set(ctx, data.Key, data.Value)
 		} else if data.Op == Update {
-			bz := k.ps.GovSetter().GetRaw(ctx, data.Key)
+			bz := k.ps.GetRaw(ctx, data.Key)
 			if bz == nil || len(bz) == 0 {
 				logger.Error("Execute ParameterProposal ", "err", "Parameter "+data.Key+" is not exist")
 			} else {
-				k.ps.GovSetter().SetString(ctx, data.Key, data.Value)
+				k.ps.SetString(ctx, data.Key, data.Value)
 			}
 		}
 	}
