@@ -199,7 +199,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -481,9 +480,9 @@
     "types",
     "version"
   ]
-  revision = "fb697db81e3f0b04fb9c6f393ce9a09b984a4687"
+  revision = "bc9a42a60837b5c23c18c921e7d6e2c71a0ff170"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.22.6-iris1"
+  version = "v0.22.6-iris2"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -599,6 +598,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "229f9905857cf4f1f368b1dea33748c0765e9437b728db927dbf3a6daf69c5f2"
+  inputs-digest = "421bec49dc49069d936902c452298cd1e8deb627a6d783149d3babb176a432aa"
   solver-name = "gps-cdcl"
   solver-version = 1
