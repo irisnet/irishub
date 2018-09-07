@@ -1,8 +1,8 @@
-#Running a Validator Node
+# Running a Validator Node
 
 Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](full-node.md)
 
-Validators are responsible for committing new blocks to the blockchain through voting. A validator's stake is slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
+Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
 ## Create A Validator
 
@@ -16,7 +16,7 @@ You need to get `iris` and `iriscli` installed first. Then, follow the instructi
 iriscli keys add <NAME_OF_KEY>
 ```
 
-Then, you should print a password of at least 8 characters.
+Then, you should set a password of at least 8 characters.
 
 The output will look like the following:
 ```
@@ -30,7 +30,7 @@ blast change tumble toddler rival ordinary chicken dirt physical club few langua
 
 You could see the address and public key of this account. Please node that account address in IRISnet will start with `faa` and public key of account will start with `fap`.
 
-The seed phrase of this account will also be displayed. You could use these 24-character phrase to recover this account in another server. The recover command is:
+The seed phrase of this account will also be displayed. You could use these 24 phrases to recover this account in another server. The recover command is:
 ```
 iriscli keys add <NAME_OF_KEY> --recover
 ```
@@ -50,9 +50,9 @@ You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer
 ## Create A Validator
 
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of will start `fvp`, it can be used to create a new validator by staking tokens. 
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fvp`, it can be used to create a new validator by staking tokens. 
 
-You can find your validator pubkey by running:
+You can find your validator's pubkey by running:
 
 ```
 iris tendermint show_validator --home=<IRIS-HOME>
@@ -86,7 +86,7 @@ View the validator's information with this command:
 iriscli stake validator  --address-validator=account  --chain-id=game-of-genesis --node=tcp://localhost:26657 
 ```
 
-The `<account>` is start with config.toml
+The `<account>` is your account address that starts with 'faa'
 
 ### Confirm Your Validator is Running
 
