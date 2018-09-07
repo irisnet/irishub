@@ -1,17 +1,11 @@
 # IRISnet测试网
 
 
- * [IRIShub 简介](#IRIShub-简介)
-  * [如何加入fuxi-2000测试网](#如何加入fuxi-1002测试网)
-    * [安装IRIShub](#安装IRIShub)
-    * [部署一个全节点](#部署一个全节点)
-    * [测试IRISHub相关功能](#测试IRISHub相关功能)
-
 ## IRIShub 简介
 
 IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
-## 如何加入fuxi-2000测试网
+## 如何加入fuxi-3000测试网
 
 ### 安装IRIShub
 
@@ -39,10 +33,10 @@ IRIS Hub是用Go语言编写的。它可以在任何能够编译并运行Go语�
 执行以下命令,若出现对应的版本号则说明安装成功。
 ```
 $ iris version
-v0.3.4
+v0.4.0
     
 $ iriscli version
-v0.3.4
+v0.4.0
 ```
 #### 方法2：源码编译安装
 
@@ -109,11 +103,11 @@ make get_vendor_deps && make install
 以上命令将完成 iris 和 iriscli的安装. 若出现对应的版本号则说明安装成功。
 
 ```
-    $ iris version
-    v0.4.0
+$ iris version
+v0.4.0
     
-    $ iriscli version
-    v0.4.0
+$ iriscli version
+v0.4.0
 ```
 
 ### 部署一个全节点
