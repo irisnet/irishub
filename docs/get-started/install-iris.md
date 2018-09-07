@@ -10,23 +10,25 @@ All the blockchains in IRISnet is based on Cosmos-SDK, which is a framework for 
 2. Memory: 4GB
 3. Disk: 60GB SSD
 4. OS: Ubuntu 16.04 LTS
-5. Allow all incoming connections from TCP port 26656 and 26657
+5. Allow all incoming connections on TCP port 26656 and 26657
 
 ### Step 2: Install Iris
 
-There are two ways to get Iris running on your server. First, you could download the binary files from our release pages. You could also download the source code and compile it locally.
+There are two ways to get Iris running on your server. You can download the binary files from our release pages, or you can download the source code and compile it locally.
 
 #### Download Binary Directly
 
-Go to the download page: https://github.com/irisnet/irishub/releases/  then get the release v0.3.4 on your computer.
-`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/  ` You could verify you have the right version installed by running the following commands:
+Go to the download page: https://github.com/irisnet/irishub/releases/  then get the release v0.4.0 on your computer.
+`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/ ` 
+
+You can verify you have the right version installed by running the following commands:
 
 ```
 $ iris version
-v0.3.4
+v0.4.0
 
 $ iriscli version
-v0.3.4
+v0.4.0
 ```
 
 #### Compile Source Code
@@ -84,12 +86,12 @@ $ echo $PATH
 - Get the code and compile Iris
 
 After setup Go correctly, you should be able to compile and run **Iris**.
-
+Make sure that you can access to google.com for that our project used some libraries provided by google.
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.3.4
+cd irishub && git checkout v0.4.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_vendor_deps && make install
 ```
@@ -99,9 +101,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.3.4
+v0.4.0
 $ iriscli version
-v0.3.4
+v0.4.0
 ```
 
 ### How to Update
@@ -111,7 +113,8 @@ Get latest code (you can also `git fetch` only the version desired), ensure the 
 ```
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout VERSION
+rm Gopkg.lock
+git checkout v0.4.0
 make get_vendor_deps
 make install
 ```
