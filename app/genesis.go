@@ -57,7 +57,7 @@ var (
 	flagName       = "name"
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
-	denom          = "iris"
+	denom          = "iris-atto"
 	feeAmt   = int64(100)
 	IrisCt = types.NewDefaultCoinType(denom)
 	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
@@ -176,7 +176,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 			// add some new shares to the validator
 			var issuedDelShares sdk.Rat
-			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, feeAmt)
+			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, freeFermionVal.Amount)
 			//validator.TokenPrecision = stakeData.Params.DenomPrecision
 			stakeData.Validators = append(stakeData.Validators, validator)
 
