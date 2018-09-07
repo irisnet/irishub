@@ -10,7 +10,7 @@ Please run the `gen-tx` command to generate files.
 
 
 ```
-iris init gen-tx --name=<your_name> --home=<path_to_home> --ip=<Your_public_IP>
+iris init gen-tx --name=your_name --home=path_to_home --ip=Your_public_IP
 ```
 
 You could see the following output:

@@ -18,7 +18,7 @@ On the sentry node's side, you need to get fully initialized first.
 Then, you should edit its `config.tmol` file, and change `private_peers_id` field：
 
 ```
-private_peers_ids="<validator node id>"
+private_peers_ids="validator_node_id"
 ```
 
 `validator node id` is the `node-id` of validator node. 
@@ -26,7 +26,7 @@ private_peers_ids="<validator node id>"
 Then you could start your sentry node,
 
 ```
-iris  start --home=<sentry home>
+iris  start --home=sentry_home
 ```
 
 If you have multiple sentry node, you could make them as `persistent-peers` to each other. 
@@ -38,7 +38,7 @@ On the validator node's side, you also need to get fully initialized first, and 
 Then, you should edit its `config.tmol` file,
 
 ```
-persistent_peers="<sentry node id>@<sentry listen address>" 
+persistent_peers="sentry_node_id@sentry_listen_address" 
 ```
 
 If you want to put multiple sentry info, you need to separate the information with `,`
@@ -52,7 +52,7 @@ In this way, the validator node will diable its peer reactor, so it will not res
 Then you could start your validator node,
 
 ```
-iris  start --home=<sentry home>
+iris  start --home=sentry_home
 ```
 
 It's also recommanded to enable the firewall of validator node.  

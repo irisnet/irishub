@@ -6,14 +6,14 @@
 2. 执行gentx命令，获得一个node-id.json的文件。这个操作将默认生成一个余额为200IRIS的账户，该账户默认绑定100IRIS成为一个验证人候选人。
 
 ```
-       iris init gen-tx --name=<your_name> --home=<path_to_home> --ip=<Your_public_IP>
+       iris init gen-tx --name=your_name --home=path_to_home --ip=Your_public_IP
 ```
    代码示例：
-   ```
+```
        iris init gen-tx --name=alice 
-  ```
+```
 
-  ```
+```
        {
         "app_message": {
           "secret": "similar spread grace kite security age pig easy always prize salon clip exhibit electric art abandon"

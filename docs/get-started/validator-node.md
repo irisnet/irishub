@@ -74,7 +74,7 @@ Please note the **amount** needs to be the **minimium unit** of IRIS.
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --pubkey=<pubkey> --address-validator=<account> --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=game-of-genesis   --node=tcp://localhost:26657  --amount=1000000000000000000iris
+iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=game-of-genesis   --node=tcp://localhost:26657  --amount=1000000000000000000iris
 ```
 Don't forget the `fee` and `gas` field. To read more about fees in IRISHub, you should read [this](/modules/fee-token/feeToken.md)
 
@@ -83,7 +83,7 @@ Don't forget the `fee` and `gas` field. To read more about fees in IRISHub, you 
 View the validator's information with this command:
 
 ```
-iriscli stake validator  --address-validator=<account>  --chain-id=game-of-genesis --node=tcp://localhost:26657 
+iriscli stake validator  --address-validator=account  --chain-id=game-of-genesis --node=tcp://localhost:26657 
 ```
 
 The `<account>` is start with config.toml
@@ -106,8 +106,8 @@ You can edit your validator's public description. This info is to identify your 
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator  --address-validator=<account> --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=game-of-genesis 
-  --name=<key_name> --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
+iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=game-of-genesis 
+  --name=key_name --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
 ```
 ### View Validator Description
 

@@ -119,7 +119,7 @@ iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下
 * **初始化**
   执行以下操作，
  ```
-  iris init --home=<iris-home>
+  iris init --home=iris-home
  ```
 
 会在$IRISHOME下创建两个文件夹：/config 和 /data。/config终会包含两个重要文件：genesis.json 和config.toml。genesis文件中定义了区块链网络的初始状态，而config.toml指定了iris软件模块的重要组成部分。
@@ -193,7 +193,7 @@ iris unsafe_reset_all --home=$IRIShome
 
 通过以下命令启动全节点，并将日志输出到文件中：
 
-    iris start --home <path_to_your_home> > log文件地址 &
+    iris start --home path_to_your_home > log文件地址 &
 
 通过执行以下操作确认节点的运行状态：
 
