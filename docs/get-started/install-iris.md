@@ -18,15 +18,17 @@ There are two ways to get Iris running on your server. First, you could download
 
 #### Download Binary Directly
 
-Go to the download page: https://github.com/irisnet/irishub/releases/  then get the release v0.3.4 on your computer.
-`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/  ` You could verify you have the right version installed by running the following commands:
+Go to the download page: https://github.com/irisnet/irishub/releases/  then get the release v0.4.0 on your computer.
+`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/ ` 
+
+You could verify you have the right version installed by running the following commands:
 
 ```
 $ iris version
-v0.3.4
+v0.4.0
 
 $ iriscli version
-v0.3.4
+v0.4.0
 ```
 
 #### Compile Source Code
@@ -89,7 +91,7 @@ After setup Go correctly, you should be able to compile and run **Iris**.
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.3.4
+cd irishub && git checkout v0.4.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_vendor_deps && make install
 ```
@@ -99,9 +101,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.3.4
+v0.4.0
 $ iriscli version
-v0.3.4
+v0.4.0
 ```
 
 ### How to Update
