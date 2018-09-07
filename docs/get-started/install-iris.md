@@ -113,7 +113,8 @@ Get latest code (you can also `git fetch` only the version desired), ensure the 
 ```
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout VERSION
+rm Gopkg.lock
+git checkout v0.4.0
 make get_vendor_deps
 make install
 ```

@@ -124,15 +124,13 @@ iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下
 
 * **初始化**
   执行以下操作，
-  ```
+ ```
   iris init --home=<iris-home>
-  ```
+ ```
 
 会在$IRISHOME下创建两个文件夹：/config 和 /data。/config终会包含两个重要文件：genesis.json 和config.toml。genesis文件中定义了区块链网络的初始状态，而config.toml指定了iris软件模块的重要组成部分。
 
 * **下载配置文件文件**
-
-如果你想参加到genesis文件的生成流程中，请根据以下[文档](https://github.com/irisnet/testnets/blob/master/fuxi/docs_CN/Genesis-generation.md)提交相关文件。
 
 下载配置文件，并替换原有的/$IRISHOME/config目录下的文件：
 
@@ -148,8 +146,9 @@ iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下
 
 1. 将moniker字段配置称为自定义的名称，这样便于区分不同的节点
 2. seed字段用语设置种子节点，在fuxi-2000中的官方种子节点为：
-
+```
 c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
+```
 
 3. 将`external_address` 改为`本地IP:26656`
 
@@ -165,8 +164,9 @@ c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
 
 示例输出：
 
-    {"node_info":{"id":"3fb472c641078eaaee4a4acbe32841f18967672c","listen_addr":"172.31.0.190:26656","network":"fuxi-2000","version":"0.22.6","channels":"4020212223303800","moniker":"name","other":["amino_version=0.10.1","p2p_version=0.5.0","consensus_version=v1/0.2.2","rpc_version=0.7.0/3","tx_index=on","rpc_addr=tcp://0.0.0.0:26657"]},"sync_info":{"latest_block_hash":"7B1168B2055B19F811773EEE56BB3C9ECB6F3B37","latest_app_hash":"B8F7F8BF18E3F1829CCDE26897DB905A51AF4372","latest_block_height":12567,"latest_block_time":"2018-08-25T11:33:13.164432273Z","catching_up":false},"validator_info":{"address":"CAF80DAEC0F4A7036DD2116B56F89B07F43A133E","pub_key":{"type":"AC26791624DE60","value":"Cl6Yq+gqZZY14QxrguOaZqAswPhluv7bDfcyQx2uSRc="},"voting_power":0}}
-
+```json
+{"node_info":{"id":"1c40d19d695721fc3e3ce44cbc3f446f038b36e4","listen_addr":"172.31.0.190:46656","network":"iris-stage-4","version":"0.22.6","channels":"4020212223303800","moniker":"name","other":["amino_version=0.10.1","p2p_version=0.5.0","consensus_version=v1/0.2.2","rpc_version=0.7.0/3","tx_index=on","rpc_addr=tcp://0.0.0.0:46657"]},"sync_info":{"latest_block_hash":"41117D8CB54FA54EFD8DEAD81D6D83BDCE0E63AC","latest_app_hash":"95D82B8AC8B64C4CD6F85C1D91F999C2D1DA4F0A","latest_block_height":"1517","latest_block_time":"2018-09-07T05:44:27.810641328Z","catching_up":false},"validator_info":{"address":"3FCCECF1A27A9CEBD394F3A0C5253ADAA8392EB7","pub_key":{"type":"tendermint/PubKeyEd25519","value":"wZp1blOEwJu4UuqbEmivzjUMO1UwUK4C0jRH96HhV90="},"voting_power":"100"}}
+```
 通过以上命令可以查看状态：
 
 * `"catching_up":false`: 表示节点与网络保持同步
@@ -184,8 +184,10 @@ c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
 重置IRIShub节点流程如下：
 
 1. 关闭iris进程
-
-    kill -9 <PID>
+```
+kill -9 PID
+```
+    
 
 若Genesis文件有变动，则需要下载新的文件到$IRISHOME/config目录下。
 
@@ -206,7 +208,7 @@ iris unsafe_reset_all --home=$IRIShome
 示例输出：
 
 ```json
-{"node_info":{"id":"3fb472c641078eaaee4a4acbe32841f18967672c","listen_addr":"172.31.0.190:26656","network":"fuxi-2000","version":"0.22.6","channels":"4020212223303800","moniker":"name","other":["amino_version=0.10.1","p2p_version=0.5.0","consensus_version=v1/0.2.2","rpc_version=0.7.0/3","tx_index=on","rpc_addr=tcp://0.0.0.0:26657"]},"sync_info":{"latest_block_hash":"7B1168B2055B19F811773EEE56BB3C9ECB6F3B37","latest_app_hash":"B8F7F8BF18E3F1829CCDE26897DB905A51AF4372","latest_block_height":12567,"latest_block_time":"2018-08-25T11:33:13.164432273Z","catching_up":false},"validator_info":{"address":"CAF80DAEC0F4A7036DD2116B56F89B07F43A133E","pub_key":{"type":"AC26791624DE60","value":"Cl6Yq+gqZZY14QxrguOaZqAswPhluv7bDfcyQx2uSRc="},"voting_power":0}}
+{"node_info":{"id":"1c40d19d695721fc3e3ce44cbc3f446f038b36e4","listen_addr":"172.31.0.190:46656","network":"iris-stage-4","version":"0.22.6","channels":"4020212223303800","moniker":"name","other":["amino_version=0.10.1","p2p_version=0.5.0","consensus_version=v1/0.2.2","rpc_version=0.7.0/3","tx_index=on","rpc_addr=tcp://0.0.0.0:46657"]},"sync_info":{"latest_block_hash":"41117D8CB54FA54EFD8DEAD81D6D83BDCE0E63AC","latest_app_hash":"95D82B8AC8B64C4CD6F85C1D91F999C2D1DA4F0A","latest_block_height":"1517","latest_block_time":"2018-09-07T05:44:27.810641328Z","catching_up":false},"validator_info":{"address":"3FCCECF1A27A9CEBD394F3A0C5253ADAA8392EB7","pub_key":{"type":"tendermint/PubKeyEd25519","value":"wZp1blOEwJu4UuqbEmivzjUMO1UwUK4C0jRH96HhV90="},"voting_power":"100"}}
 ```
 
 通过以上命令可以查看状态：
@@ -215,11 +217,3 @@ iris unsafe_reset_all --home=$IRIShome
 
 * `"latest_block_height"`: 表示最新的区块高度
 
-
-### 测试IRISHub相关功能
-
-在接下来你可以执行以下操作测试IRISHub的功能：
-
-* 通证交易：[Link](https://github.com/irisnet/testnets/blob/master/fuxi/docs_CN/转账交易.md)
-* 对于权益通证进行绑定和委托的操作： [Link](https://github.com/irisnet/testnets/blob/master/fuxi/docs_CN/Basic-Bond:Delegate-Operation.md)
-* 部署IRISHub Monitor [Link](https://github.com/irisnet/testnets/blob/master/fuxi/docs_CN/如何部署monitor.md)
