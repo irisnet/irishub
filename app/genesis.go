@@ -57,10 +57,10 @@ var (
 	flagName       = "name"
 	flagClientHome = "home-client"
 	flagOWK        = "owk"
-	denom          = "iris-atto"
-	feeAmt   = int64(100)
-	IrisCt = types.NewDefaultCoinType(denom)
-	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
+	Denom          = "iris"
+	feeAmt         = int64(100)
+	IrisCt         = types.NewDefaultCoinType(Denom)
+	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,Denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
@@ -229,7 +229,7 @@ func createGenesisState() stake.GenesisState {
 			GoalBonded:          sdk.NewRat(67, 100),
 			UnbondingTime:       defaultUnbondingTime,
 			MaxValidators:       100,
-			BondDenom:           denom,
+			BondDenom:           Denom,
 		},
 	}
 }

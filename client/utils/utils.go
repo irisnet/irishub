@@ -3,61 +3,88 @@ package utils
 import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/context"
+	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 )
 
-// SendTx implements a auxiliary handler that facilitates sending a series of
-// messages in a signed transaction given a TxContext and a QueryContext. It
-// ensures that the account exists, has a proper number and sequence set. In
-// addition, it builds and signs a transaction with the supplied messages.
-// Finally, it broadcasts the signed transaction to a node.
-func SendTx(ctx app.Context, msgs []sdk.Msg) error {
-	txCtx := ctx.GetTxCxt()
-	if err := ctx.EnsureAccountExists(); err != nil {
-		return err
-	}
-
-	from, err := ctx.GetFromAddress()
+func SendTx(txCtx authctx.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
+	txCtx, err := prepareTxContext(txCtx, cliCtx)
 	if err != nil {
 		return err
 	}
 
-	// automatically doing a manual lookup.
-	if txCtx.AccountNumber == 0 {
-		accNum, err := ctx.GetAccountNumber(from)
-		if err != nil {
-			return err
-		}
-
-		txCtx = txCtx.WithAccountNumber(accNum)
-	}
-
-	// automatically doing a manual lookup.
-	if txCtx.Sequence == 0 {
-		accSeq, err := ctx.GetAccountSequence(from)
-		if err != nil {
-			return err
-		}
-
-		txCtx = txCtx.WithSequence(accSeq)
-	}
-
-	passphrase, err := keys.GetPassphrase(ctx.FromAddressName)
+	passphrase, err := keys.GetPassphrase(cliCtx.FromAddressName)
 	if err != nil {
 		return err
 	}
 
 	// build and sign the transaction
-	ctx = ctx.WithTxContext(txCtx)
-	msg, err := ctx.Build(msgs)
-	if err != nil {
-		return err
-	}
-	txBytes, err := txCtx.Sign(ctx.FromAddressName, passphrase, msg)
+	txBytes, err := txCtx.BuildAndSign(cliCtx.FromAddressName, passphrase, msgs)
 	if err != nil {
 		return err
 	}
 
 	// broadcast to a Tendermint node
-	return ctx.EnsureBroadcastTx(txBytes)
+	return cliCtx.EnsureBroadcastTx(txBytes)
+}
+
+// PrintUnsignedStdTx builds an unsigned StdTx and prints it to os.Stdout.
+func PrintUnsignedStdTx(txCtx authctx.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (err error) {
+	stdTx, err := buildUnsignedStdTx(txCtx, cliCtx, msgs)
+	if err != nil {
+		return
+	}
+	json, err := txCtx.Codec.MarshalJSON(stdTx)
+	if err == nil {
+		fmt.Printf("%s\n", json)
+	}
+	return
+}
+
+// buildUnsignedStdTx builds a StdTx as per the parameters passed in the
+// contexts. Gas is automatically estimated if gas wanted is set to 0.
+func buildUnsignedStdTx(txCtx authctx.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
+	txCtx, err = prepareTxContext(txCtx, cliCtx)
+	if err != nil {
+		return
+	}
+	stdSignMsg, err := txCtx.Build(msgs)
+	if err != nil {
+		return
+	}
+	return auth.NewStdTx(stdSignMsg.Msgs, stdSignMsg.Fee, nil, stdSignMsg.Memo), nil
+}
+
+func prepareTxContext(txCtx authctx.TxContext, cliCtx context.CLIContext) (authctx.TxContext, error) {
+	if err := cliCtx.EnsureAccountExists(); err != nil {
+		return txCtx, err
+	}
+
+	from, err := cliCtx.GetFromAddress()
+	if err != nil {
+		return txCtx, err
+	}
+
+	// TODO: (ref #1903) Allow for user supplied account number without
+	// automatically doing a manual lookup.
+	if txCtx.AccountNumber == 0 {
+		accNum, err := cliCtx.GetAccountNumber(from)
+		if err != nil {
+			return txCtx, err
+		}
+		txCtx = txCtx.WithAccountNumber(accNum)
+	}
+
+	// TODO: (ref #1903) Allow for user supplied account sequence without
+	// automatically doing a manual lookup.
+	if txCtx.Sequence == 0 {
+		accSeq, err := cliCtx.GetAccountSequence(from)
+		if err != nil {
+			return txCtx, err
+		}
+		txCtx = txCtx.WithSequence(accSeq)
+	}
+	return txCtx, nil
 }

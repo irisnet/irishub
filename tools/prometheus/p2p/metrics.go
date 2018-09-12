@@ -3,7 +3,6 @@ package p2p
 import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
-	"github.com/irisnet/irishub/app"
 	"github.com/pelletier/go-toml"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
@@ -12,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"github.com/irisnet/irishub/client/context"
 )
 
 
@@ -47,7 +47,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics) Start(ctx app.Context) {
+func (m *Metrics) Start(ctx context.CLIContext) {
 	//func (m *Metrics) Start(ctx tools.Context) {
 	m.setP2PPersistentPeers(viper.GetString("home"))
 	go func() {

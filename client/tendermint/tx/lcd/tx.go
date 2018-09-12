@@ -7,13 +7,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/crypto"
 	"io/ioutil"
 	"net/http"
+	"github.com/irisnet/irishub/client/context"
 )
 
-func RegisterRoutes(ctx app.Context, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
+func RegisterRoutes(ctx context.CLIContext, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
 	r.HandleFunc("/tx/send", SendTxRequestHandlerFn(cdc, kb, ctx)).Methods("POST")
 }
 
@@ -32,7 +32,7 @@ type StdSignature struct {
 }
 
 //send traction(sign with rainbow) to irishub
-func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) http.HandlerFunc {
+func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var tx sendTx
 		body, err := ioutil.ReadAll(r.Body)
@@ -85,7 +85,7 @@ func SendTxRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, ctx app.Context) h
 		}
 		txByte, _ := cdc.MarshalBinary(stdTx)
 		// send
-		res, err := ctx.Get().BroadcastTxAsync(txByte)
+		res, err := ctx.BroadcastTxAsync(txByte)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))

@@ -25,6 +25,7 @@ import (
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/version"
+	"github.com/irisnet/irishub/client/context"
 )
 
 // ServeCommand will generate a long-running rest server
@@ -76,7 +77,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 		panic(err)
 	}
 
-	ctx := app.NewContext()
+	ctx := context.NewCLIContext().WithCodec(cdc)
 
 	r.HandleFunc("/version", version.VersionHandlerFn(ctx, cdc)).Methods("GET")
 	// TODO make more functional? aka r = keys.RegisterRoutes(r)

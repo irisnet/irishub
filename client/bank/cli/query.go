@@ -1,20 +1,20 @@
-package coin
+package cli
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/spf13/cobra"
 	"fmt"
-	"github.com/irisnet/irishub/app"
+	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/spf13/cobra"
 )
 
 func GetCmdQueryCoinType(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "types [coin_name]",
-		Short: "query coin_type",
-		Args: cobra.ExactArgs(1),
+		Use:   "coin-type [coin_name]",
+		Short: "query coin type",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := app.NewContext().WithCodeC(cdc)
-			res , err  := ctx.GetCoinType(args[0])
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			res, err := cliCtx.GetCoinType(args[0])
 			if err != nil {
 				return err
 			}

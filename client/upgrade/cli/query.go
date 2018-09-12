@@ -1,61 +1,53 @@
-package upgrade
+package cli
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/pkg/errors"
-	"fmt"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"os"
-	"github.com/cosmos/cosmos-sdk/client/utils"
 )
 
-const (
-	flagProposalID = "proposalID"
-	flagTitle      = "title"
-	flagVoter      = "voter"
-)
-
-// submit switch msg
-func GetCmdSubmitSwitch(cdc *wire.Codec) *cobra.Command {
+func GetCmdInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "submit-switch",
-		Short: "Submit a switch msg for a upgrade propsal",
+		Use:   "info",
+		Short: "query the information of upgrade module",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			title := viper.GetString(flagTitle)
-			proposalID := viper.GetInt64(flagProposalID)
 
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			// get the from/to address
-			from, err := cliCtx.GetFromAddress()
+			res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgrade.GetCurrentProposalAcceptHeightKey()), "params")
+			res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgrade.GetCurrentProposalIdKey()), "params")
+			var height int64
+			var proposalID int64
+			cdc.MustUnmarshalBinary(res_height, &height)
+			cdc.MustUnmarshalBinary(res_proposalID, &proposalID)
+
+			res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
+			var versionID int64
+			cdc.MustUnmarshalBinary(res_versionID, &versionID)
+
+			res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
+			var version upgrade.Version
+			cdc.MustUnmarshalBinary(res_version, &version)
+			output, err := wire.MarshalJSONIndent(cdc, version)
 			if err != nil {
 				return err
 			}
 
-			msg := upgrade.NewMsgSwitch(title, proposalID, from)
-			if err = msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			cliCtx.PrintResponse = true
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			fmt.Println(string(output))
+			fmt.Println("CurrentProposalId           = ", proposalID)
+			fmt.Println("CurrentProposalAcceptHeight = ", height)
+			return nil
 		},
 	}
-
-	cmd.Flags().String(flagTitle, "", "title of switch")
-	cmd.Flags().String(flagProposalID, "", "proposalID of upgrade proposal")
-
 	return cmd
 }
 
@@ -80,7 +72,7 @@ func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			res, err := cliCtx.QueryStore(upgrade.GetSwitchKey(proposalID, voter), storeName)
 			if len(res) == 0 || err != nil {
-				return errors.Errorf("proposalID [%d] is not existed", proposalID)
+				return fmt.Errorf("proposalID [%d] is not existed", proposalID)
 			}
 
 			var switchMsg upgrade.MsgSwitch

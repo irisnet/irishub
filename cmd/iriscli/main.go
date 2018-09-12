@@ -9,25 +9,23 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	bankcmd "github.com/irisnet/irishub/client/cli/bank"
-	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
+	authutil "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	c "github.com/irisnet/irishub/client/lcd"
-	govcmd "github.com/irisnet/irishub/client/cli/gov"
-	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
+
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
+	bankcmd "github.com/irisnet/irishub/client/bank/cli"
+	govcmd "github.com/irisnet/irishub/client/gov/cli"
+	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
-	"github.com/irisnet/irishub/client/cli/coin"
-	"github.com/irisnet/irishub/client/cli/auth"
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
 		Use:   "iriscli",
-		Short: "irishub light-client",
+		Short: "irishub command line interface",
 	}
 )
 
@@ -53,29 +51,8 @@ func main() {
 	)
 	tx.AddCommands(tendermintCmd, cdc)
 
-	//Add IBC commands
-	ibcCmd := &cobra.Command{
-		Use:   "ibc",
-		Short: "Inter-Blockchain Communication subcommands",
-	}
-	ibcCmd.AddCommand(
-		client.PostCommands(
-			ibccmd.IBCTransferCmd(cdc),
-			ibccmd.IBCRelayCmd(cdc),
-		)...)
-
-	advancedCmd := &cobra.Command{
-		Use:   "advanced",
-		Short: "Advanced subcommands",
-	}
-
-	advancedCmd.AddCommand(
-		tendermintCmd,
-		ibcCmd,
-		c.ServeCommand(cdc),
-	)
 	rootCmd.AddCommand(
-		advancedCmd,
+		tendermintCmd,
 		client.LineBreak,
 	)
 
@@ -149,7 +126,8 @@ func main() {
 	//Add auth and bank commands
 	rootCmd.AddCommand(
 		client.GetCommands(
-			auth.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			authcmd.GetAccountCmd("acc", cdc, authutil.GetAccountDecoder(cdc)),
+			bankcmd.GetCmdQueryCoinType(cdc),
 		)...)
 	rootCmd.AddCommand(
 		client.PostCommands(
@@ -165,17 +143,6 @@ func main() {
 		client.GetCommands(
 			version.GetCmdVersion("upgrade", cdc),
 		)...)
-
-	coinCmd := &cobra.Command{
-		Use:   "coin",
-		Short: "Coin and CoinType",
-	}
-	coinCmd.AddCommand(
-		client.GetCommands(
-			coin.GetCmdQueryCoinType(cdc),
-		)...)
-
-	rootCmd.AddCommand(coinCmd)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)

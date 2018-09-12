@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/spf13/cobra"
 	"net/http"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/context"
 )
 
 // Version - Iris Version
@@ -22,7 +22,7 @@ func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			fmt.Printf("v%s\n", Version)
 
-			ctx := app.NewContext()
+			ctx := context.NewCLIContext()
 
 			var res_versionID []byte
 			var err error
@@ -57,9 +57,8 @@ type VersionInfo struct {
 	ProposalId     int64  `json:"proposal_id"`
 }
 
-func VersionHandlerFn(ctx app.Context, cdc *wire.Codec) http.HandlerFunc {
+func VersionHandlerFn(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := app.NewContext()
 
 		res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), "upgrade")
 		var versionID int64

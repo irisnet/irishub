@@ -57,7 +57,7 @@
 
 [[projects]]
   branch = "irisnet/develop"
-  digest = "1:30a362be7be5b3b0fe27e206577a77cff95f8cd11a12d1179f93934cccbe5663"
+  digest = "1:cf1daa8f56d427967f2713ba8e1b2768a3dcb4ddb3918469c577a08b068b7e1f"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -84,14 +84,11 @@
     "x/auth/client/rest",
     "x/bank",
     "x/bank/client",
-    "x/bank/client/cli",
     "x/bank/client/rest",
     "x/gov",
-    "x/gov/client/cli",
     "x/gov/client/rest",
     "x/gov/tags",
     "x/ibc",
-    "x/ibc/client/cli",
     "x/ibc/client/rest",
     "x/mock",
     "x/mock/simulation",
@@ -107,7 +104,7 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "1d5c081067680987f342d99c1c4087c477ea9b4a"
+  revision = "8c058b8e5b028dc7373f5427dd36e00686d8f6a5"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -730,7 +727,6 @@
     "github.com/cosmos/cosmos-sdk/client/keys",
     "github.com/cosmos/cosmos-sdk/client/rpc",
     "github.com/cosmos/cosmos-sdk/client/tx",
-    "github.com/cosmos/cosmos-sdk/client/utils",
     "github.com/cosmos/cosmos-sdk/crypto/keys",
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/config",
@@ -744,14 +740,11 @@
     "github.com/cosmos/cosmos-sdk/x/auth/client/rest",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/bank/client",
-    "github.com/cosmos/cosmos-sdk/x/bank/client/cli",
     "github.com/cosmos/cosmos-sdk/x/bank/client/rest",
     "github.com/cosmos/cosmos-sdk/x/gov",
-    "github.com/cosmos/cosmos-sdk/x/gov/client/cli",
     "github.com/cosmos/cosmos-sdk/x/gov/client/rest",
     "github.com/cosmos/cosmos-sdk/x/gov/tags",
     "github.com/cosmos/cosmos-sdk/x/ibc",
-    "github.com/cosmos/cosmos-sdk/x/ibc/client/cli",
     "github.com/cosmos/cosmos-sdk/x/ibc/client/rest",
     "github.com/cosmos/cosmos-sdk/x/mock",
     "github.com/cosmos/cosmos-sdk/x/mock/simulation",
@@ -790,6 +783,8 @@
     "github.com/tendermint/tendermint/libs/common",
     "github.com/tendermint/tendermint/libs/db",
     "github.com/tendermint/tendermint/libs/log",
+    "github.com/tendermint/tendermint/lite",
+    "github.com/tendermint/tendermint/lite/proxy",
     "github.com/tendermint/tendermint/mempool",
     "github.com/tendermint/tendermint/node",
     "github.com/tendermint/tendermint/rpc/client",
