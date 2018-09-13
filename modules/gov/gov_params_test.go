@@ -36,11 +36,11 @@ func TestDepositProcedureParam(t *testing.T) {
 
 	DepositProcedureParameter.SetReadWriter(paramKeeper.Setter())
 	find := DepositProcedureParameter.LoadValue(ctx)
-	require.Equal(t, find,false)
+	require.Equal(t, find, false)
 
-	DepositProcedureParameter.InitGenesis()
-
+	DepositProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
+
 	require.Equal(t, DepositProcedureParameter.ToJson(), "{\"min_deposit\":[{\"denom\":\"iris\",\"amount\":\"10\"}],\"max_deposit_period\":1440}")
 	DepositProcedureParameter.Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris\",\"amount\":\"30\"}],\"max_deposit_period\":1440}")
 	require.NotEqual(t, p1, DepositProcedureParameter.Value)
@@ -49,14 +49,12 @@ func TestDepositProcedureParam(t *testing.T) {
 	result := DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"atom\",\"amount\":\"30\"}],\"max_deposit_period\":1440}")
 	require.Error(t, result)
 
-	DepositProcedureParameter.InitGenesis()
+	DepositProcedureParameter.InitGenesis(p2)
+	require.Equal(t, p2, DepositProcedureParameter.Value)
+	DepositProcedureParameter.InitGenesis(p1)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
+
 	DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 
 }
-
-
-
-
-

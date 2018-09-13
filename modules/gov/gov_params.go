@@ -15,10 +15,14 @@ type DepositProcedureParam struct {
 	pg    params.Getter
 }
 
-func (param *DepositProcedureParam) InitGenesis() {
-	param.Value = DepositProcedure{
-		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 10)},
-		MaxDepositPeriod: 1440}
+func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
+	if value, ok := genesisState.(DepositProcedure); ok {
+		param.Value = value
+	} else {
+		param.Value = DepositProcedure{
+			MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 10)},
+			MaxDepositPeriod: 1440}
+	}
 }
 
 func (param *DepositProcedureParam) SetReadWriter(setter params.Setter) {
