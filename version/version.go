@@ -12,7 +12,7 @@ import (
 )
 
 // Version - Iris Version
-const Version = "0.4.0"
+const Version = "0.4.1"
 
 func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
