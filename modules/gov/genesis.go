@@ -2,17 +2,19 @@ package gov
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 // GenesisState - all staking state that must be provided at genesis
 type GenesisState struct {
 	StartingProposalID int64             `json:"starting_proposalID"`
-	DepositProcedure   DepositProcedure  `json:"deposit_period"`
+	DepositProcedure   govparams.DepositProcedure  `json:"deposit_period"`
 	VotingProcedure    VotingProcedure   `json:"voting_period"`
 	TallyingProcedure  TallyingProcedure `json:"tallying_procedure"`
 }
 
-func NewGenesisState(startingProposalID int64, dp DepositProcedure, vp VotingProcedure, tp TallyingProcedure) GenesisState {
+func NewGenesisState(startingProposalID int64, dp govparams.DepositProcedure, vp VotingProcedure, tp TallyingProcedure) GenesisState {
 	return GenesisState{
 		StartingProposalID: startingProposalID,
 		DepositProcedure:   dp,
@@ -28,9 +30,11 @@ func InitGenesis(ctx sdk.Context, k Keeper,data GenesisState) {
 		// TODO: Handle this with #870
 		panic(err)
 	}
-	k.setDepositProcedure(ctx, data.DepositProcedure)
+	//k.setDepositProcedure(ctx, data.DepositProcedure)
+	parameter.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
 	k.setVotingProcedure(ctx, data.VotingProcedure)
 	k.setTallyingProcedure(ctx, data.TallyingProcedure)
+
 }
 
 // WriteGenesis - output genesis parameters

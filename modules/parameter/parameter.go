@@ -6,7 +6,6 @@ import (
 )
 
 type Parameter interface {
-
 	InitGenesis(interface{})
 
 	GetStoreKey() string
@@ -25,7 +24,7 @@ type SignalParameter interface {
 type GovParameter interface {
 	Parameter
 
-	Valid(json string) error
+	Valid(json string) sdk.Error
 
 	Update(ctx sdk.Context, json string)
 
