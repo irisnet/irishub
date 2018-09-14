@@ -34,7 +34,7 @@ func TestInitGenesisParameter(t *testing.T) {
 		MaxDepositPeriod: 1440}
 
 	p2 := gov.DepositProcedure{
-		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 10)},
+		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 20)},
 		MaxDepositPeriod: 1440}
 
 	govParam.DepositProcedureParameter.SetReadWriter(paramKeeper.Setter())
