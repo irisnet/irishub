@@ -1,10 +1,11 @@
-package gov
+package GovParams
 
 import (
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -26,11 +27,11 @@ func TestDepositProcedureParam(t *testing.T) {
 	ctx := defaultContext(skey)
 	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
 
-	p1 := DepositProcedure{
+	p1 := gov.DepositProcedure{
 		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 10)},
 		MaxDepositPeriod: 1440}
 
-	p2 := DepositProcedure{
+	p2 := gov.DepositProcedure{
 		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 30)},
 		MaxDepositPeriod: 1440}
 

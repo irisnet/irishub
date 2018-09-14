@@ -46,7 +46,7 @@ func ErrAddressNotStaked(codespace sdk.CodespaceType, address sdk.AccAddress) sd
 	return sdk.NewError(codespace, CodeAddressNotStaked, fmt.Sprintf("Address %s is not staked and is thus ineligible to vote", address))
 }
 
-func ErrInvalidTitle(codespace sdk.CodespaceType, title string) sdk.Error {
+func  ErrInvalidTitle(codespace sdk.CodespaceType, title string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidTitle, fmt.Sprintf("Proposal Title '%s' is not valid", title))
 }
 
