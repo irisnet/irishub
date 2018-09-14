@@ -88,3 +88,12 @@ func prepareTxContext(txCtx authctx.TxContext, cliCtx context.CLIContext) (authc
 	}
 	return txCtx, nil
 }
+
+func StringArrayContain(array []string, target string) bool {
+	for _, element := range array {
+		if element == target {
+			return true
+		}
+	}
+	return false
+}

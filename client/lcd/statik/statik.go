@@ -7,6 +7,6 @@ import (
 )
 
 func init() {
-    data := ""
+	data := ""
 	fs.Register(data)
 }

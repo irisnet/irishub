@@ -14,6 +14,18 @@ import (
 // Version - Iris Version
 const Version = "0.4.0"
 
+// GitCommit set by build flags
+var GitCommit = ""
+
+// return version of CLI/node and commit hash
+func GetVersion() string {
+	v := Version
+	if GitCommit != "" {
+		v = v + "-" + GitCommit
+	}
+	return v
+}
+
 func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
