@@ -54,13 +54,13 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 }
 
 var (
-	flagName       = "name"
-	flagClientHome = "home-client"
-	flagOWK        = "owk"
-	Denom          = "iris"
-	feeAmt         = int64(100)
-	IrisCt         = types.NewDefaultCoinType(Denom)
-	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,Denom))
+	flagName          = "name"
+	flagClientHome    = "home-client"
+	flagOWK           = "owk"
+	Denom             = "iris"
+	feeAmt            = int64(100)
+	IrisCt            = types.NewDefaultCoinType(Denom)
+	freeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second

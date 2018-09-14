@@ -222,7 +222,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		panic(err)
 	}
 
-	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10, Denom))
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	if err != nil {
 		panic(err)
 	}
