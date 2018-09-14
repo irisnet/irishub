@@ -8,15 +8,15 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"time"
 	"github.com/irisnet/irishub/types"
-	"fmt"
+	"time"
 )
 
 // State to Unmarshal
@@ -54,13 +54,13 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 }
 
 var (
-	flagName       = "name"
-	flagClientHome = "home-client"
-	flagOWK        = "owk"
-	Denom          = "iris"
-	feeAmt         = int64(100)
-	IrisCt         = types.NewDefaultCoinType(Denom)
-	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,Denom))
+	flagName          = "name"
+	flagClientHome    = "home-client"
+	flagOWK           = "owk"
+	Denom             = "iris"
+	feeAmt            = int64(100)
+	IrisCt            = types.NewDefaultCoinType(Denom)
+	freeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
