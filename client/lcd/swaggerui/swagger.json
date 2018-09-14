@@ -17,13 +17,13 @@
   },
   "basePath": "/",
   "paths": {
-    "/node_version": {
+    "/node_binary_version": {
       "get": {
         "tags": [
           "Version"
         ],
-        "summary": "Get connected full node version",
-        "description": "Get connected full node version",
+        "summary": "Get connected full node executable binary version",
+        "description": "Get connected full node executable binary version",
         "consumes": [
           "application/json"
         ],
@@ -35,6 +35,47 @@
             "description": "OK",
             "schema": {
               "type": "string"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/HTTPError"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/HTTPError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPError"
+            }
+          }
+        }
+      }
+    },
+    "/node_running_version": {
+      "get": {
+        "tags": [
+          "Version"
+        ],
+        "summary": "Get connected full node running version",
+        "description": "Get connected full node running version",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/RunningVersionInfo"
             }
           },
           "400": {
@@ -114,6 +155,23 @@
         },
         "error message": {
           "type": "string"
+        }
+      }
+    },
+    "RunningVersionInfo": {
+      "type": "object",
+      "properties": {
+        "iris_version": {
+          "type": "string"
+        },
+        "upgrade_version": {
+          "type": "integer"
+        },
+        "start_height": {
+          "type": "integer"
+        },
+        "proposal_id": {
+          "type": "integer"
         }
       }
     }

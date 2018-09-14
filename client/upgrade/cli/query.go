@@ -96,8 +96,8 @@ func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
 
 func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "node-version",
-		Short: "Show full node version info",
+		Use:   "version",
+		Short: "Show full node running version info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			fmt.Printf("v%s\n", irisVersion.Version)

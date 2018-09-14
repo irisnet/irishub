@@ -14,6 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
 	"net/http"
+	upgradeHandler "github.com/irisnet/irishub/client/upgrade/lcd"
 )
 
 // ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
@@ -80,7 +81,9 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
-	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/node_binary_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/node_running_version", upgradeHandler.VersionHandlerFn(cliCtx, cdc)).Methods("GET")
+
 	/*
 		keys.RegisterRoutes(r)
 		rpc.RegisterRoutes(cliCtx, r)
