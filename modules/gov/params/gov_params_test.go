@@ -1,4 +1,4 @@
-package GovParams
+package govparams
 
 import (
 	"github.com/cosmos/cosmos-sdk/store"

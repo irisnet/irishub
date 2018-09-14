@@ -1,4 +1,4 @@
-package GovParams
+package govparams
 
 import (
 	"encoding/json"
