@@ -145,12 +145,12 @@ func main() {
 		)
 	*/
 	rootCmd.AddCommand(
-		client.GetCommands(
-			version.GetCmdVersion("upgrade", cdc),
-		)...)
+		upgradecmd.GetCmdVersion("upgrade", cdc),
+		version.ServeVersionCommand(cdc),
+	)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "IRISCLI", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		// handle with #870

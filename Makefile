@@ -1,5 +1,8 @@
 all: get_vendor_deps install
 
+COMMIT_HASH := $(shell git rev-parse --short HEAD)
+BUILD_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
+
 DEP_CHECK := $(shell command -v dep 2> /dev/null)
 STATIK_CHECK := $(shell command -v statik 2> /dev/null)
 
@@ -27,9 +30,9 @@ get_vendor_deps:
 	@dep ensure -v
 
 install: update_gaia_lite_docs
-	go install ./cmd/iris
-	go install ./cmd/iriscli
-	go install ./cmd/irislcd
+	go install $(BUILD_FLAGS) ./cmd/iris
+	go install $(BUILD_FLAGS) ./cmd/iriscli
+	go install $(BUILD_FLAGS) ./cmd/irislcd
 
 build_linux: update_gaia_lite_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \

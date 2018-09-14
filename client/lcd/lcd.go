@@ -16,17 +16,15 @@ import (
 	"net/http"
 )
 
-// ServeSwaggerCommand will generate a long-running rest server
-// that exposes functionality similar to the ServeCommand, but it provide swagger-ui
-// Which is much friendly for further development
-func ServeLCDCommand(cdc *wire.Codec) *cobra.Command {
+// ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
+func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 	flagListenAddr := "laddr"
 	flagCORS := "cors"
 	flagMaxOpenConnections := "max-open"
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start irislcd (irishub light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swaggerui/",
+		Short: "Start irislcd (irishub light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listenAddr := viper.GetString(flagListenAddr)
 			router := createHandler(cdc)
@@ -36,7 +34,7 @@ func ServeLCDCommand(cdc *wire.Codec) *cobra.Command {
 				panic(err)
 			}
 			staticServer := http.FileServer(statikFS)
-			router.PathPrefix("/swaggerui/").Handler(http.StripPrefix("/swaggerui/", staticServer))
+			router.PathPrefix("/swagger-ui/").Handler(http.StripPrefix("/swagger-ui/", staticServer))
 
 			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "irislcd")
 			maxOpen := viper.GetInt(flagMaxOpenConnections)
