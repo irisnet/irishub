@@ -27,7 +27,7 @@ func main() {
 	)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "IRISLCD", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "IRISLCD", app.DefaultLCDHome)
 	err := executor.Execute()
 	if err != nil {
 		// handle with #870

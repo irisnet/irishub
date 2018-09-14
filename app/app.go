@@ -42,6 +42,7 @@ const (
 
 // default home directories for expected binaries
 var (
+	DefaultLCDHome  = os.ExpandEnv("$HOME/.irislcd")
 	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
 	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 )
