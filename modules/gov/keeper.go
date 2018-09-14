@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"strconv"
 	"strings"
 )
@@ -211,27 +212,11 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 // Procedures
 
 // Returns the current Deposit Procedure from the global param store
-func (keeper Keeper) GetDepositProcedure(ctx sdk.Context) DepositProcedure {
-	return DepositProcedure{
-		MinDeposit:       keeper.getDepositProcedureDeposit(ctx),
-		MaxDepositPeriod: keeper.getDepositProcedureMaxDepositPeriod(ctx),
-	}
+func (keeper Keeper) GetDepositProcedure(ctx sdk.Context) govparams.DepositProcedure {
+	govparams.DepositProcedureParameter.LoadValue(ctx)
+	return govparams.DepositProcedureParameter.Value
 }
 
-func (keeper Keeper) getDepositProcedureMaxDepositPeriod(ctx sdk.Context) (MaxDepositPeriod int64) {
-	var maxDepositPeriod string
-	if keeper.ps.Get(ctx, ParamStoreKeyDepositProcedureMaxDepositPeriod, &maxDepositPeriod) == nil {
-		MaxDepositPeriod, _ = strconv.ParseInt(maxDepositPeriod, 10, 64)
-	}
-	return
-}
-
-func (keeper Keeper) getDepositProcedureDeposit(ctx sdk.Context) (Deposit sdk.Coins) {
-	var data string
-	keeper.ps.Get(ctx, ParamStoreKeyDepositProcedureDeposit, &data)
-	Deposit, _ = sdk.ParseCoins(data)
-	return
-}
 
 // Returns the current Voting Procedure from the global param store
 func (keeper Keeper) GetVotingProcedure(ctx sdk.Context) VotingProcedure {
@@ -267,14 +252,14 @@ func (keeper Keeper) getTallyingProcedure(ctx sdk.Context, key string) sdk.Rat {
 
 }
 
-func (keeper Keeper) setDepositProcedure(ctx sdk.Context, depositProcedure DepositProcedure) {
-	minDeposit := depositProcedure.MinDeposit.String()
-	keeper.ps.Set(ctx, ParamStoreKeyDepositProcedureDeposit, &minDeposit)
-
-	maxDepositPeriod := strconv.FormatInt(depositProcedure.MaxDepositPeriod, 10)
-	keeper.ps.Set(ctx, ParamStoreKeyDepositProcedureMaxDepositPeriod, &maxDepositPeriod)
-
-}
+//func (keeper Keeper) setDepositProcedure(ctx sdk.Context, depositProcedure DepositProcedure) {
+//	minDeposit := depositProcedure.MinDeposit.String()
+//	keeper.ps.Set(ctx, ParamStoreKeyDepositProcedureDeposit, &minDeposit)
+//
+//	maxDepositPeriod := strconv.FormatInt(depositProcedure.MaxDepositPeriod, 10)
+//	keeper.ps.Set (ctx, ParamStoreKeyDepositProcedureMaxDepositPeriod, &maxDepositPeriod)
+//
+//}
 
 func (keeper Keeper) setVotingProcedure(ctx sdk.Context, votingProcedure VotingProcedure) {
 	votingPeriod := strconv.FormatInt(votingProcedure.VotingPeriod, 10)

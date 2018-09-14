@@ -17,6 +17,7 @@ import (
 	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/types"
 	"fmt"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 // initialize the mock application for this module
@@ -74,7 +75,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		minDeposit,_ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s",10,"iris"))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: DepositProcedure{
+			DepositProcedure: govparams.DepositProcedure{
 				MinDeposit:       sdk.Coins{minDeposit},
 				MaxDepositPeriod: 1440,
 			},

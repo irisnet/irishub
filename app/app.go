@@ -4,34 +4,33 @@ import (
 	"encoding/json"
 	"io"
 	"os"
-
 	bam "github.com/irisnet/irishub/baseapp"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iparams"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
-
-	"errors"
-	"fmt"
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/modules/parameter"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"strings"
+	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"github.com/cosmos/cosmos-sdk/x/stake"
+	"errors"
+	"github.com/cosmos/cosmos-sdk/server"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
 	bc "github.com/tendermint/tendermint/blockchain"
-	"strings"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
@@ -144,6 +143,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyIparams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
+
+
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain)
@@ -155,7 +156,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
-
+	govparams.DepositProcedureParameter.SetReadWriter(app.paramsKeeper.Setter())
+	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter)
 	return app
 }
 
@@ -226,7 +228,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
-		DepositProcedure: gov.DepositProcedure{
+		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 1440,
 		},
