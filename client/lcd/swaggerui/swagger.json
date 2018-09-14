@@ -22,8 +22,8 @@
         "tags": [
           "Version"
         ],
-        "summary": "Get connected full node executable binary version",
-        "description": "Get connected full node executable binary version",
+        "summary": "Get the version of connected full node",
+        "description": "Get the version of connected full node",
         "consumes": [
           "application/json"
         ],
