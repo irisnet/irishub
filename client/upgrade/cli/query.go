@@ -11,7 +11,7 @@ import (
 
 func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "version",
+		Use:   "info",
 		Short: "Show full node running version info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 

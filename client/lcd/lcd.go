@@ -14,7 +14,6 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
 	"net/http"
-	upgradeHandler "github.com/irisnet/irishub/client/upgrade/lcd"
 )
 
 // ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
@@ -65,7 +64,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(client.FlagChainID, "", "The chain ID to connect to")
 	cmd.Flags().String(client.FlagNode, "tcp://localhost:26657", "Address of the node to connect to")
 	cmd.Flags().Int(flagMaxOpenConnections, 1000, "The number of maximum open connections")
-	cmd.Flags().Bool(client.FlagTrustNode, false, "Whether trust connected full node")
+	cmd.Flags().Bool(client.FlagTrustNode, false, "Don't verify proofs for responses")
 
 	return cmd
 }
@@ -81,8 +80,7 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
-	r.HandleFunc("/node_binary_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/node_running_version", upgradeHandler.VersionHandlerFn(cliCtx, cdc)).Methods("GET")
+	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	/*
 		keys.RegisterRoutes(r)

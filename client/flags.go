@@ -28,7 +28,6 @@ var LineBreak = &cobra.Command{Run: func(*cobra.Command, []string) {}}
 // GetCommands adds common flags to query commands
 func GetCommands(cmds ...*cobra.Command) []*cobra.Command {
 	for _, c := range cmds {
-		// TODO: make this default false when we support proofs
 		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
 		c.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
 		c.Flags().String(FlagChainID, "", "Chain ID of tendermint node")
@@ -52,6 +51,7 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().Int64(FlagGas, 200000, "gas limit to set per-transaction")
 		c.Flags().Bool(FlagAsync, false, "broadcast transactions asynchronously")
 		c.Flags().Bool(FlagJson, false, "return output in json format")
+		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
 		c.Flags().Bool(FlagPrintResponse, false, "return tx response (only works with async = false)")
 		c.Flags().Bool(FlagGenerateOnly, false, "build an unsigned transaction and write it to STDOUT")
 	}

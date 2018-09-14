@@ -21,7 +21,7 @@ else
 	go get -v $(STATIK)
 endif
 
-update_gaia_lite_docs:
+update_irislcd_swagger_docs:
 	@statik -src=client/lcd/swaggerui -dest=client/lcd
 
 get_vendor_deps:
@@ -29,33 +29,33 @@ get_vendor_deps:
 	@echo "--> Running dep ensure"
 	@dep ensure -v
 
-install: update_gaia_lite_docs
+install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(BUILD_FLAGS) ./cmd/irislcd
 
-build_linux: update_gaia_lite_docs
+build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd
 
-build_cur: update_gaia_lite_docs
+build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
 	go build -o build/iriscli ./cmd/iriscli
 
-build_example: update_gaia_lite_docs
+build_example: update_irislcd_swagger_docs
 	go build  -o build/iris1 ./examples/irishub1/cmd/iris1
 	go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
 	go build  -o build/iris2 ./examples/irishub2/cmd/iris2
 	go build  -o build/iriscli2 ./examples/irishub2/cmd/iriscli2
 
-install_examples: update_gaia_lite_docs
+install_examples: update_irislcd_swagger_docs
 	go install ./examples/irishub1/cmd/iris1
 	go install ./examples/irishub1/cmd/iriscli1
 	go install ./examples/irishub2/cmd/iris2
 	go install ./examples/irishub2/cmd/iriscli2
 
-build_example_linux: update_gaia_lite_docs
+build_example_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris1 ./examples/irishub1/cmd/iris1
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2 ./examples/irishub2/cmd/iris2
