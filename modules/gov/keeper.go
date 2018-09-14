@@ -4,14 +4,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iparams"
 	"strconv"
 	"strings"
 )
 
 // nolint
-
 
 // Governance Keeper
 type Keeper struct {
@@ -58,12 +57,12 @@ func (keeper Keeper) WireCodec() *wire.Codec {
 // =====================================================
 // Proposals
 
-func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind,params Params) Proposal{
+func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	switch proposalType {
 	case ProposalTypeText:
 		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	case ProposalTypeParameterChange:
-		return keeper.NewParametersProposal(ctx, title, description, proposalType,params)
+		return keeper.NewParametersProposal(ctx, title, description, proposalType, params)
 	case ProposalTypeSoftwareUpgrade:
 		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
 	}
@@ -92,7 +91,7 @@ func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description 
 	return proposal
 }
 
-func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind,params Params) Proposal{
+func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -116,7 +115,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	return proposal
 }
 
-func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal{
+func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -216,7 +215,6 @@ func (keeper Keeper) GetDepositProcedure(ctx sdk.Context) govparams.DepositProce
 	govparams.DepositProcedureParameter.LoadValue(ctx)
 	return govparams.DepositProcedureParameter.Value
 }
-
 
 // Returns the current Voting Procedure from the global param store
 func (keeper Keeper) GetVotingProcedure(ctx sdk.Context) VotingProcedure {

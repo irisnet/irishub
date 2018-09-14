@@ -16,9 +16,9 @@ type DepositProcedure struct {
 }
 
 type DepositProcedureParam struct {
-	Value      DepositProcedure
-	psetter    params.Setter
-	pgetter    params.Getter
+	Value   DepositProcedure
+	psetter params.Setter
+	pgetter params.Getter
 }
 
 func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {

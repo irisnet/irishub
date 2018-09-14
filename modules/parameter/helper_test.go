@@ -36,9 +36,9 @@ func TestInitGenesisParameter(t *testing.T) {
 		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 20)},
 		MaxDepositPeriod: 1440}
 
-	govparams.DepositProcedureParameter.SetReadWriter(paramKeeper.Setter())
+	SetParamReadWriter(paramKeeper.Setter(),&govparams.DepositProcedureParameter,&govparams.DepositProcedureParameter)
 
-	InitGenesisParameter(&govparams.DepositProcedureParameter, ctx,nil)
+	InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, nil)
 
 	require.Equal(t, p1, govparams.DepositProcedureParameter.Value)
 
