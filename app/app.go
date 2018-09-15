@@ -41,6 +41,7 @@ const (
 
 // default home directories for expected binaries
 var (
+	DefaultLCDHome  = os.ExpandEnv("$HOME/.irislcd")
 	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
 	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 )
@@ -221,7 +222,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		panic(err)
 	}
 
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, denom))
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	if err != nil {
 		panic(err)
 	}
