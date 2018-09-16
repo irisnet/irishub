@@ -9,7 +9,7 @@ These instructions are for setting up a brand new full node from scratch.
 First, initialize the node and create the necessary config files:
 
 ```
-iris init --name your_custom_name --home=IRISHOME
+iris init --name=<your_custom_name< --home=$IRISHOME
 ```
 
 > Note: Only ASCII characters are supported for the `--name`. Using Unicode characters will render your node unreachable.
