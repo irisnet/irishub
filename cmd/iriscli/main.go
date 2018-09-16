@@ -5,8 +5,10 @@ import (
 
 	"github.com/tendermint/tendermint/libs/cli"
 
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
+	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 )
@@ -22,6 +24,24 @@ var (
 func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
+
+	//Add bank commands
+	bankCmd := &cobra.Command{
+		Use:   "bank",
+		Short: "Bank subcommands",
+	}
+	bankCmd.AddCommand(
+		client.GetCommands(
+			bankcmd.GetCmdQueryCoinType(cdc),
+			bankcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+		)...)
+	bankCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
+	rootCmd.AddCommand(
+		bankCmd,
+	)
 
 	//Add upgrade commands
 	upgradeCmd := &cobra.Command{

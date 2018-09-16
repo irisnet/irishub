@@ -4,7 +4,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/cosmos/cosmos-sdk/x/bank/client"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
@@ -16,7 +15,7 @@ import (
 
 type sendBody struct {
 	Amount sdk.Coins `json:"amount"`
-	utils.BaseTx
+	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address
@@ -31,12 +30,12 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		broadcastSync, err := strconv.ParseBool(vars[utils.BroadcastSync])
+		generateOnly, err := strconv.ParseBool(vars[utils.GenerateOnly])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		generateOnly, err := strconv.ParseBool(vars[utils.GenerateOnly])
+		async, err := strconv.ParseBool(vars[utils.Async])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -54,44 +53,50 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			return
 		}
 
-		info, err := kb.Get(m.LocalAccountName)
+		info, err := kb.Get(m.BaseTx.LocalAccountName)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
+		txCtx := context.TxContext{
+			Codec:         cdc,
+			Gas:           m.BaseTx.Gas,
+			Fee:           m.BaseTx.Fees,
+			ChainID:       m.BaseTx.ChainID,
+			AccountNumber: m.BaseTx.AccountNumber,
+			Sequence:      m.BaseTx.Sequence,
+		}
+
+		amount, err := txCtx.ParseCoins(m.Amount.String())
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 		// build message
-		msg := client.BuildMsg(sdk.AccAddress(info.GetPubKey().Address()), to, m.Amount)
+		msg := client.BuildMsg(sdk.AccAddress(info.GetPubKey().Address()), to, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		txCtx := authctx.TxContext{
-			Codec:         cdc,
-			Gas:           m.Gas,
-			Fee:           m.Fees,
-			ChainID:       m.ChainID,
-			AccountNumber: m.AccountNumber,
-			Sequence:      m.Sequence,
-		}
 
 		if generateOnly {
 			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 			return
 		}
 
-		txBytes, err := txCtx.BuildAndSign(m.LocalAccountName, m.Password, []sdk.Msg{msg})
+		txBytes, err := txCtx.BuildAndSign(m.BaseTx.LocalAccountName, m.BaseTx.Password, []sdk.Msg{msg})
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
 		var res interface{}
-		if broadcastSync {
-			res, err = cliCtx.BroadcastTx(txBytes)
-		} else {
+		if async {
 			res, err = cliCtx.BroadcastTxAsync(txBytes)
+		} else {
+			res, err = cliCtx.BroadcastTx(txBytes)
 		}
 
 		output, err := cdc.MarshalJSONIndent(res, "", "  ")

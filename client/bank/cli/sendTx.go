@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/cosmos/cosmos-sdk/x/bank/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -25,7 +24,7 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "send",
 		Short: "Create and sign a send tx",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -43,8 +42,9 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			// parse coins trying to be sent
-			amount := viper.GetString(flagAmount)
-			coins, err := sdk.ParseCoins(amount)
+			amountString := viper.GetString(flagAmount)
+
+			coins, err := txCtx.ParseCoins(amountString)
 			if err != nil {
 				return err
 			}

@@ -394,37 +394,6 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	return coinType, nil
 }
 
-func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
-	mainUnit, err := types.GetCoinName(coinStr)
-	coinType, err := cliCtx.GetCoinType(mainUnit)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	coin, err := coinType.ConvertToMinCoin(coinStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-	return coin, nil
-}
-
-func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	for _, coinStr := range coinStrs {
-		coin, err := cliCtx.ParseCoin(coinStr)
-		if err != nil {
-			return coins, err
-		}
-		coins = append(coins, coin)
-	}
-	return coins, nil
-}
-
 func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
 	client := cliCtx.Client.(*tmclient.HTTP)
 	return client.NetInfo()

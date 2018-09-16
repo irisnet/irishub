@@ -12,10 +12,10 @@ import (
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
-	r.HandleFunc(fmt.Sprintf("/accounts/{address}/send/{%s}/{%s}", utils.BroadcastSync, utils.GenerateOnly),
+	r.HandleFunc(fmt.Sprintf("/bank/{address}/send/{%s}/{%s}", utils.GenerateOnly, utils.Async),
 		SendRequestHandlerFn(cdc, kb, cliCtx)).Methods("POST")
-	r.HandleFunc("/accounts/{address}",
+	r.HandleFunc("/bank/accounts/{address}",
 		QueryAccountRequestHandlerFn("acc", cdc, authcmd.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
-	r.HandleFunc("/accounts/{coin-type}",
+	r.HandleFunc("/bank/coin/{coin-type}",
 		QueryCoinTypeRequestHandlerFn(cdc, cliCtx)).Methods("GET")
 }

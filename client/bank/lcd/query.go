@@ -45,7 +45,7 @@ func QueryAccountRequestHandlerFn(storeName string, cdc *wire.Codec,
 		}
 
 		// print out whole account
-		output, err := cdc.MarshalJSON(account)
+		output, err := cdc.MarshalJSONIndent(account, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't marshall query result. Error: %s", err.Error()))
 			return
