@@ -94,6 +94,8 @@ iriscli stake validator  --address-validator=account  --chain-id=fuxi-3000 --nod
 
 The `<account>` is your account address that starts with 'faa'
 
+To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
+
 ### Confirm Your Validator is Running
 
 Your validator is active if the following command returns anything:
