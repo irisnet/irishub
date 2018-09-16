@@ -41,9 +41,6 @@ iriscli account <ACCOUNT> --node=http://localhost:26657
 ```
 ### Claim tokens
 
-
-Please reply this [issue](https://github.com/irisnet/testnets/issues/69) with the generated address. The team will send you 10000IRIS after verfication.
-
 You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). Please don't abuse it.
 
 
@@ -114,9 +111,7 @@ iriscli stake edit-validator  --address-validator=account --moniker="choose a mo
 View the validator's information with this command:
 
 ```
-iriscli stake validator \
-  --address-validator=<account_cosmosaccaddr> \
-  --chain-id=fuxi-2000
+iriscli stake validator --address-validator=<account_cosmosaccaddr> --chain-id=fuxi-3000
 ```
 
 ### Confirm Your Validator is Running

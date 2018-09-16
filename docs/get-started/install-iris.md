@@ -91,7 +91,7 @@ Make sure that you can access to google.com for that our project used some libra
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.4.0
+cd irishub && git checkout v0.4.1
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_vendor_deps && make install
 ```
@@ -101,9 +101,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.4.0
+v0.4.1
 $ iriscli version
-v0.4.0
+v0.4.1
 ```
 
 ### How to Update
@@ -114,7 +114,7 @@ Get latest code (you can also `git fetch` only the version desired), ensure the 
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 rm Gopkg.lock
-git checkout v0.4.0
+git checkout v0.4.1
 make get_vendor_deps
 make install
 ```
