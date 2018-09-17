@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"net/url"
 )
 
 const (
@@ -73,3 +74,9 @@ func WriteGenerateStdTxResponse(w http.ResponseWriter, txCtx context.TxContext, 
 	w.Write(output)
 	return
 }
+
+func AsyncOnlyArg(r *http.Request) bool { return urlQueryHasArg(r.URL, Async) }
+
+func GenerateOnlyArg(r *http.Request) bool { return urlQueryHasArg(r.URL, GenerateOnly) }
+
+func urlQueryHasArg(url *url.URL, arg string) bool { return url.Query().Get(arg) == "true" }

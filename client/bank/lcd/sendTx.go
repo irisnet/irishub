@@ -9,7 +9,6 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"github.com/irisnet/irishub/client/bank"
 )
 
@@ -30,16 +29,8 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx.GenerateOnly, err = strconv.ParseBool(vars[utils.GenerateOnly])
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		cliCtx.Async, err = strconv.ParseBool(vars[utils.Async])
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		cliCtx.GenerateOnly = utils.GenerateOnlyArg(r)
+		cliCtx.Async = utils.AsyncOnlyArg(r)
 
 		var m sendBody
 		body, err := ioutil.ReadAll(r.Body)
