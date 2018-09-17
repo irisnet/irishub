@@ -27,16 +27,17 @@ module.exports = {
         title: 'Modules',
         collapsable: false,
         children: [
-          ['/modules/coin/README.md', 'Coin Type'],
+          // ['/modules/coin/README.md', 'Coin Type'],
           ['/modules/fee-token/README.md', 'Fee Token'],
-          ['/modules/gov/README.md', 'Governance']
+          // ['/modules/gov/README.md', 'Governance']
         ]
       },{
         title: 'Validators',
         collapsable: false,
         children: [
-          ['/validators/overview.md', 'Overview'],
-          ['/validators/Setup A Sentry Node.md', 'Setup a Sentry Node']
+          ['/validators/README.md', 'Overview'],
+          ['/validators/Setup-A-Sentry-Node.md', 'Setup a Sentry Node'],
+          ['/validators/FAQ.md', 'FAQ']
         ]
       }
     ]
