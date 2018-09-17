@@ -27,9 +27,10 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 			initialDeposit := viper.GetString(flagDeposit)
 			paramsStr := viper.GetString(flagParams)
 
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -87,11 +88,12 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 		Use:   "deposit",
 		Short: "deposit tokens for activing proposal",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			depositerAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -134,11 +136,12 @@ func GetCmdVote(cdc *wire.Codec) *cobra.Command {
 		Use:   "vote",
 		Short: "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			voterAddr, err := cliCtx.GetFromAddress()
 			if err != nil {

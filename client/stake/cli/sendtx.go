@@ -24,11 +24,12 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 		Use:   "create-validator",
 		Short: "create new validator initialized with a self-delegation to it",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			amounstStr := viper.GetString(FlagAmount)
 			if amounstStr == "" {
@@ -95,11 +96,12 @@ func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
 		Use:   "edit-validator",
 		Short: "edit and existing validator account",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			validatorAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -129,11 +131,12 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 		Use:   "delegate",
 		Short: "delegate liquid tokens to an validator",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			amount, err := sdk.ParseCoin(viper.GetString(FlagAmount))
 			if err != nil {
@@ -184,11 +187,12 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 		Use:   "begin",
 		Short: "begin redelegation",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			var err error
 			delegatorAddr, err := cliCtx.GetFromAddress()
@@ -282,11 +286,12 @@ func GetCmdCompleteRedelegate(cdc *wire.Codec) *cobra.Command {
 		Use:   "complete",
 		Short: "complete redelegation",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			delegatorAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -336,11 +341,12 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 		Use:   "begin",
 		Short: "begin unbonding",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			delegatorAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -381,11 +387,12 @@ func GetCmdCompleteUnbonding(cdc *wire.Codec) *cobra.Command {
 		Use:   "complete",
 		Short: "complete unbonding",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
 
 			delegatorAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
