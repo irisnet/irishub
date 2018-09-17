@@ -1,6 +1,6 @@
 # Running a Validator Node
 
-Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](full-node.md)
+Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
 
 Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
@@ -35,16 +35,17 @@ The seed phrase of this account will also be displayed. You could use these 24 p
 iriscli keys add <NAME_OF_KEY> --recover
 ```
 
-Once you have created your own address, please comment this issue with your address and you could receive 1,000iris soon. Each team will receivce once, then you could use these tokens to stake as a validator. The following command is used to check the balance of your account:
-```
-iriscli account <ACCOUNT> --node=http://localhost:26657
-```
+
 ### Claim tokens
 
 You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). The faucet will send you 10IRIS every request, Please don't abuse it.
 
+Once you have created your own address, please  then you could use this　account to stake as a validatord. The following command is used to check the balance of your account:
+```
+iriscli account <ACCOUNT> --node=http://localhost:26657
+```
 
-## Create A Validator
+## Create-Validator
 
 ### Confirm Your Validator is Synced
 

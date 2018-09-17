@@ -23,9 +23,9 @@
 
 ## 如何提交一个提案?
 
-Anyone could submit a governance proposal, but you need to make the deposit for this proposal more than the minimium requirement.
+任何人都可以提交链上治理提案，但你需要为此提案存入超过最低要求的押金。
 
-The following command is for submitting a `Text` proposal:
+如下的命令将执行提交一个 `Text`类型的提案:
 
 ```
 iriscli gov submit-proposal --title="Text" --description="name of the proposal" --type="Text" --deposit="1000000000000000000000iris" --proposer=<account>  --from=<name>  --chain-id=fuxi-3000 --fee=400000000000000iris --gas=20000 --node=http://localhost:36657
