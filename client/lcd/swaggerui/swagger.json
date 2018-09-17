@@ -40,19 +40,19 @@
           "400": {
             "description": "Bad Request",
             "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
+              "$ref": "#/definitions/HTTPError"
             }
           },
           "404": {
             "description": "Not Found",
             "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
+              "$ref": "#/definitions/HTTPError"
             }
           },
           "500": {
             "description": "Internal Server Error",
             "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
+              "$ref": "#/definitions/HTTPError"
             }
           }
         }
@@ -81,192 +81,19 @@
           "400": {
             "description": "Bad Request",
             "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
+              "$ref": "#/definitions/HTTPError"
             }
           },
           "404": {
             "description": "Not Found",
             "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
+              "$ref": "#/definitions/HTTPError"
             }
           },
           "500": {
             "description": "Internal Server Error",
             "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          }
-        }
-      }
-    },
-    "/bank/accounts/{address}": {
-      "get": {
-        "tags": [
-          "ICS20: Bank"
-        ],
-        "summary": "Get token information",
-        "description": "Get token information of user specific address",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "address",
-            "in": "path",
-            "description": "address",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/bank.AccountQueryResponse"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          }
-        }
-      }
-    },
-    "/bank/coin/{coin-type}": {
-      "get": {
-        "tags": [
-          "ICS20: Bank"
-        ],
-        "summary": "Get coin type",
-        "description": "Get the detailed information about the given coin type",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "coin-type",
-            "in": "path",
-            "description": "coin-type name",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/bank.CoinType"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          }
-        }
-      }
-    },
-    "/bank/{address}/send/{generate-only}/{async}": {
-      "post": {
-        "tags": [
-          "ICS20: Bank"
-        ],
-        "summary": "Transfer tokens",
-        "description": "Transfer tokens to given address.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "address",
-            "description": "address to send token",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "path",
-            "name": "generate-only",
-            "description": "if true, only generate and return a unsigned transaction byte array",
-            "required": true,
-            "type": "boolean"
-          },
-          {
-            "in": "path",
-            "name": "async",
-            "description": "if true, broadcast transaction asynchronously",
-            "required": true,
-            "type": "boolean"
-          },
-          {
-            "in": "body",
-            "name": "sendToken",
-            "description": "parameters to send token",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/bank.TransferBody"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/common.BroadcastTxCommitResult"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "$ref": "#/definitions/utils.HTTPError"
+              "$ref": "#/definitions/HTTPError"
             }
           }
         }
@@ -274,7 +101,7 @@
     }
   },
   "definitions": {
-    "utils.HTTPError": {
+    "HTTPError": {
       "type": "object",
       "properties": {
         "rest api": {
@@ -287,272 +114,6 @@
         },
         "error message": {
           "type": "string"
-        }
-      }
-    },
-    "sdk.Coin": {
-      "type": "object",
-      "properties": {
-        "denom": {
-          "type": "string"
-        },
-        "amount": {
-          "type": "string"
-        }
-      }
-    },
-    "sdk.Coins": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/sdk.Coin"
-      }
-    },
-    "common.KVPair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "value": {
-          "type": "integer"
-        }
-      }
-    },
-    "common.KVPairs": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/common.KVPair"
-      }
-    },
-    "common.CheckTxResult": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "string"
-        },
-        "gas_used": {
-          "type": "integer"
-        },
-        "gas_wanted": {
-          "type": "integer"
-        },
-        "info": {
-          "type": "string"
-        },
-        "log": {
-          "type": "string"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/common.KVPairs"
-          }
-        }
-      },
-      "example": {
-        "code": 0,
-        "data": "data",
-        "log": "log",
-        "gas_used": 6,
-        "gas_wanted": 1,
-        "info": "info",
-        "tags": [
-          "",
-          ""
-        ]
-      }
-    },
-    "common.DeliverTxResult": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "string"
-        },
-        "gas_used": {
-          "type": "integer"
-        },
-        "gas_wanted": {
-          "type": "integer"
-        },
-        "info": {
-          "type": "string"
-        },
-        "log": {
-          "type": "string"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/common.KVPairs"
-          }
-        }
-      },
-      "example": {
-        "code": 5,
-        "data": "data",
-        "log": "log",
-        "gas_used": 5,
-        "gas_wanted": 2,
-        "info": "info",
-        "tags": [
-          "",
-          ""
-        ]
-      }
-    },
-    "common.BroadcastTxCommitResult": {
-      "type": "object",
-      "properties": {
-        "check_tx": {
-          "$ref": "#/definitions/common.CheckTxResult"
-        },
-        "deliver_tx": {
-          "$ref": "#/definitions/common.DeliverTxResult"
-        },
-        "hash": {
-          "type": "string"
-        },
-        "height": {
-          "type": "integer"
-        }
-      },
-      "example": {
-        "check_tx": {
-          "code": 0,
-          "data": "data",
-          "log": "log",
-          "gas_used": 6,
-          "gas_wanted": 1,
-          "info": "info",
-          "tags": [
-            "",
-            ""
-          ]
-        },
-        "deliver_tx": {
-          "code": 5,
-          "data": "data",
-          "log": "log",
-          "gas_used": 5,
-          "gas_wanted": 2,
-          "info": "info",
-          "tags": [
-            "",
-            ""
-          ]
-        },
-        "hash": "hash",
-        "height": 7
-      }
-    },
-    "coin.Unit": {
-      "type": "object",
-      "properties": {
-        "denom": {
-          "type": "string"
-        },
-        "decimal": {
-          "type": "integer"
-        }
-      }
-    },
-    "sdk.Units": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/coin.Unit"
-      }
-    },
-    "utils.BaseTx": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "chain_id": {
-          "type": "string"
-        },
-        "account_number": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string"
-        },
-        "gas": {
-          "type": "string"
-        },
-        "fee": {
-          "type": "string"
-        }
-      }
-    },
-    "bank.BaseAccount": {
-      "type": "object",
-      "properties": {
-        "account_number": {
-          "type": "integer"
-        },
-        "address": {
-          "type": "string"
-        },
-        "coins": {
-          "$ref": "#/definitions/sdk.Coins"
-        },
-        "public_key": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "integer"
-        }
-      }
-    },
-    "bank.AccountQueryResponse": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string"
-        },
-        "value": {
-          "$ref": "#/definitions/bank.BaseAccount"
-        }
-      }
-    },
-    "bank.TransferBody": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/sdk.Coins"
-        },
-        "base_tx": {
-          "$ref": "#/definitions/utils.BaseTx"
-        }
-      }
-    },
-    "bank.CoinType": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "desc": {
-          "type": "string"
-        },
-        "min_unit": {
-          "$ref": "#/definitions/coin.Unit"
-        },
-        "Units": {
-          "$ref": "#/definitions/coin.Units"
-        },
-        "origin": {
-          "type": "integer"
         }
       }
     }
