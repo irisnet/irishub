@@ -16,10 +16,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/version"
 )
 
 // Key to store the header in the DB itself.
@@ -54,8 +54,8 @@ type BaseApp struct {
 	codespacer *sdk.Codespacer      // handle module codespacing
 	txDecoder  sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
-	anteHandler sdk.AnteHandler // ante handler for fee and auth
-	feeRefundHandler types.FeeRefundHandler // fee handler for fee refund
+	anteHandler          sdk.AnteHandler            // ante handler for fee and auth
+	feeRefundHandler     types.FeeRefundHandler     // fee handler for fee refund
 	feePreprocessHandler types.FeePreprocessHandler // fee handler for fee preprocessor
 
 	// may be nil
@@ -64,7 +64,7 @@ type BaseApp struct {
 	endBlocker       sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 	addrPeerFilter   sdk.PeerFilter   // filter peers by address and port
 	pubkeyPeerFilter sdk.PeerFilter   // filter peers by public key
-	runMsg			 RunMsg
+	runMsg           RunMsg
 
 	//--------------------
 	// Volatile
@@ -148,6 +148,7 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
 }
+
 ////////////////////  iris/cosmos-sdk end  ///////////////////////////
 
 // default custom logic for transaction decoding
@@ -462,7 +463,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 					Log:       result.Log,
 					GasWanted: result.GasWanted,
 					GasUsed:   result.GasUsed,
-					Tags: result.Tags,
+					Tags:      result.Tags,
 				}
 			}
 		}
@@ -485,7 +486,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 		Log:       result.Log,
 		GasWanted: result.GasWanted,
 		GasUsed:   result.GasUsed,
-		Tags: result.Tags,
+		Tags:      result.Tags,
 	}
 }
 
@@ -643,7 +644,7 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
 				result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
-				result.Tags.AppendTag("consumedTxFee-" + refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
+				result.Tags.AppendTag("consumedTxFee-"+refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
 			}
 		}
 	}()

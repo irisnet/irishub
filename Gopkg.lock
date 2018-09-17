@@ -2,6 +2,22 @@
 
 
 [[projects]]
+  digest = "1:d1665c44bd5db19aaee18d1b6233c99b0b9a986e8bccb24ef54747547a48027f"
+  name = "github.com/PuerkitoBio/purell"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:c739832d67eb1e9cc478a19cc1a1ccd78df0397bf8a32978b759152e205f644b"
+  name = "github.com/PuerkitoBio/urlesc"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "de5bf2ad457846296e2031421a34e2568e304e35"
+
+[[projects]]
   digest = "1:e92f5581902c345eb4ceffdcd4a854fb8f73cf436d47d837d1ec98ef1fe0a214"
   name = "github.com/StackExchange/wmi"
   packages = ["."]
@@ -57,7 +73,7 @@
 
 [[projects]]
   branch = "irisnet/develop"
-  digest = "1:30a362be7be5b3b0fe27e206577a77cff95f8cd11a12d1179f93934cccbe5663"
+  digest = "1:5df3d1c3a90a759d109516f403b494d3b4f6d614538ceb562a03e5a411f1667f"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -81,33 +97,26 @@
     "x/auth",
     "x/auth/client/cli",
     "x/auth/client/context",
-    "x/auth/client/rest",
     "x/bank",
     "x/bank/client",
     "x/bank/client/cli",
-    "x/bank/client/rest",
     "x/gov",
     "x/gov/client/cli",
-    "x/gov/client/rest",
     "x/gov/tags",
     "x/ibc",
-    "x/ibc/client/cli",
-    "x/ibc/client/rest",
     "x/mock",
     "x/mock/simulation",
     "x/params",
     "x/slashing",
     "x/slashing/client/cli",
-    "x/slashing/client/rest",
     "x/stake",
     "x/stake/client/cli",
-    "x/stake/client/rest",
     "x/stake/keeper",
     "x/stake/tags",
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "1d5c081067680987f342d99c1c4087c477ea9b4a"
+  revision = "8c058b8e5b028dc7373f5427dd36e00686d8f6a5"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -167,6 +176,38 @@
   pruneopts = "UT"
   revision = "a41e3c4b706f6ae8dfbff342b06e40fa4d2d0506"
   version = "v1.2.1"
+
+[[projects]]
+  digest = "1:2997679181d901ac8aaf4330d11138ecf3974c6d3334995ff36f20cbd597daf8"
+  name = "github.com/go-openapi/jsonpointer"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3a0015ad55fa9873f41605d3e8f28cd279c32ab2"
+  version = "0.16.0"
+
+[[projects]]
+  digest = "1:1ae3f233d75a731b164ca9feafd8ed646cbedf1784095876ed6988ce8aa88b1f"
+  name = "github.com/go-openapi/jsonreference"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3fb327e6747da3043567ee86abd02bb6376b6be2"
+  version = "0.16.0"
+
+[[projects]]
+  digest = "1:3e5bdbd2a071c72c778c28fd7b5dfde95cdfbcef412f364377e031877205e418"
+  name = "github.com/go-openapi/spec"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "384415f06ee238aae1df5caad877de6ceac3a5c4"
+  version = "0.16.0"
+
+[[projects]]
+  digest = "1:c80984d4a9bb79539743aff5af91b595d84f513700150b0ed73c1697d1200d54"
+  name = "github.com/go-openapi/swag"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "becd2f08beafcca035645a8a101e0e3e18140458"
+  version = "0.16.0"
 
 [[projects]]
   digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
@@ -286,6 +327,18 @@
   pruneopts = "UT"
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
   version = "v1.8.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:84a5a2b67486d5d67060ac393aa255d05d24ed5ee41daecd5635ec22657b6492"
+  name = "github.com/mailru/easyjson"
+  packages = [
+    "buffer",
+    "jlexer",
+    "jwriter",
+  ]
+  pruneopts = "UT"
+  revision = "60711f1a8329503b04e1c88535f419d0bb440bff"
 
 [[projects]]
   digest = "1:d4d17353dbd05cb52a2a52b7fe1771883b682806f68db442b436294926bbfafb"
@@ -472,6 +525,14 @@
   version = "v1.2.1"
 
 [[projects]]
+  digest = "1:f7e7c41b7c708912d83dc5e4acd1392402733e18f5a6aebbe217e0f9e10057f2"
+  name = "github.com/swaggo/swag"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "db2ee6c14a35e4fca95b0d75054296ef2b699050"
+  version = "v1.3.2"
+
+[[projects]]
   branch = "master"
   digest = "1:f2ffd421680b0a3f7887501b3c6974bcf19217ecd301d0e2c9b681940ec363d5"
   name = "github.com/syndtr/goleveldb"
@@ -648,7 +709,7 @@
   revision = "4910a1d54f876d7b22162a85f4d066d3ee649450"
 
 [[projects]]
-  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
+  digest = "1:0c56024909189aee3364b7f21a95a27459f718aa7c199a5c111c36cfffd9eaef"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -665,6 +726,7 @@
     "unicode/cldr",
     "unicode/norm",
     "unicode/rangetable",
+    "width",
   ]
   pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
@@ -741,27 +803,20 @@
     "github.com/cosmos/cosmos-sdk/x/auth",
     "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
     "github.com/cosmos/cosmos-sdk/x/auth/client/context",
-    "github.com/cosmos/cosmos-sdk/x/auth/client/rest",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/bank/client",
     "github.com/cosmos/cosmos-sdk/x/bank/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/bank/client/rest",
     "github.com/cosmos/cosmos-sdk/x/gov",
     "github.com/cosmos/cosmos-sdk/x/gov/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/gov/client/rest",
     "github.com/cosmos/cosmos-sdk/x/gov/tags",
     "github.com/cosmos/cosmos-sdk/x/ibc",
-    "github.com/cosmos/cosmos-sdk/x/ibc/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/ibc/client/rest",
     "github.com/cosmos/cosmos-sdk/x/mock",
     "github.com/cosmos/cosmos-sdk/x/mock/simulation",
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/slashing/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/slashing/client/rest",
     "github.com/cosmos/cosmos-sdk/x/stake",
     "github.com/cosmos/cosmos-sdk/x/stake/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/stake/client/rest",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
@@ -779,6 +834,7 @@
     "github.com/spf13/viper",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
+    "github.com/swaggo/swag",
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
     "github.com/tendermint/tendermint/blockchain",
@@ -790,6 +846,8 @@
     "github.com/tendermint/tendermint/libs/common",
     "github.com/tendermint/tendermint/libs/db",
     "github.com/tendermint/tendermint/libs/log",
+    "github.com/tendermint/tendermint/lite",
+    "github.com/tendermint/tendermint/lite/proxy",
     "github.com/tendermint/tendermint/mempool",
     "github.com/tendermint/tendermint/node",
     "github.com/tendermint/tendermint/rpc/client",
