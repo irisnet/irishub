@@ -2,11 +2,11 @@ package cli
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/modules/upgrade"
 	irisVersion "github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
+	"github.com/irisnet/irishub/client/context"
 )
 
 func GetCmdVersion(storeName string, cdc *wire.Codec) *cobra.Command {
