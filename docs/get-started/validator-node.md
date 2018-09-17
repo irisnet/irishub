@@ -41,16 +41,22 @@ iriscli account <ACCOUNT> --node=http://localhost:26657
 ```
 ### Claim tokens
 
-
-Please reply this [issue](https://github.com/irisnet/testnets/issues/69) with the generated address. The team will send you 10000IRIS after verfication.
-
-You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). Please don't abuse it.
+You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). The faucet will send you 10IRIS every request, Please don't abuse it.
 
 
 ## Create A Validator
 
+### Confirm Your Validator is Synced
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fvp`, it can be used to create a new validator by staking tokens. 
+Your validator is active if the following command returns anything:
+
+```
+iriscli status --node=tcp://localhost:26657 
+```
+
+You should also be able to see `catching_up` is `false`. 
+
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fvp`, it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, please read this [doc](./tools/Bech32%20on%20IRISnet.md)
 
 You can find your validator's pubkey by running:
 
@@ -74,7 +80,7 @@ Please note the **amount** needs to be the **minimium unit** of IRIS.
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=game-of-genesis   --node=tcp://localhost:26657  --amount=1000000000000000000iris
+iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3000   --node=tcp://localhost:26657  --amount=1000000000000000000iris
 ```
 Don't forget the `fee` and `gas` field. To read more about fees in IRISHub, you should read [this](/modules/fee-token/feeToken.md)
 
@@ -83,10 +89,12 @@ Don't forget the `fee` and `gas` field. To read more about fees in IRISHub, you 
 View the validator's information with this command:
 
 ```
-iriscli stake validator  --address-validator=account  --chain-id=game-of-genesis --node=tcp://localhost:26657 
+iriscli stake validator  --address-validator=account  --chain-id=fuxi-3000 --node=tcp://localhost:26657 
 ```
 
 The `<account>` is your account address that starts with 'faa'
+
+To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
 
 ### Confirm Your Validator is Running
 
@@ -106,7 +114,7 @@ You can edit your validator's public description. This info is to identify your 
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=game-of-genesis 
+iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-3000 
   --name=key_name --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
 ```
 ### View Validator Description
@@ -114,20 +122,10 @@ iriscli stake edit-validator  --address-validator=account --moniker="choose a mo
 View the validator's information with this command:
 
 ```
-iriscli stake validator \
-  --address-validator=<account_cosmosaccaddr> \
-  --chain-id=fuxi-2000
+iriscli stake validator --address-validator=<account_cosmosaccaddr> --chain-id=fuxi-3000
 ```
 
-### Confirm Your Validator is Running
-
-Your validator is active if the following command returns anything:
-
-```
-iriscli status
-```
-
-You should  see the voting power of your validator node is above zero. 
+### Use IRISPlorer
 
 You should also be able to see your validator on the [Explorer](https://testnet.irisplorer.io). You are looking for the `bech32` encoded `address` in the `~/.iris/config/priv_validator.json` file.
 
