@@ -11,6 +11,7 @@ import (
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
+	tendermintcmd "github.com/irisnet/irishub/client/tendermint/cli"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 )
@@ -26,6 +27,19 @@ var (
 func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
+
+	//Add state commands
+	tendermintCmd := &cobra.Command{
+		Use:   "tendermint",
+		Short: "Tendermint state querying subcommands",
+	}
+	tendermintCmd.AddCommand(
+		tendermintcmd.QueryTxCmd(cdc),
+		tendermintcmd.SearchTxCmd(cdc),
+		tendermintcmd.BlockCommand(),
+		tendermintcmd.ValidatorCommand(),
+	)
+	rootCmd.AddCommand(tendermintCmd)
 
 	//Add bank commands
 	bankCmd := &cobra.Command{

@@ -18,12 +18,14 @@ import (
 	"github.com/tendermint/tendermint/libs/common"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
+	tmliteErr "github.com/tendermint/tendermint/lite/errors"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"github.com/tendermint/tendermint/lite"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an
@@ -426,6 +428,17 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 	}
 
 	return &res.Result, nil
+}
+
+// Certify verifies the consensus proof at given height
+func (ctx CLIContext) Certify(height int64) (lite.Commit, error) {
+	check, err := tmliteProxy.GetCertifiedCommit(height, ctx.Client, ctx.Certifier)
+	if tmliteErr.IsCommitNotFoundErr(err) {
+		return lite.Commit{}, ErrVerifyCommit(height)
+	} else if err != nil {
+		return lite.Commit{}, err
+	}
+	return check, nil
 }
 
 // isQueryStoreWithProof expects a format like /<queryType>/<storeName>/<subpath>
