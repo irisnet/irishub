@@ -1,4 +1,4 @@
-# IRISnet Testnet，Codename Fuxi
+# IRISnet Testnet Codename Fuxi
 
 ## What is IRISnet
 
