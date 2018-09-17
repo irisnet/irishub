@@ -56,3 +56,4 @@ For both command line and rest API:
 * Currently, the transaction senders have no motivation to pay more fee, just ensure the gasPrice is no less than the gasPriceThreshold. Next new mechanisms will be brought in to encourage users to pay more fee. For example, proposals will tender to include transactions with higher gasPrice. Transactions with lower gasPrice have to wait for more time.
 * When a proposal builds a block, it should check whether the sum of all transaction gas is greater than blockGasLimit. If so, remove some transactions the accommodate this rule. With blockGasLimit, transactions which will consumed too much resource, such as memory , disk space and execution time, will be rejected. These special transaction may cause crash or consensus failure.
 * Consider to charge fee even if the transactions encounter execution failure. This is helpful for defencing DDos attack.
+cfgtyhdryd
