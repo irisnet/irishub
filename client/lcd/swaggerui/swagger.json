@@ -494,7 +494,7 @@
         }
       }
     },
-    "bank.BaseAccount": {
+    "bank.AccountQueryResponse": {
       "type": "object",
       "properties": {
         "account_number": {
@@ -504,24 +504,16 @@
           "type": "string"
         },
         "coins": {
-          "$ref": "#/definitions/sdk.Coins"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "public_key": {
           "type": "string"
         },
         "sequence": {
           "type": "integer"
-        }
-      }
-    },
-    "bank.AccountQueryResponse": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string"
-        },
-        "value": {
-          "$ref": "#/definitions/bank.BaseAccount"
         }
       }
     },
