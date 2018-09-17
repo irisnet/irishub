@@ -1,5 +1,5 @@
 # IRISHub
-![banner](https://github.com/irisnet/irishub/blob/master/docs/pics/iris.jpg)
+![banner](./docs/pics/iris.jpg)
 
 
 IRIS network (a.k.a. IRISnet) aims to establish a technology foundation to facilitate construction of next-generation distributed applications. By incorpo- rating a comprehensive service infrastructure and an enhanced IBC protocol into the Tendermint & Cosmos stack, IRISnet enables service interoperability as well as token transfers across an internet of blockchains.
