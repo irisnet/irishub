@@ -188,11 +188,13 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	)
 
 	// add handlers
+	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
+	app.iparamsKeeper = iparams.NewKeeper(app.cdc, app.keyIparams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
-	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
+	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.iparamsKeeper.GovSetter())
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.iparamsKeeper.GovSetter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
