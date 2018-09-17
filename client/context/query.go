@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 
@@ -13,17 +12,20 @@ import (
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/common"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
+	tmliteErr "github.com/tendermint/tendermint/lite/errors"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"github.com/tendermint/tendermint/lite"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an
@@ -394,37 +396,6 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	return coinType, nil
 }
 
-func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
-	mainUnit, err := types.GetCoinName(coinStr)
-	coinType, err := cliCtx.GetCoinType(mainUnit)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	coin, err := coinType.ConvertToMinCoin(coinStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-	return coin, nil
-}
-
-func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	for _, coinStr := range coinStrs {
-		coin, err := cliCtx.ParseCoin(coinStr)
-		if err != nil {
-			return coins, err
-		}
-		coins = append(coins, coin)
-	}
-	return coins, nil
-}
-
 func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
 	client := cliCtx.Client.(*tmclient.HTTP)
 	return client.NetInfo()
@@ -457,6 +428,17 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 	}
 
 	return &res.Result, nil
+}
+
+// Certify verifies the consensus proof at given height
+func (ctx CLIContext) Certify(height int64) (lite.Commit, error) {
+	check, err := tmliteProxy.GetCertifiedCommit(height, ctx.Client, ctx.Certifier)
+	if tmliteErr.IsCommitNotFoundErr(err) {
+		return lite.Commit{}, ErrVerifyCommit(height)
+	} else if err != nil {
+		return lite.Commit{}, err
+	}
+	return check, nil
 }
 
 // isQueryStoreWithProof expects a format like /<queryType>/<storeName>/<subpath>

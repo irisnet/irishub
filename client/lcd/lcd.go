@@ -6,7 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
+	bankHandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -71,16 +73,16 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 
 func createHandler(cdc *wire.Codec) *mux.Router {
 	r := mux.NewRouter()
-	/*
-		kb, err := keys.GetKeyBase()
-		if err != nil {
-			panic(err)
-		}
-	*/
+	kb, err := keys.GetKeyBase()
+	if err != nil {
+		panic(err)
+	}
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
+
+	bankHandler.RegisterRoutes(cliCtx, r, cdc, kb)
 
 	/*
 		keys.RegisterRoutes(r)
