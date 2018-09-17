@@ -29,11 +29,12 @@
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  branch = "irisnet/refactor"
+  version = "=v0.23.0-iris4"
 
 [[override]]
   name = "github.com/golang/protobuf"
   version = "=1.1.0"
+
 
 [[constraint]]
   name = "github.com/spf13/cobra"
@@ -45,18 +46,16 @@
 
 [[override]]
   name = "github.com/tendermint/go-amino"
-  version = "=v0.12.0-rc0"
+  version = "=0.10.1"
 
 [[override]]
   name = "github.com/tendermint/iavl"
-#  version = "=v0.9.2"
-  branch = "irisnet/feature_upgrade"
-  source = "https://github.com/irisnet/iavl.git"
+  version = "=v0.9.2"
 
 [[override]]
   name = "github.com/tendermint/tendermint"
   source = "https://github.com/irisnet/tendermint.git"
-  branch = "irisnet/develop"
+  version = "=v0.22.6-iris2"
 
 
 [prune]
