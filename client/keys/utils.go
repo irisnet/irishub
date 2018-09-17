@@ -2,14 +2,13 @@ package keys
 
 import (
 	"fmt"
-	keys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/client"
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"path/filepath"
-	"github.com/cosmos/cosmos-sdk/wire"
 )
 
 // KeyDBName is the directory under root where we store the keys
@@ -64,10 +63,10 @@ func GetPassphrase(name string) (string, error) {
 // ReadPassphraseFromStdin attempts to read a passphrase from STDIN return an
 // error upon failure.
 func ReadPassphraseFromStdin(name string) (string, error) {
-	buf := client.BufferStdin()
+	buf := BufferStdin()
 	prompt := fmt.Sprintf("Password to sign with '%s':", name)
 
-	passphrase, err := client.GetPassword(prompt, buf)
+	passphrase, err := GetPassword(prompt, buf)
 	if err != nil {
 		return passphrase, fmt.Errorf("Error reading passphrase: %v", err)
 	}
@@ -82,7 +81,7 @@ func GetKeyBaseFromDir(rootDir string) (keys.Keybase, error) {
 		if err != nil {
 			return nil, err
 		}
-		keybase = client.GetKeyBase(db)
+		keybase = GetKeyBaseFromDB(db)
 	}
 	return keybase, nil
 }

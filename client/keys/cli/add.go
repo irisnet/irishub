@@ -49,11 +49,11 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 	var err error
 	var name, pass string
 
-	buf := client.BufferStdin()
+	buf := keys.BufferStdin()
 	if viper.GetBool(flagDryRun) {
 		// we throw this away, so don't enforce args,
 		// we want to get a new random seed phrase quickly
-		kb = client.MockKeyBase()
+		kb = keys.MockKeyBase()
 		pass = "throwing-this-key-away"
 		name = "inmemorykey"
 	} else {
@@ -69,7 +69,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 		_, err := kb.Get(name)
 		if err == nil {
 			// account exists, ask for user confirmation
-			if response, err := client.GetConfirmation(
+			if response, err := keys.GetConfirmation(
 				fmt.Sprintf("override the existing name %s", name), buf); err != nil || !response {
 				return err
 			}
@@ -77,7 +77,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 
 		// ask for a password when generating a local key
 		if !viper.GetBool(client.FlagUseLedger) {
-			pass, err = client.GetCheckPassword(
+			pass, err = keys.GetCheckPassword(
 				"Enter a passphrase for your key:",
 				"Repeat the passphrase:", buf)
 			if err != nil {
@@ -97,7 +97,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 		}
 		printCreate(info, "")
 	} else if viper.GetBool(flagRecover) {
-		seed, err := client.GetSeed(
+		seed, err := keys.GetSeed(
 			"Enter your recovery seed phrase:", buf)
 		if err != nil {
 			return err

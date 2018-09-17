@@ -98,7 +98,7 @@ func AddNewKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 
 // function to just a new seed to display in the UI before actually persisting it in the keybase
 func getSeed(algo cryptokeys.SigningAlgo) string {
-	kb := client.MockKeyBase()
+	kb := keys.MockKeyBase()
 	pass := "throwing-this-key-away"
 	name := "inmemorykey"
 	_, seed, _ := kb.CreateMnemonic(name, cryptokeys.English, pass, algo)

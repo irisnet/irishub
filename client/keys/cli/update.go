@@ -2,7 +2,6 @@ package keys
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
 )
@@ -20,19 +19,19 @@ func updateKeyCommand() *cobra.Command {
 func runUpdateCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
-	buf := client.BufferStdin()
+	buf := keys.BufferStdin()
 	kb, err := keys.GetKeyBase()
 	if err != nil {
 		return err
 	}
-	oldpass, err := client.GetPassword(
+	oldpass, err := keys.GetPassword(
 		"Enter the current passphrase:", buf)
 	if err != nil {
 		return err
 	}
 
 	getNewpass := func() (string, error) {
-		return client.GetCheckPassword(
+		return keys.GetCheckPassword(
 			"Enter the new passphrase:",
 			"Repeat the new passphrase:", buf)
 	}

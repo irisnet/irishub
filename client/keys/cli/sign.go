@@ -3,7 +3,6 @@ package keys
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -32,8 +31,8 @@ var keySignCmd = &cobra.Command{
 			return err
 		}
 
-		buf := client.BufferStdin()
-		password, err := client.GetPassword(
+		buf := keys.BufferStdin()
+		password, err := keys.GetPassword(
 			"Enter passphrase:", buf)
 		if err != nil {
 			return err

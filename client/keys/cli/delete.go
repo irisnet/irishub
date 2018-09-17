@@ -2,7 +2,6 @@ package keys
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
 )
@@ -30,8 +29,8 @@ func runDeleteCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	buf := client.BufferStdin()
-	oldpass, err := client.GetPassword(
+	buf := keys.BufferStdin()
+	oldpass, err := keys.GetPassword(
 		"DANGER - enter password to permanently delete key:", buf)
 	if err != nil {
 		return err
