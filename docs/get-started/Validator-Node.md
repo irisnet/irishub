@@ -1,6 +1,6 @@
 # Running a Validator Node
 
-Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](full-node.md)
+Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
 
 Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 

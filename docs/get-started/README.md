@@ -8,16 +8,16 @@ IRIS network (a.k.a. IRISnet) is named after Greek goddess **Iris**, said to be 
 
 ### Step 1: Install Iris on Your Server
 
-Please follow this [instruction](install-iris.md) to get **Iris** installed locally.
+Please follow this [instruction](Install-Iris.md) to get **Iris** installed locally.
 
 ### Step 2: Run a Full Node
 
-Please follow this [instruction](full-node.md) to get your full node running.
+Please follow this [instruction](Full-Node.md) to get your full node running.
 
 
 ### Step 3: Upgrade to Validator Node
 
-Please follow this [instruction](validator-node.md) to upgrade your full node to validator node.
+Please follow this [instruction](Validator-Node.md) to upgrade your full node to validator node.
 
 ### Deploy IRISHub Monitor
 
@@ -34,7 +34,7 @@ If you miss the genesis file generation process, you can still upgrade your full
 
 ### Setup a sentry node
 
-A validator is under the risk of being attacked. You could follow this [guide](tools/Setup_Sentrynode.md) to setup a sentry node to protect yourself.
+A validator is under the risk of being attacked. You could follow this [guide](tools/Setup-Sentry-Node.md) to setup a sentry node to protect yourself.
 
 ##  Useful Links
 

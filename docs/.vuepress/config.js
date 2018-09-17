@@ -19,9 +19,9 @@ module.exports = {
         title: 'Getting Started',
         collapsable: false,
         children: [
-          ['/get-started/install-iris.md', 'Install'],
-          ['/get-started/full-node.md', 'Run a Full Node'],
-          ['/get-started/validator-node.md', 'Run a Validator Node']
+          ['/get-started/Install-Iris.md', 'Install'],
+          ['/get-started/Full-Node.md', 'Run a Full Node'],
+          ['/get-started/Validator-Node.md', 'Run a Validator Node']
         ]
       },{
         title: 'Modules',
