@@ -9,6 +9,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
+	"github.com/irisnet/irishub/client/bank"
 )
 
 // QueryAccountRequestHandlerFn performs account information query
@@ -44,8 +45,14 @@ func QueryAccountRequestHandlerFn(storeName string, cdc *wire.Codec,
 			return
 		}
 
+		accountRes, err := bank.ConvertAccountCoin(cliCtx, account)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
 		// print out whole account
-		output, err := cdc.MarshalJSONIndent(account, "", "  ")
+		output, err := cdc.MarshalJSONIndent(accountRes, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't marshall query result. Error: %s", err.Error()))
 			return

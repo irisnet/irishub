@@ -92,7 +92,7 @@ func getValidators(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 		}
 	}
 
-	output, err := cdc.MarshalJSON(outputValidatorsRes)
+	output, err := cdc.MarshalJSONIndent(outputValidatorsRes, "", "  ")
 	if err != nil {
 		return nil, err
 	}

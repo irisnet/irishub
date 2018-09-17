@@ -7,11 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
-	"github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"os"
-	"strings"
 )
 
 // TxContext implements a transaction context created in SDK modules.
@@ -104,7 +102,7 @@ func (txCtx TxContext) Build(msgs []sdk.Msg) (auth.StdSignMsg, error) {
 
 	fee := sdk.Coins{}
 	if txCtx.Fee != "" {
-		parsedFee, err := txCtx.ParseCoins(txCtx.Fee)
+		parsedFee, err := txCtx.cliCtx.ParseCoins(txCtx.Fee)
 		if err != nil {
 			return auth.StdSignMsg{}, err
 		}
@@ -155,35 +153,4 @@ func (txCtx TxContext) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]
 	}
 
 	return txCtx.Sign(name, passphrase, msg)
-}
-
-func (txCtx TxContext) ParseCoin(coinStr string) (sdk.Coin, error) {
-	mainUnit, err := types.GetCoinName(coinStr)
-	coinType, err := txCtx.cliCtx.GetCoinType(mainUnit)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	coin, err := coinType.ConvertToMinCoin(coinStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-	return coin, nil
-}
-
-func (txCtx TxContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	for _, coinStr := range coinStrs {
-		coin, err := txCtx.ParseCoin(coinStr)
-		if err != nil {
-			return coins, err
-		}
-		coins = append(coins, coin)
-	}
-	return coins, nil
 }

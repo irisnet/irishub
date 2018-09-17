@@ -39,7 +39,7 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	}
 
 	if !cliCtx.TrustNode {
-		check, err := cliCtx.Certify(*height)
+		check, err := cliCtx.Certify(res.Block.Height)
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +57,7 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 
 	// TODO move maarshalling into cmd/rest functions
 	// output, err := tmcodec.MarshalJSON(res)
-	output, err := cdc.MarshalJSON(res)
+	output, err := cdc.MarshalJSONIndent(res, "", "  ")
 	if err != nil {
 		return nil, err
 	}

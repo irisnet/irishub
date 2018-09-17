@@ -2,16 +2,14 @@ package utils
 
 import (
 	"net/http"
-	"strconv"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 )
 
 const (
 	Async = "async"
-	GenerateOnly  = "generate_only"
+	GenerateOnly  = "generate-only"
 )
 
 type BaseTx struct {
@@ -22,7 +20,7 @@ type BaseTx struct {
 	Sequence         int64     `json:"sequence"`
 	Gas              int64     `json:"gas"`
 	Fees             string    `json:"fee"`
-} 
+}
 
 // WriteErrorResponse prepares and writes a HTTP error
 // given a status code and an error message.
@@ -31,18 +29,33 @@ func WriteErrorResponse(w http.ResponseWriter, status int, msg string) {
 	w.Write([]byte(msg))
 }
 
-// ParseFloat64OrReturnBadRequest converts s to a float64 value. It returns a default
-// value if the string is empty. Write
-func ParseFloat64OrReturnBadRequest(w http.ResponseWriter, s string, defaultIfEmpty float64) (n float64, ok bool) {
-	if len(s) == 0 {
-		return defaultIfEmpty, true
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, txCtx context.TxContext, baseTx BaseTx, msgs []sdk.Msg)  {
+
+	if cliCtx.GenerateOnly {
+		WriteGenerateStdTxResponse(w, txCtx, msgs)
+		return
 	}
-	n, err := strconv.ParseFloat(s, 64)
+
+	txBytes, err := txCtx.BuildAndSign(baseTx.LocalAccountName, baseTx.Password, msgs)
 	if err != nil {
-		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		return n, false
+		WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
 	}
-	return n, true
+
+	var res interface{}
+	if cliCtx.Async {
+		res, err = cliCtx.BroadcastTxAsync(txBytes)
+	} else {
+		res, err = cliCtx.BroadcastTx(txBytes)
+	}
+
+	output, err := txCtx.Codec.MarshalJSONIndent(res, "", "  ")
+	if err != nil {
+		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.Write(output)
 }
 
 // WriteGenerateStdTxResponse writes response for the generate_only mode.
