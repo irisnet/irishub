@@ -4,6 +4,8 @@ import (
 	bam "github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"fmt"
+	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // InitGenesis - build the genesis version For first Version
@@ -21,6 +23,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router) {
 	k.AddNewVersion(ctx, genesisVersion)
 
 	k.SetCurrentProposalAcceptHeight(ctx, -1)
-	k.SetCurrentProposalID(ctx, -1)
+	parameter.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, -1)
 	InitGenesis_commitID(ctx, k)
 }

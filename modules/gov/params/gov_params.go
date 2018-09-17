@@ -5,9 +5,12 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/parameter"
 )
 
 var DepositProcedureParameter DepositProcedureParam
+
+var _ parameter.GovParameter = (*DepositProcedureParam)(nil)
 
 // Procedure around Deposits for governance
 type DepositProcedure struct {
@@ -71,19 +74,19 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.MinDeposit[0].Denom != "iris" {
-			return sdk.NewError(DefaultCodespace, CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris "))
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris "))
 		}
 
 		if param.Value.MinDeposit[0].Amount.GT(sdk.NewInt(10)) && param.Value.MinDeposit[0].Amount.LT(sdk.NewInt(20000)) {
-			return sdk.NewError(DefaultCodespace, CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount should be larger than 10 and less than 20000"))
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount should be larger than 10 and less than 20000"))
 		}
 
 		if param.Value.MaxDepositPeriod > 20 && param.Value.MaxDepositPeriod < 20000 {
-			return sdk.NewError(DefaultCodespace, CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod should be larger than 20 and less than 20000"))
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod should be larger than 20 and less than 20000"))
 		}
 
 		return nil
 
 	}
-	return sdk.NewError(DefaultCodespace, CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
 }
