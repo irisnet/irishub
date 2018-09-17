@@ -27,9 +27,9 @@ module.exports = {
         title: 'Modules',
         collapsable: false,
         children: [
-          ['/modules/coin/coin_type.md', 'Coin Type'],
-          ['/modules/fee-token/feeToken.md', 'Fee Token'],
-          ['/modules/gov/gov_spec.md', 'Governance']
+          ['/modules/coin/README.md', 'Coin Type'],
+          ['/modules/fee-token/README.md', 'Fee Token'],
+          ['/modules/gov/README.md', 'Governance']
         ]
       },{
         title: 'Validators',
