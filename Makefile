@@ -9,6 +9,9 @@ install:
 	go install ./cmd/iris
 	go install ./cmd/iriscli
 
+install_debug:
+	go install ./cmd/irisdebug
+
 build_linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli
