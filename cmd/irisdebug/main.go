@@ -179,6 +179,7 @@ func runAddrCmd(cmd *cobra.Command, args []string) error {
 	valAddr := sdk.ValAddress(addr)
 
 	fmt.Println("Address:", addr)
+	fmt.Printf("Hex: %X\n", addr)
 	fmt.Printf("Bech32 Acc: %s\n", accAddr)
 	fmt.Printf("Bech32 Val: %s\n", valAddr)
 	return nil
