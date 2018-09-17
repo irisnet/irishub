@@ -26,7 +26,7 @@ func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.Account) (BaseAccoun
 		Coins:         coinsString,
 		PubKey:        acc.GetPubKey(),
 		AccountNumber: acc.GetAccountNumber(),
-		Sequence:      acc.GetAccountNumber(),
+		Sequence:      acc.GetSequence(),
 	}, nil
 }
 
