@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/common"

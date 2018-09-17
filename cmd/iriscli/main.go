@@ -56,6 +56,7 @@ func main() {
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
 			govcmd.GetCmdQueryProposals("gov", cdc),
+			govcmd.GetCmdQueryConfig("gov", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -112,6 +113,7 @@ func main() {
 
 	//Add keys and version commands
 	rootCmd.AddCommand(
+		client.LineBreak,
 		keyscmd.Commands(),
 		version.ServeVersionCommand(cdc),
 	)

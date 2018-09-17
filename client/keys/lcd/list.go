@@ -4,15 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/irisnet/irishub/client/keys/utils"
+	"github.com/irisnet/irishub/client/keys"
 )
-
-/////////////////////////
-// REST
 
 // query key list REST handler
 func QueryKeysRequestHandler(w http.ResponseWriter, r *http.Request) {
-	kb, err := utils.GetKeyBase()
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -29,7 +26,7 @@ func QueryKeysRequestHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("[]"))
 		return
 	}
-	keysOutput, err := utils.Bech32KeysOutput(infos)
+	keysOutput, err := keys.Bech32KeysOutput(infos)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

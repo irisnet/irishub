@@ -4,13 +4,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/bank/client"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"github.com/irisnet/irishub/client/bank"
 )
 
 type sendBody struct {
@@ -74,7 +74,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			return
 		}
 		// build message
-		msg := client.BuildMsg(sdk.AccAddress(info.GetPubKey().Address()), to, amount)
+		msg := bank.BuildMsg(sdk.AccAddress(info.GetPubKey().Address()), to, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

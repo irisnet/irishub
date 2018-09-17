@@ -1,4 +1,4 @@
-package utils
+package keys
 
 import (
 	"github.com/cosmos/cosmos-sdk/wire"

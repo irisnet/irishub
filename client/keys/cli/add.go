@@ -2,16 +2,16 @@ package keys
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	ccrypto "github.com/cosmos/cosmos-sdk/crypto"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/tendermint/tendermint/libs/cli"
-	"github.com/irisnet/irishub/client/keys/utils"
 )
 
 const (
@@ -45,7 +45,7 @@ phrase, otherwise, a new key will be generated.`,
 // nolint: gocyclo
 // TODO remove the above when addressing #1446
 func runAddCmd(cmd *cobra.Command, args []string) error {
-	var kb keys.Keybase
+	var kb cryptokeys.Keybase
 	var err error
 	var name, pass string
 
@@ -61,7 +61,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 			return errors.New("you must provide a name for the key")
 		}
 		name = args[0]
-		kb, err = utils.GetKeyBase()
+		kb, err = keys.GetKeyBase()
 		if err != nil {
 			return err
 		}
@@ -90,7 +90,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 		account := uint32(viper.GetInt(flagAccount))
 		index := uint32(viper.GetInt(flagIndex))
 		path := ccrypto.DerivationPath{44, 118, account, 0, index}
-		algo := keys.SigningAlgo(viper.GetString(flagType))
+		algo := cryptokeys.SigningAlgo(viper.GetString(flagType))
 		info, err := kb.CreateLedger(name, path, algo)
 		if err != nil {
 			return err
@@ -110,8 +110,8 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 		viper.Set(flagNoBackup, true)
 		printCreate(info, "")
 	} else {
-		algo := keys.SigningAlgo(viper.GetString(flagType))
-		info, seed, err := kb.CreateMnemonic(name, keys.English, pass, algo)
+		algo := cryptokeys.SigningAlgo(viper.GetString(flagType))
+		info, seed, err := kb.CreateMnemonic(name, cryptokeys.English, pass, algo)
 		if err != nil {
 			return err
 		}
@@ -120,11 +120,11 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func printCreate(info keys.Info, seed string) {
+func printCreate(info cryptokeys.Info, seed string) {
 	output := viper.Get(cli.OutputFlag)
 	switch output {
 	case "text":
-		utils.PrintInfo(info)
+		keys.PrintInfo(cdc, info)
 		// print seed unless requested not to.
 		if !viper.GetBool(client.FlagUseLedger) && !viper.GetBool(flagNoBackup) {
 			fmt.Println("**Important** write this seed phrase in a safe place.")
@@ -133,14 +133,14 @@ func printCreate(info keys.Info, seed string) {
 			fmt.Println(seed)
 		}
 	case "json":
-		out, err := utils.Bech32KeyOutput(info)
+		out, err := keys.Bech32KeyOutput(info)
 		if err != nil {
 			panic(err)
 		}
 		if !viper.GetBool(flagNoBackup) {
 			out.Seed = seed
 		}
-		json, err := utils.MarshalJSON(out)
+		json, err := cdc.MarshalJSON(out)
 		if err != nil {
 			panic(err) // really shouldn't happen...
 		}

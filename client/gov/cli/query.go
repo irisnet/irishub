@@ -235,3 +235,41 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 
 	return cmd
 }
+
+// GetCmdQueryConfig implements the command to query config.
+// nolint: gocyclo
+func GetCmdQueryConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "query-params",
+		Short: "query parameter proposal's config",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCLIContext().WithCodec(cdc)
+			res , err  := ctx.QuerySubspace([]byte(gov.Prefix),storeName)
+
+			var kvs []KvPair
+			for _,kv := range res {
+				var v string
+				cdc.UnmarshalBinary(kv.Value, &v)
+				kv := KvPair{
+					K: string(kv.Key),
+					V: v,
+				}
+				kvs = append(kvs, kv)
+			}
+			output, err := wire.MarshalJSONIndent(cdc, kvs)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+
+	return cmd
+}
+
+type KvPair struct {
+	K string `json:"key"`
+	V string `json:"value"`
+}

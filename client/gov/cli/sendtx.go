@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,11 +25,10 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 			strProposalType := viper.GetString(flagProposalType)
 			initialDeposit := viper.GetString(flagDeposit)
+			paramsStr := viper.GetString(flagParams)
 
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -38,7 +36,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			amount, err := sdk.ParseCoins(initialDeposit)
+			amount, err := txCtx.ParseCoins(initialDeposit)
 			if err != nil {
 				return err
 			}
@@ -48,24 +46,37 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount)
+			var params gov.Params
+			if proposalType == gov.ProposalTypeParameterChange {
+				if err := json.Unmarshal([]byte(paramsStr), &params); err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+			}
+
+			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
 
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
 
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
+			}
 			// Build and sign the transaction, then broadcast to Tendermint
 			// proposalID must be returned, and it is a part of response.
 			cliCtx.PrintResponse = true
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
+	cmd.Flags().String(flagParams, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 
 	return cmd
 }
@@ -76,7 +87,7 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 		Use:   "deposit",
 		Short: "deposit tokens for activing proposal",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -100,10 +111,14 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
+			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			cliCtx.PrintResponse = true
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -119,7 +134,7 @@ func GetCmdVote(cdc *wire.Codec) *cobra.Command {
 		Use:   "vote",
 		Short: "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -149,9 +164,14 @@ func GetCmdVote(cdc *wire.Codec) *cobra.Command {
 				voterAddr.String(), msg.ProposalID, msg.Option.String(),
 			)
 
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
+			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			cliCtx.PrintResponse = true
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 

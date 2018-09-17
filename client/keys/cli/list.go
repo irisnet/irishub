@@ -1,8 +1,8 @@
 package keys
 
 import (
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/client/keys/utils"
 )
 
 // CMD
@@ -17,14 +17,14 @@ along with their associated name and address.`,
 }
 
 func runListCmd(cmd *cobra.Command, args []string) error {
-	kb, err := utils.GetKeyBase()
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		return err
 	}
 
 	infos, err := kb.List()
 	if err == nil {
-		utils.PrintInfos(infos)
+		keys.PrintInfos(cdc, infos)
 	}
 	return err
 }

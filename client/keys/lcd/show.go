@@ -2,14 +2,13 @@ package keys
 
 import (
 	"encoding/json"
-	"net/http"
-
-	"github.com/gorilla/mux"
-
-	"github.com/irisnet/irishub/client/keys/utils"
-	"strings"
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/keys"
+	"net/http"
+	"strings"
 )
+
 ///////////////////////////
 // REST
 
@@ -18,7 +17,7 @@ func GetKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 
-	info, err := utils.GetKey(name)
+	info, err := keys.GetKey(name)
 	if err != nil {
 		if strings.Contains(err.Error(), fmt.Sprintf("Key %s not found", name)) {
 			w.WriteHeader(http.StatusNotFound)
@@ -31,7 +30,7 @@ func GetKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	keyOutput, err := utils.Bech32KeyOutput(info)
+	keyOutput, err := keys.Bech32KeyOutput(info)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

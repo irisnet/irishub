@@ -2,13 +2,20 @@ package utils
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/keys"
 )
 
-func SendTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
+func SendOrPrintTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
+	if cliCtx.GenerateOnly {
+		return PrintUnsignedStdTx(txCtx, cliCtx, msgs)
+	}
+	// Build and sign the transaction, then broadcast to a Tendermint
+	// node.
+	cliCtx.PrintResponse = true
+
 	txCtx, err := prepareTxContext(txCtx, cliCtx)
 	if err != nil {
 		return err

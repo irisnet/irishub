@@ -1,24 +1,23 @@
 package context
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/keys"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"fmt"
 	"os"
-	"github.com/irisnet/irishub/types"
 	"strings"
 )
 
 // TxContext implements a transaction context created in SDK modules.
 type TxContext struct {
 	Codec         *wire.Codec
-	cliCtx		  CLIContext
+	cliCtx        CLIContext
 	AccountNumber int64
 	Sequence      int64
 	Gas           int64
@@ -119,7 +118,7 @@ func (txCtx TxContext) Build(msgs []sdk.Msg) (auth.StdSignMsg, error) {
 		Sequence:      txCtx.Sequence,
 		Memo:          txCtx.Memo,
 		Msgs:          msgs,
-		Fee: auth.NewStdFee(txCtx.Gas, fee...),
+		Fee:           auth.NewStdFee(txCtx.Gas, fee...),
 	}, nil
 }
 
@@ -157,7 +156,6 @@ func (txCtx TxContext) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]
 
 	return txCtx.Sign(name, passphrase, msg)
 }
-
 
 func (txCtx TxContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 	mainUnit, err := types.GetCoinName(coinStr)

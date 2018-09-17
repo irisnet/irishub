@@ -1,18 +1,15 @@
-package utils
+package keys
 
 import (
 	"fmt"
-	"path/filepath"
-
-	"github.com/spf13/viper"
-
 	keys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/client"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
-
-	"github.com/cosmos/cosmos-sdk/client"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"path/filepath"
+	"github.com/cosmos/cosmos-sdk/wire"
 )
 
 // KeyDBName is the directory under root where we store the keys
@@ -99,11 +96,6 @@ func GetKey(name string) (keys.Info, error) {
 	return kb.Get(name)
 }
 
-// used to set the keybase manually in test
-func SetKeyBase(kb keys.Keybase) {
-	keybase = kb
-}
-
 // used for outputting keys.Info over REST
 type KeyOutput struct {
 	Name    string         `json:"name"`
@@ -141,7 +133,7 @@ func Bech32KeyOutput(info keys.Info) (KeyOutput, error) {
 	}, nil
 }
 
-func PrintInfo(info keys.Info) {
+func PrintInfo(cdc *wire.Codec, info keys.Info) {
 	ko, err := Bech32KeyOutput(info)
 	if err != nil {
 		panic(err)
@@ -151,7 +143,7 @@ func PrintInfo(info keys.Info) {
 		fmt.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
 		printKeyOutput(ko)
 	case "json":
-		out, err := MarshalJSON(ko)
+		out, err := cdc.MarshalJSON(ko)
 		if err != nil {
 			panic(err)
 		}
@@ -159,7 +151,7 @@ func PrintInfo(info keys.Info) {
 	}
 }
 
-func PrintInfos(infos []keys.Info) {
+func PrintInfos(cdc *wire.Codec, infos []keys.Info) {
 	kos, err := Bech32KeysOutput(infos)
 	if err != nil {
 		panic(err)
@@ -171,7 +163,7 @@ func PrintInfos(infos []keys.Info) {
 			printKeyOutput(ko)
 		}
 	case "json":
-		out, err := MarshalJSON(kos)
+		out, err := cdc.MarshalJSON(kos)
 		if err != nil {
 			panic(err)
 		}

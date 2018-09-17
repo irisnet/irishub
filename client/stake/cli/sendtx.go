@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/client"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
@@ -25,7 +24,7 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 		Use:   "create-validator",
 		Short: "create new validator initialized with a self-delegation to it",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -78,8 +77,7 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 				msg = stake.NewMsgCreateValidator(validatorAddr, pk, amount, description)
 			}
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -97,7 +95,7 @@ func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
 		Use:   "edit-validator",
 		Short: "edit and existing validator account",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -116,8 +114,7 @@ func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
 			}
 			msg := stake.NewMsgEditValidator(validatorAddr, description)
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -132,7 +129,7 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 		Use:   "delegate",
 		Short: "delegate liquid tokens to an validator",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -155,8 +152,7 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 
 			msg := stake.NewMsgDelegate(delegatorAddr, validatorAddr, amount)
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -188,7 +184,7 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 		Use:   "begin",
 		Short: "begin redelegation",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -223,8 +219,7 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			msg := stake.NewMsgBeginRedelegate(delegatorAddr, validatorSrcAddr, validatorDstAddr, sharesAmount)
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -287,7 +282,7 @@ func GetCmdCompleteRedelegate(cdc *wire.Codec) *cobra.Command {
 		Use:   "complete",
 		Short: "complete redelegation",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -310,8 +305,7 @@ func GetCmdCompleteRedelegate(cdc *wire.Codec) *cobra.Command {
 
 			msg := stake.NewMsgCompleteRedelegate(delegatorAddr, validatorSrcAddr, validatorDstAddr)
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -342,7 +336,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 		Use:   "begin",
 		Short: "begin unbonding",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -371,8 +365,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			msg := stake.NewMsgBeginUnbonding(delegatorAddr, validatorAddr, sharesAmount)
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
@@ -388,7 +381,7 @@ func GetCmdCompleteUnbonding(cdc *wire.Codec) *cobra.Command {
 		Use:   "complete",
 		Short: "complete unbonding",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -406,8 +399,7 @@ func GetCmdCompleteUnbonding(cdc *wire.Codec) *cobra.Command {
 
 			msg := stake.NewMsgCompleteUnbonding(delegatorAddr, validatorAddr)
 
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 

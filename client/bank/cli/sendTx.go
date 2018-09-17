@@ -5,12 +5,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/bank/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"github.com/irisnet/irishub/client/bank"
 )
 
 const (
@@ -64,13 +64,9 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 				return fmt.Errorf("address %s doesn't have enough coins to pay for this transaction", from)
 			}
 
-			// build and sign the transaction, then broadcast to Tendermint
-			msg := client.BuildMsg(from, to, coins)
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
+			msg := bank.BuildMsg(from, to, coins)
 
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 

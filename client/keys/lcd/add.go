@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 
-	"github.com/irisnet/irishub/client/keys/utils"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
 )
 
 // NewKeyBody - the request body for create or recover new keys
@@ -21,10 +21,10 @@ type NewKeyBody struct {
 
 // AddNewKeyRequestHandler performs create or recover new keys operation
 func AddNewKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
-	var kb keys.Keybase
+	var kb cryptokeys.Keybase
 	var m NewKeyBody
 
-	kb, err := utils.GetKeyBase()
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -32,13 +32,18 @@ func AddNewKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &m)
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
 	}
+	err = cdc.UnmarshalJSON(body, &m)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
 	if m.Name == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("You have to specify a name for the locally stored account."))
@@ -63,7 +68,7 @@ func AddNewKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 	// create account
 	seed := m.Seed
 	if seed == "" {
-		seed = getSeed(keys.Secp256k1)
+		seed = getSeed(cryptokeys.Secp256k1)
 	}
 	info, err := kb.CreateKey(m.Name, seed, m.Password)
 	if err != nil {
@@ -72,7 +77,7 @@ func AddNewKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	keyOutput, err := utils.Bech32KeyOutput(info)
+	keyOutput, err := keys.Bech32KeyOutput(info)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -92,10 +97,10 @@ func AddNewKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // function to just a new seed to display in the UI before actually persisting it in the keybase
-func getSeed(algo keys.SigningAlgo) string {
+func getSeed(algo cryptokeys.SigningAlgo) string {
 	kb := client.MockKeyBase()
 	pass := "throwing-this-key-away"
 	name := "inmemorykey"
-	_, seed, _ := kb.CreateMnemonic(name, keys.English, pass, algo)
+	_, seed, _ := kb.CreateMnemonic(name, cryptokeys.English, pass, algo)
 	return seed
 }

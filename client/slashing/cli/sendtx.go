@@ -3,15 +3,14 @@ package cli
 import (
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 
 	"github.com/spf13/cobra"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 // GetCmdUnrevoke implements the create unrevoke validator command.
@@ -21,7 +20,7 @@ func GetCmdUnrevoke(cdc *wire.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(0),
 		Short: "unrevoke validator previously revoked for downtime",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txCtx := authctx.NewTxContextFromCLI().WithCodec(cdc)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc)
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
@@ -34,7 +33,7 @@ func GetCmdUnrevoke(cdc *wire.Codec) *cobra.Command {
 
 			msg := slashing.NewMsgUnrevoke(validatorAddr)
 
-			return utils.SendTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 

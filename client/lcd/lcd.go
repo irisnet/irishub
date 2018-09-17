@@ -3,12 +3,12 @@ package lcd
 import (
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	bankHandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

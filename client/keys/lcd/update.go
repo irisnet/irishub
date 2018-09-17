@@ -1,12 +1,11 @@
 package keys
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/client/keys/utils"
+	"github.com/irisnet/irishub/client/keys"
+	"io/ioutil"
 	"strings"
 )
 
@@ -20,18 +19,23 @@ type UpdateKeyBody struct {
 func UpdateKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
-	var kb keys.Keybase
 	var m UpdateKeyBody
 
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&m)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
-	kb, err = utils.GetKeyBase()
+	err = cdc.UnmarshalJSON(body, &m)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

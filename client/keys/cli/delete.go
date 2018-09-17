@@ -2,9 +2,9 @@ package keys
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/client/keys/utils"
 )
 
 func deleteKeyCommand() *cobra.Command {
@@ -20,7 +20,7 @@ func deleteKeyCommand() *cobra.Command {
 func runDeleteCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
-	kb, err := utils.GetKeyBase()
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		return err
 	}

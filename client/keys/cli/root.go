@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/irisnet/irishub/client"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +21,7 @@ func Commands() *cobra.Command {
 		addKeyCommand(),
 		listKeysCmd,
 		showKeysCmd,
+		keySignCmd,
 		client.LineBreak,
 		deleteKeyCommand(),
 		updateKeyCommand(),

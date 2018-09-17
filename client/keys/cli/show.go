@@ -1,8 +1,8 @@
 package keys
 
 import (
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/client/keys/utils"
 )
 
 var showKeysCmd = &cobra.Command{
@@ -12,12 +12,10 @@ var showKeysCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		info, err := utils.GetKey(name)
+		info, err := keys.GetKey(name)
 		if err == nil {
-			utils.PrintInfo(info)
+			keys.PrintInfo(cdc, info)
 		}
 		return err
 	},
 }
-
-
