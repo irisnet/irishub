@@ -57,7 +57,7 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 
 	// TODO move maarshalling into cmd/rest functions
 	// output, err := tmcodec.MarshalJSON(res)
-	output, err := cdc.MarshalJSONIndent(res,"", "  ")
+	output, err := cdc.MarshalJSONIndent(res, "", "  ")
 	if err != nil {
 		return nil, err
 	}
