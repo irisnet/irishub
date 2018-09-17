@@ -41,7 +41,7 @@ You could see the following output:
 ```
 
 The `app_message` contains the seed phrase to recover the account of `address` field you just created.
-There will be a gentx-node-ID.json a file.
+There will be a gentx-node-ID.json a file at `$IRISHOME/config/gentx/`.
 
 The content of the file will be:
 

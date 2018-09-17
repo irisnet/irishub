@@ -28,10 +28,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.4.0
+v0.4.1
     
 $ iriscli version
-v0.4.0
+v0.4.1
 ```
 #### 方法2：源码编译安装
 
