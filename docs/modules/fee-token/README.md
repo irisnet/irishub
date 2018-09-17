@@ -18,22 +18,22 @@ Now we must specify fee for each transaction properly. Otherwise, your transacti
 
 For command Line:
 ```
-iriscli send --to=faa1ze87hkku6vgnqp7gqkn528d60ttr06xuudx0k9 --name=moniker --chain-id=test-chain-UieBV2 --amount=100000000000000000iris --node=tcp://localhost:26657 \
---gas=10000 --fee=2000000000000000iris
+iriscli send --to=faa1ze87hkku6vgnqp7gqkn528d60ttr06xuudx0k9 --name=moniker --chain-id=test-chain-UieBV2 --amount=10iris --node=tcp://localhost:26657 \
+--gas=10000 --fee=0.0005iris
 ```
 In command line, we specify gas and fee token by two option: "--gas" and "--fee". The "--gas" option can be omitted. Because gas has default value: 200000. However, the "--fee" option can't be omitted. Because its default value is empty.
    
 For rest API:
 ```
 {
-	"amount":[{"denom":"monikerToken","amount":"100000000000000000"}],
+	"amount":[{"denom":"iris","amount":"10"}],
 	"name":"moniker",
 	"password":"1234567890",
 	"chain_id":"test-chain-UieBV2",
 	"sequence":"9",
 	"account_number":"0",
 	"gas":"10000",
-	"fee":"200000000000000iris"
+	"fee":"0.0005iris"
 }
 ```
 In rest API, the gas and fee token are specified by gas field and fee field in json body. Both of them can't be omitted. 

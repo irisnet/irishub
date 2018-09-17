@@ -1,99 +1,28 @@
-## IRIShub 简介
-
-IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
-
-## 现有资源
-
-* 源码：https://github.com/irisnet/irishub
-* 浏览器：http://testnet.irisplorer.io 
-* 水龙头：http://testnet.irisplorer.io/#/faucet
-* 文档：https://github.com/irisnet/testnets/tree/master/testnets
+# IRISHub
+![banner](./docs/pics/iris.jpg)
 
 
-
-## 安装IRIShub
-
-### 方法1：下载发行版安装
-
-进入下载页: https://github.com/irisnet/irishub/releases/
-下载对应版本的可执行文件
-解压缩tar -C /usr/local/bin -xzf 、irishub_0.2.0_linux_amd64.zip
-拷贝到/usr/local/bin/目录下 
-执行以下命令,若出现对应的版本号则说明安装成功。
-```
-$ iris version
-v0.2.0
-    
-$ iriscli version
-v0.2.0
-```
-### 方法2：源码编译安装
-
-### 安装Go版本 1.10+ 
+IRIS network (a.k.a. IRISnet) aims to establish a technology foundation to facilitate construction of next-generation distributed applications. By incorpo- rating a comprehensive service infrastructure and an enhanced IBC protocol into the Tendermint & Cosmos stack, IRISnet enables service interoperability as well as token transfers across an internet of blockchains.
+As the centerpiece of IRISnet, IRIS Hub (a.k.a. IRIShub) will be the first regional hub connecting to the main Cosmos Hub, thus making IRISnet an inseparable part of the whole Cosmos network.
 
 
-系统要求：
+## Fuxi Testnet
 
-Ubuntu LTS 16.04
+To join the Fuxi testnet, follow 
+[this guide](https://github.com/irisnet/irishub/blob/feature/docs/docs/get-started/README.md).
 
+For status updates and genesis files, see the
+[testnets repo](https://github.com/irisnet/testnets).
 
-安装IRISHub需要保证Go的版本在1.10以上，
+## Install
 
-通过执行以下命令安装1.10版本的Go。
+See the 
+[install instructions](https://github.com/irisnet/irishub/blob/feature/docs/docs/get-started/install-iris.md).
 
-```
-    $ sudo add-apt-repository ppa:gophers/archive
-    $ sudo apt-get update
-    $ sudo apt-get install golang-1.10-go
-```
+## Resources
 
-以上命令将安装 golang-1.10-go在 /usr/lib/go-1.10/bin. 需要将它加入到PATH中
-
-```
-    echo "export PATH=$PATH:/usr/lib/go-1.10/bin" >> ~/.bash_profile
-    source ~/.bash_profile
-```
-
-同时，你需要指定相关的 $GOPATH, $GOBIN, 和 $PATH 变量, 例如:
-
-```
-    mkdir -p $HOME/go/bin
-    echo "export GOPATH=$HOME/go" >> ~/.bash_profile
-    echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
-    echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
-    source ~/.bash_profile
-```
-
-参考链接：
-
-1. https://golang.org/doc/install
-2. https://github.com/golang/go/wiki/Ubuntu
+* Explorer：http://testnet.irisplorer.io 
+* Faucet：http://testnet.irisplorer.io/#/faucet
 
 
-
-### 下载源码并安装
-
-
-在完成Go的安装后，通过以下命令下载并安装IRIS hub相关程序.
-
-```
-    mkdir -p $GOPATH/src/github.com/irisnet
-    cd $GOPATH/src/github.com/irisnet
-    git clone https://github.com/irisnet/irishub
-    cd irishub && git checkout v0.2.0
-
-    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
-    make get_vendor_deps && make install
-```
-
-以上命令将完成 iris 和 iriscli的安装. 若出现对应的版本号则说明安装成功。
-
-```
-    $ iris version
-    v0.2.0
-    
-    $ iriscli version
-    v0.2.0
-```
 
