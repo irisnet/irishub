@@ -431,14 +431,69 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 }
 
 // Certify verifies the consensus proof at given height
-func (ctx CLIContext) Certify(height int64) (lite.Commit, error) {
-	check, err := tmliteProxy.GetCertifiedCommit(height, ctx.Client, ctx.Certifier)
+func (cliCtx CLIContext) Certify(height int64) (lite.Commit, error) {
+	check, err := tmliteProxy.GetCertifiedCommit(height, cliCtx.Client, cliCtx.Certifier)
 	if tmliteErr.IsCommitNotFoundErr(err) {
 		return lite.Commit{}, ErrVerifyCommit(height)
 	} else if err != nil {
 		return lite.Commit{}, err
 	}
 	return check, nil
+}
+
+
+func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
+	mainUnit, err := types.GetCoinName(coinStr)
+	coinType, err := cliCtx.GetCoinType(mainUnit)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	coin, err := coinType.ConvertToMinCoin(coinStr)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+	return coin, nil
+}
+
+func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
+	coinsStr = strings.TrimSpace(coinsStr)
+	if len(coinsStr) == 0 {
+		return coins, nil
+	}
+
+	coinStrs := strings.Split(coinsStr, ",")
+	for _, coinStr := range coinStrs {
+		coin, err := cliCtx.ParseCoin(coinStr)
+		if err != nil {
+			return coins, err
+		}
+		coins = append(coins, coin)
+	}
+	return coins, nil
+}
+
+func (cliCtx CLIContext) ConvertCoinToMainUnit(coinsStr string) (coins []string, err error) {
+	coinsStr = strings.TrimSpace(coinsStr)
+	if len(coinsStr) == 0 {
+		return coins, nil
+	}
+
+	coinStrs := strings.Split(coinsStr, ",")
+	for _, coinStr := range coinStrs {
+		mainUnit, err := types.GetCoinName(coinStr)
+		coinType, err := cliCtx.GetCoinType(mainUnit)
+		if err != nil {
+			return nil, err
+		}
+
+		coin, err := coinType.Convert(coinStr, mainUnit)
+		if err != nil {
+			return nil, err
+		}
+		coins = append(coins, coin)
+	}
+	return coins, nil
 }
 
 // isQueryStoreWithProof expects a format like /<queryType>/<storeName>/<subpath>
