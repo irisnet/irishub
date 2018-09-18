@@ -5,16 +5,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"io/ioutil"
 	"net/http"
-	"github.com/irisnet/irishub/client/bank"
 )
 
 type sendBody struct {
-	Amount sdk.Coins `json:"amount"`
-	BaseTx utils.BaseTx `json:"base_tx"`
+	Amount sdk.Coins      `json:"amount"`
+	Sender string         `json:"sender"`
+	BaseTx context.BaseTx `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address
@@ -29,37 +29,21 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx.GenerateOnly = utils.GenerateOnlyArg(r)
-		cliCtx.Async = utils.AsyncOnlyArg(r)
-
 		var m sendBody
-		body, err := ioutil.ReadAll(r.Body)
+		err = utils.ReadPostBody(w, r, cdc, &m)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		err = cdc.UnmarshalJSON(body, &m)
+		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.LocalAccountName, m.Sender)
+		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, m.BaseTx)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx.FromAddressName = m.BaseTx.LocalAccountName
-		cliCtx.Signer = m.BaseTx.Signer
 		fromAddress, err := cliCtx.GetFromAddress()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-
-		txCtx := context.TxContext{
-			Codec:         cdc,
-			Gas:           m.BaseTx.Gas,
-			Fee:           m.BaseTx.Fees,
-			ChainID:       m.BaseTx.ChainID,
-			AccountNumber: m.BaseTx.AccountNumber,
-			Sequence:      m.BaseTx.Sequence,
-		}
-		txCtx = txCtx.WithCliCtx(cliCtx)
 
 		amount, err := cliCtx.ParseCoins(m.Amount.String())
 		if err != nil {
@@ -72,7 +56,6 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
 
 		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, m.BaseTx, []sdk.Msg{msg})
 	}

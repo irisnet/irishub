@@ -12,6 +12,46 @@ import (
 	"os"
 )
 
+type BaseTx struct {
+	LocalAccountName string `json:"name"`
+	Password         string `json:"password"`
+	ChainID          string `json:"chain_id"`
+	AccountNumber    int64  `json:"account_number"`
+	Sequence         int64  `json:"sequence"`
+	Gas              int64  `json:"gas"`
+	Fees             string `json:"fee"`
+	Memo 			 string `json:"memo"`
+}
+
+func (baseTx BaseTx) Validate(cliCtx CLIContext) error {
+	if cliCtx.GenerateOnly {
+		if len(baseTx.LocalAccountName) == 0 && len(cliCtx.Signer) == 0 {
+			return fmt.Errorf("In generate-only mode, either key name or signer address should be specified")
+		}
+	} else  {
+		if len(baseTx.LocalAccountName) == 0 {
+			return fmt.Errorf("In non-generate-only mode, name required but not specified")
+		}
+
+		if len(baseTx.Password) == 0 {
+			return fmt.Errorf("In non-generate-only mode, password required but not specified")
+		}
+	}
+
+	if len(baseTx.ChainID) == 0 {
+		return fmt.Errorf("ChainID required but not specified")
+	}
+
+	if baseTx.AccountNumber < 0 {
+		return fmt.Errorf("Account Number required but not specified")
+	}
+
+	if baseTx.Sequence < 0 {
+		return fmt.Errorf("Sequence required but not specified")
+	}
+	return nil
+}
+
 // TxContext implements a transaction context created in SDK modules.
 type TxContext struct {
 	Codec         *wire.Codec
@@ -42,6 +82,23 @@ func NewTxContextFromCLI() TxContext {
 		Fee:           viper.GetString(client.FlagFee),
 		Memo:          viper.GetString(client.FlagMemo),
 	}
+}
+
+func NewTxContextFromBaseTx(cliCtx CLIContext, cdc *wire.Codec, baseTx BaseTx) (TxContext, error) {
+	err := baseTx.Validate(cliCtx)
+	if err != nil {
+		return TxContext{}, err
+	}
+	return TxContext{
+		Codec:         cdc,
+		cliCtx:        cliCtx,
+		ChainID:       baseTx.ChainID,
+		Gas:           baseTx.Gas,
+		AccountNumber: baseTx.AccountNumber,
+		Sequence:      baseTx.Sequence,
+		Fee:           baseTx.Fees,
+		Memo:          baseTx.Memo,
+	}, nil
 }
 
 // WithCodec returns a copy of the context with an updated codec.

@@ -468,16 +468,13 @@
         "$ref": "#/definitions/coin.Unit"
       }
     },
-    "utils.BaseTx": {
+    "common.BaseTx": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
         "password": {
-          "type": "string"
-        },
-        "signer": {
           "type": "string"
         },
         "chain_id": {
@@ -526,8 +523,11 @@
         "amount": {
           "$ref": "#/definitions/sdk.Coins"
         },
+        "sender": {
+          "type": "string"
+        },
         "base_tx": {
-          "$ref": "#/definitions/utils.BaseTx"
+          "$ref": "#/definitions/common.BaseTx"
         }
       }
     },

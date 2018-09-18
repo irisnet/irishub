@@ -6,23 +6,14 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"net/http"
 	"net/url"
+	"github.com/cosmos/cosmos-sdk/wire"
+	"io/ioutil"
 )
 
 const (
 	Async        = "async"
 	GenerateOnly = "generate-only"
 )
-
-type BaseTx struct {
-	LocalAccountName string `json:"name"`
-	Password         string `json:"password"`
-	Signer           string `json:"signer"`
-	ChainID          string `json:"chain_id"`
-	AccountNumber    int64  `json:"account_number"`
-	Sequence         int64  `json:"sequence"`
-	Gas              int64  `json:"gas"`
-	Fees             string `json:"fee"`
-}
 
 // WriteErrorResponse prepares and writes a HTTP error
 // given a status code and an error message.
@@ -31,7 +22,29 @@ func WriteErrorResponse(w http.ResponseWriter, status int, msg string) {
 	w.Write([]byte(msg))
 }
 
-func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, txCtx context.TxContext, baseTx BaseTx, msgs []sdk.Msg) {
+func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *wire.Codec, req interface{}) error {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		return err
+	}
+	err = cdc.UnmarshalJSON(body, req)
+	if err != nil {
+		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		return err
+	}
+	return nil
+}
+
+func InitRequestClictx(cliCtx context.CLIContext, r *http.Request, name string, signerAddress string) context.CLIContext {
+	cliCtx.GenerateOnly = GenerateOnlyArg(r)
+	cliCtx.Async = AsyncOnlyArg(r)
+	cliCtx.FromAddressName = name
+	cliCtx.Signer = signerAddress
+	return cliCtx
+}
+
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, txCtx context.TxContext, baseTx context.BaseTx, msgs []sdk.Msg) {
 
 	if cliCtx.GenerateOnly {
 		WriteGenerateStdTxResponse(w, txCtx, msgs)
