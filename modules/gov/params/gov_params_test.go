@@ -10,6 +10,8 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"testing"
+	"fmt"
+	"github.com/irisnet/irishub/types"
 )
 
 func defaultContext(key sdk.StoreKey) sdk.Context {
@@ -26,12 +28,14 @@ func TestDepositProcedureParam(t *testing.T) {
 	ctx := defaultContext(skey)
 	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
 
+	p1deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+	p2Deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
 	p1 := DepositProcedure{
-		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 10)},
+		MinDeposit:       sdk.Coins{p1deposit},
 		MaxDepositPeriod: 1440}
 
 	p2 := DepositProcedure{
-		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 30)},
+		MinDeposit:       sdk.Coins{p2Deposit},
 		MaxDepositPeriod: 1440}
 
 	DepositProcedureParameter.SetReadWriter(paramKeeper.Setter())
@@ -41,12 +45,14 @@ func TestDepositProcedureParam(t *testing.T) {
 	DepositProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	require.Equal(t, DepositProcedureParameter.ToJson(), "{\"min_deposit\":[{\"denom\":\"iris\",\"amount\":\"10\"}],\"max_deposit_period\":1440}")
-	DepositProcedureParameter.Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris\",\"amount\":\"30\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, DepositProcedureParameter.ToJson(), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+
+	DepositProcedureParameter.Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":1440}")
+
 	require.NotEqual(t, p1, DepositProcedureParameter.Value)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 
-	result := DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"atom\",\"amount\":\"30\"}],\"max_deposit_period\":1440}")
+	result := DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"atom\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":1440}")
 	require.Error(t, result)
 
 	DepositProcedureParameter.InitGenesis(p2)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/parameter"
 )
 
 // name to idetify transaction types
@@ -17,17 +18,17 @@ type MsgSubmitProposal struct {
 	ProposalType   ProposalKind   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress //  Address of the proposer
 	InitialDeposit sdk.Coins      //  Initial deposit paid by sender. Must be strictly positive.
-	Params         Params
+	Param         Param
 }
 
-func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins,params Params) MsgSubmitProposal {
+func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins,param Param) MsgSubmitProposal {
 	return MsgSubmitProposal{
 		Title:          title,
 		Description:    description,
 		ProposalType:   proposalType,
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
-		Params:			params,
+		Param:			param,
 	}
 }
 
@@ -53,6 +54,9 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	}
 	if !msg.InitialDeposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
+	}
+	if p, ok := parameter.ParamMapping[msg.Param.Key]; ok{
+        return p.Valid(msg.Param.Value)
 	}
 	return nil
 }

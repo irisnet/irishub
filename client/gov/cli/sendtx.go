@@ -25,7 +25,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 			strProposalType := viper.GetString(flagProposalType)
 			initialDeposit := viper.GetString(flagDeposit)
-			paramsStr := viper.GetString(flagParams)
+			paramStr := viper.GetString(flagParam)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -47,15 +47,15 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			var params gov.Params
+			var param gov.Param
 			if proposalType == gov.ProposalTypeParameterChange {
-				if err := json.Unmarshal([]byte(paramsStr), &params); err != nil {
+				if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
 					fmt.Println(err.Error())
 					return nil
 				}
 			}
 
-			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
+			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
 
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -77,7 +77,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagDescription, "", "description of proposal")
 	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
-	cmd.Flags().String(flagParams, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
+	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 
 	return cmd
 }
