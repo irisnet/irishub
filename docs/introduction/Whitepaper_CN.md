@@ -167,7 +167,7 @@ IRIS Services（又名“iServices”）旨在对链下服务从定义、绑定�
 * `Name (string)`:  iService中该方法的唯一名称
 * `Description (string)`: 对该方法的描述
 * `Input (string)`: 对输入参数的结构化定义
-* `Output (string)`: 对输出结果的机构化定义
+* `Output (string)`: 对输出结果的结构化定义
 * `Error (string)`: 对可能出现的错误条件的结构化定义
 * `OutputPrivacy (enum)`: 设置此方法是非隐私的还是公钥加密的，可选值`NoPrivacy`/`PubKeyEncryption`
 
