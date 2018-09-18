@@ -1,4 +1,4 @@
-package cli
+package tx
 
 import (
 	"errors"
@@ -8,10 +8,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"net/http"
+	"net/url"
 )
 
 const (
@@ -117,4 +120,60 @@ func FormatTxResults(cdc *wire.Codec, res []*ctypes.ResultTx) ([]Info, error) {
 		}
 	}
 	return out, nil
+}
+
+// Search Tx REST Handler
+func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tag := r.FormValue("tag")
+		if tag == "" {
+			w.WriteHeader(400)
+			w.Write([]byte("You need to provide at least a tag as a key=value pair to search for. Postfix the key with _bech32 to search bech32-encoded addresses or public keys"))
+			return
+		}
+
+		keyValue := strings.Split(tag, "=")
+		key := keyValue[0]
+
+		value, err := url.QueryUnescape(keyValue[1])
+		if err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte("Could not decode address: " + err.Error()))
+			return
+		}
+
+		if strings.HasSuffix(key, "_bech32") {
+			bech32address := strings.Trim(value, "'")
+			prefix := strings.Split(bech32address, "1")[0]
+			bz, err := sdk.GetFromBech32(bech32address, prefix)
+			if err != nil {
+				w.WriteHeader(400)
+				w.Write([]byte(err.Error()))
+				return
+			}
+
+			tag = strings.TrimRight(key, "_bech32") + "='" + sdk.AccAddress(bz).String() + "'"
+		}
+
+		txs, err := searchTxs(cliCtx, cdc, []string{tag})
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		if len(txs) == 0 {
+			w.Write([]byte("[]"))
+			return
+		}
+
+		output, err := cdc.MarshalJSON(txs)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
+	}
 }

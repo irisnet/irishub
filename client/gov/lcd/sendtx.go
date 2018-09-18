@@ -78,17 +78,12 @@ func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFu
 		strProposalID := vars[RestProposalID]
 
 		if len(strProposalID) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("proposalId required but not specified")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
 			return
 		}
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			err := fmt.Errorf("proposalID [%d] is not positive", proposalID)
-			w.Write([]byte(err.Error()))
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

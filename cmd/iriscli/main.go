@@ -11,7 +11,8 @@ import (
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
-	tendermintcmd "github.com/irisnet/irishub/client/tendermint/cli"
+	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
+	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 )
@@ -34,10 +35,11 @@ func main() {
 		Short: "Tendermint state querying subcommands",
 	}
 	tendermintCmd.AddCommand(
-		tendermintcmd.QueryTxCmd(cdc),
-		tendermintcmd.SearchTxCmd(cdc),
-		tendermintcmd.BlockCommand(),
-		tendermintcmd.ValidatorCommand(),
+		tenderminttxcmd.QueryTxCmd(cdc),
+		tenderminttxcmd.SearchTxCmd(cdc),
+		tendermintrpccmd.BlockCommand(),
+		tendermintrpccmd.ValidatorCommand(),
+		tendermintrpccmd.StatusCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
 
