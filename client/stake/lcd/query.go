@@ -10,9 +10,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/tendermint/tx"
+	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 	"strings"
-	"github.com/irisnet/irishub/client/utils"
+	"encoding/json"
 )
 
 const storeName = "stake"
@@ -99,7 +100,7 @@ func delegatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 			}
 		}
 
-		output, err := cdc.MarshalJSONIndent(delegationSummary,"", "  ")
+		output, err := cdc.MarshalJSONIndent(delegationSummary, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -177,7 +178,7 @@ func delegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Hand
 			txs = append(txs, foundTxs...)
 		}
 
-		output, err = cdc.MarshalJSONIndent(txs,"", "  ")
+		output, err = cdc.MarshalJSONIndent(txs, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -234,7 +235,7 @@ func unbondingDelegationsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) h
 		// unbondings will be a list in the future but is not yet, but we want to keep the API consistent
 		ubdArray := []stake.UnbondingDelegation{ubd}
 
-		output, err := cdc.MarshalJSONIndent(ubdArray,"", "  ")
+		output, err := cdc.MarshalJSONIndent(ubdArray, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("couldn't marshall unbonding-delegation. Error: %s", err.Error())))
@@ -297,7 +298,7 @@ func delegationHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handle
 			Shares:        delegation.Shares.FloatString(),
 		}
 
-		output, err := cdc.MarshalJSONIndent(outputDelegation,"", "  ")
+		output, err := cdc.MarshalJSONIndent(outputDelegation, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -360,7 +361,7 @@ func delegatorValidatorsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) ht
 
 			bondedValidators = append(bondedValidators, validator)
 		}
-		output, err := cdc.MarshalJSONIndent(bondedValidators,"", "  ")
+		output, err := cdc.MarshalJSONIndent(bondedValidators, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -398,7 +399,7 @@ func delegatorValidatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) htt
 			w.WriteHeader(statusCode)
 			return
 		}
-		output, err = cdc.MarshalJSONIndent(validator,"", "  ")
+		output, err = cdc.MarshalJSONIndent(validator, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -432,7 +433,7 @@ func validatorsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handle
 			return
 		}
 
-		output, err := cdc.MarshalJSONIndent(validators,"", "  ")
+		output, err := cdc.MarshalJSONIndent(validators, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -472,7 +473,7 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 
 		validator := types.MustUnmarshalValidator(cdc, valAddress, res)
 
-		output, err = cdc.MarshalJSONIndent(validator,"", "  ")
+		output, err = cdc.MarshalJSONIndent(validator, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
@@ -484,5 +485,53 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 			return
 		}
 		w.Write(output)
+	}
+}
+
+type ExRateResponse struct {
+	ExRate float64 `json:"token_shares_rate"`
+}
+
+func getValidatorExRate(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// read parameters
+		vars := mux.Vars(r)
+		bech32validatorAddr := vars["addr"]
+		valAddress, err := sdk.AccAddressFromBech32(bech32validatorAddr)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
+			return
+		}
+
+		key := stake.GetValidatorKey(valAddress)
+		cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+		res, err := cliCtx.QueryStore(key, storeName)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		} else if len(res) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("No validator found with address %s", valAddress))
+			return
+		}
+
+		validator := types.MustUnmarshalValidator(cdc, valAddress, res)
+
+		// validator exRate
+		valExRate := validator.DelegatorShareExRate()
+
+		floatExRate,_ := valExRate.Float64()
+		exRate := ExRateResponse{
+			ExRate: floatExRate,
+		}
+
+		resRaw, err := json.Marshal(exRate)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		w.Write(resRaw)
 	}
 }

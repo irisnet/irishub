@@ -60,4 +60,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, k
 		"/stake/validators/{addr}",
 		validatorHandlerFn(cliCtx, cdc),
 	).Methods("GET")
+
+	r.HandleFunc("/stake/validator/{addr}/exRate",
+		getValidatorExRate(cliCtx, cdc)).Methods("GET")
 }
