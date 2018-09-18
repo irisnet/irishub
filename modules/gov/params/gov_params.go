@@ -41,7 +41,6 @@ func (param *DepositProcedureParam) SetReadWriter(setter params.Setter) {
 
 func (param *DepositProcedureParam) GetStoreKey() string {
 	return "Gov/gov/depositProcedure"
-
 }
 
 func (param *DepositProcedureParam) SaveValue(ctx sdk.Context) {

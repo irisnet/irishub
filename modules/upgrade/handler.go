@@ -60,7 +60,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 
 	upgradeparams.CurrentUpgradeProposalIdParameter.LoadValue(ctx)
-	if (upgradeparams.CurrentUpgradeProposalIdParameter.Value != -1) && (ctx.BlockHeight() == keeper.GetCurrentProposalAcceptHeight(ctx)+defaultSwitchPeriod) {
+	upgradeparams.ProposalAcceptHeightParameter.LoadValue(ctx)
+
+	if (upgradeparams.CurrentUpgradeProposalIdParameter.Value != -1) && (ctx.BlockHeight() == upgradeparams.ProposalAcceptHeightParameter.Value+defaultSwitchPeriod) {
 		switchPasses := tally(ctx, keeper)
 		if switchPasses {
 			tags.AppendTag("action", []byte("switchPassed"))

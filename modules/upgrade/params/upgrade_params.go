@@ -40,3 +40,39 @@ func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
 	}
 	return true
 }
+
+
+var ProposalAcceptHeightParameter ProposalAcceptHeightParam
+
+var _ parameter.SignalParameter = (*ProposalAcceptHeightParam)(nil)
+
+type ProposalAcceptHeightParam struct {
+	Value   int64
+	psetter params.Setter
+	pgetter params.Getter
+}
+
+func (param *ProposalAcceptHeightParam) InitGenesis(genesisState interface{}) {
+	param.Value = -1
+}
+
+func (param *ProposalAcceptHeightParam) SetReadWriter(setter params.Setter) {
+	param.psetter = setter
+	param.pgetter = setter.Getter
+}
+
+func (param *ProposalAcceptHeightParam) GetStoreKey() string {
+	return "Sig/upgrade/proposalAcceptHeight"
+}
+
+func (param *ProposalAcceptHeightParam) SaveValue(ctx sdk.Context) {
+	param.psetter.Set(ctx, param.GetStoreKey(), param.Value)
+}
+
+func (param *ProposalAcceptHeightParam) LoadValue(ctx sdk.Context) bool {
+	err := param.pgetter.Get(ctx, param.GetStoreKey(), &param.Value)
+	if err != nil {
+		return false
+	}
+	return true
+}
