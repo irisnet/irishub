@@ -8,6 +8,7 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"fmt"
 	"os"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 func GetCmdInfo(storeName string, cdc *wire.Codec) *cobra.Command {
@@ -23,7 +24,7 @@ func GetCmdInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 
 
 			res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgrade.GetCurrentProposalAcceptHeightKey()), "params")
-            res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgrade.GetCurrentProposalIdKey()),"params")
+            res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()),"params")
 			var height int64
 			var proposalID int64
 			cdc.MustUnmarshalBinary(res_height, &height)
