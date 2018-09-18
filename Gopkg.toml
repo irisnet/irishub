@@ -58,6 +58,9 @@
   source = "https://github.com/irisnet/tendermint.git"
   branch = "irisnet/develop"
 
+[[constraint]]
+  name = "github.com/rakyll/statik"
+  version = "=v0.1.4"
 
 [prune]
   go-tests = true
