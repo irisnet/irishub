@@ -1,95 +1,100 @@
 package lcd
 
 import (
-	"net/http"
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client"
+	bankHandler "github.com/irisnet/irishub/client/bank/lcd"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/keys"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/log"
-
 	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
-
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/keys"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/wire"
-	auth "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
-	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
-	ibc "github.com/cosmos/cosmos-sdk/x/ibc/client/rest"
-	stake "github.com/cosmos/cosmos-sdk/x/stake/client/rest"
-	gov "github.com/cosmos/cosmos-sdk/x/gov/client/rest"
-	slashing "github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/version"
+	"net/http"
 )
 
-// ServeCommand will generate a long-running rest server
-// (aka Light Client Daemon) that exposes functionality similar
-// to the cli, but over rest
-func ServeCommand(cdc *wire.Codec) *cobra.Command {
+// ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
+func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 	flagListenAddr := "laddr"
 	flagCORS := "cors"
 	flagMaxOpenConnections := "max-open"
 
 	cmd := &cobra.Command{
-		Use:   "rest-server",
-		Short: "Start LCD (light-client daemon), a local REST server",
+		Use:   "start",
+		Short: "Start irislcd (irishub light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listenAddr := viper.GetString(flagListenAddr)
-			handler := createHandler(cdc)
-			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "rest-server")
+			router := createHandler(cdc)
+
+			statikFS, err := fs.New()
+			if err != nil {
+				panic(err)
+			}
+			staticServer := http.FileServer(statikFS)
+			router.PathPrefix("/swagger-ui/").Handler(http.StripPrefix("/swagger-ui/", staticServer))
+
+			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "irislcd")
 			maxOpen := viper.GetInt(flagMaxOpenConnections)
 
 			listener, err := tmserver.StartHTTPServer(
-				listenAddr, handler, logger,
+				listenAddr, router, logger,
 				tmserver.Config{MaxOpenConnections: maxOpen},
 			)
 			if err != nil {
 				return err
 			}
-			logger.Info("REST server started")
 
-			// Wait forever and cleanup
+			logger.Info("irislcd server started")
+
+			// wait forever and cleanup
 			cmn.TrapSignal(func() {
 				err := listener.Close()
-				logger.Error("Error closing listener", "err", err)
+				logger.Error("error closing listener", "err", err)
 			})
+
 			return nil
 		},
 	}
-	cmd.Flags().StringP(flagListenAddr, "a", "tcp://localhost:1317", "Address for server to listen on")
-	cmd.Flags().String(flagCORS, "", "Set to domains that can make CORS requests (* for all)")
-	cmd.Flags().StringP(client.FlagChainID, "c", "", "ID of chain we connect to")
-	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:46657", "Node to connect to")
+
+	cmd.Flags().String(flagListenAddr, "tcp://localhost:1317", "The address for the server to listen on")
+	cmd.Flags().String(flagCORS, "", "Set the domains that can make CORS requests (* for all)")
+	cmd.Flags().String(client.FlagChainID, "", "The chain ID to connect to")
+	cmd.Flags().String(client.FlagNode, "tcp://localhost:26657", "Address of the node to connect to")
+	cmd.Flags().Int(flagMaxOpenConnections, 1000, "The number of maximum open connections")
+	cmd.Flags().Bool(client.FlagTrustNode, false, "Don't verify proofs for responses")
+
 	return cmd
 }
 
-func createHandler(cdc *wire.Codec) http.Handler {
+func createHandler(cdc *wire.Codec) *mux.Router {
 	r := mux.NewRouter()
-
-	kb, err := keys.GetKeyBase() //XXX
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		panic(err)
 	}
+	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
-	ctx := app.NewContext()
+	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
+	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
-	r.HandleFunc("/version", version.VersionHandlerFn(ctx, cdc)).Methods("GET")
-	// TODO make more functional? aka r = keys.RegisterRoutes(r)
-	keys.RegisterRoutes(r)
-	rpc.RegisterRoutes(ctx.Get(), r)
-	tx.RegisterRoutes(ctx.Get(), r, cdc)
-	auth.RegisterRoutes(ctx.Get(), r, cdc, "acc")
-	bank.RegisterRoutes(ctx.Get(), r, cdc, kb)
-	ibc.RegisterRoutes(ctx.Get(), r, cdc, kb)
-	stake.RegisterRoutes(ctx.Get(), r, cdc, kb)
-	RegisterRoutes(ctx, r, cdc, kb)
-	RegisterStakeExRate(ctx.Get(), r, cdc)
-	gov.RegisterRoutes(ctx.Get(), r, cdc)
-	slashing.RegisterRoutes(ctx.Get(), r, cdc, kb)
+	bankHandler.RegisterRoutes(cliCtx, r, cdc, kb)
+
+	/*
+		keys.RegisterRoutes(r)
+		rpc.RegisterRoutes(cliCtx, r)
+		tx.RegisterRoutes(cliCtx, r, cdc)
+
+		auth.RegisterRoutes(cliCtx, r, cdc, "acc")
+		bank.RegisterRoutes(cliCtx, r, cdc, kb)
+		ibc.RegisterRoutes(cliCtx, r, cdc, kb)
+		stake.RegisterRoutes(cliCtx, r, cdc, kb)
+		slashing.RegisterRoutes(cliCtx, r, cdc, kb)
+		gov.RegisterRoutes(cliCtx, r, cdc)
+	*/
 	return r
 }

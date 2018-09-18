@@ -1,9 +1,9 @@
 package prometheus
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/app"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,7 +17,7 @@ func MonitorCommand(cdc *wire.Codec) *cobra.Command {
 		Use:   "monitor",
 		Short: "irishub monitor",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := app.NewContext().WithCodeC(cdc)
+			ctx := context.NewCLIContext().WithCodec(cdc)
 			//ctx := tools.NewContext(storeName, cdc)
 			monitor := DefaultMonitor(ctx)
 			monitor.Start()
