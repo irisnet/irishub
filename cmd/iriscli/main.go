@@ -29,6 +29,7 @@ func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 
+	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
 	//Add state commands
 	tendermintCmd := &cobra.Command{
 		Use:   "tendermint",
@@ -39,7 +40,6 @@ func main() {
 		tenderminttxcmd.SearchTxCmd(cdc),
 		tendermintrpccmd.BlockCommand(),
 		tendermintrpccmd.ValidatorCommand(),
-		tendermintrpccmd.StatusCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
 
