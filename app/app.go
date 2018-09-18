@@ -19,6 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/modules/parameter"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -156,7 +157,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
-	parameter.SetParamReadWriter(app.paramsKeeper.Setter(), &govparams.DepositProcedureParameter)
+	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
+							&govparams.DepositProcedureParameter,
+							&upgradeparams.CurrentUpgradeProposalIdParameter,
+							&upgradeparams.ProposalAcceptHeightParameter)
+
 	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter)
 
 	return app

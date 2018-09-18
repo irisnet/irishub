@@ -6,14 +6,20 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/parameter"
+
 )
 
 var DepositProcedureParameter DepositProcedureParam
+
 
 var (
 	MinDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
 	MaxDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
 )
+
+var _ parameter.GovParameter = (*DepositProcedureParam)(nil)
+
 
 // Procedure around Deposits for governance
 type DepositProcedure struct {
@@ -44,7 +50,6 @@ func (param *DepositProcedureParam) SetReadWriter(setter params.Setter) {
 
 func (param *DepositProcedureParam) GetStoreKey() string {
 	return "Gov/gov/depositProcedure"
-
 }
 
 func (param *DepositProcedureParam) SaveValue(ctx sdk.Context) {
@@ -76,20 +81,22 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
+
 		if param.Value.MinDeposit[0].Denom != "iris-atto" {
-			return sdk.NewError(DefaultCodespace, CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto"))
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto! git"))
 		}
 
 		if param.Value.MinDeposit[0].Amount.GT(MinDeposit.Amount) && param.Value.MinDeposit[0].Amount.LT(MaxDeposit.Amount) {
-			return sdk.NewError(DefaultCodespace, CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount should be larger than 10 and less than 20000"))
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount should be larger than 10 and less than 20000"))
+
 		}
 
 		if param.Value.MaxDepositPeriod > 20 && param.Value.MaxDepositPeriod < 20000 {
-			return sdk.NewError(DefaultCodespace, CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod should be larger than 20 and less than 20000"))
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod should be larger than 20 and less than 20000"))
 		}
 
 		return nil
 
 	}
-	return sdk.NewError(DefaultCodespace, CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
 }
