@@ -2,6 +2,7 @@ package gov
 
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 // Register concrete types on wire codec
@@ -15,7 +16,7 @@ func RegisterWire(cdc *wire.Codec) {
 	cdc.RegisterConcrete(&TextProposal{}, "gov/TextProposal", nil)
 
 	////////////////////  iris begin  ///////////////////////////
-	cdc.RegisterConcrete(DepositProcedure{},"cosmos-sdk/DepositProcedure",nil)
+	cdc.RegisterConcrete(govparams.DepositProcedure{},"cosmos-sdk/DepositProcedure",nil)
 	cdc.RegisterConcrete(TallyingProcedure{},"cosmos-sdk/TallyingProcedure",nil)
 	cdc.RegisterConcrete(VotingProcedure{},"cosmos-sdk/VotingProcedure",nil)
 	cdc.RegisterConcrete(&ParameterProposal{}, "gov/ParameterProposal", nil)

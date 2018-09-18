@@ -2,21 +2,22 @@ package gov
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
 	"testing"
-	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/types"
-	"fmt"
 )
 
 // initialize the mock application for this module
@@ -33,7 +34,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	pk := iparams.NewKeeper(mapp.Cdc, keyGlobalParams)
 	ck := bank.NewKeeper(mapp.AccountMapper)
 	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
-	keeper := NewKeeper(mapp.Cdc, keyGov, pk.Setter(), ck, sk, DefaultCodespace)
+	keeper := NewKeeper(mapp.Cdc, keyGov, pk.GovSetter(), ck, sk, DefaultCodespace)
 	mapp.Router().AddRoute("gov", NewHandler(keeper))
 
 	mapp.SetEndBlocker(getEndBlocker(keeper))
@@ -71,10 +72,10 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		ct := types.NewDefaultCoinType("iris")
-		minDeposit,_ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s",10,"iris"))
+		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: DepositProcedure{
+			DepositProcedure: govparams.DepositProcedure{
 				MinDeposit:       sdk.Coins{minDeposit},
 				MaxDepositPeriod: 1440,
 			},

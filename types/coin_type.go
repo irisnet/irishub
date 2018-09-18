@@ -120,8 +120,11 @@ func (ct CoinType) Convert(orgCoinStr string, denom string) (destCoinStr string,
 	// target Coin = original amount * (10^(target decimal) / 10^(original decimal))
 	if orgUnit, err := ct.GetUnit(orgDenom); err == nil {
 		rat := sdk.NewRatFromInt(destUint.GetPrecision(), orgUnit.GetPrecision())
-		amount, _ := sdk.NewRatFromDecimal(orgAmt, destUint.Decimal) //Convert the original amount to the target accuracy
-		amt := NewRat(amount.Mul(rat)).DecimalString(destUint.Decimal)
+		amount, err := sdk.NewRatFromDecimal(orgAmt, ct.MinUnit.Decimal) //Convert the original amount to the target accuracy
+		if err != nil {
+			return destCoinStr, err
+		}
+		amt := NewRat(amount.Mul(rat)).DecimalString(ct.MinUnit.Decimal)
 		destCoinStr = fmt.Sprintf("%s%s", amt, destUint.Denom)
 		return destCoinStr, nil
 	}

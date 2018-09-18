@@ -2,23 +2,17 @@ package main
 
 import (
 	"github.com/spf13/cobra"
-
 	"github.com/tendermint/tendermint/libs/cli"
-
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/keys"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
-	"github.com/cosmos/cosmos-sdk/client/tx"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
-	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
-	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/app"
-	c "github.com/irisnet/irishub/client"
-	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	paramcmd "github.com/cosmos/cosmos-sdk/x/params/client/cli"
-	//upgradecmd "github.com/irisnet/irishub/modules/upgrade/client/cli"
+	"github.com/irisnet/irishub/client"
+	bankcmd "github.com/irisnet/irishub/client/bank/cli"
+	govcmd "github.com/irisnet/irishub/client/gov/cli"
+	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
+	stakecmd "github.com/irisnet/irishub/client/stake/cli"
+	tendermintcmd "github.com/irisnet/irishub/client/tendermint/cli"
+	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -26,7 +20,7 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "iriscli",
-		Short: "irishub light-client",
+		Short: "irishub command line interface",
 	}
 )
 
@@ -34,51 +28,61 @@ func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 
-	// TODO: setup keybase, viper object, etc. to be passed into
-	// the below functions and eliminate global vars, like we do
-	// with the cdc
-
-	// add standard rpc commands
-	rpc.AddCommands(rootCmd)
-
 	//Add state commands
 	tendermintCmd := &cobra.Command{
 		Use:   "tendermint",
 		Short: "Tendermint state querying subcommands",
 	}
 	tendermintCmd.AddCommand(
-		rpc.BlockCommand(),
-		rpc.ValidatorCommand(),
+		tendermintcmd.QueryTxCmd(cdc),
+		tendermintcmd.SearchTxCmd(cdc),
+		tendermintcmd.BlockCommand(),
+		tendermintcmd.ValidatorCommand(),
 	)
-	tx.AddCommands(tendermintCmd, cdc)
+	rootCmd.AddCommand(tendermintCmd)
 
-	//Add IBC commands
-	ibcCmd := &cobra.Command{
-		Use:   "ibc",
-		Short: "Inter-Blockchain Communication subcommands",
+	//Add bank commands
+	bankCmd := &cobra.Command{
+		Use:   "bank",
+		Short: "Bank subcommands",
 	}
-	ibcCmd.AddCommand(
-		client.PostCommands(
-			ibccmd.IBCTransferCmd(cdc),
-			ibccmd.IBCRelayCmd(cdc),
+	bankCmd.AddCommand(
+		client.GetCommands(
+			bankcmd.GetCmdQueryCoinType(cdc),
+			bankcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
 		)...)
-
-	advancedCmd := &cobra.Command{
-		Use:   "advanced",
-		Short: "Advanced subcommands",
-	}
-
-	advancedCmd.AddCommand(
-		tendermintCmd,
-		ibcCmd,
-		c.ServeCommand(cdc),
-	)
+	bankCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
 	rootCmd.AddCommand(
-		advancedCmd,
-		client.LineBreak,
+		bankCmd,
 	)
 
 	//Add stake commands
+	govCmd := &cobra.Command{
+		Use:   "gov",
+		Short: "Governance and voting subcommands",
+	}
+	govCmd.AddCommand(
+		client.GetCommands(
+			govcmd.GetCmdQueryProposal("gov", cdc),
+			govcmd.GetCmdQueryVote("gov", cdc),
+			govcmd.GetCmdQueryVotes("gov", cdc),
+			govcmd.GetCmdQueryProposals("gov", cdc),
+			govcmd.GetCmdQueryConfig("gov", cdc),
+		)...)
+	govCmd.AddCommand(
+		client.PostCommands(
+			govcmd.GetCmdSubmitProposal(cdc),
+			govcmd.GetCmdDeposit(cdc),
+			govcmd.GetCmdVote(cdc),
+		)...)
+	rootCmd.AddCommand(
+		govCmd,
+	)
+
+	//Add staking and slashing commands
 	stakeCmd := &cobra.Command{
 		Use:   "stake",
 		Short: "Stake and validation subcommands",
@@ -89,6 +93,10 @@ func main() {
 			stakecmd.GetCmdQueryValidators("stake", cdc),
 			stakecmd.GetCmdQueryDelegation("stake", cdc),
 			stakecmd.GetCmdQueryDelegations("stake", cdc),
+			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
+			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryRedelegation("stake", cdc),
+			stakecmd.GetCmdQueryRedelegations("stake", cdc),
 			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
 		)...)
 	stakeCmd.AddCommand(
@@ -104,78 +112,28 @@ func main() {
 		stakeCmd,
 	)
 
-	//Add gov commands
-	govCmd := &cobra.Command{
-		Use:   "gov",
-		Short: "Governance and voting subcommands",
+	//Add upgrade commands
+	upgradeCmd := &cobra.Command{
+		Use:   "upgrade",
+		Short: "Software Upgrade subcommands",
 	}
-	govCmd.AddCommand(
+	upgradeCmd.AddCommand(
 		client.GetCommands(
-			govcmd.GetCmdQueryProposal("gov", cdc),
-			govcmd.GetCmdQueryVote("gov", cdc),
-		)...)
-	govCmd.AddCommand(
-		client.PostCommands(
-			govcmd.GetCmdSubmitProposal(cdc),
-			govcmd.GetCmdDeposit(cdc),
-			govcmd.GetCmdVote(cdc),
+			upgradecmd.GetCmdVersion("upgrade", cdc),
 		)...)
 	rootCmd.AddCommand(
-		govCmd,
+		upgradeCmd,
 	)
 
-	////Add upgrade commands
-	//upgradeCmd := &cobra.Command{
-	//	Use:   "upgrade",
-	//	Short: "Software Upgrade subcommands",
-	//}
-	//upgradeCmd.AddCommand(
-	//	client.GetCommands(
-	//		upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-	//		upgradecmd.GetCmdInfo("upgrade", cdc),
-	//	)...)
-	//upgradeCmd.AddCommand(
-	//	client.PostCommands(
-	//		upgradecmd.GetCmdSubmitSwitch(cdc),
-	//	)...)
-	//rootCmd.AddCommand(
-	//	upgradeCmd,
-	//)
-
-	//Add auth and bank commands
+	//Add keys and version commands
 	rootCmd.AddCommand(
-		client.GetCommands(
-			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
-		)...)
-	rootCmd.AddCommand(
-		client.PostCommands(
-			bankcmd.SendTxCmd(cdc),
-		)...)
-
-	// add proxy, version and key info
-	rootCmd.AddCommand(
-		keys.Commands(),
 		client.LineBreak,
+		keyscmd.Commands(),
+		version.ServeVersionCommand(cdc),
 	)
-	rootCmd.AddCommand(
-		client.GetCommands(
-			version.GetCmdVersion("upgrade", cdc),
-		)...)
-
-	paramsCmd := &cobra.Command{
-		Use:   "params",
-		Short: "Governance and voting subcommands",
-	}
-
-	paramsCmd.AddCommand(
-		client.GetCommands(
-			paramcmd.ExportCmd("params",cdc),
-		)...)
-
-	rootCmd.AddCommand(paramsCmd)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "IRISCLI", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		// handle with #870

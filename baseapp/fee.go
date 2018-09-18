@@ -99,17 +99,19 @@ func NewFeeRefundHandler(am auth.AccountMapper, fck auth.FeeCollectionKeeper, fm
 
 // FeeManager do fee tokens preprocess according to fee token configuration
 type FeeManager struct {
-	getter iparams.GetterProxy
+	globalGetter iparams.GlobalGetter
+	govGetter iparams.GovGetter
 }
 
-func NewFeeManager(getter iparams.GetterProxy) FeeManager {
+func NewFeeManager(globalGetter iparams.GlobalGetter, govGetter iparams.GovGetter) FeeManager {
 	return FeeManager{
-		getter: getter,
+		globalGetter: globalGetter,
+		govGetter: govGetter,
 	}
 }
 
 func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
-	nativeFeeToken, err := fck.getter.GetString(ctx, nativeFeeTokenKey)
+	nativeFeeToken, err := fck.globalGetter.GetString(ctx, nativeFeeTokenKey)
 	if err != nil {
 		panic(err)
 	}
@@ -125,11 +127,11 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 	if gasLimit <= 0 {
 		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
 	}
-	nativeFeeToken, err := fck.getter.GetString(ctx, nativeFeeTokenKey)
+	nativeFeeToken, err := fck.globalGetter.GetString(ctx, nativeFeeTokenKey)
 	if err != nil {
 		panic(err)
 	}
-	nativeGasPriceThreshold, err := fck.getter.GovGetter().GetString(ctx, nativeGasPriceThresholdKey)
+	nativeGasPriceThreshold, err := fck.govGetter.GetString(ctx, nativeGasPriceThresholdKey)
 	if err != nil {
 		panic(err)
 	}
@@ -175,7 +177,7 @@ type FeeGenesisStateConfig struct {
 	GasPriceThreshold int64 `json:"gas_price_threshold"`
 }
 
-func InitGenesis(ctx sdk.Context, setter iparams.SetterProxy, data FeeGenesisStateConfig) {
-	setter.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
-	setter.GovSetter().SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
+func InitGenesis(ctx sdk.Context, globalSetter iparams.GlobalSetter, govSetter iparams.GovSetter, data FeeGenesisStateConfig) {
+	globalSetter.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
+	govSetter.SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
 }
