@@ -48,3 +48,4 @@ func TestInitGenesisParameter(t *testing.T) {
 
 	require.Equal(t, p1, govparams.DepositProcedureParameter.Value)
 }
+
