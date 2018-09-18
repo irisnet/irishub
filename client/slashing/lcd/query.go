@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 )
 
@@ -17,8 +18,7 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *wire
 
 		pk, err := sdk.GetValPubKeyBech32(vars["validator"])
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -26,8 +26,7 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *wire
 
 		res, err := cliCtx.QueryStore(key, storeName)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("couldn't query signing info. Error: %s", err.Error())))
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't query signing info. Error: %s", err.Error()))
 			return
 		}
 
@@ -35,15 +34,13 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *wire
 
 		err = cdc.UnmarshalBinary(res, &signingInfo)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("couldn't decode signing info. Error: %s", err.Error())))
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't decode signing info. Error: %s", err.Error()))
 			return
 		}
 
-		output, err := cdc.MarshalJSON(signingInfo)
+		output, err := cdc.MarshalJSONIndent(signingInfo, "", "  ")
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 

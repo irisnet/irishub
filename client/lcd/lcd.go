@@ -9,6 +9,7 @@ import (
 	bankHandler "github.com/irisnet/irishub/client/bank/lcd"
 	govHandler "github.com/irisnet/irishub/client/gov/lcd"
 	keysHandler "github.com/irisnet/irishub/client/keys/lcd"
+	slashingHandler "github.com/irisnet/irishub/client/slashing/lcd"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/rakyll/statik/fs"
@@ -87,17 +88,8 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 	keysHandler.RegisterRoutes(r)
 	bankHandler.RegisterRoutes(cliCtx, r, cdc, kb)
 	govHandler.RegisterRoutes(cliCtx, r, cdc)
-	/*
-		keys.RegisterRoutes(r)
-		rpc.RegisterRoutes(cliCtx, r)
-		tx.RegisterRoutes(cliCtx, r, cdc)
-
-		auth.RegisterRoutes(cliCtx, r, cdc, "acc")
-		bank.RegisterRoutes(cliCtx, r, cdc, kb)
-		ibc.RegisterRoutes(cliCtx, r, cdc, kb)
-		stake.RegisterRoutes(cliCtx, r, cdc, kb)
-		slashing.RegisterRoutes(cliCtx, r, cdc, kb)
-		gov.RegisterRoutes(cliCtx, r, cdc)
-	*/
+	slashingHandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	//stake.RegisterRoutes(cliCtx, r, cdc, kb)
+	//tendermint.RegisterRoutes(cliCtx, r, cdc)
 	return r
 }
