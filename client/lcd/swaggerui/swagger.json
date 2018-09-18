@@ -2654,23 +2654,8 @@
     "stake.EditDelegationsBody": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "chain_id": {
-          "type": "string"
-        },
-        "account_number": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string"
-        },
-        "gas": {
-          "type": "string"
+        "base_tx": {
+          "$ref": "#/definitions/common.BaseTx"
         },
         "delegations": {
           "type": "array",

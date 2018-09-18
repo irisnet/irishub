@@ -12,6 +12,7 @@ import (
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	"net/http"
 	"strings"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 const storeName = "stake"
@@ -457,19 +458,19 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 			return
 		}
 
-		kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)
+		key := stake.GetValidatorKey(valAddress)
+		cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+		res, err := cliCtx.QueryStore(key, storeName)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		} else if len(res) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("No validator found with address %s", valAddress))
 			return
 		}
 
-		validator, err := getValidator(valAddress, kvs, cdc)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("couldn't query validator. Error: %s", err.Error())))
-			return
-		}
+		validator := types.MustUnmarshalValidator(cdc, valAddress, res)
 
 		output, err = cdc.MarshalJSONIndent(validator,"", "  ")
 		if err != nil {

@@ -43,12 +43,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, k
 		delegationHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// GET /stake/delegators/{delegatorAddr}/delegations/{validatorAddr} // Query a delegation between a delegator and a validator
-	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/delegations/{validatorAddr}",
-		delegationHandlerFn(cliCtx, cdc),
-	).Methods("GET")
-
 	// GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr} // Query all unbonding_delegations between a delegator and a validator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}",
