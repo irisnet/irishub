@@ -8,7 +8,7 @@
 ```
 iris  init --name=<your name> --home=<sentry home>
 ```
-< sentry home>是你指定的哨兵节点的地址。示例：
+`<sentry home>`是你指定的哨兵节点的地址。示例：
 ```
 iris init --name="sentry" --home=sentry --home-client=sentry
 {
@@ -23,22 +23,22 @@ iris init --name="sentry" --home=sentry --home-client=sentry
 
 ## 修改哨兵节点的配置
 
-然后将验证人节点中的genesis.json文件复制到 < sentry home>/config/目录下。接下来对< sentry home>/config/目录下的config.tmol进行编辑。需要进行如下修改：
+然后将验证人节点中的genesis.json文件复制到 `<sentry home>/config/`目录下。接下来对`<sentry home>/config/`目录下的config.toml进行编辑。需要进行如下修改：
 ```
 private_peers_ids="validator_node_id"
 ```
 
-这里的< validator node id>可以在验证人节点上使用iriscli status命令获得。经过这样设置之后然后使用
+这里的`<validator node id>`可以在验证人节点上使用iriscli status命令获得。经过这样设置之后然后使用
 
 ```
-iris  init --home=sentry_home
+iris init --home=<sentry home>
 ```
 
 启动哨兵节点。对每个哨兵节点都需要进行这些操作。
 
 ## 修改验证人节点的配置
 
-接下来需要对验证人节点的< validator home>/config/目录下的config.tmol进行修改：
+接下来需要对验证人节点的`<validator home>/config/`目录下的config.toml进行修改：
 
 ```
 persistent_peers="sentry node id@sentry listen address" 
@@ -47,8 +47,8 @@ persistent_peers="sentry node id@sentry listen address"
 这里只写sentry节点的node id和地址，多个哨兵节点的信息使用逗号分开。
 
 设置`pex=false` 不与其他节点进行peers交换，这样验证人节点就不会连接除persistent_peers之外的节点。
-这里的< sentry node id>可以在哨兵节点上使用iriscli status命令获得。修改完成后需要重启验证人节点使修改生效。
+这里的`<sentry node id>`可以在哨兵节点上使用iriscli status命令获得。修改完成后需要重启验证人节点使修改生效。
 
 ```
-iris  init --home=validator node home
+iris  init --home=<validator node home>
 ```

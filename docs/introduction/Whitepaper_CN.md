@@ -579,7 +579,7 @@ Tendermint将在扩展Tendermint ABCI和Cosmos IBC技术方面，为IRIS项目�
 
 <div STYLE="page-break-after: always;"></div>
 
-## 参考文献###################################################################
+## 参考文献
 
 [1]: https://drive.google.com/file/d/1bI7JIOe-CfJ5fPHKxYlFub2Kg-KCGU6r/view?usp=sharing
 [2]: http://ethdocs.org/en/latest/

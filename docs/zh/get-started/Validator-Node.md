@@ -56,7 +56,7 @@ iriscli status --node=tcp://localhost:26657
 ```
 若 `catching_up` 字段为 `false`那么你的节点就是同步的。
 
-你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fvp`为首字节，想要了解更多的编码信息，请参考以下 [文档](../get-started/tools/Bech32-on-IRISnet.md)
+你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fvp`为首字节，想要了解更多的编码信息，请参考以下 [文档](Bech32-on-IRISnet.md)
 
 通过执行以下命令获得节点的公钥信息：
 

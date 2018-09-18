@@ -22,16 +22,29 @@ vim start.sh
 
 将第三条命令中的
 
+```
 -a=378E63271D5BE927443E17CBAAFE68DEFF383DA7
+```
 修改为
+```
 -a=<你的验证人地址的hex编码>
---chain-id=fuxi-test
-修改为
---chain-id=<你要监控的网络的ID>
---node="tcp://localhost:26657"
-修改为
---node=<你要监控的节点监听的rpc端口(默认为26657)>
+```
 
+```
+--chain-id=fuxi-test
+```
+修改为
+```
+--chain-id=<你要监控的网络的ID>
+```
+
+```
+--node="tcp://localhost:26657"
+```
+修改为
+```
+--node=<你要监控的节点监听的rpc端口(默认为26657)>
+```
 
 4. 启动监控工具
 ```
