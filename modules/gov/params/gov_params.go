@@ -71,6 +71,7 @@ func (param *DepositProcedureParam) ToJson() string {
 
 func (param *DepositProcedureParam) Update(ctx sdk.Context, jsonStr string) {
 	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
+		fmt.Println(param.Value)
 		param.SaveValue(ctx)
 	}
 }

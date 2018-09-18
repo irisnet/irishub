@@ -6,17 +6,15 @@ import (
 	"github.com/irisnet/irishub/modules/parameter"
 )
 
-type Op string
-
 const (
-	Add    Op = "add"
-	Update Op = "update"
+	Add    string = "add"
+	Update string = "update"
 )
 
 type Param struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
-	Op    Op     `json:"op"`
+	Op    string `json:"op"`
 }
 
 type Params []Param
@@ -33,7 +31,8 @@ func (pp *ParameterProposal) Execute(ctx sdk.Context, k Keeper) (err error) {
 
 	logger := ctx.Logger().With("module", "x/gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-	parameter.ParamMapping[pp.Param.Key].Update(ctx,pp.Param.Value)
-
+	if pp.Param.Op == Update {
+		parameter.ParamMapping[pp.Param.Key].Update(ctx,pp.Param.Value)
+	}
 	return
 }
