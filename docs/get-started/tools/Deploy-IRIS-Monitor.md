@@ -21,12 +21,19 @@ vim start.sh
 
 4. Edit the third command in `start.sh`
 
+You could get hex encoded validator address by running:
+```
+iriscli status
+```
+
+It corresponds to `validator_info.address` field.
+
 modify
 -a=378E63271D5BE927443E17CBAAFE68DEFF383DA7
 to 
 -a=<hex encoded validator address>
 modify
---chain-id=fuxi-test
+--chain-id=fuxi-3000
 to
 --chain-id=<blockchain id that you want to monitor>
 modify

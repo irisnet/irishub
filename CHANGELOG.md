@@ -2,14 +2,14 @@
 
 ## 0.4.0
 
-*August 16th, 2018*
+*September 6th, 2018*
 
 BREAKING CHANGES:
 
 - [cosmos-sdk] Upgrade to cosmos-sdk v0.23.0
     - Change the address prefix format:
       - cosmosaccaddr --> faa
-      - cosmosaccaddr --> fap
+      - cosmosaccpub --> fap
       - cosmosvaladdr --> fva
       - cosmosvalpub --> fvp
     - Adjust the Route & rootMultiStore Commit for software upgrade
@@ -19,12 +19,19 @@ BREAKING CHANGES:
 FEATURES:
 
 - [tendermint] Upgrade to Tendermint v0.22.6
-    - Store the pre-state to support the replay function in software upgrade
+    - Store the pre-state to support the replay function
 - [cosmos-sdk] Upgrade to cosmos-sdk v0.23.0
     - Add the paramProposal and softwareUpgradeProposal in gov module
     - Improve fee token mechanism to more reasonably deduct transaction fee and achieve more ability to defent DDOS attack.
     - Introduce the global parameter module
-- [irishub] Add the upgrade module and example apps for the async software upgrade
+
+BUG FIXES
+
+- Default account balance in genesis
+- Fix iris version issue
+- Fix the unit conflict issue in slashing
+- Check the voting power when create validator
+- Fix evidence amimo register issue
 
 
 ## 0.3.0

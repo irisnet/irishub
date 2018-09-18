@@ -44,7 +44,7 @@ func main() {
 	)
 
 	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
-	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
+	//startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
 		server.InitCmd(ctx, cdc, app.IrisAppInit()),
 		startCmd,
