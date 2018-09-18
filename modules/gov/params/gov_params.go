@@ -15,8 +15,11 @@ var DepositProcedureParameter DepositProcedureParam
 
 
 var (
-	MinDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+	minDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
 )
+
+const LOWER_BOUND_AMOUNT = 1
+const UPPER_BOUND_AMOUNT = 200
 
 var _ parameter.GovParameter = (*DepositProcedureParam)(nil)
 
@@ -38,7 +41,7 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 		param.Value = value
 	} else {
 		param.Value = DepositProcedure{
-			MinDeposit:       sdk.Coins{MinDeposit},
+			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 1440}
 	}
 }
@@ -71,7 +74,6 @@ func (param *DepositProcedureParam) ToJson() string {
 
 func (param *DepositProcedureParam) Update(ctx sdk.Context, jsonStr string) {
 	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-		fmt.Println(param.Value)
 		param.SaveValue(ctx)
 	}
 }
@@ -87,8 +89,8 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto! git"))
 		}
 
-		LowerBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1, "iris"))
-		UpperBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
+		LowerBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, "iris"))
+		UpperBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, "iris"))
 
 		if param.Value.MinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.MinDeposit[0].Amount.GT(UpperBound.Amount) {
 			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 10 and less than 20000"))
