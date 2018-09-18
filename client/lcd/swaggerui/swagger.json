@@ -224,14 +224,14 @@
             "in": "query",
             "name": "generate-only",
             "description": "if true, only generate and return a unsigned transaction byte array",
-            "required": true,
+            "required": false,
             "type": "boolean"
           },
           {
             "in": "query",
             "name": "async",
             "description": "if true, broadcast transaction asynchronously",
-            "required": true,
+            "required": false,
             "type": "boolean"
           },
           {
@@ -475,6 +475,9 @@
           "type": "string"
         },
         "password": {
+          "type": "string"
+        },
+        "signer": {
           "type": "string"
         },
         "chain_id": {

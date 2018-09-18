@@ -11,6 +11,7 @@ const (
 	FlagGas           = "gas"
 	FlagTrustNode     = "trust-node"
 	FlagFrom          = "from"
+	FlagSigner        = "signer"
 	FlagAccountNumber = "account-number"
 	FlagSequence      = "sequence"
 	FlagMemo          = "memo"
@@ -54,6 +55,7 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
 		c.Flags().Bool(FlagPrintResponse, false, "return tx response (only works with async = false)")
 		c.Flags().Bool(FlagGenerateOnly, false, "build an unsigned transaction and write it to STDOUT")
+		c.Flags().String(FlagSigner, "", "Specify signer address for generate-only mode")
 	}
 	return cmds
 }

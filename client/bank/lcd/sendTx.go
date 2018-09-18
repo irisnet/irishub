@@ -43,10 +43,11 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-
-		info, err := kb.Get(m.BaseTx.LocalAccountName)
+		cliCtx.FromAddressName = m.BaseTx.LocalAccountName
+		cliCtx.Signer = m.BaseTx.Signer
+		fromAddress, err := cliCtx.GetFromAddress()
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -58,6 +59,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			AccountNumber: m.BaseTx.AccountNumber,
 			Sequence:      m.BaseTx.Sequence,
 		}
+		txCtx = txCtx.WithCliCtx(cliCtx)
 
 		amount, err := cliCtx.ParseCoins(m.Amount.String())
 		if err != nil {
@@ -65,7 +67,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			return
 		}
 		// build message
-		msg := bank.BuildMsg(sdk.AccAddress(info.GetPubKey().Address()), to, amount)
+		msg := bank.BuildMsg(fromAddress, to, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

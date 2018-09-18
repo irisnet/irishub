@@ -1,26 +1,27 @@
 package utils
 
 import (
-	"net/http"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/client/context"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/client/context"
+	"net/http"
 	"net/url"
 )
 
 const (
-	Async = "async"
-	GenerateOnly  = "generate-only"
+	Async        = "async"
+	GenerateOnly = "generate-only"
 )
 
 type BaseTx struct {
-	LocalAccountName string    `json:"name"`
-	Password         string    `json:"password"`
-	ChainID          string    `json:"chain_id"`
-	AccountNumber    int64     `json:"account_number"`
-	Sequence         int64     `json:"sequence"`
-	Gas              int64     `json:"gas"`
-	Fees             string    `json:"fee"`
+	LocalAccountName string `json:"name"`
+	Password         string `json:"password"`
+	Signer           string `json:"signer"`
+	ChainID          string `json:"chain_id"`
+	AccountNumber    int64  `json:"account_number"`
+	Sequence         int64  `json:"sequence"`
+	Gas              int64  `json:"gas"`
+	Fees             string `json:"fee"`
 }
 
 // WriteErrorResponse prepares and writes a HTTP error
@@ -30,7 +31,7 @@ func WriteErrorResponse(w http.ResponseWriter, status int, msg string) {
 	w.Write([]byte(msg))
 }
 
-func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, txCtx context.TxContext, baseTx BaseTx, msgs []sdk.Msg)  {
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, txCtx context.TxContext, baseTx BaseTx, msgs []sdk.Msg) {
 
 	if cliCtx.GenerateOnly {
 		WriteGenerateStdTxResponse(w, txCtx, msgs)
