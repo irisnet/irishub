@@ -1,16 +1,16 @@
 package lcd
 
 import (
-	"errors"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"net/http"
 	"strconv"
-	"github.com/irisnet/irishub/client/gov/cli"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -19,37 +19,32 @@ func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Han
 		strProposalID := vars[RestProposalID]
 
 		if len(strProposalID) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("proposalId required but not specified")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
 			return
 		}
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			err := fmt.Errorf("proposalID [%d] is not positive", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%d] is not positive", proposalID))
 			return
 		}
 
 		res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
 		if err != nil || len(res) == 0 {
-			err := fmt.Errorf("proposalID [%d] does not exist", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
 			return
 		}
 
 		var proposal gov.Proposal
 		cdc.MustUnmarshalBinary(res, &proposal)
-
-		output, err := wire.MarshalJSONIndent(cdc, proposal)
+		proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -64,36 +59,24 @@ func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 		bechDepositerAddr := vars[RestDepositer]
 
 		if len(strProposalID) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("proposalId required but not specified")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
 			return
 		}
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			err := fmt.Errorf("proposalID [%d] is not positive", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%d] is not positive", proposalID))
 			return
 		}
 
 		if len(bechDepositerAddr) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("depositer address required but not specified")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "depositer address required but not specified")
 			return
 		}
 
 		depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			err := fmt.Errorf("'%s' needs to be bech32 encoded", RestDepositer)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestDepositer))
 			return
 		}
 
@@ -101,28 +84,26 @@ func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 		if err != nil || len(res) == 0 {
 			res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
 			if err != nil || len(res) == 0 {
-				w.WriteHeader(http.StatusNotFound)
-				err := fmt.Errorf("proposalID [%d] does not exist", proposalID)
-				w.Write([]byte(err.Error()))
-
+				utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
 				return
 			}
 
-			w.WriteHeader(http.StatusNotFound)
-			err = fmt.Errorf("depositer [%s] did not deposit on proposalID [%d]", bechDepositerAddr, proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("depositer [%s] did not deposit on proposalID [%d]",
+				bechDepositerAddr, proposalID))
 			return
 		}
 
 		var deposit gov.Deposit
 		cdc.MustUnmarshalBinary(res, &deposit)
 
-		output, err := wire.MarshalJSONIndent(cdc, deposit)
+		depositeResponse, err := govClient.ConvertDepositeCoins(cliCtx, deposit)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		output, err := wire.MarshalJSONIndent(cdc, depositeResponse)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -137,34 +118,24 @@ func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handler
 		bechVoterAddr := vars[RestVoter]
 
 		if len(strProposalID) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("proposalId required but not specified")
-			w.Write([]byte(err.Error()))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
 			return
 		}
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			err := fmt.Errorf("proposalID [%s] is not positive", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%s] is not positive", proposalID))
 			return
 		}
 
 		if len(bechVoterAddr) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("voter address required but not specified")
-			w.Write([]byte(err.Error()))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "voter address required but not specified")
 			return
 		}
 
 		voterAddr, err := sdk.AccAddressFromBech32(bechVoterAddr)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			err := fmt.Errorf("'%s' needs to be bech32 encoded", RestVoter)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestVoter))
 			return
 		}
 
@@ -172,17 +143,11 @@ func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handler
 		if err != nil || len(res) == 0 {
 			res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
 			if err != nil || len(res) == 0 {
-				w.WriteHeader(http.StatusNotFound)
-				err := fmt.Errorf("proposalID [%d] does not exist", proposalID)
-				w.Write([]byte(err.Error()))
-
+				utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
 				return
 			}
-
-			w.WriteHeader(http.StatusNotFound)
-			err = fmt.Errorf("voter [%s] did not vote on proposalID [%d]", bechVoterAddr, proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("voter [%s] did not vote on proposalID [%d]",
+				bechVoterAddr, proposalID))
 			return
 		}
 
@@ -191,9 +156,7 @@ func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handler
 
 		output, err := wire.MarshalJSONIndent(cdc, vote)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -209,27 +172,19 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		strProposalID := vars[RestProposalID]
 
 		if len(strProposalID) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("proposalId required but not specified")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
 			return
 		}
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			err := fmt.Errorf("proposalID [%s] is not positive", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%s] is not positive", proposalID))
 			return
 		}
 
 		res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
 		if err != nil || len(res) == 0 {
-			err := fmt.Errorf("proposalID [%d] does not exist", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
 			return
 		}
 
@@ -237,16 +192,13 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		cdc.MustUnmarshalBinary(res, &proposal)
 
 		if proposal.GetStatus() != gov.StatusVotingPeriod {
-			err := fmt.Errorf("proposal is not in Voting Period", proposalID)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposal is not in Voting Period", proposalID))
 			return
 		}
 
 		res2, err := cliCtx.QuerySubspace(gov.KeyVotesSubspace(proposalID), storeName)
 		if err != nil {
-			err = errors.New("ProposalID doesn't exist")
-			w.Write([]byte(err.Error()))
+			utils.WriteErrorResponse(w, http.StatusNotFound, "ProposalID doesn't exist")
 			return
 		}
 
@@ -260,9 +212,7 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 
 		output, err := wire.MarshalJSONIndent(cdc, votes)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -286,9 +236,7 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		if len(bechVoterAddr) != 0 {
 			voterAddr, err = sdk.AccAddressFromBech32(bechVoterAddr)
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				err := fmt.Errorf("'%s' needs to be bech32 encoded", RestVoter)
-				w.Write([]byte(err.Error()))
+				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestVoter))
 				return
 			}
 		}
@@ -296,10 +244,7 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		if len(bechDepositerAddr) != 0 {
 			depositerAddr, err = sdk.AccAddressFromBech32(bechDepositerAddr)
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				err := fmt.Errorf("'%s' needs to be bech32 encoded", RestDepositer)
-				w.Write([]byte(err.Error()))
-
+				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestDepositer))
 				return
 			}
 		}
@@ -307,26 +252,21 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		if len(strProposalStatus) != 0 {
 			proposalStatus, err = gov.ProposalStatusFromString(strProposalStatus)
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				err := fmt.Errorf("'%s' is not a valid Proposal Status", strProposalStatus)
-				w.Write([]byte(err.Error()))
-
+				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' is not a valid Proposal Status", strProposalStatus))
 				return
 			}
 		}
 
 		res, err := cliCtx.QueryStore(gov.KeyNextProposalID, storeName)
 		if err != nil {
-			err = errors.New("no proposals exist yet and proposalID has not been set")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusNotFound, "no proposals exist yet and proposalID has not been set")
 			return
 		}
 
 		var maxProposalID int64
 		cdc.MustUnmarshalBinary(res, &maxProposalID)
 
-		matchingProposals := []gov.Proposal{}
+		matchingProposals := []govClient.TextProposalResponse{}
 
 		for proposalID := int64(0); proposalID < maxProposalID; proposalID++ {
 			if voterAddr != nil {
@@ -356,15 +296,17 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 					continue
 				}
 			}
-
-			matchingProposals = append(matchingProposals, proposal)
+			proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			matchingProposals = append(matchingProposals, proposalResponse)
 		}
 
 		output, err := wire.MarshalJSONIndent(cdc, matchingProposals)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -377,16 +319,14 @@ func queryConfigHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := cliCtx.QuerySubspace([]byte(gov.Prefix), storeName)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		var kvs []cli.KvPair
+		var kvs []govClient.KvPair
 		for _, kv := range res {
 			var v string
 			cdc.UnmarshalBinary(kv.Value, &v)
-			kv := cli.KvPair{
+			kv := govClient.KvPair{
 				K: string(kv.Key),
 				V: v,
 			}
@@ -394,9 +334,7 @@ func queryConfigHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 		}
 		output, err := wire.MarshalJSONIndent(cdc, kvs)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
