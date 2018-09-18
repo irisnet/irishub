@@ -82,7 +82,7 @@ iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address
 iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3000   --node=tcp://localhost:26657  --amount=1000000000000000000iris
 ```
 
-请记得在命令中注明`fee` 和 `gas`字段。请在以下[文档](../modules/coin/README.md) 了解更多有关代币单位的内容。
+请记得在命令中注明`fee` 和 `gas`字段。`fee`和`amount`的单位为`iris-atto`,但是在命令中为了方便写成`iris`。请在以下[文档](../modules/coin/README.md) 了解更多有关代币单位的内容。
 
 ### 查询验证人信息
 
