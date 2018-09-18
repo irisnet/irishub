@@ -29,7 +29,7 @@ var LineBreak = &cobra.Command{Run: func(*cobra.Command, []string) {}}
 // GetCommands adds common flags to query commands
 func GetCommands(cmds ...*cobra.Command) []*cobra.Command {
 	for _, c := range cmds {
-		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
+		c.Flags().Bool(FlagTrustNode, false, "Don't verify proofs for responses")
 		c.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
 		c.Flags().String(FlagChainID, "", "Chain ID of tendermint node")
 		c.Flags().String(FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
