@@ -74,16 +74,16 @@ Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` c
 ```
 iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --chain-id=game-of-genesis --name=<key_name> --node=http://localhost:26657
 ```
-Please note the **amount** needs to be the **minimium unit** of IRIS.
+Please note the **amount** needs to be the **minimium unit** of IRIS token: `iris-atto`.
 
-1 IRIS=10^18iris
+1 IRIS=10^18 iris-atto
 
 In this way, to stake 1IRIS, you need to do:
 
 ```
 iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3000   --node=tcp://localhost:26657  --amount=1000000000000000000iris
 ```
-Don't forget the `fee` and `gas` field. To read more about fees in IRISHub, you should read [this](/modules/fee-token/feeToken.md)
+Don't forget the `fee` and `gas` field. In this version of IRIHub, all the `unit` for `amount` and `field` correspond to `iris-atto`,but it's shown as `iris`. To read more about coin-type in IRISHub, you should read [this](../zh/modules/coin/README.md)
 
 ### View Validator Info
 
