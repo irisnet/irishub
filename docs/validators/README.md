@@ -6,7 +6,7 @@ Tendermint is software for securely and consistently replicating an application 
 
 ## What is a validator
 
-The IRIS network will keep generating value when its validators could keep the whole network secure.
+In IRIS network , a validator is responsible for for creating new blocks and verifying transactions. The IRIS network will keep generating value when its validators could keep the whole network secure.
 Validator candidates can bond their own IRIS to become a validator.
 
 

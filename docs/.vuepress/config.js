@@ -19,24 +19,25 @@ module.exports = {
         title: 'Getting Started',
         collapsable: false,
         children: [
-          ['/get-started/install-iris.md', 'Install'],
-          ['/get-started/full-node.md', 'Run a Full Node'],
-          ['/get-started/validator-node.md', 'Run a Validator Node']
+          ['/get-started/Install-Iris.md', 'Install'],
+          ['/get-started/Full-Node.md', 'Run a Full Node'],
+          ['/get-started/Validator-Node.md', 'Run a Validator Node']
         ]
       },{
         title: 'Modules',
         collapsable: false,
         children: [
-          ['/modules/coin/coin_type.md', 'Coin Type'],
-          ['/modules/fee-token/feeToken.md', 'Fee Token'],
-          ['/modules/gov/gov_spec.md', 'Governance']
+          // ['/modules/coin/README.md', 'Coin Type'],
+          ['/modules/fee-token/README.md', 'Fee Token'],
+          // ['/modules/gov/README.md', 'Governance']
         ]
       },{
         title: 'Validators',
         collapsable: false,
         children: [
-          ['/validators/overview.md', 'Overview'],
-          ['/validators/Setup A Sentry Node.md', 'Setup a Sentry Node']
+          ['/validators/README.md', 'Overview'],
+          ['/validators/Setup-A-Sentry-Node.md', 'Setup a Sentry Node'],
+          ['/validators/FAQ.md', 'FAQ']
         ]
       }
     ]

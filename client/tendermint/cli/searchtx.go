@@ -47,7 +47,7 @@ $ gaiacli tendermint txs --tag test1,test2 --any
 				return err
 			}
 
-			output, err := cdc.MarshalJSON(txs)
+			output, err := cdc.MarshalJSONIndent(txs, "", "  ")
 			if err != nil {
 				return err
 			}

@@ -30,12 +30,12 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		generateOnly, err := strconv.ParseBool(vars[utils.GenerateOnly])
+		cliCtx.GenerateOnly, err = strconv.ParseBool(vars[utils.GenerateOnly])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		async, err := strconv.ParseBool(vars[utils.Async])
+		cliCtx.Async, err = strconv.ParseBool(vars[utils.Async])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -68,7 +68,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			Sequence:      m.BaseTx.Sequence,
 		}
 
-		amount, err := txCtx.ParseCoins(m.Amount.String())
+		amount, err := cliCtx.ParseCoins(m.Amount.String())
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -81,30 +81,6 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 		}
 
 
-		if generateOnly {
-			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-			return
-		}
-
-		txBytes, err := txCtx.BuildAndSign(m.BaseTx.LocalAccountName, m.BaseTx.Password, []sdk.Msg{msg})
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-
-		var res interface{}
-		if async {
-			res, err = cliCtx.BroadcastTxAsync(txBytes)
-		} else {
-			res, err = cliCtx.BroadcastTx(txBytes)
-		}
-
-		output, err := cdc.MarshalJSONIndent(res, "", "  ")
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		w.Write(output)
+		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, m.BaseTx, []sdk.Msg{msg})
 	}
 }
