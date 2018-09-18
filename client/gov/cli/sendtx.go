@@ -37,7 +37,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			amount, err := txCtx.ParseCoins(initialDeposit)
+			amount, err := cliCtx.ParseCoins(initialDeposit)
 			if err != nil {
 				return err
 			}
