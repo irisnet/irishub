@@ -1,8 +1,6 @@
 package upgradeparams
 
 import (
-	"encoding/json"
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/modules/parameter"
@@ -41,23 +39,4 @@ func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
 		return false
 	}
 	return true
-}
-
-func (param *CurrentUpgradeProposalIdParam) ToJson() string {
-	jsonBytes, _ := json.Marshal(param.Value)
-	return string(jsonBytes)
-}
-
-func (param *CurrentUpgradeProposalIdParam) Update(ctx sdk.Context, jsonStr string) {
-	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-		param.SaveValue(ctx)
-	}
-}
-
-func (param *CurrentUpgradeProposalIdParam) Valid(jsonStr string) sdk.Error {
-	var err error
-	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-		return nil
-	}
-	return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidCurrentUpgradeProposalID, fmt.Sprintf("Json is not valid"))
 }
