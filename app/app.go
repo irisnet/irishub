@@ -157,7 +157,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
-	parameter.SetParamReadWriter(app.paramsKeeper.Setter(), &govparams.DepositProcedureParameter, &upgradeparams.CurrentUpgradeProposalIdParameter)
+	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
+							&govparams.DepositProcedureParameter,
+							&upgradeparams.CurrentUpgradeProposalIdParameter,
+							&upgradeparams.ProposalAcceptHeightParameter)
+
 	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter)
 
 	return app
