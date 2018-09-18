@@ -54,8 +54,14 @@ func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
+		initDepositAmount, err := cliCtx.ParseCoins(req.InitialDeposit.String())
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		// create the message
-		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, req.ProposalType, proposer, req.InitialDeposit, req.Params)
+		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, req.ProposalType, proposer, initDepositAmount, req.Params)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -103,8 +109,13 @@ func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFu
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+		depositAmount, err := cliCtx.ParseCoins(req.Amount.String())
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		// create the message
-		msg := gov.NewMsgDeposit(depositer, proposalID, req.Amount)
+		msg := gov.NewMsgDeposit(depositer, proposalID, depositAmount)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
