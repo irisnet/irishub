@@ -29,6 +29,7 @@ type CLIContext struct {
 	Height          int64
 	NodeURI         string
 	FromAddressName string
+	Signer          string
 	AccountStore    string
 	TrustNode       bool
 	UseLedger       bool
@@ -54,6 +55,7 @@ func NewCLIContext() CLIContext {
 		NodeURI:         nodeURI,
 		AccountStore:    ctxAccStoreName,
 		FromAddressName: viper.GetString(client.FlagFrom),
+		Signer:          viper.GetString(client.FlagSigner),
 		Height:          viper.GetInt64(client.FlagHeight),
 		TrustNode:       viper.GetBool(client.FlagTrustNode),
 		UseLedger:       viper.GetBool(client.FlagUseLedger),

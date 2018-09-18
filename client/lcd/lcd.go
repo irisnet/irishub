@@ -6,9 +6,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
-	bankHandler "github.com/irisnet/irishub/client/bank/lcd"
+	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
+	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	"github.com/irisnet/irishub/client/keys"
+	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
+	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
+	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
+	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
+	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -82,19 +88,12 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
-	bankHandler.RegisterRoutes(cliCtx, r, cdc, kb)
-
-	/*
-		keys.RegisterRoutes(r)
-		rpc.RegisterRoutes(cliCtx, r)
-		tx.RegisterRoutes(cliCtx, r, cdc)
-
-		auth.RegisterRoutes(cliCtx, r, cdc, "acc")
-		bank.RegisterRoutes(cliCtx, r, cdc, kb)
-		ibc.RegisterRoutes(cliCtx, r, cdc, kb)
-		stake.RegisterRoutes(cliCtx, r, cdc, kb)
-		slashing.RegisterRoutes(cliCtx, r, cdc, kb)
-		gov.RegisterRoutes(cliCtx, r, cdc)
-	*/
+	keyshandler.RegisterRoutes(r)
+	bankhandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	govhandler.RegisterRoutes(cliCtx, r, cdc)
+	slashinghandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	stakehandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	rpchandler.RegisterRoutes(cliCtx, r, cdc)
+	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	return r
 }

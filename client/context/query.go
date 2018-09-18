@@ -85,18 +85,22 @@ func (cliCtx CLIContext) GetAccount(address []byte) (auth.Account, error) {
 
 // GetFromAddress returns the from address from the context's name.
 func (cliCtx CLIContext) GetFromAddress() (from sdk.AccAddress, err error) {
-	if cliCtx.FromAddressName == "" {
-		return nil, errors.Errorf("must provide a from address name")
-	}
-
-	keybase, err := keys.GetKeyBase()
+	kb, err := keys.GetKeyBase()
 	if err != nil {
 		return nil, err
 	}
-
-	info, err := keybase.Get(cliCtx.FromAddressName)
+	if cliCtx.GenerateOnly {
+		signerAddress, err := sdk.AccAddressFromBech32(cliCtx.Signer)
+		if err == nil {
+			return signerAddress, nil
+		}
+	}
+	if cliCtx.FromAddressName == "" {
+		return nil, fmt.Errorf("must provide a from address name")
+	}
+	info, err := kb.Get(cliCtx.FromAddressName)
 	if err != nil {
-		return nil, errors.Errorf("no key for: %s", cliCtx.FromAddressName)
+		return nil, err
 	}
 
 	return sdk.AccAddress(info.GetPubKey().Address()), nil
