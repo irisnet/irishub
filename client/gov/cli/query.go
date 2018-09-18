@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/gov"
+	govClient "github.com/irisnet/irishub/client/gov"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -27,7 +28,11 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 			var proposal gov.Proposal
 			cdc.MustUnmarshalBinary(res, &proposal)
 
-			output, err := wire.MarshalJSONIndent(cdc, proposal)
+			proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+			if err != nil {
+				return err
+			}
+			output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
 			if err != nil {
 				return err
 			}
@@ -89,7 +94,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 			var maxProposalID int64
 			cdc.MustUnmarshalBinary(res, &maxProposalID)
 
-			matchingProposals := []gov.Proposal{}
+			matchingProposals := []govClient.TextProposalResponse{}
 
 			if latestProposalsIDs == 0 {
 				latestProposalsIDs = maxProposalID
@@ -124,7 +129,12 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 					}
 				}
 
-				matchingProposals = append(matchingProposals, proposal)
+				proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+				if err != nil {
+					return err
+				}
+
+				matchingProposals = append(matchingProposals, proposalResponse)
 			}
 
 			if len(matchingProposals) == 0 {
@@ -133,7 +143,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			for _, proposal := range matchingProposals {
-				fmt.Printf("  %d - %s\n", proposal.GetProposalID(), proposal.GetTitle())
+				fmt.Printf("  %d - %s\n", proposal.ProposalID, proposal.Title)
 			}
 
 			return nil
@@ -246,11 +256,11 @@ func GetCmdQueryConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res , err  := ctx.QuerySubspace([]byte(gov.Prefix),storeName)
 
-			var kvs []KvPair
+			var kvs []govClient.KvPair
 			for _,kv := range res {
 				var v string
 				cdc.UnmarshalBinary(kv.Value, &v)
-				kv := KvPair{
+				kv := govClient.KvPair{
 					K: string(kv.Key),
 					V: v,
 				}
@@ -267,9 +277,4 @@ func GetCmdQueryConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	}
 
 	return cmd
-}
-
-type KvPair struct {
-	K string `json:"key"`
-	V string `json:"value"`
 }
