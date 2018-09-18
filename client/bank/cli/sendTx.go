@@ -45,7 +45,7 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 			// parse coins trying to be sent
 			amountString := viper.GetString(flagAmount)
 
-			coins, err := txCtx.ParseCoins(amountString)
+			coins, err := cliCtx.ParseCoins(amountString)
 			if err != nil {
 				return err
 			}

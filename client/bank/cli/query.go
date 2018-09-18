@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/spf13/cobra"
+	"github.com/irisnet/irishub/client/bank"
 )
 
 // GetAccountCmd returns a query account that will display the state of the
@@ -39,7 +40,12 @@ func GetAccountCmd(storeName string, cdc *wire.Codec, decoder auth.AccountDecode
 				return err
 			}
 
-			output, err := wire.MarshalJSONIndent(cdc, acc)
+			accountRes, err := bank.ConvertAccountCoin(cliCtx, acc)
+			if err != nil {
+				return err
+			}
+
+			output, err := wire.MarshalJSONIndent(cdc, accountRes)
 			if err != nil {
 				return err
 			}

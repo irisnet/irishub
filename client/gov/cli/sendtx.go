@@ -37,7 +37,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			amount, err := txCtx.ParseCoins(initialDeposit)
+			amount, err := cliCtx.ParseCoins(initialDeposit)
 			if err != nil {
 				return err
 			}
@@ -97,7 +97,7 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 
 			proposalID := viper.GetInt64(flagProposalID)
 
-			amount, err := sdk.ParseCoins(viper.GetString(flagDeposit))
+			amount, err := cliCtx.ParseCoins(viper.GetString(flagDeposit))
 			if err != nil {
 				return err
 			}
