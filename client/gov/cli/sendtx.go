@@ -57,11 +57,6 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
 
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
-
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}

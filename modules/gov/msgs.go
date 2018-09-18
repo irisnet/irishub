@@ -55,8 +55,15 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if !msg.InitialDeposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
 	}
-	if p, ok := parameter.ParamMapping[msg.Param.Key]; ok{
-        return p.Valid(msg.Param.Value)
+
+	if msg.ProposalType == ProposalTypeParameterChange {
+
+		if p, ok := parameter.ParamMapping[msg.Param.Key]; ok{
+			return p.Valid(msg.Param.Value)
+		} else {
+			return ErrInvalidParam(DefaultCodespace)
+		}
+
 	}
 	return nil
 }
