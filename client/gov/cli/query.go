@@ -1,14 +1,14 @@
 package cli
 
 import (
+	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/client/context"
+	govClient "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"fmt"
-	"github.com/irisnet/irishub/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov"
-	govClient "github.com/irisnet/irishub/client/gov"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -254,10 +254,10 @@ func GetCmdQueryConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 		Short: "query parameter proposal's config",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
-			res , err  := ctx.QuerySubspace([]byte(gov.Prefix),storeName)
+			res, err := ctx.QuerySubspace([]byte(gov.Prefix), storeName)
 
 			var kvs []govClient.KvPair
-			for _,kv := range res {
+			for _, kv := range res {
 				var v string
 				cdc.UnmarshalBinary(kv.Value, &v)
 				kv := govClient.KvPair{
