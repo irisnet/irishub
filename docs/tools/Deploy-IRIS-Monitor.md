@@ -1,4 +1,4 @@
-# How to deploy IRISHUB monitor
+# How to deploy IRIShub Monitor
 
 Please make sure that iris is installed in your computer and added to $PATH.You can see this page for insturcion https://github.com/irisnet/irishub. You also need /bin/bash, wc, ps to ensure the monitor work properly.
 
@@ -29,18 +29,31 @@ iriscli status
 It corresponds to `validator_info.address` field.
 
 modify
+```
 -a=378E63271D5BE927443E17CBAAFE68DEFF383DA7
-to 
--a=<hex encoded validator address>
-modify
---chain-id=fuxi-3000
-to
---chain-id=<blockchain id that you want to monitor>
-modify
---node="tcp://localhost:26657"
-to
---node=<listening address of the node that you want to monitor ("tcp://localhost:26657" by default, you should not change this if you didn't modify your rpc port)>
+```
 
+to 
+```
+-a=<hex encoded validator address>
+```
+
+modify
+```
+--chain-id=fuxi-3000
+```
+to
+```
+--chain-id=<blockchain id that you want to monitor>
+```
+modify
+```
+--node="tcp://localhost:26657"
+```
+to
+```
+--node=<listening address of the node that you want to monitor ("tcp://localhost:26657" by default, you should not change this if you didn't modify your rpc port)>
+```
 5. start the monitoring tools
 ```
 ./start.sh
