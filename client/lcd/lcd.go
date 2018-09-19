@@ -10,9 +10,9 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	"github.com/irisnet/irishub/client/keys"
+	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
+	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
 	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
-	//slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
-	//stakehandler "github.com/irisnet/irishub/client/stake/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/rakyll/statik/fs"
@@ -90,9 +90,9 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 
 	keyshandler.RegisterRoutes(r)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	slashinghandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	stakehandler.RegisterRoutes(cliCtx, r, cdc, kb)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
-	//slashinghandler.RegisterRoutes(cliCtx, r, cdc, kb)
-	//stakehandler.RegisterRoutes(cliCtx, r, cdc, kb)
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	return r
