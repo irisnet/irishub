@@ -25,7 +25,7 @@ var _ parameter.GovParameter = (*DepositProcedureParam)(nil)
 
 type ParamSet struct {
 	DepositProcedure   DepositProcedure `json:"Gov/gov/depositProcedure"`
-	//VotingProcedure    VotingProcedure            `json:"voting_period"`
+	VotingProcedure    VotingProcedure  `json:"Gov/gov/VotingProcedure"`
 	//TallyingProcedure  TallyingProcedure          `json:"tallying_procedure"`
 }
 
@@ -110,4 +110,73 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	}
 	return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
+}
+
+
+// Procedure around Voting in governance
+type VotingProcedure struct {
+	VotingPeriod int64 `json:"voting_period"` //  Length of the voting period.
+}
+
+type VotingProcedureParam struct {
+	Value   VotingProcedure
+	psetter params.Setter
+	pgetter params.Getter
+}
+
+func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
+	if value, ok := genesisState.(VotingProcedure); ok {
+		param.Value = value
+	} else {
+		param.Value = VotingProcedure{VotingPeriod: 1000,
+		}
+	}
+}
+
+func (param *VotingProcedureParam) SetReadWriter(setter params.Setter) {
+	param.psetter = setter
+	param.pgetter = setter.Getter
+}
+
+func (param *VotingProcedureParam) GetStoreKey() string {
+	return "Gov/gov/votingProcedure"
+}
+
+func (param *VotingProcedureParam) SaveValue(ctx sdk.Context) {
+	param.psetter.Set(ctx, param.GetStoreKey(), param.Value)
+}
+
+func (param *VotingProcedureParam) LoadValue(ctx sdk.Context) bool {
+	err := param.pgetter.Get(ctx, param.GetStoreKey(), &param.Value)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (param *VotingProcedureParam) ToJson() string {
+	jsonBytes, _ := json.Marshal(param.Value)
+	return string(jsonBytes)
+}
+
+func (param *VotingProcedureParam) Update(ctx sdk.Context, jsonStr string) {
+	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
+		param.SaveValue(ctx)
+	}
+}
+
+func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
+
+	var err error
+
+	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
+
+		if param.Value.VotingPeriod < 20 || param.Value.VotingPeriod > 20000 {
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod ("+strconv.Itoa(int(param.Value.VotingPeriod))+") should be larger than 20 and less than 20000"))
+		}
+
+		return nil
+
+	}
+	return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidVotingProcedure, fmt.Sprintf("Json is not valid"))
 }

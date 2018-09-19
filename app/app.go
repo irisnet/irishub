@@ -238,7 +238,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 10,
 		},
-		VotingProcedure: gov.VotingProcedure{
+		VotingProcedure: govparams.VotingProcedure{
 			VotingPeriod: 10,
 		},
 		TallyingProcedure: gov.TallyingProcedure{

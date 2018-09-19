@@ -11,7 +11,4 @@ type TallyingProcedure struct {
 	GovernancePenalty sdk.Rat `json:"governance_penalty"` //  Penalty if validator does not vote
 }
 
-// Procedure around Voting in governance
-type VotingProcedure struct {
-	VotingPeriod int64 `json:"voting_period"` //  Length of the voting period.
-}
+
