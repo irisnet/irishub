@@ -102,3 +102,44 @@ func TestDepositProcedureParamValid(t *testing.T) {
 	require.Error(t, result)
 
 }
+
+func TestVotingProcedureParam(t *testing.T) {
+	skey := sdk.NewKVStoreKey("params")
+	ctx := defaultContext(skey)
+	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+
+
+	p1 := VotingProcedure{
+		VotingPeriod:1000,
+	}
+
+	p2 := VotingProcedure{
+		VotingPeriod: 2000,
+	}
+
+	VotingProcedureParameter.SetReadWriter(paramKeeper.Setter())
+	find := VotingProcedureParameter.LoadValue(ctx)
+	require.Equal(t, find, false)
+
+	VotingProcedureParameter.InitGenesis(nil)
+	require.Equal(t, p1, VotingProcedureParameter.Value)
+
+	require.Equal(t, VotingProcedureParameter.ToJson(), "{\"voting_period\":1000}")
+
+	VotingProcedureParameter.Update(ctx, "{\"voting_period\":2000}")
+
+	require.NotEqual(t, p1, VotingProcedureParameter.Value)
+	require.Equal(t, p2, VotingProcedureParameter.Value)
+
+	result := VotingProcedureParameter.Valid("{\"voting_period\":400000}")
+	require.Error(t, result)
+
+	VotingProcedureParameter.InitGenesis(p2)
+	require.Equal(t, p2, VotingProcedureParameter.Value)
+	VotingProcedureParameter.InitGenesis(p1)
+	require.Equal(t, p1, VotingProcedureParameter.Value)
+
+	VotingProcedureParameter.LoadValue(ctx)
+	require.Equal(t, p2, VotingProcedureParameter.Value)
+
+}
