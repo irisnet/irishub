@@ -40,7 +40,7 @@ func InitRequestClictx(cliCtx context.CLIContext, r *http.Request, name string, 
 	cliCtx.GenerateOnly = GenerateOnlyArg(r)
 	cliCtx.Async = AsyncOnlyArg(r)
 	cliCtx.FromAddressName = name
-	cliCtx.Signer = signerAddress
+	cliCtx.SignerAddr = signerAddress
 	return cliCtx
 }
 
