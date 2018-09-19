@@ -7,6 +7,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -246,35 +247,78 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryConfig implements the command to query config.
-// nolint: gocyclo
-func GetCmdQueryConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+var (
+	flagModule = "module"
+	flagKey    = "key"
+)
+
+type Param struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+	Op    string `json:"op"`
+}
+
+func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-params",
 		Short: "query parameter proposal's config",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			moduleStr := viper.GetString(flagModule)
+			keyStr := viper.GetString(flagKey)
+
 			ctx := context.NewCLIContext().WithCodec(cdc)
-			res, err := ctx.QuerySubspace([]byte(gov.Prefix), storeName)
 
-			var kvs []govClient.KvPair
-			for _, kv := range res {
-				var v string
-				cdc.UnmarshalBinary(kv.Value, &v)
-				kv := govClient.KvPair{
-					K: string(kv.Key),
-					V: v,
+			if moduleStr != "" {
+				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
+				if err == nil {
+					var keys []string
+					for _, kv := range res {
+						keys = append(keys, string(kv.Key))
+					}
+					output, err := wire.MarshalJSONIndent(cdc, keys)
+					//cmn.WriteFile(,output,644)
+					if err != nil {
+						return err
+					}
+					fmt.Println(string(output))
+					return nil
+				} else {
+					return nil
 				}
-				kvs = append(kvs, kv)
-			}
-			output, err := wire.MarshalJSONIndent(cdc, kvs)
-			if err != nil {
-				return err
 			}
 
-			fmt.Println(string(output))
+			if keyStr != "" {
+				res, err := ctx.QueryStore([]byte(keyStr), storeName)
+				if err == nil {
+					switch keyStr {
+					case "Gov/gov/depositProcedure":
+						var p govparams.DepositProcedure
+						cdc.MustUnmarshalBinary(res, &p)
+						ToParamStr(cdc, p, keyStr)
+					}
+				}
+
+			}
+
 			return nil
 		},
 	}
 
+	cmd.Flags().String(flagModule, "", "the module of parameter ")
+	cmd.Flags().String(flagKey, "", "the key of parameter")
 	return cmd
+}
+func ToParamStr(cdc *wire.Codec, p interface{}, keyStr string) {
+	var param Param
+	param.Key = keyStr
+	param.Value = ToJson(cdc, p)
+	param.Op = ""
+	jsonBytes, _ := cdc.MarshalJSON(param)
+	//jsonBytes, _ := wire.MarshalJSONIndent(cdc, param)
+	fmt.Println(string(jsonBytes))
+}
+
+func ToJson(cdc *wire.Codec, p interface{}) string {
+	jsonBytes, _ := cdc.MarshalJSON(p)
+	return string(jsonBytes)
 }
