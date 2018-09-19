@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"path"
+	"github.com/pkg/errors"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -81,6 +82,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
+	cmd.Flags().String(flagPath, "", "the path of param.json")
 	return cmd
 }
 
@@ -94,7 +96,7 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 		} else {
 			return param, err
 		}
-	} else {
+	} else if pathStr != ""{
 		pathStr = path.Join(os.ExpandEnv("$HOME"),pathStr,"config/params.json")
 
 		jsonBytes,err := cmn.ReadFile(pathStr)
@@ -118,6 +120,9 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 		case "Gov/gov/depositProcedure":
 			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
 			valueStr = string(jsonBytes)
+		default:
+			fmt.Println("The key isn't existed")
+			return param,errors.New("The key isn't existed")
 		}
 
 		param.Value = valueStr
@@ -128,6 +133,11 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 
 		fmt.Println("Param:\n",string(jsonBytes))
 		return param, nil
+
+	} else {
+
+		fmt.Println("Path and param are both empty")
+		return param,errors.New("Path and param are both empty")
 	}
 }
 
