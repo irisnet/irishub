@@ -13,4 +13,8 @@ const (
 	CodeInvalidCurrentUpgradeProposalID sdk.CodeType      = 104
 	CodeInvalidVotingPeriod             sdk.CodeType      = 105
 	CodeInvalidVotingProcedure          sdk.CodeType      = 106
+	CodeInvalidThreshold                sdk.CodeType      = 107
+	CodeInvalidGovernancePenalty        sdk.CodeType      = 108
+	CodeInvalidVeto                     sdk.CodeType      = 109
+	CodeInvalidTallyingProcedure        sdk.CodeType      = 110
 )

@@ -10,8 +10,8 @@ import (
 type GenesisState struct {
 	StartingProposalID int64                      `json:"starting_proposalID"`
 	DepositProcedure   govparams.DepositProcedure `json:"deposit_period"`
-	VotingProcedure    govparams.VotingProcedure            `json:"voting_period"`
-	TallyingProcedure  TallyingProcedure          `json:"tallying_procedure"`
+	VotingProcedure    govparams.VotingProcedure  `json:"voting_period"`
+	TallyingProcedure  govparams.TallyingProcedure          `json:"tallying_procedure"`
 }
 
 func NewGenesisState(startingProposalID int64, dp govparams.DepositProcedure, vp govparams.VotingProcedure, tp TallyingProcedure) GenesisState {

@@ -242,7 +242,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		VotingProcedure: govparams.VotingProcedure{
 			VotingPeriod: 10,
 		},
-		TallyingProcedure: gov.TallyingProcedure{
+		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
 			Veto:              sdk.NewRat(1, 3),
 			GovernancePenalty: sdk.NewRat(1, 100),
