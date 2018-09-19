@@ -12,4 +12,5 @@ const (
 	flagStatus            = "status"
 	flagLatestProposalIDs = "latest"
 	flagParam             = "param"
+	flagOp                = "op"
 	)

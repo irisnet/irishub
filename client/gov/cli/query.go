@@ -13,6 +13,7 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/irisnet/irishub/app"
+
 	)
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -241,17 +242,11 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-var (
+const (
 	flagModule = "module"
 	flagKey    = "key"
-	flagHome   = "home"
+	flagPath   = "path"
 )
-
-type Param struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-	Op    string `json:"op"`
-}
 
 func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -304,7 +299,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 func ToParamStr(p interface{}, keyStr string) {
-	var param Param
+	var param gov.Param
 	param.Key = keyStr
 	param.Value = ToJson(p)
 	param.Op = ""
