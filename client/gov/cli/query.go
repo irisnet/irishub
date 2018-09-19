@@ -10,6 +10,9 @@ import (
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	cmn "github.com/tendermint/tendermint/libs/common"
+    "path"
+    "encoding/json"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -247,16 +250,11 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-var (
+const (
 	flagModule = "module"
 	flagKey    = "key"
+	flagPath   = "path"
 )
-
-type Param struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-	Op    string `json:"op"`
-}
 
 func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -294,7 +292,12 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 					case "Gov/gov/depositProcedure":
 						var p govparams.DepositProcedure
 						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(cdc, p, keyStr)
+						ToParamStr(p, keyStr)
+					case "Gov/gov/votingProcedure":
+						var p govparams.VotingProcedure
+						cdc.MustUnmarshalBinary(res, &p)
+						ToParamStr(p, keyStr)
+
 					}
 				}
 
@@ -308,17 +311,71 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	return cmd
 }
-func ToParamStr(cdc *wire.Codec, p interface{}, keyStr string) {
-	var param Param
+
+func ToParamStr(p interface{}, keyStr string) {
+	var param gov.Param
 	param.Key = keyStr
-	param.Value = ToJson(cdc, p)
+	param.Value = ToJson(p)
 	param.Op = ""
-	jsonBytes, _ := cdc.MarshalJSON(param)
+	jsonBytes, _ := json.Marshal(param)
 	//jsonBytes, _ := wire.MarshalJSONIndent(cdc, param)
 	fmt.Println(string(jsonBytes))
 }
 
-func ToJson(cdc *wire.Codec, p interface{}) string {
-	jsonBytes, _ := cdc.MarshalJSON(p)
+func ToJson(p interface{}) string {
+	jsonBytes, _ := json.Marshal(p)
 	return string(jsonBytes)
+}
+
+
+type ParameterDoc struct {
+	Govparams govparams.ParamSet `json:"gov"`
+}
+
+func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pull-params",
+		Short: "generate param.json file",
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			ctx := context.NewCLIContext().WithCodec(cdc)
+			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
+
+			if err == nil {
+				var paramSet ParameterDoc
+				for _, kv := range res {
+					switch string(kv.Key) {
+					case "Gov/gov/depositProcedure":
+						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
+					case "Gov/gov/votingProcedure":
+						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.VotingProcedure)
+					}
+				}
+				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")
+				//cmn.WriteFile(,output,644)
+				if err != nil {
+					return err
+				}
+
+				pathStr := viper.GetString(flagPath)
+				pathStr = path.Join(pathStr,"config/params.json")
+				err = cmn.WriteFile(pathStr, output, 0644)
+				if err != nil {
+
+					fmt.Println(err)
+					return err
+				}
+
+				fmt.Println("Save the parameter config file in ", pathStr)
+				return nil
+
+			}
+
+			fmt.Println("No GovParams can be found")
+			return err
+
+		},
+	}
+	cmd.Flags().String(flagPath, "", "the path of param.json")
+	return cmd
 }
