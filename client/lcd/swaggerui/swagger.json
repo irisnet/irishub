@@ -1733,7 +1733,7 @@
         }
       }
     },
-    "/slashing/signing_info/{validator}": {
+    "/slashing/signing_info/{validator_pub}": {
       "get": {
         "description": "Get validator sign info",
         "consumes": [
@@ -1749,8 +1749,8 @@
         "parameters": [
           {
             "type": "string",
-            "description": "validator address",
-            "name": "validator",
+            "description": "validator public key",
+            "name": "validator_pub",
             "required": true,
             "in": "path"
           }
