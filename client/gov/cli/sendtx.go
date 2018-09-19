@@ -108,9 +108,6 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
 			cliCtx.PrintResponse = true
@@ -161,10 +158,6 @@ func GetCmdVote(cdc *wire.Codec) *cobra.Command {
 			fmt.Printf("Vote[Voter:%s,ProposalID:%d,Option:%s]",
 				voterAddr.String(), msg.ProposalID, msg.Option.String(),
 			)
-
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
 			cliCtx.PrintResponse = true

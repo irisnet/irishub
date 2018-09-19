@@ -1,11 +1,11 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/client/context"
+	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/spf13/cobra"
@@ -29,7 +29,11 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 			var proposal gov.Proposal
 			cdc.MustUnmarshalBinary(res, &proposal)
 
-			output, err := wire.MarshalJSONIndent(cdc, proposal)
+			proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+			if err != nil {
+				return err
+			}
+			output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
 			if err != nil {
 				return err
 			}
@@ -91,7 +95,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 			var maxProposalID int64
 			cdc.MustUnmarshalBinary(res, &maxProposalID)
 
-			matchingProposals := []gov.Proposal{}
+			matchingProposals := []govClient.TextProposalResponse{}
 
 			if latestProposalsIDs == 0 {
 				latestProposalsIDs = maxProposalID
@@ -126,7 +130,12 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 					}
 				}
 
-				matchingProposals = append(matchingProposals, proposal)
+				proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+				if err != nil {
+					return err
+				}
+
+				matchingProposals = append(matchingProposals, proposalResponse)
 			}
 
 			if len(matchingProposals) == 0 {
@@ -135,7 +144,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			for _, proposal := range matchingProposals {
-				fmt.Printf("  %d - %s\n", proposal.GetProposalID(), proposal.GetTitle())
+				fmt.Printf("  %d - %s\n", proposal.ProposalID, proposal.Title)
 			}
 
 			return nil
@@ -258,6 +267,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			keyStr := viper.GetString(flagKey)
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
+
 			if moduleStr != "" {
 				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
 				if err == nil {
@@ -284,7 +294,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 					case "Gov/gov/depositProcedure":
 						var p govparams.DepositProcedure
 						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(p, keyStr)
+						ToParamStr(cdc, p, keyStr)
 					}
 				}
 
@@ -298,18 +308,17 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	return cmd
 }
-
-func ToParamStr(p interface{}, keyStr string) {
+func ToParamStr(cdc *wire.Codec, p interface{}, keyStr string) {
 	var param Param
 	param.Key = keyStr
-	param.Value = ToJson(p)
+	param.Value = ToJson(cdc, p)
 	param.Op = ""
-	jsonBytes, _ := json.Marshal(param)
+	jsonBytes, _ := cdc.MarshalJSON(param)
 	//jsonBytes, _ := wire.MarshalJSONIndent(cdc, param)
 	fmt.Println(string(jsonBytes))
 }
 
-func ToJson(p interface{}) string {
-	jsonBytes, _ := json.Marshal(p)
+func ToJson(cdc *wire.Codec, p interface{}) string {
+	jsonBytes, _ := cdc.MarshalJSON(p)
 	return string(jsonBytes)
 }

@@ -35,7 +35,7 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 			if amounstStr == "" {
 				return fmt.Errorf("Must specify amount to stake using --amount")
 			}
-			amount, err := sdk.ParseCoin(amounstStr)
+			amount, err := cliCtx.ParseCoin(amounstStr)
 			if err != nil {
 				return err
 			}
@@ -138,7 +138,7 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			amount, err := sdk.ParseCoin(viper.GetString(FlagAmount))
+			amount, err := cliCtx.ParseCoin(viper.GetString(FlagAmount))
 			if err != nil {
 				return err
 			}
