@@ -170,7 +170,7 @@ func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cdc *wire.C
 			return stake.BechValidator{}, err
 		}
 
-		ownerAddress := validator.PubKey.Address()
+		ownerAddress := validator.Owner
 		if bytes.Equal(ownerAddress.Bytes(), address.Bytes()) {
 			bech32Validator, err := validator.Bech32Validator()
 			if err != nil {

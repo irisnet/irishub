@@ -447,7 +447,6 @@ func validatorsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handle
 // HTTP request handler to query the validator information from a given validator address
 func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var output []byte
 		// read parameters
 		vars := mux.Vars(r)
@@ -459,21 +458,21 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 			return
 		}
 
-		key := stake.GetValidatorKey(valAddress)
-		cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-		res, err := cliCtx.QueryStore(key, storeName)
+		kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		} else if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("No validator found with address %s", valAddress))
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
 			return
 		}
 
-		validator := types.MustUnmarshalValidator(cdc, valAddress, res)
+		validator, err := getValidator(valAddress, kvs, cdc)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("couldn't query validator. Error: %s", err.Error())))
+			return
+		}
 
-		output, err = cdc.MarshalJSONIndent(validator, "", "  ")
+		output, err = cdc.MarshalJSON(validator)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
