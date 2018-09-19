@@ -355,16 +355,17 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				if err != nil {
 
 					fmt.Println(err)
-					return nil
+					return err
 				}
 
 				fmt.Println("Save the parameter config file in ", homeStr+"/config/params.json")
 				return nil
 
-			} else {
-				return nil
 			}
-			return nil
+
+			fmt.Println("No GovParams can be found")
+			return err
+
 		},
 	}
 
