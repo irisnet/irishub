@@ -24,6 +24,18 @@ type BaseTx struct {
 }
 
 func (baseTx BaseTx) Validate(cliCtx CLIContext) error {
+	if cliCtx.GenerateOnly {
+		if len(baseTx.LocalAccountName) == 0 && len(cliCtx.SignerAddr) == 0 {
+			return ErrInvalidBaseTx("In generate-only mode, either key name or signer address should be specified")
+		}
+	} else  {
+		if len(baseTx.LocalAccountName) == 0 {
+			return ErrInvalidBaseTx("In non-generate-only mode, name required but not specified")
+		}
+		if len(baseTx.Password) == 0 {
+			return ErrInvalidBaseTx("In non-generate-only mode, password required but not specified")
+		}
+	}
 
 	if len(baseTx.ChainID) == 0 {
 		return ErrInvalidBaseTx("ChainID required but not specified")
