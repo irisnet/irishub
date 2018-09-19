@@ -37,6 +37,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.LocalAccountName, m.Sender)
 		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, m.BaseTx)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		fromAddress, err := cliCtx.GetFromAddress()
@@ -47,7 +48,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 
 		amount, err := cliCtx.ParseCoins(m.Amount.String())
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		// build message

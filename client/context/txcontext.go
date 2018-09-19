@@ -24,31 +24,27 @@ type BaseTx struct {
 }
 
 func (baseTx BaseTx) Validate(cliCtx CLIContext) error {
-	if cliCtx.GenerateOnly {
-		if len(baseTx.LocalAccountName) == 0 && len(cliCtx.Signer) == 0 {
-			return fmt.Errorf("In generate-only mode, either key name or signer address should be specified")
-		}
-	} else  {
-		if len(baseTx.LocalAccountName) == 0 {
-			return fmt.Errorf("In non-generate-only mode, name required but not specified")
-		}
-
-		if len(baseTx.Password) == 0 {
-			return fmt.Errorf("In non-generate-only mode, password required but not specified")
-		}
-	}
 
 	if len(baseTx.ChainID) == 0 {
-		return fmt.Errorf("ChainID required but not specified")
+		return ErrInvalidBaseTx("ChainID required but not specified")
 	}
 
 	if baseTx.AccountNumber < 0 {
-		return fmt.Errorf("Account Number required but not specified")
+		return ErrInvalidBaseTx("Account Number required but not specified")
 	}
 
 	if baseTx.Sequence < 0 {
-		return fmt.Errorf("Sequence required but not specified")
+		return ErrInvalidBaseTx("Sequence required but not specified")
 	}
+
+	if baseTx.Gas < 0 {
+		return ErrInvalidBaseTx("Gas should not be less then zero")
+	}
+
+	if len(baseTx.Fees) ==0 {
+		return ErrInvalidBaseTx("Fee required but not specified")
+	}
+
 	return nil
 }
 
