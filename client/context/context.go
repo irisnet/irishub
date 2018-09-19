@@ -29,6 +29,7 @@ type CLIContext struct {
 	Height          int64
 	NodeURI         string
 	FromAddressName string
+	//If GenerateOnly is true and FromAddressName is not specified, the signer is required for building msg
 	Signer          string
 	AccountStore    string
 	TrustNode       bool
