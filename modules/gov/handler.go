@@ -26,7 +26,13 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Params)
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err.Result()
+	}
+
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {

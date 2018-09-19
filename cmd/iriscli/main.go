@@ -71,8 +71,7 @@ func main() {
 			govcmd.GetCmdQueryProposal("gov", cdc),
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
-			govcmd.GetCmdQueryProposals("gov", cdc),
-			govcmd.GetCmdQueryConfig("gov", cdc),
+			govcmd.GetCmdQueryGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -121,7 +120,7 @@ func main() {
 	}
 	upgradeCmd.AddCommand(
 		client.GetCommands(
-			upgradecmd.GetCmdVersion("upgrade", cdc),
+			upgradecmd.GetInfoCmd("upgrade", cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,

@@ -167,7 +167,7 @@ IRIS Services（又名“iServices”）旨在对链下服务从定义、绑定�
 * `Name (string)`:  iService中该方法的唯一名称
 * `Description (string)`: 对该方法的描述
 * `Input (string)`: 对输入参数的结构化定义
-* `Output (string)`: 对输出结果的机构化定义
+* `Output (string)`: 对输出结果的结构化定义
 * `Error (string)`: 对可能出现的错误条件的结构化定义
 * `OutputPrivacy (enum)`: 设置此方法是非隐私的还是公钥加密的，可选值`NoPrivacy`/`PubKeyEncryption`
 
@@ -579,7 +579,7 @@ Tendermint将在扩展Tendermint ABCI和Cosmos IBC技术方面，为IRIS项目�
 
 <div STYLE="page-break-after: always;"></div>
 
-## 参考文献###################################################################
+## 参考文献
 
 [1]: https://drive.google.com/file/d/1bI7JIOe-CfJ5fPHKxYlFub2Kg-KCGU6r/view?usp=sharing
 [2]: http://ethdocs.org/en/latest/
