@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/gov"
@@ -241,6 +242,7 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 var (
 	flagModule = "module"
 	flagKey    = "key"
+	flagHome   = "home"
 )
 
 type Param struct {
@@ -312,4 +314,52 @@ func ToParamStr(p interface{}, keyStr string) {
 func ToJson(p interface{}) string {
 	jsonBytes, _ := json.Marshal(p)
 	return string(jsonBytes)
+}
+
+type ParameterDoc struct {
+	Govparams govparams.ParamSet `json:"gov"`
+}
+
+func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pull-params",
+		Short: "query parameter proposal's config",
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			homeStr := viper.GetString(flagHome)
+
+			ctx := context.NewCLIContext().WithCodec(cdc)
+
+			if homeStr != "" {
+				res , err  := ctx.QuerySubspace([]byte("Gov/"),storeName)
+				if err == nil {
+					var paramSet ParameterDoc
+					for _, kv := range res {
+						switch string(kv.Key){
+						case "Gov/gov/depositProcedure":
+							cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
+						}
+					}
+					output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")
+					//cmn.WriteFile(,output,644)
+					if err != nil {
+						return err
+					}
+
+					cmn.WriteFile(homeStr+"/config/params.json",output,0644)
+					fmt.Println("Save the parameter config file in ",homeStr+"/config/params.json")
+					return  nil
+				} else {
+					return nil
+				}
+			}
+
+			return nil
+		},
+	}
+
+	cmd.Flags().String(flagModule, "", "the module of parameter ")
+	cmd.Flags().String(flagKey, "", "the key of parameter")
+	cmd.Flags().String(flagHome, "", "the directory of param.json file")
+	return cmd
 }
