@@ -20,7 +20,7 @@ type BaseTx struct {
 	Sequence         int64  `json:"sequence"`
 	Gas              int64  `json:"gas"`
 	Fees             string `json:"fee"`
-	Memo 			 string `json:"memo"`
+	Memo             string `json:"memo"`
 }
 
 func (baseTx BaseTx) Validate(cliCtx CLIContext) error {
@@ -41,7 +41,7 @@ func (baseTx BaseTx) Validate(cliCtx CLIContext) error {
 		return ErrInvalidBaseTx("Gas should not be less then zero")
 	}
 
-	if len(baseTx.Fees) ==0 {
+	if len(baseTx.Fees) == 0 {
 		return ErrInvalidBaseTx("Fee required but not specified")
 	}
 

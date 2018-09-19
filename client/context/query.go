@@ -17,15 +17,15 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/common"
 	cmn "github.com/tendermint/tendermint/libs/common"
-	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
+	"github.com/tendermint/tendermint/lite"
 	tmliteErr "github.com/tendermint/tendermint/lite/errors"
+	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"github.com/tendermint/tendermint/lite"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an
@@ -445,7 +445,6 @@ func (cliCtx CLIContext) Certify(height int64) (lite.Commit, error) {
 	}
 	return check, nil
 }
-
 
 func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 	mainUnit, err := types.GetCoinName(coinStr)
