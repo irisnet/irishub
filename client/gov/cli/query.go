@@ -10,7 +10,10 @@ import (
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-)
+	tmcli "github.com/tendermint/tendermint/libs/cli"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/irisnet/irishub/app"
+	)
 
 // GetCmdQueryProposal implements the query proposal command.
 func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
@@ -241,6 +244,7 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 var (
 	flagModule = "module"
 	flagKey    = "key"
+	flagHome   = "home"
 )
 
 type Param struct {
@@ -312,4 +316,60 @@ func ToParamStr(p interface{}, keyStr string) {
 func ToJson(p interface{}) string {
 	jsonBytes, _ := json.Marshal(p)
 	return string(jsonBytes)
+}
+
+type ParameterDoc struct {
+	Govparams govparams.ParamSet `json:"gov"`
+}
+
+func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pull-params",
+		Short: "generate param.json file",
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			ctx := context.NewCLIContext().WithCodec(cdc)
+
+			homeStr := viper.GetString(tmcli.HomeFlag)
+
+			if homeStr == "" {
+				homeStr = app.DefaultNodeHome
+			}
+
+			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
+			if err == nil {
+				var paramSet ParameterDoc
+				for _, kv := range res {
+					switch string(kv.Key) {
+					case "Gov/gov/depositProcedure":
+						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
+					}
+				}
+				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")
+				//cmn.WriteFile(,output,644)
+				if err != nil {
+					return err
+				}
+
+				err = cmn.WriteFile(homeStr+"/config/params.json", output, 0644)
+				if err != nil {
+
+					fmt.Println(err)
+					return err
+				}
+
+				fmt.Println("Save the parameter config file in ", homeStr+"/config/params.json")
+				return nil
+
+			}
+
+			fmt.Println("No GovParams can be found")
+			return err
+
+		},
+	}
+
+	cmd.Flags().String(flagModule, "", "the module of parameter ")
+	cmd.Flags().String(flagKey, "", "the key of parameter")
+	return cmd
 }

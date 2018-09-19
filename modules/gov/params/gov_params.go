@@ -23,6 +23,11 @@ const UPPER_BOUND_AMOUNT = 200
 
 var _ parameter.GovParameter = (*DepositProcedureParam)(nil)
 
+type ParamSet struct {
+	DepositProcedure   DepositProcedure `json:"Gov/gov/depositProcedure"`
+	//VotingProcedure    VotingProcedure            `json:"voting_period"`
+	//TallyingProcedure  TallyingProcedure          `json:"tallying_procedure"`
+}
 
 // Procedure around Deposits for governance
 type DepositProcedure struct {
