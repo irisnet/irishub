@@ -57,7 +57,6 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				opStr := viper.GetString(flagOp)
 				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr,cdc)
 				if err != nil {
-					fmt.Println(err)
 					return err
 				}
 			}
@@ -104,14 +103,12 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 		fmt.Println("Open ",pathStr)
 
 		if err != nil {
-			fmt.Println(err)
 			return param,err
 		}
 
 		paramDoc := ParameterDoc{}
 		err = cdc.UnmarshalJSON(jsonBytes, &paramDoc)
 		if err != nil {
-			fmt.Println(err)
 			return param, err
 		}
 
@@ -121,7 +118,7 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
 			valueStr = string(jsonBytes)
 		default:
-			fmt.Println("The key isn't existed")
+
 			return param,errors.New("The key isn't existed")
 		}
 
@@ -136,7 +133,6 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 
 	} else {
 
-		fmt.Println("Path and param are both empty")
 		return param,errors.New("Path and param are both empty")
 	}
 }
