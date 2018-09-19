@@ -113,6 +113,10 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 }
 
 
+
+var VotingProcedureParameter VotingProcedureParam
+var _ parameter.GovParameter = (*VotingProcedureParam)(nil)
+
 // Procedure around Voting in governance
 type VotingProcedure struct {
 	VotingPeriod int64 `json:"voting_period"` //  Length of the voting period.
