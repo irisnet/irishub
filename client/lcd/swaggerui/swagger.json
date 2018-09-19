@@ -104,8 +104,8 @@
         "tags": [
           "ICS20: Bank"
         ],
-        "summary": "Get token information",
-        "description": "Get token information of user specific address",
+        "summary": "Get account information",
+        "description": "Get account information",
         "consumes": [
           "application/json"
         ],
@@ -116,7 +116,6 @@
           {
             "name": "address",
             "in": "path",
-            "description": "address",
             "required": true,
             "type": "string"
           }
@@ -166,7 +165,6 @@
           {
             "name": "coin-type",
             "in": "path",
-            "description": "coin-type name",
             "required": true,
             "type": "string"
           }
@@ -204,8 +202,8 @@
         "tags": [
           "ICS20: Bank"
         ],
-        "summary": "Transfer tokens",
-        "description": "Transfer tokens to given address.",
+        "summary": "Send tokens",
+        "description": "Send tokens to given address.",
         "consumes": [
           "application/json"
         ],
@@ -216,14 +214,14 @@
           {
             "in": "path",
             "name": "address",
-            "description": "address to send token",
+            "description": "address to receive tokens",
             "required": true,
             "type": "string"
           },
           {
             "in": "query",
             "name": "generate-only",
-            "description": "if true, only generate and return a unsigned transaction byte array",
+            "description": "if true, only generate an unsigned transaction without broadcasting",
             "required": false,
             "type": "boolean"
           },
@@ -237,7 +235,7 @@
           {
             "in": "body",
             "name": "sendToken",
-            "description": "parameters to send token",
+            "description": "The sender field is required only when generate-only is true. Otherwise, just omit it. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
             "required": true,
             "schema": {
               "$ref": "#/definitions/bank.TransferBody"
@@ -274,7 +272,7 @@
     },
     "/keys": {
       "get": {
-        "description": "Get all keys in the key store",
+        "description": "List all keys in the key store",
         "consumes": [
           "application/json"
         ],
@@ -284,8 +282,7 @@
         "tags": [
           "ICS1: Key Management"
         ],
-        "summary": "list all keys",
-        "operationId": "queryKeysRequest",
+        "summary": "List all keys in the key store",
         "responses": {
           "200": {
             "description": "OK",
@@ -321,7 +318,7 @@
         }
       },
       "post": {
-        "description": "Create a new key and persistent it to the key store",
+        "description": "Create a new key and persistent it to the keystore",
         "consumes": [
           "application/json"
         ],
@@ -331,10 +328,10 @@
         "tags": [
           "ICS1: Key Management"
         ],
-        "summary": "Create a account",
+        "summary": "Create a new key and persistent it to the keystore",
         "parameters": [
           {
-            "description": "name and password for a new key",
+            "description": "if the seed field is not empty, it will be used to recover a key",
             "name": "CreateNewKeyBody",
             "in": "body",
             "required": true,
@@ -349,7 +346,7 @@
             "description": "OK",
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/keys.NewKeyBody"
+              "$ref": "#/definitions/keys.KeyOutputResponse"
             }
           },
           "400": {
@@ -378,7 +375,7 @@
     },
     "/keys/{name}": {
       "get": {
-        "description": "Get key detailed information by its name",
+        "description": "Get key information",
         "consumes": [
           "application/json"
         ],
@@ -388,7 +385,7 @@
         "tags": [
           "ICS1: Key Management"
         ],
-        "summary": "Get key information",
+        "summary": "Get key detailed information by its name",
         "parameters": [
           {
             "type": "string",
@@ -444,13 +441,11 @@
         "parameters": [
           {
             "type": "string",
-            "description": "key name",
             "name": "name",
             "required": true,
             "in": "path"
           },
           {
-            "description": "key name",
             "name": "pwd",
             "in": "body",
             "required": true,
@@ -505,13 +500,11 @@
         "parameters": [
           {
             "type": "string",
-            "description": "key name",
             "name": "name",
             "required": true,
             "in": "path"
           },
           {
-            "description": "password",
             "name": "pwd",
             "in": "body",
             "required": true,
@@ -554,7 +547,7 @@
     },
     "/gov/proposals": {
       "post": {
-        "description": "Send transaction to launch a proposal",
+        "description": "Send transaction to submit a proposal",
         "consumes": [
           "application/json"
         ],
@@ -564,12 +557,12 @@
         "tags": [
           "ICS22: Governance"
         ],
-        "summary": "Launch a proposal",
+        "summary": "Submit a proposal",
         "parameters": [
           {
             "in": "query",
             "name": "generate-only",
-            "description": "if true, only generate and return a unsigned transaction byte array",
+            "description": "if true, only generate an unsigned transaction without broadcasting",
             "required": false,
             "type": "boolean"
           },
@@ -581,7 +574,7 @@
             "type": "boolean"
           },
           {
-            "description": "proposal information",
+            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
             "name": "postProposalBody",
             "in": "body",
             "required": true,
@@ -633,6 +626,29 @@
         "tags": [
           "ICS22: Governance"
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "voter",
+            "description": "voter address",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "depositer",
+            "description": "depositer address",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "description": "proposal status",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "summary": "Query proposals",
         "responses": {
           "200": {
@@ -641,7 +657,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/stake.TextProposalResponse"
+                "$ref": "#/definitions/gov.TextProposalResponse"
               }
             }
           },
@@ -686,7 +702,7 @@
           {
             "in": "query",
             "name": "generate-only",
-            "description": "if true, only generate and return a unsigned transaction byte array",
+            "description": "if true, only generate an unsigned transaction without broadcasting",
             "required": false,
             "type": "boolean"
           },
@@ -705,7 +721,7 @@
             "in": "path"
           },
           {
-            "description": "deposit information",
+            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
             "name": "depositBody",
             "in": "body",
             "required": true,
@@ -764,7 +780,7 @@
           {
             "in": "query",
             "name": "generate-only",
-            "description": "if true, only generate and return a unsigned transaction byte array",
+            "description": "if true, only generate an unsigned transaction without broadcasting",
             "required": false,
             "type": "boolean"
           },
@@ -783,7 +799,7 @@
             "in": "path"
           },
           {
-            "description": "vote information",
+            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
             "name": "voteBody",
             "in": "body",
             "required": true,
@@ -852,7 +868,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/stake.VoteResponse"
+                "$ref": "#/definitions/gov.VoteResponse"
               }
             }
           },
@@ -896,7 +912,6 @@
         "parameters": [
           {
             "type": "string",
-            "description": "proposal id",
             "name": "proposal-id",
             "required": true,
             "in": "path"
@@ -1068,7 +1083,7 @@
         "tags": [
           "ICS22: Governance"
         ],
-        "summary": "Query governance parameters",
+        "summary": "Query parameters which were added or modified by governance",
         "parameters": [
 
         ],
@@ -1076,8 +1091,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/common.KVPairs"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/common.KVPair"
+              }
             }
           },
           "400": {
@@ -1106,7 +1124,7 @@
     },
     "/stake/delegators/{delegatorAddr}/delegations": {
       "post": {
-        "description": "Send stake related transactions",
+        "description": "Send stake transactions",
         "consumes": [
           "application/json"
         ],
@@ -1116,7 +1134,7 @@
         "tags": [
           "ICS21: Staking"
         ],
-        "summary": "Send stake related transaction",
+        "summary": "Send stake transactions",
         "parameters": [
           {
             "type": "string",
@@ -1128,7 +1146,7 @@
           {
             "in": "query",
             "name": "generate-only",
-            "description": "if true, only generate and return a unsigned transaction byte array",
+            "description": "if true, only generate an unsigned transaction without broadcasting",
             "required": false,
             "type": "boolean"
           },
@@ -1140,7 +1158,7 @@
             "type": "boolean"
           },
           {
-            "description": "delegation parameters",
+            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
             "name": "EditDelegationsBody",
             "in": "body",
             "required": true,
@@ -1586,7 +1604,7 @@
     },
     "/stake/validators/{addr}": {
       "get": {
-        "description": "Get a single validator info",
+        "description": "Get a single validator",
         "consumes": [
           "application/json"
         ],
@@ -1596,7 +1614,7 @@
         "tags": [
           "ICS21: Staking"
         ],
-        "summary": "Get a single validator info",
+        "summary": "Get a single validator",
         "parameters": [
           {
             "type": "string",
@@ -1759,7 +1777,7 @@
         "summary": "Unreoke a revoked validator",
         "parameters": [
           {
-            "description": "unrevoke parameter",
+            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
             "name": "UnrevokeBody",
             "in": "body",
             "required": true,
