@@ -96,7 +96,7 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 			return param, err
 		}
 	} else if pathStr != ""{
-		pathStr = path.Join(os.ExpandEnv("$HOME"),pathStr,"config/params.json")
+		pathStr = path.Join(pathStr,"config/params.json")
 
 		jsonBytes,err := cmn.ReadFile(pathStr)
 

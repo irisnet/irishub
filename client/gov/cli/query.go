@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/viper"
 	cmn "github.com/tendermint/tendermint/libs/common"
     "path"
-	"os"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -340,7 +339,7 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				}
 
 				pathStr := viper.GetString(flagPath)
-				pathStr = path.Join(os.ExpandEnv("$HOME"),pathStr,"config/params.json")
+				pathStr = path.Join(pathStr,"config/params.json")
 				err = cmn.WriteFile(pathStr, output, 0644)
 				if err != nil {
 
