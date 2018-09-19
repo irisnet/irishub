@@ -290,8 +290,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/keys.KeyOutputsResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/keys.KeyOutputResponse"
+              }
             }
           },
           "400": {
@@ -635,8 +638,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/gov.TextProposalsResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/stake.TextProposalResponse"
+              }
             }
           },
           "400": {
@@ -843,8 +849,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/gov.VotesResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/stake.VoteResponse"
+              }
             }
           },
           "400": {
@@ -1253,8 +1262,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/stake.TxInfosResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/stake.TxInfoResponse"
+              }
             }
           },
           "400": {
@@ -1307,8 +1319,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/stake.BechValidatorsResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/stake.BechValidatorResponse"
+              }
             }
           },
           "400": {
@@ -1490,8 +1505,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/stake.UnbondingDelegationsResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/stake.UnbondingDelegationResponse"
+              }
             }
           },
           "400": {
@@ -1535,8 +1553,11 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object",
-              "$ref": "#/definitions/stake.BechValidatorsResponse"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/stake.BechValidatorResponse"
+              }
             }
           },
           "400": {
@@ -2179,9 +2200,9 @@
         }
       }
     },
-    "/txs/broadcast": {
+    "/txs/send": {
       "post": {
-        "description": "Broadcase transaction",
+        "description": "Compose and broadcast transaction",
         "consumes": [
           "application/json"
         ],
@@ -2191,7 +2212,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Broadcase transaction",
+        "summary": "Broadcast transaction",
         "parameters": [
           {
             "in": "query",
@@ -2201,13 +2222,13 @@
             "type": "boolean"
           },
           {
-            "description": "tranaction byte array",
-            "name": "BroadcastTxBody",
+            "description": "stdTx",
+            "name": "sendTxBody",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/tx.BroadcastTxBody"
+              "$ref": "#/definitions/tx.SendTxBody"
             }
           }
         ],
@@ -2271,12 +2292,6 @@
         }
       }
     },
-    "common.Coins": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/common.Coin"
-      }
-    },
     "common.KVPair": {
       "type": "object",
       "properties": {
@@ -2286,12 +2301,6 @@
         "value": {
           "type": "string"
         }
-      }
-    },
-    "common.KVPairs": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/common.KVPair"
       }
     },
     "common.CheckTxResult": {
@@ -2318,7 +2327,8 @@
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/common.KVPairs"
+            "type": "object",
+            "$ref": "#/definitions/common.KVPair"
           }
         }
       },
@@ -2359,7 +2369,8 @@
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/common.KVPairs"
+            "type": "object",
+            "$ref": "#/definitions/common.KVPair"
           }
         }
       },
@@ -2432,12 +2443,6 @@
         }
       }
     },
-    "common.coinUnits": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/common.coinUnit"
-      }
-    },
     "common.BaseTx": {
       "type": "object",
       "properties": {
@@ -2491,7 +2496,11 @@
       "type": "object",
       "properties": {
         "amount": {
-          "$ref": "#/definitions/common.Coins"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.Coin"
+          }
         },
         "sender": {
           "type": "string"
@@ -2514,7 +2523,11 @@
           "$ref": "#/definitions/common.coinUnit"
         },
         "Units": {
-          "$ref": "#/definitions/common.coinUnits"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.coinUnit"
+          }
         },
         "origin": {
           "type": "integer"
@@ -2571,13 +2584,6 @@
         }
       }
     },
-    "keys.KeyOutputsResponse": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/keys.KeyOutputResponse"
-      }
-    },
     "gov.PostProposalBody": {
       "type": "object",
       "properties": {
@@ -2597,7 +2603,11 @@
           "type": "string"
         },
         "initial_deposit": {
-          "$ref": "#/definitions/common.Coins"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.Coin"
+          }
         }
       }
     },
@@ -2611,7 +2621,11 @@
           "type": "string"
         },
         "amount": {
-          "$ref": "#/definitions/common.Coins"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.Coin"
+          }
         }
       }
     },
@@ -2669,18 +2683,6 @@
         "option": {
           "type": "string"
         }
-      }
-    },
-    "gov.VotesResponse": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/gov.VoteResponse"
-      }
-    },
-    "gov.TextProposalsResponse": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/gov.TextProposalResponse"
       }
     },
     "stake.MsgDelegationsInput": {
@@ -2782,11 +2784,60 @@
         }
       }
     },
-    "tx.BroadcastTxBody": {
+    "common.StdSignature": {
       "type": "object",
       "properties": {
-        "tx": {
+        "pub_key": {
           "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        },
+        "account_number": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string"
+        }
+      }
+    },
+    "common.StdFee": {
+      "type": "object",
+      "properties": {
+        "gas": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.Coin"
+          }
+        }
+      }
+    },
+    "tx.SendTxBody": {
+      "type": "object",
+      "properties": {
+        "memo": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "object",
+          "$ref": "#/definitions/common.StdFee"
+        },
+        "msgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.StdSignature"
+          }
         }
       }
     },
@@ -2813,13 +2864,6 @@
         "min_time": {
           "type": "integer"
         }
-      }
-    },
-    "stake.UnbondingDelegationsResponse": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/stake.UnbondingDelegationResponse"
       }
     },
     "stake.RedelegationResponse": {
@@ -2854,13 +2898,6 @@
         "shares_dst": {
           "type": "string"
         }
-      }
-    },
-    "stake.RedelegationsResponse": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/stake.RedelegationResponse"
       }
     },
     "stake.DescriptionResponse": {
@@ -2912,8 +2949,11 @@
           "type": "integer"
         },
         "proposer_reward_pool": {
-          "type": "object",
-          "$ref": "#/definitions/common.Coins"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/common.Coin"
+          }
         },
         "commission": {
           "type": "string"
@@ -2930,13 +2970,6 @@
         "prev_bonded_shares": {
           "type": "string"
         }
-      }
-    },
-    "stake.BechValidatorsResponse": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/stake.BechValidatorResponse"
       }
     },
     "stake.DelegationWithoutRatResponse": {
@@ -2956,27 +2989,29 @@
         }
       }
     },
-    "stake.DelegationWithoutRatsResponse": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/stake.DelegationWithoutRatResponse"
-      }
-    },
     "stake.DelegationSummaryResponse": {
       "type": "object",
       "properties": {
         "redelegations": {
-          "type": "object",
-          "$ref": "#/definitions/stake.RedelegationsResponse"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/stake.RedelegationResponse"
+          }
         },
         "unbonding_delegations": {
-          "type": "object",
-          "$ref": "#/definitions/stake.UnbondingDelegationsResponse"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/stake.UnbondingDelegationResponse"
+          }
         },
         "delegations": {
-          "type": "object",
-          "$ref": "#/definitions/stake.DelegationWithoutRatsResponse"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/stake.DelegationWithoutRatResponse"
+          }
         }
       }
     },
@@ -2996,13 +3031,6 @@
           "type": "object",
           "$ref": "#/definitions/common.DeliverTxResult"
         }
-      }
-    },
-    "stake.TxInfosResponse": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/stake.TxInfoResponse"
       }
     },
     "slashing.UnrevokeBody": {
