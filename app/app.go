@@ -19,6 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/modules/parameter"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -156,7 +157,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
-	parameter.SetParamReadWriter(app.paramsKeeper.Setter(), &govparams.DepositProcedureParameter)
+	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
+							&govparams.DepositProcedureParameter,
+							&upgradeparams.CurrentUpgradeProposalIdParameter,
+							&upgradeparams.ProposalAcceptHeightParameter)
+
 	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter)
 
 	return app
@@ -231,10 +236,10 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 1440,
+			MaxDepositPeriod: 10,
 		},
 		VotingProcedure: gov.VotingProcedure{
-			VotingPeriod: 30,
+			VotingPeriod: 10,
 		},
 		TallyingProcedure: gov.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),

@@ -57,12 +57,12 @@ func (keeper Keeper) WireCodec() *wire.Codec {
 // =====================================================
 // Proposals
 
-func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
+func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
 	switch proposalType {
 	case ProposalTypeText:
 		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	case ProposalTypeParameterChange:
-		return keeper.NewParametersProposal(ctx, title, description, proposalType, params)
+		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSoftwareUpgrade:
 		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
 	}
@@ -91,7 +91,7 @@ func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description 
 	return proposal
 }
 
-func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
+func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -108,7 +108,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	}
 	var proposal Proposal = &ParameterProposal{
 		textProposal,
-		params,
+		param,
 	}
 	keeper.SetProposal(ctx, proposal)
 	keeper.InactiveProposalQueuePush(ctx, proposal)
