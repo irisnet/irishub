@@ -1,4 +1,4 @@
-package cli
+package rpc
 
 import (
 	amino "github.com/tendermint/go-amino"

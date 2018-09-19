@@ -1,4 +1,4 @@
-# Online Governance In IRISHub
+# Onchain Governance In IRISHub
 
 ## What is onchain governance?
 

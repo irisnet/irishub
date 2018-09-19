@@ -1,6 +1,6 @@
 # Setup A Full-node
 
-Before setting up your validator node, make sure you already had **Iris** installed by following this [guide](install-iris.md)
+Before setting up your validator node, make sure you already had **Iris** installed by following this [guide](Install-Iris.md)
 
 ### Step 1: Init Your Node
 
@@ -82,4 +82,4 @@ You could see the following
 ```
 {"node_info":{"id":"1c40d19d695721fc3e3ce44cbc3f446f038b36e4","listen_addr":"172.31.0.190:46656","network":"iris-stage-4","version":"0.22.6","channels":"4020212223303800","moniker":"name","other":["amino_version=0.10.1","p2p_version=0.5.0","consensus_version=v1/0.2.2","rpc_version=0.7.0/3","tx_index=on","rpc_addr=tcp://0.0.0.0:46657"]},"sync_info":{"latest_block_hash":"41117D8CB54FA54EFD8DEAD81D6D83BDCE0E63AC","latest_app_hash":"95D82B8AC8B64C4CD6F85C1D91F999C2D1DA4F0A","latest_block_height":"1517","latest_block_time":"2018-09-07T05:44:27.810641328Z","catching_up":false},"validator_info":{"address":"3FCCECF1A27A9CEBD394F3A0C5253ADAA8392EB7","pub_key":{"type":"tendermint/PubKeyEd25519","value":"wZp1blOEwJu4UuqbEmivzjUMO1UwUK4C0jRH96HhV90="},"voting_power":"100"}}
 ```
-If you see the 	`catching_up` is `false`, it means your node is fully synced with the network, otherwise your node is still downloading blocks. Once fully synced, you could upgrade your node to a validator node. The instructions is in [here](validator-node.md).	
+If you see the 	`catching_up` is `false`, it means your node is fully synced with the network, otherwise your node is still downloading blocks. Once fully synced, you could upgrade your node to a validator node. The instructions is in [here](Validator-Node.md).	
