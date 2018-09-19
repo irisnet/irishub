@@ -13,6 +13,9 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"path"
+	"github.com/pkg/errors"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -49,9 +52,12 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 
 			var param gov.Param
 			if proposalType == gov.ProposalTypeParameterChange {
-				if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
-					fmt.Println(err.Error())
-					return nil
+				pathStr := viper.GetString(flagPath)
+				keyStr := viper.GetString(flagKey)
+				opStr := viper.GetString(flagOp)
+				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr,cdc)
+				if err != nil {
+					return err
 				}
 			}
 
@@ -73,8 +79,62 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
-
+	cmd.Flags().String(flagKey, "", "the key of parameter")
+	cmd.Flags().String(flagOp, "", "the operation of parameter")
+	cmd.Flags().String(flagPath, "", "the path of param.json")
 	return cmd
+}
+
+func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string,cdc *wire.Codec) (gov.Param, error) {
+	var param gov.Param
+
+	if paramStr != "" {
+		if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
+			fmt.Println(err.Error())
+			return param, nil
+		} else {
+			return param, err
+		}
+	} else if pathStr != ""{
+		pathStr = path.Join(pathStr,"config/params.json")
+
+		jsonBytes,err := cmn.ReadFile(pathStr)
+
+		fmt.Println("Open ",pathStr)
+
+		if err != nil {
+			return param,err
+		}
+
+		paramDoc := ParameterDoc{}
+		err = cdc.UnmarshalJSON(jsonBytes, &paramDoc)
+		if err != nil {
+			return param, err
+		}
+
+		var valueStr string
+		switch keyStr{
+		case "Gov/gov/depositProcedure":
+			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
+			valueStr = string(jsonBytes)
+		default:
+
+			return param,errors.New("The key isn't existed")
+		}
+
+		param.Value = valueStr
+		param.Key = keyStr
+		param.Op = opStr
+
+		jsonBytes,_ = json.MarshalIndent(param,""," ")
+
+		fmt.Println("Param:\n",string(jsonBytes))
+		return param, nil
+
+	} else {
+
+		return param,errors.New("Path and param are both empty")
+	}
 }
 
 // GetCmdDeposit implements depositing tokens for an active proposal.
