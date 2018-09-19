@@ -61,10 +61,6 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			// Build and sign the transaction, then broadcast to Tendermint
 			// proposalID must be returned, and it is a part of response.
 			cliCtx.PrintResponse = true
@@ -102,7 +98,7 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 
 			proposalID := viper.GetInt64(flagProposalID)
 
-			amount, err := sdk.ParseCoins(viper.GetString(flagDeposit))
+			amount, err := cliCtx.ParseCoins(viper.GetString(flagDeposit))
 			if err != nil {
 				return err
 			}
@@ -112,9 +108,6 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
-			}
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
@@ -166,10 +159,6 @@ func GetCmdVote(cdc *wire.Codec) *cobra.Command {
 			fmt.Printf("Vote[Voter:%s,ProposalID:%d,Option:%s]",
 				voterAddr.String(), msg.ProposalID, msg.Option.String(),
 			)
-
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
 			cliCtx.PrintResponse = true

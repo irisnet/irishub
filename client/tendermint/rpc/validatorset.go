@@ -1,4 +1,4 @@
-package cli
+package rpc
 
 import (
 	"fmt"
@@ -8,9 +8,11 @@ import (
 
 	"bytes"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"net/http"
 )
 
 // TODO these next two functions feel kinda hacky based on their placement
@@ -123,4 +125,55 @@ func printValidators(cmd *cobra.Command, args []string) error {
 
 	fmt.Println(string(output))
 	return nil
+}
+
+// Validator Set at a height REST handler
+func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		height, err := strconv.ParseInt(vars["height"], 10, 64)
+		if err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte("ERROR: Couldn't parse block height. Assumed format is '/validatorsets/{height}'."))
+			return
+		}
+
+		chainHeight, err := GetChainHeight(cliCtx)
+		if height > chainHeight {
+			w.WriteHeader(404)
+			w.Write([]byte("ERROR: Requested block height is bigger then the chain length."))
+			return
+		}
+
+		output, err := getValidators(cliCtx, &height)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
+	}
+}
+
+// Latest Validator Set REST handler
+func LatestValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		height, err := GetChainHeight(cliCtx)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		output, err := getValidators(cliCtx, &height)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
+	}
 }

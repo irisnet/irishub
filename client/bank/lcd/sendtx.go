@@ -5,17 +5,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"io/ioutil"
 	"net/http"
-	"strconv"
-	"github.com/irisnet/irishub/client/bank"
 )
 
 type sendBody struct {
-	Amount sdk.Coins `json:"amount"`
-	BaseTx utils.BaseTx `json:"base_tx"`
+	Amount sdk.Coins      `json:"amount"`
+	Sender string         `json:"sender"`
+	BaseTx context.BaseTx `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address
@@ -30,56 +29,34 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx.GenerateOnly, err = strconv.ParseBool(vars[utils.GenerateOnly])
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		cliCtx.Async, err = strconv.ParseBool(vars[utils.Async])
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		var m sendBody
-		body, err := ioutil.ReadAll(r.Body)
+		err = utils.ReadPostBody(w, r, cdc, &m)
+		if err != nil {
+			return
+		}
+		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.LocalAccountName, m.Sender)
+		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, m.BaseTx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		err = cdc.UnmarshalJSON(body, &m)
+		fromAddress, err := cliCtx.GetFromAddress()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
-		}
-
-		info, err := kb.Get(m.BaseTx.LocalAccountName)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-
-		txCtx := context.TxContext{
-			Codec:         cdc,
-			Gas:           m.BaseTx.Gas,
-			Fee:           m.BaseTx.Fees,
-			ChainID:       m.BaseTx.ChainID,
-			AccountNumber: m.BaseTx.AccountNumber,
-			Sequence:      m.BaseTx.Sequence,
 		}
 
 		amount, err := cliCtx.ParseCoins(m.Amount.String())
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		// build message
-		msg := bank.BuildMsg(sdk.AccAddress(info.GetPubKey().Address()), to, amount)
+		msg := bank.BuildMsg(fromAddress, to, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
 
 		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, m.BaseTx, []sdk.Msg{msg})
 	}

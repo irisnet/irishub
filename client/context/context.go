@@ -29,6 +29,8 @@ type CLIContext struct {
 	Height          int64
 	NodeURI         string
 	FromAddressName string
+	//If GenerateOnly is true and FromAddressName is not specified, the signer is required for building msg
+	SignerAddr      string
 	AccountStore    string
 	TrustNode       bool
 	UseLedger       bool
@@ -54,6 +56,7 @@ func NewCLIContext() CLIContext {
 		NodeURI:         nodeURI,
 		AccountStore:    ctxAccStoreName,
 		FromAddressName: viper.GetString(client.FlagFrom),
+		SignerAddr:      viper.GetString(client.FlagSignerAddr),
 		Height:          viper.GetInt64(client.FlagHeight),
 		TrustNode:       viper.GetBool(client.FlagTrustNode),
 		UseLedger:       viper.GetBool(client.FlagUseLedger),
