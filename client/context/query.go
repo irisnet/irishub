@@ -90,7 +90,7 @@ func (cliCtx CLIContext) GetFromAddress() (from sdk.AccAddress, err error) {
 		return nil, err
 	}
 	if cliCtx.GenerateOnly {
-		signerAddress, err := sdk.AccAddressFromBech32(cliCtx.Signer)
+		signerAddress, err := sdk.AccAddressFromBech32(cliCtx.SignerAddr)
 		// When generate-only is true, if the user specified signer address is correct, then just return the address.
 		if err == nil {
 			return signerAddress, nil
