@@ -39,10 +39,10 @@ func TestMsgSubmitProposal(t *testing.T) {
 		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsMulti, true},
 	}
 
-	var params Params
+	var param Param
 
 	for i, tc := range tests {
-		msg := NewMsgSubmitProposal(tc.title, tc.description, tc.proposalType, tc.proposerAddr, tc.initialDeposit, params)
+		msg := NewMsgSubmitProposal(tc.title, tc.description, tc.proposalType, tc.proposerAddr, tc.initialDeposit, param)
 		if tc.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", i)
 		} else {
@@ -105,3 +105,4 @@ func TestMsgVote(t *testing.T) {
 		}
 	}
 }
+

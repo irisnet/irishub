@@ -25,7 +25,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 			strProposalType := viper.GetString(flagProposalType)
 			initialDeposit := viper.GetString(flagDeposit)
-			paramsStr := viper.GetString(flagParams)
+			paramStr := viper.GetString(flagParam)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -47,20 +47,15 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			var params gov.Params
+			var param gov.Param
 			if proposalType == gov.ProposalTypeParameterChange {
-				if err := json.Unmarshal([]byte(paramsStr), &params); err != nil {
+				if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
 					fmt.Println(err.Error())
 					return nil
 				}
 			}
 
-			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
-
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
+			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
 
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -77,7 +72,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagDescription, "", "description of proposal")
 	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
-	cmd.Flags().String(flagParams, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
+	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 
 	return cmd
 }
@@ -102,7 +97,7 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 
 			proposalID := viper.GetInt64(flagProposalID)
 
-			amount, err := sdk.ParseCoins(viper.GetString(flagDeposit))
+			amount, err := cliCtx.ParseCoins(viper.GetString(flagDeposit))
 			if err != nil {
 				return err
 			}
