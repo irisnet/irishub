@@ -79,7 +79,6 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
-	cmd.Flags().String(flagPath, "", "the path of param.json")
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
 	return cmd
