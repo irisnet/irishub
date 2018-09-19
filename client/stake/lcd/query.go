@@ -472,7 +472,7 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 			return
 		}
 
-		output, err = cdc.MarshalJSON(validator)
+		output, err = cdc.MarshalJSONIndent(validator,"", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
