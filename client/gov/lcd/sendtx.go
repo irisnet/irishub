@@ -15,7 +15,7 @@ import (
 
 type postProposalReq struct {
 	BaseTx         context.BaseTx   `json:"base_tx"`
-	Params         gov.Params       `json:"params"`
+	Param          gov.Param        `json:"param"`
 	Title          string           `json:"title"`           //  Title of the proposal
 	Description    string           `json:"description"`     //  Description of the proposal
 	ProposalType   gov.ProposalKind `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
@@ -61,7 +61,7 @@ func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 		// create the message
-		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, req.ProposalType, proposer, initDepositAmount, req.Params)
+		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, req.ProposalType, proposer, initDepositAmount, req.Param)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

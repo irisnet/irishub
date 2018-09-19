@@ -64,6 +64,11 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, tx
 		res, err = cliCtx.BroadcastTx(txBytes)
 	}
 
+	if err != nil {
+		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	output, err := txCtx.Codec.MarshalJSONIndent(res, "", "  ")
 	if err != nil {
 		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
