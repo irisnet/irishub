@@ -10,11 +10,11 @@ import (
 type GenesisState struct {
 	StartingProposalID int64                      `json:"starting_proposalID"`
 	DepositProcedure   govparams.DepositProcedure `json:"deposit_period"`
-	VotingProcedure    VotingProcedure            `json:"voting_period"`
+	VotingProcedure    govparams.VotingProcedure            `json:"voting_period"`
 	TallyingProcedure  TallyingProcedure          `json:"tallying_procedure"`
 }
 
-func NewGenesisState(startingProposalID int64, dp govparams.DepositProcedure, vp VotingProcedure, tp TallyingProcedure) GenesisState {
+func NewGenesisState(startingProposalID int64, dp govparams.DepositProcedure, vp govparams.VotingProcedure, tp TallyingProcedure) GenesisState {
 	return GenesisState{
 		StartingProposalID: startingProposalID,
 		DepositProcedure:   dp,
@@ -32,7 +32,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 	//k.setDepositProcedure(ctx, data.DepositProcedure)
 	parameter.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
-	k.setVotingProcedure(ctx, data.VotingProcedure)
+	parameter.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
 	k.setTallyingProcedure(ctx, data.TallyingProcedure)
 
 }

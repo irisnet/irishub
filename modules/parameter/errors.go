@@ -11,4 +11,6 @@ const (
 	CodeInvalidMinDepositAmount         sdk.CodeType      = 102
 	CodeInvalidDepositPeriod            sdk.CodeType      = 103
 	CodeInvalidCurrentUpgradeProposalID sdk.CodeType      = 104
+	CodeInvalidVotingPeriod             sdk.CodeType      = 105
+	CodeInvalidVotingProcedure          sdk.CodeType      = 106
 )

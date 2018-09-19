@@ -282,6 +282,10 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 						var p govparams.DepositProcedure
 						cdc.MustUnmarshalBinary(res, &p)
 						ToParamStr(p, keyStr)
+					case "Gov/gov/votingProcedure":
+						var p govparams.VotingProcedure
+						cdc.MustUnmarshalBinary(res, &p)
+						ToParamStr(p, keyStr)
 					}
 				}
 
@@ -330,6 +334,8 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 					switch string(kv.Key) {
 					case "Gov/gov/depositProcedure":
 						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
+					case "Gov/gov/votingProcedure":
+						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.VotingProcedure)
 					}
 				}
 				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")
