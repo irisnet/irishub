@@ -373,69 +373,6 @@
         }
       }
     },
-    "/keys/{name}/sign": {
-      "post": {
-        "description": "Sign user specified byte array, tx byte array must be base64 encoding",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "ICS1: Key Management"
-        ],
-        "parameters": [
-          {
-            "type": "string",
-            "description": "key name",
-            "name": "name",
-            "required": true,
-            "in": "path"
-          },
-          {
-            "description": "seed and password for a new key",
-            "name": "txAndPwd",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "$ref": "#/definitions/keys.SignBody"
-            }
-          }
-        ],
-        "summary": "Sign user specified bytes array",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "string"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "$ref": "#/definitions/common.HTTPError"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "type": "object",
-              "$ref": "#/definitions/common.HTTPError"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "type": "object",
-              "$ref": "#/definitions/common.HTTPError"
-            }
-          }
-        }
-      }
-    },
     "/keys/{name}": {
       "get": {
         "description": "Get key detailed information by its name",
@@ -2602,17 +2539,6 @@
           "type": "string"
         },
         "seed": {
-          "type": "string"
-        }
-      }
-    },
-    "keys.SignBody": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "tx_bytes": {
           "type": "string"
         }
       }
