@@ -13,6 +13,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
     "path"
     "encoding/json"
+	"github.com/pkg/errors"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -289,15 +290,20 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
 				if err == nil {
 					switch keyStr {
-					case "Gov/gov/depositProcedure":
+					case "Gov/gov/DepositProcedure":
 						var p govparams.DepositProcedure
 						cdc.MustUnmarshalBinary(res, &p)
 						ToParamStr(p, keyStr)
-					case "Gov/gov/votingProcedure":
+					case "Gov/gov/VotingProcedure":
 						var p govparams.VotingProcedure
 						cdc.MustUnmarshalBinary(res, &p)
 						ToParamStr(p, keyStr)
-
+					case "Gov/gov/TallyingProcedure":
+						var p govparams.TallyingProcedure
+						cdc.MustUnmarshalBinary(res, &p)
+						ToParamStr(p, keyStr)
+					default:
+						return errors.New(keyStr+" is not found")
 					}
 				}
 
@@ -345,10 +351,14 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				var paramSet ParameterDoc
 				for _, kv := range res {
 					switch string(kv.Key) {
-					case "Gov/gov/depositProcedure":
+					case "Gov/gov/DepositProcedure":
 						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
-					case "Gov/gov/votingProcedure":
+					case "Gov/gov/VotingProcedure":
 						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.VotingProcedure)
+					case "Gov/gov/TallyingProcedure":
+						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.TallyingProcedure)
+					default:
+						return errors.New(string(kv.Key)+" is not found")
 					}
 				}
 				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")

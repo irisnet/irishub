@@ -142,7 +142,7 @@ func (param *VotingProcedureParam) SetReadWriter(setter params.Setter) {
 }
 
 func (param *VotingProcedureParam) GetStoreKey() string {
-	return "Gov/gov/votingProcedure"
+	return "Gov/gov/VotingProcedure"
 }
 
 func (param *VotingProcedureParam) SaveValue(ctx sdk.Context) {

@@ -114,8 +114,14 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 
 		var valueStr string
 		switch keyStr{
-		case "Gov/gov/depositProcedure":
+		case "Gov/gov/DepositProcedure":
 			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
+			valueStr = string(jsonBytes)
+		case "Gov/gov/VotingProcedure":
+			jsonBytes,_ = json.Marshal(paramDoc.Govparams.VotingProcedure)
+			valueStr = string(jsonBytes)
+		case "Gov/gov/TallyingProcedure":
+			jsonBytes,_ = json.Marshal(paramDoc.Govparams.TallyingProcedure)
 			valueStr = string(jsonBytes)
 		default:
 
