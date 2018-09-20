@@ -294,8 +294,8 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				res , err := ctx.QueryStore([]byte(keyStr), storeName)
 				if err == nil {
 					if p , ok:=parameter.ParamMapping[keyStr]; ok {
-						value := p.GetValueFromRawData(cdc,res)//.(govparams.TallyingProcedure)
-						PrintParamStr(value,keyStr)
+						p.GetValueFromRawData(cdc,res)//.(govparams.TallyingProcedure)
+						PrintParamStr(p,keyStr)
 					}else{
 						return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
 					}
@@ -312,18 +312,13 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func PrintParamStr(value interface{}, keyStr string) {
+func PrintParamStr(p parameter.GovParameter, keyStr string) {
 	var param gov.ParamRefactor
 	param.Key = keyStr
-	param.Value = ToJson(value)
+	param.Value = p.ToJson()
 	param.Op = ""
 	jsonBytes, _ := json.Marshal(param)
 	fmt.Println(string(jsonBytes))
-}
-
-func ToJson(p interface{}) string {
-	jsonBytes, _ := json.Marshal(p)
-	return string(jsonBytes)
 }
 
 

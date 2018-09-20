@@ -16,11 +16,6 @@ type Param struct {
 	Value string `json:"value"`
 	Op    string `json:"op"`
 }
-type ParamRefactor struct {
-	Key   string `json:"key"`
-	Value interface{} `json:"value"`
-	Op    string `json:"op"`
-}
 
 // Implements Proposal Interface
 var _ Proposal = (*ParameterProposal)(nil)

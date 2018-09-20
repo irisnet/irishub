@@ -57,6 +57,8 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
+				jsonBytes,_ := json.MarshalIndent(param,""," ")
+				fmt.Println("Param:\n",string(jsonBytes))
 			}
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
@@ -87,12 +89,9 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 	var param gov.Param
 
 	if paramStr != "" {
-		if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
-			fmt.Println(err.Error())
-			return param, nil
-		} else {
-			return param, err
-		}
+		err := json.Unmarshal([]byte(paramStr), &param)
+		return param, err
+
 	} else if pathStr != ""{
 		paramDoc := ParameterDoc{}
 		err := paramDoc.ReadFile(cdc,pathStr)
