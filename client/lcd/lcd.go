@@ -31,7 +31,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start irislcd (irishub light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
+		Short: "Start IRISLCD (IRISHUB light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listenAddr := viper.GetString(flagListenAddr)
 			router := createHandler(cdc)
@@ -54,7 +54,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			logger.Info("irislcd server started")
+			logger.Info("IRISLCD server started")
 
 			// wait forever and cleanup
 			cmn.TrapSignal(func() {

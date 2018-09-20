@@ -1,14 +1,14 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "All irislcd supported APIs will be shown by this swagger-ui page. You can access these APIs through this page.",
+    "description": "All IRISLCD supported APIs will be shown by this swagger-ui page. You can access them on this page.",
     "version": "1.0",
-    "title": "irislcd Swagger-UI",
-    "termsOfService": "http://swagger.io/terms/",
+    "title": "IRISLCD Swagger-UI",
+    "termsOfService": "https://www.irisnet.org",
     "contact": {
-      "name": "API Support",
-      "url": "http://www.swagger.io/support",
-      "email": "support@swagger.io"
+      "name": "边界智能",
+      "url": "https://bianjie.ai/",
+      "email": "service@bianjie.ai"
     },
     "license": {
       "name": "Apache 2.0",
