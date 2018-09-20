@@ -6,6 +6,7 @@ import (
 )
 
 type Parameter interface {
+
 	InitGenesis(interface{})
 
 	GetStoreKey() string

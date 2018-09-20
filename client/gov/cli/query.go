@@ -13,7 +13,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
     "path"
     "encoding/json"
-	"github.com/pkg/errors"
+	"github.com/irisnet/irishub/modules/parameter"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -303,7 +303,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 						cdc.MustUnmarshalBinary(res, &p)
 						ToParamStr(p, keyStr)
 					default:
-						return errors.New(keyStr+" is not found")
+						return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
 					}
 				}
 
@@ -358,7 +358,7 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 					case "Gov/gov/TallyingProcedure":
 						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.TallyingProcedure)
 					default:
-						return errors.New(string(kv.Key)+" is not found")
+						return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
 					}
 				}
 				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")

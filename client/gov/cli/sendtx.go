@@ -112,29 +112,24 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 			return param, err
 		}
 
-		var valueStr string
 		switch keyStr{
 		case "Gov/gov/DepositProcedure":
 			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
-			valueStr = string(jsonBytes)
 		case "Gov/gov/VotingProcedure":
 			jsonBytes,_ = json.Marshal(paramDoc.Govparams.VotingProcedure)
-			valueStr = string(jsonBytes)
 		case "Gov/gov/TallyingProcedure":
 			jsonBytes,_ = json.Marshal(paramDoc.Govparams.TallyingProcedure)
-			valueStr = string(jsonBytes)
 		default:
-
 			return param,errors.New("The key isn't existed")
 		}
 
-		param.Value = valueStr
+		param.Value = string(jsonBytes)
 		param.Key = keyStr
 		param.Op = opStr
 
 		jsonBytes,_ = json.MarshalIndent(param,""," ")
 
-		fmt.Println("Param:\n",string(jsonBytes))
+		fmt.Println("Param:\n", string(jsonBytes))
 		return param, nil
 
 	} else {
