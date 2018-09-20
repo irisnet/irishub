@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 )
 
 // GetCmdQueryValidator implements the validator query command.
@@ -37,10 +38,14 @@ func GetCmdQueryValidator(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			validator := types.MustUnmarshalValidator(cdc, addr, res)
-
+			validatorOutput,err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+			if err != nil {
+				return err
+			}
+			
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
-				human, err := validator.HumanReadableString()
+				human, err := validatorOutput.HumanReadableString()
 				if err != nil {
 					return err
 				}
@@ -48,7 +53,7 @@ func GetCmdQueryValidator(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			case "json":
 				// parse out the validator
-				output, err := wire.MarshalJSONIndent(cdc, validator)
+				output, err := wire.MarshalJSONIndent(cdc, validatorOutput)
 				if err != nil {
 					return err
 				}
@@ -79,11 +84,15 @@ func GetCmdQueryValidators(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			// parse out the validators
-			var validators []stake.Validator
+			var validators []stakeClient.ValidatorOutput
 			for _, kv := range resKVs {
 				addr := kv.Key[1:]
 				validator := types.MustUnmarshalValidator(cdc, addr, kv.Value)
-				validators = append(validators, validator)
+				validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+				if err != nil {
+					return err
+				}
+				validators = append(validators, validatorOutput)
 			}
 
 			switch viper.Get(cli.OutputFlag) {
@@ -140,17 +149,17 @@ func GetCmdQueryDelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			// parse out the delegation
 			delegation := types.MustUnmarshalDelegation(cdc, key, res)
-
+			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
-				resp, err := delegation.HumanReadableString()
+				resp, err := delegationOutput.HumanReadableString()
 				if err != nil {
 					return err
 				}
 
 				fmt.Println(resp)
 			case "json":
-				output, err := wire.MarshalJSONIndent(cdc, delegation)
+				output, err := wire.MarshalJSONIndent(cdc, delegationOutput)
 				if err != nil {
 					return err
 				}
@@ -191,10 +200,11 @@ func GetCmdQueryDelegations(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			// parse out the validators
-			var delegations []stake.Delegation
+			var delegations []stakeClient.DelegationOutput
 			for _, kv := range resKVs {
 				delegation := types.MustUnmarshalDelegation(cdc, kv.Key, kv.Value)
-				delegations = append(delegations, delegation)
+				delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
+				delegations = append(delegations, delegationOutput)
 			}
 
 			output, err := wire.MarshalJSONIndent(cdc, delegations)
@@ -239,17 +249,18 @@ func GetCmdQueryUnbondingDelegation(storeName string, cdc *wire.Codec) *cobra.Co
 
 			// parse out the unbonding delegation
 			ubd := types.MustUnmarshalUBD(cdc, key, res)
+			ubdOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd)
 
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
-				resp, err := ubd.HumanReadableString()
+				resp, err := ubdOutput.HumanReadableString()
 				if err != nil {
 					return err
 				}
 
 				fmt.Println(resp)
 			case "json":
-				output, err := wire.MarshalJSONIndent(cdc, ubd)
+				output, err := wire.MarshalJSONIndent(cdc, ubdOutput)
 				if err != nil {
 					return err
 				}
@@ -290,10 +301,11 @@ func GetCmdQueryUnbondingDelegations(storeName string, cdc *wire.Codec) *cobra.C
 			}
 
 			// parse out the validators
-			var ubds []stake.UnbondingDelegation
+			var ubds []stakeClient.UnbondingDelegationOutput
 			for _, kv := range resKVs {
 				ubd := types.MustUnmarshalUBD(cdc, kv.Key, kv.Value)
-				ubds = append(ubds, ubd)
+				ubdOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd)
+				ubds = append(ubds, ubdOutput)
 			}
 
 			output, err := wire.MarshalJSONIndent(cdc, ubds)
@@ -343,17 +355,17 @@ func GetCmdQueryRedelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			// parse out the unbonding delegation
 			red := types.MustUnmarshalRED(cdc, key, res)
-
+			redOutput := stakeClient.ConvertREDToREDOutput(cliCtx, red)
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
-				resp, err := red.HumanReadableString()
+				resp, err := redOutput.HumanReadableString()
 				if err != nil {
 					return err
 				}
 
 				fmt.Println(resp)
 			case "json":
-				output, err := wire.MarshalJSONIndent(cdc, red)
+				output, err := wire.MarshalJSONIndent(cdc, redOutput)
 				if err != nil {
 					return err
 				}
@@ -394,10 +406,11 @@ func GetCmdQueryRedelegations(storeName string, cdc *wire.Codec) *cobra.Command 
 			}
 
 			// parse out the validators
-			var reds []stake.Redelegation
+			var reds []stakeClient.RedelegationOutput
 			for _, kv := range resKVs {
 				red := types.MustUnmarshalRED(cdc, kv.Key, kv.Value)
-				reds = append(reds, red)
+				redOutput := stakeClient.ConvertREDToREDOutput(cliCtx, red)
+				reds = append(reds, redOutput)
 			}
 
 			output, err := wire.MarshalJSONIndent(cdc, reds)

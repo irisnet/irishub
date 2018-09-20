@@ -9,10 +9,9 @@ import (
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
-	"github.com/irisnet/irishub/client/keys"
+	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
-	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/rakyll/statik/fs"
@@ -32,7 +31,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start irislcd (irishub light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
+		Short: "Start IRISLCD (IRISHUB light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listenAddr := viper.GetString(flagListenAddr)
 			router := createHandler(cdc)
@@ -55,7 +54,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			logger.Info("irislcd server started")
+			logger.Info("IRISLCD server started")
 
 			// wait forever and cleanup
 			cmn.TrapSignal(func() {
@@ -79,20 +78,18 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 
 func createHandler(cdc *wire.Codec) *mux.Router {
 	r := mux.NewRouter()
-	kb, err := keys.GetKeyBase()
-	if err != nil {
-		panic(err)
-	}
+
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	keyshandler.RegisterRoutes(r)
-	bankhandler.RegisterRoutes(cliCtx, r, cdc, kb)
-	slashinghandler.RegisterRoutes(cliCtx, r, cdc, kb)
-	stakehandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	bankhandler.RegisterRoutes(cliCtx, r, cdc)
+	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
+	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
+	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	return r

@@ -3,7 +3,6 @@ package lcd
 import (
 	"bytes"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -18,7 +17,7 @@ type UnrevokeBody struct {
 	ValidatorAddr string         `json:"validator_addr"`
 }
 
-func unrevokeRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
+func unrevokeRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var m UnrevokeBody
 		err := utils.ReadPostBody(w, r, cdc, &m)
