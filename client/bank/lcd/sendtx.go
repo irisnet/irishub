@@ -12,7 +12,7 @@ import (
 )
 
 type sendBody struct {
-	Amount sdk.Coins      `json:"amount"`
+	Amount string         `json:"amount"`
 	Sender string         `json:"sender"`
 	BaseTx context.BaseTx `json:"base_tx"`
 }
@@ -46,7 +46,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			return
 		}
 
-		amount, err := cliCtx.ParseCoins(m.Amount.String())
+		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

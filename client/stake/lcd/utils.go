@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake/tags"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/pkg/errors"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
@@ -27,60 +28,55 @@ func contains(stringSlice []string, txType string) bool {
 }
 
 func getDelegatorValidator(cliCtx context.CLIContext, cdc *wire.Codec, delegatorAddr sdk.AccAddress, validatorAccAddr sdk.AccAddress) (
-	validator types.BechValidator, httpStatusCode int, errMsg string, err error) {
+	validator stakeClient.ValidatorOutput, httpStatusCode int, errMsg string, err error) {
 
 	// check if the delegator is bonded or redelegated to the validator
 	keyDel := stake.GetDelegationKey(delegatorAddr, validatorAccAddr)
 
 	res, err := cliCtx.QueryStore(keyDel, storeName)
 	if err != nil {
-		return types.BechValidator{}, http.StatusInternalServerError, "couldn't query delegation. Error: ", err
+		return stakeClient.ValidatorOutput{}, http.StatusInternalServerError, "couldn't query delegation. Error: ", err
 	}
 
 	if len(res) == 0 {
-		return types.BechValidator{}, http.StatusNoContent, "", nil
+		return stakeClient.ValidatorOutput{}, http.StatusNoContent, "", nil
 	}
 
 	kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)
 	if err != nil {
-		return types.BechValidator{}, http.StatusInternalServerError, "Error: ", err
+		return stakeClient.ValidatorOutput{}, http.StatusInternalServerError, "Error: ", err
 	}
 	if len(kvs) == 0 {
 		// the query will return empty if there are no delegations
-		return types.BechValidator{}, http.StatusNoContent, "", nil
+		return stakeClient.ValidatorOutput{}, http.StatusNoContent, "", nil
 	}
 
-	validator, errVal := getValidatorFromAccAdrr(validatorAccAddr, kvs, cdc)
+	validator, errVal := getValidatorFromAccAdrr(validatorAccAddr, kvs, cliCtx, cdc)
 	if errVal != nil {
-		return types.BechValidator{}, http.StatusInternalServerError, "Couldn't get info from validator. Error: ", errVal
+		return stakeClient.ValidatorOutput{}, http.StatusInternalServerError, "Couldn't get info from validator. Error: ", errVal
 	}
 	return validator, http.StatusOK, "", nil
 }
 
 func getDelegatorDelegations(cliCtx context.CLIContext, cdc *wire.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
-	outputDelegation DelegationWithoutRat, httpStatusCode int, errMsg string, err error) {
+	outputDelegation stakeClient.DelegationOutput, httpStatusCode int, errMsg string, err error) {
 	delegationKey := stake.GetDelegationKey(delegatorAddr, validatorAddr)
 	marshalledDelegation, err := cliCtx.QueryStore(delegationKey, storeName)
 	if err != nil {
-		return DelegationWithoutRat{}, http.StatusInternalServerError, "couldn't query delegation. Error: ", err
+		return stakeClient.DelegationOutput{}, http.StatusInternalServerError, "couldn't query delegation. Error: ", err
 	}
 
 	// the query will return empty if there is no data for this record
 	if len(marshalledDelegation) == 0 {
-		return DelegationWithoutRat{}, http.StatusNoContent, "", nil
+		return stakeClient.DelegationOutput{}, http.StatusNoContent, "", nil
 	}
 
 	delegation, err := types.UnmarshalDelegation(cdc, delegationKey, marshalledDelegation)
 	if err != nil {
-		return DelegationWithoutRat{}, http.StatusInternalServerError, "couldn't unmarshall delegation. Error: ", err
+		return stakeClient.DelegationOutput{}, http.StatusInternalServerError, "couldn't unmarshall delegation. Error: ", err
 	}
 
-	outputDelegation = DelegationWithoutRat{
-		DelegatorAddr: delegation.DelegatorAddr,
-		ValidatorAddr: delegation.ValidatorAddr,
-		Height:        delegation.Height,
-		Shares:        delegation.Shares.FloatString(),
-	}
+	outputDelegation = stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 
 	return outputDelegation, http.StatusOK, "", nil
 }
@@ -141,8 +137,8 @@ func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *wire.Codec,
 }
 
 // gets all validators
-func getValidators(validatorKVs []sdk.KVPair, cdc *wire.Codec) ([]types.BechValidator, error) {
-	validators := make([]types.BechValidator, len(validatorKVs))
+func getValidators(cliCtx context.CLIContext, cdc *wire.Codec, validatorKVs []sdk.KVPair) ([]stakeClient.ValidatorOutput, error) {
+	validators := make([]stakeClient.ValidatorOutput, len(validatorKVs))
 	for i, kv := range validatorKVs {
 
 		addr := kv.Key[1:]
@@ -151,64 +147,64 @@ func getValidators(validatorKVs []sdk.KVPair, cdc *wire.Codec) ([]types.BechVali
 			return nil, err
 		}
 
-		bech32Validator, err := validator.Bech32Validator()
+		validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 		if err != nil {
 			return nil, err
 		}
-		validators[i] = bech32Validator
+		validators[i] = validatorOutput
 	}
 	return validators, nil
 }
 
 // gets a validator given a ValAddress
-func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cdc *wire.Codec) (stake.BechValidator, error) {
+func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *wire.Codec) (stakeClient.ValidatorOutput, error) {
 	// parse out the validators
 	for _, kv := range validatorKVs {
 		addr := kv.Key[1:]
 		validator, err := types.UnmarshalValidator(cdc, addr, kv.Value)
 		if err != nil {
-			return stake.BechValidator{}, err
+			return stakeClient.ValidatorOutput{}, err
 		}
 
 		ownerAddress := validator.Owner
 		if bytes.Equal(ownerAddress.Bytes(), address.Bytes()) {
-			bech32Validator, err := validator.Bech32Validator()
+			validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 			if err != nil {
-				return stake.BechValidator{}, err
+				return stakeClient.ValidatorOutput{}, err
 			}
 
-			return bech32Validator, nil
+			return validatorOutput, nil
 		}
 	}
-	return stake.BechValidator{}, errors.Errorf("Couldn't find validator")
+	return stakeClient.ValidatorOutput{}, errors.Errorf("Couldn't find validator")
 }
 
 // gets a validator given an AccAddress
-func getValidatorFromAccAdrr(address sdk.AccAddress, validatorKVs []sdk.KVPair, cdc *wire.Codec) (stake.BechValidator, error) {
+func getValidatorFromAccAdrr(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *wire.Codec) (stakeClient.ValidatorOutput, error) {
 	// parse out the validators
 	for _, kv := range validatorKVs {
 		addr := kv.Key[1:]
 		validator, err := types.UnmarshalValidator(cdc, addr, kv.Value)
 		if err != nil {
-			return stake.BechValidator{}, err
+			return stakeClient.ValidatorOutput{}, err
 		}
 
 		ownerAddress := validator.Owner
 		if bytes.Equal(ownerAddress.Bytes(), address.Bytes()) {
-			bech32Validator, err := validator.Bech32Validator()
+			validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 			if err != nil {
-				return stake.BechValidator{}, err
+				return stakeClient.ValidatorOutput{}, err
 			}
 
-			return bech32Validator, nil
+			return validatorOutput, nil
 		}
 	}
-	return stake.BechValidator{}, errors.Errorf("Couldn't find validator")
+	return stakeClient.ValidatorOutput{}, errors.Errorf("Couldn't find validator")
 }
 
 //  gets all Bech32 validators from a key
-func getBech32Validators(storeName string, cliCtx context.CLIContext, cdc *wire.Codec) (
-	validators []types.BechValidator, httpStatusCode int, errMsg string, err error) {
+func getValidatorOutputs(storeName string, cliCtx context.CLIContext, cdc *wire.Codec) (
+	validators []stakeClient.ValidatorOutput, httpStatusCode int, errMsg string, err error) {
 	// Get all validators using key
 	kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)
 	if err != nil {
@@ -220,7 +216,7 @@ func getBech32Validators(storeName string, cliCtx context.CLIContext, cdc *wire.
 		return nil, http.StatusNoContent, "", nil
 	}
 
-	validators, err = getValidators(kvs, cdc)
+	validators, err = getValidators(cliCtx, cdc, kvs)
 	if err != nil {
 		return nil, http.StatusInternalServerError, "Error: ", err
 	}

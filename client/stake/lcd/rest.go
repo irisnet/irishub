@@ -1,10 +1,10 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/gorilla/mux"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/context"
 )
 
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
@@ -27,7 +27,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, k
 
 	// GET /stake/delegators/{delegatorAddr}/validators // Query all validators that a delegator is bonded to
 	r.HandleFunc(
-	"/stake/delegators/{delegatorAddr}/validators",
+		"/stake/delegators/{delegatorAddr}/validators",
 		delegatorValidatorsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 

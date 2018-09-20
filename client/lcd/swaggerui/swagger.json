@@ -235,7 +235,7 @@
           {
             "in": "body",
             "name": "sendToken",
-            "description": "The sender field is required only when generate-only is true. Otherwise, just omit it. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
+            "description": "The \"sender\" field is required only when generate-only is true. Otherwise, just omit it. \nThe \"amount\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 10000",
             "required": true,
             "schema": {
               "$ref": "#/definitions/bank.TransferBody"
@@ -574,7 +574,7 @@
             "type": "boolean"
           },
           {
-            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
+            "description": "The \"initial_deposit\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "postProposalBody",
             "in": "body",
             "required": true,
@@ -721,7 +721,7 @@
             "in": "path"
           },
           {
-            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
+            "description": "The \"amount\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "depositBody",
             "in": "body",
             "required": true,
@@ -799,7 +799,7 @@
             "in": "path"
           },
           {
-            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
+            "description": "The value of \"option\" field can be \"Yes\", \"No\", \"NoWithVeto\", \"Abstain\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "voteBody",
             "in": "body",
             "required": true,
@@ -1158,7 +1158,7 @@
             "type": "boolean"
           },
           {
-            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
+            "description": "The \"delegation\" field under \"delegations\" represent the delegation token amount. It should contains only iris token, for instance: \"10iris\" or \"5.5iris\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "EditDelegationsBody",
             "in": "body",
             "required": true,
@@ -1777,7 +1777,7 @@
         "summary": "Unreoke a revoked validator",
         "parameters": [
           {
-            "description": "gasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris",
+            "description": "\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "UnrevokeBody",
             "in": "body",
             "required": true,
@@ -2514,11 +2514,7 @@
       "type": "object",
       "properties": {
         "amount": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/common.Coin"
-          }
+          "type": "string"
         },
         "sender": {
           "type": "string"
@@ -2621,11 +2617,7 @@
           "type": "string"
         },
         "initial_deposit": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/common.Coin"
-          }
+          "type": "string"
         }
       }
     },
@@ -2639,11 +2631,7 @@
           "type": "string"
         },
         "amount": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/common.Coin"
-          }
+          "type": "string"
         }
       }
     },
@@ -2710,8 +2698,7 @@
           "type": "string"
         },
         "delegation": {
-          "type": "object",
-          "$ref": "#/definitions/common.Coin"
+          "type": "string"
         }
       }
     },
@@ -2869,12 +2856,10 @@
           "type": "string"
         },
         "initial_balance": {
-          "type": "object",
-          "$ref": "#/definitions/common.Coin"
+          "type": "string"
         },
         "balance": {
-          "type": "object",
-          "$ref": "#/definitions/common.Coin"
+          "type": "string"
         },
         "creation_height": {
           "type": "integer"
@@ -2903,12 +2888,10 @@
           "type": "integer"
         },
         "initial_balance": {
-          "type": "object",
-          "$ref": "#/definitions/common.Coin"
+          "type": "string"
         },
         "balance": {
-          "type": "object",
-          "$ref": "#/definitions/common.Coin"
+          "type": "string"
         },
         "shares_src": {
           "type": "string"
@@ -2967,11 +2950,7 @@
           "type": "integer"
         },
         "proposer_reward_pool": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/common.Coin"
-          }
+          "type": "string"
         },
         "commission": {
           "type": "string"

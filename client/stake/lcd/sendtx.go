@@ -10,13 +10,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 )
 
 type msgDelegationsInput struct {
 	ValidatorAddr string   `json:"validator_addr"` // in bech32
-	Delegation    sdk.Coin `json:"delegation"`
+	Delegation    string   `json:"delegation"`
 }
 type msgBeginRedelegateInput struct {
 	ValidatorSrcAddr string `json:"validator_src_addr"` // in bech32
@@ -99,7 +100,7 @@ func delegationsRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx contex
 				return
 			}
 
-			delegationToken, err := cliCtx.ParseCoin(msg.Delegation.String())
+			delegationToken, err := cliCtx.ParseCoin(msg.Delegation)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
@@ -139,7 +140,7 @@ func delegationsRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx contex
 				DelegatorAddr:    delegatorAccAddress,
 				ValidatorSrcAddr: validatorSrcAddr,
 				ValidatorDstAddr: validatorDstAddr,
-				SharesAmount:     shares,
+				SharesAmount:     shares.Quo(stakeClient.ExRateFromStakeTokenToMainUnit(cliCtx)),
 			}
 
 			i++
@@ -186,7 +187,7 @@ func delegationsRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx contex
 			messages[i] = stake.MsgBeginUnbonding{
 				DelegatorAddr: delegatorAccAddress,
 				ValidatorAddr: validatorAddr,
-				SharesAmount:  shares,
+				SharesAmount:  shares.Quo(stakeClient.ExRateFromStakeTokenToMainUnit(cliCtx)),
 			}
 
 			i++

@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -9,30 +10,24 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 	"strings"
-	"encoding/json"
 )
 
 const storeName = "stake"
 
-// already resolve the rational shares to not handle this in the client
-
-// defines a delegation without type Rat for shares
-type DelegationWithoutRat struct {
-	DelegatorAddr sdk.AccAddress `json:"delegator_addr"`
-	ValidatorAddr sdk.AccAddress `json:"validator_addr"`
-	Shares        string         `json:"shares"`
-	Height        int64          `json:"height"`
-}
-
 // aggregation of all delegations, unbondings and redelegations
 type DelegationSummary struct {
-	Delegations          []DelegationWithoutRat      `json:"delegations"`
-	UnbondingDelegations []stake.UnbondingDelegation `json:"unbonding_delegations"`
-	Redelegations        []stake.Redelegation        `json:"redelegations"`
+	Delegations          []stakeClient.DelegationOutput          `json:"delegations"`
+	UnbondingDelegations []stakeClient.UnbondingDelegationOutput `json:"unbonding_delegations"`
+	Redelegations        []stakeClient.RedelegationOutput        `json:"redelegations"`
+}
+
+type ExRateResponse struct {
+	ExRate float64 `json:"token_shares_rate"`
 }
 
 // HTTP request handler to query a delegator delegations
@@ -54,7 +49,7 @@ func delegatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 		}
 
 		// Get all validators using key
-		validators, statusCode, errMsg, err := getBech32Validators(storeName, cliCtx, cdc)
+		validators, statusCode, errMsg, err := getValidatorOutputs(storeName, cliCtx, cdc)
 		if err != nil {
 			w.WriteHeader(statusCode)
 			w.Write([]byte(fmt.Sprintf("%s%s", errMsg, err.Error())))
@@ -83,7 +78,8 @@ func delegatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 				return
 			}
 			if statusCode != http.StatusNoContent {
-				delegationSummary.UnbondingDelegations = append(delegationSummary.UnbondingDelegations, unbondingDelegation)
+				delegationSummary.UnbondingDelegations = append(delegationSummary.UnbondingDelegations,
+					stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation))
 			}
 
 			// Redelegations
@@ -96,7 +92,8 @@ func delegatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 				return
 			}
 			if statusCode != http.StatusNoContent {
-				delegationSummary.Redelegations = append(delegationSummary.Redelegations, redelegations)
+				delegationSummary.Redelegations = append(delegationSummary.Redelegations,
+					stakeClient.ConvertREDToREDOutput(cliCtx, redelegations))
 			}
 		}
 
@@ -233,7 +230,7 @@ func unbondingDelegationsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) h
 		}
 
 		// unbondings will be a list in the future but is not yet, but we want to keep the API consistent
-		ubdArray := []stake.UnbondingDelegation{ubd}
+		ubdArray := []stakeClient.UnbondingDelegationOutput{stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd)}
 
 		output, err := cdc.MarshalJSONIndent(ubdArray, "", "  ")
 		if err != nil {
@@ -291,12 +288,7 @@ func delegationHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handle
 			return
 		}
 
-		outputDelegation := DelegationWithoutRat{
-			DelegatorAddr: delegation.DelegatorAddr,
-			ValidatorAddr: delegation.ValidatorAddr,
-			Height:        delegation.Height,
-			Shares:        delegation.Shares.FloatString(),
-		}
+		outputDelegation := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 
 		output, err := cdc.MarshalJSONIndent(outputDelegation, "", "  ")
 		if err != nil {
@@ -314,7 +306,7 @@ func delegatorValidatorsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) ht
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var validatorAccAddr sdk.AccAddress
-		var bondedValidators []types.BechValidator
+		var bondedValidators []stakeClient.ValidatorOutput
 
 		// read parameters
 		vars := mux.Vars(r)
@@ -339,7 +331,7 @@ func delegatorValidatorsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) ht
 			return
 		}
 
-		validators, err := getValidators(kvs, cdc)
+		validators, err := getValidators(cliCtx, cdc, kvs)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
@@ -426,7 +418,7 @@ func validatorsHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handle
 			return
 		}
 
-		validators, err := getValidators(kvs, cdc)
+		validators, err := getValidators(cliCtx, cdc, kvs)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
@@ -465,14 +457,14 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 			return
 		}
 
-		validator, err := getValidator(valAddress, kvs, cdc)
+		validator, err := getValidator(valAddress, kvs, cliCtx, cdc)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("couldn't query validator. Error: %s", err.Error())))
 			return
 		}
 
-		output, err = cdc.MarshalJSONIndent(validator,"", "  ")
+		output, err = cdc.MarshalJSONIndent(validator, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
@@ -485,10 +477,6 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 		}
 		w.Write(output)
 	}
-}
-
-type ExRateResponse struct {
-	ExRate float64 `json:"token_shares_rate"`
 }
 
 func getValidatorExRate(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
@@ -520,7 +508,7 @@ func getValidatorExRate(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFun
 		// validator exRate
 		valExRate := validator.DelegatorShareExRate()
 
-		floatExRate,_ := valExRate.Float64()
+		floatExRate, _ := valExRate.Float64()
 		exRate := ExRateResponse{
 			ExRate: floatExRate,
 		}
