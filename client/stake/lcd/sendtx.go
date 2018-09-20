@@ -3,7 +3,6 @@ package lcd
 import (
 	"bytes"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
@@ -49,7 +48,7 @@ type EditDelegationsBody struct {
 // nolint: gocyclo
 // TODO: Split this up into several smaller functions, and remove the above nolint
 // TODO: use sdk.ValAddress instead of sdk.AccAddress for validators in messages
-func delegationsRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
+func delegationsRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		delegatorAddr := vars["delegatorAddr"]

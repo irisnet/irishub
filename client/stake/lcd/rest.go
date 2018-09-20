@@ -1,16 +1,15 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 )
 
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
+func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/delegations",
-		delegationsRequestHandlerFn(cdc, kb, cliCtx),
+		delegationsRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// GET /stake/delegators/{delegatorAddr} // Get all delegations (delegation, undelegation and redelegation) from a delegator

@@ -79,19 +79,16 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 
 func createHandler(cdc *wire.Codec) *mux.Router {
 	r := mux.NewRouter()
-	kb, err := keys.GetKeyBase()
-	if err != nil {
-		panic(err)
-	}
+
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	keyshandler.RegisterRoutes(r)
-	bankhandler.RegisterRoutes(cliCtx, r, cdc, kb)
-	slashinghandler.RegisterRoutes(cliCtx, r, cdc, kb)
-	stakehandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	bankhandler.RegisterRoutes(cliCtx, r, cdc)
+	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
+	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
