@@ -206,27 +206,6 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 }
 
 // =====================================================
-// Procedures
-
-// Returns the current Deposit Procedure from the global param store
-func (keeper Keeper) GetDepositProcedure(ctx sdk.Context) govparams.DepositProcedure {
-	govparams.DepositProcedureParameter.LoadValue(ctx)
-	return govparams.DepositProcedureParameter.Value
-}
-
-// Returns the current Voting Procedure from the global param store
-func (keeper Keeper) GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
-	govparams.VotingProcedureParameter.LoadValue(ctx)
-	return govparams.VotingProcedureParameter.Value
-}
-
-// Returns the current Tallying Procedure from the global param store
-func (keeper Keeper) GetTallyingProcedure(ctx sdk.Context) govparams.TallyingProcedure {
-	govparams.TallyingProcedureParameter.LoadValue(ctx)
-	return govparams.TallyingProcedureParameter.Value
-}
-
-// =====================================================
 // Votes
 
 // Adds a vote on a specific proposal
@@ -330,7 +309,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID int64, depositerAddr
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsGTE(keeper.GetDepositProcedure(ctx).MinDeposit) {
+	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsGTE(govparams.GetDepositProcedure(ctx).MinDeposit) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}

@@ -40,9 +40,9 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 // WriteGenesis - output genesis parameters
 func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	startingProposalID, _ := k.getNewProposalID(ctx)
-	depositProcedure := k.GetDepositProcedure(ctx)
-	votingProcedure := k.GetVotingProcedure(ctx)
-	tallyingProcedure := k.GetTallyingProcedure(ctx)
+	depositProcedure := govparams.GetDepositProcedure(ctx)
+	votingProcedure := govparams.GetVotingProcedure(ctx)
+	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
 
 	return GenesisState{
 		StartingProposalID: startingProposalID,
