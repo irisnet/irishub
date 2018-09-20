@@ -153,8 +153,7 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 	k.AddNewVersion(ctx, VersionToBeSwitched)
 
 	k.SetDoingSwitch(ctx, false)
-	upgradeparams.CurrentUpgradeProposalIdParameter.Value = -1
-	upgradeparams.CurrentUpgradeProposalIdParameter.SaveValue(ctx)
+	upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
 	k.SetKVStoreKeylist(ctx)
 }
 

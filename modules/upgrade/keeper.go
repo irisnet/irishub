@@ -208,26 +208,3 @@ func (k Keeper) GetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddre
 	}
 	return MsgSwitch{}, false
 }
-
-//func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
-//	kvStore := ctx.KVStore(k.storeKey)
-//	heightBytes, err := k.cdc.MarshalBinary(height)
-//	if err != nil {
-//		panic(err)
-//	}
-//	kvStore.Set(GetCurrentProposalAcceptHeightKey(), heightBytes)
-//}
-//
-//func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
-//	kvStore := ctx.KVStore(k.storeKey)
-//	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
-//	if proposalAcceptHeightBytes != nil {
-//		var proposalAcceptHeight int64
-//		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes, &proposalAcceptHeight)
-//		if err != nil {
-//			panic(err)
-//		}
-//		return proposalAcceptHeight
-//	}
-//	return -1
-//}
