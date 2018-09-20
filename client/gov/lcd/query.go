@@ -37,7 +37,7 @@ func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Han
 
 		var proposal gov.Proposal
 		cdc.MustUnmarshalBinary(res, &proposal)
-		proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+		proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -96,7 +96,7 @@ func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 		var deposit gov.Deposit
 		cdc.MustUnmarshalBinary(res, &deposit)
 
-		depositeResponse, err := govClient.ConvertDepositeCoins(cliCtx, deposit)
+		depositeResponse, err := govClient.ConvertDepositToDepositOutput(cliCtx, deposit)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -266,7 +266,7 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		var maxProposalID int64
 		cdc.MustUnmarshalBinary(res, &maxProposalID)
 
-		matchingProposals := []govClient.TextProposalResponse{}
+		matchingProposals := []govClient.ProposalOutput{}
 
 		for proposalID := int64(0); proposalID < maxProposalID; proposalID++ {
 			if voterAddr != nil {
@@ -296,7 +296,7 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 					continue
 				}
 			}
-			proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+			proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
