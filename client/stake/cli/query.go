@@ -37,10 +37,7 @@ func GetCmdQueryValidator(storeName string, cdc *wire.Codec) *cobra.Command {
 				return fmt.Errorf("No validator found with address %s", args[0])
 			}
 
-			validator, err := types.UnmarshalValidator(cdc, addr, res)
-			if err != nil {
-				return err
-			}
+			validator := types.MustUnmarshalValidator(cdc, addr, res)
 			validatorOutput,err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 			if err != nil {
 				return err
@@ -90,10 +87,7 @@ func GetCmdQueryValidators(storeName string, cdc *wire.Codec) *cobra.Command {
 			var validators []stakeClient.ValidatorOutput
 			for _, kv := range resKVs {
 				addr := kv.Key[1:]
-				validator, err := types.UnmarshalValidator(cdc, addr, kv.Value)
-				if err != nil {
-					return err
-				}
+				validator := types.MustUnmarshalValidator(cdc, addr, kv.Value)
 				validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 				if err != nil {
 					return err
@@ -154,10 +148,7 @@ func GetCmdQueryDelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			// parse out the delegation
-			delegation, err := types.UnmarshalDelegation(cdc, key, res)
-			if err != nil {
-				return err
-			}
+			delegation := types.MustUnmarshalDelegation(cdc, key, res)
 			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
@@ -211,10 +202,7 @@ func GetCmdQueryDelegations(storeName string, cdc *wire.Codec) *cobra.Command {
 			// parse out the validators
 			var delegations []stakeClient.DelegationOutput
 			for _, kv := range resKVs {
-				delegation, err := types.UnmarshalDelegation(cdc, kv.Key, kv.Value)
-				if err != nil {
-					return err
-				}
+				delegation := types.MustUnmarshalDelegation(cdc, kv.Key, kv.Value)
 				delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 				delegations = append(delegations, delegationOutput)
 			}
@@ -260,10 +248,7 @@ func GetCmdQueryUnbondingDelegation(storeName string, cdc *wire.Codec) *cobra.Co
 			}
 
 			// parse out the unbonding delegation
-			ubd, err := types.UnmarshalUBD(cdc, key, res)
-			if err != nil {
-				return err
-			}
+			ubd := types.MustUnmarshalUBD(cdc, key, res)
 			ubdOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd)
 
 			switch viper.Get(cli.OutputFlag) {
@@ -318,10 +303,7 @@ func GetCmdQueryUnbondingDelegations(storeName string, cdc *wire.Codec) *cobra.C
 			// parse out the validators
 			var ubds []stakeClient.UnbondingDelegationOutput
 			for _, kv := range resKVs {
-				ubd, err := types.UnmarshalUBD(cdc, kv.Key, kv.Value)
-				if err != nil {
-					return err
-				}
+				ubd := types.MustUnmarshalUBD(cdc, kv.Key, kv.Value)
 				ubdOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd)
 				ubds = append(ubds, ubdOutput)
 			}
@@ -372,10 +354,7 @@ func GetCmdQueryRedelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			// parse out the unbonding delegation
-			red, err := types.UnmarshalRED(cdc, key, res)
-			if err != nil {
-				return err
-			}
+			red := types.MustUnmarshalRED(cdc, key, res)
 			redOutput := stakeClient.ConvertREDToREDOutput(cliCtx, red)
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
@@ -429,10 +408,7 @@ func GetCmdQueryRedelegations(storeName string, cdc *wire.Codec) *cobra.Command 
 			// parse out the validators
 			var reds []stakeClient.RedelegationOutput
 			for _, kv := range resKVs {
-				red, err := types.UnmarshalRED(cdc, kv.Key, kv.Value)
-				if err != nil {
-					return err
-				}
+				red := types.MustUnmarshalRED(cdc, kv.Key, kv.Value)
 				redOutput := stakeClient.ConvertREDToREDOutput(cliCtx, red)
 				reds = append(reds, redOutput)
 			}
