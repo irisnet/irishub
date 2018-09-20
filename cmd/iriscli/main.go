@@ -73,6 +73,7 @@ func main() {
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
+		    govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(

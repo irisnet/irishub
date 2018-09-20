@@ -217,10 +217,9 @@ func (keeper Keeper) GetDepositProcedure(ctx sdk.Context) govparams.DepositProce
 }
 
 // Returns the current Voting Procedure from the global param store
-func (keeper Keeper) GetVotingProcedure(ctx sdk.Context) VotingProcedure {
-	return VotingProcedure{
-		VotingPeriod: keeper.getVotingProcedureVotingPeriod(ctx),
-	}
+func (keeper Keeper) GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
+	govparams.VotingProcedureParameter.LoadValue(ctx)
+	return govparams.VotingProcedureParameter.Value
 }
 
 func (keeper Keeper) getVotingProcedureVotingPeriod(ctx sdk.Context) (VotingPeriod int64) {
@@ -250,19 +249,7 @@ func (keeper Keeper) getTallyingProcedure(ctx sdk.Context, key string) sdk.Rat {
 
 }
 
-//func (keeper Keeper) setDepositProcedure(ctx sdk.Context, depositProcedure DepositProcedure) {
-//	minDeposit := depositProcedure.MinDeposit.String()
-//	keeper.ps.Set(ctx, ParamStoreKeyDepositProcedureDeposit, &minDeposit)
-//
-//	maxDepositPeriod := strconv.FormatInt(depositProcedure.MaxDepositPeriod, 10)
-//	keeper.ps.Set (ctx, ParamStoreKeyDepositProcedureMaxDepositPeriod, &maxDepositPeriod)
-//
-//}
 
-func (keeper Keeper) setVotingProcedure(ctx sdk.Context, votingProcedure VotingProcedure) {
-	votingPeriod := strconv.FormatInt(votingProcedure.VotingPeriod, 10)
-	keeper.ps.Set(ctx, ParamStoreKeyVotingProcedureVotingPeriod, &votingPeriod)
-}
 
 func (keeper Keeper) setTallyingProcedure(ctx sdk.Context, tallyingProcedure TallyingProcedure) {
 	threshold := tallyingProcedure.Threshold.String()
