@@ -13,8 +13,6 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"path"
 	"github.com/pkg/errors"
 )
 
@@ -96,42 +94,13 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 			return param, err
 		}
 	} else if pathStr != ""{
-		pathStr = path.Join(pathStr,"config/params.json")
-
-		jsonBytes,err := cmn.ReadFile(pathStr)
-
-		fmt.Println("Open ",pathStr)
-
-		if err != nil {
-			return param,err
-		}
-
 		paramDoc := ParameterDoc{}
-		err = cdc.UnmarshalJSON(jsonBytes, &paramDoc)
+		err := paramDoc.ReadFile(cdc,pathStr)
 		if err != nil {
 			return param, err
 		}
-
-		switch keyStr{
-		case "Gov/gov/DepositProcedure":
-			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
-		case "Gov/gov/VotingProcedure":
-			jsonBytes,_ = json.Marshal(paramDoc.Govparams.VotingProcedure)
-		case "Gov/gov/TallyingProcedure":
-			jsonBytes,_ = json.Marshal(paramDoc.Govparams.TallyingProcedure)
-		default:
-			return param,errors.New("The key isn't existed")
-		}
-
-		param.Value = string(jsonBytes)
-		param.Key = keyStr
-		param.Op = opStr
-
-		jsonBytes,_ = json.MarshalIndent(param,""," ")
-
-		fmt.Println("Param:\n", string(jsonBytes))
-		return param, nil
-
+		param,err := paramDoc.GetParamFromKey(keyStr,opStr)
+		return param, err
 	} else {
 
 		return param,errors.New("Path and param are both empty")

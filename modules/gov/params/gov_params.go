@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/cosmos/cosmos-sdk/wire"
 
 	"strconv"
 )
@@ -40,6 +41,11 @@ type DepositProcedureParam struct {
 	psetter params.Setter
 	pgetter params.Getter
 }
+func (param *DepositProcedureParam) GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}{
+	cdc.MustUnmarshalBinary(res,&param.Value)
+	return param.Value
+}
+
 
 func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
@@ -126,6 +132,10 @@ type VotingProcedureParam struct {
 	psetter params.Setter
 	pgetter params.Getter
 }
+func (param *VotingProcedureParam) GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}{
+	cdc.MustUnmarshalBinary(res,&param.Value)
+	return param.Value
+}
 
 func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(VotingProcedure); ok {
@@ -201,6 +211,11 @@ type TallyingProcedureParam struct {
 	pgetter params.Getter
 }
 
+func (param *TallyingProcedureParam) GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}{
+	cdc.MustUnmarshalBinary(res,&param.Value)
+	return param.Value
+}
+
 func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(TallyingProcedure); ok {
 		param.Value = value
@@ -266,6 +281,5 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 	}
 	return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf("Json is not valid"))
 }
-
 
 
