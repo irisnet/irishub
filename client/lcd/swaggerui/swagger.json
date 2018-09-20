@@ -574,7 +574,7 @@
             "type": "boolean"
           },
           {
-            "description": "The \"initial_deposit\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The \"initial_deposit\" field can specify multiple tokens, for instance: \"10iris,20atom\". \nThe \"proposal_type\" represent proposal type, and its value can be \"Text\", \"ParameterChange\", \"SoftwareUpgrade\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "postProposalBody",
             "in": "body",
             "required": true,
@@ -644,7 +644,7 @@
           {
             "in": "query",
             "name": "status",
-            "description": "proposal status",
+            "description": "proposal status, supported values: \"DepositPeriod\", \"VotingPeriod\", \"Passed\", \"Rejected\"",
             "required": false,
             "type": "string"
           }
