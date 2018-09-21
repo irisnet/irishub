@@ -29,6 +29,10 @@ type ParamSet struct {
 	VotingProcedure    VotingProcedure   `json:"Gov/gov/VotingProcedure"`
 	TallyingProcedure  TallyingProcedure `json:"Gov/gov/TallyingProcedure"`
 }
+func (ps *ParamSet) Update(){
+
+}
+
 
 // Procedure around Deposits for governance
 type DepositProcedure struct {
@@ -94,7 +98,7 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 	var err error
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-
+        fmt.Println(param.Value)
 
 		if param.Value.MinDeposit[0].Denom != "iris-atto" {
 			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto! git"))
