@@ -2014,7 +2014,7 @@
     },
     "/validatorsets/latest": {
       "get": {
-        "description": "Get the latest validator's set",
+        "description": "Get the latest validator set",
         "consumes": [
           "application/json"
         ],
@@ -2024,7 +2024,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get the latest validator's set",
+        "summary": "Get the latest validator set",
         "parameters": [
 
         ],
@@ -2061,7 +2061,7 @@
     },
     "/validatorsets/{height}": {
       "get": {
-        "description": "Get a validator's set at a given height",
+        "description": "Get a validator set at a given height",
         "consumes": [
           "application/json"
         ],
@@ -2071,7 +2071,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get a validator's set at a given height",
+        "summary": "Get a validator set at a given height",
         "parameters": [
           {
             "type": "string",
