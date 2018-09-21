@@ -20,13 +20,13 @@ type postProposalReq struct {
 	Description    string           `json:"description"`     //  Description of the proposal
 	ProposalType   gov.ProposalKind `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       string           `json:"proposer"`        //  Address of the proposer
-	InitialDeposit sdk.Coins        `json:"initial_deposit"` // Coins to add to the proposal's deposit
+	InitialDeposit string           `json:"initial_deposit"` // Coins to add to the proposal's deposit
 }
 
 type depositReq struct {
 	BaseTx    context.BaseTx `json:"base_tx"`
 	Depositer string         `json:"depositer"` // Address of the depositer
-	Amount    sdk.Coins      `json:"amount"`    // Coins to add to the proposal's deposit
+	Amount    string         `json:"amount"`    // Coins to add to the proposal's deposit
 }
 
 type voteReq struct {
@@ -55,7 +55,7 @@ func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		initDepositAmount, err := cliCtx.ParseCoins(req.InitialDeposit.String())
+		initDepositAmount, err := cliCtx.ParseCoins(req.InitialDeposit)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -104,7 +104,7 @@ func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFu
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		depositAmount, err := cliCtx.ParseCoins(req.Amount.String())
+		depositAmount, err := cliCtx.ParseCoins(req.Amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

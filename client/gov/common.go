@@ -7,13 +7,13 @@ import (
 )
 
 // Deposit
-type DepositResponse struct {
+type DepositOutput struct {
 	Depositer  sdk.AccAddress `json:"depositer"`   //  Address of the depositer
 	ProposalID int64          `json:"proposal_id"` //  proposalID of the proposal
 	Amount     []string       `json:"amount"`      //  Deposit amount
 }
 
-type TextProposalResponse struct {
+type ProposalOutput struct {
 	ProposalID   int64            `json:"proposal_id"`   //  ID of the proposal
 	Title        string           `json:"title"`         //  Title of the proposal
 	Description  string           `json:"description"`   //  Description of the proposal
@@ -33,12 +33,12 @@ type KvPair struct {
 	V string `json:"value"`
 }
 
-func ConvertProposalCoins(cliCtx context.CLIContext, proposal gov.Proposal) (TextProposalResponse, error) {
+func ConvertProposalToProposalOutput(cliCtx context.CLIContext, proposal gov.Proposal) (ProposalOutput, error) {
 	totalDeposit, err := cliCtx.ConvertCoinToMainUnit(proposal.GetTotalDeposit().String())
 	if err != nil {
-		return TextProposalResponse{}, err
+		return ProposalOutput{}, err
 	}
-	return TextProposalResponse{
+	return ProposalOutput{
 		ProposalID:   proposal.GetProposalID(),
 		Title:        proposal.GetTitle(),
 		Description:  proposal.GetDescription(),
@@ -54,12 +54,12 @@ func ConvertProposalCoins(cliCtx context.CLIContext, proposal gov.Proposal) (Tex
 	}, nil
 }
 
-func ConvertDepositeCoins(cliCtx context.CLIContext, deposite gov.Deposit) (DepositResponse, error) {
+func ConvertDepositToDepositOutput(cliCtx context.CLIContext, deposite gov.Deposit) (DepositOutput, error) {
 	amount, err := cliCtx.ConvertCoinToMainUnit(deposite.Amount.String())
 	if err != nil {
-		return DepositResponse{}, err
+		return DepositOutput{}, err
 	}
-	return DepositResponse{
+	return DepositOutput{
 		ProposalID: deposite.ProposalID,
 		Depositer:  deposite.Depositer,
 		Amount:     amount,
