@@ -235,7 +235,7 @@
           {
             "in": "body",
             "name": "sendToken",
-            "description": "The \"sender\" field is required only when generate-only is true. Otherwise, just omit it. \nThe \"amount\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 10000",
+            "description": "The `\"sender\"` field is required only when generate-only is true. Otherwise, just omit it. \nThe `\"amount\"` field can specify multiple tokens, for instance: `\"10iris,20atom\"`. \nThe `\"fee\"` field can specify multi-token as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 10000",
             "required": true,
             "schema": {
               "$ref": "#/definitions/bank.TransferBody"
@@ -574,7 +574,7 @@
             "type": "boolean"
           },
           {
-            "description": "The \"initial_deposit\" field can specify multiple tokens, for instance: \"10iris,20atom\". \nThe \"proposal_type\" represent proposal type, and its value can be \"Text\", \"ParameterChange\", \"SoftwareUpgrade\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"initial_deposit\"` field can specify multiple tokens, for instance: `\"10iris,20atom\"`. \nThe `\"proposal_type\"` represent proposal type, and its value can be `\"Text\"`, `\"ParameterChange\"`, `\"SoftwareUpgrade\"`. \nThe `\"fee\"` field can specify multi-token as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "postProposalBody",
             "in": "body",
             "required": true,
@@ -644,7 +644,7 @@
           {
             "in": "query",
             "name": "status",
-            "description": "proposal status, supported values: \"DepositPeriod\", \"VotingPeriod\", \"Passed\", \"Rejected\"",
+            "description": "proposal status, supported values: `\"DepositPeriod\"`, `\"VotingPeriod\"`, `\"Passed\"`, `\"Rejected\"`",
             "required": false,
             "type": "string"
           }
@@ -721,7 +721,7 @@
             "in": "path"
           },
           {
-            "description": "The \"amount\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"amount\"` field can specify multiple tokens, for instance: `\"10iris,20atom\"`. \nThe `\"fee\"` field can specify multi-token as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "depositBody",
             "in": "body",
             "required": true,
@@ -799,7 +799,7 @@
             "in": "path"
           },
           {
-            "description": "The value of \"option\" field can be \"Yes\", \"No\", \"NoWithVeto\", \"Abstain\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The value of `\"option\"` field can be `\"Yes\"`, `\"No\"`, `\"NoWithVeto\"`, `\"Abstain\"`. \nThe `\"fee\"` field can specify multi-token as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "voteBody",
             "in": "body",
             "required": true,
@@ -1158,7 +1158,7 @@
             "type": "boolean"
           },
           {
-            "description": "The \"delegation\" field under \"delegations\" represent the delegation token amount. It should contains only iris token, for instance: \"10iris\" or \"5.5iris\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"delegation\"` field under `\"delegations\"` represents the delegation token amount. It should only contain iris token, for instance: `\"10iris\"` or `\"5.5iris\"`. \nThe `\"fee\"` field can specify multi-token as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "EditDelegationsBody",
             "in": "body",
             "required": true,
@@ -1777,7 +1777,7 @@
         "summary": "Unreoke a revoked validator",
         "parameters": [
           {
-            "description": "\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"fee\"` field can specify multi-token as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
             "name": "UnrevokeBody",
             "in": "body",
             "required": true,
@@ -2128,7 +2128,7 @@
         "parameters": [
           {
             "type": "string",
-            "description": "transaction tag, for instance: sender=faa12lyh9nzczkamen2ppa0v2ej0jkax9mqzaqqr57",
+            "description": "transaction tag, for instance: sender=`'faa12lyh9nzczkamen2ppa0v2ej0jkax9mqzaqqr57'`",
             "name": "tag",
             "required": true,
             "in": "query"
