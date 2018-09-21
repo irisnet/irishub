@@ -3,34 +3,49 @@ all: get_vendor_deps install
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 BUILD_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
 
-DEP = github.com/golang/dep/cmd/dep
-STATIK = github.com/rakyll/statik
-DEP_CHECK := $(shell command -v dep 2> /dev/null)
-STATIK_CHECK := $(shell command -v statik 2> /dev/null)
+########################################
+### Tools & dependencies
+
+check_tools:
+	cd deps_tools && $(MAKE) check_tools
+
+check_dev_tools:
+	cd deps_tools && $(MAKE) check_dev_tools
+
+update_tools:
+	cd deps_tools && $(MAKE) update_tools
+
+update_dev_tools:
+	cd deps_tools && $(MAKE) update_dev_tools
 
 get_tools:
-ifdef DEP_CHECK
-	@echo "Dep is already installed.  Run 'make update_tools' to update."
-else
-	@echo "Installing dep"
-	go get -v $(DEP)
-endif
-ifdef STATIK_CHECK
-	@echo "Statik is already installed.  Run 'make update_tools' to update."
-else
-	@echo "Installing statik"
-	go version
-	go get -v $(STATIK)
-endif
+	cd deps_tools && $(MAKE) get_tools
 
+get_dev_tools:
+	cd deps_tools && $(MAKE) get_dev_tools
+
+get_vendor_deps:
+	@echo "--> Generating vendor directory via dep ensure"
+	@rm -rf .vendor-new
+	@dep ensure -v -vendor-only
+
+update_vendor_deps:
+	@echo "--> Running dep ensure"
+	@rm -rf .vendor-new
+	@dep ensure -v
+
+draw_deps:
+	@# requires brew install graphviz or apt-get install graphviz
+	go get github.com/RobotsAndPencils/goviz
+	@goviz -i github.com/irisnet/irishub/cmd/iris -d 2 | dot -Tpng -o dependency-graph.png
+
+########################################
+### Generate swagger docs for irislcd
 update_irislcd_swagger_docs:
 	@statik -src=client/lcd/swaggerui -dest=client/lcd
 
-get_vendor_deps:
-	@rm -rf vendor/
-	@echo "--> Running dep ensure"
-	@dep ensure -v
-
+########################################
+### Compile and Install
 install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
