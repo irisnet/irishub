@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.2
+
+*September 22th, 2018*
+
+BUG FIXES
+
+- Fix consensus failure due to the double sign evidence be broadcasted before the genesis block
+
+## 0.4.1
+
+*September 12th, 2018*
+
+BUG FIXES
+
+- Missing to set validator intraTxCount in stake genesis init
+
+
 ## 0.4.0
 
 *September 6th, 2018*
