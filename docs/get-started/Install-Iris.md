@@ -104,7 +104,6 @@ $ iris version
 v0.4.2
 $ iriscli version
 v0.4.2
-v0.4.2
 ```
 
 ### How to Update
