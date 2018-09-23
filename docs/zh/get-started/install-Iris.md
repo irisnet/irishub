@@ -28,10 +28,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 #### 方法2：源码编译安装
 
@@ -99,10 +99,10 @@ make get_vendor_deps && make install
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 ### 如何升级IRISHub
 
@@ -112,7 +112,7 @@ v0.4.1
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 rm Gopkg.lock
-git checkout v0.4.1
+git checkout v0.4.2
 make get_vendor_deps
 make install
 ```
