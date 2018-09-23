@@ -27,8 +27,8 @@ After intializing your node, please download the genesis file and the config fil
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3000/config/config.toml
 ```
 ## Edit your Config File
 
