@@ -25,10 +25,10 @@ You can verify you have the right version installed by running the following com
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
 
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 
 #### Compile Source Code
