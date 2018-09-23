@@ -235,7 +235,7 @@
           {
             "in": "body",
             "name": "sendToken",
-            "description": "The \"sender\" field is required only when generate-only is true. Otherwise, just omit it. \nThe \"amount\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 10000",
+            "description": "The `\"sender\"` field is required only when generate-only is true. Otherwise, just omit it. \nThe `\"amount\"` field can specify multiple tokens, for instance: `\"10iris,20atom\"`. \nThe `\"fee\"` field can specify multi-tokens as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 10000, and the suggested fee is 0.0002iris.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/bank.TransferBody"
@@ -318,7 +318,7 @@
         }
       },
       "post": {
-        "description": "Create a new key and persistent it to the keystore",
+        "description": "Create a new key and save it to the keystore",
         "consumes": [
           "application/json"
         ],
@@ -328,7 +328,7 @@
         "tags": [
           "ICS1: Key Management"
         ],
-        "summary": "Create a new key and persistent it to the keystore",
+        "summary": "Create a new key and save it to the keystore",
         "parameters": [
           {
             "description": "if the seed field is not empty, it will be used to recover a key",
@@ -375,7 +375,7 @@
     },
     "/keys/{name}": {
       "get": {
-        "description": "Get key information",
+        "description": "Get the detailed information of a key",
         "consumes": [
           "application/json"
         ],
@@ -385,7 +385,7 @@
         "tags": [
           "ICS1: Key Management"
         ],
-        "summary": "Get key detailed information by its name",
+        "summary": "Get the detailed information of a key by its name",
         "parameters": [
           {
             "type": "string",
@@ -574,7 +574,7 @@
             "type": "boolean"
           },
           {
-            "description": "The \"initial_deposit\" field can specify multiple tokens, for instance: \"10iris,20atom\". \nThe \"proposal_type\" represent proposal type, and its value can be \"Text\", \"ParameterChange\", \"SoftwareUpgrade\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"initial_deposit\"` field can specify multiple tokens, for instance: `\"10iris,20atom\"`. \nThe `\"proposal_type\"` represent proposal type, and its value can be `\"Text\"`, `\"ParameterChange\"`, `\"SoftwareUpgrade\"`. \nThe `\"fee\"` field can specify multi-tokens as transaction fee. For instance, `\"0.1iris, 0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000, and the suggested fee is 0.004iris.",
             "name": "postProposalBody",
             "in": "body",
             "required": true,
@@ -644,7 +644,7 @@
           {
             "in": "query",
             "name": "status",
-            "description": "proposal status, supported values: \"DepositPeriod\", \"VotingPeriod\", \"Passed\", \"Rejected\"",
+            "description": "proposal status, supported values: `\"DepositPeriod\"`, `\"VotingPeriod\"`, `\"Passed\"`, `\"Rejected\"`",
             "required": false,
             "type": "string"
           }
@@ -687,7 +687,7 @@
     },
     "/gov/proposals/{proposal-id}/deposits": {
       "post": {
-        "description": "Send transaction to deposit token to proposal",
+        "description": "Send transaction to deposit tokens to a proposal",
         "consumes": [
           "application/json"
         ],
@@ -697,7 +697,7 @@
         "tags": [
           "ICS22: Governance"
         ],
-        "summary": "Deposit token to a proposal",
+        "summary": "Deposit tokens to a proposal",
         "parameters": [
           {
             "in": "query",
@@ -721,7 +721,7 @@
             "in": "path"
           },
           {
-            "description": "The \"amount\" field can specify multiple tokens, for instance: \"10iris,20atom\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"amount\"` field can specify multiple tokens, for instance: `\"10iris,20atom\"`. \nThe `\"fee\"` field can specify multi-tokens as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000, and the suggested fee is 0.004iris.",
             "name": "depositBody",
             "in": "body",
             "required": true,
@@ -799,7 +799,7 @@
             "in": "path"
           },
           {
-            "description": "The value of \"option\" field can be \"Yes\", \"No\", \"NoWithVeto\", \"Abstain\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The value of `\"option\"` field can be `\"Yes\"`, `\"No\"`, `\"NoWithVeto\"` and `\"Abstain\"`. \nThe `\"fee\"` field can specify multi-tokens as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000, and the suggested fee is 0.004iris.",
             "name": "voteBody",
             "in": "body",
             "required": true,
@@ -898,7 +898,7 @@
     },
     "/gov/proposals/{proposal-id}": {
       "get": {
-        "description": "Query proposal by id",
+        "description": "Query a proposal by id",
         "consumes": [
           "application/json"
         ],
@@ -908,7 +908,7 @@
         "tags": [
           "ICS22: Governance"
         ],
-        "summary": "Query proposal",
+        "summary": "Query a proposal",
         "parameters": [
           {
             "type": "string",
@@ -1124,7 +1124,7 @@
     },
     "/stake/delegators/{delegatorAddr}/delegations": {
       "post": {
-        "description": "Send stake transactions",
+        "description": "Send staking transactions",
         "consumes": [
           "application/json"
         ],
@@ -1134,7 +1134,7 @@
         "tags": [
           "ICS21: Staking"
         ],
-        "summary": "Send stake transactions",
+        "summary": "Send staking transactions",
         "parameters": [
           {
             "type": "string",
@@ -1158,7 +1158,7 @@
             "type": "boolean"
           },
           {
-            "description": "The \"delegation\" field under \"delegations\" represent the delegation token amount. It should contains only iris token, for instance: \"10iris\" or \"5.5iris\". \n\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"delegation\"` field under `\"delegations\"` represents the delegation token amount. Only iris token is supported, for instance: `\"10iris\"` or `\"5.5iris\"`. \nThe `\"fee\"` field can specify multi-tokens as transaction fee, for instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000, and the suggested fee is 0.004iris.",
             "name": "EditDelegationsBody",
             "in": "body",
             "required": true,
@@ -1604,7 +1604,7 @@
     },
     "/stake/validators/{addr}": {
       "get": {
-        "description": "Get a single validator",
+        "description": "Get a specific validator",
         "consumes": [
           "application/json"
         ],
@@ -1614,7 +1614,7 @@
         "tags": [
           "ICS21: Staking"
         ],
-        "summary": "Get a single validator",
+        "summary": "Get a specific validator",
         "parameters": [
           {
             "type": "string",
@@ -1658,7 +1658,7 @@
     },
     "/stake/validator/{addr}/exRate": {
       "get": {
-        "description": "Get the delegator share exchange rate of the given validator",
+        "description": "Get the delegated share exchange rate of the given validator",
         "consumes": [
           "application/json"
         ],
@@ -1668,7 +1668,7 @@
         "tags": [
           "ICS21: Staking"
         ],
-        "summary": "Get the delegator share exchange rate of the given validator",
+        "summary": "Get the delegated share exchange rate of the given validator",
         "parameters": [
           {
             "type": "string",
@@ -1711,7 +1711,7 @@
     },
     "/slashing/signing_info/{validator_pub}": {
       "get": {
-        "description": "Get validator sign info",
+        "description": "Get validator's sign info",
         "consumes": [
           "application/json"
         ],
@@ -1721,11 +1721,11 @@
         "tags": [
           "ICS23: Slashing"
         ],
-        "summary": "Get validator sign info",
+        "summary": "Get validator's sign info",
         "parameters": [
           {
             "type": "string",
-            "description": "validator public key",
+            "description": "validator's public key",
             "name": "validator_pub",
             "required": true,
             "in": "path"
@@ -1764,7 +1764,7 @@
     },
     "/slashing/unrevoke": {
       "post": {
-        "description": "Unreoke a revoked validator",
+        "description": "Unrevoke a revoked validator",
         "consumes": [
           "application/json"
         ],
@@ -1774,10 +1774,10 @@
         "tags": [
           "ICS23: Slashing"
         ],
-        "summary": "Unreoke a revoked validator",
+        "summary": "Unrevoke a revoked validator",
         "parameters": [
           {
-            "description": "\"fee\" can specify multi-token as transaction fee, for instance, \"0.1iris,0.1atom\". Currently, only iris token is valid. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000",
+            "description": "The `\"fee\"` field can specify multi-tokens as transaction fee. For instance, `\"0.1iris,0.1atom\"`. \nCurrently, only iris token is supported. Other tokens will be ingnored. \ngasPrice = fee/gas, gasPrice should be no less than 2*10^(-8)iris. The suggested gas is 200000, and the suggested fee is 0.004iris.",
             "name": "UnrevokeBody",
             "in": "body",
             "required": true,
@@ -1820,7 +1820,7 @@
     },
     "/node_info": {
       "get": {
-        "description": "Get connected full node information",
+        "description": "Get connected full node's information",
         "consumes": [
           "application/json"
         ],
@@ -1830,7 +1830,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get connected full node information",
+        "summary": "Get connected full node's information",
         "parameters": [
 
         ],
@@ -1961,7 +1961,7 @@
     },
     "/blocks/{height}": {
       "get": {
-        "description": "Get block at given height",
+        "description": "Get block at a given height",
         "consumes": [
           "application/json"
         ],
@@ -1971,7 +1971,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get block at given height",
+        "summary": "Get block at a given height",
         "parameters": [
           {
             "type": "integer",
@@ -2014,7 +2014,7 @@
     },
     "/validatorsets/latest": {
       "get": {
-        "description": "Get latest validator set",
+        "description": "Get the latest validator set",
         "consumes": [
           "application/json"
         ],
@@ -2024,7 +2024,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get latest validator set",
+        "summary": "Get the latest validator set",
         "parameters": [
 
         ],
@@ -2061,7 +2061,7 @@
     },
     "/validatorsets/{height}": {
       "get": {
-        "description": "Get validator set at given height",
+        "description": "Get a validator set at a given height",
         "consumes": [
           "application/json"
         ],
@@ -2071,7 +2071,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get validator set at given height",
+        "summary": "Get a validator set at a given height",
         "parameters": [
           {
             "type": "string",
@@ -2114,7 +2114,7 @@
     },
     "/txs": {
       "get": {
-        "description": "Search transaction by the given tags",
+        "description": "Search a transaction by the given tags",
         "consumes": [
           "application/json"
         ],
@@ -2124,11 +2124,11 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Search transaction",
+        "summary": "Search a transaction",
         "parameters": [
           {
             "type": "string",
-            "description": "transaction tag, for instance: sender=faa12lyh9nzczkamen2ppa0v2ej0jkax9mqzaqqr57",
+            "description": "transaction tag, for instance: sender=`'faa12lyh9nzczkamen2ppa0v2ej0jkax9mqzaqqr57'`",
             "name": "tag",
             "required": true,
             "in": "query"
@@ -2167,7 +2167,7 @@
     },
     "/txs/{hash}": {
       "get": {
-        "description": "Get transaction by hash",
+        "description": "Get a transaction by hash",
         "consumes": [
           "application/json"
         ],
@@ -2177,7 +2177,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Get transaction by hash",
+        "summary": "Get a transaction by hash",
         "parameters": [
           {
             "type": "string",
@@ -2220,7 +2220,7 @@
     },
     "/txs/send": {
       "post": {
-        "description": "Compose and broadcast transaction",
+        "description": "Compose and broadcast a transaction",
         "consumes": [
           "application/json"
         ],
@@ -2230,7 +2230,7 @@
         "tags": [
           "ICS0: Tendermint"
         ],
-        "summary": "Broadcast transaction",
+        "summary": "Broadcast a transaction",
         "parameters": [
           {
             "in": "query",
