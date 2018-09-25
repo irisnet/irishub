@@ -2,6 +2,7 @@ package gov
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 // validatorGovInfo used for tallying
@@ -81,7 +82,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 		totalVotingPower = totalVotingPower.Add(votingPower)
 	}
 
-	tallyingProcedure := keeper.GetTallyingProcedure(ctx)
+	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
 
 	tallyResults = TallyResult{
 		Yes:        results[OptionYes],

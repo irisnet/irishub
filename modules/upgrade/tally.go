@@ -9,8 +9,7 @@ var Threshold = sdk.NewRat(95, 100)
 
 func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
-	upgradeparams.CurrentUpgradeProposalIdParameter.LoadValue(ctx)
-	proposalID := upgradeparams.CurrentUpgradeProposalIdParameter.Value
+	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 
 	if proposalID != -1 {
 
