@@ -1,7 +1,6 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
@@ -12,14 +11,14 @@ import (
 )
 
 type sendBody struct {
-	Amount sdk.Coins      `json:"amount"`
+	Amount string         `json:"amount"`
 	Sender string         `json:"sender"`
 	BaseTx context.BaseTx `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address
 // nolint: gocyclo
-func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
+func SendRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// collect data
 		vars := mux.Vars(r)
@@ -46,7 +45,7 @@ func SendRequestHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLICo
 			return
 		}
 
-		amount, err := cliCtx.ParseCoins(m.Amount.String())
+		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
