@@ -5,6 +5,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
+var ParamMapping = make(map[string]GovParameter)
+
+func RegisterGovParamMapping(gps ...GovParameter) {
+	for _, gp := range gps {
+		if gp != nil {
+			ParamMapping[gp.GetStoreKey()] = gp
+		}
+	}
+}
+
 func InitGenesisParameter(p Parameter, ctx sdk.Context, genesisData interface{}) {
 	if p != nil {
 		find := p.LoadValue(ctx)
