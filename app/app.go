@@ -160,10 +160,13 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
 							&govparams.DepositProcedureParameter,
 		                    &govparams.VotingProcedureParameter,
+		                    &govparams.TallyingProcedureParameter,
 							&upgradeparams.CurrentUpgradeProposalIdParameter,
 							&upgradeparams.ProposalAcceptHeightParameter)
 
-	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,&govparams.VotingProcedureParameter)
+	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		                              &govparams.VotingProcedureParameter,
+		                              &govparams.TallyingProcedureParameter,)
 
 	return app
 }
@@ -242,7 +245,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		VotingProcedure: govparams.VotingProcedure{
 			VotingPeriod: 10,
 		},
-		TallyingProcedure: gov.TallyingProcedure{
+		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
 			Veto:              sdk.NewRat(1, 3),
 			GovernancePenalty: sdk.NewRat(1, 100),

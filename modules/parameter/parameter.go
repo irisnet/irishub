@@ -3,9 +3,11 @@ package parameter
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/wire"
 )
 
 type Parameter interface {
+
 	InitGenesis(interface{})
 
 	GetStoreKey() string
@@ -25,6 +27,8 @@ type GovParameter interface {
 	Parameter
 
 	Valid(json string) sdk.Error
+
+	GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}
 
 	Update(ctx sdk.Context, json string)
 

@@ -6,8 +6,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iparams"
-	"strconv"
-	"strings"
 )
 
 // nolint
@@ -208,62 +206,6 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 }
 
 // =====================================================
-// Procedures
-
-// Returns the current Deposit Procedure from the global param store
-func (keeper Keeper) GetDepositProcedure(ctx sdk.Context) govparams.DepositProcedure {
-	govparams.DepositProcedureParameter.LoadValue(ctx)
-	return govparams.DepositProcedureParameter.Value
-}
-
-// Returns the current Voting Procedure from the global param store
-func (keeper Keeper) GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
-	govparams.VotingProcedureParameter.LoadValue(ctx)
-	return govparams.VotingProcedureParameter.Value
-}
-
-func (keeper Keeper) getVotingProcedureVotingPeriod(ctx sdk.Context) (VotingPeriod int64) {
-	var votingPeriod string
-	if keeper.ps.Get(ctx, ParamStoreKeyVotingProcedureVotingPeriod, &votingPeriod) == nil {
-		VotingPeriod, _ = strconv.ParseInt(votingPeriod, 10, 64)
-	}
-	return
-}
-
-// Returns the current Tallying Procedure from the global param store
-func (keeper Keeper) GetTallyingProcedure(ctx sdk.Context) TallyingProcedure {
-	return TallyingProcedure{
-		Threshold:         keeper.getTallyingProcedure(ctx, ParamStoreKeyTallyingProcedureThreshold),
-		Veto:              keeper.getTallyingProcedure(ctx, ParamStoreKeyTallyingProcedureVeto),
-		GovernancePenalty: keeper.getTallyingProcedure(ctx, ParamStoreKeyTallyingProcedurePenalty),
-	}
-}
-
-func (keeper Keeper) getTallyingProcedure(ctx sdk.Context, key string) sdk.Rat {
-	var data string
-	keeper.ps.Get(ctx, key, &data)
-	str := strings.Split(data, "/")
-	x, _ := strconv.ParseInt(str[0], 10, 64)
-	y, _ := strconv.ParseInt(str[1], 10, 64)
-	return sdk.NewRat(x, y)
-
-}
-
-
-
-func (keeper Keeper) setTallyingProcedure(ctx sdk.Context, tallyingProcedure TallyingProcedure) {
-	threshold := tallyingProcedure.Threshold.String()
-	keeper.ps.Set(ctx, ParamStoreKeyTallyingProcedureThreshold, &threshold)
-
-	veto := tallyingProcedure.Veto.String()
-	keeper.ps.Set(ctx, ParamStoreKeyTallyingProcedureVeto, &veto)
-
-	governancePenalty := tallyingProcedure.GovernancePenalty.String()
-	keeper.ps.Set(ctx, ParamStoreKeyTallyingProcedurePenalty, &governancePenalty)
-
-}
-
-// =====================================================
 // Votes
 
 // Adds a vote on a specific proposal
@@ -367,7 +309,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID int64, depositerAddr
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsGTE(keeper.GetDepositProcedure(ctx).MinDeposit) {
+	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsGTE(govparams.GetDepositProcedure(ctx).MinDeposit) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}
