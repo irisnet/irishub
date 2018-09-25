@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -8,12 +9,11 @@ import (
 	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/parameter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cmn "github.com/tendermint/tendermint/libs/common"
-    "path"
-    "encoding/json"
-	"github.com/irisnet/irishub/modules/parameter"
+	"path"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -274,7 +274,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 					for _, kv := range res {
 						keys = append(keys, string(kv.Key))
 					}
-					output, err := wire.MarshalJSONIndent(cdc, keys)
+					output, err := json.MarshalIndent(keys, "", " ")
 					//cmn.WriteFile(,output,644)
 					if err != nil {
 						return err
@@ -287,24 +287,20 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			if keyStr != "" {
+				parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+					&govparams.VotingProcedureParameter,
+					&govparams.TallyingProcedureParameter)
+
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
 				if err == nil {
-					switch keyStr {
-					case "Gov/gov/DepositProcedure":
-						var p govparams.DepositProcedure
-						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(p, keyStr)
-					case "Gov/gov/VotingProcedure":
-						var p govparams.VotingProcedure
-						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(p, keyStr)
-					case "Gov/gov/TallyingProcedure":
-						var p govparams.TallyingProcedure
-						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(p, keyStr)
-					default:
+					if p, ok := parameter.ParamMapping[keyStr]; ok {
+						p.GetValueFromRawData(cdc, res) //.(govparams.TallyingProcedure)
+						PrintParamStr(p, keyStr)
+					} else {
 						return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
 					}
+				} else {
+					return err
 				}
 
 			}
@@ -318,24 +314,90 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func ToParamStr(p interface{}, keyStr string) {
+func PrintParamStr(p parameter.GovParameter, keyStr string) {
 	var param gov.Param
 	param.Key = keyStr
-	param.Value = ToJson(p)
+	param.Value = p.ToJson()
 	param.Op = ""
 	jsonBytes, _ := json.Marshal(param)
-	//jsonBytes, _ := wire.MarshalJSONIndent(cdc, param)
 	fmt.Println(string(jsonBytes))
 }
 
-func ToJson(p interface{}) string {
-	jsonBytes, _ := json.Marshal(p)
-	return string(jsonBytes)
+type ParameterConfigFile struct {
+	Govparams govparams.ParamSet `json:"gov"`
 }
 
+func (pd *ParameterConfigFile) ReadFile(cdc *wire.Codec, pathStr string) error {
+	pathStr = path.Join(pathStr, "config/params.json")
 
-type ParameterDoc struct {
-	Govparams govparams.ParamSet `json:"gov"`
+	jsonBytes, err := cmn.ReadFile(pathStr)
+
+	fmt.Println("Open ", pathStr)
+
+	if err != nil {
+		return err
+	}
+
+	err = cdc.UnmarshalJSON(jsonBytes, &pd)
+	return err
+}
+func (pd *ParameterConfigFile) WriteFile(cdc *wire.Codec, res []sdk.KVPair) error {
+	for _, kv := range res {
+		switch string(kv.Key) {
+		case "Gov/gov/DepositProcedure":
+			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.DepositProcedure)
+		case "Gov/gov/VotingProcedure":
+			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.VotingProcedure)
+		case "Gov/gov/TallyingProcedure":
+			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.TallyingProcedure)
+		default:
+			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
+		}
+	}
+	output, err := cdc.MarshalJSONIndent(pd, "", "  ")
+
+	if err != nil {
+		return err
+	}
+
+	pathStr := viper.GetString(flagPath)
+	pathStr = path.Join(pathStr, "config/params.json")
+	err = cmn.WriteFile(pathStr, output, 0644)
+	if err != nil {
+
+		return err
+	}
+
+	fmt.Println("Save the parameter config file in ", pathStr)
+	return nil
+}
+
+func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (gov.Param, error) {
+	var param gov.Param
+	var err error
+	var jsonBytes []byte
+	switch keyStr {
+	case "Gov/gov/DepositProcedure":
+		jsonBytes, err = json.Marshal(pd.Govparams.DepositProcedure)
+	case "Gov/gov/VotingProcedure":
+		jsonBytes, err = json.Marshal(pd.Govparams.VotingProcedure)
+	case "Gov/gov/TallyingProcedure":
+		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
+	default:
+		return param, sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
+	}
+
+	if err != nil {
+		return param, err
+	}
+	param.Value = string(jsonBytes)
+	param.Key = keyStr
+	param.Op = opStr
+
+	jsonBytes, _ = json.MarshalIndent(param, "", " ")
+
+	fmt.Println("Param:\n", string(jsonBytes))
+	return param, err
 }
 
 func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
@@ -346,44 +408,14 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
-
 			if err == nil {
-				var paramSet ParameterDoc
-				for _, kv := range res {
-					switch string(kv.Key) {
-					case "Gov/gov/DepositProcedure":
-						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
-					case "Gov/gov/VotingProcedure":
-						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.VotingProcedure)
-					case "Gov/gov/TallyingProcedure":
-						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.TallyingProcedure)
-					default:
-						return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
-					}
-				}
-				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")
-				//cmn.WriteFile(,output,644)
-				if err != nil {
-					return err
-				}
-
-				pathStr := viper.GetString(flagPath)
-				pathStr = path.Join(pathStr,"config/params.json")
-				err = cmn.WriteFile(pathStr, output, 0644)
-				if err != nil {
-
-					fmt.Println(err)
-					return err
-				}
-
-				fmt.Println("Save the parameter config file in ", pathStr)
-				return nil
-
+				var pd ParameterConfigFile
+				err := pd.WriteFile(cdc, res)
+				return err
+			} else {
+				fmt.Println("No GovParams can be found")
+				return err
 			}
-
-			fmt.Println("No GovParams can be found")
-			return err
-
 		},
 	}
 	cmd.Flags().String(flagPath, "", "the path of param.json")
