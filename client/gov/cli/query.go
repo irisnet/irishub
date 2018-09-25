@@ -33,7 +33,7 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 			var proposal gov.Proposal
 			cdc.MustUnmarshalBinary(res, &proposal)
 
-			proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+			proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
 			if err != nil {
 				return err
 			}
@@ -99,7 +99,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 			var maxProposalID int64
 			cdc.MustUnmarshalBinary(res, &maxProposalID)
 
-			matchingProposals := []govClient.TextProposalResponse{}
+			matchingProposals := []govClient.ProposalOutput{}
 
 			if latestProposalsIDs == 0 {
 				latestProposalsIDs = maxProposalID
@@ -134,7 +134,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 					}
 				}
 
-				proposalResponse, err := govClient.ConvertProposalCoins(cliCtx, proposal)
+				proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
 				if err != nil {
 					return err
 				}
