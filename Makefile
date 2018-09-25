@@ -25,13 +25,8 @@ get_dev_tools:
 	cd deps_tools && $(MAKE) get_dev_tools
 
 get_vendor_deps:
-	@echo "--> Generating vendor directory via dep ensure"
-	@rm -rf .vendor-new
-	@dep ensure -v -vendor-only
-
-update_vendor_deps:
+	@rm -rf vendor/
 	@echo "--> Running dep ensure"
-	@rm -rf .vendor-new
 	@dep ensure -v
 
 draw_deps:
@@ -58,6 +53,11 @@ build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd
+
+build_windows: update_irislcd_swagger_docs
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iris.exe ./cmd/iris && \
+    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iriscli.exe ./cmd/iriscli && \
+    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irislcd.exe ./cmd/irislcd
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
