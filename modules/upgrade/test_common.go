@@ -16,7 +16,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"encoding/hex"
-	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 var (
@@ -54,18 +54,20 @@ func createTestCodec() *wire.Codec {
 	return cdc
 }
 
-func createTestInput(t *testing.T) (sdk.Context, Keeper) {
+func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	keyAcc := sdk.NewKVStoreKey("acc")
 	keyStake := sdk.NewKVStoreKey("stake")
 	keyUpdate := sdk.NewKVStoreKey("update")
 	keyParams := sdk.NewKVStoreKey("params")
+	keyIparams := sdk.NewKVStoreKey("iparams")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
-    ms.MountStoreWithDB(keyParams,sdk.StoreTypeIAVL, db)
+    ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyIparams, sdk.StoreTypeIAVL, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
@@ -74,7 +76,9 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	accountMapper := auth.NewAccountMapper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewKeeper(accountMapper)
 	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
-    pk := iparams.NewKeeper(cdc,keyParams)
-	keeper := NewKeeper(cdc, keyUpdate, sk,pk.GovSetter())
-	return ctx, keeper
+
+	keeper := NewKeeper(cdc, keyUpdate, sk)
+	paramKeeper := params.NewKeeper(wire.NewCodec(), keyParams)
+
+	return ctx, keeper, paramKeeper
 }
