@@ -17,3 +17,14 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey) Keeper {
 	}
 	return keeper
 }
+
+func (k Keeper) AddServiceDefinition(ctx sdk.Context, serviceDef MsgSvcDef) {
+	kvStore := ctx.KVStore(k.storeKey)
+
+	serviceDefBytes, err := k.cdc.MarshalBinary(serviceDef)
+	if err != nil {
+		panic(err)
+	}
+
+	kvStore.Set(GetServiceDefinitionKey(serviceDef.ChainId, serviceDef.Name), serviceDefBytes)
+}
