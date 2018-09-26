@@ -28,3 +28,20 @@ func (k Keeper) AddServiceDefinition(ctx sdk.Context, serviceDef MsgSvcDef) {
 
 	kvStore.Set(GetServiceDefinitionKey(serviceDef.ChainId, serviceDef.Name), serviceDefBytes)
 }
+
+func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) *MsgSvcDef {
+	kvStore := ctx.KVStore(k.storeKey)
+
+	serviceDefBytes := kvStore.Get(GetServiceDefinitionKey(chainId, name))
+	if serviceDefBytes != nil {
+		var serviceDef MsgSvcDef
+		err := k.cdc.UnmarshalBinary(serviceDefBytes, &serviceDef)
+		if err != nil {
+			panic(err)
+		}
+
+		return &serviceDef
+
+	}
+	return nil
+}
