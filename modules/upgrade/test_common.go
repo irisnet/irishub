@@ -16,7 +16,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"encoding/hex"
-	"github.com/irisnet/irishub/modules/iparams"
 )
 
 var (
@@ -74,7 +73,6 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	accountMapper := auth.NewAccountMapper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewKeeper(accountMapper)
 	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
-    pk := iparams.NewKeeper(cdc,keyParams)
-	keeper := NewKeeper(cdc, keyUpdate, sk,pk.GovSetter())
+	keeper := NewKeeper(cdc, keyUpdate, sk)
 	return ctx, keeper
 }
