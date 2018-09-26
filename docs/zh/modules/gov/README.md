@@ -1,102 +1,257 @@
-# Governance
+# Gov/Iparam User Guide
 
-## 初始化区块链运行环境
+## 基本功能描述
+
+1. 文本提议的链上治理
+2. 参数修改提议的链上治理
+3. 软件升级提议的链上治理（不可用）
+
+## 交互流程
+
+### 治理流程
+
+1. 任何用户可以发起提议，并抵押一部分资金，如果超过`min_deposit`,提议进入投票，否则留在抵押期。其他人可以对在抵押期的提议进行抵押资金，如果提议的抵押资金总和超过`min_deposit`,则进入投票期。但是提议在抵押期停留的区块数目超过`max_deposit_period`，则提议被关闭。
+2. 进入投票期的提议，只有验证人和委托人可以进行投票，委托人如果没投票，则他继承他委托的验证人的投票选项，如果委托人投票了，则覆盖他委托的验证人的投票选项，当提议到达`voting_perid`,统计投票结果。
+3. 具体提议投票逻辑细节见[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/governance/overview.md)
+
+## 使用场景
+### 创建使用环境
 
 ```
-rm -rf .iris
+rm -rf iris                                                                         
 rm -rf .iriscli
-iris init gen-tx --name=iris
-iris init --gen-txs --chain-id=gov-test
-iris start
-
+iris init gen-tx --name=x --home=iris
+iris init --gen-txs --chain-id=gov-test -o --home=iris
+iris start --home=iris
 ```
 
-## 提议流程
+### 参数修改的使用场景
 
-这里以"参数修改提议"为例，其他提议不需要--params参数。比如，当某一个时间点我们发现，系统产生了很多无用的提议，原因可能是当前最小抵押金额太小了，造成很多人都可以提交一个无意义的提议。
-这个时候我们可以使用"参数修改提议"来修改系统预设的最小抵押金额这个参数。我们首先需要知道该参数对应的key值，才能修改。可以使用以下命令查看：
-```
-iriscli params export gov
-```
-这个命令会导出所有可以使用"参数修改提议"来修改的参数，比如我们得到如下结果：
+场景一：通过命令行带入参数修改信息进行参数修改
 
 ```
+# 根据gov模块名查询的可修改的参数
+iriscli gov query-params --module=gov --trust-node
+
+# 结果
 [
-  {
-    "key": "gov/depositprocedure/deposit",
-    "value": "10000000000000000000iris"
-  },
-  {
-    "key": "gov/depositprocedure/maxDepositPeriod",
-    "value": "10"
-  },
-  {
-    "key": "gov/feeToken/gasPriceThreshold",
-    "value": "20000000000"
-  },
-  {
-    "key": "gov/tallyingprocedure/penalty",
-    "value": "1/100"
-  },
-  {
-    "key": "gov/tallyingprocedure/threshold",
-    "value": "1/2"
-  },
-  {
-    "key": "gov/tallyingprocedure/veto",
-    "value": "1/3"
-  },
-  {
-    "key": "gov/votingprocedure/votingPeriod",
-    "value": "20"
-  }
+ "Gov/gov/DepositProcedure",
+ "Gov/gov/TallyingProcedure",
+ "Gov/gov/VotingProcedure"
 ]
 
-```
-每一个(key，value)对应一组系统预设的可修改参数，具体的意义会在以后的文档中来完善。这里最小抵押金额的key为gov/depositprocedure/deposit
-目前value:10000000000000000000iris（该值是经过进度换算以后的值，具体参考fee-token模块）。我们准备将该值修改为:20000000000000000000iris
-提高一倍，来限制提交提议的门槛。可以使用以下命令:
+# 根据Key查询可修改参数的内容
+iriscli gov query-params --key=Gov/gov/DepositProcedure --trust-node
+
+# 结果
+{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":10}","op":""}
+
+# 发送提议，返回参数修改的内容
+echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+
+# 对提议进行抵押
+echo 1234567890 | iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+
+# 对提议投票
+echo 1234567890 | iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+
+# 查询提议情况
+iriscli gov query-proposal --proposal-id=1 --trust-node
 
 ```
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange"
-                            --deposit="9000000000000000000iris" 
-                            --params='[{"key":"gov/depositprocedure/deposit","value":"20000000000000000001iris","op":"update"}]' 
-                            --proposer=faa1pkunlumfyglqd9dgup0mwp66kjrp6y09twmuvd 
-                            --from=iris 
-                            --chain-id=gov-test 
-                            --fee=400000000000000iris 
-                            --gas=20000
+
+场景二，通过文件修改参数
 
 ```
+# 导出配置文件
+iriscli gov pull-params --path=iris --trust-node
 
-这里我抵押的金额为9000000000000000000iris，比最小抵押金额少1000000000000000000iris，所以该提议还未被激活，不能进入投票阶段，需要在10（key:gov/depositprocedure/maxDepositPeriod）个区块之前筹齐10000000000000000000iris的抵押金额(如果当前出块时间为5s,意味着你需要在 5 * 10s之前完成抵押任务)，抵押操作命令如下:
+# 查询配置文件信息
+cat iris/config/params.json                                                         
+{
+  "gov": {
+    "Gov/gov/DepositProcedure": {
+      "min_deposit": [
+        {
+          "denom": "iris-atto",
+          "amount": "10000000000000000000"
+        }
+      ],
+      "max_deposit_period": "10"
+    },
+    "Gov/gov/VotingProcedure": {
+      "voting_period": "10"
+    },
+    "Gov/gov/TallyingProcedure": {
+      "threshold": "1/2",
+      "veto": "1/3",
+      "governance_penalty": "1/100"
+    }
+  }
+}
+# 修改配置文件(TallyingProcedure的governance_penalty)
+vi iris/config/params.json                                                            
+{
+  "gov": {
+    "Gov/gov/DepositProcedure": {
+      "min_deposit": [
+        {
+          "denom": "iris-atto",
+          "amount": "10000000000000000000"
+        }
+      ],
+      "max_deposit_period": "10"
+    },
+    "Gov/gov/VotingProcedure": {
+      "voting_period": "10"
+    },
+    "Gov/gov/TallyingProcedure": {
+      "threshold": "1/2",
+      "veto": "1/3",
+      "governance_penalty": "20/100"
+    }
+  }
+}
+
+# 通过文件修改参数的命令，返回参数修改的内容
+echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --path=iris --key=Gov/gov/TallyingProcedure --op=update --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+
+# 对提议进行抵押
+echo 1234567890 | iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+
+# 对提议投票
+echo 1234567890 | iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+
+# 查询提议情况
+iriscli gov query-proposal --proposal-id=1 --trust-node
+```
+
+## CLI命令详情
+
+### 治理模块基础方法
 
 ```
-iriscli gov deposit --proposalID=1 
-                    --depositer=faa1pkunlumfyglqd9dgup0mwp66kjrp6y09twmuvd 
-                    --deposit=1000000000000000000iris   
-                    --from=iris 
-                    --chain-id=gov-test  
-                    --fee=200000000000000iris 
-                    --gas=20000
+# 文本类提议
+iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="Text" --deposit="10iris" --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+```
+
+* `--title`       提议的标题
+* `--description` 提议的描述
+* `--type`        提议的类型 {'Text','ParameterChange','SoftwareUpgrade'}
+* `--deposit`     抵押贷币的数量
+* 上面就是典型的文本类提议
 
 ```
-以上的proposalID是由第一步返回结果得到的，这个阶段我们抵押了1000000000000000000iris个代币，正好等于最小抵押金额，所以该提议将进入投票阶段，提议者可以向各个validator发起投票请求(目前只能靠链下通知，以后可以考虑采用链上通知或者监控通知)。然后各个validator可以先查看该提议内容，使用以下命令:
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 ```
-iriscli gov query-proposal --proposalID=1 
+
+* `--propsal-id` 抵押提议ID
+* `--deposit`    抵押的贷币数目
+
 ```
-之后投票者可以根据自己的意愿发起投票，这里我投赞成票(option=Yes)：
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 ```
-iriscli gov vote --proposalID=1 
-                 --voter=faa1pkunlumfyglqd9dgup0mwp66kjrp6y09twmuvd 
-                 --option=Yes  
-                 --from=iris 
-                 --chain-id=gov-test  
-                 --fee=400000000000000iris 
-                 --gas=20000
+
+* `--proposal-id` 投票提议ID
+* `--option`      投票的选项{'Yes'赞同,'Abstain'弃权,'No'不同意,'nowithVeto'强烈不同意}
+
+
 ```
-注意投票期有最大等待时间20个区块高度(key:gov/votingprocedure/votingPeriod)。如果超过这个高度选票的赞成票比例还未达到1/2(key：gov/tallyingprocedure/threshold)。那么系统认为该提议未被通过。不会退还之前抵押的代币(如果有validator未投票，还会被slash，惩罚的比例为当前stake代币总量的1/100(key：gov/tallyingprocedure/penalty)，当前版本还没有这个机制)。假设当前我们只有一个validator，因为我们投的是赞成票，所以赞成的比例为1>1/2 并且 强烈反对票为0<1/3（key:gov/tallyingprocedure/veto）,所以提议通过。等投票期结束，开始自动执行提议内容：将(key:gov/depositprocedure/deposit,value:10000000000000000000iris)修改为(key:gov/depositprocedure/deposit,value:20000000000000000000iris)。接下来我们可以验证这个结果，查询当前系统的最小抵押金额:
+# 查询提议情况
+iriscli gov query-proposal --proposal-id=1 --trust-node
 ```
-iriscli iriscli params export gov/depositprocedure/deposit
+
+* `--proposal-id` 查询提议ID
+
+
+
+### 参数修改提议部分
+
 ```
-到此，gov治理流程结束。
+# 根据gov模块名查询的可修改的参数
+iriscli gov query-params --module=gov --trust-node
+```
+
+* `--module` 查询module可修改参数的key的列表
+
+
+```
+# 根据Key查询可修改参数的内容
+iriscli gov query-params --key=Gov/gov/DepositProcedure --trust-node
+```
+
+* `--key` 查询key对应的参数值
+
+```
+# 导出配置文件
+iriscli gov pull-params --path=iris --trust-node
+```
+
+* `--path` 节点初始化的文件夹
+
+
+
+```
+# 通过命令行带入参数修改信息进行参数修改 
+iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+```
+
+* `--param` 参数修改的具体内容（通过query-params得到参数内容，然后直接对其修改，并在"op"上添上update,具体可见使用场景）
+* 其他字段与文本提议类似
+
+```
+# 通过文件修改参数的命令，返回参数修改的内容
+echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --path=iris --key=Gov/gov/TallyingProcedure --op=update --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
+```
+
+* `--path` 节点初始化的文件夹
+* `--key`  要修改参数的key
+* `--op`   参数修改类型，目前只实现了'update'
+* 其他字段与文本提议类似
+
+### 软件升级提议部分
+
+## 基本参数
+
+```
+# DepositProcedure（抵押阶段的参数）
+"Gov/gov/DepositProcedure": {
+    "min_deposit": [
+    {
+        "denom": "iris-atto",
+        "amount": "10000000000000000000"
+    }
+    ],
+    "max_deposit_period": "10"
+}
+```
+
+* 可修改参数
+* 参数的key:"Gov/gov/DepositProcedure"
+* `min_deposit[0].denom`  最小抵押贷币的token只能是单位是iris-atto的iris通证。
+* `min_deposit[0].amount` 最小抵押贷币的数量,默认范围:10iris（1iris，200iris）
+* `max_deposit_period`    补交抵押的窗口期,默认:10 范围（0，1）     
+
+```
+# VotingProcedure（投票阶段的参数）
+"Gov/gov/VotingProcedure": {
+    "voting_period": "10"
+},
+```
+    
+* `voting_perid` 投票的窗口期,默认10,范围（20，20000）
+   
+```
+# TallyingProcedure (统计阶段段参数)    
+"Gov/gov/TallyingProcedure": {
+    "threshold": "1/2",
+    "veto": "1/3",
+    "governance_penalty": "1/100"
+}
+```   
+* `veto` 默认1/3,范围（0，1）
+* `threshold` 默认1/2,范围（0，1）
+* `governance_penalty` 未投票的验证人惩罚贷币的比例 默认1/100,范围（0，1）
+*  投票统计逻辑：如果强烈反对的voting_power占总的voting_power 超过 veto,提议不通过。然后再看赞同的voting_power占总的投票的voting_power 是否超过 veto,超过则提议不通过,不超过则不通过。
+
+

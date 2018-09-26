@@ -79,10 +79,13 @@ iriscli gov deposit --proposalID=1
 
 ```
 The above proposalID is the result from the first step. At this stage, we delegate 1000000000000000000iris tokens, which is exactly equal to the minimum delegating amount, so the proposal can be voted. And the proposer can send a voting request to each validators (currently only off-chain notification is available, but on-chain or monitoring notification will be implemented later). Then each validators can view the proposal first with the following command:
+
 ```
 iriscli gov query-proposal --proposalID=1 
 ```
+
 Later proposers can vote as they wish, here I vote Yes (option=Yes):
+
 ```
 iriscli gov vote --proposalID=1 
                  --voter=faa1pkunlumfyglqd9dgup0mwp66kjrp6y09twmuvd 
@@ -92,8 +95,11 @@ iriscli gov vote --proposalID=1
                  --fee=400000000000000iris 
                  --gas=20000
 ```
+
 Notice that the maximum of waiting time is in 20 blocks during the voting period (key: gov/votingprocedure/votingPeriod). If the percentage of affirmative vote is still less than 50% during this period (key: gov/tallyingprocedure/threshold), the proposal will not be passed and the tokens delegated will also not be refunded (the validators haven't voted will be slashed, and 1/100 of the total tokens delegated currently will be deducted (key: gov/tallyingprocedure/penalty). This mechanism has not been implemented in current version ). Suppose there is only one validator. If I voted yes, the ratio of affirmative vote is 1>1/2 and the strong negative vote is 0<1/3 (key:gov/tallyingprocedure/veto), the proposal will be passed. After voting, the proposal  is automatically executed: (key: gov/depositprocedure/deposit, value: 10000000000000000000iris) is modified to (key: gov/depositprocedure/deposit, value: 20000000000000000000iris). Then we can verify this result and query the minimum delegating amount in current system:
+
 ```
 iriscli iriscli params export gov/depositprocedure/deposit
 ```
+
 This is the end of the governance process.
