@@ -2,21 +2,22 @@ package gov
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
 	"testing"
-	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/types"
-	"fmt"
 )
 
 // initialize the mock application for this module
@@ -71,17 +72,17 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		ct := types.NewDefaultCoinType("iris")
-		minDeposit,_ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s",10,"iris"))
+		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: DepositProcedure{
+			DepositProcedure: govparams.DepositProcedure{
 				MinDeposit:       sdk.Coins{minDeposit},
 				MaxDepositPeriod: 1440,
 			},
-			VotingProcedure: VotingProcedure{
+			VotingProcedure: govparams.VotingProcedure{
 				VotingPeriod: 30,
 			},
-			TallyingProcedure: TallyingProcedure{
+			TallyingProcedure: govparams.TallyingProcedure{
 				Threshold:         sdk.NewRat(1, 2),
 				Veto:              sdk.NewRat(1, 3),
 				GovernancePenalty: sdk.NewRat(1, 100),

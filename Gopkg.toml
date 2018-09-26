@@ -29,7 +29,7 @@
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  branch = "irisnet/refactor"
+  branch = "irisnet/develop"
 
 [[override]]
   name = "github.com/golang/protobuf"
@@ -58,6 +58,9 @@
   source = "https://github.com/irisnet/tendermint.git"
   branch = "irisnet/develop"
 
+[[constraint]]
+  name = "github.com/rakyll/statik"
+  version = "=v0.1.4"
 
 [prune]
   go-tests = true

@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/gov/tags"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 // Handle all "gov" type messages.
@@ -26,7 +27,13 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Params)
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err.Result()
+	}
+
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
@@ -123,7 +130,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		activeProposal := keeper.ActiveProposalQueuePop(ctx)
 
 		proposalStartBlock := activeProposal.GetVotingStartBlock()
-		votingPeriod := keeper.GetVotingProcedure(ctx).VotingPeriod
+		votingPeriod := govparams.GetVotingProcedure(ctx).VotingPeriod
 		if ctx.BlockHeight() < proposalStartBlock+votingPeriod {
 			continue
 		}
@@ -153,7 +160,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 				val.GetPubKey(),
 				ctx.BlockHeight(),
 				val.GetPower().RoundInt64(),
-				keeper.GetTallyingProcedure(ctx).GovernancePenalty)
+				govparams.GetTallyingProcedure(ctx).GovernancePenalty)
 
 			logger.Info(fmt.Sprintf("Validator %s failed to vote on proposal %d, slashing",
 				val.GetOwner(), activeProposal.GetProposalID()))
@@ -166,7 +173,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	return resTags
 }
 func shouldPopInactiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
-	depositProcedure := keeper.GetDepositProcedure(ctx)
+	depositProcedure := govparams.GetDepositProcedure(ctx)
 	peekProposal := keeper.InactiveProposalQueuePeek(ctx)
 
 	if peekProposal == nil {
@@ -180,7 +187,7 @@ func shouldPopInactiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
 }
 
 func shouldPopActiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
-	votingProcedure := keeper.GetVotingProcedure(ctx)
+	votingProcedure := govparams.GetVotingProcedure(ctx)
 	peekProposal := keeper.ActiveProposalQueuePeek(ctx)
 
 	if peekProposal == nil {

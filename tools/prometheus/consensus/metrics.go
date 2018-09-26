@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
-	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/consensus"
@@ -18,6 +17,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"github.com/irisnet/irishub/client/context"
 )
 
 // TODO
@@ -130,7 +130,7 @@ func (cs *Metrics) SetAddress(addr_str string) {
 	}
 }
 
-func (cs *Metrics) Start(ctx app.Context) {
+func (cs *Metrics) Start(ctx context.CLIContext) {
 
 	validaor_addr := viper.GetString("address")
 	cs.SetAddress(validaor_addr)
@@ -153,7 +153,7 @@ func (cs *Metrics) Start(ctx app.Context) {
 	go func() {
 		for e := range blockC {
 			block := e.(types.TMEventData).(types.EventDataNewBlock)
-			cs.RecordMetrics(ctx, ctx.Cdc, block.Block)
+			cs.RecordMetrics(ctx, ctx.Codec, block.Block)
 		}
 	}()
 
@@ -172,7 +172,7 @@ func (cs *Metrics) Start(ctx app.Context) {
 	}()
 }
 
-func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.Block) {
+func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block *types.Block) {
 	var client = ctx.Client
 
 	cs.TmMetrics.Height.Set(float64(block.Height))
@@ -258,7 +258,7 @@ func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.
 	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 
-func getCandidatesNum(ctx app.Context) int {
+func getCandidatesNum(ctx context.CLIContext) int {
 	key := stake.ValidatorsKey
 	resKVs, err := ctx.QuerySubspace(key, keyStoreStake)
 	if err != nil {

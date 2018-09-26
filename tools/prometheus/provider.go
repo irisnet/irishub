@@ -1,19 +1,19 @@
 package prometheus
 
 import (
-	"github.com/irisnet/irishub/app"
 	cs "github.com/irisnet/irishub/tools/prometheus/consensus"
 	mempl "github.com/irisnet/irishub/tools/prometheus/mempool"
 	"github.com/irisnet/irishub/tools/prometheus/p2p"
 	sys "github.com/irisnet/irishub/tools/prometheus/system"
+	"github.com/irisnet/irishub/client/context"
 )
 
 type Monitor struct {
 	providers []MetricsProvider
-	ctx       app.Context
+	ctx       context.CLIContext
 }
 
-func DefaultMonitor(ctx app.Context) *Monitor {
+func DefaultMonitor(ctx context.CLIContext) *Monitor {
 	var providers []MetricsProvider
 	monitor := &Monitor{
 		providers: providers,
@@ -38,5 +38,5 @@ func (m *Monitor) Start() {
 }
 
 type MetricsProvider interface {
-	Start(ctx app.Context)
+	Start(ctx context.CLIContext)
 }
