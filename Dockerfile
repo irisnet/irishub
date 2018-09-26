@@ -28,6 +28,7 @@ COPY . $REPO_PATH/
 RUN cd $REPO_PATH && \
     apk add --no-cache $PACKAGES && \
     go get github.com/golang/dep/cmd/dep && \
+    make get_tools && \
     make get_vendor_deps && \
     make build_linux && \
     cp build/* /usr/local/bin/ && \

@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strconv"
 	"strings"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 var (
@@ -144,13 +145,15 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 	}
 
 	VersionToBeSwitched := NewVersion(currentVersion.Id+1, 0, 0, moduleList)
-	VersionToBeSwitched.ProposalID = k.GetCurrentProposalID(ctx)
+
+	upgradeparams.CurrentUpgradeProposalIdParameter.LoadValue(ctx)
+	VersionToBeSwitched.ProposalID = upgradeparams.CurrentUpgradeProposalIdParameter.Value
 	VersionToBeSwitched.Start = ctx.BlockHeight()
 
 	k.AddNewVersion(ctx, VersionToBeSwitched)
 
 	k.SetDoingSwitch(ctx, false)
-	k.SetCurrentProposalID(ctx, -1)
+	upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
 	k.SetKVStoreKeylist(ctx)
 }
 

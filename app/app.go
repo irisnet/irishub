@@ -2,37 +2,37 @@ package app
 
 import (
 	"encoding/json"
-	"io"
-	"os"
-
-	bam "github.com/irisnet/irishub/baseapp"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
-	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
-
+	"errors"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
-	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/irisnet/irishub/modules/parameter"
 	"github.com/irisnet/irishub/modules/upgrade"
-
-	"errors"
-	"fmt"
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
+	abci "github.com/tendermint/tendermint/abci/types"
+	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
-	bc "github.com/tendermint/tendermint/blockchain"
+	tmtypes "github.com/tendermint/tendermint/types"
+	"io"
+	"os"
 	"strings"
-	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
@@ -42,6 +42,7 @@ const (
 
 // default home directories for expected binaries
 var (
+	DefaultLCDHome  = os.ExpandEnv("$HOME/.irislcd")
 	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
 	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 )
@@ -72,11 +73,11 @@ type IrisApp struct {
 	slashingKeeper      slashing.Keeper
 	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
-	iparamsKeeper        iparams.Keeper
+	iparamsKeeper       iparams.Keeper
 	upgradeKeeper       upgrade.Keeper
 
 	// fee manager
-	feeManager  bam.FeeManager
+	feeManager bam.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -97,7 +98,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 		keyParams:        sdk.NewKVStoreKey("params"),
-		keyIparams:        sdk.NewKVStoreKey("iparams"),
+		keyIparams:       sdk.NewKVStoreKey("iparams"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 	}
 
@@ -114,7 +115,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	)
 
 	// add handlers
-	app.paramsKeeper = params.NewKeeper(cdc,app.keyParams)
+	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
 	app.iparamsKeeper = iparams.NewKeeper(app.cdc, app.keyIparams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
@@ -144,6 +145,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyIparams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
+
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain)
@@ -155,6 +157,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
+	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
+							&govparams.DepositProcedureParameter,
+		                    &govparams.VotingProcedureParameter,
+		                    &govparams.TallyingProcedureParameter,
+							&upgradeparams.CurrentUpgradeProposalIdParameter,
+							&upgradeparams.ProposalAcceptHeightParameter)
+
+	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		                              &govparams.VotingProcedureParameter,
+		                              &govparams.TallyingProcedureParameter,)
 
 	return app
 }
@@ -219,21 +231,21 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		panic(err)
 	}
 
-	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10,denom))
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	if err != nil {
 		panic(err)
 	}
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
-		DepositProcedure: gov.DepositProcedure{
+		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 1440,
+			MaxDepositPeriod: 10,
 		},
-		VotingProcedure: gov.VotingProcedure{
-			VotingPeriod: 30,
+		VotingProcedure: govparams.VotingProcedure{
+			VotingPeriod: 10,
 		},
-		TallyingProcedure: gov.TallyingProcedure{
+		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
 			Veto:              sdk.NewRat(1, 3),
 			GovernancePenalty: sdk.NewRat(1, 100),
@@ -348,7 +360,7 @@ func (app *IrisApp) replay() int64 {
 	defer func() {
 		stateDB.Close()
 		blockStoreDB.Close()
-	} ()
+	}()
 
 	curState := sm.LoadState(stateDB)
 	preState := sm.LoadPreState(stateDB)
