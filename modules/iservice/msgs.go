@@ -2,6 +2,7 @@ package iservice
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/iservice/idl"
 )
 
 type MsgSvcDef struct {
@@ -41,6 +42,9 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 }
 
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
+	if !idl.ValidIDL(msg.IDLContent) {
+		return NewError(DefaultCodespace, CodeInvalidIDL, "")
+	}
 	return nil
 }
 
