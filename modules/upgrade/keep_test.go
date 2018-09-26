@@ -2,15 +2,16 @@ package upgrade
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 func TestUpdateKeeper(t *testing.T) {
-	ctx, keeper := createTestInput(t)
+	ctx, keeper, _ := createTestInput(t)
 	router := baseapp.NewRouter()
 	router.AddRoute("main", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
 	router.AddRoute("acc", []*sdk.KVStoreKey{sdk.NewKVStoreKey("acc")}, nil)
@@ -124,7 +125,7 @@ func TestSwitchKeeper(t *testing.T) {
 }
 
 func TestSetKVStoreKeylist(t *testing.T) {
-	ctx, keeper := createTestInput(t)
+	ctx, keeper, paramKeeper := createTestInput(t)
 
 	router := baseapp.NewRouter()
 	router.AddRoute("main-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
@@ -132,6 +133,10 @@ func TestSetKVStoreKeylist(t *testing.T) {
 	router.AddRoute("gov-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("gov")}, nil)
 	router.AddRoute("stake-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
 	router.AddRoute("upgrade-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
+
+
+	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
+	upgradeparams.CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
 
 	InitGenesis(ctx, keeper, router)
 	keeper.SetKVStoreKeylist(ctx)
@@ -153,7 +158,7 @@ func getModuleList(router baseapp.Router) ModuleLifeTimeList {
 }
 
 func TestKeeper_InitGenesis_commidID(t *testing.T) {
-	ctx, keeper := createTestInput(t)
+	ctx, keeper, paramKeeper := createTestInput(t)
 	router := baseapp.NewRouter()
 	router.AddRoute("main", []*sdk.KVStoreKey{sdk.NewKVStoreKey("main")}, nil)
 	router.AddRoute("acc", []*sdk.KVStoreKey{sdk.NewKVStoreKey("acc")}, nil)
@@ -169,6 +174,8 @@ func TestKeeper_InitGenesis_commidID(t *testing.T) {
 	InitGenesis_commitID(ctx, keeper)
 	fmt.Println(keeper.GetKVStoreKeylist(ctx))
 
-	keeper.SetCurrentProposalAcceptHeight(ctx, 1234234000)
-	fmt.Println(keeper.GetCurrentProposalAcceptHeight(ctx))
+	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
+
+	upgradeparams.SetProposalAcceptHeight(ctx, 1234234000)
+	fmt.Println(upgradeparams.GetProposalAcceptHeight(ctx))
 }
