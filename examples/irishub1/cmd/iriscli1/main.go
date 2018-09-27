@@ -15,9 +15,8 @@ import (
 	slashingcmd "github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
 	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 	"github.com/irisnet/irishub/examples/irishub1/app"
-	c "github.com/irisnet/irishub/client/lcd"
 	govcmd "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	upgradecmd "github.com/irisnet/irishub/client/cli/upgrade"
+	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -71,7 +70,6 @@ func main() {
 	advancedCmd.AddCommand(
 		tendermintCmd,
 		ibcCmd,
-		c.ServeCommand(cdc),
 	)
 	rootCmd.AddCommand(
 		advancedCmd,
@@ -132,7 +130,7 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-			upgradecmd.GetCmdInfo("upgrade", cdc),
+			upgradecmd.GetInfoCmd("upgrade", cdc),
 		)...)
 	upgradeCmd.AddCommand(
 		client.PostCommands(
@@ -159,7 +157,7 @@ func main() {
 	)
 	rootCmd.AddCommand(
 		client.GetCommands(
-			version.GetCmdVersion("upgrade", cdc),
+			version.ServeVersionCommand(cdc),
 		)...)
 
 	// prepare and add flags

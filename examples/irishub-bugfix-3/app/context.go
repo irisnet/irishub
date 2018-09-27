@@ -16,7 +16,6 @@ import (
 	"strings"
 )
 
-//TODO 以后需要重构，现在有点乱
 type Context struct {
 	context.CLIContext
 	txCtx txcxt.TxContext
@@ -88,7 +87,7 @@ func (c Context) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 func (c Context) GetCoinType(coinName string) (types.CoinType, error) {
 	var coinType types.CoinType
 	coinName = strings.ToLower(coinName)
-	if coinName == denom {
+	if coinName == Denom {
 		coinType = IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)

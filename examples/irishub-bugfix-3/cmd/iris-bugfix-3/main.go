@@ -54,7 +54,7 @@ func main() {
 		tendermintCmd,
 		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
 		client.LineBreak,
-		version.GetCmdVersion("upgrade", cdc),
+		version.ServeVersionCommand(cdc),
 	)
 
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
