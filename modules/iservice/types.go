@@ -1,25 +1,27 @@
 package iservice
 
 type OutputPrivacyEnum byte
-type OutputCachedEnum byte
-type BroadcastEnum byte
-
 const (
-	NoPrivacy        OutputPrivacyEnum = 1
-	PubKeyEncryption OutputPrivacyEnum = 2
-	OffChainCached   OutputCachedEnum  = 3
-	NoCached         OutputCachedEnum  = 4
-	Broadcast        BroadcastEnum     = 5
-	Unicast          BroadcastEnum     = 6
+	NoPrivacy        OutputPrivacyEnum = 0x01
+	PubKeyEncryption OutputPrivacyEnum = 0x02
+)
+
+type OutputCachedEnum byte
+const (
+	OffChainCached   OutputCachedEnum  = 0x01
+	NoCached         OutputCachedEnum  = 0x02
+)
+
+type BroadcastEnum byte
+const (
+	Broadcast        BroadcastEnum     = 0x01
+	Unicast          BroadcastEnum     = 0x02
 )
 
 type MethodProperty struct {
 	ID            string            `json:"id"`
 	Name          string            `json:"name"`
 	Description   string            `json:"description"`
-	Input         string            `json:"input"`
-	Output        string            `json:"output"`
-	Error         string            `json:"error"`
-	OutputPrivacy OutputPrivacyEnum `json:"outputprivacy"`
-	OutputCached  OutputCachedEnum  `json:"outputcached"`
+	OutputPrivacy OutputPrivacyEnum `json:"output_privacy"`
+	OutputCached  OutputCachedEnum  `json:"output_cached"`
 }

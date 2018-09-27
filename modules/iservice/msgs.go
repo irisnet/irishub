@@ -12,7 +12,7 @@ type MsgSvcDef struct {
 	Tags              []string       `json:"tags"`
 	Author            sdk.AccAddress `json:"author"`
 	AuthorDescription string         `json:"author_description"`
-	IDLContent        string         `json:"methods"`
+	IDLContent        string         `json:"idl_content"`
 	Broadcast         BroadcastEnum  `json:"broadcast"`
 }
 
