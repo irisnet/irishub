@@ -21,7 +21,7 @@ Please follow this [instruction](Validator-Node.md) to upgrade your full node to
 
 ### Deploy IRISHub Monitor
 
-Please follow this [guide](tools/Deploy-IRIS-Monitor.md) to get IRIHub monitor running on your side.
+Please follow this [guide](../tools/Deploy-IRIS-Monitor.md) to get IRIHub monitor running on your side.
 
 
 ### Upgrade to Validator Node
@@ -34,7 +34,7 @@ If you miss the genesis file generation process, you can still upgrade your full
 
 ### Setup a sentry node
 
-A validator is under the risk of being attacked. You could follow this [guide](tools/Setup-Sentry-Node.md) to setup a sentry node to protect yourself.
+A validator is under the risk of being attacked. You could follow this [guide](../validators/Setup-Sentry-Node.md) to setup a sentry node to protect yourself.
 
 ##  Useful Links
 
