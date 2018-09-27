@@ -4,7 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/irisnet/irishub/modules/iparams"
 	"math"
 )
 
@@ -18,15 +17,13 @@ type Keeper struct {
 	cdc      *wire.Codec
 	// The ValidatorSet to get information about validators
 	sk     stake.Keeper
-	params iparams.GovSetter
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps iparams.GovSetter) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
 		sk:       sk,
-		params:   ps,
 	}
 	return keeper
 }
