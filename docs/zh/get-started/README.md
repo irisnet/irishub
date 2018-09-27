@@ -33,10 +33,10 @@ IRIS Hub是用Go语言编写的。它可以在任何能够编译并运行Go语�
 执行以下命令,若出现对应的版本号则说明安装成功。
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 #### 方法2：源码编译安装
 
@@ -93,7 +93,7 @@ Ubuntu LTS 16.04
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.4.1
+cd irishub && git checkout v0.4.2
 
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
@@ -104,10 +104,10 @@ make get_vendor_deps && make install
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 
 ### 部署一个全节点
