@@ -68,7 +68,7 @@
 
    `app_gen_tx`中说明了拥有这个节点的账户信息。这个账户的助记词就是刚刚的secret
 
-3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-3000/config/gentx`目录下：
+3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-3001/config/gentx`目录下：
 
    注意⚠️：json文中的IP改成公网IP
 

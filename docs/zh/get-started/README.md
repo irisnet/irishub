@@ -5,7 +5,7 @@
 
 IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
-## 如何加入fuxi-3000测试网
+## 如何加入fuxi-3001测试网
 
 ### 安装IRIShub
 
@@ -131,15 +131,15 @@ iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下
     cd $IRISHOME/config/
     rm genesis.json
     rm config.toml
-    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3000/config/config.toml
-    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3000/config/genesis.json
+    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3001/config/config.toml
+    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3001/config/genesis.json
 
 * **修改配置文件**
 
 在config.toml文件中可以配置以下信息：
 
 1. 将moniker字段配置称为自定义的名称，这样便于区分不同的节点
-2. seed字段用语设置种子节点，在fuxi-3000中的官方种子节点为：
+2. seed字段用语设置种子节点，在fuxi-3001中的官方种子节点为：
 ```
 c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
 ```
