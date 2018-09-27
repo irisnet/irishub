@@ -5,15 +5,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparams"
 )
 
 // nolint
 
 // Governance Keeper
 type Keeper struct {
-	// The reference to the ParamSetter to get and set Global Params
-	ps iparams.GovSetter
 
 	// The reference to the CoinKeeper to modify balances
 	ck bank.Keeper
@@ -35,10 +32,9 @@ type Keeper struct {
 }
 
 // NewGovernanceMapper returns a mapper that uses go-wire to (binary) encode and decode gov types.
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ps iparams.GovSetter, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
-		ps:        ps,
 		ck:        ck,
 		ds:        ds,
 		vs:        ds.GetValidatorSet(),
