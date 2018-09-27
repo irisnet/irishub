@@ -10,8 +10,8 @@
 
 ### 治理流程
 
-1. 任何用户可以发起提议，并抵押一部分资金，如果超过`min_deposit`,提议进入投票，否则留在抵押期。其他人可以对在抵押期的提议进行抵押资金，如果提议的抵押资金总和超过`min_deposit`,则进入投票期。但是提议在抵押期停留的区块数目超过`max_deposit_period`，则提议被关闭。
-2. 进入投票期的提议，只有验证人和委托人可以进行投票，委托人如果没投票，则他继承他委托的验证人的投票选项，如果委托人投票了，则覆盖他委托的验证人的投票选项，当提议到达`voting_perid`,统计投票结果。
+1. 任何用户可以发起提议，并抵押一部分token，如果超过`min_deposit`,提议进入投票，否则留在抵押期。其他人可以对在抵押期的提议进行抵押token，如果提议的抵押token总和超过`min_deposit`,则进入投票期。但若提议在抵押期停留的出块数目超过`max_deposit_period`，则提议被关闭。
+2. 进入投票期的提议，只有验证人和委托人可以进行投票。如果委托人没投票，则他继承他委托的验证人的投票选项。如果委托人投票了，则覆盖他委托的验证人的投票选项。当提议到达`voting_perid`,统计投票结果。
 3. 具体提议投票逻辑细节见[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/governance/overview.md)
 
 ## 使用场景
@@ -138,7 +138,7 @@ iriscli gov submit-proposal --title="update MinDeposit" --description="test" --t
 * `--title`       提议的标题
 * `--description` 提议的描述
 * `--type`        提议的类型 {'Text','ParameterChange','SoftwareUpgrade'}
-* `--deposit`     抵押贷币的数量
+* `--deposit`     抵押的token数量
 * 上面就是典型的文本类提议
 
 ```
@@ -146,7 +146,7 @@ iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test
 ```
 
 * `--propsal-id` 抵押提议ID
-* `--deposit`    抵押的贷币数目
+* `--deposit`    抵押的token数量
 
 ```
 iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
@@ -228,9 +228,9 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
 
 * 可修改参数
 * 参数的key:"Gov/gov/DepositProcedure"
-* `min_deposit[0].denom`  最小抵押贷币的token只能是单位是iris-atto的iris通证。
-* `min_deposit[0].amount` 最小抵押贷币的数量,默认范围:10iris（1iris，200iris）
-* `max_deposit_period`    补交抵押的窗口期,默认:10 范围（0，1）     
+* `min_deposit[0].denom`  最小抵押token只能是单位是iris-atto的iris通证。
+* `min_deposit[0].amount` 最小抵押token数量,默认:10iris,范围（1iris，200iris）
+* `max_deposit_period`    补交抵押token的窗口期,默认:10,范围（0，1）     
 
 ```
 # VotingProcedure（投票阶段的参数）
@@ -239,7 +239,7 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
 },
 ```
     
-* `voting_perid` 投票的窗口期,默认10,范围（20，20000）
+* `voting_perid` 投票的窗口期,默认:10,范围（20，20000）
    
 ```
 # TallyingProcedure (统计阶段段参数)    
@@ -249,9 +249,9 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
     "governance_penalty": "1/100"
 }
 ```   
-* `veto` 默认1/3,范围（0，1）
-* `threshold` 默认1/2,范围（0，1）
-* `governance_penalty` 未投票的验证人惩罚贷币的比例 默认1/100,范围（0，1）
+* `veto` 默认:1/3,范围（0，1）
+* `threshold` 默认:1/2,范围（0，1）
+* `governance_penalty` 未投票的验证人惩罚token的比例 默认:1/100,范围（0，1）
 *  投票统计逻辑：如果强烈反对的voting_power占总的voting_power 超过 veto,提议不通过。然后再看赞同的voting_power占总的投票的voting_power 是否超过 veto,超过则提议不通过,不超过则不通过。
 
 

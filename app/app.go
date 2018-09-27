@@ -16,8 +16,7 @@ import (
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparams"
-	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
@@ -73,7 +72,6 @@ type IrisApp struct {
 	slashingKeeper      slashing.Keeper
 	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
-	iparamsKeeper       iparams.Keeper
 	upgradeKeeper       upgrade.Keeper
 
 	// fee manager
@@ -116,14 +114,13 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	// add handlers
 	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
-	app.iparamsKeeper = iparams.NewKeeper(app.cdc, app.keyIparams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.iparamsKeeper.GovSetter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -135,7 +132,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyIparams, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
-	app.feeManager = bam.NewFeeManager(app.iparamsKeeper.GlobalGetter(), app.iparamsKeeper.GovGetter())
+	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -157,14 +154,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
-	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
+	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
 							&govparams.DepositProcedureParameter,
 		                    &govparams.VotingProcedureParameter,
 		                    &govparams.TallyingProcedureParameter,
 							&upgradeparams.CurrentUpgradeProposalIdParameter,
 							&upgradeparams.ProposalAcceptHeightParameter)
 
-	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 		                              &govparams.VotingProcedureParameter,
 		                              &govparams.TallyingProcedureParameter,)
 
@@ -257,7 +254,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	bam.InitGenesis(ctx, app.iparamsKeeper.GlobalSetter(), app.iparamsKeeper.GovSetter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)

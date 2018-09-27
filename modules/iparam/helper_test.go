@@ -1,4 +1,4 @@
-package parameter
+package iparam
 
 import (
 	"github.com/cosmos/cosmos-sdk/store"
