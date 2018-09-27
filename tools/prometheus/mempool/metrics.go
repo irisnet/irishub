@@ -1,38 +1,35 @@
 package mempool
 
 import (
-	"github.com/go-kit/kit/metrics"
-	"github.com/go-kit/kit/metrics/prometheus"
-	tools "github.com/irisnet/irishub/tools"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/irisnet/irishub/app"
+	"github.com/tendermint/tendermint/mempool"
 	"time"
+  "log"
 )
 
 // Metrics contains metrics exposed by this package.
 // see MetricsProvider for descriptions.
 type Metrics struct {
-	// Size of the mempool.
-	Size metrics.Gauge
+	TmMetrics mempool.Metrics
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
+	tmMetrics := *mempool.PrometheusMetrics()
 	return &Metrics{
-		Size: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "mempool",
-			Name:      "size",
-			Help:      "Size of the mempool (number of uncommitted transactions).",
-		}, []string{}),
+		tmMetrics,
 	}
 }
 
-func (m *Metrics) Start(rpc tools.Context) {
+func (m *Metrics) Start(rpc app.Context) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
-			result := rpc.NumUnconfirmedTxs()
-			m.Size.Set(float64(result.N))
+			if result, err := rpc.NumUnconfirmedTxs(); err == nil{
+				m.TmMetrics.Size.Set(float64(result.N))
+			}else {
+        log.Println(err)
+			}
 		}
 	}()
-
 }

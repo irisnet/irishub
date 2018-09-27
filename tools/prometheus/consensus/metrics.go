@@ -1,6 +1,8 @@
 package consensus
 
 import (
+	"bytes"
+	"container/list"
 	cctx "context"
 	"encoding/hex"
 	"fmt"
@@ -8,25 +10,28 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
-	tools "github.com/irisnet/irishub/tools"
+	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/spf13/viper"
+	"github.com/tendermint/tendermint/consensus"
 	"github.com/tendermint/tendermint/types"
 	"log"
 	"strings"
 	"time"
 )
 
+// TODO
+const keyStoreStake = "stake"
+
+type BlockInfo struct {
+	Height int64
+	Time   time.Time
+	signed int // whether the given address signed the block, 1 if signed, 0 else.
+}
+
 // Metrics contains metrics exposed by this package.
-type Metrics struct {
-	// Height of the chain.
-	Height metrics.Gauge
 
-	// Number of rounds.
-	Rounds metrics.Gauge
-
-	// Number of validators.
-	Validators metrics.Gauge
-	// Number of Candidates
+type IrisMetrics struct {
 	Candidates metrics.Gauge
 	// Total power of all validators.
 	ValidatorsPower metrics.Gauge
@@ -39,98 +44,100 @@ type Metrics struct {
 	// Total power of the byzantine validators.
 	ByzantineValidatorsPower metrics.Gauge
 
-	// Time between this and the last block.
-	BlockIntervalSeconds metrics.Histogram
+	//average block interval in last 100 blocks (in seconds)
+	AvgBlockIntervalSeconds metrics.Gauge
+	//block info
+	blockInfo *list.List // queue of BlockInfo
 
-	// Number of transactions.
-	NumTxs metrics.Gauge
-	// Size of the block.
-	BlockSizeBytes metrics.Gauge
-	// Total number of transactions.
-	TotalTxs metrics.Gauge
+	//Voting Power of the validator
+	VotingPower metrics.Gauge
+	//ratio of Voting Power of the validator to total voting power
+	VotingPowerRatio metrics.Gauge
+	// ratio of signed blocks in last 100 blocks
+	UpTime metrics.Gauge
+	// missed precommited since monitor up
+	MissedPrecommits metrics.Gauge
+	// given address
+	Address     types.Address
+	SignedCount int
+	MissedCount int
 }
 
-// PrometheusMetrics returns Metrics build using Prometheus client library.
-func PrometheusMetrics() *Metrics {
-	return &Metrics{
-		Height: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "consensus",
-			Name:      "height",
-			Help:      "Height of the chain.",
-		}, []string{}),
-		Rounds: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "consensus",
-			Name:      "rounds",
-			Help:      "Number of rounds.",
-		}, []string{}),
-
-		Validators: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "consensus",
-			Name:      "validators",
-			Help:      "Number of validators.",
-		}, []string{}),
-
+func NewIrisMetrics() IrisMetrics {
+	return IrisMetrics{
 		Candidates: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
 			Name:      "candidates",
 			Help:      "Number of Candidates.",
 		}, []string{}),
 
-		ValidatorsPower: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		AvgBlockIntervalSeconds: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "validators_power",
-			Help:      "Total power of all validators.",
+			Name:      "avg_block_interval_seconds",
+			Help:      "average block interval of last 100 blocks (in seconds).",
 		}, []string{}),
-		MissingValidators: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		blockInfo: list.New(),
+		UpTime: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "missing_validators",
-			Help:      "Number of validators who did not sign.",
+			Name:      "up_time",
+			Help:      "ratio of signed blocks in last 100 blocks.",
 		}, []string{}),
-		MissingValidatorsPower: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		MissedPrecommits: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "missing_validators_power",
-			Help:      "Total power of the missing validators.",
+			Name:      "missed_precommits_count",
+			Help:      "missed precommited since monitor up.",
 		}, []string{}),
-		ByzantineValidators: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		VotingPower: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "byzantine_validators",
-			Help:      "Number of validators who tried to double sign.",
+			Name:      "voting_power",
+			Help:      "voting power of the validator",
 		}, []string{}),
-		ByzantineValidatorsPower: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		VotingPowerRatio: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Subsystem: "consensus",
-			Name:      "byzantine_validators_power",
-			Help:      "Total power of the byzantine validators.",
+			Name:      "voting_power_ratio",
+			Help:      "ratio of voting power of the validator to total voting power",
 		}, []string{}),
-
-		BlockIntervalSeconds: prometheus.NewHistogramFrom(stdprometheus.HistogramOpts{
-			Subsystem: "consensus",
-			Name:      "block_interval_seconds",
-			Help:      "Time between this and the last block.",
-			Buckets:   []float64{1, 2.5, 5, 10, 60},
-		}, []string{}),
-
-		NumTxs: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "consensus",
-			Name:      "num_txs",
-			Help:      "Number of transactions.",
-		}, []string{}),
-		BlockSizeBytes: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "consensus",
-			Name:      "block_size_bytes",
-			Help:      "Size of the block.",
-		}, []string{}),
-		TotalTxs: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Subsystem: "consensus",
-			Name:      "total_txs",
-			Help:      "Total number of transactions.",
-		}, []string{}),
+		Address:     make([]byte, 0),
+		SignedCount: 0,
+		MissedCount: 0,
 	}
 }
 
-func (cs *Metrics) Start(ctx tools.Context) {
-	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
+type Metrics struct {
+	TmMetrics   consensus.Metrics
+	IrisMetrics IrisMetrics
+}
 
-	var client = ctx.Client
+// PrometheusMetrics returns Metrics build using Prometheus client library.
+func PrometheusMetrics() *Metrics {
+	tmMetrics := *consensus.PrometheusMetrics()
+	irisMetrics := NewIrisMetrics()
+	return &Metrics{
+		TmMetrics:   tmMetrics,
+		IrisMetrics: irisMetrics,
+	}
+}
+
+func (cs *Metrics) SetAddress(addr_str string) {
+	if addr, err := hex.DecodeString(addr_str); err != nil {
+		log.Println("parse validator address falid ", err)
+	} else {
+		if len(addr) == 0 {
+			log.Println("validator address is null ")
+		} else {
+			cs.IrisMetrics.Address = addr
+		}
+	}
+}
+
+func (cs *Metrics) Start(ctx app.Context) {
+
+	validaor_addr := viper.GetString("address")
+	cs.SetAddress(validaor_addr)
+
+	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
+	var client = ctx.Ctx.Client
+
 	//开启监听事件
 	client.Start()
 
@@ -140,29 +147,47 @@ func (cs *Metrics) Start(ctx tools.Context) {
 
 	if err != nil {
 		log.Println("got ", err)
+		return
 	}
 
 	go func() {
 		for e := range blockC {
 			block := e.(types.TMEventData).(types.EventDataNewBlock)
-			cs.RecordMetrics(ctx, ctx.Cdc, block.Block, ctx.StoreName)
+			cs.RecordMetrics(ctx, ctx.Cdc, block.Block)
+		}
+	}()
+
+	roundC := make(chan interface{})
+	err = client.Subscribe(context, "monitor", types.EventQueryNewRound, roundC)
+	if err != nil {
+		log.Println("got ", err)
+		return
+	}
+
+	go func() {
+		for e := range roundC {
+			round := e.(types.TMEventData).(types.EventDataRoundState)
+			cs.TmMetrics.Rounds.Set(float64(round.Round))
 		}
 	}()
 }
 
-func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *types.Block, storeName string) {
-	cs.Height.Set(float64(block.Height))
-	cs.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
+func (cs *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec, block *types.Block) {
+	var client = ctx.Ctx.Client
+
+	cs.TmMetrics.Height.Set(float64(block.Height))
+	cs.TmMetrics.ByzantineValidators.Set(float64(len(block.Evidence.Evidence)))
 
 	missingValidators := 0
 	missingValidatorsPower := int64(0)
 	validatorsPower := int64(0)
-	resultValidators, err := ctx.Client.Validators(&block.Height)
+	resultValidators, err := client.Validators(&block.Height)
 	if err != nil {
 		panic(err)
 	}
 	validators := resultValidators.Validators
 	valMap := make(map[string]types.Validator, len(validators))
+	var votingPower int64
 	for i, val := range validators {
 		var vote *types.Vote
 		if i < len(block.LastCommit.Precommits) {
@@ -172,15 +197,20 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *type
 			missingValidators++
 			missingValidatorsPower += val.VotingPower
 		}
-
+		if bytes.Equal(cs.IrisMetrics.Address, val.Address) {
+			votingPower = val.VotingPower
+		}
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
-	cs.Candidates.Set(float64(getCandidatesNum(cdc, ctx, storeName)))
-	cs.MissingValidators.Set(float64(missingValidators))
-	cs.MissingValidatorsPower.Set(float64(missingValidatorsPower))
-	cs.ValidatorsPower.Set(float64(validatorsPower))
-	cs.Validators.Set(float64(len(validators)))
+	cs.IrisMetrics.Candidates.Set(float64(getCandidatesNum(cdc, ctx)))
+	cs.TmMetrics.MissingValidators.Set(float64(missingValidators))
+	cs.TmMetrics.MissingValidatorsPower.Set(float64(missingValidatorsPower))
+	cs.TmMetrics.ValidatorsPower.Set(float64(validatorsPower))
+	cs.TmMetrics.Validators.Set(float64(len(validators)))
+
+	cs.IrisMetrics.VotingPower.Set(float64(votingPower))
+	cs.IrisMetrics.VotingPowerRatio.Set(float64(votingPower) / float64(validatorsPower))
 
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {
@@ -189,25 +219,48 @@ func (cs *Metrics) RecordMetrics(ctx tools.Context, cdc *wire.Codec, block *type
 			byzantineValidatorsPower += val.VotingPower
 		}
 	}
-	cs.ByzantineValidatorsPower.Set(float64(byzantineValidatorsPower))
+	cs.TmMetrics.ByzantineValidatorsPower.Set(float64(byzantineValidatorsPower))
 
 	if block.Height > 1 {
 		lastBlockHight := block.Height - 1
-		lastBlock, _ := ctx.Client.Block(&lastBlockHight)
+		lastBlock, _ := client.Block(&lastBlockHight)
 		interval := block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds()
-		cs.BlockIntervalSeconds.Observe(interval)
+		cs.TmMetrics.BlockIntervalSeconds.Observe(interval)
 	}
 
-	cs.NumTxs.Set(float64(block.NumTxs))
-	cs.TotalTxs.Set(float64(block.TotalTxs))
+	cs.TmMetrics.NumTxs.Set(float64(block.NumTxs))
+	cs.TmMetrics.TotalTxs.Set(float64(block.TotalTxs))
 
+	if block.Height > 0 {
+		signed := 0
+		for _, vote := range block.LastCommit.Precommits {
+			if vote != nil && bytes.Equal(vote.ValidatorAddress.Bytes(), cs.IrisMetrics.Address.Bytes()) {
+				signed = 1
+				break
+			}
+		}
+		cs.IrisMetrics.MissedCount += 1 - signed
+		cs.IrisMetrics.SignedCount += signed
+
+		cs.IrisMetrics.blockInfo.PushBack(BlockInfo{Height: block.Height, Time: block.Time, signed: signed})
+		firstBlock := cs.IrisMetrics.blockInfo.Front().Value.(BlockInfo)
+		if cs.IrisMetrics.blockInfo.Len() > 100 {
+			cs.IrisMetrics.blockInfo.Remove(cs.IrisMetrics.blockInfo.Front())
+			cs.IrisMetrics.SignedCount -= firstBlock.signed
+		}
+
+		avgInterval := time.Now().Sub(firstBlock.Time).Seconds() / float64(cs.IrisMetrics.blockInfo.Len())
+		cs.IrisMetrics.AvgBlockIntervalSeconds.Set(avgInterval)
+		cs.IrisMetrics.UpTime.Set(float64(cs.IrisMetrics.SignedCount) / float64(cs.IrisMetrics.blockInfo.Len()))
+		cs.IrisMetrics.MissedPrecommits.Set(float64(cs.IrisMetrics.MissedCount))
+	}
 	bz, _ := cdc.MarshalBinaryBare(block)
-	cs.BlockSizeBytes.Set(float64(len(bz)))
+	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 
-func getCandidatesNum(cdc *wire.Codec, ctx tools.Context, storeName string) int {
+func getCandidatesNum(cdc *wire.Codec, ctx app.Context) int {
 	key := stake.ValidatorsKey
-	resKVs, err := ctx.QuerySubspace(cdc, key, storeName)
+	resKVs, err := ctx.Ctx.QuerySubspace(cdc, key, keyStoreStake)
 	if err != nil {
 		fmt.Println(err)
 	}
