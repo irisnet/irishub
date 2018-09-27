@@ -16,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparams"
 	"github.com/irisnet/irishub/types"
 )
 
@@ -31,10 +30,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	keyStake := sdk.NewKVStoreKey("stake")
 	keyGov := sdk.NewKVStoreKey("gov")
 
-	pk := iparams.NewKeeper(mapp.Cdc, keyGlobalParams)
 	ck := bank.NewKeeper(mapp.AccountMapper)
 	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
-	keeper := NewKeeper(mapp.Cdc, keyGov, pk.GovSetter(), ck, sk, DefaultCodespace)
+	keeper := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
 	mapp.Router().AddRoute("gov", NewHandler(keeper))
 
 	mapp.SetEndBlocker(getEndBlocker(keeper))
