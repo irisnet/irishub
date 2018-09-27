@@ -8,15 +8,15 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"time"
 	"github.com/irisnet/irishub/types"
-	"fmt"
+	"time"
 )
 
 // State to Unmarshal
@@ -54,13 +54,13 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 }
 
 var (
-	flagName       = "name"
-	flagClientHome = "home-client"
-	flagOWK        = "owk"
-	denom          = "iris"
-	feeAmt   = int64(100)
-	IrisCt = types.NewDefaultCoinType(denom)
-	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
+	flagName          = "name"
+	flagClientHome    = "home-client"
+	flagOWK           = "owk"
+	Denom             = "iris"
+	feeAmt            = int64(100)
+	IrisCt            = types.NewDefaultCoinType(Denom)
+	freeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
@@ -176,7 +176,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 			// add some new shares to the validator
 			var issuedDelShares sdk.Rat
-			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, feeAmt)
+			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, freeFermionVal.Amount)
 			//validator.TokenPrecision = stakeData.Params.DenomPrecision
 			stakeData.Validators = append(stakeData.Validators, validator)
 
@@ -229,7 +229,7 @@ func createGenesisState() stake.GenesisState {
 			GoalBonded:          sdk.NewRat(67, 100),
 			UnbondingTime:       defaultUnbondingTime,
 			MaxValidators:       100,
-			BondDenom:           denom,
+			BondDenom:           Denom + "-" + types.Atto,
 		},
 	}
 }

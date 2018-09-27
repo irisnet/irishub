@@ -34,7 +34,6 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	bc "github.com/tendermint/tendermint/blockchain"
 	"strings"
-	"github.com/irisnet/irishub/modules/iparams"
 )
 
 const (
@@ -76,7 +75,6 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
-	iparamsKeeper       iparams.Keeper
 
 	// fee manager
 	feeManager  bam.FeeManager
@@ -126,7 +124,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.iparamsKeeper.Setter())
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
@@ -142,7 +140,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
-	app.feeManager = bam.NewFeeManager(app.iparamsKeeper.Getter())
+	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
@@ -230,7 +228,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		panic(err)
 	}
 
-	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10,denom))
+	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10,Denom))
 	if err != nil {
 		panic(err)
 	}
@@ -256,7 +254,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	bam.InitGenesis(ctx, app.iparamsKeeper.Setter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
