@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -31,6 +31,9 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"strings"
+	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 const (
@@ -118,7 +121,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
@@ -154,6 +157,18 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
+	upgrade.RegisterModuleList(app.Router())
+	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter)
+
+	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,)
+
 
 	return app
 }
@@ -227,14 +242,14 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
-		DepositProcedure: gov.DepositProcedure{
+		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 1440,
+			MaxDepositPeriod: 10,
 		},
-		VotingProcedure: gov.VotingProcedure{
-			VotingPeriod: 30,
+		VotingProcedure: govparams.VotingProcedure{
+			VotingPeriod: 10,
 		},
-		TallyingProcedure: gov.TallyingProcedure{
+		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
 			Veto:              sdk.NewRat(1, 3),
 			GovernancePenalty: sdk.NewRat(1, 100),
@@ -293,7 +308,6 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
-		fmt.Println("============ runMsgs() ===========  " + msgType)
 		if err != nil {
 			return err.Result()
 		}
@@ -302,7 +316,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
 		}
-		fmt.Println(msg)
+
 		msgResult := handler(ctx, msg)
 
 		// NOTE: GasWanted is determined by ante handler and

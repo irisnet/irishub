@@ -25,8 +25,8 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")
-			res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
+			res_height, _ := cliCtx.QueryStore([]byte(upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")
+			res_proposalID, _ := cliCtx.QueryStore([]byte(upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
 			var height int64
 			var proposalID int64
 			cdc.MustUnmarshalBinary(res_height, &height)
