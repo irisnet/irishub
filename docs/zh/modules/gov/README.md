@@ -138,7 +138,7 @@ iriscli gov submit-proposal --title="update MinDeposit" --description="test" --t
 * `--title`       提议的标题
 * `--description` 提议的描述
 * `--type`        提议的类型 {'Text','ParameterChange','SoftwareUpgrade'}
-* `--deposit`     抵押token的数量
+* `--deposit`     抵押的token数量
 * 上面就是典型的文本类提议
 
 ```
@@ -146,7 +146,7 @@ iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test
 ```
 
 * `--propsal-id` 抵押提议ID
-* `--deposit`    抵押的token数目
+* `--deposit`    抵押的token数量
 
 ```
 iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
