@@ -3,15 +3,15 @@
 ## Basic Function Description
 
 1. On-chain governance proposals on text
-2. On-chain governance proposals on parameter modification
+2. On-chain governance proposals on parameter change
 3. On-chain governance proposals on software upgrade （unavailable)
 
-## interactive process
+## Interactive process
 
 ### governance process
 
-1. Any users can deposit some tokens to initiate a proposal. Once deposit reaches a certain value 'min_deposit`, enter voting period, otherwise it will remain in the deposit period. Others can deposit the proposals on the deposit period. Once the sum of the deposit reaches 'min_deposit`, enter voting period. However, if the block-time exceeds `max_deposit_period` in the deposit period, the proposal will be closed.
-2. The proposals which enter voting period only can be voted by validators and delegators. The vote of a delegator who hasn't vote will be the same as his validator's vote, and the vote of a delegator who has voted will be remained. The votes wil be counted when reach `voting_period'.
+1. Any users can deposit some tokens to initiate a proposal. Once deposit reaches a certain value `min_deposit`, enter voting period, otherwise it will remain in the deposit period. Others can deposit the proposals on the deposit period. Once the sum of the deposit reaches `min_deposit`, enter voting period. However, if the block-time exceeds `max_deposit_period` in the deposit period, the proposal will be closed.
+2. The proposals which enter voting period only can be voted by validators and delegators. The vote of a delegator who hasn't vote will be the same as his validator's vote, and the vote of a delegator who has voted will be remained. The votes wil be tallyed when reach `voting_period'.
 3. More details about voting for proposals:
 [CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/governance/overview.md)
 
@@ -26,12 +26,12 @@ iris init --gen-txs --chain-id=gov-test -o --home=iris
 iris start --home=iris
 ```
 
-### Usage scenario of parameter modification
+### Usage scenario of parameter change
 
-Scenario 1：Modify the parameters through the command lines
+Scenario 1：Change the parameters through the command lines
 
 ```
-# Query parameters can be modified by the modules'name in gov 
+# Query parameters can be changed by the modules'name in gov 
 iriscli gov query-params --module=gov --trust-node
 
 # Results
@@ -47,7 +47,7 @@ iriscli gov query-params --key=Gov/gov/DepositProcedure --trust-node
 # Results
 {"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":10}","op":""}
 
-# Send proposals, return modified parameters
+# Send proposals, return changed parameters
 echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 
 # Deposit for a proposal
@@ -61,7 +61,7 @@ iriscli gov query-proposal --proposal-id=1 --trust-node
 
 ```
 
-Scenario 2: Modify the parameters by the files
+Scenario 2: Change the parameters by the files
 
 ```
 # Export profiles
@@ -114,7 +114,7 @@ vi iris/config/params.json
   }
 }
 
-# Modify the parameters through files, return modified parameters
+# Change the parameters through files, return changed parameters
 echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --path=iris --key=Gov/gov/TallyingProcedure --op=update --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 
 # Deposit for a proposal
@@ -153,7 +153,7 @@ iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test
 iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 ```
 
-* `--proposal-id` The ID of the proposal deposited
+* `--proposal-id` The ID of the proposal in voting period
 * `--option`      Vote option{'Yes'-agree,'Abstain'-abstain,'No'-disagree,'nowithVeto'-strongly disagree }
 
 
@@ -173,7 +173,7 @@ iriscli gov query-proposal --proposal-id=1 --trust-node
 iriscli gov query-params --module=gov --trust-node
 ```
 
-* `--module` Query the list of "key" of the parameters can be modified in the module
+* `--module` Query the list of "key" of the parameters can be changed in the module
 
 
 ```
@@ -197,17 +197,17 @@ iriscli gov pull-params --path=iris --trust-node
 iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 ```
 
-* `--param` The details of modified parameters （get parameters through query-params, modify it and then add "update" on the "op", more details in usage scenarios）
+* `--param` The details of changed parameters （get parameters through query-params, modify it and then add "update" on the "op", more details in usage scenarios）
 * Other fields' proposals are similar with text proposal
 
 ```
-# Modify the parameters through files, return modified parameters
+# Change the parameters through files, return modified parameters
 echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --path=iris --key=Gov/gov/TallyingProcedure --op=update --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 ```
 
 * `--path` The folder of node initialization 
 * `--key`  The key of the parameter to be modified
-* `--op`   The type of modified parameters; only 'update' is implemented at present
+* `--op`   The type of changed parameters; only 'update' is implemented at present
 * Other fields' proposals are similar with text proposal
 
 ### Proposals on software upgrade 
@@ -227,7 +227,7 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
 }
 ```
 
-* Parameters can be modified
+* Parameters can be changed
 * The key of parameters:"Gov/gov/DepositProcedure"
 * `min_deposit[0].denom`  The minimum tokens deposited are counted by iris-atto.
 * `min_deposit[0].amount` The number of minimum tokens and the default scope：10iris,（1iris，200iris）
@@ -239,19 +239,22 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
     "voting_period": "10"
 },
 ```
-    
+
+* Parameters can be changed   
 * `voting_perid`  Window period for vote, default：10, scope（20，20000）
    
 ```
-# TallyingProcedure (The parameters in counting period)    
+# TallyingProcedure (The parameters in Tallying period)    
 "Gov/gov/TallyingProcedure": {
     "threshold": "1/2",
     "veto": "1/3",
     "governance_penalty": "1/100"
 }
-```   
+``` 
+  
+* Parameters can be changed
 * `veto` default: 1/3, scope（0，1）
 * `threshold` default 1/2, scope（0，1）
 * `governance_penalty` The default ratio of slashing tokens of validators who didn't vote: 1/100, scope（0，1）
-*  Vote rules: If the ratio of voting_power of "strongly disagree" over "veto", the proposal won't be passed. If the ratio of voting_power of "agree" over "veto", the proposal won't be passed. Otherwise, it will be passed.
+*  Vote rules: If the ratio of voting power of "strongly disagree" over "veto", the proposal won't be passed. If the ratio of voting_power of "agree" over "veto", the proposal won't be passed. Otherwise, it will be passed.
 
