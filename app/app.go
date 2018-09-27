@@ -122,7 +122,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.iparamsKeeper.GovSetter())
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.iparamsKeeper.GovSetter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
@@ -159,10 +159,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	upgrade.RegisterModuleList(app.Router())
 	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
 							&govparams.DepositProcedureParameter,
+		                    &govparams.VotingProcedureParameter,
+		                    &govparams.TallyingProcedureParameter,
 							&upgradeparams.CurrentUpgradeProposalIdParameter,
 							&upgradeparams.ProposalAcceptHeightParameter)
 
-	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter)
+	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		                              &govparams.VotingProcedureParameter,
+		                              &govparams.TallyingProcedureParameter,)
 
 	return app
 }
@@ -238,10 +242,10 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 10,
 		},
-		VotingProcedure: gov.VotingProcedure{
+		VotingProcedure: govparams.VotingProcedure{
 			VotingPeriod: 10,
 		},
-		TallyingProcedure: gov.TallyingProcedure{
+		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
 			Veto:              sdk.NewRat(1, 3),
 			GovernancePenalty: sdk.NewRat(1, 100),

@@ -79,10 +79,10 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 				MinDeposit:       sdk.Coins{minDeposit},
 				MaxDepositPeriod: 1440,
 			},
-			VotingProcedure: VotingProcedure{
+			VotingProcedure: govparams.VotingProcedure{
 				VotingPeriod: 30,
 			},
-			TallyingProcedure: TallyingProcedure{
+			TallyingProcedure: govparams.TallyingProcedure{
 				Threshold:         sdk.NewRat(1, 2),
 				Veto:              sdk.NewRat(1, 3),
 				GovernancePenalty: sdk.NewRat(1, 100),

@@ -11,5 +11,7 @@ const (
 	flagDepositer         = "depositer"
 	flagStatus            = "status"
 	flagLatestProposalIDs = "latest"
-	flagParam            = "param"
-)
+	flagParam             = "param"
+	flagOp                = "op"
+	)
+

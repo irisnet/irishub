@@ -13,6 +13,7 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/pkg/errors"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -49,10 +50,15 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 
 			var param gov.Param
 			if proposalType == gov.ProposalTypeParameterChange {
-				if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
-					fmt.Println(err.Error())
-					return nil
+				pathStr := viper.GetString(flagPath)
+				keyStr := viper.GetString(flagKey)
+				opStr := viper.GetString(flagOp)
+				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr,cdc)
+				if err != nil {
+					return err
 				}
+				jsonBytes,_ := json.MarshalIndent(param,""," ")
+				fmt.Println("Param:\n",string(jsonBytes))
 			}
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
@@ -73,8 +79,31 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
-
+	cmd.Flags().String(flagKey, "", "the key of parameter")
+	cmd.Flags().String(flagOp, "", "the operation of parameter")
+	cmd.Flags().String(flagPath, "", "the path of param.json")
 	return cmd
+}
+
+func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string,cdc *wire.Codec) (gov.Param, error) {
+	var param gov.Param
+
+	if paramStr != "" {
+		err := json.Unmarshal([]byte(paramStr), &param)
+		return param, err
+
+	} else if pathStr != ""{
+		paramDoc := ParameterConfigFile{}
+		err := paramDoc.ReadFile(cdc,pathStr)
+		if err != nil {
+			return param, err
+		}
+		param,err := paramDoc.GetParamFromKey(keyStr,opStr)
+		return param, err
+	} else {
+
+		return param,errors.New("Path and param are both empty")
+	}
 }
 
 // GetCmdDeposit implements depositing tokens for an active proposal.
@@ -107,9 +136,6 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
-			}
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
@@ -161,10 +187,6 @@ func GetCmdVote(cdc *wire.Codec) *cobra.Command {
 			fmt.Printf("Vote[Voter:%s,ProposalID:%d,Option:%s]",
 				voterAddr.String(), msg.ProposalID, msg.Option.String(),
 			)
-
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			// Build and sign the transaction, then broadcast to a Tendermint
 			// node.
 			cliCtx.PrintResponse = true

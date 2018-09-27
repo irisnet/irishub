@@ -3,8 +3,9 @@ package lcd
 import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/upgrade"
-	irisVersion "github.com/irisnet/irishub/version"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"net/http"
 )
 
@@ -15,28 +16,26 @@ type VersionInfo struct {
 	ProposalId     int64  `json:"proposal_id"`
 }
 
-func VersionHandlerFn(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+func InfoHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		res_versionID, _ := ctx.QueryStore(upgrade.GetCurrentVersionKey(), "upgrade")
+		res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")
+		res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
+		var height int64
+		var proposalID int64
+		cdc.MustUnmarshalBinary(res_height, &height)
+		cdc.MustUnmarshalBinary(res_proposalID, &proposalID)
+
+		res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
 		var versionID int64
 		cdc.MustUnmarshalBinary(res_versionID, &versionID)
 
-		res_version, _ := ctx.QueryStore(upgrade.GetVersionIDKey(versionID), "upgrade")
+		res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
 		var version upgrade.Version
 		cdc.MustUnmarshalBinary(res_version, &version)
-
-		versionInfo := VersionInfo{
-			IrisVersion:    irisVersion.Version,
-			UpgradeVersion: version.Id,
-			StartHeight:    version.Start,
-			ProposalId:     version.ProposalID,
-		}
-
-		output, err := cdc.MarshalJSONIndent(versionInfo, "", "  ")
+		output, err := cdc.MarshalJSONIndent(version, "", "  ")
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 

@@ -10,12 +10,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/utils"
-	"github.com/irisnet/irishub/client"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
@@ -35,7 +36,7 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 			if amounstStr == "" {
 				return fmt.Errorf("Must specify amount to stake using --amount")
 			}
-			amount, err := sdk.ParseCoin(amounstStr)
+			amount, err := cliCtx.ParseCoin(amounstStr)
 			if err != nil {
 				return err
 			}
@@ -138,7 +139,7 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			amount, err := sdk.ParseCoin(viper.GetString(FlagAmount))
+			amount, err := cliCtx.ParseCoin(viper.GetString(FlagAmount))
 			if err != nil {
 				return err
 			}
@@ -214,7 +215,7 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
 			sharesAmount, err := getShares(
-				storeName, cdc, sharesAmountStr, sharesPercentStr,
+				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorSrcAddr,
 			)
 			if err != nil {
@@ -236,7 +237,7 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 // nolint: gocyclo
 // TODO: Make this pass gocyclo linting
 func getShares(
-	storeName string, cdc *wire.Codec, sharesAmountStr,
+	storeName string, cliCtx context.CLIContext, cdc *wire.Codec, sharesAmountStr,
 	sharesPercentStr string, delegatorAddr, validatorAddr sdk.AccAddress,
 ) (sharesAmount sdk.Rat, err error) {
 	switch {
@@ -252,6 +253,7 @@ func getShares(
 		if !sharesAmount.GT(sdk.ZeroRat()) {
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
+		sharesAmount.Quo(stakeClient.ExRateFromStakeTokenToMainUnit(cliCtx))
 	case sharesPercentStr != "":
 		var sharesPercent sdk.Rat
 		sharesPercent, err = sdk.NewRatFromDecimal(sharesPercentStr, types.MaxBondDenominatorPrecision)
@@ -362,7 +364,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
 			sharesAmount, err := getShares(
-				storeName, cdc, sharesAmountStr, sharesPercentStr,
+				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorAddr,
 			)
 			if err != nil {

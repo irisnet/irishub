@@ -1,4 +1,4 @@
-package cli
+package tx
 
 import (
 	"encoding/hex"
@@ -6,12 +6,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/common"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"net/http"
 )
 
 // QueryTxCmd implements the default command for a tx query.
@@ -118,4 +120,21 @@ func parseTx(cdc *wire.Codec, txBytes []byte) (sdk.Tx, error) {
 	}
 
 	return tx, nil
+}
+
+// transaction query REST handler
+func QueryTxRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		hashHexStr := vars["hash"]
+
+		output, err := queryTx(cdc, cliCtx, hashHexStr)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
+	}
 }

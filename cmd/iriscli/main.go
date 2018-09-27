@@ -11,7 +11,8 @@ import (
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
-	tendermintcmd "github.com/irisnet/irishub/client/tendermint/cli"
+	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
+	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 )
@@ -28,16 +29,17 @@ func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 
+	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
 	//Add state commands
 	tendermintCmd := &cobra.Command{
 		Use:   "tendermint",
 		Short: "Tendermint state querying subcommands",
 	}
 	tendermintCmd.AddCommand(
-		tendermintcmd.QueryTxCmd(cdc),
-		tendermintcmd.SearchTxCmd(cdc),
-		tendermintcmd.BlockCommand(),
-		tendermintcmd.ValidatorCommand(),
+		tenderminttxcmd.QueryTxCmd(cdc),
+		tenderminttxcmd.SearchTxCmd(cdc),
+		tendermintrpccmd.BlockCommand(),
+		tendermintrpccmd.ValidatorCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
 
@@ -67,9 +69,11 @@ func main() {
 	govCmd.AddCommand(
 		client.GetCommands(
 			govcmd.GetCmdQueryProposal("gov", cdc),
+			govcmd.GetCmdQueryProposals("gov", cdc),
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
+		    govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -118,7 +122,7 @@ func main() {
 	}
 	upgradeCmd.AddCommand(
 		client.GetCommands(
-			upgradecmd.GetCmdVersion("upgrade", cdc),
+			upgradecmd.GetInfoCmd("upgrade", cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,

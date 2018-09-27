@@ -229,7 +229,7 @@ func createGenesisState() stake.GenesisState {
 			GoalBonded:          sdk.NewRat(67, 100),
 			UnbondingTime:       defaultUnbondingTime,
 			MaxValidators:       100,
-			BondDenom:           Denom,
+			BondDenom:           Denom + "-" + types.Atto,
 		},
 	}
 }
