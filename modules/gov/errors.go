@@ -22,6 +22,7 @@ const (
 	CodeInvalidGenesis          sdk.CodeType = 10
 	CodeInvalidProposalStatus   sdk.CodeType = 11
 	CodeInvalidParam            sdk.CodeType = 12
+	CodeInvalidParamOp          sdk.CodeType = 13
 )
 
 //----------------------------------------
@@ -68,5 +69,9 @@ func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
 }
 
 func ErrInvalidParam(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("Param '%s' is not valid"))
+	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("Param is not valid"))
+}
+
+func ErrInvalidParamOp(codespace sdk.CodespaceType, opStr string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidParamOp, fmt.Sprintf("Op '%s' is not valid", opStr))
 }
