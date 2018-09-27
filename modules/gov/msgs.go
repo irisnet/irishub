@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/iparam"
 )
 
 // name to idetify transaction types
@@ -58,13 +58,18 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 
 	if msg.ProposalType == ProposalTypeParameterChange {
 
-		if p, ok := parameter.ParamMapping[msg.Param.Key]; ok{
+		if p, ok := iparam.ParamMapping[msg.Param.Key]; ok{
 			return p.Valid(msg.Param.Value)
 		} else {
 			return ErrInvalidParam(DefaultCodespace)
 		}
 
 	}
+
+	if msg.Param.Op != Update && msg.Param.Op != Insert {
+		return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
+	}
+
 	return nil
 }
 
