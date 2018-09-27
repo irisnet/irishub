@@ -9,7 +9,7 @@ import (
 	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -287,17 +287,17 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			if keyStr != "" {
-				parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+				iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 					&govparams.VotingProcedureParameter,
 					&govparams.TallyingProcedureParameter)
 
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
 				if err == nil {
-					if p, ok := parameter.ParamMapping[keyStr]; ok {
+					if p, ok := iparam.ParamMapping[keyStr]; ok {
 						p.GetValueFromRawData(cdc, res) //.(govparams.TallyingProcedure)
 						PrintParamStr(p, keyStr)
 					} else {
-						return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
+						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
 					}
 				} else {
 					return err
@@ -314,7 +314,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func PrintParamStr(p parameter.GovParameter, keyStr string) {
+func PrintParamStr(p iparam.GovParameter, keyStr string) {
 	var param gov.Param
 	param.Key = keyStr
 	param.Value = p.ToJson()
@@ -351,7 +351,7 @@ func (pd *ParameterConfigFile) WriteFile(cdc *wire.Codec, res []sdk.KVPair) erro
 		case "Gov/gov/TallyingProcedure":
 			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.TallyingProcedure)
 		default:
-			return sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
 		}
 	}
 	output, err := cdc.MarshalJSONIndent(pd, "", "  ")
@@ -384,7 +384,7 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (gov
 	case "Gov/gov/TallyingProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
 	default:
-		return param, sdk.NewError(parameter.DefaultCodespace, parameter.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
+		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
 	}
 
 	if err != nil {
