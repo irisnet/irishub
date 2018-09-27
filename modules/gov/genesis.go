@@ -3,7 +3,7 @@ package gov
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/iparam"
 )
 
 // GenesisState - all staking state that must be provided at genesis
@@ -31,9 +31,9 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		panic(err)
 	}
 	//k.setDepositProcedure(ctx, data.DepositProcedure)
-	parameter.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
-	parameter.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
-	parameter.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
+	iparam.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
+	iparam.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
+	iparam.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
 
 }
 

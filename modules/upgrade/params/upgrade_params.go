@@ -3,12 +3,12 @@ package upgradeparams
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/modules/parameter"
+	"github.com/irisnet/irishub/modules/iparam"
 )
 
 var CurrentUpgradeProposalIdParameter CurrentUpgradeProposalIdParam
 
-var _ parameter.SignalParameter = (*CurrentUpgradeProposalIdParam)(nil)
+var _ iparam.SignalParameter = (*CurrentUpgradeProposalIdParam)(nil)
 
 type CurrentUpgradeProposalIdParam struct {
 	Value   int64
@@ -44,7 +44,7 @@ func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
 
 var ProposalAcceptHeightParameter ProposalAcceptHeightParam
 
-var _ parameter.SignalParameter = (*ProposalAcceptHeightParam)(nil)
+var _ iparam.SignalParameter = (*ProposalAcceptHeightParam)(nil)
 
 type ProposalAcceptHeightParam struct {
 	Value   int64

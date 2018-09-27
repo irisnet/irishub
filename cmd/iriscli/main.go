@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/libs/cli"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
@@ -15,6 +13,8 @@ import (
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
+	"github.com/spf13/cobra"
+	"github.com/tendermint/tendermint/libs/cli"
 )
 
 // rootCmd is the entry point for this binary
@@ -73,7 +73,7 @@ func main() {
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
-		    govcmd.GetCmdPullGovConfig("params", cdc),
+			govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -123,6 +123,11 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetInfoCmd("upgrade", cdc),
+			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+		)...)
+	upgradeCmd.AddCommand(
+		client.PostCommands(
+			upgradecmd.GetCmdSubmitSwitch(cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,
