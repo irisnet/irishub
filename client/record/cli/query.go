@@ -1,34 +1,43 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
+
+type RecordMetadata struct {
+	OwnerAddress string
+	SubmitTime   string
+	DataHash     string
+	DataSize     string
+	PinedNode    string
+}
 
 func GetCmdQureyHash(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tx [hash]",
-		Short: "Matches this txhash over all committed blocks",
+		Use:   "query [hash]",
+		Short: "query specified file with tx hash",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// find the key to look up the account
+
+			trustNode := viper.GetBool(client.FlagTrustNode)
+
 			hashHexStr := viper.GetString(FlagTxHash)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			output, err := queryTx(cdc, cliCtx, hashHexStr)
+			record, err := queryRecordMetadata(cdc, cliCtx, hashHexStr, trustNode)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			fmt.Println("Record metadata %v", record)
 			return nil
 		},
 	}
@@ -37,51 +46,43 @@ func GetCmdQureyHash(cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
 	cmd.Flags().String(FlagTxHash, "", "tx hash")
+	cmd.Flags().String(FlagTargetPath, "", "target path")
+	cmd.Flags().String(FlagFileName, "", "file name")
 
 	return cmd
 }
 
-func queryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
-	hash, err := hex.DecodeString(hashHexStr)
+func queryRecordMetadata(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string, trustNode bool) (RecordMetadata, error) {
+
+	tx, err := queryTx(cdc, cliCtx, hashHexStr, trustNode)
 	if err != nil {
-		return nil, err
+		return RecordMetadata{}, err
 	}
 
-	node, err := cliCtx.GetNode()
-	if err != nil {
-		return nil, err
+	msgs := tx.GetMsgs()
+
+	if len(msgs) != 1 {
+		return RecordMetadata{}, nil
 	}
 
-	res, err := node.Tx(hash, !cliCtx.TrustNode)
-	if err != nil {
-		return nil, err
+	// WIP
+	var ok bool
+	var m record.MsgSubmitFile
+	if m, ok = msgs[0].(record.MsgSubmitFile); ok {
+		return RecordMetadata{}, nil
 	}
 
-	if !cliCtx.TrustNode {
-		err := ValidateTxResult(cliCtx, res)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	info, err := formatTxResult(cdc, res)
-	if err != nil {
-		return nil, err
-	}
-
-	return cdc.MarshalJSONIndent(info, "", "  ")
+	return GetMetadata(m)
 }
 
-// ValidateTxResult performs transaction verification
-func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
-	check, err := cliCtx.Certify(res.Height)
-	if err != nil {
-		return err
-	}
+func GetMetadata(msg record.MsgSubmitFile) (RecordMetadata, error) {
+	// Get record msg from record type msg (TO DO)
+	var metadata RecordMetadata
+	metadata.OwnerAddress = "address from record type msg"
+	metadata.DataHash = "data hash from record type msg"
+	metadata.DataSize = "data size from record type msg"
+	metadata.PinedNode = "pined node from record type msg"
+	metadata.SubmitTime = "submit time  from record type msg"
 
-	err = res.Proof.Validate(check.Header.DataHash)
-	if err != nil {
-		return err
-	}
-	return nil
+	return metadata, nil
 }

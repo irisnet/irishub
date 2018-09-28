@@ -16,7 +16,6 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
-
 	"github.com/irisnet/irishub/version"
 )
 
@@ -131,27 +130,21 @@ func main() {
 		upgradeCmd,
 	)
 
-	recordCmd := &cobra.Command{
-		Use:   "record",
-		Short: "Record subcommands",
-	}
-
-	recordCmd.AddCommand(
-		recordcmd.GetCmdQureyHash(cdc),
-	)
-
-	recordCmd.AddCommand(
-		client.GetCommands(
-			recordcmd.GetCmdDownload(cdc),
-		)...)
-
-	recordCmd.AddCommand(
-		client.PostCommands(
-			recordcmd.GetCmdSubmit(cdc),
-		)...)
-
+	//Add auth and bank commands
 	rootCmd.AddCommand(
-		recordCmd,
+		client.GetCommands(
+			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+		)...)
+	rootCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
+
+	// add proxy, version and key info
+	rootCmd.AddCommand(
+		client.LineBreak,
+		keyscmd.Commands(),
+		version.ServeVersionCommand(cdc),
 	)
 
 	//Add auth and bank commands
@@ -169,6 +162,30 @@ func main() {
 		client.LineBreak,
 		keyscmd.Commands(),
 		version.ServeVersionCommand(cdc),
+	)
+
+	//add record command
+	recordCmd := &cobra.Command{
+		Use:   "record",
+		Short: "Record subcommands",
+	}
+
+	recordCmd.AddCommand(
+		recordcmd.GetCmdQureyHash(cdc),
+	)
+
+	recordCmd.AddCommand(
+		client.GetCommands(
+			recordcmd.GetCmdDownload(cdc),
+		)...)
+
+	// recordCmd.AddCommand(
+	// 	client.PostCommands(
+	// 		recordcmd.GetCmdSubmitFileProposal(cdc),
+	// 	)...)
+
+	rootCmd.AddCommand(
+		recordCmd,
 	)
 
 	// prepare and add flags
