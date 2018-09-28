@@ -29,7 +29,7 @@
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  branch = "irisnet/develop"
+  version = "=v0.24.2-iris1"
 
 [[override]]
   name = "github.com/golang/protobuf"
@@ -49,14 +49,13 @@
 
 [[override]]
   name = "github.com/tendermint/iavl"
-#  version = "=v0.9.2"
-  branch = "irisnet/feature_upgrade"
   source = "https://github.com/irisnet/iavl.git"
+  version = "=v0.9.2-iris1"
 
 [[override]]
   name = "github.com/tendermint/tendermint"
   source = "https://github.com/irisnet/tendermint.git"
-  branch = "irisnet/develop"
+  version = "=v0.23.1-rc0-iris1"
 
 [[constraint]]
   name = "github.com/rakyll/statik"
