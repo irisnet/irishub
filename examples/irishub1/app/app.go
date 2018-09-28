@@ -5,35 +5,35 @@ import (
 	"io"
 	"os"
 
-	bam "github.com/irisnet/irishub/baseapp"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
-	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
-
+	"errors"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	bam "github.com/irisnet/irishub/baseapp"
 	ibc1 "github.com/irisnet/irishub/examples/irishub1/ibc"
 	"github.com/irisnet/irishub/modules/upgrade"
-
-	"errors"
-	"fmt"
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/spf13/viper"
+	abci "github.com/tendermint/tendermint/abci/types"
+	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
-	bc "github.com/tendermint/tendermint/blockchain"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"strings"
-	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 const (
@@ -74,10 +74,9 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
-	iparamsKeeper       iparams.Keeper
 
 	// fee manager
-	feeManager  bam.FeeManager
+	feeManager bam.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -121,8 +120,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.iparamsKeeper.Setter())
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
@@ -136,7 +135,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
-	app.feeManager = bam.NewFeeManager(app.iparamsKeeper.Getter())
+	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
@@ -158,6 +157,18 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
+	upgrade.RegisterModuleList(app.Router())
+	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter)
+
+	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,)
+
 
 	return app
 }
@@ -224,21 +235,21 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		panic(err)
 	}
 
-	minDeposit,err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",10,denom))
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	if err != nil {
 		panic(err)
 	}
 
 	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
 		StartingProposalID: 1,
-		DepositProcedure: gov.DepositProcedure{
+		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 1440,
+			MaxDepositPeriod: 10,
 		},
-		VotingProcedure: gov.VotingProcedure{
-			VotingPeriod: 30,
+		VotingProcedure: govparams.VotingProcedure{
+			VotingPeriod: 10,
 		},
-		TallyingProcedure: gov.TallyingProcedure{
+		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
 			Veto:              sdk.NewRat(1, 3),
 			GovernancePenalty: sdk.NewRat(1, 100),
@@ -250,7 +261,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	bam.InitGenesis(ctx, app.iparamsKeeper.Setter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
@@ -297,7 +308,6 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
-		fmt.Println("============ runMsgs() ===========  " + msgType)
 		if err != nil {
 			return err.Result()
 		}
@@ -306,7 +316,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
 		}
-		fmt.Println(msg)
+
 		msgResult := handler(ctx, msg)
 
 		// NOTE: GasWanted is determined by ante handler and
@@ -354,7 +364,7 @@ func (app *IrisApp) replay() int64 {
 	defer func() {
 		stateDB.Close()
 		blockStoreDB.Close()
-	} ()
+	}()
 
 	curState := sm.LoadState(stateDB)
 	preState := sm.LoadPreState(stateDB)

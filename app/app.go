@@ -60,7 +60,6 @@ type IrisApp struct {
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
-	keyIparams       *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -96,7 +95,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 		keyParams:        sdk.NewKVStoreKey("params"),
-		keyIparams:       sdk.NewKVStoreKey("iparams"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 	}
 
@@ -129,7 +127,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyIparams, app.keyParams}, gov.NewHandler(app.govKeeper)).
+		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
@@ -140,7 +138,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyIparams, app.keyUpgrade)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
 
 	var err error
@@ -237,10 +235,10 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 10,
+			MaxDepositPeriod: 30,
 		},
 		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 10,
+			VotingPeriod: 30,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
