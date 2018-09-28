@@ -10,15 +10,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/examples/irishub1/app"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/version"
 
+	"github.com/irisnet/irishub/tools/prometheus"
+	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/tools/prometheus"
 )
 
 func main() {
@@ -54,6 +54,9 @@ func main() {
 		tendermintCmd,
 		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
 		client.LineBreak,
+	)
+
+	rootCmd.AddCommand(
 		version.ServeVersionCommand(cdc),
 	)
 

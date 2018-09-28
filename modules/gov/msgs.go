@@ -64,11 +64,13 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 			return ErrInvalidParam(DefaultCodespace)
 		}
 
+		if msg.Param.Op != Update && msg.Param.Op != Insert {
+			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
+		}
+
 	}
 
-	if msg.Param.Op != Update && msg.Param.Op != Insert {
-		return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
-	}
+
 
 	return nil
 }
