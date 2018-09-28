@@ -1,19 +1,22 @@
 package main
 
 import (
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+
 	"github.com/irisnet/irishub/version"
 )
 
@@ -73,7 +76,7 @@ func main() {
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
-		    govcmd.GetCmdPullGovConfig("params", cdc),
+			govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -128,7 +131,40 @@ func main() {
 		upgradeCmd,
 	)
 
-	//Add keys and version commands
+	recordCmd := &cobra.Command{
+		Use:   "record",
+		Short: "Record subcommands",
+	}
+
+	recordCmd.AddCommand(
+		recordcmd.GetCmdQureyHash(cdc),
+	)
+
+	recordCmd.AddCommand(
+		client.GetCommands(
+			recordcmd.GetCmdDownload(cdc),
+		)...)
+
+	recordCmd.AddCommand(
+		client.PostCommands(
+			recordcmd.GetCmdSubmit(cdc),
+		)...)
+
+	rootCmd.AddCommand(
+		recordCmd,
+	)
+
+	//Add auth and bank commands
+	rootCmd.AddCommand(
+		client.GetCommands(
+			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+		)...)
+	rootCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
+
+	// add proxy, version and key info
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
