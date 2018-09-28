@@ -51,20 +51,20 @@ iriscli gov query-proposal --proposal-id=1 --trust-node
 用户在限定的时间内（2天 57600个区块高度），完成以下动作：
 
 ```
-#1. 下载新版本iris1
+# 1. 下载新版本iris1
 
-#2. 关闭旧软件
+# 2. 关闭旧软件
 kill -f iris
 
-#3. 安装新版本 iris1 并启动（copy to bin）
+# 3. 安装新版本 iris1 并启动（copy to bin）
 iris1 start --home=iris
 
-#4. 发送switch消息，广y播全网自己已经安装新软件。
+# 4. 发送switch消息，广y播全网自己已经安装新软件。
 iriscli1  upgrade submit-switch --from=x --proposalID=1  --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
-#5. 到达规定的时间，自动升级
+# 5. 到达规定的时间，自动升级
 
-#6. 查询当前版本是否升级成功
+# 6. 查询当前版本是否升级成功
 iriscli upgrade info --trust-node
 ```
 
@@ -73,15 +73,15 @@ iriscli upgrade info --trust-node
 用户未在限定的时间内（2天 57600个区块高度），执行场景一中的动作，导致新版本全网生效后该节点的共识报错：
 
 ```
-#1. 下载新版本iris1
+# 1. 下载新版本iris1
 
-#2. 关闭旧软件
+# 2. 关闭旧软件
 kill -f iris
 
-#3. 安装新版本 iris1 并通过以下命令方式启动（copy to bin）
+# 3. 安装新版本 iris1 并通过以下命令方式启动（copy to bin）
 iris1 start --replay --home=iris
 
-#4. 查询当前版本是否升级成功
+# 4. 查询当前版本是否升级成功
 iriscli upgrade info --trust-node
 ```
 
