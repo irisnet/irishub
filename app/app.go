@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -17,6 +21,7 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
@@ -29,9 +34,6 @@ import (
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io"
-	"os"
-	"strings"
 )
 
 const (
@@ -61,6 +63,7 @@ type IrisApp struct {
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
+	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -72,6 +75,7 @@ type IrisApp struct {
 	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
+	recordKeeper        record.Keeper
 
 	// fee manager
 	feeManager bam.FeeManager
@@ -119,6 +123,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.recordKeeper = record.NewKeeper(app.cdc, app.keyRecord)
 
 	// register message routes
 	// need to update each module's msg type
@@ -128,7 +133,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
+		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
+		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper))
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 	// initialize BaseApp
@@ -153,15 +159,15 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
-							&govparams.DepositProcedureParameter,
-		                    &govparams.VotingProcedureParameter,
-		                    &govparams.TallyingProcedureParameter,
-							&upgradeparams.CurrentUpgradeProposalIdParameter,
-							&upgradeparams.ProposalAcceptHeightParameter)
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter)
 
 	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		                              &govparams.VotingProcedureParameter,
-		                              &govparams.TallyingProcedureParameter,)
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -169,6 +175,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 // custom tx codec
 func MakeCodec() *wire.Codec {
 	var cdc = wire.NewCodec()
+	record.RegisterWire(cdc)
 	ibc.RegisterWire(cdc)
 	bank.RegisterWire(cdc)
 	stake.RegisterWire(cdc)
@@ -178,6 +185,7 @@ func MakeCodec() *wire.Codec {
 	upgrade.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
+
 	return cdc
 }
 
