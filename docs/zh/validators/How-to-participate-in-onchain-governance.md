@@ -28,7 +28,7 @@
 如下的命令将执行提交一个 `Text`类型的提案:
 
 ```
-iriscli gov submit-proposal --title="Text" --description="name of the proposal" --type="Text" --deposit="1000000000000000000000iris" --proposer=<account>  --from=<name>  --chain-id=fuxi-3000 --fee=400000000000000iris --gas=20000 --node=http://localhost:36657
+iriscli gov submit-proposal --title="Text" --description="name of the proposal" --type="Text" --deposit="1000000000000000000000iris" --proposer=<account>  --from=<name>  --chain-id=fuxi-3001 --fee=400000000000000iris --gas=20000 --node=http://localhost:36657
 ```
 
 The `<account>` for `proposer` field should start with `faa` which corresponds to `<name>`.
@@ -39,7 +39,7 @@ The `<account>` for `proposer` field should start with `faa` which corresponds t
 To add deposit to some proposal, you could execute this command to add `10IRIS` to the proposal's deposit:
 
 ```
-iriscli gov deposit --proposalID=1 --depositer=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-3000  --fee=400000000000000iris --gas=20000  --node=http://localhost:36657 
+iriscli gov deposit --proposalID=1 --depositer=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-3001  --fee=400000000000000iris --gas=20000  --node=http://localhost:36657 
 ```
 
 ##如何投票?
@@ -54,7 +54,7 @@ You could put one of the choices in the `--option` field.
 
 To vote for a proposal, you need to get the correct `<proposal_id>`.You could execute the following command to vote on proposal with ID = 1:
 ```
-iriscli  vote --from=jerry --voter=<account> --proposalID=1 --option=Yes --chain-id=fuxi-3000   --fee=2000000000000000iris --gas=20000  --node=http://localhost:36657
+iriscli  vote --from=jerry --voter=<account> --proposalID=1 --option=Yes --chain-id=fuxi-3001   --fee=2000000000000000iris --gas=20000  --node=http://localhost:36657
 ```
 
 ## 如何查询投票信息?
@@ -62,7 +62,7 @@ iriscli  vote --from=jerry --voter=<account> --proposalID=1 --option=Yes --chain
 例如，查询第一个提案的信息：
 
 ```
-iriscli gov query-proposal --proposalID=1 --chain-id=fuxi-3000 --node=http://localhost:26657
+iriscli gov query-proposal --proposalID=1 --chain-id=fuxi-3001 --node=http://localhost:26657
 
 ``````
 也可以在浏览器上查询。
