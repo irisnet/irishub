@@ -1,6 +1,6 @@
 # What is Irislcd
 
-An irislcd node is a REST server which can connect to any full nodes and provide a set of rest APIs. By these APIs, users can send transactions and query blockchain data. Irislcd can verify the proof of query result. So it can provide the same security as a full node with the minimal requirements on bandwidth, computing and storage resource. Besides, it also provides swagger-ui which presents detailed description about what APIs it provides and how to use the them. 
+An irislcd node is a REST server which can connect to any full nodes and provide a set of rest APIs. By these APIs, users can send transactions and query blockchain data. Irislcd can verify the proof of query result. So it can provide the same security as a full node with the minimal requirements on bandwidth, computing and storage resource. Besides, it also provides swagger-ui which presents detailed description about what APIs it provides and how to use them. 
 
 ## Irislcd options
 
