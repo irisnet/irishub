@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/app"
@@ -283,15 +284,31 @@ func (cliCtx CLIContext) ensureBroadcastTx(txBytes []byte) error {
 		resStr := fmt.Sprintf("Committed at block %d (tx hash: %s)\n", res.Height, res.Hash.String())
 
 		if cliCtx.PrintResponse {
-			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n",
-				res.Height, res.Hash.String(), res.DeliverTx,
+			jsonStr, _ := DeliverTxMarshalIndentJSON(res.DeliverTx)
+			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n%s\n",
+				res.Height, res.Hash.String(), res.DeliverTx, string(jsonStr),
 			)
+
 		}
 
 		io.WriteString(cliCtx.Logger, resStr)
 	}
 
 	return nil
+}
+
+func DeliverTxMarshalIndentJSON(dtx abci.ResponseDeliverTx) ([]byte, error) {
+
+	tags := make(map[string]string)
+	for _, kv := range dtx.Tags {
+		tags[string(kv.Key)] = strings.Replace(string(kv.Value), "\\", "", -1)
+	}
+
+	return json.MarshalIndent(&struct {
+		Tags map[string]string `json:"tags,omitempty"`
+	}{
+		Tags: tags,
+	}, " ", "  ")
 }
 
 // query performs a query from a Tendermint node with the provided store name

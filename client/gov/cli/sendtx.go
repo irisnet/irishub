@@ -57,8 +57,6 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				jsonBytes, _ := json.MarshalIndent(param, "", " ")
-				fmt.Println("Param:\n", string(jsonBytes))
 			}
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)

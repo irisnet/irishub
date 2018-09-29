@@ -76,8 +76,19 @@ func (param *DepositProcedureParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
-func (param *DepositProcedureParam) ToJson() string {
-	jsonBytes, _ := json.Marshal(param.Value)
+func (param *DepositProcedureParam) ToJson(jsonStr string) string {
+
+	var jsonBytes []byte
+
+	if len(jsonStr) == 0 {
+		jsonBytes, _  = json.Marshal(param.Value)
+		return string(jsonBytes)
+	}
+
+	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
+		jsonBytes, _  = json.Marshal(param.Value)
+		return string(jsonBytes)
+	}
 	return string(jsonBytes)
 }
 
@@ -163,8 +174,18 @@ func (param *VotingProcedureParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
-func (param *VotingProcedureParam) ToJson() string {
-	jsonBytes, _ := json.Marshal(param.Value)
+func (param *VotingProcedureParam) ToJson(jsonStr string) string {
+	var jsonBytes []byte
+
+	if len(jsonStr) == 0 {
+		jsonBytes, _  = json.Marshal(param.Value)
+		return string(jsonBytes)
+	}
+
+	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
+		jsonBytes, _  = json.Marshal(param.Value)
+		return string(jsonBytes)
+	}
 	return string(jsonBytes)
 }
 
@@ -244,8 +265,18 @@ func (param *TallyingProcedureParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
-func (param *TallyingProcedureParam) ToJson() string {
-	jsonBytes, _ := json.Marshal(param.Value)
+func (param *TallyingProcedureParam) ToJson(jsonStr string) string {
+	var jsonBytes []byte
+
+	if len(jsonStr) == 0 {
+		jsonBytes, _  = json.Marshal(param.Value)
+		return string(jsonBytes)
+	}
+
+	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
+		jsonBytes, _  = json.Marshal(param.Value)
+		return string(jsonBytes)
+	}
 	return string(jsonBytes)
 }
 
