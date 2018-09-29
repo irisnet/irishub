@@ -18,10 +18,11 @@ type MsgSubmitFile struct {
 	FileType    string         //  Type of file
 	Proposer    sdk.AccAddress //  Address of the proposer
 	Amount      sdk.Coins      //  File upload paid by sender. Must be non negative.
+	DataSize    int64          // File Size in bytes
 }
 
 //msg := record.NewMsgSubmitFile(filename, filepath, description, fileType, fromAddr, amount)
-func NewMsgSubmitFile(filename string, filepath string, description string, fileType string, proposer sdk.AccAddress, amount sdk.Coins) MsgSubmitFile {
+func NewMsgSubmitFile(filename string, filepath string, description string, fileType string, proposer sdk.AccAddress, amount sdk.Coins, dataSize int64) MsgSubmitFile {
 	return MsgSubmitFile{
 		Filename:    filename,
 		Filepath:    filepath,
@@ -29,6 +30,7 @@ func NewMsgSubmitFile(filename string, filepath string, description string, file
 		FileType:    fileType,
 		Proposer:    proposer,
 		Amount:      amount,
+		DataSize:    dataSize,
 	}
 }
 

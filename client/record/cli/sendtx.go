@@ -25,7 +25,8 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 			strAmount := viper.GetString(flagAmount)
 			//todo upload to ipfs
 			strFilepath := viper.GetString(flagPath)
-			if file, err := os.Stat(strFilepath); os.IsNotExist(err) {
+			file, err := os.Stat(strFilepath)
+			if os.IsNotExist(err) {
 				// file does not exist
 				return err
 			}
@@ -51,7 +52,7 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 
 			proposalType := strProposalType
 
-			msg := record.NewMsgSubmitFile(filename, strFilepath, description, proposalType, fromAddr, amount)
+			msg := record.NewMsgSubmitFile(filename, strFilepath, description, proposalType, fromAddr, amount, dataSize)
 
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
