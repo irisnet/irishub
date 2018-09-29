@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/types"
 	"strconv"
 )
 
 var DepositProcedureParameter DepositProcedureParam
-
 
 var (
 	minDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
@@ -24,9 +23,9 @@ const UPPER_BOUND_AMOUNT = 200
 var _ iparam.GovParameter = (*DepositProcedureParam)(nil)
 
 type ParamSet struct {
-	DepositProcedure   DepositProcedure  `json:"Gov/gov/DepositProcedure"`
-	VotingProcedure    VotingProcedure   `json:"Gov/gov/VotingProcedure"`
-	TallyingProcedure  TallyingProcedure `json:"Gov/gov/TallyingProcedure"`
+	DepositProcedure  DepositProcedure  `json:"Gov/gov/DepositProcedure"`
+	VotingProcedure   VotingProcedure   `json:"Gov/gov/VotingProcedure"`
+	TallyingProcedure TallyingProcedure `json:"Gov/gov/TallyingProcedure"`
 }
 
 // Procedure around Deposits for governance
@@ -40,11 +39,11 @@ type DepositProcedureParam struct {
 	psetter params.Setter
 	pgetter params.Getter
 }
-func (param *DepositProcedureParam) GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}{
-	cdc.MustUnmarshalBinary(res,&param.Value)
+
+func (param *DepositProcedureParam) GetValueFromRawData(cdc *wire.Codec, res []byte) interface{} {
+	cdc.MustUnmarshalBinary(res, &param.Value)
 	return param.Value
 }
-
 
 func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
@@ -116,7 +115,6 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
 }
 
-
 var VotingProcedureParameter VotingProcedureParam
 var _ iparam.GovParameter = (*VotingProcedureParam)(nil)
 
@@ -130,8 +128,9 @@ type VotingProcedureParam struct {
 	psetter params.Setter
 	pgetter params.Getter
 }
-func (param *VotingProcedureParam) GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}{
-	cdc.MustUnmarshalBinary(res,&param.Value)
+
+func (param *VotingProcedureParam) GetValueFromRawData(cdc *wire.Codec, res []byte) interface{} {
+	cdc.MustUnmarshalBinary(res, &param.Value)
 	return param.Value
 }
 
@@ -139,8 +138,7 @@ func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(VotingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = VotingProcedure{VotingPeriod: 1000,
-		}
+		param.Value = VotingProcedure{VotingPeriod: 1000}
 	}
 }
 
@@ -202,15 +200,14 @@ type TallyingProcedure struct {
 	GovernancePenalty sdk.Rat `json:"governance_penalty"` //  Penalty if validator does not vote
 }
 
-
 type TallyingProcedureParam struct {
 	Value   TallyingProcedure
 	psetter params.Setter
 	pgetter params.Getter
 }
 
-func (param *TallyingProcedureParam) GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}{
-	cdc.MustUnmarshalBinary(res,&param.Value)
+func (param *TallyingProcedureParam) GetValueFromRawData(cdc *wire.Codec, res []byte) interface{} {
+	cdc.MustUnmarshalBinary(res, &param.Value)
 	return param.Value
 }
 
@@ -279,5 +276,3 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 	}
 	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf("Json is not valid"))
 }
-
-

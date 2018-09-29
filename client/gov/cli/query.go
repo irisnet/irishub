@@ -269,10 +269,10 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			if moduleStr != "" {
 				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
-				if err == nil{
+				if err == nil {
 
-				    if len(res) == 0 {
-				        return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
+					if len(res) == 0 {
+						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
 					}
 
 					var keys []string
@@ -302,12 +302,12 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 					if p, ok := iparam.ParamMapping[keyStr]; ok {
 
 						if len(res) == 0 {
-                        	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
+							return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
 						}
 
 						p.GetValueFromRawData(cdc, res)
 						PrintParamStr(p, keyStr)
-						return  nil
+						return nil
 
 					} else {
 						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
@@ -317,7 +317,6 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				}
 
 			}
-
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
 		},
 	}
@@ -389,6 +388,11 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (gov
 	var param gov.Param
 	var err error
 	var jsonBytes []byte
+
+	if len(keyStr) == 0 {
+		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf("Key can't be empty!"))
+	}
+
 	switch keyStr {
 	case "Gov/gov/DepositProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.DepositProcedure)
@@ -397,7 +401,7 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (gov
 	case "Gov/gov/TallyingProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
 	default:
-		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
+		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 	}
 
 	if err != nil {
@@ -409,7 +413,6 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (gov
 
 	jsonBytes, _ = json.MarshalIndent(param, "", " ")
 
-	fmt.Println("Param:\n", string(jsonBytes))
 	return param, err
 }
 

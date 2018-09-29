@@ -36,7 +36,7 @@ func TestInitGenesisParameter(t *testing.T) {
 		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 20)},
 		MaxDepositPeriod: 1440}
 
-	SetParamReadWriter(paramKeeper.Setter(),&govparams.DepositProcedureParameter,&govparams.DepositProcedureParameter)
+	SetParamReadWriter(paramKeeper.Setter(), &govparams.DepositProcedureParameter, &govparams.DepositProcedureParameter)
 
 	InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, nil)
 
@@ -63,7 +63,7 @@ func TestRegisterParamMapping(t *testing.T) {
 		MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris", 30)},
 		MaxDepositPeriod: 1440}
 
-	SetParamReadWriter(paramKeeper.Setter(),&govparams.DepositProcedureParameter, &govparams.DepositProcedureParameter)
+	SetParamReadWriter(paramKeeper.Setter(), &govparams.DepositProcedureParameter, &govparams.DepositProcedureParameter)
 	RegisterGovParamMapping(&govparams.DepositProcedureParameter)
 	InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, nil)
 
