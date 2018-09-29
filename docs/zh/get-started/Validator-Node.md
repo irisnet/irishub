@@ -70,7 +70,7 @@ fvp1zcjduepqv7z2kgussh7ufe8e0prupwcm7l9jcn2fp90yeupaszmqjk73rjxq8yzw85
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --chain-id=game-of-genesis --name=<key_name> --node=http://localhost:26657
+iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --fee=40000000000000000iris  --gas=2000000 --chain-id=fuxi-3001  --name=<key_name> --node=http://localhost:26657
 ```
 > 注意：**amount** 和 **Fee** 字段需要使用最小单位 `iris-atto` 。准化比例为：
 

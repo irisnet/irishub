@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"os"
 )
@@ -162,14 +161,14 @@ func (txCtx TxContext) WithCliCtx(cliCtx CLIContext) TxContext {
 func (txCtx TxContext) Build(msgs []sdk.Msg) (auth.StdSignMsg, error) {
 	chainID := txCtx.ChainID
 	if chainID == "" {
-		return auth.StdSignMsg{}, errors.Errorf("chain ID required but not specified")
+		return auth.StdSignMsg{}, fmt.Errorf("chain ID required but not specified")
 	}
 
 	fee := sdk.Coins{}
 	if txCtx.Fee != "" {
 		parsedFee, err := txCtx.cliCtx.ParseCoins(txCtx.Fee)
 		if err != nil {
-			return auth.StdSignMsg{}, err
+			return auth.StdSignMsg{}, fmt.Errorf("encountered error in parsing transaction fee: %s", err.Error())
 		}
 
 		fee = parsedFee
