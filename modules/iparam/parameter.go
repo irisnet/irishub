@@ -2,12 +2,11 @@ package iparam
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 type Parameter interface {
-
 	InitGenesis(interface{})
 
 	GetStoreKey() string
@@ -28,11 +27,11 @@ type GovParameter interface {
 
 	Valid(json string) sdk.Error
 
-	GetValueFromRawData(cdc *wire.Codec,res []byte) interface{}
+	GetValueFromRawData(cdc *wire.Codec, res []byte) interface{}
 
 	Update(ctx sdk.Context, json string)
 
-	ToJson() string
+	ToJson(string) string
 }
 
 type GovArrayParameter interface {

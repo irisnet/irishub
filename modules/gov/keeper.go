@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iparam"
 )
 
 // nolint
@@ -100,6 +101,9 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		SubmitBlock:      ctx.BlockHeight(),
 		VotingStartBlock: -1, // TODO: Make Time
 	}
+
+	param.Value = iparam.ParamMapping[param.Key].ToJson(param.Value)
+
 	var proposal Proposal = &ParameterProposal{
 		textProposal,
 		param,
