@@ -58,15 +58,18 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 
 	if msg.ProposalType == ProposalTypeParameterChange {
 
+
+		if msg.Param.Op != Update && msg.Param.Op != Insert {
+			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
+		}
+
 		if p, ok := iparam.ParamMapping[msg.Param.Key]; ok{
 			return p.Valid(msg.Param.Value)
 		} else {
 			return ErrInvalidParam(DefaultCodespace)
 		}
 
-		if msg.Param.Op != Update && msg.Param.Op != Insert {
-			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
-		}
+
 
 	}
 
