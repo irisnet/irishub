@@ -269,13 +269,19 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			if moduleStr != "" {
 				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
-				if err == nil {
+				if err == nil{
+
+				    if len(res) == 0 {
+				        return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
+					}
+
 					var keys []string
 					for _, kv := range res {
 						keys = append(keys, string(kv.Key))
 					}
+
 					output, err := json.MarshalIndent(keys, "", " ")
-					//cmn.WriteFile(,output,644)
+
 					if err != nil {
 						return err
 					}
@@ -294,8 +300,10 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
 				if err == nil {
 					if p, ok := iparam.ParamMapping[keyStr]; ok {
+
 						p.GetValueFromRawData(cdc, res) //.(govparams.TallyingProcedure)
 						PrintParamStr(p, keyStr)
+
 					} else {
 						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
 					}
@@ -305,7 +313,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			}
 
-			return nil
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
 		},
 	}
 
