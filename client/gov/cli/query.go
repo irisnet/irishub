@@ -424,7 +424,7 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
-			if err == nil {
+			if err == nil && len(res)!=0 {
 				var pd ParameterConfigFile
 				err := pd.WriteFile(cdc, res)
 				return err
