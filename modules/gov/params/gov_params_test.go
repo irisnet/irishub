@@ -45,7 +45,7 @@ func TestDepositProcedureParam(t *testing.T) {
 	DepositProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	require.Equal(t, DepositProcedureParameter.ToJson(), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
 
 	DepositProcedureParameter.Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":1440}")
 
@@ -105,7 +105,7 @@ func TestVotingProcedureParam(t *testing.T) {
 	VotingProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, VotingProcedureParameter.Value)
 
-	require.Equal(t, VotingProcedureParameter.ToJson(), "{\"voting_period\":1000}")
+	require.Equal(t, VotingProcedureParameter.ToJson(""), "{\"voting_period\":1000}")
 
 	VotingProcedureParameter.Update(ctx, "{\"voting_period\":2000}")
 
@@ -148,7 +148,7 @@ func TestTallyingProcedureParam(t *testing.T) {
 
 	TallyingProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, TallyingProcedureParameter.Value)
-	require.Equal(t, TallyingProcedureParameter.ToJson(), "{\"threshold\":\"1/2\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
+	require.Equal(t, TallyingProcedureParameter.ToJson(""), "{\"threshold\":\"1/2\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
 
 	TallyingProcedureParameter.Update(ctx, "{\"threshold\":\"0.5\",\"veto\":\"1/3\",\"governance_penalty\":\"1/50\"}")
 

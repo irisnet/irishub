@@ -19,4 +19,5 @@ var (
 	VotingPeriodStart = "voting-period-start"
 	Depositer         = "depositer"
 	Voter             = "voter"
+	Param             = "param"
 )

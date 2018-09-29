@@ -31,7 +31,7 @@ type GovParameter interface {
 
 	Update(ctx sdk.Context, json string)
 
-	ToJson() string
+	ToJson(string) string
 }
 
 type GovArrayParameter interface {

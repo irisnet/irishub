@@ -329,7 +329,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 func PrintParamStr(p iparam.GovParameter, keyStr string) {
 	var param gov.Param
 	param.Key = keyStr
-	param.Value = p.ToJson()
+	param.Value = p.ToJson("")
 	param.Op = ""
 	jsonBytes, _ := json.Marshal(param)
 	fmt.Println(string(jsonBytes))

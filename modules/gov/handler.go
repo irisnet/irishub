@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/gov/tags"
+	"github.com/irisnet/irishub/modules/gov/tags"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"strconv"
+	"encoding/json"
 )
 
 // Handle all "gov" type messages.
@@ -28,11 +30,13 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 
 	err := msg.ValidateBasic()
+
 	if err != nil {
 		return err.Result()
 	}
 
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
+
 
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
@@ -40,12 +44,19 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 		return err.Result()
 	}
 
-	proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(proposal.GetProposalID())
+	proposalIDBytes := []byte(strconv.FormatInt(proposal.GetProposalID(),10))
+
+	var paramBytes []byte
+	if msg.ProposalType == ProposalTypeParameterChange{
+		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
+	}
+
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
+		tags.Param, paramBytes,
 	)
 
 	if votingStarted {
