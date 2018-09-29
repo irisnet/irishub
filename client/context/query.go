@@ -397,17 +397,20 @@ func (cliCtx CLIContext) queryStore(key cmn.HexBytes, storeName, endPath string)
 func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	var coinType types.CoinType
 	coinName = strings.ToLower(coinName)
+	if coinName == "" {
+		return types.CoinType{}, fmt.Errorf("coin name is empty")
+	}
 	if coinName == app.Denom {
 		coinType = app.IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)
-		bz, err := cliCtx.QueryStore([]byte(key), "iparams")
+		bz, err := cliCtx.QueryStore([]byte(key), "params")
 		if err != nil {
 			return coinType, err
 		}
 
 		if bz == nil {
-			return types.CoinType{}, fmt.Errorf("can't find any information about coin type: %s", coinName)
+			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
 		if err = cliCtx.Codec.UnmarshalBinary(bz, &coinType); err != nil {
