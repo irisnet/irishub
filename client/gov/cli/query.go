@@ -301,11 +301,16 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 				if err == nil {
 					if p, ok := iparam.ParamMapping[keyStr]; ok {
 
-						p.GetValueFromRawData(cdc, res) //.(govparams.TallyingProcedure)
+						if len(res) == 0 {
+                        	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
+						}
+
+						p.GetValueFromRawData(cdc, res)
 						PrintParamStr(p, keyStr)
+						return  nil
 
 					} else {
-						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(keyStr+" is not found"))
+						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 					}
 				} else {
 					return err
