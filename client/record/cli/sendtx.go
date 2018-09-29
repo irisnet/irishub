@@ -17,7 +17,7 @@ import (
 func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
-		Short: "Submit a proposal with a file",
+		Short: "Submit a transaction with a file hash",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			filename := viper.GetString(flagFilename)
 			description := viper.GetString(flagDescription)
@@ -25,10 +25,14 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 			strAmount := viper.GetString(flagAmount)
 			//todo upload to ipfs
 			strFilepath := viper.GetString(flagPath)
-			if _, err := os.Stat(strFilepath); os.IsNotExist(err) {
+			if file, err := os.Stat(strFilepath); os.IsNotExist(err) {
 				// file does not exist
 				return err
 			}
+
+			//file size
+			dataSize := file.Size()
+			//pinedNode
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
