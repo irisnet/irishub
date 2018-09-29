@@ -158,7 +158,7 @@ func TestTallyingProcedureParam(t *testing.T) {
 	require.NotEqual(t, p1, TallyingProcedureParameter.Value)
 	require.Equal(t, p2, TallyingProcedureParameter.Value)
 
-	result := TallyingProcedureParameter.Valid("{\"threshold\":\"2/1\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
+	result := TallyingProcedureParameter.Valid("{\"threshold\":\"1/1\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
 	require.Error(t, result)
 
 	result = TallyingProcedureParameter.Valid("{\"threshold\":\"abcd\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
