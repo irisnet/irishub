@@ -3,11 +3,11 @@ package gov
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov/tags"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"strconv"
 	"encoding/json"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/gov/tags"
+	"strconv"
 )
 
 // Handle all "gov" type messages.
@@ -37,20 +37,17 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
-
-
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
 
-	proposalIDBytes := []byte(strconv.FormatInt(proposal.GetProposalID(),10))
+	proposalIDBytes := []byte(strconv.FormatInt(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange{
+	if msg.ProposalType == ProposalTypeParameterChange {
 		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
 	}
-
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSubmitProposal,
@@ -153,7 +150,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
-			activeProposal.Execute(ctx,keeper)
+			activeProposal.Execute(ctx, keeper)
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
