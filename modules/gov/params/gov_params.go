@@ -293,13 +293,13 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.Threshold.LTE(sdk.NewRat(0)) || param.Value.Threshold.GTE(sdk.NewRat(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidThreshold, fmt.Sprintf("VotingPeriod ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidThreshold, fmt.Sprintf("Invalid Threshold ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
 		}
 		if param.Value.GovernancePenalty.LTE(sdk.NewRat(0)) || param.Value.GovernancePenalty.GTE(sdk.NewRat(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidGovernancePenalty, fmt.Sprintf("VotingPeriod ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid Penalty ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
 		}
 		if param.Value.Veto.LTE(sdk.NewRat(0)) || param.Value.Veto.GTE(sdk.NewRat(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVeto, fmt.Sprintf("VotingPeriod ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
 		}
 
 		return nil
