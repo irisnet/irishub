@@ -11,11 +11,10 @@ import (
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	//cmn "github.com/tendermint/tendermint/libs/common"
 )
 
-// GetCmdSubmitFileProposal implements submitting transaction command.
-func GetCmdSubmitFileProposal(cdc *wire.Codec) *cobra.Command {
+// GetCmdSubmitFile implements submitting upload file transaction command.
+func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
 		Short: "Submit a proposal with a file",
@@ -24,6 +23,12 @@ func GetCmdSubmitFileProposal(cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 			strProposalType := viper.GetString(flagProposalType)
 			strAmount := viper.GetString(flagAmount)
+			//todo upload to ipfs
+			strFilepath := viper.GetString(flagPath)
+			if _, err := os.Stat(strFilepath); os.IsNotExist(err) {
+				// file does not exist
+				return err
+			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -42,7 +47,7 @@ func GetCmdSubmitFileProposal(cdc *wire.Codec) *cobra.Command {
 
 			proposalType := strProposalType
 
-			msg := record.NewMsgSubmitFile(filename, description, proposalType, fromAddr, amount)
+			msg := record.NewMsgSubmitFile(filename, strFilepath, description, proposalType, fromAddr, amount)
 
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -55,7 +60,9 @@ func GetCmdSubmitFileProposal(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagFilename, "", "filename of proposal")
-	cmd.Flags().String(flagDescription, "", "description of proposal")
+	cmd.Flags().String(flagFilename, "", "name of file")
+	cmd.Flags().String(flagDescription, "", "description of file")
+	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
+
 	return cmd
 }

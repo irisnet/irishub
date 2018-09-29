@@ -13,18 +13,20 @@ const MsgType = "record"
 // MsgSubmitFile
 type MsgSubmitFile struct {
 	Filename    string         //  Filename of the File
+	Filepath    string         //  full path of the File
 	Description string         //  Description of the File
 	FileType    string         //  Type of file
 	Proposer    sdk.AccAddress //  Address of the proposer
-	Amount      sdk.Coins      //  Initial deposit paid by sender. Must be strictly positive.
+	Amount      sdk.Coins      //  File upload paid by sender. Must be non negative.
 }
 
-//msg := record.NewMsgSubmitFile(filename, description, FileType, fromAddr, amount)
-func NewMsgSubmitFile(filename string, description string, FileType string, proposer sdk.AccAddress, amount sdk.Coins) MsgSubmitFile {
+//msg := record.NewMsgSubmitFile(filename, filepath, description, fileType, fromAddr, amount)
+func NewMsgSubmitFile(filename string, filepath string, description string, fileType string, proposer sdk.AccAddress, amount sdk.Coins) MsgSubmitFile {
 	return MsgSubmitFile{
 		Filename:    filename,
+		Filepath:    filepath,
 		Description: description,
-		FileType:    FileType,
+		FileType:    fileType,
 		Proposer:    proposer,
 		Amount:      amount,
 	}

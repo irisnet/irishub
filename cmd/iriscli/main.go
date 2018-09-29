@@ -1,21 +1,21 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/libs/cli"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
-	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	"github.com/irisnet/irishub/version"
+	"github.com/spf13/cobra"
+	"github.com/tendermint/tendermint/libs/cli"
 )
 
 // rootCmd is the entry point for this binary
@@ -74,7 +74,7 @@ func main() {
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
-		    govcmd.GetCmdPullGovConfig("params", cdc),
+			govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -144,7 +144,7 @@ func main() {
 
 	recordCmd.AddCommand(
 		client.PostCommands(
-			recordcmd.GetCmdSubmitFileProposal(cdc),
+			recordcmd.GetCmdSubmitFile(cdc),
 		)...)
 	rootCmd.AddCommand(
 		recordCmd,
