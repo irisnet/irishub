@@ -14,6 +14,7 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -133,6 +134,20 @@ func main() {
 		client.LineBreak,
 		keyscmd.Commands(),
 		version.ServeVersionCommand(cdc),
+	)
+
+	//add record command
+	recordCmd := &cobra.Command{
+		Use:   "record",
+		Short: "Record and subcommands",
+	}
+
+	recordCmd.AddCommand(
+		client.PostCommands(
+			recordcmd.GetCmdSubmitFileProposal(cdc),
+		)...)
+	rootCmd.AddCommand(
+		recordCmd,
 	)
 
 	// prepare and add flags
