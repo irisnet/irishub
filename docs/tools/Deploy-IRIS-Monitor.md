@@ -40,7 +40,7 @@ to
 
 modify
 ```
---chain-id=fuxi-3000
+--chain-id=fuxi-3001
 ```
 to
 ```

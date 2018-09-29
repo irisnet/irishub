@@ -1,17 +1,17 @@
 package govparams
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"testing"
-	"fmt"
-	"github.com/irisnet/irishub/types"
 )
 
 func defaultContext(key sdk.StoreKey) sdk.Context {
@@ -90,9 +90,8 @@ func TestVotingProcedureParam(t *testing.T) {
 	ctx := defaultContext(skey)
 	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
 
-
 	p1 := VotingProcedure{
-		VotingPeriod:1000,
+		VotingPeriod: 1000,
 	}
 
 	p2 := VotingProcedure{
@@ -126,12 +125,10 @@ func TestVotingProcedureParam(t *testing.T) {
 
 }
 
-
 func TestTallyingProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
 	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
-
 
 	p1 := TallyingProcedure{
 		Threshold:         sdk.NewRat(1, 2),
@@ -140,10 +137,10 @@ func TestTallyingProcedureParam(t *testing.T) {
 	}
 
 	p2 := TallyingProcedure{
-        Threshold:         sdk.NewRat(1, 2),
-        Veto:              sdk.NewRat(1, 3),
-        GovernancePenalty: sdk.NewRat(1, 50),
-    }
+		Threshold:         sdk.NewRat(1, 2),
+		Veto:              sdk.NewRat(1, 3),
+		GovernancePenalty: sdk.NewRat(1, 50),
+	}
 
 	TallyingProcedureParameter.SetReadWriter(paramKeeper.Setter())
 	find := TallyingProcedureParameter.LoadValue(ctx)
@@ -158,7 +155,7 @@ func TestTallyingProcedureParam(t *testing.T) {
 	require.NotEqual(t, p1, TallyingProcedureParameter.Value)
 	require.Equal(t, p2, TallyingProcedureParameter.Value)
 
-	result := TallyingProcedureParameter.Valid("{\"threshold\":\"2/1\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
+	result := TallyingProcedureParameter.Valid("{\"threshold\":\"1/1\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
 	require.Error(t, result)
 
 	result = TallyingProcedureParameter.Valid("{\"threshold\":\"abcd\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")

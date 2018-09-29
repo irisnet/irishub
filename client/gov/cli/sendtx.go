@@ -11,9 +11,9 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/pkg/errors"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -53,12 +53,12 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				pathStr := viper.GetString(flagPath)
 				keyStr := viper.GetString(flagKey)
 				opStr := viper.GetString(flagOp)
-				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr,cdc)
+				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr, cdc)
 				if err != nil {
 					return err
 				}
-				jsonBytes,_ := json.MarshalIndent(param,""," ")
-				fmt.Println("Param:\n",string(jsonBytes))
+				jsonBytes, _ := json.MarshalIndent(param, "", " ")
+				fmt.Println("Param:\n", string(jsonBytes))
 			}
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
@@ -85,24 +85,24 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string,cdc *wire.Codec) (gov.Param, error) {
+func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *wire.Codec) (gov.Param, error) {
 	var param gov.Param
 
 	if paramStr != "" {
 		err := json.Unmarshal([]byte(paramStr), &param)
 		return param, err
 
-	} else if pathStr != ""{
+	} else if pathStr != "" {
 		paramDoc := ParameterConfigFile{}
-		err := paramDoc.ReadFile(cdc,pathStr)
+		err := paramDoc.ReadFile(cdc, pathStr)
 		if err != nil {
 			return param, err
 		}
-		param,err := paramDoc.GetParamFromKey(keyStr,opStr)
+		param, err := paramDoc.GetParamFromKey(keyStr, opStr)
 		return param, err
 	} else {
 
-		return param,errors.New("Path and param are both empty")
+		return param, errors.New("Path and param are both empty")
 	}
 }
 
