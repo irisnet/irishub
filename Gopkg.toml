@@ -62,6 +62,10 @@
   name = "github.com/rakyll/statik"
   version = "=v0.1.4"
 
+[[constraint]]
+  name = "github.com/emicklei/proto"
+  version = "=v1.6.5"
+
 [prune]
   go-tests = true
   unused-packages = true
