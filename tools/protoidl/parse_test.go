@@ -49,26 +49,21 @@ var (
 )
 
 func TestValidateProto(t *testing.T) {
-	for i, tc := range tests {
-		validate, err := ValidateProto(tc.content)
-		if !tc.expectPass {
-			assert.Error(t, err, i)
-			return
-		}
-		require.Equal(t, validate, tc.expectPass, i)
+	for _, tc := range tests {
+		validate, _ := ValidateProto(tc.content)
+		require.Equal(t, validate, tc.expectPass)
 	}
-
 }
 
 func TestGetMethods(t *testing.T) {
-	for i, tc := range tests {
+	for _, tc := range tests {
 		methods, err := GetMethods(tc.content)
 		if !tc.expectPass {
-			assert.Error(t, err, i)
+			assert.Error(t, err)
 			return
 		}
-		require.Len(t, methods, tc.methodNumber, i)
-		require.Equal(t, methods[0].Name, "SayHello", i)
-		require.Equal(t, methods[0].Comment, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"}, i)
+		require.Len(t, methods, tc.methodNumber)
+		require.Equal(t, methods[0].Name, "SayHello")
+		require.Equal(t, methods[0].Comment, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"})
 	}
 }
