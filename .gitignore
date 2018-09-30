@@ -9,3 +9,4 @@ node_modules/
 package.json
 yarn.lock
 client/lcd/statik/statik.go
+dependency-graph.png
