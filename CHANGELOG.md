@@ -1,5 +1,31 @@
 # Changelog
 
+
+## 0.5.0-rc0
+
+*September 30th, 2018*
+
+BREAKING CHANGES:
+
+- [cointype] Introduce the cointype of iris:
+  - 1 iris = 10^18 iris-atto
+  - 1 iris-milli = 10^15 iris-atto
+  - 1 iris-micro = 10^12 iris-atto
+  - 1 iris-nano = 10^9 iris-atto
+  - 1 iris-pico = 10^6 iris-atto
+  - 1 iris-femto = 10^3 iris-atto
+
+FEATURES:
+
+- [tendermint] Upgrade to Tendermint v0.23.1-rc0
+- [cosmos-sdk] Upgrade to cosmos-sdk v0.24.2
+    - Move the previous irisnet changeset about cosmos-sdk into irishub
+- [irisdebug] Add irisdebug tool
+- [LCD/cli] Add the proof verification to the LCD and CLI
+- [iparam] Support the modification of governance parameters of complex data type through governance, and the submission of modified proposals through json config files
+- [software-upgrade] Software upgrade solutions of the irisnet
+
+
 ## 0.4.2
 
 *September 22th, 2018*
@@ -49,6 +75,27 @@ BUG FIXES
 - Fix the unit conflict issue in slashing
 - Check the voting power when create validator
 - Fix evidence amimo register issue
+
+
+## 0.4.0-rc2
+
+*Sep 5th, 2018*
+
+BUG FIXES
+
+- Fix evidence amimo register issue
+
+
+## 0.4.0-rc1
+
+*Aug 27th, 2018*
+
+BUG FIXES
+
+- Default account balance in genesis
+- iris version issue
+- Fix the unit conflict issue in slashing
+- Check the voting power when create validator
 
 
 ## 0.3.0

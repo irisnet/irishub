@@ -4,6 +4,7 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"reflect"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 func NewHandler(k Keeper) sdk.Handler {
@@ -26,7 +27,8 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 	}
 
 	proposalID := msgSwitch.ProposalID
-	CurrentProposalID := k.GetCurrentProposalID(ctx)
+
+	CurrentProposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 
 	if proposalID != CurrentProposalID {
 
@@ -56,7 +58,10 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 
-	if (keeper.GetCurrentProposalID(ctx) != -1) && (ctx.BlockHeight() == keeper.GetCurrentProposalAcceptHeight(ctx)+defaultSwitchPeriod) {
+	height := upgradeparams.GetProposalAcceptHeight(ctx)
+	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
+
+	if (proposalID != -1) && (ctx.BlockHeight() == height + defaultSwitchPeriod) {
 		switchPasses := tally(ctx, keeper)
 		if switchPasses {
 			tags.AppendTag("action", []byte("switchPassed"))
@@ -65,7 +70,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 		} else {
 			tags.AppendTag("action", []byte("switchDropped"))
 
-			keeper.SetCurrentProposalID(ctx, -1)
+			upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
 		}
 	}
 

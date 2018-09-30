@@ -9,16 +9,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/irisnet/irishub/version"
+	bam "github.com/irisnet/irishub/baseapp"
 
+	"github.com/irisnet/irishub/tools/prometheus"
+	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/tools/prometheus"
 )
 
 func main() {
@@ -44,11 +44,11 @@ func main() {
 	)
 
 	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
-	//startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
+	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
 		server.InitCmd(ctx, cdc, app.IrisAppInit()),
 		startCmd,
-		server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
+		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
@@ -57,9 +57,8 @@ func main() {
 	)
 
 	rootCmd.AddCommand(
-		client.GetCommands(
-			version.GetCmdVersion("upgrade", cdc),
-		)...)
+		version.ServeVersionCommand(cdc),
+	)
 
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 

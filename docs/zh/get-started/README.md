@@ -5,7 +5,7 @@
 
 IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
-## 如何加入fuxi-3000测试网
+## 如何加入fuxi-3001测试网
 
 ### 安装IRIShub
 
@@ -33,10 +33,10 @@ IRIS Hub是用Go语言编写的。它可以在任何能够编译并运行Go语�
 执行以下命令,若出现对应的版本号则说明安装成功。
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 #### 方法2：源码编译安装
 
@@ -93,7 +93,7 @@ Ubuntu LTS 16.04
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.4.1
+cd irishub && git checkout v0.4.2
 
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
@@ -104,10 +104,10 @@ make get_vendor_deps && make install
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 
 ### 部署一个全节点
@@ -131,15 +131,15 @@ iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下
     cd $IRISHOME/config/
     rm genesis.json
     rm config.toml
-    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3000/config/config.toml
-    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3000/config/genesis.json
+    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3001/config/config.toml
+    wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-3001/config/genesis.json
 
 * **修改配置文件**
 
-在config.tmol文件中可以配置以下信息：
+在config.toml文件中可以配置以下信息：
 
 1. 将moniker字段配置称为自定义的名称，这样便于区分不同的节点
-2. seed字段用语设置种子节点，在fuxi-2000中的官方种子节点为：
+2. seed字段用语设置种子节点，在fuxi-3001中的官方种子节点为：
 ```
 c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
 ```
