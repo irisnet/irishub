@@ -71,8 +71,8 @@ type IrisApp struct {
 	ibc1Mapper          ibc1.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
-	govKeeper           gov.Keeper
 	paramsKeeper        params.Keeper
+	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
 
 	// fee manager
@@ -113,7 +113,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	)
 
 	// add handlers
-	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
+	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.ibc1Mapper = ibc1.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc1.DefaultCodespace))
@@ -122,7 +122,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
-	//app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper.Setter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -136,7 +135,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
-
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -146,6 +144,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade)
 	app.SetRunMsg(app.runMsgs)
+
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain)
@@ -157,18 +156,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
-	upgrade.RegisterModuleList(app.Router())
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
-		&upgradeparams.CurrentUpgradeProposalIdParameter,
-		&upgradeparams.ProposalAcceptHeightParameter)
+							&govparams.DepositProcedureParameter,
+		                    &govparams.VotingProcedureParameter,
+		                    &govparams.TallyingProcedureParameter,
+							&upgradeparams.CurrentUpgradeProposalIdParameter,
+							&upgradeparams.ProposalAcceptHeightParameter)
 
 	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,)
-
+		                              &govparams.VotingProcedureParameter,
+		                              &govparams.TallyingProcedureParameter,)
 
 	return app
 }
