@@ -735,7 +735,6 @@
     "github.com/cosmos/cosmos-sdk/x/auth/client/context",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/gov",
-    "github.com/cosmos/cosmos-sdk/x/gov/tags",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mock",
     "github.com/cosmos/cosmos-sdk/x/mock/simulation",
