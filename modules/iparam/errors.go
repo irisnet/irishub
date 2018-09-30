@@ -18,5 +18,7 @@ const (
 	CodeInvalidVeto                     sdk.CodeType      = 109
 	CodeInvalidTallyingProcedure        sdk.CodeType      = 110
 	CodeInvalidKey                      sdk.CodeType      = 111
-	CodeInvalidParamString              sdk.CodeType      = 123
+	CodeInvalidParamString              sdk.CodeType      = 112
+	CodeInvalidModule                   sdk.CodeType      = 113
+	CodeInvalidQueryParams              sdk.CodeType      = 114
 )
