@@ -253,7 +253,7 @@ func getShares(
 		if !sharesAmount.GT(sdk.ZeroRat()) {
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
-		sharesAmount.Quo(stakeClient.ExRateFromStakeTokenToMainUnit(cliCtx))
+		sharesAmount = sharesAmount.Quo(stakeClient.ExRateFromStakeTokenToMainUnit(cliCtx))
 	case sharesPercentStr != "":
 		var sharesPercent sdk.Rat
 		sharesPercent, err = sdk.NewRatFromDecimal(sharesPercentStr, types.MaxBondDenominatorPrecision)

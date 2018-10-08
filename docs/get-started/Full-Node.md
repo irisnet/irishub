@@ -2,7 +2,7 @@
 
 Before setting up your validator node, make sure you already had **Iris** installed by following this [guide](Install-Iris.md)
 
-### Step 1: Init Your Node
+## Init Your Node
 
 These instructions are for setting up a brand new full node from scratch.
 
@@ -18,7 +18,7 @@ The default \$IRISHOME is `~/.iris` , You can edit this `name` later, in the `~/
 
 Your full node has been initialized!
 
-### Get Configuration Files
+## Get Configuration Files
 
 
 After intializing your node, please download the genesis file and the config file to join in the testnet.
@@ -27,10 +27,10 @@ After intializing your node, please download the genesis file and the config fil
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3001/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3001/config/genesis.json
 ```
-## Edit your Config File
+## Edit Your Config File
 
 You could customized the `moniker` and `external_address` fields. 
 

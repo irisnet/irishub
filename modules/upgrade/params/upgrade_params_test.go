@@ -65,3 +65,22 @@ func TestProposalAcceptHeightParameter(t *testing.T) {
 	ProposalAcceptHeightParameter.LoadValue(ctx)
 	require.Equal(t, int64(3), ProposalAcceptHeightParameter.Value)
 }
+
+func TestUpgradeParameterSetAndGet(t *testing.T) {
+	skey := sdk.NewKVStoreKey("params")
+	ctx := defaultContext(skey)
+	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+
+	CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
+	find := CurrentUpgradeProposalIdParameter.LoadValue(ctx)
+	require.Equal(t, find, false)
+
+	ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
+	find = ProposalAcceptHeightParameter.LoadValue(ctx)
+	require.Equal(t, find, false)
+
+	SetCurrentUpgradeProposalId(ctx,5)
+	require.Equal(t,int64(5),GetCurrentUpgradeProposalId(ctx))
+	SetProposalAcceptHeight(ctx,100)
+	require.Equal(t, int64(100),GetProposalAcceptHeight(ctx) )
+}
