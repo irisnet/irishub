@@ -19,6 +19,9 @@ import (
 	"time"
 )
 
+// DefaultKeyPass contains the default key password for genesis transactions
+const DefaultKeyPass = "12345678"
+
 // State to Unmarshal
 type GenesisState struct {
 	Accounts  []GenesisAccount   `json:"accounts"`
