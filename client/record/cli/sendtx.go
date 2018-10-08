@@ -2,6 +2,7 @@ package cli
 
 import (
 	"os"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -21,9 +22,8 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			filename := viper.GetString(flagFilename)
 			description := viper.GetString(flagDescription)
-			strProposalType := viper.GetString(flagProposalType)
-			strAmount := viper.GetString(flagAmount)
 			//todo upload to ipfs
+			dataHash := "todo - the upload file's ipfs hash"
 			strFilepath := viper.GetString(flagPath)
 			file, err := os.Stat(strFilepath)
 			if os.IsNotExist(err) {
@@ -45,20 +45,21 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			amount, err := cliCtx.ParseCoins(strAmount)
-			if err != nil {
-				return err
-			}
+			submitTime := time.Now().Unix()
 
-			proposalType := strProposalType
-
-			msg := record.NewMsgSubmitFile(filename, strFilepath, description, proposalType, fromAddr, amount, dataSize)
+			msg := record.NewMsgSubmitFile(filename,
+				strFilepath,
+				description,
+				submitTime,
+				fromAddr,
+				dataHash,
+				dataSize)
 
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
+
 			// Build and sign the transaction, then broadcast to Tendermint
-			// proposalID must be returned, and it is a part of response.
 			cliCtx.PrintResponse = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
