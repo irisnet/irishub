@@ -1,6 +1,6 @@
 package protoidl
 
 type Method struct {
-	Name    string
-	Comment map[string]string
+	Name       string
+	Attributes map[string]string
 }

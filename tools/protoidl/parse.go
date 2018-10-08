@@ -34,13 +34,13 @@ func GetMethods(content string) (methods []Method, err error) {
 
 	// get method attribute from comment, each line comment only define one attribute
 	for _, r := range rs {
-		commentMap := make(map[string]string)
+		attributes := make(map[string]string)
 		if r.Comment != nil {
-			commentMap = transferComment(r.Comment.Lines)
+			attributes = transferComment(r.Comment.Lines)
 		}
 		method := Method{
 			r.Name,
-			commentMap,
+			attributes,
 		}
 		methods = append(methods, method)
 	}
@@ -50,12 +50,33 @@ func GetMethods(content string) (methods []Method, err error) {
 func transferComment(lines []string) map[string]string {
 	commentMap := make(map[string]string)
 	for _, line := range lines {
-		line = strings.Replace(line, " ", "", -1)
-		ss := strings.Split(line, ":")
-		if len(ss) < 2 {
+		index := strings.Index(line, "@Attribute")
+		if index == -1 {
 			continue
 		}
-		commentMap[ss[0]] = ss[1]
+		ss := line[index+10:]
+		key := []rune("")
+		value := []rune("")
+
+		split := false
+		for _, s := range ss {
+			switch s {
+			case ' ':
+				continue
+			case ':':
+				split = true
+				continue
+			default:
+				if !split {
+					key = append(key, s)
+				} else {
+					value = append(value, s)
+				}
+			}
+		}
+		if len(key) > 0 && len(value) > 0 {
+			commentMap[string(key)] = string(value)
+		}
 	}
 	return commentMap
 }

@@ -31,9 +31,9 @@ var (
 
 	// The greeting service definition.
 	service Greeter {
-		//description: sayHello
-		//output_privacy: NoPrivacy
-		//output_cached: NoCached
+		//@Attribute description:sayHello
+		//@Attribute output_privacy:NoPrivacy
+		//@Attribute output_cached:NoCached
 		rpc SayHello (HelloRequest) returns (HelloReply) {}
 	}
 
@@ -64,6 +64,6 @@ func TestGetMethods(t *testing.T) {
 		}
 		require.Len(t, methods, tc.methodNumber)
 		require.Equal(t, methods[0].Name, "SayHello")
-		require.Equal(t, methods[0].Comment, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"})
+		require.Equal(t, methods[0].Attributes, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"})
 	}
 }
