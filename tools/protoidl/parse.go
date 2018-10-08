@@ -3,6 +3,7 @@ package protoidl
 import (
 	"github.com/emicklei/proto"
 	"strings"
+	"fmt"
 )
 
 // validate proto idl text
@@ -16,7 +17,7 @@ func ValidateProto(content string) (bool, error) {
 	return true, nil
 }
 
-// get all method from proto idl text
+// validate proto idl text and get all method
 func GetMethods(content string) (methods []Method, err error) {
 	reader := strings.NewReader(content)
 	parser := proto.NewParser(reader)
@@ -36,7 +37,10 @@ func GetMethods(content string) (methods []Method, err error) {
 	for _, r := range rs {
 		attributes := make(map[string]string)
 		if r.Comment != nil {
-			attributes = transferComment(r.Comment.Lines)
+			attributes, err = transferComment(r.Comment.Lines)
+			if err != nil {
+				return methods, err
+			}
 		}
 		method := Method{
 			r.Name,
@@ -47,36 +51,26 @@ func GetMethods(content string) (methods []Method, err error) {
 	return methods, nil
 }
 
-func transferComment(lines []string) map[string]string {
-	commentMap := make(map[string]string)
+func transferComment(lines []string) (map[string]string, error) {
+	attributes := make(map[string]string)
 	for _, line := range lines {
 		index := strings.Index(line, "@Attribute")
 		if index == -1 {
 			continue
 		}
-		ss := line[index+10:]
-		key := []rune("")
-		value := []rune("")
-
-		split := false
-		for _, s := range ss {
-			switch s {
-			case ' ':
-				continue
-			case ':':
-				split = true
-				continue
-			default:
-				if !split {
-					key = append(key, s)
-				} else {
-					value = append(value, s)
-				}
-			}
+		ss := strings.SplitN(line[index+10:], ":", 2)
+		if len(ss) < 2 {
+			return attributes, fmt.Errorf("invalid attribute at %s", line)
 		}
-		if len(key) > 0 && len(value) > 0 {
-			commentMap[string(key)] = string(value)
+		key := strings.Replace(ss[0], " ", "", -1)
+		if key == "" {
+			return attributes, fmt.Errorf("attribute has empty key at %s", line)
 		}
+		value := strings.TrimSpace(ss[1])
+		if key == "" {
+			return attributes, fmt.Errorf("attribute has empty value at %s", line)
+		}
+		attributes[key] = value
 	}
-	return commentMap
+	return attributes, nil
 }
