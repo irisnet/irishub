@@ -4,10 +4,10 @@
 # > docker run -v $HOME/.iris:/root/.iris iris init
 # > docker run -v $HOME/.iris:/root/.iris iris start
 
-FROM alpine:edge
+FROM golang:1.11-alpine3.7
 
 # Set up dependencies
-ENV PACKAGES go make git libc-dev bash
+ENV PACKAGES make git libc-dev bash
 
 # Set up GOPATH & PATH
 
