@@ -32,7 +32,7 @@ iris start --home=iris
 
 ```
 # 发送升级提议
-iriscli gov submit-proposal --title=Upgrade --description="I am crazy" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
 # 对提议进行抵押
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
@@ -60,7 +60,7 @@ kill -f iris
 iris1 start --home=iris
 
 # 4. 发送switch消息，广播全网自己已经安装新软件。
-iriscli1 upgrade submit-switch --from=x --proposalID=1  --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli1 upgrade submit-switch --from=x --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
 # 5. 到达规定的时间，自动升级
 
@@ -88,7 +88,7 @@ iriscli upgrade info --trust-node
 ## 命令详情
 
 ```
-iriscli gov submit-proposal --title=Upgrade --description="I am crazy" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 ```
 
 * `--type`  "SoftwareUpgrade" 软件升级提议的类型

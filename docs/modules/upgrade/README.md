@@ -31,13 +31,13 @@ iris start --home=iris
 ### Submit a software upgrade proposal
 ```
 # Send an upgrade proposal
-echo 1234567890 | iriscli gov submit-proposal --title=Upgrade --description="I am crazy" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
 # Deposit for a proposal
-echo 1234567890 | iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
 # Vote for a proposal
-echo 1234567890 | iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
 # Query the state of a proposal
 iriscli gov query-proposal --proposal-id=1 --trust-node
@@ -59,7 +59,7 @@ kill -f iris
 iris1 start --home=iris
 
 # 4. Send a switch message, and broadcast to the whole network that the new software has been installed.
-iriscli1  upgrade submit-switch --from=x --proposalID=1  --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli1  upgrade submit-switch --from=x --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
 
 # 5. Upgrade automatically when reach the preset time
 
@@ -87,7 +87,7 @@ iriscli upgrade info --trust-node
 ## Command details
 
 ```
-iriscli gov submit-proposal --title=Upgrade --description="I am crazy" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
 ```
 
 * `--type`  "SoftwareUpgrade" The type of Software upgrade proposals
