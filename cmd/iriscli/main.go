@@ -169,6 +169,23 @@ func main() {
 		version.ServeVersionCommand(cdc),
 	)
 
+	//Add auth and bank commands
+	rootCmd.AddCommand(
+		client.GetCommands(
+			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+		)...)
+	rootCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
+
+	// add proxy, version and key info
+	rootCmd.AddCommand(
+		client.LineBreak,
+		keyscmd.Commands(),
+		version.ServeVersionCommand(cdc),
+	)
+
 	//add record command
 	recordCmd := &cobra.Command{
 		Use:   "record",
