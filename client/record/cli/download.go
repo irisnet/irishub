@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/client/record/ipfs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tmlibs/cli"
+
+	shell "github.com/ipfs/go-ipfs-api"
 )
 
 func FileExists(path string) (bool, error) {
@@ -52,30 +52,35 @@ func GetCmdDownload(cdc *wire.Codec) *cobra.Command {
 			// }
 
 			// WIP
-			record.DataHash = "QmTp2hEo8eXRp6wg7jXv1BLCMh5a4F3B7buAUZNZUu772j"
+			record.DataHash = "QmTp2hEo8eXRp6wg7jXv1BLCMh5a4F3B7buAUZNZUu772j" // this data hash will be replaced in the future
 			filePath := filepath.Join(home, downloadFileName)
+			sh := shell.NewShell("localhost:5001")
 
 			//Begin to download file from ipfs
-
 			exist, _ := FileExists(filePath)
 			if exist == true {
 				fmt.Printf("%v already exists, please try another file name.\n", filePath)
-				os.Exit(1)
+				return nil
 			}
 
+			// fhandle, ferr := os.Open(filePath) // For read access.
+			// if ferr != nil {
+			// 	log.Fatal(err)
+			// }
+
+			// fmt.Printf("Uploading %v ...\n", filePath)
+			// cid, err := sh.Add(bufio.NewReader(fhandle))
+			// if err != nil {
+			// 	return err
+			// }
+			// fmt.Printf("this is uploadfile hash :%v\n", cid)
+
 			fmt.Printf("Downloading %v ...\n", filePath)
-
-			client := ipfs.NewIpfsclient()
-
-			err = client.Get(record.DataHash, filePath)
+			err = sh.Get(record.DataHash, filePath)
 			if err != nil {
 				return err
 			}
-
-			fmt.Printf("Complete.\n")
-
-			cid, err := client.Add(strings.NewReader("Upload file!"), true, false)
-			fmt.Printf("this is uploadfile hash :%v\n", cid)
+			fmt.Printf("Download file complete.\n")
 
 			return nil
 		},
