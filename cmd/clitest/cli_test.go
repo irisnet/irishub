@@ -19,6 +19,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/keys"
+	govcli "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 )
 
@@ -38,6 +39,9 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	chainID := executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
 
+	err := modifyGenesisFile(t, irisHome)
+	require.NoError(t, err)
+
 	// get a free port, also setup some common flags
 	servAddr, port, err := server.FreeTCPAddr()
 	require.NoError(t, err)
@@ -54,7 +58,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "1000000000000iris", fooCoin)
 
 	proposalsQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -80,32 +84,38 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
-	require.Equal(t, int64(1), proposal1.GetProposalID())
-	require.Equal(t, gov.StatusDepositPeriod, proposal1.GetStatus())
+	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, gov.StatusDepositPeriod, proposal1.Status)
 
 	proposalsQuery = tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "  1 - Test", proposalsQuery)
 
 	depositStr := fmt.Sprintf("iriscli gov deposit %v", flags)
 	depositStr += fmt.Sprintf(" --from=%s", "foo")
-	depositStr += fmt.Sprintf(" --deposit=%s", "10steak")
+	depositStr += fmt.Sprintf(" --deposit=%s", "10iris")
 	depositStr += fmt.Sprintf(" --proposal-id=%s", "1")
+	depositStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
 	executeWrite(t, depositStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	num = getAmuntFromCoinStr(t, fooCoin)
+
+	if !(num > 84 && num < 85) {
+		t.Error("Test Failed: (84, 85) expected, recieved: {}", num)
+	}
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
-	require.Equal(t, int64(1), proposal1.GetProposalID())
-	require.Equal(t, gov.StatusVotingPeriod, proposal1.GetStatus())
+	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
 
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
 	voteStr += fmt.Sprintf(" --from=%s", "foo")
 	voteStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	voteStr += fmt.Sprintf(" --option=%s", "Yes")
+	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
 	executeWrite(t, voteStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -132,6 +142,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --type=%s", "Text")
 	spStr += fmt.Sprintf(" --title=%s", "Apples")
 	spStr += fmt.Sprintf(" --description=%s", "test")
+	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
 	executeWrite(t, spStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -226,9 +237,9 @@ func executeGetValidator(t *testing.T, cmdStr string) stake.Validator {
 	return validator
 }
 
-func executeGetProposal(t *testing.T, cmdStr string) gov.Proposal {
+func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
 	out := tests.ExecuteT(t, cmdStr, "")
-	var proposal gov.Proposal
+	var proposal govcli.ProposalOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
