@@ -78,7 +78,8 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	iparamsKeeper       iparams.Keeper
 	upgradeKeeper       upgrade.Keeper
-	recordKeeper        record.Keeper
+	//todo record
+	//recordKeeper        record.Keeper
 
 	// fee manager
 	feeManager bam.FeeManager

@@ -176,11 +176,10 @@ func main() {
 			recordcmd.GetCmdDownload(cdc),
 		)...)
 
-	// recordCmd.AddCommand(
-	// 	client.PostCommands(
-	// 		recordcmd.GetCmdSubmitFileProposal(cdc),
-	// 	)...)
-
+	recordCmd.AddCommand(
+		client.PostCommands(
+			recordcmd.GetCmdSubmitFile(cdc),
+		)...)
 	rootCmd.AddCommand(
 		recordCmd,
 	)
