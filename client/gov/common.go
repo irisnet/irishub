@@ -26,6 +26,8 @@ type ProposalOutput struct {
 	TotalDeposit []string `json:"total_deposit"` //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
 	VotingStartBlock int64 `json:"voting_start_block"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+
+	Param gov.Param `json:"param"`
 }
 
 type KvPair struct {
@@ -38,7 +40,8 @@ func ConvertProposalToProposalOutput(cliCtx context.CLIContext, proposal gov.Pro
 	if err != nil {
 		return ProposalOutput{}, err
 	}
-	return ProposalOutput{
+
+	proposalOutput := ProposalOutput{
 		ProposalID:   proposal.GetProposalID(),
 		Title:        proposal.GetTitle(),
 		Description:  proposal.GetDescription(),
@@ -51,7 +54,14 @@ func ConvertProposalToProposalOutput(cliCtx context.CLIContext, proposal gov.Pro
 		TotalDeposit: totalDeposit,
 
 		VotingStartBlock: proposal.GetVotingStartBlock(),
-	}, nil
+		Param:            gov.Param{},
+	}
+
+	if proposal.GetProposalType() == gov.ProposalTypeParameterChange {
+		proposalOutput.Param = proposal.(*gov.ParameterProposal).Param
+	}
+
+	return proposalOutput, nil
 }
 
 func ConvertDepositToDepositOutput(cliCtx context.CLIContext, deposite gov.Deposit) (DepositOutput, error) {
