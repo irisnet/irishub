@@ -2,6 +2,7 @@ package main
 
 import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
@@ -129,7 +130,34 @@ func main() {
 		upgradeCmd,
 	)
 
-	//Add keys and version commands
+	//Add auth and bank commands
+	rootCmd.AddCommand(
+		client.GetCommands(
+			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+		)...)
+	rootCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
+
+	// add proxy, version and key info
+	rootCmd.AddCommand(
+		client.LineBreak,
+		keyscmd.Commands(),
+		version.ServeVersionCommand(cdc),
+	)
+
+	//Add auth and bank commands
+	rootCmd.AddCommand(
+		client.GetCommands(
+			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+		)...)
+	rootCmd.AddCommand(
+		client.PostCommands(
+			bankcmd.SendTxCmd(cdc),
+		)...)
+
+	// add proxy, version and key info
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
@@ -139,8 +167,14 @@ func main() {
 	//add record command
 	recordCmd := &cobra.Command{
 		Use:   "record",
-		Short: "Record and subcommands",
+		Short: "Record subcommands",
 	}
+
+	recordCmd.AddCommand(
+		client.GetCommands(
+			recordcmd.GetCmdQureyHash(cdc),
+			recordcmd.GetCmdDownload(cdc),
+		)...)
 
 	recordCmd.AddCommand(
 		client.PostCommands(

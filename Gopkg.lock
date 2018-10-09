@@ -756,7 +756,6 @@
     "github.com/cosmos/cosmos-sdk/x/slashing/client/cli",
     "github.com/cosmos/cosmos-sdk/x/stake",
     "github.com/cosmos/cosmos-sdk/x/stake/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
