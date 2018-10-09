@@ -20,8 +20,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/client/context"
 )
 
 var (
@@ -54,8 +56,9 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
 
-	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli account %s %v", fooAddr, flags))
-	require.Equal(t, int64(50), fooAcc.GetCoins().AmountOf("steak").Int64())
+	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooAcc1 := convertToIrisBaseAccount(t, fooAcc)
+	require.Equal(t, int64(100), fooAcc1.GetCoins().AmountOf("iris-atto").Int64())
 
 	proposalsQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -71,8 +74,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	executeWrite(t, spStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli account %s %v", fooAddr, flags))
-	require.Equal(t, int64(45), fooAcc.GetCoins().AmountOf("steak").Int64())
+	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	//require.Equal(t, int64(45), fooAcc.GetCoins().AmountOf("steak").Int64())
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.GetProposalID())
@@ -89,8 +92,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	executeWrite(t, depositStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli account %s %v", fooAddr, flags))
-	require.Equal(t, int64(35), fooAcc.GetCoins().AmountOf("steak").Int64())
+	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	//require.Equal(t, int64(35), fooAcc.GetCoins().AmountOf("steak").Int64())
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.GetProposalID())
 	require.Equal(t, gov.StatusVotingPeriod, proposal1.GetStatus())
@@ -195,18 +198,47 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 	return ko.Address, pk
 }
 
-func executeGetAccount(t *testing.T, cmdStr string) auth.BaseAccount {
+func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 	out := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)
 	require.NoError(t, err, "out %v, err %v", out, err)
-	value := initRes["value"]
-	var acc auth.BaseAccount
+
 	cdc := wire.NewCodec()
 	wire.RegisterCrypto(cdc)
-	err = cdc.UnmarshalJSON(value, &acc)
-	require.NoError(t, err, "value %v, err %v", string(value), err)
+
+	err = cdc.UnmarshalJSON([]byte(out), &acc)
+	require.NoError(t, err, "acc %v, err %v", string(out), err)
+
 	return acc
+}
+
+func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) (*auth.BaseAccount) {
+	cdc := wire.NewCodec()
+	wire.RegisterCrypto(cdc)
+
+	cliCtx := context.NewCLIContext().
+		WithCodec(cdc)
+
+	coinstr := acc.Coins[0]
+	for i := 1; i < len(acc.Coins); i++ {
+		coinstr += ("," + acc.Coins[i])
+	}
+
+	coins, err := cliCtx.ParseCoins(coinstr)
+	require.NoError(t, err, "coins %v, err %v", coinstr, err)
+
+	acc1 := auth.BaseAccount{
+		Address       :acc.Address,
+		Coins         :coins,
+		PubKey        :acc.PubKey,
+		AccountNumber :acc.AccountNumber,
+		Sequence      :acc.Sequence,
+	}
+
+	copy(acc1.Coins, coins)
+
+	return &acc1
 }
 
 func executeGetValidator(t *testing.T, cmdStr string) stake.Validator {
