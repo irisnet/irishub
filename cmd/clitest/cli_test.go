@@ -1,5 +1,4 @@
-
-package cli_test
+package clitest
 
 import (
 	"encoding/json"
@@ -21,7 +20,6 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/client/context"
 )
 
 var (
@@ -55,8 +53,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
-	fooAcc1 := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooAcc1)
+	fooCoin := convertToIrisBaseAccount(t, fooAcc)
+	require.Equal(t, "100iris", fooCoin)
 
 	proposalsQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -68,13 +66,18 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --type=%s", "Text")
 	spStr += fmt.Sprintf(" --title=%s", "Test")
 	spStr += fmt.Sprintf(" --description=%s", "test")
+	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
 	executeWrite(t, spStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
-	fooAcc1 = convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "95iris", fooAcc1)
+	fooCoin = convertToIrisBaseAccount(t, fooAcc)
+	num := getAmuntFromCoinStr(t, fooCoin)
+
+	if !(num > 94 && num < 95) {
+		t.Error("Test Failed: (94, 95) expected, recieved: {}", num)
+	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.GetProposalID())
@@ -92,8 +95,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
-	fooAcc1 = convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooAcc1)
+	fooCoin = convertToIrisBaseAccount(t, fooAcc)
+	require.Equal(t, "100iris", fooCoin)
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.GetProposalID())
@@ -212,25 +215,6 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 	require.NoError(t, err, "acc %v, err %v", string(out), err)
 
 	return acc
-}
-
-//func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) (*auth.BaseAccount) {
-func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) (string) {
-	cdc := wire.NewCodec()
-	wire.RegisterCrypto(cdc)
-
-	cliCtx := context.NewCLIContext().
-		WithCodec(cdc)
-
-	coinstr := acc.Coins[0]
-	for i := 1; i < len(acc.Coins); i++ {
-		coinstr += ("," + acc.Coins[i])
-	}
-
-	coins, err := cliCtx.ConvertCoinToMainUnit(coinstr)
-	require.NoError(t, err, "coins %v, err %v", coinstr, err)
-
-	return coins[0]
 }
 
 func executeGetValidator(t *testing.T, cmdStr string) stake.Validator {

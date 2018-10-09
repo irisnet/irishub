@@ -20,7 +20,7 @@ import (
 )
 
 // DefaultKeyPass contains the default key password for genesis transactions
-const DefaultKeyPass = "12345678"
+const DefaultKeyPass = "1234567890"
 
 // State to Unmarshal
 type GenesisState struct {
@@ -103,7 +103,7 @@ func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 
 	var addr sdk.AccAddress
 	var secret string
-	addr, secret, err = server.GenerateSaveCoinKey(genTxConfig.CliRoot, genTxConfig.Name, "1234567890", genTxConfig.Overwrite)
+	addr, secret, err = server.GenerateSaveCoinKey(genTxConfig.CliRoot, genTxConfig.Name, DefaultKeyPass, genTxConfig.Overwrite)
 	if err != nil {
 		return
 	}
