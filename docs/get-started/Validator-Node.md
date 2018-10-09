@@ -4,11 +4,9 @@ Before setting up your validator node, make sure you've already installed  **Iri
 
 Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
-## Create A Validator
+## Get IRIS Token
 
-### Get IRIS Token
-
-#### Create Account
+### Create Account
 
 You need to get `iris` and `iriscli` installed first. Then, follow the instructions below to create a new account:
 
@@ -45,7 +43,7 @@ Once you have created your own address, please  then you could use this　accoun
 iriscli account <ACCOUNT> --node=http://localhost:26657
 ```
 
-## Create-Validator
+## Create Validator
 
 ### Confirm Your Validator is Synced
 
@@ -72,7 +70,7 @@ Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` c
 
 
 ```
-iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --chain-id=game-of-genesis --name=<key_name> --node=http://localhost:26657
+iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --fee=40000000000000000iris  --gas=2000000  --chain-id=fuxi-3001 --name=<key_name> --node=http://localhost:26657
 ```
 Please note the **amount** needs to be the **minimium unit** of IRIS token: `iris-atto`.
 
@@ -81,7 +79,7 @@ Please note the **amount** needs to be the **minimium unit** of IRIS token: `iri
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3000   --node=tcp://localhost:26657  --amount=1000000000000000000iris
+iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3001   --node=tcp://localhost:26657  --amount=1000000000000000000iris
 ```
 Don't forget the `fee` and `gas` field. In this version of IRIHub, all the `unit` for `amount` and `field` correspond to `iris-atto`,but it's shown as `iris`. To read more about coin-type in IRISHub, you should read [this](../zh/modules/coin/README.md)
 
@@ -90,7 +88,7 @@ Don't forget the `fee` and `gas` field. In this version of IRIHub, all the `unit
 View the validator's information with this command:
 
 ```
-iriscli stake validator  --address-validator=account  --chain-id=fuxi-3000 --node=tcp://localhost:26657 
+iriscli stake validator  --address-validator=account  --chain-id=fuxi-3001 --node=tcp://localhost:26657 
 ```
 
 The `<account>` is your account address that starts with 'faa'
@@ -115,7 +113,7 @@ You can edit your validator's public description. This info is to identify your 
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-3000 
+iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-3001 
   --name=key_name --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
 ```
 ### View Validator Description
@@ -123,7 +121,7 @@ iriscli stake edit-validator  --address-validator=account --moniker="choose a mo
 View the validator's information with this command:
 
 ```
-iriscli stake validator --address-validator=<account_cosmosaccaddr> --chain-id=fuxi-3000
+iriscli stake validator --address-validator=<account_cosmosaccaddr> --chain-id=fuxi-3001
 ```
 
 ### Use IRISPlorer
