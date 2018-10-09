@@ -79,8 +79,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num := getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 94 && num < 95) {
-		t.Error("Test Failed: (94, 95) expected, recieved: {}", num)
+	if !(num > 999999999994 && num < 999999999995) {
+		t.Error("Test Failed: (999999999994, 999999999995) expected, recieved: {}", num)
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -92,7 +92,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	depositStr := fmt.Sprintf("iriscli gov deposit %v", flags)
 	depositStr += fmt.Sprintf(" --from=%s", "foo")
-	depositStr += fmt.Sprintf(" --deposit=%s", "10iris")
+	depositStr += fmt.Sprintf(" --deposit=%s", "1000iris")
 	depositStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	depositStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -103,8 +103,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 84 && num < 85) {
-		t.Error("Test Failed: (84, 85) expected, recieved: {}", num)
+	if !(num > 999999998994 && num < 999999998995) {
+		t.Error("Test Failed: (999999998994, 999999998995) expected, recieved: {}", num)
 	}
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -138,7 +138,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	// submit a second test proposal
 	spStr = fmt.Sprintf("iriscli gov submit-proposal %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
-	spStr += fmt.Sprintf(" --deposit=%s", "5steak")
+	spStr += fmt.Sprintf(" --deposit=%s", "5iris")
 	spStr += fmt.Sprintf(" --type=%s", "Text")
 	spStr += fmt.Sprintf(" --title=%s", "Apples")
 	spStr += fmt.Sprintf(" --description=%s", "test")
