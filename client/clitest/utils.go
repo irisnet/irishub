@@ -76,20 +76,14 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 
 	cdc := wire.NewCodec()
 	wire.RegisterCrypto(cdc)
-	cliCtx := context.NewCLIContext().
-		WithCodec(cdc)
 
 	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
 	if err != nil {
 		return err
 	}
 
-	coin, err := cliCtx.ParseCoin("1000000000000iris")
-	if err != nil {
-		return err
-	}
+	genesisState.GovData = gov.DefaultGenesisStateForTest()
 
-	genesisState.Accounts[0].Coins[0] = coin
 	bz, err := cdc.MarshalJSON(genesisState)
 	if err != nil {
 		return err
