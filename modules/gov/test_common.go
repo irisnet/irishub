@@ -13,10 +13,13 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
+	sdkParams "github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // initialize the mock application for this module
@@ -32,11 +35,24 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	ck := bank.NewKeeper(mapp.AccountMapper)
 	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
-	keeper := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
-	mapp.Router().AddRoute("gov", NewHandler(keeper))
+	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
+	pk := sdkParams.NewKeeper(mapp.Cdc, keyGlobalParams)
 
-	mapp.SetEndBlocker(getEndBlocker(keeper))
-	mapp.SetInitChainer(getInitChainer(mapp, keeper, sk))
+	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
+
+	iparam.SetParamReadWriter(pk.Setter(),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter)
+
+	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,)
+
+	mapp.SetEndBlocker(getEndBlocker(gk))
+	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
 
 	require.NoError(t, mapp.CompleteSetup([]*sdk.KVStoreKey{keyStake, keyGov, keyGlobalParams}))
 
@@ -44,7 +60,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	mock.SetGenesis(mapp, genAccs)
 
-	return mapp, keeper, sk, addrs, pubKeys, privKeys
+	return mapp, gk, sk, addrs, pubKeys, privKeys
 }
 
 // gov and stake endblocker
