@@ -202,3 +202,12 @@ func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
 }
+
+func executeGetParam(t *testing.T, cmdStr string) gov.Param {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var param gov.Param
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &param)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return param
+}
