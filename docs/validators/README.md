@@ -22,5 +22,26 @@ People that cannot, or do not want to run validator operations, can still partic
 
 After a validator is created with a `create-validator` transaction, it can be in the following states:
 
-![states](../pics/states.jpg)
-  
+![states](../pics/states.png)
+
+
+## Common Operations for Validators
+
+### **Create Validator**
+
+All the participants could show that they want to become a validator by sending a `create-validator` transaction, the following parameters would be necessory:
+
+* `Validator's PubKey`: With flag `` The private key associated with PubKey is used to sign blocks. 
+* `Validator's Address`: The address of a participant who wants to become a validator. This is the address used to identify your validator publicly. Thhis address is used to bond, unbond, claim rewards, receive delegation and participate in governance.
+* `Validator's name` (default value: moniker of node)
+
+The following parameters are
+
+The following parameters are optional:
+* `Validator's website`
+* `Validator's description` --details
+
+How to get the `PubKey` of your node?
+```$xslt
+iris tendermint show_validator --home=<path-to-your-home>
+```
