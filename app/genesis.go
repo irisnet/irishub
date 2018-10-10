@@ -16,6 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/gov"
 	"time"
 )
 
@@ -26,6 +27,7 @@ const DefaultKeyPass = "1234567890"
 type GenesisState struct {
 	Accounts  []GenesisAccount   `json:"accounts"`
 	StakeData stake.GenesisState `json:"stake"`
+	GovData   gov.GenesisState   `json:"gov"`
 }
 
 // GenesisAccount doesn't need pubkey or sequence
@@ -199,6 +201,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 	genesisState = GenesisState{
 		Accounts:  genaccs,
 		StakeData: stakeData,
+		GovData:   gov.DefaultGenesisState(),
 	}
 	return
 }
