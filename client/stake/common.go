@@ -95,7 +95,7 @@ type ValidatorOutput struct {
 	CommissionChangeToday sdk.Rat `json:"commission_change_today"` // XXX commission rate change today, reset each day (UTC time)
 
 	// fee related
-	LastBondedTokens sdk.Rat `json:"prev_bonded_shares"` // last bonded token amount
+	LastBondedTokens sdk.Rat `json:"prev_bonded_tokens"` // last bonded token amount
 }
 
 func (v ValidatorOutput) HumanReadableString() (string, error) {

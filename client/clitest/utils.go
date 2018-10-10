@@ -11,12 +11,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/keys"
+	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
@@ -28,6 +28,9 @@ var (
 	irisHome    = ""
 	iriscliHome = ""
 )
+
+//___________________________________________________________________________________
+// helper methods
 
 func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
 	cdc := wire.NewCodec()
@@ -95,9 +98,6 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 	genesisDoc.AppState = bz
 	return genesisDoc.SaveAs(genesisFilePath)
 }
-
-//___________________________________________________________________________________
-// helper methods
 
 func getTestingHomeDirs() (string, string) {
 	tmpDir := os.TempDir()
@@ -173,9 +173,9 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 	return acc
 }
 
-func executeGetValidator(t *testing.T, cmdStr string) stake.Validator {
+func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	out := tests.ExecuteT(t, cmdStr, "")
-	var validator stake.Validator
+	var validator stakecli.ValidatorOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &validator)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
