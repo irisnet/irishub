@@ -2,8 +2,13 @@ package iservice
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/iservice/idl"
+	"github.com/irisnet/irishub/tools/protoidl"
 )
+
+// name to idetify transaction types
+const MsgType = "iservice"
+
+var _ sdk.Msg = MsgSvcDef{}
 
 type MsgSvcDef struct {
 	Name              string         `json:"name"`
@@ -30,7 +35,7 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 }
 
 func (msg MsgSvcDef) Type() string {
-	return "iservice"
+	return MsgType
 }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
@@ -38,12 +43,12 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return sdk.MustSortJSON(b)
 }
 
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
-	if !idl.ValidIDL(msg.IDLContent) {
-		return NewError(DefaultCodespace, CodeInvalidIDL, "")
+	if valid, _ := protoidl.ValidateProto(msg.IDLContent); !valid {
+		return ErrInvalidIDL(DefaultCodespace)
 	}
 	return nil
 }

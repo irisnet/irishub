@@ -5,9 +5,10 @@ import (
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 11
+	DefaultCodespace sdk.CodespaceType = 6
 
-	CodeInvalidIDL sdk.CodeType = 100
+	CodeInvalidIDL   sdk.CodeType = 100
+	CodeSvcDefExists sdk.CodeType = 101
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -29,4 +30,12 @@ func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
 		return msg
 	}
 	return codeToDefaultMsg(code)
+}
+
+func ErrSvcDefExists(codespace sdk.CodespaceType, svcDefName string) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcDefExists, "service definition name %s already exist,must use new name", svcDefName)
+}
+
+func ErrInvalidIDL(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcDefExists, codeToDefaultMsg(CodeInvalidIDL))
 }

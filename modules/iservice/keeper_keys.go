@@ -2,8 +2,8 @@ package iservice
 
 var (
 	// Keys for store prefixes
-	serviceDefinitionKey       = []byte{0x00}
-	methodPropertyKey          = []byte{0x01}
+	serviceDefinitionKey = []byte{0x00}
+	methodPropertyKey    = []byte{0x01}
 )
 
 func GetServiceDefinitionKey(chainId, name string) []byte {

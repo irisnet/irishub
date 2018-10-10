@@ -19,9 +19,8 @@ func TestKeeper_IService_Definition(t *testing.T) {
 		idlContent,
 		Broadcast)
 
+	serviceDefB, _ := keeper.GetServiceDefinition(ctx, "testnet", "myService")
 	keeper.AddServiceDefinition(ctx, serviceDef)
-
-	serviceDefB := keeper.GetServiceDefinition(ctx, "testnet", "myService")
 
 	require.Equal(t, serviceDefB.IDLContent, idlContent)
 	require.Equal(t, serviceDefB.Name, "myService")

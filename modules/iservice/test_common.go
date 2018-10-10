@@ -42,7 +42,6 @@ func newPubKey(pk string) (res crypto.PubKey) {
 	return pkEd
 }
 
-
 func createTestCodec() *wire.Codec {
 	cdc := wire.NewCodec()
 	sdk.RegisterWire(cdc)
@@ -66,14 +65,14 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyParams,sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyIService,sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyIService, sdk.StoreTypeIAVL, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewTMLogger(os.Stdout))
 	cdc := createTestCodec()
 
-	keeper := NewKeeper(cdc, keyIService)
+	keeper := NewKeeper(cdc, keyIService, DefaultCodespace)
 	return ctx, keeper
 }
