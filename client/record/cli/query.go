@@ -56,18 +56,18 @@ func queryRecordMetadata(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr 
 
 	msgs := tx.GetMsgs()
 
-	if len(msgs) != 1 {
-		return RecordMetadata{}, nil
+	for i := 0; i < len(msgs); i++ {
+		if msgs[i].Type() == "record" {
+			var ok bool
+			var m record.MsgSubmitFile
+			if m, ok = msgs[i].(record.MsgSubmitFile); ok {
+				return GetMetadata(m)
+			}
+			return RecordMetadata{}, nil
+		}
 	}
 
-	// WIP
-	var ok bool
-	var m record.MsgSubmitFile
-	if m, ok = msgs[0].(record.MsgSubmitFile); ok {
-		return RecordMetadata{}, nil
-	}
-
-	return GetMetadata(m)
+	return RecordMetadata{}, nil
 }
 
 func GetMetadata(msg record.MsgSubmitFile) (RecordMetadata, error) {
