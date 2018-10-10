@@ -20,6 +20,7 @@ import (
 	"github.com/irisnet/irishub/modules/parameter"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/iservice"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -63,6 +64,7 @@ type IrisApp struct {
 	keyParams        *sdk.KVStoreKey
 	keyIparams       *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
+	keyIservice      *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -75,6 +77,7 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	iparamsKeeper       iparams.Keeper
 	upgradeKeeper       upgrade.Keeper
+	iserviceKeeper      iservice.Keeper
 
 	// fee manager
 	feeManager bam.FeeManager
@@ -100,6 +103,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyParams:        sdk.NewKVStoreKey("params"),
 		keyIparams:       sdk.NewKVStoreKey("iparams"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
+		keyIservice:      sdk.NewKVStoreKey("iservice"),
 	}
 
 	var lastHeight int64
@@ -124,6 +128,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper, app.iparamsKeeper.GovSetter())
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.iparamsKeeper.GovSetter(), app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.iserviceKeeper = iservice.NewKeeper(app.cdc, app.keyIservice, app.RegisterCodespace(iservice.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -133,7 +138,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyIparams, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
+		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
+		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper))
 
 	app.feeManager = bam.NewFeeManager(app.iparamsKeeper.GlobalGetter(), app.iparamsKeeper.GovGetter())
 	// initialize BaseApp
@@ -143,7 +149,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyIparams, app.keyUpgrade)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyIparams, app.keyUpgrade, app.keyIservice)
 	app.SetRunMsg(app.runMsgs)
 
 	var err error
@@ -158,12 +164,12 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	parameter.SetParamReadWriter(app.paramsKeeper.Setter(),
-							&govparams.DepositProcedureParameter,
-		                    &govparams.VotingProcedureParameter,
-							&upgradeparams.CurrentUpgradeProposalIdParameter,
-							&upgradeparams.ProposalAcceptHeightParameter)
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter)
 
-	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter,&govparams.VotingProcedureParameter)
+	parameter.RegisterGovParamMapping(&govparams.DepositProcedureParameter, &govparams.VotingProcedureParameter)
 
 	return app
 }
@@ -178,6 +184,7 @@ func MakeCodec() *wire.Codec {
 	gov.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
 	upgrade.RegisterWire(cdc)
+	iservice.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
