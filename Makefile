@@ -1,3 +1,4 @@
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation')
 all: get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
@@ -83,3 +84,21 @@ build_example_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris-bugfix-2
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli-bugfix-2
+
+########################################
+### Testing
+
+test: test_unit
+
+test_cli:
+	@go test -count 1 -p 1 `go list github.com/cosmos/cosmos-sdk/cmd/gaia/cli_test` -tags=cli_test
+
+test_unit:
+	@go test $(PACKAGES_NOSIMULATION)
+
+test_race:
+	@go test -race $(PACKAGES_NOSIMULATION)
+
+test_sim_modules:
+	@echo "Running individual module simulations..."
+	@go test $(PACKAGES_SIMTEST)
