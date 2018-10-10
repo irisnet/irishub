@@ -26,7 +26,6 @@ var (
 	}
 )
 
-
 func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
@@ -166,5 +165,3 @@ func main() {
 		panic(err)
 	}
 }
-
-
