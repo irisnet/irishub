@@ -24,24 +24,87 @@ After a validator is created with a `create-validator` transaction, it can be in
 
 ![states](../pics/states.png)
 
+After a validator is created with a create-validator transaction, it can be in five states:
+
+* `unbonded` & `unjailed` : 
+* `bonded`: Validator is in the active set and participates in consensus. Validator is earning rewards and can be slashed for misbehaviour.
+unbonding: Validator is not in the active set and does not participate in consensus. Validator is not earning rewards, but can still be 
+slashed for misbehaviour. This is a transition state from bonded to unbonded. If validator does not send a rebond transaction while in 
+unbonding mode, it will take three weeks for the state transition to complete.
+unbonded: Validator is not in the active set, and therefore not signing blocs. 
+Validator cannot be slashed, and does not earn any reward. It is still possible to delegate Atoms to this validator. Un-delegating 
+from an unbonded validator is immediate.
 
 ## Common Operations for Validators
 
-### **Create Validator**
+* **Create Validator**
 
 All the participants could show that they want to become a validator by sending a `create-validator` transaction, the following parameters would be necessory:
 
-* `Validator's PubKey`: With flag `` The private key associated with PubKey is used to sign blocks. 
-* `Validator's Address`: The address of a participant who wants to become a validator. This is the address used to identify your validator publicly. Thhis address is used to bond, unbond, claim rewards, receive delegation and participate in governance.
-* `Validator's name` (default value: moniker of node)
+The following parameters are essential:
 
-The following parameters are
+* `Validator's PubKey`: With flag `--pubkey`, the private key associated with PubKey is used to sign blocks. 
+* `Validator's Address`: With flag `--address-validator`, the address of a participant who wants to become a validator. This is the address used to identify your validator publicly. Thhis address is used to bond, unbond, claim rewards, receive delegation and participate in governance.
+* `Validator's name` : With flag `--pubkey`, default value: [do-not-modify]
+* `Validator's self bond tokens`: With flag `--amount`, this value should be more than 0 and it's under unit `iris-atto`
+
 
 The following parameters are optional:
-* `Validator's website`
-* `Validator's description` --details
+* `Validator's website`: With flag `--website`
+* `Validator's details`: With flag  `--details`
 
 How to get the `PubKey` of your node?
-```$xslt
-iris tendermint show_validator --home=<path-to-your-home>
 ```
+iris tendermint show_validator --home={path-to-your-home}
+```
+
+The example output is the following:
+```
+fvp1zcjduepqcxd82mjnsnqfhwzja2d3y690ec6scw64xpg2uqkjx3rl0g0p2lwsprxnnf
+```
+
+In summary, an example of the `create-validator` command to bond 10IRIS is the following:
+```
+iriscli stake create-validator  --address-delegator={address1} --address-validator={address1} --name={name} --chain-id=fuxi-3001 --from=name --pubkey={pubkey} --gas=2000000 --fee=40000000000000000iris --amount=10000000000000000000iris 
+```
+* Edit Validator Information
+
+Validators could edit its information.
+
+The following parameters are optional:
+
+* keybase signature of the validator key holder: With flag `--keybase-sig`,default value: [do-not-modify]
+* the official website of the validator operator: With flag `--website`,default value: [do-not-modify]
+* the name of validator: With flag `--moniker`,default value: [do-not-modify]
+
+
+The command is the following:
+```$xslt
+iriscli stake edit-validator --address-validator={address-validator} --chain-id=fuxi-3001 --from=name  --details=details --gas=2000000 --fee=40000000000000000iris 
+```
+
+For each validator, the voting power is the sum of self-bonded token and delegated tokens. 
+
+
+* View Validator Description
+
+Anyone can view certain validator's information with the following command:
+```$xslt
+iriscli stake validator --address-validator={address-validator} --chain-id=fuxi-3001
+```
+ 
+* Track Validator Signing Information
+In order to keep track of a validator's signatures in the past you can do so by using the signing-info command:
+
+gaiacli stake signing-information <validator-pubkey>\
+  --chain-id=<chain_id>
+Unrevoke Validator
+When a validator is Revoked for downtime, you must submit an Unrevoke transaction in order to be able to get block proposer rewards again (depends on the zone fee distribution).
+
+gaiacli stake unrevoke \
+	--from=<key_name> \
+	--chain-id=<chain_id>
+1
+2
+3
+#
