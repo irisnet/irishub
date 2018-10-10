@@ -24,6 +24,11 @@ import (
 	"github.com/tendermint/tendermint/types"
 )
 
+var (
+	irisHome    = ""
+	iriscliHome = ""
+)
+
 func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
 	cdc := wire.NewCodec()
 	wire.RegisterCrypto(cdc)

@@ -11,11 +11,6 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 )
 
-var (
-	irisHome    = ""
-	iriscliHome = ""
-)
-
 func init() {
 	irisHome, iriscliHome = getTestingHomeDirs()
 }
