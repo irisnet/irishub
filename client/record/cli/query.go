@@ -9,14 +9,16 @@ import (
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type RecordMetadata struct {
-	OwnerAddress string
-	SubmitTime   string
+	OwnerAddress sdk.AccAddress
+	SubmitTime   int64
 	DataHash     string
-	DataSize     string
-	PinedNode    string
+	DataSize     int64
+	//PinedNode    string
 }
 
 func GetCmdQureyHash(cdc *wire.Codec) *cobra.Command {
@@ -49,7 +51,8 @@ func GetCmdQureyHash(cdc *wire.Codec) *cobra.Command {
 
 func queryRecordMetadata(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string, trustNode bool) (RecordMetadata, error) {
 
-	tx, err := queryTx(cdc, cliCtx, hashHexStr, trustNode)
+	tx, err := QueryTx(cdc, cliCtx, hashHexStr, trustNode)
+
 	if err != nil {
 		return RecordMetadata{}, err
 	}
@@ -57,11 +60,18 @@ func queryRecordMetadata(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr 
 	msgs := tx.GetMsgs()
 
 	for i := 0; i < len(msgs); i++ {
-		if msgs[i].Type() == "record" {
+		if msgs[i].Type() == record.MsgType {
 			var ok bool
 			var m record.MsgSubmitFile
 			if m, ok = msgs[i].(record.MsgSubmitFile); ok {
-				return GetMetadata(m)
+
+				var metadata RecordMetadata
+				metadata.OwnerAddress = m.OwnerAddress
+				metadata.DataHash = m.DataHash
+				metadata.DataSize = m.DataSize
+				metadata.SubmitTime = m.SubmitTime
+
+				return metadata, nil
 			}
 			return RecordMetadata{}, nil
 		}
@@ -70,14 +80,7 @@ func queryRecordMetadata(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr 
 	return RecordMetadata{}, nil
 }
 
-func GetMetadata(msg record.MsgSubmitFile) (RecordMetadata, error) {
-	// Get record msg from record type msg (TO DO)
-	var metadata RecordMetadata
-	metadata.OwnerAddress = "address from record type msg"
-	metadata.DataHash = "data hash from record type msg"
-	metadata.DataSize = "data size from record type msg"
-	metadata.PinedNode = "pined node from record type msg"
-	metadata.SubmitTime = "submit time  from record type msg"
+func QueryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string, trustNode bool) (sdk.Tx, error) {
 
-	return metadata, nil
+	return nil, nil
 }
