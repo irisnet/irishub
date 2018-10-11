@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/context"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -151,7 +151,7 @@ func (metrics *Metrics) setProcess(command string) {
 	metrics.processes = process
 }
 
-func (metrics *Metrics) Start(ctx app.Context) {
+func (metrics *Metrics) Start(ctx context.CLIContext) {
 	metrics.add()
 	go func() {
 		for {
@@ -237,6 +237,7 @@ func getProcessNum(command string) (num int, err error) {
 		fmt.Println("Error:Invalid command,", err)
 		return 0, err
 	}
+	defer cmd.Wait()
 
 	bytes, err := ioutil.ReadAll(stdout)
 	if err != nil {
@@ -276,6 +277,7 @@ func getPid(command string) (pid int, err error) {
 		fmt.Println("Error:Invalid command,", err)
 		return 0, err
 	}
+	defer cmd.Wait()
 
 	bytes, err := ioutil.ReadAll(stdout)
 	if err != nil {

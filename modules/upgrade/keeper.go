@@ -5,28 +5,25 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"math"
-	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
-	//defaultSwitchPeriod     int64 = 57600	// 2 days
-	defaultSwitchPeriod int64 = 30 // for test (4 minutes)
+	defaultSwitchPeriod     int64 = 57600	// 2 days
+	//defaultSwitchPeriod int64 = 40 // for test (4 minutes)
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *wire.Codec
 	// The ValidatorSet to get information about validators
-	sk       stake.Keeper
-	ps       params.SetterProxy
+	sk     stake.Keeper
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper, ps params.SetterProxy) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
 		sk:       sk,
-		ps:       ps,
 	}
 	return keeper
 }
@@ -181,7 +178,6 @@ func (k Keeper) GetVersionList(ctx sdk.Context) VersionList {
 	return versionList
 }
 
-
 func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string, sdk.Error) {
 	currentVersion := k.GetCurrentVersion(ctx)
 	return currentVersion.getMsgType(msg)
@@ -209,26 +205,3 @@ func (k Keeper) GetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddre
 	}
 	return MsgSwitch{}, false
 }
-
-//func (k Keeper) SetCurrentProposalAcceptHeight(ctx sdk.Context, height int64) {
-//	kvStore := ctx.KVStore(k.storeKey)
-//	heightBytes, err := k.cdc.MarshalBinary(height)
-//	if err != nil {
-//		panic(err)
-//	}
-//	kvStore.Set(GetCurrentProposalAcceptHeightKey(), heightBytes)
-//}
-//
-//func (k Keeper) GetCurrentProposalAcceptHeight(ctx sdk.Context) int64 {
-//	kvStore := ctx.KVStore(k.storeKey)
-//	proposalAcceptHeightBytes := kvStore.Get(GetCurrentProposalAcceptHeightKey())
-//	if proposalAcceptHeightBytes != nil {
-//		var proposalAcceptHeight int64
-//		err := k.cdc.UnmarshalBinary(proposalAcceptHeightBytes, &proposalAcceptHeight)
-//		if err != nil {
-//			panic(err)
-//		}
-//		return proposalAcceptHeight
-//	}
-//	return -1
-//}

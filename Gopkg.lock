@@ -8,7 +8,6 @@
   version = "1.0.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/bartekn/go-bip39"
   packages = ["."]
   revision = "a05967ea095d81c8fe4833776774cfaff8e5036c"
@@ -35,7 +34,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "d81d8877b8f327112e94e814937143a71d1692a7"
+  revision = "79e00513b1011888b1e675157ab89f527f901cae"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -49,8 +48,7 @@
     "client",
     "client/context",
     "client/keys",
-    "client/rpc",
-    "client/tx",
+    "client/utils",
     "crypto",
     "crypto/keys",
     "crypto/keys/bcrypt",
@@ -59,38 +57,29 @@
     "server",
     "server/config",
     "store",
+    "tests",
     "types",
     "version",
     "wire",
     "x/auth",
     "x/auth/client/cli",
-    "x/auth/client/rest",
+    "x/auth/client/context",
     "x/bank",
-    "x/bank/client",
-    "x/bank/client/cli",
-    "x/bank/client/rest",
     "x/gov",
-    "x/gov/client/cli",
-    "x/gov/client/rest",
+    "x/gov/tags",
     "x/ibc",
-    "x/ibc/client/cli",
-    "x/ibc/client/rest",
     "x/mock",
+    "x/mock/simulation",
     "x/params",
-    "x/params/client/cli",
     "x/slashing",
-    "x/slashing/client/cli",
-    "x/slashing/client/rest",
     "x/stake",
-    "x/stake/client/cli",
-    "x/stake/client/rest",
     "x/stake/keeper",
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "c69a00d827e16cf91b35ac533cadfff7ee454519"
+  revision = "c6189e6d8c13d6b78a009f83e0ceac4a1aab3d73"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.23.0-iris1"
+  version = "v0.24.2-iris1"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -141,8 +130,8 @@
 [[projects]]
   name = "github.com/go-stack/stack"
   packages = ["."]
-  revision = "259ab82a6cad3992b4e21ff5cac294ccb06474bc"
-  version = "v1.7.0"
+  revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
+  version = "v1.8.0"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
@@ -194,13 +183,11 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -208,7 +195,8 @@
     "json/scanner",
     "json/token"
   ]
-  revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
+  revision = "8cb6e5b959231cc1119e43259c4a608f9c51a241"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -304,6 +292,12 @@
     "xfs"
   ]
   revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+
+[[projects]]
+  name = "github.com/rakyll/statik"
+  packages = ["fs"]
+  revision = "aa8a7b1baecd0f31a436bf7956fcdcc609a83035"
+  version = "v0.1.4"
 
 [[projects]]
   name = "github.com/rcrowley/go-metrics"
@@ -410,14 +404,15 @@
 [[projects]]
   name = "github.com/tendermint/go-amino"
   packages = ["."]
-  revision = "2106ca61d91029c931fd54968c2bb02dc96b1412"
-  version = "0.10.1"
+  revision = "a8328986c1608950fa5d3d1c0472cccc4f8fc02c"
+  version = "v0.12.0-rc0"
 
 [[projects]]
   name = "github.com/tendermint/iavl"
   packages = ["."]
-  revision = "35f66e53d9b01e83b30de68b931f54b2477a94c9"
-  version = "v0.9.2"
+  revision = "f93c0a13ec78edd04c6faef6b3158f72e66f699f"
+  source = "https://github.com/irisnet/iavl.git"
+  version = "v0.9.2-iris1"
 
 [[projects]]
   name = "github.com/tendermint/tendermint"
@@ -481,21 +476,24 @@
     "types",
     "version"
   ]
-  revision = "fb697db81e3f0b04fb9c6f393ce9a09b984a4687"
+  revision = "46b52ca74937f3a680a4861f7b60b262d3fda777"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.22.6-iris1"
+  version = "0.23.1-rc0-iris1"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
   packages = ["."]
-  revision = "39ba4728c137c75718a21f9b4b3280fa31b9139b"
+  revision = "4296ee5701e945f9b3a7dbe51f402e0b9be57259"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "blowfish",
+    "chacha20poly1305",
     "curve25519",
+    "hkdf",
+    "internal/chacha20",
     "internal/subtle",
     "nacl/box",
     "nacl/secretbox",
@@ -526,10 +524,11 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = [
+    "cpu",
     "unix",
     "windows"
   ]
-  revision = "11551d06cbcc94edc80a0facaccbda56473c19c1"
+  revision = "4910a1d54f876d7b22162a85f4d066d3ee649450"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -599,6 +598,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "44386e4006f0acb8e013d69639b86f5d8c6440153a5069dbccc833739bc048e9"
+  inputs-digest = "ac3184a005168fdc0235424178a9dc39db00b318ce54ff8d6f1257b7e88ebfc2"
   solver-name = "gps-cdcl"
   solver-version = 1
