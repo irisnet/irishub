@@ -30,8 +30,8 @@ After a validator is created with a create-validator transaction, it can be in f
 * `bonded`: Validator is in the active set and participates in consensus. Validator is earning rewards and can be slashed for misbehaviour.
 unbonding: Validator is not in the active set and does not participate in consensus. Validator is not earning rewards, but can still be 
 slashed for misbehaviour. This is a transition state from bonded to unbonded. If validator does not send a rebond transaction while in 
-unbonding mode, it will take three weeks for the state transition to complete.
-unbonded: Validator is not in the active set, and therefore not signing blocs. 
+* unbonding mode, it will take three weeks for the state transition to complete.
+* unbonded: Validator is not in the active set, and therefore not signing blocs. 
 Validator cannot be slashed, and does not earn any reward. It is still possible to delegate Atoms to this validator. Un-delegating 
 from an unbonded validator is immediate.
 
@@ -96,15 +96,37 @@ iriscli stake validator --address-validator={address-validator} --chain-id=fuxi-
 * Track Validator Signing Information
 In order to keep track of a validator's signatures in the past you can do so by using the signing-info command:
 
-gaiacli stake signing-information <validator-pubkey>\
-  --chain-id=<chain_id>
-Unrevoke Validator
-When a validator is Revoked for downtime, you must submit an Unrevoke transaction in order to be able to get block proposer rewards again (depends on the zone fee distribution).
+The command is the following:
+```
+iriscli stake signing-information <validator-pubkey> --chain-id=fuxi-3001
+```
 
-gaiacli stake unrevoke \
-	--from=<key_name> \
-	--chain-id=<chain_id>
-1
-2
-3
-#
+* Unrevoke Validator
+When a validator is Revoked for downtime, you must submit an Unrevoke transaction in order to be able to get block rewards again.
+In fuxi-3001, if your node missed the previous 5000 blocks in the last 10000 blocks, you will get revoked.
+To query your validator's info:
+```$xslt
+Validator
+Owner: 
+Validator: 
+Revoked: true
+Status: Bonded
+Tokens: 211.5500000000
+Delegator Shares: 2800.3740578441
+Description: {}
+Bond Height: 642721
+Proposer Reward Pool:
+Commission: 0/1
+Max Commission Rate: 0/1
+Commission Change Rate: 0/1
+Commission Change Today: 0/1
+Previous Bonded Tokens: 0/1
+```
+
+The `Revoked` field of an offline validator will be `true`. 
+
+To unrevoke your validator node, the command is the following:
+
+```
+iriscli stake unrevoke {address-validator} --from=name  --chain-id=fuxi-3001
+```
