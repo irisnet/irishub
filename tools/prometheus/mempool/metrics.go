@@ -1,7 +1,7 @@
 package mempool
 
 import (
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/tendermint/tendermint/mempool"
 	"log"
 	"time"
@@ -21,7 +21,7 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics) Start(rpc app.Context) {
+func (m *Metrics) Start(rpc context.CLIContext) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
