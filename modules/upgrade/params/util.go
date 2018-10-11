@@ -15,6 +15,11 @@ func GetProposalAcceptHeight(ctx sdk.Context) int64 {
 	return  ProposalAcceptHeightParameter.Value
 }
 
+func GetSwitchPeriod(ctx sdk.Context) int64 {
+	SwitchPeriodParameter.LoadValue(ctx)
+	return  SwitchPeriodParameter.Value
+}
+
 func SetCurrentUpgradeProposalId(ctx sdk.Context, i int64) {
 	CurrentUpgradeProposalIdParameter.Value = i
 	CurrentUpgradeProposalIdParameter.SaveValue(ctx)
@@ -23,4 +28,9 @@ func SetCurrentUpgradeProposalId(ctx sdk.Context, i int64) {
 func SetProposalAcceptHeight(ctx sdk.Context,i int64 ){
 	ProposalAcceptHeightParameter.Value = i
 	ProposalAcceptHeightParameter.SaveValue(ctx)
+}
+
+func SetSwitchPeriod(ctx sdk.Context,i int64 ){
+	SwitchPeriodParameter.Value = i
+	SwitchPeriodParameter.SaveValue(ctx)
 }
