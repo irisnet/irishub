@@ -41,7 +41,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "1000000000000iris", fooCoin)
+	require.Equal(t, "100iris", fooCoin)
 
 	proposalsQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -62,8 +62,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num := getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 999999999994 && num < 999999999995) {
-		t.Error("Test Failed: (999999999994, 999999999995) expected, recieved: {}", num)
+	if !(num > 94 && num < 95) {
+		t.Error("Test Failed: (94, 95) expected, recieved: {}", num)
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -75,7 +75,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	depositStr := fmt.Sprintf("iriscli gov deposit %v", flags)
 	depositStr += fmt.Sprintf(" --from=%s", "foo")
-	depositStr += fmt.Sprintf(" --deposit=%s", "1000iris")
+	depositStr += fmt.Sprintf(" --deposit=%s", "5iris")
 	depositStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	depositStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -86,13 +86,15 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 999999998994 && num < 999999998995) {
-		t.Error("Test Failed: (999999998994, 999999998995) expected, recieved: {}", num)
+	if !(num > 89 && num < 90) {
+		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
 	}
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
+
+	votingStartBlock1 := proposal1.VotingStartBlock
 
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
 	voteStr += fmt.Sprintf(" --from=%s", "foo")
@@ -117,6 +119,11 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	proposalsQuery = tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals --status=VotingPeriod %v", flags), "")
 	require.Equal(t, "  1 - Test", proposalsQuery)
+
+	tests.WaitForHeightTM(votingStartBlock1+20, port)
+	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
+	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, gov.StatusPassed, proposal1.Status)
 
 	// submit a second test proposal
 	spStr = fmt.Sprintf("iriscli gov submit-proposal %v", flags)

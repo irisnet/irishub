@@ -91,7 +91,7 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 		return param, err
 
 	} else if pathStr != "" {
-		paramDoc := ParameterConfigFile{}
+		paramDoc := gov.ParameterConfigFile{}
 		err := paramDoc.ReadFile(cdc, pathStr)
 		if err != nil {
 			return param, err

@@ -76,20 +76,14 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 
 	cdc := wire.NewCodec()
 	wire.RegisterCrypto(cdc)
-	cliCtx := context.NewCLIContext().
-		WithCodec(cdc)
 
 	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
 	if err != nil {
 		return err
 	}
 
-	coin, err := cliCtx.ParseCoin("1000000000000iris")
-	if err != nil {
-		return err
-	}
+	genesisState.GovData = gov.DefaultGenesisStateForTest()
 
-	genesisState.Accounts[0].Coins[0] = coin
 	bz, err := cdc.MarshalJSON(genesisState)
 	if err != nil {
 		return err
@@ -207,4 +201,13 @@ func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
+}
+
+func executeGetParam(t *testing.T, cmdStr string) gov.Param {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var param gov.Param
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &param)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return param
 }
