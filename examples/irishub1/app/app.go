@@ -12,14 +12,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	ibc1 "github.com/irisnet/irishub/examples/irishub1/ibc"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -31,9 +34,6 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"strings"
-	"github.com/irisnet/irishub/modules/iparam"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 const (
@@ -157,15 +157,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
-							&govparams.DepositProcedureParameter,
-		                    &govparams.VotingProcedureParameter,
-		                    &govparams.TallyingProcedureParameter,
-							&upgradeparams.CurrentUpgradeProposalIdParameter,
-							&upgradeparams.ProposalAcceptHeightParameter)
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter,
+		&upgradeparams.SwitchPeriodParameter)
 
 	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		                              &govparams.VotingProcedureParameter,
-		                              &govparams.TallyingProcedureParameter,)
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -263,7 +264,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,
