@@ -157,7 +157,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
 		&upgradeparams.CurrentUpgradeProposalIdParameter,
-		&upgradeparams.ProposalAcceptHeightParameter)
+		&upgradeparams.ProposalAcceptHeightParameter,
+		&upgradeparams.SwitchPeriodParameter)
 
 	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
@@ -237,7 +238,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,
