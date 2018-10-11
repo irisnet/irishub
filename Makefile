@@ -50,12 +50,6 @@ install: update_irislcd_swagger_docs
 install_debug:
 	go install ./cmd/irisdebug
 
-install_examples:
-	go install  $(BUILD_FLAGS) ./examples/irishub1/cmd/iris1
-	go install  $(BUILD_FLAGS) ./examples/irishub1/cmd/iriscli1
-	go install  $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iris-bugfix-2
-	go install  $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iriscli-bugfix-2
-
 build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
