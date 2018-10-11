@@ -14,6 +14,7 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -61,7 +62,7 @@ func main() {
 		bankCmd,
 	)
 
-	//Add stake commands
+	//Add gov commands
 	govCmd := &cobra.Command{
 		Use:   "gov",
 		Short: "Governance and voting subcommands",
@@ -126,6 +127,23 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,
+	)
+
+	//Add iservice commands
+	iserviceCmd := &cobra.Command{
+		Use:   "iservice",
+		Short: "iservice subcommands",
+	}
+	iserviceCmd.AddCommand(
+		client.GetCommands(
+			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
+		)...)
+	iserviceCmd.AddCommand(client.PostCommands(
+		iservicecmd.GetCmdScvDef(cdc),
+	)...)
+
+	rootCmd.AddCommand(
+		iserviceCmd,
 	)
 
 	//Add keys and version commands
