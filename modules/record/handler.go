@@ -23,18 +23,7 @@ func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitFile) sdk.
 	if err != nil {
 		return err.Result()
 	}
-
 	//todo
-	/*proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
-	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.Amount)
-	if err != nil {
-		return err.Result()
-	}
-
-	proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(proposal.GetProposalID())*/
-
-	return sdk.Result{
-		//Data: proposalIDBytes,
-	}
+	return sdk.Result{}
 }

@@ -26,7 +26,8 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 
 			strFilepath := viper.GetString(flagPath)
 			file, err := os.Stat(strFilepath)
-			if os.IsNotExist(err) {
+
+			if err != nil {
 				// file does not exist
 				return err
 			}
