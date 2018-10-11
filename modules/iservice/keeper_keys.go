@@ -20,3 +20,11 @@ func GetMethodPropertyKey(chainId, serviceName, methodName string) []byte {
 		[]byte(serviceName)...),
 		[]byte(methodName)...)
 }
+
+// Key for getting all methods on a service from the store
+func GetMethodsSubspaceKey(chainId, serviceName string) []byte {
+	return append(append(
+		methodPropertyKey,
+		[]byte(chainId)...),
+		[]byte(serviceName)...)
+}

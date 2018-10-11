@@ -6,7 +6,12 @@ import (
 )
 
 // name to idetify transaction types
-const MsgType = "iservice"
+const (
+	MsgType       = "iservice"
+	outputPrivacy = "output_privacy"
+	outputCached  = "output_cached"
+	description   = "description"
+)
 
 var _ sdk.Msg = MsgSvcDef{}
 
@@ -47,12 +52,80 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 }
 
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
-	if valid, _ := protoidl.ValidateProto(msg.IDLContent); !valid {
+	if len(msg.Name) == 0 {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if len(msg.ChainId) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.Author) == 0 {
+		return ErrInvalidAuthor(DefaultCodespace)
+	}
+	if !validBroadcastEnum(msg.Broadcast) {
+		return ErrInvalidBroadcastEnum(DefaultCodespace, msg.Broadcast)
+	}
+
+	if len(msg.IDLContent) == 0 {
 		return ErrInvalidIDL(DefaultCodespace)
 	}
+	methods, err := protoidl.GetMethods(msg.IDLContent)
+	if err != nil {
+		return ErrInvalidIDL(DefaultCodespace)
+	}
+	if valid, err := validateMethods(methods); !valid {
+		return err
+	}
+
 	return nil
 }
 
 func (msg MsgSvcDef) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Author}
+}
+
+func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
+	for _, method := range methods {
+		if len(method.Name) == 0 {
+			return false, ErrInvalidMethodName(DefaultCodespace)
+		}
+		if _, ok := method.Attributes[outputPrivacy]; ok {
+			_, err := OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
+			if err != nil {
+				return false, ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
+			}
+		}
+		if _, ok := method.Attributes[outputCached]; ok {
+			_, err := OutputCachedEnumFromString(method.Attributes[outputCached])
+			if err != nil {
+				return false, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
+			}
+		}
+	}
+	return true, nil
+}
+
+func methodToMethodProperty(method protoidl.Method) (methodProperty MethodProperty, err error) {
+	// set default value
+	opp := NoPrivacy
+	opc := NoCached
+
+	if _, ok := method.Attributes[outputPrivacy]; ok {
+		opp, err = OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
+		if err != nil {
+			return methodProperty, ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
+		}
+	}
+	if _, ok := method.Attributes[outputCached]; ok {
+		opc, err = OutputCachedEnumFromString(method.Attributes[outputCached])
+		if err != nil {
+			return methodProperty, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
+		}
+	}
+	methodProperty = MethodProperty{
+		Name:          method.Name,
+		Description:   method.Attributes[description],
+		OutputPrivacy: opp,
+		OutputCached:  opc,
+	}
+	return
 }

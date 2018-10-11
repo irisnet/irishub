@@ -39,23 +39,21 @@ func (k Keeper) AddServiceDefinition(ctx sdk.Context, serviceDef MsgSvcDef) {
 	kvStore.Set(GetServiceDefinitionKey(serviceDef.ChainId, serviceDef.Name), serviceDefBytes)
 }
 
-func (k Keeper) AddMethods(ctx sdk.Context, serviceDef MsgSvcDef) {
+func (k Keeper) AddMethods(ctx sdk.Context, serviceDef MsgSvcDef) sdk.Error {
 	methods, err := protoidl.GetMethods(serviceDef.IDLContent)
 	if err != nil {
 		panic(err)
 	}
 	kvStore := ctx.KVStore(k.storeKey)
-	for i, method := range methods {
-		methodProperty := MethodProperty{
-			ID:            int64(i),
-			Name:          method.Name,
-			Description:   method.Attributes["description"],
-			OutputPrivacy: NoPrivacy,
-			OutputCached:  OffChainCached,
+	for _, method := range methods {
+		methodProperty, err := methodToMethodProperty(method)
+		if err != nil {
+			return ErrInvalidServiceName(k.codespace)
 		}
 		methodBytes := k.cdc.MustMarshalBinary(methodProperty)
 		kvStore.Set(GetMethodPropertyKey(serviceDef.ChainId, serviceDef.Name, method.Name), methodBytes)
 	}
+	return nil
 }
 
 func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (msgSvcDef MsgSvcDef, found bool) {
@@ -68,4 +66,10 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (msg
 		return serviceDef, true
 	}
 	return msgSvcDef, false
+}
+
+// Gets all the methods in a specific service
+func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetMethodsSubspaceKey(chainId,name))
 }
