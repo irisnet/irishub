@@ -15,8 +15,8 @@ import (
 
 func GetCmdQuerySevDef(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "definition [chain-id] [name]",
-		Short: "create new service definition",
+		Use:   "definition",
+		Short: "query service definition",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))

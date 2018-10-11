@@ -104,19 +104,20 @@ func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
 	return true, nil
 }
 
-func methodToMethodProperty(method protoidl.Method) (methodProperty MethodProperty, err error) {
+func methodToMethodProperty(method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
 	// set default value
 	opp := NoPrivacy
 	opc := NoCached
 
+	var err1 error
 	if _, ok := method.Attributes[outputPrivacy]; ok {
-		opp, err = OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
-		if err != nil {
+		opp, err1 = OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
+		if err1 != nil {
 			return methodProperty, ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
 		}
 	}
 	if _, ok := method.Attributes[outputCached]; ok {
-		opc, err = OutputCachedEnumFromString(method.Attributes[outputCached])
+		opc, err1 = OutputCachedEnumFromString(method.Attributes[outputCached])
 		if err != nil {
 			return methodProperty, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
 		}

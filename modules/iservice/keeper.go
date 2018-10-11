@@ -48,7 +48,7 @@ func (k Keeper) AddMethods(ctx sdk.Context, serviceDef MsgSvcDef) sdk.Error {
 	for _, method := range methods {
 		methodProperty, err := methodToMethodProperty(method)
 		if err != nil {
-			return ErrInvalidServiceName(k.codespace)
+			return err
 		}
 		methodBytes := k.cdc.MustMarshalBinary(methodProperty)
 		kvStore.Set(GetMethodPropertyKey(serviceDef.ChainId, serviceDef.Name, method.Name), methodBytes)
@@ -71,5 +71,5 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (msg
 // Gets all the methods in a specific service
 func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetMethodsSubspaceKey(chainId,name))
+	return sdk.KVStorePrefixIterator(store, GetMethodsSubspaceKey(chainId, name))
 }

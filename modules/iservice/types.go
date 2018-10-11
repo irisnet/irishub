@@ -162,7 +162,6 @@ func (oe *OutputCachedEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-
 // String to outputPrivacyEnum byte, Returns ff if invalid.
 func OutputPrivacyEnumFromString(str string) (OutputPrivacyEnum, error) {
 	switch str {
@@ -226,4 +225,3 @@ func (oe *OutputPrivacyEnum) UnmarshalJSON(data []byte) error {
 	*oe = bz2
 	return nil
 }
-

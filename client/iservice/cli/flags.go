@@ -28,8 +28,8 @@ func init() {
 	FsServiceName.String(FlagServiceName, "", "service name")
 	FsServiceDescription.String(FlagServiceDescription, "", "service description")
 	FsTags.String(FlagTags, "", "service tags")
-	FsAuthorDescription.String(FlagAuthorDescription, "", "service description")
+	FsAuthorDescription.String(FlagAuthorDescription, "", "service author description")
 	FsIdlContent.String(FlagIdlContent, "", "service method idl content")
-	FsBroadcast.String(FlagBroadcast, "", "broadcast")
+	FsBroadcast.String(FlagBroadcast, "", "service broadcast type")
 	FsFile.String(FlagFile, "", "service idl file path")
 }
