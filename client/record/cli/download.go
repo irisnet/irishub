@@ -6,35 +6,38 @@ import (
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tmlibs/cli"
 
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
-func GetCmdDownload(cdc *wire.Codec) *cobra.Command {
+func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "download [hash]",
 		Short: "download specified file with tx hash",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			trustNode := viper.GetBool(client.FlagTrustNode)
-			hashHexStr := viper.GetString(FlagTxHash)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			downloadFileName := viper.GetString(FlagFileName)
 			home := viper.GetString(cli.HomeFlag)
+			hashHexStr := viper.GetString(FlagTxHash)
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			record, err := queryRecordMetadata(cdc, cliCtx, hashHexStr, trustNode)
-			if err != nil {
-				return err
+			var tmpkey = cmn.HexBytes{}
+			res, err := cliCtx.QueryStore(tmpkey /*record.KeyProposal(hashHexStr)*/, storeName)
+			if len(res) == 0 || err != nil {
+				return fmt.Errorf("Record hash [%s] is not existed", hashHexStr)
 			}
 
-			if len(record.DataHash) == 0 {
-				fmt.Printf("Request file was not found on the blockchain.\n")
+			var submitFile record.MsgSubmitFile
+			cdc.MustUnmarshalBinary(res, &submitFile)
+
+			if len(submitFile.DataHash) == 0 {
+				fmt.Errorf("Request file was not found on the blockchain.\n")
 				return nil
 			}
 
@@ -48,7 +51,7 @@ func GetCmdDownload(cdc *wire.Codec) *cobra.Command {
 			}
 
 			fmt.Printf("Downloading %v ...\n", filePath)
-			err = sh.Get(record.DataHash, filePath)
+			err = sh.Get(submitFile.DataHash, filePath)
 			if err != nil {
 				return err
 			}
