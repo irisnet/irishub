@@ -226,26 +226,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		panic(err)
 	}
 
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, Denom))
-	if err != nil {
-		panic(err)
-	}
-
-	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
-		StartingProposalID: 1,
-		DepositProcedure: govparams.DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 20000,
-		},
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 20000,
-		},
-		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
-		},
-	})
+	gov.InitGenesis(ctx, app.govKeeper, genesisState.GovData)
 
 	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
