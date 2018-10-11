@@ -32,12 +32,12 @@ func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
 			tags := viper.GetStringSlice(FlagTags)
 			content := viper.GetString(FlagIdlContent)
 			filePath := viper.GetString(FlagFile)
-			if filePath != "" {
-				jsonBytes, err := cmn.ReadFile(filePath)
+			if len(filePath) > 0 {
+				contentBytes, err := cmn.ReadFile(filePath)
 				if err != nil {
 					return err
 				}
-				content = string(jsonBytes)
+				content = string(contentBytes)
 			}
 			fmt.Printf("idl condent: \n%s\n", content)
 			broadcastStr := viper.GetString(FlagBroadcast)
