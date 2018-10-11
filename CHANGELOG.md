@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0-rc1
+
+*October 11th, 2018*
+
+FEATURES:
+
+- Make all the gov and upgrade parameters can be configured in the genesis.json
+
+BUG FIXES
+
+- Add check for iavl proof and value before building multistore proof
+
 
 ## 0.5.0-rc0
 
