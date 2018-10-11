@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irishub/types"
 )
 
-// GenesisState - all staking state that must be provided at genesis
+// GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
 	StartingProposalID int64                        `json:"starting_proposalID"`
 	DepositProcedure   govparams.DepositProcedure   `json:"deposit_period"`
