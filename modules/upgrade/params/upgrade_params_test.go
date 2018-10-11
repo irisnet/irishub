@@ -66,6 +66,24 @@ func TestProposalAcceptHeightParameter(t *testing.T) {
 	require.Equal(t, int64(3), ProposalAcceptHeightParameter.Value)
 }
 
+
+func TestSwitchPeriodParameter(t *testing.T) {
+	skey := sdk.NewKVStoreKey("params")
+	ctx := defaultContext(skey)
+	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
+	find := SwitchPeriodParameter.LoadValue(ctx)
+	require.Equal(t, find, false)
+	SwitchPeriodParameter.InitGenesis(int64(12345))
+	require.Equal(t, int64(12345), SwitchPeriodParameter.Value)
+	SwitchPeriodParameter.LoadValue(ctx)
+	require.Equal(t, int64(12345), SwitchPeriodParameter.Value)
+	SwitchPeriodParameter.Value = 30
+	SwitchPeriodParameter.SaveValue(ctx)
+	SwitchPeriodParameter.LoadValue(ctx)
+	require.Equal(t, int64(30), SwitchPeriodParameter.Value)
+}
+
 func TestUpgradeParameterSetAndGet(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
@@ -79,8 +97,17 @@ func TestUpgradeParameterSetAndGet(t *testing.T) {
 	find = ProposalAcceptHeightParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
+	SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
+	find = SwitchPeriodParameter.LoadValue(ctx)
+	require.Equal(t, find, false)
+
 	SetCurrentUpgradeProposalId(ctx,5)
 	require.Equal(t,int64(5),GetCurrentUpgradeProposalId(ctx))
 	SetProposalAcceptHeight(ctx,100)
 	require.Equal(t, int64(100),GetProposalAcceptHeight(ctx) )
+
+	SetSwitchPeriod(ctx,500000)
+	require.Equal(t,int64(500000),GetSwitchPeriod(ctx))
+	SetSwitchPeriod(ctx,30000)
+	require.Equal(t,int64(30000),GetSwitchPeriod(ctx))
 }
