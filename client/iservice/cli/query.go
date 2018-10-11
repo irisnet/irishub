@@ -13,7 +13,7 @@ import (
 	cmn "github.com/irisnet/irishub/client/iservice"
 )
 
-func GetCmdQuerySevDef(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryScvDef(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "definition",
 		Short: "query service definition",

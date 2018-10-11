@@ -136,7 +136,7 @@ func main() {
 	}
 	iserviceCmd.AddCommand(
 		client.GetCommands(
-			iservicecmd.GetCmdQuerySevDef("iservice", cdc),
+			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
 		)...)
 	iserviceCmd.AddCommand(client.PostCommands(
 		iservicecmd.GetCmdScvDef(cdc),
