@@ -1,4 +1,4 @@
-package consensus
+package governance
 
 import (
 	"github.com/go-kit/kit/metrics"
@@ -9,14 +9,15 @@ import (
 	"time"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/irisnet/irishub/app"
 	"fmt"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/client/context"
 )
 
 // TODO
-const keyStoreStake = "KeyActiveProposalQueue"
-
+const (
+	storeName = "gov"
+)
 
 // Metrics contains metrics exposed by this package.
 type GovMetrics struct {
@@ -24,7 +25,7 @@ type GovMetrics struct {
 	activeProposalNum metrics.Gauge
 	// number of active proposals that voted by the validator with given address
 	needToVoteActiveProposalNum metrics.Gauge
-	Address     sdk.AccAddress
+	Address                     sdk.AccAddress
 }
 
 func NewGovMetrics() GovMetrics {
@@ -40,7 +41,7 @@ func NewGovMetrics() GovMetrics {
 			Name:      "need_voted_active_proposal_num",
 			Help:      "Number of active proposals that need to vote.",
 		}, []string{}),
-		Address:     make([]byte, 0),
+		Address: make([]byte, 0),
 	}
 }
 
@@ -68,74 +69,74 @@ func (gov *Metrics) SetAddress(addr_str string) {
 	}
 }
 
-func (gov *Metrics) Start(ctx app.Context) {
+func (gov *Metrics) Start(ctx context.CLIContext) {
 
-	account_addr := viper.GetString("account-address")
-	gov.SetAddress(account_addr)
+	accountAddr := viper.GetString("account-address")
+	gov.SetAddress(accountAddr)
 
 	go func() {
 		for {
-			gov.RecordMetrics(ctx, ctx.Cdc)
-			time.Sleep(time.Second*1)
+			gov.RecordMetrics(ctx, ctx.Codec)
+			time.Sleep(time.Second * 1)
 		}
 	}()
 }
 
-func (gov *Metrics) RecordMetrics(ctx app.Context, cdc *wire.Codec) {
+func (gov *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec) {
 	count := 0
-	need_to_vote := 0
-	if active_proposals, err :=  getAllActiveProposalsID(cdc, ctx);err != nil{
+	needToVote := 0
+	if activeProposals, err := getAllActiveProposalsID(cdc, ctx); err != nil {
 		log.Println(err.Error())
-	}else{
-		count = len(active_proposals)
-		for _, proposal_id := range active_proposals{
-			if _, err := getVote(proposal_id, gov.govMetrics.Address, cdc, ctx);
-			err != nil{
-				need_to_vote++
+	} else {
+		count = len(activeProposals)
+		for _, proposalId := range activeProposals {
+			if _, err := getVote(proposalId, gov.govMetrics.Address, cdc, ctx);
+				err != nil {
+				needToVote++
 			}
 		}
 	}
 
 	gov.govMetrics.activeProposalNum.Set(float64(count))
-	gov.govMetrics.needToVoteActiveProposalNum.Set(float64(need_to_vote))
+	gov.govMetrics.needToVoteActiveProposalNum.Set(float64(needToVote))
 }
+
 //-------------------------help functions--------------------------------------
 
-func getAllInactiveProposalsID(cdc *wire.Codec, ctx app.Context) (proposals gov.ProposalQueue, err error){
-	if res, err := ctx.Ctx.QueryStore(gov.KeyInactiveProposalQueue, "gov"); err != nil{
+func getAllInactiveProposalsID(cdc *wire.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
+	if res, err := ctx.QueryStore(gov.KeyInactiveProposalQueue, storeName); err != nil {
 		return gov.ProposalQueue{}, err
-	}else {
+	} else {
 		err = cdc.UnmarshalBinary(res, &proposals)
 		return proposals, err
 	}
 }
 
-func getAllActiveProposalsID(cdc *wire.Codec, ctx app.Context) (proposals gov.ProposalQueue, err error){
-	if res, err := ctx.Ctx.QueryStore(gov.KeyActiveProposalQueue, "gov"); err != nil{
+func getAllActiveProposalsID(cdc *wire.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
+	if res, err := ctx.QueryStore(gov.KeyActiveProposalQueue, storeName); len(res) == 0 || err != nil {
 		return gov.ProposalQueue{}, err
-	}else {
+	} else {
 		err = cdc.UnmarshalBinary(res, &proposals)
 		return proposals, err
 	}
 
 }
 
-func getProposal(ID int64, cdc *wire.Codec, ctx app.Context) ( *gov.Proposal, error){
-	if res, err := ctx.Ctx.QueryStore(gov.KeyProposal(ID), "gov"); err != nil{
+func getProposal(ID int64, cdc *wire.Codec, ctx context.CLIContext) (*gov.Proposal, error) {
+	if res, err := ctx.QueryStore(gov.KeyProposal(ID), storeName); err != nil {
 		return nil, err
-	}else {
+	} else {
 		var proposal *gov.Proposal
 		err = cdc.UnmarshalBinary(res, proposal)
 		return proposal, err
 	}
 }
 
-
-func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *wire.Codec, ctx app.Context) (vote gov.Vote, err error){
-	if res, err := ctx.Ctx.QueryStore(gov.KeyVote(proposalID, voterAddr), "gov"); err != nil{
+func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *wire.Codec, ctx context.CLIContext) (vote gov.Vote, err error) {
+	if res, err := ctx.QueryStore(gov.KeyVote(proposalID, voterAddr), storeName); err != nil {
 		return gov.Vote{}, err
-	}else {
-		if len(res) == 0{
+	} else {
+		if len(res) == 0 {
 			return gov.Vote{}, fmt.Errorf("cannot find the vote that %s vote for proposal %d", voterAddr.String(), proposalID)
 		}
 		err = cdc.UnmarshalBinary(res, &vote)
