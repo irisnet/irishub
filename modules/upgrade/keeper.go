@@ -76,6 +76,7 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 	}
 
 	kvStore.Set(GetVersionIDKey(version.Id), versionBytes)
+	VersionListCached = append(VersionListCached, version)
 
 	versionIDBytes, err := k.cdc.MarshalBinary(version.Id)
 	if err != nil {
