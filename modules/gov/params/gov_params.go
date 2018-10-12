@@ -13,10 +13,6 @@ import (
 
 var DepositProcedureParameter DepositProcedureParam
 
-var (
-	minDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
-)
-
 const LOWER_BOUND_AMOUNT = 1
 const UPPER_BOUND_AMOUNT = 200
 
@@ -49,6 +45,8 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
 		param.Value = value
 	} else {
+		var minDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+
 		param.Value = DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
 			MaxDepositPeriod: 1440}

@@ -56,7 +56,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:1b6b69a3b0b1ce19e038ba842043d158fc14ff5d0e55e0324a6f795cb4ace1d2"
+  digest = "1:b377b858bfe55eaae4ea65a2ab5d00c039b0bae31a87a99224bd957ddbce999b"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -72,6 +72,7 @@
     "server",
     "server/config",
     "store",
+    "tests",
     "types",
     "version",
     "wire",
@@ -728,6 +729,7 @@
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/config",
     "github.com/cosmos/cosmos-sdk/store",
+    "github.com/cosmos/cosmos-sdk/tests",
     "github.com/cosmos/cosmos-sdk/types",
     "github.com/cosmos/cosmos-sdk/wire",
     "github.com/cosmos/cosmos-sdk/x/auth",
@@ -767,6 +769,7 @@
     "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/ed25519",
+    "github.com/tendermint/tendermint/crypto/secp256k1",
     "github.com/tendermint/tendermint/crypto/tmhash",
     "github.com/tendermint/tendermint/libs/cli",
     "github.com/tendermint/tendermint/libs/common",
