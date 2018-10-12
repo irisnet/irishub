@@ -1,6 +1,8 @@
 package record
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 )
@@ -31,4 +33,15 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) K
 // Returns the go-wire codec.
 func (keeper Keeper) WireCodec() *wire.Codec {
 	return keeper.cdc
+}
+
+func KeyRecord(addr sdk.AccAddress, dataHash string) []byte {
+	return []byte(fmt.Sprintf("record:%d:%s", addr, dataHash))
+}
+
+func (keeper Keeper) AddRecord(ctx sdk.Context, msg MsgSubmitFile) {
+
+	store := ctx.KVStore(keeper.storeKey)
+	bz := keeper.cdc.MustMarshalBinary(msg)
+	store.Set(KeyRecord(msg.OwnerAddress, msg.DataHash), bz)
 }

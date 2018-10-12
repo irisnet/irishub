@@ -19,11 +19,11 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitFile) sdk.Result {
 
-	err := msg.ValidateBasic()
-	if err != nil {
-		return err.Result()
-	}
-	//todo
+	keeper.AddRecord(ctx, msg)
 
-	return sdk.Result{}
+	dataHashBytes := keeper.cdc.MustMarshalBinaryBare(msg.DataHash)
+
+	return sdk.Result{
+		Data: dataHashBytes,
+	}
 }
