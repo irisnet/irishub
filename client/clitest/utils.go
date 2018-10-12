@@ -213,3 +213,12 @@ func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return param
 }
+
+//func executeGetUpgradeInfo(t *testing.T, cmdStr string) gov.Param {
+//	out := tests.ExecuteT(t, cmdStr, "")
+//	var param gov.Param
+//	cdc := app.MakeCodec()
+//	err := cdc.UnmarshalJSON([]byte(out), &param)
+//	require.NoError(t, err, "out %v\n, err %v", out, err)
+//	return param
+//}
