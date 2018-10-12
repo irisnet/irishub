@@ -91,7 +91,7 @@ build_example_linux: update_irislcd_swagger_docs
 test: test_unit test_cli
 
 test_cli:
-	@go test -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
 
 test_unit:
 	@go test $(PACKAGES_NOSIMULATION)
