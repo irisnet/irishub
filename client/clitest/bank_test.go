@@ -41,7 +41,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "1000000000000iris", fooCoin)
+	require.Equal(t, "100iris", fooCoin)
 
 	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -54,8 +54,8 @@ func TestIrisCLIBankSend(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num := getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 999999999989 && num < 999999999990) {
-		t.Error("Test Failed: (999999999989, 999999999990) expected, recieved: {}", num)
+	if !(num > 89 && num < 90) {
+		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
 	}
 
 	// test autosequencing
@@ -70,8 +70,8 @@ func TestIrisCLIBankSend(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 999999999979 && num < 999999999980) {
-		t.Error("Test Failed: (999999999979, 999999999980) expected, recieved: {}", num)
+	if !(num > 79 && num < 80) {
+		t.Error("Test Failed: (79, 80) expected, recieved: {}", num)
 	}
 
 	// test memo
@@ -86,7 +86,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 999999999969 && num < 999999999970) {
-		t.Error("Test Failed: (999999999969, 999999999970) expected, recieved: {}", num)
+	if !(num > 69 && num < 70) {
+		t.Error("Test Failed: (69, 70) expected, recieved: {}", num)
 	}
 }
