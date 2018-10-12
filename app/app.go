@@ -152,6 +152,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
+	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
+
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
