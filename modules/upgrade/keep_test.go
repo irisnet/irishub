@@ -137,8 +137,9 @@ func TestSetKVStoreKeylist(t *testing.T) {
 
 	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
 	upgradeparams.CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
+	upgradeparams.SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
 
-	InitGenesis(ctx, keeper, router)
+	InitGenesis(ctx, keeper, router, DefaultGenesisStateForTest())
 	keeper.SetKVStoreKeylist(ctx)
 }
 

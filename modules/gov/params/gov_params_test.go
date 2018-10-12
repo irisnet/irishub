@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -21,6 +22,75 @@ func defaultContext(key sdk.StoreKey) sdk.Context {
 	cms.LoadLatestVersion()
 	ctx := sdk.NewContext(cms, abci.Header{}, false, log.NewNopLogger())
 	return ctx
+}
+
+func TestInitGenesisParameter(t *testing.T) {
+
+	skey := sdk.NewKVStoreKey("params")
+	ctx := defaultContext(skey)
+	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+
+	Denom             := "iris"
+	IrisCt            := types.NewDefaultCoinType(Denom)
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
+	require.NoError(t, err)
+
+	p1 := DepositProcedure{
+		MinDeposit:       sdk.Coins{minDeposit},
+		MaxDepositPeriod: 1440}
+
+	minDeposit, err = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 20, Denom))
+	require.NoError(t, err)
+
+	p2 := DepositProcedure{
+		MinDeposit:       sdk.Coins{minDeposit},
+		MaxDepositPeriod: 1440}
+
+	iparam.SetParamReadWriter(paramKeeper.Setter(), &DepositProcedureParameter, &DepositProcedureParameter)
+
+	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
+
+	require.Equal(t, p1, DepositProcedureParameter.Value)
+
+	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+
+	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, p2)
+
+	require.Equal(t, p1, DepositProcedureParameter.Value)
+}
+
+func TestRegisterParamMapping(t *testing.T) {
+
+	skey := sdk.NewKVStoreKey("params")
+	ctx := defaultContext(skey)
+	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+
+	Denom             := "iris"
+	IrisCt            := types.NewDefaultCoinType(Denom)
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
+	require.NoError(t, err)
+
+	p1 := DepositProcedure{
+		MinDeposit:       sdk.Coins{minDeposit},
+		MaxDepositPeriod: 1440}
+
+	minDeposit, err = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 30, Denom))
+	require.NoError(t, err)
+
+	p2 := DepositProcedure{
+		MinDeposit:       sdk.Coins{minDeposit},
+		MaxDepositPeriod: 1440}
+
+	iparam.SetParamReadWriter(paramKeeper.Setter(), &DepositProcedureParameter, &DepositProcedureParameter)
+	iparam.RegisterGovParamMapping(&DepositProcedureParameter)
+	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
+
+	require.Equal(t, iparam.ParamMapping[DepositProcedureParameter.GetStoreKey()].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, p1, DepositProcedureParameter.Value)
+
+	iparam.ParamMapping[DepositProcedureParameter.GetStoreKey()].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":1440}")
+	DepositProcedureParameter.LoadValue(ctx)
+	require.Equal(t, p2, DepositProcedureParameter.Value)
 }
 
 func TestDepositProcedureParam(t *testing.T) {
