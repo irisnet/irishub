@@ -48,7 +48,7 @@ func main() {
 	rootCmd.AddCommand(
 		server.InitCmd(ctx, cdc, app.IrisAppInit()),
 		startCmd,
-		server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
+		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,

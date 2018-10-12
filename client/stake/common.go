@@ -81,8 +81,8 @@ type ValidatorOutput struct {
 	Revoked bool           `json:"revoked"` // has the validator been revoked from bonded status?
 
 	Status          sdk.BondStatus `json:"status"`           // validator status (bonded/unbonding/unbonded)
-	Tokens          sdk.Rat        `json:"tokens"`           // delegated tokens (incl. self-delegation)
-	DelegatorShares sdk.Rat        `json:"delegator_shares"` // total shares issued to a validator's delegators
+	Tokens          string        `json:"tokens"`           // delegated tokens (incl. self-delegation)
+	DelegatorShares string        `json:"delegator_shares"` // total shares issued to a validator's delegators
 
 	Description        stake.Description `json:"description"`           // description terms for the validator
 	BondHeight         int64       `json:"bond_height"`           // earliest height as a bonded validator
@@ -95,7 +95,7 @@ type ValidatorOutput struct {
 	CommissionChangeToday sdk.Rat `json:"commission_change_today"` // XXX commission rate change today, reset each day (UTC time)
 
 	// fee related
-	LastBondedTokens sdk.Rat `json:"prev_bonded_shares"` // last bonded token amount
+	LastBondedTokens sdk.Rat `json:"prev_bonded_tokens"` // last bonded token amount
 }
 
 func (v ValidatorOutput) HumanReadableString() (string, error) {
@@ -104,8 +104,8 @@ func (v ValidatorOutput) HumanReadableString() (string, error) {
 	resp += fmt.Sprintf("Validator: %s\n", v.PubKey)
 	resp += fmt.Sprintf("Revoked: %v\n", v.Revoked)
 	resp += fmt.Sprintf("Status: %s\n", sdk.BondStatusToString(v.Status))
-	resp += fmt.Sprintf("Tokens: %s\n", v.Tokens.FloatString())
-	resp += fmt.Sprintf("Delegator Shares: %s\n", v.DelegatorShares.FloatString())
+	resp += fmt.Sprintf("Tokens: %s\n", v.Tokens)
+	resp += fmt.Sprintf("Delegator Shares: %s\n", v.DelegatorShares)
 	resp += fmt.Sprintf("Description: %s\n", v.Description)
 	resp += fmt.Sprintf("Bond Height: %d\n", v.BondHeight)
 	resp += fmt.Sprintf("Proposer Reward Pool: %s\n", v.ProposerRewardPool)
@@ -144,8 +144,8 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		Revoked: v.Revoked,
 
 		Status:          v.Status,
-		Tokens:          v.Tokens.Mul(exRate),
-		DelegatorShares: v.DelegatorShares.Mul(exRate),
+		Tokens:          v.Tokens.Mul(exRate).FloatString(),
+		DelegatorShares: v.DelegatorShares.Mul(exRate).FloatString(),
 
 		Description:        v.Description,
 		BondHeight:         v.BondHeight,

@@ -56,16 +56,13 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/develop"
-  digest = "1:5df3d1c3a90a759d109516f403b494d3b4f6d614538ceb562a03e5a411f1667f"
+  digest = "1:b377b858bfe55eaae4ea65a2ab5d00c039b0bae31a87a99224bd957ddbce999b"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
     "client",
     "client/context",
     "client/keys",
-    "client/rpc",
-    "client/tx",
     "client/utils",
     "crypto",
     "crypto/keys",
@@ -75,6 +72,7 @@
     "server",
     "server/config",
     "store",
+    "tests",
     "types",
     "version",
     "wire",
@@ -82,26 +80,22 @@
     "x/auth/client/cli",
     "x/auth/client/context",
     "x/bank",
-    "x/bank/client",
-    "x/bank/client/cli",
     "x/gov",
-    "x/gov/client/cli",
     "x/gov/tags",
     "x/ibc",
     "x/mock",
     "x/mock/simulation",
     "x/params",
     "x/slashing",
-    "x/slashing/client/cli",
     "x/stake",
-    "x/stake/client/cli",
     "x/stake/keeper",
     "x/stake/tags",
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "8c058b8e5b028dc7373f5427dd36e00686d8f6a5"
+  revision = "c6189e6d8c13d6b78a009f83e0ceac4a1aab3d73"
   source = "https://github.com/irisnet/cosmos-sdk.git"
+  version = "v0.24.2-iris1"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -514,17 +508,16 @@
   version = "v0.12.0-rc0"
 
 [[projects]]
-  branch = "irisnet/feature_upgrade"
-  digest = "1:54f4d8af39f33769cd0d9de09141a676283d2948a349c9ae72dc39dfd6a6aae8"
+  digest = "1:f6e293333e941a78f8029927165d1926c5efdedd8612a3108977b30b8a871b87"
   name = "github.com/tendermint/iavl"
   packages = ["."]
   pruneopts = "UT"
-  revision = "849c21e8f93ce782cb9f9f64fabcccb5580b4f90"
+  revision = "f93c0a13ec78edd04c6faef6b3158f72e66f699f"
   source = "https://github.com/irisnet/iavl.git"
+  version = "v0.9.2-iris1"
 
 [[projects]]
-  branch = "irisnet/develop"
-  digest = "1:3b9a2a8316e40b16dcd3f5f42e467b049b5d68465a5d8360014d0b3acebd570e"
+  digest = "1:e787411e638d991be9b98018f4f31854fb33e28d8e3e4a5b1e6fbeed39f51bb4"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -587,8 +580,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "c7737b350a9453bab6571d8d5f489a590609d6f2"
+  revision = "46b52ca74937f3a680a4861f7b60b262d3fda777"
   source = "https://github.com/irisnet/tendermint.git"
+  version = "0.23.1-rc0-iris1"
 
 [[projects]]
   digest = "1:4dcb0dd65feecb068ce23a234d1a07c7868a1e39f52a6defcae0bb371d03abf6"
@@ -729,33 +723,26 @@
     "github.com/cosmos/cosmos-sdk/baseapp",
     "github.com/cosmos/cosmos-sdk/client",
     "github.com/cosmos/cosmos-sdk/client/context",
-    "github.com/cosmos/cosmos-sdk/client/keys",
-    "github.com/cosmos/cosmos-sdk/client/rpc",
-    "github.com/cosmos/cosmos-sdk/client/tx",
     "github.com/cosmos/cosmos-sdk/client/utils",
     "github.com/cosmos/cosmos-sdk/crypto",
     "github.com/cosmos/cosmos-sdk/crypto/keys",
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/config",
     "github.com/cosmos/cosmos-sdk/store",
+    "github.com/cosmos/cosmos-sdk/tests",
     "github.com/cosmos/cosmos-sdk/types",
     "github.com/cosmos/cosmos-sdk/wire",
     "github.com/cosmos/cosmos-sdk/x/auth",
     "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
     "github.com/cosmos/cosmos-sdk/x/auth/client/context",
     "github.com/cosmos/cosmos-sdk/x/bank",
-    "github.com/cosmos/cosmos-sdk/x/bank/client/cli",
     "github.com/cosmos/cosmos-sdk/x/gov",
-    "github.com/cosmos/cosmos-sdk/x/gov/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/gov/tags",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mock",
     "github.com/cosmos/cosmos-sdk/x/mock/simulation",
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
-    "github.com/cosmos/cosmos-sdk/x/slashing/client/cli",
     "github.com/cosmos/cosmos-sdk/x/stake",
-    "github.com/cosmos/cosmos-sdk/x/stake/client/cli",
     "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
     "github.com/go-kit/kit/metrics",
@@ -774,7 +761,6 @@
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "github.com/spf13/viper",
-    "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
     "github.com/tendermint/go-amino",
     "github.com/tendermint/tendermint/abci/server",
@@ -783,6 +769,7 @@
     "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/ed25519",
+    "github.com/tendermint/tendermint/crypto/secp256k1",
     "github.com/tendermint/tendermint/crypto/tmhash",
     "github.com/tendermint/tendermint/libs/cli",
     "github.com/tendermint/tendermint/libs/common",

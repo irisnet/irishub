@@ -70,7 +70,7 @@ Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` c
 
 
 ```
-iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --chain-id=game-of-genesis --name=<key_name> --node=http://localhost:26657
+iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --fee=40000000000000000iris  --gas=2000000  --chain-id=fuxi-3001 --name=<key_name> --node=http://localhost:26657
 ```
 Please note the **amount** needs to be the **minimium unit** of IRIS token: `iris-atto`.
 

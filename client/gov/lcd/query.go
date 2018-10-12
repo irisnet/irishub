@@ -124,7 +124,7 @@ func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handler
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%s] is not positive", proposalID))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%d] is not positive", proposalID))
 			return
 		}
 
@@ -178,7 +178,7 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 
 		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%s] is not positive", proposalID))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%d] is not positive", proposalID))
 			return
 		}
 
@@ -192,7 +192,7 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 		cdc.MustUnmarshalBinary(res, &proposal)
 
 		if proposal.GetStatus() != gov.StatusVotingPeriod {
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposal is not in Voting Period", proposalID))
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposal [%d] is not in Voting Period", proposalID))
 			return
 		}
 

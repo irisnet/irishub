@@ -153,15 +153,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
-							&govparams.DepositProcedureParameter,
-		                    &govparams.VotingProcedureParameter,
-		                    &govparams.TallyingProcedureParameter,
-							&upgradeparams.CurrentUpgradeProposalIdParameter,
-							&upgradeparams.ProposalAcceptHeightParameter)
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter,
+		&upgradeparams.SwitchPeriodParameter)
 
 	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		                              &govparams.VotingProcedureParameter,
-		                              &govparams.TallyingProcedureParameter,)
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -192,11 +193,11 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 
 // application updates every end block
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
-
 	tags := gov.EndBlocker(ctx, app.govKeeper)
+	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
-
+	// Add these new validators to the addr -> pubkey map.
+	app.slashingKeeper.AddValidators(ctx, validatorUpdates)
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
@@ -225,27 +226,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	if err != nil {
 		panic(err)
 	}
-
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
-	if err != nil {
-		panic(err)
-	}
-
-	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
-		StartingProposalID: 1,
-		DepositProcedure: govparams.DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 10,
-		},
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 10,
-		},
-		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
-		},
-	})
+	gov.InitGenesis(ctx, app.govKeeper, genesisState.GovData)
 
 	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
@@ -257,7 +238,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

@@ -1,19 +1,31 @@
 # Changelog
 
-
 ## 0.5.0-rc1
 
-*September 27th, 2018*
+*October 11th, 2018*
+
+FEATURES:
+
+- Make all the gov and upgrade parameters can be configured in the genesis.json
+
+BUG FIXES
+
+- Add check for iavl proof and value before building multistore proof
+
+
+## 0.5.0-rc0
+
+*September 30th, 2018*
 
 BREAKING CHANGES:
 
 - [cointype] Introduce the cointype of iris:
-	- 1 iris = 10^18 iris-atto
-	- 1 iris-milli = 10^15 iris-atto
-	- 1 iris-micro = 10^12 iris-atto
-	- 1 iris-nano = 10^9 iris-atto
-	- 1 iris-pico = 10^6 iris-atto
-	- 1 iris-femto = 10^3 iris-atto
+  - 1 iris = 10^18 iris-atto
+  - 1 iris-milli = 10^15 iris-atto
+  - 1 iris-micro = 10^12 iris-atto
+  - 1 iris-nano = 10^9 iris-atto
+  - 1 iris-pico = 10^6 iris-atto
+  - 1 iris-femto = 10^3 iris-atto
 
 FEATURES:
 
@@ -21,9 +33,9 @@ FEATURES:
 - [cosmos-sdk] Upgrade to cosmos-sdk v0.24.2
     - Move the previous irisnet changeset about cosmos-sdk into irishub
 - [irisdebug] Add irisdebug tool
-- [LCD/cli] Add the proof verification in the LCD and cli
-- [iparam] Support governance modify the complex struct type parameter and can be done through the Json parameter config file
-- [software-upgrade] Software upgrade solution of the irisnet
+- [LCD/cli] Add the proof verification to the LCD and CLI
+- [iparam] Support the modification of governance parameters of complex data type through governance, and the submission of modified proposals through json config files
+- [software-upgrade] Software upgrade solutions of the irisnet
 
 
 ## 0.4.2

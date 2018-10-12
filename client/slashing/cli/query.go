@@ -32,6 +32,9 @@ func GetCmdQuerySigningInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if len(res) ==0 {
+				return fmt.Errorf("the signing information of this validator %s is empty, please make sure its existence", args[0])
+			}
 
 			signingInfo := new(slashing.ValidatorSigningInfo)
 			cdc.MustUnmarshalBinary(res, signingInfo)
