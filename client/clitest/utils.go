@@ -18,6 +18,7 @@ import (
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -83,6 +84,7 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 	}
 
 	genesisState.GovData = gov.DefaultGenesisStateForTest()
+	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	bz, err := cdc.MarshalJSON(genesisState)
 	if err != nil {
