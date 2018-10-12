@@ -44,6 +44,11 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "100iris", fooCoin)
 
+	// check the upgrade info
+	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli upgrade info --output=json %v", flags))
+	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
+
 	// submit a upgrade proposal
 	spStr := fmt.Sprintf("iriscli gov submit-proposal %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
@@ -76,7 +81,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, int64(1), votes[0].ProposalID)
 	require.Equal(t, gov.OptionYes, votes[0].Option)
 
-	tests.WaitForHeightTM(votingStartBlock1+20, port)
+	tests.WaitForHeightTM(votingStartBlock1 + 12, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
@@ -89,7 +94,14 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	proc1 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris1 start --home=%s --rpc.laddr=%v", irisHome, servAddr))
 	defer proc1.Stop(false)
 
+	tests.WaitForTMStart(port)
+	tests.WaitForNextNBlocksTM(2, port)
+
 	// check the upgrade info
-	//upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	require.Equal(t, int64(1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
+
 
 }

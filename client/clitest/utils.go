@@ -15,6 +15,7 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/modules/gov"
@@ -214,11 +215,12 @@ func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 	return param
 }
 
-//func executeGetUpgradeInfo(t *testing.T, cmdStr string) gov.Param {
-//	out := tests.ExecuteT(t, cmdStr, "")
-//	var param gov.Param
-//	cdc := app.MakeCodec()
-//	err := cdc.UnmarshalJSON([]byte(out), &param)
-//	require.NoError(t, err, "out %v\n, err %v", out, err)
-//	return param
-//}
+func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var info upgcli.UpgradeInfoOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &info)
+
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return info
+}
