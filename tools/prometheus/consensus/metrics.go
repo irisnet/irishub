@@ -6,7 +6,7 @@ import (
 	cctx "context"
 	"encoding/hex"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
@@ -125,8 +125,8 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (cs *Metrics) SetAddress(addr_str string) {
-	if addr, err := hex.DecodeString(addr_str); err != nil {
+func (cs *Metrics) SetAddress(addrStr string) {
+	if addr, err := hex.DecodeString(addrStr); err != nil {
 		log.Println("parse validator address falid ", err)
 	} else {
 		if len(addr) == 0 {
@@ -139,10 +139,10 @@ func (cs *Metrics) SetAddress(addr_str string) {
 
 func (cs *Metrics) Start(ctx context.CLIContext) {
 
-	validaor_addr := viper.GetString("address")
-	cs.SetAddress(validaor_addr)
+	validatorAddr := viper.GetString("address")
+	cs.SetAddress(validatorAddr)
 
-	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
+	ct, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
 	var client = ctx.Client
 
 	//开启监听事件
@@ -150,7 +150,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 
 	blockC := make(chan interface{})
 
-	err := client.Subscribe(context, "monitor", types.EventQueryNewBlock, blockC)
+	err := client.Subscribe(ct, "monitor", types.EventQueryNewBlock, blockC)
 
 	if err != nil {
 		log.Println("got ", err)
@@ -165,7 +165,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 	}()
 
 	roundC := make(chan interface{})
-	err = client.Subscribe(context, "monitor", types.EventQueryNewRound, roundC)
+	err = client.Subscribe(ct, "monitor", types.EventQueryNewRound, roundC)
 	if err != nil {
 		log.Println("got ", err)
 		return
