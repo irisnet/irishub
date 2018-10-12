@@ -27,13 +27,35 @@ After a validator is created with a `create-validator` transaction, it can be in
 After a validator is created with a create-validator transaction, it can be in five states:
 
 * `unbonded` & `unjailed` : 
-* `bonded`: Validator is in the active set and participates in consensus. Validator is earning rewards and can be slashed for misbehaviour.
+* `bonded`:
+* `unbonding`& `unjailed`:
+* `unbonding`& `jailed`:
+* `unbonded`&`jailed`:
+
+Validator is in the active set and participates in consensus. Validator is earning rewards and can be slashed for misbehaviour.
 unbonding: Validator is not in the active set and does not participate in consensus. Validator is not earning rewards, but can still be 
 slashed for misbehaviour. This is a transition state from bonded to unbonded. If validator does not send a rebond transaction while in 
 * unbonding mode, it will take three weeks for the state transition to complete.
 * unbonded: Validator is not in the active set, and therefore not signing blocs. 
 Validator cannot be slashed, and does not earn any reward. It is still possible to delegate Atoms to this validator. Un-delegating 
 from an unbonded validator is immediate.
+
+Once a user execute `create-validator` transaction with pubkey of a fully synced node, 
+its state become `unbonded` & `unjailed`. If it's voting power is in the top 100 of all the candidates, then the state will change to `Bonded`.
+But if the voting power is not enough to make to top 100, then the state will change to `unbonding`& `unjailed`. If the state keeps unchange for 3 weeks, 
+then the state will change back to `unbonded` & `unjailed`. During this time, the validator could use additional delegations or add self-delegation. 
+If the validator get jailed for slashing or unbond all of his self-delegation, then his state will change to `unbonding`& `jailed`. The slashing conditions
+are explained below. The validator could use a `unrevoke` command to unjailed himself. His voting power will be reduced by a portion. 
+If he could still remain in the top 100 validator candidates, then his state is `Bonded`, otherwise it's `unbonding`& `unjailed`.
+However, if the validator doesn't unjail himself in 3 weeks, his state will be `unbonded`&`jailed`. But he could still unjail himself later. 
+If he unjailed himself from the state `unbonded`&`jailed`, his state will be `Bonded` if his voting power is within top 100.
+
+### Slashing conditions
+While a validator’s goal is staying online, we will test slashing. Slashing is a punitive function that is triggered by a validator ’s bad actions. Getting slashed is losing voting power. Validators will be slashed for the actions below:
+
+* Going offline or unable to communicate with the network
+
+* Double sign a block
 
 ## Common Operations for Validators
 
