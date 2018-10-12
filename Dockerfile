@@ -24,7 +24,11 @@ RUN cd $REPO_PATH && \
     go get github.com/golang/dep/cmd/dep && \
     make get_tools && \
     make get_vendor_deps && \
-    make build_linux
+    make build_linux && \
+    make test_unit && \
+    make install && \
+    make install_examples && \ 
+    make test_cli
 
 
 FROM alpine:3.7
