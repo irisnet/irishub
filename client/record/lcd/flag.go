@@ -1,6 +1,7 @@
 package lcd
 
 const (
-	RecordHash = "recordHash"
-	storeName  = "record"
+	RestRecordHash     = "recordHash"
+	RestAccountAddress = "accountAddress"
+	storeName          = "record"
 )

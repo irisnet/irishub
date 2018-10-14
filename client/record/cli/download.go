@@ -5,12 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tmlibs/cli"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -26,9 +27,19 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 			downloadFileName := viper.GetString(FlagFileName)
 			home := viper.GetString(cli.HomeFlag)
 			hashHexStr := viper.GetString(FlagTxHash)
+			trustNode := viper.GetBool(client.FlagTrustNode)
 
-			var tmpkey = cmn.HexBytes{}
-			res, err := cliCtx.QueryStore(tmpkey /*record.KeyProposal(hashHexStr)*/, storeName)
+			addr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			ipfsHash, err := GetDataHash(cdc, cliCtx, hashHexStr, trustNode)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryStore(record.KeyRecord(addr, ipfsHash), storeName)
 			if len(res) == 0 || err != nil {
 				return fmt.Errorf("Record hash [%s] is not existed", hashHexStr)
 			}

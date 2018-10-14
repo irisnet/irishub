@@ -1,9 +1,12 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
@@ -11,7 +14,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	recordClient "github.com/irisnet/irishub/client/record"
-	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 type RecordMetadata struct {
@@ -31,9 +33,19 @@ func GetCmdQureyHash(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			hashHexStr := viper.GetString(FlagTxHash)
+			trustNode := viper.GetBool(client.FlagTrustNode)
 
-			var tmpkey = cmn.HexBytes{}
-			res, err := cliCtx.QueryStore(tmpkey /*record.KeyProposal(hashHexStr)*/, storeName)
+			addr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			ipfsHash, err := GetDataHash(cdc, cliCtx, hashHexStr, trustNode)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryStore(record.KeyRecord(addr, ipfsHash), storeName)
 			if len(res) == 0 || err != nil {
 				return fmt.Errorf("Record hash [%s] is not existed", hashHexStr)
 			}
@@ -62,38 +74,40 @@ func GetCmdQureyHash(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func queryRecordMetadata(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string, trustNode bool) (RecordMetadata, error) {
-
-	tx, err := QueryTx(cdc, cliCtx, hashHexStr, trustNode)
-
+func GetDataHash(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string, trustNode bool) (string, error) {
+	hash, err := hex.DecodeString(hashHexStr)
 	if err != nil {
-		return RecordMetadata{}, err
+		return "", err
+	}
+
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return "", err
+	}
+
+	res, err := node.Tx(hash, !trustNode)
+	if err != nil {
+		return "", err
+	}
+
+	var tx auth.StdTx
+	err = cdc.UnmarshalBinary(res.Tx, &tx)
+	if err != nil {
+		return "", err
 	}
 
 	msgs := tx.GetMsgs()
-
-	for i := 0; i < len(msgs); i++ {
-		if msgs[i].Type() == record.MsgType {
-			var ok bool
-			var m record.MsgSubmitFile
-			if m, ok = msgs[i].(record.MsgSubmitFile); ok {
-
-				var metadata RecordMetadata
-				metadata.OwnerAddress = m.OwnerAddress
-				metadata.DataHash = m.DataHash
-				metadata.DataSize = m.DataSize
-				metadata.SubmitTime = m.SubmitTime
-
-				return metadata, nil
-			}
-			return RecordMetadata{}, nil
-		}
+	if len(msgs) != 1 {
+		fmt.Errorf("Record tx format error: there are more than one msg in the tx!\n")
+		return "", err
 	}
 
-	return RecordMetadata{}, nil
-}
+	var ok bool
+	var m record.MsgSubmitFile
+	if m, ok = msgs[0].(record.MsgSubmitFile); !ok {
+		fmt.Errorf("MsgSubmitFile type assertion failed!\n")
+		return "", err
+	}
 
-func QueryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string, trustNode bool) (sdk.Tx, error) {
-
-	return nil, nil
+	return m.DataHash, nil
 }
