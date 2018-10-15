@@ -12,6 +12,8 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 )
 
+var lastSwitchHeight int64
+
 func init() {
 	irisHome, iriscliHome = getTestingHomeDirs()
 }
@@ -23,7 +25,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	chainID := executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
 
-	err := modifyGenesisFile(t, irisHome)
+	err := modifyGenesisFile(irisHome)
 	require.NoError(t, err)
 
 	// get a free port, also setup some common flags
@@ -82,7 +84,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, int64(1), votes[0].ProposalID)
 	require.Equal(t, gov.OptionYes, votes[0].Option)
 
-	tests.WaitForHeightTM(votingStartBlock1 + 12, port)
+	tests.WaitForHeightTM(votingStartBlock1+12, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
@@ -101,7 +103,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	// check the upgrade info
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
 	require.Equal(t, int64(1), upgradeInfo.CurrentProposalId)
-	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, votingStartBlock1+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
 
 	// submit switch msg
@@ -120,12 +122,13 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
 	// check whether switched to the new version
-	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 17, port)
+	lastSwitchHeight = upgradeInfo.CurrentProposalAcceptHeight + 17
+	tests.WaitForHeightTM(lastSwitchHeight, port)
+
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
 	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
-	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, votingStartBlock1+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
-
 
 	//////////////////////////////// Bugfix Software Upgrade ////////////////////////////////
 
@@ -162,7 +165,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, int64(2), votes[0].ProposalID)
 	require.Equal(t, gov.OptionYes, votes[0].Option)
 
-	tests.WaitForHeightTM(votingStartBlock2 + 12, port)
+	tests.WaitForHeightTM(votingStartBlock2+12, port)
 	proposal2 = executeGetProposal(t, fmt.Sprintf("iriscli1 gov query-proposal --proposal-id=2 --output=json %v", flags))
 	require.Equal(t, int64(2), proposal2.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal2.Status)
@@ -181,7 +184,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	// check the upgrade info
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
 	require.Equal(t, int64(2), upgradeInfo.CurrentProposalId)
-	require.Equal(t, votingStartBlock2 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, votingStartBlock2+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
 	// submit switch msg
@@ -200,9 +203,113 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
 	// check whether switched to the new version
-	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 17, port)
+	lastSwitchHeight = upgradeInfo.CurrentProposalAcceptHeight + 17
+	tests.WaitForHeightTM(lastSwitchHeight, port)
+
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
 	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
-	require.Equal(t, votingStartBlock2 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, votingStartBlock2+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(2), upgradeInfo.Verion.Id)
+
+	//////////////////// replay from version 0 for new coming node /////////////////////////////
+	/// start a new node
+
+	go startNodeBToReplay(t)
+}
+
+func startNodeBToReplay(t *testing.T) {
+	irisBHome, iriscliBHome := getTestingHomeDirsB()
+	require.True(t, irisBHome != irisHome)
+	require.True(t, iriscliBHome != iriscliHome)
+
+	tests.ExecuteT(t, fmt.Sprintf("iris2-bugfix --home=%s unsafe_reset_all", irisBHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
+	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --name=foo --home=%s --home-client=%s", irisBHome, iriscliBHome))
+
+	err := setupGenesisAndConfig(irisHome, irisBHome)
+	require.NoError(t, err)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err := server.FreeTCPAddr()
+	require.NoError(t, err)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliBHome, servAddr, chainID)
+
+	// start new iris2-bugfix server
+	proc3 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris2-bugfix start --home=%s --rpc.laddr=%v", irisBHome, servAddr))
+	defer proc3.Stop(false)
+
+	tests.WaitForTMStart(port)
+	tests.WaitForHeightTM(lastSwitchHeight + 10, port)
+
+	// check the upgrade info
+	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
+	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, int64(2), upgradeInfo.Verion.Id)
+}
+
+func TestIrisStartTwoNodes(t *testing.T) {
+
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
+	chainID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
+
+	err := modifyGenesisFile(irisHome)
+	require.NoError(t, err)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err := server.FreeTCPAddr()
+	require.NoError(t, err)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
+
+	// start iris server
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+
+	defer proc.Stop(false)
+	tests.WaitForTMStart(port)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
+
+	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooCoin := convertToIrisBaseAccount(t, fooAcc)
+	require.Equal(t, "100iris", fooCoin)
+
+	//////////////////////// start node B ////////////////////////////
+
+	go irisStartNodeB(t)
+}
+
+func irisStartNodeB(t *testing.T) {
+	irisBHome, iriscliBHome := getTestingHomeDirsB()
+	require.True(t, irisBHome != irisHome)
+	require.True(t, iriscliBHome != iriscliHome)
+
+	tests.ExecuteT(t, fmt.Sprintf("iris2-bugfix --home=%s unsafe_reset_all", irisBHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
+	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --name=foo --home=%s --home-client=%s", irisBHome, iriscliBHome))
+
+	err := setupGenesisAndConfig(irisHome, irisBHome)
+	require.NoError(t, err)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err := server.FreeTCPAddr()
+	require.NoError(t, err)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliBHome, servAddr, chainID)
+
+	// start new iris2-bugfix server
+	proc3 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris2-bugfix start --home=%s --rpc.laddr=%v", irisBHome, servAddr))
+	defer proc3.Stop(false)
+
+	tests.WaitForTMStart(port)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
+
+	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooCoin := convertToIrisBaseAccount(t, fooAcc)
+	require.Equal(t, "100iris", fooCoin)
 }

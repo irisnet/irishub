@@ -24,11 +24,13 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
+	"io"
 )
 
 var (
 	irisHome    = ""
 	iriscliHome = ""
+	chainID = ""
 )
 
 //___________________________________________________________________________________
@@ -51,7 +53,7 @@ func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
 	return coins[0]
 }
 
-func getAmuntFromCoinStr(t *testing.T, coinStr string) float64 {
+func getAmuntFromCoinStr(coinStr string) float64 {
 	index := strings.Index(coinStr, "iris")
 	if index <= 0 {
 		return -1
@@ -66,7 +68,34 @@ func getAmuntFromCoinStr(t *testing.T, coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisFile(t *testing.T, irisHome string) error {
+func setupGenesisAndConfig(srcHome, dstHome string) error {
+	genesisSrcFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", srcHome, string(os.PathSeparator), string(os.PathSeparator))
+	configSrcFilePath := fmt.Sprintf("%s%sconfig%sconfig.toml", srcHome, string(os.PathSeparator), string(os.PathSeparator))
+
+	genesisDstFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", dstHome, string(os.PathSeparator), string(os.PathSeparator))
+	configDstFilePath := fmt.Sprintf("%s%sconfig%sconfig.toml", dstHome, string(os.PathSeparator), string(os.PathSeparator))
+
+	err := os.Remove(genesisDstFilePath)
+	if err != nil {
+		return err
+	}
+	err = os.Remove(configDstFilePath)
+	if err != nil {
+		return err
+	}
+
+	err = copyFile(genesisDstFilePath, genesisSrcFilePath)
+	if err != nil {
+		return err
+	}
+	err = copyFile(configDstFilePath, configSrcFilePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func modifyGenesisFile(irisHome string) error {
 	genesisFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", irisHome, string(os.PathSeparator), string(os.PathSeparator))
 
 	genesisDoc, err := types.GenesisDocFromFile(genesisFilePath)
@@ -101,6 +130,30 @@ func getTestingHomeDirs() (string, string) {
 	irisHome := fmt.Sprintf("%s%s.test_iris", tmpDir, string(os.PathSeparator))
 	iriscliHome := fmt.Sprintf("%s%s.test_iriscli", tmpDir, string(os.PathSeparator))
 	return irisHome, iriscliHome
+}
+
+func getTestingHomeDirsB() (string, string) {
+	tmpDir := os.TempDir()
+	irisHome := fmt.Sprintf("%s%s.test_iris_b", tmpDir, string(os.PathSeparator))
+	iriscliHome := fmt.Sprintf("%s%s.test_iriscli_b", tmpDir, string(os.PathSeparator))
+	return irisHome, iriscliHome
+}
+
+func copyFile(dstFile, srcFile string) error {
+	src, err := os.Open(srcFile)
+	if err != nil {
+		return err
+	}
+
+	defer src.Close()
+	dst, err := os.OpenFile(dstFile, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+
+	defer dst.Close()
+	_, err = io.Copy(dst, src)
+	return err
 }
 
 //___________________________________________________________________________________
