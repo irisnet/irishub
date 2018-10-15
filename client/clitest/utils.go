@@ -25,6 +25,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	"io"
+	"bufio"
 )
 
 var (
@@ -88,7 +89,7 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 	if err != nil {
 		return err
 	}
-	err = copyFile(configDstFilePath, configSrcFilePath)
+	err = modifyConfigFile(configSrcFilePath, configDstFilePath)
 	if err != nil {
 		return err
 	}
@@ -123,6 +124,34 @@ func modifyGenesisFile(irisHome string) error {
 
 	genesisDoc.AppState = bz
 	return genesisDoc.SaveAs(genesisFilePath)
+}
+
+func modifyConfigFile(configSrcPath, configDstPath string) error {
+	fsrc, err := os.Open(configSrcPath)
+	if err != nil {
+		return err
+	}
+	defer fsrc.Close()
+
+	fdst, err := os.Create(configDstPath)
+	if err != nil {
+		return err
+	}
+	defer fdst.Close()
+
+	w := bufio.NewWriter(fdst)
+	br := bufio.NewReader(fsrc)
+
+	for {
+		line, _, err := br.ReadLine()
+		if err == io.EOF {
+			break
+		}
+
+		newline := strings.Replace(string(line), "266", "366", -1)
+		fmt.Fprintln(w, newline)
+	}
+	return w.Flush()
 }
 
 func getTestingHomeDirs() (string, string) {

@@ -10,9 +10,13 @@ import (
 	"github.com/irisnet/irishub/app"
 	//sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/gov"
+	"sync"
 )
 
-var lastSwitchHeight int64
+var (
+	lastSwitchHeight int64
+	wg sync.WaitGroup
+)
 
 func init() {
 	irisHome, iriscliHome = getTestingHomeDirs()
@@ -22,7 +26,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
-	chainID := executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+	chainID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
 
 	err := modifyGenesisFile(irisHome)
@@ -215,6 +219,10 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	/// start a new node
 
 	go startNodeBToReplay(t)
+
+	wg.Add(1)
+	wg.Wait()
+	proc2.Stop(true)
 }
 
 func startNodeBToReplay(t *testing.T) {
@@ -246,6 +254,8 @@ func startNodeBToReplay(t *testing.T) {
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
 	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
 	require.Equal(t, int64(2), upgradeInfo.Verion.Id)
+
+	wg.Done()
 }
 
 func TestIrisStartTwoNodes(t *testing.T) {
@@ -280,6 +290,10 @@ func TestIrisStartTwoNodes(t *testing.T) {
 	//////////////////////// start node B ////////////////////////////
 
 	go irisStartNodeB(t)
+
+	wg.Add(1)
+	wg.Wait()
+	proc.Stop(true)
 }
 
 func irisStartNodeB(t *testing.T) {
@@ -312,4 +326,6 @@ func irisStartNodeB(t *testing.T) {
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli2-bugfix bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "100iris", fooCoin)
+
+	wg.Done()
 }
