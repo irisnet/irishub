@@ -13,6 +13,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
 
 	r.HandleFunc(fmt.Sprintf("/record/records/{%s}/accounts/{%s}", RestRecordHash, RestAccountAddress), queryRecordHandlerFn(cdc, cliCtx)).Methods("GET")
 
-	//r.HandleFunc("/record/records", queryRecordsWithParameterFn(cdc, cliCtx)).Methods("GET")
+	r.HandleFunc("/record/records", queryRecordsWithParameterFn(cdc, cliCtx)).Methods("GET")
 
 }
