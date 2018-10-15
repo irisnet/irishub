@@ -172,22 +172,22 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	proc1.Stop(true)
 
 	// start iris1 server
-	proc2 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris1 start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc2 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris2-bugfix start --home=%s --rpc.laddr=%v", irisHome, servAddr))
 	defer proc2.Stop(false)
 
 	tests.WaitForTMStart(port)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check the upgrade info
-	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
-	require.Equal(t, int64(1), upgradeInfo.CurrentProposalId)
-	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
-	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
+	require.Equal(t, int64(2), upgradeInfo.CurrentProposalId)
+	require.Equal(t, votingStartBlock2 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
 	// submit switch msg
-	switchStr := fmt.Sprintf("iriscli1 upgrade submit-switch %v", flags)
+	switchStr = fmt.Sprintf("iriscli2-bugfix upgrade submit-switch %v", flags)
 	switchStr += fmt.Sprintf(" --from=%s", "foo")
-	switchStr += fmt.Sprintf(" --proposalID=%s", "1")
+	switchStr += fmt.Sprintf(" --proposalID=%s", "2")
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -195,14 +195,14 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
-	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposalID=1 --voter=%v --output=json %v", fooAddr.String(), flags))
-	require.Equal(t, int64(1), switchMsg.ProposalID)
+	switchMsg = executeGetSwitch(t, fmt.Sprintf("iriscli2-bugfix upgrade query-switch --proposalID=2 --voter=%v --output=json %v", fooAddr.String(), flags))
+	require.Equal(t, int64(2), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
 	// check whether switched to the new version
 	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 17, port)
-	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
 	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
-	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
-	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
+	require.Equal(t, votingStartBlock2 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(2), upgradeInfo.Verion.Id)
 }
