@@ -49,6 +49,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
 	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
 
+	/////////////////// Upgrade Proposal /////////////////////////////////
 	// submit a upgrade proposal
 	spStr := fmt.Sprintf("iriscli gov submit-proposal %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
@@ -119,10 +120,89 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
 	// check whether switched to the new version
-	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 45, port)
+	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 17, port)
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
 	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
 	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
+
+	//////////////////////////////// Bugfix Software Upgrade ////////////////////////////////
+
+	/////////////////// Upgrade Proposal /////////////////////////////////
+	// submit a upgrade proposal
+	spStr = fmt.Sprintf("iriscli1 gov submit-proposal %v", flags)
+	spStr += fmt.Sprintf(" --from=%s", "foo")
+	spStr += fmt.Sprintf(" --deposit=%s", "10iris")
+	spStr += fmt.Sprintf(" --type=%s", "SoftwareUpgrade")
+	spStr += fmt.Sprintf(" --title=%s", "Upgrade")
+	spStr += fmt.Sprintf(" --description=%s", "test")
+	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+
+	executeWrite(t, spStr, app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	proposal2 := executeGetProposal(t, fmt.Sprintf("iriscli1 gov query-proposal --proposal-id=2 --output=json %v", flags))
+	require.Equal(t, int64(2), proposal2.ProposalID)
+	require.Equal(t, gov.StatusVotingPeriod, proposal2.Status)
+
+	votingStartBlock2 := proposal2.VotingStartBlock
+
+	voteStr = fmt.Sprintf("iriscli1 gov vote %v", flags)
+	voteStr += fmt.Sprintf(" --from=%s", "foo")
+	voteStr += fmt.Sprintf(" --proposal-id=%s", "2")
+	voteStr += fmt.Sprintf(" --option=%s", "Yes")
+	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+
+	executeWrite(t, voteStr, app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	votes = executeGetVotes(t, fmt.Sprintf("iriscli1 gov query-votes --proposal-id=2 --output=json %v", flags))
+	require.Len(t, votes, 1)
+	require.Equal(t, int64(2), votes[0].ProposalID)
+	require.Equal(t, gov.OptionYes, votes[0].Option)
+
+	tests.WaitForHeightTM(votingStartBlock2 + 12, port)
+	proposal2 = executeGetProposal(t, fmt.Sprintf("iriscli1 gov query-proposal --proposal-id=2 --output=json %v", flags))
+	require.Equal(t, int64(2), proposal2.ProposalID)
+	require.Equal(t, gov.StatusPassed, proposal2.Status)
+
+	/////////////// Stop and Run new version Software ////////////////////
+	// kill iris
+	proc1.Stop(true)
+
+	// start iris1 server
+	proc2 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris1 start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	defer proc2.Stop(false)
+
+	tests.WaitForTMStart(port)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// check the upgrade info
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	require.Equal(t, int64(1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
+
+	// submit switch msg
+	switchStr := fmt.Sprintf("iriscli1 upgrade submit-switch %v", flags)
+	switchStr += fmt.Sprintf(" --from=%s", "foo")
+	switchStr += fmt.Sprintf(" --proposalID=%s", "1")
+	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
+	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+
+	executeWrite(t, switchStr, app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// check switch msg
+	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposalID=1 --voter=%v --output=json %v", fooAddr.String(), flags))
+	require.Equal(t, int64(1), switchMsg.ProposalID)
+	require.Equal(t, "Upgrade", switchMsg.Title)
+
+	// check whether switched to the new version
+	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 17, port)
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 }
