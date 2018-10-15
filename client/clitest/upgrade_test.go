@@ -8,7 +8,8 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/app"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	//sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/gov"
 )
 
 func init() {
@@ -38,58 +39,90 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
-	barAddr, barPubKey := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show bar --output=json --home=%s", iriscliHome))
-	barCeshPubKey := sdk.MustBech32ifyValPub(barPubKey)
-
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), app.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(2, port)
-
-	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
-	barCoin := convertToIrisBaseAccount(t, barAcc)
-	require.Equal(t, "10iris", barCoin)
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	num := getAmuntFromCoinStr(t, fooCoin)
+	require.Equal(t, "100iris", fooCoin)
 
-	if !(num > 999999999989 && num < 999999999990) {
-		t.Error("Test Failed: (999999999989, 999999999990) expected, recieved: {}", num)
-	}
+	// check the upgrade info
+	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli upgrade info --output=json %v", flags))
+	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
 
-	// create validator
-	cvStr := fmt.Sprintf("iriscli stake create-validator %v", flags)
-	cvStr += fmt.Sprintf(" --from=%s", "bar")
-	cvStr += fmt.Sprintf(" --pubkey=%s", barCeshPubKey)
-	cvStr += fmt.Sprintf(" --amount=%v", "2iris")
-	cvStr += fmt.Sprintf(" --moniker=%v", "bar-vally")
-	cvStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	// submit a upgrade proposal
+	spStr := fmt.Sprintf("iriscli gov submit-proposal %v", flags)
+	spStr += fmt.Sprintf(" --from=%s", "foo")
+	spStr += fmt.Sprintf(" --deposit=%s", "10iris")
+	spStr += fmt.Sprintf(" --type=%s", "SoftwareUpgrade")
+	spStr += fmt.Sprintf(" --title=%s", "Upgrade")
+	spStr += fmt.Sprintf(" --description=%s", "test")
+	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, cvStr, app.DefaultKeyPass)
+	executeWrite(t, spStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
-	barCoin = convertToIrisBaseAccount(t, barAcc)
-	num = getAmuntFromCoinStr(t, barCoin)
+	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
+	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
 
-	if !(num > 7 && num < 8) {
-		t.Error("Test Failed: (7, 8) expected, recieved: {}", num)
-	}
+	votingStartBlock1 := proposal1.VotingStartBlock
 
-	validator := executeGetValidator(t, fmt.Sprintf("iriscli stake validator %s --output=json %v", barAddr, flags))
-	require.Equal(t, validator.Owner, barAddr)
-	require.Equal(t, "2.0000000000", validator.Tokens)
+	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
+	voteStr += fmt.Sprintf(" --from=%s", "foo")
+	voteStr += fmt.Sprintf(" --proposal-id=%s", "1")
+	voteStr += fmt.Sprintf(" --option=%s", "Yes")
+	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	// unbond a single share
-	unbondStr := fmt.Sprintf("iriscli stake unbond begin %v", flags)
-	unbondStr += fmt.Sprintf(" --from=%s", "bar")
-	unbondStr += fmt.Sprintf(" --address-validator=%s", barAddr)
-	unbondStr += fmt.Sprintf(" --shares-amount=%v", "1")
-	unbondStr += fmt.Sprintf(" --fee=%s", "0.004iris")
-
-	success := executeWrite(t, unbondStr, app.DefaultKeyPass)
-	require.True(t, success)
+	executeWrite(t, voteStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	validator = executeGetValidator(t, fmt.Sprintf("iriscli stake validator %s --output=json %v", barAddr, flags))
-	require.Equal(t, "1.0000000000", validator.Tokens)
+	votes := executeGetVotes(t, fmt.Sprintf("iriscli gov query-votes --proposal-id=1 --output=json %v", flags))
+	require.Len(t, votes, 1)
+	require.Equal(t, int64(1), votes[0].ProposalID)
+	require.Equal(t, gov.OptionYes, votes[0].Option)
+
+	tests.WaitForHeightTM(votingStartBlock1 + 12, port)
+	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
+	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, gov.StatusPassed, proposal1.Status)
+
+	/////////////// Stop and Run new version Software ////////////////////
+	// kill iris
+	proc.Stop(true)
+
+	// start iris1 server
+	proc1 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris1 start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	defer proc1.Stop(false)
+
+	tests.WaitForTMStart(port)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// check the upgrade info
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	require.Equal(t, int64(1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
+
+	// submit switch msg
+	switchStr := fmt.Sprintf("iriscli1 upgrade submit-switch %v", flags)
+	switchStr += fmt.Sprintf(" --from=%s", "foo")
+	switchStr += fmt.Sprintf(" --proposalID=%s", "1")
+	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
+	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+
+	executeWrite(t, switchStr, app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// check switch msg
+	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposalID=1 --voter=%v --output=json %v", fooAddr.String(), flags))
+	require.Equal(t, int64(1), switchMsg.ProposalID)
+	require.Equal(t, "Upgrade", switchMsg.Title)
+
+	// check whether switched to the new version
+	tests.WaitForHeightTM(upgradeInfo.CurrentProposalAcceptHeight + 45, port)
+	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, votingStartBlock1 + 10, upgradeInfo.CurrentProposalAcceptHeight)
+	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
+
 }

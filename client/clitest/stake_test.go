@@ -52,8 +52,8 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	num := getAmuntFromCoinStr(t, fooCoin)
 
-	if !(num > 999999999989 && num < 999999999990) {
-		t.Error("Test Failed: (999999999989, 999999999990) expected, recieved: {}", num)
+	if !(num > 89 && num < 90) {
+		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
 	}
 
 	// create validator
