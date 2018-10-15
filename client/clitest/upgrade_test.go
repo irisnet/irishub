@@ -223,8 +223,8 @@ func startNodeBToReplay(t *testing.T) {
 	require.True(t, iriscliBHome != iriscliHome)
 
 	tests.ExecuteT(t, fmt.Sprintf("iris2-bugfix --home=%s unsafe_reset_all", irisBHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
 	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --name=foo --home=%s --home-client=%s", irisBHome, iriscliBHome))
 
 	err := setupGenesisAndConfig(irisHome, irisBHome)
@@ -288,8 +288,8 @@ func irisStartNodeB(t *testing.T) {
 	require.True(t, iriscliBHome != iriscliHome)
 
 	tests.ExecuteT(t, fmt.Sprintf("iris2-bugfix --home=%s unsafe_reset_all", irisBHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
 	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --name=foo --home=%s --home-client=%s", irisBHome, iriscliBHome))
 
 	err := setupGenesisAndConfig(irisHome, irisBHome)
@@ -307,9 +307,9 @@ func irisStartNodeB(t *testing.T) {
 	tests.WaitForTMStart(port)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
+	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli2-bugfix keys show foo --output=json --home=%s", iriscliHome))
 
-	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli2-bugfix bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "100iris", fooCoin)
 }
