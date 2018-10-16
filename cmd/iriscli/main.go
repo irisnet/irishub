@@ -177,7 +177,7 @@ func main() {
 
 	recordCmd.AddCommand(
 		client.GetCommands(
-			recordcmd.GetCmdQureyHash("record", cdc),
+			recordcmd.GetCmdQureyRecord("record", cdc),
 			recordcmd.GetCmdDownload("record", cdc),
 		)...)
 

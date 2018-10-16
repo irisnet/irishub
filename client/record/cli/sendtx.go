@@ -25,6 +25,7 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 
 			strFilepath := viper.GetString(flagPath)
+			strPinedNode := viper.GetString(flagPinedNode)
 			file, err := os.Stat(strFilepath)
 
 			if err != nil {
@@ -33,7 +34,7 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 			}
 
 			//upload to ipfs
-			sh := ipfs.NewShell("localhost:5001")
+			sh := ipfs.NewShell(strPinedNode)
 			f, err := os.Open(strFilepath)
 			if err != nil {
 				return err
@@ -67,7 +68,9 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 				submitTime,
 				fromAddr,
 				dataHash,
-				dataSize)
+				dataSize,
+				strPinedNode,
+			)
 
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -81,8 +84,9 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagFilename, "", "name of file")
-	cmd.Flags().String(flagDescription, "", "description of file")
+	cmd.Flags().String(flagDescription, "record file", "description of file")
 	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
+	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")
 
 	return cmd
 }

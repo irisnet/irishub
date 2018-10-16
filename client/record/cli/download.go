@@ -5,9 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
@@ -19,29 +17,19 @@ import (
 
 func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "download [hash]",
-		Short: "download specified file with tx hash",
+		Use:   "download [record ID]",
+		Short: "download specified file with record ID",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			strPinedNode := viper.GetString(flagPinedNode)
 			downloadFileName := viper.GetString(FlagFileName)
 			home := viper.GetString(cli.HomeFlag)
-			hashHexStr := viper.GetString(FlagTxHash)
-			trustNode := viper.GetBool(client.FlagTrustNode)
+			recordID := viper.GetString(FlagRecordID)
 
-			addr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
-
-			ipfsHash, err := GetDataHash(cdc, cliCtx, hashHexStr, trustNode)
-			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryStore(record.KeyRecord(addr, ipfsHash), storeName)
+			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
 			if len(res) == 0 || err != nil {
-				return fmt.Errorf("Record hash [%s] is not existed", hashHexStr)
+				return fmt.Errorf("Record id [%s] is not existed", recordID)
 			}
 
 			var submitFile record.MsgSubmitFile
@@ -53,7 +41,7 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			filePath := filepath.Join(home, downloadFileName)
-			sh := shell.NewShell("localhost:5001")
+			sh := shell.NewShell(strPinedNode)
 
 			//Begin to download file from ipfs
 			if _, err := os.Stat("/path/to/whatever"); !os.IsNotExist(err) {
@@ -72,7 +60,8 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(FlagTxHash, "", "tx hash")
+	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to download file,ip:port")
+	cmd.Flags().String(FlagRecordID, "", "record ID")
 	cmd.Flags().String(FlagFileName, "", "download file name")
 
 	return cmd

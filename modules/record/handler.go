@@ -21,9 +21,7 @@ func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitFile) sdk.
 
 	keeper.AddRecord(ctx, msg)
 
-	dataHashBytes := keeper.cdc.MustMarshalBinaryBare(msg.DataHash)
-
 	return sdk.Result{
-		Data: dataHashBytes,
+		Log: msg.RecordId,
 	}
 }
