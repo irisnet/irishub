@@ -42,7 +42,6 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/develop"
   digest = "1:b377b858bfe55eaae4ea65a2ab5d00c039b0bae31a87a99224bd957ddbce999b"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [

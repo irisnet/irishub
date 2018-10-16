@@ -18,6 +18,7 @@ import (
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
+	iservicecli "github.com/irisnet/irishub/client/iservice"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
@@ -233,4 +234,13 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return switchMsg
+}
+
+func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.ServiceOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var serviceDef iservicecli.ServiceOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return serviceDef
 }
