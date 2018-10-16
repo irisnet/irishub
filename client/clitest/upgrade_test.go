@@ -258,7 +258,7 @@ func startNodeBToReplay(t *testing.T) {
 	wg.Done()
 }
 
-func TestIrisStartTwoNodes(t *testing.T) {
+func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
 
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
@@ -320,7 +320,7 @@ func irisStartNodeB(t *testing.T) {
 	defer proc3.Stop(false)
 
 	tests.WaitForTMStart(port)
-	tests.WaitForNextNBlocksTM(2, port)
+	tests.WaitForHeightTM(10, port)
 
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
 
