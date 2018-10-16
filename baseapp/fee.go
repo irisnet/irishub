@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"errors"
 	"github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/iparams"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 var (
@@ -54,7 +54,7 @@ func NewFeeRefundHandler(am auth.AccountMapper, fck auth.FeeCollectionKeeper, fm
 		}
 		// Refund process will also cost gas, but this is compensation for previous fee deduction.
 		// It is not reasonable to consume users' gas. So the context gas is reset to transaction gas
-		ctx = ctx.WithGasMeter(sdk.NewGasMeter(stdTx.Fee.Gas))
+		ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
 		fee := auth.StdFee{
 			Gas: stdTx.Fee.Gas,
@@ -99,19 +99,17 @@ func NewFeeRefundHandler(am auth.AccountMapper, fck auth.FeeCollectionKeeper, fm
 
 // FeeManager do fee tokens preprocess according to fee token configuration
 type FeeManager struct {
-	globalGetter iparams.GlobalGetter
-	govGetter iparams.GovGetter
+	ps params.Setter
 }
 
-func NewFeeManager(globalGetter iparams.GlobalGetter, govGetter iparams.GovGetter) FeeManager {
+func NewFeeManager(ps params.Setter) FeeManager {
 	return FeeManager{
-		globalGetter: globalGetter,
-		govGetter: govGetter,
+		ps:ps,
 	}
 }
 
 func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
-	nativeFeeToken, err := fck.globalGetter.GetString(ctx, nativeFeeTokenKey)
+	nativeFeeToken, err := fck.ps.GetString(ctx, nativeFeeTokenKey)
 	if err != nil {
 		panic(err)
 	}
@@ -127,11 +125,11 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 	if gasLimit <= 0 {
 		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
 	}
-	nativeFeeToken, err := fck.globalGetter.GetString(ctx, nativeFeeTokenKey)
+	nativeFeeToken, err := fck.ps.GetString(ctx, nativeFeeTokenKey)
 	if err != nil {
 		panic(err)
 	}
-	nativeGasPriceThreshold, err := fck.govGetter.GetString(ctx, nativeGasPriceThresholdKey)
+	nativeGasPriceThreshold, err := fck.ps.GetString(ctx, nativeGasPriceThresholdKey)
 	if err != nil {
 		panic(err)
 	}
@@ -177,7 +175,7 @@ type FeeGenesisStateConfig struct {
 	GasPriceThreshold int64 `json:"gas_price_threshold"`
 }
 
-func InitGenesis(ctx sdk.Context, globalSetter iparams.GlobalSetter, govSetter iparams.GovSetter, data FeeGenesisStateConfig) {
-	globalSetter.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
-	govSetter.SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
+func InitGenesis(ctx sdk.Context, ps params.Setter, data FeeGenesisStateConfig) {
+	ps.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
+	ps.SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
 }

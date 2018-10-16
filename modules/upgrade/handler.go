@@ -28,8 +28,7 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 
 	proposalID := msgSwitch.ProposalID
 
-	upgradeparams.CurrentUpgradeProposalIdParameter.LoadValue(ctx)
-	CurrentProposalID := upgradeparams.CurrentUpgradeProposalIdParameter.Value
+	CurrentProposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 
 	if proposalID != CurrentProposalID {
 
@@ -59,10 +58,11 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 
-	upgradeparams.CurrentUpgradeProposalIdParameter.LoadValue(ctx)
-	upgradeparams.ProposalAcceptHeightParameter.LoadValue(ctx)
+	height := upgradeparams.GetProposalAcceptHeight(ctx)
+	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
+	switchPeriod := upgradeparams.GetSwitchPeriod(ctx)
 
-	if (upgradeparams.CurrentUpgradeProposalIdParameter.Value != -1) && (ctx.BlockHeight() == upgradeparams.ProposalAcceptHeightParameter.Value+defaultSwitchPeriod) {
+	if (proposalID != -1) && (ctx.BlockHeight() == height + switchPeriod) {
 		switchPasses := tally(ctx, keeper)
 		if switchPasses {
 			tags.AppendTag("action", []byte("switchPassed"))
@@ -71,8 +71,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 		} else {
 			tags.AppendTag("action", []byte("switchDropped"))
 
-			upgradeparams.CurrentUpgradeProposalIdParameter.Value = -1
-			upgradeparams.CurrentUpgradeProposalIdParameter.SaveValue(ctx)
+			upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
 		}
 	}
 

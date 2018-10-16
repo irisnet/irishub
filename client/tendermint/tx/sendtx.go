@@ -1,12 +1,14 @@
 package tx
 
 import (
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/tendermint/tendermint/crypto"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -27,8 +29,14 @@ type stdSignature struct {
 func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var sendTxBody sendTx
-		err := utils.ReadPostBody(w, r, cdc, &sendTxBody)
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		err = json.Unmarshal(body, &sendTxBody)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		cliCtx.Async = utils.AsyncOnlyArg(r)
@@ -38,6 +46,7 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Han
 			var pubkey crypto.PubKey
 			if err := cdc.UnmarshalBinaryBare(s.PubKey, &pubkey); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
 			}
 			sig[index].PubKey = pubkey
 			sig[index].Signature = s.Signature

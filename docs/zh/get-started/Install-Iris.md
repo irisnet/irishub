@@ -28,10 +28,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 #### 方法2：源码编译安装
 
@@ -88,7 +88,7 @@ Ubuntu LTS 16.04
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.4.1
+cd irishub && git checkout v0.4.2
 
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
@@ -99,20 +99,20 @@ make get_vendor_deps && make install
 
 ```
 $ iris version
-v0.4.1
+v0.4.2
     
 $ iriscli version
-v0.4.1
+v0.4.2
 ```
 ### 如何升级IRISHub
 
-通过执行一下命令可以完成IRISHub从v0.3.4到v0.4.1的升级
+通过执行一下命令可以完成IRISHub从v0.3.4到v0.4.2的升级
 
 ```
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 rm Gopkg.lock
-git checkout v0.4.1
+git checkout v0.4.2
 make get_vendor_deps
 make install
 ```

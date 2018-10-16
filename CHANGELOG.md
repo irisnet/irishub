@@ -1,15 +1,70 @@
 # Changelog
 
+## 0.5.0-rc1
+
+*October 11th, 2018*
+
+FEATURES:
+
+- Make all the gov and upgrade parameters can be configured in the genesis.json
+
+BUG FIXES
+
+- Add check for iavl proof and value before building multistore proof
+
+
+## 0.5.0-rc0
+
+*September 30th, 2018*
+
+BREAKING CHANGES:
+
+- [cointype] Introduce the cointype of iris:
+  - 1 iris = 10^18 iris-atto
+  - 1 iris-milli = 10^15 iris-atto
+  - 1 iris-micro = 10^12 iris-atto
+  - 1 iris-nano = 10^9 iris-atto
+  - 1 iris-pico = 10^6 iris-atto
+  - 1 iris-femto = 10^3 iris-atto
+
+FEATURES:
+
+- [tendermint] Upgrade to Tendermint v0.23.1-rc0
+- [cosmos-sdk] Upgrade to cosmos-sdk v0.24.2
+    - Move the previous irisnet changeset about cosmos-sdk into irishub
+- [irisdebug] Add irisdebug tool
+- [LCD/cli] Add the proof verification to the LCD and CLI
+- [iparam] Support the modification of governance parameters of complex data type through governance, and the submission of modified proposals through json config files
+- [software-upgrade] Software upgrade solutions of the irisnet
+
+
+## 0.4.2
+
+*September 22th, 2018*
+
+BUG FIXES
+
+- Fix consensus failure due to the double sign evidence be broadcasted before the genesis block
+
+## 0.4.1
+
+*September 12th, 2018*
+
+BUG FIXES
+
+- Missing to set validator intraTxCount in stake genesis init
+
+
 ## 0.4.0
 
-*August 16th, 2018*
+*September 6th, 2018*
 
 BREAKING CHANGES:
 
 - [cosmos-sdk] Upgrade to cosmos-sdk v0.23.0
     - Change the address prefix format:
       - cosmosaccaddr --> faa
-      - cosmosaccaddr --> fap
+      - cosmosaccpub --> fap
       - cosmosvaladdr --> fva
       - cosmosvalpub --> fvp
     - Adjust the Route & rootMultiStore Commit for software upgrade
@@ -19,12 +74,40 @@ BREAKING CHANGES:
 FEATURES:
 
 - [tendermint] Upgrade to Tendermint v0.22.6
-    - Store the pre-state to support the replay function in software upgrade
+    - Store the pre-state to support the replay function
 - [cosmos-sdk] Upgrade to cosmos-sdk v0.23.0
     - Add the paramProposal and softwareUpgradeProposal in gov module
     - Improve fee token mechanism to more reasonably deduct transaction fee and achieve more ability to defent DDOS attack.
     - Introduce the global parameter module
-- [irishub] Add the upgrade module and example apps for the async software upgrade
+
+BUG FIXES
+
+- Default account balance in genesis
+- Fix iris version issue
+- Fix the unit conflict issue in slashing
+- Check the voting power when create validator
+- Fix evidence amimo register issue
+
+
+## 0.4.0-rc2
+
+*Sep 5th, 2018*
+
+BUG FIXES
+
+- Fix evidence amimo register issue
+
+
+## 0.4.0-rc1
+
+*Aug 27th, 2018*
+
+BUG FIXES
+
+- Default account balance in genesis
+- iris version issue
+- Fix the unit conflict issue in slashing
+- Check the voting power when create validator
 
 
 ## 0.3.0

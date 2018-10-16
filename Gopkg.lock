@@ -43,14 +43,13 @@
 
 [[projects]]
   branch = "irisnet/develop"
+  digest = "1:b377b858bfe55eaae4ea65a2ab5d00c039b0bae31a87a99224bd957ddbce999b"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
     "client",
     "client/context",
     "client/keys",
-    "client/rpc",
-    "client/tx",
     "client/utils",
     "crypto",
     "crypto/keys",
@@ -60,6 +59,7 @@
     "server",
     "server/config",
     "store",
+    "tests",
     "types",
     "version",
     "wire",
@@ -67,25 +67,22 @@
     "x/auth/client/cli",
     "x/auth/client/context",
     "x/bank",
-    "x/bank/client",
-    "x/bank/client/cli",
     "x/gov",
-    "x/gov/client/cli",
     "x/gov/tags",
     "x/ibc",
     "x/mock",
     "x/mock/simulation",
     "x/params",
     "x/slashing",
-    "x/slashing/client/cli",
     "x/stake",
-    "x/stake/client/cli",
     "x/stake/keeper",
     "x/stake/tags",
     "x/stake/types"
   ]
-  revision = "8c058b8e5b028dc7373f5427dd36e00686d8f6a5"
+  pruneopts = "UT"
+  revision = "c6189e6d8c13d6b78a009f83e0ceac4a1aab3d73"
   source = "https://github.com/irisnet/cosmos-sdk.git"
+  version = "v0.24.2-iris1"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -420,14 +417,16 @@
   version = "v0.12.0-rc0"
 
 [[projects]]
-  branch = "irisnet/feature_upgrade"
+  digest = "1:f6e293333e941a78f8029927165d1926c5efdedd8612a3108977b30b8a871b87"
   name = "github.com/tendermint/iavl"
   packages = ["."]
-  revision = "849c21e8f93ce782cb9f9f64fabcccb5580b4f90"
+  pruneopts = "UT"
+  revision = "f93c0a13ec78edd04c6faef6b3158f72e66f699f"
   source = "https://github.com/irisnet/iavl.git"
+  version = "v0.9.2-iris1"
 
 [[projects]]
-  branch = "irisnet/develop"
+  digest = "1:e787411e638d991be9b98018f4f31854fb33e28d8e3e4a5b1e6fbeed39f51bb4"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -489,8 +488,10 @@
     "types",
     "version"
   ]
-  revision = "c7737b350a9453bab6571d8d5f489a590609d6f2"
+  pruneopts = "UT"
+  revision = "46b52ca74937f3a680a4861f7b60b262d3fda777"
   source = "https://github.com/irisnet/tendermint.git"
+  version = "0.23.1-rc0-iris1"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
@@ -610,6 +611,73 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "58a3f40f048a31b580b316e4357d005701bd730985eff79515f9167a586ba342"
+  input-imports = [
+    "github.com/bgentry/speakeasy",
+    "github.com/cosmos/cosmos-sdk/baseapp",
+    "github.com/cosmos/cosmos-sdk/client",
+    "github.com/cosmos/cosmos-sdk/client/context",
+    "github.com/cosmos/cosmos-sdk/client/utils",
+    "github.com/cosmos/cosmos-sdk/crypto",
+    "github.com/cosmos/cosmos-sdk/crypto/keys",
+    "github.com/cosmos/cosmos-sdk/server",
+    "github.com/cosmos/cosmos-sdk/server/config",
+    "github.com/cosmos/cosmos-sdk/store",
+    "github.com/cosmos/cosmos-sdk/tests",
+    "github.com/cosmos/cosmos-sdk/types",
+    "github.com/cosmos/cosmos-sdk/wire",
+    "github.com/cosmos/cosmos-sdk/x/auth",
+    "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
+    "github.com/cosmos/cosmos-sdk/x/auth/client/context",
+    "github.com/cosmos/cosmos-sdk/x/bank",
+    "github.com/cosmos/cosmos-sdk/x/gov",
+    "github.com/cosmos/cosmos-sdk/x/ibc",
+    "github.com/cosmos/cosmos-sdk/x/mock",
+    "github.com/cosmos/cosmos-sdk/x/mock/simulation",
+    "github.com/cosmos/cosmos-sdk/x/params",
+    "github.com/cosmos/cosmos-sdk/x/slashing",
+    "github.com/cosmos/cosmos-sdk/x/stake",
+    "github.com/cosmos/cosmos-sdk/x/stake/tags",
+    "github.com/cosmos/cosmos-sdk/x/stake/types",
+    "github.com/go-kit/kit/metrics",
+    "github.com/go-kit/kit/metrics/prometheus",
+    "github.com/gorilla/mux",
+    "github.com/mattn/go-isatty",
+    "github.com/pelletier/go-toml",
+    "github.com/pkg/errors",
+    "github.com/prometheus/client_golang/prometheus",
+    "github.com/prometheus/client_golang/prometheus/promhttp",
+    "github.com/rakyll/statik/fs",
+    "github.com/shirou/gopsutil/cpu",
+    "github.com/shirou/gopsutil/disk",
+    "github.com/shirou/gopsutil/mem",
+    "github.com/shirou/gopsutil/process",
+    "github.com/spf13/cobra",
+    "github.com/spf13/pflag",
+    "github.com/spf13/viper",
+    "github.com/stretchr/testify/require",
+    "github.com/tendermint/go-amino",
+    "github.com/tendermint/tendermint/abci/server",
+    "github.com/tendermint/tendermint/abci/types",
+    "github.com/tendermint/tendermint/blockchain",
+    "github.com/tendermint/tendermint/consensus",
+    "github.com/tendermint/tendermint/crypto",
+    "github.com/tendermint/tendermint/crypto/ed25519",
+    "github.com/tendermint/tendermint/crypto/secp256k1",
+    "github.com/tendermint/tendermint/crypto/tmhash",
+    "github.com/tendermint/tendermint/libs/cli",
+    "github.com/tendermint/tendermint/libs/common",
+    "github.com/tendermint/tendermint/libs/db",
+    "github.com/tendermint/tendermint/libs/log",
+    "github.com/tendermint/tendermint/lite",
+    "github.com/tendermint/tendermint/lite/errors",
+    "github.com/tendermint/tendermint/lite/proxy",
+    "github.com/tendermint/tendermint/mempool",
+    "github.com/tendermint/tendermint/node",
+    "github.com/tendermint/tendermint/rpc/client",
+    "github.com/tendermint/tendermint/rpc/core/types",
+    "github.com/tendermint/tendermint/rpc/lib/server",
+    "github.com/tendermint/tendermint/state",
+    "github.com/tendermint/tendermint/types",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

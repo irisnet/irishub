@@ -8,21 +8,28 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"time"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
-	"fmt"
+	"time"
 )
+
+// DefaultKeyPass contains the default key password for genesis transactions
+const DefaultKeyPass = "1234567890"
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts  []GenesisAccount   `json:"accounts"`
-	StakeData stake.GenesisState `json:"stake"`
+	Accounts    []GenesisAccount     `json:"accounts"`
+	StakeData   stake.GenesisState   `json:"stake"`
+	GovData     gov.GenesisState     `json:"gov"`
+	UpgradeData upgrade.GenesisState `json:"upgrade"`
 }
 
 // GenesisAccount doesn't need pubkey or sequence
@@ -54,13 +61,13 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 }
 
 var (
-	flagName       = "name"
-	flagClientHome = "home-client"
-	flagOWK        = "owk"
-	denom          = "iris"
-	feeAmt   = int64(100)
-	IrisCt = types.NewDefaultCoinType(denom)
-	freeFermionVal ,_ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s",feeAmt,denom))
+	flagName          = "name"
+	flagClientHome    = "home-client"
+	flagOWK           = "owk"
+	Denom             = "iris"
+	feeAmt            = int64(100)
+	IrisCt            = types.NewDefaultCoinType(Denom)
+	freeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
 )
 
 const defaultUnbondingTime time.Duration = 60 * 10 * time.Second
@@ -100,7 +107,7 @@ func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 
 	var addr sdk.AccAddress
 	var secret string
-	addr, secret, err = server.GenerateSaveCoinKey(genTxConfig.CliRoot, genTxConfig.Name, "1234567890", genTxConfig.Overwrite)
+	addr, secret, err = server.GenerateSaveCoinKey(genTxConfig.CliRoot, genTxConfig.Name, DefaultKeyPass, genTxConfig.Overwrite)
 	if err != nil {
 		return
 	}
@@ -176,7 +183,7 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 			// add some new shares to the validator
 			var issuedDelShares sdk.Rat
-			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, feeAmt)
+			validator, stakeData.Pool, issuedDelShares = validator.AddTokensFromDel(stakeData.Pool, freeFermionVal.Amount)
 			//validator.TokenPrecision = stakeData.Params.DenomPrecision
 			stakeData.Validators = append(stakeData.Validators, validator)
 
@@ -194,8 +201,10 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 	// create the final app state
 	genesisState = GenesisState{
-		Accounts:  genaccs,
-		StakeData: stakeData,
+		Accounts:    genaccs,
+		StakeData:   stakeData,
+		GovData:     gov.DefaultGenesisState(),
+		UpgradeData: upgrade.DefaultGenesisState(),
 	}
 	return
 }
@@ -229,7 +238,7 @@ func createGenesisState() stake.GenesisState {
 			GoalBonded:          sdk.NewRat(67, 100),
 			UnbondingTime:       defaultUnbondingTime,
 			MaxValidators:       100,
-			BondDenom:           denom,
+			BondDenom:           Denom + "-" + types.Atto,
 		},
 	}
 }
