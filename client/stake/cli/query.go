@@ -145,6 +145,8 @@ func GetCmdQueryDelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 			res, err := cliCtx.QueryStore(key, storeName)
 			if err != nil {
 				return err
+			} else if len(res) == 0 {
+				return fmt.Errorf("no delegation found with delegator %s on validator %s", delAddr, valAddr)
 			}
 
 			// parse out the delegation
@@ -245,6 +247,8 @@ func GetCmdQueryUnbondingDelegation(storeName string, cdc *wire.Codec) *cobra.Co
 			res, err := cliCtx.QueryStore(key, storeName)
 			if err != nil {
 				return err
+			} else if len(res) == 0 {
+				return fmt.Errorf("no unbonding-delegation found with delegator %s from validator %s", delAddr, valAddr)
 			}
 
 			// parse out the unbonding delegation
@@ -351,6 +355,9 @@ func GetCmdQueryRedelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 			res, err := cliCtx.QueryStore(key, storeName)
 			if err != nil {
 				return err
+			} else if len(res) == 0 {
+				return fmt.Errorf("no redelegation found with delegator %s from source validator %s to destination validator %s",
+					delAddr, valSrcAddr, valDstAddr)
 			}
 
 			// parse out the unbonding delegation

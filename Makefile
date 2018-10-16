@@ -1,3 +1,4 @@
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest')
 all: get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
@@ -64,24 +65,34 @@ build_cur: update_irislcd_swagger_docs
 	go build -o build/iriscli ./cmd/iriscli && \
 	go build -o build/irislcd ./cmd/irislcd
 
-build_example: update_irislcd_swagger_docs
+build_examples: update_irislcd_swagger_docs
 	go build  -o build/iris1 ./examples/irishub1/cmd/iris1
 	go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	go build  -o build/iris2 ./examples/irishub2/cmd/iris2
-	go build  -o build/iriscli2 ./examples/irishub2/cmd/iriscli2
+	go build  -o build/iris-bugfix-2 ./examples/irishub-bugfix-2/cmd/iris-bugfix-2
+	go build  -o build/iriscli-bugfix-2 ./examples/irishub-bugfix-2/cmd/iriscli-bugfix-2
+
 
 install_examples: update_irislcd_swagger_docs
 	go install ./examples/irishub1/cmd/iris1
 	go install ./examples/irishub1/cmd/iriscli1
-	go install ./examples/irishub2/cmd/iris2
-	go install ./examples/irishub2/cmd/iriscli2
+	go install ./examples/irishub-bugfix-2/cmd/iris-bugfix-2
+	go install ./examples/irishub-bugfix-2/cmd/iriscli-bugfix-2
+
 
 build_example_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris1 ./examples/irishub1/cmd/iris1
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2 ./examples/irishub2/cmd/iris2
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli2 ./examples/irishub2/cmd/iriscli2
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris-bugfix-2
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli-bugfix-2
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris3-bugfix ./examples/irishub-bugfix-3/cmd/iris-bugfix-3
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli3-bugfix ./examples/irishub-bugfix-3/cmd/iriscli-bugfix-3
+
+########################################
+### Testing
+
+test: test_unit test_cli
+
+test_cli:
+	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+
+test_unit:
+	@go test $(PACKAGES_NOSIMULATION)
+

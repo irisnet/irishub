@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -8,11 +9,9 @@ import (
 	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
-    "path"
-    "encoding/json"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -269,12 +268,18 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			if moduleStr != "" {
 				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
 				if err == nil {
+
+					if len(res) == 0 {
+						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
+					}
+
 					var keys []string
 					for _, kv := range res {
 						keys = append(keys, string(kv.Key))
 					}
-					output, err := wire.MarshalJSONIndent(cdc, keys)
-					//cmn.WriteFile(,output,644)
+
+					output, err := json.MarshalIndent(keys, "", " ")
+
 					if err != nil {
 						return err
 					}
@@ -286,24 +291,31 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			if keyStr != "" {
+				iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+					&govparams.VotingProcedureParameter,
+					&govparams.TallyingProcedureParameter)
+
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
 				if err == nil {
-					switch keyStr {
-					case "Gov/gov/depositProcedure":
-						var p govparams.DepositProcedure
-						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(p, keyStr)
-					case "Gov/gov/votingProcedure":
-						var p govparams.VotingProcedure
-						cdc.MustUnmarshalBinary(res, &p)
-						ToParamStr(p, keyStr)
+					if p, ok := iparam.ParamMapping[keyStr]; ok {
 
+						if len(res) == 0 {
+							return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
+						}
+
+						p.GetValueFromRawData(cdc, res)
+						PrintParamStr(p, keyStr)
+						return nil
+
+					} else {
+						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 					}
+				} else {
+					return err
 				}
 
 			}
-
-			return nil
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
 		},
 	}
 
@@ -312,24 +324,13 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func ToParamStr(p interface{}, keyStr string) {
+func PrintParamStr(p iparam.GovParameter, keyStr string) {
 	var param gov.Param
 	param.Key = keyStr
-	param.Value = ToJson(p)
+	param.Value = p.ToJson("")
 	param.Op = ""
 	jsonBytes, _ := json.Marshal(param)
-	//jsonBytes, _ := wire.MarshalJSONIndent(cdc, param)
 	fmt.Println(string(jsonBytes))
-}
-
-func ToJson(p interface{}) string {
-	jsonBytes, _ := json.Marshal(p)
-	return string(jsonBytes)
-}
-
-
-type ParameterDoc struct {
-	Govparams govparams.ParamSet `json:"gov"`
 }
 
 func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
@@ -340,40 +341,15 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
-
-			if err == nil {
-				var paramSet ParameterDoc
-				for _, kv := range res {
-					switch string(kv.Key) {
-					case "Gov/gov/depositProcedure":
-						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.DepositProcedure)
-					case "Gov/gov/votingProcedure":
-						cdc.MustUnmarshalBinary(kv.Value, &paramSet.Govparams.VotingProcedure)
-					}
-				}
-				output, err := cdc.MarshalJSONIndent(paramSet, "", "  ")
-				//cmn.WriteFile(,output,644)
-				if err != nil {
-					return err
-				}
-
+			if err == nil && len(res)!=0 {
+				var pd gov.ParameterConfigFile
 				pathStr := viper.GetString(flagPath)
-				pathStr = path.Join(pathStr,"config/params.json")
-				err = cmn.WriteFile(pathStr, output, 0644)
-				if err != nil {
-
-					fmt.Println(err)
-					return err
-				}
-
-				fmt.Println("Save the parameter config file in ", pathStr)
-				return nil
-
+				err := pd.WriteFile(cdc, res, pathStr)
+				return err
+			} else {
+				fmt.Println("No GovParams can be found")
+				return err
 			}
-
-			fmt.Println("No GovParams can be found")
-			return err
-
 		},
 	}
 	cmd.Flags().String(flagPath, "", "the path of param.json")

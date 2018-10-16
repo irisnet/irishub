@@ -11,11 +11,9 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"path"
-	"github.com/pkg/errors"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -55,7 +53,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 				pathStr := viper.GetString(flagPath)
 				keyStr := viper.GetString(flagKey)
 				opStr := viper.GetString(flagOp)
-				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr,cdc)
+				param, err = GetParamFromString(paramStr, pathStr, keyStr, opStr, cdc)
 				if err != nil {
 					return err
 				}
@@ -85,55 +83,24 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string,cdc *wire.Codec) (gov.Param, error) {
+func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *wire.Codec) (gov.Param, error) {
 	var param gov.Param
 
 	if paramStr != "" {
-		if err := json.Unmarshal([]byte(paramStr), &param); err != nil {
-			fmt.Println(err.Error())
-			return param, nil
-		} else {
-			return param, err
-		}
-	} else if pathStr != ""{
-		pathStr = path.Join(pathStr,"config/params.json")
+		err := json.Unmarshal([]byte(paramStr), &param)
+		return param, err
 
-		jsonBytes,err := cmn.ReadFile(pathStr)
-
-		fmt.Println("Open ",pathStr)
-
-		if err != nil {
-			return param,err
-		}
-
-		paramDoc := ParameterDoc{}
-		err = cdc.UnmarshalJSON(jsonBytes, &paramDoc)
+	} else if pathStr != "" {
+		paramDoc := gov.ParameterConfigFile{}
+		err := paramDoc.ReadFile(cdc, pathStr)
 		if err != nil {
 			return param, err
 		}
-
-		var valueStr string
-		switch keyStr{
-		case "Gov/gov/depositProcedure":
-			jsonBytes,_ = json.Marshal(paramDoc.Govparams.DepositProcedure)
-			valueStr = string(jsonBytes)
-		default:
-
-			return param,errors.New("The key isn't existed")
-		}
-
-		param.Value = valueStr
-		param.Key = keyStr
-		param.Op = opStr
-
-		jsonBytes,_ = json.MarshalIndent(param,""," ")
-
-		fmt.Println("Param:\n",string(jsonBytes))
-		return param, nil
-
+		param, err := paramDoc.GetParamFromKey(keyStr, opStr)
+		return param, err
 	} else {
 
-		return param,errors.New("Path and param are both empty")
+		return param, errors.New("Path and param are both empty")
 	}
 }
 
