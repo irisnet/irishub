@@ -78,6 +78,9 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 
 	// method test
 	require.Equal(t, "SayHello", iserviceDef.Methods[0].Name)
+	require.Equal(t, "sayHello", iserviceDef.Methods[0].Description)
+	require.Equal(t, "NoCached", iserviceDef.Methods[0].OutputCached.String())
+	require.Equal(t, "NoPrivacy", iserviceDef.Methods[0].OutputPrivacy.String())
 }
 
 const idlContent = `
