@@ -56,7 +56,7 @@ func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
 	return coins[0]
 }
 
-func getAmuntFromCoinStr(coinStr string) float64 {
+func getAmountFromCoinStr(coinStr string) float64 {
 	index := strings.Index(coinStr, "iris")
 	if index <= 0 {
 		return -1
