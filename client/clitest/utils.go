@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"bufio"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -17,16 +18,22 @@ import (
 	govcli "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
+	iservicecli "github.com/irisnet/irishub/client/iservice"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
+	"io"
 )
 
 var (
 	irisHome    = ""
 	iriscliHome = ""
+	chainID     = ""
+	nodeID      = ""
 )
 
 //___________________________________________________________________________________
@@ -49,7 +56,7 @@ func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
 	return coins[0]
 }
 
-func getAmuntFromCoinStr(t *testing.T, coinStr string) float64 {
+func getAmountFromCoinStr(coinStr string) float64 {
 	index := strings.Index(coinStr, "iris")
 	if index <= 0 {
 		return -1
@@ -64,7 +71,34 @@ func getAmuntFromCoinStr(t *testing.T, coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisFile(t *testing.T, irisHome string) error {
+func setupGenesisAndConfig(srcHome, dstHome string) error {
+	genesisSrcFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", srcHome, string(os.PathSeparator), string(os.PathSeparator))
+	configSrcFilePath := fmt.Sprintf("%s%sconfig%sconfig.toml", srcHome, string(os.PathSeparator), string(os.PathSeparator))
+
+	genesisDstFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", dstHome, string(os.PathSeparator), string(os.PathSeparator))
+	configDstFilePath := fmt.Sprintf("%s%sconfig%sconfig.toml", dstHome, string(os.PathSeparator), string(os.PathSeparator))
+
+	err := os.Remove(genesisDstFilePath)
+	if err != nil {
+		return err
+	}
+	err = os.Remove(configDstFilePath)
+	if err != nil {
+		return err
+	}
+
+	err = copyFile(genesisDstFilePath, genesisSrcFilePath)
+	if err != nil {
+		return err
+	}
+	err = modifyConfigFile(configSrcFilePath, configDstFilePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func modifyGenesisFile(irisHome string) error {
 	genesisFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", irisHome, string(os.PathSeparator), string(os.PathSeparator))
 
 	genesisDoc, err := types.GenesisDocFromFile(genesisFilePath)
@@ -76,20 +110,15 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 
 	cdc := wire.NewCodec()
 	wire.RegisterCrypto(cdc)
-	cliCtx := context.NewCLIContext().
-		WithCodec(cdc)
 
 	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
 	if err != nil {
 		return err
 	}
 
-	coin, err := cliCtx.ParseCoin("1000000000000iris")
-	if err != nil {
-		return err
-	}
+	genesisState.GovData = gov.DefaultGenesisStateForTest()
+	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
-	genesisState.Accounts[0].Coins[0] = coin
 	bz, err := cdc.MarshalJSON(genesisState)
 	if err != nil {
 		return err
@@ -99,11 +128,68 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 	return genesisDoc.SaveAs(genesisFilePath)
 }
 
+func modifyConfigFile(configSrcPath, configDstPath string) error {
+	fsrc, err := os.Open(configSrcPath)
+	if err != nil {
+		return err
+	}
+	defer fsrc.Close()
+
+	fdst, err := os.Create(configDstPath)
+	if err != nil {
+		return err
+	}
+	defer fdst.Close()
+
+	w := bufio.NewWriter(fdst)
+	br := bufio.NewReader(fsrc)
+
+	for {
+		line, _, err := br.ReadLine()
+		if err == io.EOF {
+			break
+		}
+
+		newline := strings.Replace(string(line), "266", "366", -1)
+
+		if strings.Index(newline, "persistent_peers") != -1 {
+			newline = fmt.Sprintf("persistent_peers = \"%s@127.0.0.1:26656\"", nodeID)
+		}
+		fmt.Fprintln(w, newline)
+	}
+
+	return w.Flush()
+}
+
 func getTestingHomeDirs() (string, string) {
 	tmpDir := os.TempDir()
 	irisHome := fmt.Sprintf("%s%s.test_iris", tmpDir, string(os.PathSeparator))
 	iriscliHome := fmt.Sprintf("%s%s.test_iriscli", tmpDir, string(os.PathSeparator))
 	return irisHome, iriscliHome
+}
+
+func getTestingHomeDirsB() (string, string) {
+	tmpDir := os.TempDir()
+	irisHome := fmt.Sprintf("%s%s.test_iris_b", tmpDir, string(os.PathSeparator))
+	iriscliHome := fmt.Sprintf("%s%s.test_iriscli_b", tmpDir, string(os.PathSeparator))
+	return irisHome, iriscliHome
+}
+
+func copyFile(dstFile, srcFile string) error {
+	src, err := os.Open(srcFile)
+	if err != nil {
+		return err
+	}
+
+	defer src.Close()
+	dst, err := os.OpenFile(dstFile, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+
+	defer dst.Close()
+	_, err = io.Copy(dst, src)
+	return err
 }
 
 //___________________________________________________________________________________
@@ -134,7 +220,7 @@ func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 	//	fmt.Println("EXEC WRITE", string(bz))
 }
 
-func executeInit(t *testing.T, cmdStr string) (chainID string) {
+func executeInit(t *testing.T, cmdStr string) (chainID, nodeID string) {
 	out := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
@@ -142,6 +228,9 @@ func executeInit(t *testing.T, cmdStr string) (chainID string) {
 	require.NoError(t, err)
 
 	err = json.Unmarshal(initRes["chain_id"], &chainID)
+	require.NoError(t, err)
+
+	err = json.Unmarshal(initRes["node_id"], &nodeID)
 	require.NoError(t, err)
 
 	return
@@ -207,4 +296,42 @@ func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
+}
+
+func executeGetParam(t *testing.T, cmdStr string) gov.Param {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var param gov.Param
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &param)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return param
+}
+
+func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var info upgcli.UpgradeInfoOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &info)
+
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return info
+}
+
+func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var switchMsg upgrade.MsgSwitch
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &switchMsg)
+
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return switchMsg
+}
+
+func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.ServiceOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var serviceDef iservicecli.ServiceOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return serviceDef
 }

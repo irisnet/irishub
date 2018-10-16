@@ -15,8 +15,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/types"
 	"time"
 )
 
@@ -25,9 +26,10 @@ const DefaultKeyPass = "1234567890"
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts  []GenesisAccount   `json:"accounts"`
-	StakeData stake.GenesisState `json:"stake"`
-	GovData   gov.GenesisState   `json:"gov"`
+	Accounts    []GenesisAccount     `json:"accounts"`
+	StakeData   stake.GenesisState   `json:"stake"`
+	GovData     gov.GenesisState     `json:"gov"`
+	UpgradeData upgrade.GenesisState `json:"upgrade"`
 }
 
 // GenesisAccount doesn't need pubkey or sequence
@@ -199,9 +201,10 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 
 	// create the final app state
 	genesisState = GenesisState{
-		Accounts:  genaccs,
-		StakeData: stakeData,
-		GovData:   gov.DefaultGenesisState(),
+		Accounts:    genaccs,
+		StakeData:   stakeData,
+		GovData:     gov.DefaultGenesisState(),
+		UpgradeData: upgrade.DefaultGenesisState(),
 	}
 	return
 }

@@ -26,8 +26,8 @@ func main() {
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
-		Use:               "iris-bugfix-2",
-		Short:             "iris-bugfix-2 Daemon (server)",
+		Use:               "iris2-bugfix",
+		Short:             "iris2-bugfix Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 

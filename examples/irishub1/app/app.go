@@ -12,14 +12,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	ibc1 "github.com/irisnet/irishub/examples/irishub1/ibc"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/iservice"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -31,9 +35,6 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"strings"
-	"github.com/irisnet/irishub/modules/iparam"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 const (
@@ -62,6 +63,7 @@ type IrisApp struct {
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
+	keyIservice      *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountMapper
@@ -74,6 +76,7 @@ type IrisApp struct {
 	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
+	iserviceKeeper      iservice.Keeper
 
 	// fee manager
 	feeManager bam.FeeManager
@@ -98,6 +101,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 		keyParams:        sdk.NewKVStoreKey("params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
+		keyIservice:      sdk.NewKVStoreKey("iservice"),
 	}
 
 	var lastHeight int64
@@ -122,6 +126,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
+	app.iserviceKeeper = iservice.NewKeeper(app.cdc, app.keyIservice, app.RegisterCodespace(iservice.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -132,7 +137,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
+		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
+		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper))
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 	// initialize BaseApp
@@ -142,7 +148,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyIservice)
 	app.SetRunMsg(app.runMsgs)
 
 	var err error
@@ -156,16 +162,19 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
+	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
+
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
-							&govparams.DepositProcedureParameter,
-		                    &govparams.VotingProcedureParameter,
-		                    &govparams.TallyingProcedureParameter,
-							&upgradeparams.CurrentUpgradeProposalIdParameter,
-							&upgradeparams.ProposalAcceptHeightParameter)
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&upgradeparams.CurrentUpgradeProposalIdParameter,
+		&upgradeparams.ProposalAcceptHeightParameter,
+		&upgradeparams.SwitchPeriodParameter)
 
 	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		                              &govparams.VotingProcedureParameter,
-		                              &govparams.TallyingProcedureParameter,)
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -182,6 +191,7 @@ func MakeCodec() *wire.Codec {
 	gov.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
 	upgrade.RegisterWire(cdc)
+	iservice.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
@@ -231,27 +241,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	if err != nil {
 		panic(err)
 	}
-
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, Denom))
-	if err != nil {
-		panic(err)
-	}
-
-	gov.InitGenesis(ctx, app.govKeeper, gov.GenesisState{
-		StartingProposalID: 1,
-		DepositProcedure: govparams.DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 20000,
-		},
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 20000,
-		},
-		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
-		},
-	})
+	gov.InitGenesis(ctx, app.govKeeper, genesisState.GovData)
 
 	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
@@ -263,7 +253,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router())
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

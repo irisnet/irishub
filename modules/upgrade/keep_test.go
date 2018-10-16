@@ -49,7 +49,10 @@ func TestUpdateKeeper(t *testing.T) {
 		t.FailNow()
 	}
 
-	version = keeper.GetVersionByVersionId(ctx, 1)
+	kvStore := ctx.KVStore(keeper.storeKey)
+	keeper.RefreshVersionList(kvStore)
+
+	version = keeper.GetVersionByVersionId(1)
 	if version == nil || version.Id != 1 {
 		t.FailNow()
 	}
@@ -137,8 +140,9 @@ func TestSetKVStoreKeylist(t *testing.T) {
 
 	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
 	upgradeparams.CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
+	upgradeparams.SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
 
-	InitGenesis(ctx, keeper, router)
+	InitGenesis(ctx, keeper, router, DefaultGenesisStateForTest())
 	keeper.SetKVStoreKeylist(ctx)
 }
 

@@ -18,10 +18,10 @@ func TestIrisCLIBankSend(t *testing.T) {
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
-	chainID := executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
 
-	err := modifyGenesisFile(t, irisHome)
+	err := modifyGenesisFile(irisHome)
 	require.NoError(t, err)
 
 	// get a free port, also setup some common flags
@@ -41,7 +41,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "1000000000000iris", fooCoin)
+	require.Equal(t, "100iris", fooCoin)
 
 	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -52,10 +52,10 @@ func TestIrisCLIBankSend(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num := getAmuntFromCoinStr(t, fooCoin)
+	num := getAmountFromCoinStr(fooCoin)
 
-	if !(num > 999999999989 && num < 999999999990) {
-		t.Error("Test Failed: (999999999989, 999999999990) expected, recieved: {}", num)
+	if !(num > 89 && num < 90) {
+		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
 	}
 
 	// test autosequencing
@@ -68,10 +68,10 @@ func TestIrisCLIBankSend(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num = getAmuntFromCoinStr(t, fooCoin)
+	num = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 999999999979 && num < 999999999980) {
-		t.Error("Test Failed: (999999999979, 999999999980) expected, recieved: {}", num)
+	if !(num > 79 && num < 80) {
+		t.Error("Test Failed: (79, 80) expected, recieved: {}", num)
 	}
 
 	// test memo
@@ -84,9 +84,9 @@ func TestIrisCLIBankSend(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num = getAmuntFromCoinStr(t, fooCoin)
+	num = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 999999999969 && num < 999999999970) {
-		t.Error("Test Failed: (999999999969, 999999999970) expected, recieved: {}", num)
+	if !(num > 69 && num < 70) {
+		t.Error("Test Failed: (69, 70) expected, recieved: {}", num)
 	}
 }

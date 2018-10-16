@@ -5,19 +5,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"math"
-)
-
-const (
-	defaultSwitchPeriod     int64 = 57600	// 2 days
-	//defaultSwitchPeriod int64 = 40 // for test (4 minutes)
+	"fmt"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *wire.Codec
 	// The ValidatorSet to get information about validators
-	sk     stake.Keeper
+	sk stake.Keeper
 }
+
+var VersionListCached VersionList
 
 func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
 	keeper := Keeper{
@@ -78,6 +76,7 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 	}
 
 	kvStore.Set(GetVersionIDKey(version.Id), versionBytes)
+	VersionListCached = append(VersionListCached, version)
 
 	versionIDBytes, err := k.cdc.MarshalBinary(version.Id)
 	if err != nil {
@@ -141,22 +140,26 @@ func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId int64) *Versi
 	return nil
 }
 
-func (k Keeper) GetVersionByVersionId(ctx sdk.Context, versionId int64) *Version {
-	kvStore := ctx.KVStore(k.storeKey)
-	curVersionBytes := kvStore.Get(GetVersionIDKey(versionId))
-	if curVersionBytes != nil {
-		var version Version
-		err := k.cdc.UnmarshalBinary(curVersionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		return &version
+func (k Keeper) GetVersionByVersionId(versionId int64) *Version {
+	len := len(VersionListCached)
+	if versionId < 0 || versionId >= int64(len) {
+		panic(fmt.Errorf("version id %d doesn't exist", versionId))
 	}
-	return nil
+
+	return &(VersionListCached[versionId])
+}
+
+func (k Keeper) RefreshVersionList(kvStore sdk.KVStore) {
+	VersionListCached = k.GetVersionListByStore(kvStore)
 }
 
 func (k Keeper) GetVersionList(ctx sdk.Context) VersionList {
 	kvStore := ctx.KVStore(k.storeKey)
+	return k.GetVersionListByStore(kvStore)
+}
+
+func (k Keeper) GetVersionListByStore(kvStore sdk.KVStore) VersionList {
+
 	iterator := kvStore.Iterator(GetVersionIDKey(0), GetVersionIDKey(math.MaxInt64))
 	defer iterator.Close()
 
