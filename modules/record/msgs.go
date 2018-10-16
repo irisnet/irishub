@@ -19,7 +19,8 @@ type MsgSubmitFile struct {
 	OwnerAddress sdk.AccAddress //  Address of the owner
 	DataHash     string         // ipfs hash of file
 	DataSize     int64          // File Size in bytes
-	//PinedNode    string         //pined node of ipfs
+	RecordId     string         // Record key of kvstore
+	PinedNode    string         //pined node of ipfs
 }
 
 func NewMsgSubmitFile(filename string,
@@ -28,7 +29,8 @@ func NewMsgSubmitFile(filename string,
 	submitTime int64,
 	ownerAddress sdk.AccAddress,
 	dataHash string,
-	dataSize int64) MsgSubmitFile {
+	dataSize int64,
+	pinedNode string) MsgSubmitFile {
 	return MsgSubmitFile{
 		Filename:     filename,
 		Filepath:     filepath,
@@ -37,6 +39,8 @@ func NewMsgSubmitFile(filename string,
 		OwnerAddress: ownerAddress,
 		DataHash:     dataHash,
 		DataSize:     dataSize,
+		RecordId:     string(KeyRecord(ownerAddress, dataHash)),
+		PinedNode:    pinedNode,
 	}
 }
 

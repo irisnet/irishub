@@ -19,22 +19,9 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitFile) sdk.Result {
 
-	err := msg.ValidateBasic()
-	if err != nil {
-		return err.Result()
-	}
-
-	//todo
-	/*proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
-
-	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.Amount)
-	if err != nil {
-		return err.Result()
-	}
-
-	proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(proposal.GetProposalID())*/
+	keeper.AddRecord(ctx, msg)
 
 	return sdk.Result{
-		//Data: proposalIDBytes,
+		Log: msg.RecordId,
 	}
 }

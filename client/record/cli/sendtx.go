@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
@@ -22,12 +23,26 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			filename := viper.GetString(flagFilename)
 			description := viper.GetString(flagDescription)
-			//todo upload to ipfs
-			dataHash := "todo - the upload file's ipfs hash"
+
 			strFilepath := viper.GetString(flagPath)
+			strPinedNode := viper.GetString(flagPinedNode)
 			file, err := os.Stat(strFilepath)
-			if os.IsNotExist(err) {
+
+			if err != nil {
 				// file does not exist
+				return err
+			}
+
+			//upload to ipfs
+			sh := ipfs.NewShell(strPinedNode)
+			f, err := os.Open(strFilepath)
+			if err != nil {
+				return err
+			}
+
+			dataHash, err := sh.Add(f)
+
+			if err != nil {
 				return err
 			}
 
@@ -53,7 +68,9 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 				submitTime,
 				fromAddr,
 				dataHash,
-				dataSize)
+				dataSize,
+				strPinedNode,
+			)
 
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -67,8 +84,9 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagFilename, "", "name of file")
-	cmd.Flags().String(flagDescription, "", "description of file")
+	cmd.Flags().String(flagDescription, "record file", "description of file")
 	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
+	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")
 
 	return cmd
 }
