@@ -19,10 +19,10 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
-	chainID := executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
 
-	err := modifyGenesisFile(t, irisHome)
+	err := modifyGenesisFile(irisHome)
 	require.NoError(t, err)
 
 	// get a free port, also setup some common flags
@@ -50,7 +50,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	num := getAmuntFromCoinStr(t, fooCoin)
+	num := getAmuntFromCoinStr(fooCoin)
 
 	if !(num > 89 && num < 90) {
 		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
@@ -69,7 +69,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
-	num = getAmuntFromCoinStr(t, barCoin)
+	num = getAmuntFromCoinStr(barCoin)
 
 	if !(num > 7 && num < 8) {
 		t.Error("Test Failed: (7, 8) expected, recieved: {}", num)
