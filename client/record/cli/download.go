@@ -10,7 +10,6 @@ import (
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tmlibs/cli"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -18,19 +17,19 @@ import (
 
 func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "download [hash]",
-		Short: "download specified file with tx hash",
+		Use:   "download [record ID]",
+		Short: "download specified file with record ID",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			strPinedNode := viper.GetString(flagPinedNode)
 			downloadFileName := viper.GetString(FlagFileName)
 			home := viper.GetString(cli.HomeFlag)
-			hashHexStr := viper.GetString(FlagTxHash)
+			recordID := viper.GetString(FlagRecordID)
 
-			var tmpkey = cmn.HexBytes{}
-			res, err := cliCtx.QueryStore(tmpkey /*record.KeyProposal(hashHexStr)*/, storeName)
+			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
 			if len(res) == 0 || err != nil {
-				return fmt.Errorf("Record hash [%s] is not existed", hashHexStr)
+				return fmt.Errorf("Record id [%s] is not existed", recordID)
 			}
 
 			var submitFile record.MsgSubmitFile
@@ -42,7 +41,7 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			filePath := filepath.Join(home, downloadFileName)
-			sh := shell.NewShell("localhost:5001")
+			sh := shell.NewShell(strPinedNode)
 
 			//Begin to download file from ipfs
 			if _, err := os.Stat("/path/to/whatever"); !os.IsNotExist(err) {
@@ -61,7 +60,8 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(FlagTxHash, "", "tx hash")
+	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to download file,ip:port")
+	cmd.Flags().String(FlagRecordID, "", "record ID")
 	cmd.Flags().String(FlagFileName, "", "download file name")
 
 	return cmd

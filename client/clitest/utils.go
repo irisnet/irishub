@@ -15,9 +15,11 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -83,6 +85,7 @@ func modifyGenesisFile(t *testing.T, irisHome string) error {
 	}
 
 	genesisState.GovData = gov.DefaultGenesisStateForTest()
+	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	bz, err := cdc.MarshalJSON(genesisState)
 	if err != nil {
@@ -210,4 +213,24 @@ func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return param
+}
+
+func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var info upgcli.UpgradeInfoOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &info)
+
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return info
+}
+
+func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var switchMsg upgrade.MsgSwitch
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &switchMsg)
+
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return switchMsg
 }
