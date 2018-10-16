@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"bufio"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -15,9 +16,9 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
-	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
@@ -30,7 +31,8 @@ import (
 var (
 	irisHome    = ""
 	iriscliHome = ""
-	chainID = ""
+	chainID     = ""
+	nodeID      = ""
 )
 
 //___________________________________________________________________________________
@@ -88,7 +90,7 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 	if err != nil {
 		return err
 	}
-	err = copyFile(configDstFilePath, configSrcFilePath)
+	err = modifyConfigFile(configSrcFilePath, configDstFilePath)
 	if err != nil {
 		return err
 	}
@@ -123,6 +125,39 @@ func modifyGenesisFile(irisHome string) error {
 
 	genesisDoc.AppState = bz
 	return genesisDoc.SaveAs(genesisFilePath)
+}
+
+func modifyConfigFile(configSrcPath, configDstPath string) error {
+	fsrc, err := os.Open(configSrcPath)
+	if err != nil {
+		return err
+	}
+	defer fsrc.Close()
+
+	fdst, err := os.Create(configDstPath)
+	if err != nil {
+		return err
+	}
+	defer fdst.Close()
+
+	w := bufio.NewWriter(fdst)
+	br := bufio.NewReader(fsrc)
+
+	for {
+		line, _, err := br.ReadLine()
+		if err == io.EOF {
+			break
+		}
+
+		newline := strings.Replace(string(line), "266", "366", -1)
+
+		if strings.Index(newline, "persistent_peers") != -1 {
+			newline = fmt.Sprintf("persistent_peers = \"%s@127.0.0.1:26656\"", nodeID)
+		}
+		fmt.Fprintln(w, newline)
+	}
+
+	return w.Flush()
 }
 
 func getTestingHomeDirs() (string, string) {
@@ -184,7 +219,7 @@ func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 	//	fmt.Println("EXEC WRITE", string(bz))
 }
 
-func executeInit(t *testing.T, cmdStr string) (chainID string) {
+func executeInit(t *testing.T, cmdStr string) (chainID, nodeID string) {
 	out := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
@@ -192,6 +227,9 @@ func executeInit(t *testing.T, cmdStr string) (chainID string) {
 	require.NoError(t, err)
 
 	err = json.Unmarshal(initRes["chain_id"], &chainID)
+	require.NoError(t, err)
+
+	err = json.Unmarshal(initRes["node_id"], &nodeID)
 	require.NoError(t, err)
 
 	return
