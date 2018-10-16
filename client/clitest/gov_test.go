@@ -60,7 +60,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num := getAmuntFromCoinStr(fooCoin)
+	num := getAmountFromCoinStr(fooCoin)
 
 	if !(num > 94 && num < 95) {
 		t.Error("Test Failed: (94, 95) expected, recieved: {}", num)
@@ -84,7 +84,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num = getAmuntFromCoinStr(fooCoin)
+	num = getAmountFromCoinStr(fooCoin)
 
 	if !(num > 89 && num < 90) {
 		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
