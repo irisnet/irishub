@@ -30,6 +30,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake/client/rest"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
+	stakeLcd "github.com/irisnet/irishub/client/stake/lcd"
 	"bytes"
 )
 
@@ -399,7 +401,7 @@ func TestBonding(t *testing.T) {
 	validatorAddr := sdk.AccAddress(pks[0].Address())
 	unbondings := getUndelegations(t, port, addr, validatorAddr)
 	assert.Len(t, unbondings, 1, "Unbondings holds all unbonding-delegations")
-	assert.Equal(t, "30", unbondings[0].Balance.Amount.String())
+	assert.Equal(t, "30iris", unbondings[0].Balance)
 
 	// query summary
 	summary := getDelegationSummary(t, port, addr)
@@ -407,7 +409,7 @@ func TestBonding(t *testing.T) {
 	assert.Len(t, summary.Delegations, 1, "Delegation summary holds all delegations")
 	assert.Equal(t, "30.0000000000", summary.Delegations[0].Shares)
 	assert.Len(t, summary.UnbondingDelegations, 1, "Delegation summary holds all unbonding-delegations")
-	assert.Equal(t, "30", summary.UnbondingDelegations[0].Balance.Amount.String())
+	assert.Equal(t, "30iris", summary.UnbondingDelegations[0].Balance)
 
 	// TODO add redelegation, need more complex capabilities such to mock context and
 	// TODO check summary for redelegation
@@ -717,23 +719,23 @@ func getDelegation(t *testing.T, port string, delegatorAddr, validatorAddr sdk.A
 	return bond
 }
 
-func getUndelegations(t *testing.T, port string, delegatorAddr, validatorAddr sdk.AccAddress) []stake.UnbondingDelegation {
+func getUndelegations(t *testing.T, port string, delegatorAddr, validatorAddr sdk.AccAddress) []stakeClient.UnbondingDelegationOutput {
 
 	// get the account to get the sequence
 	res, body := Request(t, port, "GET", fmt.Sprintf("/stake/delegators/%s/unbonding_delegations/%s", delegatorAddr, validatorAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	var unbondings []stake.UnbondingDelegation
+	var unbondings []stakeClient.UnbondingDelegationOutput
 	err := cdc.UnmarshalJSON([]byte(body), &unbondings)
 	require.Nil(t, err)
 	return unbondings
 }
 
-func getDelegationSummary(t *testing.T, port string, delegatorAddr sdk.AccAddress) rest.DelegationSummary {
+func getDelegationSummary(t *testing.T, port string, delegatorAddr sdk.AccAddress) stakeLcd.DelegationSummary {
 
 	// get the account to get the sequence
 	res, body := Request(t, port, "GET", fmt.Sprintf("/stake/delegators/%s", delegatorAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	var summary rest.DelegationSummary
+	var summary stakeLcd.DelegationSummary
 	err := cdc.UnmarshalJSON([]byte(body), &summary)
 	require.Nil(t, err)
 	return summary
