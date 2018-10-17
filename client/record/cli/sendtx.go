@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,8 +25,6 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 			strFilepath := viper.GetString(flagPath)
 			strPinedNode := viper.GetString(flagPinedNode)
-
-			_, filename := filepath.Split(strFilepath)
 
 			var fileInfo os.FileInfo
 			var err error
@@ -60,14 +57,12 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 
 			submitTime := time.Now().Unix()
 
-			msg := record.NewMsgSubmitFile(filename,
-				strFilepath,
+			msg := record.NewMsgSubmitFile(
 				description,
 				submitTime,
 				fromAddr,
 				dataHash,
 				dataSize,
-				strPinedNode,
 			)
 
 			if cliCtx.GenerateOnly {
