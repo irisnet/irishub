@@ -51,6 +51,7 @@ func TestIrismon(t *testing.T) {
 
 	// start irismon
 	proc1 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("irismon --address=%s --chain-id=%s --account-address=%s --port=%s", pkHex, chainID, accountAddress.String(), port1))
+	defer proc1.Stop(false)
 
 	// wait 20s for irismon start
 	time.Sleep(time.Second * 20)
@@ -59,6 +60,4 @@ func TestIrismon(t *testing.T) {
 	resp, err := http.Get(fmt.Sprintf("http://0.0.0.0:%s", port1))
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
-
-	defer proc1.Stop(false)
 }
