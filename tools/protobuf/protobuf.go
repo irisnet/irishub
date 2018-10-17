@@ -11,9 +11,6 @@ import (
     "unsafe"
 )
 
-func init() {
-}
-
 func SerializeJsonToProto(protoPath, protoName, messageName string, jsonString string) []byte {
 	path := C.CString(protoPath)
 	name := C.CString(protoName)
@@ -30,7 +27,7 @@ func SerializeJsonToProto(protoPath, protoName, messageName string, jsonString s
 	resultLength := C.int(0)
 	resultByte := C.serializeJsonToProto(path, name, message, json, &resultLength)
 	protoBufByte := C.GoBytes(unsafe.Pointer(resultByte), resultLength)
-
+	C.free(unsafe.Pointer(resultByte))
 	return protoBufByte
 }
 
@@ -50,6 +47,6 @@ func ConvertProtoToJson(protoPath, protoName, messageName string, protoBufByte [
 	resultLength := C.int(0)
 	resultByte := C.convertProtoToJson(path, name, message, protoBufCByte, protoBufCByteLength, &resultLength)
 	json := C.GoStringN(resultByte, resultLength)
-
+	C.free(unsafe.Pointer(resultByte))
 	return json
 }
