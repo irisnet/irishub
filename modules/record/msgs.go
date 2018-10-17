@@ -20,14 +20,11 @@ type MsgSubmitFile struct {
 	RecordId     string         // Record index ID
 }
 
-func NewMsgSubmitFile(filename string,
-	filepath string,
-	description string,
+func NewMsgSubmitFile(description string,
 	submitTime int64,
 	ownerAddress sdk.AccAddress,
 	dataHash string,
-	dataSize int64,
-	pinedNode string) MsgSubmitFile {
+	dataSize int64) MsgSubmitFile {
 	return MsgSubmitFile{
 		Description:  description,
 		SubmitTime:   submitTime,
