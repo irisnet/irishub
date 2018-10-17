@@ -178,7 +178,7 @@ func InitializeTestLCD(t *testing.T, nValidators int, initAddrs []sdk.AccAddress
 	genesisState, err := irisapp.IrisAppGenState(cdc, appGenTxs[:])
 	require.NoError(t, err)
 
-	genesisState.GovData = gov.DefaultGenesisStateForTest()
+	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	// add some tokens to init accounts

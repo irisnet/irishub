@@ -545,18 +545,15 @@ func TestProposalsQuery(t *testing.T) {
 
 	// Addr1 proposes (and deposits) proposals #1 and #2
 	resultTx := doSubmitProposal(t, port, seed, name, password1, addr)
-	var proposalID1 int64
-	cdc.UnmarshalBinaryBare(resultTx.DeliverTx.GetData(), &proposalID1)
+	proposalID1, _ := strconv.ParseInt(string(resultTx.DeliverTx.GetData()), 10, 64)
 	tests.WaitForHeight(resultTx.Height+1, port)
 	resultTx = doSubmitProposal(t, port, seed, name, password1, addr)
-	var proposalID2 int64
-	cdc.UnmarshalBinaryBare(resultTx.DeliverTx.GetData(), &proposalID2)
+	proposalID2, _ := strconv.ParseInt(string(resultTx.DeliverTx.GetData()), 10, 64)
 	tests.WaitForHeight(resultTx.Height+1, port)
 
 	// Addr2 proposes (and deposits) proposals #3
 	resultTx = doSubmitProposal(t, port, seed2, name2, password2, addr2)
-	var proposalID3 int64
-	cdc.UnmarshalBinaryBare(resultTx.DeliverTx.GetData(), &proposalID3)
+	proposalID3, _ := strconv.ParseInt(string(resultTx.DeliverTx.GetData()), 10, 64)
 	tests.WaitForHeight(resultTx.Height+1, port)
 
 	// Addr2 deposits on proposals #2 & #3
@@ -568,12 +565,12 @@ func TestProposalsQuery(t *testing.T) {
 	// Only proposals #1 should be in Deposit Period
 	proposals := getProposalsFilterStatus(t, port, gov.StatusDepositPeriod)
 	require.Len(t, proposals, 1)
-	require.Equal(t, proposalID1, proposals[0].GetProposalID())
+	require.Equal(t, proposalID1, proposals[0].ProposalID)
 	// Only proposals #2 and #3 should be in Voting Period
 	proposals = getProposalsFilterStatus(t, port, gov.StatusVotingPeriod)
 	require.Len(t, proposals, 2)
-	require.Equal(t, proposalID2, proposals[0].GetProposalID())
-	require.Equal(t, proposalID3, proposals[1].GetProposalID())
+	require.Equal(t, proposalID2, proposals[0].ProposalID)
+	require.Equal(t, proposalID3, proposals[1].ProposalID)
 
 	// Addr1 votes on proposals #2 & #3
 	resultTx = doVote(t, port, seed, name, password1, addr, proposalID2)
@@ -587,31 +584,31 @@ func TestProposalsQuery(t *testing.T) {
 
 	// Test query all proposals
 	proposals = getProposalsAll(t, port)
-	require.Equal(t, proposalID1, (proposals[0]).GetProposalID())
-	require.Equal(t, proposalID2, (proposals[1]).GetProposalID())
-	require.Equal(t, proposalID3, (proposals[2]).GetProposalID())
+	require.Equal(t, proposalID1, (proposals[0]).ProposalID)
+	require.Equal(t, proposalID2, (proposals[1]).ProposalID)
+	require.Equal(t, proposalID3, (proposals[2]).ProposalID)
 
 	// Test query deposited by addr1
 	proposals = getProposalsFilterDepositer(t, port, addr)
-	require.Equal(t, proposalID1, (proposals[0]).GetProposalID())
+	require.Equal(t, proposalID1, (proposals[0]).ProposalID)
 
 	// Test query deposited by addr2
 	proposals = getProposalsFilterDepositer(t, port, addr2)
-	require.Equal(t, proposalID2, (proposals[0]).GetProposalID())
-	require.Equal(t, proposalID3, (proposals[1]).GetProposalID())
+	require.Equal(t, proposalID2, (proposals[0]).ProposalID)
+	require.Equal(t, proposalID3, (proposals[1]).ProposalID)
 
 	// Test query voted by addr1
 	proposals = getProposalsFilterVoter(t, port, addr)
-	require.Equal(t, proposalID2, (proposals[0]).GetProposalID())
-	require.Equal(t, proposalID3, (proposals[1]).GetProposalID())
+	require.Equal(t, proposalID2, (proposals[0]).ProposalID)
+	require.Equal(t, proposalID3, (proposals[1]).ProposalID)
 
 	// Test query voted by addr2
 	proposals = getProposalsFilterVoter(t, port, addr2)
-	require.Equal(t, proposalID3, (proposals[0]).GetProposalID())
+	require.Equal(t, proposalID3, (proposals[0]).ProposalID)
 
 	// Test query voted and deposited by addr1
 	proposals = getProposalsFilterVoterDepositer(t, port, addr, addr)
-	require.Equal(t, proposalID2, (proposals[0]).GetProposalID())
+	require.Equal(t, proposalID2, (proposals[0]).ProposalID)
 
 	// Test query votes on Proposal 2
 	votes := getVotes(t, port, proposalID2)
@@ -943,51 +940,51 @@ func getVotes(t *testing.T, port string, proposalID int64) []gov.Vote {
 	return votes
 }
 
-func getProposalsAll(t *testing.T, port string) []gov.Proposal {
+func getProposalsAll(t *testing.T, port string) []govcli.ProposalOutput {
 	res, body := Request(t, port, "GET", "/gov/proposals", nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []gov.Proposal
+	var proposals []govcli.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterDepositer(t *testing.T, port string, depositerAddr sdk.AccAddress) []gov.Proposal {
+func getProposalsFilterDepositer(t *testing.T, port string, depositerAddr sdk.AccAddress) []govcli.ProposalOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?depositer=%s", depositerAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []gov.Proposal
+	var proposals []govcli.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterVoter(t *testing.T, port string, voterAddr sdk.AccAddress) []gov.Proposal {
+func getProposalsFilterVoter(t *testing.T, port string, voterAddr sdk.AccAddress) []govcli.ProposalOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?voter=%s", voterAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []gov.Proposal
+	var proposals []govcli.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterVoterDepositer(t *testing.T, port string, voterAddr, depositerAddr sdk.AccAddress) []gov.Proposal {
+func getProposalsFilterVoterDepositer(t *testing.T, port string, voterAddr, depositerAddr sdk.AccAddress) []govcli.ProposalOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?depositer=%s&voter=%s", depositerAddr, voterAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []gov.Proposal
+	var proposals []govcli.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterStatus(t *testing.T, port string, status gov.ProposalStatus) []gov.Proposal {
+func getProposalsFilterStatus(t *testing.T, port string, status gov.ProposalStatus) []govcli.ProposalOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?status=%s", status), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []gov.Proposal
+	var proposals []govcli.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
