@@ -18,17 +18,17 @@ type MsgSubmitProposal struct {
 	ProposalType   ProposalKind   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress //  Address of the proposer
 	InitialDeposit sdk.Coins      //  Initial deposit paid by sender. Must be strictly positive.
-	Param         Param
+	Param          Param
 }
 
-func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins,param Param) MsgSubmitProposal {
+func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, param Param) MsgSubmitProposal {
 	return MsgSubmitProposal{
 		Title:          title,
 		Description:    description,
 		ProposalType:   proposalType,
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
-		Param:			param,
+		Param:          param,
 	}
 }
 
@@ -58,22 +58,17 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 
 	if msg.ProposalType == ProposalTypeParameterChange {
 
-
 		if msg.Param.Op != Update && msg.Param.Op != Insert {
 			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
 		}
 
-		if p, ok := iparam.ParamMapping[msg.Param.Key]; ok{
+		if p, ok := iparam.ParamMapping[msg.Param.Key]; ok {
 			return p.Valid(msg.Param.Value)
 		} else {
 			return ErrInvalidParam(DefaultCodespace)
 		}
 
-
-
 	}
-
-
 
 	return nil
 }

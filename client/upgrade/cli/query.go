@@ -41,7 +41,7 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 			var version upgrade.Version
 			cdc.MustUnmarshalBinary(res_version, &version)
 
-			upgradeInfoOutput := upgcli.ConvertDepositToDepositOutput(version, proposalID, height)
+			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(version, proposalID, height)
 
 			output, err := wire.MarshalJSONIndent(cdc, upgradeInfoOutput)
 			if err != nil {

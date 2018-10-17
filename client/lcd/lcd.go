@@ -3,6 +3,8 @@ package lcd
 import (
 	"os"
 
+	"net/http"
+
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
@@ -10,6 +12,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
+	recordhandle "github.com/irisnet/irishub/client/record/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
@@ -20,7 +23,6 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
-	"net/http"
 )
 
 // ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
@@ -89,6 +91,7 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
+	recordhandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
