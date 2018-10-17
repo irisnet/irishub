@@ -2,7 +2,6 @@ package main
 
 import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
@@ -14,6 +13,7 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -63,7 +63,7 @@ func main() {
 		bankCmd,
 	)
 
-	//Add stake commands
+	//Add gov commands
 	govCmd := &cobra.Command{
 		Use:   "gov",
 		Short: "Governance and voting subcommands",
@@ -135,38 +135,21 @@ func main() {
 		upgradeCmd,
 	)
 
-	//Add auth and bank commands
-	rootCmd.AddCommand(
+	//Add iservice commands
+	iserviceCmd := &cobra.Command{
+		Use:   "iservice",
+		Short: "iservice subcommands",
+	}
+	iserviceCmd.AddCommand(
 		client.GetCommands(
-			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
 		)...)
-	rootCmd.AddCommand(
-		client.PostCommands(
-			bankcmd.SendTxCmd(cdc),
-		)...)
+	iserviceCmd.AddCommand(client.PostCommands(
+		iservicecmd.GetCmdScvDef(cdc),
+	)...)
 
-	// add proxy, version and key info
 	rootCmd.AddCommand(
-		client.LineBreak,
-		keyscmd.Commands(),
-		version.ServeVersionCommand(cdc),
-	)
-
-	//Add auth and bank commands
-	rootCmd.AddCommand(
-		client.GetCommands(
-			authcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
-		)...)
-	rootCmd.AddCommand(
-		client.PostCommands(
-			bankcmd.SendTxCmd(cdc),
-		)...)
-
-	// add proxy, version and key info
-	rootCmd.AddCommand(
-		client.LineBreak,
-		keyscmd.Commands(),
-		version.ServeVersionCommand(cdc),
+		iserviceCmd,
 	)
 
 	//add record command
@@ -187,6 +170,13 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		recordCmd,
+	)
+
+	//Add keys and version commands
+	rootCmd.AddCommand(
+		client.LineBreak,
+		keyscmd.Commands(),
+		version.ServeVersionCommand(cdc),
 	)
 
 	// prepare and add flags
