@@ -23,9 +23,9 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			strPinedNode := viper.GetString(flagPinedNode)
-			downloadFileName := viper.GetString(FlagFileName)
+			downloadFileName := viper.GetString(flagFileName)
 			home := viper.GetString(cli.HomeFlag)
-			recordID := viper.GetString(FlagRecordID)
+			recordID := viper.GetString(flagRecordID)
 
 			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
 			if len(res) == 0 || err != nil {
@@ -44,7 +44,7 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 			sh := shell.NewShell(strPinedNode)
 
 			//Begin to download file from ipfs
-			if _, err := os.Stat("/path/to/whatever"); !os.IsNotExist(err) {
+			if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 				fmt.Printf("%v already exists, please try another file name.\n", filePath)
 				return err
 			}
@@ -61,8 +61,8 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to download file,ip:port")
-	cmd.Flags().String(FlagRecordID, "", "record ID")
-	cmd.Flags().String(FlagFileName, "", "download file name")
+	cmd.Flags().String(flagRecordID, "", "record ID")
+	cmd.Flags().String(flagFileName, "", "download file name")
 
 	return cmd
 }
