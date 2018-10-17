@@ -24,7 +24,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
+	govcli "github.com/irisnet/irishub/client/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/client/rest"
@@ -33,6 +34,7 @@ import (
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	stakeLcd "github.com/irisnet/irishub/client/stake/lcd"
 	"bytes"
+	"strconv"
 )
 
 func init() {
@@ -440,12 +442,11 @@ func TestSubmitProposal(t *testing.T) {
 	require.Equal(t, uint32(0), resultTx.CheckTx.Code)
 	require.Equal(t, uint32(0), resultTx.DeliverTx.Code)
 
-	var proposalID int64
-	cdc.UnmarshalBinaryBare(resultTx.DeliverTx.GetData(), &proposalID)
+	proposalID, _ := strconv.Atoi(string(resultTx.DeliverTx.GetData()))
 
 	// query proposal
-	proposal := getProposal(t, port, proposalID)
-	require.Equal(t, "Test", proposal.GetTitle())
+	proposal := getProposal(t, port, int64(proposalID))
+	require.Equal(t, "Test", proposal.Title)
 }
 
 func TestDeposit(t *testing.T) {
@@ -467,7 +468,7 @@ func TestDeposit(t *testing.T) {
 
 	// query proposal
 	proposal := getProposal(t, port, proposalID)
-	require.Equal(t, "Test", proposal.GetTitle())
+	require.Equal(t, "Test", proposal.Title)
 
 	// create SubmitProposal TX
 	resultTx = doDeposit(t, port, seed, name, password, addr, proposalID)
@@ -475,7 +476,7 @@ func TestDeposit(t *testing.T) {
 
 	// query proposal
 	proposal = getProposal(t, port, proposalID)
-	require.True(t, proposal.GetTotalDeposit().IsEqual(sdk.Coins{sdk.NewInt64Coin("steak", 10)}))
+	require.Equal(t, proposal.TotalDeposit, "10iris")
 
 	// query deposit
 	deposit := getDeposit(t, port, proposalID, addr)
@@ -501,7 +502,7 @@ func TestVote(t *testing.T) {
 
 	// query proposal
 	proposal := getProposal(t, port, proposalID)
-	require.Equal(t, "Test", proposal.GetTitle())
+	require.Equal(t, "Test", proposal.Title)
 
 	// create SubmitProposal TX
 	resultTx = doDeposit(t, port, seed, name, password, addr, proposalID)
@@ -509,7 +510,7 @@ func TestVote(t *testing.T) {
 
 	// query proposal
 	proposal = getProposal(t, port, proposalID)
-	require.Equal(t, gov.StatusVotingPeriod, proposal.GetStatus())
+	require.Equal(t, gov.StatusVotingPeriod, proposal.Status)
 
 	// create SubmitProposal TX
 	resultTx = doVote(t, port, seed, name, password, addr, proposalID)
@@ -908,10 +909,10 @@ func getValidator(t *testing.T, port string, validatorAddr sdk.AccAddress) stake
 
 // ============= Governance Module ================
 
-func getProposal(t *testing.T, port string, proposalID int64) gov.Proposal {
+func getProposal(t *testing.T, port string, proposalID int64) govcli.ProposalOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	var proposal gov.Proposal
+	var proposal govcli.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposal)
 	require.Nil(t, err)
 	return proposal
@@ -1009,14 +1010,20 @@ func doSubmitProposal(t *testing.T, port, seed, name, password string, proposerA
 		"proposal_type": "Text",
 		"proposer": "%s",
 		"initial_deposit": "5iris",
-		"base_req": {
+		"base_tx": {
 			"name": "%s",
 			"password": "%s",
 			"chain_id": "%s",
 			"account_number":"%d",
 			"sequence":"%d",
 			"gas":"200000",
-			"fee":"0.004iris"
+			"fee":"0.004iris",
+			"memo":"test"
+		},
+		"param": {
+			"key":"test",
+			"value":"",
+			"op":""
 		}
 	}`, proposerAddr, name, password, chainID, accnum, sequence))
 	res, body := Request(t, port, "POST", "/gov/proposals", jsonStr)
