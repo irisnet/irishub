@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,19 +21,21 @@ import (
 func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
-		Short: "Submit a transaction with a file hash",
+		Short: "Submit the specified file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			filename := viper.GetString(flagFilename)
 			description := viper.GetString(flagDescription)
-
 			strFilepath := viper.GetString(flagPath)
 			strPinedNode := viper.GetString(flagPinedNode)
-			file, err := os.Stat(strFilepath)
 
-			if err != nil {
-				// file does not exist
+			_, filename := filepath.Split(strFilepath)
+
+			var fileInfo os.FileInfo
+			var err error
+			if fileInfo, err = os.Stat(strFilepath); os.IsNotExist(err) {
+				fmt.Printf("File %v doesn't exists, please check correstponding path.\n", strFilepath)
 				return err
 			}
+			dataSize := fileInfo.Size()
 
 			//upload to ipfs
 			sh := ipfs.NewShell(strPinedNode)
@@ -39,16 +43,10 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			dataHash, err := sh.Add(f)
-
 			if err != nil {
 				return err
 			}
-
-			//file size
-			dataSize := file.Size()
-			//pinedNode
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -83,7 +81,6 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagFilename, "", "name of file")
 	cmd.Flags().String(flagDescription, "record file", "description of file")
 	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
 	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")

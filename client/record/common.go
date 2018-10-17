@@ -7,27 +7,22 @@ import (
 )
 
 type RecordOutput struct {
-	Filename     string         `json:"Filename"`     //  Filename of the File
-	Filepath     string         `json:"Filepath"`     //  full path of the File
-	Description  string         `json:"Description"`  //  Description of the File
-	SubmitTime   int64          `json:"SubmitTime"`   //  File  submit unix timestamp
-	OwnerAddress sdk.AccAddress `json:"OwnerAddress"` //  Address of the owner
-	DataHash     string         `json:"DataHash"`     // ipfs hash of file
+	Description  string         `json:"Description"`  // File description
+	SubmitTime   int64          `json:"SubmitTime"`   // File upload timestamp
+	OwnerAddress sdk.AccAddress `json:"OwnerAddress"` // Owner of file
+	DataHash     string         `json:"DataHash"`     // IPFS hash of file
 	DataSize     int64          `json:"DataSize"`     // File Size in bytes
-	//PinedNode    string        `json:"PinedNode"` //pined node of ipfs
+	RecordId     string         `json:"RecordId"`     // Record index ID
 }
 
 func ConvertRecordToRecordOutput(cliCtx context.CLIContext, r record.MsgSubmitFile) (RecordOutput, error) {
-
-	// TODO : Currently we only copy values from record msg, we can call related methods later
 	recordOutput := RecordOutput{
-		Filename:     r.Filename,
-		Filepath:     r.Filepath,
 		Description:  r.Description,
 		SubmitTime:   r.SubmitTime,
 		OwnerAddress: r.OwnerAddress,
 		DataHash:     r.DataHash,
 		DataSize:     r.DataSize,
+		RecordId:     r.RecordId,
 	}
 
 	return recordOutput, nil
