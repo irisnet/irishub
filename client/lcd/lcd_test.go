@@ -463,24 +463,23 @@ func TestDeposit(t *testing.T) {
 	require.Equal(t, uint32(0), resultTx.CheckTx.Code)
 	require.Equal(t, uint32(0), resultTx.DeliverTx.Code)
 
-	var proposalID int64
-	cdc.UnmarshalBinaryBare(resultTx.DeliverTx.GetData(), &proposalID)
+	proposalID, _ := strconv.Atoi(string(resultTx.DeliverTx.GetData()))
 
 	// query proposal
-	proposal := getProposal(t, port, proposalID)
+	proposal := getProposal(t, port, int64(proposalID))
 	require.Equal(t, "Test", proposal.Title)
 
 	// create SubmitProposal TX
-	resultTx = doDeposit(t, port, seed, name, password, addr, proposalID)
+	resultTx = doDeposit(t, port, seed, name, password, addr, int64(proposalID))
 	tests.WaitForHeight(resultTx.Height+1, port)
 
 	// query proposal
-	proposal = getProposal(t, port, proposalID)
-	require.Equal(t, proposal.TotalDeposit, "10iris")
+	proposal = getProposal(t, port, int64(proposalID))
+	require.Equal(t, "10iris", proposal.TotalDeposit[0])
 
 	// query deposit
-	deposit := getDeposit(t, port, proposalID, addr)
-	require.True(t, deposit.Amount.IsEqual(sdk.Coins{sdk.NewInt64Coin("steak", 10)}))
+	deposit := getDeposit(t, port, int64(proposalID), addr)
+	require.Equal(t, deposit.Amount[0], "10iris")
 }
 
 func TestVote(t *testing.T) {
@@ -918,10 +917,10 @@ func getProposal(t *testing.T, port string, proposalID int64) govcli.ProposalOut
 	return proposal
 }
 
-func getDeposit(t *testing.T, port string, proposalID int64, depositerAddr sdk.AccAddress) gov.Deposit {
+func getDeposit(t *testing.T, port string, proposalID int64, depositerAddr sdk.AccAddress) govcli.DepositOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/deposits/%s", proposalID, depositerAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	var deposit gov.Deposit
+	var deposit govcli.DepositOutput
 	err := cdc.UnmarshalJSON([]byte(body), &deposit)
 	require.Nil(t, err)
 	return deposit
@@ -1047,14 +1046,15 @@ func doDeposit(t *testing.T, port, seed, name, password string, proposerAddr sdk
 	// deposit on proposal
 	jsonStr := []byte(fmt.Sprintf(`{
 		"depositer": "%s",
-		"amount": [{ "denom": "steak", "amount": "5" }],
-		"base_req": {
+		"amount": "5iris",
+		"base_tx": {
 			"name": "%s",
 			"password": "%s",
 			"chain_id": "%s",
 			"account_number":"%d",
 			"sequence": "%d",
-			"gas":"100000"
+			"gas": "50000",
+			"fee":"0.05iris"
 		}
 	}`, proposerAddr, name, password, chainID, accnum, sequence))
 	res, body := Request(t, port, "POST", fmt.Sprintf("/gov/proposals/%d/deposits", proposalID), jsonStr)

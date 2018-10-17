@@ -91,11 +91,13 @@ func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFu
 		var req depositReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Depositer)
 		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -144,11 +146,13 @@ func voteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc 
 		var req voteReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Voter)
 		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
