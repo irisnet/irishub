@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/baseapp"
 
-	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -59,8 +58,6 @@ func main() {
 	rootCmd.AddCommand(
 		version.ServeVersionCommand(cdc),
 	)
-
-	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
