@@ -37,6 +37,8 @@ import (
 	"github.com/irisnet/irishub/client/keys"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 )
 
 // makePathname creates a unique pathname for each test. It will panic if it
@@ -175,6 +177,9 @@ func InitializeTestLCD(t *testing.T, nValidators int, initAddrs []sdk.AccAddress
 
 	genesisState, err := irisapp.IrisAppGenState(cdc, appGenTxs[:])
 	require.NoError(t, err)
+
+	genesisState.GovData = gov.DefaultGenesisStateForTest()
+	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	// add some tokens to init accounts
 	for _, addr := range initAddrs {

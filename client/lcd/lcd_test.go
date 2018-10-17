@@ -496,27 +496,26 @@ func TestVote(t *testing.T) {
 	require.Equal(t, uint32(0), resultTx.CheckTx.Code)
 	require.Equal(t, uint32(0), resultTx.DeliverTx.Code)
 
-	var proposalID int64
-	cdc.UnmarshalBinaryBare(resultTx.DeliverTx.GetData(), &proposalID)
+	proposalID, _ := strconv.Atoi(string(resultTx.DeliverTx.GetData()))
 
 	// query proposal
-	proposal := getProposal(t, port, proposalID)
+	proposal := getProposal(t, port, int64(proposalID))
 	require.Equal(t, "Test", proposal.Title)
 
 	// create SubmitProposal TX
-	resultTx = doDeposit(t, port, seed, name, password, addr, proposalID)
+	resultTx = doDeposit(t, port, seed, name, password, addr, int64(proposalID))
 	tests.WaitForHeight(resultTx.Height+1, port)
 
 	// query proposal
-	proposal = getProposal(t, port, proposalID)
+	proposal = getProposal(t, port, int64(proposalID))
 	require.Equal(t, gov.StatusVotingPeriod, proposal.Status)
 
 	// create SubmitProposal TX
-	resultTx = doVote(t, port, seed, name, password, addr, proposalID)
+	resultTx = doVote(t, port, seed, name, password, addr, int64(proposalID))
 	tests.WaitForHeight(resultTx.Height+1, port)
 
-	vote := getVote(t, port, proposalID, addr)
-	require.Equal(t, proposalID, vote.ProposalID)
+	vote := getVote(t, port, int64(proposalID), addr)
+	require.Equal(t, int64(proposalID), vote.ProposalID)
 	require.Equal(t, gov.OptionYes, vote.Option)
 }
 
@@ -1079,13 +1078,14 @@ func doVote(t *testing.T, port, seed, name, password string, proposerAddr sdk.Ac
 	jsonStr := []byte(fmt.Sprintf(`{
 		"voter": "%s",
 		"option": "Yes",
-		"base_req": {
+		"base_tx": {
 			"name": "%s",
 			"password": "%s",
 			"chain_id": "%s",
 			"account_number": "%d",
 			"sequence": "%d",
-			"gas":"100000"
+			"gas":"100000",
+			"fee":"0.05iris"
 		}
 	}`, proposerAddr, name, password, chainID, accnum, sequence))
 	res, body := Request(t, port, "POST", fmt.Sprintf("/gov/proposals/%d/votes", proposalID), jsonStr)
