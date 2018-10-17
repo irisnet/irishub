@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/pkg/errors"
@@ -39,14 +40,15 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 			res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
 			var version upgrade.Version
 			cdc.MustUnmarshalBinary(res_version, &version)
-			output, err := wire.MarshalJSONIndent(cdc, version)
+
+			upgradeInfoOutput := upgcli.ConvertDepositToDepositOutput(version, proposalID, height)
+
+			output, err := wire.MarshalJSONIndent(cdc, upgradeInfoOutput)
 			if err != nil {
 				return err
 			}
 
 			fmt.Println(string(output))
-			fmt.Println("CurrentProposalId           = ", proposalID)
-			fmt.Println("CurrentProposalAcceptHeight = ", height)
 			return nil
 		},
 	}

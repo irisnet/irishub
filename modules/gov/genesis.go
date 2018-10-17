@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irishub/types"
 )
 
-// GenesisState - all staking state that must be provided at genesis
+// GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
 	StartingProposalID int64                        `json:"starting_proposalID"`
 	DepositProcedure   govparams.DepositProcedure   `json:"deposit_period"`
@@ -70,6 +70,31 @@ func DefaultGenesisState() GenesisState {
 		},
 		VotingProcedure: govparams.VotingProcedure{
 			VotingPeriod: 20000,
+		},
+		TallyingProcedure: govparams.TallyingProcedure{
+			Threshold:         sdk.NewRat(1, 2),
+			Veto:              sdk.NewRat(1, 3),
+			GovernancePenalty: sdk.NewRat(1, 100),
+		},
+	}
+}
+
+// get raw genesis raw message for testing
+func DefaultGenesisStateForTest() GenesisState {
+	Denom  := "iris"
+	IrisCt := types.NewDefaultCoinType(Denom)
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
+	if err != nil {
+		panic(err)
+	}
+	return GenesisState{
+		StartingProposalID: 1,
+		DepositProcedure: govparams.DepositProcedure{
+			MinDeposit:       sdk.Coins{minDeposit},
+			MaxDepositPeriod: 10,
+		},
+		VotingProcedure: govparams.VotingProcedure{
+			VotingPeriod: 10,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewRat(1, 2),
