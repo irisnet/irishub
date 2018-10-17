@@ -10,6 +10,18 @@
   version = "1.0.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:4cf11742b199ab3aacf26b00187e72f7ff8ba2145f363b74f295d54f098f79e4"
+  name = "github.com/agl/ed25519"
+  packages = [
+    ".",
+    "edwards25519",
+    "extra25519",
+  ]
+  pruneopts = "UT"
+  revision = "5312a61534124124185d41f09206b9fef1d88403"
+
+[[projects]]
   digest = "1:09a7f74eb6bb3c0f14d8926610c87f569c5cff68e978d30e9a3540aeb626fdf0"
   name = "github.com/bartekn/go-bip39"
   packages = ["."]
@@ -111,6 +123,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "95f809107225be108efcf10a3509e4ea6ceef3c4"
+
+[[projects]]
+  digest = "1:50272737989a0ecdc6529d90e0cdf7dd2378220f1f8fce9870b410ad04d064b7"
+  name = "github.com/emicklei/proto"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "31ca1a37608053a92355be293b13f08fe25e526e"
+  version = "v1.6.5"
 
 [[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
@@ -225,6 +245,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:e3ddd1f59d3c84917c99ecb1c3420aa6899f6df7495ba9414c13732b2e9568dd"
+  name = "github.com/gxed/hashland"
+  packages = ["keccakpg"]
+  pruneopts = "UT"
+  revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
+
+[[projects]]
   digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
   name = "github.com/hashicorp/hcl"
   packages = [
@@ -251,6 +279,22 @@
   version = "v1.0"
 
 [[projects]]
+  digest = "1:0b9cab5474015038cc258d2af017ebaa01f2fb387ca2ab7eb78516f46669954c"
+  name = "github.com/ipfs/go-ipfs-api"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c26fc48ff114bc48b2cc357f8d12484397f5738d"
+  version = "v1.3.5"
+
+[[projects]]
+  digest = "1:960df862bef266ca070f8ed90aeb274edc89e9fd8fa2e12472e59845c77a4dab"
+  name = "github.com/ipfs/go-ipfs-cmdkit"
+  packages = ["files"]
+  pruneopts = "UT"
+  revision = "23a066ae3c5d2db34e61ce8c75d71a4d99ee4864"
+  version = "v1.1.3"
+
+[[projects]]
   branch = "master"
   digest = "1:39b27d1381a30421f9813967a5866fba35dc1d4df43a6eefe3b7a5444cb07214"
   name = "github.com/jmhodges/levigo"
@@ -265,6 +309,57 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
+
+[[projects]]
+  digest = "1:19f2d2506cc0f9a233c9c0753e8c3fd5afa88afb43ff7b795cbba3629d0e96b5"
+  name = "github.com/libp2p/go-flow-metrics"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cc546389dcf06b4bcbf6b8594069588e5c8a1451"
+  version = "v0.2.0"
+
+[[projects]]
+  digest = "1:4ff86c6d6dd8df23a58e6b6060fea5f150d1a502cdfe8a3e9efd5d25339196c6"
+  name = "github.com/libp2p/go-libp2p-crypto"
+  packages = [
+    ".",
+    "pb",
+  ]
+  pruneopts = "UT"
+  revision = "274de1bb6c27780863df6b230c91324ab481dab2"
+  version = "v2.0.1"
+
+[[projects]]
+  digest = "1:e01814b1390e3abc93ca170141d457fab1dcc0c532cdfdd269be58fb2cd6a9f4"
+  name = "github.com/libp2p/go-libp2p-metrics"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "20c0e3fed14ddf84ac8192038accfd393610ed82"
+  version = "v2.1.7"
+
+[[projects]]
+  digest = "1:d59d3f32a53e3d1ef4f19f92c8f4cbccabfae6c965760577958b2fb937fede98"
+  name = "github.com/libp2p/go-libp2p-peer"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "dd9b45c0649b38aebe65f98cb460676b4214a42c"
+  version = "v2.4.0"
+
+[[projects]]
+  digest = "1:99c29233479cb14a63c7cb6b49927a60ae9d6b4b36d74deb12cc45ce503ddeb5"
+  name = "github.com/libp2p/go-libp2p-protocol"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e34f0d7468b3519bf9bf4e43c1d028ce651eab51"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:9b60f7fe71b4d55377c2082dcb3d1db35e7e1a0917cf73217cbe84c892506685"
+  name = "github.com/libp2p/go-libp2p-pubsub"
+  packages = ["pb"]
+  pruneopts = "UT"
+  revision = "a031ab4d1b8142714eec946acb7033abafade3d7"
+  version = "v0.1.0"
 
 [[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
@@ -291,12 +386,68 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "master"
+  digest = "1:130cefe87d7eeefc824978dcb78e35672d4c49a11f25c153fbf0cfd952756fa3"
+  name = "github.com/minio/blake2b-simd"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3f5f724cb5b182a5c278d6d3d55b40e7f8c2efb4"
+
+[[projects]]
+  branch = "master"
+  digest = "1:445210ef1e723060b3ebeb691648b5090f154992ee35f7065b70a6a5a96a3bb8"
+  name = "github.com/minio/sha256-simd"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "51976451ce1942acbb55707a983ed232fa027110"
+
+[[projects]]
+  digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ae18d6b8b3205b561c79e8e5f69bff09736185f4"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:645110e089152bd0f4a011a2648fbb0e4df5977be73ca605781157ac297f50c4"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   pruneopts = "UT"
   revision = "fa473d140ef3c6adf42d6b391fe76707f1f243c8"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:cf5b7fbff2c87cff6c0e11f87b30edc21abc6592e6a76f41003ca6d5a712cf48"
+  name = "github.com/mr-tron/base58"
+  packages = ["base58"]
+  pruneopts = "UT"
+  revision = "d724c80ecac7b49e4e562d58b2b4f4ee4ed8c312"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:e54be212eca970f4d5d39899666aef429c437969783e360a0cab075ba1423a80"
+  name = "github.com/multiformats/go-multiaddr"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2b4e098f3e0aa2c8bc960f0e4bdc3247efc3749c"
+  version = "v1.3.0"
+
+[[projects]]
+  digest = "1:d395f9e8e637fe576f096f6cc65862dc6617236316828032b5a26b42bc9a62a0"
+  name = "github.com/multiformats/go-multiaddr-net"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cba4f9fea8613343eb7ecc4ddadd8e7298a00c39"
+  version = "v1.6.3"
+
+[[projects]]
+  digest = "1:c0ea71365e7d0e63a2e8f48e6fc2ba92f2f2b739bbeb3cdabdcd719037e175c2"
+  name = "github.com/multiformats/go-multihash"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8be2a682ab9f254311de1375145a2f78a809b07d"
+  version = "v1.0.8"
 
 [[projects]]
   digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
@@ -403,6 +554,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
+
+[[projects]]
+  digest = "1:919bb3aa6d9d0b67648c219fa4925312bc3c2872da19e818fa769e9c97a2b643"
+  name = "github.com/spaolacci/murmur3"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9f5d223c60793748f04a9d5b4b4eacddfc1f755d"
+  version = "v1.1"
 
 [[projects]]
   digest = "1:bd1ae00087d17c5a748660b8e89e1043e1e5479d0fea743352cda2f8dd8c4f84"
@@ -585,6 +744,22 @@
   version = "0.23.1-rc0-iris1"
 
 [[projects]]
+  digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
+  name = "github.com/tendermint/tmlibs"
+  packages = ["cli"]
+  pruneopts = "UT"
+  revision = "49596e0a1f48866603813df843c9409fc19805c6"
+  version = "v0.9.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:e2599924072678810fe41b00dead8e11e95fa55be2dbc01b5309c4bf04f2209c"
+  name = "github.com/whyrusleeping/tar-utils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8c6c8ba81d5c71fd69c0f48dbde4b2fb422b6dfc"
+
+[[projects]]
   digest = "1:4dcb0dd65feecb068ce23a234d1a07c7868a1e39f52a6defcae0bb371d03abf6"
   name = "github.com/zondax/ledger-goclient"
   packages = ["."]
@@ -593,9 +768,10 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:27507554c6d4f060d8d700c31c624a43d3a92baa634e178ddc044bdf7d13b44a"
+  digest = "1:08ee0e71139155154f1bf134ac603cb13421e80176a7248b66f47f6fa3ce211b"
   name = "golang.org/x/crypto"
   packages = [
+    "blake2s",
     "blowfish",
     "chacha20poly1305",
     "curve25519",
@@ -610,6 +786,7 @@
     "poly1305",
     "ripemd160",
     "salsa20/salsa",
+    "sha3",
   ]
   pruneopts = "UT"
   revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
@@ -745,9 +922,11 @@
     "github.com/cosmos/cosmos-sdk/x/stake",
     "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
+    "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
     "github.com/gorilla/mux",
+    "github.com/ipfs/go-ipfs-api",
     "github.com/mattn/go-isatty",
     "github.com/pelletier/go-toml",
     "github.com/pkg/errors",
@@ -761,6 +940,7 @@
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "github.com/spf13/viper",
+    "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
     "github.com/tendermint/go-amino",
     "github.com/tendermint/tendermint/abci/server",
@@ -785,6 +965,7 @@
     "github.com/tendermint/tendermint/rpc/lib/server",
     "github.com/tendermint/tendermint/state",
     "github.com/tendermint/tendermint/types",
+    "github.com/tendermint/tmlibs/cli",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

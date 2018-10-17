@@ -44,6 +44,6 @@ func DefaultGenesisState() GenesisState {
 // get raw genesis raw message for testing
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
-		SwitchPeriod: 40,
+		SwitchPeriod: 15,
 	}
 }

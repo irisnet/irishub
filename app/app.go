@@ -4,10 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"os"
-	"strings"
-
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -24,6 +20,7 @@ import (
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/iservice"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -34,6 +31,9 @@ import (
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"io"
+	"os"
+	"strings"
 )
 
 const (
@@ -63,6 +63,7 @@ type IrisApp struct {
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
 	keyUpgrade       *sdk.KVStoreKey
+	keyIservice      *sdk.KVStoreKey
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -75,6 +76,7 @@ type IrisApp struct {
 	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
+	iserviceKeeper      iservice.Keeper
 	recordKeeper        record.Keeper
 
 	// fee manager
@@ -101,6 +103,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 		keyParams:        sdk.NewKVStoreKey("params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
+		keyIservice:      sdk.NewKVStoreKey("iservice"),
 	}
 
 	var lastHeight int64
@@ -125,6 +128,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	app.recordKeeper = record.NewKeeper(app.cdc, app.keyRecord, app.RegisterCodespace(record.DefaultCodespace))
+	app.iserviceKeeper = iservice.NewKeeper(app.cdc, app.keyIservice, app.RegisterCodespace(iservice.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -135,7 +139,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
-		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper))
+		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
+		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper))
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 	// initialize BaseApp
@@ -145,8 +150,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord)
-
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyIservice)
 	app.SetRunMsg(app.runMsgs)
 
 	var err error
@@ -160,6 +164,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	upgrade.RegisterModuleList(app.Router())
+	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
 
 	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
 		&govparams.DepositProcedureParameter,
@@ -187,9 +192,9 @@ func MakeCodec() *wire.Codec {
 	record.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
 	upgrade.RegisterWire(cdc)
+	iservice.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
-
 	return cdc
 }
 

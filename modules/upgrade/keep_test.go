@@ -49,7 +49,10 @@ func TestUpdateKeeper(t *testing.T) {
 		t.FailNow()
 	}
 
-	version = keeper.GetVersionByVersionId(ctx, 1)
+	kvStore := ctx.KVStore(keeper.storeKey)
+	keeper.RefreshVersionList(kvStore)
+
+	version = keeper.GetVersionByVersionId(1)
 	if version == nil || version.Id != 1 {
 		t.FailNow()
 	}
