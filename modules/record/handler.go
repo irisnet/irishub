@@ -22,6 +22,6 @@ func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitFile) sdk.
 	keeper.AddRecord(ctx, msg)
 
 	return sdk.Result{
-		Log: msg.RecordId,
+		Log: msg.RecordID,
 	}
 }
