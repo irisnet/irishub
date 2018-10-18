@@ -18,6 +18,7 @@ import (
 	govcli "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/keys"
 	stakecli "github.com/irisnet/irishub/client/stake"
+	iservicecli "github.com/irisnet/irishub/client/iservice"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
@@ -55,7 +56,7 @@ func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
 	return coins[0]
 }
 
-func getAmuntFromCoinStr(coinStr string) float64 {
+func getAmountFromCoinStr(coinStr string) float64 {
 	index := strings.Index(coinStr, "iris")
 	if index <= 0 {
 		return -1
@@ -324,4 +325,13 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return switchMsg
+}
+
+func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.ServiceOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var serviceDef iservicecli.ServiceOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return serviceDef
 }

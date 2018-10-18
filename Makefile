@@ -46,6 +46,7 @@ install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(BUILD_FLAGS) ./cmd/irislcd
+	go install $(BUILD_FLAGS) ./cmd/irismon
 
 install_debug:
 	go install ./cmd/irisdebug
@@ -53,17 +54,20 @@ install_debug:
 build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
 
 build_windows: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iris.exe ./cmd/iris && \
     CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iriscli.exe ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irislcd.exe ./cmd/irislcd
+    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irislcd.exe ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irismon.exe ./cmd/irismon
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
 	go build -o build/iriscli ./cmd/iriscli && \
-	go build -o build/irislcd ./cmd/irislcd
+	go build -o build/irislcd ./cmd/irislcd && \
+	go build -o build/irismon ./cmd/irismon
 
 build_examples: update_irislcd_swagger_docs
 	go build  -o build/iris1 ./examples/irishub1/cmd/iris1
