@@ -36,13 +36,13 @@ func (keeper Keeper) WireCodec() *wire.Codec {
 	return keeper.cdc
 }
 
-func KeyRecord(addr sdk.AccAddress, dataHash string) []byte {
-	return []byte(fmt.Sprintf("record:%d:%s", addr, dataHash))
+func KeyRecord(dataHash string) []byte {
+	return []byte(fmt.Sprintf("record:%s", dataHash))
 }
 
 func (keeper Keeper) AddRecord(ctx sdk.Context, msg MsgSubmitFile) {
 
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinary(msg)
-	store.Set(KeyRecord(msg.OwnerAddress, msg.DataHash), bz)
+	store.Set(KeyRecord(msg.DataHash), bz)
 }

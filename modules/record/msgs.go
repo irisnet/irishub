@@ -33,7 +33,7 @@ func NewMsgSubmitFile(description string,
 		OwnerAddress: ownerAddress,
 		DataHash:     dataHash,
 		DataSize:     dataSize,
-		RecordID:     string(KeyRecord(ownerAddress, dataHash)),
+		RecordID:     string(KeyRecord(dataHash)),
 		Data:         data,
 	}
 }

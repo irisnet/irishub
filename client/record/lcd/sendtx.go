@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -12,17 +13,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
+	recordClient "github.com/irisnet/irishub/client/record"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
 )
 
 type postRecordReq struct {
-	BaseTx      context.BaseTx `json:"base_tx"`
-	FilePath    string         `json:"file_path"`
-	Data        string         `json:"data"`
+	BaseTx      context.BaseTx `json:"base_tx"`   // basic tx info
 	Submitter   string         `json:"submitter"` //  Address of the submitter
-	PinedNode   string         `json:"pined_node"`
 	Description string         `json:"description"`
+	FilePath    string         `json:"file_path"`  // for ipfs
+	PinedNode   string         `json:"pined_node"` // for ipfs
+	Data        string         `json:"data"`       // for onchain
 }
 
 func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -54,8 +56,14 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 		// --onchain-data has a high priority over --file-path
 		if len(onchainData) != 0 {
 			dataSize = int64(binary.Size([]byte(onchainData)))
+			if dataSize >= recordClient.UploadLimitOfIpfs {
+				utils.WriteErrorResponse(w, http.StatusBadRequest,
+					fmt.Sprintf("Upload data is too large, max supported data size is %d", recordClient.UploadLimitOfIpfs))
+				return
+			}
+
 			sum := sha256.Sum256([]byte(onchainData))
-			recordHash = hex.EncodeToString(sum[:])
+			recordHash = hex.EncodeToString(sum[:recordClient.IpfsHashLength/2])
 		} else if len(filePath) != 0 {
 
 			var fileInfo os.FileInfo
@@ -63,7 +71,13 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+
 			dataSize = fileInfo.Size()
+			if dataSize >= recordClient.UploadLimitOfIpfs {
+				utils.WriteErrorResponse(w, http.StatusBadRequest,
+					fmt.Sprintf("Upload data is too large, max supported data size is %d", recordClient.UploadLimitOfIpfs))
+				return
+			}
 
 			//upload to ipfs
 			sh := ipfs.NewShell(req.PinedNode)
@@ -78,7 +92,19 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 				return
 			}
 		} else {
+			utils.WriteErrorResponse(w, http.StatusBadRequest,
+				"--onchain-data and --file-path are both empty and pleae specify one of them")
+			return
+		}
+
+		recordID := record.KeyRecord(recordHash)
+		res, err := cliCtx.QueryStore([]byte(recordID), storeName)
+		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		if len(res) != 0 {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Record ID '%s' is already existed", recordID))
 			return
 		}
 

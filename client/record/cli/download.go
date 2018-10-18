@@ -35,27 +35,44 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 			var submitFile record.MsgSubmitFile
 			cdc.MustUnmarshalBinary(res, &submitFile)
 
-			if len(submitFile.DataHash) == 0 {
+			filePath := filepath.Join(home, downloadFileName)
+			if _, err := os.Stat(filePath); !os.IsNotExist(err) {
+				fmt.Printf("Warning: %v already exists, please try another file name.\n", filePath)
+				return err
+			}
+
+			if len(submitFile.RecordID) == 0 {
 				fmt.Errorf("Request file was not found on the blockchain.\n")
 				return nil
 			}
+			if len(submitFile.Data) != 0 {
+				//Begin to download file from blockchain directly
+				fmt.Printf("[ONCHAIN] Downloading %v from blockchain directly...\n", filePath)
+				fh, err := os.Create(filePath)
+				if err != nil {
+					return err
+				}
 
-			filePath := filepath.Join(home, downloadFileName)
-			sh := shell.NewShell(strPinedNode)
+				defer func() {
+					if err := fh.Close(); err != nil {
+						panic(err)
+					}
+				}()
 
-			//Begin to download file from ipfs
-			if _, err := os.Stat(filePath); !os.IsNotExist(err) {
-				fmt.Printf("%v already exists, please try another file name.\n", filePath)
-				return err
+				if _, err := fh.Write([]byte(submitFile.Data)); err != nil {
+					return err
+				}
+				fmt.Println("[ONCHAIN] Download file from blockchain complete.")
+			} else {
+				//Begin to download file from ipfs
+				fmt.Printf("[IPFS] Downloading %v from ipfs...\n", filePath)
+				sh := shell.NewShell(strPinedNode)
+				err = sh.Get(submitFile.DataHash, filePath)
+				if err != nil {
+					return err
+				}
+				fmt.Println("[IPFS] Download file from ipfs complete.")
 			}
-
-			fmt.Printf("Downloading %v ...\n", filePath)
-			err = sh.Get(submitFile.DataHash, filePath)
-			if err != nil {
-				return err
-			}
-			fmt.Println("Download file complete.")
-
 			return nil
 		},
 	}
