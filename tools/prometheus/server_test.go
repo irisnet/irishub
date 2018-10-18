@@ -1,30 +1,32 @@
 package prometheus
 
 import (
+	"fmt"
+	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"github.com/spf13/viper"
-	"testing"
-	"github.com/go-kit/kit/metrics"
-	"time"
-	"github.com/shirou/gopsutil/cpu"
-	"net/http"
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"log"
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/spf13/viper"
 	cmn "github.com/tendermint/tendermint/libs/common"
+	"log"
+	"net/http"
 	"sync"
+	"testing"
+	"time"
 )
 
 func TestMetricsCmd(t *testing.T) {
 	cdc := app.MakeCodec()
 	comm := MonitorCommand(cdc)
 	viper.Set("node", "tcp://0.0.0.0:26657")
-  viper.Set("address", "25C2FA00D832E8BEC64E2B5CB4AD2066ADE79DB3")	
+	viper.Set("address", "25C2FA00D832E8BEC64E2B5CB4AD2066ADE79DB3")
+	viper.Set("account-address", "faa1gg37u8xhw5vhrfmr5mkfq8r5l4wgvd36t9hypd")
 	viper.Set("home", app.DefaultNodeHome)
-	viper.Set("chain-id", "fuxi-test")
+	viper.Set("chain-id", "test")
 	viper.Set("recursively", true)
+	viper.Set("trust-node", true)
 	viper.Set("port", 36660)
 	comm.ExecuteC()
 }
@@ -62,7 +64,7 @@ func Test(t *testing.T) {
 	})
 }
 
-func getCPUUsedPercent(){
+func getCPUUsedPercent() {
 	percents, _ := cpu.Percent(time.Millisecond*1000, false)
 	tmp := float64(0.0)
 	for _, percent := range percents {
@@ -73,7 +75,7 @@ func getCPUUsedPercent(){
 	CPUUsedPercent = tmp
 }
 
-func RecordMetrics(CPUUtilization (metrics.Gauge)) {
+func RecordMetrics(CPUUtilization metrics.Gauge) {
 	go getCPUUsedPercent()
 	lock.RLock()
 	defer lock.RUnlock()

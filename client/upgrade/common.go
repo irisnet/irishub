@@ -10,7 +10,7 @@ type UpgradeInfoOutput struct {
 	Verion                      upgrade.Version `json:"version"`
 }
 
-func ConvertDepositToDepositOutput(version upgrade.Version, proposalId, hight int64) UpgradeInfoOutput {
+func ConvertUpgradeInfoToUpgradeOutput(version upgrade.Version, proposalId, hight int64) UpgradeInfoOutput {
 
 	return UpgradeInfoOutput{
 		CurrentProposalId:           proposalId,
