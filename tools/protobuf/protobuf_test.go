@@ -16,10 +16,27 @@ func TestSerializeJsonToProto(t *testing.T) {
 	messageName := "Test"
 	jsonString := json
 
-	fmt.Println("-----------------serialize json string to proto byte array-----------------------")
-	resultByte := SerializeJsonToProto(path, name, messageName, jsonString)
+	resultByte, err := SerializeJsonToProto(path, name, messageName, jsonString)
+	require.Nil(t, err)
 	fmt.Println(resultByte)
 	require.Equal(t, byteArray, resultByte)
+
+	// Check error handler
+	path = "./test1/"
+	_, err = SerializeJsonToProto(path, name, messageName, jsonString)
+	fmt.Println(err.Error())
+	require.EqualErrorf(t, err, "proto file doesn't exist", "Error message doesn't match")
+
+	path = "./test/"
+	name = "foo_invalid.proto"
+	_, err = SerializeJsonToProto(path, name, messageName, jsonString)
+	require.EqualErrorf(t, err, "failed to serialize json to protobuf", "Error message doesn't match")
+
+	path = "./test/"
+	name = "foo.proto"
+	messageName = "Test1"
+	_, err = SerializeJsonToProto(path, name, messageName, jsonString)
+	require.EqualErrorf(t, err, "failed to serialize json to protobuf", "Error message doesn't match")
 }
 
 func TestConvertProtoToJson(t *testing.T) {
@@ -28,9 +45,26 @@ func TestConvertProtoToJson(t *testing.T) {
 	messageName := "Test"
 	protobufByteArray := byteArray
 
-	fmt.Println("-----------------serialize json string to proto byte array-----------------------")
-	jsonString := ConvertProtoToJson(path, name, messageName, protobufByteArray)
+	jsonString, err := ConvertProtoToJson(path, name, messageName, protobufByteArray)
+	require.Nil(t, err)
 	fmt.Println(json)
 	jsonString = strings.TrimSuffix(jsonString, "\n")
 	require.Equal(t, json, jsonString)
+
+	// Check error handler
+	path = "./test1/"
+	_, err = ConvertProtoToJson(path, name, messageName, protobufByteArray)
+	fmt.Println(err.Error())
+	require.EqualErrorf(t, err, "proto file doesn't exist", "Error message doesn't match")
+
+	path = "./test/"
+	name = "foo_invalid.proto"
+	_, err = ConvertProtoToJson(path, name, messageName, protobufByteArray)
+	require.EqualErrorf(t, err, "failed to convert protobuf to json", "Error message doesn't match")
+
+	path = "./test/"
+	name = "foo.proto"
+	messageName = "Test1"
+	_, err = ConvertProtoToJson(path, name, messageName, protobufByteArray)
+	require.EqualErrorf(t, err, "failed to convert protobuf to json", "Error message doesn't match")
 }

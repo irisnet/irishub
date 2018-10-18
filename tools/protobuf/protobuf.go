@@ -8,10 +8,22 @@ package protobuf
 import "C"
 
 import (
-    "unsafe"
+	"fmt"
+	"os"
+	"unsafe"
 )
 
-func SerializeJsonToProto(protoPath, protoName, messageName string, jsonString string) []byte {
+func checkFileExistence(protoPath, protoName string) error {
+	if _, err := os.Stat(protoPath + "/" + protoName); os.IsNotExist(err) {
+		return fmt.Errorf("ERROR: proto file doesn't exist")
+	}
+	return nil
+}
+
+func SerializeJsonToProto(protoPath, protoName, messageName string, jsonString string) ([]byte, error) {
+	if err := checkFileExistence(protoPath, protoName); err != nil {
+		return nil, err
+	}
 	path := C.CString(protoPath)
 	name := C.CString(protoName)
 	message := C.CString(messageName)
@@ -26,12 +38,19 @@ func SerializeJsonToProto(protoPath, protoName, messageName string, jsonString s
 
 	resultLength := C.int(0)
 	resultByte := C.serializeJsonToProto(path, name, message, json, &resultLength)
+	if resultLength == 0 {
+		return nil, fmt.Errorf("failed to serialize json to protobuf")
+	}
 	protoBufByte := C.GoBytes(unsafe.Pointer(resultByte), resultLength)
 	C.free(unsafe.Pointer(resultByte))
-	return protoBufByte
+	return protoBufByte, nil
 }
 
-func ConvertProtoToJson(protoPath, protoName, messageName string, protoBufByte []byte) string {
+func ConvertProtoToJson(protoPath, protoName, messageName string, protoBufByte []byte) (string, error) {
+	if err := checkFileExistence(protoPath, protoName); err != nil {
+		return "", err
+	}
+
 	path := C.CString(protoPath)
 	name := C.CString(protoName)
 	message := C.CString(messageName)
@@ -46,7 +65,10 @@ func ConvertProtoToJson(protoPath, protoName, messageName string, protoBufByte [
 	protoBufCByteLength := C.int(len(protoBufByte))
 	resultLength := C.int(0)
 	resultByte := C.convertProtoToJson(path, name, message, protoBufCByte, protoBufCByteLength, &resultLength)
+	if resultLength == 0 {
+		return "", fmt.Errorf("failed to convert protobuf to json")
+	}
 	json := C.GoStringN(resultByte, resultLength)
 	C.free(unsafe.Pointer(resultByte))
-	return json
+	return json, nil
 }

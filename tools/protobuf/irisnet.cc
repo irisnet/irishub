@@ -13,20 +13,6 @@ using namespace std;
 using namespace google::protobuf;
 using namespace google::protobuf::compiler;
 using google::protobuf::Message;
-/*
-constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-string hexStr(const char *data, int len)
-{
-    string s(len * 2, ' ');
-    for (int i = 0; i < len; ++i) {
-        s[2 * i]     = hexmap[(data[i] & 0xF0) >> 4];
-        s[2 * i + 1] = hexmap[data[i] & 0x0F];
-    }
-    return s;
-}
-*/
 
 char* serializeJsonToProto(char* protoFilePath, char* protoFileName, char* messageName, char* jsonString, int* length)
 {
@@ -37,10 +23,18 @@ char* serializeJsonToProto(char* protoFilePath, char* protoFileName, char* messa
     Importer importer(&sourceTree, NULL);
     //runtime compile foo.proto
     string fileName(protoFileName);
-    importer.Import(fileName);
+    if (importer.Import(fileName) == NULL) {
+        std::cout << "ERROR: failed to import proto file, please verifiy your proto file path and its validity" << std::endl;
+        return NULL;
+    }
+
 
     string protoMessageName(messageName);
     const Descriptor *descriptor = importer.pool()->FindMessageTypeByName(protoMessageName);
+    if (descriptor == NULL) {
+        std::cout << "ERROR: failed to get message descriptor, please check your message name" << std::endl;
+        return NULL;
+    }
 
     // build a dynamic message by "Pair" proto
     DynamicMessageFactory factory;
@@ -50,7 +44,8 @@ char* serializeJsonToProto(char* protoFilePath, char* protoFileName, char* messa
 
     string json(jsonString);
     if (Json2Pb(*pair, json) < 0 ) {
-        std::cout << "ERROR" << std::endl;
+        std::cout << "ERROR: failed to covert json to protobuf message" << std::endl;
+        return NULL;
     }
 
     ostringstream oss;
@@ -75,10 +70,17 @@ char* convertProtoToJson(char* protoFilePath, char* protoFileName, char* message
     Importer importer(&sourceTree, NULL);
     //runtime compile foo.proto
     string fileName(protoFileName);
-    importer.Import(fileName);
+    if (importer.Import(fileName) == NULL) {
+            std::cout << "ERROR: failed to import proto file, please verifiy your proto file path and its validity" << std::endl;
+            return NULL;
+        }
 
     string protoMessageName(messageName);
     const Descriptor *descriptor = importer.pool()->FindMessageTypeByName(protoMessageName);
+    if (descriptor == NULL) {
+            std::cout << "ERROR: failed to get message descriptor, please check your message name" << std::endl;
+            return NULL;
+        }
 
     // build a dynamic message by "Pair" proto
     DynamicMessageFactory factory;
@@ -91,7 +93,9 @@ char* convertProtoToJson(char* protoFilePath, char* protoFileName, char* message
     pair->ParseFromIstream(&ss);
 
     string resultString;
-    Pb2Json(*pair, resultString);
+    if (Pb2Json(*pair, resultString)< 0 ) {
+        std::cout << "ERROR: failed to covert protobuf message to json" << std::endl;
+    }
     *length = resultString.size();
     delete pair;
 
