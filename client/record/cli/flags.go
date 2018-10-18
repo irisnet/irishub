@@ -8,6 +8,4 @@ const (
 	flagFileName    = "file-name"
 	flagTargetPath  = "target-path"
 	flagRecordID    = "record-id"
-
-	uploadLimit = 1024 //upload limit in bytes
 )
