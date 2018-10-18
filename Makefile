@@ -1,5 +1,5 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest')
-all: get_tools get_vendor_deps install
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd')
+all: get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 BUILD_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
@@ -92,11 +92,13 @@ build_example_linux: update_irislcd_swagger_docs
 ########################################
 ### Testing
 
-test: test_unit test_cli
-
-test_cli:
-	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+test: test_unit test_cli test_lcd
 
 test_unit:
 	@go test $(PACKAGES_NOSIMULATION)
 
+test_cli:
+	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+
+test_lcd:
+	@go test `go list github.com/irisnet/irishub/client/lcd`

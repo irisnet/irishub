@@ -68,13 +68,15 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:b377b858bfe55eaae4ea65a2ab5d00c039b0bae31a87a99224bd957ddbce999b"
+  digest = "1:2b5a43f6f995df4351c75a74b8c0f895b581b5b61dc80d6eb40326374e84082d"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
     "client",
     "client/context",
     "client/keys",
+    "client/rpc",
+    "client/tx",
     "client/utils",
     "crypto",
     "crypto/keys",
@@ -100,6 +102,7 @@
     "x/params",
     "x/slashing",
     "x/stake",
+    "x/stake/client/rest",
     "x/stake/keeper",
     "x/stake/tags",
     "x/stake/types",
@@ -900,6 +903,9 @@
     "github.com/cosmos/cosmos-sdk/baseapp",
     "github.com/cosmos/cosmos-sdk/client",
     "github.com/cosmos/cosmos-sdk/client/context",
+    "github.com/cosmos/cosmos-sdk/client/keys",
+    "github.com/cosmos/cosmos-sdk/client/rpc",
+    "github.com/cosmos/cosmos-sdk/client/tx",
     "github.com/cosmos/cosmos-sdk/client/utils",
     "github.com/cosmos/cosmos-sdk/crypto",
     "github.com/cosmos/cosmos-sdk/crypto/keys",
@@ -920,6 +926,7 @@
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/stake",
+    "github.com/cosmos/cosmos-sdk/x/stake/client/rest",
     "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
     "github.com/emicklei/proto",
@@ -946,6 +953,7 @@
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
     "github.com/tendermint/tendermint/blockchain",
+    "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/ed25519",
@@ -960,6 +968,9 @@
     "github.com/tendermint/tendermint/lite/proxy",
     "github.com/tendermint/tendermint/mempool",
     "github.com/tendermint/tendermint/node",
+    "github.com/tendermint/tendermint/p2p",
+    "github.com/tendermint/tendermint/privval",
+    "github.com/tendermint/tendermint/proxy",
     "github.com/tendermint/tendermint/rpc/client",
     "github.com/tendermint/tendermint/rpc/core/types",
     "github.com/tendermint/tendermint/rpc/lib/server",
