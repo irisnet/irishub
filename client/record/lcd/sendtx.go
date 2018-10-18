@@ -1,6 +1,9 @@
 package lcd
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
 	"net/http"
 	"os"
 	"time"
@@ -16,9 +19,10 @@ import (
 type postRecordReq struct {
 	BaseTx      context.BaseTx `json:"base_tx"`
 	FilePath    string         `json:"file_path"`
-	Description string         `json:"description"`
+	Data        string         `json:"data"`
 	Submitter   string         `json:"submitter"` //  Address of the submitter
 	PinedNode   string         `json:"pined_node"`
+	Description string         `json:"description"`
 }
 
 func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -42,22 +46,38 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		var fileInfo os.FileInfo
-		if fileInfo, err = os.Stat(req.FilePath); os.IsNotExist(err) {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		dataSize := fileInfo.Size()
+		onchainData := req.Data
+		filePath := req.FilePath
 
-		//upload to ipfs
-		sh := ipfs.NewShell(req.PinedNode)
-		f, err := os.Open(req.FilePath)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		dataHash, err := sh.Add(f)
-		if err != nil {
+		var recordHash string
+		var dataSize int64
+		// --onchain-data has a high priority over --file-path
+		if len(onchainData) != 0 {
+			dataSize = int64(binary.Size([]byte(onchainData)))
+			sum := sha256.Sum256([]byte(onchainData))
+			recordHash = hex.EncodeToString(sum[:])
+		} else if len(filePath) != 0 {
+
+			var fileInfo os.FileInfo
+			if fileInfo, err = os.Stat(req.FilePath); os.IsNotExist(err) {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			dataSize = fileInfo.Size()
+
+			//upload to ipfs
+			sh := ipfs.NewShell(req.PinedNode)
+			f, err := os.Open(req.FilePath)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			recordHash, err = sh.Add(f)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -65,7 +85,7 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 		submitTime := time.Now().Unix()
 
 		// create the message
-		msg := record.NewMsgSubmitFile(req.Description, submitTime, submitter, dataHash, dataSize)
+		msg := record.NewMsgSubmitFile(req.Description, submitTime, submitter, recordHash, dataSize, onchainData)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

@@ -1,6 +1,9 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"time"
@@ -17,33 +20,15 @@ import (
 )
 
 // GetCmdSubmitFile implements submitting upload file transaction command.
-func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
 		Short: "Submit the specified file",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			description := viper.GetString(flagDescription)
-			strFilepath := viper.GetString(flagPath)
-			strPinedNode := viper.GetString(flagPinedNode)
-
-			var fileInfo os.FileInfo
-			var err error
-			if fileInfo, err = os.Stat(strFilepath); os.IsNotExist(err) {
-				fmt.Printf("File %v doesn't exists, please check correstponding path.\n", strFilepath)
-				return err
-			}
-			dataSize := fileInfo.Size()
-
-			//upload to ipfs
-			sh := ipfs.NewShell(strPinedNode)
-			f, err := os.Open(strFilepath)
-			if err != nil {
-				return err
-			}
-			dataHash, err := sh.Add(f)
-			if err != nil {
-				return err
-			}
+			onchainData := viper.GetString(flagOnchainData)
+			filePath := viper.GetString(flagFilePath)
+			pinedNode := viper.GetString(flagPinedNode)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -55,14 +40,57 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			submitTime := time.Now().Unix()
+			var recordHash string
+			var dataSize int64
+			// --onchain-data has a high priority over --file-path
+			if len(onchainData) != 0 {
+				dataSize = int64(binary.Size([]byte(onchainData)))
+				sum := sha256.Sum256([]byte(onchainData))
+				recordHash = hex.EncodeToString(sum[:])
+			} else if len(filePath) != 0 {
+				var fileInfo os.FileInfo
+				if fileInfo, err = os.Stat(filePath); os.IsNotExist(err) {
+					fmt.Printf("File %v doesn't exists, please check correstponding path.\n", filePath)
+					return err
+				}
+				dataSize = fileInfo.Size()
 
+				//upload to ipfs
+				sh := ipfs.NewShell(pinedNode)
+				f, err := os.Open(filePath)
+				if err != nil {
+					return err
+				}
+				ipfsHash, err := sh.Add(f)
+				recordHash = ipfsHash
+				if err != nil {
+					return err
+				}
+			} else {
+				fmt.Printf("--onchain-data and --file-path are both empty and pleae specify one of them")
+				return err
+			}
+
+			if dataSize >= uploadLimit {
+				fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, uploadLimit)
+				return err
+			}
+
+			recordID := record.KeyRecord(fromAddr, recordHash)
+			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
+			if len(res) != 0 || err != nil {
+				// Corresponding record id is already existed, so there is no need to upload file/data
+				return fmt.Errorf("Record ID [%s] is already existed", recordID)
+			}
+
+			submitTime := time.Now().Unix()
 			msg := record.NewMsgSubmitFile(
 				description,
 				submitTime,
 				fromAddr,
-				dataHash,
+				recordHash,
 				dataSize,
+				onchainData,
 			)
 
 			if cliCtx.GenerateOnly {
@@ -76,8 +104,14 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagDescription, "record file", "description of file")
-	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
+	// common flag
+	cmd.Flags().String(flagDescription, "description", "uploaded file description")
+
+	// onchain flag
+	cmd.Flags().String(flagOnchainData, "", "on chain data source")
+
+	// ipfs related flag
+	cmd.Flags().String(flagFilePath, "", "full path of file (include filename)")
 	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")
 
 	return cmd

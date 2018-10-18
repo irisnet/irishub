@@ -12,7 +12,7 @@ type RecordOutput struct {
 	OwnerAddress sdk.AccAddress `json:"OwnerAddress"` // Owner of file
 	DataHash     string         `json:"DataHash"`     // IPFS hash of file
 	DataSize     int64          `json:"DataSize"`     // File Size in bytes
-	RecordId     string         `json:"RecordId"`     // Record index ID
+	RecordID     string         `json:"RecordID"`     // Record index ID
 }
 
 func ConvertRecordToRecordOutput(cliCtx context.CLIContext, r record.MsgSubmitFile) (RecordOutput, error) {
@@ -22,7 +22,7 @@ func ConvertRecordToRecordOutput(cliCtx context.CLIContext, r record.MsgSubmitFi
 		OwnerAddress: r.OwnerAddress,
 		DataHash:     r.DataHash,
 		DataSize:     r.DataSize,
-		RecordId:     r.RecordId,
+		RecordID:     r.RecordID,
 	}
 
 	return recordOutput, nil

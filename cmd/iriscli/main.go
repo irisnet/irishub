@@ -6,6 +6,7 @@ import (
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
+	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
@@ -13,7 +14,6 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
-	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -166,7 +166,7 @@ func main() {
 
 	recordCmd.AddCommand(
 		client.PostCommands(
-			recordcmd.GetCmdSubmitFile(cdc),
+			recordcmd.GetCmdSubmitFile("record", cdc),
 		)...)
 	rootCmd.AddCommand(
 		recordCmd,

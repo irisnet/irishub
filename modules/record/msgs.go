@@ -12,26 +12,29 @@ const MsgType = "record"
 //-----------------------------------------------------------
 // MsgSubmitFile
 type MsgSubmitFile struct {
-	Description  string         // File description
 	SubmitTime   int64          // File upload timestamp
 	OwnerAddress sdk.AccAddress // Owner of file
-	DataHash     string         // IPFS hash of file
-	DataSize     int64          // File Size in bytes
-	RecordId     string         // Record index ID
+	RecordID     string         // Record index ID
+	Description  string         // Data/file description
+	DataHash     string         // Data/file hash
+	DataSize     int64          // Data/file Size in bytes
+	Data         string         // Onchain data
 }
 
 func NewMsgSubmitFile(description string,
 	submitTime int64,
 	ownerAddress sdk.AccAddress,
 	dataHash string,
-	dataSize int64) MsgSubmitFile {
+	dataSize int64,
+	data string) MsgSubmitFile {
 	return MsgSubmitFile{
 		Description:  description,
 		SubmitTime:   submitTime,
 		OwnerAddress: ownerAddress,
 		DataHash:     dataHash,
 		DataSize:     dataSize,
-		RecordId:     string(KeyRecord(ownerAddress, dataHash)),
+		RecordID:     string(KeyRecord(ownerAddress, dataHash)),
+		Data:         data,
 	}
 }
 

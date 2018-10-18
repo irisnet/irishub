@@ -1,10 +1,13 @@
 package cli
 
 const (
-	flagPath        = "file-path"
+	flagFilePath    = "file-path"
+	flagOnchainData = "onchain-data"
 	flagDescription = "description"
 	flagPinedNode   = "pinednode"
 	flagFileName    = "file-name"
 	flagTargetPath  = "target-path"
 	flagRecordID    = "record-id"
+
+	uploadLimit = 1024 //upload limit in bytes
 )
