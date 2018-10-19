@@ -40,7 +40,7 @@ func KeyRecord(dataHash string) []byte {
 	return []byte(fmt.Sprintf("record:%s", dataHash))
 }
 
-func (keeper Keeper) AddRecord(ctx sdk.Context, msg MsgSubmitFile) {
+func (keeper Keeper) AddRecord(ctx sdk.Context, msg MsgSubmitRecord) {
 
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinary(msg)

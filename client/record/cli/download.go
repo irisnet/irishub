@@ -22,7 +22,7 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			strPinedNode := viper.GetString(flagPinedNode)
+			pinedNode := viper.GetString(flagPinedNode)
 			downloadFileName := viper.GetString(flagFileName)
 			home := viper.GetString(cli.HomeFlag)
 			recordID := viper.GetString(flagRecordID)
@@ -32,7 +32,7 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 				return fmt.Errorf("Record id [%s] is not existed", recordID)
 			}
 
-			var submitFile record.MsgSubmitFile
+			var submitFile record.MsgSubmitRecord
 			cdc.MustUnmarshalBinary(res, &submitFile)
 
 			filePath := filepath.Join(home, downloadFileName)
@@ -66,7 +66,7 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 			} else {
 				//Begin to download file from ipfs
 				fmt.Printf("[IPFS] Downloading %v from ipfs...\n", filePath)
-				sh := shell.NewShell(strPinedNode)
+				sh := shell.NewShell(pinedNode)
 				err = sh.Get(submitFile.DataHash, filePath)
 				if err != nil {
 					return err

@@ -9,9 +9,14 @@ import (
 // name to idetify transaction types
 const MsgType = "record"
 
+const (
+	UploadLimitOfOnchain = 1024        //upload limit on chain in bytes(1K currently)
+	UploadLimitOfIpfs    = 1024 * 1024 //upload limit on chain in bytes(1M currently)
+)
+
 //-----------------------------------------------------------
-// MsgSubmitFile
-type MsgSubmitFile struct {
+// MsgSubmitRecord
+type MsgSubmitRecord struct {
 	SubmitTime   int64          // File upload timestamp
 	OwnerAddress sdk.AccAddress // Owner of file
 	RecordID     string         // Record index ID
@@ -21,13 +26,13 @@ type MsgSubmitFile struct {
 	Data         string         // Onchain data
 }
 
-func NewMsgSubmitFile(description string,
+func NewMsgSubmitRecord(description string,
 	submitTime int64,
 	ownerAddress sdk.AccAddress,
 	dataHash string,
 	dataSize int64,
-	data string) MsgSubmitFile {
-	return MsgSubmitFile{
+	data string) MsgSubmitRecord {
+	return MsgSubmitRecord{
 		Description:  description,
 		SubmitTime:   submitTime,
 		OwnerAddress: ownerAddress,
@@ -39,10 +44,10 @@ func NewMsgSubmitFile(description string,
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) Type() string { return MsgType }
+func (msg MsgSubmitRecord) Type() string { return MsgType }
 
 // Implements Msg.
-func (msg MsgSubmitFile) ValidateBasic() sdk.Error {
+func (msg MsgSubmitRecord) ValidateBasic() sdk.Error {
 
 	if len(msg.Description) == 0 {
 		return ErrInvalidDescription(DefaultCodespace, msg.Description)
@@ -59,8 +64,8 @@ func (msg MsgSubmitFile) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSubmitFile) String() string {
-	return fmt.Sprintf("MsgSubmitFile{%s, %d, %d}",
+func (msg MsgSubmitRecord) String() string {
+	return fmt.Sprintf("MsgSubmitRecord{%s, %d, %d}",
 		msg.OwnerAddress,
 		msg.DataSize,
 		msg.SubmitTime,
@@ -68,12 +73,12 @@ func (msg MsgSubmitFile) String() string {
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) Get(key interface{}) (value interface{}) {
+func (msg MsgSubmitRecord) Get(key interface{}) (value interface{}) {
 	return nil
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) GetSignBytes() []byte {
+func (msg MsgSubmitRecord) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -82,6 +87,6 @@ func (msg MsgSubmitFile) GetSignBytes() []byte {
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) GetSigners() []sdk.AccAddress {
+func (msg MsgSubmitRecord) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.OwnerAddress}
 }

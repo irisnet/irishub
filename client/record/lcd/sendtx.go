@@ -13,7 +13,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
-	recordClient "github.com/irisnet/irishub/client/record"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
 )
@@ -56,14 +55,14 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 		// --onchain-data has a high priority over --file-path
 		if len(onchainData) != 0 {
 			dataSize = int64(binary.Size([]byte(onchainData)))
-			if dataSize >= recordClient.UploadLimitOfIpfs {
+			if dataSize >= record.UploadLimitOfIpfs {
 				utils.WriteErrorResponse(w, http.StatusBadRequest,
-					fmt.Sprintf("Upload data is too large, max supported data size is %d", recordClient.UploadLimitOfIpfs))
+					fmt.Sprintf("Upload data is too large, max supported data size is %d", record.UploadLimitOfIpfs))
 				return
 			}
 
 			sum := sha256.Sum256([]byte(onchainData))
-			recordHash = hex.EncodeToString(sum[:recordClient.IpfsHashLength/2])
+			recordHash = hex.EncodeToString(sum[:])
 		} else if len(filePath) != 0 {
 
 			var fileInfo os.FileInfo
@@ -73,9 +72,9 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 			}
 
 			dataSize = fileInfo.Size()
-			if dataSize >= recordClient.UploadLimitOfIpfs {
+			if dataSize >= record.UploadLimitOfIpfs {
 				utils.WriteErrorResponse(w, http.StatusBadRequest,
-					fmt.Sprintf("Upload data is too large, max supported data size is %d", recordClient.UploadLimitOfIpfs))
+					fmt.Sprintf("Upload data is too large, max supported data size is %d", record.UploadLimitOfIpfs))
 				return
 			}
 
@@ -111,7 +110,7 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 		submitTime := time.Now().Unix()
 
 		// create the message
-		msg := record.NewMsgSubmitFile(req.Description, submitTime, submitter, recordHash, dataSize, onchainData)
+		msg := record.NewMsgSubmitRecord(req.Description, submitTime, submitter, recordHash, dataSize, onchainData)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

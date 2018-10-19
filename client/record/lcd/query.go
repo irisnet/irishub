@@ -33,7 +33,7 @@ func queryRecordsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) htt
 			return
 		}
 
-		var submitFile record.MsgSubmitFile
+		var submitFile record.MsgSubmitRecord
 		cdc.MustUnmarshalBinary(res, &submitFile)
 
 		recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
@@ -72,7 +72,7 @@ func queryRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		var submitFile record.MsgSubmitFile
+		var submitFile record.MsgSubmitRecord
 		cdc.MustUnmarshalBinary(res, &submitFile)
 
 		recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)

@@ -13,7 +13,6 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
-	recordClient "github.com/irisnet/irishub/client/record"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
@@ -24,7 +23,7 @@ import (
 func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
-		Short: "Submit the specified file",
+		Short: "Submit the specified file/data",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			description := viper.GetString(flagDescription)
 			onchainData := viper.GetString(flagOnchainData)
@@ -46,12 +45,12 @@ func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 			// --onchain-data has a high priority over --file-path
 			if len(onchainData) != 0 {
 				dataSize = int64(binary.Size([]byte(onchainData)))
-				if dataSize >= recordClient.UploadLimitOfOnchain {
-					fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, recordClient.UploadLimitOfOnchain)
+				if dataSize >= record.UploadLimitOfOnchain {
+					fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, record.UploadLimitOfOnchain)
 					return err
 				}
 				sum := sha256.Sum256([]byte(onchainData))
-				recordHash = hex.EncodeToString(sum[:recordClient.IpfsHashLength/2])
+				recordHash = hex.EncodeToString(sum[:])
 			} else if len(filePath) != 0 {
 				var fileInfo os.FileInfo
 				if fileInfo, err = os.Stat(filePath); os.IsNotExist(err) {
@@ -60,8 +59,8 @@ func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 				}
 
 				dataSize = fileInfo.Size()
-				if dataSize >= recordClient.UploadLimitOfIpfs {
-					fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, recordClient.UploadLimitOfIpfs)
+				if dataSize >= record.UploadLimitOfIpfs {
+					fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, record.UploadLimitOfIpfs)
 					return err
 				}
 
@@ -92,7 +91,7 @@ func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			submitTime := time.Now().Unix()
-			msg := record.NewMsgSubmitFile(
+			msg := record.NewMsgSubmitRecord(
 				description,
 				submitTime,
 				fromAddr,

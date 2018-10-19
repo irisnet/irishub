@@ -35,10 +35,10 @@ func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 				return fmt.Errorf("Record ID [%s] is not existed", recordID)
 			}
 
-			var submitFile record.MsgSubmitFile
-			cdc.MustUnmarshalBinary(res, &submitFile)
+			var submitRecord record.MsgSubmitRecord
+			cdc.MustUnmarshalBinary(res, &submitRecord)
 
-			recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
+			recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitRecord)
 			if err != nil {
 				return err
 			}
