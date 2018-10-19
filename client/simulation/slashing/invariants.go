@@ -9,11 +9,10 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
-// AllInvariants tests all governance invariants
+// AllInvariants tests all slashing invariants
 func AllInvariants() simulation.Invariant {
 	return func(t *testing.T, app *baseapp.BaseApp, log string) {
-		// TODO Add some invariants!
-		// Checking proposal queues, no passed-but-unexecuted proposals, etc.
+		// TODO Any invariants to check here?
 		require.Nil(t, nil)
 	}
 }

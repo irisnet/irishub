@@ -24,8 +24,15 @@ const chainID = ""
 type App struct {
 	*bam.BaseApp
 	Cdc        *wire.Codec // Cdc is public since the codec is passed into the module anyways
-	KeyMain    *sdk.KVStoreKey
-	KeyAccount *sdk.KVStoreKey
+	KeyMain          *sdk.KVStoreKey
+	KeyAccount       *sdk.KVStoreKey
+	KeyIBC           *sdk.KVStoreKey
+	KeyStake         *sdk.KVStoreKey
+	KeySlashing      *sdk.KVStoreKey
+	KeyGov           *sdk.KVStoreKey
+	KeyFeeCollection *sdk.KVStoreKey
+	KeyParams        *sdk.KVStoreKey
+	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountMapper       auth.AccountMapper
@@ -53,6 +60,13 @@ func NewApp() *App {
 		Cdc:              cdc,
 		KeyMain:          sdk.NewKVStoreKey("main"),
 		KeyAccount:       sdk.NewKVStoreKey("acc"),
+		KeyIBC:           sdk.NewKVStoreKey("ibc"),
+		KeyStake:         sdk.NewKVStoreKey("stake"),
+		KeySlashing:      sdk.NewKVStoreKey("slashing"),
+		KeyGov:           sdk.NewKVStoreKey("gov"),
+		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
+		KeyParams:        sdk.NewKVStoreKey("params"),
+		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
@@ -133,8 +147,8 @@ func SetGenesis(app *App, accs []auth.Account) {
 func GenTx(msgs []sdk.Msg, accnums []int64, seq []int64, priv ...crypto.PrivKey) auth.StdTx {
 	// Make the transaction free
 	fee := auth.StdFee{
-		Amount: sdk.Coins{sdk.NewInt64Coin("foocoin", 0)},
-		Gas:    100000,
+		Amount: sdk.Coins{sdk.NewInt64Coin("iris-atto", 40000000000000000)},
+		Gas:    20000,
 	}
 
 	sigs := make([]auth.StdSignature, len(priv))
@@ -204,6 +218,36 @@ func GeneratePrivKeyAddressPairsFromRand(rand *rand.Rand, n int) (keys []crypto.
 	}
 	return
 }
+
+// RandomSetGenesis set genesis accounts with random coin values using the
+// provided addresses and coin denominations.
+func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []string) {
+	accts := make([]auth.Account, len(addrs), len(addrs))
+	randCoinIntervals := []BigInterval{
+		{sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 1)},
+		{sdk.NewIntWithDecimal(1, 2), sdk.NewIntWithDecimal(1, 3)},
+		{sdk.NewIntWithDecimal(1, 40), sdk.NewIntWithDecimal(1, 50)},
+	}
+
+	for i := 0; i < len(accts); i++ {
+		coins := make([]sdk.Coin, len(denoms), len(denoms))
+
+		// generate a random coin for each denomination
+		for j := 0; j < len(denoms); j++ {
+			coins[j] = sdk.Coin{Denom: denoms[j],
+				Amount: RandFromBigInterval(r, randCoinIntervals),
+			}
+		}
+
+		app.TotalCoinsSupply = app.TotalCoinsSupply.Plus(coins)
+		baseAcc := auth.NewBaseAccountWithAddress(addrs[i])
+
+		(&baseAcc).SetCoins(coins)
+		accts[i] = &baseAcc
+	}
+	app.GenesisAccounts = accts
+}
+
 
 // GetAllAccounts returns all accounts in the accountMapper.
 func GetAllAccounts(mapper auth.AccountMapper, ctx sdk.Context) []auth.Account {
