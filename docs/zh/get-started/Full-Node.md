@@ -23,7 +23,11 @@ wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-300
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：
 * 将`moniker`字段配置称为自定义的名称，这样便于区分不同的节点
-* `seed`字段用语设置种子节点，在fuxi-3001中的官方中字节点为：3fb472c641078eaaee4a4acbe32841f18967672c@35.165.232.141:26657
+* `seed`字段用语设置种子节点，在fuxi-3001中的官方中字节点为：
+```
+c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
+a12cfb2f535210ea12731f94a76b691832056156@120.79.226.163:26656
+```
 
 ## 启动一个全节点
 

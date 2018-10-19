@@ -373,6 +373,11 @@ func delegatorValidatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) htt
 		bech32validator := vars["validatorAddr"]
 
 		delegatorAddr, err := sdk.AccAddressFromBech32(bech32delegator)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("Error: %s", err.Error())))
+			return
+		}
 		validatorAccAddr, err := sdk.AccAddressFromBech32(bech32validator)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -459,8 +464,8 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 
 		validator, err := getValidator(valAddress, kvs, cliCtx, cdc)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("couldn't query validator. Error: %s", err.Error())))
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -479,7 +484,7 @@ func validatorHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.Handler
 	}
 }
 
-func getValidatorExRate(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+func getValidatorExRate(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// read parameters
 		vars := mux.Vars(r)
@@ -492,7 +497,6 @@ func getValidatorExRate(ctx context.CLIContext, cdc *wire.Codec) http.HandlerFun
 		}
 
 		key := stake.GetValidatorKey(valAddress)
-		cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 		res, err := cliCtx.QueryStore(key, storeName)
 		if err != nil {

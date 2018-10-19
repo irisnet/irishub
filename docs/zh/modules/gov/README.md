@@ -18,7 +18,7 @@
 ### 创建使用环境
 
 ```
-rm -rf iris                                                                         
+rm -rf iris
 rm -rf .iriscli
 iris init gen-tx --name=x --home=iris
 iris init --gen-txs --chain-id=gov-test -o --home=iris
@@ -67,7 +67,7 @@ iriscli gov query-proposal --proposal-id=1 --trust-node
 iriscli gov pull-params --path=iris --trust-node
 
 # 查询配置文件信息
-cat iris/config/params.json                                                         
+cat iris/config/params.json
 {
   "gov": {
     "Gov/gov/DepositProcedure": {
@@ -90,7 +90,7 @@ cat iris/config/params.json
   }
 }
 # 修改配置文件(TallyingProcedure的governance_penalty)
-vi iris/config/params.json                                                            
+vi iris/config/params.json
 {
   "gov": {
     "Gov/gov/DepositProcedure": {
@@ -192,7 +192,7 @@ iriscli gov pull-params --path=iris --trust-node
 
 
 ```
-# 通过命令行带入参数修改信息进行参数修改 
+# 通过命令行带入参数修改信息进行参数修改
 iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
 ```
 
@@ -230,7 +230,7 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
 * 参数的key:"Gov/gov/DepositProcedure"
 * `min_deposit[0].denom`  最小抵押token只能是单位是iris-atto的iris通证。
 * `min_deposit[0].amount` 最小抵押token数量,默认:10iris,范围（1iris，200iris）
-* `max_deposit_period`    补交抵押token的窗口期,默认:10,范围（0，1）     
+* `max_deposit_period`    补交抵押token的窗口期,默认:10,范围（0，1）
 
 ```
 # VotingProcedure（投票阶段的参数）
@@ -238,20 +238,18 @@ echo 1234567890 | iriscli gov submit-proposal --title="update MinDeposit" --desc
     "voting_period": "10"
 },
 ```
-    
+
 * `voting_perid` 投票的窗口期,默认:10,范围（20，20000）
-   
+
 ```
-# TallyingProcedure (统计阶段段参数)    
+# TallyingProcedure (统计阶段段参数)
 "Gov/gov/TallyingProcedure": {
     "threshold": "1/2",
     "veto": "1/3",
     "governance_penalty": "1/100"
 }
-```   
+```
 * `veto` 默认:1/3,范围（0，1）
 * `threshold` 默认:1/2,范围（0，1）
 * `governance_penalty` 未投票的验证人惩罚token的比例 默认:1/100,范围（0，1）
 *  投票统计逻辑：如果强烈反对的voting_power占总的voting_power 超过 veto,提议不通过。然后再看赞同的voting_power占总的投票的voting_power 是否超过 veto,超过则提议不通过,不超过则不通过。
-
-
