@@ -65,6 +65,10 @@
   name = "github.com/emicklei/proto"
   version = "=v1.6.5"
 
+[[constraint]]
+  name = "github.com/ipfs/go-ipfs-api"
+  version = "=v1.3.1"
+
 [prune]
   go-tests = true
   unused-packages = true
