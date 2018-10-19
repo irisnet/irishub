@@ -14,7 +14,7 @@ import (
 
 	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/stretchr/testify/require"
 )
 
