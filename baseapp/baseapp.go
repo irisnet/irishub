@@ -640,7 +640,6 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		// Refund unspent fee
 		if app.feeRefundHandler != nil {
 			refundCoin, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
-
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted

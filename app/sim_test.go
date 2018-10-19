@@ -19,7 +19,7 @@ import (
 	govsim "github.com/irisnet/irishub/modules/gov/simulation"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	slashingsim "github.com/irisnet/irishub/client/simulation/slashing"
-	stake "github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 	stakesim "github.com/irisnet/irishub/client/simulation/stake"
 )
 
@@ -35,7 +35,7 @@ func init() {
 	flag.Int64Var(&seed, "SimulationSeed", 42, "Simulation random seed")
 	flag.IntVar(&numBlocks, "SimulationNumBlocks", 500, "Number of blocks")
 	flag.IntVar(&blockSize, "SimulationBlockSize", 200, "Operations per block")
-	flag.BoolVar(&enabled, "SimulationEnabled", true, "Enable the simulation")
+	flag.BoolVar(&enabled, "SimulationEnabled", false, "Enable the simulation")
 	flag.BoolVar(&verbose, "SimulationVerbose", false, "Verbose log output")
 }
 
@@ -44,12 +44,14 @@ func appStateFn(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json
 
 	// Randomly generate some genesis accounts
 	for _, acc := range accs {
-		amountStr := "100000000000000000000"
+		amountStr := "1000000000000000000000000"
 		amount, ok := sdk.NewIntFromString(amountStr)
 		if ok {
 			fmt.Errorf("invalid token amont %s", amountStr)
 		}
-		coins := sdk.Coins{sdk.Coin{"iris-atto", amount}}
+
+		//TODO: use two coins for stake test, will only one coin after sdk update to v0.25
+		coins := sdk.Coins{{"iris-atto", amount}, {"steak", sdk.NewInt(100)}}
 		genesisAccounts = append(genesisAccounts, GenesisAccount{
 			Address: acc,
 			Coins:   coins,

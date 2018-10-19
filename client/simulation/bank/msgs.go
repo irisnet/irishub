@@ -40,7 +40,8 @@ func TestAndRunSingleInputMsgSend(mapper auth.AccountMapper) simulation.TestAndR
 		}
 
 		denomIndex := r.Intn(len(initFromCoins))
-		amt, goErr := randPositiveInt(r, initFromCoins[denomIndex].Amount)
+		// avoid the rest amt less than fee
+		amt, goErr := randPositiveInt(r, initFromCoins[denomIndex].Amount.Div(sdk.NewInt(2)))
 		if goErr != nil {
 			return "skipping bank send due to account having no coins of denomination " + initFromCoins[denomIndex].Denom, nil
 		}
@@ -86,7 +87,7 @@ func sendAndVerifyMsgSend(t *testing.T, app *baseapp.BaseApp, mapper auth.Accoun
 		AccountNumbers,
 		SequenceNumbers,
 		privkeys...)
-	res := app.Simulate(tx)
+	res := app.Deliver(tx)
 	if !res.IsOK() {
 		// TODO: Do this in a more 'canonical' way
 		fmt.Println(res)
@@ -94,10 +95,21 @@ func sendAndVerifyMsgSend(t *testing.T, app *baseapp.BaseApp, mapper auth.Accoun
 		t.FailNow()
 	}
 
+	kvs := res.Tags.ToKVPairs()
+
+	feeCoin := []sdk.Coin{{Denom: "iris-atto", Amount: sdk.NewInt(0)}}
+	for _, v := range kvs {
+		if string(v.Key) == "completeConsumedTxFee-iris-atto" {
+			amount := sdk.NewInt(0).BigInt()
+			amount.SetBytes(v.Value)
+			feeCoin[0].Amount = sdk.NewIntFromBigInt(amount)
+		}
+	}
+
 	for i := 0; i < len(msg.Inputs); i++ {
 		terminalInputCoins := mapper.GetAccount(ctx, msg.Inputs[i].Address).GetCoins()
 		require.Equal(t,
-			initialInputAddrCoins[i].Minus(msg.Inputs[i].Coins),
+			initialInputAddrCoins[i].Minus(msg.Inputs[i].Coins).Minus(feeCoin),
 			terminalInputCoins,
 			fmt.Sprintf("Input #%d had an incorrect amount of coins\n%s", i, log),
 		)
