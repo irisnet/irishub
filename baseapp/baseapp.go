@@ -637,14 +637,18 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasWanted = gasWanted
 		result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
 
-		// Refund unspent fee if we're not in a simulation
-		if app.feeRefundHandler != nil && mode != runTxModeSimulate {
+		// Refund unspent fee
+		if app.feeRefundHandler != nil {
 			refundCoin, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
+
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
 				result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
 				result.Tags.AppendTag("consumedTxFee-"+refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
+			} else {
+				//TODO: add tag to get completeConsumedTxFee, will modify result.FeeAmount type to BigInt
+				result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
 			}
 		}
 	}()
@@ -656,16 +660,16 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	// run the fee handler if we're not in a simulation
-	if app.feePreprocessHandler != nil && mode != runTxModeSimulate {
+	// run the fee handler
+	if app.feePreprocessHandler != nil {
 		err := app.feePreprocessHandler(ctx, tx)
 		if err != nil {
 			return sdk.ErrInvalidCoins(err.Error()).Result()
 		}
 	}
 
-	// run the ante handler if we're not in a simulation
-	if app.anteHandler != nil && mode != runTxModeSimulate {
+	// run the ante handler
+	if app.anteHandler != nil {
 		newCtx, anteResult, abort := app.anteHandler(ctx, tx)
 		if abort {
 			return anteResult
