@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	denom = "iris"
+	denom = "steak"
 )
 
 // SimulateMsgSubmitProposal
