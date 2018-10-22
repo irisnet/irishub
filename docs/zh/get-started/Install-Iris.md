@@ -28,10 +28,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.4.2
+v0.5.0
     
 $ iriscli version
-v0.4.2
+v0.5.0
 ```
 #### 方法2：源码编译安装
 
@@ -48,28 +48,28 @@ Ubuntu LTS 16.04
 通过执行以下命令安装1.10版本的Go。
 
 ```
-    $ sudo add-apt-repository ppa:gophers/archive
-    $ sudo apt-get update
-    $ sudo apt-get install golang-1.10-go
+$ sudo add-apt-repository ppa:gophers/archive
+$ sudo apt-get update
+$ sudo apt-get install golang-1.10-go
 ```
 
 以上命令将安装 golang-1.10-go在 /usr/lib/go-1.10/bin. 需要将它加入到PATH中
 
 ```
-    echo "export PATH=$PATH:/usr/lib/go-1.10/bin" >> ~/.bash_profile
-    source ~/.bash_profile
+echo "export PATH=$PATH:/usr/lib/go-1.10/bin" >> ~/.bash_profile
+source ~/.bash_profile
 ```
 
 同时，你需要指定相关的 $GOPATH, $GOBIN, 和 $PATH 变量, 例如:
 
 ```
-    mkdir -p $HOME/go/bin
-    echo "export GOPATH=$HOME/go" >> ~/.bash_profile
-    source ~/.bash_profile
-    echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
-    source ~/.bash_profile
-    echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
-    source ~/.bash_profile
+mkdir -p $HOME/go/bin
+echo "export GOPATH=$HOME/go" >> ~/.bash_profile
+source ~/.bash_profile
+echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
+source ~/.bash_profile
+echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
+source ~/.bash_profile
 ```
 
 参考链接：
@@ -88,10 +88,8 @@ Ubuntu LTS 16.04
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.4.2
-
+cd irishub && git checkout v0.5.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
 make get_vendor_deps && make install
 ```
 
@@ -99,10 +97,10 @@ make get_vendor_deps && make install
 
 ```
 $ iris version
-v0.4.2
+v0.5.0
     
 $ iriscli version
-v0.4.2
+v0.5.0
 ```
 ### 如何升级IRISHub
 
@@ -112,7 +110,7 @@ v0.4.2
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 rm Gopkg.lock
-git checkout v0.4.2
+git checkout v0.5.0
 make get_vendor_deps
 make install
 ```

@@ -27,7 +27,7 @@ It is the only way to recover your account if you ever forget your password.
 blast change tumble toddler rival ordinary chicken dirt physical club few language noise oak moment consider enemy claim elephant cruel people adult peanut garden
 ```
 
-你可以查看到该账户的地址和公钥。在IRISHub中，地址经过bech32编码后将以`faa`为首字节 ，另外公钥将以 `fap`为首字节.
+你可以查看到该账户的地址和公钥。在IRISHub中，地址经过bech32编码后将以`faa1`为首字节 ，另外公钥将以 `fap1`为首字节.
 
 账户的助记词(seed phrase)也将被显示出来。你可以使用该长度为24个单词的助记词在任意的机器上恢复你的账户。恢复账户的命令是:
 
@@ -43,7 +43,7 @@ iriscli keys add <NAME_OF_KEY> --recover
 以下命令将查询你的账户的余额：
 
 ```
-iriscli account <ACCOUNT> --node=http://localhost:26657
+iriscli bank account <ACCOUNT> --node=http://localhost:26657
 ```
 
 ## 执行成为验证人操作
@@ -58,7 +58,7 @@ iriscli status --node=tcp://localhost:26657
 
 你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fvp`为首字节，想要了解更多的编码信息，请参考以下 [文档](Bech32-on-IRISnet.md)
 
-通过执行以下命令获得节点的公钥信息：
+通过执行以下命令获得节点的公钥信息，公钥信息将以`fvp1`开头：
 
 ```
 iris tendermint show_validator --home=<IRIS-HOME>
@@ -70,29 +70,25 @@ fvp1zcjduepqv7z2kgussh7ufe8e0prupwcm7l9jcn2fp90yeupaszmqjk73rjxq8yzw85
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --fee=40000000000000000iris  --gas=2000000 --chain-id=fuxi-3001  --name=<key_name> --node=http://localhost:26657
+iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-delegator=<val_addr> --moniker=<moniker> --fee=0.05iris  --gas=2000000 --chain-id=fuxi-4000  --name=<key_name> --node=http://localhost:26657
 ```
-> 注意：**amount** 和 **Fee** 字段需要使用最小单位 `iris-atto` 。准化比例为：
-
-1 IRIS=10^18 iris-atto
+> 注意：**amount** 应为整数， **Fee** 字段可以使用小数，例如`0。01iris` 。
 
 也就是说，如果你想要抵押1IRIS,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3001   --node=tcp://localhost:26657  --amount=1000000000000000000iris
+iriscli stake create-validator --pubkey=pubkey --address-delegator=<account> --fee=0.04iris  --gas=2000000 --from=<name> --chain-id=fuxi-4000  --node=tcp://localhost:26657  --amount=1iris
 ```
-
-请记得在命令中注明`fee` 和 `gas`字段。`fee`和`amount`的单位为`iris-atto`,但是在命令中为了方便写成`iris`。请在以下[文档](../modules/coin/README.md) 了解更多有关代币单位的内容。
 
 ### 查询验证人信息
 
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator  --address-validator=<account>  --chain-id=fuxi-3001 --node=tcp://localhost:26657 
+iriscli stake validator  <address-validator>  --chain-id=fuxi-4000 --node=tcp://localhost:26657 
 ```
 
-请注意 `<account>` 字段是以`faa`为首字母。
+请注意 `<address-validator>` 字段是以`faa1`为首字母。
 
 
 ### 确认验证人是否在线
@@ -111,15 +107,15 @@ iriscli status --node=tcp://localhost:26657
 你应该在`details`字段注明自定义的信息。
 
 ```
-iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-3001 
-  --name=key_name --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
+iriscli stake edit-validator  --address-delegator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-4000 
+  --name=key_name --node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
 ```
 ### 查询验证人信息
 
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator --address-validator=<account_cosmosaccaddr> --chain-id=fuxi-3001
+iriscli stake validator <address-validator> --chain-id=fuxi-4000
 ```
 
 ### 使用浏览器：IRISPlorer
