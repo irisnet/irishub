@@ -11,7 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
@@ -27,8 +26,6 @@ func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			description := viper.GetString(flagDescription)
 			onchainData := viper.GetString(flagOnchainData)
-			filePath := viper.GetString(flagFilePath)
-			pinedNode := viper.GetString(flagPinedNode)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -46,37 +43,13 @@ func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 			if len(onchainData) != 0 {
 				dataSize = int64(binary.Size([]byte(onchainData)))
 				if dataSize >= record.UploadLimitOfOnchain {
-					fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, record.UploadLimitOfOnchain)
+					fmt.Printf("Onchain data is too large, upload limit is %d bytes.\n", record.UploadLimitOfOnchain)
 					return err
 				}
 				sum := sha256.Sum256([]byte(onchainData))
 				recordHash = hex.EncodeToString(sum[:])
-			} else if len(filePath) != 0 {
-				var fileInfo os.FileInfo
-				if fileInfo, err = os.Stat(filePath); os.IsNotExist(err) {
-					fmt.Printf("File %v doesn't exists, please check correstponding path.\n", filePath)
-					return err
-				}
-
-				dataSize = fileInfo.Size()
-				if dataSize >= record.UploadLimitOfIpfs {
-					fmt.Printf("File %s is too large, upload limit is %d bytes.\n", filePath, record.UploadLimitOfIpfs)
-					return err
-				}
-
-				//upload to ipfs
-				sh := ipfs.NewShell(pinedNode)
-				f, err := os.Open(filePath)
-				if err != nil {
-					return err
-				}
-				ipfsHash, err := sh.Add(f)
-				recordHash = ipfsHash
-				if err != nil {
-					return err
-				}
 			} else {
-				fmt.Printf("--onchain-data and --file-path are both empty and pleae specify one of them")
+				fmt.Println("--onchain-data is empty and pleae double check this option")
 				return err
 			}
 
@@ -116,10 +89,6 @@ func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 
 	// onchain flag
 	cmd.Flags().String(flagOnchainData, "", "on chain data source")
-
-	// ipfs related flag
-	cmd.Flags().String(flagFilePath, "", "full path of file (include filename)")
-	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")
 
 	return cmd
 }

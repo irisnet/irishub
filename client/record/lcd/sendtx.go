@@ -6,12 +6,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
@@ -21,9 +19,7 @@ type postRecordReq struct {
 	BaseTx      context.BaseTx `json:"base_tx"`   // basic tx info
 	Submitter   string         `json:"submitter"` //  Address of the submitter
 	Description string         `json:"description"`
-	FilePath    string         `json:"file_path"`  // for ipfs
-	PinedNode   string         `json:"pined_node"` // for ipfs
-	Data        string         `json:"data"`       // for onchain
+	Data        string         `json:"data"` // for onchain
 }
 
 func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -48,51 +44,23 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		onchainData := req.Data
-		filePath := req.FilePath
 
 		var recordHash string
 		var dataSize int64
 		// --onchain-data has a high priority over --file-path
 		if len(onchainData) != 0 {
 			dataSize = int64(binary.Size([]byte(onchainData)))
-			if dataSize >= record.UploadLimitOfIpfs {
+			if dataSize >= record.UploadLimitOfOnchain {
 				utils.WriteErrorResponse(w, http.StatusBadRequest,
-					fmt.Sprintf("Upload data is too large, max supported data size is %d", record.UploadLimitOfIpfs))
+					fmt.Sprintf("Upload data is too large, max supported data size is %d", record.UploadLimitOfOnchain))
 				return
 			}
 
 			sum := sha256.Sum256([]byte(onchainData))
 			recordHash = hex.EncodeToString(sum[:])
-		} else if len(filePath) != 0 {
-
-			var fileInfo os.FileInfo
-			if fileInfo, err = os.Stat(req.FilePath); os.IsNotExist(err) {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			dataSize = fileInfo.Size()
-			if dataSize >= record.UploadLimitOfIpfs {
-				utils.WriteErrorResponse(w, http.StatusBadRequest,
-					fmt.Sprintf("Upload data is too large, max supported data size is %d", record.UploadLimitOfIpfs))
-				return
-			}
-
-			//upload to ipfs
-			sh := ipfs.NewShell(req.PinedNode)
-			f, err := os.Open(req.FilePath)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			recordHash, err = sh.Add(f)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
 		} else {
 			utils.WriteErrorResponse(w, http.StatusBadRequest,
-				"--onchain-data and --file-path are both empty and pleae specify one of them")
+				"--onchain-data is empty and pleae double check this option")
 			return
 		}
 

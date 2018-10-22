@@ -77,7 +77,6 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to download file,ip:port")
 	cmd.Flags().String(flagRecordID, "", "record ID")
 	cmd.Flags().String(flagFileName, "", "download file name")
 
