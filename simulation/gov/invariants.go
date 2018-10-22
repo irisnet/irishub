@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 )
 
 // AllInvariants tests all governance invariants

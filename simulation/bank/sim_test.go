@@ -9,8 +9,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 )
 
 func TestBankWithRandomMessages(t *testing.T) {

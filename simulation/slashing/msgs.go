@@ -11,7 +11,7 @@ import (
 
 	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 )
 

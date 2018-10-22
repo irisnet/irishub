@@ -9,8 +9,8 @@ import (
 	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

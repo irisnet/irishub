@@ -15,12 +15,12 @@ import (
 
 	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banksim "github.com/irisnet/irishub/client/simulation/bank"
-	govsim "github.com/irisnet/irishub/modules/gov/simulation"
-	"github.com/irisnet/irishub/modules/mock/simulation"
-	slashingsim "github.com/irisnet/irishub/client/simulation/slashing"
+	banksim "github.com/irisnet/irishub/simulation/bank"
+	govsim "github.com/irisnet/irishub/simulation/gov"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
+	slashingsim "github.com/irisnet/irishub/simulation/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	stakesim "github.com/irisnet/irishub/client/simulation/stake"
+	stakesim "github.com/irisnet/irishub/simulation/stake"
 )
 
 var (
@@ -120,12 +120,12 @@ func invariants(app *IrisApp) []simulation.Invariant {
 	}
 }
 
-func TestFullGaiaSimulation(t *testing.T) {
+func TestFullIrisSimulation(t *testing.T) {
 	if !enabled {
 		t.Skip("Skipping Iris simulation")
 	}
 
-	// Setup Gaia application
+	// Setup Iris application
 	var logger log.Logger
 	if verbose {
 		logger = log.TestingLogger()
@@ -150,10 +150,10 @@ func TestFullGaiaSimulation(t *testing.T) {
 }
 
 // TODO: Make another test for the fuzzer itself, which just has noOp txs
-// and doesn't depend on gaia
+// and doesn't depend on iris
 func TestAppStateDeterminism(t *testing.T) {
 	if !enabled {
-		t.Skip("Skipping Gaia simulation")
+		t.Skip("Skipping Iris simulation")
 	}
 
 	numSeeds := 5
