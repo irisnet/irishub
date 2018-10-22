@@ -8,7 +8,7 @@ import (
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case MsgSubmitFile:
+		case MsgSubmitRecord:
 			return handleMsgSubmitFile(ctx, keeper, msg)
 		default:
 			errMsg := "Unrecognized record msg type"
@@ -17,11 +17,11 @@ func NewHandler(keeper Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitFile) sdk.Result {
+func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitRecord) sdk.Result {
 
 	keeper.AddRecord(ctx, msg)
 
 	return sdk.Result{
-		Log: msg.RecordId,
+		Log: msg.RecordID,
 	}
 }

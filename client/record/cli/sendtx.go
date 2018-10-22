@@ -1,13 +1,16 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
+	"fmt"
 	"os"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	ipfs "github.com/ipfs/go-ipfs-api"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
@@ -16,39 +19,13 @@ import (
 )
 
 // GetCmdSubmitFile implements submitting upload file transaction command.
-func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
-		Short: "Submit a transaction with a file hash",
+		Short: "Submit the specified file/data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			filename := viper.GetString(flagFilename)
 			description := viper.GetString(flagDescription)
-
-			strFilepath := viper.GetString(flagPath)
-			strPinedNode := viper.GetString(flagPinedNode)
-			file, err := os.Stat(strFilepath)
-
-			if err != nil {
-				// file does not exist
-				return err
-			}
-
-			//upload to ipfs
-			sh := ipfs.NewShell(strPinedNode)
-			f, err := os.Open(strFilepath)
-			if err != nil {
-				return err
-			}
-
-			dataHash, err := sh.Add(f)
-
-			if err != nil {
-				return err
-			}
-
-			//file size
-			dataSize := file.Size()
-			//pinedNode
+			onchainData := viper.GetString(flagOnchainData)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -60,16 +37,40 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			submitTime := time.Now().Unix()
+			var recordHash string
+			var dataSize int64
+			// --onchain-data has a high priority over --file-path
+			if len(onchainData) != 0 {
+				dataSize = int64(binary.Size([]byte(onchainData)))
+				if dataSize >= record.UploadLimitOfOnchain {
+					fmt.Printf("Onchain data is too large, upload limit is %d bytes.\n", record.UploadLimitOfOnchain)
+					return err
+				}
+				sum := sha256.Sum256([]byte(onchainData))
+				recordHash = hex.EncodeToString(sum[:])
+			} else {
+				fmt.Println("--onchain-data is empty and pleae double check this option")
+				return err
+			}
 
-			msg := record.NewMsgSubmitFile(filename,
-				strFilepath,
+			recordID := record.KeyRecord(recordHash)
+			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
+			if err != nil {
+				return err
+			}
+			if len(res) != 0 {
+				// Corresponding record id is already existed, so there is no need to upload file/data
+				return fmt.Errorf("Record ID [%s] is already existed", recordID)
+			}
+
+			submitTime := time.Now().Unix()
+			msg := record.NewMsgSubmitRecord(
 				description,
 				submitTime,
 				fromAddr,
-				dataHash,
+				recordHash,
 				dataSize,
-				strPinedNode,
+				onchainData,
 			)
 
 			if cliCtx.GenerateOnly {
@@ -83,10 +84,11 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagFilename, "", "name of file")
-	cmd.Flags().String(flagDescription, "record file", "description of file")
-	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
-	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")
+	// common flag
+	cmd.Flags().String(flagDescription, "description", "uploaded file description")
+
+	// onchain flag
+	cmd.Flags().String(flagOnchainData, "", "on chain data source")
 
 	return cmd
 }

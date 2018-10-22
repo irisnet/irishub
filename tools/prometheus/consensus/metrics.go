@@ -6,7 +6,7 @@ import (
 	cctx "context"
 	"encoding/hex"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
@@ -53,6 +53,8 @@ type IrisMetrics struct {
 	VotingPower metrics.Gauge
 	//ratio of Voting Power of the validator to total voting power
 	VotingPowerRatio metrics.Gauge
+	//Voting Power ratio of the validator who has maximum voting power
+	MaximumVotingPowerRatio metrics.Gauge
 	// ratio of signed blocks in last 100 blocks
 	UpTime metrics.Gauge
 	// missed precommited since monitor up
@@ -97,6 +99,11 @@ func NewIrisMetrics() IrisMetrics {
 			Name:      "voting_power_ratio",
 			Help:      "ratio of voting power of the validator to total voting power",
 		}, []string{}),
+		MaximumVotingPowerRatio: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Subsystem: "consensus",
+			Name:      "maximum_voting_power_ratio",
+			Help:      "Voting Power ratio of the validator who has maximum voting power",
+		}, []string{}),
 		Address:     make([]byte, 0),
 		SignedCount: 0,
 		MissedCount: 0,
@@ -118,8 +125,8 @@ func PrometheusMetrics() *Metrics {
 	}
 }
 
-func (cs *Metrics) SetAddress(addr_str string) {
-	if addr, err := hex.DecodeString(addr_str); err != nil {
+func (cs *Metrics) SetAddress(addrStr string) {
+	if addr, err := hex.DecodeString(addrStr); err != nil {
 		log.Println("parse validator address falid ", err)
 	} else {
 		if len(addr) == 0 {
@@ -132,10 +139,10 @@ func (cs *Metrics) SetAddress(addr_str string) {
 
 func (cs *Metrics) Start(ctx context.CLIContext) {
 
-	validaor_addr := viper.GetString("address")
-	cs.SetAddress(validaor_addr)
+	validatorAddr := viper.GetString("address")
+	cs.SetAddress(validatorAddr)
 
-	context, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
+	ct, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
 	var client = ctx.Client
 
 	//开启监听事件
@@ -143,7 +150,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 
 	blockC := make(chan interface{})
 
-	err := client.Subscribe(context, "monitor", types.EventQueryNewBlock, blockC)
+	err := client.Subscribe(ct, "monitor", types.EventQueryNewBlock, blockC)
 
 	if err != nil {
 		log.Println("got ", err)
@@ -158,7 +165,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 	}()
 
 	roundC := make(chan interface{})
-	err = client.Subscribe(context, "monitor", types.EventQueryNewRound, roundC)
+	err = client.Subscribe(ct, "monitor", types.EventQueryNewRound, roundC)
 	if err != nil {
 		log.Println("got ", err)
 		return
@@ -181,6 +188,8 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block 
 	missingValidators := 0
 	missingValidatorsPower := int64(0)
 	validatorsPower := int64(0)
+	mostPowerful := int64(0)
+
 	resultValidators, err := client.Validators(&block.Height)
 	if err != nil {
 		panic(err)
@@ -200,6 +209,9 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block 
 		if bytes.Equal(cs.IrisMetrics.Address, val.Address) {
 			votingPower = val.VotingPower
 		}
+		if val.VotingPower > mostPowerful {
+			mostPowerful = val.VotingPower
+		}
 		valMap[val.Address.String()] = *val
 		validatorsPower += val.VotingPower
 	}
@@ -211,6 +223,7 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block 
 
 	cs.IrisMetrics.VotingPower.Set(float64(votingPower))
 	cs.IrisMetrics.VotingPowerRatio.Set(float64(votingPower) / float64(validatorsPower))
+	cs.IrisMetrics.MaximumVotingPowerRatio.Set(float64(mostPowerful) / float64(validatorsPower))
 
 	byzantineValidatorsPower := int64(0)
 	for _, ev := range block.Evidence.Evidence {

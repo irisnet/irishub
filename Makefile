@@ -1,4 +1,4 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest')
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd')
 all: get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
@@ -46,6 +46,7 @@ install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(BUILD_FLAGS) ./cmd/irislcd
+	go install $(BUILD_FLAGS) ./cmd/irismon
 
 install_debug:
 	go install ./cmd/irisdebug
@@ -53,17 +54,20 @@ install_debug:
 build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
 
 build_windows: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iris.exe ./cmd/iris && \
     CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iriscli.exe ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irislcd.exe ./cmd/irislcd
+    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irislcd.exe ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irismon.exe ./cmd/irismon
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
 	go build -o build/iriscli ./cmd/iriscli && \
-	go build -o build/irislcd ./cmd/irislcd
+	go build -o build/irislcd ./cmd/irislcd && \
+	go build -o build/irismon ./cmd/irismon
 
 build_examples: update_irislcd_swagger_docs
 	go build  -o build/iris1 ./examples/irishub1/cmd/iris1
@@ -88,11 +92,13 @@ build_example_linux: update_irislcd_swagger_docs
 ########################################
 ### Testing
 
-test: test_unit test_cli
-
-test_cli:
-	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+test: test_unit test_cli test_lcd
 
 test_unit:
 	@go test $(PACKAGES_NOSIMULATION)
 
+test_cli:
+	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+
+test_lcd:
+	@go test `go list github.com/irisnet/irishub/client/lcd`

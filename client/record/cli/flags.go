@@ -1,11 +1,11 @@
 package cli
 
 const (
-	flagFilename    = "name"
-	flagPath        = "file-path"
+	flagFilePath    = "file-path"
+	flagOnchainData = "onchain-data"
 	flagDescription = "description"
 	flagPinedNode   = "pinednode"
-	FlagFileName    = "file-name"
-	FlagTargetPath  = "target-path"
-	FlagRecordID    = "record-id"
+	flagFileName    = "file-name"
+	flagTargetPath  = "target-path"
+	flagRecordID    = "record-id"
 )

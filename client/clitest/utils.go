@@ -116,7 +116,7 @@ func modifyGenesisFile(irisHome string) error {
 		return err
 	}
 
-	genesisState.GovData = gov.DefaultGenesisStateForTest()
+	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	bz, err := cdc.MarshalJSON(genesisState)

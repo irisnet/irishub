@@ -22,47 +22,63 @@ func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			strPinedNode := viper.GetString(flagPinedNode)
-			downloadFileName := viper.GetString(FlagFileName)
+			pinedNode := viper.GetString(flagPinedNode)
+			downloadFileName := viper.GetString(flagFileName)
 			home := viper.GetString(cli.HomeFlag)
-			recordID := viper.GetString(FlagRecordID)
+			recordID := viper.GetString(flagRecordID)
 
 			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
 			if len(res) == 0 || err != nil {
 				return fmt.Errorf("Record id [%s] is not existed", recordID)
 			}
 
-			var submitFile record.MsgSubmitFile
+			var submitFile record.MsgSubmitRecord
 			cdc.MustUnmarshalBinary(res, &submitFile)
 
-			if len(submitFile.DataHash) == 0 {
+			filePath := filepath.Join(home, downloadFileName)
+			if _, err := os.Stat(filePath); !os.IsNotExist(err) {
+				fmt.Printf("Warning: %v already exists, please try another file name.\n", filePath)
+				return err
+			}
+
+			if len(submitFile.RecordID) == 0 {
 				fmt.Errorf("Request file was not found on the blockchain.\n")
 				return nil
 			}
+			if len(submitFile.Data) != 0 {
+				//Begin to download file from blockchain directly
+				fmt.Printf("[ONCHAIN] Downloading %v from blockchain directly...\n", filePath)
+				fh, err := os.Create(filePath)
+				if err != nil {
+					return err
+				}
 
-			filePath := filepath.Join(home, downloadFileName)
-			sh := shell.NewShell(strPinedNode)
+				defer func() {
+					if err := fh.Close(); err != nil {
+						panic(err)
+					}
+				}()
 
-			//Begin to download file from ipfs
-			if _, err := os.Stat("/path/to/whatever"); !os.IsNotExist(err) {
-				fmt.Printf("%v already exists, please try another file name.\n", filePath)
-				return err
+				if _, err := fh.Write([]byte(submitFile.Data)); err != nil {
+					return err
+				}
+				fmt.Println("[ONCHAIN] Download file from blockchain complete.")
+			} else {
+				//Begin to download file from ipfs
+				fmt.Printf("[IPFS] Downloading %v from ipfs...\n", filePath)
+				sh := shell.NewShell(pinedNode)
+				err = sh.Get(submitFile.DataHash, filePath)
+				if err != nil {
+					return err
+				}
+				fmt.Println("[IPFS] Download file from ipfs complete.")
 			}
-
-			fmt.Printf("Downloading %v ...\n", filePath)
-			err = sh.Get(submitFile.DataHash, filePath)
-			if err != nil {
-				return err
-			}
-			fmt.Println("Download file complete.")
-
 			return nil
 		},
 	}
 
-	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to download file,ip:port")
-	cmd.Flags().String(FlagRecordID, "", "record ID")
-	cmd.Flags().String(FlagFileName, "", "download file name")
+	cmd.Flags().String(flagRecordID, "", "record ID")
+	cmd.Flags().String(flagFileName, "", "download file name")
 
 	return cmd
 }
