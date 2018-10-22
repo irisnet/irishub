@@ -40,7 +40,7 @@ You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer
 
 Once you have created your own address, please  then you could use this　account to stake as a validatord. The following command is used to check the balance of your account:
 ```
-iriscli account <ACCOUNT> --node=http://localhost:26657
+iriscli bank account <ACCOUNT> --node=http://localhost:26657
 ```
 
 ## Create Validator
@@ -66,34 +66,35 @@ Example output:
 ```
 fvp1zcjduepqv7z2kgussh7ufe8e0prupwcm7l9jcn2fp90yeupaszmqjk73rjxq8yzw85
 ```
-Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` command:
+Next, use the output as  `<pubkey>` field and the account you created as `<address-delegator>` field for `iriscli stake create-validator` command:
 
 
 ```
-iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-validator=<val_addr> --moniker=<moniker> --fee=40000000000000000iris  --gas=2000000  --chain-id=fuxi-3001 --name=<key_name> --node=http://localhost:26657
+iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-delegator=<val_addr> --moniker=<moniker> --fee=0.05iris  --gas=2000000  --chain-id=fuxi-4000 --name=<key_name> --node=http://localhost:26657
 ```
-Please note the **amount** needs to be the **minimium unit** of IRIS token: `iris-atto`.
+Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`.
 
-1 IRIS=10^18 iris-atto
 
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --pubkey=pubkey --address-validator=account --fee=40000000000000000iris  --gas=2000000 --from=<name> --chain-id=fuxi-3001   --node=tcp://localhost:26657  --amount=1000000000000000000iris
+iriscli stake create-validator --pubkey=pubkey --address-delegator=account --fee=0.05iris  --gas=2000000 --from=<name> --chain-id=fuxi-4000   --node=tcp://localhost:26657  --amount=1iris
 ```
-Don't forget the `fee` and `gas` field. In this version of IRIHub, all the `unit` for `amount` and `field` correspond to `iris-atto`,but it's shown as `iris`. To read more about coin-type in IRISHub, you should read [this](../zh/modules/coin/README.md)
+Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../zh/modules/coin/README.md)
+
+To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
+
 
 ### View Validator Info
 
 View the validator's information with this command:
 
 ```
-iriscli stake validator  --address-validator=account  --chain-id=fuxi-3001 --node=tcp://localhost:26657 
+iriscli stake validator <val-address>  --chain-id=fuxi-4000 --node=tcp://localhost:26657 
 ```
 
-The `<account>` is your account address that starts with 'faa'
+The `<val-address>` is your account address that starts with 'faa'
 
-To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
 
 ### Confirm Your Validator is Running
 
@@ -103,7 +104,7 @@ Your validator is active if the following command returns anything:
 iriscli status --node=tcp://localhost:26657 
 ```
 
-You should also be able to see your power is above 0. Also, you should see validator on the [Explorer](https://testnet.irisplorer.io).
+You should also be able to see your power is above 0 if your bonded toke is in top 100. Also, you should see validator on the [Explorer](https://testnet.irisplorer.io).
 
 
 ### Edit Validator Description
@@ -113,7 +114,7 @@ You can edit your validator's public description. This info is to identify your 
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator  --address-validator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-3001 
+iriscli stake edit-validator  --address-delegator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-4000
   --name=key_name --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
 ```
 ### View Validator Description
@@ -121,7 +122,7 @@ iriscli stake edit-validator  --address-validator=account --moniker="choose a mo
 View the validator's information with this command:
 
 ```
-iriscli stake validator --address-validator=<account_cosmosaccaddr> --chain-id=fuxi-3001
+iriscli stake validator <val-address> --chain-id=fuxi-4000
 ```
 
 ### Use IRISPlorer
