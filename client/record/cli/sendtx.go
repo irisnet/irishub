@@ -20,6 +20,7 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
 		Short: "Submit a transaction with a file hash",
+		Example: "iriscli record submit --chain-id=<chain-id> --from=<key name> --fee=0.004iris --name=<file name> --description=<record description> --file-path=<local file path>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			filename := viper.GetString(flagFilename)
 			description := viper.GetString(flagDescription)
@@ -83,10 +84,10 @@ func GetCmdSubmitFile(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagFilename, "", "name of file")
-	cmd.Flags().String(flagDescription, "record file", "description of file")
-	cmd.Flags().String(flagPath, "", "full path of file (include filename)")
-	cmd.Flags().String(flagPinedNode, "localhost:5001", "node to upload file,ip:port")
+	cmd.Flags().String(flagFilename, "", "file name")
+	cmd.Flags().String(flagDescription, "record file", "file description")
+	cmd.Flags().String(flagPath, "", "full path of file (including filename)")
+	cmd.Flags().String(flagPinedNode, "localhost:5001", "rpc of an ipfs node")
 
 	return cmd
 }

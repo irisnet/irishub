@@ -25,6 +25,7 @@ func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query [record ID]",
 		Short: "query specified file with record ID",
+		Example: "iriscli record query <record-id>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
