@@ -27,7 +27,7 @@ func TestBankWithRandomMessages(t *testing.T) {
 	}
 
 	appStateFn := func(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json.RawMessage {
-		mock.RandomSetGenesis(r, mapp, accs, []string{"iris"})
+		mock.RandomSetGenesis(r, mapp, accs, []string{"iris-atto"})
 		return json.RawMessage("{}")
 	}
 

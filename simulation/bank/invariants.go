@@ -45,6 +45,6 @@ func TotalCoinsInvariant(mapper auth.AccountMapper, totalSupplyFn func() sdk.Coi
 		}
 
 		mapper.IterateAccounts(ctx, chkAccount)
-		require.Equal(t, totalSupplyFn(), totalCoins, log)
+		require.Equal(t, true, totalSupplyFn().IsGTE(totalCoins), log)
 	}
 }

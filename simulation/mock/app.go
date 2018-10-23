@@ -14,6 +14,10 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 const chainID = ""
@@ -23,7 +27,7 @@ const chainID = ""
 // capabilities aren't needed for testing.
 type App struct {
 	*bam.BaseApp
-	Cdc        *wire.Codec // Cdc is public since the codec is passed into the module anyways
+	Cdc              *wire.Codec // Cdc is public since the codec is passed into the module anyways
 	KeyMain          *sdk.KVStoreKey
 	KeyAccount       *sdk.KVStoreKey
 	KeyIBC           *sdk.KVStoreKey
@@ -37,9 +41,13 @@ type App struct {
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountMapper       auth.AccountMapper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
+	ParamsKeeper        params.Keeper
 
 	GenesisAccounts  []auth.Account
 	TotalCoinsSupply sdk.Coins
+
+	// fee manager
+	FeeManager bam.FeeManager
 }
 
 // NewApp partially constructs a new app on the memstore for module and genesis
@@ -77,12 +85,28 @@ func NewApp() *App {
 		auth.ProtoBaseAccount,
 	)
 
+	paramsKeeper := params.NewKeeper(app.Cdc, app.KeyParams)
+	app.ParamsKeeper = paramsKeeper
+	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Setter())
+
 	// Initialize the app. The chainers and blockers can be overwritten before
 	// calling complete setup.
 	app.SetInitChainer(app.InitChainer)
+	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountMapper, app.FeeCollectionKeeper))
-
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountMapper, app.FeeCollectionKeeper, app.FeeManager))
+	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
+
+
+	// init iparam
+	iparam.SetParamReadWriter(paramsKeeper.Setter(),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
+	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -92,6 +116,8 @@ func NewApp() *App {
 func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
 	newKeys = append(newKeys, app.KeyMain)
 	newKeys = append(newKeys, app.KeyAccount)
+	newKeys = append(newKeys, app.KeyParams)
+	newKeys = append(newKeys, app.KeyFeeCollection)
 
 	app.MountStoresIAVL(newKeys...)
 	err := app.LoadLatestVersion(app.KeyMain)
@@ -107,6 +133,12 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		acc.SetCoins(genacc.GetCoins())
 		app.AccountMapper.SetAccount(ctx, acc)
 	}
+
+	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+		FeeTokenNative:    types.NewDefaultCoinType("iris").MinUnit.Denom,
+		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
+	}
+	bam.InitGenesis(ctx, app.ParamsKeeper.Setter(), feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{}
 }
@@ -232,10 +264,12 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 	for i := 0; i < len(accts); i++ {
 		coins := make([]sdk.Coin, len(denoms), len(denoms))
 
+		amountStr := "100000000000000000000"
+		amount, _ := sdk.NewIntFromString(amountStr)
 		// generate a random coin for each denomination
 		for j := 0; j < len(denoms); j++ {
 			coins[j] = sdk.Coin{Denom: denoms[j],
-				Amount: RandFromBigInterval(r, randCoinIntervals),
+				Amount: RandFromBigInterval(r, randCoinIntervals).Add(amount),
 			}
 		}
 
@@ -247,7 +281,6 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 	}
 	app.GenesisAccounts = accts
 }
-
 
 // GetAllAccounts returns all accounts in the accountMapper.
 func GetAllAccounts(mapper auth.AccountMapper, ctx sdk.Context) []auth.Account {
