@@ -17,6 +17,7 @@ func GetAccountCmd(storeName string, cdc *wire.Codec, decoder auth.AccountDecode
 	return &cobra.Command{
 		Use:   "account [address]",
 		Short: "Query account balance",
+		Example: "iriscli bank account <account address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// find the key to look up the account
@@ -61,6 +62,7 @@ func GetCmdQueryCoinType(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "coin-type [coin_name]",
 		Short: "query coin type",
+		Example: "iriscli bank coin-type <token name>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

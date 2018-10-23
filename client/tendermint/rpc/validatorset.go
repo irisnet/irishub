@@ -22,6 +22,7 @@ func ValidatorCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validator-set [height]",
 		Short: "Get the full tendermint validator set at given height",
+		Example: "iriscli tendermint validator-set",
 		Args:  cobra.MaximumNArgs(1),
 		RunE:  printValidators,
 	}

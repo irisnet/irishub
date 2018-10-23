@@ -16,6 +16,7 @@ func BlockCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "block [height]",
 		Short: "Get verified data for a the block at given height",
+		Example: "iriscli tendermint block",
 		Args:  cobra.MaximumNArgs(1),
 		RunE:  printBlock,
 	}
