@@ -1,8 +1,8 @@
 # Coin_Type
 
-##  Definition
+##  Definitions
 
-Coin_type defines the available units of tokens in the iris-hub system. All the registered coin_type in the system can be used to transfer. The system default token in iris-hub is iris, which has following available units: iris-milli, iris-micro, iris-nano, iris-pico, iris-femto and iris-atto. The conversion relationship between them are as follows:
+Coin_type defines the available units of tokens in IRIShub. All the registered coin_type in the system can be used to transfer. The system default token in iris-hub is iris, which has following available units: iris-milli, iris-micro, iris-nano, iris-pico, iris-femto and iris-atto. The conversion relationship between them are as follows:
 
 ```
 1 iris = 10^3 iris-milli
@@ -13,7 +13,7 @@ Coin_type defines the available units of tokens in the iris-hub system. All the 
 1 iris = 10^18 iris-atto
 ```
 
-## Data model of coin_type
+## Data Structure of coin_type
 
 ```golang
 type CoinType struct {
@@ -42,10 +42,55 @@ Denom is defined as the name of the unit, and Decimal is defined as the maximum 
 * Origin defines the source of the coin_type, with the value Native (inner system, iris), External (external system, such as eth, etc.), and UserIssued (user-defined).
 * Desc：Description of the coin_type.
 
-## Inquery of coin_type
+## Query of coin_type
 
 If you want to query the coin_type configuration of a certain token, you can use the following command:
 
 ```golang
-iriscli coin types [coin_name]
+iriscli  bank coin-type [coin_name]
+```
+
+If you query the `coin-type` of `iris` with `iriscli bank coin-type iris`
+ 
+Example output:
+```$xslt
+{
+  "name": "iris",
+  "min_unit": {
+    "denom": "iris-atto",
+    "decimal": "18"
+  },
+  "units": [
+    {
+      "denom": "iris",
+      "decimal": "0"
+    },
+    {
+      "denom": "iris-milli",
+      "decimal": "3"
+    },
+    {
+      "denom": "iris-micro",
+      "decimal": "6"
+    },
+    {
+      "denom": "iris-nano",
+      "decimal": "9"
+    },
+    {
+      "denom": "iris-pico",
+      "decimal": "12"
+    },
+    {
+      "denom": "iris-femto",
+      "decimal": "15"
+    },
+    {
+      "denom": "iris-atto",
+      "decimal": "18"
+    }
+  ],
+  "origin": 1,
+  "desc": "IRIS Network"
+}
 ```

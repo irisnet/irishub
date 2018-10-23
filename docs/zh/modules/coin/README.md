@@ -47,5 +47,53 @@ type Unit struct {
 如果想查询某种代币的coin_type配置，可以使用如下命令
 
 ```golang
-iriscli coin types [coin_name]
+iriscli  bank coin-type [coin_name]
+
+```
+
+
+如果需要查询`iris`的 `coin-type`，可以执行以下命令： `iriscli bank coin-type iris`
+ 
+示例输出:
+
+```$xslt
+{
+  "name": "iris",
+  "min_unit": {
+    "denom": "iris-atto",
+    "decimal": "18"
+  },
+  "units": [
+    {
+      "denom": "iris",
+      "decimal": "0"
+    },
+    {
+      "denom": "iris-milli",
+      "decimal": "3"
+    },
+    {
+      "denom": "iris-micro",
+      "decimal": "6"
+    },
+    {
+      "denom": "iris-nano",
+      "decimal": "9"
+    },
+    {
+      "denom": "iris-pico",
+      "decimal": "12"
+    },
+    {
+      "denom": "iris-femto",
+      "decimal": "15"
+    },
+    {
+      "denom": "iris-atto",
+      "decimal": "18"
+    }
+  ],
+  "origin": 1,
+  "desc": "IRIS Network"
+}
 ```
