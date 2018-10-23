@@ -2,6 +2,7 @@ package record
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/record/tags"
 )
 
 // Handle all "record" type messages.
@@ -21,7 +22,16 @@ func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitRecord) sd
 
 	keeper.AddRecord(ctx, msg)
 
+	recordIDBytes := []byte(msg.RecordID)
+
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSubmitRecord,
+		tags.OwnerAddress, []byte(msg.OwnerAddress.String()),
+		tags.RecordID, recordIDBytes,
+	)
+
 	return sdk.Result{
-		Log: msg.RecordID,
+		Data: recordIDBytes,
+		Tags: resTags,
 	}
 }
