@@ -93,7 +93,8 @@ build_example_linux: update_irislcd_swagger_docs
 ########################################
 ### Testing
 
-test: test_unit test_cli test_lcd
+test: test_unit test_cli test_lcd test_sim
+test_sim: test_sim_modules test_sim_iris_nondeterminism test_sim_iris_fast
 
 test_unit:
 	@go test $(PACKAGES_NOSIMULATION)
