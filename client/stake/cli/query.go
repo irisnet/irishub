@@ -20,7 +20,7 @@ func GetCmdQueryValidator(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validator [owner-addr]",
 		Short: "Query a validator",
-		Example: "iriscli stake validator <owner address>",
+		Example: "iriscli stake validator <validator owner address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			addr, err := sdk.AccAddressFromBech32(args[0])

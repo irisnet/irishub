@@ -62,7 +62,7 @@ func GetCmdQueryCoinType(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "coin-type [coin_name]",
 		Short: "query coin type",
-		Example: "iriscli bank coin-type <token name>",
+		Example: "iriscli bank coin-type iris",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

@@ -12,6 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/app"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -324,8 +325,8 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagModule, "", "the module of parameter ")
-	cmd.Flags().String(flagKey, "", "the key of parameter")
+	cmd.Flags().String(flagModule, "", "module name")
+	cmd.Flags().String(flagKey, "", "key name of parameter")
 	return cmd
 }
 
@@ -342,7 +343,7 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pull-params",
 		Short: "generate param.json file",
-		Example: "iriscli gov pull-params --path=<directory of iris home>",
+		Example: "iriscli gov pull-params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
@@ -358,6 +359,6 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().String(flagPath, "", "the path of param.json")
+	cmd.Flags().String(flagPath, app.DefaultNodeHome, "directory of iris home")
 	return cmd
 }

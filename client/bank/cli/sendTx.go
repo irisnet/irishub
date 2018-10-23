@@ -72,8 +72,8 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagTo, "", "Address to send coins")
-	cmd.Flags().String(flagAmount, "", "Amount of coins to send")
+	cmd.Flags().String(flagTo, "", "Bech32 encoding address to receive coins")
+	cmd.Flags().String(flagAmount, "", "Amount of coins to send, for instance: 10iris")
 
 	return cmd
 }
