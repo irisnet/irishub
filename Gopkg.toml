@@ -29,7 +29,8 @@
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "=v0.24.2-iris1"
+  #version = "=v0.24.2-iris1"
+  branch = "irisnet/v0.24.2-v0.6"
 
 [[override]]
   name = "github.com/golang/protobuf"
