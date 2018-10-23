@@ -13,7 +13,7 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/mock"
+	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
