@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/x/mock/simulation"
+	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 )
 
 // AllInvariants tests all governance invariants

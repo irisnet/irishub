@@ -9,10 +9,10 @@ import (
 
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/cosmos/cosmos-sdk/x/mock/simulation"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 )
 
@@ -32,6 +32,7 @@ func SimulateMsgSubmitProposal(k gov.Keeper, sk stake.Keeper) simulation.TestAnd
 			gov.ProposalTypeText,
 			addr,
 			deposit,
+			gov.Param{},
 		)
 		require.Nil(t, msg.ValidateBasic(), "expected msg to pass ValidateBasic: %s", msg.GetSignBytes())
 		ctx, write := ctx.CacheContext()
