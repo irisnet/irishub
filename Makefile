@@ -1,4 +1,4 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd')
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
 all: get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
@@ -56,12 +56,6 @@ build_linux: update_irislcd_swagger_docs
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
-
-build_windows: update_irislcd_swagger_docs
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iris.exe ./cmd/iris && \
-    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/iriscli.exe ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irislcd.exe ./cmd/irislcd && \
-    CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/irismon.exe ./cmd/irismon
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
