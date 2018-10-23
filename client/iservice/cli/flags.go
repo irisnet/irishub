@@ -29,7 +29,7 @@ func init() {
 	FsServiceDescription.String(FlagServiceDescription, "", "service description")
 	FsTags.String(FlagTags, "", "service tags")
 	FsAuthorDescription.String(FlagAuthorDescription, "", "service author description")
-	FsIdlContent.String(FlagIdlContent, "", "service idl content")
-	FsBroadcast.String(FlagBroadcast, "", "service broadcast type")
-	FsFile.String(FlagFile, "", "service idl file path")
+	FsIdlContent.String(FlagIdlContent, "", "content of service interface description language")
+	FsBroadcast.String(FlagBroadcast, "", "service broadcast type, valid values can be Broadcast and Unicast")
+	FsFile.String(FlagFile, "", "path of file which contains service interface description language")
 }
