@@ -13,6 +13,7 @@ var listKeysCmd = &cobra.Command{
 	Short: "List all keys",
 	Long: `Return a list of all public keys stored by this key manager
 along with their associated name and address.`,
+	Example: "iriscli keys list",
 	RunE: runListCmd,
 }
 

@@ -14,6 +14,7 @@ func StatusCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "status",
 		Short: "Query remote node for status",
+		Example: "iriscli status",
 		RunE:  printNodeStatus,
 	}
 

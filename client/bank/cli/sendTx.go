@@ -23,6 +23,7 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send",
 		Short: "Create and sign a send tx",
+		Example: "iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --chain-id=<chain-id> --amount=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -71,8 +72,8 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagTo, "", "Address to send coins")
-	cmd.Flags().String(flagAmount, "", "Amount of coins to send")
+	cmd.Flags().String(flagTo, "", "Bech32 encoding address to receive coins")
+	cmd.Flags().String(flagAmount, "", "Amount of coins to send, for instance: 10iris")
 
 	return cmd
 }
