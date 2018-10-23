@@ -2,7 +2,7 @@
 
 ##  Definitions
 
-Coin_type defines the available units of tokens in IRIShub. All the registered coin_type in the system can be used to transfer. The system default token in iris-hub is iris, which has following available units: iris-milli, iris-micro, iris-nano, iris-pico, iris-femto and iris-atto. The conversion relationship between them are as follows:
+Coin_type defines the available units of a kind of token in IRISnet. The developers can specify different coin_type for  their tokens. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. The conversion relationship between them are as follows:
 
 ```
 1 iris = 10^3 iris-milli
@@ -12,6 +12,8 @@ Coin_type defines the available units of tokens in IRIShub. All the registered c
 1 iris = 10^15 iris-femto
 1 iris = 10^18 iris-atto
 ```
+
+All the registered types of `iris` in the system can be used with transactions.
 
 ## Data Structure of coin_type
 
@@ -25,8 +27,13 @@ type CoinType struct {
 }
 ```
 
-* Name : The name of tokens, which is also the main unit of coin；for instance, iris.
-* MinUnit：The  minimum unit of coin_type. The tokens present in the system are all in the form of minimum unit, such as iris. The unit stored in iris-hub is iris-atto. You must use the minimum unit of the tokens when sending a transaction to the iris-hub. But if you use the command line tool provided by iris-hub, you can use any system-recognized unit and the system will automatically convert to the minimum unit of corresponding token. For example, if you use the "send" command to transfer 1iris, the command line will be processed as 10^18 iris-attos in the backend, and you will only see 10^18 iris-attos when enquiring the transaction details by the transaction hash.
+* Name : The name of tokens, which is also the default unit of coin；for instance, `iris`.
+* MinUnit：The  minimum unit of coin_type. The tokens in the system are all stored in the form of minimum unit, 
+such as `iris-atto`. You must use the minimum unit of the tokens when sending a transaction to the IRIShub. 
+But if you use the command line tool provided by iris-hub, you can use any system-recognized unit and the system 
+will automatically convert to the minimum unit of corresponding token. For example, if you use the "send" command 
+to transfer 1iris, the command line will be processed as 10^18 iris-attos in the backend, and you will only 
+see 10^18 iris-attos when enquiring the transaction details by the transaction hash.
 
 ## Structure definition of Unit
 
@@ -37,9 +44,11 @@ type Unit struct {
 }
 ```
 
-Denom is defined as the name of the unit, and Decimal is defined as the maximum precision of the unit. For example, the maximum precision of iris-atto is 18.
+Denom is defined as the name of the unit, and Decimal is defined as the maximum precision of the unit. 
+For example, the maximum precision of iris-atto is 18.
 * Units dfines a set of units available under coin_type.
-* Origin defines the source of the coin_type, with the value Native (inner system, iris), External (external system, such as eth, etc.), and UserIssued (user-defined).
+* Origin defines the source of the coin_type, with the value Native (inner system, iris), 
+External (external system, such as eth, etc.), and UserIssued (user-defined).
 * Desc：Description of the coin_type.
 
 ## Query of coin_type
