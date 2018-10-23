@@ -71,7 +71,7 @@ func (be BroadcastEnum) String() string {
 	case Broadcast:
 		return "Broadcast"
 	case Unicast:
-		return "unicast"
+		return "Unicast"
 	default:
 		return ""
 	}

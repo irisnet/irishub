@@ -19,6 +19,7 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "info",
 		Short: "query the information of upgrade module",
+		Example: "iriscli upgrade info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().
@@ -60,6 +61,7 @@ func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-switch",
 		Short: "query switch details",
+		Example: "iriscli upgrade query-switch --proposalID 1 --voter <voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			proposalID := viper.GetInt64(flagProposalID)
 			voterStr := viper.GetString(flagVoter)
