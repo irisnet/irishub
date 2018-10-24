@@ -9,17 +9,17 @@ import (
 
 // nolint - Mostly for testing
 func (app *BaseApp) Check(tx sdk.Tx) (result sdk.Result) {
-	return app.runTx(runTxModeCheck, nil, tx)
+	return app.runTx(RunTxModeCheck, nil, tx)
 }
 
 // nolint - full tx execution
 func (app *BaseApp) Simulate(tx sdk.Tx) (result sdk.Result) {
-	return app.runTx(runTxModeSimulate, nil, tx)
+	return app.runTx(RunTxModeSimulate, nil, tx)
 }
 
 // nolint
 func (app *BaseApp) Deliver(tx sdk.Tx) (result sdk.Result) {
-	return app.runTx(runTxModeDeliver, nil, tx)
+	return app.runTx(RunTxModeDeliver, nil, tx)
 }
 
 // RunForever - BasecoinApp execution and cleanup
