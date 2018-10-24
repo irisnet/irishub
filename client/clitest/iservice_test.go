@@ -4,11 +4,11 @@ import (
 	"testing"
 	"github.com/cosmos/cosmos-sdk/tests"
 	"fmt"
-	"github.com/stretchr/testify/require"
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
 	"io/ioutil"
 	"os"
+	"github.com/stretchr/testify/require"
+	"github.com/cosmos/cosmos-sdk/server"
 )
 
 func init() {

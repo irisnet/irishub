@@ -1,5 +1,27 @@
 # Changelog
 
+
+## 0.6.0-rc0
+
+*October 22th, 2018*
+
+BREAKING CHANGES:
+
+- [monitor] Use new executable binary for monitor
+
+FEATURES:
+
+- [record] Add the record module for the data certification on blockchain
+- [iservice] Add the feature of iservice definition
+- [test] Add Cli/LCD/Sim auto-test
+
+BUG FIXES:
+
+- Fix software upgrade issue caused by tx fee
+- Panic when building the lcd proof
+- Fix bug of converting validator power to byte array
+
+
 ## 0.5.0-rc1
 
 *October 11th, 2018*

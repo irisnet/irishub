@@ -20,6 +20,7 @@ func GetCmdQueryValidator(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validator [owner-addr]",
 		Short: "Query a validator",
+		Example: "iriscli stake validator <validator owner address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			addr, err := sdk.AccAddressFromBech32(args[0])
@@ -74,6 +75,7 @@ func GetCmdQueryValidators(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validators",
 		Short: "Query for all validators",
+		Example: "iriscli stake validators",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key := stake.ValidatorsKey
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -128,6 +130,7 @@ func GetCmdQueryDelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delegation",
 		Short: "Query a delegation based on address and validator address",
+		Example: "iriscli stake delegation --address-validator=<validator address> --address-delegator=<delegator address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidator))
 			if err != nil {
@@ -186,6 +189,7 @@ func GetCmdQueryDelegations(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delegations [delegator-addr]",
 		Short: "Query all delegations made from one delegator",
+		Example: "iriscli stake delegations <delegator address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			delegatorAddr, err := sdk.AccAddressFromBech32(args[0])
@@ -230,6 +234,7 @@ func GetCmdQueryUnbondingDelegation(storeName string, cdc *wire.Codec) *cobra.Co
 	cmd := &cobra.Command{
 		Use:   "unbonding-delegation",
 		Short: "Query an unbonding-delegation record based on delegator and validator address",
+		Example: "iriscli stake unbonding-delegation --address-validator=<validator address> --address-delegator=<delegator address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidator))
 			if err != nil {
@@ -289,6 +294,7 @@ func GetCmdQueryUnbondingDelegations(storeName string, cdc *wire.Codec) *cobra.C
 	cmd := &cobra.Command{
 		Use:   "unbonding-delegations [delegator-addr]",
 		Short: "Query all unbonding-delegations records for one delegator",
+		Example: "iriscli stake unbonding-delegation <delegator address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			delegatorAddr, err := sdk.AccAddressFromBech32(args[0])
@@ -333,6 +339,7 @@ func GetCmdQueryRedelegation(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "redelegation",
 		Short: "Query a redelegation record based on delegator and a source and destination validator address",
+		Example: "iriscli stake redelegation --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --address-delegator=<delegator address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valSrcAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidatorSrc))
 			if err != nil {
@@ -397,6 +404,7 @@ func GetCmdQueryRedelegations(storeName string, cdc *wire.Codec) *cobra.Command 
 	cmd := &cobra.Command{
 		Use:   "redelegations [delegator-addr]",
 		Short: "Query all redelegations records for one delegator",
+		Example: "iriscli stake redelegations <delegator address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			delegatorAddr, err := sdk.AccAddressFromBech32(args[0])

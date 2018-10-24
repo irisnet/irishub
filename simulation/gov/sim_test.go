@@ -10,10 +10,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/cosmos/cosmos-sdk/x/mock"
-	"github.com/cosmos/cosmos-sdk/x/mock/simulation"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 )
 
@@ -28,10 +27,9 @@ func TestGovWithRandomMessages(t *testing.T) {
 	stakeKey := sdk.NewKVStoreKey("stake")
 	stakeKeeper := stake.NewKeeper(mapp.Cdc, stakeKey, coinKeeper, stake.DefaultCodespace)
 	paramKey := sdk.NewKVStoreKey("params")
-	paramKeeper := params.NewKeeper(mapp.Cdc, paramKey)
 	govKey := sdk.NewKVStoreKey("gov")
-	govKeeper := gov.NewKeeper(mapp.Cdc, govKey, paramKeeper.Setter(), coinKeeper, stakeKeeper, gov.DefaultCodespace)
-	mapp.Router().AddRoute("gov", gov.NewHandler(govKeeper))
+	govKeeper := gov.NewKeeper(mapp.Cdc, govKey, coinKeeper, stakeKeeper, gov.DefaultCodespace)
+	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{mapp.KeyGov, mapp.KeyAccount, mapp.KeyStake, mapp.KeyParams}, gov.NewHandler(govKeeper))
 	mapp.SetEndBlocker(func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 		gov.EndBlocker(ctx, govKeeper)
 		return abci.ResponseEndBlock{}
@@ -43,7 +41,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 	}
 
 	appStateFn := func(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json.RawMessage {
-		mock.RandomSetGenesis(r, mapp, accs, []string{"stake"})
+		mock.RandomSetGenesis(r, mapp, accs, []string{"iris"})
 		return json.RawMessage("{}")
 	}
 
