@@ -295,7 +295,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 }
 
 // Iterates through msgs and executes them
-func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result) {
+func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode) (result sdk.Result) {
 	// accumulate results
 	logs := make([]string, 0, len(msgs))
 	var data []byte   // NOTE: we just append them all (?!)
@@ -313,7 +313,10 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg) (result sdk.Result)
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
 		}
 
-		msgResult := handler(ctx, msg)
+		var msgResult sdk.Result
+		if mode != bam.RunTxModeCheck {
+			msgResult = handler(ctx, msg)
+		}
 
 		// NOTE: GasWanted is determined by ante handler and
 		// GasUsed by the GasMeter
