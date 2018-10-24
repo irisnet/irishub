@@ -68,8 +68,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/v0.24.2-v0.6"
-  digest = "1:e487832acd654b5fc2bc296c34cc679808652f5571e3d18c37ec726e1697070d"
+  digest = "1:f2f4e260193eb9a9ad307b26bcfcf94e57da65d2ea16b51023268435d3a116cc"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -99,7 +98,6 @@
     "x/gov/tags",
     "x/ibc",
     "x/mock",
-    "x/mock/simulation",
     "x/params",
     "x/slashing",
     "x/stake",
@@ -111,6 +109,7 @@
   pruneopts = "UT"
   revision = "7c39b51abdd5089636060470e294b2ea1fec7954"
   source = "https://github.com/irisnet/cosmos-sdk.git"
+  version = "v0.24.2-irisv0.6"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -256,12 +255,13 @@
   revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
 
 [[projects]]
-  digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
+  digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -401,8 +401,8 @@
   name = "github.com/mr-tron/base58"
   packages = ["base58"]
   pruneopts = "UT"
-  revision = "d724c80ecac7b49e4e562d58b2b4f4ee4ed8c312"
-  version = "v1.0.0"
+  revision = "89529c6904fcd077434931b4eac8b4b2f0991baf"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:e54be212eca970f4d5d39899666aef429c437969783e360a0cab075ba1423a80"
@@ -472,7 +472,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3307c587aea10ad16379bcda6ab59ae71beda5893c99767a4c908760c7b5b996"
+  digest = "1:db712fde5d12d6cdbdf14b777f0c230f4ff5ab0be8e35b239fc319953ed577a4"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -480,7 +480,7 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "c5df33d3bef320f5f0a7ddc06ccef10a0433286c"
+  revision = "7e9e6cabbd393fc208072eedef99188d0ce788b6"
 
 [[projects]]
   branch = "master"
@@ -788,7 +788,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:08232b2c3ccc55a20aeec26a36b63e50510c36cfdd7797dcaee3802998144509"
+  digest = "1:317d73d5f30aa478da851362c17dbed491e43f599f07d99eeb06323fa51e1e4f"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -796,7 +796,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "8f1d3d21f81be6e86ebcd6febee89c89bc50719f"
+  revision = "44b849a8bc13eb42e95e6c6c5e360481b73ec710"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -876,7 +876,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/bgentry/speakeasy",
-    "github.com/cosmos/cosmos-sdk/baseapp",
     "github.com/cosmos/cosmos-sdk/client",
     "github.com/cosmos/cosmos-sdk/client/context",
     "github.com/cosmos/cosmos-sdk/client/keys",
@@ -898,7 +897,6 @@
     "github.com/cosmos/cosmos-sdk/x/gov",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mock",
-    "github.com/cosmos/cosmos-sdk/x/mock/simulation",
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/stake",
