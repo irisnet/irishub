@@ -66,20 +66,24 @@ func TestProposalAcceptHeightParameter(t *testing.T) {
 	require.Equal(t, int64(3), ProposalAcceptHeightParameter.Value)
 }
 
-
 func TestSwitchPeriodParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
 	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+
 	SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
 	find := SwitchPeriodParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
+
 	SwitchPeriodParameter.InitGenesis(int64(12345))
 	require.Equal(t, int64(12345), SwitchPeriodParameter.Value)
+
 	SwitchPeriodParameter.LoadValue(ctx)
 	require.Equal(t, int64(12345), SwitchPeriodParameter.Value)
+
 	SwitchPeriodParameter.Value = 30
 	SwitchPeriodParameter.SaveValue(ctx)
+
 	SwitchPeriodParameter.LoadValue(ctx)
 	require.Equal(t, int64(30), SwitchPeriodParameter.Value)
 }

@@ -24,5 +24,6 @@ See the
 * Explorer：https://testnet.irisplorer.io 
 * Faucet：https://testnet.irisplorer.io/#/faucet
 
+## How To Contribute
 
-
+See the [contributing](./CONTRIBUTING.md)

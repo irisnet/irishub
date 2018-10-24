@@ -41,6 +41,7 @@ func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
+
 var ProposalAcceptHeightParameter ProposalAcceptHeightParam
 
 var _ iparam.SignalParameter = (*ProposalAcceptHeightParam)(nil)
@@ -76,7 +77,9 @@ func (param *ProposalAcceptHeightParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
+
 var SwitchPeriodParameter SwitchPeriodParam
+
 var _ iparam.SignalParameter = (*SwitchPeriodParam)(nil)
 
 type SwitchPeriodParam struct {
@@ -88,16 +91,20 @@ type SwitchPeriodParam struct {
 func (param *SwitchPeriodParam) InitGenesis(genesisState interface{}) {
 	param.Value = genesisState.(int64)
 }
+
 func (param *SwitchPeriodParam) SetReadWriter(setter params.Setter) {
 	param.psetter = setter
 	param.pgetter = setter.Getter
 }
+
 func (param *SwitchPeriodParam) GetStoreKey() string {
 	return "Sig/upgrade/switchperiod"
 }
+
 func (param *SwitchPeriodParam) SaveValue(ctx sdk.Context) {
 	param.psetter.Set(ctx, param.GetStoreKey(), param.Value)
 }
+
 func (param *SwitchPeriodParam) LoadValue(ctx sdk.Context) bool {
 	err := param.pgetter.Get(ctx, param.GetStoreKey(), &param.Value)
 	if err != nil {

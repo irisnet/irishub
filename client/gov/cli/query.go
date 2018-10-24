@@ -12,8 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"path"
+	"github.com/irisnet/irishub/app"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -21,6 +20,7 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-proposal",
 		Short: "query proposal details",
+		Example: "iriscli gov query-proposal --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := viper.GetInt64(flagProposalID)
@@ -58,6 +58,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-proposals",
 		Short: "query proposals with optional filters",
+		Example: "iriscli gov query-proposals --status=Passed",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bechDepositerAddr := viper.GetString(flagDepositer)
 			bechVoterAddr := viper.GetString(flagVoter)
@@ -169,6 +170,7 @@ func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-vote",
 		Short: "query vote",
+		Example: "iriscli gov query-vote --proposal-id=1 --voter=<voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := viper.GetInt64(flagProposalID)
@@ -207,6 +209,7 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-votes",
 		Short: "query votes on a proposal",
+		Example: "iriscli gov query-votes --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := viper.GetInt64(flagProposalID)
@@ -261,6 +264,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-params",
 		Short: "query parameter proposal's config",
+		Example: "iriscli gov query-params --module=<module name> --key=<key name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			moduleStr := viper.GetString(flagModule)
 			keyStr := viper.GetString(flagKey)
@@ -321,8 +325,8 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagModule, "", "the module of parameter ")
-	cmd.Flags().String(flagKey, "", "the key of parameter")
+	cmd.Flags().String(flagModule, "", "module name")
+	cmd.Flags().String(flagKey, "", "key name of parameter")
 	return cmd
 }
 
@@ -335,98 +339,19 @@ func PrintParamStr(p iparam.GovParameter, keyStr string) {
 	fmt.Println(string(jsonBytes))
 }
 
-type ParameterConfigFile struct {
-	Govparams govparams.ParamSet `json:"gov"`
-}
-
-func (pd *ParameterConfigFile) ReadFile(cdc *wire.Codec, pathStr string) error {
-	pathStr = path.Join(pathStr, "config/params.json")
-
-	jsonBytes, err := cmn.ReadFile(pathStr)
-
-	fmt.Println("Open ", pathStr)
-
-	if err != nil {
-		return err
-	}
-
-	err = cdc.UnmarshalJSON(jsonBytes, &pd)
-	return err
-}
-func (pd *ParameterConfigFile) WriteFile(cdc *wire.Codec, res []sdk.KVPair) error {
-	for _, kv := range res {
-		switch string(kv.Key) {
-		case "Gov/gov/DepositProcedure":
-			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.DepositProcedure)
-		case "Gov/gov/VotingProcedure":
-			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.VotingProcedure)
-		case "Gov/gov/TallyingProcedure":
-			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.TallyingProcedure)
-		default:
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
-		}
-	}
-	output, err := cdc.MarshalJSONIndent(pd, "", "  ")
-
-	if err != nil {
-		return err
-	}
-
-	pathStr := viper.GetString(flagPath)
-	pathStr = path.Join(pathStr, "config/params.json")
-	err = cmn.WriteFile(pathStr, output, 0644)
-	if err != nil {
-
-		return err
-	}
-
-	fmt.Println("Save the parameter config file in ", pathStr)
-	return nil
-}
-
-func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (gov.Param, error) {
-	var param gov.Param
-	var err error
-	var jsonBytes []byte
-
-	if len(keyStr) == 0 {
-		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf("Key can't be empty!"))
-	}
-
-	switch keyStr {
-	case "Gov/gov/DepositProcedure":
-		jsonBytes, err = json.Marshal(pd.Govparams.DepositProcedure)
-	case "Gov/gov/VotingProcedure":
-		jsonBytes, err = json.Marshal(pd.Govparams.VotingProcedure)
-	case "Gov/gov/TallyingProcedure":
-		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
-	default:
-		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
-	}
-
-	if err != nil {
-		return param, err
-	}
-	param.Value = string(jsonBytes)
-	param.Key = keyStr
-	param.Op = opStr
-
-	jsonBytes, _ = json.MarshalIndent(param, "", " ")
-
-	return param, err
-}
-
 func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pull-params",
 		Short: "generate param.json file",
+		Example: "iriscli gov pull-params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
 			if err == nil && len(res)!=0 {
-				var pd ParameterConfigFile
-				err := pd.WriteFile(cdc, res)
+				var pd gov.ParameterConfigFile
+				pathStr := viper.GetString(flagPath)
+				err := pd.WriteFile(cdc, res, pathStr)
 				return err
 			} else {
 				fmt.Println("No GovParams can be found")
@@ -434,6 +359,6 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().String(flagPath, "", "the path of param.json")
+	cmd.Flags().String(flagPath, app.DefaultNodeHome, "directory of iris home")
 	return cmd
 }

@@ -3,10 +3,10 @@
 # > docker run -v $HOME/.iris:/root/.iris iris init
 # > docker run -v $HOME/.iris:/root/.iris iris start
 
-FROM golang:1.11-alpine3.7 as builder
+FROM golang:1.10-alpine3.7 as builder
 
 # Set up dependencies
-ENV PACKAGES make git libc-dev bash
+ENV PACKAGES make gcc git libc-dev bash
 
 # Set up GOPATH & PATH
 
@@ -24,8 +24,13 @@ RUN cd $REPO_PATH && \
     go get github.com/golang/dep/cmd/dep && \
     make get_tools && \
     make get_vendor_deps && \
-    make build_linux
-
+    make test_unit && \
+    make build_linux && \
+    make install && \
+    make install_examples && \
+    make test_cli && \
+    make test_lcd && \
+    make test_sim
 
 FROM alpine:3.7
 

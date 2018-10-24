@@ -29,7 +29,7 @@
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "=v0.24.2-iris2"
+  version = "=v0.24.2-irisv0.6"
 
 [[override]]
   name = "github.com/golang/protobuf"
@@ -60,6 +60,22 @@
 [[constraint]]
   name = "github.com/rakyll/statik"
   version = "=v0.1.4"
+
+[[constraint]]
+  name = "github.com/emicklei/proto"
+  version = "=v1.6.5"
+
+[[constraint]]
+  name = "github.com/ipfs/go-ipfs-api"
+  version = "=v1.3.1"
+
+[[override]]
+  name = "github.com/libp2p/go-libp2p-pubsub"
+  version = "=v0.9.36"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
 
 [prune]
   go-tests = true
