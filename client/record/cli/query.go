@@ -23,24 +23,24 @@ type RecordMetadata struct {
 
 func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query [record ID]",
-		Short: "query specified file with record ID",
+		Use:     "query [record ID]",
+		Short:   "query specified record",
 		Example: "iriscli record query <record-id>",
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			recordID := viper.GetString(FlagRecordID)
+			recordID := viper.GetString(flagRecordID)
 
 			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
 			if len(res) == 0 || err != nil {
 				return fmt.Errorf("Record ID [%s] is not existed", recordID)
 			}
 
-			var submitFile record.MsgSubmitFile
-			cdc.MustUnmarshalBinary(res, &submitFile)
+			var submitRecord record.MsgSubmitRecord
+			cdc.MustUnmarshalBinary(res, &submitRecord)
 
-			recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
+			recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitRecord)
 			if err != nil {
 				return err
 			}
@@ -56,7 +56,7 @@ func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(FlagRecordID, "", "record ID for query")
+	cmd.Flags().String(flagRecordID, "", "record ID for query")
 
 	return cmd
 }

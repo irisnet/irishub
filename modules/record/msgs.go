@@ -9,49 +9,44 @@ import (
 // name to idetify transaction types
 const MsgType = "record"
 
+const (
+	UploadLimitOfOnchain = 1024 //upload limit on chain in bytes(1K currently)
+)
+
 //-----------------------------------------------------------
-// MsgSubmitFile
-type MsgSubmitFile struct {
-	Filename     string         //  Filename of the File
-	Filepath     string         //  full path of the File
-	Description  string         //  Description of the File
-	SubmitTime   int64          //  File  submit unix timestamp
-	OwnerAddress sdk.AccAddress //  Address of the owner
-	DataHash     string         // ipfs hash of file
-	DataSize     int64          // File Size in bytes
-	RecordId     string         // Record key of kvstore
-	PinedNode    string         //pined node of ipfs
+// MsgSubmitRecord
+type MsgSubmitRecord struct {
+	SubmitTime   int64          // File upload timestamp
+	OwnerAddress sdk.AccAddress // Owner of file
+	RecordID     string         // Record index ID
+	Description  string         // Data/file description
+	DataHash     string         // Data/file hash
+	DataSize     int64          // Data/file Size in bytes
+	Data         string         // Onchain data
 }
 
-func NewMsgSubmitFile(filename string,
-	filepath string,
-	description string,
+func NewMsgSubmitRecord(description string,
 	submitTime int64,
 	ownerAddress sdk.AccAddress,
 	dataHash string,
 	dataSize int64,
-	pinedNode string) MsgSubmitFile {
-	return MsgSubmitFile{
-		Filename:     filename,
-		Filepath:     filepath,
+	data string) MsgSubmitRecord {
+	return MsgSubmitRecord{
 		Description:  description,
 		SubmitTime:   submitTime,
 		OwnerAddress: ownerAddress,
 		DataHash:     dataHash,
 		DataSize:     dataSize,
-		RecordId:     string(KeyRecord(ownerAddress, dataHash)),
-		PinedNode:    pinedNode,
+		RecordID:     string(KeyRecord(dataHash)),
+		Data:         data,
 	}
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) Type() string { return MsgType }
+func (msg MsgSubmitRecord) Type() string { return MsgType }
 
 // Implements Msg.
-func (msg MsgSubmitFile) ValidateBasic() sdk.Error {
-	if len(msg.Filename) == 0 {
-		return ErrInvalidFilename(DefaultCodespace, msg.Filename)
-	}
+func (msg MsgSubmitRecord) ValidateBasic() sdk.Error {
 
 	if len(msg.Description) == 0 {
 		return ErrInvalidDescription(DefaultCodespace, msg.Description)
@@ -68,9 +63,8 @@ func (msg MsgSubmitFile) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSubmitFile) String() string {
-	return fmt.Sprintf("MsgSubmitFile{%s, %s, %d, %d}",
-		msg.Filename,
+func (msg MsgSubmitRecord) String() string {
+	return fmt.Sprintf("MsgSubmitRecord{%s, %d, %d}",
 		msg.OwnerAddress,
 		msg.DataSize,
 		msg.SubmitTime,
@@ -78,12 +72,12 @@ func (msg MsgSubmitFile) String() string {
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) Get(key interface{}) (value interface{}) {
+func (msg MsgSubmitRecord) Get(key interface{}) (value interface{}) {
 	return nil
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) GetSignBytes() []byte {
+func (msg MsgSubmitRecord) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -92,6 +86,6 @@ func (msg MsgSubmitFile) GetSignBytes() []byte {
 }
 
 // Implements Msg.
-func (msg MsgSubmitFile) GetSigners() []sdk.AccAddress {
+func (msg MsgSubmitRecord) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.OwnerAddress}
 }

@@ -11,8 +11,10 @@ import (
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
 
+	r.HandleFunc("/record/records", postRecordHandlerFn(cdc, cliCtx)).Methods("POST")
+
 	r.HandleFunc(fmt.Sprintf("/record/records/{%s}", RestRecordID), queryRecordHandlerFn(cdc, cliCtx)).Methods("GET")
 
-	r.HandleFunc("/record/record", queryRecordsWithParameterFn(cdc, cliCtx)).Methods("GET")
+	r.HandleFunc("/record/records", queryRecordsWithParameterFn(cdc, cliCtx)).Methods("GET")
 
 }
