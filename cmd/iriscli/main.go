@@ -166,7 +166,7 @@ func main() {
 
 	recordCmd.AddCommand(
 		client.PostCommands(
-			recordcmd.GetCmdSubmitFile("record", cdc),
+			recordcmd.GetCmdSubmitRecord("record", cdc),
 		)...)
 	rootCmd.AddCommand(
 		recordCmd,

@@ -19,11 +19,11 @@ import (
 )
 
 // GetCmdSubmitFile implements submitting upload file transaction command.
-func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "submit",
-		Short: "Submit a transaction with a file hash",
-		Example: "iriscli record submit --chain-id=<chain-id> --from=<key name> --fee=0.004iris --name=<file name> --description=<record description> --file-path=<local file path>",
+		Use:     "submit",
+		Short:   "Submit a new record",
+		Example: "iriscli record submit --chain-id=<chain-id> --description=<record description> --onchain-data=<record data> --from=<key name> --fee=0.004iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			description := viper.GetString(flagDescription)
 			onchainData := viper.GetString(flagOnchainData)

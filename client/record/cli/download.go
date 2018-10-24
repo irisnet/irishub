@@ -17,8 +17,9 @@ import (
 
 func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "download [record ID]",
-		Short: "download specified file with record ID",
+		Use:     "download [record ID]",
+		Short:   "download related data with unique record ID to specified file",
+		Example: "iriscli record download --chain-id=<chain-id> --file-name=<file name> --record-id=<record-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
