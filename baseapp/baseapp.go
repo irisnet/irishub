@@ -29,18 +29,18 @@ import (
 var dbHeaderKey = []byte("header")
 
 // Enum mode for app.runTx
-type runTxMode uint8
+type RunTxMode uint8
 
 const (
 	// Check a transaction
-	runTxModeCheck runTxMode = iota
+	RunTxModeCheck RunTxMode = iota
 	// Simulate a transaction
-	runTxModeSimulate runTxMode = iota
+	RunTxModeSimulate RunTxMode = iota
 	// Deliver a transaction
-	runTxModeDeliver runTxMode = iota
+	RunTxModeDeliver RunTxMode = iota
 )
 
-type RunMsg func(ctx sdk.Context, msgs []sdk.Msg) sdk.Result
+type RunMsg func(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) sdk.Result
 
 // BaseApp reflects the ABCI application implementation.
 type BaseApp struct {
@@ -477,7 +477,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	if err != nil {
 		result = err.Result()
 	} else {
-		result = app.runTx(runTxModeCheck, txBytes, tx)
+		result = app.runTx(RunTxModeCheck, txBytes, tx)
 	}
 
 	return abci.ResponseCheckTx{
@@ -498,7 +498,7 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	if err != nil {
 		result = err.Result()
 	} else {
-		result = app.runTx(runTxModeDeliver, txBytes, tx)
+		result = app.runTx(RunTxModeDeliver, txBytes, tx)
 	}
 
 	// Even though the Result.Code is not OK, there are still effects,
@@ -534,9 +534,9 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 	return nil
 }
 
-func (app *BaseApp) getContextForAnte(mode runTxMode, txBytes []byte) (ctx sdk.Context) {
+func (app *BaseApp) getContextForAnte(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
 	// Get the context
-	if mode == runTxModeCheck || mode == runTxModeSimulate {
+	if mode == RunTxModeCheck || mode == RunTxModeSimulate {
 		ctx = app.checkState.ctx.WithTxBytes(txBytes)
 	} else {
 		ctx = app.deliverState.ctx.WithTxBytes(txBytes)
@@ -547,9 +547,9 @@ func (app *BaseApp) getContextForAnte(mode runTxMode, txBytes []byte) (ctx sdk.C
 }
 
 // Iterates through msgs and executes them
-func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode runTxMode) (result sdk.Result) {
+func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (result sdk.Result) {
 	if app.runMsg != nil {
-		return app.runMsg(ctx, msgs)
+		return app.runMsg(ctx, msgs, mode)
 	}
 
 	// accumulate results
@@ -567,7 +567,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode runTxMode) (re
 
 		var msgResult sdk.Result
 		// Skip actual execution for CheckTx
-		if mode != runTxModeCheck {
+		if mode != RunTxModeCheck {
 			msgResult = handler(ctx, msg)
 		}
 
@@ -604,8 +604,8 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode runTxMode) (re
 
 // Returns the applicantion's deliverState if app is in runTxModeDeliver,
 // otherwise it returns the application's checkstate.
-func getState(app *BaseApp, mode runTxMode) *state {
-	if mode == runTxModeCheck || mode == runTxModeSimulate {
+func getState(app *BaseApp, mode RunTxMode) *state {
+	if mode == RunTxModeCheck || mode == RunTxModeSimulate {
 		return app.checkState
 	}
 
@@ -615,7 +615,7 @@ func getState(app *BaseApp, mode runTxMode) *state {
 // runTx processes a transaction. The transactions is proccessed via an
 // anteHandler. txBytes may be nil in some cases, eg. in tests. Also, in the
 // future we may support "internal" transactions.
-func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk.Result) {
+func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk.Result) {
 	// NOTE: GasWanted should be returned by the AnteHandler. GasUsed is
 	// determined by the GasMeter. We need access to the context to get the gas
 	// meter so we initialize upfront.
@@ -638,16 +638,14 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
 
 		// Refund unspent fee
-		if app.feeRefundHandler != nil {
-			refundCoin, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
-			if err != nil {
+		if mode != RunTxModeCheck && app.feeRefundHandler != nil {
+			actualCostFee, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
+			if err == nil {
+				result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+actualCostFee.Denom, actualCostFee.Amount.BigInt().Bytes())
+			} else {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
 				result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
-				result.Tags.AppendTag("consumedTxFee-"+refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
-			} else {
-				//TODO: add tag to get completeConsumedTxFee, will modify result.FeeAmount type to BigInt
-				result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+refundCoin.Denom, refundCoin.Amount.BigInt().Bytes())
 			}
 		}
 	}()
@@ -695,7 +693,7 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	result.GasWanted = gasWanted
 
 	// only update state if all messages pass and we're not in a simulation
-	if result.IsOK() && mode != runTxModeSimulate {
+	if result.IsOK() && mode != RunTxModeSimulate {
 		msCache.Write()
 	}
 

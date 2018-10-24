@@ -57,7 +57,7 @@ func TestIrismon(t *testing.T) {
 	time.Sleep(time.Second * 20)
 
 	// irismon test
-	resp, err := http.Get(fmt.Sprintf("http://0.0.0.0:%s", port1))
+	resp, err := http.Get(fmt.Sprintf("http://localhost:%s", port1))
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
 }
