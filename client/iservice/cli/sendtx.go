@@ -20,6 +20,9 @@ func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
 		Short: "create new service definition",
+		Example: "iriscli iservice define --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
+			"--name=<service name> --service-description=<service description> --author-description=<author description> " +
+			"--tags=<service tags> --idl-content=<interface description content> --broadcast=Broadcast",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))

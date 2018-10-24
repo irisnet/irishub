@@ -68,7 +68,8 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:2b5a43f6f995df4351c75a74b8c0f895b581b5b61dc80d6eb40326374e84082d"
+  branch = "irisnet/v0.24.2-v0.6"
+  digest = "1:e487832acd654b5fc2bc296c34cc679808652f5571e3d18c37ec726e1697070d"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -108,9 +109,8 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "c6189e6d8c13d6b78a009f83e0ceac4a1aab3d73"
+  revision = "7c39b51abdd5089636060470e294b2ea1fec7954"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.24.2-iris1"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"

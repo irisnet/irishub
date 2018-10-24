@@ -22,7 +22,8 @@ import (
 func GetCmdSubmitFile(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
-		Short: "Submit the specified file/data",
+		Short: "Submit a transaction with a file hash",
+		Example: "iriscli record submit --chain-id=<chain-id> --from=<key name> --fee=0.004iris --name=<file name> --description=<record description> --file-path=<local file path>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			description := viper.GetString(flagDescription)
 			onchainData := viper.GetString(flagOnchainData)
