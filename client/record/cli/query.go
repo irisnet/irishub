@@ -23,10 +23,9 @@ type RecordMetadata struct {
 
 func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query [record ID]",
+		Use:     "query",
 		Short:   "query specified record",
-		Example: "iriscli record query <record-id>",
-		Args:    cobra.ExactArgs(1),
+		Example: "iriscli record query --chain-id=<chain-id> --record-id=<record-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
