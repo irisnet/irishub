@@ -6,13 +6,13 @@
 2. Service Binding (TODO)
 3. Service Invocation (TODO)
 4. Dispute Resolution (TODO)
-5. Service Profiling (TODO)
+5. Service Analysis (TODO)
 
 ## Interactive process
 
-### Service define process
+### Service definition process
 
-1. Any users can define a service. In service definition，Use [protobuf](https://developers.google.com/protocol-buffers/) standardize the definition of the service's method, its input and output parameters.
+1. Any users can define a service. In service definition，Use [protobuf](https://developers.google.com/protocol-buffers/) to standardize the definition of the service's method, its input and output parameters.
 
 ## Usage Scenario
 ### Create an environment
@@ -28,7 +28,7 @@ iris start --home=iris
 ### Service Definition
 
 ```
-# Service define
+# Service definition
 iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --broadcast=Broadcast --idl-content=<idl-content> --file=test.proto
 
 # Result
@@ -50,29 +50,29 @@ iriscli iservice definition --name=test-service --chain-id=service-test
 iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --broadcast=Broadcast --idl-content=<idl-content> --file=test.proto
 ```
 
-* `--name`  The name of this iService
-* `--service-description`  A description of this iService
-* `--author-description`  A self-description of the iService creator. Optional
-* `--tags`  keywords about this iService
-* `--broadcast`  Broadcast type of this iService{`Broadcast`,`Unicast`}
-* `--idl-content`  A standardized definition of the methods for this iService
-* `--file`  Use files instead idl-content，if the item is not empty，will replace idl-content
+* `--name`  The name of iService
+* `--service-description`  The description of this iService
+* `--author-description`  The self-description of the iService creator which is optional
+* `--tags`  The keywords of this iService
+* `--broadcast`  The Broadcast type of this iService{`Broadcast`,`Unicast`}
+* `--idl-content`  The standardized definition of the methods for this iService
+* `--file`  Idl-content can be replaced by files,if the item is not empty.
 
 ```
 iriscli iservice definition --name=test-service --chain-id=service-test
 ```
 
-* `--chain-id`  The ID of the blockchain where the iService be defined
-* `--name`  The name of this iService
+* `--chain-id`  The ID of the blockchain defined of the iService
+* `--name`  The name of iService
 
 ## IDL extension
-When using proto file standardize the definition of the service's method, its input and output parameters, method attributes can be added through annotations.
+When using proto file to standardize the definition of the service's method, its input and output parameters, the method attributes can be added through annotations.
 
 ### Annotation standard
-* If `//@Attribute attribute： value` wrote on top of `rpc method`，it will be added to the method attributes。eg.
+* If `//@Attribute attribute： value` wrote on top of `rpc method`，it will be added to the method attributes. Eg.
 > //@Attribute description: sayHello
 
-### Currently supported properties
+### Currently supported attributes
 * `description` The name of this method in the iService
 * `output_privacy` Whether the output of the method is encrypted，{`NoPrivacy`,`PubKeyEncryption`}
 * `output_cached` Whether the output of the method is cached，{`OffChainCached`，`NoCached`}
