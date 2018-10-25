@@ -82,7 +82,3 @@ func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 
 	return cmd
 }
-
-func checkRecordData() {
-
-}
