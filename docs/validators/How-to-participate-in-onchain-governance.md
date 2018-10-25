@@ -1,16 +1,27 @@
-# Onchain Governance In IRISHub
+# Governance In IRISHub
 
-## What is onchain governance?
+## What is Blockchain Governance?
 
-On-chain governance is used for validators to modify the parameters of certain modules.
+Generally, governance is about decisions that ultimately affect stakeholders of blockchain network. It’s about the processes 
+that community members in governance use to make decisions. 
+It’s also about how different groups coordinate around decisions and decision-making processes. 
+It includes the establishment, maintenance, and revocation of the legitimacy of decisions, decision making processes, norms,
+and other mechanisms for coordination.
 
-### Types of Governance Proposal
+### Stakeholder of Governance
 
-* Text
-* System Parameter Change
-* Protocol Upgrade [not implemented]
+* Core Developers:a blockchain are software developers who work on the software that implement that protocol. 
+Developers have processes that are supposed to assure the quality of the software they release, 
+
+* Validators/Delegators: Validators and delegators are responsible for securing the network. They need to actively involved in governance
+proposals or their credit will be damaged. 
+
+* Community Members: They could come up with interesting for improvement of network
+
+
 
 ## Governance Process
+![workflow](../pics/flow.jpg)
 
 The governance process is divided in a few steps that are outlined below:
 
@@ -27,6 +38,13 @@ For `System Parameter Change` proposals, the following parameters are eligible f
 * Pass Threshold: 50%
 * Voting Period: 20000 blocks
 
+### Types of Governance Proposal
+
+* Text
+* System Parameter Change
+* Protocol Upgrade 
+
+
 ## How to submit a proposal?
 
 Anyone could submit a governance proposal, but you need to make the deposit for this proposal more than the minimium requirement.
@@ -34,10 +52,8 @@ Anyone could submit a governance proposal, but you need to make the deposit for 
 The following command is for submitting a `Text` proposal:
 
 ```
-iriscli gov submit-proposal --title="Text" --description="name of the proposal" --type="Text" --deposit="1000000000000000000000iris" --proposer=<account>  --from=<name>  --chain-id=fuxi-3001 --fee=400000000000000iris --gas=20000 --node=http://localhost:36657
+iriscli gov submit-proposal --title="Text" --description="name of the proposal" --type="Text" --deposit="100iris" --proposer=<account>  --from=<name>  --chain-id=fuxi-4000 --fee=0.05iris --gas=20000 --node=http://localhost:26657
 ```
-
-> Please Note the `deposit` is in minimum unit.
 
 The `<account>` for `proposer` field should start with `faa` which corresponds to `<name>`.
 
@@ -49,6 +65,9 @@ To add deposit to some proposal, you could execute this command to add `10IRIS` 
 ```
 iriscli gov deposit --proposalID=1 --depositer=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-3001  --fee=400000000000000iris --gas=20000  --node=http://localhost:36657 
 ```
+## How to query proposals?
+
+You could also use IRISplorer to query all proposal. 
 
 ## How to vote a proposal?
 

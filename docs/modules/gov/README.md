@@ -4,7 +4,7 @@
 
 1. On-chain governance proposals on text
 2. On-chain governance proposals on parameter change
-3. On-chain governance proposals on software upgrade （unavailable)
+3. On-chain governance proposals on software upgrade 
 
 ## Interactive process
 
