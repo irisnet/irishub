@@ -641,7 +641,8 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		if mode != RunTxModeCheck && app.feeRefundHandler != nil {
 			actualCostFee, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
 			if err == nil {
-				result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+actualCostFee.Denom, actualCostFee.Amount.BigInt().Bytes())
+				fee, _ := actualCostFee.Amount.BigInt().MarshalJSON()
+				result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+actualCostFee.Denom, fee)
 			} else {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
