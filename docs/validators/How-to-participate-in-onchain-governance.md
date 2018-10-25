@@ -32,11 +32,12 @@ The governance process is divided in a few steps that are outlined below:
 
 For `System Parameter Change` proposals, the following parameters are eligible for change:
 
-* Mininimum Depost: `100IRIS`
+* Mininimum Depost: `10IRIS`
 * Deposit Period: 1440 blocks
 * Penalty for non-voting validtors: 1%
 * Pass Threshold: 50%
 * Voting Period: 20000 blocks
+
 
 ### Types of Governance Proposal
 
@@ -93,24 +94,58 @@ In the current version of governance module, you have the following choices for 
 You could put one of the choices in the `--option` field. 
 
 To vote for a proposal, you need to get the correct `<proposal_id>`.You could execute the following command to vote on proposal with ID = 1:
-```
-iriscli  vote --from=jerry --voter=<account> --proposalID=1 --option=Yes --chain-id=fuxi-3001
-   --fee=2000000000000000iris --gas=20000  --node=http://localhost:36657
-```
+
 
 ## How to get more information about a proposal?
 
 You could use the following command to get the first proposal:  
 ```
-iriscli gov query-proposal 1 --chain-id=fuxi-3001 --node=http://localhost:26657
+iriscli gov query-proposal --proposal-id=6 --chain-id=fuxi-3001 --node=http://localhost:26657
+```
+
+Example output is the following:
+```$xslt
+{
+  "proposal_id": "1",
+  "title": "text_proposal",
+  "description": "test_description",
+  "proposal_type": "Text",
+  "proposal_status": "VotingPeriod",
+  "tally_result": {
+    "yes": "0",
+    "abstain": "0",
+    "no": "0",
+    "no_with_veto": "0"
+  },
+  "submit_block": "200981",
+  "total_deposit": [
+    "20iris"
+  ],
+  "voting_start_block": "200981",
+  "param": {
+    "key": "",
+    "value": "",
+    "op": ""
+  }
+}
 ```
 ## Proposal Examples
 
 ### Text Proposal
 
+A text proposal is just a notice. You could send one with the following command:
+```$xslt
+iriscli gov submit-proposal --title=text_proposal --description=test_description --type=Text --deposit=20iris --fee=0.1iris  --from=bft --chain-id=fuxi-4000 
+```
+You could vote on it with the following command:
+```$xslt
+iriscli gov vote --proposal-id=6 --option=Yes --from=bft --chain-id=fuxi-4000 --fee=0.05iris --gas=20000 
+```
+
+
 ### System Parameter Change Proposal
 
-First, you could query the fixable parameters with the following command:
+First, you could query the flexible parameters with the following command:
 ```
 iriscli gov query-params --trust-node --module=gov 
 
@@ -149,3 +184,15 @@ governance_penalty: "1/100"
 },
 ```
 
+
+The default value of flexible parameters are shown above.
+
+You could submit a parameter change proposal,
+```$xslt
+iriscli gov submit-proposal --title="update VotingProcedure" --description="test" --type="ParameterChange" --deposit=10iris --param='{"key":"Gov/gov/VotingProcedure","value":"{\"voting_period\": 250}","op":"update"}' --from=bft --chain-id=fuxi-4000  --fee=0.05iris --gas=20000
+```
+This proposal will change the voting period from default to 250.
+
+### System Upgrade Proposal
+
+You could read more about it in the [doc](../modules/upgrade/README.md)
