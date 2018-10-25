@@ -62,14 +62,14 @@ iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name
 iriscli iservice definition --name=test-service --chain-id=service-test
 ```
 
-* `--chain-id` iService服务被定义的区块链chain-id
+* `--chain-id` 定义该iservice服务的区块链ID
 * `--name`  iService服务的名称
 
 ## IDL文件扩展
 在使用proto文件对服务的方法，输入、输出参数进行标准化定义时，可通过注释的方式增加method属性。
 
 ### 注释标准
-* 使用 `//@Attribute 属性： 值`的方式添加在rpc方法上，即可将该属性、值添加为method的属性。例如: 
+* 使用 `//@Attribute 属性： 值`的方式添加在rpc方法上，即可将该属性添加为方法的属性。例如: 
 > //@Attribute description: sayHello
 
 ### 目前支持的属性
@@ -77,8 +77,9 @@ iriscli iservice definition --name=test-service --chain-id=service-test
 * `output_privacy` 是否对该方法的输出进行加密处理，{`NoPrivacy`,`PubKeyEncryption`}
 * `output_cached` 是否对该方法的输出进行缓存，{`OffChainCached`,`NoCached`}
 
-### idl-content参照
-* idl-example
+### IDL content参照
+* IDL content参照
 `syntax = \"proto3\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output_privacy: NoPrivacy\n    //@Attribute output_cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n`
 
-[example.proto](./test.proto)
+* IDL文件参照
+[test.proto](./test.proto)
