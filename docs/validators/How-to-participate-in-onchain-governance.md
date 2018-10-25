@@ -60,14 +60,27 @@ The `<account>` for `proposer` field should start with `faa` which corresponds t
 
 ## How to add deposit to a proposal?
 
-To add deposit to some proposal, you could execute this command to add `10IRIS` to the proposal's deposit:
+To add deposit to some proposal, you could execute this command to add `100IRIS` to the proposal's deposit:
 
 ```
 iriscli gov deposit --proposalID=1 --depositer=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-3001  --fee=400000000000000iris --gas=20000  --node=http://localhost:36657 
 ```
 ## How to query proposals?
 
-You could also use IRISplorer to query all proposal. 
+Run the following command will return all the existing proposals:
+```$xslt
+iriscli gov query-proposals
+```
+Example output:
+```$xslt
+  1 - 78547
+  2 - 96866
+  3 - 46727
+  4 - 92454
+  5 - 57682
+```
+
+You could also use IRISplorer to see all proposal. 
 
 ## How to vote a proposal?
 
@@ -89,7 +102,50 @@ iriscli  vote --from=jerry --voter=<account> --proposalID=1 --option=Yes --chain
 
 You could use the following command to get the first proposal:  
 ```
-iriscli gov query-proposal --proposalID=1 --chain-id=fuxi-3001 --node=http://localhost:26657
+iriscli gov query-proposal 1 --chain-id=fuxi-3001 --node=http://localhost:26657
+```
+## Proposal Examples
 
+### Text Proposal
+
+### System Parameter Change Proposal
+
+First, you could query the fixable parameters with the following command:
+```
+iriscli gov query-params --trust-node --module=gov 
+
+```
+
+The output is the shown below:
+```$xslt
+[
+ "Gov/gov/DepositProcedure",
+ "Gov/gov/TallyingProcedure",
+ "Gov/gov/VotingProcedure"
+]
+```
+It corresponds to the following fields in genesis file:
+
+```json
+gov: {
+starting_proposalID: "1",
+deposit_period: {
+min_deposit: [
+{
+denom: "iris-atto",
+amount: "10000000000000000000"
+}
+],
+max_deposit_period: "50"
+},
+voting_period: {
+voting_period: "50"
+},
+tallying_procedure: {
+threshold: "1/2",
+veto: "1/3",
+governance_penalty: "1/100"
+}
+},
 ```
 
