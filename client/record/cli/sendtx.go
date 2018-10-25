@@ -38,21 +38,8 @@ func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			var recordHash string
-			var dataSize int64
-			// --onchain-data has a high priority over --file-path
-			if len(onchainData) != 0 {
-				dataSize = int64(binary.Size([]byte(onchainData)))
-				if dataSize >= record.UploadLimitOfOnchain {
-					fmt.Printf("Onchain data is too large, upload limit is %d bytes.\n", record.UploadLimitOfOnchain)
-					return err
-				}
-				sum := sha256.Sum256([]byte(onchainData))
-				recordHash = hex.EncodeToString(sum[:])
-			} else {
-				fmt.Println("--onchain-data is empty and pleae double check this option")
-				return err
-			}
+			sum := sha256.Sum256([]byte(onchainData))
+			recordHash := hex.EncodeToString(sum[:])
 
 			recordID := record.KeyRecord(recordHash)
 			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
@@ -60,11 +47,13 @@ func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 			if len(res) != 0 {
-				// Corresponding record id is already existed, so there is no need to upload file/data
-				return fmt.Errorf("Record ID [%s] is already existed", recordID)
+				// Corresponding record id already exists, so there is no need to upload file/data
+				fmt.Printf("Warning: Record ID %v already exists.\n", string(recordID))
+				return nil
 			}
 
 			submitTime := time.Now().Unix()
+			dataSize := int64(binary.Size([]byte(onchainData)))
 			msg := record.NewMsgSubmitRecord(
 				description,
 				submitTime,
@@ -92,4 +81,8 @@ func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 	cmd.Flags().String(flagOnchainData, "", "on chain data source")
 
 	return cmd
+}
+
+func checkRecordData() {
+
 }
