@@ -15,14 +15,14 @@ const (
 	CodeFailUploadFile         sdk.CodeType = 3
 )
 
-func ErrInvalidFilename(codespace sdk.CodespaceType, filename string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidFilename, fmt.Sprintf("File Name '%s' is not valid", filename))
+func ErrInvalidDataSize(codespace sdk.CodespaceType, size int64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidFilename, fmt.Sprintf("Onchain data can't be empty and upload limit is %d bytes", size))
 }
 
-func ErrInvalidDescription(codespace sdk.CodespaceType, description string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidFileDescription, fmt.Sprintf("File Desciption '%s' is not valid", description))
+func ErrInvalidDescription(codespace sdk.CodespaceType, size int64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidFileDescription, fmt.Sprintf("Descriprion can't be empty and upload limit is %d bytes", size))
 }
 
-func ErrFailUploadFile(codespace sdk.CodespaceType, dataHash string) sdk.Error {
-	return sdk.NewError(codespace, CodeFailUploadFile, fmt.Sprintf("File Upload failed with %s", dataHash))
+func ErrInvalidDataHash(codespace sdk.CodespaceType, hash string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidFilename, fmt.Sprintf("Data hash [%s] is invalid", hash))
 }
