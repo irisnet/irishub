@@ -101,7 +101,7 @@ func sendAndVerifyMsgSend(t *testing.T, app *baseapp.BaseApp, mapper auth.Accoun
 	for _, v := range kvs {
 		if string(v.Key) == "completeConsumedTxFee-iris-atto" {
 			amount := sdk.NewInt(0).BigInt()
-			amount.SetBytes(v.Value)
+			amount.UnmarshalJSON(v.Value)
 			feeCoin[0].Amount = sdk.NewIntFromBigInt(amount)
 		}
 	}
