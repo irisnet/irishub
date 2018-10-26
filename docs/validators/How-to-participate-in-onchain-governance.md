@@ -16,7 +16,7 @@ Developers have processes that are supposed to assure the quality of the softwar
 * Validators/Delegators: Validators and delegators are responsible for securing the network. They need to actively involved in governance
 proposals or their credit will be damaged. 
 
-* Community Members: They could come up with interesting for improvement of network
+* Community Members: They could come up with interesting for improvement of network. block explorers and other low level service providers, exchanges, speculators, application developers, users, journalists and passive observers
 
 
 

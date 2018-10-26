@@ -115,7 +115,7 @@ You should put your name of your team in `details`.
 
 ```
 iriscli stake edit-validator  --address-delegator=account --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-4000
-  --name=key_name --node=tcp://localhost:26657 --fee=40000000000000000iris  --gas=2000000
+  --name=key_name --node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
 ```
 ### View Validator Description
 
