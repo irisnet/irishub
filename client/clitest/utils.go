@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"bufio"
+	"io"
+
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
@@ -16,17 +18,19 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
-	"github.com/irisnet/irishub/client/keys"
-	stakecli "github.com/irisnet/irishub/client/stake"
 	iservicecli "github.com/irisnet/irishub/client/iservice"
+	"github.com/irisnet/irishub/client/keys"
+	recordCli "github.com/irisnet/irishub/client/record"
+	stakecli "github.com/irisnet/irishub/client/stake"
+	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
-	"io"
 )
 
 var (
@@ -334,4 +338,92 @@ func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.Servic
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceDef
+}
+
+func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...string) string {
+	proc := tests.GoExecuteT(t, cmdStr)
+
+	for _, write := range writes {
+		_, err := proc.StdinPipe.Write([]byte(write + "\n"))
+		require.NoError(t, err)
+	}
+	stdout, stderr, err := proc.ReadAll()
+	if err != nil {
+		fmt.Println("Err on proc.ReadAll()", err, cmdStr)
+	}
+	// Log output.
+	if len(stdout) > 0 {
+		t.Log("Stdout:", cmn.Green(string(stdout)))
+	}
+	if len(stderr) > 0 {
+		t.Log("Stderr:", cmn.Red(string(stderr)))
+	}
+
+	type toJSON struct {
+		Height   int64  `json:"Height"`
+		TxHash   string `json:"TxHash"`
+		Response string `json:"Response"`
+	}
+	var res toJSON
+	cdc := app.MakeCodec()
+	err = cdc.UnmarshalJSON([]byte(stdout), &res)
+	require.NoError(t, err, "out %v\n, err %v", stdout, err)
+
+	return res.TxHash
+}
+
+func executeGetRecordID(t *testing.T, cmdStr string) string {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var info tx.Info
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &info)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	recordMsg, ok := info.Tx.GetMsgs()[0].(record.MsgSubmitRecord)
+	if !ok {
+		fmt.Println("Err MsgSubmitRecord type assertion failed")
+		return ""
+	}
+	return recordMsg.RecordID
+}
+
+func executeGetRecord(t *testing.T, cmdStr string) recordCli.RecordOutput {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var record recordCli.RecordOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &record)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return record
+}
+
+func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force bool) bool {
+
+	if force {
+		os.Remove(filePath)
+	}
+
+	proc := tests.GoExecuteT(t, cmdStr)
+	stdout, stderr, err := proc.ReadAll()
+	if err != nil {
+		fmt.Println("Err on proc.ReadAll()", err, cmdStr)
+	}
+	// Log output.
+	if len(stdout) > 0 {
+		t.Log("Stdout:", cmn.Green(string(stdout)))
+	}
+	if len(stderr) > 0 {
+		t.Log("Stderr:", cmn.Red(string(stderr)))
+	}
+
+	proc.Wait()
+
+	if !proc.ExitState.Success() {
+		return false
+	}
+
+	// Check whether download file exists
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return false
+	}
+	return true
+
 }

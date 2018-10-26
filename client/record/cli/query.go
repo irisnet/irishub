@@ -33,7 +33,7 @@ func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
 			if len(res) == 0 || err != nil {
-				return fmt.Errorf("Record ID [%s] is not existed", recordID)
+				return fmt.Errorf("Record ID [%s] doesn't exist", recordID)
 			}
 
 			var submitRecord record.MsgSubmitRecord
