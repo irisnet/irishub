@@ -17,19 +17,34 @@ genesis文件中定义了区块链网络的初始状态，而config.toml指定�
 
 ```
 cd $IRISHOME/config/
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3001/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3001/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-4000/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-4000/config/genesis.json
 ```
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：
 * 将`moniker`字段配置称为自定义的名称，这样便于区分不同的节点
-* `seed`字段用语设置种子节点，在fuxi-3001中的官方中字节点为：
+* `seed`字段用语设置种子节点，在fuxi-4000中的官方中字节点为：
 ```
 c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
 a12cfb2f535210ea12731f94a76b691832056156@120.79.226.163:26656
 ```
 
-## 启动一个全节点
+你也可以配置 `moniker` 和 `external_address` 字段. 
+
+```
+moniker = "<your_custom_name>"
+external_address = "your-public-IP:26656"
+```
+
+
+另外，如果你需要与其他节点通过内网链接，请设置 `addr_book_strict` 为 `false` 。
+
+```
+addr_book_strict = false
+```
+###  配置端口
+
+如果你的节点需要与其他节点建立链接，则需要开放 `26656` 端口；若需要通过rpc端口查询Tendermint提供的信息，则需要开放 `26657` 端口。
 
 通过以下命令启动全节点，并将日志输出到文件中：
 ```
