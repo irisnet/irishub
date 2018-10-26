@@ -58,7 +58,7 @@ func (msg MsgSubmitRecord) ValidateBasic() sdk.Error {
 
 	if msg.DataSize == 0 ||
 		msg.DataSize > UploadLimitOfOnchain {
-		return ErrInvalidDataSize(DefaultCodespace, msg.DataSize)
+		return ErrInvalidDataSize(DefaultCodespace, UploadLimitOfOnchain)
 	}
 
 	if len(msg.DataHash) == 0 {
