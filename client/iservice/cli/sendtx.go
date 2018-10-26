@@ -14,6 +14,7 @@ import (
 	"github.com/irisnet/irishub/client"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"fmt"
+	"strings"
 )
 
 func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
@@ -34,6 +35,9 @@ func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
 			content := viper.GetString(FlagIdlContent)
+			if len(content) > 0 {
+				content = strings.Replace(content, `\n`, "\n", -1)
+			}
 			filePath := viper.GetString(FlagFile)
 			if len(filePath) > 0 {
 				contentBytes, err := cmn.ReadFile(filePath)
