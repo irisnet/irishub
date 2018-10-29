@@ -17,6 +17,8 @@ const (
 	CodeInvalidAuthor            sdk.CodeType = 106
 	CodeInvalidMethodName        sdk.CodeType = 107
 	CodeInvalidBroadcastEnum     sdk.CodeType = 108
+	CodeMoreTags                 sdk.CodeType = 109
+	CodeDuplicateTags            sdk.CodeType = 110
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -44,8 +46,8 @@ func ErrSvcDefExists(codespace sdk.CodespaceType, svcDefName string) sdk.Error {
 	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exist,must use new name", svcDefName))
 }
 
-func ErrInvalidIDL(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidIDL, codeToDefaultMsg(CodeInvalidIDL))
+func ErrInvalidIDL(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidIDL, fmt.Sprintf("The IDL content cannot be parsed, err: %s", msg))
 }
 
 func ErrInvalidOutputPrivacyEnum(codespace sdk.CodespaceType, value string) sdk.Error {
@@ -74,4 +76,12 @@ func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrInvalidBroadcastEnum(codespace sdk.CodespaceType, value BroadcastEnum) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidBroadcastEnum, fmt.Sprintf("invalid BroadcastEnum %s", value))
+}
+
+func ErrMoreTags(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeMoreTags, fmt.Sprintf("tags are limited to %d", maxTagsNum))
+}
+
+func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeDuplicateTags, "tags contains duplicate tag")
 }
