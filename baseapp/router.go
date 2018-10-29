@@ -39,14 +39,14 @@ func NewRouter() *router {
 	}
 }
 
-var isAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
+var isAlphaNumeric = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 
 // AddRoute - TODO add description
 ////////////////////  iris/cosmos-sdk begin  ///////////////////////////
 func (rtr *router) AddRoute(r string, s []*sdk.KVStoreKey, h sdk.Handler) Router {
 	rstrs := strings.Split(r, "-")
 
-	if !isAlpha(rstrs[0]) {
+	if !isAlphaNumeric(rstrs[0]) {
 		panic("route expressions can only contain alphabet characters")
 	}
 	rtr.routes = append(rtr.routes, route{r, s, h})
