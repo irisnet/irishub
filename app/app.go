@@ -36,6 +36,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sort"
 )
 
 const (
@@ -197,8 +198,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// register message routes
 	// need to update each module's msg type
 	app.Router().
-		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.coinKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
+		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
@@ -206,7 +207,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
 		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper))
 
+	app.QueryRouter().
+		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
+
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
+
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -317,7 +322,45 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	bam.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
 
 	// load the address to pubkey map
-	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
+	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
+	mint.InitGenesis(ctx, app.mintKeeper, genesisState.MintData)
+	distr.InitGenesis(ctx, app.distrKeeper, genesisState.DistrData)
+	err = IrisValidateGenesisState(genesisState)
+	if err != nil {
+		panic(err) // TODO find a way to do this w/o panics
+	}
+
+	if len(genesisState.GenTxs) > 0 {
+		for _, genTx := range genesisState.GenTxs {
+			var tx auth.StdTx
+			err = app.cdc.UnmarshalJSON(genTx, &tx)
+			if err != nil {
+				panic(err)
+			}
+			bz := app.cdc.MustMarshalBinary(tx)
+			res := app.BaseApp.DeliverTx(bz)
+			if !res.IsOK() {
+				panic(res.Log)
+			}
+		}
+
+		validators = app.stakeKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+	}
+	app.slashingKeeper.AddValidators(ctx, validators)
+
+	// sanity check
+	if len(req.Validators) > 0 {
+		if len(req.Validators) != len(validators) {
+			panic(fmt.Errorf("len(RequestInitChain.Validators) != len(validators) (%d != %d) ", len(req.Validators), len(validators)))
+		}
+		sort.Sort(abci.ValidatorUpdates(req.Validators))
+		sort.Sort(abci.ValidatorUpdates(validators))
+		for i, val := range validators {
+			if !val.Equal(req.Validators[i]) {
+				panic(fmt.Errorf("validators[%d] != req.Validators[%d] ", i, i))
+			}
+		}
+	}
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
@@ -338,11 +381,15 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		return false
 	}
 	app.accountMapper.IterateAccounts(ctx, appendAccount)
-
-	genState := GenesisState{
-		Accounts:  accounts,
-		StakeData: stake.WriteGenesis(ctx, app.stakeKeeper),
-	}
+	genState := NewGenesisState(
+		accounts,
+		stake.WriteGenesis(ctx, app.stakeKeeper),
+		mint.WriteGenesis(ctx, app.mintKeeper),
+		distr.WriteGenesis(ctx, app.distrKeeper),
+		gov.WriteGenesis(ctx, app.govKeeper),
+		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
+		slashing.GenesisState{}, // TODO create write methods
+	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
 	if err != nil {
 		return nil, nil, err
