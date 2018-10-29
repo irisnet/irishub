@@ -1,7 +1,7 @@
 package gov
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/modules/gov/params"
 )
 

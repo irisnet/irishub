@@ -8,7 +8,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire" // XXX fix
+	"github.com/cosmos/cosmos-sdk/codec" // XXX fix
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/irisnet/irishub/client/context"
 )

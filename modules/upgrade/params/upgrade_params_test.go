@@ -3,7 +3,7 @@ package upgradeparams
 import (
 	"testing"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/require"
 	"github.com/cosmos/cosmos-sdk/store"
 

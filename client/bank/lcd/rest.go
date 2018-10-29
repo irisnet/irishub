@@ -1,7 +1,7 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"

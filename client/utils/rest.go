@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"net/http"
 	"net/url"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"io/ioutil"
 )
 

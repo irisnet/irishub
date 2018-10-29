@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"github.com/spf13/viper"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"

@@ -10,10 +10,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	wire "github.com/cosmos/cosmos-sdk/wire"
+	wire "github.com/cosmos/cosmos-sdk/codec"
 
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authctx "github.com/cosmos/cosmos-sdk/x/auth/client/context"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"os"
 	"github.com/cosmos/cosmos-sdk/client/utils"

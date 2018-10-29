@@ -5,7 +5,7 @@ import (
 
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"

@@ -11,7 +11,7 @@ import (
 
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/store"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/types"

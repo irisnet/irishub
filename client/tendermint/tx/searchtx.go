@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"

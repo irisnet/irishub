@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	wire "github.com/cosmos/cosmos-sdk/wire"
+	wire "github.com/cosmos/cosmos-sdk/codec"
 )
 
 // IBC Mapper
