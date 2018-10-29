@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 )
 
-func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -42,7 +42,7 @@ func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Han
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
+		output, err := codec.MarshalJSONIndent(cdc, proposalResponse)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -52,7 +52,7 @@ func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Han
 	}
 }
 
-func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -101,7 +101,7 @@ func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		output, err := wire.MarshalJSONIndent(cdc, depositeResponse)
+		output, err := codec.MarshalJSONIndent(cdc, depositeResponse)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -111,7 +111,7 @@ func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 	}
 }
 
-func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -154,7 +154,7 @@ func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handler
 		var vote gov.Vote
 		cdc.MustUnmarshalBinary(res, &vote)
 
-		output, err := wire.MarshalJSONIndent(cdc, vote)
+		output, err := codec.MarshalJSONIndent(cdc, vote)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -166,7 +166,7 @@ func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handler
 
 // nolint: gocyclo
 // todo: Split this functionality into helper functions to remove the above
-func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -210,7 +210,7 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 			votes = append(votes, vote)
 		}
 
-		output, err := wire.MarshalJSONIndent(cdc, votes)
+		output, err := codec.MarshalJSONIndent(cdc, votes)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -222,7 +222,7 @@ func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 
 // nolint: gocyclo
 // todo: Split this functionality into helper functions to remove the above
-func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		bechVoterAddr := r.URL.Query().Get(RestVoter)
 		bechDepositerAddr := r.URL.Query().Get(RestDepositer)
@@ -304,7 +304,7 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 			matchingProposals = append(matchingProposals, proposalResponse)
 		}
 
-		output, err := wire.MarshalJSONIndent(cdc, matchingProposals)
+		output, err := codec.MarshalJSONIndent(cdc, matchingProposals)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -315,7 +315,7 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 }
 
 // nolint: gocyclo
-func queryConfigHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryConfigHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := cliCtx.QuerySubspace([]byte(gov.Prefix), storeName)
 		if err != nil {
@@ -332,7 +332,7 @@ func queryConfigHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 			}
 			kvs = append(kvs, kv)
 		}
-		output, err := wire.MarshalJSONIndent(cdc, kvs)
+		output, err := codec.MarshalJSONIndent(cdc, kvs)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

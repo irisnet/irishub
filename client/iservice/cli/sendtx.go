@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
+func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
 		Short: "create new service definition",

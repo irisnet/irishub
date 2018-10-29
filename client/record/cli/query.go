@@ -21,7 +21,7 @@ type RecordMetadata struct {
 	//PinedNode    string
 }
 
-func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQureyRecord(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query",
 		Short:   "query specified record",
@@ -44,7 +44,7 @@ func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			output, err := wire.MarshalJSONIndent(cdc, recordResponse)
+			output, err := codec.MarshalJSONIndent(cdc, recordResponse)
 			if err != nil {
 				return err
 			}

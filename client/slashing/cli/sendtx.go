@@ -14,7 +14,7 @@ import (
 )
 
 // GetCmdUnrevoke implements the create unrevoke validator command.
-func GetCmdUnrevoke(cdc *wire.Codec) *cobra.Command {
+func GetCmdUnrevoke(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "unrevoke",
 		Args:  cobra.ExactArgs(0),

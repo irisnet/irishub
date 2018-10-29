@@ -19,7 +19,7 @@ const (
 )
 
 // submit switch msg
-func GetCmdSubmitSwitch(cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitSwitch(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit-switch",
 		Short: "Submit a switch msg for a upgrade propsal",

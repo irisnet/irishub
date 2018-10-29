@@ -27,7 +27,7 @@ type GovParameter interface {
 
 	Valid(json string) sdk.Error
 
-	GetValueFromRawData(cdc *wire.Codec, res []byte) interface{}
+	GetValueFromRawData(cdc *codec.Codec, res []byte) interface{}
 
 	Update(ctx sdk.Context, json string)
 

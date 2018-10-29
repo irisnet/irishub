@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irishub/app"
 )
 
-func MonitorCommand(cdc *wire.Codec) *cobra.Command {
+func MonitorCommand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "irismon",
 		Short:        "iris monitor tool",

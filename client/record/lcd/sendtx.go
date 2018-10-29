@@ -22,7 +22,7 @@ type postRecordReq struct {
 	Data        string         `json:"data"` // for onchain
 }
 
-func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req postRecordReq
 		err := utils.ReadPostBody(w, r, cdc, &req)

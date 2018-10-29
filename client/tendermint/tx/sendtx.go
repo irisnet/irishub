@@ -26,7 +26,7 @@ type stdSignature struct {
 	Sequence      int64  `json:"sequence"`
 }
 
-func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var sendTxBody sendTx
 		body, err := ioutil.ReadAll(r.Body)

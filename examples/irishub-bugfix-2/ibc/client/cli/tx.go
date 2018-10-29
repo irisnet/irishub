@@ -12,7 +12,7 @@ import (
 )
 
 // IBC transfer command
-func IBCGetCmd(cdc *wire.Codec) *cobra.Command {
+func IBCGetCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "get",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -40,7 +40,7 @@ func IBCGetCmd(cdc *wire.Codec) *cobra.Command {
 
 
 // IBC transfer command
-func IBCSetCmd(cdc *wire.Codec) *cobra.Command {
+func IBCSetCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "set",
 		RunE: func(cmd *cobra.Command, args []string) error {

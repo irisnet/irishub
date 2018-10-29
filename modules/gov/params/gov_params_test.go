@@ -28,7 +28,7 @@ func TestInitGenesisParameter(t *testing.T) {
 
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	Denom             := "iris"
 	IrisCt            := types.NewDefaultCoinType(Denom)
@@ -63,7 +63,7 @@ func TestRegisterParamMapping(t *testing.T) {
 
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	Denom             := "iris"
 	IrisCt            := types.NewDefaultCoinType(Denom)
@@ -96,7 +96,7 @@ func TestRegisterParamMapping(t *testing.T) {
 func TestDepositProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	p1deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
 	p2Deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
@@ -158,7 +158,7 @@ func TestDepositProcedureParam(t *testing.T) {
 func TestVotingProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	p1 := VotingProcedure{
 		VotingPeriod: 1000,
@@ -198,7 +198,7 @@ func TestVotingProcedureParam(t *testing.T) {
 func TestTallyingProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	p1 := TallyingProcedure{
 		Threshold:         sdk.NewRat(1, 2),

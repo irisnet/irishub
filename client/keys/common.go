@@ -132,7 +132,7 @@ func Bech32KeyOutput(info keys.Info) (KeyOutput, error) {
 	}, nil
 }
 
-func PrintInfo(cdc *wire.Codec, info keys.Info) {
+func PrintInfo(cdc *codec.Codec, info keys.Info) {
 	ko, err := Bech32KeyOutput(info)
 	if err != nil {
 		panic(err)
@@ -150,7 +150,7 @@ func PrintInfo(cdc *wire.Codec, info keys.Info) {
 	}
 }
 
-func PrintInfos(cdc *wire.Codec, infos []keys.Info) {
+func PrintInfos(cdc *codec.Codec, infos []keys.Info) {
 	kos, err := Bech32KeysOutput(infos)
 	if err != nil {
 		panic(err)

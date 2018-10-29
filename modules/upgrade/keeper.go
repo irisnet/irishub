@@ -10,14 +10,14 @@ import (
 
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      *wire.Codec
+	cdc      *codec.Codec
 	// The ValidatorSet to get information about validators
 	sk stake.Keeper
 }
 
 var VersionListCached VersionList
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,

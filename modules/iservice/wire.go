@@ -4,13 +4,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// Register concrete types on wire codec
-func RegisterWire(cdc *wire.Codec) {
+// Register concrete types on codec codec
+func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSvcDef{}, "iris-hub/iservice/MsgSvcDef", nil)
 }
 
-var msgCdc = wire.NewCodec()
+var msgCdc = codec.New()
 
 func init() {
-	RegisterWire(msgCdc)
+	RegisterCodec(msgCdc)
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	wire "github.com/cosmos/cosmos-sdk/codec"
+	codec "github.com/cosmos/cosmos-sdk/codec"
 
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
@@ -25,7 +25,7 @@ const (
 )
 
 // IBC transfer command
-func IBCTransferCmd(cdc *wire.Codec) *cobra.Command {
+func IBCTransferCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "transfer",
 		RunE: func(cmd *cobra.Command, args []string) error {

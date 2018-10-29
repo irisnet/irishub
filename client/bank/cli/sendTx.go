@@ -19,7 +19,7 @@ const (
 )
 
 // SendTxCmd will create a send tx and sign it with the given key.
-func SendTxCmd(cdc *wire.Codec) *cobra.Command {
+func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send",
 		Short: "Create and sign a send tx",

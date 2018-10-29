@@ -42,14 +42,14 @@ func newPubKey(pk string) (res crypto.PubKey) {
 	return pkEd
 }
 
-func createTestCodec() *wire.Codec {
-	cdc := wire.NewCodec()
-	sdk.RegisterWire(cdc)
-	RegisterWire(cdc)
-	auth.RegisterWire(cdc)
-	bank.RegisterWire(cdc)
-	stake.RegisterWire(cdc)
-	wire.RegisterCrypto(cdc)
+func createTestCodec() *codec.Codec {
+	cdc := codec.New()
+	sdk.RegisterCodec(cdc)
+	RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 	return cdc
 }
 

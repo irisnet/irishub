@@ -17,7 +17,7 @@ type UnrevokeBody struct {
 	ValidatorAddr string         `json:"validator_addr"`
 }
 
-func unrevokeRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var m UnrevokeBody
 		err := utils.ReadPostBody(w, r, cdc, &m)

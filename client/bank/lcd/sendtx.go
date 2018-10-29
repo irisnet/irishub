@@ -18,7 +18,7 @@ type sendBody struct {
 
 // SendRequestHandlerFn - http request handler to send coins to a address
 // nolint: gocyclo
-func SendRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// collect data
 		vars := mux.Vars(r)

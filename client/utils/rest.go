@@ -22,7 +22,7 @@ func WriteErrorResponse(w http.ResponseWriter, status int, msg string) {
 	w.Write([]byte(msg))
 }
 
-func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *wire.Codec, req interface{}) error {
+func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req interface{}) error {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())

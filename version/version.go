@@ -22,7 +22,7 @@ func GetVersion() string {
 }
 
 // ServeVersionCommand
-func ServeVersionCommand(cdc *wire.Codec) *cobra.Command {
+func ServeVersionCommand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Show executable binary version",

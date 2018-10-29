@@ -15,7 +15,7 @@ type ParameterConfigFile struct {
 	Govparams govparams.ParamSet `json:"gov"`
 }
 
-func (pd *ParameterConfigFile) ReadFile(cdc *wire.Codec, pathStr string) error {
+func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
 	pathStr = path.Join(pathStr, "config/params.json")
 
 	jsonBytes, err := cmn.ReadFile(pathStr)
@@ -29,7 +29,7 @@ func (pd *ParameterConfigFile) ReadFile(cdc *wire.Codec, pathStr string) error {
 	err = cdc.UnmarshalJSON(jsonBytes, &pd)
 	return err
 }
-func (pd *ParameterConfigFile) WriteFile(cdc *wire.Codec, res []sdk.KVPair , pathStr string) error {
+func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pathStr string) error {
 	for _, kv := range res {
 		switch string(kv.Key) {
 		case "Gov/gov/DepositProcedure":

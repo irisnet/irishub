@@ -26,7 +26,7 @@ import (
 )
 
 // ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
-func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
+func ServeLCDStartCommand(cdc *codec.Codec) *cobra.Command {
 	flagListenAddr := "laddr"
 	flagCORS := "cors"
 	flagMaxOpenConnections := "max-open"
@@ -79,7 +79,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func createHandler(cdc *wire.Codec) *mux.Router {
+func createHandler(cdc *codec.Codec) *mux.Router {
 	r := mux.NewRouter()
 
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)

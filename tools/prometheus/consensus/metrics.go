@@ -179,7 +179,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 	}()
 }
 
-func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block *types.Block) {
+func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec, block *types.Block) {
 	var client = ctx.Client
 
 	cs.TmMetrics.Height.Set(float64(block.Height))

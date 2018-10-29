@@ -43,14 +43,14 @@ func newPubKey(pk string) (res crypto.PubKey) {
 	return pkEd
 }
 
-func createTestCodec() *wire.Codec {
-	cdc := wire.NewCodec()
-	sdk.RegisterWire(cdc)
-	RegisterWire(cdc)
-	auth.RegisterWire(cdc)
-	bank.RegisterWire(cdc)
-	stake.RegisterWire(cdc)
-	wire.RegisterCrypto(cdc)
+func createTestCodec() *codec.Codec {
+	cdc := codec.NewCodec()
+	sdk.RegisterCodec(cdc)
+	RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 	return cdc
 }
 
@@ -78,7 +78,7 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
 
 	keeper := NewKeeper(cdc, keyUpdate, sk)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), keyParams)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), keyParams)
 
 	return ctx, keeper, paramKeeper
 }

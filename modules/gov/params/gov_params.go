@@ -36,7 +36,7 @@ type DepositProcedureParam struct {
 	pgetter params.Getter
 }
 
-func (param *DepositProcedureParam) GetValueFromRawData(cdc *wire.Codec, res []byte) interface{} {
+func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
 	cdc.MustUnmarshalBinary(res, &param.Value)
 	return param.Value
 }
@@ -138,7 +138,7 @@ type VotingProcedureParam struct {
 	pgetter params.Getter
 }
 
-func (param *VotingProcedureParam) GetValueFromRawData(cdc *wire.Codec, res []byte) interface{} {
+func (param *VotingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
 	cdc.MustUnmarshalBinary(res, &param.Value)
 	return param.Value
 }
@@ -225,7 +225,7 @@ type TallyingProcedureParam struct {
 	pgetter params.Getter
 }
 
-func (param *TallyingProcedureParam) GetValueFromRawData(cdc *wire.Codec, res []byte) interface{} {
+func (param *TallyingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
 	cdc.MustUnmarshalBinary(res, &param.Value)
 	return param.Value
 }

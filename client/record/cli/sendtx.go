@@ -19,7 +19,7 @@ import (
 )
 
 // GetCmdSubmitFile implements submitting upload file transaction command.
-func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitRecord(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "submit",
 		Short:   "Submit a new record",

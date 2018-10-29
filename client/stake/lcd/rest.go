@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 )
 
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
+func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/delegations",
 		delegationsRequestHandlerFn(cdc, cliCtx),

@@ -27,7 +27,7 @@ func contains(stringSlice []string, txType string) bool {
 	return false
 }
 
-func getDelegatorValidator(cliCtx context.CLIContext, cdc *wire.Codec, delegatorAddr sdk.AccAddress, validatorAccAddr sdk.AccAddress) (
+func getDelegatorValidator(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAccAddr sdk.AccAddress) (
 	validator stakeClient.ValidatorOutput, httpStatusCode int, errMsg string, err error) {
 
 	// check if the delegator is bonded or redelegated to the validator
@@ -58,7 +58,7 @@ func getDelegatorValidator(cliCtx context.CLIContext, cdc *wire.Codec, delegator
 	return validator, http.StatusOK, "", nil
 }
 
-func getDelegatorDelegations(cliCtx context.CLIContext, cdc *wire.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
+func getDelegatorDelegations(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
 	outputDelegation stakeClient.DelegationOutput, httpStatusCode int, errMsg string, err error) {
 	delegationKey := stake.GetDelegationKey(delegatorAddr, validatorAddr)
 	marshalledDelegation, err := cliCtx.QueryStore(delegationKey, storeName)
@@ -81,7 +81,7 @@ func getDelegatorDelegations(cliCtx context.CLIContext, cdc *wire.Codec, delegat
 	return outputDelegation, http.StatusOK, "", nil
 }
 
-func getDelegatorUndelegations(cliCtx context.CLIContext, cdc *wire.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
+func getDelegatorUndelegations(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
 	unbonds types.UnbondingDelegation, httpStatusCode int, errMsg string, err error) {
 	undelegationKey := stake.GetUBDKey(delegatorAddr, validatorAddr)
 	marshalledUnbondingDelegation, err := cliCtx.QueryStore(undelegationKey, storeName)
@@ -101,7 +101,7 @@ func getDelegatorUndelegations(cliCtx context.CLIContext, cdc *wire.Codec, deleg
 	return unbondingDelegation, http.StatusOK, "", nil
 }
 
-func getDelegatorRedelegations(cliCtx context.CLIContext, cdc *wire.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
+func getDelegatorRedelegations(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
 	regelegations types.Redelegation, httpStatusCode int, errMsg string, err error) {
 
 	keyRedelegateTo := stake.GetREDsByDelToValDstIndexKey(delegatorAddr, validatorAddr)
@@ -123,7 +123,7 @@ func getDelegatorRedelegations(cliCtx context.CLIContext, cdc *wire.Codec, deleg
 }
 
 // queries staking txs
-func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *wire.Codec, tag string, delegatorAddr string) ([]tx.Info, error) {
+func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *codec.Codec, tag string, delegatorAddr string) ([]tx.Info, error) {
 	page := 0
 	perPage := 100
 	prove := !cliCtx.TrustNode
@@ -137,7 +137,7 @@ func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *wire.Codec,
 }
 
 // gets all validators
-func getValidators(cliCtx context.CLIContext, cdc *wire.Codec, validatorKVs []sdk.KVPair) ([]stakeClient.ValidatorOutput, error) {
+func getValidators(cliCtx context.CLIContext, cdc *codec.Codec, validatorKVs []sdk.KVPair) ([]stakeClient.ValidatorOutput, error) {
 	validators := make([]stakeClient.ValidatorOutput, len(validatorKVs))
 	for i, kv := range validatorKVs {
 
@@ -157,7 +157,7 @@ func getValidators(cliCtx context.CLIContext, cdc *wire.Codec, validatorKVs []sd
 }
 
 // gets a validator given a ValAddress
-func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *wire.Codec) (stakeClient.ValidatorOutput, error) {
+func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *codec.Codec) (stakeClient.ValidatorOutput, error) {
 	// parse out the validators
 	for _, kv := range validatorKVs {
 		addr := kv.Key[1:]
@@ -180,7 +180,7 @@ func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx cont
 }
 
 // gets a validator given an AccAddress
-func getValidatorFromAccAdrr(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *wire.Codec) (stakeClient.ValidatorOutput, error) {
+func getValidatorFromAccAdrr(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *codec.Codec) (stakeClient.ValidatorOutput, error) {
 	// parse out the validators
 	for _, kv := range validatorKVs {
 		addr := kv.Key[1:]
@@ -203,7 +203,7 @@ func getValidatorFromAccAdrr(address sdk.AccAddress, validatorKVs []sdk.KVPair, 
 }
 
 //  gets all Bech32 validators from a key
-func getValidatorOutputs(storeName string, cliCtx context.CLIContext, cdc *wire.Codec) (
+func getValidatorOutputs(storeName string, cliCtx context.CLIContext, cdc *codec.Codec) (
 	validators []stakeClient.ValidatorOutput, httpStatusCode int, errMsg string, err error) {
 	// Get all validators using key
 	kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)

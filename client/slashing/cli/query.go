@@ -14,7 +14,7 @@ import (
 )
 
 // GetCmdQuerySigningInfo implements the command to query signing info.
-func GetCmdQuerySigningInfo(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQuerySigningInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "signing-info [validator-pubkey]",
 		Short: "Query a validator's signing information",
@@ -48,7 +48,7 @@ func GetCmdQuerySigningInfo(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			case "json":
 				// parse out the signing info
-				output, err := wire.MarshalJSONIndent(cdc, signingInfo)
+				output, err := codec.MarshalJSONIndent(cdc, signingInfo)
 				if err != nil {
 					return err
 				}
