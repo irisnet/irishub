@@ -60,35 +60,42 @@ type IrisApp struct {
 	keyAccount       *sdk.KVStoreKey
 	keyIBC           *sdk.KVStoreKey
 	keyStake         *sdk.KVStoreKey
+	tkeyStake        *sdk.TransientStoreKey
 	keySlashing      *sdk.KVStoreKey
+	keyMint          *sdk.KVStoreKey
+	keyDistr         *sdk.KVStoreKey
+	tkeyDistr        *sdk.TransientStoreKey
 	keyGov           *sdk.KVStoreKey
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
+	tkeyParams       *sdk.TransientStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 	keyIservice      *sdk.KVStoreKey
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
-	accountMapper       auth.AccountMapper
+	accountMapper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
-	coinKeeper          bank.Keeper
+	bankKeeper          bank.Keeper
 	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
-	paramsKeeper        params.Keeper
+	mintKeeper          mint.Keeper
+	distrKeeper         distr.Keeper
 	govKeeper           gov.Keeper
+	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
 	iserviceKeeper      iservice.Keeper
 	recordKeeper        record.Keeper
 
 	// fee manager
-	feeManager bam.FeeManager
+	feeManager 			bam.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := bam.NewBaseApp(appName, cdc, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
@@ -99,11 +106,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyAccount:       sdk.NewKVStoreKey("acc"),
 		keyIBC:           sdk.NewKVStoreKey("ibc"),
 		keyStake:         sdk.NewKVStoreKey("stake"),
+		tkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
+		keyMint:          sdk.NewKVStoreKey("mint"),
+		keyDistr:         sdk.NewKVStoreKey("distr"),
+		tkeyDistr:        sdk.NewTransientStoreKey("transient_distr"),
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
 		keyRecord:        sdk.NewKVStoreKey("record"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee"),
 		keyParams:        sdk.NewKVStoreKey("params"),
+		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		keyIservice:      sdk.NewKVStoreKey("iservice"),
 	}
@@ -114,23 +126,73 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	// define the accountMapper
-	app.accountMapper = auth.NewAccountMapper(
+	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,        // target store
 		auth.ProtoBaseAccount, // prototype
 	)
 
 	// add handlers
-	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
-	app.coinKeeper = bank.NewKeeper(app.accountMapper)
-	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
-	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
-	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, app.stakeKeeper, app.paramsKeeper.Getter(), app.RegisterCodespace(slashing.DefaultCodespace))
-	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
-	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
-	app.recordKeeper = record.NewKeeper(app.cdc, app.keyRecord, app.RegisterCodespace(record.DefaultCodespace))
-	app.iserviceKeeper = iservice.NewKeeper(app.cdc, app.keyIservice, app.RegisterCodespace(iservice.DefaultCodespace))
+	app.bankKeeper = bank.NewBaseKeeper(app.accountMapper)
+	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
+		app.cdc,
+		app.keyFeeCollection,
+	)
+	app.paramsKeeper = params.NewKeeper(
+		app.cdc,
+		app.keyParams, app.tkeyParams,
+	)
+	app.ibcMapper = ibc.NewMapper(
+		app.cdc,
+		app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace),
+	)
+	app.stakeKeeper = stake.NewKeeper(
+		app.cdc,
+		app.keyStake, app.tkeyStake,
+		app.bankKeeper, app.paramsKeeper.Subspace(stake.DefaultParamspace),
+		app.RegisterCodespace(stake.DefaultCodespace),
+	)
+	app.mintKeeper = mint.NewKeeper(app.cdc, app.keyMint,
+		app.paramsKeeper.Subspace(mint.DefaultParamspace),
+		app.stakeKeeper, app.feeCollectionKeeper,
+	)
+	app.distrKeeper = distr.NewKeeper(
+		app.cdc,
+		app.keyDistr,
+		app.paramsKeeper.Subspace(distr.DefaultParamspace),
+		app.bankKeeper, app.stakeKeeper, app.feeCollectionKeeper,
+		app.RegisterCodespace(stake.DefaultCodespace),
+	)
+	app.slashingKeeper = slashing.NewKeeper(
+		app.cdc,
+		app.keySlashing,
+		app.stakeKeeper, app.paramsKeeper.Subspace(slashing.DefaultParamspace),
+		app.RegisterCodespace(slashing.DefaultCodespace),
+	)
+	app.upgradeKeeper = upgrade.NewKeeper(
+		app.cdc,
+		app.keyUpgrade, app.stakeKeeper,
+	)
+	app.govKeeper = gov.NewKeeper(
+		app.cdc,
+		app.keyGov,
+		app.bankKeeper, app.stakeKeeper,
+		app.RegisterCodespace(gov.DefaultCodespace),
+	)
+	app.recordKeeper = record.NewKeeper(
+		app.cdc,
+		app.keyRecord,
+		app.RegisterCodespace(record.DefaultCodespace),
+	)
+	app.iserviceKeeper = iservice.NewKeeper(
+		app.cdc,
+		app.keyIservice,
+		app.RegisterCodespace(iservice.DefaultCodespace),
+	)
+
+	// register the staking hooks
+	app.stakeKeeper = app.stakeKeeper.WithHooks(
+		NewHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
 
 	// register message routes
 	// need to update each module's msg type
@@ -376,4 +438,47 @@ func (app *IrisApp) replay() int64 {
 	}
 
 	return loadHeight
+}
+
+
+//______________________________________________________________________________________________
+
+// Combined Staking Hooks
+type Hooks struct {
+	dh distr.Hooks
+	sh slashing.Hooks
+}
+
+func NewHooks(dh distr.Hooks, sh slashing.Hooks) Hooks {
+	return Hooks{dh, sh}
+}
+
+var _ sdk.StakingHooks = Hooks{}
+
+// nolint
+func (h Hooks) OnValidatorCreated(ctx sdk.Context, addr sdk.ValAddress) {
+	h.dh.OnValidatorCreated(ctx, addr)
+}
+func (h Hooks) OnValidatorModified(ctx sdk.Context, addr sdk.ValAddress) {
+	h.dh.OnValidatorModified(ctx, addr)
+}
+func (h Hooks) OnValidatorRemoved(ctx sdk.Context, addr sdk.ValAddress) {
+	h.dh.OnValidatorRemoved(ctx, addr)
+}
+func (h Hooks) OnValidatorBonded(ctx sdk.Context, addr sdk.ConsAddress, operator sdk.ValAddress) {
+	h.dh.OnValidatorBonded(ctx, addr, operator)
+	h.sh.OnValidatorBonded(ctx, addr, operator)
+}
+func (h Hooks) OnValidatorBeginUnbonding(ctx sdk.Context, addr sdk.ConsAddress, operator sdk.ValAddress) {
+	h.dh.OnValidatorBeginUnbonding(ctx, addr, operator)
+	h.sh.OnValidatorBeginUnbonding(ctx, addr, operator)
+}
+func (h Hooks) OnDelegationCreated(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
+	h.dh.OnDelegationCreated(ctx, delAddr, valAddr)
+}
+func (h Hooks) OnDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
+	h.dh.OnDelegationSharesModified(ctx, delAddr, valAddr)
+}
+func (h Hooks) OnDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
+	h.dh.OnDelegationRemoved(ctx, delAddr, valAddr)
 }
