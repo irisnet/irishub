@@ -16,6 +16,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	qr "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
@@ -49,7 +50,7 @@ type BaseApp struct {
 	db          dbm.DB               // common DB backend
 	cms         sdk.CommitMultiStore // Main (uncached) state
 	router      Router               // handle any kind of message
-	queryRouter QueryRouter          // router for redirecting query calls
+	queryRouter qr.QueryRouter          // router for redirecting query calls
 	codespacer  *sdk.Codespacer      // handle module codespacing
 	txDecoder   sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
@@ -99,7 +100,7 @@ func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecod
 		db:          db,
 		cms:         store.NewCommitMultiStore(db),
 		router:      NewRouter(),
-		queryRouter: NewQueryRouter(),
+		queryRouter: qr.NewQueryRouter(),
 		codespacer:  sdk.NewCodespacer(),
 		txDecoder:   txDecoder,
 	}
@@ -555,10 +556,10 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 
 // retrieve the context for the ante handler and store the tx bytes; store
 // the vote infos if the tx runs within the deliverTx() state.
-func (app *BaseApp) getContextForAnte(mode runTxMode, txBytes []byte) (ctx sdk.Context) {
+func (app *BaseApp) getContextForAnte(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
 	// Get the context
 	ctx = getState(app, mode).ctx.WithTxBytes(txBytes)
-	if mode == runTxModeDeliver {
+	if mode == RunTxModeDeliver {
 		ctx = ctx.WithVoteInfos(app.voteInfos)
 	}
 	return
@@ -631,7 +632,7 @@ func getState(app *BaseApp, mode RunTxMode) *state {
 	return app.deliverState
 }
 
-func (app *BaseApp) initializeContext(ctx sdk.Context, mode runTxMode) sdk.Context {
+func (app *BaseApp) initializeContext(ctx sdk.Context, mode RunTxMode) sdk.Context {
 	if mode == RunTxModeSimulate {
 		ctx = ctx.WithMultiStore(getState(app, RunTxModeSimulate).CacheMultiStore())
 	}
