@@ -1,31 +1,31 @@
 package baseapp
 
 import (
-	"fmt"
-	"runtime/debug"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"errors"
-	"github.com/irisnet/irishub/types"
+	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/types"
+	"runtime/debug"
 )
 
 var (
-	nativeFeeTokenKey = []byte("feeToken/native")
-	nativeGasPriceThresholdKey  = []byte("feeToken/gasPriceThreshold")
+	nativeFeeTokenKey          = []byte("feeToken/native")
+	nativeGasPriceThresholdKey = []byte("feeToken/gasPriceThreshold")
 	//	FeeExchangeRatePrefix = "feeToken/exchangeRate/"	//  key = gov/feeToken/exchangeRate/<denomination>, rate = BigInt(value)/10^9
 	//	RatePrecision = int64(1000000000) //10^9
 )
 
 // NewFeePreprocessHandler creates a fee token preprocess handler
 func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (error) {
+	return func(ctx sdk.Context, tx sdk.Tx) error {
 		stdTx, ok := tx.(auth.StdTx)
 		if !ok {
 			return sdk.ErrInternal("tx must be StdTx")
 		}
 		fee := auth.StdFee{
-			Gas: stdTx.Fee.Gas,
+			Gas:    stdTx.Fee.Gas,
 			Amount: sdk.Coins{fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)},
 		}
 		return fm.feePreprocess(ctx, fee.Amount, fee.Gas)
@@ -57,14 +57,14 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 		ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
 		fee := auth.StdFee{
-			Gas: stdTx.Fee.Gas,
+			Gas:    stdTx.Fee.Gas,
 			Amount: sdk.Coins{fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)}, // consume gas
 		}
 
 		//If all gas has been consumed, then there is no necessary to run fee refund process
 		if txResult.GasWanted <= txResult.GasUsed {
 			refundResult = sdk.Coin{
-				Denom: fee.Amount[0].Denom,
+				Denom:  fee.Amount[0].Denom,
 				Amount: fee.Amount[0].Amount,
 			}
 			return refundResult, nil
@@ -72,24 +72,24 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 
 		unusedGas := txResult.GasWanted - txResult.GasUsed
 		var refundCoins sdk.Coins
-		for _,coin := range fee.Amount {
+		for _, coin := range fee.Amount {
 			newCoin := sdk.Coin{
-				Denom:	coin.Denom,
+				Denom:  coin.Denom,
 				Amount: coin.Amount.Mul(sdk.NewInt(unusedGas)).Div(sdk.NewInt(txResult.GasWanted)),
 			}
 			refundCoins = append(refundCoins, newCoin)
 		}
-		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins()   // consume gas
+		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
 		err = firstAccount.SetCoins(coins.Plus(refundCoins))
 		if err != nil {
 			return sdk.Coin{}, err
 		}
 
-		am.SetAccount(ctx, firstAccount)                                    // consume gas
-		fck.RefundCollectedFees(ctx, refundCoins)                           // consume gas
+		am.SetAccount(ctx, firstAccount)          // consume gas
+		fck.RefundCollectedFees(ctx, refundCoins) // consume gas
 		// There must be just one fee token
 		refundResult = sdk.Coin{
-			Denom: fee.Amount[0].Denom,
+			Denom:  fee.Amount[0].Denom,
 			Amount: fee.Amount[0].Amount.Mul(sdk.NewInt(txResult.GasUsed)).Div(sdk.NewInt(txResult.GasWanted)),
 		}
 
@@ -97,12 +97,11 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 	}
 }
 
-
 // Type declaration for parameters
 func ParamTypeTable() params.TypeTable {
 	return params.NewTypeTable(
-		nativeFeeTokenKey,"",
-		nativeGasPriceThresholdKey,"",
+		nativeFeeTokenKey, "",
+		nativeGasPriceThresholdKey, "",
 	)
 }
 
@@ -114,14 +113,14 @@ type FeeManager struct {
 
 func NewFeeManager(paramSpace params.Subspace) FeeManager {
 	return FeeManager{
-		paramSpace:paramSpace.WithTypeTable(ParamTypeTable()),
+		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 }
 
 func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
 	var nativeFeeToken string
-	fck.paramSpace.Get(ctx, nativeFeeTokenKey,nativeFeeToken)
-	for _,coin := range coins {
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey, nativeFeeToken)
+	for _, coin := range coins {
 		if coin.Denom == nativeFeeToken {
 			return coin
 		}
@@ -134,10 +133,10 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
 	}
 	var nativeFeeToken string
-	fck.paramSpace.Get(ctx, nativeFeeTokenKey,nativeFeeToken)
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey, nativeFeeToken)
 
 	var nativeGasPriceThreshold string
-	fck.paramSpace.Get(ctx, nativeGasPriceThresholdKey,nativeGasPriceThreshold)
+	fck.paramSpace.Get(ctx, nativeGasPriceThresholdKey, nativeGasPriceThreshold)
 
 	threshold, ok := sdk.NewIntFromString(nativeGasPriceThreshold)
 	if !ok {
@@ -177,8 +176,8 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 }
 
 type FeeGenesisStateConfig struct {
-	FeeTokenNative string `json:"fee_token_native"`
-	GasPriceThreshold int64 `json:"gas_price_threshold"`
+	FeeTokenNative    string `json:"fee_token_native"`
+	GasPriceThreshold int64  `json:"gas_price_threshold"`
 }
 
 func InitGenesis(ctx sdk.Context, ps FeeManager, data FeeGenesisStateConfig) {

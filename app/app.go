@@ -4,24 +4,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/mint"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/modules/iservice"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/modules/iservice"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -34,8 +34,8 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	"io"
 	"os"
-	"strings"
 	"sort"
+	"strings"
 )
 
 const (
@@ -89,7 +89,7 @@ type IrisApp struct {
 	recordKeeper        record.Keeper
 
 	// fee manager
-	feeManager 			bam.FeeManager
+	feeManager bam.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -237,9 +237,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
 
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(),int64((0)),
-		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(),int64(0),
-        upgradeparams.SwitchPeriodParameter.GetStoreKey(),int64(0),
+		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
 	)),
 		//&govparams.DepositProcedureParameter,
 		//&govparams.VotingProcedureParameter,
@@ -491,7 +491,6 @@ func (app *IrisApp) replay() int64 {
 
 	return loadHeight
 }
-
 
 //______________________________________________________________________________________________
 

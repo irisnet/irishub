@@ -11,7 +11,7 @@ var CurrentUpgradeProposalIdParameter CurrentUpgradeProposalIdParam
 var _ iparam.SignalParameter = (*CurrentUpgradeProposalIdParam)(nil)
 
 type CurrentUpgradeProposalIdParam struct {
-	Value   int64
+	Value      int64
 	paramSpace params.Subspace
 }
 
@@ -36,13 +36,12 @@ func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
-
 var ProposalAcceptHeightParameter ProposalAcceptHeightParam
 
 var _ iparam.SignalParameter = (*ProposalAcceptHeightParam)(nil)
 
 type ProposalAcceptHeightParam struct {
-	Value   int64
+	Value      int64
 	paramSpace params.Subspace
 }
 
@@ -67,13 +66,12 @@ func (param *ProposalAcceptHeightParam) LoadValue(ctx sdk.Context) bool {
 	return true
 }
 
-
 var SwitchPeriodParameter SwitchPeriodParam
 
 var _ iparam.SignalParameter = (*SwitchPeriodParam)(nil)
 
 type SwitchPeriodParam struct {
-	Value   int64
+	Value      int64
 	paramSpace params.Subspace
 }
 
