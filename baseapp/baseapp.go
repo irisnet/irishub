@@ -200,7 +200,7 @@ func (app *BaseApp) initFromStore(mainKey sdk.StoreKey) error {
 	if main == nil {
 		return errors.New("baseapp expects MultiStore with 'main' KVStore")
 	}
-	// Needed for `gaiad export`, which inits from store but never calls initchain
+	// Needed for `iris export`, which inits from store but never calls initchain
 	app.setCheckState(abci.Header{})
 
 	app.Seal()
@@ -668,16 +668,22 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 
 		// Refund unspent fee
-		if mode != RunTxModeCheck && app.feeRefundHandler != nil && ctx.BlockHeight() != 0 {
+		if mode != RunTxModeCheck && app.feeRefundHandler != nil {
 			actualCostFee, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
-			if err == nil {
-				fee, _ := actualCostFee.Amount.BigInt().MarshalJSON()
-				result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+actualCostFee.Denom, fee)
-			} else {
+			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
 				result.GasUsed = ctx.GasMeter().GasConsumed()
+				return
 			}
+			fee, err := actualCostFee.Amount.MarshalJSON()
+			if err != nil {
+				result = sdk.ErrInternal(err.Error()).Result()
+				result.GasWanted = gasWanted
+				result.GasUsed = ctx.GasMeter().GasConsumed()
+				return
+			}
+			result.Tags = result.Tags.AppendTag("completeConsumedTxFee-"+actualCostFee.Denom, fee)
 		}
 	}()
 

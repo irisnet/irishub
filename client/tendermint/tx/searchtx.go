@@ -33,12 +33,12 @@ passed to the --tags option. To match any transaction, use the --any option.
 
 For example:
 
-$ gaiacli tendermint txs --tag test1,test2
+$ iriscli tendermint txs --tag test1,test2
 
 will match any transaction tagged with both test1,test2. To match a transaction tagged with either
 test1 or test2, use:
 
-$ gaiacli tendermint txs --tag test1,test2 --any
+$ iriscli tendermint txs --tag test1,test2 --any
 `),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			tags := viper.GetStringSlice(flagTags)
