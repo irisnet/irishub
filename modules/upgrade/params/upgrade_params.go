@@ -32,6 +32,9 @@ func (param *CurrentUpgradeProposalIdParam) SaveValue(ctx sdk.Context) {
 }
 
 func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
+		return false
+	}
 	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
@@ -62,6 +65,9 @@ func (param *ProposalAcceptHeightParam) SaveValue(ctx sdk.Context) {
 }
 
 func (param *ProposalAcceptHeightParam) LoadValue(ctx sdk.Context) bool {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
+		return false
+	}
 	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
@@ -92,6 +98,9 @@ func (param *SwitchPeriodParam) SaveValue(ctx sdk.Context) {
 }
 
 func (param *SwitchPeriodParam) LoadValue(ctx sdk.Context) bool {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
+		return false
+	}
 	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
