@@ -38,7 +38,7 @@ const nodeDirPerm = 0755
 func TestnetFilesCmd(ctx *server.Context, cdc *codec.Codec, appInit server.AppInit) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "testnet",
-		Short: "Initialize files for a Gaiad testnet",
+		Short: "Initialize files for a irishub testnet",
 		Long: `testnet will create "v" number of directories and populate each with
 necessary files (private validator, genesis, config, etc.).
 
@@ -46,7 +46,7 @@ Note, strict routability for addresses is turned off in the config file.
 
 Example:
 
-	gaiad testnet --v 4 --o ./output --starting-ip-address 192.168.10.2
+	iris testnet --v 4 --o ./output --starting-ip-address 192.168.10.2
 	`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			config := ctx.Config
@@ -59,9 +59,9 @@ Example:
 		"Directory to store initialization data for the testnet")
 	cmd.Flags().String(nodeDirPrefix, "node",
 		"Prefix the directory name for each node with (node results in node0, node1, ...)")
-	cmd.Flags().String(nodeDaemonHome, "gaiad",
+	cmd.Flags().String(nodeDaemonHome, "iris",
 		"Home directory of the node's daemon configuration")
-	cmd.Flags().String(nodeCliHome, "gaiacli",
+	cmd.Flags().String(nodeCliHome, "iriscli",
 		"Home directory of the node's cli configuration")
 
 	cmd.Flags().String(startingIPAddress, "192.168.0.1",
