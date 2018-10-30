@@ -20,6 +20,7 @@ const (
 	FlagJson          = "json"
 	FlagPrintResponse = "print-response"
 	FlagGenerateOnly  = "generate-only"
+	FlagName          = "name"
 )
 
 // LineBreak can be included in a command list to provide a blank line

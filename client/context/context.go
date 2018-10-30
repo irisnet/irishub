@@ -15,6 +15,7 @@ import (
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	"os"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 const ctxAccStoreName = "acc"
@@ -37,7 +38,7 @@ type CLIContext struct {
 	Async           bool
 	JSON            bool
 	PrintResponse   bool
-	Certifier       tmlite.Certifier
+	Certifier       tmlite.Verifier
 	GenerateOnly    bool
 }
 
@@ -68,7 +69,7 @@ func NewCLIContext() CLIContext {
 	}
 }
 
-func createCertifier() tmlite.Certifier {
+func createCertifier() tmlite.Verifier {
 	trustNodeDefined := viper.IsSet(client.FlagTrustNode)
 	if !trustNodeDefined {
 		return nil
@@ -98,7 +99,9 @@ func createCertifier() tmlite.Certifier {
 		os.Exit(1)
 	}
 
-	certifier, err := tmliteProxy.GetCertifier(chainID, home, nodeURI)
+	node := rpcclient.NewHTTP(nodeURI, "/websocket")
+
+	certifier, err := tmliteProxy.NewVerifier(chainID, home, node, log.NewNopLogger())
 	if err != nil {
 		fmt.Printf("Abort!! IRISLCD encountered fatal error in creating certifier: %s", err.Error())
 		os.Exit(1)
@@ -166,7 +169,7 @@ func (ctx CLIContext) WithUseLedger(useLedger bool) CLIContext {
 }
 
 // WithCertifier - return a copy of the context with an updated Certifier
-func (ctx CLIContext) WithCertifier(certifier tmlite.Certifier) CLIContext {
+func (ctx CLIContext) WithCertifier(certifier tmlite.Verifier) CLIContext {
 	ctx.Certifier = certifier
 	return ctx
 }

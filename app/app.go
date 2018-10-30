@@ -201,7 +201,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
+		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
@@ -214,7 +214,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov,
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyMint, app.keyDistr,
 		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyIservice)
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -414,9 +414,17 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 	var code sdk.ABCICodeType
 	for msgIdx, msg := range msgs {
 		// Match route.
-		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
-		if err != nil {
-			return err.Result()
+		var msgType string
+		var err sdk.Error
+		if ctx.BlockHeight() != 0 {
+			msgType, err = app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
+
+			if err != nil {
+				return err.Result()
+			}
+
+		} else {
+			msgType = msg.Route()
 		}
 
 		handler := app.Router().Route(msgType)

@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:53159e3a9350fb41be45b98443ebc46944a59b598bee25328d44c835152855c3"
+  digest = "1:d4d3c5c22acc12f3816049302080fa10e56499a34c4fa64d88b59df1977513cb"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -87,6 +87,7 @@
     "crypto/keys/mintkey",
     "server",
     "server/config",
+    "server/mock",
     "store",
     "tests",
     "types",
@@ -108,6 +109,7 @@
     "x/params/subspace",
     "x/slashing",
     "x/stake",
+    "x/stake/client/cli",
     "x/stake/client/rest",
     "x/stake/keeper",
     "x/stake/querier",
@@ -115,7 +117,7 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "ce60699c06bf891cf2931e0031343219377770f7"
+  revision = "70cd87758a466fc6d3f57bbca635e05f24e9ff3f"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -910,11 +912,13 @@
     "github.com/cosmos/cosmos-sdk/crypto/keys",
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/config",
+    "github.com/cosmos/cosmos-sdk/server/mock",
     "github.com/cosmos/cosmos-sdk/store",
     "github.com/cosmos/cosmos-sdk/tests",
     "github.com/cosmos/cosmos-sdk/types",
     "github.com/cosmos/cosmos-sdk/x/auth",
     "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
+    "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/distribution",
     "github.com/cosmos/cosmos-sdk/x/gov",
@@ -924,6 +928,7 @@
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/stake",
+    "github.com/cosmos/cosmos-sdk/x/stake/client/cli",
     "github.com/cosmos/cosmos-sdk/x/stake/client/rest",
     "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
@@ -951,6 +956,7 @@
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
     "github.com/tendermint/tendermint/blockchain",
+    "github.com/tendermint/tendermint/cmd/tendermint/commands",
     "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",

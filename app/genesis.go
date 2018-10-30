@@ -29,8 +29,8 @@ var (
 	Denom             = "iris"
 	feeAmt            = int64(100)
 	IrisCt            = types.NewDefaultCoinType(Denom)
-	freeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
-	freeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
+	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
+	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
 )
 
 const (
@@ -129,17 +129,40 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		msg := msgs[0].(stake.MsgCreateValidator)
 
 		// create the genesis account, give'm few iris token and a buncha token with there name
-		genaccs[i] = genesisAccountFromMsgCreateValidator(msg, freeFermionAcc.Amount)
-		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(freeFermionAcc.Amount)) // increase the supply
+		genaccs[i] = genesisAccountFromMsgCreateValidator(msg, FreeFermionAcc.Amount)
+		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(FreeFermionAcc.Amount)) // increase the supply
 	}
 
 	// create the final app state
 	genesisState = GenesisState{
 		Accounts:     genaccs,
 		StakeData:    stakeData,
-		MintData:     mint.DefaultGenesisState(),
+		MintData:     mint.GenesisState{
+			Minter: mint.InitialMinter(),
+			Params: mint.Params{
+				MintDenom:           "iris",
+				InflationRateChange: sdk.NewDecWithPrec(13, 2),
+				InflationMax:        sdk.NewDecWithPrec(20, 2),
+				InflationMin:        sdk.NewDecWithPrec(7, 2),
+				GoalBonded:          sdk.NewDecWithPrec(67, 2),
+			},
+		},
 		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
+		GovData:      gov.GenesisState{
+			StartingProposalID: 1,
+			DepositProcedure: gov.DepositProcedure{
+				MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)},
+				MaxDepositPeriod: time.Duration(172800) * time.Second,
+			},
+			VotingProcedure: gov.VotingProcedure{
+				VotingPeriod: time.Duration(172800) * time.Second,
+			},
+			TallyingProcedure: gov.TallyingProcedure{
+				Threshold:         sdk.NewDecWithPrec(5, 1),
+				Veto:              sdk.NewDecWithPrec(334, 3),
+				GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+			},
+		},
 		UpgradeData:  upgrade.DefaultGenesisState(),
 		SlashingData: slashingData,
 		GenTxs:       appGenTxs,
@@ -245,7 +268,7 @@ func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
 		msg := msgs[0].(stake.MsgCreateValidator)
 		validators = append(validators, tmtypes.GenesisValidator{
 			PubKey: msg.PubKey,
-			Power:  freeFermionVal.Amount.Int64(),
+			Power:  FreeFermionVal.Amount.Int64(),
 			Name:   msg.Description.Moniker,
 		})
 
@@ -264,8 +287,7 @@ func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
 func NewDefaultGenesisAccount(addr sdk.AccAddress) GenesisAccount {
 	accAuth := auth.NewBaseAccountWithAddress(addr)
 	accAuth.Coins = []sdk.Coin{
-		{"fooToken", sdk.NewInt(1000)},
-		freeFermionAcc,
+		FreeFermionAcc,
 	}
 	return NewGenesisAccount(&accAuth)
 }
