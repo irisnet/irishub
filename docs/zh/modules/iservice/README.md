@@ -40,7 +40,7 @@ Committed at block 1040 (tx hash: 58FD40B739F592F5BD9B904A661B8D7B19C63FA9, resp
 }
 
 # 查询服务定义
-iriscli iservice definition --name=test-service --chain-id=service-test
+iriscli iservice definition --def-chain-id=service-test --name=test-service --chain-id=service-test
 
 ```
 
@@ -59,10 +59,10 @@ iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name
 * `--file`  可使用文件代替idl-content，当该项不为空时，覆盖`idl-content`内容
 
 ```
-iriscli iservice definition --name=test-service --chain-id=service-test
+iriscli iservice definition --def-chain-id=service-test --name=test-service --chain-id=service-test
 ```
 
-* `--chain-id` 定义该iservice服务的区块链ID
+* `--def-chain-id` 定义该iservice服务的区块链ID
 * `--name`  iService服务的名称
 
 ## IDL文件扩展
