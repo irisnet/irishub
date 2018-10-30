@@ -141,9 +141,32 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 	genesisState = GenesisState{
 		Accounts:     genaccs,
 		StakeData:    stakeData,
-		MintData:     mint.DefaultGenesisState(),
+		MintData:     mint.GenesisState{
+			Minter: mint.InitialMinter(),
+			Params: mint.Params{
+				MintDenom:           "iris",
+				InflationRateChange: sdk.NewDecWithPrec(13, 2),
+				InflationMax:        sdk.NewDecWithPrec(20, 2),
+				InflationMin:        sdk.NewDecWithPrec(7, 2),
+				GoalBonded:          sdk.NewDecWithPrec(67, 2),
+			},
+		},
 		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
+		GovData:      gov.GenesisState{
+			StartingProposalID: 1,
+			DepositProcedure: gov.DepositProcedure{
+				MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)},
+				MaxDepositPeriod: time.Duration(172800) * time.Second,
+			},
+			VotingProcedure: gov.VotingProcedure{
+				VotingPeriod: time.Duration(172800) * time.Second,
+			},
+			TallyingProcedure: gov.TallyingProcedure{
+				Threshold:         sdk.NewDecWithPrec(5, 1),
+				Veto:              sdk.NewDecWithPrec(334, 3),
+				GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+			},
+		},
 		UpgradeData:  upgrade.DefaultGenesisState(),
 		SlashingData: slashingData,
 		GenTxs:       appGenTxs,
