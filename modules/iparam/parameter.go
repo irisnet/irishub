@@ -1,17 +1,17 @@
 package iparam
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 type Parameter interface {
 	InitGenesis(interface{})
 
-	GetStoreKey() string
+	GetStoreKey() []byte
 
-	SetReadWriter(setter params.Setter)
+	SetReadWriter(paramSpace params.Subspace)
 
 	SaveValue(ctx sdk.Context)
 

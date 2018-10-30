@@ -1,31 +1,31 @@
 package baseapp
 
 import (
-	"fmt"
-	"runtime/debug"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"errors"
-	"github.com/irisnet/irishub/types"
+	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/types"
+	"runtime/debug"
 )
 
 var (
-	nativeFeeTokenKey = "feeToken/native"
-	nativeGasPriceThresholdKey  = "feeToken/gasPriceThreshold"
-//	FeeExchangeRatePrefix = "feeToken/exchangeRate/"	//  key = gov/feeToken/exchangeRate/<denomination>, rate = BigInt(value)/10^9
-//	RatePrecision = int64(1000000000) //10^9
+	nativeFeeTokenKey          = []byte("feeToken/native")
+	nativeGasPriceThresholdKey = []byte("feeToken/gasPriceThreshold")
+	//	FeeExchangeRatePrefix = "feeToken/exchangeRate/"	//  key = gov/feeToken/exchangeRate/<denomination>, rate = BigInt(value)/10^9
+	//	RatePrecision = int64(1000000000) //10^9
 )
 
 // NewFeePreprocessHandler creates a fee token preprocess handler
 func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (error) {
+	return func(ctx sdk.Context, tx sdk.Tx) error {
 		stdTx, ok := tx.(auth.StdTx)
 		if !ok {
 			return sdk.ErrInternal("tx must be StdTx")
 		}
 		fee := auth.StdFee{
-			Gas: stdTx.Fee.Gas,
+			Gas:    stdTx.Fee.Gas,
 			Amount: sdk.Coins{fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)},
 		}
 		return fm.feePreprocess(ctx, fee.Amount, fee.Gas)
@@ -57,14 +57,14 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 		ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
 		fee := auth.StdFee{
-			Gas: stdTx.Fee.Gas,
+			Gas:    stdTx.Fee.Gas,
 			Amount: sdk.Coins{fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)}, // consume gas
 		}
 
 		//If all gas has been consumed, then there is no necessary to run fee refund process
 		if txResult.GasWanted <= txResult.GasUsed {
 			refundResult = sdk.Coin{
-				Denom: fee.Amount[0].Denom,
+				Denom:  fee.Amount[0].Denom,
 				Amount: fee.Amount[0].Amount,
 			}
 			return refundResult, nil
@@ -72,24 +72,24 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 
 		unusedGas := txResult.GasWanted - txResult.GasUsed
 		var refundCoins sdk.Coins
-		for _,coin := range fee.Amount {
+		for _, coin := range fee.Amount {
 			newCoin := sdk.Coin{
-				Denom:	coin.Denom,
+				Denom:  coin.Denom,
 				Amount: coin.Amount.Mul(sdk.NewInt(unusedGas)).Div(sdk.NewInt(txResult.GasWanted)),
 			}
 			refundCoins = append(refundCoins, newCoin)
 		}
-		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins()   // consume gas
+		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
 		err = firstAccount.SetCoins(coins.Plus(refundCoins))
 		if err != nil {
 			return sdk.Coin{}, err
 		}
 
-		am.SetAccount(ctx, firstAccount)                                    // consume gas
-		fck.RefundCollectedFees(ctx, refundCoins)                           // consume gas
+		am.SetAccount(ctx, firstAccount)          // consume gas
+		fck.RefundCollectedFees(ctx, refundCoins) // consume gas
 		// There must be just one fee token
 		refundResult = sdk.Coin{
-			Denom: fee.Amount[0].Denom,
+			Denom:  fee.Amount[0].Denom,
 			Amount: fee.Amount[0].Amount.Mul(sdk.NewInt(txResult.GasUsed)).Div(sdk.NewInt(txResult.GasWanted)),
 		}
 
@@ -97,23 +97,30 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 	}
 }
 
-// FeeManager do fee tokens preprocess according to fee token configuration
-type FeeManager struct {
-	ps params.Setter
+// Type declaration for parameters
+func ParamTypeTable() params.TypeTable {
+	return params.NewTypeTable(
+		nativeFeeTokenKey, "",
+		nativeGasPriceThresholdKey, "",
+	)
 }
 
-func NewFeeManager(ps params.Setter) FeeManager {
+// FeeManager do fee tokens preprocess according to fee token configuration
+type FeeManager struct {
+	// The reference to the Paramstore to get and set gov specific params
+	paramSpace params.Subspace
+}
+
+func NewFeeManager(paramSpace params.Subspace) FeeManager {
 	return FeeManager{
-		ps:ps,
+		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 }
 
 func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
-	nativeFeeToken, err := fck.ps.GetString(ctx, nativeFeeTokenKey)
-	if err != nil {
-		panic(err)
-	}
-	for _,coin := range coins {
+	var nativeFeeToken string
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey, nativeFeeToken)
+	for _, coin := range coins {
 		if coin.Denom == nativeFeeToken {
 			return coin
 		}
@@ -125,14 +132,12 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 	if gasLimit <= 0 {
 		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
 	}
-	nativeFeeToken, err := fck.ps.GetString(ctx, nativeFeeTokenKey)
-	if err != nil {
-		panic(err)
-	}
-	nativeGasPriceThreshold, err := fck.ps.GetString(ctx, nativeGasPriceThresholdKey)
-	if err != nil {
-		panic(err)
-	}
+	var nativeFeeToken string
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey, nativeFeeToken)
+
+	var nativeGasPriceThreshold string
+	fck.paramSpace.Get(ctx, nativeGasPriceThresholdKey, nativeGasPriceThreshold)
+
 	threshold, ok := sdk.NewIntFromString(nativeGasPriceThreshold)
 	if !ok {
 		panic(errors.New("failed to parse gas price from string"))
@@ -171,11 +176,11 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 }
 
 type FeeGenesisStateConfig struct {
-	FeeTokenNative string `json:"fee_token_native"`
-	GasPriceThreshold int64 `json:"gas_price_threshold"`
+	FeeTokenNative    string `json:"fee_token_native"`
+	GasPriceThreshold int64  `json:"gas_price_threshold"`
 }
 
-func InitGenesis(ctx sdk.Context, ps params.Setter, data FeeGenesisStateConfig) {
-	ps.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
-	ps.SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
+func InitGenesis(ctx sdk.Context, ps FeeManager, data FeeGenesisStateConfig) {
+	ps.paramSpace.Set(ctx, nativeFeeTokenKey, data.FeeTokenNative)
+	ps.paramSpace.Set(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
 }
