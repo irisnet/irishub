@@ -228,7 +228,7 @@ func initWithConfig(cdc *codec.Codec, config *cfg.Config, initCfg initConfig) (
 		)
 		txBldr := authtx.NewTxBuilderFromCLI().WithCodec(cdc).WithMemo(memo).WithChainID(chainID)
 		signedTx, err = txBldr.SignStdTx(
-			initCfg.Name, keyPass, auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{Amount:sdk.Coins{sdk.NewInt64Coin("iris-atto",4000000000000000)},Gas:200000}, []auth.StdSignature{}, memo), false,
+			initCfg.Name, keyPass, auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo), false,
 		)
 		if err != nil {
 			return

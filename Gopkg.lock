@@ -69,8 +69,8 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/v0.25.0-iris"
-  digest = "1:bebac7d9ed1e0526f86e7ce978272240ce8c609c07cc97221250929414ae9af6"
+  branch = "jiacheng/v0.25.0-iris"
+  digest = "1:6d66f482d9647a0d4430de806148b8c9f16eb1958c6cc11dc7a0808b4632c385"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -80,7 +80,6 @@
     "client/rpc",
     "client/tx",
     "client/utils",
-    "cmd/gaia/app",
     "codec",
     "crypto",
     "crypto/keys",
@@ -118,7 +117,7 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "ce60699c06bf891cf2931e0031343219377770f7"
+  revision = "928f63433421b068ec0d1a87adbf3c5e582bc81e"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -908,7 +907,6 @@
     "github.com/cosmos/cosmos-sdk/client/rpc",
     "github.com/cosmos/cosmos-sdk/client/tx",
     "github.com/cosmos/cosmos-sdk/client/utils",
-    "github.com/cosmos/cosmos-sdk/cmd/gaia/app",
     "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/cosmos-sdk/crypto",
     "github.com/cosmos/cosmos-sdk/crypto/keys",

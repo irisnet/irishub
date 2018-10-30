@@ -119,7 +119,7 @@ func NewFeeManager(paramSpace params.Subspace) FeeManager {
 
 func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
 	var nativeFeeToken string
-	fck.paramSpace.Get(ctx, nativeFeeTokenKey, nativeFeeToken)
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey, &nativeFeeToken)
 	for _, coin := range coins {
 		if coin.Denom == nativeFeeToken {
 			return coin
@@ -133,10 +133,10 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
 	}
 	var nativeFeeToken string
-	fck.paramSpace.Get(ctx, nativeFeeTokenKey, nativeFeeToken)
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey, &nativeFeeToken)
 
 	var nativeGasPriceThreshold string
-	fck.paramSpace.Get(ctx, nativeGasPriceThresholdKey, nativeGasPriceThreshold)
+	fck.paramSpace.Get(ctx, nativeGasPriceThresholdKey, &nativeGasPriceThreshold)
 
 	threshold, ok := sdk.NewIntFromString(nativeGasPriceThreshold)
 	if !ok {

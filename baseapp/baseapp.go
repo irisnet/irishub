@@ -668,7 +668,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 
 		// Refund unspent fee
-		if mode != RunTxModeCheck && app.feeRefundHandler != nil {
+		if mode != RunTxModeCheck && app.feeRefundHandler != nil && ctx.BlockHeight() != 0 {
 			actualCostFee, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
 			if err == nil {
 				fee, _ := actualCostFee.Amount.BigInt().MarshalJSON()
@@ -687,7 +687,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	// run the fee handler
-	if app.feePreprocessHandler != nil {
+	if app.feePreprocessHandler != nil && mode == RunTxModeCheck {
 		err := app.feePreprocessHandler(ctx, tx)
 		if err != nil {
 			return sdk.ErrInvalidCoins(err.Error()).Result()

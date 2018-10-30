@@ -414,9 +414,17 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 	var code sdk.ABCICodeType
 	for msgIdx, msg := range msgs {
 		// Match route.
-		msgType, err := app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
-		if err != nil {
-			return err.Result()
+		var msgType string
+		var err sdk.Error
+		if ctx.BlockHeight() != 0 {
+			msgType, err = app.upgradeKeeper.GetMsgTypeInCurrentVersion(ctx, msg)
+
+			if err != nil {
+				return err.Result()
+			}
+
+		} else {
+			msgType = msg.Route()
 		}
 
 		handler := app.Router().Route(msgType)
