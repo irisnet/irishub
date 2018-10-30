@@ -35,6 +35,12 @@ const (
 	flagMoniker      = "moniker"
 )
 
+const (
+	defaultCommissionRate          = "0.1"
+	defaultCommissionMaxRate       = "0.2"
+	defaultCommissionMaxChangeRate = "0.01"
+)
+
 type initConfig struct {
 	ChainID      string
 	GenTxsDir    string

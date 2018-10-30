@@ -37,7 +37,7 @@ following delegation and commission default parameters:
 	commission rate:             %s
 	commission max rate:         %s
 	commission max change rate:  %s
-`, app.FreeFermionVal.String(),app.DefaultCommissionRate, app.DefaultCommissionMaxRate, app.DefaultCommissionMaxChangeRate),
+`, app.FreeFermionVal.String(),defaultCommissionRate, defaultCommissionMaxRate, defaultCommissionMaxChangeRate),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			config := ctx.Config
@@ -91,9 +91,9 @@ func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip string, val
 	viper.Set(cli.FlagIP, ip)                                      // --ip
 	viper.Set(cli.FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey)) // --pubkey
 	viper.Set(cli.FlagAmount, app.FreeFermionVal.String())                       // --amount
-	viper.Set(cli.FlagCommissionRate, app.DefaultCommissionRate)
-	viper.Set(cli.FlagCommissionMaxRate, app.DefaultCommissionMaxRate)
-	viper.Set(cli.FlagCommissionMaxChangeRate, app.DefaultCommissionMaxChangeRate)
+	viper.Set(cli.FlagCommissionRate, defaultCommissionRate)
+	viper.Set(cli.FlagCommissionMaxRate, defaultCommissionMaxRate)
+	viper.Set(cli.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
 	viper.Set(cli.FlagGenesisFormat, true)     // --genesis-format
 	viper.Set(cli.FlagMoniker, config.Moniker) // --moniker
 	if config.Moniker == "" {

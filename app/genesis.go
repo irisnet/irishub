@@ -37,10 +37,6 @@ const (
 	defaultUnbondingTime time.Duration = 60 * 10 * time.Second
 	// DefaultKeyPass contains the default key password for genesis transactions
 	DefaultKeyPass = "1234567890"
-
-	DefaultCommissionRate          = "0.1"
-	DefaultCommissionMaxRate       = "0.2"
-	DefaultCommissionMaxChangeRate = "0.01"
 )
 
 // State to Unmarshal
@@ -291,7 +287,6 @@ func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
 func NewDefaultGenesisAccount(addr sdk.AccAddress) GenesisAccount {
 	accAuth := auth.NewBaseAccountWithAddress(addr)
 	accAuth.Coins = []sdk.Coin{
-		{"fooToken", sdk.NewInt(1000)},
 		FreeFermionAcc,
 	}
 	return NewGenesisAccount(&accAuth)
