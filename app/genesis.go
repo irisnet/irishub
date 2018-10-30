@@ -10,19 +10,19 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/mint"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
-	"time"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"time"
 )
 
 var (
@@ -41,12 +41,12 @@ const (
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts    []GenesisAccount     `json:"accounts"`
-	StakeData   stake.GenesisState   `json:"stake"`
+	Accounts     []GenesisAccount      `json:"accounts"`
+	StakeData    stake.GenesisState    `json:"stake"`
 	MintData     mint.GenesisState     `json:"mint"`
 	DistrData    distr.GenesisState    `json:"distr"`
-	GovData     gov.GenesisState     `json:"gov"`
-	UpgradeData upgrade.GenesisState `json:"upgrade"`
+	GovData      gov.GenesisState      `json:"gov"`
+	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
 	SlashingData slashing.GenesisState `json:"slashing"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
@@ -96,7 +96,7 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 // get app init parameters for server init command
 func IrisAppInit() server.AppInit {
 	return server.AppInit{
-		AppGenState:      IrisAppGenStateJSON,
+		AppGenState: IrisAppGenStateJSON,
 	}
 }
 
@@ -135,12 +135,12 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 
 	// create the final app state
 	genesisState = GenesisState{
-		Accounts:    genaccs,
-		StakeData:   stakeData,
+		Accounts:     genaccs,
+		StakeData:    stakeData,
 		MintData:     mint.DefaultGenesisState(),
 		DistrData:    distr.DefaultGenesisState(),
-		GovData:     gov.DefaultGenesisState(),
-		UpgradeData: upgrade.DefaultGenesisState(),
+		GovData:      gov.DefaultGenesisState(),
+		UpgradeData:  upgrade.DefaultGenesisState(),
 		SlashingData: slashingData,
 		GenTxs:       appGenTxs,
 	}
@@ -270,17 +270,16 @@ func NewDefaultGenesisAccount(addr sdk.AccAddress) GenesisAccount {
 	return NewGenesisAccount(&accAuth)
 }
 
-
 func createGenesisState() stake.GenesisState {
 	return stake.GenesisState{
 		Pool: stake.Pool{
-			LooseTokens:             sdk.ZeroDec(),
-			BondedTokens:            sdk.ZeroDec(),
+			LooseTokens:  sdk.ZeroDec(),
+			BondedTokens: sdk.ZeroDec(),
 		},
 		Params: stake.Params{
-			UnbondingTime:       defaultUnbondingTime,
-			MaxValidators:       100,
-			BondDenom:           Denom + "-" + types.Atto,
+			UnbondingTime: defaultUnbondingTime,
+			MaxValidators: 100,
+			BondDenom:     Denom + "-" + types.Atto,
 		},
 	}
 }
