@@ -70,6 +70,8 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
     ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyIparams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyStake, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
