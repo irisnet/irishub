@@ -16,7 +16,7 @@ import (
 func TestBankWithRandomMessages(t *testing.T) {
 	mapp := mock.NewApp()
 
-	bank.RegisterWire(mapp.Cdc)
+	bank.RegisterCodec(mapp.Cdc)
 	mapper := mapp.AccountMapper
 	coinKeeper := bank.NewKeeper(mapper)
 	mapp.Router().AddRoute("bank", []*sdk.KVStoreKey{mapp.KeyAccount}, bank.NewHandler(coinKeeper))

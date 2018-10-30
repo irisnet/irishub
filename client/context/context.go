@@ -3,7 +3,7 @@ package context
 import (
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client"
 
@@ -22,7 +22,7 @@ const ctxAccStoreName = "acc"
 // CLIContext implements a typical CLI context created in SDK modules for
 // transaction handling and queries.
 type CLIContext struct {
-	Codec           *wire.Codec
+	Codec           *codec.Codec
 	AccDecoder      auth.AccountDecoder
 	Client          rpcclient.Client
 	Logger          io.Writer
@@ -108,7 +108,7 @@ func createCertifier() tmlite.Certifier {
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (ctx CLIContext) WithCodec(cdc *wire.Codec) CLIContext {
+func (ctx CLIContext) WithCodec(cdc *codec.Codec) CLIContext {
 	ctx.Codec = cdc
 	return ctx
 }

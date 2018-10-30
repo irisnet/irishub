@@ -16,8 +16,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	qr "github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 )
@@ -45,14 +45,14 @@ type RunMsg func(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) sdk.Result
 // BaseApp reflects the ABCI application implementation.
 type BaseApp struct {
 	// initialized on creation
-	Logger     log.Logger
-	name       string               // application name from abci.Info
-	cdc        *wire.Codec          // Amino codec
-	db         dbm.DB               // common DB backend
-	cms        sdk.CommitMultiStore // Main (uncached) state
-	router     Router               // handle any kind of message
-	codespacer *sdk.Codespacer      // handle module codespacing
-	txDecoder  sdk.TxDecoder        // unmarshal []byte into sdk.Tx
+	Logger      log.Logger
+	name        string               // application name from abci.Info
+	db          dbm.DB               // common DB backend
+	cms         sdk.CommitMultiStore // Main (uncached) state
+	router      Router               // handle any kind of message
+	queryRouter qr.QueryRouter          // router for redirecting query calls
+	codespacer  *sdk.Codespacer      // handle module codespacing
+	txDecoder   sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
 	anteHandler          sdk.AnteHandler            // ante handler for fee and auth
 	feeRefundHandler     types.FeeRefundHandler     // fee handler for fee refund
@@ -71,9 +71,12 @@ type BaseApp struct {
 	// checkState is set on initialization and reset on Commit.
 	// deliverState is set in InitChain and BeginBlock and cleared on Commit.
 	// See methods setCheckState and setDeliverState.
-	checkState       *state                  // for CheckTx
-	deliverState     *state                  // for DeliverTx
-	signedValidators []abci.SigningValidator // absent validators from begin block
+	checkState   *state          // for CheckTx
+	deliverState *state          // for DeliverTx
+	voteInfos    []abci.VoteInfo // absent validators from begin block
+
+	// minimum fees for spam prevention
+	minimumFees sdk.Coins
 
 	// flag for sealing
 	sealed bool
@@ -90,16 +93,16 @@ var _ abci.Application = (*BaseApp)(nil)
 // NOTE: The db is used to store the version number for now.
 // Accepts a user-defined txDecoder
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
-func NewBaseApp(name string, cdc *wire.Codec, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
+func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:     logger,
-		name:       name,
-		cdc:        cdc,
-		db:         db,
-		cms:        store.NewCommitMultiStore(db),
-		router:     NewRouter(),
-		codespacer: sdk.NewCodespacer(),
-		txDecoder:  txDecoder,
+		Logger:      logger,
+		name:        name,
+		db:          db,
+		cms:         store.NewCommitMultiStore(db),
+		router:      NewRouter(),
+		queryRouter: qr.NewQueryRouter(),
+		codespacer:  sdk.NewCodespacer(),
+		txDecoder:   txDecoder,
 	}
 
 	// Register the undefined & root codespaces, which should not be used by
@@ -127,10 +130,17 @@ func (app *BaseApp) RegisterCodespace(codespace sdk.CodespaceType) sdk.Codespace
 	return app.codespacer.RegisterNext(codespace)
 }
 
-// Mount a store to the provided key in the BaseApp multistore
+// Mount IAVL stores to the provided keys in the BaseApp multistore
 func (app *BaseApp) MountStoresIAVL(keys ...*sdk.KVStoreKey) {
 	for _, key := range keys {
 		app.MountStore(key, sdk.StoreTypeIAVL)
+	}
+}
+
+// Mount stores to the provided keys in the BaseApp multistore
+func (app *BaseApp) MountStoresTransient(keys ...*sdk.TransientStoreKey) {
+	for _, key := range keys {
+		app.MountStore(key, sdk.StoreTypeTransient)
 	}
 }
 
@@ -148,32 +158,7 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
 }
-
 ////////////////////  iris/cosmos-sdk end  ///////////////////////////
-
-// default custom logic for transaction decoding
-// TODO: remove auth and wire dependencies from baseapp
-//	- move this to auth.DefaultTxDecoder
-//	- set the default here to JSON decode like docs/examples/app1 (it will fail
-//		for multiple messages ;))
-//	- pass a TxDecoder into NewBaseApp, instead of a codec.
-func defaultTxDecoder(cdc *wire.Codec) sdk.TxDecoder {
-	return func(txBytes []byte) (sdk.Tx, sdk.Error) {
-		var tx = auth.StdTx{}
-
-		if len(txBytes) == 0 {
-			return nil, sdk.ErrTxDecode("txBytes are empty")
-		}
-
-		// StdTx.Msg is an interface. The concrete sdk
-		// are registered by MakeTxCodec
-		err := cdc.UnmarshalBinary(txBytes, &tx)
-		if err != nil {
-			return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
-		}
-		return tx, nil
-	}
-}
 
 func (app *BaseApp) SetRunMsg(runMsg RunMsg) {
 	app.runMsg = runMsg
@@ -223,10 +208,13 @@ func (app *BaseApp) initFromStore(mainKey sdk.StoreKey) error {
 	return nil
 }
 
+// SetMinimumFees sets the minimum fees.
+func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
+
 // NewContext returns a new Context with the correct store, the given header, and nil txBytes.
 func (app *BaseApp) NewContext(isCheckTx bool, header abci.Header) sdk.Context {
 	if isCheckTx {
-		return sdk.NewContext(app.checkState.ms, header, true, app.Logger)
+		return sdk.NewContext(app.checkState.ms, header, true, app.Logger).WithMinimumFees(app.minimumFees)
 	}
 	return sdk.NewContext(app.deliverState.ms, header, false, app.Logger)
 }
@@ -244,7 +232,7 @@ func (app *BaseApp) setCheckState(header abci.Header) {
 	ms := app.cms.CacheMultiStore()
 	app.checkState = &state{
 		ms:  ms,
-		ctx: sdk.NewContext(ms, header, true, app.Logger),
+		ctx: sdk.NewContext(ms, header, true, app.Logger).WithMinimumFees(app.minimumFees),
 	}
 }
 
@@ -310,6 +298,7 @@ func (app *BaseApp) FilterPeerByPubKey(info string) abci.ResponseQuery {
 	return abci.ResponseQuery{}
 }
 
+// Splits a string path using the delimter '/'.  i.e. "this/is/funny" becomes []string{"this", "is", "funny"}
 func splitPath(requestPath string) (path []string) {
 	path = strings.Split(requestPath, "/")
 	// first element is empty string
@@ -335,6 +324,8 @@ func (app *BaseApp) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 		return handleQueryStore(app, path, req)
 	case "p2p":
 		return handleQueryP2P(app, path, req)
+	case "custom":
+		return handleQueryCustom(app, path, req)
 	}
 
 	msg := "unknown query path"
@@ -363,7 +354,7 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 		}
 
 		// Encode with json
-		value := wire.Cdc.MustMarshalBinary(result)
+		value := codec.Cdc.MustMarshalBinary(result)
 		return abci.ResponseQuery{
 			Code:  uint32(sdk.ABCICodeOK),
 			Value: value,
@@ -384,6 +375,7 @@ func handleQueryStore(app *BaseApp, path []string, req abci.RequestQuery) (res a
 	return queryable.Query(req)
 }
 
+// nolint: unparam
 func handleQueryP2P(app *BaseApp, path []string, req abci.RequestQuery) (res abci.ResponseQuery) {
 	// "/p2p" prefix for p2p queries
 	if len(path) >= 4 {
@@ -404,6 +396,34 @@ func handleQueryP2P(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 
 	msg := "Expected path is p2p filter <addr|pubkey> <parameter>"
 	return sdk.ErrUnknownRequest(msg).QueryResult()
+}
+
+func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res abci.ResponseQuery) {
+	// path[0] should be "custom" because "/custom" prefix is required for keeper queries.
+	// the queryRouter routes using path[1]. For example, in the path "custom/gov/proposal", queryRouter routes using "gov"
+	if len(path) < 2 || path[1] == "" {
+		return sdk.ErrUnknownRequest("No route for custom query specified").QueryResult()
+	}
+	querier := app.queryRouter.Route(path[1])
+	if querier == nil {
+		return sdk.ErrUnknownRequest(fmt.Sprintf("no custom querier found for route %s", path[1])).QueryResult()
+	}
+
+	ctx := sdk.NewContext(app.cms.CacheMultiStore(), app.checkState.ctx.BlockHeader(), true, app.Logger).
+		WithMinimumFees(app.minimumFees)
+	// Passes the rest of the path as an argument to the querier.
+	// For example, in the path "custom/gov/proposal/test", the gov querier gets []string{"proposal", "test"} as the path
+	resBytes, err := querier(ctx, path[2:], req)
+	if err != nil {
+		return abci.ResponseQuery{
+			Code: uint32(err.ABCICode()),
+			Log:  err.ABCILog(),
+		}
+	}
+	return abci.ResponseQuery{
+		Code:  uint32(sdk.ABCICodeOK),
+		Value: resBytes,
+	}
 }
 
 // BeginBlock implements the ABCI application interface.
@@ -432,7 +452,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 
 	// set the signed validators for addition to context in deliverTx
 	// TODO: communicate this result to the address to pubkey map in slashing
-	app.signedValidators = req.LastCommitInfo.GetValidators()
+	app.voteInfos = req.LastCommitInfo.GetVotes()
 	return
 }
 
@@ -534,15 +554,14 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 	return nil
 }
 
+// retrieve the context for the ante handler and store the tx bytes; store
+// the vote infos if the tx runs within the deliverTx() state.
 func (app *BaseApp) getContextForAnte(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
 	// Get the context
-	if mode == RunTxModeCheck || mode == RunTxModeSimulate {
-		ctx = app.checkState.ctx.WithTxBytes(txBytes)
-	} else {
-		ctx = app.deliverState.ctx.WithTxBytes(txBytes)
-		ctx = ctx.WithSigningValidators(app.signedValidators)
+	ctx = getState(app, mode).ctx.WithTxBytes(txBytes)
+	if mode == RunTxModeDeliver {
+		ctx = ctx.WithVoteInfos(app.voteInfos)
 	}
-
 	return
 }
 
@@ -559,10 +578,10 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	var code sdk.ABCICodeType
 	for msgIdx, msg := range msgs {
 		// Match route.
-		msgType := msg.Type()
-		handler := app.router.Route(msgType)
+		msgRoute := msg.Route()
+		handler := app.router.Route(msgRoute)
 		if handler == nil {
-			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgType).Result()
+			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgRoute).Result()
 		}
 
 		var msgResult sdk.Result
@@ -570,6 +589,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		if mode != RunTxModeCheck {
 			msgResult = handler(ctx, msg)
 		}
+		msgResult.Tags = append(msgResult.Tags, sdk.MakeTag("action", []byte(msg.Type())))
 
 		// NOTE: GasWanted is determined by ante handler and
 		// GasUsed by the GasMeter
@@ -612,6 +632,13 @@ func getState(app *BaseApp, mode RunTxMode) *state {
 	return app.deliverState
 }
 
+func (app *BaseApp) initializeContext(ctx sdk.Context, mode RunTxMode) sdk.Context {
+	if mode == RunTxModeSimulate {
+		ctx = ctx.WithMultiStore(getState(app, RunTxModeSimulate).CacheMultiStore())
+	}
+	return ctx
+}
+
 // runTx processes a transaction. The transactions is proccessed via an
 // anteHandler. txBytes may be nil in some cases, eg. in tests. Also, in the
 // future we may support "internal" transactions.
@@ -620,8 +647,11 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// determined by the GasMeter. We need access to the context to get the gas
 	// meter so we initialize upfront.
 	var gasWanted int64
+	var msCache sdk.CacheMultiStore
 	ctx := app.getContextForAnte(mode, txBytes)
+	ctx = app.initializeContext(ctx, mode)
 	ctxWithNoCache := ctx
+
 	defer func() {
 		if r := recover(); r != nil {
 			switch rType := r.(type) {
@@ -635,7 +665,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 
 		result.GasWanted = gasWanted
-		result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
+		result.GasUsed = ctx.GasMeter().GasConsumed()
 
 		// Refund unspent fee
 		if mode != RunTxModeCheck && app.feeRefundHandler != nil {
@@ -646,15 +676,13 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 			} else {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
-				result.GasUsed = ctxWithNoCache.GasMeter().GasConsumed()
+				result.GasUsed = ctx.GasMeter().GasConsumed()
 			}
 		}
 	}()
 
 	var msgs = tx.GetMsgs()
-
-	err := validateBasicTxMsgs(msgs)
-	if err != nil {
+	if err := validateBasicTxMsgs(msgs); err != nil {
 		return err.Result()
 	}
 
@@ -668,21 +696,27 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 	// run the ante handler
 	if app.anteHandler != nil {
-		newCtx, anteResult, abort := app.anteHandler(ctx, tx)
+		newCtx, result, abort := app.anteHandler(ctx, tx, (mode == RunTxModeSimulate))
 		if abort {
-			return anteResult
+			return result
 		}
 		if !newCtx.IsZero() {
 			ctx = newCtx
 			ctxWithNoCache = newCtx
 		}
 
-		gasWanted = anteResult.GasWanted
+		gasWanted = result.GasWanted
+	}
+
+	if mode == RunTxModeSimulate {
+		result = app.runMsgs(ctx, msgs, mode)
+		result.GasWanted = gasWanted
+		return
 	}
 
 	// Keep the state in a transient CacheWrap in case processing the messages
 	// fails.
-	msCache := getState(app, mode).CacheMultiStore()
+	msCache = getState(app, mode).CacheMultiStore()
 	if msCache.TracingEnabled() {
 		msCache = msCache.WithTracingContext(sdk.TraceContext(
 			map[string]interface{}{"txHash": cmn.HexBytes(tmhash.Sum(txBytes)).String()},
@@ -693,8 +727,8 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	result = app.runMsgs(ctx, msgs, mode)
 	result.GasWanted = gasWanted
 
-	// only update state if all messages pass and we're not in a simulation
-	if result.IsOK() && mode != RunTxModeSimulate {
+	// only update state if all messages pass
+	if result.IsOK() {
 		msCache.Write()
 	}
 

@@ -2,7 +2,7 @@ package gov
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iparam"
@@ -25,15 +25,15 @@ type Keeper struct {
 	// The (unexposed) keys used to access the stores from the Context.
 	storeKey sdk.StoreKey
 
-	// The wire codec for binary encoding/decoding.
-	cdc *wire.Codec
+	// The codec codec for binary encoding/decoding.
+	cdc *codec.Codec
 
 	// Reserved codespace
 	codespace sdk.CodespaceType
 }
 
-// NewGovernanceMapper returns a mapper that uses go-wire to (binary) encode and decode gov types.
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+// NewGovernanceMapper returns a mapper that uses go-codec to (binary) encode and decode gov types.
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
 		ck:        ck,
@@ -44,8 +44,8 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.Delegat
 	}
 }
 
-// Returns the go-wire codec.
-func (keeper Keeper) WireCodec() *wire.Codec {
+// Returns the go-codec codec.
+func (keeper Keeper) WireCodec() *codec.Codec {
 	return keeper.cdc
 }
 

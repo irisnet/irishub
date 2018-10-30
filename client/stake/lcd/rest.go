@@ -1,12 +1,12 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 )
 
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
+func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/delegations",
 		delegationsRequestHandlerFn(cdc, cliCtx),

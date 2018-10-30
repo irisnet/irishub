@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -35,7 +35,7 @@ type voteReq struct {
 	Option gov.VoteOption `json:"option"` //  option from OptionSet chosen by the voter
 }
 
-func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req postProposalReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -72,7 +72,7 @@ func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 	}
 }
 
-func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -123,7 +123,7 @@ func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFu
 	}
 }
 
-func voteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]

@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/tendermint/tendermint/crypto"
 	"encoding/hex"
 	"github.com/tendermint/tendermint/crypto/ed25519"
@@ -42,14 +42,14 @@ func newPubKey(pk string) (res crypto.PubKey) {
 	return pkEd
 }
 
-func createTestCodec() *wire.Codec {
-	cdc := wire.NewCodec()
-	sdk.RegisterWire(cdc)
-	RegisterWire(cdc)
-	auth.RegisterWire(cdc)
-	bank.RegisterWire(cdc)
-	stake.RegisterWire(cdc)
-	wire.RegisterCrypto(cdc)
+func createTestCodec() *codec.Codec {
+	cdc := codec.New()
+	sdk.RegisterCodec(cdc)
+	RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 	return cdc
 }
 

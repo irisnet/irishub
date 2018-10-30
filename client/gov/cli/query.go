@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
@@ -16,7 +16,7 @@ import (
 )
 
 // GetCmdQueryProposal implements the query proposal command.
-func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryProposal(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-proposal",
 		Short: "query proposal details",
@@ -37,7 +37,7 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
+			output, err := codec.MarshalJSONIndent(cdc, proposalResponse)
 			if err != nil {
 				return err
 			}
@@ -54,7 +54,7 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 
 // nolint: gocyclo
 // GetCmdQueryProposals implements a query proposals command.
-func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryProposals(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-proposals",
 		Short: "query proposals with optional filters",
@@ -166,7 +166,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 
 // Command to Get a Proposal Information
 // GetCmdQueryVote implements the query proposal vote command.
-func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryVote(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-vote",
 		Short: "query vote",
@@ -188,7 +188,7 @@ func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
 			var vote gov.Vote
 			cdc.MustUnmarshalBinary(res, &vote)
 
-			output, err := wire.MarshalJSONIndent(cdc, vote)
+			output, err := codec.MarshalJSONIndent(cdc, vote)
 			if err != nil {
 				return err
 			}
@@ -205,7 +205,7 @@ func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdQueryVotes implements the command to query for proposal votes.
-func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryVotes(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-votes",
 		Short: "query votes on a proposal",
@@ -239,7 +239,7 @@ func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
 				votes = append(votes, vote)
 			}
 
-			output, err := wire.MarshalJSONIndent(cdc, votes)
+			output, err := codec.MarshalJSONIndent(cdc, votes)
 			if err != nil {
 				return err
 			}
@@ -260,7 +260,7 @@ const (
 	flagPath   = "path"
 )
 
-func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-params",
 		Short: "query parameter proposal's config",
@@ -339,7 +339,7 @@ func PrintParamStr(p iparam.GovParameter, keyStr string) {
 	fmt.Println(string(jsonBytes))
 }
 
-func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pull-params",
 		Short: "generate param.json file",

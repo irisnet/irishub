@@ -34,6 +34,15 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState
 	InitGenesis_commitID(ctx, k)
 }
 
+
+// WriteGenesis - output genesis parameters
+func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
+
+	return GenesisState{
+		SwitchPeriod: upgradeparams.GetSwitchPeriod(ctx),
+	}
+}
+
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{

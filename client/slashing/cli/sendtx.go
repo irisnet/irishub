@@ -4,7 +4,7 @@ import (
 	"os"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 
@@ -14,7 +14,7 @@ import (
 )
 
 // GetCmdUnrevoke implements the create unrevoke validator command.
-func GetCmdUnrevoke(cdc *wire.Codec) *cobra.Command {
+func GetCmdUnrevoke(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "unrevoke",
 		Args:  cobra.ExactArgs(0),

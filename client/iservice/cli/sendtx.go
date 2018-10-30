@@ -4,7 +4,7 @@ import (
 	"os"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
+func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
 		Short: "create new service definition",

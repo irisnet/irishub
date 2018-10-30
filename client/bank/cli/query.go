@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/spf13/cobra"
@@ -13,7 +13,7 @@ import (
 // GetAccountCmd returns a query account that will display the state of the
 // account at a given address.
 // nolint: unparam
-func GetAccountCmd(storeName string, cdc *wire.Codec, decoder auth.AccountDecoder) *cobra.Command {
+func GetAccountCmd(storeName string, cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	return &cobra.Command{
 		Use:   "account [address]",
 		Short: "Query account balance",
@@ -46,7 +46,7 @@ func GetAccountCmd(storeName string, cdc *wire.Codec, decoder auth.AccountDecode
 				return err
 			}
 
-			output, err := wire.MarshalJSONIndent(cdc, accountRes)
+			output, err := codec.MarshalJSONIndent(cdc, accountRes)
 			if err != nil {
 				return err
 			}
@@ -58,7 +58,7 @@ func GetAccountCmd(storeName string, cdc *wire.Codec, decoder auth.AccountDecode
 }
 
 // GetCmdQueryCoinType performs coin type query
-func GetCmdQueryCoinType(cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "coin-type [coin_name]",
 		Short: "query coin type",
@@ -70,7 +70,7 @@ func GetCmdQueryCoinType(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			output, err := wire.MarshalJSONIndent(cdc, res)
+			output, err := codec.MarshalJSONIndent(cdc, res)
 			if err != nil {
 				return err
 			}

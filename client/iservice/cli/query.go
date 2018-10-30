@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"github.com/spf13/viper"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
@@ -13,7 +13,7 @@ import (
 	cmn "github.com/irisnet/irishub/client/iservice"
 )
 
-func GetCmdQueryScvDef(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "definition",
 		Short: "query service definition",
@@ -45,7 +45,7 @@ func GetCmdQueryScvDef(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			service := cmn.ServiceOutput{MsgSvcDef: msgSvcDef, Methods: methods}
-			output, err := wire.MarshalJSONIndent(cdc, service)
+			output, err := codec.MarshalJSONIndent(cdc, service)
 			if err != nil {
 				return err
 			}

@@ -33,7 +33,7 @@ func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
 }
 
 // NewFeePreprocessHandler creates a fee token refund handler
-func NewFeeRefundHandler(am auth.AccountMapper, fck auth.FeeCollectionKeeper, fm FeeManager) types.FeeRefundHandler {
+func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm FeeManager) types.FeeRefundHandler {
 	return func(ctx sdk.Context, tx sdk.Tx, txResult sdk.Result) (refundResult sdk.Coin, err error) {
 		defer func() {
 			if r := recover(); r != nil {

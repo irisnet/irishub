@@ -11,7 +11,7 @@ import (
 
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/store"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/types"
@@ -366,7 +366,7 @@ func (cliCtx CLIContext) verifyProof(path string, resp abci.ResponseQuery) error
 	}
 
 	var multiStoreProof store.MultiStoreProof
-	cdc := wire.NewCodec()
+	cdc := codec.NewCodec()
 	err = cdc.UnmarshalBinary(resp.Proof, &multiStoreProof)
 	if err != nil {
 		return errors.Wrap(err, "failed to unmarshalBinary rangeProof")

@@ -3,7 +3,7 @@ package upgradeparams
 import (
 	"testing"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/require"
 	"github.com/cosmos/cosmos-sdk/store"
 
@@ -25,7 +25,7 @@ func defaultContext(key sdk.StoreKey) sdk.Context {
 func TestCurrentUpgradeProposalIdParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
 	find := CurrentUpgradeProposalIdParameter.LoadValue(ctx)
@@ -47,7 +47,7 @@ func TestCurrentUpgradeProposalIdParameter(t *testing.T) {
 func TestProposalAcceptHeightParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
 	find := ProposalAcceptHeightParameter.LoadValue(ctx)
@@ -69,7 +69,7 @@ func TestProposalAcceptHeightParameter(t *testing.T) {
 func TestSwitchPeriodParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
 	find := SwitchPeriodParameter.LoadValue(ctx)
@@ -91,7 +91,7 @@ func TestSwitchPeriodParameter(t *testing.T) {
 func TestUpgradeParameterSetAndGet(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
 	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	paramKeeper := params.NewKeeper(codec.NewCodec(), skey)
 
 	CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
 	find := CurrentUpgradeProposalIdParameter.LoadValue(ctx)

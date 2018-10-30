@@ -6,7 +6,7 @@ import (
 
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -17,7 +17,7 @@ import (
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
-func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit-proposal",
 		Short: "Submit a proposal along with an initial deposit",
@@ -83,7 +83,7 @@ func GetCmdSubmitProposal(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *wire.Codec) (gov.Param, error) {
+func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *codec.Codec) (gov.Param, error) {
 	var param gov.Param
 
 	if paramStr != "" {
@@ -105,7 +105,7 @@ func GetParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 }
 
 // GetCmdDeposit implements depositing tokens for an active proposal.
-func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
+func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deposit",
 		Short: "deposit tokens for activing proposal",
@@ -150,7 +150,7 @@ func GetCmdDeposit(cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdVote implements creating a new vote command.
-func GetCmdVote(cdc *wire.Codec) *cobra.Command {
+func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "vote",
 		Short: "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",

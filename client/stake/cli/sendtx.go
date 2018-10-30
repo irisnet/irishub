@@ -5,7 +5,7 @@ import (
 	"os"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
@@ -20,7 +20,7 @@ import (
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
-func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
+func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-validator",
 		Short: "create new validator initialized with a self-delegation to it",
@@ -93,7 +93,7 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdEditValidator implements the create edit validator command.
-func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
+func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-validator",
 		Short: "edit and existing validator account",
@@ -129,7 +129,7 @@ func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdDelegate implements the delegate command.
-func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
+func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delegate",
 		Short: "delegate liquid tokens to an validator",
@@ -170,7 +170,7 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdRedelegate implements the redelegate validator command.
-func GetCmdRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "redelegate",
 		Short: "redelegate illiquid tokens from one validator to another",
@@ -186,7 +186,7 @@ func GetCmdRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdBeginRedelegate the begin redelegation command.
-func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdBeginRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "begin",
 		Short: "begin redelegation",
@@ -241,7 +241,7 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 // nolint: gocyclo
 // TODO: Make this pass gocyclo linting
 func getShares(
-	storeName string, cliCtx context.CLIContext, cdc *wire.Codec, sharesAmountStr,
+	storeName string, cliCtx context.CLIContext, cdc *codec.Codec, sharesAmountStr,
 	sharesPercentStr string, delegatorAddr, validatorAddr sdk.AccAddress,
 ) (sharesAmount sdk.Rat, err error) {
 	switch {
@@ -287,7 +287,7 @@ func getShares(
 }
 
 // GetCmdCompleteRedelegate implements the complete redelegation command.
-func GetCmdCompleteRedelegate(cdc *wire.Codec) *cobra.Command {
+func GetCmdCompleteRedelegate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "complete",
 		Short: "complete redelegation",
@@ -327,7 +327,7 @@ func GetCmdCompleteRedelegate(cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdUnbond implements the unbond validator command.
-func GetCmdUnbond(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "unbond",
 		Short: "begin or complete unbonding shares from a validator",
@@ -343,7 +343,7 @@ func GetCmdUnbond(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdBeginUnbonding implements the begin unbonding validator command.
-func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdBeginUnbonding(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "begin",
 		Short: "begin unbonding",
@@ -390,7 +390,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdCompleteUnbonding implements the complete unbonding validator command.
-func GetCmdCompleteUnbonding(cdc *wire.Codec) *cobra.Command {
+func GetCmdCompleteUnbonding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "complete",
 		Short: "complete unbonding",

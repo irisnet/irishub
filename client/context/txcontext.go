@@ -3,7 +3,7 @@ package context
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
@@ -61,7 +61,7 @@ func (baseTx BaseTx) Validate(cliCtx CLIContext) error {
 
 // TxContext implements a transaction context created in SDK modules.
 type TxContext struct {
-	Codec         *wire.Codec
+	Codec         *codec.Codec
 	cliCtx        CLIContext
 	AccountNumber int64
 	Sequence      int64
@@ -91,7 +91,7 @@ func NewTxContextFromCLI() TxContext {
 	}
 }
 
-func NewTxContextFromBaseTx(cliCtx CLIContext, cdc *wire.Codec, baseTx BaseTx) (TxContext, error) {
+func NewTxContextFromBaseTx(cliCtx CLIContext, cdc *codec.Codec, baseTx BaseTx) (TxContext, error) {
 	err := baseTx.Validate(cliCtx)
 	if err != nil {
 		return TxContext{}, err
@@ -109,7 +109,7 @@ func NewTxContextFromBaseTx(cliCtx CLIContext, cdc *wire.Codec, baseTx BaseTx) (
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (txCtx TxContext) WithCodec(cdc *wire.Codec) TxContext {
+func (txCtx TxContext) WithCodec(cdc *codec.Codec) TxContext {
 	txCtx.Codec = cdc
 	return txCtx
 }

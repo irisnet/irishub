@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
@@ -15,7 +15,7 @@ import (
 	"os"
 )
 
-func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "info",
 		Short: "query the information of upgrade module",
@@ -44,7 +44,7 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(version, proposalID, height)
 
-			output, err := wire.MarshalJSONIndent(cdc, upgradeInfoOutput)
+			output, err := codec.MarshalJSONIndent(cdc, upgradeInfoOutput)
 			if err != nil {
 				return err
 			}
@@ -57,7 +57,7 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // Command to Get a Switch Information
-func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQuerySwitch(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-switch",
 		Short: "query switch details",
@@ -83,7 +83,7 @@ func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			var switchMsg upgrade.MsgSwitch
 			cdc.MustUnmarshalBinary(res, &switchMsg)
-			output, err := wire.MarshalJSONIndent(cdc, switchMsg)
+			output, err := codec.MarshalJSONIndent(cdc, switchMsg)
 			if err != nil {
 				return err
 			}

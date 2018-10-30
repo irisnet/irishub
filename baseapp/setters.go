@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/types"
+	qr "github.com/cosmos/cosmos-sdk/baseapp"
 )
 
 // nolint - Setter functions
@@ -87,6 +88,11 @@ func (app *BaseApp) Router() Router {
 	//}
 	return app.router
 }
+
+func (app *BaseApp) QueryRouter() qr.QueryRouter {
+	return app.queryRouter
+}
+
 func (app *BaseApp) Seal()          { app.sealed = true }
 func (app *BaseApp) IsSealed() bool { return app.sealed }
 func (app *BaseApp) enforceSeal() {
