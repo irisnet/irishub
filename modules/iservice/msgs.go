@@ -11,6 +11,7 @@ const (
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
+	maxTagsNum    = 5
 )
 
 var _ sdk.Msg = MsgSvcDef{}
@@ -39,9 +40,9 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 	}
 }
 
-func (msg MsgSvcDef) Type() string {
-	return MsgType
-}
+
+func (msg MsgSvcDef) Route() string { return MsgType }
+func (msg MsgSvcDef) Type() string {return "iservice definition"}
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -52,11 +53,14 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 }
 
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
+	if len(msg.ChainId) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
 	if len(msg.Name) == 0 {
 		return ErrInvalidServiceName(DefaultCodespace)
 	}
-	if len(msg.ChainId) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+	if valid, err := validateTags(msg.Tags); !valid {
+		return err
 	}
 	if len(msg.Author) == 0 {
 		return ErrInvalidAuthor(DefaultCodespace)
@@ -66,11 +70,11 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	}
 
 	if len(msg.IDLContent) == 0 {
-		return ErrInvalidIDL(DefaultCodespace)
+		return ErrInvalidIDL(DefaultCodespace, "content is empty")
 	}
 	methods, err := protoidl.GetMethods(msg.IDLContent)
 	if err != nil {
-		return ErrInvalidIDL(DefaultCodespace)
+		return ErrInvalidIDL(DefaultCodespace, err.Error())
 	}
 	if valid, err := validateMethods(methods); !valid {
 		return err
@@ -98,6 +102,22 @@ func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
 			_, err := OutputCachedEnumFromString(method.Attributes[outputCached])
 			if err != nil {
 				return false, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
+			}
+		}
+	}
+	return true, nil
+}
+
+func validateTags(tags []string) (bool, sdk.Error) {
+	if len(tags) > maxTagsNum {
+		return false, ErrMoreTags(DefaultCodespace)
+	}
+	if len(tags) > 0 {
+		for i, tag := range tags {
+			for _, tag1 := range tags[i+1:] {
+				if tag == tag1 {
+					return false, ErrDuplicateTags(DefaultCodespace)
+				}
 			}
 		}
 	}
