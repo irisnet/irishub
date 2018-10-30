@@ -2,8 +2,8 @@ package init
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/app"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,12 +20,7 @@ import (
 	"path/filepath"
 )
 
-const (
-	defaultAmount                  = "100steak"
-	defaultCommissionRate          = "0.1"
-	defaultCommissionMaxRate       = "0.2"
-	defaultCommissionMaxChangeRate = "0.01"
-)
+
 
 // GenTxCmd builds the gaiad gentx command.
 // nolint: errcheck
@@ -42,7 +37,7 @@ following delegation and commission default parameters:
 	commission rate:             %s
 	commission max rate:         %s
 	commission max change rate:  %s
-`, defaultAmount, defaultCommissionRate, defaultCommissionMaxRate, defaultCommissionMaxChangeRate),
+`, app.FreeFermionVal.String(),app.DefaultCommissionRate, app.DefaultCommissionMaxRate, app.DefaultCommissionMaxChangeRate),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			config := ctx.Config
@@ -95,10 +90,10 @@ func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip string, val
 	viper.Set(cli.FlagNodeID, nodeID)                              // --node-id
 	viper.Set(cli.FlagIP, ip)                                      // --ip
 	viper.Set(cli.FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey)) // --pubkey
-	viper.Set(cli.FlagAmount, defaultAmount)                       // --amount
-	viper.Set(cli.FlagCommissionRate, defaultCommissionRate)
-	viper.Set(cli.FlagCommissionMaxRate, defaultCommissionMaxRate)
-	viper.Set(cli.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
+	viper.Set(cli.FlagAmount, app.FreeFermionVal.String())                       // --amount
+	viper.Set(cli.FlagCommissionRate, app.DefaultCommissionRate)
+	viper.Set(cli.FlagCommissionMaxRate, app.DefaultCommissionMaxRate)
+	viper.Set(cli.FlagCommissionMaxChangeRate, app.DefaultCommissionMaxChangeRate)
 	viper.Set(cli.FlagGenesisFormat, true)     // --genesis-format
 	viper.Set(cli.FlagMoniker, config.Moniker) // --moniker
 	if config.Moniker == "" {

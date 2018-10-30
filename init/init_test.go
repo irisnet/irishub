@@ -2,8 +2,8 @@ package init
 
 import (
 	"bytes"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/libs/cli"
 	"io"
 	"io/ioutil"

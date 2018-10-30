@@ -32,8 +32,7 @@ type DepositProcedure struct {
 
 type DepositProcedureParam struct {
 	Value   DepositProcedure
-	psetter params.Setter
-	pgetter params.Getter
+	paramSpace
 }
 
 func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -214,9 +213,9 @@ var _ iparam.GovParameter = (*TallyingProcedureParam)(nil)
 
 // Procedure around Tallying votes in governance
 type TallyingProcedure struct {
-	Threshold         sdk.Rat `json:"threshold"`          //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
-	Veto              sdk.Rat `json:"veto"`               //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
-	GovernancePenalty sdk.Rat `json:"governance_penalty"` //  Penalty if validator does not vote
+	Threshold         sdk.Dec `json:"threshold"`          //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
+	Veto              sdk.Dec `json:"veto"`               //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
+	GovernancePenalty sdk.Dec `json:"governance_penalty"` //  Penalty if validator does not vote
 }
 
 type TallyingProcedureParam struct {
@@ -235,9 +234,9 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 		param.Value = value
 	} else {
 		param.Value = TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
+			Threshold:         sdk.NewDecWithPrec(5, 1),
+			Veto:              sdk.NewDecWithPrec(334, 3),
+			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
 		}
 	}
 }

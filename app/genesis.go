@@ -29,14 +29,18 @@ var (
 	Denom             = "iris"
 	feeAmt            = int64(100)
 	IrisCt            = types.NewDefaultCoinType(Denom)
-	freeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
-	freeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
+	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
+	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
 )
 
 const (
 	defaultUnbondingTime time.Duration = 60 * 10 * time.Second
 	// DefaultKeyPass contains the default key password for genesis transactions
 	DefaultKeyPass = "1234567890"
+
+	DefaultCommissionRate          = "0.1"
+	DefaultCommissionMaxRate       = "0.2"
+	DefaultCommissionMaxChangeRate = "0.01"
 )
 
 // State to Unmarshal
@@ -129,8 +133,8 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		msg := msgs[0].(stake.MsgCreateValidator)
 
 		// create the genesis account, give'm few iris token and a buncha token with there name
-		genaccs[i] = genesisAccountFromMsgCreateValidator(msg, freeFermionAcc.Amount)
-		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(freeFermionAcc.Amount)) // increase the supply
+		genaccs[i] = genesisAccountFromMsgCreateValidator(msg, FreeFermionAcc.Amount)
+		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(FreeFermionAcc.Amount)) // increase the supply
 	}
 
 	// create the final app state
@@ -245,7 +249,7 @@ func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
 		msg := msgs[0].(stake.MsgCreateValidator)
 		validators = append(validators, tmtypes.GenesisValidator{
 			PubKey: msg.PubKey,
-			Power:  freeFermionVal.Amount.Int64(),
+			Power:  FreeFermionVal.Amount.Int64(),
 			Name:   msg.Description.Moniker,
 		})
 
@@ -265,7 +269,7 @@ func NewDefaultGenesisAccount(addr sdk.AccAddress) GenesisAccount {
 	accAuth := auth.NewBaseAccountWithAddress(addr)
 	accAuth.Coins = []sdk.Coin{
 		{"fooToken", sdk.NewInt(1000)},
-		freeFermionAcc,
+		FreeFermionAcc,
 	}
 	return NewGenesisAccount(&accAuth)
 }

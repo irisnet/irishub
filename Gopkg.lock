@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:53159e3a9350fb41be45b98443ebc46944a59b598bee25328d44c835152855c3"
+  digest = "1:bebac7d9ed1e0526f86e7ce978272240ce8c609c07cc97221250929414ae9af6"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -80,6 +80,7 @@
     "client/rpc",
     "client/tx",
     "client/utils",
+    "cmd/gaia/app",
     "codec",
     "crypto",
     "crypto/keys",
@@ -87,6 +88,7 @@
     "crypto/keys/mintkey",
     "server",
     "server/config",
+    "server/mock",
     "store",
     "tests",
     "types",
@@ -108,6 +110,7 @@
     "x/params/subspace",
     "x/slashing",
     "x/stake",
+    "x/stake/client/cli",
     "x/stake/client/rest",
     "x/stake/keeper",
     "x/stake/querier",
@@ -905,16 +908,19 @@
     "github.com/cosmos/cosmos-sdk/client/rpc",
     "github.com/cosmos/cosmos-sdk/client/tx",
     "github.com/cosmos/cosmos-sdk/client/utils",
+    "github.com/cosmos/cosmos-sdk/cmd/gaia/app",
     "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/cosmos-sdk/crypto",
     "github.com/cosmos/cosmos-sdk/crypto/keys",
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/config",
+    "github.com/cosmos/cosmos-sdk/server/mock",
     "github.com/cosmos/cosmos-sdk/store",
     "github.com/cosmos/cosmos-sdk/tests",
     "github.com/cosmos/cosmos-sdk/types",
     "github.com/cosmos/cosmos-sdk/x/auth",
     "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
+    "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/distribution",
     "github.com/cosmos/cosmos-sdk/x/gov",
@@ -924,6 +930,7 @@
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/stake",
+    "github.com/cosmos/cosmos-sdk/x/stake/client/cli",
     "github.com/cosmos/cosmos-sdk/x/stake/client/rest",
     "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
@@ -951,6 +958,7 @@
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
     "github.com/tendermint/tendermint/blockchain",
+    "github.com/tendermint/tendermint/cmd/tendermint/commands",
     "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",

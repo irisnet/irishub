@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	nativeFeeTokenKey          = []byte("feeToken/native")
-	nativeGasPriceThresholdKey = []byte("feeToken/gasPriceThreshold")
+	nativeFeeTokenKey          = []byte("feeTokenNative")
+	nativeGasPriceThresholdKey = []byte("feeTokenGasPriceThreshold")
 	//	FeeExchangeRatePrefix = "feeToken/exchangeRate/"	//  key = gov/feeToken/exchangeRate/<denomination>, rate = BigInt(value)/10^9
 	//	RatePrecision = int64(1000000000) //10^9
 )

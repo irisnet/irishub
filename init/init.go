@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/app"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/cosmos/cosmos-sdk/x/stake"
@@ -222,13 +222,13 @@ func initWithConfig(cdc *codec.Codec, config *cfg.Config, initCfg initConfig) (
 		msg := stake.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			initCfg.ValPubKey,
-			sdk.NewInt64Coin("steak", 100),
+			sdk.NewCoin("iris-atto",sdk.NewIntWithDecimal(1,20)),
 			stake.NewDescription(config.Moniker, "", "", ""),
 			stake.NewCommissionMsg(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
 		)
 		txBldr := authtx.NewTxBuilderFromCLI().WithCodec(cdc).WithMemo(memo).WithChainID(chainID)
 		signedTx, err = txBldr.SignStdTx(
-			initCfg.Name, keyPass, auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo), false,
+			initCfg.Name, keyPass, auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{Amount:sdk.Coins{sdk.NewInt64Coin("iris-atto",4000000000000000)},Gas:200000}, []auth.StdSignature{}, memo), false,
 		)
 		if err != nil {
 			return
@@ -241,7 +241,7 @@ func initWithConfig(cdc *codec.Codec, config *cfg.Config, initCfg initConfig) (
 	}
 
 	cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
-	appState, err = app.GaiaAppGenStateJSON(cdc, genTxs)
+	appState, err = app.IrisAppGenStateJSON(cdc, genTxs)
 	if err != nil {
 		return
 	}
