@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"

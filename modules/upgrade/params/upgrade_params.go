@@ -3,7 +3,7 @@ package upgradeparams
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 )
 
 var CurrentUpgradeProposalIdParameter CurrentUpgradeProposalIdParam
@@ -24,7 +24,7 @@ func (param *CurrentUpgradeProposalIdParam) SetReadWriter(paramSpace params.Subs
 }
 
 func (param *CurrentUpgradeProposalIdParam) GetStoreKey() []byte {
-	return []byte("upgrade/proposalId")
+	return []byte("upgrade0proposalId")
 }
 
 func (param *CurrentUpgradeProposalIdParam) SaveValue(ctx sdk.Context) {
@@ -32,6 +32,9 @@ func (param *CurrentUpgradeProposalIdParam) SaveValue(ctx sdk.Context) {
 }
 
 func (param *CurrentUpgradeProposalIdParam) LoadValue(ctx sdk.Context) bool {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
+		return false
+	}
 	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
@@ -54,7 +57,7 @@ func (param *ProposalAcceptHeightParam) SetReadWriter(paramSpace params.Subspace
 }
 
 func (param *ProposalAcceptHeightParam) GetStoreKey() []byte {
-	return []byte("upgrade/proposalAcceptHeight")
+	return []byte("upgrade0proposalAcceptHeight")
 }
 
 func (param *ProposalAcceptHeightParam) SaveValue(ctx sdk.Context) {
@@ -62,6 +65,9 @@ func (param *ProposalAcceptHeightParam) SaveValue(ctx sdk.Context) {
 }
 
 func (param *ProposalAcceptHeightParam) LoadValue(ctx sdk.Context) bool {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
+		return false
+	}
 	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
@@ -84,7 +90,7 @@ func (param *SwitchPeriodParam) SetReadWriter(paramSpace params.Subspace) {
 }
 
 func (param *SwitchPeriodParam) GetStoreKey() []byte {
-	return []byte("upgrade/switchperiod")
+	return []byte("upgrade0switchperiod")
 }
 
 func (param *SwitchPeriodParam) SaveValue(ctx sdk.Context) {
@@ -92,6 +98,9 @@ func (param *SwitchPeriodParam) SaveValue(ctx sdk.Context) {
 }
 
 func (param *SwitchPeriodParam) LoadValue(ctx sdk.Context) bool {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
+		return false
+	}
 	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }

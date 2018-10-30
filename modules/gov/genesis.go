@@ -3,7 +3,7 @@ package gov
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"fmt"
 	"github.com/irisnet/irishub/types"
 )

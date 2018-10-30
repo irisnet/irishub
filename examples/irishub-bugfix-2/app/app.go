@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/irisnet/irishub/modules/iservice"

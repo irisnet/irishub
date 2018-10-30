@@ -9,7 +9,7 @@ import (
 	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/irisnet/irishub/app"

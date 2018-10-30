@@ -2,7 +2,7 @@ package gov
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"path"

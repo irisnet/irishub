@@ -31,14 +31,17 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 	CurrentProposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 
 	if proposalID != CurrentProposalID {
-
 		return NewError(DefaultCodespace, CodeNotCurrentProposal, "It isn't the current SoftwareUpgradeProposal").Result()
 
 	}
 
 	voter := msgSwitch.Voter
+	valAcc, err := sdk.ValAddressFromBech32(voter.String())
+	if err != nil {
+		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
+	}
 
-	if _, ok := k.sk.GetValidator(ctx, voter); !ok {
+	if _, ok := k.sk.GetValidator(ctx, valAcc); !ok {
 		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
 	}
 

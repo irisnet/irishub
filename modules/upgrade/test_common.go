@@ -44,7 +44,7 @@ func newPubKey(pk string) (res crypto.PubKey) {
 }
 
 func createTestCodec() *codec.Codec {
-	cdc := codec.NewCodec()
+	cdc := codec.New()
 	sdk.RegisterCodec(cdc)
 	RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
@@ -60,6 +60,8 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	keyUpdate := sdk.NewKVStoreKey("update")
 	keyParams := sdk.NewKVStoreKey("params")
 	keyIparams := sdk.NewKVStoreKey("iparams")
+	tkeyStake := sdk.NewTransientStoreKey("transient_stake")
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
@@ -73,12 +75,20 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	require.Nil(t, err)
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewTMLogger(os.Stdout))
 	cdc := createTestCodec()
-	accountMapper := auth.NewAccountMapper(cdc, keyAcc, auth.ProtoBaseAccount)
-	ck := bank.NewKeeper(accountMapper)
-	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
+	accountMapper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
+	ck := bank.NewBaseKeeper(accountMapper)
 
+	paramsKeeper := params.NewKeeper(
+		cdc,
+		keyParams, tkeyParams,
+	)
+	sk := stake.NewKeeper(
+		cdc,
+		keyStake, tkeyStake,
+		ck, paramsKeeper.Subspace(stake.DefaultParamspace),
+		stake.DefaultCodespace,
+	)
 	keeper := NewKeeper(cdc, keyUpdate, sk)
-	paramKeeper := params.NewKeeper(codec.NewCodec(), keyParams)
 
-	return ctx, keeper, paramKeeper
+	return ctx, keeper, paramsKeeper
 }
