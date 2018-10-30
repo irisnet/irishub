@@ -5,7 +5,7 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
-var Threshold = sdk.NewRat(95, 100)
+var Threshold = sdk.NewDecWithPrec(95, 2)
 
 func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
@@ -13,19 +13,21 @@ func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
 	if proposalID != -1 {
 
-		totalVotingPower := sdk.ZeroRat()
-		switchVotingPower := sdk.ZeroRat()
+		totalVotingPower := sdk.ZeroDec()
+		switchVotingPower := sdk.ZeroDec()
 		for _, validator := range k.sk.GetAllValidators(ctx) {
 			totalVotingPower = totalVotingPower.Add(validator.GetPower())
-			if _, ok := k.GetSwitch(ctx, proposalID, validator.Owner); ok {
-				switchVotingPower = switchVotingPower.Add(validator.GetPower())
+			acc, err := sdk.AccAddressFromBech32(validator.OperatorAddr.String())
+			if err == nil {
+				if _, ok := k.GetSwitch(ctx, proposalID, acc); ok {
+					switchVotingPower = switchVotingPower.Add(validator.GetPower())
+				}
 			}
 		}
 		// If more than 95% of validator update , do switch
 		if switchVotingPower.Quo(totalVotingPower).GT(Threshold) {
 			return true
 		}
-
 	}
 	return false
 }

@@ -18,7 +18,7 @@ import (
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
 	sdkParams "github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
