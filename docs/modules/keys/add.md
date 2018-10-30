@@ -6,7 +6,7 @@ Create a new key, or import from seed
 
 ## Usage
 
-```shell
+```
 iriscli keys add <name> [flags]
 ```
 
@@ -33,14 +33,14 @@ iriscli keys add MyKey
 
 You'll be asked to enter a password for your key, note: password must be at least 8 characters.
 
-```shell
+```txt
 Enter a passphrase for your key:
 Repeat the passphrase:
 ```
 
 After that, you're done with creating a new key, but remember to backup your seed phrase, it is the only way to recover your account if you ever forget your password or lose your key.
 
-```shell
+```txt
 NAME:	TYPE:	ADDRESS:						PUBKEY:
 MyKey	local	faa1mmsm487rqkgktl2qgrjad0z3yaf9n8t5pkp33m	fap1addwnpepq2g0u7cnxp5ew0yhqep8j4rth5ugq8ky7gjmunk8tkpze95ss23ak4svkjq
 **Important** write this seed phrase in a safe place.
@@ -55,13 +55,13 @@ The 24 words above is a seed phrase just for example, **DO NOT** use it in produ
 
 If you forget your password or lose your key, or you wanna use your key in another place, you can recover your key by your seed phrase.
 
-```shell
+```txt
 iriscli keys add MyKey --recover
 ```
 
 You'll be asked to enter a new password for your key, and enter the seed phrase. Then you get your key back.
 
-```shell
+```txt
 Enter a passphrase for your key:
 Repeat the passphrase:
 Enter your recovery seed phrase:
