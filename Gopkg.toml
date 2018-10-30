@@ -76,6 +76,11 @@
   name = "github.com/libp2p/go-libp2p-pubsub"
   version = "=v0.9.36"
 
+[[override]]
+  name = "golang.org/x/crypto"
+  source = "https://github.com/tendermint/crypto"
+  revision = "3764759f34a542a3aef74d6b02e35be7ab893bba"
+
 [[constraint]]
   name = "github.com/prometheus/client_golang"
   revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"

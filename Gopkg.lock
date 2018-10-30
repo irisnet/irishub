@@ -269,13 +269,12 @@
   revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
 
 [[projects]]
-  digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
+  digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -771,8 +770,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:fe7b5d0210eee1aa79c7a769d78b0ae24a3fbd0f9c85612d78bc2e6c0d9c65f8"
+  digest = "1:6f9d70587d10ff0eece3990c74f44afab85a40692ae5a3fa824b7088291a65c5"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
@@ -794,7 +792,8 @@
     "sha3",
   ]
   pruneopts = "UT"
-  revision = "b078efbc8099b041569edb8c6ab625cd430e3fce"
+  revision = "3764759f34a542a3aef74d6b02e35be7ab893bba"
+  source = "https://github.com/tendermint/crypto"
 
 [[projects]]
   digest = "1:d36f55a999540d29b6ea3c2ea29d71c76b1d9853fdcd3e5c5cb4836f2ba118f1"

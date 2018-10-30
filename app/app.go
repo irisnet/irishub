@@ -16,8 +16,7 @@ import (
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/irisnet/irishub/modules/iparam"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
@@ -174,12 +173,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.cdc,
 		app.keyUpgrade, app.stakeKeeper,
 	)
+
 	app.govKeeper = gov.NewKeeper(
 		app.cdc,
 		app.keyGov,
-		app.bankKeeper, app.stakeKeeper,
+		app.paramsKeeper, app.paramsKeeper.Subspace(gov.DefaultParamspace), app.bankKeeper, app.stakeKeeper,
 		app.RegisterCodespace(gov.DefaultCodespace),
 	)
+
 	app.recordKeeper = record.NewKeeper(
 		app.cdc,
 		app.keyRecord,
@@ -210,7 +211,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.QueryRouter().
 		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
 
-	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
+	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainer)
@@ -235,17 +236,21 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
 
-	iparam.SetParamReadWriter(app.paramsKeeper.Setter(),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
+	iparam.SetParamReadWriter(app.paramsKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(),int64((0)),
+		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(),int64(0),
+        upgradeparams.SwitchPeriodParameter.GetStoreKey(),int64(0),
+	)),
+		//&govparams.DepositProcedureParameter,
+		//&govparams.VotingProcedureParameter,
+		//&govparams.TallyingProcedureParameter,
 		&upgradeparams.CurrentUpgradeProposalIdParameter,
 		&upgradeparams.ProposalAcceptHeightParameter,
 		&upgradeparams.SwitchPeriodParameter)
 
-	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+	//iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+	//	&govparams.VotingProcedureParameter,
+	//	&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -319,7 +324,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	bam.InitGenesis(ctx, app.paramsKeeper.Setter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.feeManager, feeTokenGensisConfig)
 
 	// load the address to pubkey map
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)

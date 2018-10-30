@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	nativeFeeTokenKey = "feeToken/native"
-	nativeGasPriceThresholdKey  = "feeToken/gasPriceThreshold"
-//	FeeExchangeRatePrefix = "feeToken/exchangeRate/"	//  key = gov/feeToken/exchangeRate/<denomination>, rate = BigInt(value)/10^9
-//	RatePrecision = int64(1000000000) //10^9
+	nativeFeeTokenKey = []byte("feeToken/native")
+	nativeGasPriceThresholdKey  = []byte("feeToken/gasPriceThreshold")
+	//	FeeExchangeRatePrefix = "feeToken/exchangeRate/"	//  key = gov/feeToken/exchangeRate/<denomination>, rate = BigInt(value)/10^9
+	//	RatePrecision = int64(1000000000) //10^9
 )
 
 // NewFeePreprocessHandler creates a fee token preprocess handler
@@ -97,22 +97,30 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 	}
 }
 
-// FeeManager do fee tokens preprocess according to fee token configuration
-type FeeManager struct {
-	ps params.Setter
+
+// Type declaration for parameters
+func ParamTypeTable() params.TypeTable {
+	return params.NewTypeTable(
+		nativeFeeTokenKey,"",
+		nativeGasPriceThresholdKey,"",
+	)
 }
 
-func NewFeeManager(ps params.Setter) FeeManager {
+// FeeManager do fee tokens preprocess according to fee token configuration
+type FeeManager struct {
+	// The reference to the Paramstore to get and set gov specific params
+	paramSpace params.Subspace
+}
+
+func NewFeeManager(paramSpace params.Subspace) FeeManager {
 	return FeeManager{
-		ps:ps,
+		paramSpace:paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 }
 
 func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
-	nativeFeeToken, err := fck.ps.GetString(ctx, nativeFeeTokenKey)
-	if err != nil {
-		panic(err)
-	}
+	var nativeFeeToken string
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey,nativeFeeToken)
 	for _,coin := range coins {
 		if coin.Denom == nativeFeeToken {
 			return coin
@@ -125,14 +133,12 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 	if gasLimit <= 0 {
 		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
 	}
-	nativeFeeToken, err := fck.ps.GetString(ctx, nativeFeeTokenKey)
-	if err != nil {
-		panic(err)
-	}
-	nativeGasPriceThreshold, err := fck.ps.GetString(ctx, nativeGasPriceThresholdKey)
-	if err != nil {
-		panic(err)
-	}
+	var nativeFeeToken string
+	fck.paramSpace.Get(ctx, nativeFeeTokenKey,nativeFeeToken)
+
+	var nativeGasPriceThreshold string
+	fck.paramSpace.Get(ctx, nativeGasPriceThresholdKey,nativeGasPriceThreshold)
+
 	threshold, ok := sdk.NewIntFromString(nativeGasPriceThreshold)
 	if !ok {
 		panic(errors.New("failed to parse gas price from string"))
@@ -175,7 +181,7 @@ type FeeGenesisStateConfig struct {
 	GasPriceThreshold int64 `json:"gas_price_threshold"`
 }
 
-func InitGenesis(ctx sdk.Context, ps params.Setter, data FeeGenesisStateConfig) {
-	ps.SetString(ctx, nativeFeeTokenKey, data.FeeTokenNative)
-	ps.SetString(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
+func InitGenesis(ctx sdk.Context, ps FeeManager, data FeeGenesisStateConfig) {
+	ps.paramSpace.Set(ctx, nativeFeeTokenKey, data.FeeTokenNative)
+	ps.paramSpace.Set(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
 }

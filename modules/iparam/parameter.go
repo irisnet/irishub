@@ -9,9 +9,9 @@ import (
 type Parameter interface {
 	InitGenesis(interface{})
 
-	GetStoreKey() string
+	GetStoreKey() []byte
 
-	SetReadWriter(setter params.Setter)
+	SetReadWriter(paramSpace params.Subspace)
 
 	SaveValue(ctx sdk.Context)
 
