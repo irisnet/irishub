@@ -45,7 +45,8 @@ func NewMsgSubmitRecord(description string,
 }
 
 // Implements Msg.
-func (msg MsgSubmitRecord) Type() string { return MsgType }
+func (msg MsgSubmitRecord) Route() string { return MsgType }
+func (msg MsgSubmitRecord) Type() string  { return "submit_record" }
 
 // Implements Msg.
 func (msg MsgSubmitRecord) ValidateBasic() sdk.Error {

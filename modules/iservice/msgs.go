@@ -40,9 +40,9 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 	}
 }
 
-func (msg MsgSvcDef) Type() string {
-	return MsgType
-}
+
+func (msg MsgSvcDef) Route() string { return MsgType }
+func (msg MsgSvcDef) Type() string {return "iservice definition"}
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
