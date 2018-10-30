@@ -41,7 +41,7 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 
 	serviceName := "testService"
 
-	serviceQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli iservice definition --name=%s %v", serviceName, flags), "")
+	serviceQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli iservice definition --name=%s --def-chain-id=%s %v", serviceName, chainID, flags), "")
 	require.Equal(t, "", serviceQuery)
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -74,7 +74,7 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 		t.Error("Test Failed: (99, 100) expected, recieved: {}", num)
 	}
 
-	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli iservice definition --name=%s %v", serviceName, flags))
+	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli iservice definition --name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
 	require.Equal(t, serviceName, serviceDef.Name)
 
 	// method test

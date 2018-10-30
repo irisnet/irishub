@@ -40,7 +40,7 @@ Committed at block 1040 (tx hash: 58FD40B739F592F5BD9B904A661B8D7B19C63FA9, resp
 }
 
 # Query service definition
-iriscli iservice definition --name=test-service --chain-id=service-test
+iriscli iservice definition --def-chain-id=service-test --name=test-service --chain-id=service-test
 
 ```
 
@@ -59,10 +59,10 @@ iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name
 * `--file`  Idl-content can be replaced by files,if the item is not empty.
 
 ```
-iriscli iservice definition --name=test-service --chain-id=service-test
+iriscli iservice definition --def-chain-id=service-test --name=test-service --chain-id=service-test
 ```
 
-* `--chain-id`  The ID of the blockchain defined of the iService
+* `--def-chain-id`  The ID of the blockchain defined of the iService
 * `--name`  The name of iService
 
 ## IDL extension
