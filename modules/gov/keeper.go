@@ -51,6 +51,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,ck bank.Keeper, ds sdk.Delegat
 // =====================================================
 // Proposals
 
+////////////////////  iris begin  ///////////////////////////
 func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
 	switch proposalType {
 	case ProposalTypeText:
@@ -62,6 +63,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	}
 	return nil
 }
+////////////////////  iris end  /////////////////////////////
+
 
 // =====================================================
 // Proposals
@@ -87,6 +90,7 @@ func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description 
 	return proposal
 }
 
+////////////////////  iris begin  ///////////////////////////
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
@@ -136,6 +140,8 @@ func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, descripti
 	keeper.InactiveProposalQueuePush(ctx, proposal)
 	return proposal
 }
+////////////////////  iris end  /////////////////////////////
+
 
 // Get Proposal from store by ProposalID
 func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID int64) Proposal {
@@ -362,7 +368,9 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID int64, depositerAddr
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
+	////////////////////  iris begin  ///////////////////////////
 	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsGTE(govparams.GetDepositProcedure(ctx).MinDeposit) {
+	////////////////////  iris end  /////////////////////////////
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}

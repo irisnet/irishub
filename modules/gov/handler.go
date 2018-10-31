@@ -28,26 +28,30 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
-
+	////////////////////  iris begin  ///////////////////////////
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+	////////////////////  iris end  /////////////////////////////
+
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
-
+	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatInt(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
 	if msg.ProposalType == ProposalTypeParameterChange {
 		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
 	}
-
+	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
+		////////////////////  iris begin  ///////////////////////////
 		tags.Param, paramBytes,
+		////////////////////  iris end  /////////////////////////////
 	)
 
 	if votingStarted {
@@ -67,7 +71,10 @@ func handleMsgDeposit(ctx sdk.Context, keeper Keeper, msg MsgDeposit) sdk.Result
 		return err.Result()
 	}
 
+	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatInt(msg.ProposalID, 10))
+	////////////////////  iris end  /////////////////////////////
+
 
 	// TODO: Add tag for if voting period started
 	resTags := sdk.NewTags(
@@ -92,7 +99,9 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 		return err.Result()
 	}
 
+	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatInt(msg.ProposalID, 10))
+	////////////////////  iris end  /////////////////////////////
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionVote,
@@ -117,8 +126,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		if inactiveProposal.GetStatus() != StatusDepositPeriod {
 			continue
 		}
-
+		////////////////////  iris begin  ///////////////////////////
 		proposalIDBytes := []byte(strconv.FormatInt(inactiveProposal.GetProposalID(), 10))
+		////////////////////  iris end  /////////////////////////////
 		keeper.DeleteProposal(ctx, inactiveProposal)
 		resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags.AppendTag(tags.ProposalID, proposalIDBytes)
@@ -127,7 +137,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %v iris-atto (had only %v iris-atto); deleted",
 				inactiveProposal.GetProposalID(),
 				inactiveProposal.GetTitle(),
+				////////////////////  iris begin  ///////////////////////////
 				govparams.GetDepositProcedure(ctx).MinDeposit.AmountOf("iris-atto"),
+				////////////////////  iris end  /////////////////////////////
 				inactiveProposal.GetTotalDeposit().AmountOf("iris-atto"),
 			),
 		)
@@ -138,18 +150,25 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		activeProposal := keeper.ActiveProposalQueuePop(ctx)
 
 		proposalStartTime := activeProposal.GetVotingStartTime()
+		////////////////////  iris begin  ///////////////////////////
 		votingPeriod := govparams.GetVotingProcedure(ctx).VotingPeriod
+		////////////////////  iris end  /////////////////////////////
 		if ctx.BlockHeader().Time.Before(proposalStartTime.Add(votingPeriod)) {
 			continue
 		}
 
 		passes, tallyResults := tally(ctx, keeper, activeProposal)
+		////////////////////  iris begin  ///////////////////////////
 		proposalIDBytes := []byte(strconv.FormatInt(activeProposal.GetProposalID(), 10))
+		////////////////////  iris end  /////////////////////////////
 		var action []byte
 		if passes {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
+			////////////////////  iris begin  ///////////////////////////
+			activeProposal.Execute(ctx, keeper)
+			////////////////////  iris end  /////////////////////////////
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
@@ -168,7 +187,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	return resTags
 }
 func shouldPopInactiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
+	////////////////////  iris begin  ///////////////////////////
 	depositProcedure := govparams.GetDepositProcedure(ctx)
+	////////////////////  iris end  /////////////////////////////
 	peekProposal := keeper.InactiveProposalQueuePeek(ctx)
 
 	if peekProposal == nil {
@@ -182,7 +203,9 @@ func shouldPopInactiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
 }
 
 func shouldPopActiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
+	////////////////////  iris begin  ///////////////////////////
 	votingProcedure := govparams.GetVotingProcedure(ctx)
+	////////////////////  iris end  /////////////////////////////
 	peekProposal := keeper.ActiveProposalQueuePeek(ctx)
 
 	if peekProposal == nil {

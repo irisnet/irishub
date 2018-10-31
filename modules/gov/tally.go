@@ -85,7 +85,9 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 		totalVotingPower = totalVotingPower.Add(votingPower)
 	}
 
+	////////////////////  iris begin  ///////////////////////////
 	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
+	////////////////////  iris end  /////////////////////////////
 
 	tallyResults = TallyResult{
 		Yes:        results[OptionYes],
