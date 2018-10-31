@@ -5,8 +5,8 @@ import (
 	"github.com/irisnet/irishub/tools/protoidl"
 )
 
-// name to idetify transaction types
 const (
+	// name to idetify transaction types
 	MsgType       = "iservice"
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
@@ -16,27 +16,25 @@ const (
 
 var _ sdk.Msg = MsgSvcDef{}
 
+//______________________________________________________________________
+
+// MsgSvcDef - struct for define a service
 type MsgSvcDef struct {
-	Name              string         `json:"name"`
-	ChainId           string         `json:"chain_id"`
-	Description       string         `json:"description"`
-	Tags              []string       `json:"tags"`
-	Author            sdk.AccAddress `json:"author"`
-	AuthorDescription string         `json:"author_description"`
-	IDLContent        string         `json:"idl_content"`
-	Broadcast         BroadcastEnum  `json:"broadcast"`
+	SvcDef
 }
 
-func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string, broadcast BroadcastEnum) MsgSvcDef {
+func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string, messaging MessagingType) MsgSvcDef {
 	return MsgSvcDef{
-		Name:              name,
-		ChainId:           chainId,
-		Description:       description,
-		Tags:              tags,
-		Author:            author,
-		AuthorDescription: authorDescription,
-		IDLContent:        idlContent,
-		Broadcast:         broadcast,
+		SvcDef{
+			Name:              name,
+			ChainId:           chainId,
+			Description:       description,
+			Tags:              tags,
+			Author:            author,
+			AuthorDescription: authorDescription,
+			IDLContent:        idlContent,
+			Messaging:         messaging,
+		},
 	}
 }
 
@@ -65,8 +63,8 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if len(msg.Author) == 0 {
 		return ErrInvalidAuthor(DefaultCodespace)
 	}
-	if !validBroadcastEnum(msg.Broadcast) {
-		return ErrInvalidBroadcastEnum(DefaultCodespace, msg.Broadcast)
+	if !validMessagingType(msg.Messaging) {
+		return ErrInvalidMessagingType(DefaultCodespace, msg.Messaging)
 	}
 
 	if len(msg.IDLContent) == 0 {
@@ -124,7 +122,7 @@ func validateTags(tags []string) (bool, sdk.Error) {
 	return true, nil
 }
 
-func methodToMethodProperty(method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
+func methodToMethodProperty(index int, method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
 	// set default value
 	opp := NoPrivacy
 	opc := NoCached
@@ -143,10 +141,56 @@ func methodToMethodProperty(method protoidl.Method) (methodProperty MethodProper
 		}
 	}
 	methodProperty = MethodProperty{
+		ID:            index,
 		Name:          method.Name,
 		Description:   method.Attributes[description],
 		OutputPrivacy: opp,
 		OutputCached:  opc,
 	}
 	return
+}
+
+//______________________________________________________________________
+
+// MsgSvcBinding - struct for bind a service
+type MsgSvcBind struct {
+	BindingBasic
+	Prices map[int]sdk.Coin `json:"prices"`
+	Levels map[int]int      `json:"levels"`
+}
+
+func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coin, prices map[int]sdk.Coin, levels map[int]int, expiration int64) MsgSvcBind {
+	return MsgSvcBind{
+		BindingBasic: BindingBasic{
+			DefChainID:  defChainID,
+			DefName:     defName,
+			BindChainID: bindChainID,
+			Provider:    provider,
+			BindingType: bindingType,
+			Deposit:     deposit,
+			Expiration:  expiration,
+		},
+		Prices: prices,
+		Levels: levels,
+	}
+}
+
+func (msg MsgSvcBind) Type() string {
+	return MsgType
+}
+
+func (msg MsgSvcBind) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcBind) ValidateBasic() sdk.Error {
+	return nil
+}
+
+func (msg MsgSvcBind) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
 }

@@ -29,7 +29,7 @@ iris start --home=iris
 
 ```
 # 服务定义
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --broadcast=Broadcast --idl-content=<idl-content> --file=test.proto
+iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 
 # 结果
 Committed at block 1040 (tx hash: 58FD40B739F592F5BD9B904A661B8D7B19C63FA9, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:13601 Tags:[{Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[247 102 151 120 200 0]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -47,14 +47,14 @@ iriscli iservice definition --def-chain-id=service-test --name=test-service --ch
 ## 命令详情
 
 ```
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --broadcast=Broadcast --idl-content=<idl-content> --file=test.proto
+iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 ```
 
 * `--name`  该iService服务的名称
 * `--service-description`  该iService服务的描述
 * `--author-description`  该iService服务创建者的描述. 可选
 * `--tags`  该iService服务的关键字
-* `--broadcast`  此服务消息广播类型{`Broadcast`,`Unicast`}
+* `--messaging`  此服务消息传送类型{`Unicast`,`Multicast`}
 * `--idl-content`  对该iService服务的methods的标准化定义内容
 * `--file`  可使用文件代替idl-content，当该项不为空时，覆盖`idl-content`内容
 

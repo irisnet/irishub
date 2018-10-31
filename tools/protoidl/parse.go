@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+const maxElements = 1000
+
 // validate proto idl text
 func ValidateProto(content string) (bool, error) {
 	reader := strings.NewReader(content)
@@ -23,6 +25,11 @@ func GetMethods(content string) (methods []Method, err error) {
 	parser := proto.NewParser(reader)
 	definition, err := parser.Parse()
 	if err != nil {
+		return methods, err
+	}
+
+	if len(definition.Elements) > maxElements {
+		err = fmt.Errorf("too many elements in idl content, limit to %d", maxElements)
 		return methods, err
 	}
 

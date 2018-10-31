@@ -23,7 +23,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 		Short: "create new service definition",
 		Example: "iriscli iservice define --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--name=<service name> --service-description=<service description> --author-description=<author description> " +
-			"--tags=\"tag1 tag2\" --idl-content=<interface description content> --broadcast=Broadcast",
+			"--tags=\"tag1 tag2\" --messaging=Unicast --idl-content=<interface description content> --file=test.proto",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -47,7 +47,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 				content = string(contentBytes)
 			}
 			fmt.Printf("idl condent: \n%s\n", content)
-			broadcastStr := viper.GetString(FlagBroadcast)
+			broadcastStr := viper.GetString(FlagMessaging)
 			chainId := viper.GetString(client.FlagChainID)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -55,7 +55,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			broadcast, err := iservice.BroadcastEnumFromString(broadcastStr)
+			broadcast, err := iservice.MessagingTypeFromString(broadcastStr)
 			if err != nil {
 				return err
 			}
@@ -70,7 +70,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(FsTags)
 	cmd.Flags().AddFlagSet(FsAuthorDescription)
 	cmd.Flags().AddFlagSet(FsIdlContent)
-	cmd.Flags().AddFlagSet(FsBroadcast)
+	cmd.Flags().AddFlagSet(FsMessaging)
 	cmd.Flags().AddFlagSet(FsFile)
 
 	return cmd

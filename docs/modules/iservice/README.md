@@ -29,7 +29,7 @@ iris start --home=iris
 
 ```
 # Service definition
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --broadcast=Broadcast --idl-content=<idl-content> --file=test.proto
+iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 
 # Result
 Committed at block 1040 (tx hash: 58FD40B739F592F5BD9B904A661B8D7B19C63FA9, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:13601 Tags:[{Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[247 102 151 120 200 0]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -47,14 +47,14 @@ iriscli iservice definition --def-chain-id=service-test --name=test-service --ch
 ## CLI Command Details
 
 ```
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --broadcast=Broadcast --idl-content=<idl-content> --file=test.proto
+iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 ```
 
 * `--name`  The name of iService
 * `--service-description`  The description of this iService
 * `--author-description`  The self-description of the iService creator which is optional
 * `--tags`  The keywords of this iService
-* `--broadcast`  The Broadcast type of this iService{`Broadcast`,`Unicast`}
+* `--messaging`  The messaging type of this iService{`Unicast`,`Multicast`}
 * `--idl-content`  The standardized definition of the methods for this iService
 * `--file`  Idl-content can be replaced by files,if the item is not empty.
 

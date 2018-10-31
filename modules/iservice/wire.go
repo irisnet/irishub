@@ -7,6 +7,7 @@ import (
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSvcDef{}, "iris-hub/iservice/MsgSvcDef", nil)
+	cdc.RegisterConcrete(MsgSvcBind{}, "iris-hub/iservice/MsgSvcBinding", nil)
 }
 
 var msgCdc = codec.New()

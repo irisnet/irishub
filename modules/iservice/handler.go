@@ -10,6 +10,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgSvcDef:
 			return handleMsgSvcDef(ctx, k, msg)
+		case MsgSvcBind:
+			return handleMsgSvcBind(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in staking module").Result()
 		}
@@ -24,6 +26,14 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	err := k.AddMethods(ctx, msg)
 	if err != nil {
 		return err.Result()
+	}
+	return sdk.Result{}
+}
+
+func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
+	_, found := k.GetServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	if found {
+		return ErrSvcBindingExists(k.Codespace(), msg.Provider).Result()
 	}
 	return sdk.Result{}
 }

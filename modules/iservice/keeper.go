@@ -45,13 +45,13 @@ func (k Keeper) AddMethods(ctx sdk.Context, serviceDef MsgSvcDef) sdk.Error {
 		panic(err)
 	}
 	kvStore := ctx.KVStore(k.storeKey)
-	for _, method := range methods {
-		methodProperty, err := methodToMethodProperty(method)
+	for index, method := range methods {
+		methodProperty, err := methodToMethodProperty(index+1, method)
 		if err != nil {
 			return err
 		}
 		methodBytes := k.cdc.MustMarshalBinary(methodProperty)
-		kvStore.Set(GetMethodPropertyKey(serviceDef.ChainId, serviceDef.Name, method.Name), methodBytes)
+		kvStore.Set(GetMethodPropertyKey(serviceDef.ChainId, serviceDef.Name, methodProperty.ID), methodBytes)
 	}
 	return nil
 }
@@ -72,4 +72,27 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (msg
 func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, GetMethodsSubspaceKey(chainId, name))
+}
+
+func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) {
+	kvStore := ctx.KVStore(k.storeKey)
+
+	svcBindingBytes, err := k.cdc.MarshalBinary(svcBinding)
+	if err != nil {
+		panic(err)
+	}
+
+	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
+}
+
+func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (svcBinding SvcBinding, found bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+
+	svcBindingBytes := kvStore.Get(GetServiceBindingKey(defChainID, defName, bindChainID, provider))
+	if svcBindingBytes != nil {
+		var svcBinding SvcBinding
+		k.cdc.MustUnmarshalBinary(svcBindingBytes, &svcBinding)
+		return svcBinding, true
+	}
+	return svcBinding, false
 }

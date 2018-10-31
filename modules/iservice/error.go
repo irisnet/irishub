@@ -16,9 +16,11 @@ const (
 	CodeInvalidChainId           sdk.CodeType = 105
 	CodeInvalidAuthor            sdk.CodeType = 106
 	CodeInvalidMethodName        sdk.CodeType = 107
-	CodeInvalidBroadcastEnum     sdk.CodeType = 108
+	CodeInvalidMessagingType     sdk.CodeType = 108
 	CodeMoreTags                 sdk.CodeType = 109
 	CodeDuplicateTags            sdk.CodeType = 110
+
+	SvcBindingExists            sdk.CodeType = 111
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -43,7 +45,7 @@ func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
 }
 
 func ErrSvcDefExists(codespace sdk.CodespaceType, svcDefName string) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exist,must use new name", svcDefName))
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exist, must use a new name", svcDefName))
 }
 
 func ErrInvalidIDL(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -74,8 +76,8 @@ func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidMethodName, fmt.Sprintf("method name is empty"))
 }
 
-func ErrInvalidBroadcastEnum(codespace sdk.CodespaceType, value BroadcastEnum) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidBroadcastEnum, fmt.Sprintf("invalid BroadcastEnum %s", value))
+func ErrInvalidMessagingType(codespace sdk.CodespaceType, value MessagingType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidMessagingType, fmt.Sprintf("invalid Messaging type %s", value))
 }
 
 func ErrMoreTags(codespace sdk.CodespaceType) sdk.Error {
@@ -84,4 +86,8 @@ func ErrMoreTags(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeDuplicateTags, "tags contains duplicate tag")
+}
+
+func ErrSvcBindingExists(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service binding provider %v already exist, must use a new name", provider))
 }
