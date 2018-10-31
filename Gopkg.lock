@@ -117,7 +117,7 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "70cd87758a466fc6d3f57bbca635e05f24e9ff3f"
+  revision = "a6d81b98d0d993c0e5fbf02fe4537c13f2140f77"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
