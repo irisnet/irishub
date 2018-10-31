@@ -180,7 +180,6 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 func genesisAccountFromMsgCreateValidator(msg stake.MsgCreateValidator, amount sdk.Int) GenesisAccount {
 	accAuth := auth.NewBaseAccountWithAddress(sdk.AccAddress(msg.ValidatorAddr))
 	accAuth.Coins = []sdk.Coin{
-		{msg.Description.Moniker + "Token", sdk.NewInt(1000)},
 		{"iris-atto", amount},
 	}
 	return NewGenesisAccount(&accAuth)

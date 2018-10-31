@@ -78,7 +78,7 @@ func queryTx(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]
 
 // ValidateTxResult performs transaction verification
 func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
-	check, err := cliCtx.Certify(res.Height)
+	check, err := cliCtx.Verify(res.Height)
 	if err != nil {
 		return err
 	}
