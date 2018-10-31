@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
-
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -106,34 +104,6 @@ func WriteGenerateStdTxResponse(w http.ResponseWriter, txCtx context.TxContext, 
 
 func urlQueryHasArg(url *url.URL, arg string) bool { return url.Query().Get(arg) == "true" }
 
-//----------------------------------------
-// Building / Sending utilities
-
-// BaseReq defines a structure that can be embedded in other request structures
-// that all share common "base" fields.
-type BaseReq struct {
-	Name          string `json:"name"`
-	Password      string `json:"password"`
-	ChainID       string `json:"chain_id"`
-	AccountNumber int64  `json:"account_number"`
-	Sequence      int64  `json:"sequence"`
-	Gas           string `json:"gas"`
-	GasAdjustment string `json:"gas_adjustment"`
-}
-
-// Sanitize performs basic sanitization on a BaseReq object.
-func (br BaseReq) Sanitize() BaseReq {
-	return BaseReq{
-		Name:          strings.TrimSpace(br.Name),
-		Password:      strings.TrimSpace(br.Password),
-		ChainID:       strings.TrimSpace(br.ChainID),
-		Gas:           strings.TrimSpace(br.Gas),
-		GasAdjustment: strings.TrimSpace(br.GasAdjustment),
-		AccountNumber: br.AccountNumber,
-		Sequence:      br.Sequence,
-	}
-}
-
 // ReadPostBody
 func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req interface{}) error {
 	body, err := ioutil.ReadAll(r.Body)
@@ -155,31 +125,13 @@ func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req 
 func InitRequestClictx(cliCtx context.CLIContext, r *http.Request, name string, signerAddress string) context.CLIContext {
 	cliCtx.GenerateOnly = HasGenerateOnlyArg(r)
 	cliCtx.Async = AsyncOnlyArg(r)
+	cliCtx.DryRun = HasDryRunArg(r)
 	cliCtx.FromAddressName = name
 	cliCtx.SignerAddr = signerAddress
 	return cliCtx
 }
 
-// ValidateBasic performs basic validation of a BaseReq. If custom validation
-// logic is needed, the implementing request handler should perform those
-// checks manually.
-func (br BaseReq) ValidateBasic(w http.ResponseWriter) bool {
-	switch {
-	case len(br.Name) == 0:
-		WriteErrorResponse(w, http.StatusUnauthorized, "name required but not specified")
-		return false
 
-	case len(br.Password) == 0:
-		WriteErrorResponse(w, http.StatusUnauthorized, "password required but not specified")
-		return false
-
-	case len(br.ChainID) == 0:
-		WriteErrorResponse(w, http.StatusUnauthorized, "chainID required but not specified")
-		return false
-	}
-
-	return true
-}
 
 // SendOrReturnUnsignedTx implements a utility function that facilitates
 // sending a series of messages in a signed transaction given a TxBuilder and a
@@ -189,14 +141,14 @@ func (br BaseReq) ValidateBasic(w http.ResponseWriter) bool {
 //
 // NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
-func SendOrReturnUnsignedTx(w http.ResponseWriter, r *http.Request, cliCtx context.CLIContext, baseReq BaseReq, msgs []sdk.Msg, cdc *codec.Codec) {
-	simulateGas, gas, err := client.ReadGasFlag(baseReq.Gas)
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg, cdc *codec.Codec) {
+	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	adjustment, ok := ParseFloat64OrReturnBadRequest(w, baseReq.GasAdjustment, client.DefaultGasAdjustment)
+	adjustment, ok := ParseFloat64OrReturnBadRequest(w, baseTx.GasAdjustment, client.DefaultGasAdjustment)
 	if !ok {
 		return
 	}
@@ -206,19 +158,19 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, r *http.Request, cliCtx conte
 		Gas:           gas,
 		GasAdjustment: adjustment,
 		SimulateGas:   simulateGas,
-		ChainID:       baseReq.ChainID,
-		AccountNumber: baseReq.AccountNumber,
-		Sequence:      baseReq.Sequence,
+		ChainID:       baseTx.ChainID,
+		AccountNumber: baseTx.AccountNumber,
+		Sequence:      baseTx.Sequence,
 	}
 
-	if HasDryRunArg(r) || txCtx.SimulateGas {
-		newBldr, err := EnrichCtxWithGas(txCtx, cliCtx, baseReq.Name, msgs)
+	if cliCtx.DryRun || txCtx.SimulateGas {
+		newBldr, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
 		if err != nil {
 			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		if HasDryRunArg(r) {
+		if cliCtx.DryRun {
 			WriteSimulationResponse(w, newBldr.Gas)
 			return
 		}
@@ -226,12 +178,12 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, r *http.Request, cliCtx conte
 		txCtx = newBldr
 	}
 
-	if HasGenerateOnlyArg(r) {
+	if cliCtx.GenerateOnly {
 		WriteGenerateStdTxResponse(w, txCtx, msgs)
 		return
 	}
 
-	txBytes, err := txCtx.BuildAndSign(baseReq.Name, baseReq.Password, msgs)
+	txBytes, err := txCtx.BuildAndSign(baseTx.Name, baseTx.Password, msgs)
 	if keyerror.IsErrKeyNotFound(err) {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		return

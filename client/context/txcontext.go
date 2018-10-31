@@ -11,7 +11,61 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"fmt"
+	"strings"
+	"net/http"
 )
+
+//----------------------------------------
+// Building / Sending utilities
+
+// BaseReq defines a structure that can be embedded in other request structures
+// that all share common "base" fields.
+type BaseTx struct {
+	Name          string `json:"name"`
+	Password      string `json:"password"`
+	ChainID       string `json:"chain_id"`
+	AccountNumber int64  `json:"account_number"`
+	Sequence      int64  `json:"sequence"`
+	Gas           string `json:"gas"`
+	GasAdjustment string `json:"gas_adjustment"`
+}
+
+// Sanitize performs basic sanitization on a BaseReq object.
+func (br BaseTx) Sanitize() BaseTx {
+	return BaseTx{
+		Name:          strings.TrimSpace(br.Name),
+		Password:      strings.TrimSpace(br.Password),
+		ChainID:       strings.TrimSpace(br.ChainID),
+		Gas:           strings.TrimSpace(br.Gas),
+		GasAdjustment: strings.TrimSpace(br.GasAdjustment),
+		AccountNumber: br.AccountNumber,
+		Sequence:      br.Sequence,
+	}
+}
+
+// ValidateBasic performs basic validation of a BaseReq. If custom validation
+// logic is needed, the implementing request handler should perform those
+// checks manually.
+func (br BaseTx) ValidateBasic(w http.ResponseWriter) bool {
+	switch {
+	case len(br.Name) == 0:
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("name required but not specified"))
+		return false
+
+	case len(br.Password) == 0:
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("password required but not specified"))
+		return false
+
+	case len(br.ChainID) == 0:
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("chainID required but not specified"))
+		return false
+	}
+
+	return true
+}
 
 // TxContext implements a transaction context created in SDK modules.
 type TxContext struct {
