@@ -179,9 +179,12 @@ func main() {
 	iserviceCmd.AddCommand(
 		client.GetCommands(
 			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
+			iservicecmd.GetCmdQueryScvBind("iservice", cdc),
+			iservicecmd.GetCmdQueryScvBinds("iservice", cdc),
 		)...)
 	iserviceCmd.AddCommand(client.PostCommands(
 		iservicecmd.GetCmdScvDef(cdc),
+		iservicecmd.GetCmdScvBind(cdc),
 	)...)
 
 	rootCmd.AddCommand(

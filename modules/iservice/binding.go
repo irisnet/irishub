@@ -9,42 +9,34 @@ import (
 )
 
 type SvcBinding struct {
-	BindingBasic
-	Prices  []sdk.Coin `json:"price"`
-	Levels  []int      `json:"level"`
-	IsValid bool       `json:"is_valid"`
-}
-
-type BindingBasic struct {
 	DefName     string         `json:"def_name"`
 	DefChainID  string         `json:"def_chain_id"`
 	BindChainID string         `json:"bind_chain_id"`
 	Provider    sdk.AccAddress `json:"provider"`
 	BindingType BindingType    `json:"binding_type"`
-	Deposit     sdk.Coin       `json:"deposit"`
+	Deposit     sdk.Coins      `json:"deposit"`
 	Expiration  int64          `json:"expiration"`
+	Prices      []sdk.Coin     `json:"price"`
+	Level       Level          `json:"level"`
 }
 
 type Level struct {
-	AvgRspTime int     `json:"avg_rsp_time"`
-	UsableTime float32 `json:"usable_time"`
+	AvgRspTime int64 `json:"avg_rsp_time"`
+	UsableTime int64 `json:"usable_time"`
 }
 
 // NewSvcBinding returns a new SvcBinding with the provided values.
-func NewSvcBinding(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coin, prices []sdk.Coin, levels []int, expiration int64) SvcBinding {
+func NewSvcBinding(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, expiration int64) SvcBinding {
 	return SvcBinding{
-		BindingBasic: BindingBasic{
-			DefChainID:  defChainID,
-			DefName:     defName,
-			BindChainID: bindChainID,
-			Provider:    provider,
-			BindingType: bindingType,
-			Deposit:     deposit,
-			Expiration:  expiration,
-		},
-		Prices:  prices,
-		Levels:  levels,
-		IsValid: false,
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+		BindingType: bindingType,
+		Deposit:     deposit,
+		Expiration:  expiration,
+		Prices:      prices,
+		Level:       level,
 	}
 }
 
@@ -55,19 +47,23 @@ func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 		bindingA.Provider.String() == bindingB.Provider.String() &&
 		bindingA.BindingType == bindingB.BindingType &&
 		bindingA.Deposit.IsEqual(bindingB.Deposit) &&
-		len(bindingA.Levels) == len(bindingB.Levels) &&
+		bindingA.Level.AvgRspTime == bindingB.Level.AvgRspTime &&
+		bindingA.Level.UsableTime == bindingB.Level.UsableTime &&
 		len(bindingA.Prices) == len(bindingB.Prices) &&
 		bindingA.Expiration == bindingB.Expiration {
-		for i, level := range bindingA.Levels {
-			if level != bindingB.Levels[i] {
-				return false
-			}
-		}
 		for j, prices := range bindingA.Prices {
 			if !prices.IsEqual(bindingB.Prices[j]) {
 				return false
 			}
 		}
+		return true
+	}
+	return false
+}
+
+// is valid level?
+func validLevel(lv Level) bool {
+	if lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 100 {
 		return true
 	}
 	return false

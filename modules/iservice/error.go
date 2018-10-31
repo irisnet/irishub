@@ -20,7 +20,11 @@ const (
 	CodeMoreTags                 sdk.CodeType = 109
 	CodeDuplicateTags            sdk.CodeType = 110
 
-	SvcBindingExists            sdk.CodeType = 111
+	SvcBindingExists       sdk.CodeType = 111
+	CodeInvalidDefChainId  sdk.CodeType = 112
+	CodeInvalidBindingType sdk.CodeType = 113
+	CodeInvalidLevel       sdk.CodeType = 114
+	CodeInvalidPriceCount  sdk.CodeType = 115
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -77,7 +81,7 @@ func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidMessagingType(codespace sdk.CodespaceType, value MessagingType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidMessagingType, fmt.Sprintf("invalid Messaging type %s", value))
+	return sdk.NewError(codespace, CodeInvalidMessagingType, fmt.Sprintf("invalid messaging type %s", value))
 }
 
 func ErrMoreTags(codespace sdk.CodespaceType) sdk.Error {
@@ -88,6 +92,22 @@ func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeDuplicateTags, "tags contains duplicate tag")
 }
 
+func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("def-chain-id is empty"))
+}
+
 func ErrSvcBindingExists(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service binding provider %v already exist, must use a new name", provider))
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service binding provider %v already exist", provider))
+}
+
+func ErrInvalidBindingType(codespace sdk.CodespaceType, bindingType BindingType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidBindingType, fmt.Sprintf("invalid binding type %s", bindingType))
+}
+
+func ErrInvalidLevel(codespace sdk.CodespaceType, level Level) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidLevel, fmt.Sprintf("invalid level %v, must avg_rsp_time>0 and 0<usable_time<=100", level))
+}
+
+func ErrInvalidPriceCount(codespace sdk.CodespaceType, priceCount int, methodCount int) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidPriceCount, fmt.Sprintf("invalid Price count %d, method count %v is supposed to", priceCount, methodCount))
 }

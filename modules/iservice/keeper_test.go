@@ -10,21 +10,21 @@ import (
 func TestKeeper_IService_Definition(t *testing.T) {
 	ctx, keeper := createTestInput(t)
 
-	serviceDef := NewMsgSvcDef("myService",
+	serviceDef := NewSvcDef("myService",
 		"testnet",
 		"the iservice for unit test",
 		[]string{"test", "tutorial"},
 		addrs[0],
 		"unit test author",
 		idlContent,
-		Broadcast)
+		Unicast)
 
 	keeper.AddServiceDefinition(ctx, serviceDef)
 	serviceDefB, _ := keeper.GetServiceDefinition(ctx, "testnet", "myService")
 
 	require.Equal(t, serviceDefB.IDLContent, idlContent)
 	require.Equal(t, serviceDefB.Name, "myService")
-	require.Equal(t, serviceDefB.Broadcast, Broadcast)
+	require.Equal(t, serviceDefB.Messaging, Unicast)
 
 	// test methods
 	keeper.AddMethods(ctx, serviceDef)
@@ -48,7 +48,7 @@ func TestKeeper_IService_Binding(t *testing.T) {
 
 	// test binding
 	svcBinding := NewSvcBinding("testnet", "myService", "testnet",
-		addrs[1], Local, sdk.NewCoin("iris", sdk.NewInt(100)), []sdk.Coin{{"iris", sdk.NewInt(100)}},
+		addrs[1], Local, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
 		[]int{1}, 1000)
 	keeper.AddServiceBinding(ctx, svcBinding)
 	gotSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)

@@ -54,3 +54,13 @@ func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.Acc
 		emptyByte...),
 		[]byte(provider.String())...)
 }
+
+// Key for getting all methods on a service from the store
+func GetBindingsSubspaceKey(chainId, serviceName string) []byte {
+	return append(append(append(append(
+		bindingPropertyKey,
+		[]byte(chainId)...),
+		emptyByte...),
+		[]byte(serviceName)...),
+		emptyByte...)
+}

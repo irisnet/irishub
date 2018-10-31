@@ -35,5 +35,19 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	if found {
 		return ErrSvcBindingExists(k.Codespace(), msg.Provider).Result()
 	}
+
+	methodIterator := k.GetMethods(ctx, msg.DefChainID, msg.DefName)
+	var methods []MethodProperty
+	for ; methodIterator.Valid(); methodIterator.Next() {
+		var method MethodProperty
+		k.cdc.MustUnmarshalBinary(methodIterator.Value(), &method)
+		methods = append(methods, method)
+	}
+
+	if len(methods) != len(msg.Prices) {
+		return ErrInvalidPriceCount(k.Codespace(), len(msg.Prices), len(methods)).Result()
+	}
+
+	k.AddServiceBinding(ctx, msg.SvcBinding)
 	return sdk.Result{}
 }

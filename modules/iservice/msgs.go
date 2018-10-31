@@ -154,14 +154,12 @@ func methodToMethodProperty(index int, method protoidl.Method) (methodProperty M
 
 // MsgSvcBinding - struct for bind a service
 type MsgSvcBind struct {
-	BindingBasic
-	Prices map[int]sdk.Coin `json:"prices"`
-	Levels map[int]int      `json:"levels"`
+	SvcBinding
 }
 
-func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coin, prices map[int]sdk.Coin, levels map[int]int, expiration int64) MsgSvcBind {
+func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, expiration int64) MsgSvcBind {
 	return MsgSvcBind{
-		BindingBasic: BindingBasic{
+		SvcBinding{
 			DefChainID:  defChainID,
 			DefName:     defName,
 			BindChainID: bindChainID,
@@ -169,9 +167,9 @@ func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddr
 			BindingType: bindingType,
 			Deposit:     deposit,
 			Expiration:  expiration,
+			Prices:      prices,
+			Level:       level,
 		},
-		Prices: prices,
-		Levels: levels,
 	}
 }
 
@@ -188,6 +186,32 @@ func (msg MsgSvcBind) GetSignBytes() []byte {
 }
 
 func (msg MsgSvcBind) ValidateBasic() sdk.Error {
+	if len(msg.DefChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.BindChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.DefName) == 0 {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if !validBindingType(msg.BindingType) {
+		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
+	}
+	if !msg.Deposit.IsValid() {
+		return sdk.ErrInvalidCoins(msg.Deposit.String())
+	}
+	if !msg.Deposit.IsNotNegative() {
+		return sdk.ErrInvalidCoins(msg.Deposit.String())
+	}
+	for _, price := range msg.Prices {
+		if !price.IsNotNegative() {
+			return sdk.ErrInvalidCoins(price.String())
+		}
+	}
+	if !validLevel(msg.Level) {
+		return ErrInvalidLevel(DefaultCodespace, msg.Level)
+	}
 	return nil
 }
 

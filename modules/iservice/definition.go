@@ -27,6 +27,19 @@ type MethodProperty struct {
 	OutputCached  OutputCachedEnum  `json:"output_cached"`
 }
 
+func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string, messaging MessagingType) SvcDef {
+	return SvcDef{
+		Name:              name,
+		ChainId:           chainId,
+		Description:       description,
+		Tags:              tags,
+		Author:            author,
+		AuthorDescription: authorDescription,
+		IDLContent:        idlContent,
+		Messaging:         messaging,
+	}
+}
+
 type OutputPrivacyEnum byte
 
 const (

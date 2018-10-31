@@ -76,7 +76,6 @@ func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
 
 func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) {
 	kvStore := ctx.KVStore(k.storeKey)
-
 	svcBindingBytes, err := k.cdc.MarshalBinary(svcBinding)
 	if err != nil {
 		panic(err)

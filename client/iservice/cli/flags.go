@@ -17,8 +17,9 @@ const (
 	FlagBindChainID        = "bind-chain-id"
 	FlagBindType           = "bind-type"
 	FlagDeposit            = "deposit"
-	FlagPrices             = "price"
-	FlagLevels             = "levels"
+	FlagPrices             = "prices"
+	FlagAvgRspTime         = "avg-rsp-time"
+	FlagUsableTime         = "usable-time"
 	FlagExpiration         = "expiration"
 )
 
@@ -36,7 +37,8 @@ var (
 	FsBindType           = flag.NewFlagSet("", flag.ContinueOnError)
 	FsDeposit            = flag.NewFlagSet("", flag.ContinueOnError)
 	FsPrices             = flag.NewFlagSet("", flag.ContinueOnError)
-	FsLevels             = flag.NewFlagSet("", flag.ContinueOnError)
+	FsAvgRspTime         = flag.NewFlagSet("", flag.ContinueOnError)
+	FsUsableTime         = flag.NewFlagSet("", flag.ContinueOnError)
 	FsExpiration         = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
@@ -52,9 +54,10 @@ func init() {
 
 	FsProvider.String(FlagProvider, "", "bech32 encoded account created the iService binding")
 	FsBindChainID.String(FlagBindChainID, "", "the ID of the blockchain bond of the iService")
-	FsBindType.String(FlagBindType, "", "	")
-	FsDeposit.String(FlagDeposit, "", "path of file which contains service interface description language")
-	FsPrices.String(FlagPrices, "", "path of file which contains service interface description language")
-	FsLevels.String(FlagLevels, "", "path of file which contains service interface description language")
-	FsExpiration.String(FlagExpiration, "", "path of file which contains service interface description language")
+	FsBindType.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
+	FsDeposit.String(FlagDeposit, "", "deposit of binding")
+	FsPrices.String(FlagPrices, "", "price of binding, will contains all method")
+	FsAvgRspTime.String(FlagAvgRspTime, "", "the average service response time in milliseconds")
+	FsUsableTime.String(FlagUsableTime, "", "the usable time in every 100 service invocation")
+	FsExpiration.String(FlagExpiration, "", "the blockchain height where this binding expires")
 }
