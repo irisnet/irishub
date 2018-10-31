@@ -540,6 +540,10 @@ func (h Hooks) OnValidatorBonded(ctx sdk.Context, addr sdk.ConsAddress, operator
 	h.dh.OnValidatorBonded(ctx, addr, operator)
 	h.sh.OnValidatorBonded(ctx, addr, operator)
 }
+func (h Hooks) OnValidatorPowerDidChange(ctx sdk.Context, addr sdk.ConsAddress, operator sdk.ValAddress) {
+	h.dh.OnValidatorPowerDidChange(ctx, addr, operator)
+	h.sh.OnValidatorPowerDidChange(ctx, addr, operator)
+}
 func (h Hooks) OnValidatorBeginUnbonding(ctx sdk.Context, addr sdk.ConsAddress, operator sdk.ValAddress) {
 	h.dh.OnValidatorBeginUnbonding(ctx, addr, operator)
 	h.sh.OnValidatorBeginUnbonding(ctx, addr, operator)
