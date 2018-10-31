@@ -32,21 +32,20 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 }
 
-// NewGovernanceMapper returns a mapper that uses go-codec to (binary) encode and decode gov types.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+// NewKeeper returns a governance keeper. It handles:
+// - submitting governance proposals
+// - depositing funds into proposals, and activating upon sufficient funds being deposited
+// - users voting on proposals, with weight proportional to stake in the system
+// - and tallying the result of the vote.
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
-		storeKey:  key,
-		ck:        ck,
-		ds:        ds,
-		vs:        ds.GetValidatorSet(),
-		cdc:       cdc,
-		codespace: codespace,
+		storeKey:     key,
+		ck:           ck,
+		ds:           ds,
+		vs:           ds.GetValidatorSet(),
+		cdc:          cdc,
+		codespace:    codespace,
 	}
-}
-
-// Returns the go-codec codec.
-func (keeper Keeper) WireCodec() *codec.Codec {
-	return keeper.cdc
 }
 
 // =====================================================
@@ -64,6 +63,9 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	return nil
 }
 
+// =====================================================
+// Proposals
+
 // Creates a NewProposal
 func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
@@ -71,15 +73,14 @@ func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description 
 		return nil
 	}
 	var proposal Proposal = &TextProposal{
-		ProposalID:       proposalID,
-		Title:            title,
-		Description:      description,
-		ProposalType:     proposalType,
-		Status:           StatusDepositPeriod,
-		TallyResult:      EmptyTallyResult(),
-		TotalDeposit:     sdk.Coins{},
-		SubmitBlock:      ctx.BlockHeight(),
-		VotingStartBlock: -1, // TODO: Make Time
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
 	}
 	keeper.SetProposal(ctx, proposal)
 	keeper.InactiveProposalQueuePush(ctx, proposal)
@@ -92,14 +93,14 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		return nil
 	}
 	var textProposal = TextProposal{
-		ProposalID:       proposalID,
-		Title:            title,
-		Description:      description,
-		ProposalType:     proposalType,
-		Status:           StatusDepositPeriod,
-		TotalDeposit:     sdk.Coins{},
-		SubmitBlock:      ctx.BlockHeight(),
-		VotingStartBlock: -1, // TODO: Make Time
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
 	}
 
 	param.Value = iparam.ParamMapping[param.Key].ToJson(param.Value)
@@ -119,14 +120,14 @@ func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, descripti
 		return nil
 	}
 	var textProposal = TextProposal{
-		ProposalID:       proposalID,
-		Title:            title,
-		Description:      description,
-		ProposalType:     proposalType,
-		Status:           StatusDepositPeriod,
-		TotalDeposit:     sdk.Coins{},
-		SubmitBlock:      ctx.BlockHeight(),
-		VotingStartBlock: -1, // TODO: Make Time
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
 		textProposal,
@@ -150,17 +151,62 @@ func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID int64) Proposal {
 	return proposal
 }
 
-// Implements sdk.AccountMapper.
+// Implements sdk.AccountKeeper.
 func (keeper Keeper) SetProposal(ctx sdk.Context, proposal Proposal) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinary(proposal)
 	store.Set(KeyProposal(proposal.GetProposalID()), bz)
 }
 
-// Implements sdk.AccountMapper.
+// Implements sdk.AccountKeeper.
 func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposal Proposal) {
 	store := ctx.KVStore(keeper.storeKey)
 	store.Delete(KeyProposal(proposal.GetProposalID()))
+}
+
+// Get Proposal from store by ProposalID
+func (keeper Keeper) GetProposalsFiltered(ctx sdk.Context, voterAddr sdk.AccAddress, depositerAddr sdk.AccAddress, status ProposalStatus, numLatest int64) []Proposal {
+
+	maxProposalID, err := keeper.peekCurrentProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+
+	matchingProposals := []Proposal{}
+
+	if numLatest <= 0 {
+		numLatest = maxProposalID
+	}
+
+	for proposalID := maxProposalID - numLatest; proposalID < maxProposalID; proposalID++ {
+		if voterAddr != nil && len(voterAddr) != 0 {
+			_, found := keeper.GetVote(ctx, proposalID, voterAddr)
+			if !found {
+				continue
+			}
+		}
+
+		if depositerAddr != nil && len(depositerAddr) != 0 {
+			_, found := keeper.GetDeposit(ctx, proposalID, depositerAddr)
+			if !found {
+				continue
+			}
+		}
+
+		proposal := keeper.GetProposal(ctx, proposalID)
+		if proposal == nil {
+			continue
+		}
+
+		if validProposalStatus(status) {
+			if proposal.GetStatus() != status {
+				continue
+			}
+		}
+
+		matchingProposals = append(matchingProposals, proposal)
+	}
+	return matchingProposals
 }
 
 func (keeper Keeper) setInitialProposalID(ctx sdk.Context, proposalID int64) sdk.Error {
@@ -176,16 +222,15 @@ func (keeper Keeper) setInitialProposalID(ctx sdk.Context, proposalID int64) sdk
 
 // Get the last used proposal ID
 func (keeper Keeper) GetLastProposalID(ctx sdk.Context) (proposalID int64) {
-	store := ctx.KVStore(keeper.storeKey)
-	bz := store.Get(KeyNextProposalID)
-	if bz == nil {
+	proposalID, err := keeper.peekCurrentProposalID(ctx)
+	if err != nil {
 		return 0
 	}
-	keeper.cdc.MustUnmarshalBinary(bz, &proposalID)
 	proposalID--
 	return
 }
 
+// Gets the next available ProposalID and increments it
 func (keeper Keeper) getNewProposalID(ctx sdk.Context) (proposalID int64, err sdk.Error) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyNextProposalID)
@@ -198,15 +243,23 @@ func (keeper Keeper) getNewProposalID(ctx sdk.Context) (proposalID int64, err sd
 	return proposalID, nil
 }
 
+// Peeks the next available ProposalID without incrementing it
+func (keeper Keeper) peekCurrentProposalID(ctx sdk.Context) (proposalID int64, err sdk.Error) {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := store.Get(KeyNextProposalID)
+	if bz == nil {
+		return -1, ErrInvalidGenesis(keeper.codespace, "InitialProposalID never set")
+	}
+	keeper.cdc.MustUnmarshalBinary(bz, &proposalID)
+	return proposalID, nil
+}
+
 func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
-	proposal.SetVotingStartBlock(ctx.BlockHeight())
+	proposal.SetVotingStartTime(ctx.BlockHeader().Time)
 	proposal.SetStatus(StatusVotingPeriod)
 	keeper.SetProposal(ctx, proposal)
 	keeper.ActiveProposalQueuePush(ctx, proposal)
 }
-
-// =====================================================
-// Votes
 
 // Adds a vote on a specific proposal
 func (keeper Keeper) AddVote(ctx sdk.Context, proposalID int64, voterAddr sdk.AccAddress, option VoteOption) sdk.Error {

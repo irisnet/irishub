@@ -2,24 +2,21 @@ package gov
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/x/params"
+
+	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/types"
-	sdkParams "github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/iparam"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // initialize the mock application for this module
@@ -30,38 +27,28 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	RegisterCodec(mapp.Cdc)
 
 	keyGlobalParams := sdk.NewKVStoreKey("params")
+	tkeyGlobalParams := sdk.NewTransientStoreKey("transient_params")
 	keyStake := sdk.NewKVStoreKey("stake")
+	tkeyStake := sdk.NewTransientStoreKey("transient_stake")
 	keyGov := sdk.NewKVStoreKey("gov")
 
-	ck := bank.NewKeeper(mapp.AccountMapper)
-	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
-	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
-	pk := sdkParams.NewKeeper(mapp.Cdc, keyGlobalParams)
+	pk := params.NewKeeper(mapp.Cdc, keyGlobalParams, tkeyGlobalParams)
+	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
+	sk := stake.NewKeeper(mapp.Cdc, keyStake, tkeyStake, ck, pk.Subspace(stake.DefaultParamspace), mapp.RegisterCodespace(stake.DefaultCodespace))
+	keeper := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
 
-	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
+	mapp.Router().AddRoute("gov", NewHandler(keeper))
 
-	iparam.SetParamReadWriter(pk.Setter(),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
-		&upgradeparams.CurrentUpgradeProposalIdParameter,
-		&upgradeparams.ProposalAcceptHeightParameter)
+	mapp.SetEndBlocker(getEndBlocker(keeper))
+	mapp.SetInitChainer(getInitChainer(mapp, keeper, sk))
 
-	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,)
+	require.NoError(t, mapp.CompleteSetup(keyStake, tkeyStake, keyGov, keyGlobalParams, tkeyGlobalParams))
 
-	mapp.SetEndBlocker(getEndBlocker(gk))
-	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
-
-	require.NoError(t, mapp.CompleteSetup([]*sdk.KVStoreKey{keyStake, keyGov, keyGlobalParams}))
-
-	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
-	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
+	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{sdk.NewInt64Coin("steak", 42)})
 
 	mock.SetGenesis(mapp, genAccs)
 
-	return mapp, gk, sk, addrs, pubKeys, privKeys
+	return mapp, keeper, sk, addrs, pubKeys, privKeys
 }
 
 // gov and stake endblocker
@@ -80,33 +67,30 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		mapp.InitChainer(ctx, req)
 
 		stakeGenesis := stake.DefaultGenesisState()
-		stakeGenesis.Params.BondDenom = "iris-atto"
-		stakeGenesis.Pool.LooseTokens = sdk.NewRat(100000)
+		stakeGenesis.Pool.LooseTokens = sdk.NewDec(100000)
 
 		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 		if err != nil {
 			panic(err)
 		}
-		ct := types.NewDefaultCoinType("iris")
-		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
-		InitGenesis(ctx, keeper, GenesisState{
-			StartingProposalID: 1,
-			DepositProcedure: govparams.DepositProcedure{
-				MinDeposit:       sdk.Coins{minDeposit},
-				MaxDepositPeriod: 1440,
-			},
-			VotingProcedure: govparams.VotingProcedure{
-				VotingPeriod: 30,
-			},
-			TallyingProcedure: govparams.TallyingProcedure{
-				Threshold:         sdk.NewRat(1, 2),
-				Veto:              sdk.NewRat(1, 3),
-				GovernancePenalty: sdk.NewRat(1, 100),
-			},
-		})
+		InitGenesis(ctx, keeper, DefaultGenesisState())
 		return abci.ResponseInitChain{
 			Validators: validators,
 		}
+	}
+}
+
+// TODO: Remove once address interface has been implemented (ref: #2186)
+func SortValAddresses(addrs []sdk.ValAddress) {
+	var byteAddrs [][]byte
+	for _, addr := range addrs {
+		byteAddrs = append(byteAddrs, addr.Bytes())
+	}
+
+	SortByteArrays(byteAddrs)
+
+	for i, byteAddr := range byteAddrs {
+		addrs[i] = byteAddr
 	}
 }
 
