@@ -44,6 +44,10 @@
   branch = "irisnet/v0.25.1-rc0-iris"
 
 [[constraint]]
+  name = "github.com/prometheus/client_golang"
+  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+
+[[constraint]]
   name = "github.com/emicklei/proto"
   version = "=v1.6.5"
 
@@ -115,10 +119,6 @@
 [[override]]
   name = "github.com/syndtr/goleveldb"
   revision = "c4c61651e9e37fa117f53c5a906d3b63090d8445"
-
-[[override]]
-  name = "golang.org/x/sys"
-  revision = "4e1fef5609515ec7a2cee7b5de30ba6d9b438cbf"
 
 [[override]]
   name = "google.golang.org/genproto"
