@@ -9,13 +9,17 @@ import (
 
 	"bytes"
 	"fmt"
+	"os"
+
+	cskeys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/tendermint/tendermint/libs/log"
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	"os"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 const ctxAccStoreName = "acc"
@@ -31,21 +35,28 @@ type CLIContext struct {
 	NodeURI         string
 	FromAddressName string
 	//If GenerateOnly is true and FromAddressName is not specified, the signer is required for building msg
-	SignerAddr      string
-	AccountStore    string
-	TrustNode       bool
-	UseLedger       bool
-	Async           bool
-	JSON            bool
-	PrintResponse   bool
-	Certifier       tmlite.Verifier
-	GenerateOnly    bool
+	SignerAddr    string
+	AccountStore  string
+	TrustNode     bool
+	UseLedger     bool
+	Async         bool
+	JSON          bool
+	PrintResponse bool
+	Verifier      tmlite.Verifier
+	GenerateOnly  bool
+	fromAddress   types.AccAddress
+	fromName      string
+	Indent        bool
+	DryRun        bool
 }
 
 // NewCLIContext returns a new initialized CLIContext with parameters from the
 // command line using Viper.
 func NewCLIContext() CLIContext {
 	var rpc rpcclient.Client
+
+	from := viper.GetString(client.FlagFrom)
+	fromAddress, fromName := fromFields(from)
 
 	nodeURI := viper.GetString(client.FlagNode)
 	if nodeURI != "" {
@@ -64,12 +75,16 @@ func NewCLIContext() CLIContext {
 		Async:           viper.GetBool(client.FlagAsync),
 		JSON:            viper.GetBool(client.FlagJson),
 		PrintResponse:   viper.GetBool(client.FlagPrintResponse),
-		Certifier:       createCertifier(),
+		Verifier:        createVerifier(),
+		DryRun:          viper.GetBool(client.FlagDryRun),
 		GenerateOnly:    viper.GetBool(client.FlagGenerateOnly),
+		fromAddress:     fromAddress,
+		fromName:        fromName,
+		Indent:          viper.GetBool(client.FlagIndentResponse),
 	}
 }
 
-func createCertifier() tmlite.Verifier {
+func createVerifier() tmlite.Verifier {
 	trustNodeDefined := viper.IsSet(client.FlagTrustNode)
 	if !trustNodeDefined {
 		return nil
@@ -108,6 +123,37 @@ func createCertifier() tmlite.Verifier {
 	}
 
 	return certifier
+}
+
+func fromFields(from string) (fromAddr types.AccAddress, fromName string) {
+	if from == "" {
+		return nil, ""
+	}
+
+	keybase, err := keys.GetKeyBase()
+	if err != nil {
+		fmt.Println("no keybase found")
+		os.Exit(1)
+	}
+
+	var info cskeys.Info
+	if addr, err := types.AccAddressFromBech32(from); err == nil {
+		info, err = keybase.GetByAddress(addr)
+		if err != nil {
+			fmt.Printf("could not find key %s\n", from)
+			os.Exit(1)
+		}
+	} else {
+		info, err = keybase.Get(from)
+		if err != nil {
+			fmt.Printf("could not find key %s\n", from)
+			os.Exit(1)
+		}
+	}
+
+	fromAddr = info.GetAddress()
+	fromName = info.GetName()
+	return
 }
 
 // WithCodec returns a copy of the context with an updated codec.
@@ -169,7 +215,7 @@ func (ctx CLIContext) WithUseLedger(useLedger bool) CLIContext {
 }
 
 // WithCertifier - return a copy of the context with an updated Certifier
-func (ctx CLIContext) WithCertifier(certifier tmlite.Verifier) CLIContext {
-	ctx.Certifier = certifier
+func (ctx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
+	ctx.Verifier = verifier
 	return ctx
 }

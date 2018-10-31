@@ -5,14 +5,9 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
-	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
-	recordcmd "github.com/irisnet/irishub/client/record/cli"
-	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
-	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
-	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -87,6 +82,7 @@ func main() {
 	//)
 
 	//Add staking and slashing commands
+	/*
 	stakeCmd := &cobra.Command{
 		Use:   "stake",
 		Short: "Stake and validation subcommands",
@@ -170,7 +166,7 @@ func main() {
 	rootCmd.AddCommand(
 		recordCmd,
 	)
-
+*/
 	//Add keys and version commands
 	rootCmd.AddCommand(
 		client.LineBreak,
