@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iservice"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
@@ -125,7 +126,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = app.replay()
 	}
 
-	// define the accountMapper
+	// define the AccountKeeper
 	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,        // target store
@@ -177,7 +178,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.govKeeper = gov.NewKeeper(
 		app.cdc,
 		app.keyGov,
-		app.paramsKeeper, app.paramsKeeper.Subspace(gov.DefaultParamspace), app.bankKeeper, app.stakeKeeper,
+		app.bankKeeper, app.stakeKeeper,
 		app.RegisterCodespace(gov.DefaultCodespace),
 	)
 
@@ -238,21 +239,30 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
 
-	iparam.SetParamReadWriter(app.paramsKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
-		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
-		upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
-	)),
-		//&govparams.DepositProcedureParameter,
-		//&govparams.VotingProcedureParameter,
-		//&govparams.TallyingProcedureParameter,
+	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
+		params.NewTypeTable(
+			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+			upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
+		)),
 		&upgradeparams.CurrentUpgradeProposalIdParameter,
 		&upgradeparams.ProposalAcceptHeightParameter,
 		&upgradeparams.SwitchPeriodParameter)
 
-	//iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-	//	&govparams.VotingProcedureParameter,
-	//	&govparams.TallyingProcedureParameter)
+	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+		params.NewTypeTable(
+			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
+			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
+			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+		)),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
+
+	iparam.RegisterGovParamMapping(
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }

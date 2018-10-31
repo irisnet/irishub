@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/types"
@@ -59,15 +58,18 @@ func recordEqual(recordA MsgSubmitRecord, recordB MsgSubmitRecord) bool {
 func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, []sdk.AccAddress, []crypto.PubKey, []crypto.PrivKey) {
 	mapp := mock.NewApp()
 
-	stake.RegisterWire(mapp.Cdc)
-	RegisterWire(mapp.Cdc)
+	stake.RegisterCodec(mapp.Cdc)
+	RegisterCodec(mapp.Cdc)
 
 	keyStake := sdk.NewKVStoreKey("stake")
 	keyGov := sdk.NewKVStoreKey("gov")
 	keyRecord := sdk.NewKVStoreKey("record")
 
-	ck := bank.NewKeeper(mapp.AccountMapper)
-	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
+	sk := stake.NewKeeper(
+		mapp.Cdc,
+		mapp.KeyStake, mapp.TkeyStake,
+		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
+		mapp.RegisterCodespace(stake.DefaultCodespace))
 	rk := NewKeeper(mapp.Cdc, keyRecord, mapp.RegisterCodespace(DefaultCodespace))
 
 	mapp.Router().AddRoute("record", []*sdk.KVStoreKey{keyRecord}, NewHandler(rk))

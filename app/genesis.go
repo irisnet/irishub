@@ -18,11 +18,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"time"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 var (
@@ -133,6 +134,12 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(FreeFermionAcc.Amount)) // increase the supply
 	}
 
+	IrisCt := types.NewDefaultCoinType("iris")
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, "iris"))
+	if err != nil {
+		panic(err)
+	}
+
 	// create the final app state
 	genesisState = GenesisState{
 		Accounts:     genaccs,
@@ -140,7 +147,7 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		MintData:     mint.GenesisState{
 			Minter: mint.InitialMinter(),
 			Params: mint.Params{
-				MintDenom:           "iris",
+				MintDenom:           "iris-atto",
 				InflationRateChange: sdk.NewDecWithPrec(13, 2),
 				InflationMax:        sdk.NewDecWithPrec(20, 2),
 				InflationMin:        sdk.NewDecWithPrec(7, 2),
@@ -150,14 +157,14 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		DistrData:    distr.DefaultGenesisState(),
 		GovData:      gov.GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: gov.DepositProcedure{
-				MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)},
+			DepositProcedure: govparams.DepositProcedure{
+				MinDeposit:       sdk.Coins{minDeposit},
 				MaxDepositPeriod: time.Duration(172800) * time.Second,
 			},
-			VotingProcedure: gov.VotingProcedure{
+			VotingProcedure: govparams.VotingProcedure{
 				VotingPeriod: time.Duration(172800) * time.Second,
 			},
-			TallyingProcedure: gov.TallyingProcedure{
+			TallyingProcedure: govparams.TallyingProcedure{
 				Threshold:         sdk.NewDecWithPrec(5, 1),
 				Veto:              sdk.NewDecWithPrec(334, 3),
 				GovernancePenalty: sdk.NewDecWithPrec(1, 2),

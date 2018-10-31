@@ -18,7 +18,7 @@ import (
 )
 
 // SimulateMsgCreateValidator
-func SimulateMsgCreateValidator(m auth.AccountMapper, k stake.Keeper) simulation.TestAndRunTx {
+func SimulateMsgCreateValidator(m auth.AccountKeeper, k stake.Keeper) simulation.TestAndRunTx {
 	return func(t *testing.T, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, keys []crypto.PrivKey, log string, event func(string)) (action string, err sdk.Error) {
 		denom := k.GetParams(ctx).BondDenom
 		description := stake.Description{
@@ -83,7 +83,7 @@ func SimulateMsgEditValidator(k stake.Keeper) simulation.TestAndRunTx {
 }
 
 // SimulateMsgDelegate
-func SimulateMsgDelegate(m auth.AccountMapper, k stake.Keeper) simulation.TestAndRunTx {
+func SimulateMsgDelegate(m auth.AccountKeeper, k stake.Keeper) simulation.TestAndRunTx {
 	return func(t *testing.T, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, keys []crypto.PrivKey, log string, event func(string)) (action string, err sdk.Error) {
 		denom := k.GetParams(ctx).BondDenom
 		validatorKey := simulation.RandomKey(r, keys)
@@ -115,7 +115,7 @@ func SimulateMsgDelegate(m auth.AccountMapper, k stake.Keeper) simulation.TestAn
 }
 
 // SimulateMsgBeginUnbonding
-func SimulateMsgBeginUnbonding(m auth.AccountMapper, k stake.Keeper) simulation.TestAndRunTx {
+func SimulateMsgBeginUnbonding(m auth.AccountKeeper, k stake.Keeper) simulation.TestAndRunTx {
 	return func(t *testing.T, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, keys []crypto.PrivKey, log string, event func(string)) (action string, err sdk.Error) {
 		denom := k.GetParams(ctx).BondDenom
 		validatorKey := simulation.RandomKey(r, keys)
@@ -170,7 +170,7 @@ func SimulateMsgCompleteUnbonding(k stake.Keeper) simulation.TestAndRunTx {
 }
 
 // SimulateMsgBeginRedelegate
-func SimulateMsgBeginRedelegate(m auth.AccountMapper, k stake.Keeper) simulation.TestAndRunTx {
+func SimulateMsgBeginRedelegate(m auth.AccountKeeper, k stake.Keeper) simulation.TestAndRunTx {
 	return func(t *testing.T, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, keys []crypto.PrivKey, log string, event func(string)) (action string, err sdk.Error) {
 		denom := k.GetParams(ctx).BondDenom
 		sourceValidatorKey := simulation.RandomKey(r, keys)
@@ -242,10 +242,10 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 		params := k.GetParams(ctx)
 		denom := params.BondDenom
 		loose := sdk.ZeroInt()
-		mapp.AccountMapper.IterateAccounts(ctx, func(acc auth.Account) bool {
+		mapp.AccountKeeper.IterateAccounts(ctx, func(acc auth.Account) bool {
 			balance := simulation.RandomAmount(r, sdk.NewInt(1000000))
 			acc.SetCoins(acc.GetCoins().Plus(sdk.Coins{sdk.NewCoin(denom, balance)}))
-			mapp.AccountMapper.SetAccount(ctx, acc)
+			mapp.AccountKeeper.SetAccount(ctx, acc)
 			loose = loose.Add(balance)
 			return false
 		})

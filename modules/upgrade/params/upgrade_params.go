@@ -24,7 +24,7 @@ func (param *CurrentUpgradeProposalIdParam) SetReadWriter(paramSpace params.Subs
 }
 
 func (param *CurrentUpgradeProposalIdParam) GetStoreKey() []byte {
-	return []byte("upgrade0proposalId")
+	return []byte("upgradeProposalId")
 }
 
 func (param *CurrentUpgradeProposalIdParam) SaveValue(ctx sdk.Context) {
@@ -57,7 +57,7 @@ func (param *ProposalAcceptHeightParam) SetReadWriter(paramSpace params.Subspace
 }
 
 func (param *ProposalAcceptHeightParam) GetStoreKey() []byte {
-	return []byte("upgrade0proposalAcceptHeight")
+	return []byte("upgradeProposalAcceptHeight")
 }
 
 func (param *ProposalAcceptHeightParam) SaveValue(ctx sdk.Context) {
@@ -90,7 +90,7 @@ func (param *SwitchPeriodParam) SetReadWriter(paramSpace params.Subspace) {
 }
 
 func (param *SwitchPeriodParam) GetStoreKey() []byte {
-	return []byte("upgrade0switchperiod")
+	return []byte("upgradeSwitchPeriod")
 }
 
 func (param *SwitchPeriodParam) SaveValue(ctx sdk.Context) {

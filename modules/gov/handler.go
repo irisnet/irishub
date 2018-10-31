@@ -3,11 +3,11 @@ package gov
 import (
 	"fmt"
 
-	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/gov/tags"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"strconv"
+	"encoding/json"
 )
 
 // Handle all "gov" type messages.
@@ -28,32 +28,30 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
+	////////////////////  iris begin  ///////////////////////////
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+	////////////////////  iris end  /////////////////////////////
 
-	err := msg.ValidateBasic()
-
-	if err != nil {
-		return err.Result()
-	}
-
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
-
+	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatInt(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
 	if msg.ProposalType == ProposalTypeParameterChange {
 		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
 	}
-
+	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
+		////////////////////  iris begin  ///////////////////////////
 		tags.Param, paramBytes,
+		////////////////////  iris end  /////////////////////////////
 	)
 
 	if votingStarted {
@@ -73,7 +71,10 @@ func handleMsgDeposit(ctx sdk.Context, keeper Keeper, msg MsgDeposit) sdk.Result
 		return err.Result()
 	}
 
-	proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(msg.ProposalID)
+	////////////////////  iris begin  ///////////////////////////
+	proposalIDBytes := []byte(strconv.FormatInt(msg.ProposalID, 10))
+	////////////////////  iris end  /////////////////////////////
+
 
 	// TODO: Add tag for if voting period started
 	resTags := sdk.NewTags(
@@ -98,7 +99,9 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 		return err.Result()
 	}
 
-	proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(msg.ProposalID)
+	////////////////////  iris begin  ///////////////////////////
+	proposalIDBytes := []byte(strconv.FormatInt(msg.ProposalID, 10))
+	////////////////////  iris end  /////////////////////////////
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionVote,
@@ -123,34 +126,49 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		if inactiveProposal.GetStatus() != StatusDepositPeriod {
 			continue
 		}
-
-		proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(inactiveProposal.GetProposalID())
+		////////////////////  iris begin  ///////////////////////////
+		proposalIDBytes := []byte(strconv.FormatInt(inactiveProposal.GetProposalID(), 10))
+		////////////////////  iris end  /////////////////////////////
 		keeper.DeleteProposal(ctx, inactiveProposal)
 		resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags.AppendTag(tags.ProposalID, proposalIDBytes)
 
-		logger.Info("Proposal %d - \"%s\" - didn't mean minimum deposit (had only %s), deleted",
-			inactiveProposal.GetProposalID(), inactiveProposal.GetTitle(), inactiveProposal.GetTotalDeposit())
+		logger.Info(
+			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %v iris-atto (had only %v iris-atto); deleted",
+				inactiveProposal.GetProposalID(),
+				inactiveProposal.GetTitle(),
+				////////////////////  iris begin  ///////////////////////////
+				govparams.GetDepositProcedure(ctx).MinDeposit.AmountOf("iris-atto"),
+				////////////////////  iris end  /////////////////////////////
+				inactiveProposal.GetTotalDeposit().AmountOf("iris-atto"),
+			),
+		)
 	}
 
 	// Check if earliest Active Proposal ended voting period yet
 	for shouldPopActiveProposalQueue(ctx, keeper) {
 		activeProposal := keeper.ActiveProposalQueuePop(ctx)
 
-		proposalStartBlock := activeProposal.GetVotingStartBlock()
+		proposalStartTime := activeProposal.GetVotingStartTime()
+		////////////////////  iris begin  ///////////////////////////
 		votingPeriod := govparams.GetVotingProcedure(ctx).VotingPeriod
-		if ctx.BlockHeight() < proposalStartBlock+votingPeriod {
+		////////////////////  iris end  /////////////////////////////
+		if ctx.BlockHeader().Time.Before(proposalStartTime.Add(votingPeriod)) {
 			continue
 		}
 
-		passes, tallyResults, nonVotingVals := tally(ctx, keeper, activeProposal)
-		proposalIDBytes := keeper.cdc.MustMarshalBinaryBare(activeProposal.GetProposalID())
+		passes, tallyResults := tally(ctx, keeper, activeProposal)
+		////////////////////  iris begin  ///////////////////////////
+		proposalIDBytes := []byte(strconv.FormatInt(activeProposal.GetProposalID(), 10))
+		////////////////////  iris end  /////////////////////////////
 		var action []byte
 		if passes {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
+			////////////////////  iris begin  ///////////////////////////
 			activeProposal.Execute(ctx, keeper)
+			////////////////////  iris end  /////////////////////////////
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
@@ -159,20 +177,8 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
 
-		logger.Info("Proposal %d - \"%s\" - tallied, passed: %v",
-			activeProposal.GetProposalID(), activeProposal.GetTitle(), passes)
-
-		for _, valAddr := range nonVotingVals {
-			val := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
-			keeper.ds.GetValidatorSet().Slash(ctx,
-				val.GetPubKey(),
-				ctx.BlockHeight(),
-				val.GetPower().RoundInt64(),
-				govparams.GetTallyingProcedure(ctx).GovernancePenalty)
-
-			logger.Info(fmt.Sprintf("Validator %s failed to vote on proposal %d, slashing",
-				val.GetOwner(), activeProposal.GetProposalID()))
-		}
+		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; passed: %v",
+			activeProposal.GetProposalID(), activeProposal.GetTitle(), passes))
 
 		resTags.AppendTag(tags.Action, action)
 		resTags.AppendTag(tags.ProposalID, proposalIDBytes)
@@ -181,26 +187,30 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	return resTags
 }
 func shouldPopInactiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
+	////////////////////  iris begin  ///////////////////////////
 	depositProcedure := govparams.GetDepositProcedure(ctx)
+	////////////////////  iris end  /////////////////////////////
 	peekProposal := keeper.InactiveProposalQueuePeek(ctx)
 
 	if peekProposal == nil {
 		return false
 	} else if peekProposal.GetStatus() != StatusDepositPeriod {
 		return true
-	} else if ctx.BlockHeight() >= peekProposal.GetSubmitBlock()+depositProcedure.MaxDepositPeriod {
+	} else if !ctx.BlockHeader().Time.Before(peekProposal.GetSubmitTime().Add(depositProcedure.MaxDepositPeriod)) {
 		return true
 	}
 	return false
 }
 
 func shouldPopActiveProposalQueue(ctx sdk.Context, keeper Keeper) bool {
+	////////////////////  iris begin  ///////////////////////////
 	votingProcedure := govparams.GetVotingProcedure(ctx)
+	////////////////////  iris end  /////////////////////////////
 	peekProposal := keeper.ActiveProposalQueuePeek(ctx)
 
 	if peekProposal == nil {
 		return false
-	} else if ctx.BlockHeight() >= peekProposal.GetVotingStartBlock()+votingProcedure.VotingPeriod {
+	} else if !ctx.BlockHeader().Time.Before(peekProposal.GetVotingStartTime().Add(votingProcedure.VotingPeriod)) {
 		return true
 	}
 	return false

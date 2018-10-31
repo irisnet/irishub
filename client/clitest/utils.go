@@ -44,7 +44,7 @@ var (
 // helper methods
 
 func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
-	cdc := codec.NewCodec()
+	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
 	cliCtx := context.NewCLIContext().
 		WithCodec(cdc)
@@ -112,7 +112,7 @@ func modifyGenesisFile(irisHome string) error {
 
 	var genesisState app.GenesisState
 
-	cdc := codec.NewCodec()
+	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
 
 	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
@@ -257,7 +257,7 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 	err := json.Unmarshal([]byte(out), &initRes)
 	require.NoError(t, err, "out %v, err %v", out, err)
 
-	cdc := codec.NewCodec()
+	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
 
 	err = cdc.UnmarshalJSON([]byte(out), &acc)
