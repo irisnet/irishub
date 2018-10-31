@@ -134,20 +134,8 @@ func (br BaseReq) Sanitize() BaseReq {
 	}
 }
 
-/*
-ReadRESTReq is a simple convenience wrapper that reads the body and
-unmarshals to the req interface.
-
-  Usage:
-    type SomeReq struct {
-      BaseReq            `json:"base_req"`
-      CustomField string `json:"custom_field"`
-		}
-
-    req := new(SomeReq)
-    err := ReadRESTReq(w, r, cdc, req)
-*/
-func ReadRESTReq(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req interface{}) error {
+// ReadPostBody
+func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req interface{}) error {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -161,6 +149,15 @@ func ReadRESTReq(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req i
 	}
 
 	return nil
+}
+
+// InitRequestClictx
+func InitRequestClictx(cliCtx context.CLIContext, r *http.Request, name string, signerAddress string) context.CLIContext {
+	cliCtx.GenerateOnly = HasGenerateOnlyArg(r)
+	cliCtx.Async = AsyncOnlyArg(r)
+	cliCtx.FromAddressName = name
+	cliCtx.SignerAddr = signerAddress
+	return cliCtx
 }
 
 // ValidateBasic performs basic validation of a BaseReq. If custom validation
@@ -184,15 +181,15 @@ func (br BaseReq) ValidateBasic(w http.ResponseWriter) bool {
 	return true
 }
 
-// CompleteAndBroadcastTxREST implements a utility function that facilitates
+// SendOrReturnUnsignedTx implements a utility function that facilitates
 // sending a series of messages in a signed transaction given a TxBuilder and a
 // QueryContext. It ensures that the account exists, has a proper number and
 // sequence set. In addition, it builds and signs a transaction with the
 // supplied messages. Finally, it broadcasts the signed transaction to a node.
 //
-// NOTE: Also see CompleteAndBroadcastTxCli.
+// NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
-func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx context.CLIContext, baseReq BaseReq, msgs []sdk.Msg, cdc *codec.Codec) {
+func SendOrReturnUnsignedTx(w http.ResponseWriter, r *http.Request, cliCtx context.CLIContext, baseReq BaseReq, msgs []sdk.Msg, cdc *codec.Codec) {
 	simulateGas, gas, err := client.ReadGasFlag(baseReq.Gas)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())

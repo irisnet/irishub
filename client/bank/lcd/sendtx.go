@@ -13,7 +13,7 @@ import (
 type sendBody struct {
 	Amount string         `json:"amount"`
 	Sender string         `json:"sender"`
-	BaseTx context.BaseTx `json:"base_tx"`
+	BaseTx utils.BaseReq `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address
@@ -33,8 +33,7 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		if err != nil {
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.LocalAccountName, m.Sender)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, m.BaseTx)
+		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.Name, m.Sender)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -57,6 +56,6 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, m.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, r, cliCtx, m.BaseTx, []sdk.Msg{msg}, cdc)
 	}
 }

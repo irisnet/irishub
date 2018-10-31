@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irishub/client/keys"
 )
 
-// CompleteAndBroadcastTxCli implements a utility function that
+// SendOrPrintTx implements a utility function that
 // facilitates sending a series of messages in a signed
 // transaction given a TxContext and a QueryContext. It ensures
 // that the account exists, has a proper number and sequence
@@ -21,8 +21,15 @@ import (
 // supplied messages.  Finally, it broadcasts the signed
 // transaction to a node.
 // NOTE: Also see CompleteAndBroadcastTxREST.
-func CompleteAndBroadcastTxCli(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
-	txCtx, err := prepareTxBuilder(txCtx, cliCtx)
+func SendOrPrintTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
+	if cliCtx.GenerateOnly {
+		return PrintUnsignedStdTx(txCtx, cliCtx, msgs, false)
+	}
+	// Build and sign the transaction, then broadcast to a Tendermint
+	// node.
+	cliCtx.PrintResponse = true
+
+	txCtx, err := prepareTxContext(txCtx, cliCtx)
 	if err != nil {
 		return err
 	}
@@ -176,7 +183,7 @@ func parseQueryResponse(cdc *amino.Codec, rawRes []byte) (int64, error) {
 	return simulationResult.GasUsed, nil
 }
 
-func prepareTxBuilder(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
+func prepareTxContext(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
 	if err := cliCtx.EnsureAccountExists(); err != nil {
 		return txCtx, err
 	}
@@ -211,7 +218,7 @@ func prepareTxBuilder(txCtx context.TxContext, cliCtx context.CLIContext) (conte
 // buildUnsignedStdTx builds a StdTx as per the parameters passed in the
 // contexts. Gas is automatically estimated if gas wanted is set to 0.
 func buildUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
-	txCtx, err = prepareTxBuilder(txCtx, cliCtx)
+	txCtx, err = prepareTxContext(txCtx, cliCtx)
 	if err != nil {
 		return
 	}

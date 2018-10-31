@@ -30,7 +30,7 @@ func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			TxCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
 			if err := cliCtx.EnsureAccountExists(); err != nil {
 				return err
@@ -68,10 +68,10 @@ func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 			// build and sign the transaction, then broadcast to Tendermint
 			msg := bank.BuildMsg(from, to, coins)
 			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(TxCtx, cliCtx, []sdk.Msg{msg}, false)
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, false)
 			}
 
-			return utils.CompleteAndBroadcastTxCli(TxCtx, cliCtx, []sdk.Msg{msg})
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
