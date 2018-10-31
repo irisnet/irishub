@@ -27,9 +27,9 @@ func resultBroadcastTxToCommit(res *ctypes.ResultBroadcastTx) *ctypes.ResultBroa
 // based on the context parameters. The result of the broadcast is parsed into
 // an intermediate structure which is logged if the context has a logger
 // defined.
-func (ctx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
-	if ctx.Async {
-		res, err := ctx.broadcastTxAsync(txBytes)
+func (cliCtx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+	if cliCtx.Async {
+		res, err := cliCtx.broadcastTxAsync(txBytes)
 		if err != nil {
 			return nil, err
 		}
@@ -38,13 +38,13 @@ func (ctx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxComm
 		return resCommit, err
 	}
 
-	return ctx.broadcastTxCommit(txBytes)
+	return cliCtx.broadcastTxCommit(txBytes)
 }
 
 // BroadcastTxAndAwaitCommit broadcasts transaction bytes to a Tendermint node
 // and waits for a commit.
-func (ctx CLIContext) BroadcastTxAndAwaitCommit(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
-	node, err := ctx.GetNode()
+func (cliCtx CLIContext) BroadcastTxAndAwaitCommit(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +67,8 @@ func (ctx CLIContext) BroadcastTxAndAwaitCommit(tx []byte) (*ctypes.ResultBroadc
 
 // BroadcastTxSync broadcasts transaction bytes to a Tendermint node
 // synchronously.
-func (ctx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
-	node, err := ctx.GetNode()
+func (cliCtx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
+	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +83,8 @@ func (ctx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, err
 
 // BroadcastTxAsync broadcasts transaction bytes to a Tendermint node
 // asynchronously.
-func (ctx CLIContext) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
-	node, err := ctx.GetNode()
+func (cliCtx CLIContext) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
+	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
@@ -97,41 +97,41 @@ func (ctx CLIContext) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx, er
 	return res, err
 }
 
-func (ctx CLIContext) broadcastTxAsync(txBytes []byte) (*ctypes.ResultBroadcastTx, error) {
-	res, err := ctx.BroadcastTxAsync(txBytes)
+func (cliCtx CLIContext) broadcastTxAsync(txBytes []byte) (*ctypes.ResultBroadcastTx, error) {
+	res, err := cliCtx.BroadcastTxAsync(txBytes)
 	if err != nil {
 		return res, err
 	}
 
-	if ctx.Logger != nil {
-		if ctx.JSON {
+	if cliCtx.Logger != nil {
+		if cliCtx.JSON {
 			type toJSON struct {
 				TxHash string
 			}
 
 			resJSON := toJSON{res.Hash.String()}
-			bz, err := ctx.Codec.MarshalJSON(resJSON)
+			bz, err := cliCtx.Codec.MarshalJSON(resJSON)
 			if err != nil {
 				return res, err
 			}
 
-			ctx.Logger.Write(bz)
-			io.WriteString(ctx.Logger, "\n")
+			cliCtx.Logger.Write(bz)
+			io.WriteString(cliCtx.Logger, "\n")
 		} else {
-			io.WriteString(ctx.Logger, fmt.Sprintf("async tx sent (tx hash: %s)\n", res.Hash))
+			io.WriteString(cliCtx.Logger, fmt.Sprintf("async tx sent (tx hash: %s)\n", res.Hash))
 		}
 	}
 
 	return res, nil
 }
 
-func (ctx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
-	res, err := ctx.BroadcastTxAndAwaitCommit(txBytes)
+func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+	res, err := cliCtx.BroadcastTxAndAwaitCommit(txBytes)
 	if err != nil {
 		return res, err
 	}
 
-	if ctx.JSON {
+	if cliCtx.JSON {
 		// Since JSON is intended for automated scripts, always include response in
 		// JSON mode.
 		type toJSON struct {
@@ -140,30 +140,30 @@ func (ctx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcast
 			Response abci.ResponseDeliverTx
 		}
 
-		if ctx.Logger != nil {
+		if cliCtx.Logger != nil {
 			resJSON := toJSON{res.Height, res.Hash.String(), res.DeliverTx}
-			bz, err := ctx.Codec.MarshalJSON(resJSON)
+			bz, err := cliCtx.Codec.MarshalJSON(resJSON)
 			if err != nil {
 				return res, err
 			}
 
-			ctx.Logger.Write(bz)
-			io.WriteString(ctx.Logger, "\n")
+			cliCtx.Logger.Write(bz)
+			io.WriteString(cliCtx.Logger, "\n")
 		}
 
 		return res, nil
 	}
 
-	if ctx.Logger != nil {
+	if cliCtx.Logger != nil {
 		resStr := fmt.Sprintf("Committed at block %d (tx hash: %s)\n", res.Height, res.Hash.String())
 
-		if ctx.PrintResponse {
+		if cliCtx.PrintResponse {
 			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n",
 				res.Height, res.Hash.String(), res.DeliverTx,
 			)
 		}
 
-		io.WriteString(ctx.Logger, resStr)
+		io.WriteString(cliCtx.Logger, resStr)
 	}
 
 	return res, nil

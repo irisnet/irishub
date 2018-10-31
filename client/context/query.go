@@ -24,57 +24,57 @@ import (
 
 // GetNode returns an RPC client. If the context's client is not defined, an
 // error is returned.
-func (ctx CLIContext) GetNode() (rpcclient.Client, error) {
-	if ctx.Client == nil {
+func (cliCtx CLIContext) GetNode() (rpcclient.Client, error) {
+	if cliCtx.Client == nil {
 		return nil, errors.New("no RPC client defined")
 	}
 
-	return ctx.Client, nil
+	return cliCtx.Client, nil
 }
 
 // Query performs a query for information about the connected node.
-func (ctx CLIContext) Query(path string, data cmn.HexBytes) (res []byte, err error) {
-	return ctx.query(path, data)
+func (cliCtx CLIContext) Query(path string, data cmn.HexBytes) (res []byte, err error) {
+	return cliCtx.query(path, data)
 }
 
 // Query information about the connected node with a data payload
-func (ctx CLIContext) QueryWithData(path string, data []byte) (res []byte, err error) {
-	return ctx.query(path, data)
+func (cliCtx CLIContext) QueryWithData(path string, data []byte) (res []byte, err error) {
+	return cliCtx.query(path, data)
 }
 
 // QueryStore performs a query from a Tendermint node with the provided key and
 // store name.
-func (ctx CLIContext) QueryStore(key cmn.HexBytes, storeName string) (res []byte, err error) {
-	return ctx.queryStore(key, storeName, "key")
+func (cliCtx CLIContext) QueryStore(key cmn.HexBytes, storeName string) (res []byte, err error) {
+	return cliCtx.queryStore(key, storeName, "key")
 }
 
 // QuerySubspace performs a query from a Tendermint node with the provided
 // store name and subspace.
-func (ctx CLIContext) QuerySubspace(subspace []byte, storeName string) (res []sdk.KVPair, err error) {
-	resRaw, err := ctx.queryStore(subspace, storeName, "subspace")
+func (cliCtx CLIContext) QuerySubspace(subspace []byte, storeName string) (res []sdk.KVPair, err error) {
+	resRaw, err := cliCtx.queryStore(subspace, storeName, "subspace")
 	if err != nil {
 		return res, err
 	}
 
-	ctx.Codec.MustUnmarshalBinary(resRaw, &res)
+	cliCtx.Codec.MustUnmarshalBinary(resRaw, &res)
 	return
 }
 
 // GetAccount queries for an account given an address and a block height. An
 // error is returned if the query or decoding fails.
-func (ctx CLIContext) GetAccount(address []byte) (auth.Account, error) {
-	if ctx.AccDecoder == nil {
+func (cliCtx CLIContext) GetAccount(address []byte) (auth.Account, error) {
+	if cliCtx.AccDecoder == nil {
 		return nil, errors.New("account decoder required but not provided")
 	}
 
-	res, err := ctx.QueryStore(auth.AddressStoreKey(address), ctx.AccountStore)
+	res, err := cliCtx.QueryStore(auth.AddressStoreKey(address), cliCtx.AccountStore)
 	if err != nil {
 		return nil, err
 	} else if len(res) == 0 {
 		return nil, err
 	}
 
-	account, err := ctx.AccDecoder(res)
+	account, err := cliCtx.AccDecoder(res)
 	if err != nil {
 		return nil, err
 	}
@@ -83,19 +83,19 @@ func (ctx CLIContext) GetAccount(address []byte) (auth.Account, error) {
 }
 
 // GetFromAddress returns the from address from the context's name.
-func (ctx CLIContext) GetFromAddress() (sdk.AccAddress, error) {
-	return ctx.fromAddress, nil
+func (cliCtx CLIContext) GetFromAddress() (sdk.AccAddress, error) {
+	return cliCtx.fromAddress, nil
 }
 
 // GetFromName returns the key name for the current context.
-func (ctx CLIContext) GetFromName() (string, error) {
-	return ctx.fromName, nil
+func (cliCtx CLIContext) GetFromName() (string, error) {
+	return cliCtx.fromName, nil
 }
 
 // GetAccountNumber returns the next account number for the given account
 // address.
-func (ctx CLIContext) GetAccountNumber(address []byte) (int64, error) {
-	account, err := ctx.GetAccount(address)
+func (cliCtx CLIContext) GetAccountNumber(address []byte) (int64, error) {
+	account, err := cliCtx.GetAccount(address)
 	if err != nil {
 		return 0, err
 	}
@@ -105,8 +105,8 @@ func (ctx CLIContext) GetAccountNumber(address []byte) (int64, error) {
 
 // GetAccountSequence returns the sequence number for the given account
 // address.
-func (ctx CLIContext) GetAccountSequence(address []byte) (int64, error) {
-	account, err := ctx.GetAccount(address)
+func (cliCtx CLIContext) GetAccountSequence(address []byte) (int64, error) {
+	account, err := cliCtx.GetAccount(address)
 	if err != nil {
 		return 0, err
 	}
@@ -116,13 +116,13 @@ func (ctx CLIContext) GetAccountSequence(address []byte) (int64, error) {
 
 // EnsureAccountExists ensures that an account exists for a given context. An
 // error is returned if it does not.
-func (ctx CLIContext) EnsureAccountExists() error {
-	addr, err := ctx.GetFromAddress()
+func (cliCtx CLIContext) EnsureAccountExists() error {
+	addr, err := cliCtx.GetFromAddress()
 	if err != nil {
 		return err
 	}
 
-	accountBytes, err := ctx.QueryStore(auth.AddressStoreKey(addr), ctx.AccountStore)
+	accountBytes, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), cliCtx.AccountStore)
 	if err != nil {
 		return err
 	}
@@ -137,8 +137,8 @@ func (ctx CLIContext) EnsureAccountExists() error {
 // EnsureAccountExistsFromAddr ensures that an account exists for a given
 // address. Instead of using the context's from name, a direct address is
 // given. An error is returned if it does not.
-func (ctx CLIContext) EnsureAccountExistsFromAddr(addr sdk.AccAddress) error {
-	accountBytes, err := ctx.QueryStore(auth.AddressStoreKey(addr), ctx.AccountStore)
+func (cliCtx CLIContext) EnsureAccountExistsFromAddr(addr sdk.AccAddress) error {
+	accountBytes, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), cliCtx.AccountStore)
 	if err != nil {
 		return err
 	}
@@ -152,15 +152,15 @@ func (ctx CLIContext) EnsureAccountExistsFromAddr(addr sdk.AccAddress) error {
 
 // query performs a query from a Tendermint node with the provided store name
 // and path.
-func (ctx CLIContext) query(path string, key cmn.HexBytes) (res []byte, err error) {
-	node, err := ctx.GetNode()
+func (cliCtx CLIContext) query(path string, key cmn.HexBytes) (res []byte, err error) {
+	node, err := cliCtx.GetNode()
 	if err != nil {
 		return res, err
 	}
 
 	opts := rpcclient.ABCIQueryOptions{
-		Height:  ctx.Height,
-		Trusted: ctx.TrustNode,
+		Height:  cliCtx.Height,
+		Trusted: cliCtx.TrustNode,
 	}
 
 	result, err := node.ABCIQueryWithOptions(path, key, opts)
@@ -174,11 +174,11 @@ func (ctx CLIContext) query(path string, key cmn.HexBytes) (res []byte, err erro
 	}
 
 	// data from trusted node or subspace query doesn't need verification
-	if ctx.TrustNode || !isQueryStoreWithProof(path) {
+	if cliCtx.TrustNode || !isQueryStoreWithProof(path) {
 		return resp.Value, nil
 	}
 
-	err = ctx.verifyProof(path, resp)
+	err = cliCtx.verifyProof(path, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -187,8 +187,8 @@ func (ctx CLIContext) query(path string, key cmn.HexBytes) (res []byte, err erro
 }
 
 // Verify verifies the consensus proof at given height.
-func (ctx CLIContext) Verify(height int64) (tmtypes.SignedHeader, error) {
-	check, err := tmliteProxy.GetCertifiedCommit(height, ctx.Client, ctx.Verifier)
+func (cliCtx CLIContext) Verify(height int64) (tmtypes.SignedHeader, error) {
+	check, err := tmliteProxy.GetCertifiedCommit(height, cliCtx.Client, cliCtx.Verifier)
 	switch {
 	case tmliteErr.IsErrCommitNotFound(err):
 		return tmtypes.SignedHeader{}, ErrVerifyCommit(height)
@@ -200,13 +200,13 @@ func (ctx CLIContext) Verify(height int64) (tmtypes.SignedHeader, error) {
 }
 
 // verifyProof perform response proof verification.
-func (ctx CLIContext) verifyProof(_ string, resp abci.ResponseQuery) error {
-	if ctx.Verifier == nil {
+func (cliCtx CLIContext) verifyProof(_ string, resp abci.ResponseQuery) error {
+	if cliCtx.Verifier == nil {
 		return fmt.Errorf("missing valid certifier to verify data from distrusted node")
 	}
 
 	// the AppHash for height H is in header H+1
-	commit, err := ctx.Verify(resp.Height + 1)
+	commit, err := cliCtx.Verify(resp.Height + 1)
 	if err != nil {
 		return err
 	}
@@ -237,9 +237,9 @@ func (ctx CLIContext) verifyProof(_ string, resp abci.ResponseQuery) error {
 
 // queryStore performs a query from a Tendermint node with the provided a store
 // name and path.
-func (ctx CLIContext) queryStore(key cmn.HexBytes, storeName, endPath string) ([]byte, error) {
+func (cliCtx CLIContext) queryStore(key cmn.HexBytes, storeName, endPath string) ([]byte, error) {
 	path := fmt.Sprintf("/store/%s/%s", storeName, endPath)
-	return ctx.query(path, key)
+	return cliCtx.query(path, key)
 }
 
 // isQueryStoreWithProof expects a format like /<queryType>/<storeName>/<subpath>

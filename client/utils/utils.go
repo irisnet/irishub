@@ -21,8 +21,8 @@ import (
 // supplied messages.  Finally, it broadcasts the signed
 // transaction to a node.
 // NOTE: Also see CompleteAndBroadcastTxREST.
-func CompleteAndBroadcastTxCli(TxCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
-	TxCtx, err := prepareTxBuilder(TxCtx, cliCtx)
+func CompleteAndBroadcastTxCli(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
+	txCtx, err := prepareTxBuilder(txCtx, cliCtx)
 	if err != nil {
 		return err
 	}
@@ -32,12 +32,12 @@ func CompleteAndBroadcastTxCli(TxCtx context.TxContext, cliCtx context.CLIContex
 		return err
 	}
 
-	if TxCtx.SimulateGas || cliCtx.DryRun {
-		TxCtx, err = EnrichCtxWithGas(TxCtx, cliCtx, name, msgs)
+	if txCtx.SimulateGas || cliCtx.DryRun {
+		txCtx, err = EnrichCtxWithGas(txCtx, cliCtx, name, msgs)
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(os.Stderr, "estimated gas = %v\n", TxCtx.Gas)
+		fmt.Fprintf(os.Stderr, "estimated gas = %v\n", txCtx.Gas)
 	}
 	if cliCtx.DryRun {
 		return nil
@@ -49,7 +49,7 @@ func CompleteAndBroadcastTxCli(TxCtx context.TxContext, cliCtx context.CLIContex
 	}
 
 	// build and sign the transaction
-	txBytes, err := TxCtx.BuildAndSign(name, passphrase, msgs)
+	txBytes, err := txCtx.BuildAndSign(name, passphrase, msgs)
 	if err != nil {
 		return err
 	}
@@ -60,12 +60,12 @@ func CompleteAndBroadcastTxCli(TxCtx context.TxContext, cliCtx context.CLIContex
 
 // EnrichCtxWithGas calculates the gas estimate that would be consumed by the
 // transaction and set the transaction's respective value accordingly.
-func EnrichCtxWithGas(TxCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (context.TxContext, error) {
-	_, adjusted, err := simulateMsgs(TxCtx, cliCtx, name, msgs)
+func EnrichCtxWithGas(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (context.TxContext, error) {
+	_, adjusted, err := simulateMsgs(txCtx, cliCtx, name, msgs)
 	if err != nil {
-		return TxCtx, err
+		return txCtx, err
 	}
-	return TxCtx.WithGas(adjusted), nil
+	return txCtx.WithGas(adjusted), nil
 }
 
 // CalculateGas simulates the execution of a transaction and returns
@@ -87,21 +87,21 @@ func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *
 
 // PrintUnsignedStdTx builds an unsigned StdTx and prints it to os.Stdout.
 // Don't perform online validation or lookups if offline is true.
-func PrintUnsignedStdTx(TxCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg, offline bool) (err error) {
+func PrintUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg, offline bool) (err error) {
 	var stdTx auth.StdTx
 	if offline {
-		stdTx, err = buildUnsignedStdTxOffline(TxCtx, cliCtx, msgs)
+		stdTx, err = buildUnsignedStdTxOffline(txCtx, cliCtx, msgs)
 	} else {
-		stdTx, err = buildUnsignedStdTx(TxCtx, cliCtx, msgs)
+		stdTx, err = buildUnsignedStdTx(txCtx, cliCtx, msgs)
 	}
 	if err != nil {
 		return
 	}
 	var json []byte
 	if cliCtx.Indent {
-		json, err = TxCtx.Codec.MarshalJSONIndent(stdTx, "", "  ")
+		json, err = txCtx.Codec.MarshalJSONIndent(stdTx, "", "  ")
 	} else {
-		json, err = TxCtx.Codec.MarshalJSON(stdTx)
+		json, err = txCtx.Codec.MarshalJSON(stdTx)
 	}
 	if err == nil {
 		fmt.Printf("%s\n", json)
@@ -112,7 +112,7 @@ func PrintUnsignedStdTx(TxCtx context.TxContext, cliCtx context.CLIContext, msgs
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If appendSig
 // is false, it replaces the signatures already attached with the new signature.
 // Don't perform online validation or lookups if offline is true.
-func SignStdTx(TxCtx context.TxContext, cliCtx context.CLIContext, name string, stdTx auth.StdTx, appendSig bool, offline bool) (auth.StdTx, error) {
+func SignStdTx(txCtx context.TxContext, cliCtx context.CLIContext, name string, stdTx auth.StdTx, appendSig bool, offline bool) (auth.StdTx, error) {
 	var signedStdTx auth.StdTx
 
 	keybase, err := keys.GetKeyBase()
@@ -130,37 +130,37 @@ func SignStdTx(TxCtx context.TxContext, cliCtx context.CLIContext, name string, 
 		fmt.Fprintf(os.Stderr, "WARNING: The generated transaction's intended signer does not match the given signer: '%v'\n", name)
 	}
 
-	if !offline && TxCtx.AccountNumber == 0 {
+	if !offline && txCtx.AccountNumber == 0 {
 		accNum, err := cliCtx.GetAccountNumber(addr)
 		if err != nil {
 			return signedStdTx, err
 		}
-		TxCtx = TxCtx.WithAccountNumber(accNum)
+		txCtx = txCtx.WithAccountNumber(accNum)
 	}
 
-	if !offline && TxCtx.Sequence == 0 {
+	if !offline && txCtx.Sequence == 0 {
 		accSeq, err := cliCtx.GetAccountSequence(addr)
 		if err != nil {
 			return signedStdTx, err
 		}
-		TxCtx = TxCtx.WithSequence(accSeq)
+		txCtx = txCtx.WithSequence(accSeq)
 	}
 
 	passphrase, err := keys.GetPassphrase(name)
 	if err != nil {
 		return signedStdTx, err
 	}
-	return TxCtx.SignStdTx(name, passphrase, stdTx, appendSig)
+	return txCtx.SignStdTx(name, passphrase, stdTx, appendSig)
 }
 
 // nolint
 // SimulateMsgs simulates the transaction and returns the gas estimate and the adjusted value.
-func simulateMsgs(TxCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted int64, err error) {
-	txBytes, err := TxCtx.BuildWithPubKey(name, msgs)
+func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted int64, err error) {
+	txBytes, err := txCtx.BuildWithPubKey(name, msgs)
 	if err != nil {
 		return
 	}
-	estimated, adjusted, err = CalculateGas(cliCtx.Query, cliCtx.Codec, txBytes, TxCtx.GasAdjustment)
+	estimated, adjusted, err = CalculateGas(cliCtx.Query, cliCtx.Codec, txBytes, txCtx.GasAdjustment)
 	return
 }
 
@@ -176,63 +176,63 @@ func parseQueryResponse(cdc *amino.Codec, rawRes []byte) (int64, error) {
 	return simulationResult.GasUsed, nil
 }
 
-func prepareTxBuilder(TxCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
+func prepareTxBuilder(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
 	if err := cliCtx.EnsureAccountExists(); err != nil {
-		return TxCtx, err
+		return txCtx, err
 	}
 
 	from, err := cliCtx.GetFromAddress()
 	if err != nil {
-		return TxCtx, err
+		return txCtx, err
 	}
 
 	// TODO: (ref #1903) Allow for user supplied account number without
 	// automatically doing a manual lookup.
-	if TxCtx.AccountNumber == 0 {
+	if txCtx.AccountNumber == 0 {
 		accNum, err := cliCtx.GetAccountNumber(from)
 		if err != nil {
-			return TxCtx, err
+			return txCtx, err
 		}
-		TxCtx = TxCtx.WithAccountNumber(accNum)
+		txCtx = txCtx.WithAccountNumber(accNum)
 	}
 
 	// TODO: (ref #1903) Allow for user supplied account sequence without
 	// automatically doing a manual lookup.
-	if TxCtx.Sequence == 0 {
+	if txCtx.Sequence == 0 {
 		accSeq, err := cliCtx.GetAccountSequence(from)
 		if err != nil {
-			return TxCtx, err
+			return txCtx, err
 		}
-		TxCtx = TxCtx.WithSequence(accSeq)
+		txCtx = txCtx.WithSequence(accSeq)
 	}
-	return TxCtx, nil
+	return txCtx, nil
 }
 
 // buildUnsignedStdTx builds a StdTx as per the parameters passed in the
 // contexts. Gas is automatically estimated if gas wanted is set to 0.
-func buildUnsignedStdTx(TxCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
-	TxCtx, err = prepareTxBuilder(TxCtx, cliCtx)
+func buildUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
+	txCtx, err = prepareTxBuilder(txCtx, cliCtx)
 	if err != nil {
 		return
 	}
-	return buildUnsignedStdTxOffline(TxCtx, cliCtx, msgs)
+	return buildUnsignedStdTxOffline(txCtx, cliCtx, msgs)
 }
 
-func buildUnsignedStdTxOffline(TxCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
-	if TxCtx.SimulateGas {
+func buildUnsignedStdTxOffline(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
+	if txCtx.SimulateGas {
 		var name string
 		name, err = cliCtx.GetFromName()
 		if err != nil {
 			return
 		}
 
-		TxCtx, err = EnrichCtxWithGas(TxCtx, cliCtx, name, msgs)
+		txCtx, err = EnrichCtxWithGas(txCtx, cliCtx, name, msgs)
 		if err != nil {
 			return
 		}
-		fmt.Fprintf(os.Stderr, "estimated gas = %v\n", TxCtx.Gas)
+		fmt.Fprintf(os.Stderr, "estimated gas = %v\n", txCtx.Gas)
 	}
-	stdSignMsg, err := TxCtx.Build(msgs)
+	stdSignMsg, err := txCtx.Build(msgs)
 	if err != nil {
 		return
 	}

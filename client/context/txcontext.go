@@ -52,64 +52,64 @@ func NewTxContextFromCLI() TxContext {
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (bldr TxContext) WithCliCtx(ctx CLIContext) TxContext {
-	bldr.cliCtx = ctx
-	return bldr
+func (txCtx TxContext) WithCliCtx(ctx CLIContext) TxContext {
+	txCtx.cliCtx = ctx
+	return txCtx
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (bldr TxContext) WithCodec(cdc *codec.Codec) TxContext {
-	bldr.Codec = cdc
-	return bldr
+func (txCtx TxContext) WithCodec(cdc *codec.Codec) TxContext {
+	txCtx.Codec = cdc
+	return txCtx
 }
 
 // WithChainID returns a copy of the context with an updated chainID.
-func (bldr TxContext) WithChainID(chainID string) TxContext {
-	bldr.ChainID = chainID
-	return bldr
+func (txCtx TxContext) WithChainID(chainID string) TxContext {
+	txCtx.ChainID = chainID
+	return txCtx
 }
 
 // WithGas returns a copy of the context with an updated gas.
-func (bldr TxContext) WithGas(gas int64) TxContext {
-	bldr.Gas = gas
-	return bldr
+func (txCtx TxContext) WithGas(gas int64) TxContext {
+	txCtx.Gas = gas
+	return txCtx
 }
 
 // WithFee returns a copy of the context with an updated fee.
-func (bldr TxContext) WithFee(fee string) TxContext {
-	bldr.Fee = fee
-	return bldr
+func (txCtx TxContext) WithFee(fee string) TxContext {
+	txCtx.Fee = fee
+	return txCtx
 }
 
 // WithSequence returns a copy of the context with an updated sequence number.
-func (bldr TxContext) WithSequence(sequence int64) TxContext {
-	bldr.Sequence = sequence
-	return bldr
+func (txCtx TxContext) WithSequence(sequence int64) TxContext {
+	txCtx.Sequence = sequence
+	return txCtx
 }
 
 // WithMemo returns a copy of the context with an updated memo.
-func (bldr TxContext) WithMemo(memo string) TxContext {
-	bldr.Memo = memo
-	return bldr
+func (txCtx TxContext) WithMemo(memo string) TxContext {
+	txCtx.Memo = memo
+	return txCtx
 }
 
 // WithAccountNumber returns a copy of the context with an account number.
-func (bldr TxContext) WithAccountNumber(accnum int64) TxContext {
-	bldr.AccountNumber = accnum
-	return bldr
+func (txCtx TxContext) WithAccountNumber(accnum int64) TxContext {
+	txCtx.AccountNumber = accnum
+	return txCtx
 }
 
 // Build builds a single message to be signed from a TxContext given a set of
 // messages. It returns an error if a fee is supplied but cannot be parsed.
-func (bldr TxContext) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
-	chainID := bldr.ChainID
+func (txCtx TxContext) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
+	chainID := txCtx.ChainID
 	if chainID == "" {
 		return authtxb.StdSignMsg{}, errors.Errorf("chain ID required but not specified")
 	}
 
 	fee := sdk.Coins{}
-	if bldr.Fee != "" {
-		parsedFee, err := bldr.cliCtx.ParseCoins(bldr.Fee)
+	if txCtx.Fee != "" {
+		parsedFee, err := txCtx.cliCtx.ParseCoins(txCtx.Fee)
 		if err != nil {
 			return authtxb.StdSignMsg{}, fmt.Errorf("encountered error in parsing transaction fee: %s", err.Error())
 		}
@@ -118,43 +118,43 @@ func (bldr TxContext) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
 	}
 
 	return authtxb.StdSignMsg{
-		ChainID:       bldr.ChainID,
-		AccountNumber: bldr.AccountNumber,
-		Sequence:      bldr.Sequence,
-		Memo:          bldr.Memo,
+		ChainID:       txCtx.ChainID,
+		AccountNumber: txCtx.AccountNumber,
+		Sequence:      txCtx.Sequence,
+		Memo:          txCtx.Memo,
 		Msgs:          msgs,
-		Fee:           auth.NewStdFee(bldr.Gas, fee...),
+		Fee:           auth.NewStdFee(txCtx.Gas, fee...),
 	}, nil
 }
 
 // Sign signs a transaction given a name, passphrase, and a single message to
 // signed. An error is returned if signing fails.
-func (bldr TxContext) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]byte, error) {
+func (txCtx TxContext) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]byte, error) {
 	sig, err := MakeSignature(name, passphrase, msg)
 	if err != nil {
 		return nil, err
 	}
-	return bldr.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, []auth.StdSignature{sig}, msg.Memo))
+	return txCtx.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, []auth.StdSignature{sig}, msg.Memo))
 }
 
 // BuildAndSign builds a single message to be signed, and signs a transaction
 // with the built message given a name, passphrase, and a set of
 // messages.
-func (bldr TxContext) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]byte, error) {
-	msg, err := bldr.Build(msgs)
+func (txCtx TxContext) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]byte, error) {
+	msg, err := txCtx.Build(msgs)
 	if err != nil {
 		return nil, err
 	}
 
-	return bldr.Sign(name, passphrase, msg)
+	return txCtx.Sign(name, passphrase, msg)
 }
 
 // BuildWithPubKey builds a single message to be signed from a TxContext given a set of
 // messages and attach the public key associated to the given name.
 // It returns an error if a fee is supplied but cannot be parsed or the key cannot be
 // retrieved.
-func (bldr TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, error) {
-	msg, err := bldr.Build(msgs)
+func (txCtx TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, error) {
+	msg, err := txCtx.Build(msgs)
 	if err != nil {
 		return nil, err
 	}
@@ -175,16 +175,16 @@ func (bldr TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, erro
 		PubKey:        info.GetPubKey(),
 	}}
 
-	return bldr.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, sigs, msg.Memo))
+	return txCtx.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, sigs, msg.Memo))
 }
 
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If append
 // is false, it replaces the signatures already attached with the new signature.
-func (bldr TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appendSig bool) (signedStdTx auth.StdTx, err error) {
+func (txCtx TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appendSig bool) (signedStdTx auth.StdTx, err error) {
 	stdSignature, err := MakeSignature(name, passphrase, authtxb.StdSignMsg{
-		ChainID:       bldr.ChainID,
-		AccountNumber: bldr.AccountNumber,
-		Sequence:      bldr.Sequence,
+		ChainID:       txCtx.ChainID,
+		AccountNumber: txCtx.AccountNumber,
+		Sequence:      txCtx.Sequence,
 		Fee:           stdTx.Fee,
 		Msgs:          stdTx.GetMsgs(),
 		Memo:          stdTx.GetMemo(),

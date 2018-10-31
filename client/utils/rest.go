@@ -87,14 +87,14 @@ func ParseFloat64OrReturnBadRequest(w http.ResponseWriter, s string, defaultIfEm
 }
 
 // WriteGenerateStdTxResponse writes response for the generate_only mode.
-func WriteGenerateStdTxResponse(w http.ResponseWriter, TxCtx context.TxContext, msgs []sdk.Msg) {
-	stdMsg, err := TxCtx.Build(msgs)
+func WriteGenerateStdTxResponse(w http.ResponseWriter, txCtx context.TxContext, msgs []sdk.Msg) {
+	stdMsg, err := txCtx.Build(msgs)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	output, err := TxCtx.Codec.MarshalJSON(auth.NewStdTx(stdMsg.Msgs, stdMsg.Fee, nil, stdMsg.Memo))
+	output, err := txCtx.Codec.MarshalJSON(auth.NewStdTx(stdMsg.Msgs, stdMsg.Fee, nil, stdMsg.Memo))
 	if err != nil {
 		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -204,7 +204,7 @@ func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx c
 		return
 	}
 
-	TxCtx := context.TxContext{
+	txCtx := context.TxContext{
 		Codec:         cdc,
 		Gas:           gas,
 		GasAdjustment: adjustment,
@@ -214,8 +214,8 @@ func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx c
 		Sequence:      baseReq.Sequence,
 	}
 
-	if HasDryRunArg(r) || TxCtx.SimulateGas {
-		newBldr, err := EnrichCtxWithGas(TxCtx, cliCtx, baseReq.Name, msgs)
+	if HasDryRunArg(r) || txCtx.SimulateGas {
+		newBldr, err := EnrichCtxWithGas(txCtx, cliCtx, baseReq.Name, msgs)
 		if err != nil {
 			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -226,15 +226,15 @@ func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx c
 			return
 		}
 
-		TxCtx = newBldr
+		txCtx = newBldr
 	}
 
 	if HasGenerateOnlyArg(r) {
-		WriteGenerateStdTxResponse(w, TxCtx, msgs)
+		WriteGenerateStdTxResponse(w, txCtx, msgs)
 		return
 	}
 
-	txBytes, err := TxCtx.BuildAndSign(baseReq.Name, baseReq.Password, msgs)
+	txBytes, err := txCtx.BuildAndSign(baseReq.Name, baseReq.Password, msgs)
 	if keyerror.IsErrKeyNotFound(err) {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
