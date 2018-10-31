@@ -15,20 +15,28 @@ import (
 	"testing"
 )
 
-func defaultContext(key sdk.StoreKey) sdk.Context {
+func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Context {
 	db := dbm.NewMemDB()
 	cms := store.NewCommitMultiStore(db)
 	cms.MountStoreWithDB(key, sdk.StoreTypeIAVL, db)
+	cms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+
 	cms.LoadLatestVersion()
 	ctx := sdk.NewContext(cms, abci.Header{}, false, log.NewNopLogger())
 	return ctx
 }
 
 func TestInitGenesisParameter(t *testing.T) {
-
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(codec.New(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
 
 	Denom             := "iris"
 	IrisCt            := types.NewDefaultCoinType(Denom)
@@ -46,24 +54,33 @@ func TestInitGenesisParameter(t *testing.T) {
 		MinDeposit:       sdk.Coins{minDeposit},
 		MaxDepositPeriod: 1440}
 
-	iparam.SetParamReadWriter(paramKeeper.Setter(), &DepositProcedureParameter, &DepositProcedureParameter)
-
+	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
+		params.NewTypeTable(
+			DepositProcedureParameter.GetStoreKey(), DepositProcedure{},
+			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
+			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
+		))
+	iparam.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
 	require.Equal(t, p1, DepositProcedureParameter.Value)
-
 	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
 
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, p2)
-
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 }
 
 func TestRegisterParamMapping(t *testing.T) {
-
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(codec.New(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
 
 	Denom             := "iris"
 	IrisCt            := types.NewDefaultCoinType(Denom)
@@ -81,22 +98,35 @@ func TestRegisterParamMapping(t *testing.T) {
 		MinDeposit:       sdk.Coins{minDeposit},
 		MaxDepositPeriod: 1440}
 
-	iparam.SetParamReadWriter(paramKeeper.Setter(), &DepositProcedureParameter, &DepositProcedureParameter)
+	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
+		params.NewTypeTable(
+			DepositProcedureParameter.GetStoreKey(), DepositProcedure{},
+			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
+			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
+		))
+	iparam.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
 	iparam.RegisterGovParamMapping(&DepositProcedureParameter)
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
-	require.Equal(t, iparam.ParamMapping[DepositProcedureParameter.GetStoreKey()].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, iparam.ParamMapping[string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	iparam.ParamMapping[DepositProcedureParameter.GetStoreKey()].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":1440}")
+	iparam.ParamMapping[string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":1440}")
 	DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 }
 
 func TestDepositProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(codec.New(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
 
 	p1deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
 	p2Deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
@@ -108,7 +138,14 @@ func TestDepositProcedureParam(t *testing.T) {
 		MinDeposit:       sdk.Coins{p2Deposit},
 		MaxDepositPeriod: 1440}
 
-	DepositProcedureParameter.SetReadWriter(paramKeeper.Setter())
+	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
+		params.NewTypeTable(
+			DepositProcedureParameter.GetStoreKey(), DepositProcedure{},
+			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
+			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
+		))
+
+	DepositProcedureParameter.SetReadWriter(subspace)
 	find := DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
@@ -157,8 +194,15 @@ func TestDepositProcedureParam(t *testing.T) {
 
 func TestVotingProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(codec.New(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
 
 	p1 := VotingProcedure{
 		VotingPeriod: 1000,
@@ -168,7 +212,14 @@ func TestVotingProcedureParam(t *testing.T) {
 		VotingPeriod: 2000,
 	}
 
-	VotingProcedureParameter.SetReadWriter(paramKeeper.Setter())
+	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
+		params.NewTypeTable(
+			DepositProcedureParameter.GetStoreKey(), DepositProcedure{},
+			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
+			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
+		))
+
+	VotingProcedureParameter.SetReadWriter(subspace)
 	find := VotingProcedureParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
@@ -197,30 +248,44 @@ func TestVotingProcedureParam(t *testing.T) {
 
 func TestTallyingProcedureParam(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(codec.New(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
 
 	p1 := TallyingProcedure{
-		Threshold:         sdk.NewRat(1, 2),
-		Veto:              sdk.NewRat(1, 3),
-		GovernancePenalty: sdk.NewRat(1, 100),
+		Threshold:         sdk.NewDecWithPrec(5, 1),
+		Veto:              sdk.NewDecWithPrec(334, 3),
+		GovernancePenalty: sdk.NewDecWithPrec(1, 2),
 	}
 
 	p2 := TallyingProcedure{
-		Threshold:         sdk.NewRat(1, 2),
-		Veto:              sdk.NewRat(1, 3),
-		GovernancePenalty: sdk.NewRat(1, 50),
+		Threshold:         sdk.NewDecWithPrec(5, 1),
+		Veto:              sdk.NewDecWithPrec(334, 3),
+		GovernancePenalty: sdk.NewDecWithPrec(2, 2),
 	}
 
-	TallyingProcedureParameter.SetReadWriter(paramKeeper.Setter())
+	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
+		params.NewTypeTable(
+			DepositProcedureParameter.GetStoreKey(), DepositProcedure{},
+			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
+			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
+		))
+
+	TallyingProcedureParameter.SetReadWriter(subspace)
 	find := TallyingProcedureParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
 	TallyingProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, TallyingProcedureParameter.Value)
-	require.Equal(t, TallyingProcedureParameter.ToJson(""), "{\"threshold\":\"1/2\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
+	require.Equal(t, "{\"threshold\":\"0.5000000000\",\"veto\":\"0.3340000000\",\"governance_penalty\":\"0.0100000000\"}", TallyingProcedureParameter.ToJson(""))
 
-	TallyingProcedureParameter.Update(ctx, "{\"threshold\":\"0.5\",\"veto\":\"1/3\",\"governance_penalty\":\"1/50\"}")
+	TallyingProcedureParameter.Update(ctx, "{\"threshold\":\"0.5\",\"veto\":\"0.3340000000\",\"governance_penalty\":\"0.0200000000\"}")
 
 	require.NotEqual(t, p1, TallyingProcedureParameter.Value)
 	require.Equal(t, p2, TallyingProcedureParameter.Value)
