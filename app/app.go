@@ -126,7 +126,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = app.replay()
 	}
 
-	// define the accountMapper
+	// define the AccountKeeper
 	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,        // target store

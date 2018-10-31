@@ -77,8 +77,8 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	require.Nil(t, err)
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewTMLogger(os.Stdout))
 	cdc := createTestCodec()
-	accountMapper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
-	ck := bank.NewBaseKeeper(accountMapper)
+	AccountKeeper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
+	ck := bank.NewBaseKeeper(AccountKeeper)
 
 	paramsKeeper := params.NewKeeper(
 		cdc,

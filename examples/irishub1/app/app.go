@@ -68,7 +68,7 @@ type IrisApp struct {
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
-	accountMapper       auth.AccountMapper
+	AccountKeeper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	coinKeeper          bank.Keeper
 	ibcMapper           ibc.Mapper
@@ -113,8 +113,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = app.replay()
 	}
 
-	// define the accountMapper
-	app.accountMapper = auth.NewAccountMapper(
+	// define the AccountKeeper
+	app.AccountKeeper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,        // target store
 		auth.ProtoBaseAccount, // prototype
@@ -122,7 +122,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	// add handlers
 	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
-	app.coinKeeper = bank.NewKeeper(app.accountMapper)
+	app.coinKeeper = bank.NewKeeper(app.AccountKeeper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.ibc1Mapper = ibc1.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc1.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
@@ -151,8 +151,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
+	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.feeCollectionKeeper))
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.feeCollectionKeeper, app.feeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyIservice)
 	app.SetRunMsg(app.runMsgs)
@@ -239,8 +239,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the accounts
 	for _, gacc := range genesisState.Accounts {
 		acc := gacc.ToAccount()
-		acc.AccountNumber = app.accountMapper.GetNextAccountNumber(ctx)
-		app.accountMapper.SetAccount(ctx, acc)
+		acc.AccountNumber = app.AccountKeeper.GetNextAccountNumber(ctx)
+		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
 	// load the initial stake information
@@ -278,7 +278,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		accounts = append(accounts, account)
 		return false
 	}
-	app.accountMapper.IterateAccounts(ctx, appendAccount)
+	app.AccountKeeper.IterateAccounts(ctx, appendAccount)
 
 	genState := GenesisState{
 		Accounts:  accounts,

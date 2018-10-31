@@ -33,7 +33,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	keyStake := sdk.NewKVStoreKey("stake")
 	keyGov := sdk.NewKVStoreKey("gov")
 
-	ck := bank.NewKeeper(mapp.AccountMapper)
+	ck := bank.NewKeeper(mapp.AccountKeeper)
 	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
 	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
 	pk := sdkParams.NewKeeper(mapp.Cdc, keyGlobalParams)

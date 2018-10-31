@@ -33,15 +33,17 @@ type App struct {
 	KeyAccount       *sdk.KVStoreKey
 	KeyIBC           *sdk.KVStoreKey
 	KeyStake         *sdk.KVStoreKey
+	TkeyStake        *sdk.TransientStoreKey
 	KeySlashing      *sdk.KVStoreKey
 	KeyGov           *sdk.KVStoreKey
 	KeyFeeCollection *sdk.KVStoreKey
 	KeyParams        *sdk.KVStoreKey
-	tkeyParams       *sdk.TransientStoreKey
+	TkeyParams       *sdk.TransientStoreKey
 	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountKeeper       auth.AccountKeeper
+	BankKeeper          bank.Keeper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
 	ParamsKeeper        params.Keeper
 
@@ -75,24 +77,27 @@ func NewApp() *App {
 		KeyIBC:           sdk.NewKVStoreKey("ibc"),
 		KeyStake:         sdk.NewKVStoreKey("stake"),
 		KeySlashing:      sdk.NewKVStoreKey("slashing"),
+		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
 		KeyGov:           sdk.NewKVStoreKey("gov"),
 		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
-		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
+		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
-	// Define the accountMapper
+	// Define the AccountKeeper
 	app.AccountKeeper = auth.NewAccountKeeper(
 		app.Cdc,
 		app.KeyAccount,
 		auth.ProtoBaseAccount,
 	)
 
+	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
+
 	app.ParamsKeeper = params.NewKeeper(
 		app.Cdc,
-		app.KeyParams, app.tkeyParams,
+		app.KeyParams, app.TkeyParams,
 	)
 
 	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
@@ -107,11 +112,18 @@ func NewApp() *App {
 	// Not sealing for custom extension
 
 	// init iparam
-	iparam.SetParamReadWriter(paramsKeeper.Setter(),
+	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace("Gov").WithTypeTable(
+		params.NewTypeTable(
+			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
+			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
+			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
-	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+
+	iparam.RegisterGovParamMapping(
+		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
 
@@ -136,16 +148,16 @@ func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
 func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.ResponseInitChain {
 	// Load the genesis accounts
 	for _, genacc := range app.GenesisAccounts {
-		acc := app.AccountMapper.NewAccountWithAddress(ctx, genacc.GetAddress())
+		acc := app.AccountKeeper.NewAccountWithAddress(ctx, genacc.GetAddress())
 		acc.SetCoins(genacc.GetCoins())
-		app.AccountMapper.SetAccount(ctx, acc)
+		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
 	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
 		FeeTokenNative:    types.NewDefaultCoinType("iris").MinUnit.Denom,
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
-	bam.InitGenesis(ctx, app.ParamsKeeper.Setter(), feeTokenGensisConfig)
+	bam.InitGenesis(ctx, app.FeeManager, feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{}
 }
@@ -289,8 +301,8 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 	app.GenesisAccounts = accts
 }
 
-// GetAllAccounts returns all accounts in the accountMapper.
-func GetAllAccounts(mapper auth.AccountMapper, ctx sdk.Context) []auth.Account {
+// GetAllAccounts returns all accounts in the AccountKeeper.
+func GetAllAccounts(mapper auth.AccountKeeper, ctx sdk.Context) []auth.Account {
 	accounts := []auth.Account{}
 	appendAccount := func(acc auth.Account) (stop bool) {
 		accounts = append(accounts, acc)
