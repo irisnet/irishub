@@ -39,7 +39,7 @@ type App struct {
 	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
-	AccountMapper       auth.AccountMapper
+	AccountMapper       auth.AccountKeeper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
 	ParamsKeeper        params.Keeper
 

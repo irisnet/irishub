@@ -32,7 +32,7 @@ type DepositProcedure struct {
 
 type DepositProcedureParam struct {
 	Value   DepositProcedure
-	paramSpace
+	paramSpace params.Subspace
 }
 
 func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -52,24 +52,23 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	}
 }
 
-func (param *DepositProcedureParam) SetReadWriter(setter params.Setter) {
-	param.psetter = setter
-	param.pgetter = setter.Getter
+func (param *DepositProcedureParam) SetReadWriter(paramSpace params.Subspace) {
+	param.paramSpace = paramSpace
 }
 
-func (param *DepositProcedureParam) GetStoreKey() string {
-	return "Gov/gov/DepositProcedure"
+func (param *DepositProcedureParam) GetStoreKey() []byte {
+	return []byte("govDepositProcedure")
 }
 
 func (param *DepositProcedureParam) SaveValue(ctx sdk.Context) {
-	param.psetter.Set(ctx, param.GetStoreKey(), param.Value)
+	param.paramSpace.Set(ctx, param.GetStoreKey(), param.Value)
 }
 
 func (param *DepositProcedureParam) LoadValue(ctx sdk.Context) bool {
-	err := param.pgetter.Get(ctx, param.GetStoreKey(), &param.Value)
-	if err != nil {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
 		return false
 	}
+	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
 
@@ -133,8 +132,7 @@ type VotingProcedure struct {
 
 type VotingProcedureParam struct {
 	Value   VotingProcedure
-	psetter params.Setter
-	pgetter params.Getter
+	paramSpace params.Subspace
 }
 
 func (param *VotingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -150,24 +148,23 @@ func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	}
 }
 
-func (param *VotingProcedureParam) SetReadWriter(setter params.Setter) {
-	param.psetter = setter
-	param.pgetter = setter.Getter
+func (param *VotingProcedureParam) SetReadWriter(paramSpace params.Subspace) {
+	param.paramSpace = paramSpace
 }
 
-func (param *VotingProcedureParam) GetStoreKey() string {
-	return "Gov/gov/VotingProcedure"
+func (param *VotingProcedureParam) GetStoreKey() []byte {
+	return []byte("govVotingProcedure")
 }
 
 func (param *VotingProcedureParam) SaveValue(ctx sdk.Context) {
-	param.psetter.Set(ctx, param.GetStoreKey(), param.Value)
+	param.paramSpace.Set(ctx, param.GetStoreKey(), param.Value)
 }
 
 func (param *VotingProcedureParam) LoadValue(ctx sdk.Context) bool {
-	err := param.pgetter.Get(ctx, param.GetStoreKey(), &param.Value)
-	if err != nil {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
 		return false
 	}
+	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
 
@@ -220,8 +217,7 @@ type TallyingProcedure struct {
 
 type TallyingProcedureParam struct {
 	Value   TallyingProcedure
-	psetter params.Setter
-	pgetter params.Getter
+	paramSpace params.Subspace
 }
 
 func (param *TallyingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -241,24 +237,23 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 	}
 }
 
-func (param *TallyingProcedureParam) SetReadWriter(setter params.Setter) {
-	param.psetter = setter
-	param.pgetter = setter.Getter
+func (param *TallyingProcedureParam) SetReadWriter(paramSpace params.Subspace) {
+	param.paramSpace = paramSpace
 }
 
-func (param *TallyingProcedureParam) GetStoreKey() string {
-	return "Gov/gov/TallyingProcedure"
+func (param *TallyingProcedureParam) GetStoreKey() []byte {
+	return []byte("govTallyingProcedure")
 }
 
 func (param *TallyingProcedureParam) SaveValue(ctx sdk.Context) {
-	param.psetter.Set(ctx, param.GetStoreKey(), param.Value)
+	param.paramSpace.Set(ctx, param.GetStoreKey(), param.Value)
 }
 
 func (param *TallyingProcedureParam) LoadValue(ctx sdk.Context) bool {
-	err := param.pgetter.Get(ctx, param.GetStoreKey(), &param.Value)
-	if err != nil {
+	if param.paramSpace.Has(ctx, param.GetStoreKey()) == false {
 		return false
 	}
+	param.paramSpace.Get(ctx, param.GetStoreKey(), &param.Value)
 	return true
 }
 
@@ -289,13 +284,13 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.Threshold.LTE(sdk.NewRat(0)) || param.Value.Threshold.GTE(sdk.NewRat(1)) {
+		if param.Value.Threshold.LTE(sdk.ZeroDec()) || param.Value.Threshold.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidThreshold, fmt.Sprintf("Invalid Threshold ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
 		}
-		if param.Value.GovernancePenalty.LTE(sdk.NewRat(0)) || param.Value.GovernancePenalty.GTE(sdk.NewRat(1)) {
+		if param.Value.GovernancePenalty.LTE(sdk.ZeroDec()) || param.Value.GovernancePenalty.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid Penalty ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
 		}
-		if param.Value.Veto.LTE(sdk.NewRat(0)) || param.Value.Veto.GTE(sdk.NewRat(1)) {
+		if param.Value.Veto.LTE(sdk.ZeroDec()) || param.Value.Veto.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
 		}
 
