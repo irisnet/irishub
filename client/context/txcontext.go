@@ -13,8 +13,8 @@ import (
 	"fmt"
 )
 
-// TxBuilder implements a transaction context created in SDK modules.
-type TxBuilder struct {
+// TxContext implements a transaction context created in SDK modules.
+type TxContext struct {
 	Codec         *codec.Codec
 	cliCtx        CLIContext
 	AccountNumber int64
@@ -27,9 +27,9 @@ type TxBuilder struct {
 	Fee           string
 }
 
-// NewTxBuilderFromCLI returns a new initialized TxBuilder with parameters from
+// NewTxBuilderFromCLI returns a new initialized TxContext with parameters from
 // the command line using Viper.
-func NewTxBuilderFromCLI() TxBuilder {
+func NewTxContextFromCLI() TxContext {
 	// if chain ID is not specified manually, read default chain ID
 	chainID := viper.GetString(client.FlagChainID)
 	if chainID == "" {
@@ -39,7 +39,7 @@ func NewTxBuilderFromCLI() TxBuilder {
 		}
 	}
 
-	return TxBuilder{
+	return TxContext{
 		ChainID:       chainID,
 		AccountNumber: viper.GetInt64(client.FlagAccountNumber),
 		Gas:           client.GasFlagVar.Gas,
@@ -52,56 +52,56 @@ func NewTxBuilderFromCLI() TxBuilder {
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (bldr TxBuilder) WithCliCtx(ctx CLIContext) TxBuilder {
+func (bldr TxContext) WithCliCtx(ctx CLIContext) TxContext {
 	bldr.cliCtx = ctx
 	return bldr
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (bldr TxBuilder) WithCodec(cdc *codec.Codec) TxBuilder {
+func (bldr TxContext) WithCodec(cdc *codec.Codec) TxContext {
 	bldr.Codec = cdc
 	return bldr
 }
 
 // WithChainID returns a copy of the context with an updated chainID.
-func (bldr TxBuilder) WithChainID(chainID string) TxBuilder {
+func (bldr TxContext) WithChainID(chainID string) TxContext {
 	bldr.ChainID = chainID
 	return bldr
 }
 
 // WithGas returns a copy of the context with an updated gas.
-func (bldr TxBuilder) WithGas(gas int64) TxBuilder {
+func (bldr TxContext) WithGas(gas int64) TxContext {
 	bldr.Gas = gas
 	return bldr
 }
 
 // WithFee returns a copy of the context with an updated fee.
-func (bldr TxBuilder) WithFee(fee string) TxBuilder {
+func (bldr TxContext) WithFee(fee string) TxContext {
 	bldr.Fee = fee
 	return bldr
 }
 
 // WithSequence returns a copy of the context with an updated sequence number.
-func (bldr TxBuilder) WithSequence(sequence int64) TxBuilder {
+func (bldr TxContext) WithSequence(sequence int64) TxContext {
 	bldr.Sequence = sequence
 	return bldr
 }
 
 // WithMemo returns a copy of the context with an updated memo.
-func (bldr TxBuilder) WithMemo(memo string) TxBuilder {
+func (bldr TxContext) WithMemo(memo string) TxContext {
 	bldr.Memo = memo
 	return bldr
 }
 
 // WithAccountNumber returns a copy of the context with an account number.
-func (bldr TxBuilder) WithAccountNumber(accnum int64) TxBuilder {
+func (bldr TxContext) WithAccountNumber(accnum int64) TxContext {
 	bldr.AccountNumber = accnum
 	return bldr
 }
 
-// Build builds a single message to be signed from a TxBuilder given a set of
+// Build builds a single message to be signed from a TxContext given a set of
 // messages. It returns an error if a fee is supplied but cannot be parsed.
-func (bldr TxBuilder) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
+func (bldr TxContext) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
 	chainID := bldr.ChainID
 	if chainID == "" {
 		return authtxb.StdSignMsg{}, errors.Errorf("chain ID required but not specified")
@@ -129,7 +129,7 @@ func (bldr TxBuilder) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
 
 // Sign signs a transaction given a name, passphrase, and a single message to
 // signed. An error is returned if signing fails.
-func (bldr TxBuilder) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]byte, error) {
+func (bldr TxContext) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]byte, error) {
 	sig, err := MakeSignature(name, passphrase, msg)
 	if err != nil {
 		return nil, err
@@ -140,7 +140,7 @@ func (bldr TxBuilder) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]b
 // BuildAndSign builds a single message to be signed, and signs a transaction
 // with the built message given a name, passphrase, and a set of
 // messages.
-func (bldr TxBuilder) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]byte, error) {
+func (bldr TxContext) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]byte, error) {
 	msg, err := bldr.Build(msgs)
 	if err != nil {
 		return nil, err
@@ -149,11 +149,11 @@ func (bldr TxBuilder) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]b
 	return bldr.Sign(name, passphrase, msg)
 }
 
-// BuildWithPubKey builds a single message to be signed from a TxBuilder given a set of
+// BuildWithPubKey builds a single message to be signed from a TxContext given a set of
 // messages and attach the public key associated to the given name.
 // It returns an error if a fee is supplied but cannot be parsed or the key cannot be
 // retrieved.
-func (bldr TxBuilder) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, error) {
+func (bldr TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, error) {
 	msg, err := bldr.Build(msgs)
 	if err != nil {
 		return nil, err
@@ -180,7 +180,7 @@ func (bldr TxBuilder) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, erro
 
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If append
 // is false, it replaces the signatures already attached with the new signature.
-func (bldr TxBuilder) SignStdTx(name, passphrase string, stdTx auth.StdTx, appendSig bool) (signedStdTx auth.StdTx, err error) {
+func (bldr TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appendSig bool) (signedStdTx auth.StdTx, err error) {
 	stdSignature, err := MakeSignature(name, passphrase, authtxb.StdSignMsg{
 		ChainID:       bldr.ChainID,
 		AccountNumber: bldr.AccountNumber,

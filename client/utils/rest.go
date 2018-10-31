@@ -87,14 +87,14 @@ func ParseFloat64OrReturnBadRequest(w http.ResponseWriter, s string, defaultIfEm
 }
 
 // WriteGenerateStdTxResponse writes response for the generate_only mode.
-func WriteGenerateStdTxResponse(w http.ResponseWriter, txBldr context.TxBuilder, msgs []sdk.Msg) {
-	stdMsg, err := txBldr.Build(msgs)
+func WriteGenerateStdTxResponse(w http.ResponseWriter, TxCtx context.TxContext, msgs []sdk.Msg) {
+	stdMsg, err := TxCtx.Build(msgs)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	output, err := txBldr.Codec.MarshalJSON(auth.NewStdTx(stdMsg.Msgs, stdMsg.Fee, nil, stdMsg.Memo))
+	output, err := TxCtx.Codec.MarshalJSON(auth.NewStdTx(stdMsg.Msgs, stdMsg.Fee, nil, stdMsg.Memo))
 	if err != nil {
 		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -204,7 +204,7 @@ func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx c
 		return
 	}
 
-	txBldr := context.TxBuilder{
+	TxCtx := context.TxContext{
 		Codec:         cdc,
 		Gas:           gas,
 		GasAdjustment: adjustment,
@@ -214,8 +214,8 @@ func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx c
 		Sequence:      baseReq.Sequence,
 	}
 
-	if HasDryRunArg(r) || txBldr.SimulateGas {
-		newBldr, err := EnrichCtxWithGas(txBldr, cliCtx, baseReq.Name, msgs)
+	if HasDryRunArg(r) || TxCtx.SimulateGas {
+		newBldr, err := EnrichCtxWithGas(TxCtx, cliCtx, baseReq.Name, msgs)
 		if err != nil {
 			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -226,15 +226,15 @@ func CompleteAndBroadcastTxREST(w http.ResponseWriter, r *http.Request, cliCtx c
 			return
 		}
 
-		txBldr = newBldr
+		TxCtx = newBldr
 	}
 
 	if HasGenerateOnlyArg(r) {
-		WriteGenerateStdTxResponse(w, txBldr, msgs)
+		WriteGenerateStdTxResponse(w, TxCtx, msgs)
 		return
 	}
 
-	txBytes, err := txBldr.BuildAndSign(baseReq.Name, baseReq.Password, msgs)
+	txBytes, err := TxCtx.BuildAndSign(baseReq.Name, baseReq.Password, msgs)
 	if keyerror.IsErrKeyNotFound(err) {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
