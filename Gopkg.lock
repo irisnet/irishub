@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:d4d3c5c22acc12f3816049302080fa10e56499a34c4fa64d88b59df1977513cb"
+  digest = "1:896ab4b4cb62853a49af731d7f04d37505c9f398311ff7ae7e8dcc0ea7c1817c"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -84,6 +84,7 @@
     "crypto",
     "crypto/keys",
     "crypto/keys/hd",
+    "crypto/keys/keyerror",
     "crypto/keys/mintkey",
     "server",
     "server/config",
@@ -271,12 +272,13 @@
   revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
 
 [[projects]]
-  digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
+  digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -297,12 +299,12 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:57485b77bf99ffca8552ef2f3dba12a9c9eaa32e2f1e4b8dbec9c03ee977741a"
+  digest = "1:0b9cab5474015038cc258d2af017ebaa01f2fb387ca2ab7eb78516f46669954c"
   name = "github.com/ipfs/go-ipfs-api"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f1ca0efb95f180e287f6e2923749dd2057c448cc"
-  version = "v1.3.1"
+  revision = "c26fc48ff114bc48b2cc357f8d12484397f5738d"
+  version = "v1.3.5"
 
 [[projects]]
   digest = "1:960df862bef266ca070f8ed90aeb274edc89e9fd8fa2e12472e59845c77a4dab"
@@ -329,6 +331,14 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
+  digest = "1:19f2d2506cc0f9a233c9c0753e8c3fd5afa88afb43ff7b795cbba3629d0e96b5"
+  name = "github.com/libp2p/go-flow-metrics"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cc546389dcf06b4bcbf6b8594069588e5c8a1451"
+  version = "v0.2.0"
+
+[[projects]]
   digest = "1:4ff86c6d6dd8df23a58e6b6060fea5f150d1a502cdfe8a3e9efd5d25339196c6"
   name = "github.com/libp2p/go-libp2p-crypto"
   packages = [
@@ -340,6 +350,14 @@
   version = "v2.0.1"
 
 [[projects]]
+  digest = "1:e01814b1390e3abc93ca170141d457fab1dcc0c532cdfdd269be58fb2cd6a9f4"
+  name = "github.com/libp2p/go-libp2p-metrics"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "20c0e3fed14ddf84ac8192038accfd393610ed82"
+  version = "v2.1.7"
+
+[[projects]]
   digest = "1:d59d3f32a53e3d1ef4f19f92c8f4cbccabfae6c965760577958b2fb937fede98"
   name = "github.com/libp2p/go-libp2p-peer"
   packages = ["."]
@@ -348,12 +366,20 @@
   version = "v2.4.0"
 
 [[projects]]
-  digest = "1:eca3b2ce3d7669b23248e1c41b9982f2dbd5265a8a224f6cc5935b3ed0d06eaa"
+  digest = "1:99c29233479cb14a63c7cb6b49927a60ae9d6b4b36d74deb12cc45ce503ddeb5"
+  name = "github.com/libp2p/go-libp2p-protocol"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e34f0d7468b3519bf9bf4e43c1d028ce651eab51"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:0c84c529a410cea768ebeaf3ea70632f2d8df41662003204045ff1a32cd79cda"
   name = "github.com/libp2p/go-libp2p-pubsub"
   packages = ["pb"]
   pruneopts = "UT"
-  revision = "4986a90e6d122bf9207561efeea9d8afdf193629"
-  version = "v0.9.36"
+  revision = "3d408775deaf28da57cc356d37f2b8bf9c57db64"
+  version = "v0.10.2"
 
 [[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
@@ -771,6 +797,7 @@
   version = "v0.1.0"
 
 [[projects]]
+  branch = "master"
   digest = "1:6f9d70587d10ff0eece3990c74f44afab85a40692ae5a3fa824b7088291a65c5"
   name = "golang.org/x/crypto"
   packages = [
@@ -813,7 +840,8 @@
   revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
 
 [[projects]]
-  digest = "1:97b9c092b7a75a364d5845f70073ecb0dec874399536f247ae22e5f4f782f25d"
+  branch = "master"
+  digest = "1:77a31bc7a4a2de684e08ab188f0e3e264ddf80f0046343b7713ac9471a885673"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -821,7 +849,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4e1fef5609515ec7a2cee7b5de30ba6d9b438cbf"
+  revision = "7e31e0c00fa05cb5fbf4347b585621d6709e19a4"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
