@@ -7,7 +7,7 @@ import (
 var cdc *codec.Codec
 
 func init() {
-	cdc = codec.NewCodec()
+	cdc = codec.New()
 	codec.RegisterCrypto(cdc)
 }
 

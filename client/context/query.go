@@ -366,7 +366,7 @@ func (cliCtx CLIContext) verifyProof(path string, resp abci.ResponseQuery) error
 	}
 
 	var multiStoreProof store.MultiStoreProof
-	cdc := codec.NewCodec()
+	cdc := codec.New()
 	err = cdc.UnmarshalBinary(resp.Proof, &multiStoreProof)
 	if err != nil {
 		return errors.Wrap(err, "failed to unmarshalBinary rangeProof")

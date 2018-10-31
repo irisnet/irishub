@@ -5,7 +5,7 @@ import (
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
-var cdc = amino.NewCodec()
+var cdc = amino.New()
 
 func init() {
 	ctypes.RegisterAmino(cdc)

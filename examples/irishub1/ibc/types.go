@@ -12,7 +12,7 @@ var (
 )
 
 func init() {
-	msgCdc = codec.NewCodec()
+	msgCdc = codec.New()
 }
 
 // ------------------------------

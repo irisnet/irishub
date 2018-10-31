@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/cosmos/cosmos-sdk/x/bank"
 )
 
 const chainID = ""
@@ -36,10 +37,11 @@ type App struct {
 	KeyGov           *sdk.KVStoreKey
 	KeyFeeCollection *sdk.KVStoreKey
 	KeyParams        *sdk.KVStoreKey
+	tkeyParams       *sdk.TransientStoreKey
 	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
-	AccountMapper       auth.AccountKeeper
+	AccountKeeper       auth.AccountKeeper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
 	ParamsKeeper        params.Keeper
 
@@ -57,14 +59,16 @@ func NewApp() *App {
 	db := dbm.NewMemDB()
 
 	// Create the cdc with some standard codecs
-	cdc := codec.NewCodec()
+	cdc := codec.New()
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	auth.RegisterCodec(cdc)
 
+	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
+
 	// Create your application object
 	app := &App{
-		BaseApp:          bam.NewBaseApp("mock", cdc, logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing")),
+		BaseApp:          bApp,
 		Cdc:              cdc,
 		KeyMain:          sdk.NewKVStoreKey("main"),
 		KeyAccount:       sdk.NewKVStoreKey("acc"),
@@ -74,30 +78,33 @@ func NewApp() *App {
 		KeyGov:           sdk.NewKVStoreKey("gov"),
 		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
+		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
 	// Define the accountMapper
-	app.AccountMapper = auth.NewAccountMapper(
+	app.AccountKeeper = auth.NewAccountKeeper(
 		app.Cdc,
 		app.KeyAccount,
 		auth.ProtoBaseAccount,
 	)
 
-	paramsKeeper := params.NewKeeper(app.Cdc, app.KeyParams)
-	app.ParamsKeeper = paramsKeeper
-	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Setter())
+	app.ParamsKeeper = params.NewKeeper(
+		app.Cdc,
+		app.KeyParams, app.tkeyParams,
+	)
+
+	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
 
 	// Initialize the app. The chainers and blockers can be overwritten before
 	// calling complete setup.
 	app.SetInitChainer(app.InitChainer)
 	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
-	app.SetAnteHandler(auth.NewAnteHandler(app.AccountMapper, app.FeeCollectionKeeper))
-	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountMapper, app.FeeCollectionKeeper, app.FeeManager))
+	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
-
 
 	// init iparam
 	iparam.SetParamReadWriter(paramsKeeper.Setter(),

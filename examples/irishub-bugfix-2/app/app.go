@@ -190,7 +190,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 // custom tx codec
 func MakeCodec() *codec.Codec {
-	var cdc = codec.NewCodec()
+	var cdc = codec.New()
 	ibc.RegisterCodec(cdc)
 	ibcbugfix.RegisterCodec(cdc)
 	bank.RegisterCodec(cdc)
