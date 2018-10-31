@@ -6,6 +6,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
+const (
+	SignalParamspace = "Sig"
+	GovParamspace = "Gov"
+)
+
 type Parameter interface {
 	InitGenesis(interface{})
 

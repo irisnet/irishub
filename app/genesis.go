@@ -134,6 +134,12 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(FreeFermionAcc.Amount)) // increase the supply
 	}
 
+	IrisCt := types.NewDefaultCoinType("iris")
+	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, "iris"))
+	if err != nil {
+		panic(err)
+	}
+
 	// create the final app state
 	genesisState = GenesisState{
 		Accounts:     genaccs,
@@ -141,7 +147,7 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		MintData:     mint.GenesisState{
 			Minter: mint.InitialMinter(),
 			Params: mint.Params{
-				MintDenom:           "iris",
+				MintDenom:           "iris-atto",
 				InflationRateChange: sdk.NewDecWithPrec(13, 2),
 				InflationMax:        sdk.NewDecWithPrec(20, 2),
 				InflationMin:        sdk.NewDecWithPrec(7, 2),
@@ -152,7 +158,7 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		GovData:      gov.GenesisState{
 			StartingProposalID: 1,
 			DepositProcedure: govparams.DepositProcedure{
-				MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)},
+				MinDeposit:       sdk.Coins{minDeposit},
 				MaxDepositPeriod: time.Duration(172800) * time.Second,
 			},
 			VotingProcedure: govparams.VotingProcedure{
