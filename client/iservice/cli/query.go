@@ -16,7 +16,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
 		Short:   "query service definition",
-		Example: "iriscli iservice definition --name=<service name> --def-chain-id=<chain-id>",
+		Example: "iriscli iservice definition --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -29,8 +29,8 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("chain-id [%s] service [%s] is not existed", defChainId, name)
 			}
 
-			var msgSvcDef iservice.MsgSvcDef
-			cdc.MustUnmarshalBinary(res, &msgSvcDef)
+			var svcDef iservice.SvcDef
+			cdc.MustUnmarshalBinary(res, &svcDef)
 
 			res2, err := cliCtx.QuerySubspace(iservice.GetMethodsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
@@ -44,7 +44,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 				methods = append(methods, method)
 			}
 
-			service := cmn.ServiceOutput{MsgSvcDef: msgSvcDef, Methods: methods}
+			service := cmn.ServiceOutput{SvcDef: svcDef, Methods: methods}
 			output, err := codec.MarshalJSONIndent(cdc, service)
 			if err != nil {
 				return err

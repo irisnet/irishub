@@ -22,8 +22,8 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if found {
 		return ErrSvcDefExists(k.Codespace(), msg.Name).Result()
 	}
-	k.AddServiceDefinition(ctx, msg)
-	err := k.AddMethods(ctx, msg)
+	k.AddServiceDefinition(ctx, msg.SvcDef)
+	err := k.AddMethods(ctx, msg.SvcDef)
 	if err != nil {
 		return err.Result()
 	}

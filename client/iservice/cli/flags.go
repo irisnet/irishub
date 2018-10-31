@@ -6,7 +6,7 @@ import (
 
 const (
 	FlagDefChainID         = "def-chain-id"
-	FlagServiceName        = "name"
+	FlagServiceName        = "service-name"
 	FlagServiceDescription = "service-description"
 	FlagTags               = "tags"
 	FlagAuthorDescription  = "author-description"
