@@ -4,10 +4,10 @@ package gov
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/iparam"
 	"fmt"
 	"github.com/irisnet/irishub/types"
 	"time"
+	"github.com/irisnet/irishub/iparam"
 )
 
 // GenesisState - all gov state that must be provided at genesis
@@ -35,18 +35,23 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		panic(err)
 	}
 	//k.setDepositProcedure(ctx, data.DepositProcedure)
+	////////////////////  iris begin  ///////////////////////////
 	iparam.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
 	iparam.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
 	iparam.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
-
+	////////////////////  iris end  /////////////////////////////
 }
 
 // WriteGenesis - output genesis parameters
 func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	startingProposalID, _ := k.getNewProposalID(ctx)
+
+	////////////////////  iris begin  ///////////////////////////
 	depositProcedure := govparams.GetDepositProcedure(ctx)
 	votingProcedure := govparams.GetVotingProcedure(ctx)
 	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
+	////////////////////  iris end  /////////////////////////////
+
 
 	return GenesisState{
 		StartingProposalID: startingProposalID,

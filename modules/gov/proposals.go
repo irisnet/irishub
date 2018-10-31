@@ -39,6 +39,11 @@ type Proposal interface {
 
 	GetVotingStartTime() time.Time
 	SetVotingStartTime(time.Time)
+
+	////////////////////  iris begin  ///////////////////////////
+	Execute(ctx sdk.Context, k Keeper) error
+	////////////////////  iris end  ///////////////////////////
+
 }
 
 // checks if two proposals are equal
@@ -98,6 +103,9 @@ func (tp TextProposal) GetVotingStartTime() time.Time              { return tp.V
 func (tp *TextProposal) SetVotingStartTime(votingStartTime time.Time) {
 	tp.VotingStartTime = votingStartTime
 }
+////////////////////  iris begin  ///////////////////////////
+func (pp *TextProposal) Execute(ctx sdk.Context, k Keeper) (err error) {return nil}
+////////////////////  iris end  /////////////////////////////
 
 //-----------------------------------------------------------
 // ProposalQueue
