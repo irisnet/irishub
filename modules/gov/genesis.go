@@ -1,3 +1,4 @@
+
 package gov
 
 import (
@@ -6,6 +7,7 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"fmt"
 	"github.com/irisnet/irishub/types"
+	"time"
 )
 
 // GenesisState - all gov state that must be provided at genesis
@@ -66,15 +68,15 @@ func DefaultGenesisState() GenesisState {
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 20000,
+			MaxDepositPeriod: time.Duration(172800) * time.Second,
 		},
 		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 20000,
+			VotingPeriod: time.Duration(172800) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
+			Threshold:         sdk.NewDecWithPrec(5, 1),
+			Veto:              sdk.NewDecWithPrec(334, 3),
+			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
 		},
 	}
 }
@@ -91,15 +93,15 @@ func DefaultGenesisStateForCliTest() GenesisState {
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 10,
+			MaxDepositPeriod: time.Duration(172800) * time.Second,
 		},
 		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 10,
+			VotingPeriod: time.Duration(172800) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
+			Threshold:         sdk.NewDecWithPrec(5, 1),
+			Veto:              sdk.NewDecWithPrec(334, 3),
+			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
 		},
 	}
 }
@@ -116,15 +118,15 @@ func DefaultGenesisStateForLCDTest() GenesisState {
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 30,
+			MaxDepositPeriod: time.Duration(172800) * time.Second,
 		},
 		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: 30,
+			VotingPeriod: time.Duration(172800) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewRat(1, 2),
-			Veto:              sdk.NewRat(1, 3),
-			GovernancePenalty: sdk.NewRat(1, 100),
+			Threshold:         sdk.NewDecWithPrec(5, 1),
+			Veto:              sdk.NewDecWithPrec(334, 3),
+			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
 		},
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/types"
 	"strconv"
+	"time"
 )
 
 var DepositProcedureParameter DepositProcedureParam
@@ -26,8 +27,8 @@ type ParamSet struct {
 
 // Procedure around Deposits for governance
 type DepositProcedure struct {
-	MinDeposit       sdk.Coins `json:"min_deposit"`        //  Minimum deposit for a proposal to enter voting period.
-	MaxDepositPeriod int64     `json:"max_deposit_period"` //  Maximum period for Atom holders to deposit on a proposal. Initial value: 2 months
+	MinDeposit       sdk.Coins        `json:"min_deposit"`        //  Minimum deposit for a proposal to enter voting period.
+	MaxDepositPeriod time.Duration    `json:"max_deposit_period"` //  Maximum period for Atom holders to deposit on a proposal. Initial value: 2 months
 }
 
 type DepositProcedureParam struct {
@@ -127,7 +128,7 @@ var _ iparam.GovParameter = (*VotingProcedureParam)(nil)
 
 // Procedure around Voting in governance
 type VotingProcedure struct {
-	VotingPeriod int64 `json:"voting_period"` //  Length of the voting period.
+	VotingPeriod time.Duration `json:"voting_period"` //  Length of the voting period.
 }
 
 type VotingProcedureParam struct {

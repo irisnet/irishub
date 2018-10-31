@@ -18,11 +18,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"time"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 var (
@@ -150,14 +151,14 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		DistrData:    distr.DefaultGenesisState(),
 		GovData:      gov.GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: gov.DepositProcedure{
+			DepositProcedure: govparams.DepositProcedure{
 				MinDeposit:       sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)},
 				MaxDepositPeriod: time.Duration(172800) * time.Second,
 			},
-			VotingProcedure: gov.VotingProcedure{
+			VotingProcedure: govparams.VotingProcedure{
 				VotingPeriod: time.Duration(172800) * time.Second,
 			},
-			TallyingProcedure: gov.TallyingProcedure{
+			TallyingProcedure: govparams.TallyingProcedure{
 				Threshold:         sdk.NewDecWithPrec(5, 1),
 				Veto:              sdk.NewDecWithPrec(334, 3),
 				GovernancePenalty: sdk.NewDecWithPrec(1, 2),
