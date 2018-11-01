@@ -23,7 +23,6 @@ import (
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"time"
-	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 var (
@@ -134,12 +133,6 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(FreeFermionAcc.Amount)) // increase the supply
 	}
 
-	IrisCt := types.NewDefaultCoinType("iris")
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, "iris"))
-	if err != nil {
-		panic(err)
-	}
-
 	// create the final app state
 	genesisState = GenesisState{
 		Accounts:     genaccs,
@@ -155,21 +148,7 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 			},
 		},
 		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.GenesisState{
-			StartingProposalID: 1,
-			DepositProcedure: govparams.DepositProcedure{
-				MinDeposit:       sdk.Coins{minDeposit},
-				MaxDepositPeriod: time.Duration(172800) * time.Second,
-			},
-			VotingProcedure: govparams.VotingProcedure{
-				VotingPeriod: time.Duration(172800) * time.Second,
-			},
-			TallyingProcedure: govparams.TallyingProcedure{
-				Threshold:         sdk.NewDecWithPrec(5, 1),
-				Veto:              sdk.NewDecWithPrec(334, 3),
-				GovernancePenalty: sdk.NewDecWithPrec(1, 2),
-			},
-		},
+		GovData:      gov.DefaultGenesisState(),
 		UpgradeData:  upgrade.DefaultGenesisState(),
 		SlashingData: slashingData,
 		GenTxs:       appGenTxs,
