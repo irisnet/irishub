@@ -139,7 +139,7 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 //
 // NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
-func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg, cdc *codec.Codec) {
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg) {
 	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -152,7 +152,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	}
 
 	txCtx := context.TxContext{
-		Codec:         cdc,
+		Codec:         cliCtx.Codec,
 		Gas:           gas,
 		GasAdjustment: adjustment,
 		SimulateGas:   simulateGas,
@@ -200,7 +200,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		return
 	}
 
-	PostProcessResponse(w, cdc, res, cliCtx.Indent)
+	PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 }
 
 // PostProcessResponse performs post process for rest response
