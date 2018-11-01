@@ -160,6 +160,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		AccountNumber: baseTx.AccountNumber,
 		Sequence:      baseTx.Sequence,
 	}
+	txCtx = txCtx.WithCliCtx(cliCtx)
 
 	if cliCtx.DryRun || txCtx.SimulateGas {
 		newTxCtx, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
