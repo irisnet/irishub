@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/gov"
+	"time"
 )
 
 // Deposit
@@ -22,10 +23,10 @@ type ProposalOutput struct {
 	Status      gov.ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
 	TallyResult gov.TallyResult    `json:"tally_result"`    //  Result of Tallys
 
-	SubmitBlock  int64    `json:"submit_block"`  //  Height of the block where TxGovSubmitProposal was included
+	SubmitTime   time.Time `json:"submit_time"`   //  Height of the block where TxGovSubmitProposal was included
 	TotalDeposit []string `json:"total_deposit"` //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartBlock int64 `json:"voting_start_block"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingStartTime time.Time `json:"voting_start_time"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 
 	Param gov.Param `json:"param"`
 }
@@ -50,10 +51,10 @@ func ConvertProposalToProposalOutput(cliCtx context.CLIContext, proposal gov.Pro
 		Status:      proposal.GetStatus(),
 		TallyResult: proposal.GetTallyResult(),
 
-		SubmitBlock:  proposal.GetSubmitBlock(),
+		SubmitTime:  proposal.GetSubmitTime(),
 		TotalDeposit: totalDeposit,
 
-		VotingStartBlock: proposal.GetVotingStartBlock(),
+		VotingStartTime: proposal.GetVotingStartTime(),
 		Param:            gov.Param{},
 	}
 

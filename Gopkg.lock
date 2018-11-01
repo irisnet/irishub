@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:896ab4b4cb62853a49af731d7f04d37505c9f398311ff7ae7e8dcc0ea7c1817c"
+  digest = "1:d59e37e97536707dad88b591f40a1c8023b1e8aff822d8ebb311a20f1630427e"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -102,6 +102,7 @@
     "x/distribution/tags",
     "x/distribution/types",
     "x/gov",
+    "x/gov/client",
     "x/gov/tags",
     "x/ibc",
     "x/mint",
@@ -272,13 +273,12 @@
   revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
 
 [[projects]]
-  digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
+  digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -797,7 +797,6 @@
   version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
   digest = "1:6f9d70587d10ff0eece3990c74f44afab85a40692ae5a3fa824b7088291a65c5"
   name = "golang.org/x/crypto"
   packages = [
@@ -938,6 +937,7 @@
     "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/cosmos-sdk/crypto",
     "github.com/cosmos/cosmos-sdk/crypto/keys",
+    "github.com/cosmos/cosmos-sdk/crypto/keys/keyerror",
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/config",
     "github.com/cosmos/cosmos-sdk/server/mock",
@@ -950,6 +950,7 @@
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/distribution",
     "github.com/cosmos/cosmos-sdk/x/gov",
+    "github.com/cosmos/cosmos-sdk/x/gov/client",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mint",
     "github.com/cosmos/cosmos-sdk/x/mock",

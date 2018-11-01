@@ -10,7 +10,7 @@ var ParamMapping = make(map[string]GovParameter)
 func RegisterGovParamMapping(gps ...GovParameter) {
 	for _, gp := range gps {
 		if gp != nil {
-			ParamMapping[string(gp.GetStoreKey())] = gp
+			ParamMapping[GovParamspace+"/"+string(gp.GetStoreKey())] = gp
 		}
 	}
 }
