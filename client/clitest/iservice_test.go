@@ -41,7 +41,7 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 
 	serviceName := "testService"
 
-	serviceQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli iservice definition --name=%s --def-chain-id=%s %v", serviceName, chainID, flags), "")
+	serviceQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli iservice definition --name=%s --def-chain-id=%s %v", serviceName, chainID, flags), "")
 	require.Equal(t, "", serviceQuery)
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
