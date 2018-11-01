@@ -7,6 +7,8 @@ import (
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
+	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
+	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/version"
@@ -83,7 +85,6 @@ func main() {
 	//)
 
 	//Add staking and slashing commands
-	/*
 	stakeCmd := &cobra.Command{
 		Use:   "stake",
 		Short: "Stake and validation subcommands",
@@ -112,42 +113,42 @@ func main() {
 	rootCmd.AddCommand(
 		stakeCmd,
 	)
+	/*
+		//Add upgrade commands
+		upgradeCmd := &cobra.Command{
+			Use:   "upgrade",
+			Short: "Software Upgrade subcommands",
+		}
+		upgradeCmd.AddCommand(
+			client.GetCommands(
+				upgradecmd.GetInfoCmd("upgrade", cdc),
+				upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+			)...)
+		upgradeCmd.AddCommand(
+			client.PostCommands(
+				upgradecmd.GetCmdSubmitSwitch(cdc),
+			)...)
+		rootCmd.AddCommand(
+			upgradeCmd,
+		)
 
-	//Add upgrade commands
-	upgradeCmd := &cobra.Command{
-		Use:   "upgrade",
-		Short: "Software Upgrade subcommands",
-	}
-	upgradeCmd.AddCommand(
-		client.GetCommands(
-			upgradecmd.GetInfoCmd("upgrade", cdc),
-			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+		//Add iservice commands
+		iserviceCmd := &cobra.Command{
+			Use:   "iservice",
+			Short: "iservice subcommands",
+		}
+		iserviceCmd.AddCommand(
+			client.GetCommands(
+				iservicecmd.GetCmdQueryScvDef("iservice", cdc),
+			)...)
+		iserviceCmd.AddCommand(client.PostCommands(
+			iservicecmd.GetCmdScvDef(cdc),
 		)...)
-	upgradeCmd.AddCommand(
-		client.PostCommands(
-			upgradecmd.GetCmdSubmitSwitch(cdc),
-		)...)
-	rootCmd.AddCommand(
-		upgradeCmd,
-	)
 
-	//Add iservice commands
-	iserviceCmd := &cobra.Command{
-		Use:   "iservice",
-		Short: "iservice subcommands",
-	}
-	iserviceCmd.AddCommand(
-		client.GetCommands(
-			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
-		)...)
-	iserviceCmd.AddCommand(client.PostCommands(
-		iservicecmd.GetCmdScvDef(cdc),
-	)...)
-
-	rootCmd.AddCommand(
-		iserviceCmd,
-	)
-*/
+		rootCmd.AddCommand(
+			iserviceCmd,
+		)
+	*/
 	//add record command
 	recordCmd := &cobra.Command{
 		Use:   "record",

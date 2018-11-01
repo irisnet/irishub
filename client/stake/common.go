@@ -4,15 +4,17 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
+	irishubType "github.com/irisnet/irishub/types"
 	"time"
 )
 
 // defines a delegation without type Rat for shares
 type DelegationOutput struct {
 	DelegatorAddr sdk.AccAddress `json:"delegator_addr"`
-	ValidatorAddr sdk.AccAddress `json:"validator_addr"`
+	ValidatorAddr sdk.ValAddress `json:"validator_addr"`
 	Shares        string         `json:"shares"`
 	Height        int64          `json:"height"`
 }
@@ -30,7 +32,7 @@ func (d DelegationOutput) HumanReadableString() (string, error) {
 // UnbondingDelegation reflects a delegation's passive unbonding queue.
 type UnbondingDelegationOutput struct {
 	DelegatorAddr  sdk.AccAddress `json:"delegator_addr"`  // delegator
-	ValidatorAddr  sdk.AccAddress `json:"validator_addr"`  // validator unbonding from owner addr
+	ValidatorAddr  sdk.ValAddress `json:"validator_addr"`  // validator unbonding from owner addr
 	CreationHeight int64          `json:"creation_height"` // height which the unbonding took place
 	MinTime        time.Time      `json:"min_time"`        // unix time for unbonding completion
 	InitialBalance string         `json:"initial_balance"` // atoms initially scheduled to receive at completion
@@ -51,14 +53,14 @@ func (d UnbondingDelegationOutput) HumanReadableString() (string, error) {
 
 type RedelegationOutput struct {
 	DelegatorAddr    sdk.AccAddress `json:"delegator_addr"`     // delegator
-	ValidatorSrcAddr sdk.AccAddress `json:"validator_src_addr"` // validator redelegation source owner addr
-	ValidatorDstAddr sdk.AccAddress `json:"validator_dst_addr"` // validator redelegation destination owner addr
+	ValidatorSrcAddr sdk.ValAddress `json:"validator_src_addr"` // validator redelegation source owner addr
+	ValidatorDstAddr sdk.ValAddress `json:"validator_dst_addr"` // validator redelegation destination owner addr
 	CreationHeight   int64          `json:"creation_height"`    // height which the redelegation took place
 	MinTime          time.Time      `json:"min_time"`           // unix time for redelegation completion
 	InitialBalance   string         `json:"initial_balance"`    // initial balance when redelegation started
 	Balance          string         `json:"balance"`            // current balance
-	SharesSrc        sdk.Rat        `json:"shares_src"`         // amount of source shares redelegating
-	SharesDst        sdk.Rat        `json:"shares_dst"`         // amount of destination shares redelegating
+	SharesSrc        string         `json:"shares_src"`         // amount of source shares redelegating
+	SharesDst        string         `json:"shares_dst"`         // amount of destination shares redelegating
 }
 
 func (d RedelegationOutput) HumanReadableString() (string, error) {
@@ -68,96 +70,106 @@ func (d RedelegationOutput) HumanReadableString() (string, error) {
 	resp += fmt.Sprintf("Destination Validator: %s\n", d.ValidatorDstAddr)
 	resp += fmt.Sprintf("Creation height: %v\n", d.CreationHeight)
 	resp += fmt.Sprintf("Min time to unbond (unix): %v\n", d.MinTime)
-	resp += fmt.Sprintf("Source shares: %s", d.SharesSrc.String())
-	resp += fmt.Sprintf("Destination shares: %s", d.SharesDst.String())
+	resp += fmt.Sprintf("Source shares: %s", d.SharesSrc)
+	resp += fmt.Sprintf("Destination shares: %s", d.SharesDst)
 
 	return resp, nil
 
 }
 
+type Commission struct {
+	Rate          string    `json:"rate"`
+	MaxRate       string    `json:"max_rate"`
+	MaxChangeRate string    `json:"max_change_rate"`
+	UpdateTime    time.Time `json:"update_time"`
+}
+
 type ValidatorOutput struct {
-	Owner   sdk.AccAddress `json:"owner"`   // in bech32
-	PubKey  string         `json:"pub_key"` // in bech32
-	Revoked bool           `json:"revoked"` // has the validator been revoked from bonded status?
-
-	Status          sdk.BondStatus `json:"status"`           // validator status (bonded/unbonding/unbonded)
-	Tokens          string        `json:"tokens"`           // delegated tokens (incl. self-delegation)
-	DelegatorShares string        `json:"delegator_shares"` // total shares issued to a validator's delegators
-
-	Description        stake.Description `json:"description"`           // description terms for the validator
-	BondHeight         int64       `json:"bond_height"`           // earliest height as a bonded validator
-	BondIntraTxCounter int16       `json:"bond_intra_tx_counter"` // block-local tx index of validator change
-	ProposerRewardPool []string   `json:"proposer_reward_pool"`  // XXX reward pool collected from being the proposer
-
-	Commission            sdk.Rat `json:"commission"`              // XXX the commission rate of fees charged to any delegators
-	CommissionMax         sdk.Rat `json:"commission_max"`          // XXX maximum commission rate which this validator can ever charge
-	CommissionChangeRate  sdk.Rat `json:"commission_change_rate"`  // XXX maximum daily increase of the validator commission
-	CommissionChangeToday sdk.Rat `json:"commission_change_today"` // XXX commission rate change today, reset each day (UTC time)
-
-	// fee related
-	LastBondedTokens sdk.Rat `json:"prev_bonded_tokens"` // last bonded token amount
+	OperatorAddr       sdk.ValAddress    `json:"operator_address"`
+	ConsPubKey         string            `json:"consensus_pubkey"`
+	Jailed             bool              `json:"jailed"`
+	Status             sdk.BondStatus    `json:"status"`
+	Tokens             string            `json:"tokens"`
+	DelegatorShares    string            `json:"delegator_shares"`
+	Description        stake.Description `json:"description"`
+	BondHeight         int64             `json:"bond_height"`
+	BondIntraTxCounter int16             `json:"bond_intra_tx_counter"`
+	UnbondingHeight    int64             `json:"unbonding_height"`
+	UnbondingMinTime   time.Time         `json:"unbonding_time"`
+	Commission         Commission        `json:"commission"`
 }
 
 func (v ValidatorOutput) HumanReadableString() (string, error) {
 	resp := "Validator \n"
-	resp += fmt.Sprintf("Owner: %s\n", v.Owner)
-	resp += fmt.Sprintf("Validator: %s\n", v.PubKey)
-	resp += fmt.Sprintf("Revoked: %v\n", v.Revoked)
+	resp += fmt.Sprintf("Operator Address: %s\n", v.OperatorAddr)
+	resp += fmt.Sprintf("Validator Consensus Pubkey: %s\n", v.ConsPubKey)
+	resp += fmt.Sprintf("Jailed: %v\n", v.Jailed)
 	resp += fmt.Sprintf("Status: %s\n", sdk.BondStatusToString(v.Status))
 	resp += fmt.Sprintf("Tokens: %s\n", v.Tokens)
 	resp += fmt.Sprintf("Delegator Shares: %s\n", v.DelegatorShares)
 	resp += fmt.Sprintf("Description: %s\n", v.Description)
 	resp += fmt.Sprintf("Bond Height: %d\n", v.BondHeight)
-	resp += fmt.Sprintf("Proposer Reward Pool: %s\n", v.ProposerRewardPool)
-	resp += fmt.Sprintf("Commission: %s\n", v.Commission.String())
-	resp += fmt.Sprintf("Max Commission Rate: %s\n", v.CommissionMax.String())
-	resp += fmt.Sprintf("Commission Change Rate: %s\n", v.CommissionChangeRate.String())
-	resp += fmt.Sprintf("Commission Change Today: %s\n", v.CommissionChangeToday.String())
-	resp += fmt.Sprintf("Previous Bonded Tokens: %s\n", v.LastBondedTokens.String())
+	resp += fmt.Sprintf("Unbonding Height: %d\n", v.UnbondingHeight)
+	resp += fmt.Sprintf("Minimum Unbonding Time: %v\n", v.UnbondingMinTime)
+	resp += fmt.Sprintf("Commission: {%s}\n", v.Commission)
 
 	return resp, nil
 }
 
-func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) sdk.Rat {
+type PoolOutput struct {
+	LooseTokens  string `json:"loose_tokens"`
+	BondedTokens string `json:"bonded_tokens"`
+	TokenSupply  string `json:"total_supply"`
+	BondedRatio  string `json:"bonded_ratil"`
+}
+
+func (p PoolOutput) HumanReadableString() string {
+
+	resp := "Pool \n"
+	resp += fmt.Sprintf("Loose Tokens: %s\n", p.LooseTokens)
+	resp += fmt.Sprintf("Bonded Tokens: %s\n", p.BondedTokens)
+	resp += fmt.Sprintf("Token Supply: %s\n", p.TokenSupply)
+	resp += fmt.Sprintf("Bonded Ratio: %v\n", p.BondedRatio)
+	return resp
+}
+
+func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) irishubType.Rat {
 	stakeTokenDenom, err := cliCtx.GetCoinType(app.Denom)
 	if err != nil {
 		panic(err)
 	}
 	decimalDiff := stakeTokenDenom.MinUnit.Decimal - stakeTokenDenom.GetMainUnit().Decimal
-	exRate := sdk.NewRat(1).Quo(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
+	exRate := irishubType.NewRat(1).Quo(irishubType.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
 	return exRate
 }
 
 func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Validator) (ValidatorOutput, error) {
 	exRate := ExRateFromStakeTokenToMainUnit(cliCtx)
-	poolToken, err := cliCtx.ConvertCoinToMainUnit(v.ProposerRewardPool.String())
+
+	bechValPubkey, err := sdk.Bech32ifyValPub(v.ConsPubKey)
 	if err != nil {
 		return ValidatorOutput{}, err
 	}
-	bechValPubkey, err := sdk.Bech32ifyValPub(v.PubKey)
-	if err != nil {
-		return ValidatorOutput{}, err
+
+	commission := Commission{
+		Rate:          ConvertDecToRat(v.Commission.Rate).FloatString(),
+		MaxRate:       ConvertDecToRat(v.Commission.MaxRate).FloatString(),
+		MaxChangeRate: ConvertDecToRat(v.Commission.MaxChangeRate).FloatString(),
+		UpdateTime:    v.Commission.UpdateTime,
 	}
 	return ValidatorOutput{
-		Owner:   v.Owner,
-		PubKey:  bechValPubkey,
-		Revoked: v.Revoked,
-
-		Status:          v.Status,
-		Tokens:          v.Tokens.Mul(exRate).FloatString(),
-		DelegatorShares: v.DelegatorShares.Mul(exRate).FloatString(),
-
+		OperatorAddr:       v.OperatorAddr,
+		ConsPubKey:         bechValPubkey,
+		Jailed:             v.Jailed,
+		Status:             v.Status,
+		Tokens:             ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
+		DelegatorShares:    ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
 		Description:        v.Description,
-		BondHeight:         v.BondHeight,
+		BondHeight:         v.UnbondingHeight,
 		BondIntraTxCounter: v.BondIntraTxCounter,
-		ProposerRewardPool: poolToken,
-
-		Commission:            v.Commission,
-		CommissionMax:         v.CommissionMax,
-		CommissionChangeRate:  v.CommissionChangeRate,
-		CommissionChangeToday: v.CommissionChangeToday,
-
-		LastBondedTokens: v.LastBondedTokens,
+		UnbondingHeight:    v.UnbondingHeight,
+		UnbondingMinTime:   v.UnbondingMinTime,
+		Commission:         commission,
 	}, nil
 }
 
@@ -166,7 +178,7 @@ func ConvertDelegationToDelegationOutput(cliCtx context.CLIContext, delegation s
 	return DelegationOutput{
 		DelegatorAddr: delegation.DelegatorAddr,
 		ValidatorAddr: delegation.ValidatorAddr,
-		Shares:        delegation.Shares.Mul(exRate).FloatString(),
+		Shares:        ConvertDecToRat(delegation.Shares).Mul(exRate).FloatString(),
 		Height:        delegation.Height,
 	}
 }
@@ -208,7 +220,39 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 		MinTime:          red.MinTime,
 		InitialBalance:   initialBalance[0],
 		Balance:          balance[0],
-		SharesSrc:        red.SharesSrc.Mul(exRate),
-		SharesDst:        red.SharesDst.Mul(exRate),
+		SharesSrc:        ConvertDecToRat(red.SharesSrc).Mul(exRate).FloatString(),
+		SharesDst:        ConvertDecToRat(red.SharesDst).Mul(exRate).FloatString(),
 	}
+}
+
+func BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr string) (commission types.CommissionMsg, err error) {
+	if rateStr == "" || maxRateStr == "" || maxChangeRateStr == "" {
+		return commission, fmt.Errorf("must specify all validator commission parameters")
+	}
+
+	rate, err := sdk.NewDecFromStr(rateStr)
+	if err != nil {
+		return commission, err
+	}
+
+	maxRate, err := sdk.NewDecFromStr(maxRateStr)
+	if err != nil {
+		return commission, err
+	}
+
+	maxChangeRate, err := sdk.NewDecFromStr(maxChangeRateStr)
+	if err != nil {
+		return commission, err
+	}
+
+	commission = types.NewCommissionMsg(rate, maxRate, maxChangeRate)
+	return commission, nil
+}
+
+func ConvertDecToRat(input sdk.Dec) irishubType.Rat {
+	output, err := irishubType.NewRatFromDecimal(input.String(), 10)
+	if err != nil {
+		panic(err.Error())
+	}
+	return output
 }

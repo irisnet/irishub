@@ -3,8 +3,8 @@ package lcd
 import (
 	"bytes"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/gorilla/mux"
@@ -15,8 +15,8 @@ import (
 )
 
 type msgDelegationsInput struct {
-	ValidatorAddr string   `json:"validator_addr"` // in bech32
-	Delegation    string   `json:"delegation"`
+	ValidatorAddr string `json:"validator_addr"` // in bech32
+	Delegation    string `json:"delegation"`
 }
 type msgBeginRedelegateInput struct {
 	ValidatorSrcAddr string `json:"validator_src_addr"` // in bech32
