@@ -8,6 +8,8 @@ import (
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
+	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
+	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
@@ -89,7 +91,6 @@ func main() {
 	)
 
 	//Add staking and slashing commands
-	/*
 	stakeCmd := &cobra.Command{
 		Use:   "stake",
 		Short: "Stake and validation subcommands",
@@ -119,24 +120,24 @@ func main() {
 		stakeCmd,
 	)
 
-	//Add upgrade commands
-	upgradeCmd := &cobra.Command{
-		Use:   "upgrade",
-		Short: "Software Upgrade subcommands",
-	}
-	upgradeCmd.AddCommand(
-		client.GetCommands(
-			upgradecmd.GetInfoCmd("upgrade", cdc),
-			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-		)...)
-	upgradeCmd.AddCommand(
-		client.PostCommands(
-			upgradecmd.GetCmdSubmitSwitch(cdc),
-		)...)
-	rootCmd.AddCommand(
-		upgradeCmd,
-	)
-*/
+	////Add upgrade commands
+	//upgradeCmd := &cobra.Command{
+	//	Use:   "upgrade",
+	//	Short: "Software Upgrade subcommands",
+	//}
+	//upgradeCmd.AddCommand(
+	//	client.GetCommands(
+	//		upgradecmd.GetInfoCmd("upgrade", cdc),
+	//		upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+	//	)...)
+	//upgradeCmd.AddCommand(
+	//	client.PostCommands(
+	//		upgradecmd.GetCmdSubmitSwitch(cdc),
+	//	)...)
+	//rootCmd.AddCommand(
+	//	upgradeCmd,
+	//)
+
 	//Add iservice commands
 	iserviceCmd := &cobra.Command{
 		Use:   "iservice",
