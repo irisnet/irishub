@@ -30,7 +30,7 @@ func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Submitter)
+		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.Name, req.Submitter)
 		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
