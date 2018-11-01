@@ -23,7 +23,7 @@ const (
 	FlagGas            = "gas"
 	FlagTrustNode      = "trust-node"
 	FlagFrom           = "from"
-	FlagSignerAddr     = "signer-addr"
+	FlagFromAddr       = "from-addr"
 	FlagAccountNumber  = "account-number"
 	FlagSequence       = "sequence"
 	FlagMemo           = "memo"
@@ -69,7 +69,7 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
 		c.Flags().Bool(FlagPrintResponse, false, "return tx response (only works with async = false)")
 		c.Flags().Bool(FlagGenerateOnly, false, "build an unsigned transaction and write it to STDOUT")
-		c.Flags().String(FlagSignerAddr, "", "Specify signer address for generate-only mode")
+		c.Flags().String(FlagFromAddr, "", "Specify from address in generate-only mode")
 		c.Flags().Bool(FlagDryRun, false, "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it")
 		c.Flags().Float64(FlagGasAdjustment, DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
 	}
