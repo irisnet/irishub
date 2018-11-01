@@ -14,6 +14,7 @@ import (
 	"github.com/irisnet/irishub/client"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"fmt"
+	"strings"
 )
 
 func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
@@ -22,7 +23,7 @@ func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
 		Short: "create new service definition",
 		Example: "iriscli iservice define --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--name=<service name> --service-description=<service description> --author-description=<author description> " +
-			"--tags=<service tags> --idl-content=<interface description content> --broadcast=Broadcast",
+			"--tags=\"tag1 tag2\" --idl-content=<interface description content> --broadcast=Broadcast",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -34,6 +35,9 @@ func GetCmdScvDef(cdc *wire.Codec) *cobra.Command {
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
 			content := viper.GetString(FlagIdlContent)
+			if len(content) > 0 {
+				content = strings.Replace(content, `\n`, "\n", -1)
+			}
 			filePath := viper.GetString(FlagFile)
 			if len(filePath) > 0 {
 				contentBytes, err := cmn.ReadFile(filePath)

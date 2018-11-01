@@ -1,6 +1,7 @@
 package record
 
 import (
+	"encoding/binary"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,7 +11,8 @@ import (
 const MsgType = "record"
 
 const (
-	UploadLimitOfOnchain = 1024 //upload limit on chain in bytes(1K currently)
+	UploadLimitOfOnchain     = 1024 // Data field upload limit in bytes(1K currently)
+	UploadLimitOfDescription = 1024 // Description field upload limit in bytes(1K currently)
 )
 
 //-----------------------------------------------------------
@@ -48,12 +50,19 @@ func (msg MsgSubmitRecord) Type() string { return MsgType }
 // Implements Msg.
 func (msg MsgSubmitRecord) ValidateBasic() sdk.Error {
 
-	if len(msg.Description) == 0 {
-		return ErrInvalidDescription(DefaultCodespace, msg.Description)
+	descriptionSize := int64(binary.Size([]byte(msg.Description)))
+	if descriptionSize == 0 ||
+		descriptionSize > UploadLimitOfDescription {
+		return ErrInvalidDescription(DefaultCodespace, UploadLimitOfDescription)
+	}
+
+	if msg.DataSize == 0 ||
+		msg.DataSize > UploadLimitOfOnchain {
+		return ErrInvalidDataSize(DefaultCodespace, UploadLimitOfOnchain)
 	}
 
 	if len(msg.DataHash) == 0 {
-		return ErrFailUploadFile(DefaultCodespace, msg.DataHash)
+		return ErrInvalidDataHash(DefaultCodespace, msg.DataHash)
 	}
 
 	if len(msg.OwnerAddress) == 0 {

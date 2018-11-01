@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	FlagDefChainID         = "def-chain-id"
 	FlagServiceName        = "name"
 	FlagServiceDescription = "service-description"
 	FlagTags               = "tags"
@@ -15,6 +16,7 @@ const (
 )
 
 var (
+	FsDefChainID         = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceName        = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceDescription = flag.NewFlagSet("", flag.ContinueOnError)
 	FsTags               = flag.NewFlagSet("", flag.ContinueOnError)
@@ -25,6 +27,7 @@ var (
 )
 
 func init() {
+	FsDefChainID.String(FlagDefChainID, "", "the ID of the blockchain defined of the iService")
 	FsServiceName.String(FlagServiceName, "", "service name")
 	FsServiceDescription.String(FlagServiceDescription, "", "service description")
 	FsTags.String(FlagTags, "", "service tags")

@@ -18,23 +18,25 @@ import (
 	"github.com/tendermint/tendermint/p2p"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 
+	"bytes"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/irisnet/irishub/modules/gov"
-	govcli "github.com/irisnet/irishub/client/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/client/rest"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
+	govcli "github.com/irisnet/irishub/client/gov"
+	recordcli "github.com/irisnet/irishub/client/record"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	stakeLcd "github.com/irisnet/irishub/client/stake/lcd"
-	"bytes"
-	"strconv"
+	"github.com/irisnet/irishub/modules/gov"
 )
 
 func init() {
@@ -622,6 +624,63 @@ func TestProposalsQuery(t *testing.T) {
 	require.True(t, addr2.String() == votes[0].Voter.String() || addr2.String() == votes[1].Voter.String())
 }
 
+func TestSubmitRecord(t *testing.T) {
+	name, password := "test", "1234567890"
+	addr, seed := CreateAddr(t, "test", password, GetKeyBase(t))
+	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
+	defer cleanup()
+
+	// create SubmitRecord TX
+	resultTx := doSubmitRecord(t, port, seed, name, password, addr, "Test")
+	tests.WaitForHeight(resultTx.Height+1, port)
+
+	// check if tx was committed
+	require.Equal(t, uint32(0), resultTx.CheckTx.Code)
+	require.Equal(t, uint32(0), resultTx.DeliverTx.Code)
+
+	recordID := string(resultTx.DeliverTx.GetData())
+
+	// query record
+	record := getRecord(t, port, recordID)
+	require.Equal(t, "Test", record.Data)
+
+}
+
+func TestRecordsQuery(t *testing.T) {
+	name, password := "test", "1234567890"
+	addr, seed := CreateAddr(t, "test", password, GetKeyBase(t))
+	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
+	defer cleanup()
+
+	// create SubmitRecord TX
+	resultTx := doSubmitRecord(t, port, seed, name, password, addr, "Test1")
+	tests.WaitForHeight(resultTx.Height+1, port)
+
+	// check if tx was committed
+	require.Equal(t, uint32(0), resultTx.CheckTx.Code)
+	require.Equal(t, uint32(0), resultTx.DeliverTx.Code)
+
+	recordID1 := string(resultTx.DeliverTx.GetData())
+
+	// query record by route /record/records/{proposalID}
+	record1 := getRecord(t, port, recordID1)
+	require.Equal(t, "Test1", record1.Data)
+
+	resultTx = doSubmitRecord(t, port, seed, name, password, addr, "Test2")
+	tests.WaitForHeight(resultTx.Height+1, port)
+
+	// check if tx was committed
+	require.Equal(t, uint32(0), resultTx.CheckTx.Code)
+	require.Equal(t, uint32(0), resultTx.DeliverTx.Code)
+
+	recordID2 := string(resultTx.DeliverTx.GetData())
+
+	// query record by route /record/records?recordID={proposalID}
+	record2 := getRecordsFilterRecordID(t, port, recordID2)
+	require.Equal(t, "Test2", record2.Data)
+
+}
+
 //_____________________________________________________________________________
 // get the account to get the sequence
 func getAccount(t *testing.T, port string, addr sdk.AccAddress) auth.Account {
@@ -649,11 +708,11 @@ func convertToAuthAcc(t *testing.T, accInfo bank.BaseAccount) auth.Account {
 	coins, err := cliCtx.ParseCoins(coinsString.String())
 	require.Nil(t, err)
 	return &auth.BaseAccount{
-		Address       :accInfo.Address,
-		Coins         :coins,
-		PubKey        :accInfo.PubKey,
-		AccountNumber :accInfo.AccountNumber,
-		Sequence      :accInfo.Sequence,
+		Address:       accInfo.Address,
+		Coins:         coins,
+		PubKey:        accInfo.PubKey,
+		AccountNumber: accInfo.AccountNumber,
+		Sequence:      accInfo.Sequence,
 	}
 }
 
@@ -1086,6 +1145,7 @@ func doVote(t *testing.T, port, seed, name, password string, proposerAddr sdk.Ac
 		}
 	}`, proposerAddr, name, password, chainID, accnum, sequence))
 	res, body := Request(t, port, "POST", fmt.Sprintf("/gov/proposals/%d/votes", proposalID), jsonStr)
+
 	fmt.Println(res)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
@@ -1094,4 +1154,57 @@ func doVote(t *testing.T, port, seed, name, password string, proposerAddr sdk.Ac
 	require.Nil(t, err)
 
 	return results
+}
+
+// ============= Record Module ================
+func doSubmitRecord(t *testing.T, port, seed, name, password string, proposerAddr sdk.AccAddress, data string) (resultTx ctypes.ResultBroadcastTxCommit) {
+	// get the account to get the sequence
+	acc := getAccount(t, port, proposerAddr)
+	accnum := acc.GetAccountNumber()
+	sequence := acc.GetSequence()
+
+	chainID := viper.GetString(client.FlagChainID)
+
+	// submitproposal
+	jsonStr := []byte(fmt.Sprintf(`{
+		"submitter":"%s",
+		"base_tx":{
+			"name":"%s",
+			"password":"%s",
+			"chain_id":"%s",
+			"gas":"200000",
+			"fee":"0.004iris",
+			"account_number":"%d",
+			"sequence":"%d"
+		 },
+		 "description":"this is record lcd test",
+		 "data":"%s"
+	}`, proposerAddr, name, password, chainID, accnum, sequence, data))
+	res, body := Request(t, port, "POST", "/record/records", jsonStr)
+	require.Equal(t, http.StatusOK, res.StatusCode, body)
+
+	var results ctypes.ResultBroadcastTxCommit
+	err := cdc.UnmarshalJSON([]byte(body), &results)
+	require.Nil(t, err)
+
+	return results
+}
+
+func getRecord(t *testing.T, port, proposalID string) recordcli.RecordOutput {
+	res, body := Request(t, port, "GET", fmt.Sprintf("/record/records/%s", proposalID), nil)
+	require.Equal(t, http.StatusOK, res.StatusCode, body)
+	var record recordcli.RecordOutput
+	err := cdc.UnmarshalJSON([]byte(body), &record)
+	require.Nil(t, err)
+	return record
+}
+
+func getRecordsFilterRecordID(t *testing.T, port, recordID string) recordcli.RecordOutput {
+	res, body := Request(t, port, "GET", fmt.Sprintf("/record/records?recordID=%s", recordID), nil)
+	require.Equal(t, http.StatusOK, res.StatusCode, body)
+
+	var record recordcli.RecordOutput
+	err := cdc.UnmarshalJSON([]byte(body), &record)
+	require.Nil(t, err)
+	return record
 }
