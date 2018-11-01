@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:d59e37e97536707dad88b591f40a1c8023b1e8aff822d8ebb311a20f1630427e"
+  digest = "1:078e0768e89c19b29c0545519f6388e297369ff8ade2d965558b05750d472dc7"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -101,9 +101,6 @@
     "x/distribution/keeper",
     "x/distribution/tags",
     "x/distribution/types",
-    "x/gov",
-    "x/gov/client",
-    "x/gov/tags",
     "x/ibc",
     "x/mint",
     "x/mock",
@@ -273,12 +270,13 @@
   revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
 
 [[projects]]
-  digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
+  digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -552,7 +550,7 @@
   revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
 
 [[projects]]
-  digest = "1:22e4289b3741da96aceecc4d1dcbf682ae167c759d010fd88c63c65c9a2e8c72"
+  digest = "1:3fb45284d554f369d08136a0fd4d01f50897f6f79469358c41fb5a30a6379dfe"
   name = "github.com/shirou/gopsutil"
   packages = [
     "cpu",
@@ -564,8 +562,8 @@
     "process",
   ]
   pruneopts = "UT"
-  revision = "8048a2e9c5773235122027dd585cf821b2af1249"
-  version = "v2.18.07"
+  revision = "3ec50d2876a36047b2ca39f955ba88fb7a455e92"
+  version = "v2.18.10"
 
 [[projects]]
   branch = "master"
@@ -840,7 +838,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:77a31bc7a4a2de684e08ab188f0e3e264ddf80f0046343b7713ac9471a885673"
+  digest = "1:7e2cb6c95ac3f1ff730a61ec4ce423a1857c7c6c28abafd8fabae25d80ccb667"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -848,7 +846,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "7e31e0c00fa05cb5fbf4347b585621d6709e19a4"
+  revision = "9b800f95dbbc54abff0acf7ee32d88ba4e328c89"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -949,8 +947,6 @@
     "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/distribution",
-    "github.com/cosmos/cosmos-sdk/x/gov",
-    "github.com/cosmos/cosmos-sdk/x/gov/client",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mint",
     "github.com/cosmos/cosmos-sdk/x/mock",
