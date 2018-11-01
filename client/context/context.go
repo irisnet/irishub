@@ -27,15 +27,12 @@ const ctxAccStoreName = "acc"
 // CLIContext implements a typical CLI context created in SDK modules for
 // transaction handling and queries.
 type CLIContext struct {
-	Codec           *codec.Codec
-	AccDecoder      auth.AccountDecoder
-	Client          rpcclient.Client
-	Logger          io.Writer
-	Height          int64
-	NodeURI         string
-	FromAddressName string
-	//If GenerateOnly is true and FromAddressName is not specified, the signer is required for building msg
-	SignerAddr    string
+	Codec         *codec.Codec
+	AccDecoder    auth.AccountDecoder
+	Client        rpcclient.Client
+	Logger        io.Writer
+	Height        int64
+	NodeURI       string
 	AccountStore  string
 	TrustNode     bool
 	UseLedger     bool
@@ -64,23 +61,21 @@ func NewCLIContext() CLIContext {
 	}
 
 	return CLIContext{
-		Client:          rpc,
-		NodeURI:         nodeURI,
-		AccountStore:    ctxAccStoreName,
-		FromAddressName: viper.GetString(client.FlagFrom),
-		SignerAddr:      viper.GetString(client.FlagSignerAddr),
-		Height:          viper.GetInt64(client.FlagHeight),
-		TrustNode:       viper.GetBool(client.FlagTrustNode),
-		UseLedger:       viper.GetBool(client.FlagUseLedger),
-		Async:           viper.GetBool(client.FlagAsync),
-		JSON:            viper.GetBool(client.FlagJson),
-		PrintResponse:   viper.GetBool(client.FlagPrintResponse),
-		Verifier:        createVerifier(),
-		DryRun:          viper.GetBool(client.FlagDryRun),
-		GenerateOnly:    viper.GetBool(client.FlagGenerateOnly),
-		fromAddress:     fromAddress,
-		fromName:        fromName,
-		Indent:          viper.GetBool(client.FlagIndentResponse),
+		Client:        rpc,
+		NodeURI:       nodeURI,
+		AccountStore:  ctxAccStoreName,
+		Height:        viper.GetInt64(client.FlagHeight),
+		TrustNode:     viper.GetBool(client.FlagTrustNode),
+		UseLedger:     viper.GetBool(client.FlagUseLedger),
+		Async:         viper.GetBool(client.FlagAsync),
+		JSON:          viper.GetBool(client.FlagJson),
+		PrintResponse: viper.GetBool(client.FlagPrintResponse),
+		Verifier:      createVerifier(),
+		DryRun:        viper.GetBool(client.FlagDryRun),
+		GenerateOnly:  viper.GetBool(client.FlagGenerateOnly),
+		fromAddress:   fromAddress,
+		fromName:      fromName,
+		Indent:        viper.GetBool(client.FlagIndentResponse),
 	}
 }
 
@@ -126,8 +121,20 @@ func createVerifier() tmlite.Verifier {
 }
 
 func fromFields(from string) (fromAddr types.AccAddress, fromName string) {
+	// In generate-only mode, if the signer key doesn't exist in keystore, the fromAddress can be specified by --from-addr
 	if from == "" {
-		return nil, ""
+		fromAddrString := viper.GetString(client.FlagFromAddr)
+		if fromAddrString == "" {
+			return nil, ""
+		}
+		address, err := types.AccAddressFromBech32(fromAddrString)
+		if err != nil {
+			fmt.Printf("invalid from address %s\n", fromAddrString)
+			os.Exit(1)
+		}
+		fromAddr = address
+		fromName = ""
+		return
 	}
 
 	keybase, err := keys.GetKeyBase()
@@ -178,13 +185,6 @@ func (ctx CLIContext) WithLogger(w io.Writer) CLIContext {
 // WithAccountStore returns a copy of the context with an updated AccountStore.
 func (ctx CLIContext) WithAccountStore(accountStore string) CLIContext {
 	ctx.AccountStore = accountStore
-	return ctx
-}
-
-// WithFromAddressName returns a copy of the context with an updated from
-// address.
-func (ctx CLIContext) WithFromAddressName(addrName string) CLIContext {
-	ctx.FromAddressName = addrName
 	return ctx
 }
 

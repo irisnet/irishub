@@ -177,6 +177,7 @@ func NewDefaultCoinType(name string) CoinType {
 	}
 }
 
+//TODO currently only iris token is supported
 func CoinTypeKey(coinName string) string {
 	return fmt.Sprintf("%s/%s/%s", "global", "coin_types", coinName)
 }

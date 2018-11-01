@@ -21,9 +21,9 @@ func GetAccountCmd(storeName string, cdc *codec.Codec, decoder auth.AccountDecod
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// find the key to look up the account
-			addr := args[0]
+			addrString := args[0]
 
-			key, err := sdk.AccAddressFromBech32(addr)
+			addr, err := sdk.AccAddressFromBech32(addrString)
 			if err != nil {
 				return err
 			}
@@ -32,11 +32,11 @@ func GetAccountCmd(storeName string, cdc *codec.Codec, decoder auth.AccountDecod
 				WithCodec(cdc).
 				WithAccountDecoder(decoder)
 
-			if err := cliCtx.EnsureAccountExistsFromAddr(key); err != nil {
+			if err := cliCtx.EnsureAccountExistsFromAddr(addr); err != nil {
 				return err
 			}
 
-			acc, err := cliCtx.GetAccount(key)
+			acc, err := cliCtx.GetAccount(addr)
 			if err != nil {
 				return err
 			}

@@ -200,7 +200,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// register message routes
 	// need to update each module's msg type
 	app.Router().
-		AddRoute("send", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
+		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
@@ -290,6 +290,12 @@ func MakeCodec() *codec.Codec {
 // application updates every end block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
+
+	// distribute rewards from previous block
+	distr.BeginBlocker(ctx, req, app.distrKeeper)
+
+	// mint new tokens for this new block
+	mint.BeginBlocker(ctx, app.mintKeeper)
 
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
