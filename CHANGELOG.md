@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0
+
+*November 1st, 2018*
+
+- Use --def-chain-id flag to reference the blockchain defined of the iService
+- Fix some bugs about iservice definition and record
+- Add cli and lcd test for record module
+- Update the user doc of iservice definition and record
 
 ## 0.6.0-rc0
 
