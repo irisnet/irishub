@@ -171,7 +171,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 			proposalID := viper.GetInt64(flagProposalID)
 			option := viper.GetString(flagOption)
 
-			byteVoteOption, err := gov.VoteOptionFromString(option)
+			byteVoteOption, err := gov.VoteOptionFromString(normalizeVoteOption(option))
 			if err != nil {
 				return err
 			}
