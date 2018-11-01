@@ -72,6 +72,8 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().String(FlagFromAddr, "", "Specify from address in generate-only mode")
 		c.Flags().Bool(FlagDryRun, false, "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it")
 		c.Flags().Float64(FlagGasAdjustment, DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
+		c.MarkFlagRequired(FlagChainID)
+		c.MarkFlagRequired(FlagFee)
 	}
 	return cmds
 }
