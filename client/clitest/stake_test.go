@@ -16,7 +16,7 @@ func init() {
 }
 
 func TestIrisCLIStakeCreateValidator(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
 	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
@@ -76,7 +76,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	}
 
 	validator := executeGetValidator(t, fmt.Sprintf("iriscli stake validator %s --output=json %v", barAddr, flags))
-	require.Equal(t, validator.Owner, barAddr)
+	require.Equal(t, validator.OperatorAddr, barAddr)
 	require.Equal(t, "2.0000000000", validator.Tokens)
 
 	// unbond a single share

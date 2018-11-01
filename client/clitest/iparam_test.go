@@ -16,7 +16,7 @@ func init() {
 }
 
 func TestIrisCLIParameterChangeProposal(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 
@@ -41,7 +41,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "100iris", fooCoin)
 
-	proposalsQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
+	proposalsQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
 
 	// submit a test proposal
@@ -69,8 +69,6 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
 
-	votingStartBlock1 := proposal1.VotingStartBlock
-
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
 	voteStr += fmt.Sprintf(" --from=%s", "foo")
 	voteStr += fmt.Sprintf(" --proposal-id=%s", "1")
@@ -84,7 +82,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, int64(1), vote.ProposalID)
 	require.Equal(t, gov.OptionYes, vote.Option)
 
-	tests.WaitForHeightTM(votingStartBlock1+20, port)
+	tests.WaitForNextNBlocksTM(20, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
@@ -95,7 +93,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 
 
 func TestIrisCLIQueryParams(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 
@@ -125,7 +123,7 @@ func TestIrisCLIQueryParams(t *testing.T) {
 }
 
 func TestIrisCLIPullParams(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
 

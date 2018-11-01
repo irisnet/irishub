@@ -19,7 +19,7 @@ func init() {
 }
 
 func TestIrismon(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
 	chainID, _ := executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
@@ -42,7 +42,7 @@ func TestIrismon(t *testing.T) {
 
 	accountAddress, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
 	validator := executeGetValidator(t, fmt.Sprintf("iriscli stake validator %s --output=json %v", accountAddress, flags))
-	pk, err := sdk.GetValPubKeyBech32(validator.PubKey)
+	pk, err := sdk.GetValPubKeyBech32(validator.ConsPubKey)
 	pkHex := hex.EncodeToString(pk.Bytes())
 
 	// get a free port

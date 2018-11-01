@@ -11,6 +11,7 @@ import (
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
+	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/version"
@@ -120,23 +121,23 @@ func main() {
 		stakeCmd,
 	)
 
-	////Add upgrade commands
-	//upgradeCmd := &cobra.Command{
-	//	Use:   "upgrade",
-	//	Short: "Software Upgrade subcommands",
-	//}
-	//upgradeCmd.AddCommand(
-	//	client.GetCommands(
-	//		upgradecmd.GetInfoCmd("upgrade", cdc),
-	//		upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-	//	)...)
-	//upgradeCmd.AddCommand(
-	//	client.PostCommands(
-	//		upgradecmd.GetCmdSubmitSwitch(cdc),
-	//	)...)
-	//rootCmd.AddCommand(
-	//	upgradeCmd,
-	//)
+	//Add upgrade commands
+	upgradeCmd := &cobra.Command{
+		Use:   "upgrade",
+		Short: "Software Upgrade subcommands",
+	}
+	upgradeCmd.AddCommand(
+		client.GetCommands(
+			upgradecmd.GetInfoCmd("upgrade", cdc),
+			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
+		)...)
+	upgradeCmd.AddCommand(
+		client.PostCommands(
+			upgradecmd.GetCmdSubmitSwitch(cdc),
+		)...)
+	rootCmd.AddCommand(
+		upgradeCmd,
+	)
 
 	//Add iservice commands
 	iserviceCmd := &cobra.Command{
