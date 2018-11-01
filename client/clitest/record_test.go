@@ -57,7 +57,7 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 	recordID1 := executeGetRecordID(t, fmt.Sprintf("iriscli tendermint tx %v --output json --trust-node=true %v", recordTxHash, flags))
 
 	// Submit same record twice
-	res := tests.ExecuteT(t, srStr, "")
+	res, _ := tests.ExecuteT(t, srStr, "")
 	require.Equal(t, fmt.Sprintf("Warning: Record ID %v already exists.", string(recordID1)), res)
 
 	record1 := executeGetRecord(t, fmt.Sprintf("iriscli record query --record-id=%s --output=json %v", recordID1, flags))
@@ -68,7 +68,7 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 	downloadOK := executeDownloadRecord(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s %v", recordID1, "download.txt", flags), iriscliHome+"/download.txt", true)
 	require.Equal(t, true, downloadOK)
 
-	res = tests.ExecuteT(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s %v", recordID1, "download.txt", flags), "")
+	res, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s %v", recordID1, "download.txt", flags), "")
 	require.Equal(t, fmt.Sprintf("Warning: %s already exists, please try another file name.", iriscliHome+"/download.txt"), res)
 
 	// submit a second record onchain test

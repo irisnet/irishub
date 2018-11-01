@@ -48,7 +48,7 @@ func NewVersion(id int64, proposalID int64, start int64, moduleList ModuleLifeTi
 }
 
 func (v Version) getMsgType(msg sdk.Msg) (string, sdk.Error) {
-    msgType := msg.Type()
+    msgType := msg.Route()
 
     for _, module := range v.ModuleList {
         if msgType == module.Handler {
