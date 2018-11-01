@@ -280,7 +280,7 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 			return sdk.ErrInvalidCoins(price.String())
 		}
 	}
-	if !validLevel(msg.Level) {
+	if !validUpdateLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
 	return nil

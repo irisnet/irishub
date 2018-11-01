@@ -52,11 +52,11 @@ func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
 }
 
 func ErrSvcDefExists(codespace sdk.CodespaceType, defChainId, svcDefName string) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exist in %s", svcDefName, defChainId))
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already existed in %s", svcDefName, defChainId))
 }
 
 func ErrSvcDefNotExists(codespace sdk.CodespaceType, defChainId, svcDefName string) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s not exist in %s", svcDefName, defChainId))
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s is not existed in %s", svcDefName, defChainId))
 }
 
 func ErrInvalidIDL(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -104,11 +104,11 @@ func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrSvcBindingExists(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingExists, fmt.Sprintf("service binding provider %s already exist", provider))
+	return sdk.NewError(codespace, CodeSvcBindingExists, fmt.Sprintf("service binding provider %s already existed", provider))
 }
 
 func ErrSvcBindingNotExists(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingNotExists, fmt.Sprintf("service binding not exist"))
+	return sdk.NewError(codespace, CodeSvcBindingNotExists, fmt.Sprintf("service binding is not existed"))
 }
 
 func ErrInvalidBindingType(codespace sdk.CodespaceType, bindingType BindingType) sdk.Error {

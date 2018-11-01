@@ -27,7 +27,10 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			defChainId := viper.GetString(FlagDefChainID)
 
 			res, err := cliCtx.QueryStore(iservice.GetServiceDefinitionKey(defChainId, name), storeName)
-			if len(res) == 0 || err != nil {
+			if err != nil {
+				return err
+			}
+			if len(res) == 0 {
 				return fmt.Errorf("chain-id [%s] service [%s] is not existed", defChainId, name)
 			}
 
@@ -81,7 +84,10 @@ func GetCmdQueryScvBind(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 			res, err := cliCtx.QueryStore(iservice.GetServiceBindingKey(defChainId, name, bindChainId, provider), storeName)
-			if len(res) == 0 || err != nil {
+			if err != nil {
+				return err
+			}
+			if len(res) == 0 {
 				return fmt.Errorf("def-chain-id [%s] service [%s] bind-chain-id [%s] provider [%s] is not existed", defChainId, name, bindChainId, provider)
 			}
 
@@ -113,7 +119,7 @@ func GetCmdQueryScvBinds(storeName string, cdc *wire.Codec) *cobra.Command {
 			defChainId := viper.GetString(FlagDefChainID)
 
 			res, err := cliCtx.QuerySubspace(iservice.GetBindingsSubspaceKey(defChainId, name), storeName)
-			if err != nil || len(res) < 1 {
+			if err != nil {
 				return err
 			}
 

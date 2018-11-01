@@ -69,6 +69,17 @@ func validLevel(lv Level) bool {
 	return false
 }
 
+// is valid update level?
+func validUpdateLevel(lv Level) bool {
+	if lv.AvgRspTime < 0 {
+		return false
+	}
+	if lv.UsableTime < 0 && lv.UsableTime > 10000 {
+		return false
+	}
+	return true
+}
+
 func (svcBind SvcBinding) isValid(height int64) bool {
 	return svcBind.Expiration > height &&
 		svcBind.Deposit.IsGTE(iserviceParams.MinProviderDeposit)

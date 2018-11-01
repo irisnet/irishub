@@ -33,6 +33,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/modules/iservice"
 )
 
 var (
@@ -398,6 +399,24 @@ func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.Servic
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceDef
+}
+
+func executeGetServiceBinding(t *testing.T, cmdStr string) iservice.SvcBinding {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var serviceBinding iservice.SvcBinding
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &serviceBinding)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return serviceBinding
+}
+
+func executeGetServiceBindings(t *testing.T, cmdStr string) []iservice.SvcBinding {
+	out := tests.ExecuteT(t, cmdStr, "")
+	var serviceBindings []iservice.SvcBinding
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return serviceBindings
 }
 
 func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...string) string {
