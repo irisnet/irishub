@@ -317,22 +317,26 @@ func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) h
 // nolint: gocyclo
 func queryConfigHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, err := cliCtx.QuerySubspace([]byte(gov.Prefix), storeName)
+		res, err := cliCtx.QuerySubspace([]byte("Gov/"), "params")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		var kvs []govClient.KvPair
+		var pd gov.ParameterConfigFile
 		for _, kv := range res {
-			var v string
-			cdc.UnmarshalBinary(kv.Value, &v)
-			kv := govClient.KvPair{
-				K: string(kv.Key),
-				V: v,
-			}
-			kvs = append(kvs, kv)
+			switch string(kv.Key) {
+			case "Gov/gov/DepositProcedure":
+				cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.DepositProcedure)
+			case "Gov/gov/VotingProcedure":
+				cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.VotingProcedure)
+			case "Gov/gov/TallyingProcedure":
+				cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.TallyingProcedure)
+			default:
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+				}
 		}
-		output, err := wire.MarshalJSONIndent(cdc, kvs)
+		output, err := cdc.MarshalJSONIndent(pd, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
