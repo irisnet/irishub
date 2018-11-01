@@ -459,16 +459,17 @@ func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			pool := types.MustUnmarshalPool(cdc, res)
+			poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, pool)
 
 			switch viper.Get(cli.OutputFlag) {
 			case "text":
-				human := pool.HumanReadableString()
+				human := poolOutput.HumanReadableString()
 
 				fmt.Println(human)
 
 			case "json":
 				// parse out the pool
-				output, err := codec.MarshalJSONIndent(cdc, pool)
+				output, err := codec.MarshalJSONIndent(cdc, poolOutput)
 				if err != nil {
 					return err
 				}

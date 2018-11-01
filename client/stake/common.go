@@ -225,6 +225,16 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 	}
 }
 
+func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.Pool) PoolOutput {
+	exRate := ExRateFromStakeTokenToMainUnit(cliCtx)
+	return PoolOutput{
+		LooseTokens:  ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),
+		BondedTokens: ConvertDecToRat(pool.BondedTokens).Mul(exRate).FloatString(),
+		TokenSupply:  ConvertDecToRat(pool.BondedTokens.Add(pool.LooseTokens)).Mul(exRate).FloatString(),
+		BondedRatio:  ConvertDecToRat(pool.BondedTokens.Quo(pool.BondedTokens.Add(pool.LooseTokens))).FloatString(),
+	}
+}
+
 func BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr string) (commission types.CommissionMsg, err error) {
 	if rateStr == "" || maxRateStr == "" || maxChangeRateStr == "" {
 		return commission, fmt.Errorf("must specify all validator commission parameters")

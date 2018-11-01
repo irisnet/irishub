@@ -99,6 +99,8 @@ func main() {
 			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
 			stakecmd.GetCmdQueryRedelegation("stake", cdc),
 			stakecmd.GetCmdQueryRedelegations("stake", cdc),
+			stakecmd.GetCmdQueryPool("stake", cdc),
+			stakecmd.GetCmdQueryParams("stake", cdc),
 			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
 		)...)
 	stakeCmd.AddCommand(

@@ -23,7 +23,7 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create-validator",
 		Short:   "create new validator initialized with a self-delegation to it",
-		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name>",
+		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name> --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -116,6 +116,7 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().Bool(FlagGenesisFormat, false, "Export the transaction in gen-tx format; it implies --generate-only")
 	cmd.Flags().String(FlagIP, "", fmt.Sprintf("Node's public IP. It takes effect only when used in combination with --%s", FlagGenesisFormat))
 	cmd.Flags().String(FlagNodeID, "", "Node's ID")
+	cmd.MarkFlagRequired(FlagMoniker)
 	cmd.MarkFlagRequired(FlagPubKey)
 	cmd.MarkFlagRequired(FlagAmount)
 	cmd.MarkFlagRequired(FlagCommissionRate)
