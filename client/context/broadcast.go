@@ -8,6 +8,8 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"strings"
+	"encoding/json"
 )
 
 // TODO: This should get deleted eventually, and perhaps
@@ -158,8 +160,9 @@ func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadc
 		resStr := fmt.Sprintf("Committed at block %d (tx hash: %s)\n", res.Height, res.Hash.String())
 
 		if cliCtx.PrintResponse {
-			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n",
-				res.Height, res.Hash.String(), res.DeliverTx,
+			jsonStr, _ := deliverTxMarshalIndentJSON(res.DeliverTx)
+			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n%s\n",
+				res.Height, res.Hash.String(), res.DeliverTx, string(jsonStr),
 			)
 		}
 
@@ -167,4 +170,18 @@ func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadc
 	}
 
 	return res, nil
+}
+
+func deliverTxMarshalIndentJSON(dtx abci.ResponseDeliverTx) ([]byte, error) {
+
+	tags := make(map[string]string)
+	for _, kv := range dtx.Tags {
+		tags[string(kv.Key)] = strings.Replace(string(kv.Value), "\\", "", -1)
+	}
+
+	return json.MarshalIndent(&struct {
+		Tags map[string]string `json:"tags,omitempty"`
+	}{
+		Tags: tags,
+	}, " ", "  ")
 }
