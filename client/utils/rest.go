@@ -121,13 +121,11 @@ func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req 
 	return nil
 }
 
-// InitRequestClictx
-func InitRequestClictx(cliCtx context.CLIContext, r *http.Request, name string, signerAddress string) context.CLIContext {
+// InitReqCliCtx
+func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContext {
 	cliCtx.GenerateOnly = HasGenerateOnlyArg(r)
 	cliCtx.Async = AsyncOnlyArg(r)
 	cliCtx.DryRun = HasDryRunArg(r)
-	cliCtx.FromAddressName = name
-	cliCtx.SignerAddr = signerAddress
 	return cliCtx
 }
 
@@ -141,7 +139,7 @@ func InitRequestClictx(cliCtx context.CLIContext, r *http.Request, name string, 
 //
 // NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
-func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg, cdc *codec.Codec) {
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg) {
 	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -154,7 +152,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	}
 
 	txCtx := context.TxContext{
-		Codec:         cdc,
+		Codec:         cliCtx.Codec,
 		Gas:           gas,
 		GasAdjustment: adjustment,
 		SimulateGas:   simulateGas,
@@ -162,20 +160,21 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		AccountNumber: baseTx.AccountNumber,
 		Sequence:      baseTx.Sequence,
 	}
+	txCtx = txCtx.WithCliCtx(cliCtx)
 
 	if cliCtx.DryRun || txCtx.SimulateGas {
-		newBldr, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
+		newTxCtx, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
 		if err != nil {
 			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if cliCtx.DryRun {
-			WriteSimulationResponse(w, newBldr.Gas)
+			WriteSimulationResponse(w, newTxCtx.Gas)
 			return
 		}
 
-		txCtx = newBldr
+		txCtx = newTxCtx
 	}
 
 	if cliCtx.GenerateOnly {
@@ -201,7 +200,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		return
 	}
 
-	PostProcessResponse(w, cdc, res, cliCtx.Indent)
+	PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 }
 
 // PostProcessResponse performs post process for rest response
