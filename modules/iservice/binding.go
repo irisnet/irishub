@@ -63,10 +63,15 @@ func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 
 // is valid level?
 func validLevel(lv Level) bool {
-	if lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 100 {
+	if lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 10000 {
 		return true
 	}
 	return false
+}
+
+func (svcBind SvcBinding) isValid(height int64) bool {
+	return svcBind.Expiration > height &&
+		svcBind.Deposit.IsGTE(iserviceParams.MinProviderDeposit)
 }
 
 type BindingType byte

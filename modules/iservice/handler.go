@@ -2,6 +2,7 @@ package iservice
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/iservice/tags"
 )
 
 // handle all "iservice" type messages.
@@ -12,42 +13,68 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcDef(ctx, k, msg)
 		case MsgSvcBind:
 			return handleMsgSvcBind(ctx, k, msg)
+		case MsgSvcBindingUpdate:
+			return handleMsgSvcBindUpdate(ctx, k, msg)
+		case MsgSvcRefundDeposit:
+			return handleMsgSvcRefundDeposit(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parse in staking module").Result()
+			return sdk.ErrTxDecode("invalid message parse in iservice module").Result()
 		}
 	}
 }
 func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	_, found := k.GetServiceDefinition(ctx, msg.ChainId, msg.Name)
 	if found {
-		return ErrSvcDefExists(k.Codespace(), msg.Name).Result()
+		return ErrSvcDefExists(k.Codespace(), msg.ChainId, msg.Name).Result()
 	}
 	k.AddServiceDefinition(ctx, msg.SvcDef)
 	err := k.AddMethods(ctx, msg.SvcDef)
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{}
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcDef,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
-	_, found := k.GetServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
-	if found {
-		return ErrSvcBindingExists(k.Codespace(), msg.Provider).Result()
+	err, _ := k.AddServiceBinding(ctx, msg.SvcBinding)
+	if err != nil {
+		return err.Result()
 	}
-
-	methodIterator := k.GetMethods(ctx, msg.DefChainID, msg.DefName)
-	var methods []MethodProperty
-	for ; methodIterator.Valid(); methodIterator.Next() {
-		var method MethodProperty
-		k.cdc.MustUnmarshalBinary(methodIterator.Value(), &method)
-		methods = append(methods, method)
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcBind,
+	)
+	return sdk.Result{
+		Tags: resTags,
 	}
+}
 
-	if len(methods) != len(msg.Prices) {
-		return ErrInvalidPriceCount(k.Codespace(), len(msg.Prices), len(methods)).Result()
+func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
+	err, _ := k.UpdateServiceBinding(ctx, msg.SvcBinding)
+	if err != nil {
+		return err.Result()
 	}
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcBindUpdate,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
 
-	k.AddServiceBinding(ctx, msg.SvcBinding)
-	return sdk.Result{}
+func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposit) sdk.Result {
+	err, _ := k.RefundDeposit(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	if err != nil {
+		return err.Result()
+	}
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcBindUpdate,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
 }

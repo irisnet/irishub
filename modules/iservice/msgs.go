@@ -11,7 +11,6 @@ const (
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
-	maxTagsNum    = 5
 )
 
 var _ sdk.Msg = MsgSvcDef{}
@@ -107,7 +106,7 @@ func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
 }
 
 func validateTags(tags []string) (bool, sdk.Error) {
-	if len(tags) > maxTagsNum {
+	if len(tags) > iserviceParams.MaxTagsNum {
 		return false, ErrMoreTags(DefaultCodespace)
 	}
 	if len(tags) > 0 {
@@ -198,6 +197,9 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
 	if !msg.Deposit.IsValid() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
@@ -216,5 +218,125 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSvcBind) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
+}
+
+//______________________________________________________________________
+
+// MsgSvcBindingUpdate - struct for update a service binding
+type MsgSvcBindingUpdate struct {
+	SvcBinding
+}
+
+func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, expiration int64) MsgSvcBindingUpdate {
+	return MsgSvcBindingUpdate{
+		SvcBinding{
+			DefChainID:  defChainID,
+			DefName:     defName,
+			BindChainID: bindChainID,
+			Provider:    provider,
+			BindingType: bindingType,
+			Deposit:     deposit,
+			Expiration:  expiration,
+			Prices:      prices,
+			Level:       level,
+		},
+	}
+}
+
+func (msg MsgSvcBindingUpdate) Type() string {
+	return MsgType
+}
+
+func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
+	if len(msg.DefChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.BindChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.DefName) == 0 {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
+	if !validBindingType(msg.BindingType) {
+		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
+	}
+	if !msg.Deposit.IsValid() {
+		return sdk.ErrInvalidCoins(msg.Deposit.String())
+	}
+	for _, price := range msg.Prices {
+		if !price.IsNotNegative() {
+			return sdk.ErrInvalidCoins(price.String())
+		}
+	}
+	if !validLevel(msg.Level) {
+		return ErrInvalidLevel(DefaultCodespace, msg.Level)
+	}
+	return nil
+}
+
+func (msg MsgSvcBindingUpdate) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
+}
+
+//______________________________________________________________________
+
+// MsgSvcRefundDeposit - struct for refund deposit from a service binding
+type MsgSvcRefundDeposit struct {
+	DefName     string         `json:"def_name"`
+	DefChainID  string         `json:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+}
+
+func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sdk.AccAddress) MsgSvcRefundDeposit {
+	return MsgSvcRefundDeposit{
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+	}
+}
+
+func (msg MsgSvcRefundDeposit) Type() string {
+	return MsgType
+}
+
+func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
+	if len(msg.DefChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.BindChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.DefName) == 0 {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcRefundDeposit) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }

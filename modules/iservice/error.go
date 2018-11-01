@@ -20,11 +20,14 @@ const (
 	CodeMoreTags                 sdk.CodeType = 109
 	CodeDuplicateTags            sdk.CodeType = 110
 
-	SvcBindingExists       sdk.CodeType = 111
-	CodeInvalidDefChainId  sdk.CodeType = 112
-	CodeInvalidBindingType sdk.CodeType = 113
-	CodeInvalidLevel       sdk.CodeType = 114
-	CodeInvalidPriceCount  sdk.CodeType = 115
+	CodeSvcBindingExists    sdk.CodeType = 111
+	CodeSvcBindingNotExists sdk.CodeType = 112
+	CodeInvalidDefChainId   sdk.CodeType = 113
+	CodeInvalidBindingType  sdk.CodeType = 114
+	CodeInvalidLevel        sdk.CodeType = 115
+	CodeInvalidPriceCount   sdk.CodeType = 116
+	CodeInvalidUpdate       sdk.CodeType = 117
+	CodeRefundDeposit       sdk.CodeType = 118
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -48,12 +51,16 @@ func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
 	return codeToDefaultMsg(code)
 }
 
-func ErrSvcDefExists(codespace sdk.CodespaceType, svcDefName string) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exist, must use a new name", svcDefName))
+func ErrSvcDefExists(codespace sdk.CodespaceType, defChainId, svcDefName string) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exist in %s", svcDefName, defChainId))
+}
+
+func ErrSvcDefNotExists(codespace sdk.CodespaceType, defChainId, svcDefName string) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s not exist in %s", svcDefName, defChainId))
 }
 
 func ErrInvalidIDL(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidIDL, fmt.Sprintf("The IDL content cannot be parsed, err: %s", msg))
+	return sdk.NewError(codespace, CodeInvalidIDL, fmt.Sprintf("The IDL content cannot be parsed, %s", msg))
 }
 
 func ErrInvalidOutputPrivacyEnum(codespace sdk.CodespaceType, value string) sdk.Error {
@@ -85,7 +92,7 @@ func ErrInvalidMessagingType(codespace sdk.CodespaceType, value MessagingType) s
 }
 
 func ErrMoreTags(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeMoreTags, fmt.Sprintf("tags are limited to %d", maxTagsNum))
+	return sdk.NewError(codespace, CodeMoreTags, fmt.Sprintf("tags are limited to %d", iserviceParams.MaxTagsNum))
 }
 
 func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
@@ -97,7 +104,11 @@ func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrSvcBindingExists(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service binding provider %v already exist", provider))
+	return sdk.NewError(codespace, CodeSvcBindingExists, fmt.Sprintf("service binding provider %s already exist", provider))
+}
+
+func ErrSvcBindingNotExists(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcBindingNotExists, fmt.Sprintf("service binding not exist"))
 }
 
 func ErrInvalidBindingType(codespace sdk.CodespaceType, bindingType BindingType) sdk.Error {
@@ -109,5 +120,13 @@ func ErrInvalidLevel(codespace sdk.CodespaceType, level Level) sdk.Error {
 }
 
 func ErrInvalidPriceCount(codespace sdk.CodespaceType, priceCount int, methodCount int) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidPriceCount, fmt.Sprintf("invalid Price count %d, method count %v is supposed to", priceCount, methodCount))
+	return sdk.NewError(codespace, CodeInvalidPriceCount, fmt.Sprintf("invalid prices count %d, but methods count is %d", priceCount, methodCount))
+}
+
+func ErrInvalidUpdate(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidUpdate, fmt.Sprintf("invalid service binding update, %s", msg))
+}
+
+func ErrRefundDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeRefundDeposit, fmt.Sprintf("can't refund deposit, %s", msg))
 }

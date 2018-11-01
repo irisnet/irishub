@@ -9,6 +9,7 @@ import (
 
 func TestKeeper_IService_Definition(t *testing.T) {
 	ctx, keeper := createTestInput(t)
+	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(200))})
 
 	serviceDef := NewSvcDef("myService",
 		"testnet",
@@ -41,19 +42,32 @@ func TestKeeper_IService_Definition(t *testing.T) {
 		require.Equal(t, method.OutputPrivacy.String(), "NoPrivacy")
 		require.Equal(t, method.OutputCached.String(), "NoCached")
 	}
-}
-
-func TestKeeper_IService_Binding(t *testing.T) {
-	ctx, keeper := createTestInput(t)
 
 	// test binding
 	svcBinding := NewSvcBinding("testnet", "myService", "testnet",
-		addrs[1], Local, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
-		[]int{1}, 1000)
-	keeper.AddServiceBinding(ctx, svcBinding)
+		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
+		Level{AvgRspTime: 10000, UsableTime: 9999}, 1000)
+	err, _ := keeper.AddServiceBinding(ctx, svcBinding)
+	require.NoError(t, err)
+
+	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}))
+
 	gotSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
 	require.True(t, found)
 	require.True(t, SvcBindingEqual(svcBinding, gotSvcBinding))
+
+	// test binding update
+	svcBindingUpdate := NewMsgSvcBindingUpdate("testnet", "myService", "testnet",
+		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
+		Level{AvgRspTime: 10000, UsableTime: 9999}, 1000)
+	err, _ = keeper.UpdateServiceBinding(ctx, svcBindingUpdate.SvcBinding)
+	require.NoError(t, err)
+
+	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(0))}))
+
+	upSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
+	require.True(t, found)
+	require.True(t, upSvcBinding.Deposit.IsEqual(gotSvcBinding.Deposit.Plus(svcBindingUpdate.Deposit)))
 }
 
 const idlContent = `

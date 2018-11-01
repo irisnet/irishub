@@ -4,17 +4,20 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/tools/protoidl"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"fmt"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
+	ck       bank.Keeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, codespace sdk.CodespaceType) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
@@ -74,14 +77,32 @@ func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, GetMethodsSubspaceKey(chainId, name))
 }
 
-func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) {
+func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.Error, bool) {
 	kvStore := ctx.KVStore(k.storeKey)
-	svcBindingBytes, err := k.cdc.MarshalBinary(svcBinding)
-	if err != nil {
-		panic(err)
+	_, found := k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
+	if found {
+		return ErrSvcBindingExists(k.Codespace(), svcBinding.Provider), false
 	}
 
+	_, found = k.GetServiceDefinition(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	if !found {
+		return ErrSvcDefNotExists(k.Codespace(), svcBinding.DefChainID, svcBinding.DefName), false
+	}
+
+	err := k.ValidateMethodPrices(ctx, svcBinding)
+	if err != nil {
+		return err, false
+	}
+
+	// Subtract coins from provider's account
+	_, _, err = k.ck.SubtractCoins(ctx, svcBinding.Provider, svcBinding.Deposit)
+	if err != nil {
+		return err, false
+	}
+
+	svcBindingBytes := k.cdc.MustMarshalBinary(svcBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
+	return nil, true
 }
 
 func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (svcBinding SvcBinding, found bool) {
@@ -94,4 +115,101 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChai
 		return svcBinding, true
 	}
 	return svcBinding, false
+}
+
+func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.Error, bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+	oldBinding, found := k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
+	if !found {
+		return ErrSvcBindingNotExists(k.Codespace()), false
+	}
+
+	if len(svcBinding.Prices) > 0 {
+		err := k.ValidateMethodPrices(ctx, svcBinding)
+		if err != nil {
+			return err, false
+		}
+		oldBinding.Prices = svcBinding.Prices
+	}
+
+	// can't update type Global to Local
+	if oldBinding.BindingType == Global && svcBinding.BindingType == Local {
+		return ErrInvalidUpdate(k.Codespace(), "can't update binding type from Global to Local"), false
+	}
+
+	// Subtract coins from provider's account
+	_, _, err := k.ck.SubtractCoins(ctx, svcBinding.Provider, svcBinding.Deposit)
+	if err != nil {
+		return err, false
+	}
+
+	if svcBinding.Deposit.IsNotNegative() {
+		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
+	}
+	if svcBinding.Expiration != 0 {
+		height := ctx.BlockHeader().Height
+		if oldBinding.Expiration != -1 && oldBinding.Expiration < height {
+			oldBinding.Expiration = height
+		} else {
+			oldBinding.Expiration = svcBinding.Expiration
+		}
+	}
+	if svcBinding.Level.UsableTime != 0 {
+		oldBinding.Level.UsableTime = svcBinding.Level.UsableTime
+	}
+	if svcBinding.Level.AvgRspTime != 0 {
+		oldBinding.Level.AvgRspTime = svcBinding.Level.AvgRspTime
+	}
+
+	svcBindingBytes := k.cdc.MustMarshalBinary(oldBinding)
+	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
+	return nil, true
+}
+
+func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (sdk.Error, bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+	if !found {
+		return ErrSvcBindingNotExists(k.Codespace()), false
+	}
+
+	if binding.Expiration == -1 {
+		return ErrRefundDeposit(k.Codespace(), "service binding expiration is -1"), false
+	}
+
+	if binding.Deposit.IsZero(){
+		return ErrRefundDeposit(k.Codespace(), "service binding deposit is zero"), false
+	}
+
+	height := ctx.BlockHeader().Height + int64(iserviceParams.MaxRequestTimeout)
+	if binding.Expiration < height {
+		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", height)), false
+	}
+
+	// Add coins to provider's account
+	_, _, err := k.ck.AddCoins(ctx, binding.Provider, binding.Deposit)
+	if err != nil {
+		return err, false
+	}
+
+	binding.Deposit = sdk.Coins{}
+
+	svcBindingBytes := k.cdc.MustMarshalBinary(binding)
+	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+	return nil, true
+}
+
+func (k Keeper) ValidateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
+	methodIterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	var methods []MethodProperty
+	for ; methodIterator.Valid(); methodIterator.Next() {
+		var method MethodProperty
+		k.cdc.MustUnmarshalBinary(methodIterator.Value(), &method)
+		methods = append(methods, method)
+	}
+
+	if len(methods) != len(svcBinding.Prices) {
+		return ErrInvalidPriceCount(k.Codespace(), len(svcBinding.Prices), len(methods))
+	}
+	return nil
 }
