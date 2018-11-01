@@ -446,9 +446,10 @@ func GetCmdQueryRedelegations(storeName string, cdc *codec.Codec) *cobra.Command
 // GetCmdQueryPool implements the pool query command.
 func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pool",
-		Short: "Query the current staking pool values",
-		Args:  cobra.NoArgs,
+		Use:     "pool",
+		Short:   "Query the current staking pool values",
+		Example: "iriscli stake pool",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key := stake.PoolKey
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -486,9 +487,10 @@ func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryPool implements the params query command.
 func GetCmdQueryParams(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "parameters",
-		Short: "Query the current staking parameters information",
-		Args:  cobra.NoArgs,
+		Use:     "parameters",
+		Short:   "Query the current staking parameters information",
+		Example: "iriscli stake parameters",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			bz, err := cliCtx.QueryWithData("custom/stake/"+stake.QueryParameters, nil)

@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/app"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
@@ -130,6 +131,7 @@ func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-validator",
 		Short: "edit and existing validator account",
+		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --moniker=<validator name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -226,7 +228,7 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "redelegate",
 		Short:   "redelegate illiquid tokens from one validator to another",
-		Example: "iriscli stake redelegation begin --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> shares-percent=0.5",
+		Example: "iriscli stake redelegation --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -270,7 +272,8 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(fsShares)
 	cmd.Flags().AddFlagSet(fsRedelegation)
-
+	cmd.MarkFlagRequired(FlagAddressValidatorSrc)
+	cmd.MarkFlagRequired(FlagAddressValidatorDst)
 	return cmd
 }
 
@@ -296,6 +299,13 @@ func getShares(
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
 
+		stakeTokenDenom, err := cliCtx.GetCoinType(app.Denom)
+		if err != nil {
+			panic(err)
+		}
+		decimalDiff := stakeTokenDenom.MinUnit.Decimal - stakeTokenDenom.GetMainUnit().Decimal
+		exRate := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, decimalDiff))
+		sharesAmount = sharesAmount.Mul(exRate)
 	case sharesPercentStr != "":
 		var sharesPercent sdk.Dec
 		sharesPercent, err = sdk.NewDecFromStr(sharesPercentStr)
@@ -331,8 +341,8 @@ func getShares(
 func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "unbond",
-		Short:   "begin or complete unbonding shares from a validator",
-		Example: "iriscli stake unbond begin --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator=<validator address> shares-percent=0.5",
+		Short:   "unbond shares from a validator",
+		Example: "iriscli stake unbond --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator=<validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -370,6 +380,7 @@ func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(fsShares)
 	cmd.Flags().AddFlagSet(fsValidator)
+	cmd.MarkFlagRequired(FlagAddressValidator)
 
 	return cmd
 }

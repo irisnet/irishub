@@ -16,10 +16,10 @@ import (
 // GetCmdUnrevoke implements the create unrevoke validator command.
 func GetCmdUnrevoke(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "unrevoke",
+		Use:     "unjail",
 		Args:    cobra.ExactArgs(0),
-		Short:   "unrevoke validator previously revoked for downtime",
-		Example: "iriscli stake unrevoke --to=<account address> --from <key name> --fee=0.004iris --chain-id=<chain-id>",
+		Short:   "unjail validator previously jailed for downtime",
+		Example: "iriscli stake unjail --from <key name> --fee=0.004iris --chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).

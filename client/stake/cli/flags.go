@@ -10,8 +10,8 @@ import (
 const (
 	FlagAddressDelegator    = "address-delegator"
 	FlagAddressValidator    = "address-validator"
-	FlagAddressValidatorSrc = "addr-validator-source"
-	FlagAddressValidatorDst = "addr-validator-dest"
+	FlagAddressValidatorSrc = "address-validator-source"
+	FlagAddressValidatorDst = "address-validator-dest"
 	FlagPubKey              = "pubkey"
 	FlagAmount              = "amount"
 	FlagSharesAmount        = "shares-amount"
