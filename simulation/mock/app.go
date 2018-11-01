@@ -139,6 +139,8 @@ func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
 	newKeys = append(newKeys, app.KeyFeeCollection)
 
 	app.MountStoresIAVL(newKeys...)
+	app.MountStoresTransient(app.TkeyParams, app.TkeyStake)
+
 	err := app.LoadLatestVersion(app.KeyMain)
 
 	return err
