@@ -136,6 +136,7 @@ func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
 	newKeys = append(newKeys, app.KeyMain)
 	newKeys = append(newKeys, app.KeyAccount)
 	newKeys = append(newKeys, app.KeyParams)
+	newKeys = append(newKeys, app.KeyStake)
 	newKeys = append(newKeys, app.KeyFeeCollection)
 
 	app.MountStoresIAVL(newKeys...)
