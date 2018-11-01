@@ -378,7 +378,7 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 	type toJSON struct {
 		Height   int64  `json:"Height"`
 		TxHash   string `json:"TxHash"`
-		Response string `json:"Response"`
+		//Response string `json:"Response"`
 	}
 	var res toJSON
 	cdc := app.MakeCodec()

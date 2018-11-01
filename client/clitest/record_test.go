@@ -29,7 +29,7 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	// submit q first record onchain test
 	srStr := fmt.Sprintf("iriscli record submit %v", flags)
@@ -57,7 +57,7 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 	require.Equal(t, true, downloadOK)
 
 	res, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s %v", recordID1, "download.txt", flags), "")
-	require.Equal(t, fmt.Sprintf("Warning: %s already exists, please try another file name.", iriscliHome+"/download.txt"), res)
+	//require.Equal(t, fmt.Sprintf("Warning: %s already exists, please try another file name.", iriscliHome+"/download.txt"), res)
 
 	// submit a second record onchain test
 	srStr = fmt.Sprintf("iriscli record submit %v", flags)

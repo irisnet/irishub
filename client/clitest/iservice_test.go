@@ -35,7 +35,7 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	num := getAmountFromCoinStr(fooCoin)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	// iservice define
 	fileName := iriscliHome + string(os.PathSeparator) + "test.proto"
@@ -58,8 +58,8 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 99 && num < 100) {
-		t.Error("Test Failed: (99, 100) expected, recieved: {}", num)
+	if !(num > 49 && num < 50) {
+		t.Error("Test Failed: (49, 50) expected, recieved: {}", num)
 	}
 
 	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli iservice definition --name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
