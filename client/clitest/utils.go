@@ -31,6 +31,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
+	"github.com/cosmos/cosmos-sdk/server"
 )
 
 var (
@@ -199,6 +200,24 @@ func copyFile(dstFile, srcFile string) error {
 //___________________________________________________________________________________
 // executors
 
+func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
+
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
+	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+
+	err := modifyGenesisFile(irisHome)
+	require.NoError(t, err)
+
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err = server.FreeTCPAddr()
+	require.NoError(t, err)
+	return
+}
+
 func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 	proc := tests.GoExecuteT(t, cmdStr)
 
@@ -225,16 +244,13 @@ func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 }
 
 func executeInit(t *testing.T, cmdStr string) (chainID, nodeID string) {
-	out, _ := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
+	_, stderr := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
-	err := json.Unmarshal([]byte(out), &initRes)
+	err := json.Unmarshal([]byte(stderr), &initRes)
 	require.NoError(t, err)
 
 	err = json.Unmarshal(initRes["chain_id"], &chainID)
-	require.NoError(t, err)
-
-	err = json.Unmarshal(initRes["node_id"], &nodeID)
 	require.NoError(t, err)
 
 	return

@@ -16,16 +16,7 @@ func init() {
 }
 
 func TestIrisCLIParameterChangeProposal(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
-
-	err := modifyGenesisFile(irisHome)
-	require.NoError(t, err)
-
-	// get a free port, also setup some common flags
-	servAddr, port, err := server.FreeTCPAddr()
-	require.NoError(t, err)
+	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
