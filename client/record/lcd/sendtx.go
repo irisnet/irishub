@@ -24,16 +24,17 @@ type postRecordReq struct {
 
 func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Init context and read request parameters
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var req postRecordReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
 
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.Name, req.Submitter)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -85,6 +86,6 @@ func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
