@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:896ab4b4cb62853a49af731d7f04d37505c9f398311ff7ae7e8dcc0ea7c1817c"
+  digest = "1:d59e37e97536707dad88b591f40a1c8023b1e8aff822d8ebb311a20f1630427e"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -102,6 +102,7 @@
     "x/distribution/tags",
     "x/distribution/types",
     "x/gov",
+    "x/gov/client",
     "x/gov/tags",
     "x/ibc",
     "x/mint",
@@ -949,6 +950,7 @@
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/distribution",
     "github.com/cosmos/cosmos-sdk/x/gov",
+    "github.com/cosmos/cosmos-sdk/x/gov/client",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mint",
     "github.com/cosmos/cosmos-sdk/x/mock",

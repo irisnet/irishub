@@ -200,15 +200,15 @@ type QueryTallyParams struct {
 func queryTally(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	// TODO: Dependant on #1914
 
-	var proposalID int64
-	err2 := keeper.cdc.UnmarshalJSON(req.Data, proposalID)
+	var param QueryTallyParams
+	err2 := keeper.cdc.UnmarshalJSON(req.Data, &param)
 	if err2 != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	proposal := keeper.GetProposal(ctx, proposalID)
+	proposal := keeper.GetProposal(ctx, param.ProposalID)
 	if proposal == nil {
-		return nil, ErrUnknownProposal(DefaultCodespace, proposalID)
+		return nil, ErrUnknownProposal(DefaultCodespace, param.ProposalID)
 	}
 
 	var tallyResult TallyResult

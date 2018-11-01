@@ -6,6 +6,7 @@ import (
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
@@ -59,29 +60,33 @@ func main() {
 		bankCmd,
 	)
 
-	////Add gov commands
-	//govCmd := &cobra.Command{
-	//	Use:   "gov",
-	//	Short: "Governance and voting subcommands",
-	//}
-	//govCmd.AddCommand(
-	//	client.GetCommands(
-	//		govcmd.GetCmdQueryProposal("gov", cdc),
-	//		govcmd.GetCmdQueryProposals("gov", cdc),
-	//		govcmd.GetCmdQueryVote("gov", cdc),
-	//		govcmd.GetCmdQueryVotes("gov", cdc),
-	//		govcmd.GetCmdQueryGovConfig("params", cdc),
-	//		govcmd.GetCmdPullGovConfig("params", cdc),
-	//	)...)
-	//govCmd.AddCommand(
-	//	client.PostCommands(
-	//		govcmd.GetCmdSubmitProposal(cdc),
-	//		govcmd.GetCmdDeposit(cdc),
-	//		govcmd.GetCmdVote(cdc),
-	//	)...)
-	//rootCmd.AddCommand(
-	//	govCmd,
-	//)
+	//Add gov commands
+	govCmd := &cobra.Command{
+		Use:   "gov",
+		Short: "Governance and voting subcommands",
+	}
+	govCmd.AddCommand(
+		client.GetCommands(
+			govcmd.GetCmdQueryProposal("gov", cdc),
+			govcmd.GetCmdQueryProposals("gov", cdc),
+			govcmd.GetCmdQueryVote("gov", cdc),
+			govcmd.GetCmdQueryVotes("gov", cdc),
+			govcmd.GetCmdQueryDeposit("gov",cdc),
+			govcmd.GetCmdQueryDeposits("gov",cdc),
+			govcmd.GetCmdQueryTally("gov",cdc),
+			govcmd.GetCmdQueryGovConfig("params", cdc),
+			govcmd.GetCmdPullGovConfig("params", cdc),
+		)...)
+	govCmd.AddCommand(
+		client.PostCommands(
+			govcmd.GetCmdSubmitProposal(cdc),
+			govcmd.GetCmdDeposit(cdc),
+			govcmd.GetCmdVote(cdc),
+
+		)...)
+	rootCmd.AddCommand(
+		govCmd,
+	)
 
 	//Add staking and slashing commands
 	/*

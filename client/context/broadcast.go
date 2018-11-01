@@ -127,7 +127,7 @@ func (cliCtx CLIContext) broadcastTxAsync(txBytes []byte) (*ctypes.ResultBroadca
 	return res, nil
 }
 
-func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+func (cliCtx CLIContext)  broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	res, err := cliCtx.BroadcastTxAndAwaitCommit(txBytes)
 	if err != nil {
 		return res, err
