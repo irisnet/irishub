@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/pkg/errors"
-	"github.com/cosmos/cosmos-sdk/x/gov/client"
+	client "github.com/irisnet/irishub/client/gov"
 )
 
 func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
