@@ -214,6 +214,9 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if !validLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
+	if msg.Expiration == 0 {
+		return ErrInvalidExpiration(DefaultCodespace,msg.Expiration)
+	}
 	return nil
 }
 
@@ -269,10 +272,10 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	if !validBindingType(msg.BindingType) {
+	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-	if !msg.Deposit.IsValid() {
+	if msg.Deposit.Len() > 0 && !msg.Deposit.IsValid() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	for _, price := range msg.Prices {

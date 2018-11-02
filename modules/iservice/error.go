@@ -10,24 +10,26 @@ const (
 
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101
-	CodeInvalidOutputPrivacyEnum sdk.CodeType = 102
-	CodeInvalidOutputCachedEnum  sdk.CodeType = 103
-	CodeInvalidServiceName       sdk.CodeType = 104
-	CodeInvalidChainId           sdk.CodeType = 105
-	CodeInvalidAuthor            sdk.CodeType = 106
-	CodeInvalidMethodName        sdk.CodeType = 107
-	CodeInvalidMessagingType     sdk.CodeType = 108
-	CodeMoreTags                 sdk.CodeType = 109
-	CodeDuplicateTags            sdk.CodeType = 110
+	CodeSvcDefNotExists          sdk.CodeType = 102
+	CodeInvalidOutputPrivacyEnum sdk.CodeType = 103
+	CodeInvalidOutputCachedEnum  sdk.CodeType = 104
+	CodeInvalidServiceName       sdk.CodeType = 105
+	CodeInvalidChainId           sdk.CodeType = 106
+	CodeInvalidAuthor            sdk.CodeType = 107
+	CodeInvalidMethodName        sdk.CodeType = 108
+	CodeInvalidMessagingType     sdk.CodeType = 109
+	CodeMoreTags                 sdk.CodeType = 110
+	CodeDuplicateTags            sdk.CodeType = 111
 
-	CodeSvcBindingExists    sdk.CodeType = 111
-	CodeSvcBindingNotExists sdk.CodeType = 112
-	CodeInvalidDefChainId   sdk.CodeType = 113
-	CodeInvalidBindingType  sdk.CodeType = 114
-	CodeInvalidLevel        sdk.CodeType = 115
-	CodeInvalidPriceCount   sdk.CodeType = 116
-	CodeInvalidUpdate       sdk.CodeType = 117
-	CodeRefundDeposit       sdk.CodeType = 118
+	CodeSvcBindingExists    sdk.CodeType = 112
+	CodeSvcBindingNotExists sdk.CodeType = 113
+	CodeInvalidDefChainId   sdk.CodeType = 114
+	CodeInvalidBindingType  sdk.CodeType = 115
+	CodeInvalidLevel        sdk.CodeType = 116
+	CodeInvalidPriceCount   sdk.CodeType = 117
+	CodeInvalidUpdate       sdk.CodeType = 118
+	CodeRefundDeposit       sdk.CodeType = 119
+	CodeInvalidExpiration   sdk.CodeType = 120
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -52,11 +54,11 @@ func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
 }
 
 func ErrSvcDefExists(codespace sdk.CodespaceType, defChainId, svcDefName string) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already existed in %s", svcDefName, defChainId))
+	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s already exists in %s", svcDefName, defChainId))
 }
 
 func ErrSvcDefNotExists(codespace sdk.CodespaceType, defChainId, svcDefName string) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcDefExists, fmt.Sprintf("service definition name %s is not existed in %s", svcDefName, defChainId))
+	return sdk.NewError(codespace, CodeSvcDefNotExists, fmt.Sprintf("service definition name %s is not existed in %s", svcDefName, defChainId))
 }
 
 func ErrInvalidIDL(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -103,8 +105,8 @@ func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("def-chain-id is empty"))
 }
 
-func ErrSvcBindingExists(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingExists, fmt.Sprintf("service binding provider %s already existed", provider))
+func ErrSvcBindingExists(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcBindingExists, fmt.Sprintf("service binding already exists"))
 }
 
 func ErrSvcBindingNotExists(codespace sdk.CodespaceType) sdk.Error {
@@ -116,7 +118,7 @@ func ErrInvalidBindingType(codespace sdk.CodespaceType, bindingType BindingType)
 }
 
 func ErrInvalidLevel(codespace sdk.CodespaceType, level Level) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidLevel, fmt.Sprintf("invalid level %v, must avg_rsp_time>0 and 0<usable_time<=100", level))
+	return sdk.NewError(codespace, CodeInvalidLevel, fmt.Sprintf("invalid level %v, must avg_rsp_time>0 and 0<usable_time<=10000", level))
 }
 
 func ErrInvalidPriceCount(codespace sdk.CodespaceType, priceCount int, methodCount int) sdk.Error {
@@ -129,4 +131,12 @@ func ErrInvalidUpdate(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrRefundDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeRefundDeposit, fmt.Sprintf("can't refund deposit, %s", msg))
+}
+
+func ErrInvalidExpiration(codespace sdk.CodespaceType, expiration int64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("invalid expiration %v, can't be equal to zero", expiration))
+}
+
+func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("deposit amount must >= %s", coins.String()))
 }

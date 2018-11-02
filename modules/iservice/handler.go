@@ -72,7 +72,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 		return err.Result()
 	}
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBindUpdate,
+		tags.Action, tags.ActionSvcRefundDeposit,
 	)
 	return sdk.Result{
 		Tags: resTags,

@@ -79,14 +79,18 @@ func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
 
 func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.Error, bool) {
 	kvStore := ctx.KVStore(k.storeKey)
-	_, found := k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
-	if found {
-		return ErrSvcBindingExists(k.Codespace(), svcBinding.Provider), false
-	}
-
-	_, found = k.GetServiceDefinition(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	_, found := k.GetServiceDefinition(ctx, svcBinding.DefChainID, svcBinding.DefName)
 	if !found {
 		return ErrSvcDefNotExists(k.Codespace(), svcBinding.DefChainID, svcBinding.DefName), false
+	}
+
+	_, found = k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
+	if found {
+		return ErrSvcBindingExists(k.Codespace()), false
+	}
+
+	if !svcBinding.Deposit.IsGTE(iserviceParams.MinProviderDeposit) {
+		return ErrLtMinProviderDeposit(k.Codespace(), iserviceParams.MinProviderDeposit), false
 	}
 
 	err := k.ValidateMethodPrices(ctx, svcBinding)
@@ -139,19 +143,24 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 
 	oldBinding.BindingType = svcBinding.BindingType
 
+	// Add coins to svcBinding deposit
+	if svcBinding.Deposit.IsNotNegative() {
+		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
+	}
+
+	if !oldBinding.Deposit.IsGTE(iserviceParams.MinProviderDeposit) {
+		return ErrLtMinProviderDeposit(k.Codespace(), iserviceParams.MinProviderDeposit.Minus(oldBinding.Deposit)), false
+	}
+
 	// Subtract coins from provider's account
 	_, _, err := k.ck.SubtractCoins(ctx, svcBinding.Provider, svcBinding.Deposit)
 	if err != nil {
 		return err, false
 	}
 
-	// Add coins to svcBinding deposit
-	if svcBinding.Deposit.IsNotNegative() {
-		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
-	}
 	if svcBinding.Expiration != 0 {
 		height := ctx.BlockHeader().Height
-		if oldBinding.Expiration != -1 && oldBinding.Expiration < height {
+		if oldBinding.Expiration >= 0 && oldBinding.Expiration < height {
 			oldBinding.Expiration = height
 		} else {
 			oldBinding.Expiration = svcBinding.Expiration
@@ -176,11 +185,11 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 		return ErrSvcBindingNotExists(k.Codespace()), false
 	}
 
-	if binding.Expiration == -1 {
-		return ErrRefundDeposit(k.Codespace(), "service binding expiration is -1"), false
+	if binding.Expiration < 0 {
+		return ErrRefundDeposit(k.Codespace(), "service binding don`t set expiration height"), false
 	}
 
-	if binding.Deposit.IsZero(){
+	if binding.Deposit.IsZero() {
 		return ErrRefundDeposit(k.Codespace(), "service binding deposit is zero"), false
 	}
 
