@@ -108,10 +108,10 @@ func TestRegisterParamMapping(t *testing.T) {
 	iparam.RegisterGovParamMapping(&DepositProcedureParameter)
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
-	require.Equal(t, iparam.ParamMapping[string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	iparam.ParamMapping[string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":1440}")
+	iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":1440}")
 	DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 }
