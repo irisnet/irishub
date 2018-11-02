@@ -8,13 +8,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
-	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
-	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
 	recordhandle "github.com/irisnet/irishub/client/record/lcd"
-	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
-	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/rakyll/statik/fs"
@@ -87,10 +83,10 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
-	keyshandler.RegisterRoutes(r)
-	bankhandler.RegisterRoutes(cliCtx, r, cdc)
-	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
-	stakehandler.RegisterRoutes(cliCtx, r, cdc)
+	//keyshandler.RegisterRoutes(r)
+	//bankhandler.RegisterRoutes(cliCtx, r, cdc)
+	//slashinghandler.RegisterRoutes(cliCtx, r, cdc)
+	//stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	recordhandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis

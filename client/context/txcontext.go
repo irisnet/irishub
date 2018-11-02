@@ -28,6 +28,7 @@ type BaseTx struct {
 	Sequence      int64  `json:"sequence"`
 	Gas           string `json:"gas"`
 	GasAdjustment string `json:"gas_adjustment"`
+	Fee           string `json:"fee"`
 }
 
 // Sanitize performs basic sanitization on a BaseReq object.
@@ -37,6 +38,7 @@ func (br BaseTx) Sanitize() BaseTx {
 		Password:      strings.TrimSpace(br.Password),
 		ChainID:       strings.TrimSpace(br.ChainID),
 		Gas:           strings.TrimSpace(br.Gas),
+		Fee:           strings.TrimSpace(br.Fee),
 		GasAdjustment: strings.TrimSpace(br.GasAdjustment),
 		AccountNumber: br.AccountNumber,
 		Sequence:      br.Sequence,
