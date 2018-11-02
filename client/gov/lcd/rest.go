@@ -21,5 +21,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/votes/{%s}", RestProposalID, RestVoter), queryVoteHandlerFn(cdc, cliCtx)).Methods("GET")
 
 
-	r.HandleFunc("/gov/params", queryConfigHandlerFn(cdc, cliCtx)).Methods("GET")
+	r.HandleFunc("/gov/params", queryParamsHandlerFn(cdc, cliCtx)).Methods("GET")
 }
