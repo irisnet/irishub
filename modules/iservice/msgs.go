@@ -215,7 +215,7 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
 	if msg.Expiration == 0 {
-		return ErrInvalidExpiration(DefaultCodespace,msg.Expiration)
+		return ErrInvalidExpiration(DefaultCodespace, msg.Expiration)
 	}
 	return nil
 }
@@ -285,6 +285,9 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	}
 	if !validUpdateLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
+	}
+	if msg.Expiration == 0 {
+		return ErrInvalidExpiration(DefaultCodespace, msg.Expiration)
 	}
 	return nil
 }

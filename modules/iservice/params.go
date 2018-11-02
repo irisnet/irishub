@@ -22,7 +22,7 @@ func init() {
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
-	minDeposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+	minDeposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, "iris"))
 	slashDeposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 2, "iris"))
 	return Params{
 		MaxTagsNum:         5,

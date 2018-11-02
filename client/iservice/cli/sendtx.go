@@ -83,7 +83,7 @@ func GetCmdScvBind(cdc *wire.Codec) *cobra.Command {
 		Short: "create new service binding",
 		Example: "iriscli iservice bind --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --bind-type=Local " +
-			"--deposit=1iris --prices=\"1iris 2iris\" --avg-rsp-time=10000 --usable-time=100 --expiration=-1",
+			"--deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -160,7 +160,7 @@ func GetCmdScvBindUpdate(cdc *wire.Codec) *cobra.Command {
 		Short: "update a service binding",
 		Example: "iriscli iservice update-binding --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --bind-type=Local " +
-			"--deposit=1iris --prices=\"1iris 2iris\" --avg-rsp-time=10000 --usable-time=100 --expiration=-1",
+			"--deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))

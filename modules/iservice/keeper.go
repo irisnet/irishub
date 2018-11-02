@@ -141,7 +141,9 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		return ErrInvalidUpdate(k.Codespace(), "can't update binding type from Global to Local"), false
 	}
 
-	oldBinding.BindingType = svcBinding.BindingType
+	if svcBinding.BindingType != 0x00 {
+		oldBinding.BindingType = svcBinding.BindingType
+	}
 
 	// Add coins to svcBinding deposit
 	if svcBinding.Deposit.IsNotNegative() {
@@ -160,7 +162,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 
 	if svcBinding.Expiration != 0 {
 		height := ctx.BlockHeader().Height
-		if oldBinding.Expiration >= 0 && oldBinding.Expiration < height {
+		if oldBinding.Expiration >= 0 && svcBinding.Expiration < height {
 			oldBinding.Expiration = height
 		} else {
 			oldBinding.Expiration = svcBinding.Expiration
@@ -193,9 +195,10 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 		return ErrRefundDeposit(k.Codespace(), "service binding deposit is zero"), false
 	}
 
-	height := ctx.BlockHeader().Height + int64(iserviceParams.MaxRequestTimeout)
-	if binding.Expiration > height {
-		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", height)), false
+	height := ctx.BlockHeader().Height
+	refundHeight := binding.Expiration + int64(iserviceParams.MaxRequestTimeout)
+	if refundHeight >= height {
+		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", refundHeight)), false
 	}
 
 	// Add coins to provider's account
