@@ -31,6 +31,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
+	"github.com/cosmos/cosmos-sdk/server"
 )
 
 var (
@@ -199,6 +200,24 @@ func copyFile(dstFile, srcFile string) error {
 //___________________________________________________________________________________
 // executors
 
+func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
+
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
+	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+
+	err := modifyGenesisFile(irisHome)
+	require.NoError(t, err)
+
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err = server.FreeTCPAddr()
+	require.NoError(t, err)
+	return
+}
+
 func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 	proc := tests.GoExecuteT(t, cmdStr)
 
@@ -225,23 +244,20 @@ func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 }
 
 func executeInit(t *testing.T, cmdStr string) (chainID, nodeID string) {
-	out := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
+	_, stderr := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
-	err := json.Unmarshal([]byte(out), &initRes)
+	err := json.Unmarshal([]byte(stderr), &initRes)
 	require.NoError(t, err)
 
 	err = json.Unmarshal(initRes["chain_id"], &chainID)
-	require.NoError(t, err)
-
-	err = json.Unmarshal(initRes["node_id"], &nodeID)
 	require.NoError(t, err)
 
 	return
 }
 
 func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKey) {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var ko keys.KeyOutput
 	keys.UnmarshalJSON([]byte(out), &ko)
 
@@ -252,7 +268,7 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 }
 
 func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)
 	require.NoError(t, err, "out %v, err %v", out, err)
@@ -267,7 +283,7 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 }
 
 func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var validator stakecli.ValidatorOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &validator)
@@ -276,7 +292,7 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 }
 
 func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var proposal govcli.ProposalOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
@@ -285,7 +301,7 @@ func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
 }
 
 func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var vote gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
@@ -294,7 +310,7 @@ func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
 }
 
 func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var votes []gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
@@ -303,7 +319,7 @@ func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 }
 
 func executeGetParam(t *testing.T, cmdStr string) gov.Param {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var param gov.Param
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
@@ -312,7 +328,7 @@ func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 }
 
 func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var info upgcli.UpgradeInfoOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &info)
@@ -322,7 +338,7 @@ func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput
 }
 
 func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var switchMsg upgrade.MsgSwitch
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &switchMsg)
@@ -332,7 +348,7 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 }
 
 func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.ServiceOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceDef iservicecli.ServiceOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
@@ -362,7 +378,7 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 	type toJSON struct {
 		Height   int64  `json:"Height"`
 		TxHash   string `json:"TxHash"`
-		Response string `json:"Response"`
+		//Response string `json:"Response"`
 	}
 	var res toJSON
 	cdc := app.MakeCodec()
@@ -373,7 +389,7 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 }
 
 func executeGetRecordID(t *testing.T, cmdStr string) string {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var info tx.Info
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &info)
@@ -387,7 +403,7 @@ func executeGetRecordID(t *testing.T, cmdStr string) string {
 }
 
 func executeGetRecord(t *testing.T, cmdStr string) recordCli.RecordOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var record recordCli.RecordOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &record)
