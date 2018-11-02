@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	client "github.com/irisnet/irishub/client/gov"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -171,7 +172,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 			proposalID := viper.GetInt64(flagProposalID)
 			option := viper.GetString(flagOption)
 
-			byteVoteOption, err := gov.VoteOptionFromString(normalizeVoteOption(option))
+			byteVoteOption, err := gov.VoteOptionFromString(client.NormalizeVoteOption(option))
 			if err != nil {
 				return err
 			}

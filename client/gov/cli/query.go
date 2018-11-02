@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
+	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -82,7 +83,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(strProposalStatus) != 0 {
-				proposalStatus, err := gov.ProposalStatusFromString(normalizeProposalStatus(strProposalStatus))
+				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 				if err != nil {
 					return err
 				}
@@ -415,45 +416,3 @@ func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// NormalizeVoteOption - normalize user specified vote option
-func normalizeVoteOption(option string) string {
-	switch option {
-	case "Yes", "yes":
-		return "Yes"
-	case "Abstain", "abstain":
-		return "Abstain"
-	case "No", "no":
-		return "No"
-	case "NoWithVeto", "no_with_veto":
-		return "NoWithVeto"
-	}
-	return ""
-}
-
-//NormalizeProposalType - normalize user specified proposal type
-func normalizeProposalType(proposalType string) string {
-	switch proposalType {
-	case "Text", "text":
-		return "Text"
-	case "ParameterChange", "parameter_change":
-		return "ParameterChange"
-	case "SoftwareUpgrade", "software_upgrade":
-		return "SoftwareUpgrade"
-	}
-	return ""
-}
-
-//NormalizeProposalStatus - normalize user specified proposal status
-func normalizeProposalStatus(status string) string {
-	switch status {
-	case "DepositPeriod", "deposit_period":
-		return "DepositPeriod"
-	case "VotingPeriod", "voting_period":
-		return "VotingPeriod"
-	case "Passed", "passed":
-		return "Passed"
-	case "Rejected", "rejected":
-		return "Rejected"
-	}
-	return ""
-}
