@@ -358,11 +358,11 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		for _, kv := range res {
 			switch string(kv.Key) {
 			case "Gov/govDepositProcedure":
-				cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.DepositProcedure)
+				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.DepositProcedure)
 			case "Gov/govVotingProcedure":
-				cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.VotingProcedure)
+				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
 			case "Gov/govTallyingProcedure":
-				cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.TallyingProcedure)
+				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
 			default:
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return

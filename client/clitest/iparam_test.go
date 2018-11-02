@@ -29,7 +29,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	proposalsQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -42,7 +42,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --title=%s", "Test")
 	spStr += fmt.Sprintf(" --description=%s", "test")
 	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
-	spStr += fmt.Sprintf(" --param=%s", "{\"key\":\"Gov/gov/DepositProcedure\",\"value\":\"{\\\"min_deposit\\\":[{\\\"denom\\\":\\\"iris-atto\\\",\\\"amount\\\":\\\"10000000000000000000\\\"}],\\\"max_deposit_period\\\":1440}\",\"op\":\"update\"}")
+	spStr += fmt.Sprintf(" --param=%s", "{\"key\":\"Gov/govDepositProcedure\",\"value\":\"{\\\"min_deposit\\\":[{\\\"denom\\\":\\\"iris-atto\\\",\\\"amount\\\":\\\"10000000000000000000\\\"}],\\\"max_deposit_period\\\":30000000000}\",\"op\":\"update\"}")
 
 	executeWrite(t, spStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -51,8 +51,8 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num := getAmountFromCoinStr(fooCoin)
 
-	if !(num > 89 && num < 90) {
-		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
+	if !(num > 39 && num < 40) {
+		t.Error("Test Failed: (39, 40) expected, recieved: ", num)
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -72,13 +72,13 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, int64(1), vote.ProposalID)
 	require.Equal(t, gov.OptionYes, vote.Option)
 
-	tests.WaitForNextNBlocksTM(20, port)
+	tests.WaitForNextNBlocksTM(15, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
 
-	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/gov/DepositProcedure",flags))
-	require.Equal(t,param,gov.Param{Key:"Gov/gov/DepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}",Op:""})
+	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/govDepositProcedure",flags))
+	require.Equal(t,param,gov.Param{Key:"Gov/govDepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":30000000000}",Op:""})
 }
 
 
@@ -100,7 +100,7 @@ func TestIrisCLIQueryParams(t *testing.T) {
 	require.Equal(t, "50iris", fooCoin)
 
 	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/govDepositProcedure",flags))
-	require.Equal(t,param,gov.Param{Key:"Gov/gov/DepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":10}",Op:""})
+	require.Equal(t,param,gov.Param{Key:"Gov/govDepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":60000000000}",Op:""})
 }
 
 func TestIrisCLIPullParams(t *testing.T) {
