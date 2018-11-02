@@ -1,13 +1,13 @@
 package record
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// Register concrete types on wire codec
-func RegisterWire(cdc *wire.Codec) {
+// Register concrete types on codec codec
+func RegisterCodec(cdc *codec.Codec) {
 
 	cdc.RegisterConcrete(MsgSubmitRecord{}, "cosmos-sdk/MsgSubmitRecord", nil)
 }
 
-var msgCdc = wire.NewCodec()
+var msgCdc = codec.New()

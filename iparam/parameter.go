@@ -1,17 +1,22 @@
 package iparam
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/params"
+)
+
+const (
+	SignalParamspace = "Sig"
+	GovParamspace = "Gov"
 )
 
 type Parameter interface {
 	InitGenesis(interface{})
 
-	GetStoreKey() string
+	GetStoreKey() []byte
 
-	SetReadWriter(setter params.Setter)
+	SetReadWriter(paramSpace params.Subspace)
 
 	SaveValue(ctx sdk.Context)
 
@@ -27,7 +32,7 @@ type GovParameter interface {
 
 	Valid(json string) sdk.Error
 
-	GetValueFromRawData(cdc *wire.Codec, res []byte) interface{}
+	GetValueFromRawData(cdc *codec.Codec, res []byte) interface{}
 
 	Update(ctx sdk.Context, json string)
 

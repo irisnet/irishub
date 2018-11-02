@@ -2,7 +2,6 @@ package clitest
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -16,16 +15,7 @@ func init() {
 }
 
 func TestIrisCLIParameterChangeProposal(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
-
-	err := modifyGenesisFile(irisHome)
-	require.NoError(t, err)
-
-	// get a free port, also setup some common flags
-	servAddr, port, err := server.FreeTCPAddr()
-	require.NoError(t, err)
+	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
@@ -41,7 +31,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "100iris", fooCoin)
 
-	proposalsQuery := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
+	proposalsQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
 
 	// submit a test proposal
@@ -69,8 +59,6 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
 
-	votingStartBlock1 := proposal1.VotingStartBlock
-
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
 	voteStr += fmt.Sprintf(" --from=%s", "foo")
 	voteStr += fmt.Sprintf(" --proposal-id=%s", "1")
@@ -84,7 +72,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, int64(1), vote.ProposalID)
 	require.Equal(t, gov.OptionYes, vote.Option)
 
-	tests.WaitForHeightTM(votingStartBlock1+20, port)
+	tests.WaitForNextNBlocksTM(20, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, int64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
@@ -95,16 +83,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 
 
 func TestIrisCLIQueryParams(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
-
-	err := modifyGenesisFile(irisHome)
-	require.NoError(t, err)
-
-	// get a free port, also setup some common flags
-	servAddr, port, err := server.FreeTCPAddr()
-	require.NoError(t, err)
+	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
@@ -118,23 +97,14 @@ func TestIrisCLIQueryParams(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
-	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/gov/DepositProcedure",flags))
+	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/govDepositProcedure",flags))
 	require.Equal(t,param,gov.Param{Key:"Gov/gov/DepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":10}",Op:""})
 }
 
 func TestIrisCLIPullParams(t *testing.T) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe_reset_all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
-
-	err := modifyGenesisFile(irisHome)
-	require.NoError(t, err)
-
-	// get a free port, also setup some common flags
-	servAddr, port, err := server.FreeTCPAddr()
-	require.NoError(t, err)
+	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
@@ -148,7 +118,7 @@ func TestIrisCLIPullParams(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	tests.ExecuteT(t, fmt.Sprintf("iriscli gov pull-params --path=%v --output=json %v ",irisHome,flags), "")
 }

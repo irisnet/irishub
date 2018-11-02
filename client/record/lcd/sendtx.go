@@ -9,7 +9,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"
@@ -22,18 +22,19 @@ type postRecordReq struct {
 	Data        string         `json:"data"` // for onchain
 }
 
-func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Init context and read request parameters
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var req postRecordReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
 
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Submitter)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -85,6 +86,6 @@ func postRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }

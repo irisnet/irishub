@@ -2,12 +2,12 @@ package version
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 )
 
 // Version - Iris Version
-const Version = "0.6.0"
+const Version = "0.7.0-Alpha"
 
 // GitCommit set by build flags
 var GitCommit = ""
@@ -22,7 +22,7 @@ func GetVersion() string {
 }
 
 // ServeVersionCommand
-func ServeVersionCommand(cdc *wire.Codec) *cobra.Command {
+func ServeVersionCommand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Show executable binary version",

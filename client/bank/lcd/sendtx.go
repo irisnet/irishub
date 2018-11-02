@@ -2,12 +2,13 @@ package lcd
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
+	"fmt"
 )
 
 type sendBody struct {
@@ -18,9 +19,10 @@ type sendBody struct {
 
 // SendRequestHandlerFn - http request handler to send coins to a address
 // nolint: gocyclo
-func SendRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// collect data
+		// Init context and read request parameters
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		to, err := sdk.AccAddressFromBech32(bech32addr)
@@ -33,30 +35,28 @@ func SendRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 		if err != nil {
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.LocalAccountName, m.Sender)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, m.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		baseReq := m.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
-		fromAddress, err := cliCtx.GetFromAddress()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
+		// Build message
 		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		// build message
-		msg := bank.BuildMsg(fromAddress, to, amount)
+		sender, err := sdk.AccAddressFromBech32(m.Sender)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Couldn't decode delegator. Error: %s", err.Error())))
+			return
+		}
+		msg := bank.BuildMsg(sender, to, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, m.BaseTx, []sdk.Msg{msg})
+		// Broadcast or return unsigned transaction
+		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov"
@@ -98,7 +98,7 @@ type IrisGenTx struct {
 }
 
 // Generate a gaia genesis transaction with flags
-func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
+func IrisAppGenTx(cdc *codec.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	if genTxConfig.Name == "" {
@@ -123,7 +123,7 @@ func IrisAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig config.GenTx) (
 }
 
 // Generate a gaia genesis transaction without flags
-func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name string) (
+func IrisAppGenTxNF(cdc *codec.Codec, pk crypto.PubKey, addr sdk.AccAddress, name string) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
 
 	var bz []byte
@@ -132,7 +132,7 @@ func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name
 		Address: addr,
 		PubKey:  sdk.MustBech32ifyAccPub(pk),
 	}
-	bz, err = wire.MarshalJSONIndent(cdc, gaiaGenTx)
+	bz, err = codec.MarshalJSONIndent(cdc, gaiaGenTx)
 	if err != nil {
 		return
 	}
@@ -147,7 +147,7 @@ func IrisAppGenTxNF(cdc *wire.Codec, pk crypto.PubKey, addr sdk.AccAddress, name
 
 // Create the core parameters for genesis initialization for gaia
 // note that the pubkey input is this machines pubkey
-func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState GenesisState, err error) {
+func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisState GenesisState, err error) {
 
 	if len(appGenTxs) == 0 {
 		err = errors.New("must provide at least genesis transaction")
@@ -210,14 +210,14 @@ func IrisAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (genesisState
 }
 
 // IrisAppGenState but with JSON
-func IrisAppGenStateJSON(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
+func IrisAppGenStateJSON(cdc *codec.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
 
 	// create the final app state
 	genesisState, err := IrisAppGenState(cdc, appGenTxs)
 	if err != nil {
 		return nil, err
 	}
-	appState, err = wire.MarshalJSONIndent(cdc, genesisState)
+	appState, err = codec.MarshalJSONIndent(cdc, genesisState)
 	return
 }
 

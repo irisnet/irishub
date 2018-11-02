@@ -16,7 +16,7 @@ import (
 
 // AllInvariants runs all invariants of the stake module.
 // Currently: total supply, positive power
-func AllInvariants(ck bank.Keeper, k stake.Keeper, am auth.AccountMapper) simulation.Invariant {
+func AllInvariants(ck bank.Keeper, k stake.Keeper, am auth.AccountKeeper) simulation.Invariant {
 	return func(t *testing.T, app *baseapp.BaseApp, log string) {
 		SupplyInvariants(ck, k, am)(t, app, log)
 		PositivePowerInvariant(k)(t, app, log)
@@ -25,7 +25,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper, am auth.AccountMapper) simula
 }
 
 // SupplyInvariants checks that the total supply reflects all held loose tokens, bonded tokens, and unbonding delegations
-func SupplyInvariants(ck bank.Keeper, k stake.Keeper, am auth.AccountMapper) simulation.Invariant {
+func SupplyInvariants(ck bank.Keeper, k stake.Keeper, am auth.AccountKeeper) simulation.Invariant {
 	return func(t *testing.T, app *baseapp.BaseApp, log string) {
 		ctx := app.NewContext(false, abci.Header{})
 		//pool := k.GetPool(ctx)

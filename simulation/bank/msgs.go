@@ -20,7 +20,7 @@ import (
 
 // TestAndRunSingleInputMsgSend tests and runs a single msg send, with one input and one output, where both
 // accounts already exist.
-func TestAndRunSingleInputMsgSend(mapper auth.AccountMapper) simulation.TestAndRunTx {
+func TestAndRunSingleInputMsgSend(mapper auth.AccountKeeper) simulation.TestAndRunTx {
 	return func(t *testing.T, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, keys []crypto.PrivKey, log string, event func(string)) (action string, err sdk.Error) {
 		fromKey := simulation.RandomKey(r, keys)
 		fromAddr := sdk.AccAddress(fromKey.PubKey().Address())
@@ -67,7 +67,7 @@ func TestAndRunSingleInputMsgSend(mapper auth.AccountMapper) simulation.TestAndR
 }
 
 // Sends and verifies the transition of a msg send. This fails if there are repeated inputs or outputs
-func sendAndVerifyMsgSend(t *testing.T, app *baseapp.BaseApp, mapper auth.AccountMapper, msg bank.MsgSend, ctx sdk.Context, log string, privkeys []crypto.PrivKey) {
+func sendAndVerifyMsgSend(t *testing.T, app *baseapp.BaseApp, mapper auth.AccountKeeper, msg bank.MsgSend, ctx sdk.Context, log string, privkeys []crypto.PrivKey) {
 	initialInputAddrCoins := make([]sdk.Coins, len(msg.Inputs))
 	initialOutputAddrCoins := make([]sdk.Coins, len(msg.Outputs))
 	AccountNumbers := make([]int64, len(msg.Inputs))

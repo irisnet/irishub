@@ -1,7 +1,7 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/upgrade"
@@ -16,7 +16,7 @@ type VersionInfo struct {
 	ProposalId     int64  `json:"proposal_id"`
 }
 
-func InfoHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec, storeName string) http.HandlerFunc {
+func InfoHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")

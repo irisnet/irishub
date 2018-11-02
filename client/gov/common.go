@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/gov"
+	"time"
 )
 
 // Deposit
@@ -22,10 +23,10 @@ type ProposalOutput struct {
 	Status      gov.ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
 	TallyResult gov.TallyResult    `json:"tally_result"`    //  Result of Tallys
 
-	SubmitBlock  int64    `json:"submit_block"`  //  Height of the block where TxGovSubmitProposal was included
+	SubmitTime   time.Time `json:"submit_time"`   //  Height of the block where TxGovSubmitProposal was included
 	TotalDeposit []string `json:"total_deposit"` //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartBlock int64 `json:"voting_start_block"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingStartTime time.Time `json:"voting_start_time"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 
 	Param gov.Param `json:"param"`
 }
@@ -50,10 +51,10 @@ func ConvertProposalToProposalOutput(cliCtx context.CLIContext, proposal gov.Pro
 		Status:      proposal.GetStatus(),
 		TallyResult: proposal.GetTallyResult(),
 
-		SubmitBlock:  proposal.GetSubmitBlock(),
+		SubmitTime:  proposal.GetSubmitTime(),
 		TotalDeposit: totalDeposit,
 
-		VotingStartBlock: proposal.GetVotingStartBlock(),
+		VotingStartTime: proposal.GetVotingStartTime(),
 		Param:            gov.Param{},
 	}
 
@@ -74,4 +75,47 @@ func ConvertDepositToDepositOutput(cliCtx context.CLIContext, deposite gov.Depos
 		Depositer:  deposite.Depositer,
 		Amount:     amount,
 	}, nil
+}
+
+// NormalizeVoteOption - normalize user specified vote option
+func NormalizeVoteOption(option string) string {
+	switch option {
+	case "Yes", "yes":
+		return "Yes"
+	case "Abstain", "abstain":
+		return "Abstain"
+	case "No", "no":
+		return "No"
+	case "NoWithVeto", "no_with_veto":
+		return "NoWithVeto"
+	}
+	return ""
+}
+
+//NormalizeProposalType - normalize user specified proposal type
+func NormalizeProposalType(proposalType string) string {
+	switch proposalType {
+	case "Text", "text":
+		return "Text"
+	case "ParameterChange", "parameter_change":
+		return "ParameterChange"
+	case "SoftwareUpgrade", "software_upgrade":
+		return "SoftwareUpgrade"
+	}
+	return ""
+}
+
+//NormalizeProposalStatus - normalize user specified proposal status
+func NormalizeProposalStatus(status string) string {
+	switch status {
+	case "DepositPeriod", "deposit_period":
+		return "DepositPeriod"
+	case "VotingPeriod", "voting_period":
+		return "VotingPeriod"
+	case "Passed", "passed":
+		return "Passed"
+	case "Rejected", "rejected":
+		return "Rejected"
+	}
+	return ""
 }

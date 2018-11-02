@@ -2,15 +2,16 @@ package cli
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
-	"github.com/irisnet/irishub/client/bank"
 )
 
 const (
@@ -19,18 +20,17 @@ const (
 )
 
 // SendTxCmd will create a send tx and sign it with the given key.
-func SendTxCmd(cdc *wire.Codec) *cobra.Command {
+func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send",
-		Short: "Create and sign a send tx",
+		Use:     "send",
+		Short:   "Create and sign a send tx",
 		Example: "iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --chain-id=<chain-id> --amount=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
 			if err := cliCtx.EnsureAccountExists(); err != nil {
 				return err
@@ -44,9 +44,8 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			// parse coins trying to be sent
-			amountString := viper.GetString(flagAmount)
-
-			coins, err := cliCtx.ParseCoins(amountString)
+			amount := viper.GetString(flagAmount)
+			coins, err := cliCtx.ParseCoins(amount)
 			if err != nil {
 				return err
 			}
@@ -63,10 +62,14 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 
 			// ensure account has enough coins
 			if !account.GetCoins().IsGTE(coins) {
-				return fmt.Errorf("address %s doesn't have enough coins to pay for this transaction", from)
+				return fmt.Errorf("Address %s doesn't have enough coins to pay for this transaction.", from)
 			}
 
+			// build and sign the transaction, then broadcast to Tendermint
 			msg := bank.BuildMsg(from, to, coins)
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, false)
+			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -74,6 +77,8 @@ func SendTxCmd(cdc *wire.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagTo, "", "Bech32 encoding address to receive coins")
 	cmd.Flags().String(flagAmount, "", "Amount of coins to send, for instance: 10iris")
+	cmd.MarkFlagRequired(flagTo)
+	cmd.MarkFlagRequired(flagAmount)
 
 	return cmd
 }

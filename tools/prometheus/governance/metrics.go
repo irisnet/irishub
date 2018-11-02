@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"log"
 	"time"
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/modules/gov"
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/irisnet/irishub/client/context"
@@ -82,7 +82,7 @@ func (gov *Metrics) Start(ctx context.CLIContext) {
 	}()
 }
 
-func (gov *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec) {
+func (gov *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec) {
 	count := 0
 	needToVote := 0
 	if activeProposals, err := getAllActiveProposalsID(cdc, ctx); err != nil {
@@ -103,7 +103,7 @@ func (gov *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec) {
 
 //-------------------------help functions--------------------------------------
 
-func getAllInactiveProposalsID(cdc *wire.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
+func getAllInactiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
 	if res, err := ctx.QueryStore(gov.KeyInactiveProposalQueue, storeName); err != nil {
 		return gov.ProposalQueue{}, err
 	} else {
@@ -112,7 +112,7 @@ func getAllInactiveProposalsID(cdc *wire.Codec, ctx context.CLIContext) (proposa
 	}
 }
 
-func getAllActiveProposalsID(cdc *wire.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
+func getAllActiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
 	if res, err := ctx.QueryStore(gov.KeyActiveProposalQueue, storeName); len(res) == 0 || err != nil {
 		return gov.ProposalQueue{}, err
 	} else {
@@ -122,7 +122,7 @@ func getAllActiveProposalsID(cdc *wire.Codec, ctx context.CLIContext) (proposals
 
 }
 
-func getProposal(ID int64, cdc *wire.Codec, ctx context.CLIContext) (*gov.Proposal, error) {
+func getProposal(ID int64, cdc *codec.Codec, ctx context.CLIContext) (*gov.Proposal, error) {
 	if res, err := ctx.QueryStore(gov.KeyProposal(ID), storeName); err != nil {
 		return nil, err
 	} else {
@@ -132,7 +132,7 @@ func getProposal(ID int64, cdc *wire.Codec, ctx context.CLIContext) (*gov.Propos
 	}
 }
 
-func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *wire.Codec, ctx context.CLIContext) (vote gov.Vote, err error) {
+func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *codec.Codec, ctx context.CLIContext) (vote gov.Vote, err error) {
 	if res, err := ctx.QueryStore(gov.KeyVote(proposalID, voterAddr), storeName); err != nil {
 		return gov.Vote{}, err
 	} else {

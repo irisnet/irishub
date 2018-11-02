@@ -13,7 +13,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/irisnet/irishub/modules/iservice"
@@ -54,7 +54,7 @@ var (
 // Extended ABCI application
 type IrisApp struct {
 	*bam.BaseApp
-	cdc *wire.Codec
+	cdc *codec.Codec
 
 	// keys to access the substores
 	keyMain          *sdk.KVStoreKey
@@ -70,7 +70,7 @@ type IrisApp struct {
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
-	accountMapper       auth.AccountMapper
+	AccountKeeper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	coinKeeper          bank.Keeper
 	ibcMapper           ibc.Mapper
@@ -115,8 +115,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = app.replay()
 	}
 
-	// define the accountMapper
-	app.accountMapper = auth.NewAccountMapper(
+	// define the AccountKeeper
+	app.AccountKeeper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,        // target store
 		auth.ProtoBaseAccount, // prototype
@@ -124,7 +124,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	// add handlers
 	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams)
-	app.coinKeeper = bank.NewKeeper(app.accountMapper)
+	app.coinKeeper = bank.NewKeeper(app.AccountKeeper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.ibc1Mapper = ibcbugfix.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibcbugfix.DefaultCodespace))
 
@@ -154,8 +154,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
-	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
+	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.feeCollectionKeeper))
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.feeCollectionKeeper, app.feeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyIservice)
 	app.SetRunMsg(app.runMsgs)
@@ -189,20 +189,20 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 }
 
 // custom tx codec
-func MakeCodec() *wire.Codec {
-	var cdc = wire.NewCodec()
-	ibc.RegisterWire(cdc)
-	ibcbugfix.RegisterWire(cdc)
-	bank.RegisterWire(cdc)
-	stake.RegisterWire(cdc)
-	slashing.RegisterWire(cdc)
-	gov.RegisterWire(cdc)
-	record.RegisterWire(cdc)
-	auth.RegisterWire(cdc)
-	upgrade.RegisterWire(cdc)
-	iservice.RegisterWire(cdc)
-	sdk.RegisterWire(cdc)
-	wire.RegisterCrypto(cdc)
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	ibc.RegisterCodec(cdc)
+	ibcbugfix.RegisterCodec(cdc)
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	iservice.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 	return cdc
 }
 
@@ -241,8 +241,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the accounts
 	for _, gacc := range genesisState.Accounts {
 		acc := gacc.ToAccount()
-		acc.AccountNumber = app.accountMapper.GetNextAccountNumber(ctx)
-		app.accountMapper.SetAccount(ctx, acc)
+		acc.AccountNumber = app.AccountKeeper.GetNextAccountNumber(ctx)
+		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
 	// load the initial stake information
@@ -280,13 +280,13 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		accounts = append(accounts, account)
 		return false
 	}
-	app.accountMapper.IterateAccounts(ctx, appendAccount)
+	app.AccountKeeper.IterateAccounts(ctx, appendAccount)
 
 	genState := GenesisState{
 		Accounts:  accounts,
 		StakeData: stake.WriteGenesis(ctx, app.stakeKeeper),
 	}
-	appState, err = wire.MarshalJSONIndent(app.cdc, genState)
+	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
 	if err != nil {
 		return nil, nil, err
 	}
