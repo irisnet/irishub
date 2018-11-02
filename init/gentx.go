@@ -28,7 +28,7 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gentx",
 		Short: "Generate a genesis tx carrying a self delegation",
-		Long: fmt.Sprintf(`This command is an alias of the 'iris tx create-validator' command'.
+		Long: fmt.Sprintf(`This command is an alias of the 'iriscli stake create-validator' command'.
 
 It creates a genesis piece carrying a self delegation with the
 following delegation and commission default parameters:
