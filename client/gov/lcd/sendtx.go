@@ -37,15 +37,17 @@ type voteReq struct {
 
 func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var req postProposalReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Proposer)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -68,12 +70,14 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
 
 func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
@@ -82,20 +86,20 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
+		var req depositReq
+		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		var req depositReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Depositer)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
+
+
+		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -119,7 +123,7 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
 
@@ -149,12 +153,7 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Voter)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+
 
 		voter, err := sdk.AccAddressFromBech32(req.Voter)
 		if err != nil {
@@ -169,6 +168,6 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
