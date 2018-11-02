@@ -135,6 +135,41 @@ func modifyGenesisFile(irisHome string) error {
 	return genesisDoc.SaveAs(genesisFilePath)
 }
 
+func modifyGenesisFileForIService(irisHome string) error {
+	genesisFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", irisHome, string(os.PathSeparator), string(os.PathSeparator))
+
+	genesisDoc, err := types.GenesisDocFromFile(genesisFilePath)
+	if err != nil {
+		return err
+	}
+
+	var genesisState app.GenesisState
+
+	cdc := wire.NewCodec()
+	wire.RegisterCrypto(cdc)
+
+	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
+	if err != nil {
+		return err
+	}
+
+	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
+	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
+	for i, account := range genesisState.Accounts {
+		for j, coin := range account.Coins {
+			genesisState.Accounts[i].Coins[j].Amount = coin.Amount.Mul(sdk.NewInt(21))
+		}
+	}
+
+	bz, err := cdc.MarshalJSON(genesisState)
+	if err != nil {
+		return err
+	}
+
+	genesisDoc.AppState = bz
+	return genesisDoc.SaveAs(genesisFilePath)
+}
+
 func modifyConfigFile(configSrcPath, configDstPath string) error {
 	fsrc, err := os.Open(configSrcPath)
 	if err != nil {
