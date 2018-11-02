@@ -1,4 +1,5 @@
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
+PACKAGES_MODULES=$(shell go list ./... | grep 'modules')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 all: get_vendor_deps install
@@ -47,8 +48,8 @@ update_irislcd_swagger_docs:
 install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
-	go install $(BUILD_FLAGS) ./cmd/irislcd
-	go install $(BUILD_FLAGS) ./cmd/irismon
+#	go install $(BUILD_FLAGS) ./cmd/irislcd
+#	go install $(BUILD_FLAGS) ./cmd/irismon
 
 install_debug:
 	go install ./cmd/irisdebug
@@ -56,8 +57,8 @@ install_debug:
 build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
+#    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
+#    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
@@ -89,10 +90,12 @@ build_example_linux: update_irislcd_swagger_docs
 ### Testing
 
 test: test_unit test_cli test_lcd test_sim
+
 test_sim: test_sim_modules test_sim_iris_nondeterminism test_sim_iris_fast
 
 test_unit:
-	@go test $(PACKAGES_NOSIMULATION)
+	#@go test $(PACKAGES_NOSIMULATION)
+	@go test $(PACKAGES_MODULES)
 
 test_cli:
 	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
