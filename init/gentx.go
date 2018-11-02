@@ -2,25 +2,25 @@ package init
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/app"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/stake/client/cli"
+	signcmd "github.com/irisnet/irishub/client/bank/cli"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/stake/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/common"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
-
-
 
 // GenTxCmd builds the iris gentx command.
 // nolint: errcheck
@@ -68,7 +68,7 @@ following delegation and commission default parameters:
 			w.Close()
 
 			prepareFlagsForTxSign()
-			signCmd := authcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc))
+			signCmd := signcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc))
 			if w, err = prepareOutputFile(config.RootDir, nodeID); err != nil {
 				return err
 			}
@@ -90,7 +90,7 @@ func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip string, val
 	viper.Set(cli.FlagNodeID, nodeID)                              // --node-id
 	viper.Set(cli.FlagIP, ip)                                      // --ip
 	viper.Set(cli.FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey)) // --pubkey
-	viper.Set(cli.FlagAmount, app.FreeFermionVal.String())                       // --amount
+	viper.Set(cli.FlagAmount, "10iris")                            // --amount
 	viper.Set(cli.FlagCommissionRate, defaultCommissionRate)
 	viper.Set(cli.FlagCommissionMaxRate, defaultCommissionMaxRate)
 	viper.Set(cli.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
