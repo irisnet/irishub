@@ -16,9 +16,9 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&TextProposal{}, "gov/TextProposal", nil)
 
 	////////////////////  iris begin  ///////////////////////////
-	cdc.RegisterConcrete(govparams.DepositProcedure{},"cosmos-sdk/DepositProcedure",nil)
-	cdc.RegisterConcrete(govparams.TallyingProcedure{},"cosmos-sdk/TallyingProcedure",nil)
-	cdc.RegisterConcrete(govparams.VotingProcedure{},"cosmos-sdk/VotingProcedure",nil)
+	cdc.RegisterConcrete(&govparams.DepositProcedure{},"cosmos-sdk/DepositProcedure",nil)
+	cdc.RegisterConcrete(&govparams.TallyingProcedure{},"cosmos-sdk/TallyingProcedure",nil)
+	cdc.RegisterConcrete(&govparams.VotingProcedure{},"cosmos-sdk/VotingProcedure",nil)
 	cdc.RegisterConcrete(&ParameterProposal{}, "gov/ParameterProposal", nil)
 	cdc.RegisterConcrete(&SoftwareUpgradeProposal{}, "gov/SoftwareUpgradeProposal", nil)
 	////////////////////  iris end  ///////////////////////////

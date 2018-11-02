@@ -101,8 +101,8 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			var matchingProposals []gov.Proposal
+			////////////////////  iris begin  ///////////////////////////
+			var matchingProposals gov.ProposalOutputs
 			err = cdc.UnmarshalJSON(res, &matchingProposals)
 			if err != nil {
 				return err
@@ -114,9 +114,9 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			for _, proposal := range matchingProposals {
-				fmt.Printf("  %d - %s\n", proposal.GetProposalID(), proposal.GetTitle())
+				fmt.Printf("  %d - %s\n", proposal.ProposalID, proposal.Title)
 			}
-
+			////////////////////  iris end  /////////////////////////////
 			return nil
 		},
 	}
