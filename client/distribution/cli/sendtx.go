@@ -11,10 +11,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 
+	"os"
+
 	"github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"os"
 )
 
 var (
@@ -25,10 +26,10 @@ var (
 // command to withdraw rewards
 func GetCmdWithdrawRewards(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-rewards",
-		Short: "withdraw rewards for either: all-delegations, a delegation, or a validator",
+		Use:     "withdraw-rewards",
+		Short:   "withdraw rewards for either: all-delegations, a delegation, or a validator",
 		Example: "iriscli distribution withdraw-rewards --from <key name> --fee=0.004iris --chain-id=<chain-id>",
-		Args:  cobra.NoArgs,
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			onlyFromVal := viper.GetString(flagOnlyFromValidator)
@@ -86,10 +87,10 @@ func GetCmdWithdrawRewards(cdc *codec.Codec) *cobra.Command {
 // GetCmdDelegate implements the delegate command.
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-withdraw-addr [withdraw-addr]",
-		Short: "change the default withdraw address for rewards associated with an address",
+		Use:     "set-withdraw-addr [withdraw-addr]",
+		Short:   "change the default withdraw address for rewards associated with an address",
 		Example: "iriscli distribution set-withdraw-addr <address> --from <key name> --fee=0.004iris --chain-id=<chain-id>",
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().

@@ -2,11 +2,12 @@ package stake
 
 import (
 	"fmt"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 	"github.com/irisnet/irishub/client/context"
-	"time"
 	"github.com/irisnet/irishub/client/utils"
 )
 
@@ -247,4 +248,3 @@ func BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr string) (commissio
 	commission = types.NewCommissionMsg(rate, maxRate, maxChangeRate)
 	return commission, nil
 }
-
