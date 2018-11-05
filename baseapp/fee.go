@@ -122,10 +122,19 @@ func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Co
 	fck.paramSpace.Get(ctx, nativeFeeTokenKey, &nativeFeeToken)
 	for _, coin := range coins {
 		if coin.Denom == nativeFeeToken {
+			if coin.Amount.BigInt() == nil {
+				return sdk.Coin{
+					Denom:  coin.Denom,
+					Amount: sdk.ZeroInt(),
+				}
+			}
 			return coin
 		}
 	}
-	return sdk.Coin{}
+	return sdk.Coin{
+		Denom:  "",
+		Amount: sdk.ZeroInt(),
+	}
 }
 
 func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit int64) sdk.Error {
