@@ -165,7 +165,7 @@ func main() {
 			iservice1cmd.GetCmdQueryScvBinds("iservice", cdc),
 		)...)
 	iservice1Cmd.AddCommand(client.PostCommands(
-		iservicecmd.GetCmdScvDef(cdc),
+		iservice1cmd.GetCmdScvDef(cdc),
 		iservice1cmd.GetCmdScvBind(cdc),
 		iservice1cmd.GetCmdScvBindUpdate(cdc),
 		iservice1cmd.GetCmdScvRefundDeposit(cdc),
