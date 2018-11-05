@@ -24,7 +24,7 @@ type cliConfig struct {
 }
 
 // ConfigCmd returns a CLI command to interactively create a
-// Gaia CLI config file.
+// IRISCLI config file.
 func ConfigCmd() *cobra.Command {
 	cfg := &cobra.Command{
 		Use:   "config",
@@ -42,7 +42,7 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	stdin := BufferStdin()
-	gaiaCLIHome, err := handleGaiaCLIHome(home, stdin)
+	iriscliHome, err := handleIRISCLIHome(home, stdin)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	cfg := &cliConfig{
-		Home:      gaiaCLIHome,
+		Home:      iriscliHome,
 		ChainID:   chainID,
 		TrustNode: trustNode,
 		Encoding:  encoding,
@@ -79,10 +79,10 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 		Fee:       fee,
 	}
 
-	return createGaiaCLIConfig(cfg)
+	return createIRISCLIConfig(cfg)
 }
 
-func handleGaiaCLIHome(dir string, stdin *bufio.Reader) (string, error) {
+func handleIRISCLIHome(dir string, stdin *bufio.Reader) (string, error) {
 	dirName := ".iriscli"
 	home, err := GetString(fmt.Sprintf("Where is your iriscli home directory? (Default: ~/%s)", dirName), stdin)
 	if err != nil {
@@ -140,7 +140,7 @@ func handleTrustNode(stdin *bufio.Reader) (bool, error) {
 	return GetConfirmation("Do you trust this node?", stdin)
 }
 
-func createGaiaCLIConfig(cfg *cliConfig) error {
+func createIRISCLIConfig(cfg *cliConfig) error {
 	cfgPath := path.Join(cfg.Home, "config")
 	err := os.MkdirAll(cfgPath, os.ModePerm)
 	if err != nil {
