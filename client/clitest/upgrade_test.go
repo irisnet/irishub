@@ -23,6 +23,8 @@ func init() {
 }
 
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
+	t.SkipNow()
+
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
@@ -246,6 +248,8 @@ func startNodeBToReplay(t *testing.T) {
 }
 
 func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
+
+	t.SkipNow()
 
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
