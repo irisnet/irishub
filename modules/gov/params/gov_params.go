@@ -20,9 +20,9 @@ const UPPER_BOUND_AMOUNT = 200
 var _ iparam.GovParameter = (*DepositProcedureParam)(nil)
 
 type ParamSet struct {
-	DepositProcedure  DepositProcedure  `json:"Gov/gov/DepositProcedure"`
-	VotingProcedure   VotingProcedure   `json:"Gov/gov/VotingProcedure"`
-	TallyingProcedure TallyingProcedure `json:"Gov/gov/TallyingProcedure"`
+	DepositProcedure  DepositProcedure  `json:"Gov/govDepositProcedure"`
+	VotingProcedure   VotingProcedure   `json:"Gov/govVotingProcedure"`
+	TallyingProcedure TallyingProcedure `json:"Gov/govTallyingProcedure"`
 }
 
 // Procedure around Deposits for governance
@@ -37,7 +37,7 @@ type DepositProcedureParam struct {
 }
 
 func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
-	cdc.MustUnmarshalBinary(res, &param.Value)
+	cdc.UnmarshalJSON(res, &param.Value)
 	return param.Value
 }
 
@@ -113,8 +113,8 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 
 		}
 
-		if param.Value.MaxDepositPeriod < 20 || param.Value.MaxDepositPeriod > 20000 {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod ("+strconv.Itoa(int(param.Value.MaxDepositPeriod))+") should be larger than 20 and less than 20000"))
+		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > 20000 {
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod ("+strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds()))+") should be larger than 20s and less than 20000s"))
 		}
 
 		return nil
@@ -137,7 +137,7 @@ type VotingProcedureParam struct {
 }
 
 func (param *VotingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
-	cdc.MustUnmarshalBinary(res, &param.Value)
+	cdc.UnmarshalJSON(res, &param.Value)
 	return param.Value
 }
 
@@ -196,8 +196,8 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.VotingPeriod < 20 || param.Value.VotingPeriod > 20000 {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod ("+strconv.Itoa(int(param.Value.VotingPeriod))+") should be larger than 20 and less than 20000"))
+		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > 20000 {
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod ("+strconv.Itoa(int(param.Value.VotingPeriod.Seconds()))+") should be larger than 20s and less than 20000s"))
 		}
 
 		return nil
@@ -222,7 +222,7 @@ type TallyingProcedureParam struct {
 }
 
 func (param *TallyingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
-	cdc.MustUnmarshalBinary(res, &param.Value)
+	cdc.UnmarshalJSON(res, &param.Value)
 	return param.Value
 }
 

@@ -98,10 +98,10 @@ func DefaultGenesisStateForCliTest() GenesisState {
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: time.Duration(172800) * time.Second,
+			MaxDepositPeriod: time.Duration(60) * time.Second,
 		},
 		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: time.Duration(172800) * time.Second,
+			VotingPeriod: time.Duration(60) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:         sdk.NewDecWithPrec(5, 1),

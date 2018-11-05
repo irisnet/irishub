@@ -29,7 +29,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	proposalsQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -50,8 +50,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num := getAmountFromCoinStr(fooCoin)
 
-	if !(num > 94 && num < 95) {
-		t.Error("Test Failed: (94, 95) expected, recieved: {}", num)
+	if !(num > 44 && num < 45) {
+		t.Error("Test Failed: (44, 45) expected, recieved:", num)
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -74,8 +74,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 89 && num < 90) {
-		t.Error("Test Failed: (89, 90) expected, recieved: {}", num)
+	if !(num > 39 && num < 40) {
+		t.Error("Test Failed: (39, 40) expected, recieved: ", num)
 	}
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))

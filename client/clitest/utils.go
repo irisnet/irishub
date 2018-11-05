@@ -17,7 +17,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
-	govcli "github.com/irisnet/irishub/client/gov"
 	iservicecli "github.com/irisnet/irishub/client/iservice"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
@@ -291,9 +290,9 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	return validator
 }
 
-func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
+func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var proposal govcli.ProposalOutput
+	var proposal gov.ProposalOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
