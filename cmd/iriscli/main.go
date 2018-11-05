@@ -17,6 +17,9 @@ import (
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
+	"os"
+	"github.com/spf13/viper"
+	"path"
 )
 
 // rootCmd is the entry point for this binary
@@ -30,6 +33,8 @@ var (
 func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
+
+	rootCmd.AddCommand(client.ConfigCmd())
 
 	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
 	//Add state commands
@@ -185,9 +190,35 @@ func main() {
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "IRISCLI", app.DefaultCLIHome)
-	err := executor.Execute()
+	err := initConfig(rootCmd)
+	if err != nil {
+		panic(err)
+	}
+
+	err = executor.Execute()
 	if err != nil {
 		// handle with #870
 		panic(err)
 	}
+}
+
+func initConfig(cmd *cobra.Command) error {
+	home, err := cmd.PersistentFlags().GetString(cli.HomeFlag)
+	if err != nil {
+		return err
+	}
+
+	cfgFile := path.Join(home, "config", "config.toml")
+	if _, err := os.Stat(cfgFile); err == nil {
+		viper.SetConfigFile(cfgFile)
+
+		if err := viper.ReadInConfig(); err != nil {
+			return err
+		}
+	}
+
+	if err := viper.BindPFlag(cli.EncodingFlag, cmd.PersistentFlags().Lookup(cli.EncodingFlag)); err != nil {
+		return err
+	}
+	return viper.BindPFlag(cli.OutputFlag, cmd.PersistentFlags().Lookup(cli.OutputFlag))
 }
