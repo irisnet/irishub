@@ -27,9 +27,9 @@ import (
 
 var (
 	Denom             = "iris"
-	feeAmt            = int64(100)
+	FeeAmt            = int64(100)
 	IrisCt            = types.NewDefaultCoinType(Denom)
-	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
+	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", FeeAmt, Denom))
 	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
 )
 
@@ -248,8 +248,6 @@ func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
 			return
 		}
 
-		// TODO: this could be decoupled from stake.MsgCreateValidator
-		// TODO: and we likely want to do it for real world Gaia
 		msg := msgs[0].(stake.MsgCreateValidator)
 		validators = append(validators, tmtypes.GenesisValidator{
 			PubKey: msg.PubKey,

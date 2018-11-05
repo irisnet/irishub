@@ -90,7 +90,7 @@ func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip string, val
 	viper.Set(cli.FlagNodeID, nodeID)                              // --node-id
 	viper.Set(cli.FlagIP, ip)                                      // --ip
 	viper.Set(cli.FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey)) // --pubkey
-	viper.Set(cli.FlagAmount, "10iris")                            // --amount
+	viper.Set(cli.FlagAmount, fmt.Sprintf("%d%s", app.FeeAmt, app.Denom))                            // --amount
 	viper.Set(cli.FlagCommissionRate, defaultCommissionRate)
 	viper.Set(cli.FlagCommissionMaxRate, defaultCommissionMaxRate)
 	viper.Set(cli.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
