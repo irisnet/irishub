@@ -23,7 +23,7 @@ func init() {
 }
 
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
-	t.SkipNow()
+	//t.SkipNow()
 
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
@@ -39,7 +39,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	// check the upgrade info
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli upgrade info --output=json %v", flags))
@@ -207,11 +207,11 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//////////////////// replay from version 0 for new coming node /////////////////////////////
 	/// start a new node
 
-	go startNodeBToReplay(t)
-
-	wg.Add(1)
-	wg.Wait()
-	proc2.Stop(true)
+	//go startNodeBToReplay(t)
+	//
+	//wg.Add(1)
+	//wg.Wait()
+	//proc2.Stop(true)
 }
 
 func startNodeBToReplay(t *testing.T) {
