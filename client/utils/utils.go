@@ -11,6 +11,8 @@ import (
 	"github.com/tendermint/tendermint/libs/common"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/app"
+	irishubType "github.com/irisnet/irishub/types"
 )
 
 // SendOrPrintTx implements a utility function that
@@ -253,4 +255,22 @@ func isTxSigner(user sdk.AccAddress, signers []sdk.AccAddress) bool {
 		}
 	}
 	return false
+}
+
+func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) irishubType.Rat {
+	stakeTokenDenom, err := cliCtx.GetCoinType(app.Denom)
+	if err != nil {
+		panic(err)
+	}
+	decimalDiff := stakeTokenDenom.MinUnit.Decimal - stakeTokenDenom.GetMainUnit().Decimal
+	exRate := irishubType.NewRat(1).Quo(irishubType.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
+	return exRate
+}
+
+func ConvertDecToRat(input sdk.Dec) irishubType.Rat {
+	output, err := irishubType.NewRatFromDecimal(input.String(), 10)
+	if err != nil {
+		panic(err.Error())
+	}
+	return output
 }

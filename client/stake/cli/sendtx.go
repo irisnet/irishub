@@ -10,13 +10,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
 
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/app"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
@@ -129,8 +129,8 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 // GetCmdEditValidator implements the create edit validator command.
 func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "edit-validator",
-		Short: "edit and existing validator account",
+		Use:     "edit-validator",
+		Short:   "edit and existing validator account",
 		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --moniker=<validator name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().

@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
+	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
@@ -66,9 +67,31 @@ func main() {
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
+			bankcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc)),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,
+	)
+
+	//Add distribution commands
+	distributionCmd := &cobra.Command{
+		Use:   "distribution",
+		Short: "Distribution subcommands",
+	}
+	distributionCmd.AddCommand(
+		client.GetCommands(
+			distributioncmd.GetWithdrawAddress("distr", cdc),
+			distributioncmd.GetDelegationDistInfo("distr", cdc),
+			distributioncmd.GetValidatorDistInfo("distr", cdc),
+			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
+		)...)
+	distributionCmd.AddCommand(
+		client.PostCommands(
+			distributioncmd.GetCmdSetWithdrawAddr(cdc),
+			distributioncmd.GetCmdWithdrawRewards(cdc),
+		)...)
+	rootCmd.AddCommand(
+		distributionCmd,
 	)
 
 	//Add gov commands
@@ -113,6 +136,8 @@ func main() {
 			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
 			stakecmd.GetCmdQueryRedelegation("stake", cdc),
 			stakecmd.GetCmdQueryRedelegations("stake", cdc),
+			stakecmd.GetCmdQueryPool("stake", cdc),
+			stakecmd.GetCmdQueryParams("stake", cdc),
 			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
 		)...)
 	stakeCmd.AddCommand(

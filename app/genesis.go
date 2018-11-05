@@ -21,15 +21,14 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 	"time"
 )
 
 var (
 	Denom             = "iris"
-	feeAmt            = int64(100)
+	FeeAmt            = int64(100)
 	IrisCt            = types.NewDefaultCoinType(Denom)
-	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", feeAmt, Denom))
+	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", FeeAmt, Denom))
 	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
 )
 
@@ -209,7 +208,7 @@ func IrisAppGenStateJSON(cdc *codec.Codec, appGenTxs []json.RawMessage) (appStat
 // CollectStdTxs processes and validates application's genesis StdTxs and returns the list of validators,
 // appGenTxs, and persistent peers required to generate genesis.json.
 func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
-	validators []tmtypes.GenesisValidator, appGenTxs []auth.StdTx, persistentPeers string, err error) {
+	appGenTxs []auth.StdTx, persistentPeers string, err error) {
 	var fos []os.FileInfo
 	fos, err = ioutil.ReadDir(genTxsDir)
 	if err != nil {
@@ -248,14 +247,7 @@ func CollectStdTxs(moniker string, genTxsDir string, cdc *codec.Codec) (
 			return
 		}
 
-		// TODO: this could be decoupled from stake.MsgCreateValidator
-		// TODO: and we likely want to do it for real world Gaia
 		msg := msgs[0].(stake.MsgCreateValidator)
-		validators = append(validators, tmtypes.GenesisValidator{
-			PubKey: msg.PubKey,
-			Power:  FreeFermionVal.Amount.Int64(),
-			Name:   msg.Description.Moniker,
-		})
 
 		// exclude itself from persistent peers
 		if msg.Description.Moniker != moniker {
