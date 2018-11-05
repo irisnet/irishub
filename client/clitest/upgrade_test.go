@@ -207,11 +207,11 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//////////////////// replay from version 0 for new coming node /////////////////////////////
 	/// start a new node
 
-	//go startNodeBToReplay(t)
-	//
-	//wg.Add(1)
-	//wg.Wait()
-	//proc2.Stop(true)
+	go startNodeBToReplay(t)
+
+	wg.Add(1)
+	wg.Wait()
+	proc2.Stop(true)
 }
 
 func startNodeBToReplay(t *testing.T) {
