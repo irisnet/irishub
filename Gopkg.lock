@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.25.0-iris"
-  digest = "1:9a76d7a458c49d6d5efab98e0dbdcaee4dc980bb7307d669efaad72842f0846f"
+  digest = "1:078e0768e89c19b29c0545519f6388e297369ff8ade2d965558b05750d472dc7"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -101,7 +101,6 @@
     "x/distribution/keeper",
     "x/distribution/tags",
     "x/distribution/types",
-    "x/gov/client",
     "x/ibc",
     "x/mint",
     "x/mock",
@@ -947,8 +946,6 @@
     "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
     "github.com/cosmos/cosmos-sdk/x/bank",
     "github.com/cosmos/cosmos-sdk/x/distribution",
-    "github.com/cosmos/cosmos-sdk/x/distribution/types",
-    "github.com/cosmos/cosmos-sdk/x/gov/client",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mint",
     "github.com/cosmos/cosmos-sdk/x/mock",
@@ -965,6 +962,7 @@
     "github.com/gorilla/mux",
     "github.com/ipfs/go-ipfs-api",
     "github.com/mattn/go-isatty",
+    "github.com/mitchellh/go-homedir",
     "github.com/pelletier/go-toml",
     "github.com/pkg/errors",
     "github.com/prometheus/client_golang/prometheus",
