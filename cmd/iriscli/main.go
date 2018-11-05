@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path"
+
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
@@ -17,6 +20,7 @@ import (
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
@@ -32,6 +36,9 @@ func main() {
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 
+	rootCmd.AddCommand(client.ConfigCmd())
+	rootCmd.AddCommand(client.LineBreak)
+
 	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
 	//Add state commands
 	tendermintCmd := &cobra.Command{
@@ -45,6 +52,7 @@ func main() {
 		tendermintrpccmd.ValidatorCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
+	rootCmd.AddCommand(client.LineBreak)
 
 	//Add bank commands
 	bankCmd := &cobra.Command{
@@ -204,14 +212,41 @@ func main() {
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
+		client.LineBreak,
 		version.ServeVersionCommand(cdc),
 	)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "IRISCLI", app.DefaultCLIHome)
-	err := executor.Execute()
+	err := initConfig(rootCmd)
+	if err != nil {
+		panic(err)
+	}
+
+	err = executor.Execute()
 	if err != nil {
 		// handle with #870
 		panic(err)
 	}
+}
+
+func initConfig(cmd *cobra.Command) error {
+	home, err := cmd.PersistentFlags().GetString(cli.HomeFlag)
+	if err != nil {
+		return err
+	}
+
+	cfgFile := path.Join(home, "config", "config.toml")
+	if _, err := os.Stat(cfgFile); err == nil {
+		viper.SetConfigFile(cfgFile)
+
+		if err := viper.ReadInConfig(); err != nil {
+			return err
+		}
+	}
+
+	if err := viper.BindPFlag(cli.EncodingFlag, cmd.PersistentFlags().Lookup(cli.EncodingFlag)); err != nil {
+		return err
+	}
+	return viper.BindPFlag(cli.OutputFlag, cmd.PersistentFlags().Lookup(cli.OutputFlag))
 }
