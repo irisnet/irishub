@@ -2,13 +2,13 @@ package stake
 
 import (
 	"fmt"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
-	irishubType "github.com/irisnet/irishub/types"
-	"time"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 // defines a delegation without type Rat for shares
@@ -133,18 +133,8 @@ func (p PoolOutput) HumanReadableString() string {
 	return resp
 }
 
-func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) irishubType.Rat {
-	stakeTokenDenom, err := cliCtx.GetCoinType(app.Denom)
-	if err != nil {
-		panic(err)
-	}
-	decimalDiff := stakeTokenDenom.MinUnit.Decimal - stakeTokenDenom.GetMainUnit().Decimal
-	exRate := irishubType.NewRat(1).Quo(irishubType.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
-	return exRate
-}
-
 func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Validator) (ValidatorOutput, error) {
-	exRate := ExRateFromStakeTokenToMainUnit(cliCtx)
+	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 
 	bechValPubkey, err := sdk.Bech32ifyValPub(v.ConsPubKey)
 	if err != nil {
@@ -152,9 +142,9 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 	}
 
 	commission := Commission{
-		Rate:          ConvertDecToRat(v.Commission.Rate).FloatString(),
-		MaxRate:       ConvertDecToRat(v.Commission.MaxRate).FloatString(),
-		MaxChangeRate: ConvertDecToRat(v.Commission.MaxChangeRate).FloatString(),
+		Rate:          utils.ConvertDecToRat(v.Commission.Rate).FloatString(),
+		MaxRate:       utils.ConvertDecToRat(v.Commission.MaxRate).FloatString(),
+		MaxChangeRate: utils.ConvertDecToRat(v.Commission.MaxChangeRate).FloatString(),
 		UpdateTime:    v.Commission.UpdateTime,
 	}
 	return ValidatorOutput{
@@ -162,8 +152,8 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		ConsPubKey:         bechValPubkey,
 		Jailed:             v.Jailed,
 		Status:             v.Status,
-		Tokens:             ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
-		DelegatorShares:    ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
+		Tokens:             utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
+		DelegatorShares:    utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
 		Description:        v.Description,
 		BondHeight:         v.UnbondingHeight,
 		BondIntraTxCounter: v.BondIntraTxCounter,
@@ -174,11 +164,11 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 }
 
 func ConvertDelegationToDelegationOutput(cliCtx context.CLIContext, delegation stake.Delegation) DelegationOutput {
-	exRate := ExRateFromStakeTokenToMainUnit(cliCtx)
+	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return DelegationOutput{
 		DelegatorAddr: delegation.DelegatorAddr,
 		ValidatorAddr: delegation.ValidatorAddr,
-		Shares:        ConvertDecToRat(delegation.Shares).Mul(exRate).FloatString(),
+		Shares:        utils.ConvertDecToRat(delegation.Shares).Mul(exRate).FloatString(),
 		Height:        delegation.Height,
 	}
 }
@@ -203,7 +193,7 @@ func ConvertUBDToUBDOutput(cliCtx context.CLIContext, ubd stake.UnbondingDelegat
 }
 
 func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) RedelegationOutput {
-	exRate := ExRateFromStakeTokenToMainUnit(cliCtx)
+	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	initialBalance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{red.InitialBalance}.String())
 	if err != nil && len(initialBalance) != 1 {
 		panic(err)
@@ -220,18 +210,18 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 		MinTime:          red.MinTime,
 		InitialBalance:   initialBalance[0],
 		Balance:          balance[0],
-		SharesSrc:        ConvertDecToRat(red.SharesSrc).Mul(exRate).FloatString(),
-		SharesDst:        ConvertDecToRat(red.SharesDst).Mul(exRate).FloatString(),
+		SharesSrc:        utils.ConvertDecToRat(red.SharesSrc).Mul(exRate).FloatString(),
+		SharesDst:        utils.ConvertDecToRat(red.SharesDst).Mul(exRate).FloatString(),
 	}
 }
 
 func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.Pool) PoolOutput {
-	exRate := ExRateFromStakeTokenToMainUnit(cliCtx)
+	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return PoolOutput{
-		LooseTokens:  ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),
-		BondedTokens: ConvertDecToRat(pool.BondedTokens).Mul(exRate).FloatString(),
-		TokenSupply:  ConvertDecToRat(pool.BondedTokens.Add(pool.LooseTokens)).Mul(exRate).FloatString(),
-		BondedRatio:  ConvertDecToRat(pool.BondedTokens.Quo(pool.BondedTokens.Add(pool.LooseTokens))).FloatString(),
+		LooseTokens:  utils.ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),
+		BondedTokens: utils.ConvertDecToRat(pool.BondedTokens).Mul(exRate).FloatString(),
+		TokenSupply:  utils.ConvertDecToRat(pool.BondedTokens.Add(pool.LooseTokens)).Mul(exRate).FloatString(),
+		BondedRatio:  utils.ConvertDecToRat(pool.BondedTokens.Quo(pool.BondedTokens.Add(pool.LooseTokens))).FloatString(),
 	}
 }
 
@@ -257,12 +247,4 @@ func BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr string) (commissio
 
 	commission = types.NewCommissionMsg(rate, maxRate, maxChangeRate)
 	return commission, nil
-}
-
-func ConvertDecToRat(input sdk.Dec) irishubType.Rat {
-	output, err := irishubType.NewRatFromDecimal(input.String(), 10)
-	if err != nil {
-		panic(err.Error())
-	}
-	return output
 }
