@@ -3,12 +3,13 @@ package client
 import (
 	"bufio"
 	"fmt"
-	"github.com/mitchellh/go-homedir"
-	"github.com/pelletier/go-toml"
-	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/mitchellh/go-homedir"
+	"github.com/pelletier/go-toml"
+	"github.com/spf13/cobra"
 )
 
 type cliConfig struct {
@@ -55,8 +56,8 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 
 	encoding := "btc"
 	output := "text"
-	var chainID string
-	chainID, err = handleChainID(stdin)
+
+	chainID, err := handleChainID(stdin)
 	if err != nil {
 		return err
 	}

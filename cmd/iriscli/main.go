@@ -1,25 +1,26 @@
 package main
 
 import (
+	"os"
+	"path"
+
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
-	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
+	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
+	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
-	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
-	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
+	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/libs/cli"
-	"os"
 	"github.com/spf13/viper"
-	"path"
+	"github.com/tendermint/tendermint/libs/cli"
 )
 
 // rootCmd is the entry point for this binary
@@ -79,9 +80,9 @@ func main() {
 			govcmd.GetCmdQueryProposals("gov", cdc),
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
-			govcmd.GetCmdQueryDeposit("gov",cdc),
-			govcmd.GetCmdQueryDeposits("gov",cdc),
-			govcmd.GetCmdQueryTally("gov",cdc),
+			govcmd.GetCmdQueryDeposit("gov", cdc),
+			govcmd.GetCmdQueryDeposits("gov", cdc),
+			govcmd.GetCmdQueryTally("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
 			govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
@@ -90,7 +91,6 @@ func main() {
 			govcmd.GetCmdSubmitProposal(cdc),
 			govcmd.GetCmdDeposit(cdc),
 			govcmd.GetCmdVote(cdc),
-
 		)...)
 	rootCmd.AddCommand(
 		govCmd,
