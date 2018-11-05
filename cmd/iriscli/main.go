@@ -36,6 +36,7 @@ func main() {
 	cdc := app.MakeCodec()
 
 	rootCmd.AddCommand(client.ConfigCmd())
+	rootCmd.AddCommand(client.LineBreak)
 
 	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
 	//Add state commands
@@ -50,6 +51,7 @@ func main() {
 		tendermintrpccmd.ValidatorCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
+	rootCmd.AddCommand(client.LineBreak)
 
 	//Add bank commands
 	bankCmd := &cobra.Command{
@@ -185,6 +187,7 @@ func main() {
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
+		client.LineBreak,
 		version.ServeVersionCommand(cdc),
 	)
 

@@ -20,6 +20,7 @@ type cliConfig struct {
 	Output    string `toml:"output"`
 	Node      string `toml:"node"`
 	Trace     bool   `toml:"trace"`
+	Fee       string `toml:"fee"`
 }
 
 // ConfigCmd returns a CLI command to interactively create a
@@ -62,6 +63,11 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	fee, err := handleFee(stdin)
+	if err != nil {
+		return err
+	}
+
 	cfg := &cliConfig{
 		Home:      gaiaCLIHome,
 		ChainID:   chainID,
@@ -70,6 +76,7 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 		Output:    output,
 		Node:      node,
 		Trace:     false,
+		Fee:       fee,
 	}
 
 	return createGaiaCLIConfig(cfg)
@@ -114,6 +121,19 @@ func handleChainID(stdin *bufio.Reader) (string, error) {
 	}
 
 	return chainID, nil
+}
+
+func handleFee(stdin *bufio.Reader) (string, error) {
+	fee, err := GetString("Please specify default fee", stdin)
+	if err != nil {
+		return "", err
+	}
+
+	if fee == "" {
+		fmt.Println("No fee has been specified")
+	}
+
+	return fee, nil
 }
 
 func handleTrustNode(stdin *bufio.Reader) (bool, error) {
