@@ -63,7 +63,8 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().String(FlagChainID, "", "Chain ID of tendermint node")
 		c.Flags().String(FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
 		c.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
-		c.Flags().Int64(FlagGas, 200000, "gas limit to set per-transaction")
+		c.Flags().Var(&GasFlagVar, FlagGas, fmt.Sprintf(
+			"gas limit to set per-transaction; set to %q to calculate required gas automatically", GasFlagSimulate))
 		c.Flags().Bool(FlagAsync, false, "broadcast transactions asynchronously")
 		c.Flags().Bool(FlagJson, false, "return output in json format")
 		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
