@@ -1,12 +1,9 @@
 # IService User Guide
 
 ## Basic Function Description
-IRIS Services (a.k.a. "iServices") intend to bridge the gap between the blockchain world and the conventional business application world, 
-by mediating a complete lifecycle of off-chain services -- from their definition, binding (provider registration), invocation, to their 
-governance (profiling and dispute resolution). By enhancing the IBC processing logic to support service semantics, the IRIS SDK is intended 
-to allow distributed business services to be available across the internet of blockchains. We introduced the [Interface description language](https://en.wikipedia.org/wiki/Interface_description_language) 
-(IDL) to work with the service standardized definitions to satisfy service invocations across different programming languages.
-The currently supported IDL language is [protobuf](https://developers.google.com/protocol-buffers/). The main function points of this module are as follows:
+IRIS Services (a.k.a. "iServices") intend to bridge the gap between the blockchain world and the conventional business application world, by mediating a complete lifecycle of off-chain services -- from their definition, binding (provider registration), invocation, to their governance (profiling and dispute resolution). By enhancing the IBC processing logic to support service semantics, the IRIS SDK is intended to allow distributed business services to be available across the internet of blockchains. The [Interface description language](https://en.wikipedia.org/wiki/Interface_description_language) (IDL) we introduced is
+to work with the service standardized definitions to satisfy service invocations across different programming languages.
+The currently supported IDL language is [protobuf](https://developers.google.com/protocol-buffers/). The main functions of this module are as follows:
 1. Service Definition
 2. Service Binding
 3. Service Invocation (TODO)
@@ -17,7 +14,7 @@ The currently supported IDL language is [protobuf](https://developers.google.com
 
 ### Service definition process
 
-1. Any users can define a service. In service definition，Use `protobuf` to standardize the definition of the service's method, its input and output parameters.
+1. Any users can define a service. In service definition，use `protobuf` to standardize the definition of the service's method, its input and output parameters.
 
 ## Usage Scenario
 ### Create an environment
@@ -52,7 +49,7 @@ iriscli iservice definition --def-chain-id=service-test --service-name=test-serv
 
 ### Service Binding
 ```
-# Service binding
+# Service Binding
 iriscli iservice bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
 
 # Result
@@ -67,7 +64,7 @@ Committed at block 168 (tx hash: 02CAC60E75CD93465CAE10CE35F30B53C8A95574, respo
 # Query service binding
 iriscli iservice binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
 
-# Query service bindings
+# Query service binding list
 iriscli iservice bindings --def-chain-id=service-test --service-name=test-service
 
 # Service binding update
@@ -104,7 +101,7 @@ iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --serv
 * `--service-description`  The description of this iService
 * `--author-description`  The self-description of the iService creator which is optional
 * `--tags`  The keywords of this iService
-* `--messaging`  The messaging type of this iService{`Unicast`,`Multicast`}
+* `--messaging`  The transfer type of this iService{`Unicast`,`Multicast`}
 * `--idl-content`  The standardized definition of the methods for this iService
 * `--file`  Idl-content can be replaced by files,if the item is not empty.
 
@@ -124,15 +121,15 @@ iriscli iservice bind --chain-id=service-test  --from=x --fee=0.004iris --servic
 * `--prices` Service prices, a list sorted by service method
 * `--avg-rsp-time` The average service response time in milliseconds
 * `--usable-time` An integer represents the number of usable service invocations per 10,000
-* `--expiration` The blockchain height where this binding expires; a negative number means "never expire"
+* `--expiration` Negative number used here means the unbonded blockchain height "never expire" 
 
 ```
 iriscli iservice binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
 ```
 * `--def-chain-id` The ID of the blockchain defined of the iService
 * `--service-name` The name of iService
-* `--bind-chain-id`  The ID of the blockchain bound of the iService
-* `--provider` The bech32 encoded account created the iService binding
+* `--bind-chain-id`  The ID of the blockchain bond of the iService
+* `--provider` The blockchain address of bech32 encoded account 
 
 ```
 iriscli iservice bindings --def-chain-id=service-test --service-name=test-service
