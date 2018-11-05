@@ -37,6 +37,10 @@ func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if len(res) == 0 {
+				fmt.Println("No withdraw address specified")
+				return nil
+			}
 			withdrawAddress := sdk.AccAddress(res)
 
 			fmt.Println(withdrawAddress.String())
