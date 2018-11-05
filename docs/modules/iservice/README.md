@@ -128,7 +128,7 @@ iriscli iservice binding --def-chain-id=service-test --service-name=test-service
 ```
 * `--def-chain-id` The ID of the blockchain defined of the iService
 * `--service-name` The name of iService
-* `--bind-chain-id`  The ID of the blockchain bond of the iService
+* `--bind-chain-id`  The ID of the blockchain bound of the iService
 * `--provider` The blockchain address of bech32 encoded account 
 
 ```
