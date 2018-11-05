@@ -207,11 +207,11 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//////////////////// replay from version 0 for new coming node /////////////////////////////
 	/// start a new node
 
-	go startNodeBToReplay(t)
-
-	wg.Add(1)
-	wg.Wait()
-	proc2.Stop(true)
+	//go startNodeBToReplay(t)
+	//
+	//wg.Add(1)
+	//wg.Wait()
+	//proc2.Stop(true)
 }
 
 func startNodeBToReplay(t *testing.T) {
@@ -251,18 +251,7 @@ func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
 
 	t.SkipNow()
 
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
-	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
-
-	err := modifyGenesisFile(irisHome)
-	require.NoError(t, err)
-
-	// get a free port, also setup some common flags
-	servAddr, port, err := server.FreeTCPAddr()
-	require.NoError(t, err)
+	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
@@ -276,7 +265,7 @@ func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	//////////////////////// start node B ////////////////////////////
 
@@ -317,7 +306,7 @@ func irisStartNodeB(t *testing.T) {
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	require.Equal(t, "100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	wg.Done()
 }
