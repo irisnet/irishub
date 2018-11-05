@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-const maxElements = 1000
+const maxElements = 200
 
 // validate proto idl text
 func ValidateProto(content string) (bool, error) {
@@ -35,10 +35,29 @@ func GetMethods(content string) (methods []Method, err error) {
 
 	// iterate definition get all method
 	var rs []*proto.RPC
+	rm := make(map[string]*proto.RPC)
+	var ms []*proto.Message
+	mm := make(map[string]*proto.Message)
 	proto.Walk(definition,
 		proto.WithRPC(func(r *proto.RPC) {
+			if _, ok := rm[r.Name]; ok {
+				err = fmt.Errorf("contains duplicate methods %s", r.Name)
+			}
+			rm[r.Name] = r
 			rs = append(rs, r)
-		}))
+		}),
+		proto.WithMessage(func(m *proto.Message) {
+			if _, ok := mm[m.Name]; ok {
+				err = fmt.Errorf("contains duplicate messages %s", m.Name)
+			}
+			mm[m.Name] = m
+			ms = append(ms, m)
+		}),
+	)
+
+	if err != nil {
+		return methods, err
+	}
 
 	// get method attribute from comment, each line comment only define one attribute
 	for _, r := range rs {
