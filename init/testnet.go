@@ -46,7 +46,7 @@ Note, strict routability for addresses is turned off in the config file.
 
 Example:
 
-	iris testnet --v 4 --o ./output --starting-ip-address 192.168.10.2
+	iris testnet --v 4 -o ./output --starting-ip-address 192.168.0.1
 	`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			config := ctx.Config
