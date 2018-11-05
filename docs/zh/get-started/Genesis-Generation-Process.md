@@ -7,14 +7,14 @@
 
 ```
 iriscli keys add your_name
-iris init gen-tx --name=your_name --home=<path_to_home> --ip=Your_public_IP
+iris gentx --name=your_name --home=<path_to_home> --ip=Your_public_IP
 ```
 
 代码示例：
    
 ```
 iriscli keys add alice
-iris gentx --name=alice --home=iris --chain-id=irishub-stage
+iris gentx --name=alice --home=iris --chain-id=irishub-stage --ip=1.1.1.1
 ```
 然后你可以发现在$IRISHOME/config目录下生成了一个gentx文件夹。里面存在一个gentx-node-ID.json文件。这个文件包含了如下信息：
 
@@ -65,7 +65,7 @@ iris gentx --name=alice --home=iris --chain-id=irishub-stage
         "sequence": "0"
       }
     ],
-    "memo": "0eb02fdabb96923ac1e855ac012a5a624793264a@10.1.4.82:26656"
+    "memo": "0eb02fdabb96923ac1e855ac012a5a624793264a@1.1.1.1:26656"
   }
 }
 ```

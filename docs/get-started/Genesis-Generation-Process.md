@@ -11,7 +11,7 @@ Please run the `keys add` subcommand and run the `gen-tx` subcommand to generate
 
 ```
 iriscli keys add your_name
-iris init gen-tx --name=your_name --home=<path_to_home> --ip=Your_public_IP
+iris gentx --name=your_name --home=<path_to_home> --ip=Your_public_IP
 ```
 
 For example,
