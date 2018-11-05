@@ -26,9 +26,9 @@ RUN cd $REPO_PATH && \
     make get_vendor_deps && \
     make test_unit && \
     make build_linux && \
-    make install
+    make install && \
 #    make install_examples && \
-#    make test_cli && \
+    make test_cli
 #    make test_lcd && \
 #    make test_sim
 

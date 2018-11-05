@@ -17,24 +17,21 @@ var (
 	//	RatePrecision = int64(1000000000) //10^9
 )
 
-// NewFeePreprocessHandler creates a fee token preprocess handler
+// NewFeePreprocessHandler creates a fee token preprocesser
 func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
 	return func(ctx sdk.Context, tx sdk.Tx) error {
 		stdTx, ok := tx.(auth.StdTx)
 		if !ok {
 			return sdk.ErrInternal("tx must be StdTx")
 		}
-		fee := auth.StdFee{
-			Gas:    stdTx.Fee.Gas,
-			Amount: sdk.Coins{fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)},
-		}
-		return fm.feePreprocess(ctx, fee.Amount, fee.Gas)
+		totalNativeFee := fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)
+		return fm.feePreprocess(ctx, sdk.Coins{totalNativeFee}, stdTx.Fee.Gas)
 	}
 }
 
 // NewFeePreprocessHandler creates a fee token refund handler
 func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm FeeManager) types.FeeRefundHandler {
-	return func(ctx sdk.Context, tx sdk.Tx, txResult sdk.Result) (refundResult sdk.Coin, err error) {
+	return func(ctx sdk.Context, tx sdk.Tx, txResult sdk.Result) (actualCostFee sdk.Coin, err error) {
 		defer func() {
 			if r := recover(); r != nil {
 				err = fmt.Errorf("encountered panic error during fee refund, recovered: %v\nstack:\n%v", r, string(debug.Stack()))
@@ -56,44 +53,33 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 		// It is not reasonable to consume users' gas. So the context gas is reset to transaction gas
 		ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
-		fee := auth.StdFee{
-			Gas:    stdTx.Fee.Gas,
-			Amount: sdk.Coins{fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)}, // consume gas
-		}
+		totalNativeFee := fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)
 
 		//If all gas has been consumed, then there is no necessary to run fee refund process
 		if txResult.GasWanted <= txResult.GasUsed {
-			refundResult = sdk.Coin{
-				Denom:  fee.Amount[0].Denom,
-				Amount: fee.Amount[0].Amount,
-			}
-			return refundResult, nil
+			actualCostFee = totalNativeFee
+			return actualCostFee, nil
 		}
 
 		unusedGas := txResult.GasWanted - txResult.GasUsed
-		var refundCoins sdk.Coins
-		for _, coin := range fee.Amount {
-			newCoin := sdk.Coin{
-				Denom:  coin.Denom,
-				Amount: coin.Amount.Mul(sdk.NewInt(unusedGas)).Div(sdk.NewInt(txResult.GasWanted)),
-			}
-			refundCoins = append(refundCoins, newCoin)
+		refundCoin := sdk.Coin{
+			Denom:  totalNativeFee.Denom,
+			Amount: totalNativeFee.Amount.Mul(sdk.NewInt(unusedGas)).Div(sdk.NewInt(txResult.GasWanted)),
 		}
 		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
-		err = firstAccount.SetCoins(coins.Plus(refundCoins))
+		err = firstAccount.SetCoins(coins.Plus(sdk.Coins{refundCoin}))
 		if err != nil {
 			return sdk.Coin{}, err
 		}
 
-		am.SetAccount(ctx, firstAccount)          // consume gas
-		fck.RefundCollectedFees(ctx, refundCoins) // consume gas
-		// There must be just one fee token
-		refundResult = sdk.Coin{
-			Denom:  fee.Amount[0].Denom,
-			Amount: fee.Amount[0].Amount.Mul(sdk.NewInt(txResult.GasUsed)).Div(sdk.NewInt(txResult.GasWanted)),
-		}
+		am.SetAccount(ctx, firstAccount)
+		fck.RefundCollectedFees(ctx, sdk.Coins{refundCoin})
 
-		return refundResult, nil
+		actualCostFee = sdk.Coin{
+			Denom:  totalNativeFee.Denom,
+			Amount: totalNativeFee.Amount.Sub(refundCoin.Amount),
+		}
+		return actualCostFee, nil
 	}
 }
 
@@ -122,10 +108,19 @@ func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Co
 	fck.paramSpace.Get(ctx, nativeFeeTokenKey, &nativeFeeToken)
 	for _, coin := range coins {
 		if coin.Denom == nativeFeeToken {
+			if coin.Amount.BigInt() == nil {
+				return sdk.Coin{
+					Denom:  coin.Denom,
+					Amount: sdk.ZeroInt(),
+				}
+			}
 			return coin
 		}
 	}
-	return sdk.Coin{}
+	return sdk.Coin{
+		Denom:  "",
+		Amount: sdk.ZeroInt(),
+	}
 }
 
 func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit int64) sdk.Error {

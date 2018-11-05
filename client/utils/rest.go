@@ -154,6 +154,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	txCtx := context.TxContext{
 		Codec:         cliCtx.Codec,
 		Gas:           gas,
+		Fee:           baseTx.Fee,
 		GasAdjustment: adjustment,
 		SimulateGas:   simulateGas,
 		ChainID:       baseTx.ChainID,

@@ -11,13 +11,15 @@ import (
 	"bufio"
 	"io"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
+	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
-	govcli "github.com/irisnet/irishub/client/gov"
+	distributionclient "github.com/irisnet/irishub/client/distribution"
 	iservicecli "github.com/irisnet/irishub/client/iservice"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
@@ -31,7 +33,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
-	"github.com/cosmos/cosmos-sdk/server"
 )
 
 var (
@@ -267,6 +268,49 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 	return ko.Address, pk
 }
 
+func executeGetValidatorPK(t *testing.T, cmdStr string) string {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	return out
+}
+
+func executeGetDelegatorDistrInfo(t *testing.T, cmdStr string) []distributiontypes.DelegationDistInfo {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	cdc := app.MakeCodec()
+	var ddiList []distributiontypes.DelegationDistInfo
+	err := cdc.UnmarshalJSON([]byte(out), &ddiList)
+
+	require.Empty(t, err)
+	return ddiList
+}
+
+func executeGetDelegationDistrInfo(t *testing.T, cmdStr string) distributiontypes.DelegationDistInfo {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	cdc := app.MakeCodec()
+	var ddi distributiontypes.DelegationDistInfo
+	err := cdc.UnmarshalJSON([]byte(out), &ddi)
+
+	require.Empty(t, err)
+	return ddi
+}
+
+func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclient.ValidatorDistInfoOutput {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	cdc := app.MakeCodec()
+	var vdi distributionclient.ValidatorDistInfoOutput
+	err := cdc.UnmarshalJSON([]byte(out), &vdi)
+
+	require.Empty(t, err)
+	return vdi
+}
+
 func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
@@ -291,9 +335,9 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	return validator
 }
 
-func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
+func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var proposal govcli.ProposalOutput
+	var proposal gov.ProposalOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -376,8 +420,8 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 	}
 
 	type toJSON struct {
-		Height   int64  `json:"Height"`
-		TxHash   string `json:"TxHash"`
+		Height int64  `json:"Height"`
+		TxHash string `json:"TxHash"`
 		//Response string `json:"Response"`
 	}
 	var res toJSON

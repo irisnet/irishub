@@ -37,6 +37,10 @@ import (
 	"github.com/irisnet/irishub/client/keys"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
+	"github.com/tendermint/tendermint/p2p"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/cosmos/cosmos-sdk/x/stake"
+	txbuilder "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 )
@@ -125,7 +129,14 @@ func extractPortFromAddress(listenAddress string) string {
 // their respective sockets where nValidators is the total number of validators
 // and initAddrs are the accounts to initialize with some steak tokens. It
 // returns a cleanup function, a set of validator public keys, and a port.
-func InitializeTestLCD(t *testing.T, nValidators int, initAddrs []sdk.AccAddress) (func(), []crypto.PubKey, string) {
+func InitializeTestLCD(
+	t *testing.T, nValidators int, initAddrs []sdk.AccAddress,
+) (cleanup func(), valConsPubKeys []crypto.PubKey, valOperAddrs []sdk.ValAddress, port string) {
+
+	if nValidators < 1 {
+		panic("InitializeTestLCD must use at least one validator")
+	}
+
 	config := GetConfig()
 	config.Consensus.TimeoutCommit = 100
 	config.Consensus.SkipTimeoutCommit = false
@@ -144,54 +155,56 @@ func InitializeTestLCD(t *testing.T, nValidators int, initAddrs []sdk.AccAddress
 
 	genesisFile := config.GenesisFile()
 	genDoc, err := tmtypes.GenesisDocFromFile(genesisFile)
-	require.NoError(t, err)
+	require.Nil(t, err)
+	genDoc.Validators = nil
+	genDoc.SaveAs(genesisFile)
+	genTxs := []json.RawMessage{}
 
-	if nValidators < 1 {
-		panic("InitializeTestLCD must use at least one validator")
-	}
-
-	for i := 1; i < nValidators; i++ {
-		genDoc.Validators = append(genDoc.Validators,
-			tmtypes.GenesisValidator{
-				PubKey: ed25519.GenPrivKey().PubKey(),
-				Power:  1,
-				Name:   "val",
-			},
+	// append any additional (non-proposing) validators
+	for i := 0; i < nValidators; i++ {
+		operPrivKey := secp256k1.GenPrivKey()
+		operAddr := operPrivKey.PubKey().Address()
+		pubKey := privVal.PubKey
+		delegation := 20
+		if i > 0 {
+			pubKey = ed25519.GenPrivKey().PubKey()
+			delegation = 18
+		}
+		msg := stake.NewMsgCreateValidator(
+			sdk.ValAddress(operAddr),
+			pubKey,
+			sdk.NewCoin("iris-atto",sdk.NewIntWithDecimal(1,delegation)),
+			stake.Description{Moniker: fmt.Sprintf("validator-%d", i+1)},
+			stake.NewCommissionMsg(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
 		)
+		stdSignMsg := txbuilder.StdSignMsg{
+			ChainID: genDoc.ChainID,
+			Msgs:    []sdk.Msg{msg},
+		}
+		sig, err := operPrivKey.Sign(stdSignMsg.Bytes())
+		require.Nil(t, err)
+		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{{Signature: sig, PubKey: operPrivKey.PubKey()}}, "")
+		txBytes, err := cdc.MarshalJSON(tx)
+		require.Nil(t, err)
+		genTxs = append(genTxs, txBytes)
+		valConsPubKeys = append(valConsPubKeys, pubKey)
+		valOperAddrs = append(valOperAddrs, sdk.ValAddress(operAddr))
 	}
 
-	var validatorsPKs []crypto.PubKey
-
-	// NOTE: It's bad practice to reuse public key address for the owner
-	// address but doing in the test for simplicity.
-	var appGenTxs []json.RawMessage
-	for _, gdValidator := range genDoc.Validators {
-		pk := gdValidator.PubKey
-		validatorsPKs = append(validatorsPKs, pk)
-
-		appGenTx, _, _, err := irisapp.IrisAppGenTxNF(cdc, pk, sdk.AccAddress(pk.Address()), "test_val1")
-		require.NoError(t, err)
-
-		appGenTxs = append(appGenTxs, appGenTx)
-	}
-
-	genesisState, err := irisapp.IrisAppGenState(cdc, appGenTxs[:])
+	genesisState, err := irisapp.IrisAppGenState(cdc, genTxs)
 	require.NoError(t, err)
-
-	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()
-	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	// add some tokens to init accounts
 	for _, addr := range initAddrs {
 		accAuth := auth.NewBaseAccountWithAddress(addr)
-		accAuth.Coins = sdk.Coins{sdk.Coin{
-			Denom: irisapp.Denom + "-" + "atto",
-			Amount: sdk.NewInt(100).Mul(sdk.NewIntWithDecimal(1,18)),
-		}}
+		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto",sdk.NewIntWithDecimal(1,20))}
 		acc := irisapp.NewGenesisAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
-		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1,18)))
+		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1,20)))
 	}
+
+	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()
+	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	appState, err := codec.MarshalJSONIndent(cdc, genesisState)
 	require.NoError(t, err)
@@ -203,26 +216,30 @@ func InitializeTestLCD(t *testing.T, nValidators int, initAddrs []sdk.AccAddress
 	// XXX: Need to set this so LCD knows the tendermint node address!
 	viper.Set(client.FlagNode, config.RPC.ListenAddress)
 	viper.Set(client.FlagChainID, genDoc.ChainID)
+	// TODO Set to false once the upstream Tendermint proof verification issue is fixed.
 	viper.Set(client.FlagTrustNode, true)
+	dir, err := ioutil.TempDir("", "lcd_test")
+	require.NoError(t, err)
+	viper.Set(cli.HomeFlag, dir)
 
 	node, err := startTM(config, logger, genDoc, privVal, app)
 	require.NoError(t, err)
 
-	tests.WaitForNextHeightTM(extractPortFromAddress(config.RPC.ListenAddress))
+	tests.WaitForNextHeightTM(tests.ExtractPortFromAddress(config.RPC.ListenAddress))
 	lcd, err := startLCD(logger, listenAddr, cdc)
 	require.NoError(t, err)
 
 	tests.WaitForLCDStart(port)
 	tests.WaitForHeight(1, port)
 
-	cleanup := func() {
+	cleanup = func() {
 		logger.Debug("cleaning up LCD initialization")
 		node.Stop()
 		node.Wait()
 		lcd.Close()
 	}
 
-	return cleanup, validatorsPKs, port
+	return cleanup, valConsPubKeys, valOperAddrs, port
 }
 
 // startTM creates and starts an in-process Tendermint node with memDB and
@@ -236,9 +253,14 @@ func startTM(
 ) (*nm.Node, error) {
 	genDocProvider := func() (*tmtypes.GenesisDoc, error) { return genDoc, nil }
 	dbProvider := func(*nm.DBContext) (dbm.DB, error) { return dbm.NewMemDB(), nil }
+	nodeKey, err := p2p.LoadOrGenNodeKey(tmcfg.NodeKeyFile())
+	if err != nil {
+		return nil, err
+	}
 	node, err := nm.NewNode(
 		tmcfg,
 		privVal,
+		nodeKey,
 		proxy.NewLocalClientCreator(app),
 		genDocProvider,
 		dbProvider,
