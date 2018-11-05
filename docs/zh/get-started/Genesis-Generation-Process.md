@@ -1,68 +1,78 @@
 # 参与到Genesis文件生成流程中
 
 
-1. 每个希望成为验证人的参与者确保安装了对应版本的软件：iris v0.4.2
+1. 每个希望成为验证人的参与者确保安装了对应版本的软件：iris v0.7.0
 
-2. 执行gentx命令，获得一个node-id.json的文件。这个操作将默认生成一个余额为200IRIS的账户，该账户默认绑定100IRIS成为一个验证人候选人。
-
-```
-       iris init gen-tx --name=your_name --home=<path_to_home> --ip=Your_public_IP
-```
-   代码示例：
-```
-       iris init gen-tx --name=alice 
-```
+2. 先创建账户,再执行gentx命令，获得一个gentx-node-ID.json的文件。这个操作将默认生成一个余额为150IRIS的账户，该账户默认绑定100IRIS成为一个验证人候选人。
 
 ```
-       {
-         "app_message": {
-           "secret": "village venue about lend pause popular vague swarm blue unusual level drastic field broken moral north repair blue accident miss essay loan rail harbor"
-         },
-         "gen_tx_file": {
-           "node_id": "1b45f5bb7ba1e00be01e8795dcaa0e8008f28cb5",
-           "ip": "192.168.150.206",
-           "validator": {
-             "pub_key": {
-               "type": "tendermint/PubKeyEd25519",
-               "value": "NlMcGgz05K45ukGY10R8DApp8A0N0Jv4F2/OKtq9fCU="
-             },
-             "power": "100",
-             "name": ""
-           },
-           "app_gen_tx": {
-             "name": "tom",
-             "address": "faa1mmnaknf87p7uu80m6uthyssd2ge0s73hcfr05h",
-             "pub_key": "fap1zcjduepqxef3cxsv7nj2uwd6gxvdw3rups9xnuqdphgfh7qhdl8z4k4a0sjsxh3kgg"
-           }
-         }
-       }
-  ```
+iriscli keys add your_name
+iris gentx --name=your_name --home=<path_to_home> --ip=Your_public_IP
+```
+
+代码示例：
+   
+```
+iriscli keys add alice
+iris gentx --name=alice --home=iris --chain-id=irishub-stage --ip=1.1.1.1
+```
 然后你可以发现在$IRISHOME/config目录下生成了一个gentx文件夹。里面存在一个gentx-node-ID.json文件。这个文件包含了如下信息：
 
 ```
 {
-    "node_id": "612db83e7facdd9abab879f7e465ed829f3f3487",
-    "ip": "192.168.150.223",
-    "validator": {
-      "pub_key": {
-        "type": "tendermint/PubKeyEd25519",
-        "value": "bzLIySQ4YDwBIkTgeyrnBx7VEoQ23zDnWhIV4FEEOZ4="
-      },
-      "power": "100",
-      "name": ""
+  "type": "auth/StdTx",
+  "value": {
+    "msg": [
+      {
+        "type": "cosmos-sdk/MsgCreateValidator",
+        "value": {
+          "Description": {
+            "moniker": "chenggedexiaokeai.local",
+            "identity": "",
+            "website": "",
+            "details": ""
+          },
+          "Commission": {
+            "rate": "0.1000000000",
+            "max_rate": "0.2000000000",
+            "max_change_rate": "0.0100000000"
+          },
+          "delegator_address": "faa1cf25tf4pfjdhkzx8lqnkajlse6jcpm2fyw4yme",
+          "validator_address": "fva1cf25tf4pfjdhkzx8lqnkajlse6jcpm2f3lltx7",
+          "pubkey": {
+            "type": "tendermint/PubKeyEd25519",
+            "value": "/JvLFsvyMgm2ND4QgN4JKyLxhL42dVgat67383Q+mPY="
+          },
+          "delegation": {
+            "denom": "iris-atto",
+            "amount": "100000000000000000000"
+          }
+        }
+      }
+    ],
+    "fee": {
+      "amount": null,
+      "gas": "200000"
     },
-    "app_gen_tx": {
-      "name": "haoyang-virtualbox2",
-      "address": "faa1k96h5cyppg6q2meftv6epuw39u5dd0sa8t84fv",
-      "pub_key": "fap1zcjduepqduev3jfy8psrcqfzgns8k2h8qu0d2y5yxm0npe66zg27q5gy8x0qh7wt9l"
-    }
+    "signatures": [
+      {
+        "pub_key": {
+          "type": "tendermint/PubKeySecp256k1",
+          "value": "AtfNRj0zYvffAQG+iad6SScfdl29ag9G3EI0JDSwKJmy"
+        },
+        "signature": "BwTejBceK4M+3LzmNl62jVFUr9wVv//UO7iI/yWi5KFoez9eY43HSlaZJf+3rnKLjosn2tD79EIw55BJ6SbYzQ==",
+        "account_number": "0",
+        "sequence": "0"
+      }
+    ],
+    "memo": "0eb02fdabb96923ac1e855ac012a5a624793264a@1.1.1.1:26656"
   }
+}
 ```
-validator字段对应了home/config下的节点信息
 
-`app_gen_tx`中说明了拥有这个节点的账户信息。这个账户的助记词就是刚刚的secret
+`msg` 是创建验证人节点的交易
 
-3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-4000/config/gentx`目录下：
+3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-5000/config/gentx`目录下：
 
    注意⚠️：json文中的IP改成公网IP
 
