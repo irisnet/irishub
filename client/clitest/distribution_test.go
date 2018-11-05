@@ -40,7 +40,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 
 	withdrawAddress, err := tests.ExecuteT(t, fmt.Sprintf("iriscli distribution withdraw-address %s %s", fooAddr, flags), "")
 	require.Empty(t, err)
-	require.Equal(t, "No withdraw address specified", withdrawAddress)
+	require.Equal(t, "No withdraw address specified. If the delegator does have valid delegations, then the withdraw address should be the same as the delegator address", withdrawAddress)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution set-withdraw-addr %s --from=foo --fee=0.004iris %s", barAddr, flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)

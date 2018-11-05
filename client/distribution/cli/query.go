@@ -38,7 +38,7 @@ func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			if len(res) == 0 {
-				fmt.Println("No withdraw address specified")
+				fmt.Println("No withdraw address specified. If the delegator does have valid delegations, then the withdraw address should be the same as the delegator address")
 				return nil
 			}
 			withdrawAddress := sdk.AccAddress(res)
