@@ -1158,13 +1158,12 @@ paths:
               type: string
             proposal_type:
               type: string
-              example: "text"
+              example: "Text"
             proposer:
               "$ref": "#/definitions/Address"
             initial_deposit:
-              type: array
-              items:
-                $ref: "#/definitions/Coin"
+              type: string
+              example: "10iris"
       responses:
         200:
           description: OK
@@ -1248,9 +1247,8 @@ paths:
             depositer:
               "$ref": "#/definitions/Address"
             amount:
-              type: array
-              items:
-                $ref: "#/definitions/Coin"
+              type: string
+              example: 10iris
       responses:
         200:
           description: OK
@@ -1324,7 +1322,7 @@ paths:
               "$ref": "#/definitions/Address"
             option:
               type: string
-              example: "yes"
+              example: "Yes"
       responses:
         200:
           description: OK
@@ -1444,37 +1442,16 @@ paths:
           description: Internal Server Error
   /gov/params:
     get:
-      summary: Query proposals
-      description: Query proposals information with parameters
+      summary: Query governance parameters
+      description: Query governance parameters
       produces:
       - application/json
       tags:
       - ICS22
-      parameters:
-      - in: query
-        name: voter
-        description: voter address
-        required: false
-        type: string
-      - in: query
-        name: depositer
-        description: depositer address
-        required: false
-        type: string
-      - in: query
-        name: status
-        description: proposal status, valid values can be `"DepositPeriod"`, `"VotingPeriod"`, `"Passed"`, `"Rejected"`
-        required: false
-        type: string
       responses:
         200:
           description: OK
-          schema:
-            type: array
-            items:
-              "$ref": "#/definitions/TextProposal"
-        400:
-          description: Invalid query parameters
+          #TODO add response schema
         500:
           description: Internal Server Error
 definitions:
@@ -1871,9 +1848,8 @@ definitions:
     type: object
     properties:
       amount:
-        type: array
-        items:
-          "$ref": "#/definitions/Coin"
+        type: string
+        example: 10iris
       proposal_id:
         type: integer
       depositer:
