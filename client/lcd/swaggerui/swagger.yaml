@@ -318,6 +318,35 @@ paths:
           description: Key password is wrong
         500:
           description: Server internal error
+  /tx/broadcast:
+    post:
+      tags:
+      - ICS20
+      summary: Send a signed Tx
+      description: Send a signed Tx to a Gaiad full node
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: txBroadcast
+        description: broadcast tx
+        required: true
+        schema:
+          type: object
+          properties:
+            tx:
+              $ref: "#/definitions/StdTx"
+      responses:
+        202:
+          description: Tx was send and will probably be added to the next block
+          schema:
+            $ref: "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: The Tx was malformated
+        500:
+          description: Server internal error
   /txs/send:
     post:
       description: Compose and broadcast a transaction
@@ -1647,10 +1676,10 @@ paths:
             type: array
             items:
               $ref: "#/definitions/DelegationDistInfo"
-          400:
-            description: Invalid delegator address
-          500:
-            description: Internal Server Error
+        400:
+          description: Invalid delegator address
+        500:
+          description: Internal Server Error
   /distribution/{validatorAddr}/valDistrInfo:
     parameters:
     - in: path
