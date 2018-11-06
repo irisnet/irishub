@@ -92,8 +92,8 @@ func appStateFn(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json
 	return appState
 }
 
-func testAndRunTxs(app *IrisApp) []simulation.TestAndRunTx {
-	return []simulation.TestAndRunTx{
+func testAndRunTxs(app *IrisApp) []base_simulation.TestAndRunTx {
+	return []base_simulation.TestAndRunTx{
 		banksim.TestAndRunSingleInputMsgSend(app.AccountKeeper),
 		govsim.SimulateMsgSubmitProposal(app.govKeeper, app.stakeKeeper),
 		govsim.SimulateMsgDeposit(app.govKeeper, app.stakeKeeper),
@@ -109,8 +109,8 @@ func testAndRunTxs(app *IrisApp) []simulation.TestAndRunTx {
 	}
 }
 
-func invariants(app *IrisApp) []simulation.Invariant {
-	return []simulation.Invariant{
+func invariants(app *IrisApp) []base_simulation.Invariant {
+	return []base_simulation.Invariant{
 		func(t *testing.T, baseapp *baseapp.BaseApp, log string) {
 			banksim.NonnegativeBalanceInvariant(app.AccountKeeper)(t, baseapp, log)
 			govsim.AllInvariants()(t, baseapp, log)
@@ -137,10 +137,10 @@ func TestFullIrisSimulation(t *testing.T) {
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
-	simulation.SimulateFromSeed(
+	base_simulation.SimulateFromSeed(
 		t, app.BaseApp, appStateFn, seed,
 		testAndRunTxs(app),
-		[]simulation.RandSetup{},
+		[]base_simulation.RandSetup{},
 		invariants(app),
 		numBlocks,
 		blockSize,
@@ -168,11 +168,11 @@ func TestAppStateDeterminism(t *testing.T) {
 			app := NewIrisApp(logger, db, nil)
 
 			// Run randomized simulation
-			simulation.SimulateFromSeed(
+			base_simulation.SimulateFromSeed(
 				t, app.BaseApp, appStateFn, seed,
 				testAndRunTxs(app),
-				[]simulation.RandSetup{},
-				[]simulation.Invariant{},
+				[]base_simulation.RandSetup{},
+				[]base_simulation.Invariant{},
 				20,
 				20,
 				true,
