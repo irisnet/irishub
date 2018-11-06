@@ -99,6 +99,11 @@ func QueryDelegationDistInfoHandlerFn(storeName string, cliCtx context.CLIContex
 			return
 		}
 
+		if len(res) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
+			return
+		}
+
 		var ddi types.DelegationDistInfo
 		err = cliCtx.Codec.UnmarshalBinary(res, &ddi)
 		if err != nil {
@@ -128,6 +133,11 @@ func QueryValidatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		if len(res) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
+			return
+		}
+
 		var vdi types.ValidatorDistInfo
 		err = cliCtx.Codec.UnmarshalBinary(res, &vdi)
 		if err != nil {

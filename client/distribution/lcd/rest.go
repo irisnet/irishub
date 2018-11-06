@@ -17,7 +17,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryWithdrawAddressHandlerFn(storeName, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{delegatorAddr}/distrInfo/{validatorAddr}",
 		QueryDelegationDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
-	r.HandleFunc("/distribution/{delegatorAddr}/distrInfo",
+	r.HandleFunc("/distribution/{delegatorAddr}/distrInfos",
 		QueryDelegatorDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{validatorAddr}/valDistrInfo",
 		QueryValidatorDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
