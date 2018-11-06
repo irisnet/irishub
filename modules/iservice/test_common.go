@@ -73,12 +73,14 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewTMLogger(os.Stdout))
 	cdc := createTestCodec()
 
-	accountMapper := auth.NewAccountMapper(
+	// define the AccountKeeper
+	accountMapper := auth.NewAccountKeeper(
 		cdc,
 		keyAcc,                // target store
 		auth.ProtoBaseAccount, // prototype
 	)
-	ck := bank.NewKeeper(accountMapper)
+
+	ck := bank.NewBaseKeeper(accountMapper)
 	keeper := NewKeeper(cdc, keyIService, ck, DefaultCodespace)
 	return ctx, keeper
 }

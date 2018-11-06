@@ -65,7 +65,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryScvBind(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
 		Short:   "query service binding",
@@ -93,7 +93,7 @@ func GetCmdQueryScvBind(storeName string, cdc *wire.Codec) *cobra.Command {
 
 			var svcBinding iservice.SvcBinding
 			cdc.MustUnmarshalBinary(res, &svcBinding)
-			output, err := wire.MarshalJSONIndent(cdc, svcBinding)
+			output, err := codec.MarshalJSONIndent(cdc, svcBinding)
 			fmt.Println(string(output))
 			return nil
 		},
@@ -106,7 +106,7 @@ func GetCmdQueryScvBind(storeName string, cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryScvBinds(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
 		Short:   "query service bindings",
@@ -130,7 +130,7 @@ func GetCmdQueryScvBinds(storeName string, cdc *wire.Codec) *cobra.Command {
 				bindings = append(bindings, binding)
 			}
 
-			output, err := wire.MarshalJSONIndent(cdc, bindings)
+			output, err := cdc.MarshalJSONIndent(bindings, "", "")
 			fmt.Println(string(output))
 			return nil
 		},

@@ -77,7 +77,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvBind(cdc *wire.Codec) *cobra.Command {
+func GetCmdScvBind(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bind",
 		Short: "create new service binding",
@@ -154,7 +154,7 @@ func GetCmdScvBind(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvBindUpdate(cdc *wire.Codec) *cobra.Command {
+func GetCmdScvBindUpdate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-binding",
 		Short: "update a service binding",
@@ -249,7 +249,7 @@ func GetCmdScvBindUpdate(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvRefundDeposit(cdc *wire.Codec) *cobra.Command {
+func GetCmdScvRefundDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund-deposit",
 		Short: "refund all deposit from a service binding",

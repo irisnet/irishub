@@ -128,7 +128,7 @@ iriscli iservice binding --def-chain-id=service-test --service-name=test-service
 * `--def-chain-id` 定义该iservice服务的区块链ID
 * `--service-name` iService服务的名称
 * `--bind-chain-id` 绑定该iservice服务的区块链ID
-* `--provider` 服务提供者的区块链地址
+* `--provider` 服务提供者的区块链地址(bech32编码)
 
 ```
 iriscli iservice bindings --def-chain-id=service-test --service-name=test-service

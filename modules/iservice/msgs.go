@@ -37,9 +37,8 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 	}
 }
 
-
 func (msg MsgSvcDef) Route() string { return MsgType }
-func (msg MsgSvcDef) Type() string {return "iservice definition"}
+func (msg MsgSvcDef) Type() string  { return "iservice definition" }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -172,9 +171,8 @@ func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddr
 	}
 }
 
-func (msg MsgSvcBind) Type() string {
-	return MsgType
-}
+func (msg MsgSvcBind) Route() string { return MsgType }
+func (msg MsgSvcBind) Type() string  { return "iservice binding" }
 
 func (msg MsgSvcBind) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -246,10 +244,8 @@ func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sd
 		},
 	}
 }
-
-func (msg MsgSvcBindingUpdate) Type() string {
-	return MsgType
-}
+func (msg MsgSvcBindingUpdate) Route() string { return MsgType }
+func (msg MsgSvcBindingUpdate) Type() string  { return "iservice binding update" }
 
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -315,9 +311,8 @@ func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sd
 	}
 }
 
-func (msg MsgSvcRefundDeposit) Type() string {
-	return MsgType
-}
+func (msg MsgSvcRefundDeposit) Route() string { return MsgType }
+func (msg MsgSvcRefundDeposit) Type() string  { return "iservice refund deposit" }
 
 func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)

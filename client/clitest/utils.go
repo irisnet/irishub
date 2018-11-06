@@ -145,8 +145,8 @@ func modifyGenesisFileForIService(irisHome string) error {
 
 	var genesisState app.GenesisState
 
-	cdc := wire.NewCodec()
-	wire.RegisterCrypto(cdc)
+	cdc := codec.New()
+	codec.RegisterCrypto(cdc)
 
 	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
 	if err != nil {
@@ -437,7 +437,7 @@ func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.Servic
 }
 
 func executeGetServiceBinding(t *testing.T, cmdStr string) iservice.SvcBinding {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceBinding iservice.SvcBinding
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBinding)
@@ -446,7 +446,7 @@ func executeGetServiceBinding(t *testing.T, cmdStr string) iservice.SvcBinding {
 }
 
 func executeGetServiceBindings(t *testing.T, cmdStr string) []iservice.SvcBinding {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceBindings []iservice.SvcBinding
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
