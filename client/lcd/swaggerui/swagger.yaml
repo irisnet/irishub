@@ -340,7 +340,38 @@ paths:
         required: true
         schema:
           type: object
-          $ref: "#/definitions/tx.SendTxBody"
+          properties:
+            memo:
+              type: string
+            fee:
+              type: object
+              properties:
+                gas:
+                  type: string
+                  example: "10000"
+                amount:
+                  type: array
+                  items:
+                    $ref: "#/definitions/Coin"
+            msgs:
+              type: array
+              items:
+                $ref: "#/definitions/Msg"
+            signatures:
+              type: array
+              items:
+                type: object
+                properties:
+                  pub_key:
+                    type: string
+                  signature:
+                    type: string
+                  account_number:
+                    type: string
+                    example: "0"
+                  sequence:
+                    type: string
+                    example: "0"
       responses:
         200:
           description: OK
@@ -441,7 +472,7 @@ paths:
           description: No content about this account address
         500:
           description: Server internel error
-  /bank/accounts/{address}/transfers:
+  /bank/{address}/send:
     post:
       summary: Send coins (build -> sign -> send)
       description: Send coins (build -> sign -> send)
@@ -476,10 +507,11 @@ paths:
           properties:
             base_tx:
               $ref: "#/definitions/BaseTx"
+            sender:
+              $ref: "#/definitions/Address"
             amount:
-              type: array
-              items:
-                $ref: "#/definitions/Coin"
+              type: string
+              example: "1iris"
       responses:
         202:
           description: Tx was send and will probably be added to the next block
