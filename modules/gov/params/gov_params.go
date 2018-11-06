@@ -14,9 +14,9 @@ import (
 
 var DepositProcedureParameter DepositProcedureParam
 
-const LOWER_BOUND_AMOUNT = 1
-const UPPER_BOUND_AMOUNT = 200
-
+const LOWER_BOUND_AMOUNT = 10
+const UPPER_BOUND_AMOUNT = 10000
+const THREE_DAYS = 3*3600*24
 var _ iparam.GovParameter = (*DepositProcedureParam)(nil)
 
 type ParamSet struct {
@@ -49,7 +49,7 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 
 		param.Value = DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: 1440}
+			MaxDepositPeriod: time.Duration(172800) * time.Second}
 	}
 }
 
@@ -109,12 +109,12 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 		UpperBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, "iris"))
 
 		if param.Value.MinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.MinDeposit[0].Amount.GT(UpperBound.Amount) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 1iris and less than 20000iris"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
 
 		}
 
-		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > 20000 {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod ("+strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds()))+") should be larger than 20s and less than 20000s"))
+		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod ("+strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds()))+") should be larger than 20s and less than ",THREE_DAYS,"s"))
 		}
 
 		return nil
@@ -145,7 +145,7 @@ func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(VotingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = VotingProcedure{VotingPeriod: 1000}
+		param.Value = VotingProcedure{VotingPeriod: time.Duration(172800) * time.Second}
 	}
 }
 
@@ -196,8 +196,8 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > 20000 {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod ("+strconv.Itoa(int(param.Value.VotingPeriod.Seconds()))+") should be larger than 20s and less than 20000s"))
+		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod ("+strconv.Itoa(int(param.Value.VotingPeriod.Seconds()))+") should be larger than 20s and less than ",THREE_DAYS,"s"))
 		}
 
 		return nil
