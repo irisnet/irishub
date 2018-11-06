@@ -17,11 +17,10 @@ func tally(ctx sdk.Context, k Keeper) (passes bool) {
 		switchVotingPower := sdk.ZeroDec()
 		for _, validator := range k.sk.GetAllValidators(ctx) {
 			totalVotingPower = totalVotingPower.Add(validator.GetPower())
-			acc, err := sdk.AccAddressFromBech32(validator.OperatorAddr.String())
-			if err == nil {
-				if _, ok := k.GetSwitch(ctx, proposalID, acc); ok {
-					switchVotingPower = switchVotingPower.Add(validator.GetPower())
-				}
+
+			valAcc := sdk.AccAddress(validator.OperatorAddr)
+			if _, ok := k.GetSwitch(ctx, proposalID, valAcc); ok {
+				switchVotingPower = switchVotingPower.Add(validator.GetPower())
 			}
 		}
 		// If more than 95% of validator update , do switch

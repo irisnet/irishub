@@ -36,11 +36,7 @@ func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
 	}
 
 	voter := msgSwitch.Voter
-	valAcc, err := sdk.ValAddressFromBech32(voter.String())
-	if err != nil {
-		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
-	}
-
+	valAcc := sdk.ValAddress(voter)
 	if _, ok := k.sk.GetValidator(ctx, valAcc); !ok {
 		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
 	}

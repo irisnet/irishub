@@ -127,6 +127,8 @@ type IBCSetMsg struct {
 	Addr		sdk.AccAddress
 }
 
+var _ sdk.Msg = (*IBCSetMsg)(nil)
+
 func NewIBCSetMsg(addr sdk.AccAddress) IBCSetMsg {
 	return  IBCSetMsg{
 		Addr:addr,
@@ -134,6 +136,10 @@ func NewIBCSetMsg(addr sdk.AccAddress) IBCSetMsg {
 }
 
 func (msg  IBCSetMsg) Type() string {
+	return "ibc-set"
+}
+
+func (msg  IBCSetMsg) Route() string {
 	return "ibc-1"
 }
 
@@ -157,6 +163,8 @@ type IBCGetMsg struct {
 	Addr		sdk.AccAddress
 }
 
+var _ sdk.Msg = (*IBCGetMsg)(nil)
+
 func NewIBCGetMsg(addr sdk.AccAddress) IBCGetMsg {
 	return  IBCGetMsg{
 		Addr:addr,
@@ -164,6 +172,10 @@ func NewIBCGetMsg(addr sdk.AccAddress) IBCGetMsg {
 }
 
 func (msg  IBCGetMsg) Type() string {
+	return "ibc-get"
+}
+
+func (msg  IBCGetMsg) Route() string {
 	return "ibc-1"
 }
 
