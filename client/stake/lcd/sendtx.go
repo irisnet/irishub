@@ -26,7 +26,7 @@ type (
 	msgDelegationsInput struct {
 		DelegatorAddr string   `json:"delegator_addr"` // in bech32
 		ValidatorAddr string   `json:"validator_addr"` // in bech32
-		Delegation    sdk.Coin `json:"delegation"`
+		Delegation    string   `json:"delegation"`
 	}
 
 	msgBeginRedelegateInput struct {
@@ -58,7 +58,6 @@ type (
 func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req EditDelegationsReq
-
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -106,10 +105,16 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx conte
 				return
 			}
 
+			delegationToken, err := cliCtx.ParseCoin(msg.Delegation)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
 			messages[i] = stake.MsgDelegate{
 				DelegatorAddr: delAddr,
 				ValidatorAddr: valAddr,
-				Delegation:    msg.Delegation,
+				Delegation:   delegationToken,
 			}
 
 			i++
@@ -148,7 +153,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx conte
 				DelegatorAddr:    delAddr,
 				ValidatorSrcAddr: valSrcAddr,
 				ValidatorDstAddr: valDstAddr,
-				SharesAmount:     shares,
+				SharesAmount:     sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
 			}
 
 			i++
@@ -181,7 +186,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx conte
 			messages[i] = stake.MsgBeginUnbonding{
 				DelegatorAddr: delAddr,
 				ValidatorAddr: valAddr,
-				SharesAmount:  shares,
+				SharesAmount:  sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
 			}
 
 			i++
@@ -204,6 +209,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx conte
 			GasAdjustment: adjustment,
 			SimulateGas:   simulateGas,
 			ChainID:       baseReq.ChainID,
+			Fee: baseReq.Fee,
 		}
 
 		// sign messages
