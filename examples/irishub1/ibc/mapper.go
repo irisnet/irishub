@@ -25,38 +25,6 @@ func NewMapper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) 
 	}
 }
 
-// XXX: This is not the public API. This will change in MVP2 and will henceforth
-// only be invoked from another module directly and not through a user
-// transaction.
-// TODO: Handle invalid IBC packets and return errors.
-func (ibcm Mapper) PostIBCPacket(ctx sdk.Context, packet IBCPacket) sdk.Error {
-	// write everything into the state
-	store := ctx.KVStore(ibcm.key)
-	index := ibcm.getEgressLength(store, packet.DestChain)
-	bz, err := ibcm.cdc.MarshalBinary(packet)
-	if err != nil {
-		panic(err)
-	}
-
-	store.Set(EgressKey(packet.DestChain, index), bz)
-	bz, err = ibcm.cdc.MarshalBinary(index + 1)
-	if err != nil {
-		panic(err)
-	}
-	store.Set(EgressLengthKey(packet.DestChain), bz)
-
-	return nil
-}
-
-// XXX: In the future every module is able to register it's own handler for
-// handling it's own IBC packets. The "ibc" handler will only route the packets
-// to the appropriate callbacks.
-// XXX: For now this handles all interactions with the CoinKeeper.
-// XXX: This needs to do some authentication checking.
-func (ibcm Mapper) ReceiveIBCPacket(ctx sdk.Context, packet IBCPacket) sdk.Error {
-	return nil
-}
-
 // --------------------------
 // Functions for accessing the underlying KVStore.
 
