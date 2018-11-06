@@ -122,7 +122,7 @@ func GetCmdScvBind(cdc *wire.Codec) *cobra.Command {
 			}
 			chainId := viper.GetString(client.FlagChainID)
 
-			name := viper.GetString(FlagServiceName)
+			name := viper.GetString(FlagService1Name)
 			defChainId := viper.GetString(FlagDefChainID)
 			initialDeposit := viper.GetString(FlagDeposit)
 			initialPrices := viper.GetStringSlice(FlagPrices)
@@ -168,7 +168,7 @@ func GetCmdScvBind(cdc *wire.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceName)
+	cmd.Flags().AddFlagSet(FsService1Name)
 	cmd.Flags().AddFlagSet(FsDefChainID)
 	cmd.Flags().AddFlagSet(FsDeposit)
 	cmd.Flags().AddFlagSet(FsPrices)
@@ -199,7 +199,7 @@ func GetCmdScvBindUpdate(cdc *wire.Codec) *cobra.Command {
 			}
 
 			chainId := viper.GetString(client.FlagChainID)
-			name := viper.GetString(FlagServiceName)
+			name := viper.GetString(FlagService1Name)
 			defChainId := viper.GetString(FlagDefChainID)
 			initialDeposit := viper.GetString(FlagDeposit)
 			initialPrices := viper.GetStringSlice(FlagPrices)
@@ -263,7 +263,7 @@ func GetCmdScvBindUpdate(cdc *wire.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceName)
+	cmd.Flags().AddFlagSet(FsService1Name)
 	cmd.Flags().AddFlagSet(FsDefChainID)
 	cmd.Flags().AddFlagSet(FsDeposit)
 	cmd.Flags().AddFlagSet(FsPrices)
@@ -294,7 +294,7 @@ func GetCmdScvRefundDeposit(cdc *wire.Codec) *cobra.Command {
 
 			chainId := viper.GetString(client.FlagChainID)
 
-			name := viper.GetString(FlagServiceName)
+			name := viper.GetString(FlagService1Name)
 			defChainId := viper.GetString(FlagDefChainID)
 
 			msg := iservice1.NewMsgSvcRefundDeposit(defChainId, name, chainId, fromAddr)
@@ -302,7 +302,7 @@ func GetCmdScvRefundDeposit(cdc *wire.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceName)
+	cmd.Flags().AddFlagSet(FsService1Name)
 	cmd.Flags().AddFlagSet(FsDefChainID)
 
 	return cmd

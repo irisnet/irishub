@@ -109,7 +109,7 @@ func GetCmdQueryScvBind(storeName string, cdc *wire.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			name := viper.GetString(FlagServiceName)
+			name := viper.GetString(FlagService1Name)
 			defChainId := viper.GetString(FlagDefChainID)
 			bindChainId := viper.GetString(FlagBindChainID)
 			providerStr := viper.GetString(FlagProvider)
@@ -134,7 +134,7 @@ func GetCmdQueryScvBind(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
+	cmd.Flags().AddFlagSet(FsService1Name)
 	cmd.Flags().AddFlagSet(FsBindChainID)
 	cmd.Flags().AddFlagSet(FsProvider)
 
@@ -150,7 +150,7 @@ func GetCmdQueryScvBinds(storeName string, cdc *wire.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			name := viper.GetString(FlagServiceName)
+			name := viper.GetString(FlagService1Name)
 			defChainId := viper.GetString(FlagDefChainID)
 
 			res, err := cliCtx.QuerySubspace(iservice1.GetBindingsSubspaceKey(defChainId, name), storeName)
@@ -171,7 +171,7 @@ func GetCmdQueryScvBinds(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
+	cmd.Flags().AddFlagSet(FsService1Name)
 
 	return cmd
 }
