@@ -13,6 +13,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"testing"
+	"time"
 )
 
 func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Context {
@@ -45,14 +46,14 @@ func TestInitGenesisParameter(t *testing.T) {
 
 	p1 := DepositProcedure{
 		MinDeposit:       sdk.Coins{minDeposit},
-		MaxDepositPeriod: 1440}
+		MaxDepositPeriod: time.Duration(172800) * time.Second}
 
 	minDeposit, err = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 20, Denom))
 	require.NoError(t, err)
 
 	p2 := DepositProcedure{
 		MinDeposit:       sdk.Coins{minDeposit},
-		MaxDepositPeriod: 1440}
+		MaxDepositPeriod: time.Duration(172800) * time.Second}
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
 		params.NewTypeTable(
@@ -64,7 +65,7 @@ func TestInitGenesisParameter(t *testing.T) {
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
 	require.Equal(t, p1, DepositProcedureParameter.Value)
-	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, p2)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
@@ -89,14 +90,14 @@ func TestRegisterParamMapping(t *testing.T) {
 
 	p1 := DepositProcedure{
 		MinDeposit:       sdk.Coins{minDeposit},
-		MaxDepositPeriod: 1440}
+		MaxDepositPeriod: time.Duration(172800) * time.Second}
 
 	minDeposit, err = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 30, Denom))
 	require.NoError(t, err)
 
 	p2 := DepositProcedure{
 		MinDeposit:       sdk.Coins{minDeposit},
-		MaxDepositPeriod: 1440}
+		MaxDepositPeriod: time.Duration(172800) * time.Second}
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
 		params.NewTypeTable(
@@ -108,10 +109,10 @@ func TestRegisterParamMapping(t *testing.T) {
 	iparam.RegisterGovParamMapping(&DepositProcedureParameter)
 	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
-	require.Equal(t, iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":1440}")
+	iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 }
@@ -132,11 +133,11 @@ func TestDepositProcedureParam(t *testing.T) {
 	p2Deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
 	p1 := DepositProcedure{
 		MinDeposit:       sdk.Coins{p1deposit},
-		MaxDepositPeriod: 1440}
+		MaxDepositPeriod: time.Duration(172800) * time.Second}
 
 	p2 := DepositProcedure{
 		MinDeposit:       sdk.Coins{p2Deposit},
-		MaxDepositPeriod: 1440}
+		MaxDepositPeriod: time.Duration(172800) * time.Second}
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
 		params.NewTypeTable(
@@ -152,34 +153,35 @@ func TestDepositProcedureParam(t *testing.T) {
 	DepositProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}")
+	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 
-	DepositProcedureParameter.Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":1440}")
+	DepositProcedureParameter.Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 
 	require.NotEqual(t, p1, DepositProcedureParameter.Value)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 
-	result := DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"atom\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":1440}")
+	result := DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"atom\",\"amount\":\"200000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.Error(t, result)
 
-	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":1440}")
-	require.NoError(t, result)
-
-	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000000\"}],\"max_deposit_period\":1440}")
-	require.Error(t, result)
-	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"200000000000000000\"}],\"max_deposit_period\":1440}")
+	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.Error(t, result)
 
-	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-att\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":1440}")
+	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"20000000000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.Error(t, result)
 
-	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":1440}")
+	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"200000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	require.Error(t, result)
+
+	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-att\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	require.Error(t, result)
+
+	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"20000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.NoError(t, result)
 
 	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":1}")
 	require.Error(t, result)
 
-	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":1440000}")
+	result = DepositProcedureParameter.Valid("{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"2000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.Error(t, result)
 
 	DepositProcedureParameter.InitGenesis(p2)
@@ -205,11 +207,11 @@ func TestVotingProcedureParam(t *testing.T) {
 	)
 
 	p1 := VotingProcedure{
-		VotingPeriod: 1000,
+		VotingPeriod: time.Duration(172800) * time.Second,
 	}
 
 	p2 := VotingProcedure{
-		VotingPeriod: 2000,
+		VotingPeriod: time.Duration(192800) * time.Second,
 	}
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
@@ -226,9 +228,9 @@ func TestVotingProcedureParam(t *testing.T) {
 	VotingProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, VotingProcedureParameter.Value)
 
-	require.Equal(t, VotingProcedureParameter.ToJson(""), "{\"voting_period\":1000}")
+	require.Equal(t, VotingProcedureParameter.ToJson(""), "{\"voting_period\":172800000000000}")
 
-	VotingProcedureParameter.Update(ctx, "{\"voting_period\":2000}")
+	VotingProcedureParameter.Update(ctx, "{\"voting_period\":192800000000000}")
 
 	require.NotEqual(t, p1, VotingProcedureParameter.Value)
 	require.Equal(t, p2, VotingProcedureParameter.Value)
