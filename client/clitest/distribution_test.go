@@ -67,7 +67,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	vdi := executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
 	require.Equal(t, valAddr, vdi.OperatorAddr.String())
 	require.Equal(t, int64(0), vdi.FeePoolWithdrawalHeight)
-	require.Equal(t, "0.0000000000iris", vdi.DelPool)
+	require.Equal(t, "0.2084262892iris", vdi.DelPool)
 	require.Equal(t, "0.0000000000iris", vdi.ValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.004iris %s", flags), app.DefaultKeyPass)
@@ -77,8 +77,8 @@ func TestIrisCLIDistribution(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	num := getAmountFromCoinStr(barCoin)
 
-	if num > 2.5 || num < 2.2 {
-		t.Error("Test Failed: (2.2, 2.5) expected, recieved: {}", num)
+	if num > 6.1 || num < 6.0 {
+		t.Error("Test Failed: (6.0, 6.1) expected, recieved: {}", num)
 	}
 }
 
@@ -106,12 +106,14 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 
 	valAddr := sdk.ValAddress(fooAddr).String()
 
-	withdrawAddress, err := tests.ExecuteT(t, fmt.Sprintf("iriscli distribution withdraw-address %s %s", fooAddr, flags), "")
-	require.Empty(t, err)
-	require.Equal(t, "No withdraw address specified", withdrawAddress)
-
 	executeWrite(t, fmt.Sprintf("iriscli distribution set-withdraw-addr %s --from=foo --fee=0.004iris %s", barAddr, flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
+	vdi := executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
+	require.Equal(t, valAddr, vdi.OperatorAddr.String())
+	require.Equal(t, int64(0), vdi.FeePoolWithdrawalHeight)
+	require.Equal(t, "0.6251262892iris", vdi.DelPool)
+	require.Equal(t, "0.0000000000iris", vdi.ValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.004iris %s", valAddr, flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -120,9 +122,13 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	barCoin := convertToIrisBaseAccount(t, barAcc)
 	num := getAmountFromCoinStr(barCoin)
 
-	if num > 2.7 || num <= 2.6 {
-		t.Error("Test Failed: (2.6, 2.7) expected, recieved: {}", num)
+	if num > 14.3 || num <= 14.2 {
+		t.Error("Test Failed: (14.2, 14.3) expected, recieved: {}", num)
 	}
+
+	vdi = executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
+	require.Equal(t, valAddr, vdi.OperatorAddr.String())
+	require.Equal(t, "0.0000000000iris", vdi.ValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.004iris %s", flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -132,6 +138,6 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	numNew := getAmountFromCoinStr(barCoin)
 
 	if numNew <= num {
-		t.Error("Test Failed: if --is-validator is true, more reward should be return, because of proposer reward")
+		t.Error("Test Failed: if --is-validator is true, more reward should be return")
 	}
 }
