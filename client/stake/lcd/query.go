@@ -10,6 +10,8 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 	"strings"
+	"github.com/cosmos/cosmos-sdk/x/stake/types"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 )
 
 const storeName = "stake"
@@ -216,6 +218,24 @@ func validatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		var validators []types.Validator
+		if err = cdc.UnmarshalJSON(res ,&validators);err!=nil{
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		validatorOutputs := make([]stakeClient.ValidatorOutput,len(validators))
+		for index, validator :=range validators{
+			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+			validatorOutputs[index] = validatorOutput
+		}
+
+		if res,err  = codec.MarshalJSONIndent(cdc, validatorOutputs);err!=nil{
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
@@ -240,6 +260,18 @@ func poolHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := cliCtx.QueryWithData("custom/stake/pool", nil)
 		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		var pool types.Pool
+		if err = cdc.UnmarshalJSON(res ,&pool);err!=nil{
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, pool)
+		if res,err  = codec.MarshalJSONIndent(cdc,poolOutput);err!=nil{
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
