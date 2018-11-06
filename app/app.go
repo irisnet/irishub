@@ -21,6 +21,7 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/irisnet/irishub/modules/iservice"
+	iservice1 "github.com/irisnet/irishub/modules/iservice1"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -77,6 +78,7 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
 	iserviceKeeper      iservice.Keeper
+	iservice1Keeper     iservice1.Keeper
 	recordKeeper        record.Keeper
 
 	// fee manager
@@ -129,6 +131,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.coinKeeper, app.stakeKeeper, app.RegisterCodespace(gov.DefaultCodespace))
 	app.recordKeeper = record.NewKeeper(app.cdc, app.keyRecord, app.RegisterCodespace(record.DefaultCodespace))
 	app.iserviceKeeper = iservice.NewKeeper(app.cdc, app.keyIservice, app.RegisterCodespace(iservice.DefaultCodespace))
+	app.iservice1Keeper = iservice1.NewKeeper(app.cdc, app.keyIservice, app.coinKeeper, app.RegisterCodespace(iservice1.DefaultCodespace))
 
 	// register message routes
 	// need to update each module's msg type
@@ -140,7 +143,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
 		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
-		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper))
+		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper)).
+		AddRoute("iservice-1", []*sdk.KVStoreKey{app.keyIservice}, iservice1.NewHandler(app.iservice1Keeper))
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Setter())
 	// initialize BaseApp
@@ -193,6 +197,7 @@ func MakeCodec() *wire.Codec {
 	auth.RegisterWire(cdc)
 	upgrade.RegisterWire(cdc)
 	iservice.RegisterWire(cdc)
+	iservice1.RegisterWire(cdc)
 	sdk.RegisterWire(cdc)
 	wire.RegisterCrypto(cdc)
 	return cdc
