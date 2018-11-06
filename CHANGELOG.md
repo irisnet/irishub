@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1
+
+*November 6th, 2018*
+
+FEATURES:
+
+- [iservice] Add the feature of iService binding. And need to get the feature by software upgrade process.
+
 ## 0.6.0
 
 *November 1st, 2018*
