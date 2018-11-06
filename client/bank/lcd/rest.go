@@ -14,4 +14,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryAccountRequestHandlerFn("acc", cdc, authcmd.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/coin/{coin-type}",
 		QueryCoinTypeRequestHandlerFn(cdc, cliCtx)).Methods("GET")
+	r.HandleFunc("/tx/sign", SignTxRequestHandlerFn(cdc, cliCtx)).Methods("POST")
 }

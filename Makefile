@@ -2,7 +2,7 @@ PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/
 PACKAGES_MODULES=$(shell go list ./... | grep 'modules')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
-all: get_vendor_deps install
+all: get_tools get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 BUILD_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
@@ -41,7 +41,7 @@ draw_deps:
 ########################################
 ### Generate swagger docs for irislcd
 update_irislcd_swagger_docs:
-	@statik -src=client/lcd/swaggerui -dest=client/lcd
+	@statik -src=client/lcd/swaggerui -dest=client/lcd -f
 
 ########################################
 ### Compile and Install
