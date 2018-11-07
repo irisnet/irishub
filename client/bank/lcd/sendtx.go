@@ -72,6 +72,7 @@ type broadcastBody struct {
 // BroadcastTxRequestHandlerFn returns the broadcast tx REST handler
 func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		var m broadcastBody
 		if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
 			return
@@ -119,7 +120,7 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx.Async = utils.AsyncOnlyArg(r)
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
 		var sig = make([]auth.StdSignature, len(sendTxBody.Signatures))
 		for index, s := range sendTxBody.Signatures {
@@ -164,12 +165,6 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			res, err = cliCtx.BroadcastTx(txBytes)
 		}
 
-		output, err := cdc.MarshalJSONIndent(res, "", "  ")
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
