@@ -16,13 +16,13 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *code
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		pk, err := sdk.GetValPubKeyBech32(vars["validator_pub"])
+		pk, err := sdk.GetValPubKeyBech32(vars["validatorPubKey"])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		key := slashing.GetValidatorSigningInfoKey(sdk.ValAddress(pk.Address()))
+		key := slashing.GetValidatorSigningInfoKey(sdk.ConsAddress(pk.Address()))
 
 		res, err := cliCtx.QueryStore(key, storeName)
 		if err != nil {
@@ -43,12 +43,6 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *code
 			return
 		}
 
-		output, err := cdc.MarshalJSONIndent(signingInfo, "", "  ")
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		w.Write(output)
+		utils.PostProcessResponse(w, cliCtx.Codec, signingInfo, cliCtx.Indent)
 	}
 }
