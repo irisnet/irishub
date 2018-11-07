@@ -19,6 +19,7 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const chainID = ""
@@ -126,6 +127,14 @@ func NewApp() *App {
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
+
+	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.ServiceParamspace).WithTypeTable(
+		params.NewTypeTable(
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+		)),
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
 
 	return app
 }

@@ -4,12 +4,16 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestKeeper_IService_Definition(t *testing.T) {
-	ctx, keeper := createTestInput(t)
-	amount, _ := sdk.NewIntFromString("11000000000000000000")
+	mapp, keeper, _, addrs, _, _ := getMockApp(t, 3)
+	SortAddresses(addrs)
+	mapp.BeginBlock(abci.RequestBeginBlock{})
+	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
+	amount, _ := sdk.NewIntFromString("1100000000000000000000")
 	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris-atto", amount)})
 
 	serviceDef := NewSvcDef("myService",
@@ -45,14 +49,14 @@ func TestKeeper_IService_Definition(t *testing.T) {
 	}
 
 	// test binding
-	amount1, _ := sdk.NewIntFromString("10000000000000000000")
+	amount1, _ := sdk.NewIntFromString("1000000000000000000000")
 	svcBinding := NewSvcBinding("testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, 1000)
 	err, _ := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
-	amount2, _ := sdk.NewIntFromString("1000000000000000000")
+	amount2, _ := sdk.NewIntFromString("100000000000000000000")
 	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris-atto", amount2)}))
 
 	gotSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
