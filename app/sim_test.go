@@ -37,7 +37,7 @@ var (
 
 func init() {
 	flag.Int64Var(&seed, "SimulationSeed", 42, "Simulation random seed")
-	flag.IntVar(&numBlocks, "SimulationNumBlocks", 500, "Number of blocks")
+	flag.IntVar(&numBlocks, "SimulationNumBlocks", 50, "Number of blocks")
 	flag.IntVar(&blockSize, "SimulationBlockSize", 200, "Operations per block")
 	flag.BoolVar(&enabled, "SimulationEnabled", true, "Enable the simulation")
 	flag.BoolVar(&verbose, "SimulationVerbose", false, "Verbose log output")
@@ -72,18 +72,19 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	// XXX Try different numbers of initially bonded validators
 	numInitiallyBonded := int64(50)
 	valAddrs := make([]sdk.ValAddress, numInitiallyBonded)
+	decAmt := sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 18))
 	for i := 0; i < int(numInitiallyBonded); i++ {
 		valAddr := sdk.ValAddress(accs[i].Address)
 		valAddrs[i] = valAddr
 
 		validator := stake.NewValidator(valAddr, accs[i].PubKey, stake.Description{})
-		validator.Tokens = sdk.NewDec(100)
-		validator.DelegatorShares = sdk.NewDec(100)
-		delegation := stake.Delegation{accs[i].Address, valAddr, sdk.NewDec(100), 0}
+		validator.Tokens = decAmt
+		validator.DelegatorShares = decAmt
+		delegation := stake.Delegation{accs[i].Address, valAddr, decAmt, 0}
 		validators = append(validators, validator)
 		delegations = append(delegations, delegation)
 	}
-	stakeGenesis.Pool.LooseTokens = sdk.NewDec(100*250 + (numInitiallyBonded * 100))
+	stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 20))
 	stakeGenesis.Validators = validators
 	stakeGenesis.Bonds = delegations
 	mintGenesis := mint.DefaultGenesisState()
@@ -121,13 +122,7 @@ func testAndRunTxs(app *IrisApp) []simulation.WeightedOperation {
 }
 
 func invariants(app *IrisApp) []simulation.Invariant {
-	return []simulation.Invariant{
-		//banksim.NonnegativeBalanceInvariant(app.accountMapper),
-		//govsim.AllInvariants(),
-		//stakesim.AllInvariants(app.bankKeeper, app.stakeKeeper,
-		//	app.feeCollectionKeeper, app.distrKeeper, app.accountMapper),
-		//slashingsim.AllInvariants(),
-	}
+	return []simulation.Invariant{}
 }
 
 // Profile with:

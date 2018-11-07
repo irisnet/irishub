@@ -33,7 +33,6 @@ func TestBankWithRandomMessages(t *testing.T) {
 	simulation.Simulate(
 		t, mapp.BaseApp, appStateFn,
 		[]simulation.WeightedOperation{
-			//{1, SingleInputSendTx(mapper)},
 			{1, SingleInputSendMsg(mapper, bankKeeper)},
 		},
 		[]simulation.RandSetup{},
