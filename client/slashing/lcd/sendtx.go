@@ -30,6 +30,11 @@ func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		if err != nil {
 			return
 		}
+		baseReq := m.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
+			return
+		}
+
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
 		msg := slashing.NewMsgUnjail(validatorAddr)
