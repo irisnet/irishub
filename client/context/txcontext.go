@@ -1,18 +1,18 @@
 package context
 
 import (
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
 
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"fmt"
-	"strings"
 	"net/http"
+	"strings"
 )
 
 //----------------------------------------
@@ -48,14 +48,14 @@ func (br BaseTx) Sanitize() BaseTx {
 // ValidateBasic performs basic validation of a BaseReq. If custom validation
 // logic is needed, the implementing request handler should perform those
 // checks manually.
-func (br BaseTx) ValidateBasic(w http.ResponseWriter) bool {
+func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx CLIContext) bool {
 	switch {
-	case len(br.Name) == 0:
+	case !cliCtx.GenerateOnly && len(br.Name) == 0:
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("name required but not specified"))
 		return false
 
-	case len(br.Password) == 0:
+	case !cliCtx.GenerateOnly && len(br.Password) == 0:
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("password required but not specified"))
 		return false

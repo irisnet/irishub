@@ -2,20 +2,20 @@ package utils
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"strconv"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/context"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strconv"
 )
 
 const (
-	Async       		 = "async"
+	Async                = "async"
 	queryArgDryRun       = "simulate"
 	queryArgGenerateOnly = "generate-only"
 )
@@ -105,7 +105,13 @@ func WriteGenerateStdTxResponse(w http.ResponseWriter, txCtx context.TxContext, 
 func urlQueryHasArg(url *url.URL, arg string) bool { return url.Query().Get(arg) == "true" }
 
 // ReadPostBody
-func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req interface{}) error {
+func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req interface{}) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("invalid post body")
+			WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		}
+	}()
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -129,8 +135,6 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 	return cliCtx
 }
 
-
-
 // SendOrReturnUnsignedTx implements a utility function that facilitates
 // sending a series of messages in a signed transaction given a TxBuilder and a
 // QueryContext. It ensures that the account exists, has a proper number and
@@ -140,6 +144,7 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 // NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
 func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg) {
+
 	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -163,6 +168,11 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	}
 	txCtx = txCtx.WithCliCtx(cliCtx)
 
+	if cliCtx.GenerateOnly {
+		WriteGenerateStdTxResponse(w, txCtx, msgs)
+		return
+	}
+
 	if cliCtx.DryRun || txCtx.SimulateGas {
 		newTxCtx, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
 		if err != nil {
@@ -176,11 +186,6 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		}
 
 		txCtx = newTxCtx
-	}
-
-	if cliCtx.GenerateOnly {
-		WriteGenerateStdTxResponse(w, txCtx, msgs)
-		return
 	}
 
 	txBytes, err := txCtx.BuildAndSign(baseTx.Name, baseTx.Password, msgs)

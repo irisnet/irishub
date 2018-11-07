@@ -133,12 +133,12 @@ func (p PoolOutput) HumanReadableString() string {
 	return resp
 }
 
-func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Validator) (ValidatorOutput, error) {
+func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Validator) ValidatorOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 
 	bechValPubkey, err := sdk.Bech32ifyValPub(v.ConsPubKey)
 	if err != nil {
-		return ValidatorOutput{}, err
+		panic(err)
 	}
 
 	commission := Commission{
@@ -160,7 +160,7 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		UnbondingHeight:    v.UnbondingHeight,
 		UnbondingMinTime:   v.UnbondingMinTime,
 		Commission:         commission,
-	}, nil
+	}
 }
 
 func ConvertDelegationToDelegationOutput(cliCtx context.CLIContext, delegation stake.Delegation) DelegationOutput {

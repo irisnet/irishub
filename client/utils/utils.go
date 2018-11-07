@@ -7,12 +7,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/tendermint/go-amino"
-	"github.com/tendermint/tendermint/libs/common"
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
-	"github.com/irisnet/irishub/app"
 	irishubType "github.com/irisnet/irishub/types"
+	"github.com/tendermint/go-amino"
+	"github.com/tendermint/tendermint/libs/common"
 )
 
 // SendOrPrintTx implements a utility function that
