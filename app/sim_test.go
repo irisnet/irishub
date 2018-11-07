@@ -125,6 +125,8 @@ func invariants(app *IrisApp) []simulation.Invariant {
 	return []simulation.Invariant{}
 }
 
+// Profile with:
+// go test -benchmem -run=^$ ./app -bench ^BenchmarkFullGaiaSimulation$ -SimulationCommit=true -cpuprofile cpu.out
 func BenchmarkFullIrisSimulation(b *testing.B) {
 	// Setup Iris application
 	var logger log.Logger
