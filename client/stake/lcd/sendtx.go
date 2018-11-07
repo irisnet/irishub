@@ -1,24 +1,30 @@
 package lcd
 
 import (
-	"bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
-	"io/ioutil"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/irisnet/irishub/client"
+	"fmt"
 )
 
-func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, kb keys.Keybase) {
+func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/delegations",
-		delegationsRequestHandlerFn(cdc, kb, cliCtx),
+		"/stake/delegators/{delegatorAddr}/delegation",
+		delegationsRequestHandlerFn(cdc, cliCtx),
+	).Methods("POST")
+
+	r.HandleFunc(
+		"/stake/delegators/{delegatorAddr}/begin_redelegation",
+		beginRedelegatesRequestHandlerFn(cdc, cliCtx),
+	).Methods("POST")
+
+	r.HandleFunc(
+		"/stake/delegators/{delegatorAddr}/begin_unbonding",
+		beginUnbondingRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
 
@@ -43,11 +49,19 @@ type (
 	}
 
 	// the request body for edit delegations
-	EditDelegationsReq struct {
+	DelegationsReq struct {
 		BaseReq          context.BaseTx             `json:"base_req"`
-		Delegations      []msgDelegationsInput     `json:"delegations"`
-		BeginUnbondings  []msgBeginUnbondingInput  `json:"begin_unbondings"`
-		BeginRedelegates []msgBeginRedelegateInput `json:"begin_redelegates"`
+		Delegation       msgDelegationsInput     `json:"delegations"`
+	}
+
+	BeginUnbondingReq struct {
+		BaseReq          context.BaseTx             `json:"base_req"`
+		BeginUnbonding   msgBeginUnbondingInput  `json:"begin_unbondings"`
+	}
+
+	BeginRedelegatesReq struct {
+		BaseReq          context.BaseTx             `json:"base_req"`
+		BeginRedelegate  msgBeginRedelegateInput `json:"begin_redelegates"`
 	}
 )
 
@@ -55,18 +69,18 @@ type (
 // TODO: use sdk.ValAddress instead of sdk.AccAddress for validators in messages
 // TODO: Seriously consider how to refactor...do we need to make it multiple txs?
 // If not, we can just use CompleteAndBroadcastTxREST.
-func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
+func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req EditDelegationsReq
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		var req DelegationsReq
 
-		err = cdc.UnmarshalJSON(body, &req)
+		req.Delegation.Delegation = "1"
+		req.Delegation.ValidatorAddr ="2"
+		req.Delegation.ValidatorAddr = "3"
+        x,_:=codec.MarshalJSONIndent(cdc,req)
+		fmt.Println(string(x))
+
+		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -75,195 +89,129 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx conte
 			return
 		}
 
-		info, err := kb.Get(baseReq.Name)
+		// build messages
+		delAddr, err := sdk.AccAddressFromBech32(req.Delegation.DelegatorAddr)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		// build messages
-		messages := make([]sdk.Msg, len(req.Delegations)+
-			len(req.BeginRedelegates)+
-			len(req.BeginUnbondings))
-
-		i := 0
-		for _, msg := range req.Delegations {
-			delAddr, err := sdk.AccAddressFromBech32(msg.DelegatorAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			if !bytes.Equal(info.GetPubKey().Address(), delAddr) {
-				utils.WriteErrorResponse(w, http.StatusUnauthorized, "Must use own delegator address")
-				return
-			}
-
-			delegationToken, err := cliCtx.ParseCoin(msg.Delegation)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			messages[i] = stake.MsgDelegate{
-				DelegatorAddr: delAddr,
-				ValidatorAddr: valAddr,
-				Delegation:   delegationToken,
-			}
-
-			i++
+		valAddr, err := sdk.ValAddressFromBech32(req.Delegation.ValidatorAddr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
-		for _, msg := range req.BeginRedelegates {
-			delAddr, err := sdk.AccAddressFromBech32(msg.DelegatorAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
+		delegationToken, err := cliCtx.ParseCoin(req.Delegation.Delegation)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 
-			if !bytes.Equal(info.GetPubKey().Address(), delAddr) {
-				utils.WriteErrorResponse(w, http.StatusUnauthorized, "Must use own delegator address")
-				return
-			}
+		msg := stake.MsgDelegate{
+				DelegatorAddr: delAddr,
+				ValidatorAddr: valAddr,
+				Delegation:   delegationToken,}
+		// Broadcast or return unsigned transaction
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
 
-			valSrcAddr, err := sdk.ValAddressFromBech32(msg.ValidatorSrcAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-			valDstAddr, err := sdk.ValAddressFromBech32(msg.ValidatorDstAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
+// TODO: Split this up into several smaller functions, and remove the above nolint
+// TODO: use sdk.ValAddress instead of sdk.AccAddress for validators in messages
+// TODO: Seriously consider how to refactor...do we need to make it multiple txs?
+// If not, we can just use CompleteAndBroadcastTxREST.
+func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req BeginRedelegatesReq
 
-			shares, err := sdk.NewDecFromStr(msg.SharesAmount)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
+		err := utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
+		}
 
-			messages[i] = stake.MsgBeginRedelegate{
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		delAddr, err := sdk.AccAddressFromBech32(req.BeginRedelegate.DelegatorAddr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		valSrcAddr, err := sdk.ValAddressFromBech32(req.BeginRedelegate.ValidatorSrcAddr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		valDstAddr, err := sdk.ValAddressFromBech32(req.BeginRedelegate.ValidatorDstAddr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		shares, err := sdk.NewDecFromStr(req.BeginRedelegate.SharesAmount)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msg := stake.MsgBeginRedelegate{
 				DelegatorAddr:    delAddr,
 				ValidatorSrcAddr: valSrcAddr,
 				ValidatorDstAddr: valDstAddr,
 				SharesAmount:     sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
 			}
 
-			i++
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
+
+// TODO: Split this up into several smaller functions, and remove the above nolint
+// TODO: use sdk.ValAddress instead of sdk.AccAddress for validators in messages
+// TODO: Seriously consider how to refactor...do we need to make it multiple txs?
+// If not, we can just use CompleteAndBroadcastTxREST.
+func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req BeginUnbondingReq
+
+		err := utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
 		}
 
-		for _, msg := range req.BeginUnbondings {
-			delAddr, err := sdk.AccAddressFromBech32(msg.DelegatorAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			if !bytes.Equal(info.GetPubKey().Address(), delAddr) {
-				utils.WriteErrorResponse(w, http.StatusUnauthorized, "Must use own delegator address")
-				return
-			}
-
-			valAddr, err := sdk.ValAddressFromBech32(msg.ValidatorAddr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			shares, err := sdk.NewDecFromStr(msg.SharesAmount)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			messages[i] = stake.MsgBeginUnbonding{
-				DelegatorAddr: delAddr,
-				ValidatorAddr: valAddr,
-				SharesAmount:  sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
-			}
-
-			i++
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
 		}
 
-		simulateGas, gas, err := client.ReadGasFlag(baseReq.Gas)
+
+		delAddr, err := sdk.AccAddressFromBech32(req.BeginUnbonding.DelegatorAddr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		adjustment, ok := utils.ParseFloat64OrReturnBadRequest(w, baseReq.GasAdjustment, client.DefaultGasAdjustment)
-		if !ok {
+		valAddr, err := sdk.ValAddressFromBech32(req.BeginUnbonding.ValidatorAddr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		txBldr := context.TxContext{
-			Codec:         cdc,
-			Gas:           gas,
-			GasAdjustment: adjustment,
-			SimulateGas:   simulateGas,
-			ChainID:       baseReq.ChainID,
-			Fee: baseReq.Fee,
+		shares, err := sdk.NewDecFromStr(req.BeginUnbonding.SharesAmount)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
-		// sign messages
-		signedTxs := make([][]byte, len(messages[:]))
-		for i, msg := range messages {
-			// increment sequence for each message
-			txBldr = txBldr.WithAccountNumber(baseReq.AccountNumber)
-			txBldr = txBldr.WithSequence(baseReq.Sequence)
-
-			baseReq.Sequence++
-
-			if utils.HasDryRunArg(r) || txBldr.SimulateGas {
-				newBldr, err := utils.EnrichCtxWithGas(txBldr, cliCtx, baseReq.Name, []sdk.Msg{msg})
-				if err != nil {
-					utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-					return
-				}
-
-				if utils.HasDryRunArg(r) {
-					utils.WriteSimulationResponse(w, newBldr.Gas)
-					return
-				}
-
-				txBldr = newBldr
+		msg:= stake.MsgBeginUnbonding{
+				DelegatorAddr: delAddr,
+				ValidatorAddr: valAddr,
+				SharesAmount:  sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
 			}
 
-			if utils.HasGenerateOnlyArg(r) {
-				utils.WriteGenerateStdTxResponse(w, txBldr, []sdk.Msg{msg})
-				return
-			}
-
-			txBytes, err := txBldr.BuildAndSign(baseReq.Name, baseReq.Password, []sdk.Msg{msg})
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
-				return
-			}
-
-			signedTxs[i] = txBytes
-		}
-
-		// send
-		// XXX the operation might not be atomic if a tx fails
-		//     should we have a sdk.MultiMsg type to make sending atomic?
-		results := make([]*ctypes.ResultBroadcastTxCommit, len(signedTxs[:]))
-		for i, txBytes := range signedTxs {
-			res, err := cliCtx.BroadcastTx(txBytes)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			results[i] = res
-		}
-
-		utils.PostProcessResponse(w, cdc, results, cliCtx.Indent)
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }

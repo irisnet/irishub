@@ -14,7 +14,6 @@ import (
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
-	"github.com/irisnet/irishub/client/keys"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -80,11 +79,6 @@ func ServeLCDStartCommand(cdc *codec.Codec) *cobra.Command {
 func createHandler(cdc *codec.Codec) *mux.Router {
 	r := mux.NewRouter()
 
-	kb, err := keys.GetKeyBase() //XXX
-	if err != nil {
-		panic(err)
-	}
-
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
@@ -93,7 +87,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	//keyshandler.RegisterRoutes(r)
 	//bankhandler.RegisterRoutes(cliCtx, r, cdc)
 	//slashinghandler.RegisterRoutes(cliCtx, r, cdc)
-	stakehandler.RegisterRoutes(cliCtx, r, cdc, kb)
+	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	recordhandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis

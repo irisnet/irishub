@@ -140,6 +140,7 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 // NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
 func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg) {
+
 	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
