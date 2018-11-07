@@ -46,3 +46,5 @@ To get more people involved, IRIS foundation decides to send out more tasks in t
 ##  Useful Links
 
 * Riot chat: #irisvalidators:matrix.org
+
+* Explorer: https://testnet.irisplorer.io/#/home
