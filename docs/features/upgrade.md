@@ -10,7 +10,6 @@ The module supports the infrastructure of the blockchain software upgrade. It wi
 1. Submit a software upgrade proposal
 2. More details about governance process is in GOV [User Guide](../gov/README.md)
 
-
 ### The process of software upgrade   
 1. Install a new software, send a switch message, and broadcast to the whole network.
 2. Once reach the limited time, it will be counted whether the proportion of voting power of upgraded software exceeds 95%.
@@ -28,7 +27,9 @@ iris init gen-tx --name=x --home=iris
 iris init --gen-txs --chain-id=upgrade-test -o --home=iris
 iris start --home=iris
 ```
+
 ### Submit a software upgrade proposal
+
 ```
 # Send an upgrade proposal
 iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
