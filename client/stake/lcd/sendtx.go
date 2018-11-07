@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
@@ -8,7 +9,6 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
-	"fmt"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
@@ -30,9 +30,9 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 type (
 	msgDelegationsInput struct {
-		DelegatorAddr string   `json:"delegator_addr"` // in bech32
-		ValidatorAddr string   `json:"validator_addr"` // in bech32
-		Delegation    string   `json:"delegation"`
+		DelegatorAddr string `json:"delegator_addr"` // in bech32
+		ValidatorAddr string `json:"validator_addr"` // in bech32
+		Delegation    string `json:"delegation"`
 	}
 
 	msgBeginRedelegateInput struct {
@@ -50,18 +50,18 @@ type (
 
 	// the request body for edit delegations
 	DelegationsReq struct {
-		BaseReq          context.BaseTx             `json:"base_req"`
-		Delegation       msgDelegationsInput     `json:"delegations"`
+		BaseReq    context.BaseTx      `json:"base_req"`
+		Delegation msgDelegationsInput `json:"delegations"`
 	}
 
 	BeginUnbondingReq struct {
-		BaseReq          context.BaseTx             `json:"base_req"`
-		BeginUnbonding   msgBeginUnbondingInput  `json:"begin_unbondings"`
+		BaseReq        context.BaseTx         `json:"base_req"`
+		BeginUnbonding msgBeginUnbondingInput `json:"begin_unbondings"`
 	}
 
 	BeginRedelegatesReq struct {
-		BaseReq          context.BaseTx             `json:"base_req"`
-		BeginRedelegate  msgBeginRedelegateInput `json:"begin_redelegates"`
+		BaseReq         context.BaseTx          `json:"base_req"`
+		BeginRedelegate msgBeginRedelegateInput `json:"begin_redelegates"`
 	}
 )
 
@@ -74,9 +74,9 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		var req DelegationsReq
 
 		req.Delegation.Delegation = "1"
-		req.Delegation.ValidatorAddr ="2"
+		req.Delegation.ValidatorAddr = "2"
 		req.Delegation.ValidatorAddr = "3"
-        x,_:=codec.MarshalJSONIndent(cdc,req)
+		x, _ := codec.MarshalJSONIndent(cdc, req)
 		fmt.Println(string(x))
 
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -85,7 +85,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		}
 
 		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 
@@ -109,9 +109,9 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		}
 
 		msg := stake.MsgDelegate{
-				DelegatorAddr: delAddr,
-				ValidatorAddr: valAddr,
-				Delegation:   delegationToken,}
+			DelegatorAddr: delAddr,
+			ValidatorAddr: valAddr,
+			Delegation:    delegationToken}
 		// Broadcast or return unsigned transaction
 		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
@@ -131,7 +131,7 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 		}
 
 		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 
@@ -159,11 +159,11 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 		}
 
 		msg := stake.MsgBeginRedelegate{
-				DelegatorAddr:    delAddr,
-				ValidatorSrcAddr: valSrcAddr,
-				ValidatorDstAddr: valDstAddr,
-				SharesAmount:     sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
-			}
+			DelegatorAddr:    delAddr,
+			ValidatorSrcAddr: valSrcAddr,
+			ValidatorDstAddr: valDstAddr,
+			SharesAmount:     sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
+		}
 
 		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
@@ -183,10 +183,9 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 		}
 
 		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
-
 
 		delAddr, err := sdk.AccAddressFromBech32(req.BeginUnbonding.DelegatorAddr)
 		if err != nil {
@@ -206,11 +205,11 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 			return
 		}
 
-		msg:= stake.MsgBeginUnbonding{
-				DelegatorAddr: delAddr,
-				ValidatorAddr: valAddr,
-				SharesAmount:  sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
-			}
+		msg := stake.MsgBeginUnbonding{
+			DelegatorAddr: delAddr,
+			ValidatorAddr: valAddr,
+			SharesAmount:  sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
+		}
 
 		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}

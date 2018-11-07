@@ -8,13 +8,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/tags"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/tendermint/tx"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	"github.com/irisnet/irishub/client/utils"
-	"github.com/gorilla/mux"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
+	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
+	"github.com/irisnet/irishub/client/tendermint/tx"
+	"github.com/irisnet/irishub/client/utils"
+	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
 
 // contains checks if the a given query contains one of the tx types
@@ -80,39 +80,39 @@ func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) ht
 			return
 		}
 
-		switch endpoint{
+		switch endpoint {
 		case "custom/stake/unbondingDelegation":
 			var unbondingDelegation types.UnbondingDelegation
-			if err = cdc.UnmarshalJSON(res ,&unbondingDelegation);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &unbondingDelegation); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-			unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx,unbondingDelegation)
-			if res,err  = codec.MarshalJSONIndent(cdc,unbondingDelegationOutput);err!=nil{
+			unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
+			if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationOutput); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 		case "custom/stake/delegation":
 			var delegation types.Delegation
 			// parse out the validators
-			if err = cdc.UnmarshalJSON(res,&delegation); err!=nil{
+			if err = cdc.UnmarshalJSON(res, &delegation); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
-			if res, err = codec.MarshalJSONIndent(cdc,delegationOutput);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, delegationOutput); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 		case "custom/stake/delegatorValidator":
 			var validator types.Validator
-			if err = cdc.UnmarshalJSON(res ,&validator);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &validator); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-			if res,err  = codec.MarshalJSONIndent(cdc,validatorOutput);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, validatorOutput); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
@@ -152,70 +152,70 @@ func queryDelegator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 		case "custom/stake/delegatorDelegations":
 			var delegations []types.Delegation
 			// parse out the validators
-			if err = cdc.UnmarshalJSON(res,&delegations); err!=nil{
+			if err = cdc.UnmarshalJSON(res, &delegations); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			delegationOutputs := make([]stakeClient.DelegationOutput,len(delegations))
-			for index, delegation := range  delegations {
+			delegationOutputs := make([]stakeClient.DelegationOutput, len(delegations))
+			for index, delegation := range delegations {
 				delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 				delegationOutputs[index] = delegationOutput
 			}
-			if res, err = codec.MarshalJSONIndent(cdc,delegationOutputs);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, delegationOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 		case "custom/stake/delegatorUnbondingDelegations":
 			var unbondingDelegations []types.UnbondingDelegation
-			if err = cdc.UnmarshalJSON(res ,&unbondingDelegations);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &unbondingDelegations); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-			unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput,len(unbondingDelegations))
-			for index, unbondingDelegation :=range unbondingDelegations{
-				unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx,unbondingDelegation)
+			unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput, len(unbondingDelegations))
+			for index, unbondingDelegation := range unbondingDelegations {
+				unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
 				unbondingDelegationsOutputs[index] = unbondingDelegationOutput
 			}
 
-			if res,err  = codec.MarshalJSONIndent(cdc,unbondingDelegationsOutputs);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationsOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 		case "custom/stake/delegatorRedelegations":
 			var relegations []types.Redelegation
-			if err = cdc.UnmarshalJSON(res ,&relegations);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &relegations); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			relegationsOutputs := make([]stakeClient.RedelegationOutput,len(relegations))
-			for index, relegation :=range relegations{
+			relegationsOutputs := make([]stakeClient.RedelegationOutput, len(relegations))
+			for index, relegation := range relegations {
 				relegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, relegation)
 				relegationsOutputs[index] = relegationOutput
 			}
 
-			if res,err  = codec.MarshalJSONIndent(cdc, relegationsOutputs);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, relegationsOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 		case "custom/stake/delegatorValidators":
 			var validators []types.Validator
-			if err = cdc.UnmarshalJSON(res ,&validators);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &validators); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			validatorOutputs := make([]stakeClient.ValidatorOutput,len(validators))
-			for index, validator :=range validators{
+			validatorOutputs := make([]stakeClient.ValidatorOutput, len(validators))
+			for index, validator := range validators {
 				validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 				validatorOutputs[index] = validatorOutput
 			}
 
-			if res,err  = codec.MarshalJSONIndent(cdc, validatorOutputs);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, validatorOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
@@ -253,53 +253,51 @@ func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 			return
 		}
 
-
-
-		switch endpoint{
+		switch endpoint {
 		case "custom/stake/validator":
 			var validator types.Validator
-			if err = cdc.UnmarshalJSON(res ,&validator);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &validator); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-			if res,err  = codec.MarshalJSONIndent(cdc,validatorOutput);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, validatorOutput); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 		case "custom/stake/validatorUnbondingDelegations":
 			var unbondingDelegations []types.UnbondingDelegation
-			if err = cdc.UnmarshalJSON(res ,&unbondingDelegations);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &unbondingDelegations); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-			unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput,len(unbondingDelegations))
-			for index, unbondingDelegation :=range unbondingDelegations{
-				unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx,unbondingDelegation)
+			unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput, len(unbondingDelegations))
+			for index, unbondingDelegation := range unbondingDelegations {
+				unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
 				unbondingDelegationsOutputs[index] = unbondingDelegationOutput
 			}
 
-			if res,err  = codec.MarshalJSONIndent(cdc,unbondingDelegationsOutputs);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationsOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
 		case "custom/stake/validatorRedelegations":
 			var relegations []types.Redelegation
-			if err = cdc.UnmarshalJSON(res ,&relegations);err!=nil{
+			if err = cdc.UnmarshalJSON(res, &relegations); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			relegationsOutputs := make([]stakeClient.RedelegationOutput,len(relegations))
-			for index, relegation :=range relegations{
+			relegationsOutputs := make([]stakeClient.RedelegationOutput, len(relegations))
+			for index, relegation := range relegations {
 				relegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, relegation)
 				relegationsOutputs[index] = relegationOutput
 			}
 
-			if res,err  = codec.MarshalJSONIndent(cdc, relegationsOutputs);err!=nil{
+			if res, err = codec.MarshalJSONIndent(cdc, relegationsOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}

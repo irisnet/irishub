@@ -368,12 +368,6 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 				return
 			}
 		}
-		output, err := cdc.MarshalJSONIndent(pd, "", "  ")
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, pd, cliCtx.Indent)
 	}
 }
