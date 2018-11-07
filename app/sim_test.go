@@ -37,9 +37,9 @@ var (
 
 func init() {
 	flag.Int64Var(&seed, "SimulationSeed", 42, "Simulation random seed")
-	flag.IntVar(&numBlocks, "SimulationNumBlocks", 50, "Number of blocks")
+	flag.IntVar(&numBlocks, "SimulationNumBlocks", 500, "Number of blocks")
 	flag.IntVar(&blockSize, "SimulationBlockSize", 200, "Operations per block")
-	flag.BoolVar(&enabled, "SimulationEnabled", true, "Enable the simulation")
+	flag.BoolVar(&enabled, "SimulationEnabled", false, "Enable the simulation")
 	flag.BoolVar(&verbose, "SimulationVerbose", false, "Verbose log output")
 	flag.BoolVar(&commit, "SimulationCommit", false, "Have the simulation commit")
 }
@@ -125,10 +125,8 @@ func invariants(app *IrisApp) []simulation.Invariant {
 	return []simulation.Invariant{}
 }
 
-// Profile with:
-// /usr/local/go/bin/go test -benchmem -run=^$ github.com/cosmos/cosmos-sdk/cmd/gaia/app -bench ^BenchmarkFullGaiaSimulation$ -SimulationCommit=true -cpuprofile cpu.out
 func BenchmarkFullIrisSimulation(b *testing.B) {
-	// Setup Gaia application
+	// Setup Iris application
 	var logger log.Logger
 	logger = log.NewNopLogger()
 	var db dbm.DB
@@ -167,7 +165,7 @@ func TestFullIrisSimulation(t *testing.T) {
 		t.Skip("Skipping Iris simulation")
 	}
 
-	// Setup Gaia application
+	// Setup Iris application
 	var logger log.Logger
 	if verbose {
 		logger = log.TestingLogger()
@@ -195,7 +193,7 @@ func TestFullIrisSimulation(t *testing.T) {
 }
 
 // TODO: Make another test for the fuzzer itself, which just has noOp txs
-// and doesn't depend on gaia
+// and doesn't depend on iris
 func TestAppStateDeterminism(t *testing.T) {
 	if !enabled {
 		t.Skip("Skipping Iris simulation")
