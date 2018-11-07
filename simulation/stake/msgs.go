@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	abci "github.com/tendermint/tendermint/abci/types"
-)
+	)
 
 // SimulateMsgCreateValidator
 func SimulateMsgCreateValidator(m auth.AccountKeeper, k stake.Keeper) simulation.Operation {
@@ -234,6 +234,7 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 		ctx := mapp.NewContext(false, abci.Header{})
 		gen := stake.DefaultGenesisState()
 		stake.InitGenesis(ctx, k, gen)
+
 		params := k.GetParams(ctx)
 		denom := params.BondDenom
 		loose := sdk.ZeroInt()

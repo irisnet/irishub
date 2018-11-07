@@ -14,11 +14,20 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-			"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/bank"
 	"fmt"
-					)
+	"github.com/irisnet/irishub/types"
+	)
 
-const chainID = ""
+const (
+	chainID   = ""
+	Denom     = "iris"
+	MiniDenom = "iris-atto"
+)
+
+var (
+	IrisCt = types.NewDefaultCoinType(Denom)
+)
 
 // App extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
@@ -114,11 +123,6 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
-	//feeTokenGensisConfig := bam.FeeGenesisStateConfig{
-	//	FeeTokenNative:    types.NewDefaultCoinType("iris").MinUnit.Denom,
-	//	GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
-	//}
-	//bam.InitGenesis(ctx, app.FeeManager, feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{
 	}
@@ -241,7 +245,6 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 	//	{sdk.NewIntWithDecimal(1, 2), sdk.NewIntWithDecimal(1, 3)},
 	//	{sdk.NewIntWithDecimal(1, 40), sdk.NewIntWithDecimal(1, 50)},
 	//}
-
 
 	for i := 0; i < len(accts); i++ {
 		coins := make([]sdk.Coin, len(denoms), len(denoms))
