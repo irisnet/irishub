@@ -72,7 +72,9 @@ Next, use the output as  `<pubkey>` field and the account you created as `<addre
 ```
 iriscli stake create-validator --amount=<amount>iris --pubkey=<pubkey> --address-delegator=<val_addr> --moniker=<moniker> --fee=0.05iris  --gas=2000000  --chain-id=fuxi-4000 --name=<key_name> --node=http://localhost:26657
 ```
-Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`.
+Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
+
+To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
 
 
 In this way, to stake 1IRIS, you need to do:
@@ -82,7 +84,6 @@ iriscli stake create-validator --pubkey=pubkey --address-delegator=account --fee
 ```
 Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../zh/modules/coin/README.md)
 
-To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
 
 
 ### View Validator Info

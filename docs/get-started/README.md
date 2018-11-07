@@ -46,3 +46,5 @@ Task List for Fuxi-3001: https://github.com/irisnet/testnets/blob/master/fuxi/fu
 ##  Useful Links
 
 * Riot chat: #irisvalidators:matrix.org
+
+* Explorer: https://testnet.irisplorer.io/#/home
