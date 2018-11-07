@@ -2,67 +2,61 @@
 
 Please make sure that iris is installed in your computer and added to $PATH.You can see this page for insturcion https://github.com/irisnet/irishub. You also need /bin/bash, wc, ps to ensure the monitor work properly.
 
-1. Download the monitoring tools
-```
-wget https://raw.githubusercontent.com/programokey/monitor/master/monitor.tar.gz
-```
+### Get Monitor Info
 
-2. Uncompress the monitoring tools:
-```
-tar -xzvf monitor.tar.gz
-```
-
-3. Edit the running parameters
+* Address of validator
 
 ```
-cd monitor
-vim start.sh
+-a= < hex-encoded-address-of-validator >
 ```
 
-4. Edit the third command in `start.sh`
-
-You could get hex encoded validator address by running:
+* Chain-ID
 ```
-iriscli status
+--chain-id= < id-of-blockchain >
 ```
 
-It corresponds to `validator_info.address` field.
+* Node
 
-modify
-```
--a=378E63271D5BE927443E17CBAAFE68DEFF383DA7
-```
 
-to 
 ```
--a=<hex encoded validator address>
+--node= < localhost:26657 >
 ```
-
-modify
+###  Start IRIS Monitor
+Example:
 ```
---chain-id=fuxi-3001
-```
-to
-```
---chain-id=<blockchain id that you want to monitor>
-```
-modify
-```
---node="tcp://localhost:26657"
-```
-to
-```
---node=<listening address of the node that you want to monitor ("tcp://localhost:26657" by default, you should not change this if you didn't modify your rpc port)>
-```
-5. start the monitoring tools
-```
-./start.sh
+irismon --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 --chain-id=irishub-stage --node=http://localhost:26657&
 ```
 
-then, you can visit http://localhost:3000/ to see the grafana monitoring page. The default username and password are both admin. We strongly recommend immediately changing your username & password after login.
-Click the Home button, and open the IRIS HUB. Then you can see all the monitoring parameters.
+then, you can visit http://localhost:3660/ to see the metrics page. 
 
-6. stop the monitor
+### Start Prometheus
+
+First, you need to edit the configuration file of prometheus. Add `jobs` :
+```$xslt
+- job_name: fuxi-4000
+
+    static_configs:
+
+    - targets: ['localhost:36660']
+
+      labels:
+
+        instance: fuxi-4000
 ```
-./stop.sh
+Then, you could see in your browser that there are some data available at port 36660.
+
+### Start Grafana
+
+You could start grafana with docker by running:
+```$xslt
+sudo docker run -p 3000:3000 grafana/grafana 1>grafana.log 2>grafana.error &
+```
+
+The default username and password are both admin. We strongly recommend immediately changing your username & password after login.
+
+Then you could create your own  dashboard. 
+
+###  Stop IRIS Monitor
+```
+kill -9 <irismon-process-id>
 ```
