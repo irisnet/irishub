@@ -166,7 +166,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 
 	if svcBinding.Expiration != 0 {
 		height := ctx.BlockHeader().Height
-		if oldBinding.Expiration >= 0 && svcBinding.Expiration < height {
+		if svcBinding.Expiration >= 0 && svcBinding.Expiration < height {
 			oldBinding.Expiration = height
 		} else {
 			oldBinding.Expiration = svcBinding.Expiration

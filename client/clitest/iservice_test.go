@@ -108,8 +108,8 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	barCoin := convertToIrisBaseAccount(t, barAcc)
 	barNum := getAmountFromCoinStr(barCoin)
 
-	if !(barNum > 19 && barNum < 20) {
-		t.Error("Test Failed: (19, 20) expected, recieved: {}", barNum)
+	if !(barNum > 9 && barNum < 10) {
+		t.Error("Test Failed: (9, 10) expected, recieved: {}", barNum)
 	}
 
 	serviceBinding := executeGetServiceBinding(t, fmt.Sprintf("iriscli iservice binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
@@ -123,11 +123,11 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	sdStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	sdStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
 	sdStr += fmt.Sprintf(" --bind-type=%s", "Global")
-	sdStr += fmt.Sprintf(" --deposit=%s", "10iris")
+	sdStr += fmt.Sprintf(" --deposit=%s", "1iris")
 	sdStr += fmt.Sprintf(" --prices=%s", "5iris")
 	sdStr += fmt.Sprintf(" --avg-rsp-time=%d", 99)
 	sdStr += fmt.Sprintf(" --usable-time=%d", 99)
-	sdStr += fmt.Sprintf(" --expiration=%d", 99)
+	sdStr += fmt.Sprintf(" --expiration=%d", 1)
 	sdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	sdStr += fmt.Sprintf(" --from=%s", "bar")
 	executeWrite(t, sdStr, app.DefaultKeyPass)
@@ -136,15 +136,26 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
 
-	if !(barNum > 9 && barNum < 10) {
-		t.Error("Test Failed: (9, 10) expected, recieved: {}", barNum)
+	if !(barNum > 8 && barNum < 9) {
+		t.Error("Test Failed: (8, 9) expected, recieved: {}", barNum)
 	}
 	serviceBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli iservice bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
 	var totalDeposit sdk.Coins
 	for _, bind := range serviceBindings {
 		totalDeposit = totalDeposit.Plus(bind.Deposit)
 	}
-	require.Equal(t, "20000000000000000000iris-atto", totalDeposit.String())
+	require.Equal(t, "21000000000000000000iris-atto", totalDeposit.String())
+
+	// refund-deposit test
+	tests.WaitForNextNBlocksTM(8, port)
+	executeWrite(t, fmt.Sprintf("iriscli iservice refund-deposit --service-name=%s --def-chain-id=%s --from=%s --fee=0.004iris %v", serviceName, chainID, "bar", flags), app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
+	barCoin = convertToIrisBaseAccount(t, barAcc)
+	barNum = getAmountFromCoinStr(barCoin)
+	if !(barNum > 19 && barNum < 20) {
+		t.Error("Test Failed: (19, 20) expected, recieved: {}", barNum)
+	}
 }
 
 const idlContent = `
