@@ -1,7 +1,6 @@
 package lcd
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/stake"
@@ -13,36 +12,36 @@ import (
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/delegation",
+		"/stake/delegators/{delegatorAddr}/delegate",
 		delegationsRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/begin_redelegation",
+		"/stake/delegators/{delegatorAddr}/redelegate",
 		beginRedelegatesRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/begin_unbonding",
+		"/stake/delegators/{delegatorAddr}/unbond",
 		beginUnbondingRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
 
 type (
-	msgDelegationsInput struct {
+	msgDelegateInput struct {
 		DelegatorAddr string `json:"delegator_addr"` // in bech32
 		ValidatorAddr string `json:"validator_addr"` // in bech32
 		Delegation    string `json:"delegation"`
 	}
 
-	msgBeginRedelegateInput struct {
+	msgRedelegateInput struct {
 		DelegatorAddr    string `json:"delegator_addr"`     // in bech32
 		ValidatorSrcAddr string `json:"validator_src_addr"` // in bech32
 		ValidatorDstAddr string `json:"validator_dst_addr"` // in bech32
 		SharesAmount     string `json:"shares"`
 	}
 
-	msgBeginUnbondingInput struct {
+	msgUnbondInput struct {
 		DelegatorAddr string `json:"delegator_addr"` // in bech32
 		ValidatorAddr string `json:"validator_addr"` // in bech32
 		SharesAmount  string `json:"shares"`
@@ -50,18 +49,18 @@ type (
 
 	// the request body for edit delegations
 	DelegationsReq struct {
-		BaseReq    context.BaseTx      `json:"base_req"`
-		Delegation msgDelegationsInput `json:"delegations"`
+		BaseReq       context.BaseTx      `json:"base_tx"`
+		Delegation    msgDelegateInput    `json:"delegate"`
 	}
 
 	BeginUnbondingReq struct {
-		BaseReq        context.BaseTx         `json:"base_req"`
-		BeginUnbonding msgBeginUnbondingInput `json:"begin_unbondings"`
+		BaseReq        context.BaseTx  `json:"base_tx"`
+		BeginUnbond    msgUnbondInput  `json:"unbond"`
 	}
 
 	BeginRedelegatesReq struct {
-		BaseReq         context.BaseTx          `json:"base_req"`
-		BeginRedelegate msgBeginRedelegateInput `json:"begin_redelegates"`
+		BaseReq         context.BaseTx     `json:"base_tx"`
+		BeginRedelegate msgRedelegateInput `json:"redelegate"`
 	}
 )
 
@@ -72,12 +71,6 @@ type (
 func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req DelegationsReq
-
-		req.Delegation.Delegation = "1"
-		req.Delegation.ValidatorAddr = "2"
-		req.Delegation.ValidatorAddr = "3"
-		x, _ := codec.MarshalJSONIndent(cdc, req)
-		fmt.Println(string(x))
 
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -187,19 +180,19 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 			return
 		}
 
-		delAddr, err := sdk.AccAddressFromBech32(req.BeginUnbonding.DelegatorAddr)
+		delAddr, err := sdk.AccAddressFromBech32(req.BeginUnbond.DelegatorAddr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		valAddr, err := sdk.ValAddressFromBech32(req.BeginUnbonding.ValidatorAddr)
+		valAddr, err := sdk.ValAddressFromBech32(req.BeginUnbond.ValidatorAddr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		shares, err := sdk.NewDecFromStr(req.BeginUnbonding.SharesAmount)
+		shares, err := sdk.NewDecFromStr(req.BeginUnbond.SharesAmount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
