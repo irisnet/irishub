@@ -39,7 +39,7 @@ func GetCmdQueryValidator(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			validator := types.MustUnmarshalValidator(cdc, addr, res)
-			validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 			if err != nil {
 				return err
 			}
@@ -90,7 +90,7 @@ func GetCmdQueryValidators(storeName string, cdc *codec.Codec) *cobra.Command {
 			for _, kv := range resKVs {
 				addr := kv.Key[1:]
 				validator := types.MustUnmarshalValidator(cdc, addr, kv.Value)
-				validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+				validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
 				if err != nil {
 					return err
 				}
