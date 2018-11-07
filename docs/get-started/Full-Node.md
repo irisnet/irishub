@@ -27,8 +27,8 @@ After intializing your node, please download the genesis file and the config fil
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3001/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/testnets/fuxi-3001/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-4000/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-4000/config/genesis.json
 ```
 ## Edit Your Config File
 
@@ -54,8 +54,8 @@ addr_book_strict = false
 Your node needs to know how to find more peers. You'll need to add healthy seed nodes to `$IRISHOME/config/config.toml`. Here are some seed nodes you can use:
 
 ```
-c16700520a810b270206d59f0f02ea9abd85a4fe@35.165.232.141:26656
-a12cfb2f535210ea12731f94a76b691832056156@120.79.226.163:26656
+c16700520a810b270206d59f0f02ea9abd85a4fe@ts-1.bianjie.ai:26656
+a12cfb2f535210ea12731f94a76b691832056156@ts-2.bianjie.ai:26656
 ```
 
 Meanwhile, you could add some known full node as `Persistent Peer`. Your node could connect to `sentry node` as `persistent peers`.
