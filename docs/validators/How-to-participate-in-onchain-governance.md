@@ -33,10 +33,10 @@ The governance process is divided in a few steps that are outlined below:
 For `System Parameter Change` proposals, the following parameters are eligible for change:
 
 * Mininimum Depost: `50IRIS`
-* Deposit Period: 1440 blocks
+* Deposit Period: 100 blocks
 * Penalty for non-voting validtors: 1%
 * Pass Threshold: 50%
-* Voting Period: 20000 blocks
+* Voting Period: 100 blocks
 
 
 ### Types of Governance Proposal
@@ -100,7 +100,7 @@ To vote for a proposal, you need to get the correct `<proposal_id>`.You could ex
 
 You could use the following command to get the first proposal:  
 ```
-iriscli gov query-proposal --proposal-id=6 --chain-id=fuxi-3001 --node=http://localhost:26657
+iriscli gov query-proposal --proposal-id=6 --chain-id=fuxi-4000 --node=http://localhost:26657
 ```
 
 Example output is the following:
@@ -174,7 +174,7 @@ amount: "10000000000000000000"
 max_deposit_period: "50"
 },
 voting_period: {
-voting_period: "50"
+voting_period: "100"
 },
 tallying_procedure: {
 threshold: "1/2",

@@ -6,9 +6,9 @@
 
 ### 线上治理提案的类型
 
-* Text
-* System Parameter Change
-* Protocol Upgrade [未实现]
+* Text文字类型
+* System Parameter Change系统参数修改
+* Protocol Upgrade 软件征集
 
 ## 线上治理流程
 
