@@ -34,7 +34,7 @@ func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 

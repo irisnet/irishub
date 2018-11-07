@@ -8,7 +8,7 @@ import (
 
 	"github.com/irisnet/irishub/client"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/examples/irishub1/app"
 	bam "github.com/irisnet/irishub/baseapp"
 
 	"github.com/irisnet/irishub/version"
