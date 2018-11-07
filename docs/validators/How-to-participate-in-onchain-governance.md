@@ -32,7 +32,7 @@ The governance process is divided in a few steps that are outlined below:
 
 For `System Parameter Change` proposals, the following parameters are eligible for change:
 
-* Mininimum Depost: `10IRIS`
+* Mininimum Depost: `50IRIS`
 * Deposit Period: 1440 blocks
 * Penalty for non-voting validtors: 1%
 * Pass Threshold: 50%

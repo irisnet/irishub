@@ -15,11 +15,11 @@
 链上治理投票分为以下三步骤：
 
 
-* Mininimum Depost: `1000IRIS` or `1000000000000000000000iris`
-* Deposit Period: 1440 blocks
+* Mininimum Depost: `50IRIS`
+* Deposit Period: 100 blocks
 * Penalty for non-voting validtors: 1%
 * Pass Threshold: 50%
-* Voting Period: 20000 blocks
+* Voting Period: 100 blocks
 
 ## 如何提交一个提案?
 
