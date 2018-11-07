@@ -13,15 +13,15 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/mint"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 	banksim "github.com/irisnet/irishub/simulation/bank"
 	govsim "github.com/irisnet/irishub/simulation/gov"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 	slashingsim "github.com/irisnet/irishub/simulation/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 	stakesim "github.com/irisnet/irishub/simulation/stake"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"os"
 )
 
@@ -128,7 +128,7 @@ func invariants(app *IrisApp) []simulation.Invariant {
 
 // Profile with:
 // /usr/local/go/bin/go test -benchmem -run=^$ github.com/cosmos/cosmos-sdk/cmd/gaia/app -bench ^BenchmarkFullGaiaSimulation$ -SimulationCommit=true -cpuprofile cpu.out
-func BenchmarkFullGaiaSimulation(b *testing.B) {
+func BenchmarkFullIrisSimulation(b *testing.B) {
 	// Setup Gaia application
 	var logger log.Logger
 	logger = log.NewNopLogger()
@@ -163,9 +163,9 @@ func BenchmarkFullGaiaSimulation(b *testing.B) {
 	}
 }
 
-func TestFullGaiaSimulation(t *testing.T) {
+func TestFullIrisSimulation(t *testing.T) {
 	if !enabled {
-		t.Skip("Skipping Gaia simulation")
+		t.Skip("Skipping Iris simulation")
 	}
 
 	// Setup Gaia application
@@ -199,7 +199,7 @@ func TestFullGaiaSimulation(t *testing.T) {
 // and doesn't depend on gaia
 func TestAppStateDeterminism(t *testing.T) {
 	if !enabled {
-		t.Skip("Skipping Gaia simulation")
+		t.Skip("Skipping Iris simulation")
 	}
 
 	numSeeds := 3

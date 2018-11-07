@@ -4,20 +4,21 @@ import (
 	"math/rand"
 	"os"
 
-	bam "github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"fmt"
-	"github.com/irisnet/irishub/types"
-	)
+)
 
 const (
 	chainID   = ""
@@ -38,11 +39,16 @@ type App struct {
 	KeyMain          *sdk.KVStoreKey
 	KeyAccount       *sdk.KVStoreKey
 	KeyFeeCollection *sdk.KVStoreKey
+	KeyStake         *sdk.KVStoreKey
+	TkeyStake        *sdk.TransientStoreKey
+	KeyParams        *sdk.KVStoreKey
+	TkeyParams       *sdk.TransientStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountKeeper       auth.AccountKeeper
 	BankKeeper          bank.Keeper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
+	ParamsKeeper        params.Keeper
 
 	GenesisAccounts  []auth.Account
 	TotalCoinsSupply sdk.Coins
@@ -72,6 +78,10 @@ func NewApp() *App {
 		KeyMain:          sdk.NewKVStoreKey("main"),
 		KeyAccount:       sdk.NewKVStoreKey("acc"),
 		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
+		KeyStake:         sdk.NewKVStoreKey("stake"),
+		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
+		KeyParams:        sdk.NewKVStoreKey("params"),
+		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
@@ -84,6 +94,11 @@ func NewApp() *App {
 
 	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
 	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
+
+	app.ParamsKeeper = params.NewKeeper(
+		app.Cdc,
+		app.KeyParams, app.TkeyParams,
+	)
 
 	app.SetInitChainer(app.InitChainer)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
@@ -123,9 +138,7 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
-
-	return abci.ResponseInitChain{
-	}
+	return abci.ResponseInitChain{}
 }
 
 // CreateGenAccounts generates genesis accounts loaded with coins, and returns
