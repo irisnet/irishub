@@ -329,6 +329,11 @@ paths:
       produces:
       - application/json
       parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
       - in: body
         name: broadcastTxBody
         description: broadcast tx
@@ -512,6 +517,11 @@ paths:
       produces:
       - application/json
       parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
       - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
@@ -1261,6 +1271,11 @@ paths:
       - ICS23
       parameters:
       - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1307,6 +1322,11 @@ paths:
       tags:
       - ICS22
       parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
       - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
@@ -1395,6 +1415,11 @@ paths:
       - ICS22
       parameters:
       - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1468,6 +1493,11 @@ paths:
       tags:
       - ICS22
       parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
       - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
@@ -1646,6 +1676,11 @@ paths:
       - application/json
       parameters:
       - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1708,6 +1743,11 @@ paths:
       produces:
       - application/json
       parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
       - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
