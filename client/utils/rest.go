@@ -167,6 +167,11 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	}
 	txCtx = txCtx.WithCliCtx(cliCtx)
 
+	if cliCtx.GenerateOnly {
+		WriteGenerateStdTxResponse(w, txCtx, msgs)
+		return
+	}
+
 	if cliCtx.DryRun || txCtx.SimulateGas {
 		newTxCtx, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
 		if err != nil {
@@ -180,11 +185,6 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		}
 
 		txCtx = newTxCtx
-	}
-
-	if cliCtx.GenerateOnly {
-		WriteGenerateStdTxResponse(w, txCtx, msgs)
-		return
 	}
 
 	txBytes, err := txCtx.BuildAndSign(baseTx.Name, baseTx.Password, msgs)
