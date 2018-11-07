@@ -1,0 +1,9 @@
+
+syntax = "proto3";
+
+message Test {
+    string key=1;
+    uint32 value=2;
+    uint32 age=3;
+    string gender=4;
+} 

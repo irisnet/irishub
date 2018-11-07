@@ -15,34 +15,46 @@ var (
 	coinsNeg         = sdk.Coins{sdk.NewInt64Coin("steak", -10000)}
 	coinsPosNotAtoms = sdk.Coins{sdk.NewInt64Coin("foo", 10000)}
 	coinsMulti       = sdk.Coins{sdk.NewInt64Coin("foo", 10000), sdk.NewInt64Coin("steak", 1000)}
+
+	paramNil = Param{
+		Key:   "",
+		Value: "",
+		Op:    "",
+	}
+
+	param = Param{
+		Key:   "Gov/govDepositProcedure",
+		Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}",
+		Op:    "update",
+	}
 )
 
 // test ValidateBasic for MsgCreateValidator
 func TestMsgSubmitProposal(t *testing.T) {
-	_, addrs, _, _ := mock.CreateGenAccounts(1, sdk.Coins{})
+	_, _, _, addrs, _, _ := getMockApp(t, 1)
+
 	tests := []struct {
 		title, description string
 		proposalType       ProposalKind
 		proposerAddr       sdk.AccAddress
 		initialDeposit     sdk.Coins
+		param              Param
 		expectPass         bool
 	}{
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsPos, true},
-		{"", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsPos, false},
-		{"Test Proposal", "", ProposalTypeText, addrs[0], coinsPos, false},
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeParameterChange, addrs[0], coinsPos, true},
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeSoftwareUpgrade, addrs[0], coinsPos, true},
-		{"Test Proposal", "the purpose of this proposal is to test", 0x05, addrs[0], coinsPos, false},
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, sdk.AccAddress{}, coinsPos, false},
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsZero, true},
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsNeg, false},
-		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsMulti, true},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsPos, param, true},
+		{"", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsPos, paramNil, false},
+		{"Test Proposal", "", ProposalTypeText, addrs[0], coinsPos, paramNil, false},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeParameterChange, addrs[0], coinsPos, param, true},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeSoftwareUpgrade, addrs[0], coinsPos, param, true},
+		{"Test Proposal", "the purpose of this proposal is to test", 0x05, addrs[0], coinsPos, paramNil, false},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, sdk.AccAddress{}, coinsPos, paramNil, false},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsZero, param, true},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsNeg, paramNil, false},
+		{"Test Proposal", "the purpose of this proposal is to test", ProposalTypeText, addrs[0], coinsMulti, param, true},
 	}
 
-	var param Param
-
 	for i, tc := range tests {
-		msg := NewMsgSubmitProposal(tc.title, tc.description, tc.proposalType, tc.proposerAddr, tc.initialDeposit, param)
+		msg := NewMsgSubmitProposal(tc.title, tc.description, tc.proposalType, tc.proposerAddr, tc.initialDeposit, tc.param)
 		if tc.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", i)
 		} else {
@@ -105,4 +117,3 @@ func TestMsgVote(t *testing.T) {
 		}
 	}
 }
-

@@ -22,6 +22,7 @@ func ValidatorCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validator-set [height]",
 		Short: "Get the full tendermint validator set at given height",
+		Example: "iriscli tendermint validator-set",
 		Args:  cobra.MaximumNArgs(1),
 		RunE:  printValidators,
 	}
@@ -72,12 +73,12 @@ func getValidators(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	}
 
 	if !cliCtx.TrustNode {
-		check, err := cliCtx.Certify(validatorsRes.BlockHeight)
+		check, err := cliCtx.Verify(validatorsRes.BlockHeight)
 		if err != nil {
 			return nil, err
 		}
 
-		if !bytes.Equal(check.ValidatorsHash(), tmtypes.NewValidatorSet(validatorsRes.Validators).Hash()) {
+		if !bytes.Equal(check.ValidatorsHash, tmtypes.NewValidatorSet(validatorsRes.Validators).Hash()) {
 			return nil, fmt.Errorf("got invalid validatorset")
 		}
 	}

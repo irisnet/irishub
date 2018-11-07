@@ -3,15 +3,14 @@ package lcd
 import (
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	"net/http"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
-	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
-	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
-	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
-	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
+	recordhandle "github.com/irisnet/irishub/client/record/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/rakyll/statik/fs"
@@ -20,11 +19,10 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
-	"net/http"
 )
 
 // ServeLCDStartCommand will start irislcd node, which provides rest APIs with swagger-ui
-func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
+func ServeLCDStartCommand(cdc *codec.Codec) *cobra.Command {
 	flagListenAddr := "laddr"
 	flagCORS := "cors"
 	flagMaxOpenConnections := "max-open"
@@ -32,6 +30,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start IRISLCD (IRISHUB light-client daemon), a local REST server with swagger-ui: http://localhost:1317/swagger-ui/",
+		Example: "irislcd start --chain-id=<chain-id> --trust-node --node=tcp://localhost:26657",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listenAddr := viper.GetString(flagListenAddr)
 			router := createHandler(cdc)
@@ -76,7 +75,7 @@ func ServeLCDStartCommand(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func createHandler(cdc *wire.Codec) *mux.Router {
+func createHandler(cdc *codec.Codec) *mux.Router {
 	r := mux.NewRouter()
 
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
@@ -84,11 +83,12 @@ func createHandler(cdc *wire.Codec) *mux.Router {
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
-	keyshandler.RegisterRoutes(r)
-	bankhandler.RegisterRoutes(cliCtx, r, cdc)
-	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
-	stakehandler.RegisterRoutes(cliCtx, r, cdc)
+	//keyshandler.RegisterRoutes(r)
+	//bankhandler.RegisterRoutes(cliCtx, r, cdc)
+	//slashinghandler.RegisterRoutes(cliCtx, r, cdc)
+	//stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
+	recordhandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)

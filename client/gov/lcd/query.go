@@ -1,338 +1,374 @@
 package lcd
 
 import (
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
-	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"net/http"
-	"strconv"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/pkg/errors"
+	client "github.com/irisnet/irishub/client/gov"
 )
 
-func queryProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
 		if len(strProposalID) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
+			err := errors.New("proposalId required but not specified")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
+		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		if !ok {
+			return
+		}
+
+		params := gov.QueryProposalParams{
+			ProposalID: proposalID,
+		}
+
+		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%d] is not positive", proposalID))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-		if err != nil || len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
-			return
-		}
-
-		var proposal gov.Proposal
-		cdc.MustUnmarshalBinary(res, &proposal)
-		proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
+		res, err := cliCtx.QueryWithData("custom/gov/proposal", bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
 
-func queryDepositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryDepositsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		strProposalID := vars[RestProposalID]
+
+		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		if !ok {
+			return
+		}
+
+		params := gov.QueryDepositsParams{
+			ProposalID: proposalID,
+		}
+
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData("custom/gov/deposits", bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+	}
+}
+
+func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 		bechDepositerAddr := vars[RestDepositer]
 
 		if len(strProposalID) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
+			err := errors.New("proposalId required but not specified")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%d] is not positive", proposalID))
+		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		if !ok {
 			return
 		}
 
 		if len(bechDepositerAddr) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "depositer address required but not specified")
+			err := errors.New("depositer address required but not specified")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestDepositer))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryStore(gov.KeyDeposit(proposalID, depositerAddr), storeName)
-		if err != nil || len(res) == 0 {
-			res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-			if err != nil || len(res) == 0 {
-				utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
-				return
-			}
+		params := gov.QueryDepositParams{
+			ProposalID: proposalID,
+			Depositer:  depositerAddr,
+		}
 
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("depositer [%s] did not deposit on proposalID [%d]",
-				bechDepositerAddr, proposalID))
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData("custom/gov/deposit", bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		var deposit gov.Deposit
-		cdc.MustUnmarshalBinary(res, &deposit)
-
-		depositeResponse, err := govClient.ConvertDepositToDepositOutput(cliCtx, deposit)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		cdc.UnmarshalJSON(res, &deposit)
+		if deposit.Empty() {
+			res, err := cliCtx.QueryWithData("custom/gov/proposal", cdc.MustMarshalBinary(gov.QueryProposalParams{params.ProposalID}))
+			if err != nil || len(res) == 0 {
+				err := errors.Errorf("proposalID [%d] does not exist", proposalID)
+				utils.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+				return
+			}
+			err = errors.Errorf("depositer [%s] did not deposit on proposalID [%d]", bechDepositerAddr, proposalID)
+			utils.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		output, err := wire.MarshalJSONIndent(cdc, depositeResponse)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
 
-func queryVoteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 		bechVoterAddr := vars[RestVoter]
 
 		if len(strProposalID) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
+			err := errors.New("proposalId required but not specified")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%s] is not positive", proposalID))
+		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		if !ok {
 			return
 		}
 
 		if len(bechVoterAddr) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "voter address required but not specified")
+			err := errors.New("voter address required but not specified")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		voterAddr, err := sdk.AccAddressFromBech32(bechVoterAddr)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestVoter))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryStore(gov.KeyVote(proposalID, voterAddr), storeName)
-		if err != nil || len(res) == 0 {
-			res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-			if err != nil || len(res) == 0 {
-				utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
-				return
-			}
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("voter [%s] did not vote on proposalID [%d]",
-				bechVoterAddr, proposalID))
-			return
+		params := gov.QueryVoteParams{
+			Voter:      voterAddr,
+			ProposalID: proposalID,
 		}
-
-		var vote gov.Vote
-		cdc.MustUnmarshalBinary(res, &vote)
-
-		output, err := wire.MarshalJSONIndent(cdc, vote)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		w.Write(output)
-	}
-}
-
-// nolint: gocyclo
-// todo: Split this functionality into helper functions to remove the above
-func queryVotesOnProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		strProposalID := vars[RestProposalID]
-
-		if len(strProposalID) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "proposalId required but not specified")
-			return
-		}
-
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("proposalID [%s] is not positive", proposalID))
-			return
-		}
-
-		res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-		if err != nil || len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposalID [%d] does not exist", proposalID))
-			return
-		}
-
-		var proposal gov.Proposal
-		cdc.MustUnmarshalBinary(res, &proposal)
-
-		if proposal.GetStatus() != gov.StatusVotingPeriod {
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("proposal is not in Voting Period", proposalID))
-			return
-		}
-
-		res2, err := cliCtx.QuerySubspace(gov.KeyVotesSubspace(proposalID), storeName)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusNotFound, "ProposalID doesn't exist")
-			return
-		}
-
-		var votes []gov.Vote
-
-		for i := 0; i < len(res2); i++ {
-			var vote gov.Vote
-			cdc.MustUnmarshalBinary(res2[i].Value, &vote)
-			votes = append(votes, vote)
-		}
-
-		output, err := wire.MarshalJSONIndent(cdc, votes)
+		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		w.Write(output)
+		res, err := cliCtx.QueryWithData("custom/gov/vote", bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		var vote gov.Vote
+		cdc.UnmarshalJSON(res, &vote)
+		if vote.Empty() {
+			bz, err := cdc.MarshalJSON(gov.QueryProposalParams{params.ProposalID})
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			res, err := cliCtx.QueryWithData("custom/gov/proposal", bz)
+			if err != nil || len(res) == 0 {
+				err := errors.Errorf("proposalID [%d] does not exist", proposalID)
+				utils.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+				return
+			}
+			err = errors.Errorf("voter [%s] did not deposit on proposalID [%d]", bechVoterAddr, proposalID)
+			utils.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
 
-// nolint: gocyclo
 // todo: Split this functionality into helper functions to remove the above
-func queryProposalsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		strProposalID := vars[RestProposalID]
+
+		if len(strProposalID) == 0 {
+			err := errors.New("proposalId required but not specified")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		if !ok {
+			return
+		}
+
+		params := gov.QueryVotesParams{
+			ProposalID: proposalID,
+		}
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData("custom/gov/votes", bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+	}
+}
+
+// todo: Split this functionality into helper functions to remove the above
+func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		bechVoterAddr := r.URL.Query().Get(RestVoter)
 		bechDepositerAddr := r.URL.Query().Get(RestDepositer)
 		strProposalStatus := r.URL.Query().Get(RestProposalStatus)
+		strNumLatest := r.URL.Query().Get(RestNumLatest)
 
-		var err error
-		var voterAddr sdk.AccAddress
-		var depositerAddr sdk.AccAddress
-		var proposalStatus gov.ProposalStatus
+		params := gov.QueryProposalsParams{}
 
 		if len(bechVoterAddr) != 0 {
-			voterAddr, err = sdk.AccAddressFromBech32(bechVoterAddr)
+			voterAddr, err := sdk.AccAddressFromBech32(bechVoterAddr)
 			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestVoter))
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+			params.Voter = voterAddr
 		}
 
 		if len(bechDepositerAddr) != 0 {
-			depositerAddr, err = sdk.AccAddressFromBech32(bechDepositerAddr)
+			depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
 			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' needs to be bech32 encoded", RestDepositer))
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+			params.Depositer = depositerAddr
 		}
 
 		if len(strProposalStatus) != 0 {
-			proposalStatus, err = gov.ProposalStatusFromString(strProposalStatus)
+			proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("'%s' is not a valid Proposal Status", strProposalStatus))
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+			params.ProposalStatus = proposalStatus
+		}
+		if len(strNumLatest) != 0 {
+			numLatest, ok := utils.ParseInt64OrReturnBadRequest(w, strNumLatest)
+			if !ok {
+				return
+			}
+			params.NumLatestProposals = numLatest
 		}
 
-		res, err := cliCtx.QueryStore(gov.KeyNextProposalID, storeName)
+		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusNotFound, "no proposals exist yet and proposalID has not been set")
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		var maxProposalID int64
-		cdc.MustUnmarshalBinary(res, &maxProposalID)
-
-		matchingProposals := []govClient.ProposalOutput{}
-
-		for proposalID := int64(0); proposalID < maxProposalID; proposalID++ {
-			if voterAddr != nil {
-				res, err = cliCtx.QueryStore(gov.KeyVote(proposalID, voterAddr), storeName)
-				if err != nil || len(res) == 0 {
-					continue
-				}
-			}
-
-			if depositerAddr != nil {
-				res, err = cliCtx.QueryStore(gov.KeyDeposit(proposalID, depositerAddr), storeName)
-				if err != nil || len(res) == 0 {
-					continue
-				}
-			}
-
-			res, err = cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-			if err != nil || len(res) == 0 {
-				continue
-			}
-
-			var proposal gov.Proposal
-			cdc.MustUnmarshalBinary(res, &proposal)
-
-			if len(strProposalStatus) != 0 {
-				if proposal.GetStatus() != proposalStatus {
-					continue
-				}
-			}
-			proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-			matchingProposals = append(matchingProposals, proposalResponse)
-		}
-
-		output, err := wire.MarshalJSONIndent(cdc, matchingProposals)
+		res, err := cliCtx.QueryWithData("custom/gov/proposals", bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
 
-// nolint: gocyclo
-func queryConfigHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// todo: Split this functionality into helper functions to remove the above
+func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, err := cliCtx.QuerySubspace([]byte(gov.Prefix), storeName)
+		vars := mux.Vars(r)
+		strProposalID := vars[RestProposalID]
+
+		if len(strProposalID) == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			err := errors.New("proposalId required but not specified")
+			w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		if !ok {
+			return
+		}
+
+		params := gov.QueryTallyParams{
+			ProposalID: proposalID,
+		}
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		res, err := cliCtx.QueryWithData("custom/gov/tally", bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+	}
+}
+
+
+// nolint: gocyclo
+func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := cliCtx.QuerySubspace([]byte("Gov/"), "params")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		var kvs []govClient.KvPair
+		var pd gov.ParameterConfigFile
 		for _, kv := range res {
-			var v string
-			cdc.UnmarshalBinary(kv.Value, &v)
-			kv := govClient.KvPair{
-				K: string(kv.Key),
-				V: v,
+			switch string(kv.Key) {
+			case "Gov/govDepositProcedure":
+				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.DepositProcedure)
+			case "Gov/govVotingProcedure":
+				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
+			case "Gov/govTallyingProcedure":
+				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
+			default:
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
 			}
-			kvs = append(kvs, kv)
 		}
-		output, err := wire.MarshalJSONIndent(cdc, kvs)
+		output, err := cdc.MarshalJSONIndent(pd, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

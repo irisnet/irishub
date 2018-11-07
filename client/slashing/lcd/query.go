@@ -2,8 +2,8 @@ package lcd
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
@@ -12,7 +12,7 @@ import (
 )
 
 // http request handler to query signing info
-func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *wire.Codec) http.HandlerFunc {
+func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -29,7 +29,7 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *wire
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't query signing info. Error: %s", err.Error()))
 			return
 		}
-		if len(res) ==0 {
+		if len(res) == 0 {
 			utils.WriteErrorResponse(w, http.StatusBadRequest,
 				fmt.Sprintf("the signing information of this validator %s is empty, please make sure its existence", vars["validator_pub"]))
 			return

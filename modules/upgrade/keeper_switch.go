@@ -1,11 +1,11 @@
 package upgrade
 
 import (
-	bam "github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"strconv"
 	"strings"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 var (
@@ -139,8 +139,8 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 		panic("No current version info found")
 	}
 
-	moduleList, found := GetModuleListFromBucket(currentVersion.Id+1)
-	if !found {									// reuse current version's modulelist for the bug fix upgrade
+	moduleList, found := GetModuleListFromBucket(currentVersion.Id + 1)
+	if !found { // reuse current version's modulelist for the bug fix upgrade
 		moduleList = currentVersion.ModuleList
 	}
 
@@ -153,12 +153,12 @@ func (k Keeper) DoSwitchEnd(ctx sdk.Context) {
 	k.AddNewVersion(ctx, VersionToBeSwitched)
 
 	k.SetDoingSwitch(ctx, false)
-	upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
+	upgradeparams.SetCurrentUpgradeProposalId(ctx, -1)
 	k.SetKVStoreKeylist(ctx)
 }
 
 func (k Keeper) OnlyRunAfterVersionId(ctx sdk.Context, versionId int64) bool {
-	version := k.GetVersionByVersionId(ctx, versionId)
+	version := k.GetVersionByVersionId(versionId)
 	if version == nil {
 		return false
 	}

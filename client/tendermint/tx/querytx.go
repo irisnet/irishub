@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
@@ -17,10 +17,11 @@ import (
 )
 
 // QueryTxCmd implements the default command for a tx query.
-func QueryTxCmd(cdc *wire.Codec) *cobra.Command {
+func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "tx [hash]",
 		Short: "Matches this txhash over all committed blocks",
+		Example: "iriscli tendermint tx <transaction hash>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// find the key to look up the account
@@ -44,7 +45,7 @@ func QueryTxCmd(cdc *wire.Codec) *cobra.Command {
 	return cmd
 }
 
-func queryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
+func queryTx(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
 	hash, err := hex.DecodeString(hashHexStr)
 	if err != nil {
 		return nil, err
@@ -77,7 +78,7 @@ func queryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string) ([]b
 
 // ValidateTxResult performs transaction verification
 func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
-	check, err := cliCtx.Certify(res.Height)
+	check, err := cliCtx.Verify(res.Height)
 	if err != nil {
 		return err
 	}
@@ -89,7 +90,7 @@ func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
 	return nil
 }
 
-func formatTxResult(cdc *wire.Codec, res *ctypes.ResultTx) (Info, error) {
+func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
 	tx, err := parseTx(cdc, res.Tx)
 	if err != nil {
 		return Info{}, err
@@ -111,7 +112,7 @@ type Info struct {
 	Result abci.ResponseDeliverTx `json:"result"`
 }
 
-func parseTx(cdc *wire.Codec, txBytes []byte) (sdk.Tx, error) {
+func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
 	var tx auth.StdTx
 
 	err := cdc.UnmarshalBinary(txBytes, &tx)
@@ -123,7 +124,7 @@ func parseTx(cdc *wire.Codec, txBytes []byte) (sdk.Tx, error) {
 }
 
 // transaction query REST handler
-func QueryTxRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		hashHexStr := vars["hash"]
