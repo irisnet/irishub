@@ -253,7 +253,7 @@ paths:
       - application/json
       parameters:
       - in: body
-        name: txBroadcast
+        name: broadcastTxBody
         description: Build a StdTx transaction and serilize it to a byte array with amino, then the `"tx"` field in the post body will be the base64 encoding of the byte array. The supported return types includes `"block"`(return after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return right away).
         required: true
         schema:
@@ -276,8 +276,8 @@ paths:
     post:
       tags:
       - ICS20
-      summary: Sign a Tx
-      description: Sign a Tx providing locally stored account and according password
+      summary: Sign a transation
+      description: Sign a transation providing locally stored account and according password, return a StdTx with amino encoding signature and public key
       consumes:
       - application/json
       produces:
@@ -322,15 +322,15 @@ paths:
     post:
       tags:
       - ICS20
-      summary: Send a signed Tx
-      description: Send a signed Tx to a Gaiad full node
+      summary: Broadcast a signed StdTx with amino encoding signature and public key
+      description: Broadcast a signed StdTx with amino encoding signature and public key to full iris node
       consumes:
       - application/json
       produces:
       - application/json
       parameters:
       - in: body
-        name: txBroadcast
+        name: broadcastTxBody
         description: broadcast tx
         required: true
         schema:
@@ -349,14 +349,14 @@ paths:
           description: Server internal error
   /txs/send:
     post:
-      description: Compose and broadcast a transaction
+      summary: Send non-amino encoding transaction
+      description: Send non-amino encoding transaction
       consumes:
       - application/json
       produces:
       - application/json
       tags:
       - ICS20
-      summary: Broadcast a transaction
       parameters:
       - in: query
         name: async
@@ -1160,7 +1160,7 @@ paths:
         required: false
         type: boolean
       - type: string
-        description: Bech32 validator address
+        description: Bech32 validator operator address
         name: validatorAddr
         required: true
         in: path
