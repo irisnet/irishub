@@ -93,8 +93,8 @@ func ErrInvalidMessagingType(codespace sdk.CodespaceType, value MessagingType) s
 	return sdk.NewError(codespace, CodeInvalidMessagingType, fmt.Sprintf("invalid messaging type %s", value))
 }
 
-func ErrMoreTags(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeMoreTags, fmt.Sprintf("tags are limited to %d", iserviceParams.MaxTagsNum))
+func ErrMoreTags(codespace sdk.CodespaceType, i int) sdk.Error {
+	return sdk.NewError(codespace, CodeMoreTags, fmt.Sprintf("tags are limited to %d", i))
 }
 
 func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
@@ -118,7 +118,7 @@ func ErrInvalidBindingType(codespace sdk.CodespaceType, bindingType BindingType)
 }
 
 func ErrInvalidLevel(codespace sdk.CodespaceType, level Level) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidLevel, fmt.Sprintf("invalid level %v, must avg_rsp_time>0 and 0<usable_time<=10000", level))
+	return sdk.NewError(codespace, CodeInvalidLevel, fmt.Sprintf("invalid level %v, avg_rsp_time and usable_time must be positive integer and usable_time limit to 10000", level))
 }
 
 func ErrInvalidPriceCount(codespace sdk.CodespaceType, priceCount int, methodCount int) sdk.Error {
@@ -138,5 +138,5 @@ func ErrInvalidExpiration(codespace sdk.CodespaceType, expiration int64) sdk.Err
 }
 
 func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("deposit amount must >= %s", coins.String()))
+	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
 }

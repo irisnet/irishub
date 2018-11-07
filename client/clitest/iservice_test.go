@@ -38,7 +38,7 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	num := getAmountFromCoinStr(fooCoin)
-	require.Equal(t, "2100iris", fooCoin)
+	require.Equal(t, "50iris", fooCoin)
 
 	// iservice define
 	fileName := iriscliHome + string(os.PathSeparator) + "test.proto"
@@ -61,8 +61,8 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 2099 && num < 2100) {
-		t.Error("Test Failed: (2099, 2100) expected, recieved: {}", num)
+	if !(num > 49 && num < 50) {
+		t.Error("Test Failed: (49, 50) expected, recieved: {}", num)
 	}
 
 	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli iservice definition --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
@@ -79,7 +79,7 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	sdStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	sdStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
 	sdStr += fmt.Sprintf(" --bind-type=%s", "Local")
-	sdStr += fmt.Sprintf(" --deposit=%s", "1000iris")
+	sdStr += fmt.Sprintf(" --deposit=%s", "10iris")
 	sdStr += fmt.Sprintf(" --prices=%s", "1iris")
 	sdStr += fmt.Sprintf(" --avg-rsp-time=%d", 10000)
 	sdStr += fmt.Sprintf(" --usable-time=%d", 10000)
@@ -96,11 +96,11 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 1099 && num < 1100) {
-		t.Error("Test Failed: (1099, 1100) expected, recieved: {}", num)
+	if !(num > 39 && num < 40) {
+		t.Error("Test Failed: (39, 40) expected, recieved: {}", num)
 	}
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send --to=%s --from=%s --amount=1050iris --fee=0.004iris %v", barAddr.String(), "foo", flags), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send --to=%s --from=%s --amount=20iris --fee=0.004iris %v", barAddr.String(), "foo", flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 	executeWrite(t, sdStrBar, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -108,8 +108,8 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	barCoin := convertToIrisBaseAccount(t, barAcc)
 	barNum := getAmountFromCoinStr(barCoin)
 
-	if !(barNum > 49 && barNum < 50) {
-		t.Error("Test Failed: (49, 50) expected, recieved: {}", barNum)
+	if !(barNum > 19 && barNum < 20) {
+		t.Error("Test Failed: (19, 20) expected, recieved: {}", barNum)
 	}
 
 	serviceBinding := executeGetServiceBinding(t, fmt.Sprintf("iriscli iservice binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
@@ -136,15 +136,15 @@ func TestIrisCLIIserviceDefine(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
 
-	if !(barNum > 39 && barNum < 40) {
-		t.Error("Test Failed: (39, 40) expected, recieved: {}", barNum)
+	if !(barNum > 9 && barNum < 10) {
+		t.Error("Test Failed: (9, 10) expected, recieved: {}", barNum)
 	}
 	serviceBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli iservice bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
 	var totalDeposit sdk.Coins
 	for _, bind := range serviceBindings {
 		totalDeposit = totalDeposit.Plus(bind.Deposit)
 	}
-	require.Equal(t, "2010000000000000000000iris-atto", totalDeposit.String())
+	require.Equal(t, "20000000000000000000iris-atto", totalDeposit.String())
 }
 
 const idlContent = `

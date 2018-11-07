@@ -263,6 +263,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.StakeData)
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
+	iservice.InitGenesis(ctx,genesisState.IserviceData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

@@ -11,6 +11,7 @@ const (
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
+	MaxTagsNum    = 200
 )
 
 var _ sdk.Msg = MsgSvcDef{}
@@ -105,8 +106,8 @@ func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
 }
 
 func validateTags(tags []string) (bool, sdk.Error) {
-	if len(tags) > iserviceParams.MaxTagsNum {
-		return false, ErrMoreTags(DefaultCodespace)
+	if len(tags) > MaxTagsNum {
+		return false, ErrMoreTags(DefaultCodespace, MaxTagsNum)
 	}
 	if len(tags) > 0 {
 		for i, tag := range tags {

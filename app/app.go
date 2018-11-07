@@ -37,6 +37,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const (
@@ -267,6 +268,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
 
+	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.ServiceParamspace).WithTypeTable(
+		params.NewTypeTable(
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+		)),
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
+
 	return app
 }
 
@@ -389,6 +398,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
+	iservice.InitGenesis(ctx, genesisState.IserviceData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

@@ -6,6 +6,7 @@ import (
 	"github.com/irisnet/irishub/tools/protoidl"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"fmt"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 type Keeper struct {
@@ -21,6 +22,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, codespace sdk
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
+		ck:        ck,
 		codespace: codespace,
 	}
 	return keeper
@@ -89,8 +91,9 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrSvcBindingExists(k.Codespace()), false
 	}
 
-	if !svcBinding.Deposit.IsGTE(iserviceParams.MinProviderDeposit) {
-		return ErrLtMinProviderDeposit(k.Codespace(), iserviceParams.MinProviderDeposit), false
+	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
+	if !svcBinding.Deposit.IsGTE(minDeposit) {
+		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
 	err := k.ValidateMethodPrices(ctx, svcBinding)
@@ -150,8 +153,9 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
 	}
 
-	if !oldBinding.Deposit.IsGTE(iserviceParams.MinProviderDeposit) {
-		return ErrLtMinProviderDeposit(k.Codespace(), iserviceParams.MinProviderDeposit.Minus(oldBinding.Deposit)), false
+	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
+	if !oldBinding.Deposit.IsGTE(minDeposit) {
+		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit)), false
 	}
 
 	// Subtract coins from provider's account
@@ -196,7 +200,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	}
 
 	height := ctx.BlockHeader().Height
-	refundHeight := binding.Expiration + int64(iserviceParams.MaxRequestTimeout)
+	refundHeight := binding.Expiration + int64(iserviceparams.GetMaxRequestTimeout(ctx))
 	if refundHeight >= height {
 		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", refundHeight)), false
 	}
