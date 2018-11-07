@@ -1,7 +1,6 @@
 package lcd
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 
@@ -10,10 +9,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/cosmos/cosmos-sdk/x/stake/tags"
 	"github.com/cosmos/cosmos-sdk/x/stake/types"
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
-	"github.com/pkg/errors"
+	"github.com/irisnet/irishub/client/utils"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
 
@@ -27,101 +27,6 @@ func contains(stringSlice []string, txType string) bool {
 	return false
 }
 
-func getDelegatorValidator(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAccAddr sdk.AccAddress) (
-	validator stakeClient.ValidatorOutput, httpStatusCode int, errMsg string, err error) {
-
-	// check if the delegator is bonded or redelegated to the validator
-	keyDel := stake.GetDelegationKey(delegatorAddr, validatorAccAddr)
-
-	res, err := cliCtx.QueryStore(keyDel, storeName)
-	if err != nil {
-		return stakeClient.ValidatorOutput{}, http.StatusInternalServerError, "couldn't query delegation. Error: ", err
-	}
-
-	if len(res) == 0 {
-		return stakeClient.ValidatorOutput{}, http.StatusNoContent, "", nil
-	}
-
-	kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)
-	if err != nil {
-		return stakeClient.ValidatorOutput{}, http.StatusInternalServerError, "Error: ", err
-	}
-	if len(kvs) == 0 {
-		// the query will return empty if there are no delegations
-		return stakeClient.ValidatorOutput{}, http.StatusNoContent, "", nil
-	}
-
-	validator, errVal := getValidatorFromAccAdrr(validatorAccAddr, kvs, cliCtx, cdc)
-	if errVal != nil {
-		return stakeClient.ValidatorOutput{}, http.StatusInternalServerError, "Couldn't get info from validator. Error: ", errVal
-	}
-	return validator, http.StatusOK, "", nil
-}
-
-func getDelegatorDelegations(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
-	outputDelegation stakeClient.DelegationOutput, httpStatusCode int, errMsg string, err error) {
-	delegationKey := stake.GetDelegationKey(delegatorAddr, validatorAddr)
-	marshalledDelegation, err := cliCtx.QueryStore(delegationKey, storeName)
-	if err != nil {
-		return stakeClient.DelegationOutput{}, http.StatusInternalServerError, "couldn't query delegation. Error: ", err
-	}
-
-	// the query will return empty if there is no data for this record
-	if len(marshalledDelegation) == 0 {
-		return stakeClient.DelegationOutput{}, http.StatusNoContent, "", nil
-	}
-
-	delegation, err := types.UnmarshalDelegation(cdc, delegationKey, marshalledDelegation)
-	if err != nil {
-		return stakeClient.DelegationOutput{}, http.StatusInternalServerError, "couldn't unmarshall delegation. Error: ", err
-	}
-
-	outputDelegation = stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
-
-	return outputDelegation, http.StatusOK, "", nil
-}
-
-func getDelegatorUndelegations(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
-	unbonds types.UnbondingDelegation, httpStatusCode int, errMsg string, err error) {
-	undelegationKey := stake.GetUBDKey(delegatorAddr, validatorAddr)
-	marshalledUnbondingDelegation, err := cliCtx.QueryStore(undelegationKey, storeName)
-	if err != nil {
-		return types.UnbondingDelegation{}, http.StatusInternalServerError, "couldn't query unbonding-delegation. Error: ", err
-	}
-
-	// the query will return empty if there is no data for this record
-	if len(marshalledUnbondingDelegation) == 0 {
-		return types.UnbondingDelegation{}, http.StatusNoContent, "", nil
-	}
-
-	unbondingDelegation, err := types.UnmarshalUBD(cdc, undelegationKey, marshalledUnbondingDelegation)
-	if err != nil {
-		return types.UnbondingDelegation{}, http.StatusInternalServerError, "couldn't unmarshall unbonding-delegation. Error: ", err
-	}
-	return unbondingDelegation, http.StatusOK, "", nil
-}
-
-func getDelegatorRedelegations(cliCtx context.CLIContext, cdc *codec.Codec, delegatorAddr sdk.AccAddress, validatorAddr sdk.AccAddress) (
-	regelegations types.Redelegation, httpStatusCode int, errMsg string, err error) {
-
-	keyRedelegateTo := stake.GetREDsByDelToValDstIndexKey(delegatorAddr, validatorAddr)
-	marshalledRedelegations, err := cliCtx.QueryStore(keyRedelegateTo, storeName)
-	if err != nil {
-		return types.Redelegation{}, http.StatusInternalServerError, "couldn't query redelegation. Error: ", err
-	}
-
-	if len(marshalledRedelegations) == 0 {
-		return types.Redelegation{}, http.StatusNoContent, "", nil
-	}
-
-	redelegations, err := types.UnmarshalRED(cdc, keyRedelegateTo, marshalledRedelegations)
-	if err != nil {
-		return types.Redelegation{}, http.StatusInternalServerError, "couldn't unmarshall redelegations. Error: ", err
-	}
-
-	return redelegations, http.StatusOK, "", nil
-}
-
 // queries staking txs
 func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *codec.Codec, tag string, delegatorAddr string) ([]tx.Info, error) {
 	page := 0
@@ -133,92 +38,271 @@ func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *codec.Codec
 		return nil, err
 	}
 
+	if prove {
+		for _, txData := range res.Txs {
+			err := tx.ValidateTxResult(cliCtx, txData)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return tx.FormatTxResults(cdc, res.Txs)
 }
 
-// gets all validators
-func getValidators(cliCtx context.CLIContext, cdc *codec.Codec, validatorKVs []sdk.KVPair) ([]stakeClient.ValidatorOutput, error) {
-	validators := make([]stakeClient.ValidatorOutput, len(validatorKVs))
-	for i, kv := range validatorKVs {
+func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bech32delegator := vars["delegatorAddr"]
+		bech32validator := vars["validatorAddr"]
 
-		addr := kv.Key[1:]
-		validator, err := types.UnmarshalValidator(cdc, addr, kv.Value)
+		delegatorAddr, err := sdk.AccAddressFromBech32(bech32delegator)
+		validatorAddr, err := sdk.ValAddressFromBech32(bech32validator)
 		if err != nil {
-			return nil, err
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
-		validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-		if err != nil {
-			return nil, err
-		}
-		validators[i] = validatorOutput
-	}
-	return validators, nil
-}
-
-// gets a validator given a ValAddress
-func getValidator(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *codec.Codec) (stakeClient.ValidatorOutput, error) {
-	// parse out the validators
-	for _, kv := range validatorKVs {
-		addr := kv.Key[1:]
-		validator, err := types.UnmarshalValidator(cdc, addr, kv.Value)
-		if err != nil {
-			return stakeClient.ValidatorOutput{}, err
+		params := stake.QueryBondsParams{
+			DelegatorAddr: delegatorAddr,
+			ValidatorAddr: validatorAddr,
 		}
 
-		ownerAddress := validator.Owner
-		if bytes.Equal(ownerAddress.Bytes(), address.Bytes()) {
-			validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-			if err != nil {
-				return stakeClient.ValidatorOutput{}, err
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(endpoint, bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		switch endpoint {
+		case "custom/stake/unbondingDelegation":
+			var unbondingDelegation types.UnbondingDelegation
+			if err = cdc.UnmarshalJSON(res, &unbondingDelegation); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
+			if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationOutput); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		case "custom/stake/delegation":
+			var delegation types.Delegation
+			// parse out the validators
+			if err = cdc.UnmarshalJSON(res, &delegation); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
+			if res, err = codec.MarshalJSONIndent(cdc, delegationOutput); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		case "custom/stake/delegatorValidator":
+			var validator types.Validator
+			if err = cdc.UnmarshalJSON(res, &validator); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
 			}
 
-			return validatorOutput, nil
+			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+			if res, err = codec.MarshalJSONIndent(cdc, validatorOutput); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 		}
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
-	return stakeClient.ValidatorOutput{}, errors.Errorf("Couldn't find validator")
 }
 
-// gets a validator given an AccAddress
-func getValidatorFromAccAdrr(address sdk.AccAddress, validatorKVs []sdk.KVPair, cliCtx context.CLIContext, cdc *codec.Codec) (stakeClient.ValidatorOutput, error) {
-	// parse out the validators
-	for _, kv := range validatorKVs {
-		addr := kv.Key[1:]
-		validator, err := types.UnmarshalValidator(cdc, addr, kv.Value)
+func queryDelegator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bech32delegator := vars["delegatorAddr"]
+
+		delegatorAddr, err := sdk.AccAddressFromBech32(bech32delegator)
 		if err != nil {
-			return stakeClient.ValidatorOutput{}, err
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
-		ownerAddress := validator.Owner
-		if bytes.Equal(ownerAddress.Bytes(), address.Bytes()) {
-			validatorOutput, err := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-			if err != nil {
-				return stakeClient.ValidatorOutput{}, err
+		params := stake.QueryDelegatorParams{
+			DelegatorAddr: delegatorAddr,
+		}
+
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(endpoint, bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		switch endpoint {
+		case "custom/stake/delegatorDelegations":
+			var delegations []types.Delegation
+			// parse out the validators
+			if err = cdc.UnmarshalJSON(res, &delegations); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
 			}
 
-			return validatorOutput, nil
+			delegationOutputs := make([]stakeClient.DelegationOutput, len(delegations))
+			for index, delegation := range delegations {
+				delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
+				delegationOutputs[index] = delegationOutput
+			}
+			if res, err = codec.MarshalJSONIndent(cdc, delegationOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+		case "custom/stake/delegatorUnbondingDelegations":
+			var unbondingDelegations []types.UnbondingDelegation
+			if err = cdc.UnmarshalJSON(res, &unbondingDelegations); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput, len(unbondingDelegations))
+			for index, unbondingDelegation := range unbondingDelegations {
+				unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
+				unbondingDelegationsOutputs[index] = unbondingDelegationOutput
+			}
+
+			if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationsOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+		case "custom/stake/delegatorRedelegations":
+			var relegations []types.Redelegation
+			if err = cdc.UnmarshalJSON(res, &relegations); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			relegationsOutputs := make([]stakeClient.RedelegationOutput, len(relegations))
+			for index, relegation := range relegations {
+				relegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, relegation)
+				relegationsOutputs[index] = relegationOutput
+			}
+
+			if res, err = codec.MarshalJSONIndent(cdc, relegationsOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+		case "custom/stake/delegatorValidators":
+			var validators []types.Validator
+			if err = cdc.UnmarshalJSON(res, &validators); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			validatorOutputs := make([]stakeClient.ValidatorOutput, len(validators))
+			for index, validator := range validators {
+				validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+				validatorOutputs[index] = validatorOutput
+			}
+
+			if res, err = codec.MarshalJSONIndent(cdc, validatorOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
 		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
-	return stakeClient.ValidatorOutput{}, errors.Errorf("Couldn't find validator")
 }
 
-//  gets all Bech32 validators from a key
-func getValidatorOutputs(storeName string, cliCtx context.CLIContext, cdc *codec.Codec) (
-	validators []stakeClient.ValidatorOutput, httpStatusCode int, errMsg string, err error) {
-	// Get all validators using key
-	kvs, err := cliCtx.QuerySubspace(stake.ValidatorsKey, storeName)
-	if err != nil {
-		return nil, http.StatusInternalServerError, "couldn't query validators. Error: ", err
-	}
+func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bech32validatorAddr := vars["validatorAddr"]
 
-	// the query will return empty if there are no validators
-	if len(kvs) == 0 {
-		return nil, http.StatusNoContent, "", nil
-	}
+		validatorAddr, err := sdk.ValAddressFromBech32(bech32validatorAddr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-	validators, err = getValidators(cliCtx, cdc, kvs)
-	if err != nil {
-		return nil, http.StatusInternalServerError, "Error: ", err
+		params := stake.QueryValidatorParams{
+			ValidatorAddr: validatorAddr,
+		}
+
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(endpoint, bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		switch endpoint {
+		case "custom/stake/validator":
+			var validator types.Validator
+			if err = cdc.UnmarshalJSON(res, &validator); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+			if res, err = codec.MarshalJSONIndent(cdc, validatorOutput); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+		case "custom/stake/validatorUnbondingDelegations":
+			var unbondingDelegations []types.UnbondingDelegation
+			if err = cdc.UnmarshalJSON(res, &unbondingDelegations); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput, len(unbondingDelegations))
+			for index, unbondingDelegation := range unbondingDelegations {
+				unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
+				unbondingDelegationsOutputs[index] = unbondingDelegationOutput
+			}
+
+			if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationsOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+		case "custom/stake/validatorRedelegations":
+			var relegations []types.Redelegation
+			if err = cdc.UnmarshalJSON(res, &relegations); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			relegationsOutputs := make([]stakeClient.RedelegationOutput, len(relegations))
+			for index, relegation := range relegations {
+				relegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, relegation)
+				relegationsOutputs[index] = relegationOutput
+			}
+
+			if res, err = codec.MarshalJSONIndent(cdc, relegationsOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
-	return validators, http.StatusOK, "", nil
 }
