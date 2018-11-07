@@ -73,7 +73,7 @@ type broadcastBody struct {
 func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var m broadcastBody
-		if ok := unmarshalBodyOrReturnBadRequest(cliCtx, w, r, &m); !ok {
+		if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
 			return
 		}
 
@@ -90,20 +90,6 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
-}
-
-func unmarshalBodyOrReturnBadRequest(cliCtx context.CLIContext, w http.ResponseWriter, r *http.Request, m *broadcastBody) bool {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		return false
-	}
-	err = cliCtx.Codec.UnmarshalJSON(body, m)
-	if err != nil {
-		utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		return false
-	}
-	return true
 }
 
 type sendTx struct {
