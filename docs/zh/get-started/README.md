@@ -38,15 +38,15 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 ## Fuxi测试网激励计划
 
-IRIS基金会通过推出测试网激励计划来鼓励更多的人加入到Fuxi测试网中。在Fuxi-2000中，我们针对中国社区发布了测试网激励任务。一共有14位社区成员完成了任务。
+IRIS基金会通过推出测试网激励计划来鼓励更多的人加入到Fuxi测试网中。在Fuxi-3001中，很多社区成员完成了激励任务。
 
-Fuxi-2000 任务列表： https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-2000/README.md
+* Fuxi-3001 任务列表： https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-3001/README.md
 
-Fuxi-2000 任务完成情况：https://github.com/irisnet/testnets/issues/51
+* Fuxi-3001 任务完成情况：https://github.com/irisnet/testnets/issues/125
 
-在Fuxi-3001测试网中， IRIS基金会决定推出更多的测试网激励计划。
+在Fuxi-4000测试网中， IRIS基金会决定推出更多的测试网激励计划。
 
-Fuxi-3001任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-3001/README.md
+* Fuxi-4000任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-4000/README_CN.md
 
 ##  更多链接
 
@@ -54,3 +54,5 @@ Fuxi-3001任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi
 * Explorer: https://testnet.irisplorer.io/#/home
 
 * Riot chat: #irisvalidators:matrix.org
+
+* 验证人工作QQ群：834063323
