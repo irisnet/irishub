@@ -1,18 +1,16 @@
 package simulation
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 )
 
+// TODO Any invariants to check here?
 // AllInvariants tests all slashing invariants
 func AllInvariants() simulation.Invariant {
-	return func(t *testing.T, app *baseapp.BaseApp, log string) {
-		// TODO Any invariants to check here?
-		require.Nil(t, nil)
+	return func(_ *baseapp.BaseApp, _ abci.Header) error {
+		return nil
 	}
 }
