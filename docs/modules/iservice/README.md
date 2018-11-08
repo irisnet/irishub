@@ -31,7 +31,7 @@ iris start --home=iris
 
 ```
 # Service definition
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
+iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 
 # Result
 Committed at block 92 (tx hash: A63241AA6666B8CFE6B1C092B707AB0FA350F108, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:8007 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 100 101 102 105 110 101]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 54 48 49 52 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -95,7 +95,7 @@ Committed at block 1563 (tx hash: 748CEA6EA9DEFB384FFCFBE68A3CB6D8B643361B, resp
 ## CLI Command Details
 
 ```
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags "tag1 tag2" --messaging=Unicast --idl-content=<idl-content> --file=test.proto
+iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 ```
 * `--service-name`  The name of iService
 * `--service-description`  The description of this iService
