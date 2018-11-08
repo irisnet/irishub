@@ -91,7 +91,7 @@ build_example_linux: update_irislcd_swagger_docs
 
 test: test_unit test_cli test_lcd test_sim
 
-test_sim: test_sim_modules test_sim_benchamark test_sim_iris_nondeterminism test_sim_iris_fast
+test_sim: test_sim_modules test_sim_benchmark test_sim_iris_nondeterminism test_sim_iris_fast
 
 test_unit:
 	#@go test $(PACKAGES_NOSIMULATION)
@@ -107,9 +107,9 @@ test_sim_modules:
 	@echo "Running individual module simulations..."
 	@go test $(PACKAGES_SIMTEST)
 
-test_sim_benchamark:
-    @echo "Running benchmark test..."
-    @go test -benchmem -run=^$ ./app -bench ^BenchmarkFullIrisSimulation$ -SimulationCommit=true
+test_sim_benchmark:
+	@echo "Running benchmark test..."
+	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -SimulationCommit=true
 
 test_sim_iris_nondeterminism:
 	@echo "Running nondeterminism test..."
