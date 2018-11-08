@@ -27,11 +27,11 @@ Example:
 irismon --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 --chain-id=irishub-stage --node=http://localhost:26657&
 ```
 
-then, you can visit http://localhost:3660/ to see the metrics page. 
+then, you can visit http://localhost:36660/ to see the metrics page. 
 
 ### Start Prometheus
 
-First, you need to edit the configuration file of prometheus. Add `jobs` :
+First, you need to edit the configuration file `prometheus.yml` of prometheus in `~/volumes/prometheus` folder. Add `jobs` :
 ```$xslt
 - job_name: fuxi-4000
 
@@ -43,6 +43,11 @@ First, you need to edit the configuration file of prometheus. Add `jobs` :
 
         instance: fuxi-4000
 ```
+Start prometheus service with Docker:
+```
+docker run -p 9090:9090 -v ~/volumes/prometheus:/etc/prometheus prom/prometheus 1>prometheus.log &
+```
+
 Then, you could see in your browser that there are some data available at port 36660.
 
 ### Start Grafana
