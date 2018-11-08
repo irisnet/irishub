@@ -68,7 +68,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:f2f4e260193eb9a9ad307b26bcfcf94e57da65d2ea16b51023268435d3a116cc"
+  digest = "1:bb5c454828c770a3c597978a43bedd36efe16aa119300974dbf530743fe9bc1e"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -107,9 +107,9 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "7c39b51abdd5089636060470e294b2ea1fec7954"
+  revision = "ef6e33f7de4f4e14f0d71969069415deb28cb3d0"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.24.2-irisv0.6"
+  version = "v0.24.2-irisv0.6.1"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -255,13 +255,12 @@
   revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
 
 [[projects]]
-  digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
+  digest = "1:ea40c24cdbacd054a6ae9de03e62c5f252479b96c716375aace5c120d68647c8"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
