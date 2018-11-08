@@ -62,9 +62,9 @@ validator字段对应了home/config下的节点信息
 
 `app_gen_tx`中说明了拥有这个节点的账户信息。这个账户的助记词就是刚刚的secret
 
-3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-4000/config/gentx`目录下：
+3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/fuxi/fuxi-4000/config/gentx`目录下：
 
 > 注意:json文中的IP改成公网IP
 
-4. 在收集完参与者的gentx文件后，团队将在一下目录公布fuxi-4000测试网的配置文件：`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-4000/config`。然后你就可以下载genesis.json和config.toml文件了。
+4. 在收集完参与者的gentx文件后，团队将在一下目录公布fuxi-4000测试网的配置文件：`https://github.com/irisnet/testnets/tree/master/fuxi/fuxi-4000/config`。然后你就可以下载genesis.json和config.toml文件了。
 
