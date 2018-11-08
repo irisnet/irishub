@@ -32,7 +32,12 @@ irismon --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --address=E
 
 ### 启动Prometheus
 
-在配置文件中添加 `jobs` :
+从以下链接下载默认配置文件prometheus.yml：
+* https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml
+复制到`~/volumes/prometheus`目录下。
+
+在配置文件`prometheus.yml`中添加 `jobs` :
+
 ```$xslt
       - job_name: fuxi-4000
       
@@ -45,8 +50,10 @@ irismon --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --address=E
               instance: fuxi-4000
 ```
 
-启动Prometheus后可以在本地36660端口看到监控数据。
-
+通过Docker启动Prometheus后可以在本地36660端口看到监控数据。
+```
+docker run -p 9090:9090 -v ~/volumes/prometheus:/etc/prometheus prom/prometheus 1>prometheus.log &
+```
 ### 启动Grafana
 
 通过Docker启动Grafana

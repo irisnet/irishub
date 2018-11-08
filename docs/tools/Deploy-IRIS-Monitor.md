@@ -31,6 +31,11 @@ then, you can visit http://localhost:36660/ to see the metrics page.
 
 ### Start Prometheus
 
+Download default `prometheus.yml` from the following link ：
+* https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml
+
+Copy it to`~/volumes/prometheus`。
+
 First, you need to edit the configuration file `prometheus.yml` of prometheus in `~/volumes/prometheus` folder. Add `jobs` :
 ```$xslt
 - job_name: fuxi-4000
