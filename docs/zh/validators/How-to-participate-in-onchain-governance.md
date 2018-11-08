@@ -6,20 +6,20 @@
 
 ### 线上治理提案的类型
 
-* Text
-* System Parameter Change
-* Protocol Upgrade [未实现]
+* Text文字类型
+* System Parameter Change系统参数修改
+* Protocol Upgrade 软件征集
 
 ## 线上治理流程
 
 链上治理投票分为以下三步骤：
 
 
-* Mininimum Depost: `1000IRIS` or `1000000000000000000000iris`
-* Deposit Period: 1440 blocks
+* Mininimum Depost: `50IRIS`
+* Deposit Period: 100 blocks
 * Penalty for non-voting validtors: 1%
 * Pass Threshold: 50%
-* Voting Period: 20000 blocks
+* Voting Period: 100 blocks
 
 ## 如何提交一个提案?
 
