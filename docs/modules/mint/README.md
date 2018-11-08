@@ -1,23 +1,24 @@
 # Introduction
 
-The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token which is the reward for producing block. As a POS blockchain network, the Irishub also has incentive mechanism. It is much different. Strictly speaking, it is the inflation token which will be distributed to all the contributors.
+The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token which is the reward for producing block. As a POS blockchain network, the Irishub also has incentive mechanism. But it is much different. Strictly speaking, it is the inflation token which will be distributed to all the contributors.
 
-As we all know, POW means proof of work. In each producing period, all miner compete to submit their proof of work and the fastest one will be the winner. Actually, all loser miners don't offer any help or collaboration to the winner miner, and they are only the competitors. So it is reasonable to grant all reward of producing block to the winner miner. However, in POS blockchain network, we can't do that. Because each block is the collaboration consequent of all validators and delegators, which means the reward should be share by all contributors.
+As we all know, POW means proof of work. In each producing period, all miners compete to submit their work proof and the fastest one will be the winner. Actually, all loser miners don't offer any positive help or collaboration to the winner miner, and they are only the competitors. So it is reasonable to grant all reward to the winner miner. However, in POS blockchain network, we can't do that. Because each block producing process is based on the collaboration of all validators and delegators, which means the benefit should be share by all these contributors.
 
-The detailed distribution mechanism will be documented and implemented by distribution module. Here we mainly introduce how to figure out the inflation token and what is the impact to users. 
-
+As for how to distribute inflation token to contributors, we will document and implement it in distribution module. Here we mainly introduce how to figure out the inflation token and what is the impact to users. 
 
 # Reward Calculation
 
-Unlike POW network, the reward will not be paid to contributors in each block. Instead, once an hour(block time) the reward is calculated and saved in global pool. Only when contributors send transactions to withdraw reward, then will the reward tokens be transfered to users specified addresses.
+Unlike POW network, the inflation token will not be paid to contributors in each block. Instead, once an hour(`block time`) the inflation token is calculated and saved in global pool. Only when contributors explicitly send transactions to withdraw reward, then will the inflation token be transfered to users specified addresses.
 
 ## Block Time
 
-The block time is not the machine time, because different machine may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/tendermint/tendermint/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
+The block time is not the machine time, because different machines may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/tendermint/tendermint/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
 
 ## Inflation Rate
 
-The inflation rate depends on the bonded ratio which means it always changes. The desired bonded ratio 67%. If the ratio is higher, the inflation rate will decrease. in contrast, if the bonded ratio is lower than 67%, the inflation rate will increase. Besides, the inflation rate should no more than 20% and no less than 7%. Otherwise, it will be truncated. For detailed algorithm please refer to [cosmos mint](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/mint/begin_block.md).
+The inflation rate depends on the bonded ratio which means it always changes. The desired bonded ratio 67%. If the ratio is higher, the inflation rate will decrease. In contrast, if the bonded ratio is lower, the inflation rate will increase. Besides, the inflation rate should no more than 20% and no less than 7%. Otherwise, it will be truncated.
+
+Suppose the inflation rate is 10%, and total token amount is 10000iris, then the inflation token will be 0.114iris(10000iris*10%/8766, one year has 8766 hours). After this inflation, the total token amount will be 10000.114iris.
 
 # Impact to users
 
