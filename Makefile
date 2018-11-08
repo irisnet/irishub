@@ -109,7 +109,7 @@ test_sim_modules:
 
 test_sim_benchamark:
     @echo "Running benchmark test..."
-    @go test -benchmem -run=^$ ./app -bench ^BenchmarkFullGaiaSimulation$ -SimulationCommit=true
+    @go test -benchmem -run=^$ ./app -bench ^BenchmarkFullIrisSimulation$ -SimulationCommit=true
 
 test_sim_iris_nondeterminism:
 	@echo "Running nondeterminism test..."
