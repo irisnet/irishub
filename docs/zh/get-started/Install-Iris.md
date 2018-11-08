@@ -88,7 +88,7 @@ source ~/.bash_profile
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.5.0
+cd irishub && git checkout v0.6.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools && get_vendor_deps && make install
 ```
