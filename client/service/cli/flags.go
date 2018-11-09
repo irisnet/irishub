@@ -43,7 +43,7 @@ var (
 )
 
 func init() {
-	FsDefChainID.String(FlagDefChainID, "", "the ID of the blockchain defined of the iService")
+	FsDefChainID.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")
 	FsServiceName.String(FlagServiceName, "", "service name")
 	FsServiceDescription.String(FlagServiceDescription, "", "service description")
 	FsTags.StringSlice(FlagTags, []string{}, "service tags")
@@ -52,8 +52,8 @@ func init() {
 	FsMessaging.String(FlagMessaging, "", "service messaging type, valid values can be Unicast and Multicast")
 	FsFile.String(FlagFile, "", "path of file which contains service interface description language")
 
-	FsProvider.String(FlagProvider, "", "bech32 encoded account created the iService binding")
-	FsBindChainID.String(FlagBindChainID, "", "the ID of the blockchain bond of the iService")
+	FsProvider.String(FlagProvider, "", "bech32 encoded account created the service binding")
+	FsBindChainID.String(FlagBindChainID, "", "the ID of the blockchain bond of the service")
 	FsBindType.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
 	FsDeposit.String(FlagDeposit, "", "deposit of binding")
 	FsPrices.StringSlice(FlagPrices, []string{}, "prices of binding, will contains all method")

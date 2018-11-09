@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -7,7 +7,7 @@ import (
 
 const (
 	// name to idetify transaction types
-	MsgType       = "iservice"
+	MsgType       = "service"
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
@@ -39,7 +39,7 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 }
 
 func (msg MsgSvcDef) Route() string { return MsgType }
-func (msg MsgSvcDef) Type() string  { return "iservice definition" }
+func (msg MsgSvcDef) Type() string  { return "service definition" }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
 	if len(msg.Tags) == 0 {
@@ -176,7 +176,7 @@ func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddr
 }
 
 func (msg MsgSvcBind) Route() string { return MsgType }
-func (msg MsgSvcBind) Type() string  { return "iservice binding" }
+func (msg MsgSvcBind) Type() string  { return "service binding" }
 
 func (msg MsgSvcBind) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -249,7 +249,7 @@ func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sd
 	}
 }
 func (msg MsgSvcBindingUpdate) Route() string { return MsgType }
-func (msg MsgSvcBindingUpdate) Type() string  { return "iservice binding update" }
+func (msg MsgSvcBindingUpdate) Type() string  { return "service binding update" }
 
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -316,7 +316,7 @@ func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sd
 }
 
 func (msg MsgSvcRefundDeposit) Route() string { return MsgType }
-func (msg MsgSvcRefundDeposit) Type() string  { return "iservice refund deposit" }
+func (msg MsgSvcRefundDeposit) Type() string  { return "service refund deposit" }
 
 func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)

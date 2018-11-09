@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/tools/protoidl"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"fmt"
-	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 type Keeper struct {
@@ -91,7 +91,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrSvcBindingExists(k.Codespace()), false
 	}
 
-	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
+	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
 	if !svcBinding.Deposit.IsGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
@@ -153,7 +153,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
 	}
 
-	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
+	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
 	if !oldBinding.Deposit.IsGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit)), false
 	}
@@ -200,7 +200,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	}
 
 	height := ctx.BlockHeader().Height
-	refundHeight := binding.Expiration + int64(iserviceparams.GetMaxRequestTimeout(ctx))
+	refundHeight := binding.Expiration + int64(serviceparams.GetMaxRequestTimeout(ctx))
 	if refundHeight >= height {
 		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", refundHeight)), false
 	}

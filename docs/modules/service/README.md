@@ -1,4 +1,4 @@
-# IService User Guide
+# Service User Guide
 
 ## Basic Function Description
 IRIS Services (a.k.a. "iServices") intend to bridge the gap between the blockchain world and the conventional business application world, by mediating a complete lifecycle of off-chain services -- from their definition, binding (provider registration), invocation, to their governance (profiling and dispute resolution). By enhancing the IBC processing logic to support service semantics, the IRIS SDK is intended to allow distributed business services to be available across the internet of blockchains. The [Interface description language](https://en.wikipedia.org/wiki/Interface_description_language) (IDL) we introduced is
@@ -31,7 +31,7 @@ iris start --home=iris
 
 ```
 # Service definition
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 
 # Result
 Committed at block 92 (tx hash: A63241AA6666B8CFE6B1C092B707AB0FA350F108, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:8007 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 100 101 102 105 110 101]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 54 48 49 52 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -43,14 +43,14 @@ Committed at block 92 (tx hash: A63241AA6666B8CFE6B1C092B707AB0FA350F108, respon
 }
 
 # Query service definition
-iriscli iservice definition --def-chain-id=service-test --service-name=test-service
+iriscli service definition --def-chain-id=service-test --service-name=test-service
 
 ```
 
 ### Service Binding
 ```
 # Service Binding
-iriscli iservice bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
+iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
 
 # Result
 Committed at block 168 (tx hash: 02CAC60E75CD93465CAE10CE35F30B53C8A95574, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:5437 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 98 105 110 100]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 48 56 55 52 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -62,13 +62,13 @@ Committed at block 168 (tx hash: 02CAC60E75CD93465CAE10CE35F30B53C8A95574, respo
 }
 
 # Query service binding
-iriscli iservice binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
+iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
 
 # Query service binding list
-iriscli iservice bindings --def-chain-id=service-test --service-name=test-service
+iriscli service bindings --def-chain-id=service-test --service-name=test-service
 
 # Service binding update
-iriscli iservice update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
+iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
 
 # Result
 Committed at block 233 (tx hash: 2F5F44BAF09981D137EA667F9E872EB098A9B619, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:4989 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 98 105 110 100 105 110 103 45 117 112 100 97 116 101]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[57 57 55 56 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -80,7 +80,7 @@ Committed at block 233 (tx hash: 2F5F44BAF09981D137EA667F9E872EB098A9B619, respo
 }
 
 # Refund Deposit
-iriscli iservice refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
+iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
 
 # Result
 Committed at block 1563 (tx hash: 748CEA6EA9DEFB384FFCFBE68A3CB6D8B643361B, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:5116 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 114 101 102 117 110 100 45 100 101 112 111 115 105 116]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 48 50 51 50 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
@@ -95,27 +95,27 @@ Committed at block 1563 (tx hash: 748CEA6EA9DEFB384FFCFBE68A3CB6D8B643361B, resp
 ## CLI Command Details
 
 ```
-iriscli iservice define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
 ```
-* `--service-name`  The name of iService
-* `--service-description`  The description of this iService
-* `--author-description`  The self-description of the iService creator which is optional
-* `--tags`  The keywords of this iService
-* `--messaging`  The transfer type of this iService{`Unicast`,`Multicast`}
-* `--idl-content`  The standardized definition of the methods for this iService
+* `--service-name`  The name of service
+* `--service-description`  The description of this service
+* `--author-description`  The self-description of the service creator which is optional
+* `--tags`  The keywords of this service
+* `--messaging`  The transfer type of this service{`Unicast`,`Multicast`}
+* `--idl-content`  The standardized definition of the methods for this service
 * `--file`  Idl-content can be replaced by files,if the item is not empty.
 
 ```
-iriscli iservice definition --def-chain-id=service-test --service-name=test-service
+iriscli service definition --def-chain-id=service-test --service-name=test-service
 ```
-* `--def-chain-id`  The ID of the blockchain defined of the iService
-* `--service-name`  The name of iService
+* `--def-chain-id`  The ID of the blockchain defined of the service
+* `--service-name`  The name of service
 
 ```
-iriscli iservice bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
+iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
 ```
-* `--def-chain-id` The ID of the blockchain defined of the iService
-* `--service-name` The name of iService
+* `--def-chain-id` The ID of the blockchain defined of the service
+* `--service-name` The name of service
 * `--bind-type` Set whether the service is local or global
 * `--deposit` The deposit of service provider
 * `--prices` Service prices, a list sorted by service method
@@ -124,28 +124,28 @@ iriscli iservice bind --chain-id=service-test  --from=x --fee=0.004iris --servic
 * `--expiration` Negative number used here means the unbonded blockchain height "never expire" 
 
 ```
-iriscli iservice binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
+iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
 ```
-* `--def-chain-id` The ID of the blockchain defined of the iService
-* `--service-name` The name of iService
-* `--bind-chain-id`  The ID of the blockchain bound of the iService
+* `--def-chain-id` The ID of the blockchain defined of the service
+* `--service-name` The name of service
+* `--bind-chain-id`  The ID of the blockchain bound of the service
 * `--provider` The blockchain address of bech32 encoded account 
 
 ```
-iriscli iservice bindings --def-chain-id=service-test --service-name=test-service
+iriscli service bindings --def-chain-id=service-test --service-name=test-service
 ```
-* Refer to iriscli iservice binding
+* Refer to iriscli service binding
 
 ```
-iriscli iservice update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
+iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
 ```
-* Refer to iriscli iservice bind
+* Refer to iriscli service bind
 
 ```
-iriscli iservice refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
+iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
 ```
-* `--def-chain-id` The ID of the blockchain defined of the iService
-* `--service-name` The name of iService
+* `--def-chain-id` The ID of the blockchain defined of the service
+* `--service-name` The name of service
 
 ## IDL extension
 When using proto file to standardize the definition of the service's method, its input and output parameters, the method attributes can be added through annotations.
@@ -155,7 +155,7 @@ When using proto file to standardize the definition of the service's method, its
 > //@Attribute description: sayHello
 
 ### Currently supported attributes
-* `description` The name of this method in the iService
+* `description` The name of this method in the service
 * `output_privacy` Whether the output of the method is encrypted，{`NoPrivacy`,`PubKeyEncryption`}
 * `output_cached` Whether the output of the method is cached，{`OffChainCached`，`NoCached`}
 

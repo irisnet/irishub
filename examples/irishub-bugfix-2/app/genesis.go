@@ -22,7 +22,7 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	"time"
-	"github.com/irisnet/irishub/modules/iservice"
+	"github.com/irisnet/irishub/modules/service"
 )
 
 var (
@@ -48,7 +48,7 @@ type GenesisState struct {
 	GovData      gov.GenesisState      `json:"gov"`
 	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
 	SlashingData slashing.GenesisState `json:"slashing"`
-	IserviceData iservice.GenesisState `json:"iservice"`
+	ServiceData  service.GenesisState  `json:"service"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
@@ -136,9 +136,9 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 
 	// create the final app state
 	genesisState = GenesisState{
-		Accounts:     genaccs,
-		StakeData:    stakeData,
-		MintData:     mint.GenesisState{
+		Accounts:  genaccs,
+		StakeData: stakeData,
+		MintData: mint.GenesisState{
 			Minter: mint.InitialMinter(),
 			Params: mint.Params{
 				MintDenom:           "iris-atto",
@@ -152,7 +152,7 @@ func IrisAppGenState(cdc *codec.Codec, appGenTxs []json.RawMessage) (genesisStat
 		GovData:      gov.DefaultGenesisState(),
 		UpgradeData:  upgrade.DefaultGenesisState(),
 		SlashingData: slashingData,
-		IserviceData: iservice.DefaultGenesisState(),
+		ServiceData:  service.DefaultGenesisState(),
 		GenTxs:       appGenTxs,
 	}
 	return

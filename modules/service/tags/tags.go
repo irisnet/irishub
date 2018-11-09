@@ -5,9 +5,9 @@ import (
 )
 
 var (
-	ActionSvcDef        = []byte("service-define")
-	ActionSvcBind       = []byte("service-bind")
-	ActionSvcBindUpdate = []byte("service-update-binding")
+	ActionSvcDef           = []byte("service-define")
+	ActionSvcBind          = []byte("service-bind")
+	ActionSvcBindUpdate    = []byte("service-update-binding")
 	ActionSvcRefundDeposit = []byte("service-refund-deposit")
 
 	Action = sdk.TagAction

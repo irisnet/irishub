@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestKeeper_IService_Definition(t *testing.T) {
+func TestKeeper_service_Definition(t *testing.T) {
 	mapp, keeper, _, addrs, _, _ := getMockApp(t, 3)
 	SortAddresses(addrs)
 	mapp.BeginBlock(abci.RequestBeginBlock{})
@@ -18,7 +18,7 @@ func TestKeeper_IService_Definition(t *testing.T) {
 
 	serviceDef := NewSvcDef("myService",
 		"testnet",
-		"the iservice for unit test",
+		"the service for unit test",
 		[]string{"test", "tutorial"},
 		addrs[0],
 		"unit test author",

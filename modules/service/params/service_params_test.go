@@ -1,4 +1,4 @@
-package iserviceparams
+package serviceparams
 
 import (
 	"github.com/cosmos/cosmos-sdk/store"

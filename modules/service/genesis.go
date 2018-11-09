@@ -1,11 +1,11 @@
-package iservice
+package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"fmt"
 	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/iparam"
-	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 // GenesisState - all service state that must be provided at genesis
@@ -23,18 +23,18 @@ func NewGenesisState(maxRequestTimeout int64, minProviderDeposit sdk.Coins) Gene
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, data GenesisState) {
-	iparam.InitGenesisParameter(&iserviceparams.MaxRequestTimeoutParameter, ctx, data.MaxRequestTimeout)
-	iparam.InitGenesisParameter(&iserviceparams.MinProviderDepositParameter, ctx, data.MinProviderDeposit)
+	iparam.InitGenesisParameter(&serviceparams.MaxRequestTimeoutParameter, ctx, data.MaxRequestTimeout)
+	iparam.InitGenesisParameter(&serviceparams.MinProviderDepositParameter, ctx, data.MinProviderDeposit)
 }
 
 // WriteGenesis - output genesis parameters
 func WriteGenesis(ctx sdk.Context) GenesisState {
-	maxRequestTimeout := iserviceparams.GetMaxRequestTimeout(ctx)
-	minProviderDeposit := iserviceparams.GetMinProviderDeposit(ctx)
+	maxRequestTimeout := serviceparams.GetMaxRequestTimeout(ctx)
+	minProviderDeposit := serviceparams.GetMinProviderDeposit(ctx)
 
 	return GenesisState{
-		MaxRequestTimeout: maxRequestTimeout,
-		MinProviderDeposit:   minProviderDeposit,
+		MaxRequestTimeout:  maxRequestTimeout,
+		MinProviderDeposit: minProviderDeposit,
 	}
 }
 

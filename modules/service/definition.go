@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	"fmt"

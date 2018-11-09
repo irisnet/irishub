@@ -33,7 +33,7 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/modules/iservice"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
@@ -41,7 +41,7 @@ import (
 	sm "github.com/tendermint/tendermint/state"
 	"strings"
 	"sort"
-	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 const (
@@ -75,7 +75,7 @@ type IrisApp struct {
 	keyParams        *sdk.KVStoreKey
 	tkeyParams       *sdk.TransientStoreKey
 	keyUpgrade       *sdk.KVStoreKey
-	keyIservice      *sdk.KVStoreKey
+	keyService       *sdk.KVStoreKey
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -91,7 +91,7 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
-	iserviceKeeper      iservice.Keeper
+	serviceKeeper       service.Keeper
 	recordKeeper        record.Keeper
 
 	// fee manager
@@ -123,7 +123,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		keyParams:        sdk.NewKVStoreKey("params"),
 		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
-		keyIservice:      sdk.NewKVStoreKey("iservice"),
+		keyService:       sdk.NewKVStoreKey("service"),
 	}
 
 	var lastHeight int64
@@ -196,11 +196,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.keyRecord,
 		app.RegisterCodespace(record.DefaultCodespace),
 	)
-	app.iserviceKeeper = iservice.NewKeeper(
+	app.serviceKeeper = service.NewKeeper(
 		app.cdc,
-		app.keyIservice,
+		app.keyService,
 		app.bankKeeper,
-		app.RegisterCodespace(iservice.DefaultCodespace),
+		app.RegisterCodespace(service.DefaultCodespace),
 	)
 
 	// register the staking hooks
@@ -215,22 +215,21 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("ibc-1", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibcbugfix.NewHandler(app.ibc1Mapper, app.bankKeeper, app.upgradeKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("distr",  []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
+		AddRoute("distr", []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
 		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
-		AddRoute("iservice", []*sdk.KVStoreKey{app.keyIservice}, iservice.NewHandler(app.iserviceKeeper))
+		AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper))
 
 	app.QueryRouter().
 		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
 
-
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing, app.keyGov, app.keyMint, app.keyDistr,
-		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyIservice)
+		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyService)
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
@@ -268,14 +267,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
-		&iserviceparams.MaxRequestTimeoutParameter,
-		&iserviceparams.MinProviderDepositParameter)
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
@@ -297,7 +296,7 @@ func MakeCodec() *codec.Codec {
 	gov.RegisterCodec(cdc)
 	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
-	iservice.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
@@ -405,7 +404,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
-	iservice.InitGenesis(ctx,genesisState.IserviceData)
+	service.InitGenesis(ctx, genesisState.ServiceData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

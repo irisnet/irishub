@@ -1,11 +1,11 @@
-package iservice
+package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/iservice/tags"
+	"github.com/irisnet/irishub/modules/service/tags"
 )
 
-// handle all "iservice" type messages.
+// handle all "service" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
@@ -18,7 +18,7 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgSvcRefundDeposit:
 			return handleMsgSvcRefundDeposit(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parse in iservice module").Result()
+			return sdk.ErrTxDecode("invalid message parse in service module").Result()
 		}
 	}
 }

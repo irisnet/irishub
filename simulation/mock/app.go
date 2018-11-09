@@ -20,7 +20,7 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 const (
@@ -117,14 +117,14 @@ func NewApp() *App {
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
-		&iserviceparams.MaxRequestTimeoutParameter,
-		&iserviceparams.MinProviderDepositParameter)
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
