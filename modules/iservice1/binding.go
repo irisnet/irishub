@@ -74,7 +74,7 @@ func validUpdateLevel(lv Level) bool {
 	if lv.AvgRspTime < 0 {
 		return false
 	}
-	if lv.UsableTime < 0 && lv.UsableTime > 10000 {
+	if lv.UsableTime < 0 || lv.UsableTime > 10000 {
 		return false
 	}
 	return true
