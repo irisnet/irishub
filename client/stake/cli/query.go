@@ -215,7 +215,7 @@ func GetCmdQueryDelegation(storeName string, cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("no delegation found with delegator %s on validator %s", delAddr, valAddr)
 			}
 
-			// parse out theunbonding delegation
+			// parse out the unbonding delegation
 			delegation := types.MustUnmarshalDelegation(cdc, key, res)
 			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 			switch viper.Get(cli.OutputFlag) {

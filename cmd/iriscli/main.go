@@ -143,6 +143,8 @@ func main() {
 			stakecmd.GetCmdQueryDelegations("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
 			stakecmd.GetCmdQueryRedelegation("stake", cdc),
 			stakecmd.GetCmdQueryRedelegations("stake", cdc),
 			stakecmd.GetCmdQueryPool("stake", cdc),
