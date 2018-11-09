@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/irisnet/irishub/client/context"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/consensus"
@@ -17,7 +18,6 @@ import (
 	"log"
 	"strings"
 	"time"
-	"github.com/irisnet/irishub/client/context"
 )
 
 // TODO
@@ -238,7 +238,7 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec, block
 		lastBlockHight := block.Height - 1
 		lastBlock, _ := client.Block(&lastBlockHight)
 		interval := block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds()
-		cs.TmMetrics.BlockIntervalSeconds.Observe(interval)
+		cs.TmMetrics.BlockIntervalSeconds.Set(interval)
 	}
 
 	cs.TmMetrics.NumTxs.Set(float64(block.NumTxs))

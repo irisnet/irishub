@@ -8,16 +8,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/params"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const (
@@ -43,6 +46,7 @@ type App struct {
 	TkeyStake        *sdk.TransientStoreKey
 	KeyParams        *sdk.KVStoreKey
 	TkeyParams       *sdk.TransientStoreKey
+	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountKeeper       auth.AccountKeeper
@@ -82,6 +86,7 @@ func NewApp() *App {
 		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
 		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
+		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
@@ -102,6 +107,29 @@ func NewApp() *App {
 
 	app.SetInitChainer(app.InitChainer)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
+	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.FeeManager))
+	// Not sealing for custom extension
+
+	// init iparam
+	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+		params.NewTypeTable(
+			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
+			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
+			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+		)),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
+
+	iparam.RegisterGovParamMapping(
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
 
 	return app
 }
@@ -111,7 +139,11 @@ func NewApp() *App {
 func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
 	newKeys = append(newKeys, app.KeyMain)
 	newKeys = append(newKeys, app.KeyAccount)
+	newKeys = append(newKeys, app.KeyParams)
+	newKeys = append(newKeys, app.KeyStake)
 	newKeys = append(newKeys, app.KeyFeeCollection)
+	newKeys = append(newKeys, app.TkeyParams)
+	newKeys = append(newKeys, app.TkeyStake)
 
 	for _, key := range newKeys {
 		switch key.(type) {
