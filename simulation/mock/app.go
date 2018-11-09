@@ -113,28 +113,24 @@ func NewApp() *App {
 	// Not sealing for custom extension
 
 	// init iparam
-	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace("Gov").WithTypeTable(
+	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&govparams.TallyingProcedureParameter,
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
-
-	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.ServiceParamspace).WithTypeTable(
-		params.NewTypeTable(
-			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
-		)),
-		&iserviceparams.MaxRequestTimeoutParameter,
-		&iserviceparams.MinProviderDepositParameter)
 
 	return app
 }

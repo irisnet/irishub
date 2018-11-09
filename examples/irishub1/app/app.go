@@ -266,23 +266,19 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&govparams.TallyingProcedureParameter,
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
-
-	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.ServiceParamspace).WithTypeTable(
-		params.NewTypeTable(
-			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
-		)),
-		&iserviceparams.MaxRequestTimeoutParameter,
-		&iserviceparams.MinProviderDepositParameter)
 
 	return app
 }

@@ -9,7 +9,6 @@ import (
 const (
 	SignalParamspace  = "Sig"
 	GovParamspace     = "Gov"
-	ServiceParamspace = "Service"
 )
 
 type Parameter interface {

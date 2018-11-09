@@ -24,7 +24,7 @@ func (param *MaxRequestTimeoutParam) SetReadWriter(paramSpace params.Subspace) {
 }
 
 func (param *MaxRequestTimeoutParam) GetStoreKey() []byte {
-	return []byte("maxRequestTimeout")
+	return []byte("serviceMaxRequestTimeout")
 }
 
 func (param *MaxRequestTimeoutParam) SaveValue(ctx sdk.Context) {
@@ -56,7 +56,7 @@ func (param *MinProviderDepositParam) SetReadWriter(paramSpace params.Subspace) 
 }
 
 func (param *MinProviderDepositParam) GetStoreKey() []byte {
-	return []byte("minProviderDeposit")
+	return []byte("serviceMinProviderDeposit")
 }
 
 func (param *MinProviderDepositParam) SaveValue(ctx sdk.Context) {
