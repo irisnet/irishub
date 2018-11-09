@@ -125,7 +125,7 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 		var sig = make([]auth.StdSignature, len(sendTxBody.Signatures))
 		for index, s := range sendTxBody.Signatures {
 			var pubkey crypto.PubKey
-			if err := cdc.UnMarshalBinaryLengthPrefixedBare(s.PubKey, &pubkey); err != nil {
+			if err := cdc.UnmarshalBinaryBare(s.PubKey, &pubkey); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}

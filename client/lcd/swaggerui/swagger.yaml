@@ -1392,6 +1392,11 @@ paths:
         description: proposal status, valid values can be `"DepositPeriod"`, `"VotingPeriod"`, `"Passed"`, `"Rejected"`
         required: false
         type: string
+      - in: query
+        name: limit
+        description: limit to latest [number] proposals. Defaults to all proposals
+        required: false
+        type: string
       responses:
         200:
           description: OK

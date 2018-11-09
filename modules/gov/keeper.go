@@ -1,11 +1,11 @@
 package gov
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/tendermint/tendermint/crypto"
 	"time"
 )
@@ -15,6 +15,7 @@ var (
 	DepositedCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
 	BurnedDepositCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("govBurnedDepositCoins")))
 )
+
 // Governance Keeper
 type Keeper struct {
 
@@ -42,14 +43,14 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
-		storeKey:     key,
-		ck:           ck,
-		ds:           ds,
-		vs:           ds.GetValidatorSet(),
-		cdc:          cdc,
-		codespace:    codespace,
+		storeKey:  key,
+		ck:        ck,
+		ds:        ds,
+		vs:        ds.GetValidatorSet(),
+		cdc:       cdc,
+		codespace: codespace,
 	}
 }
 
@@ -68,8 +69,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	}
 	return nil
 }
-////////////////////  iris end  /////////////////////////////
 
+////////////////////  iris end  /////////////////////////////
 
 // =====================================================
 // Proposals
@@ -154,8 +155,8 @@ func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, descripti
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
 	return proposal
 }
-////////////////////  iris end  /////////////////////////////
 
+////////////////////  iris end  /////////////////////////////
 
 // Get Proposal from store by ProposalID
 func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64) Proposal {
@@ -197,7 +198,7 @@ func (keeper Keeper) GetProposalsFiltered(ctx sdk.Context, voterAddr sdk.AccAddr
 
 	matchingProposals := []Proposal{}
 
-	if numLatest == 0 {
+	if numLatest == 0 || maxProposalID < numLatest {
 		numLatest = maxProposalID
 	}
 
