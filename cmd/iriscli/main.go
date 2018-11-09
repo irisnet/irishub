@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
@@ -18,6 +19,7 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,6 +35,13 @@ var (
 )
 
 func main() {
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 

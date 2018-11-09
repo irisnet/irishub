@@ -47,7 +47,7 @@ update_irislcd_swagger_docs:
 ### Compile and Install
 install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
-#	go install $(BUILD_FLAGS) ./cmd/iriscli
+	go install $(BUILD_FLAGS) ./cmd/iriscli
 #	go install $(BUILD_FLAGS) ./cmd/irislcd
 #	go install $(BUILD_FLAGS) ./cmd/irismon
 
