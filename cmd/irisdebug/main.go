@@ -10,15 +10,22 @@ import (
 	"strconv"
 	"strings"
 
-	iris "github.com/irisnet/irishub/app"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	iris "github.com/irisnet/irishub/app"
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 func init() {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	rootCmd.AddCommand(txCmd)
 	rootCmd.AddCommand(pubkeyCmd)
 	rootCmd.AddCommand(addrCmd)
@@ -208,7 +215,7 @@ func runTxCmd(cmd *cobra.Command, args []string) error {
 	var tx = auth.StdTx{}
 	cdc := iris.MakeCodec()
 
-	err = cdc.UnMarshalBinaryLengthPrefixed(txBytes, &tx)
+	err = cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx)
 	if err != nil {
 		return err
 	}

@@ -4,13 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+	"sort"
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -18,8 +22,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/iservice"
+	"github.com/irisnet/irishub/modules/iservice/params"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
@@ -33,11 +39,6 @@ import (
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io"
-	"os"
-	"sort"
-	"strings"
-	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const (
@@ -388,7 +389,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		if len(req.Validators) != len(validators) {
 			panic(fmt.Errorf("len(RequestInitChain.Validators) != len(validators) (%d != %d)",
 				len(req.Validators), len(validators)))
-	}
+		}
 		sort.Sort(abci.ValidatorUpdates(req.Validators))
 		sort.Sort(abci.ValidatorUpdates(validators))
 		for i, val := range validators {
