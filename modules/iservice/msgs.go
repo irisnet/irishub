@@ -42,6 +42,9 @@ func (msg MsgSvcDef) Route() string { return MsgType }
 func (msg MsgSvcDef) Type() string  { return "iservice definition" }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
+	if len(msg.Tags) == 0 {
+		msg.Tags = nil
+	}
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
