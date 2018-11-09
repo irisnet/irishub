@@ -4,43 +4,42 @@ import (
 	"encoding/json"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
-	govClient "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iparam"
+	client "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/app"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
-func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-proposal",
-		Short: "query proposal details",
+		Short: "Query details of a single proposal",
+		Example: "iriscli gov query-proposal --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := viper.GetInt64(flagProposalID)
 
-			res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-			if len(res) == 0 || err != nil {
-				return fmt.Errorf("proposalID [%d] is not existed", proposalID)
+			params := gov.QueryProposalParams{
+				ProposalID: proposalID,
 			}
 
-			var proposal gov.Proposal
-			cdc.MustUnmarshalBinary(res, &proposal)
-
-			proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
-			if err != nil {
-				return err
-			}
-			output, err := wire.MarshalJSONIndent(cdc, proposalResponse)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/proposal", queryRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -52,92 +51,61 @@ func GetCmdQueryProposal(storeName string, cdc *wire.Codec) *cobra.Command {
 
 // nolint: gocyclo
 // GetCmdQueryProposals implements a query proposals command.
-func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-proposals",
 		Short: "query proposals with optional filters",
+		Example: "iriscli gov query-proposals --status=Passed",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bechDepositerAddr := viper.GetString(flagDepositer)
 			bechVoterAddr := viper.GetString(flagVoter)
 			strProposalStatus := viper.GetString(flagStatus)
 			latestProposalsIDs := viper.GetInt64(flagLatestProposalIDs)
 
-			var err error
-			var voterAddr sdk.AccAddress
-			var depositerAddr sdk.AccAddress
-			var proposalStatus gov.ProposalStatus
+			params := gov.QueryProposalsParams{
+				NumLatestProposals: latestProposalsIDs,
+			}
 
 			if len(bechDepositerAddr) != 0 {
-				depositerAddr, err = sdk.AccAddressFromBech32(bechDepositerAddr)
+				depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
 				if err != nil {
 					return err
 				}
+				params.Depositer = depositerAddr
 			}
 
 			if len(bechVoterAddr) != 0 {
-				voterAddr, err = sdk.AccAddressFromBech32(bechVoterAddr)
+				voterAddr, err := sdk.AccAddressFromBech32(bechVoterAddr)
 				if err != nil {
 					return err
 				}
+				params.Voter = voterAddr
 			}
 
 			if len(strProposalStatus) != 0 {
-				proposalStatus, err = gov.ProposalStatusFromString(strProposalStatus)
+				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 				if err != nil {
 					return err
 				}
+				params.ProposalStatus = proposalStatus
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, err := cliCtx.QueryStore(gov.KeyNextProposalID, storeName)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/proposals", queryRoute), bz)
 			if err != nil {
 				return err
 			}
-			var maxProposalID int64
-			cdc.MustUnmarshalBinary(res, &maxProposalID)
-
-			matchingProposals := []govClient.ProposalOutput{}
-
-			if latestProposalsIDs == 0 {
-				latestProposalsIDs = maxProposalID
-			}
-
-			for proposalID := maxProposalID - latestProposalsIDs; proposalID < maxProposalID; proposalID++ {
-				if voterAddr != nil {
-					res, err = cliCtx.QueryStore(gov.KeyVote(proposalID, voterAddr), storeName)
-					if err != nil || len(res) == 0 {
-						continue
-					}
-				}
-
-				if depositerAddr != nil {
-					res, err = cliCtx.QueryStore(gov.KeyDeposit(proposalID, depositerAddr), storeName)
-					if err != nil || len(res) == 0 {
-						continue
-					}
-				}
-
-				res, err = cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-				if err != nil || len(res) == 0 {
-					continue
-				}
-
-				var proposal gov.Proposal
-				cdc.MustUnmarshalBinary(res, &proposal)
-
-				if len(strProposalStatus) != 0 {
-					if proposal.GetStatus() != proposalStatus {
-						continue
-					}
-				}
-
-				proposalResponse, err := govClient.ConvertProposalToProposalOutput(cliCtx, proposal)
-				if err != nil {
-					return err
-				}
-
-				matchingProposals = append(matchingProposals, proposalResponse)
+			////////////////////  iris begin  ///////////////////////////
+			var matchingProposals gov.ProposalOutputs
+			err = cdc.UnmarshalJSON(res, &matchingProposals)
+			if err != nil {
+				return err
 			}
 
 			if len(matchingProposals) == 0 {
@@ -148,7 +116,7 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 			for _, proposal := range matchingProposals {
 				fmt.Printf("  %d - %s\n", proposal.ProposalID, proposal.Title)
 			}
-
+			////////////////////  iris end  /////////////////////////////
 			return nil
 		},
 	}
@@ -163,10 +131,11 @@ func GetCmdQueryProposals(storeName string, cdc *wire.Codec) *cobra.Command {
 
 // Command to Get a Proposal Information
 // GetCmdQueryVote implements the query proposal vote command.
-func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-vote",
 		Short: "query vote",
+		Example: "iriscli gov query-vote --proposal-id=1 --voter=<voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := viper.GetInt64(flagProposalID)
@@ -176,20 +145,21 @@ func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryStore(gov.KeyVote(proposalID, voterAddr), storeName)
-			if len(res) == 0 || err != nil {
-				return fmt.Errorf("proposalID [%d] does not exist", proposalID)
+			params := gov.QueryVoteParams{
+				Voter:      voterAddr,
+				ProposalID: proposalID,
 			}
-
-			var vote gov.Vote
-			cdc.MustUnmarshalBinary(res, &vote)
-
-			output, err := wire.MarshalJSONIndent(cdc, vote)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/vote", queryRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -201,50 +171,138 @@ func GetCmdQueryVote(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // GetCmdQueryVotes implements the command to query for proposal votes.
-func GetCmdQueryVotes(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-votes",
 		Short: "query votes on a proposal",
+		Example: "iriscli gov query-votes --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := viper.GetInt64(flagProposalID)
 
-			res, err := cliCtx.QueryStore(gov.KeyProposal(proposalID), storeName)
-			if len(res) == 0 || err != nil {
-				return fmt.Errorf("proposalID [%d] does not exist", proposalID)
+			params := gov.QueryVotesParams{
+				ProposalID: proposalID,
 			}
-
-			var proposal gov.Proposal
-			cdc.MustUnmarshalBinary(res, &proposal)
-
-			if proposal.GetStatus() != gov.StatusVotingPeriod {
-				fmt.Println("Proposal not in voting period.")
-				return nil
-			}
-
-			res2, err := cliCtx.QuerySubspace(gov.KeyVotesSubspace(proposalID), storeName)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			var votes []gov.Vote
-			for i := 0; i < len(res2); i++ {
-				var vote gov.Vote
-				cdc.MustUnmarshalBinary(res2[i].Value, &vote)
-				votes = append(votes, vote)
-			}
-
-			output, err := wire.MarshalJSONIndent(cdc, votes)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/votes", queryRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			fmt.Println(string(res))
 			return nil
 		},
 	}
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal's votes are being queried")
+
+	return cmd
+}
+
+// Command to Get a specific Deposit Information
+// GetCmdQueryDeposit implements the query proposal deposit command.
+func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "query-deposit",
+		Short: "Query details of a deposit",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			proposalID := viper.GetInt64(flagProposalID)
+
+			depositerAddr, err := sdk.AccAddressFromBech32(viper.GetString(flagDepositer))
+			if err != nil {
+				return err
+			}
+
+			params := gov.QueryDepositParams{
+				Depositer:  depositerAddr,
+				ProposalID: proposalID,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/deposit", queryRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
+			return nil
+		},
+	}
+
+	cmd.Flags().String(flagProposalID, "", "proposalID of proposal deposited on")
+	cmd.Flags().String(flagDepositer, "", "bech32 depositer address")
+
+	return cmd
+}
+
+// GetCmdQueryDeposits implements the command to query for proposal deposits.
+func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "query-deposits",
+		Short: "Query deposits on a proposal",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			proposalID := viper.GetInt64(flagProposalID)
+
+			params := gov.QueryDepositsParams{
+				ProposalID: proposalID,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/deposits", queryRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
+			return nil
+		},
+	}
+
+	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal's deposits are being queried")
+
+	return cmd
+}
+
+// GetCmdQueryDeposits implements the command to query for proposal deposits.
+func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "query-tally",
+		Short: "Get the tally of a proposal vote",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			proposalID := viper.GetInt64(flagProposalID)
+
+			params := gov.QueryTallyParams{
+				ProposalID: proposalID,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/tally", queryRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
+			return nil
+		},
+	}
+
+	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal is being tallied")
 
 	return cmd
 }
@@ -255,10 +313,11 @@ const (
 	flagPath   = "path"
 )
 
-func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-params",
 		Short: "query parameter proposal's config",
+		Example: "iriscli gov query-params --module=<module name> --key=<key name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			moduleStr := viper.GetString(flagModule)
 			keyStr := viper.GetString(flagKey)
@@ -304,7 +363,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 						}
 
 						p.GetValueFromRawData(cdc, res)
-						PrintParamStr(p, keyStr)
+						printParamStr(p, keyStr)
 						return nil
 
 					} else {
@@ -319,12 +378,12 @@ func GetCmdQueryGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(flagModule, "", "the module of parameter ")
-	cmd.Flags().String(flagKey, "", "the key of parameter")
+	cmd.Flags().String(flagModule, "", "module name")
+	cmd.Flags().String(flagKey, "", "key name of parameter")
 	return cmd
 }
 
-func PrintParamStr(p iparam.GovParameter, keyStr string) {
+func printParamStr(p iparam.GovParameter, keyStr string) {
 	var param gov.Param
 	param.Key = keyStr
 	param.Value = p.ToJson("")
@@ -333,10 +392,11 @@ func PrintParamStr(p iparam.GovParameter, keyStr string) {
 	fmt.Println(string(jsonBytes))
 }
 
-func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pull-params",
 		Short: "generate param.json file",
+		Example: "iriscli gov pull-params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
@@ -352,6 +412,7 @@ func GetCmdPullGovConfig(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().String(flagPath, "", "the path of param.json")
+	cmd.Flags().String(flagPath, app.DefaultNodeHome, "directory of iris home")
 	return cmd
 }
+

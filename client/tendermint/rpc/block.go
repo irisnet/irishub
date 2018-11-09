@@ -16,6 +16,7 @@ func BlockCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "block [height]",
 		Short: "Get verified data for a the block at given height",
+		Example: "iriscli tendermint block",
 		Args:  cobra.MaximumNArgs(1),
 		RunE:  printBlock,
 	}
@@ -41,7 +42,7 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	}
 
 	if !cliCtx.TrustNode {
-		check, err := cliCtx.Certify(res.Block.Height)
+		check, err := cliCtx.Verify(res.Block.Height)
 		if err != nil {
 			return nil, err
 		}

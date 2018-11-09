@@ -1,74 +1,78 @@
 # 参与到Genesis文件生成流程中
 
 
-1. 每个希望成为验证人的参与者确保安装了对应版本的软件：iris v0.4.2
+1. 每个希望成为验证人的参与者确保安装了对应版本的软件：iris v0.7.0
 
-2. 执行gentx命令，获得一个node-id.json的文件。这个操作将默认生成一个余额为200IRIS的账户，该账户默认绑定100IRIS成为一个验证人候选人。
-
-```
-       iris init gen-tx --name=your_name --home=path_to_home --ip=Your_public_IP
-```
-   代码示例：
-```
-       iris init gen-tx --name=alice 
-```
+2. 先创建账户,再执行gentx命令，获得一个gentx-node-ID.json的文件。这个操作将默认生成一个余额为150IRIS的账户，该账户默认绑定100IRIS成为一个验证人候选人。
 
 ```
-       {
-        "app_message": {
-          "secret": "similar spread grace kite security age pig easy always prize salon clip exhibit electric art abandon"
-        },
-        "gen_tx_file": {
-          "node_id": "3385a8e3895b169eab3024079d987602b4d2b383",
-          "ip": "192.168.1.7",
-          "validator": {
-            "pub_key": {
-              "type": "AC26791624DE60",
-              "value": "RDxXckkpTc35q9xlLNXjzUAov6xMkGJlwtWg2IqAkD8="
-            },
-            "power": 100,
-            "name": ""
-          },
-          "app_gen_tx": {
-            "name": "alice",
-            "address": "8D3B5761BC2B9048E2A7745B14E62D51C82E0B7C",
-            "pub_key": {
-              "type": "AC26791624DE60",
-              "value": "RDxXckkpTc35q9xlLNXjzUAov6xMkGJlwtWg2IqAkD8="
-            }
-          }
-        }
-       }
-  ```
+iriscli keys add your_name
+iris gentx --name=your_name --home=<path_to_home> --ip=Your_public_IP
+```
+
+代码示例：
+   
+```
+iriscli keys add alice
+iris gentx --name=alice --home=iris --chain-id=irishub-stage --ip=1.1.1.1
+```
 然后你可以发现在$IRISHOME/config目录下生成了一个gentx文件夹。里面存在一个gentx-node-ID.json文件。这个文件包含了如下信息：
 
-   ```
-       {
-        "node_id": "3385a8e3895b169eab3024079d987602b4d2b383",
-        "ip": "192.168.1.7",
-        "validator": {
-          "pub_key": {
-            "type": "AC26791624DE60",
-            "value": "RDxXckkpTc35q9xlLNXjzUAov6xMkGJlwtWg2IqAkD8="
+```
+{
+  "type": "auth/StdTx",
+  "value": {
+    "msg": [
+      {
+        "type": "cosmos-sdk/MsgCreateValidator",
+        "value": {
+          "Description": {
+            "moniker": "chenggedexiaokeai.local",
+            "identity": "",
+            "website": "",
+            "details": ""
           },
-          "power": 100,
-          "name": ""
-        },
-        "app_gen_tx": {
-          "name": "alice",
-          "address": "8D3B5761BC2B9048E2A7745B14E62D51C82E0B7C",
-          "pub_key": {
-            "type": "AC26791624DE60",
-            "value": "RDxXckkpTc35q9xlLNXjzUAov6xMkGJlwtWg2IqAkD8="
+          "Commission": {
+            "rate": "0.1000000000",
+            "max_rate": "0.2000000000",
+            "max_change_rate": "0.0100000000"
+          },
+          "delegator_address": "faa1cf25tf4pfjdhkzx8lqnkajlse6jcpm2fyw4yme",
+          "validator_address": "fva1cf25tf4pfjdhkzx8lqnkajlse6jcpm2f3lltx7",
+          "pubkey": {
+            "type": "tendermint/PubKeyEd25519",
+            "value": "/JvLFsvyMgm2ND4QgN4JKyLxhL42dVgat67383Q+mPY="
+          },
+          "delegation": {
+            "denom": "iris-atto",
+            "amount": "100000000000000000000"
           }
         }
-       }
-  ```
-   validator字段对应了home/config下的节点信息
+      }
+    ],
+    "fee": {
+      "amount": null,
+      "gas": "200000"
+    },
+    "signatures": [
+      {
+        "pub_key": {
+          "type": "tendermint/PubKeySecp256k1",
+          "value": "AtfNRj0zYvffAQG+iad6SScfdl29ag9G3EI0JDSwKJmy"
+        },
+        "signature": "BwTejBceK4M+3LzmNl62jVFUr9wVv//UO7iI/yWi5KFoez9eY43HSlaZJf+3rnKLjosn2tD79EIw55BJ6SbYzQ==",
+        "account_number": "0",
+        "sequence": "0"
+      }
+    ],
+    "memo": "0eb02fdabb96923ac1e855ac012a5a624793264a@1.1.1.1:26656"
+  }
+}
+```
 
-   `app_gen_tx`中说明了拥有这个节点的账户信息。这个账户的助记词就是刚刚的secret
+`msg` 是创建验证人节点的交易
 
-3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-3001/config/gentx`目录下：
+3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-5000/config/gentx`目录下：
 
    注意⚠️：json文中的IP改成公网IP
 

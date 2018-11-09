@@ -10,6 +10,7 @@ func deleteKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete <name>",
 		Short: "Delete the given key",
+		Example: "iriscli keys delete <key name>",
 		RunE:  runDeleteCmd,
 		Args:  cobra.ExactArgs(1),
 	}

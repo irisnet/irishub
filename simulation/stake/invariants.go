@@ -1,0 +1,127 @@
+package simulation
+
+import (
+	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/simulation/mock/simulation"
+	abci "github.com/tendermint/tendermint/abci/types"
+)
+
+// AllInvariants runs all invariants of the stake module.
+// Currently: total supply, positive power
+func AllInvariants(ck bank.Keeper, k stake.Keeper,
+	f auth.FeeCollectionKeeper, d distribution.Keeper,
+	am auth.AccountKeeper) simulation.Invariant {
+
+	return func(app *baseapp.BaseApp, header abci.Header) error {
+		//err := SupplyInvariants(ck, k, f, d, am)(app, header)
+		//if err != nil {
+		//	return err
+		//}
+		//err = PositivePowerInvariant(k)(app, header)
+		//if err != nil {
+		//	return err
+		//}
+		//err = ValidatorSetInvariant(k)(app, header)
+		//return err
+		//return nil
+		return nil
+	}
+}
+
+// SupplyInvariants checks that the total supply reflects all held loose tokens, bonded tokens, and unbonding delegations
+// nolint: unparam
+func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
+	f auth.FeeCollectionKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
+	return func(app *baseapp.BaseApp, _ abci.Header) error {
+		ctx := app.NewContext(false, abci.Header{})
+		pool := k.GetPool(ctx)
+
+		loose := sdk.ZeroDec()
+		bonded := sdk.ZeroDec()
+		am.IterateAccounts(ctx, func(acc auth.Account) bool {
+			loose = loose.Add(sdk.NewDecFromInt(acc.GetCoins().AmountOf(mock.MiniDenom)))
+			return false
+		})
+		k.IterateUnbondingDelegations(ctx, func(_ int64, ubd stake.UnbondingDelegation) bool {
+			loose = loose.Add(sdk.NewDecFromInt(ubd.Balance.Amount))
+			return false
+		})
+		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
+			switch validator.GetStatus() {
+			case sdk.Bonded:
+				bonded = bonded.Add(validator.GetPower())
+			case sdk.Unbonding:
+				loose = loose.Add(validator.GetTokens())
+			case sdk.Unbonded:
+				loose = loose.Add(validator.GetTokens())
+			}
+			return false
+		})
+
+		feePool := d.GetFeePool(ctx)
+
+		// add outstanding fees
+		loose = loose.Add(sdk.NewDecFromInt(f.GetCollectedFees(ctx).AmountOf(mock.MiniDenom)))
+
+		// add community pool
+		loose = loose.Add(feePool.CommunityPool.AmountOf(mock.MiniDenom))
+
+		// add validator distribution pool
+		loose = loose.Add(feePool.ValPool.AmountOf(mock.MiniDenom))
+
+		// add validator distribution commission and yet-to-be-withdrawn-by-delegators
+		d.IterateValidatorDistInfos(ctx,
+			func(_ int64, distInfo distribution.ValidatorDistInfo) (stop bool) {
+				loose = loose.Add(distInfo.DelPool.AmountOf(mock.MiniDenom))
+				loose = loose.Add(distInfo.ValCommission.AmountOf(mock.MiniDenom))
+				return false
+			},
+		)
+
+		// Loose tokens should equal coin supply plus unbonding delegations
+		// plus tokens on unbonded validators
+		if !pool.LooseTokens.Equal(loose) {
+			return fmt.Errorf("loose token invariance:\n\tpool.LooseTokens: %v"+
+				"\n\tsum of account tokens: %v", pool.LooseTokens, loose)
+		}
+
+		// Bonded tokens should equal sum of tokens with bonded validators
+		if !pool.BondedTokens.Equal(bonded) {
+			return fmt.Errorf("bonded token invariance:\n\tpool.BondedTokens: %v"+
+				"\n\tsum of account tokens: %v", pool.BondedTokens, bonded)
+		}
+
+		return nil
+	}
+}
+
+// PositivePowerInvariant checks that all stored validators have > 0 power
+func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
+	return func(app *baseapp.BaseApp, _ abci.Header) error {
+		ctx := app.NewContext(false, abci.Header{})
+		var err error
+		k.IterateValidatorsBonded(ctx, func(_ int64, validator sdk.Validator) bool {
+			if !validator.GetPower().GT(sdk.ZeroDec()) {
+				err = fmt.Errorf("validator with non-positive power stored. (pubkey %v)", validator.GetConsPubKey())
+				return true
+			}
+			return false
+		})
+		return err
+	}
+}
+
+// ValidatorSetInvariant checks equivalence of Tendermint validator set and SDK validator set
+func ValidatorSetInvariant(k stake.Keeper) simulation.Invariant {
+	return func(app *baseapp.BaseApp, _ abci.Header) error {
+		// TODO
+		return nil
+	}
+}

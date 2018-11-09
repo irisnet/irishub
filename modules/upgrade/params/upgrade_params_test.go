@@ -3,7 +3,7 @@ package upgradeparams
 import (
 	"testing"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/require"
 	"github.com/cosmos/cosmos-sdk/store"
 
@@ -13,10 +13,12 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func defaultContext(key sdk.StoreKey) sdk.Context {
+func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Context {
 	db := dbm.NewMemDB()
 	cms := store.NewCommitMultiStore(db)
 	cms.MountStoreWithDB(key, sdk.StoreTypeIAVL, db)
+	cms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+
 	cms.LoadLatestVersion()
 	ctx := sdk.NewContext(cms, abci.Header{}, false, log.NewNopLogger())
 	return ctx
@@ -24,10 +26,23 @@ func defaultContext(key sdk.StoreKey) sdk.Context {
 
 func TestCurrentUpgradeProposalIdParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
-	CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
+
+	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		SwitchPeriodParameter.GetStoreKey(), int64(0),
+	))
+
+	CurrentUpgradeProposalIdParameter.SetReadWriter(subspace)
 	find := CurrentUpgradeProposalIdParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
@@ -46,10 +61,23 @@ func TestCurrentUpgradeProposalIdParameter(t *testing.T) {
 
 func TestProposalAcceptHeightParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
-	ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
+
+	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		SwitchPeriodParameter.GetStoreKey(), int64(0),
+	))
+
+	ProposalAcceptHeightParameter.SetReadWriter(subspace)
 	find := ProposalAcceptHeightParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
@@ -68,10 +96,23 @@ func TestProposalAcceptHeightParameter(t *testing.T) {
 
 func TestSwitchPeriodParameter(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
-	SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
+
+	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		SwitchPeriodParameter.GetStoreKey(), int64(0),
+	))
+
+	SwitchPeriodParameter.SetReadWriter(subspace)
 	find := SwitchPeriodParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
@@ -90,18 +131,31 @@ func TestSwitchPeriodParameter(t *testing.T) {
 
 func TestUpgradeParameterSetAndGet(t *testing.T) {
 	skey := sdk.NewKVStoreKey("params")
-	ctx := defaultContext(skey)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), skey)
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
-	CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
+	ctx := defaultContext(skey, tkeyParams)
+	cdc := codec.New()
+
+	paramKeeper := params.NewKeeper(
+		cdc,
+		skey, tkeyParams,
+	)
+
+	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		SwitchPeriodParameter.GetStoreKey(), int64(0),
+	))
+
+	CurrentUpgradeProposalIdParameter.SetReadWriter(subspace)
 	find := CurrentUpgradeProposalIdParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
-	ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
+	ProposalAcceptHeightParameter.SetReadWriter(subspace)
 	find = ProposalAcceptHeightParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
-	SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
+	SwitchPeriodParameter.SetReadWriter(subspace)
 	find = SwitchPeriodParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 

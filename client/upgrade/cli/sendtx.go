@@ -2,7 +2,7 @@ package cli
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -19,10 +19,11 @@ const (
 )
 
 // submit switch msg
-func GetCmdSubmitSwitch(cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitSwitch(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit-switch",
 		Short: "Submit a switch msg for a upgrade propsal",
+		Example: "iriscli upgrade submit-switch --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposalID 1 --title <title>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
 			proposalID := viper.GetInt64(flagProposalID)

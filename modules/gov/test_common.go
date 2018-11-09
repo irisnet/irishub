@@ -13,48 +13,35 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/mock"
+	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
-	sdkParams "github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/modules/iparam"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // initialize the mock application for this module
 func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, []sdk.AccAddress, []crypto.PubKey, []crypto.PrivKey) {
 	mapp := mock.NewApp()
 
-	stake.RegisterWire(mapp.Cdc)
-	RegisterWire(mapp.Cdc)
+	stake.RegisterCodec(mapp.Cdc)
+	RegisterCodec(mapp.Cdc)
 
-	keyGlobalParams := sdk.NewKVStoreKey("params")
-	keyStake := sdk.NewKVStoreKey("stake")
 	keyGov := sdk.NewKVStoreKey("gov")
 
-	ck := bank.NewKeeper(mapp.AccountMapper)
-	sk := stake.NewKeeper(mapp.Cdc, keyStake, ck, mapp.RegisterCodespace(stake.DefaultCodespace))
+	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
+	sk := stake.NewKeeper(
+		mapp.Cdc,
+		mapp.KeyStake, mapp.TkeyStake,
+		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
+		mapp.RegisterCodespace(stake.DefaultCodespace))
 	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
-	pk := sdkParams.NewKeeper(mapp.Cdc, keyGlobalParams)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
-
-	iparam.SetParamReadWriter(pk.Setter(),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
-		&upgradeparams.CurrentUpgradeProposalIdParameter,
-		&upgradeparams.ProposalAcceptHeightParameter)
-
-	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,)
 
 	mapp.SetEndBlocker(getEndBlocker(gk))
 	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
 
-	require.NoError(t, mapp.CompleteSetup([]*sdk.KVStoreKey{keyStake, keyGov, keyGlobalParams}))
+	require.NoError(t, mapp.CompleteSetup(keyGov))
 
 	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
@@ -81,7 +68,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 
 		stakeGenesis := stake.DefaultGenesisState()
 		stakeGenesis.Params.BondDenom = "iris-atto"
-		stakeGenesis.Pool.LooseTokens = sdk.NewRat(100000)
+		stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewInt(100000))
 
 		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 		if err != nil {
@@ -99,9 +86,9 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 				VotingPeriod: 30,
 			},
 			TallyingProcedure: govparams.TallyingProcedure{
-				Threshold:         sdk.NewRat(1, 2),
-				Veto:              sdk.NewRat(1, 3),
-				GovernancePenalty: sdk.NewRat(1, 100),
+				Threshold:         sdk.NewDecWithPrec(5, 1),
+				Veto:              sdk.NewDecWithPrec(334, 3),
+				GovernancePenalty: sdk.NewDecWithPrec(1, 2),
 			},
 		})
 		return abci.ResponseInitChain{

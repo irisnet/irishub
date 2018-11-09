@@ -142,7 +142,6 @@ func main() {
 
 	ibcCmd.AddCommand(
 		client.PostCommands(
-			ibccmd.IBCTransferCmd(cdc),
 			ibccmd.IBCSetCmd(cdc),
 			ibccmd.IBCGetCmd(cdc),
 		)...)

@@ -8,6 +8,23 @@
   version = "1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/ZondaX/hid-go"
+  packages = ["."]
+  revision = "48b08affede2cea076a3cf13b2e3f72ed262b743"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/agl/ed25519"
+  packages = [
+    ".",
+    "edwards25519",
+    "extra25519"
+  ]
+  revision = "5312a61534124124185d41f09206b9fef1d88403"
+
+[[projects]]
+  branch = "master"
   name = "github.com/bartekn/go-bip39"
   packages = ["."]
   revision = "a05967ea095d81c8fe4833776774cfaff8e5036c"
@@ -26,15 +43,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/brejski/hid"
-  packages = ["."]
-  revision = "06112dcfcc50a7e0e4fd06e17f9791e788fdaafc"
-
-[[projects]]
-  branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "79e00513b1011888b1e675157ab89f527f901cae"
+  revision = "67e573d211ace594f1366b4ce9d39726c4b19bd0"
 
 [[projects]]
   name = "github.com/btcsuite/btcutil"
@@ -42,52 +53,63 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:b377b858bfe55eaae4ea65a2ab5d00c039b0bae31a87a99224bd957ddbce999b"
+  branch = "irisnet/v0.25.0-iris"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
     "client",
     "client/context",
     "client/keys",
+    "client/rpc",
+    "client/tx",
     "client/utils",
+    "codec",
     "crypto",
     "crypto/keys",
-    "crypto/keys/bcrypt",
-    "crypto/keys/bip39",
     "crypto/keys/hd",
+    "crypto/keys/keyerror",
+    "crypto/keys/mintkey",
     "server",
     "server/config",
+    "server/mock",
     "store",
     "tests",
     "types",
     "version",
-    "wire",
     "x/auth",
     "x/auth/client/cli",
-    "x/auth/client/context",
+    "x/auth/client/txbuilder",
     "x/bank",
-    "x/gov",
-    "x/gov/tags",
+    "x/distribution",
+    "x/distribution/keeper",
+    "x/distribution/tags",
+    "x/distribution/types",
     "x/ibc",
+    "x/mint",
     "x/mock",
-    "x/mock/simulation",
     "x/params",
+    "x/params/subspace",
     "x/slashing",
     "x/stake",
+    "x/stake/client/rest",
     "x/stake/keeper",
+    "x/stake/querier",
     "x/stake/tags",
     "x/stake/types"
   ]
-  pruneopts = "UT"
-  revision = "c6189e6d8c13d6b78a009f83e0ceac4a1aab3d73"
+  revision = "a6d81b98d0d993c0e5fbf02fe4537c13f2140f77"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.24.2-iris1"
+
+[[projects]]
+  name = "github.com/cosmos/go-bip39"
+  packages = ["."]
+  revision = "52158e4697b87de16ed390e1bdaf813e581008fa"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
-  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
-  version = "v1.1.1"
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/ebuchman/fail-test"
@@ -191,6 +213,12 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/gxed/hashland"
+  packages = ["keccakpg"]
+  revision = "d9f6b97f8db22dd1e090fd0bbbe98f09cc7dd0a8"
+
+[[projects]]
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
@@ -213,6 +241,18 @@
   version = "v1.0"
 
 [[projects]]
+  name = "github.com/ipfs/go-ipfs-api"
+  packages = ["."]
+  revision = "c26fc48ff114bc48b2cc357f8d12484397f5738d"
+  version = "v1.3.5"
+
+[[projects]]
+  name = "github.com/ipfs/go-ipfs-cmdkit"
+  packages = ["files"]
+  revision = "23a066ae3c5d2db34e61ce8c75d71a4d99ee4864"
+  version = "v1.1.3"
+
+[[projects]]
   branch = "master"
   name = "github.com/jmhodges/levigo"
   packages = ["."]
@@ -225,6 +265,45 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
+  name = "github.com/libp2p/go-flow-metrics"
+  packages = ["."]
+  revision = "cc546389dcf06b4bcbf6b8594069588e5c8a1451"
+  version = "v0.2.0"
+
+[[projects]]
+  name = "github.com/libp2p/go-libp2p-crypto"
+  packages = [
+    ".",
+    "pb"
+  ]
+  revision = "274de1bb6c27780863df6b230c91324ab481dab2"
+  version = "v2.0.1"
+
+[[projects]]
+  name = "github.com/libp2p/go-libp2p-metrics"
+  packages = ["."]
+  revision = "20c0e3fed14ddf84ac8192038accfd393610ed82"
+  version = "v2.1.7"
+
+[[projects]]
+  name = "github.com/libp2p/go-libp2p-peer"
+  packages = ["."]
+  revision = "dd9b45c0649b38aebe65f98cb460676b4214a42c"
+  version = "v2.4.0"
+
+[[projects]]
+  name = "github.com/libp2p/go-libp2p-protocol"
+  packages = ["."]
+  revision = "e34f0d7468b3519bf9bf4e43c1d028ce651eab51"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/libp2p/go-libp2p-pubsub"
+  packages = ["pb"]
+  revision = "3d408775deaf28da57cc356d37f2b8bf9c57db64"
+  version = "v0.10.2"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
@@ -233,8 +312,8 @@
 [[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
-  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
-  version = "v0.0.3"
+  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
+  version = "v0.0.4"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -243,10 +322,52 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/minio/blake2b-simd"
+  packages = ["."]
+  revision = "3f5f724cb5b182a5c278d6d3d55b40e7f8c2efb4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/minio/sha256-simd"
+  packages = ["."]
+  revision = "51976451ce1942acbb55707a983ed232fa027110"
+
+[[projects]]
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "ae18d6b8b3205b561c79e8e5f69bff09736185f4"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "fa473d140ef3c6adf42d6b391fe76707f1f243c8"
-  version = "v1.0.0"
+  revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
+  version = "v1.1.2"
+
+[[projects]]
+  name = "github.com/mr-tron/base58"
+  packages = ["base58"]
+  revision = "89529c6904fcd077434931b4eac8b4b2f0991baf"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/multiformats/go-multiaddr"
+  packages = ["."]
+  revision = "2b4e098f3e0aa2c8bc960f0e4bdc3247efc3749c"
+  version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/multiformats/go-multiaddr-net"
+  packages = ["."]
+  revision = "cba4f9fea8613343eb7ecc4ddadd8e7298a00c39"
+  version = "v1.6.3"
+
+[[projects]]
+  name = "github.com/multiformats/go-multihash"
+  packages = ["."]
+  revision = "8be2a682ab9f254311de1375145a2f78a809b07d"
+  version = "v1.0.8"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -288,7 +409,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
+  revision = "7e9e6cabbd393fc208072eedef99188d0ce788b6"
 
 [[projects]]
   branch = "master"
@@ -299,7 +420,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+  revision = "185b4288413d2a0dd0806f78c90dde719829e5ae"
 
 [[projects]]
   name = "github.com/rakyll/statik"
@@ -323,8 +444,8 @@
     "net",
     "process"
   ]
-  revision = "8048a2e9c5773235122027dd585cf821b2af1249"
-  version = "v2.18.07"
+  revision = "3ec50d2876a36047b2ca39f955ba88fb7a455e92"
+  version = "v2.18.10"
 
 [[projects]]
   branch = "master"
@@ -333,19 +454,25 @@
   revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
+  name = "github.com/spaolacci/murmur3"
+  packages = ["."]
+  revision = "9f5d223c60793748f04a9d5b4b4eacddfc1f755d"
+  version = "v1.1"
+
+[[projects]]
   name = "github.com/spf13/afero"
   packages = [
     ".",
     "mem"
   ]
-  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
-  version = "v1.1.1"
+  revision = "d40851caa0d747393da1ffb28f7f9d8b4eeffebd"
+  version = "v1.1.2"
 
 [[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "8965335b8c7107321228e3e3702cab9832751bac"
-  version = "v1.2.0"
+  revision = "8c9545af88b134710ab1cd196795e7f2388358d7"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/spf13/cobra"
@@ -354,16 +481,16 @@
   version = "v0.0.1"
 
 [[projects]]
-  branch = "master"
   name = "github.com/spf13/jwalterweatherman"
   packages = ["."]
-  revision = "14d3d4c518341bea657dd8a226f5121c0ff8c9f2"
+  revision = "4a4406e478ca629068e7768fc33f3f044173c0a6"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
-  version = "v1.0.2"
+  revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
+  version = "v1.0.3"
 
 [[projects]]
   name = "github.com/spf13/viper"
@@ -381,7 +508,6 @@
   version = "v1.2.1"
 
 [[projects]]
-  branch = "master"
   name = "github.com/syndtr/goleveldb"
   packages = [
     "leveldb",
@@ -397,7 +523,12 @@
     "leveldb/table",
     "leveldb/util"
   ]
-  revision = "ae2bd5eed72d46b28834ec3f60db3a3ebedd8dbd"
+  revision = "c4c61651e9e37fa117f53c5a906d3b63090d8445"
+
+[[projects]]
+  name = "github.com/tendermint/btcd"
+  packages = ["btcec"]
+  revision = "e5840949ff4fff0c56f9b6a541e22b63581ea9df"
 
 [[projects]]
   branch = "master"
@@ -412,20 +543,18 @@
 [[projects]]
   name = "github.com/tendermint/go-amino"
   packages = ["."]
-  revision = "a8328986c1608950fa5d3d1c0472cccc4f8fc02c"
-  version = "v0.12.0-rc0"
+  revision = "faa6e731944e2b7b6a46ad202902851e8ce85bee"
+  version = "v0.12.0"
 
 [[projects]]
-  digest = "1:f6e293333e941a78f8029927165d1926c5efdedd8612a3108977b30b8a871b87"
+  branch = "irisnet/v0.11.0-iris"
   name = "github.com/tendermint/iavl"
   packages = ["."]
-  pruneopts = "UT"
-  revision = "f93c0a13ec78edd04c6faef6b3158f72e66f699f"
+  revision = "1b16706ff6e17f3a241ab13528a5078ae03b0c61"
   source = "https://github.com/irisnet/iavl.git"
-  version = "v0.9.2-iris1"
 
 [[projects]]
-  digest = "1:e787411e638d991be9b98018f4f31854fb33e28d8e3e4a5b1e6fbeed39f51bb4"
+  branch = "irisnet/v0.25.1-rc0-iris"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -443,6 +572,8 @@
     "crypto/ed25519",
     "crypto/encoding/amino",
     "crypto/merkle",
+    "crypto/multisig",
+    "crypto/multisig/bitarray",
     "crypto/secp256k1",
     "crypto/tmhash",
     "crypto/xsalsa20symmetric",
@@ -454,6 +585,7 @@
     "libs/clist",
     "libs/common",
     "libs/db",
+    "libs/errors",
     "libs/events",
     "libs/flowrate",
     "libs/log",
@@ -462,7 +594,6 @@
     "lite",
     "lite/client",
     "lite/errors",
-    "lite/files",
     "lite/proxy",
     "mempool",
     "node",
@@ -485,22 +616,35 @@
     "state/txindex/kv",
     "state/txindex/null",
     "types",
+    "types/time",
     "version"
   ]
-  pruneopts = "UT"
-  revision = "46b52ca74937f3a680a4861f7b60b262d3fda777"
+  revision = "c1a7c784d8c1e515124139b57d79946852657582"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "0.23.1-rc0-iris1"
+
+[[projects]]
+  name = "github.com/tendermint/tmlibs"
+  packages = ["cli"]
+  revision = "49596e0a1f48866603813df843c9409fc19805c6"
+  version = "v0.9.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/whyrusleeping/tar-utils"
+  packages = ["."]
+  revision = "8c6c8ba81d5c71fd69c0f48dbde4b2fb422b6dfc"
 
 [[projects]]
   name = "github.com/zondax/ledger-goclient"
   packages = ["."]
-  revision = "4296ee5701e945f9b3a7dbe51f402e0b9be57259"
+  revision = "58598458c11bc0ad1c1b8dac3dc3e11eaf270b79"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/crypto"
   packages = [
+    "bcrypt",
+    "blake2s",
     "blowfish",
     "chacha20poly1305",
     "curve25519",
@@ -514,9 +658,11 @@
     "pbkdf2",
     "poly1305",
     "ripemd160",
-    "salsa20/salsa"
+    "salsa20/salsa",
+    "sha3"
   ]
-  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
+  revision = "3764759f34a542a3aef74d6b02e35be7ab893bba"
+  source = "https://github.com/tendermint/crypto"
 
 [[projects]]
   name = "golang.org/x/net"
@@ -540,7 +686,7 @@
     "unix",
     "windows"
   ]
-  revision = "4910a1d54f876d7b22162a85f4d066d3ee649450"
+  revision = "9b800f95dbbc54abff0acf7ee32d88ba4e328c89"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -564,10 +710,9 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "c66870c02cf823ceb633bcd05be3c7cda29976f4"
+  revision = "383e8b2c3b9e36c4076b235b32537292176bae20"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -610,73 +755,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = [
-    "github.com/bgentry/speakeasy",
-    "github.com/cosmos/cosmos-sdk/baseapp",
-    "github.com/cosmos/cosmos-sdk/client",
-    "github.com/cosmos/cosmos-sdk/client/context",
-    "github.com/cosmos/cosmos-sdk/client/utils",
-    "github.com/cosmos/cosmos-sdk/crypto",
-    "github.com/cosmos/cosmos-sdk/crypto/keys",
-    "github.com/cosmos/cosmos-sdk/server",
-    "github.com/cosmos/cosmos-sdk/server/config",
-    "github.com/cosmos/cosmos-sdk/store",
-    "github.com/cosmos/cosmos-sdk/tests",
-    "github.com/cosmos/cosmos-sdk/types",
-    "github.com/cosmos/cosmos-sdk/wire",
-    "github.com/cosmos/cosmos-sdk/x/auth",
-    "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/auth/client/context",
-    "github.com/cosmos/cosmos-sdk/x/bank",
-    "github.com/cosmos/cosmos-sdk/x/gov",
-    "github.com/cosmos/cosmos-sdk/x/ibc",
-    "github.com/cosmos/cosmos-sdk/x/mock",
-    "github.com/cosmos/cosmos-sdk/x/mock/simulation",
-    "github.com/cosmos/cosmos-sdk/x/params",
-    "github.com/cosmos/cosmos-sdk/x/slashing",
-    "github.com/cosmos/cosmos-sdk/x/stake",
-    "github.com/cosmos/cosmos-sdk/x/stake/tags",
-    "github.com/cosmos/cosmos-sdk/x/stake/types",
-    "github.com/go-kit/kit/metrics",
-    "github.com/go-kit/kit/metrics/prometheus",
-    "github.com/gorilla/mux",
-    "github.com/mattn/go-isatty",
-    "github.com/pelletier/go-toml",
-    "github.com/pkg/errors",
-    "github.com/prometheus/client_golang/prometheus",
-    "github.com/prometheus/client_golang/prometheus/promhttp",
-    "github.com/rakyll/statik/fs",
-    "github.com/shirou/gopsutil/cpu",
-    "github.com/shirou/gopsutil/disk",
-    "github.com/shirou/gopsutil/mem",
-    "github.com/shirou/gopsutil/process",
-    "github.com/spf13/cobra",
-    "github.com/spf13/pflag",
-    "github.com/spf13/viper",
-    "github.com/stretchr/testify/require",
-    "github.com/tendermint/go-amino",
-    "github.com/tendermint/tendermint/abci/server",
-    "github.com/tendermint/tendermint/abci/types",
-    "github.com/tendermint/tendermint/blockchain",
-    "github.com/tendermint/tendermint/consensus",
-    "github.com/tendermint/tendermint/crypto",
-    "github.com/tendermint/tendermint/crypto/ed25519",
-    "github.com/tendermint/tendermint/crypto/secp256k1",
-    "github.com/tendermint/tendermint/crypto/tmhash",
-    "github.com/tendermint/tendermint/libs/cli",
-    "github.com/tendermint/tendermint/libs/common",
-    "github.com/tendermint/tendermint/libs/db",
-    "github.com/tendermint/tendermint/libs/log",
-    "github.com/tendermint/tendermint/lite",
-    "github.com/tendermint/tendermint/lite/errors",
-    "github.com/tendermint/tendermint/lite/proxy",
-    "github.com/tendermint/tendermint/mempool",
-    "github.com/tendermint/tendermint/node",
-    "github.com/tendermint/tendermint/rpc/client",
-    "github.com/tendermint/tendermint/rpc/core/types",
-    "github.com/tendermint/tendermint/rpc/lib/server",
-    "github.com/tendermint/tendermint/state",
-    "github.com/tendermint/tendermint/types",
-  ]
+  inputs-digest = "70f386ddd6d9109f96f499af94288edd1ec8ca21174b1c85ffeae17e6de3b880"
   solver-name = "gps-cdcl"
   solver-version = 1

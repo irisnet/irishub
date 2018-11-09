@@ -3,6 +3,7 @@ package p2p
 import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/pelletier/go-toml"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
@@ -11,12 +12,9 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"github.com/irisnet/irishub/client/context"
 )
 
-
 type Metrics struct {
-
 	// Number of peers.
 	Peers metrics.Gauge
 	// Number of connected persistent peers.
@@ -63,13 +61,12 @@ func (m *Metrics) Start(ctx context.CLIContext) {
 				m.Peers.Set(float64(result.NPeers))
 				m.ConnectedPersistentPeers.Set(float64(connected))
 				m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
-			}else {
+			} else {
 				log.Println(err)
 			}
 		}
 	}()
 }
-
 
 //set the p2p persistent peers by given home dir of iris config file
 func (m *Metrics) setP2PPersistentPeers(homeDir string) {

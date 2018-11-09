@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 func TestUpdateKeeper(t *testing.T) {
@@ -137,10 +138,15 @@ func TestSetKVStoreKeylist(t *testing.T) {
 	router.AddRoute("stake-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("stake")}, nil)
 	router.AddRoute("upgrade-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
 
+	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
+	))
 
-	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
-	upgradeparams.CurrentUpgradeProposalIdParameter.SetReadWriter(paramKeeper.Setter())
-	upgradeparams.SwitchPeriodParameter.SetReadWriter(paramKeeper.Setter())
+	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(subspace)
+	upgradeparams.CurrentUpgradeProposalIdParameter.SetReadWriter(subspace)
+	upgradeparams.SwitchPeriodParameter.SetReadWriter(subspace)
 
 	InitGenesis(ctx, keeper, router, DefaultGenesisStateForTest())
 	keeper.SetKVStoreKeylist(ctx)
@@ -178,7 +184,13 @@ func TestKeeper_InitGenesis_commidID(t *testing.T) {
 	InitGenesis_commitID(ctx, keeper)
 	fmt.Println(keeper.GetKVStoreKeylist(ctx))
 
-	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(paramKeeper.Setter())
+	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
+		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
+		upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
+	))
+
+	upgradeparams.ProposalAcceptHeightParameter.SetReadWriter(subspace)
 
 	upgradeparams.SetProposalAcceptHeight(ctx, 1234234000)
 	fmt.Println(upgradeparams.GetProposalAcceptHeight(ctx))
