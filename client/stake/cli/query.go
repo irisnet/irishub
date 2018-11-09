@@ -125,6 +125,69 @@ func GetCmdQueryValidators(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryValidatorUnbondingDelegations implements the query all unbonding delegatations from a validator command.
+func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "unbonding-delegations-from [operator-addr]",
+		Short: "Query all unbonding delegatations from a validator",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			valAddr, err := sdk.ValAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			params := stake.QueryValidatorParams{
+				ValidatorAddr: valAddr,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/validatorUnbondingDelegations", queryRoute),
+				bz)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(res))
+			return nil
+		},
+	}
+	return cmd
+}
+// GetCmdQueryValidatorRedelegations implements the query all redelegatations from a validator command.
+func GetCmdQueryValidatorRedelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "redelegations-from [operator-addr]",
+		Short: "Query all outgoing redelegatations from a validator",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			valAddr, err := sdk.ValAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			params := stake.QueryValidatorParams{
+				ValidatorAddr: valAddr,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/validatorRedelegations", queryRoute),
+				bz)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(res))
+			return nil
+		},
+	}
+	return cmd
+}
+
 // GetCmdQueryDelegation the query delegation command.
 func GetCmdQueryDelegation(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -152,7 +215,7 @@ func GetCmdQueryDelegation(storeName string, cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("no delegation found with delegator %s on validator %s", delAddr, valAddr)
 			}
 
-			// parse out the delegation
+			// parse out the unbonding delegation
 			delegation := types.MustUnmarshalDelegation(cdc, key, res)
 			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
 			switch viper.Get(cli.OutputFlag) {

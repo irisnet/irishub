@@ -10,7 +10,7 @@ const (
 	flagOption            = "option"
 	flagDepositer         = "depositer"
 	flagStatus            = "status"
-	flagLatestProposalIDs = "latest"
+	flagNumLimit          = "limit"
 	flagParam             = "param"
 	flagOp                = "op"
 )

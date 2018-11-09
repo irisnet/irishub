@@ -26,7 +26,7 @@ func GetCmdSubmitSwitch(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli upgrade submit-switch --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposalID 1 --title <title>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).

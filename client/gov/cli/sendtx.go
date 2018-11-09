@@ -124,7 +124,7 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 
 			////////////////////  iris begin  ///////////////////////////
 			amount, err := cliCtx.ParseCoins(viper.GetString(flagDeposit))
@@ -169,7 +169,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 			option := viper.GetString(flagOption)
 
 			byteVoteOption, err := gov.VoteOptionFromString(client.NormalizeVoteOption(option))
