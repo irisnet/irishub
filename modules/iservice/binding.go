@@ -82,7 +82,7 @@ func validUpdateLevel(lv Level) bool {
 
 func (svcBind SvcBinding) isValid(height int64, minProviderDeposit sdk.Coins) bool {
 	return svcBind.Expiration > height &&
-		svcBind.Deposit.IsGTE(minProviderDeposit)
+		svcBind.Deposit.IsAllGTE(minProviderDeposit)
 }
 
 type BindingType byte

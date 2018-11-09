@@ -92,7 +92,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 	}
 
 	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
-	if !svcBinding.Deposit.IsGTE(minDeposit) {
+	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
@@ -107,7 +107,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return err, false
 	}
 
-	svcBindingBytes := k.cdc.MustMarshalBinary(svcBinding)
+	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(svcBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
 	return nil, true
 }
@@ -118,7 +118,7 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChai
 	svcBindingBytes := kvStore.Get(GetServiceBindingKey(defChainID, defName, bindChainID, provider))
 	if svcBindingBytes != nil {
 		var svcBinding SvcBinding
-		k.cdc.MustUnmarshalBinary(svcBindingBytes, &svcBinding)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(svcBindingBytes, &svcBinding)
 		return svcBinding, true
 	}
 	return svcBinding, false
@@ -154,7 +154,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 	}
 
 	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
-	if !oldBinding.Deposit.IsGTE(minDeposit) {
+	if !oldBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit)), false
 	}
 
@@ -179,7 +179,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		oldBinding.Level.AvgRspTime = svcBinding.Level.AvgRspTime
 	}
 
-	svcBindingBytes := k.cdc.MustMarshalBinary(oldBinding)
+	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(oldBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
 	return nil, true
 }
@@ -213,7 +213,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 
 	binding.Deposit = sdk.Coins{}
 
-	svcBindingBytes := k.cdc.MustMarshalBinary(binding)
+	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
 	return nil, true
 }
@@ -223,7 +223,7 @@ func (k Keeper) ValidateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk
 	var methods []MethodProperty
 	for ; methodIterator.Valid(); methodIterator.Next() {
 		var method MethodProperty
-		k.cdc.MustUnmarshalBinary(methodIterator.Value(), &method)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(methodIterator.Value(), &method)
 		methods = append(methods, method)
 	}
 
