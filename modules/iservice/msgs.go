@@ -45,6 +45,9 @@ func (msg MsgSvcDef) Type() string {
 }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
+	if len(msg.Tags) == 0 {
+		msg.Tags = nil
+	}
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
