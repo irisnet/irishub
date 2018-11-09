@@ -5,6 +5,6 @@ import (
 )
 
 type ServiceOutput struct {
-	iservice.MsgSvcDef
+	iservice.SvcDef
 	Methods []iservice.MethodProperty `json:"methods"`
 }

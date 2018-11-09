@@ -39,6 +39,7 @@ import (
 	"strings"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"sort"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const (
@@ -196,6 +197,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.iserviceKeeper = iservice.NewKeeper(
 		app.cdc,
 		app.keyIservice,
+		app.bankKeeper,
 		app.RegisterCodespace(iservice.DefaultCodespace),
 	)
 
@@ -264,10 +266,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&govparams.TallyingProcedureParameter,
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
@@ -398,6 +404,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
+	iservice.InitGenesis(ctx, genesisState.IserviceData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

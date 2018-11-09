@@ -1,5 +1,9 @@
 package iservice
 
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
 var (
 	// the separator for string key
 	emptyByte = []byte{0x00}
@@ -7,6 +11,7 @@ var (
 	// Keys for store prefixes
 	serviceDefinitionKey = []byte{0x01}
 	methodPropertyKey    = []byte{0x02}
+	bindingPropertyKey   = []byte{0x03}
 )
 
 func GetServiceDefinitionKey(chainId, name string) []byte {
@@ -17,20 +22,43 @@ func GetServiceDefinitionKey(chainId, name string) []byte {
 		[]byte(name)...)
 }
 
-func GetMethodPropertyKey(chainId, serviceName, methodName string) []byte {
+// id can not zero
+func GetMethodPropertyKey(chainId, serviceName string, id int) []byte {
 	return append(append(append(append(append(
 		methodPropertyKey,
 		[]byte(chainId)...),
 		emptyByte...),
 		[]byte(serviceName)...),
 		emptyByte...),
-		[]byte(methodName)...)
+		[]byte(string(id))...)
 }
 
 // Key for getting all methods on a service from the store
 func GetMethodsSubspaceKey(chainId, serviceName string) []byte {
 	return append(append(append(append(
 		methodPropertyKey,
+		[]byte(chainId)...),
+		emptyByte...),
+		[]byte(serviceName)...),
+		emptyByte...)
+}
+
+func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.AccAddress) []byte {
+	return append(append(append(append(append(append(append(
+		bindingPropertyKey,
+		[]byte(defChainId)...),
+		emptyByte...),
+		[]byte(name)...),
+		emptyByte...),
+		[]byte(bindChainId)...),
+		emptyByte...),
+		[]byte(provider.String())...)
+}
+
+// Key for getting all methods on a service from the store
+func GetBindingsSubspaceKey(chainId, serviceName string) []byte {
+	return append(append(append(append(
+		bindingPropertyKey,
 		[]byte(chainId)...),
 		emptyByte...),
 		[]byte(serviceName)...),
