@@ -34,7 +34,7 @@ func GetCmdDownload(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var submitFile record.MsgSubmitRecord
-			cdc.MustUnmarshalBinary(res, &submitFile)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitFile)
 
 			filePath := filepath.Join(home, downloadFileName)
 			if _, err := os.Stat(filePath); !os.IsNotExist(err) {

@@ -36,7 +36,7 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 func (k Keeper) AddServiceDefinition(ctx sdk.Context, svcDef SvcDef) {
 	kvStore := ctx.KVStore(k.storeKey)
 
-	svcDefBytes, err := k.cdc.MarshalBinary(svcDef)
+	svcDefBytes, err := k.cdc.MarshalBinaryLengthPrefixed(svcDef)
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +55,7 @@ func (k Keeper) AddMethods(ctx sdk.Context, svcDef SvcDef) sdk.Error {
 		if err != nil {
 			return err
 		}
-		methodBytes := k.cdc.MustMarshalBinary(methodProperty)
+		methodBytes := k.cdc.MustMarshalBinaryLengthPrefixed(methodProperty)
 		kvStore.Set(GetMethodPropertyKey(svcDef.ChainId, svcDef.Name, methodProperty.ID), methodBytes)
 	}
 	return nil
@@ -67,7 +67,7 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (svc
 	serviceDefBytes := kvStore.Get(GetServiceDefinitionKey(chainId, name))
 	if serviceDefBytes != nil {
 		var serviceDef SvcDef
-		k.cdc.MustUnmarshalBinary(serviceDefBytes, &serviceDef)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(serviceDefBytes, &serviceDef)
 		return serviceDef, true
 	}
 	return svcDef, false

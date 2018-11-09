@@ -78,7 +78,7 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			return
 		}
 
-		txBytes, err := cliCtx.Codec.MarshalBinary(m.Tx)
+		txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(m.Tx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -125,7 +125,7 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 		var sig = make([]auth.StdSignature, len(sendTxBody.Signatures))
 		for index, s := range sendTxBody.Signatures {
 			var pubkey crypto.PubKey
-			if err := cdc.UnmarshalBinaryBare(s.PubKey, &pubkey); err != nil {
+			if err := cdc.UnMarshalBinaryLengthPrefixedBare(s.PubKey, &pubkey); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
@@ -152,7 +152,7 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			Signatures: sig,
 			Memo:       sendTxBody.Memo,
 		}
-		txBytes, err := cdc.MarshalBinary(stdTx)
+		txBytes, err := cdc.MarshalBinaryLengthPrefixed(stdTx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

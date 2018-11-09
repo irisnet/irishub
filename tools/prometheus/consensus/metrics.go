@@ -267,7 +267,7 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec, block
 		cs.IrisMetrics.UpTime.Set(float64(cs.IrisMetrics.SignedCount) / float64(cs.IrisMetrics.blockInfo.Len()))
 		cs.IrisMetrics.MissedPrecommits.Set(float64(cs.IrisMetrics.MissedCount))
 	}
-	bz, _ := cdc.MarshalBinaryBare(block)
+	bz, _ := cdc.MarshalBinaryLengthPrefixedBare(block)
 	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 

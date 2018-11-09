@@ -62,7 +62,7 @@ func QueryDelegatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 		var ddiList []types.DelegationDistInfo
 		for _, kv := range resKVs {
 			var ddi types.DelegationDistInfo
-			err = cliCtx.Codec.UnmarshalBinary(kv.Value, &ddi)
+			err = cliCtx.Codec.UnMarshalBinaryLengthPrefixed(kv.Value, &ddi)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -105,7 +105,7 @@ func QueryDelegationDistInfoHandlerFn(storeName string, cliCtx context.CLIContex
 		}
 
 		var ddi types.DelegationDistInfo
-		err = cliCtx.Codec.UnmarshalBinary(res, &ddi)
+		err = cliCtx.Codec.UnMarshalBinaryLengthPrefixed(res, &ddi)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -139,7 +139,7 @@ func QueryValidatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 		}
 
 		var vdi types.ValidatorDistInfo
-		err = cliCtx.Codec.UnmarshalBinary(res, &vdi)
+		err = cliCtx.Codec.UnMarshalBinaryLengthPrefixed(res, &vdi)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

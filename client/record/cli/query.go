@@ -37,7 +37,7 @@ func GetCmdQureyRecord(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var submitRecord record.MsgSubmitRecord
-			cdc.MustUnmarshalBinary(res, &submitRecord)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitRecord)
 
 			recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitRecord)
 			if err != nil {

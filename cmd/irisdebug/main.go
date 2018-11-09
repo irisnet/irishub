@@ -208,7 +208,7 @@ func runTxCmd(cmd *cobra.Command, args []string) error {
 	var tx = auth.StdTx{}
 	cdc := iris.MakeCodec()
 
-	err = cdc.UnmarshalBinary(txBytes, &tx)
+	err = cdc.UnMarshalBinaryLengthPrefixed(txBytes, &tx)
 	if err != nil {
 		return err
 	}
