@@ -43,7 +43,7 @@ func TestStakeWithRandomMessages(t *testing.T) {
 		}
 	})
 
-	err := mapp.CompleteSetup(stakeKey, stakeTKey, paramsKey, paramsTKey, distrKey)
+	err := mapp.CompleteSetup(distrKey)
 	if err != nil {
 		panic(err)
 	}
