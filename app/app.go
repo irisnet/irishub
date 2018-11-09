@@ -247,7 +247,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
-			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 			upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
 		)),
@@ -382,7 +382,6 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 		validators = app.stakeKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	}
-	app.slashingKeeper.AddValidators(ctx, validators)
 
 	// sanity check
 	if len(req.Validators) > 0 {
@@ -426,6 +425,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		mint.ExportGenesis(ctx, app.mintKeeper),
 		distr.ExportGenesis(ctx, app.distrKeeper),
 		gov.ExportGenesis(ctx, app.govKeeper),
+		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
