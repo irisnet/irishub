@@ -10,7 +10,6 @@ import (
 
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/types"
@@ -61,7 +60,7 @@ func (cliCtx CLIContext) QuerySubspace(subspace []byte, storeName string) (res [
 		return res, err
 	}
 
-	ctx.Codec.MustUnmarshalBinaryLengthPrefixed(resRaw, &res)
+	cliCtx.Codec.MustUnmarshalBinaryLengthPrefixed(resRaw, &res)
 	return
 }
 
@@ -298,7 +297,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		if err = cliCtx.Codec.UnMarshalBinaryLengthPrefixed(bz, &coinType); err != nil {
+		if err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(bz, &coinType); err != nil {
 			return coinType, err
 		}
 	}

@@ -216,7 +216,7 @@ func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsAmount)
+	cmd.Flags().AddFlagSet(FsAmount)
 	cmd.Flags().AddFlagSet(fsValidator)
 	cmd.MarkFlagRequired(FlagAmount)
 	cmd.MarkFlagRequired(FlagAddressValidator)
