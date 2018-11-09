@@ -42,7 +42,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 type ProposalOutput struct {
-	ProposalID   int64            `json:"proposal_id"`   //  ID of the proposal
+	ProposalID   uint64            `json:"proposal_id"`   //  ID of the proposal
 	Title        string           `json:"title"`         //  Title of the proposal
 	Description  string           `json:"description"`   //  Description of the proposal
 	ProposalType ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
@@ -50,11 +50,12 @@ type ProposalOutput struct {
 	Status       ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
 	TallyResult  TallyResult    `json:"tally_result"`    //  Result of Tallys
 
-	SubmitTime   time.Time `json:"submit_time"`   //  Height of the block where TxGovSubmitProposal was included
-	TotalDeposit sdk.Coins `json:"total_deposit"` //  Current deposit on this proposal. Initial value is set at InitialDeposit
+	SubmitTime     time.Time `json:"submit_time"`      //  Time of the block where TxGovSubmitProposal was included
+	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
+	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartTime time.Time `json:"voting_start_time"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
-
+	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
 	Param        Param `json:"param"`
 }
 
@@ -72,9 +73,11 @@ func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
 		TallyResult: proposal.GetTallyResult(),
 
 		SubmitTime:  proposal.GetSubmitTime(),
+		DepositEndTime: proposal.GetDepositEndTime(),
 		TotalDeposit: proposal.GetTotalDeposit(),
 
 		VotingStartTime: proposal.GetVotingStartTime(),
+		VotingEndTime:   proposal.GetVotingEndTime(),
 		Param:           Param{},
 	}
 
@@ -95,7 +98,7 @@ func ConvertProposalsToProposalOutputs(proposals []Proposal) ProposalOutputs {
 
 // Params for query 'custom/gov/proposal'
 type QueryProposalParams struct {
-	ProposalID int64
+	ProposalID uint64
 }
 
 // nolint: unparam
@@ -122,7 +125,7 @@ func queryProposal(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 
 // Params for query 'custom/gov/deposit'
 type QueryDepositParams struct {
-	ProposalID int64
+	ProposalID uint64
 	Depositer  sdk.AccAddress
 }
 
@@ -144,7 +147,7 @@ func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 
 // Params for query 'custom/gov/vote'
 type QueryVoteParams struct {
-	ProposalID int64
+	ProposalID uint64
 	Voter      sdk.AccAddress
 }
 
@@ -166,7 +169,7 @@ func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 
 // Params for query 'custom/gov/deposits'
 type QueryDepositsParams struct {
-	ProposalID int64
+	ProposalID uint64
 }
 
 // nolint: unparam
@@ -194,7 +197,7 @@ func queryDeposits(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 
 // Params for query 'custom/gov/votes'
 type QueryVotesParams struct {
-	ProposalID int64
+	ProposalID uint64
 }
 
 // nolint: unparam
@@ -226,7 +229,7 @@ type QueryProposalsParams struct {
 	Voter              sdk.AccAddress
 	Depositer          sdk.AccAddress
 	ProposalStatus     ProposalStatus
-	NumLatestProposals int64
+	Limit              uint64
 }
 
 // nolint: unparam
@@ -237,7 +240,7 @@ func queryProposals(ctx sdk.Context, path []string, req abci.RequestQuery, keepe
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositer, params.ProposalStatus, params.NumLatestProposals)
+	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositer, params.ProposalStatus, params.Limit)
 
 	proposalOutputs := ConvertProposalsToProposalOutputs(proposals)
 
@@ -250,7 +253,7 @@ func queryProposals(ctx sdk.Context, path []string, req abci.RequestQuery, keepe
 
 // Params for query 'custom/gov/tally'
 type QueryTallyParams struct {
-	ProposalID int64
+	ProposalID uint64
 }
 
 // nolint: unparam
