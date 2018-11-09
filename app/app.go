@@ -147,7 +147,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.cdc,
 		app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace),
 	)
-	app.stakeKeeper = stake.NewKeeper(
+	stakeKeeper := stake.NewKeeper(
 		app.cdc,
 		app.keyStake, app.tkeyStake,
 		app.bankKeeper, app.paramsKeeper.Subspace(stake.DefaultParamspace),
@@ -155,19 +155,19 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	)
 	app.mintKeeper = mint.NewKeeper(app.cdc, app.keyMint,
 		app.paramsKeeper.Subspace(mint.DefaultParamspace),
-		app.stakeKeeper, app.feeCollectionKeeper,
+		&stakeKeeper, app.feeCollectionKeeper,
 	)
 	app.distrKeeper = distr.NewKeeper(
 		app.cdc,
 		app.keyDistr,
 		app.paramsKeeper.Subspace(distr.DefaultParamspace),
-		app.bankKeeper, app.stakeKeeper, app.feeCollectionKeeper,
+		app.bankKeeper, &stakeKeeper, app.feeCollectionKeeper,
 		app.RegisterCodespace(stake.DefaultCodespace),
 	)
 	app.slashingKeeper = slashing.NewKeeper(
 		app.cdc,
 		app.keySlashing,
-		app.stakeKeeper, app.paramsKeeper.Subspace(slashing.DefaultParamspace),
+		&stakeKeeper, app.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		app.RegisterCodespace(slashing.DefaultCodespace),
 	)
 	app.upgradeKeeper = upgrade.NewKeeper(
@@ -194,7 +194,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	)
 
 	// register the staking hooks
-	app.stakeKeeper = app.stakeKeeper.WithHooks(
+	// NOTE: stakeKeeper above are passed by reference,
+	// so that it can be modified like below:
+	app.stakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
 
 	// register message routes
@@ -363,7 +365,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 			if err != nil {
 				panic(err)
 			}
-			bz := app.cdc.MustMarshalBinary(tx)
+			bz := app.cdc.MustMarshalBinaryLengthPrefixed(tx)
 			res := app.BaseApp.DeliverTx(bz)
 			if !res.IsOK() {
 				panic(res.Log)
