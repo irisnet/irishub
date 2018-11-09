@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	SignalParamspace = "Sig"
-	GovParamspace = "Gov"
+	SignalParamspace  = "Sig"
+	GovParamspace     = "Gov"
 )
 
 type Parameter interface {

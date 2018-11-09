@@ -73,7 +73,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	mapp.Router().AddRoute("record", []*sdk.KVStoreKey{keyRecord}, NewHandler(rk))
 
-	require.NoError(t, mapp.CompleteSetup([]*sdk.KVStoreKey{keyGov, keyRecord}))
+	require.NoError(t, mapp.CompleteSetup(keyGov, keyRecord))
 
 	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})

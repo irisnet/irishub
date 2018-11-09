@@ -1,10 +1,44 @@
 package iservice
 
 import (
-	"github.com/pkg/errors"
 	"fmt"
 	"encoding/json"
+
+	"github.com/pkg/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+type SvcDef struct {
+	Name              string         `json:"name"`
+	ChainId           string         `json:"chain_id"`
+	Description       string         `json:"description"`
+	Tags              []string       `json:"tags"`
+	Author            sdk.AccAddress `json:"author"`
+	AuthorDescription string         `json:"author_description"`
+	IDLContent        string         `json:"idl_content"`
+	Messaging         MessagingType  `json:"messaging"`
+}
+
+type MethodProperty struct {
+	ID            int               `json:"id"`
+	Name          string            `json:"name"`
+	Description   string            `json:"description"`
+	OutputPrivacy OutputPrivacyEnum `json:"output_privacy"`
+	OutputCached  OutputCachedEnum  `json:"output_cached"`
+}
+
+func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string, messaging MessagingType) SvcDef {
+	return SvcDef{
+		Name:              name,
+		ChainId:           chainId,
+		Description:       description,
+		Tags:              tags,
+		Author:            author,
+		AuthorDescription: authorDescription,
+		IDLContent:        idlContent,
+		Messaging:         messaging,
+	}
+}
 
 type OutputPrivacyEnum byte
 
@@ -20,56 +54,49 @@ const (
 	NoCached       OutputCachedEnum = 0x02
 )
 
-type BroadcastEnum byte
+type MessagingType byte
 
 const (
-	Broadcast BroadcastEnum = 0x01
-	Unicast   BroadcastEnum = 0x02
+	Unicast   MessagingType = 0x01
+	Multicast MessagingType = 0x02
 )
 
-type MethodProperty struct {
-	Name          string            `json:"name"`
-	Description   string            `json:"description"`
-	OutputPrivacy OutputPrivacyEnum `json:"output_privacy"`
-	OutputCached  OutputCachedEnum  `json:"output_cached"`
-}
-
-// String to broadcastEnum byte, Returns ff if invalid.
-func BroadcastEnumFromString(str string) (BroadcastEnum, error) {
+// String to messagingType byte, Returns ff if invalid.
+func MessagingTypeFromString(str string) (MessagingType, error) {
 	switch str {
-	case "Broadcast":
-		return Broadcast, nil
+	case "Multicast":
+		return Multicast, nil
 	case "Unicast":
 		return Unicast, nil
 	default:
-		return BroadcastEnum(0xff), errors.Errorf("'%s' is not a valid broadcastEnum type", str)
+		return MessagingType(0xff), errors.Errorf("'%s' is not a valid messaging type", str)
 	}
 }
 
-// is defined BroadcastEnum?
-func validBroadcastEnum(be BroadcastEnum) bool {
-	if be == Broadcast ||
-		be == Unicast {
+// is defined messagingType?
+func validMessagingType(mt MessagingType) bool {
+	if mt == Multicast ||
+		mt == Unicast {
 		return true
 	}
 	return false
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
-func (be BroadcastEnum) Format(s fmt.State, verb rune) {
+func (mt MessagingType) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", be.String())))
+		s.Write([]byte(fmt.Sprintf("%s", mt.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(be))))
+		s.Write([]byte(fmt.Sprintf("%v", byte(mt))))
 	}
 }
 
-// Turns BroadcastEnum byte to String
-func (be BroadcastEnum) String() string {
-	switch be {
-	case Broadcast:
-		return "Broadcast"
+// Turns MessagingType byte to String
+func (mt MessagingType) String() string {
+	switch mt {
+	case Multicast:
+		return "Multicast"
 	case Unicast:
 		return "Unicast"
 	default:
@@ -78,23 +105,23 @@ func (be BroadcastEnum) String() string {
 }
 
 // Marshals to JSON using string
-func (be BroadcastEnum) MarshalJSON() ([]byte, error) {
-	return json.Marshal(be.String())
+func (mt MessagingType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(mt.String())
 }
 
 // Unmarshals from JSON assuming Bech32 encoding
-func (be *BroadcastEnum) UnmarshalJSON(data []byte) error {
+func (mt *MessagingType) UnmarshalJSON(data []byte) error {
 	var s string
 	err := json.Unmarshal(data, &s)
 	if err != nil {
 		return nil
 	}
 
-	bz2, err := BroadcastEnumFromString(s)
+	bz2, err := MessagingTypeFromString(s)
 	if err != nil {
 		return err
 	}
-	*be = bz2
+	*mt = bz2
 	return nil
 }
 

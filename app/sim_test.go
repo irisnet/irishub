@@ -9,18 +9,21 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tendermint/tendermint/crypto"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/mint"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/gov"
 	banksim "github.com/irisnet/irishub/simulation/bank"
 	govsim "github.com/irisnet/irishub/simulation/gov"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 	slashingsim "github.com/irisnet/irishub/simulation/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 	stakesim "github.com/irisnet/irishub/simulation/stake"
+	"os"
 )
 
 var (
@@ -29,6 +32,7 @@ var (
 	blockSize int
 	enabled   bool
 	verbose   bool
+	commit    bool
 )
 
 func init() {
@@ -37,50 +41,61 @@ func init() {
 	flag.IntVar(&blockSize, "SimulationBlockSize", 200, "Operations per block")
 	flag.BoolVar(&enabled, "SimulationEnabled", false, "Enable the simulation")
 	flag.BoolVar(&verbose, "SimulationVerbose", false, "Verbose log output")
+	flag.BoolVar(&commit, "SimulationCommit", false, "Have the simulation commit")
 }
 
-func appStateFn(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json.RawMessage {
+func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	var genesisAccounts []GenesisAccount
+
+	amountStr := "1000000000000000000000000"
+	amt, ok := sdk.NewIntFromString(amountStr)
+	if ok {
+		fmt.Errorf("invalid token amont %s\n", amountStr)
+	}
 
 	// Randomly generate some genesis accounts
 	for _, acc := range accs {
-		amountStr := "1000000000000000000000000"
-		amount, ok := sdk.NewIntFromString(amountStr)
-		if ok {
-			fmt.Errorf("invalid token amont %s", amountStr)
-		}
-
-		//TODO: use two coins for stake test, will only one coin after sdk update to v0.25
-		coins := sdk.Coins{{"iris-atto", amount}, {"steak", sdk.NewInt(100)}}
+		coins := sdk.Coins{sdk.Coin{"iris-atto", amt}}
 		genesisAccounts = append(genesisAccounts, GenesisAccount{
-			Address: acc,
+			Address: acc.Address,
 			Coins:   coins,
 		})
 	}
 
 	// Default genesis state
+	govGenesis := gov.DefaultGenesisState()
 	stakeGenesis := stake.DefaultGenesisState()
+	slashingGenesis := slashing.DefaultGenesisState()
 	var validators []stake.Validator
 	var delegations []stake.Delegation
+
 	// XXX Try different numbers of initially bonded validators
 	numInitiallyBonded := int64(50)
+	valAddrs := make([]sdk.ValAddress, numInitiallyBonded)
+	decAmt := sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 18))
 	for i := 0; i < int(numInitiallyBonded); i++ {
-		validator := stake.NewValidator(accs[i], keys[i].PubKey(), stake.Description{})
-		validator.Tokens = sdk.NewRat(100)
-		validator.DelegatorShares = sdk.NewRat(100)
-		delegation := stake.Delegation{accs[i], accs[i], sdk.NewRat(100), 0}
+		valAddr := sdk.ValAddress(accs[i].Address)
+		valAddrs[i] = valAddr
+
+		validator := stake.NewValidator(valAddr, accs[i].PubKey, stake.Description{})
+		validator.Tokens = decAmt
+		validator.DelegatorShares = decAmt
+		delegation := stake.Delegation{accs[i].Address, valAddr, decAmt, 0}
 		validators = append(validators, validator)
 		delegations = append(delegations, delegation)
 	}
-	stakeGenesis.Pool.LooseTokens = sdk.NewRat(int64(100*250) + (numInitiallyBonded * 100))
+	stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 20))
 	stakeGenesis.Validators = validators
 	stakeGenesis.Bonds = delegations
-	// No inflation, for now
-	stakeGenesis.Params.InflationMax = sdk.NewRat(0)
-	stakeGenesis.Params.InflationMin = sdk.NewRat(0)
+	mintGenesis := mint.DefaultGenesisState()
+
 	genesis := GenesisState{
-		Accounts:  genesisAccounts,
-		StakeData: stakeGenesis,
+		Accounts:     genesisAccounts,
+		StakeData:    stakeGenesis,
+		MintData:     mintGenesis,
+		DistrData:    distr.DefaultGenesisWithValidators(valAddrs),
+		SlashingData: slashingGenesis,
+		GovData:      govGenesis,
 	}
 
 	// Marshal genesis
@@ -92,31 +107,58 @@ func appStateFn(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json
 	return appState
 }
 
-func testAndRunTxs(app *IrisApp) []simulation.TestAndRunTx {
-	return []simulation.TestAndRunTx{
-		banksim.TestAndRunSingleInputMsgSend(app.AccountKeeper),
-		govsim.SimulateMsgSubmitProposal(app.govKeeper, app.stakeKeeper),
-		govsim.SimulateMsgDeposit(app.govKeeper, app.stakeKeeper),
-		govsim.SimulateMsgVote(app.govKeeper, app.stakeKeeper),
-		stakesim.SimulateMsgCreateValidator(app.AccountKeeper, app.stakeKeeper),
-		stakesim.SimulateMsgEditValidator(app.stakeKeeper),
-		stakesim.SimulateMsgDelegate(app.AccountKeeper, app.stakeKeeper),
-		stakesim.SimulateMsgBeginUnbonding(app.AccountKeeper, app.stakeKeeper),
-		stakesim.SimulateMsgCompleteUnbonding(app.stakeKeeper),
-		stakesim.SimulateMsgBeginRedelegate(app.AccountKeeper, app.stakeKeeper),
-		stakesim.SimulateMsgCompleteRedelegate(app.stakeKeeper),
-		slashingsim.SimulateMsgUnrevoke(app.slashingKeeper),
+func testAndRunTxs(app *IrisApp) []simulation.WeightedOperation {
+	return []simulation.WeightedOperation{
+		{100, banksim.SingleInputSendMsg(app.accountMapper, app.bankKeeper)},
+		{5, govsim.SimulateSubmittingVotingAndSlashingForProposal(app.govKeeper, app.stakeKeeper)},
+		{100, govsim.SimulateMsgDeposit(app.govKeeper, app.stakeKeeper)},
+		{100, stakesim.SimulateMsgCreateValidator(app.accountMapper, app.stakeKeeper)},
+		{5, stakesim.SimulateMsgEditValidator(app.stakeKeeper)},
+		{100, stakesim.SimulateMsgDelegate(app.accountMapper, app.stakeKeeper)},
+		{100, stakesim.SimulateMsgBeginUnbonding(app.accountMapper, app.stakeKeeper)},
+		{100, stakesim.SimulateMsgBeginRedelegate(app.accountMapper, app.stakeKeeper)},
+		{100, slashingsim.SimulateMsgUnjail(app.slashingKeeper)},
 	}
 }
 
 func invariants(app *IrisApp) []simulation.Invariant {
-	return []simulation.Invariant{
-		func(t *testing.T, baseapp *baseapp.BaseApp, log string) {
-			banksim.NonnegativeBalanceInvariant(app.AccountKeeper)(t, baseapp, log)
-			govsim.AllInvariants()(t, baseapp, log)
-			stakesim.AllInvariants(app.coinKeeper, app.stakeKeeper, app.AccountKeeper)(t, baseapp, log)
-			slashingsim.AllInvariants()(t, baseapp, log)
-		},
+	return []simulation.Invariant{}
+}
+
+// Profile with:
+// go test -benchmem -run=^$ ./app -bench ^BenchmarkFullIrisSimulation$ -SimulationCommit=true -cpuprofile cpu.out
+func BenchmarkFullIrisSimulation(b *testing.B) {
+	// Setup Iris application
+	var logger log.Logger
+	logger = log.NewNopLogger()
+	var db dbm.DB
+	dir := os.TempDir()
+	db, _ = dbm.NewGoLevelDB("Simulation", dir)
+	defer func() {
+		db.Close()
+		os.RemoveAll(dir)
+	}()
+	app := NewIrisApp(logger, db, nil)
+
+	// Run randomized simulation
+	// TODO parameterize numbers, save for a later PR
+	err := simulation.SimulateFromSeed(
+		b, app.BaseApp, appStateFn, seed,
+		testAndRunTxs(app),
+		[]simulation.RandSetup{},
+		invariants(app), // these shouldn't get ran
+		numBlocks,
+		blockSize,
+		commit,
+	)
+	if err != nil {
+		fmt.Println(err)
+		b.Fail()
+	}
+	if commit {
+		fmt.Println("GoLevelDB Stats")
+		fmt.Println(db.Stats()["leveldb.stats"])
+		fmt.Println("GoLevelDB cached block size", db.Stats()["leveldb.cachedblock"])
 	}
 }
 
@@ -137,7 +179,7 @@ func TestFullIrisSimulation(t *testing.T) {
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
-	simulation.SimulateFromSeed(
+	err := simulation.SimulateFromSeed(
 		t, app.BaseApp, appStateFn, seed,
 		testAndRunTxs(app),
 		[]simulation.RandSetup{},
@@ -146,7 +188,10 @@ func TestFullIrisSimulation(t *testing.T) {
 		blockSize,
 		false,
 	)
-
+	if commit {
+		fmt.Println("Database Size", db.Stats()["database.size"])
+	}
+	require.Nil(t, err)
 }
 
 // TODO: Make another test for the fuzzer itself, which just has noOp txs
@@ -156,7 +201,7 @@ func TestAppStateDeterminism(t *testing.T) {
 		t.Skip("Skipping Iris simulation")
 	}
 
-	numSeeds := 5
+	numSeeds := 3
 	numTimesToRunPerSeed := 5
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
 
@@ -173,16 +218,16 @@ func TestAppStateDeterminism(t *testing.T) {
 				testAndRunTxs(app),
 				[]simulation.RandSetup{},
 				[]simulation.Invariant{},
-				20,
-				20,
+				50,
+				100,
 				true,
 			)
+			//app.Commit()
 			appHash := app.LastCommitID().Hash
-			fmt.Printf(">>> APP HASH: %v, %X\n", appHash, appHash)
 			appHashList[j] = appHash
 		}
 		for k := 1; k < numTimesToRunPerSeed; k++ {
-			require.Equal(t, appHashList[0], appHashList[k])
+			require.Equal(t, appHashList[0], appHashList[k], "appHash list: %v", appHashList)
 		}
 	}
 }

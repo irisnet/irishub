@@ -4,10 +4,11 @@ import (
 	"math/rand"
 	"os"
 
-	bam "github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	bam "github.com/irisnet/irishub/baseapp"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
@@ -19,9 +20,18 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
-const chainID = ""
+const (
+	chainID   = ""
+	Denom     = "iris"
+	MiniDenom = "iris-atto"
+)
+
+var (
+	IrisCt = types.NewDefaultCoinType(Denom)
+)
 
 // App extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
@@ -31,12 +41,9 @@ type App struct {
 	Cdc              *codec.Codec // Cdc is public since the codec is passed into the module anyways
 	KeyMain          *sdk.KVStoreKey
 	KeyAccount       *sdk.KVStoreKey
-	KeyIBC           *sdk.KVStoreKey
+	KeyFeeCollection *sdk.KVStoreKey
 	KeyStake         *sdk.KVStoreKey
 	TkeyStake        *sdk.TransientStoreKey
-	KeySlashing      *sdk.KVStoreKey
-	KeyGov           *sdk.KVStoreKey
-	KeyFeeCollection *sdk.KVStoreKey
 	KeyParams        *sdk.KVStoreKey
 	TkeyParams       *sdk.TransientStoreKey
 	KeyUpgrade       *sdk.KVStoreKey
@@ -74,12 +81,9 @@ func NewApp() *App {
 		Cdc:              cdc,
 		KeyMain:          sdk.NewKVStoreKey("main"),
 		KeyAccount:       sdk.NewKVStoreKey("acc"),
-		KeyIBC:           sdk.NewKVStoreKey("ibc"),
-		KeyStake:         sdk.NewKVStoreKey("stake"),
-		KeySlashing:      sdk.NewKVStoreKey("slashing"),
-		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
-		KeyGov:           sdk.NewKVStoreKey("gov"),
 		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
+		KeyStake:         sdk.NewKVStoreKey("stake"),
+		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
 		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
@@ -94,33 +98,33 @@ func NewApp() *App {
 	)
 
 	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
+	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
 
 	app.ParamsKeeper = params.NewKeeper(
 		app.Cdc,
 		app.KeyParams, app.TkeyParams,
 	)
 
-	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
-
-	// Initialize the app. The chainers and blockers can be overwritten before
-	// calling complete setup.
 	app.SetInitChainer(app.InitChainer)
-	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
 	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
 
 	// init iparam
-	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace("Gov").WithTypeTable(
+	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&govparams.TallyingProcedureParameter,
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
@@ -132,15 +136,25 @@ func NewApp() *App {
 
 // CompleteSetup completes the application setup after the routes have been
 // registered.
-func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
+func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
 	newKeys = append(newKeys, app.KeyMain)
 	newKeys = append(newKeys, app.KeyAccount)
 	newKeys = append(newKeys, app.KeyParams)
 	newKeys = append(newKeys, app.KeyStake)
 	newKeys = append(newKeys, app.KeyFeeCollection)
+	newKeys = append(newKeys, app.TkeyParams)
+	newKeys = append(newKeys, app.TkeyStake)
 
-	app.MountStoresIAVL(newKeys...)
-	app.MountStoresTransient(app.TkeyParams, app.TkeyStake)
+	for _, key := range newKeys {
+		switch key.(type) {
+		case *sdk.KVStoreKey:
+			app.MountStore(key, sdk.StoreTypeIAVL)
+		case *sdk.TransientStoreKey:
+			app.MountStore(key, sdk.StoreTypeTransient)
+		default:
+			return fmt.Errorf("unsupported StoreKey: %+v", key)
+		}
+	}
 
 	err := app.LoadLatestVersion(app.KeyMain)
 
@@ -155,12 +169,6 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		acc.SetCoins(genacc.GetCoins())
 		app.AccountKeeper.SetAccount(ctx, acc)
 	}
-
-	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
-		FeeTokenNative:    types.NewDefaultCoinType("iris").MinUnit.Denom,
-		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
-	}
-	bam.InitGenesis(ctx, app.FeeManager, feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{}
 }
@@ -277,11 +285,11 @@ func GeneratePrivKeyAddressPairsFromRand(rand *rand.Rand, n int) (keys []crypto.
 // provided addresses and coin denominations.
 func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []string) {
 	accts := make([]auth.Account, len(addrs), len(addrs))
-	randCoinIntervals := []BigInterval{
-		{sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 1)},
-		{sdk.NewIntWithDecimal(1, 2), sdk.NewIntWithDecimal(1, 3)},
-		{sdk.NewIntWithDecimal(1, 40), sdk.NewIntWithDecimal(1, 50)},
-	}
+	//randCoinIntervals := []BigInterval{
+	//	{sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 1)},
+	//	{sdk.NewIntWithDecimal(1, 2), sdk.NewIntWithDecimal(1, 3)},
+	//	{sdk.NewIntWithDecimal(1, 40), sdk.NewIntWithDecimal(1, 50)},
+	//}
 
 	for i := 0; i < len(accts); i++ {
 		coins := make([]sdk.Coin, len(denoms), len(denoms))
@@ -291,7 +299,8 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 		// generate a random coin for each denomination
 		for j := 0; j < len(denoms); j++ {
 			coins[j] = sdk.Coin{Denom: denoms[j],
-				Amount: RandFromBigInterval(r, randCoinIntervals).Add(amount),
+				//Amount: RandFromBigInterval(r, randCoinIntervals).Add(amount),
+				Amount: amount,
 			}
 		}
 
@@ -301,6 +310,7 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 		(&baseAcc).SetCoins(coins)
 		accts[i] = &baseAcc
 	}
+
 	app.GenesisAccounts = accts
 }
 

@@ -37,6 +37,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const (
@@ -190,6 +191,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.iserviceKeeper = iservice.NewKeeper(
 		app.cdc,
 		app.keyIservice,
+		app.bankKeeper,
 		app.RegisterCodespace(iservice.DefaultCodespace),
 	)
 
@@ -206,7 +208,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("distr",  []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
+		AddRoute("distr", []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
 		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
@@ -215,7 +217,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.QueryRouter().
 		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
-
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
@@ -259,10 +260,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&govparams.TallyingProcedureParameter,
+		&iserviceparams.MaxRequestTimeoutParameter,
+		&iserviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
@@ -395,6 +400,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 
 	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
+	iservice.InitGenesis(ctx, genesisState.IserviceData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,

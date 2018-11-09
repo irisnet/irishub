@@ -12,15 +12,19 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmliteErr "github.com/tendermint/tendermint/lite/errors"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	"github.com/tendermint/tendermint/crypto/merkle"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	tmclient "github.com/tendermint/tendermint/rpc/client"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/app"
+	"io/ioutil"
+	"net/http"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an
@@ -354,4 +358,42 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 		coins = append(coins, coin)
 	}
 	return coins, nil
+}
+
+func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
+	client, err := cliCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+	httpClient := client.(*tmclient.HTTP)
+	return httpClient.NetInfo()
+}
+
+func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
+	client := &http.Client{}
+	url := strings.Replace(cliCtx.NodeURI, "tcp", "http", 1)
+	reqUri := fmt.Sprintf("%s/%s", url, "num_unconfirmed_txs")
+
+	resp, err := client.Get(reqUri)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var res = struct {
+		JsonRpc string                      `json:"jsonrpc"`
+		Id      string                      `json:"id"`
+		Result  ctypes.ResultUnconfirmedTxs `json:"result"`
+	}{}
+
+	if err := cliCtx.Codec.UnmarshalJSON(body, &res); err != nil {
+		return nil, err
+	}
+
+	return &res.Result, nil
 }
