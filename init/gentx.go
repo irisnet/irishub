@@ -2,33 +2,40 @@ package init
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	signcmd "github.com/irisnet/irishub/client/bank/cli"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/client"
-	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/common"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	stakecmd "github.com/irisnet/irishub/client/stake/cli"
+	"github.com/irisnet/irishub/client/stake/cli"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client"
+	signcmd "github.com/irisnet/irishub/client/bank/cli"
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 )
 
-// GenTxCmd builds the iris gentx command.
+const (
+	defaultAmount                  = "100iris"
+	defaultCommissionRate          = "0.1"
+	defaultCommissionMaxRate       = "0.2"
+	defaultCommissionMaxChangeRate = "0.01"
+)
+
+// GenTxCmd builds the gaiad gentx command.
 // nolint: errcheck
 func GenTxCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gentx",
 		Short: "Generate a genesis tx carrying a self delegation",
-		Long: fmt.Sprintf(`This command is an alias of the 'iriscli stake create-validator' command'.
+		Long: fmt.Sprintf(`This command is an alias of the 'gaiad tx create-validator' command'.
 
 It creates a genesis piece carrying a self delegation with the
 following delegation and commission default parameters:
@@ -37,7 +44,7 @@ following delegation and commission default parameters:
 	commission rate:             %s
 	commission max rate:         %s
 	commission max change rate:  %s
-`, app.FreeFermionVal.String(),defaultCommissionRate, defaultCommissionMaxRate, defaultCommissionMaxChangeRate),
+`, defaultAmount, defaultCommissionRate, defaultCommissionMaxRate, defaultCommissionMaxChangeRate),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			config := ctx.Config
@@ -46,7 +53,6 @@ following delegation and commission default parameters:
 			if err != nil {
 				return err
 			}
-
 			ip := viper.GetString(stakecmd.FlagIP)
 			if ip == "" {
 				ip, err = server.ExternalIP()
@@ -54,8 +60,20 @@ following delegation and commission default parameters:
 					return err
 				}
 			}
-			// Run iris tx create-validator
-			prepareFlagsForTxCreateValidator(config, nodeID, ip, valPubKey)
+			genDoc, err := loadGenesisDoc(cdc, config.GenesisFile())
+			if err != nil {
+				return err
+			}
+
+			// Read --pubkey, if empty take it from priv_validator.json
+			if valPubKeyString := viper.GetString(cli.FlagPubKey); valPubKeyString != "" {
+				valPubKey, err = sdk.GetConsPubKeyBech32(valPubKeyString)
+				if err != nil {
+					return err
+				}
+			}
+			// Run gaiad tx create-validator
+			prepareFlagsForTxCreateValidator(config, nodeID, ip, genDoc.ChainID, valPubKey)
 			createValidatorCmd := stakecmd.GetCmdCreateValidator(cdc)
 
 			w, err := ioutil.TempFile("", "gentx")
@@ -80,28 +98,41 @@ following delegation and commission default parameters:
 		},
 	}
 
+	cmd.Flags().String(tmcli.HomeFlag, app.DefaultNodeHome, "node's home directory")
 	cmd.Flags().String(flagClientHome, app.DefaultCLIHome, "client's home directory")
-	cmd.Flags().String(client.FlagChainID, "", "genesis file chain-id")
 	cmd.Flags().String(client.FlagName, "", "name of private key with which to sign the gentx")
 	cmd.Flags().String(stakecmd.FlagIP,"",fmt.Sprintf("Node's public IP. It takes effect only when used in combination with --%s", stakecmd.FlagGenesisFormat))
+	cmd.Flags().AddFlagSet(stakecmd.FsCommissionCreate)
+	cmd.Flags().AddFlagSet(stakecmd.FsAmount)
+	cmd.Flags().AddFlagSet(stakecmd.FsPk)
 	cmd.MarkFlagRequired(client.FlagName)
 	return cmd
 }
 
-func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip string, valPubKey crypto.PubKey) {
-	viper.Set(tmcli.HomeFlag, viper.GetString(flagClientHome))     // --home
+func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip, chainID string,
+	valPubKey crypto.PubKey) {
+	viper.Set(tmcli.HomeFlag, viper.GetString(flagClientHome)) // --home
+	viper.Set(client.FlagChainID, chainID)
 	viper.Set(client.FlagFrom, viper.GetString(client.FlagName))   // --from
 	viper.Set(stakecmd.FlagNodeID, nodeID)                              // --node-id
 	viper.Set(stakecmd.FlagIP, ip)                                      // --ip
 	viper.Set(stakecmd.FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey)) // --pubkey
-	viper.Set(stakecmd.FlagAmount, fmt.Sprintf("%d%s", app.FeeAmt, app.Denom))                            // --amount
-	viper.Set(stakecmd.FlagCommissionRate, defaultCommissionRate)
-	viper.Set(stakecmd.FlagCommissionMaxRate, defaultCommissionMaxRate)
-	viper.Set(stakecmd.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
-	viper.Set(stakecmd.FlagGenesisFormat, true)     // --genesis-format
-	viper.Set(stakecmd.FlagMoniker, config.Moniker) // --moniker
+	viper.Set(stakecmd.FlagGenesisFormat, true)                         // --genesis-format
+	viper.Set(stakecmd.FlagMoniker, config.Moniker)                     // --moniker
 	if config.Moniker == "" {
 		viper.Set(stakecmd.FlagMoniker, viper.GetString(client.FlagName))
+	}
+	if viper.GetString(stakecmd.FlagAmount) == "" {
+		viper.Set(stakecmd.FlagAmount, defaultAmount)
+	}
+	if viper.GetString(stakecmd.FlagCommissionRate) == "" {
+		viper.Set(stakecmd.FlagCommissionRate, defaultCommissionRate)
+	}
+	if viper.GetString(stakecmd.FlagCommissionMaxRate) == "" {
+		viper.Set(stakecmd.FlagCommissionMaxRate, defaultCommissionMaxRate)
+	}
+	if viper.GetString(stakecmd.FlagCommissionMaxChangeRate) == "" {
+		viper.Set(stakecmd.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
 	}
 }
 
