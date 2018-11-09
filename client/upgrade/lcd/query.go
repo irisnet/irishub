@@ -23,16 +23,16 @@ func InfoHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec, storeName string
 		res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
 		var height int64
 		var proposalID int64
-		cdc.MustUnmarshalBinary(res_height, &height)
-		cdc.MustUnmarshalBinary(res_proposalID, &proposalID)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_height, &height)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_proposalID, &proposalID)
 
 		res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
 		var versionID int64
-		cdc.MustUnmarshalBinary(res_versionID, &versionID)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_versionID, &versionID)
 
 		res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
 		var version upgrade.Version
-		cdc.MustUnmarshalBinary(res_version, &version)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_version, &version)
 		output, err := cdc.MarshalJSONIndent(version, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

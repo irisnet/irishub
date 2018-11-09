@@ -35,7 +35,7 @@ func (k Keeper) GetCurrentVersionByStore(kvStore sdk.KVStore) *Version {
 	versionIDBytes := kvStore.Get(GetCurrentVersionKey())
 	if versionIDBytes != nil {
 		var versionID int64
-		err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionIDBytes, &versionID)
 		if err != nil {
 			panic(err)
 		}
@@ -44,7 +44,7 @@ func (k Keeper) GetCurrentVersionByStore(kvStore sdk.KVStore) *Version {
 			return nil
 		}
 		var version Version
-		err = k.cdc.UnmarshalBinary(curVersionBytes, &version)
+		err = k.cdc.UnmarshalBinaryLengthPrefixed(curVersionBytes, &version)
 		if err != nil {
 			panic(err)
 		}
@@ -70,7 +70,7 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 		module.Start = version.Start
 	}
 
-	versionBytes, err := k.cdc.MarshalBinary(version)
+	versionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(version)
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +78,7 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
 	kvStore.Set(GetVersionIDKey(version.Id), versionBytes)
 	VersionListCached = append(VersionListCached, version)
 
-	versionIDBytes, err := k.cdc.MarshalBinary(version.Id)
+	versionIDBytes, err := k.cdc.MarshalBinaryLengthPrefixed(version.Id)
 	if err != nil {
 		panic(err)
 	}
@@ -99,7 +99,7 @@ func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version 
 			return nil
 		}
 		var versionID int64
-		err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionIDBytes, &versionID)
 		if err != nil {
 			panic(err)
 		}
@@ -108,7 +108,7 @@ func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version 
 			return nil
 		}
 		var version Version
-		err = k.cdc.UnmarshalBinary(versionBytes, &version)
+		err = k.cdc.UnmarshalBinaryLengthPrefixed(versionBytes, &version)
 		if err != nil {
 			panic(err)
 		}
@@ -124,14 +124,14 @@ func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId int64) *Versi
 		return nil
 	}
 	var versionID int64
-	err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(versionIDBytes, &versionID)
 	if err != nil {
 		panic(err)
 	}
 	versionBytes := kvStore.Get(GetVersionIDKey(versionID))
 	if versionBytes != nil {
 		var version Version
-		err := k.cdc.UnmarshalBinary(versionBytes, &version)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionBytes, &version)
 		if err != nil {
 			panic(err)
 		}
@@ -171,7 +171,7 @@ func (k Keeper) GetVersionListByStore(kvStore sdk.KVStore) VersionList {
 			continue
 		}
 		var version Version
-		err := k.cdc.UnmarshalBinary(versionBytes, &version)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionBytes, &version)
 		if err != nil {
 			panic(err)
 		}
@@ -188,7 +188,7 @@ func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string
 
 func (k Keeper) SetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddress, cmsg MsgSwitch) {
 	kvStore := ctx.KVStore(k.storeKey)
-	cmsgBytes, err := k.cdc.MarshalBinary(cmsg)
+	cmsgBytes, err := k.cdc.MarshalBinaryLengthPrefixed(cmsg)
 	if err != nil {
 		panic(err)
 	}
@@ -200,7 +200,7 @@ func (k Keeper) GetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddre
 	cmsgBytes := kvStore.Get(GetSwitchKey(propsalID, address))
 	if cmsgBytes != nil {
 		var cmsg MsgSwitch
-		err := k.cdc.UnmarshalBinary(cmsgBytes, &cmsg)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(cmsgBytes, &cmsg)
 		if err != nil {
 			panic(err)
 		}

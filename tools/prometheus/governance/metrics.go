@@ -107,7 +107,7 @@ func getAllInactiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (propos
 	if res, err := ctx.QueryStore(gov.KeyInactiveProposalQueue, storeName); err != nil {
 		return gov.ProposalQueue{}, err
 	} else {
-		err = cdc.UnmarshalBinary(res, &proposals)
+		err = cdc.UnMarshalBinaryLengthPrefixed(res, &proposals)
 		return proposals, err
 	}
 }
@@ -116,7 +116,7 @@ func getAllActiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposal
 	if res, err := ctx.QueryStore(gov.KeyActiveProposalQueue, storeName); len(res) == 0 || err != nil {
 		return gov.ProposalQueue{}, err
 	} else {
-		err = cdc.UnmarshalBinary(res, &proposals)
+		err = cdc.UnMarshalBinaryLengthPrefixed(res, &proposals)
 		return proposals, err
 	}
 
@@ -127,7 +127,7 @@ func getProposal(ID int64, cdc *codec.Codec, ctx context.CLIContext) (*gov.Propo
 		return nil, err
 	} else {
 		var proposal *gov.Proposal
-		err = cdc.UnmarshalBinary(res, proposal)
+		err = cdc.UnMarshalBinaryLengthPrefixed(res, proposal)
 		return proposal, err
 	}
 }
@@ -139,7 +139,7 @@ func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *codec.Codec, ctx c
 		if len(res) == 0 {
 			return gov.Vote{}, fmt.Errorf("cannot find the vote that %s vote for proposal %d", voterAddr.String(), proposalID)
 		}
-		err = cdc.UnmarshalBinary(res, &vote)
+		err = cdc.UnMarshalBinaryLengthPrefixed(res, &vote)
 		return vote, err
 	}
 }

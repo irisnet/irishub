@@ -20,6 +20,7 @@ import (
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	"path/filepath"
 )
 
 const ctxAccStoreName = "acc"

@@ -190,7 +190,7 @@ func (txCtx TxContext) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]
 	if err != nil {
 		return nil, err
 	}
-	return txCtx.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, []auth.StdSignature{sig}, msg.Memo))
+	return txCtx.Codec.MarshalBinaryLengthPrefixed(auth.NewStdTx(msg.Msgs, msg.Fee, []auth.StdSignature{sig}, msg.Memo))
 }
 
 // BuildAndSign builds a single message to be signed, and signs a transaction
@@ -231,7 +231,7 @@ func (txCtx TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, err
 		PubKey:        info.GetPubKey(),
 	}}
 
-	return txCtx.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, sigs, msg.Memo))
+	return txCtx.Codec.MarshalBinaryLengthPrefixed(auth.NewStdTx(msg.Msgs, msg.Fee, sigs, msg.Memo))
 }
 
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If append

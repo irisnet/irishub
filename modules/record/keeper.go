@@ -43,6 +43,6 @@ func KeyRecord(dataHash string) []byte {
 func (keeper Keeper) AddRecord(ctx sdk.Context, msg MsgSubmitRecord) {
 
 	store := ctx.KVStore(keeper.storeKey)
-	bz := keeper.cdc.MustMarshalBinary(msg)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(msg)
 	store.Set(KeyRecord(msg.DataHash), bz)
 }

@@ -35,7 +35,7 @@ func getRecord(ctx sdk.Context, keeper Keeper, hash string) (error, MsgSubmitRec
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyRecord(hash))
 	msg := MsgSubmitRecord{}
-	err := keeper.cdc.UnmarshalBinary(bz, &msg)
+	err := keeper.cdc.UnmarshalBinaryLengthPrefixed(bz, &msg)
 
 	return err, msg
 }

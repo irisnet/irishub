@@ -30,7 +30,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var msgSvcDef iservice.MsgSvcDef
-			cdc.MustUnmarshalBinary(res, &msgSvcDef)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &msgSvcDef)
 
 			res2, err := cliCtx.QuerySubspace(iservice.GetMethodsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
@@ -40,7 +40,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			var methods []iservice.MethodProperty
 			for i := 0; i < len(res2); i++ {
 				var method iservice.MethodProperty
-				cdc.MustUnmarshalBinary(res2[i].Value, &method)
+				cdc.MustUnmarshalBinaryLengthPrefixed(res2[i].Value, &method)
 				methods = append(methods, method)
 			}
 
