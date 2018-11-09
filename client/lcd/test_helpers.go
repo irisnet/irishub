@@ -12,37 +12,37 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	crkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
+	txbuilder "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/cosmos/cosmos-sdk/x/stake"
+	irisapp "github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmcfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	nm "github.com/tendermint/tendermint/node"
+	"github.com/tendermint/tendermint/p2p"
 	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
 	tmrpc "github.com/tendermint/tendermint/rpc/lib/server"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/client/keys"
-	irisapp "github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/client"
-	"github.com/tendermint/tendermint/p2p"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	txbuilder "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/upgrade"
 )
 
 // makePathname creates a unique pathname for each test. It will panic if it
@@ -173,7 +173,7 @@ func InitializeTestLCD(
 		msg := stake.NewMsgCreateValidator(
 			sdk.ValAddress(operAddr),
 			pubKey,
-			sdk.NewCoin("iris-atto",sdk.NewIntWithDecimal(1,delegation)),
+			sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, delegation)),
 			stake.Description{Moniker: fmt.Sprintf("validator-%d", i+1)},
 			stake.NewCommissionMsg(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
 		)
@@ -191,16 +191,16 @@ func InitializeTestLCD(
 		valOperAddrs = append(valOperAddrs, sdk.ValAddress(operAddr))
 	}
 
-	genesisState, err := irisapp.IrisAppGenState(cdc, genTxs)
+	genesisState, err := irisapp.IrisAppGenState(cdc, *genDoc, genTxs)
 	require.NoError(t, err)
 
 	// add some tokens to init accounts
 	for _, addr := range initAddrs {
 		accAuth := auth.NewBaseAccountWithAddress(addr)
-		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto",sdk.NewIntWithDecimal(1,20))}
+		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, 20))}
 		acc := irisapp.NewGenesisAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
-		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1,20)))
+		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 20)))
 	}
 
 	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()
