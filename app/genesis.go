@@ -28,6 +28,7 @@ import (
 
 var (
 	Denom             = "iris"
+	StakeDenom        = Denom + "-" + types.Atto
 	FeeAmt            = int64(100)
 	IrisCt            = types.NewDefaultCoinType(Denom)
 	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", FeeAmt, Denom))
@@ -109,8 +110,8 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 func NewDefaultGenesisState() GenesisState {
 	return GenesisState{
 		Accounts:     nil,
-		StakeData:    stake.DefaultGenesisState(),
-		MintData:     mint.DefaultGenesisState(),
+		StakeData:    createStakeGenesisState(),
+		MintData:     createMintGenesisState(),
 		DistrData:    distr.DefaultGenesisState(),
 		GovData:      gov.DefaultGenesisState(),
 		UpgradeData:  upgrade.DefaultGenesisState(),
@@ -159,7 +160,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	for _, acc := range genesisState.Accounts {
 		// create the genesis account, give'm few iris-atto and a buncha token with there name
 		for _, coin := range acc.Coins {
-			if coin.Denom == Denom+"-"+types.Atto {
+			if coin.Denom == StakeDenom {
 				stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
 					Add(sdk.NewDecFromInt(coin.Amount)) // increase the supply
 			}
@@ -174,7 +175,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 func genesisAccountFromMsgCreateValidator(msg stake.MsgCreateValidator, amount sdk.Int) GenesisAccount {
 	accAuth := auth.NewBaseAccountWithAddress(sdk.AccAddress(msg.ValidatorAddr))
 	accAuth.Coins = []sdk.Coin{
-		{"iris-atto", amount},
+		{StakeDenom, amount},
 	}
 	return NewGenesisAccount(&accAuth)
 }
@@ -316,7 +317,7 @@ func NewDefaultGenesisAccount(addr sdk.AccAddress) GenesisAccount {
 	return NewGenesisAccount(&accAuth)
 }
 
-func createGenesisState() stake.GenesisState {
+func createStakeGenesisState() stake.GenesisState {
 	return stake.GenesisState{
 		Pool: stake.Pool{
 			LooseTokens:  sdk.ZeroDec(),
@@ -325,7 +326,20 @@ func createGenesisState() stake.GenesisState {
 		Params: stake.Params{
 			UnbondingTime: defaultUnbondingTime,
 			MaxValidators: 100,
-			BondDenom:     Denom + "-" + types.Atto,
+			BondDenom:     StakeDenom,
+		},
+	}
+}
+
+func createMintGenesisState() mint.GenesisState {
+	return mint.GenesisState{
+		Minter: mint.InitialMinter(),
+		Params: mint.Params{
+			MintDenom:           StakeDenom,
+			InflationRateChange: sdk.NewDecWithPrec(13, 2),
+			InflationMax:        sdk.NewDecWithPrec(20, 2),
+			InflationMin:        sdk.NewDecWithPrec(7, 2),
+			GoalBonded:          sdk.NewDecWithPrec(67, 2),
 		},
 	}
 }
