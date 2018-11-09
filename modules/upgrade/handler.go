@@ -61,7 +61,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 	switchPeriod := upgradeparams.GetSwitchPeriod(ctx)
 
-	if (proposalID != -1) && (ctx.BlockHeight() == height + switchPeriod) {
+	if (proposalID != 0) && (ctx.BlockHeight() == height + switchPeriod) {
 		switchPasses := tally(ctx, keeper)
 		if switchPasses {
 			tags.AppendTag("action", []byte("switchPassed"))
@@ -70,7 +70,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 		} else {
 			tags.AppendTag("action", []byte("switchDropped"))
 
-			upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
+			upgradeparams.SetCurrentUpgradeProposalId(ctx,0)
 		}
 	}
 

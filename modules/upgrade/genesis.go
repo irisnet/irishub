@@ -28,7 +28,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState
 	k.AddNewVersion(ctx, genesisVersion)
 
 	iparam.InitGenesisParameter(&upgradeparams.ProposalAcceptHeightParameter, ctx, -1)
-	iparam.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, -1)
+	iparam.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, 0)
 	iparam.InitGenesisParameter(&upgradeparams.SwitchPeriodParameter, ctx, data.SwitchPeriod)
 
 	InitGenesis_commitID(ctx, k)
