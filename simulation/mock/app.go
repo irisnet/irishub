@@ -46,6 +46,7 @@ type App struct {
 	TkeyStake        *sdk.TransientStoreKey
 	KeyParams        *sdk.KVStoreKey
 	TkeyParams       *sdk.TransientStoreKey
+	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountKeeper       auth.AccountKeeper
@@ -85,6 +86,7 @@ func NewApp() *App {
 		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
 		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
+		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
@@ -137,7 +139,11 @@ func NewApp() *App {
 func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
 	newKeys = append(newKeys, app.KeyMain)
 	newKeys = append(newKeys, app.KeyAccount)
+	newKeys = append(newKeys, app.KeyParams)
+	newKeys = append(newKeys, app.KeyStake)
 	newKeys = append(newKeys, app.KeyFeeCollection)
+	newKeys = append(newKeys, app.TkeyParams)
+	newKeys = append(newKeys, app.TkeyStake)
 
 	for _, key := range newKeys {
 		switch key.(type) {

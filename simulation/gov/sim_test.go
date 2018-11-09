@@ -9,11 +9,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 )
@@ -29,7 +26,6 @@ func TestGovWithRandomMessages(t *testing.T) {
 	stakeKey := mapp.KeyStake
 	stakeTKey := mapp.TkeyStake
 	paramKey := mapp.KeyParams
-	paramTKey := mapp.TkeyParams
 	govKey := sdk.NewKVStoreKey("gov")
 
 	paramKeeper := mapp.ParamsKeeper
@@ -45,20 +41,6 @@ func TestGovWithRandomMessages(t *testing.T) {
 		bankKeeper, stakeKeeper,
 		mapp.RegisterCodespace(gov.DefaultCodespace),
 	)
-	iparam.SetParamReadWriter(mapp.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
-		params.NewTypeTable(
-			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
-			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
-			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-		)),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
-
-	iparam.RegisterGovParamMapping(
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))
 	mapp.SetEndBlocker(func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
@@ -66,7 +48,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		return abci.ResponseEndBlock{}
 	})
 
-	err := mapp.CompleteSetup(stakeKey, stakeTKey, paramKey, paramTKey, govKey)
+	err := mapp.CompleteSetup(govKey)
 	if err != nil {
 		panic(err)
 	}
