@@ -19,10 +19,33 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	irisInit "github.com/irisnet/irishub/init"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+const (
+	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
+	bech32PrefixAccAddr = "faa"
+	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key
+	bech32PrefixAccPub = "fap"
+	// Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address
+	bech32PrefixValAddr = "fva"
+	// Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key
+	bech32PrefixValPub = "fvp"
+	// Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address
+	bech32PrefixConsAddr = "fca"
+	// Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key
+	bech32PrefixConsPub = "fcp"
 )
 
 func main() {
 	cdc := app.MakeCodec()
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
+	config.Seal()
+
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
@@ -50,6 +73,7 @@ func main() {
 		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
 		irisInit.GenTxCmd(ctx,cdc),
 		irisInit.TestnetFilesCmd(ctx,cdc,app.IrisAppInit()),
+		irisInit.CollectGenTxsCmd(ctx, cdc),
 		startCmd,
 		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),

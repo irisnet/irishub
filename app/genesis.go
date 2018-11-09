@@ -113,6 +113,7 @@ func NewDefaultGenesisState() GenesisState {
 		MintData:     mint.DefaultGenesisState(),
 		DistrData:    distr.DefaultGenesisState(),
 		GovData:      gov.DefaultGenesisState(),
+		UpgradeData:  upgrade.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
@@ -158,7 +159,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	for _, acc := range genesisState.Accounts {
 		// create the genesis account, give'm few iris-atto and a buncha token with there name
 		for _, coin := range acc.Coins {
-			if coin.Denom == Denom+"-"+"atto" {
+			if coin.Denom == Denom+"-"+types.Atto {
 				stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
 					Add(sdk.NewDecFromInt(coin.Amount)) // increase the supply
 			}
@@ -166,6 +167,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	}
 	genesisState.StakeData = stakeData
 	genesisState.GenTxs = appGenTxs
+	genesisState.UpgradeData = genesisState.UpgradeData
 	return genesisState, nil
 }
 

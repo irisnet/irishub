@@ -247,7 +247,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
-			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 			upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
 		)),
