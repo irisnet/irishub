@@ -1,0 +1,17 @@
+{
+  "node_id": "298e3b0c4f97eabac2d1c18de3f7420b3c5724a0",
+  "ip": "47.52.24.118",
+  "validator": {
+    "pub_key": {
+      "type": "tendermint/PubKeyEd25519",
+      "value": "oZB2RHKhLtTv7apzQZ99m0agU7pwhQXDvNXv5Cl8Wg4="
+    },
+    "power": "100",
+    "name": ""
+  },
+  "app_gen_tx": {
+    "name": "8btc",
+    "address": "faa1fhftv6tmcy3hs5mrj9ln686rjly2ryydh0u2yv",
+    "pub_key": "fap1zcjduepq5xg8v3rj5yhdfmld4fe5r8mandr2q5a6wzzstsau6hh7g2tutg8qxqtknp"
+  }
+}
