@@ -11,12 +11,12 @@ var CurrentUpgradeProposalIdParameter CurrentUpgradeProposalIdParam
 var _ iparam.SignalParameter = (*CurrentUpgradeProposalIdParam)(nil)
 
 type CurrentUpgradeProposalIdParam struct {
-	Value      int64
+	Value      uint64
 	paramSpace params.Subspace
 }
 
 func (param *CurrentUpgradeProposalIdParam) InitGenesis(genesisState interface{}) {
-	param.Value = -1
+	param.Value = 0
 }
 
 func (param *CurrentUpgradeProposalIdParam) SetReadWriter(paramSpace params.Subspace) {

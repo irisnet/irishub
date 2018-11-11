@@ -64,7 +64,7 @@ func GetCmdQuerySwitch(storeName string, cdc *codec.Codec) *cobra.Command {
 		Short: "query switch details",
 		Example: "iriscli upgrade query-switch --proposalID 1 --voter <voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 			voterStr := viper.GetString(flagVoter)
 
 			voter, err := sdk.AccAddressFromBech32(voterStr)

@@ -6,11 +6,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/irisnet/irishub/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/client"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -18,10 +20,16 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	irisInit "github.com/irisnet/irishub/init"
 )
 
 func main() {
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
@@ -48,8 +56,9 @@ func main() {
 	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
 		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
-		irisInit.GenTxCmd(ctx,cdc),
-		irisInit.TestnetFilesCmd(ctx,cdc,app.IrisAppInit()),
+		irisInit.GenTxCmd(ctx, cdc),
+		irisInit.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.CollectGenTxsCmd(ctx, cdc),
 		startCmd,
 		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),

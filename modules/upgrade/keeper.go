@@ -117,7 +117,7 @@ func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version 
 	return nil
 }
 
-func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId int64) *Version {
+func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId uint64) *Version {
 	kvStore := ctx.KVStore(k.storeKey)
 	versionIDBytes := kvStore.Get(GetProposalIDKey(proposalId))
 	if versionIDBytes == nil {
@@ -186,7 +186,7 @@ func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string
 	return currentVersion.getMsgType(msg)
 }
 
-func (k Keeper) SetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddress, cmsg MsgSwitch) {
+func (k Keeper) SetSwitch(ctx sdk.Context, propsalID uint64, address sdk.AccAddress, cmsg MsgSwitch) {
 	kvStore := ctx.KVStore(k.storeKey)
 	cmsgBytes, err := k.cdc.MarshalBinaryLengthPrefixed(cmsg)
 	if err != nil {
@@ -195,7 +195,7 @@ func (k Keeper) SetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddre
 	kvStore.Set(GetSwitchKey(propsalID, address), cmsgBytes)
 }
 
-func (k Keeper) GetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
+func (k Keeper) GetSwitch(ctx sdk.Context, propsalID uint64, address sdk.AccAddress) (MsgSwitch, bool) {
 	kvStore := ctx.KVStore(k.storeKey)
 	cmsgBytes := kvStore.Get(GetSwitchKey(propsalID, address))
 	if cmsgBytes != nil {

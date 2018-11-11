@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.26.0-iris"
-  digest = "1:f26b50f0ab46bbc42a964254a0c4998177755714e58c23fa86cb7ddadcd02971"
+  digest = "1:dc540b2f062c26d69b7821a1324ab7afaf04b8920da500e3378300d10e6db324"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -103,7 +103,6 @@
     "x/distribution/types",
     "x/ibc",
     "x/mint",
-    "x/mock",
     "x/params",
     "x/params/subspace",
     "x/slashing",
@@ -115,7 +114,7 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "6a94c0fe852604b5d2cb1f0dddb3bd2cd778f2f5"
+  revision = "b352686dab3f9976be1347a860c7aba28c22abe0"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -927,7 +926,6 @@
     "github.com/cosmos/cosmos-sdk/x/distribution/types",
     "github.com/cosmos/cosmos-sdk/x/ibc",
     "github.com/cosmos/cosmos-sdk/x/mint",
-    "github.com/cosmos/cosmos-sdk/x/mock",
     "github.com/cosmos/cosmos-sdk/x/params",
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/stake",
@@ -984,6 +982,7 @@
     "github.com/tendermint/tendermint/rpc/lib/server",
     "github.com/tendermint/tendermint/state",
     "github.com/tendermint/tendermint/types",
+    "github.com/tendermint/tendermint/types/time",
     "github.com/tendermint/tmlibs/cli",
   ]
   solver-name = "gps-cdcl"

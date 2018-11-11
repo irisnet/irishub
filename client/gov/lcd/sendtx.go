@@ -86,7 +86,7 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 
-		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		proposalID, ok := utils.ParseUint64OrReturnBadRequest(w, strProposalID)
 		if !ok  {
 			return
 		}
@@ -133,7 +133,7 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 			return
 		}
 
-		proposalID, ok := utils.ParseInt64OrReturnBadRequest(w, strProposalID)
+		proposalID, ok := utils.ParseUint64OrReturnBadRequest(w, strProposalID)
 		if !ok {
 			return
 		}

@@ -92,7 +92,7 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var svcBinding iservice.SvcBinding
-			cdc.MustUnmarshalBinary(res, &svcBinding)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcBinding)
 			output, err := codec.MarshalJSONIndent(cdc, svcBinding)
 			fmt.Println(string(output))
 			return nil
@@ -126,7 +126,7 @@ func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			var bindings []iservice.SvcBinding
 			for i := 0; i < len(res); i++ {
 				var binding iservice.SvcBinding
-				cdc.MustUnmarshalBinary(res[i].Value, &binding)
+				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &binding)
 				bindings = append(bindings, binding)
 			}
 
