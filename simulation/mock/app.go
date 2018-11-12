@@ -8,25 +8,41 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/iparam"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/iservice/params"
 )
 
 const (
-	chainID   = ""
-	Denom     = "iris"
-	MiniDenom = "iris-atto"
+	chainID           = ""
+	Denom             = "iris"
+	MiniDenom         = "iris-atto"
+	DefaultStakeDenom = "steak"
+)
+
+const (
+	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
+	bech32PrefixAccAddr = "faa"
+	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key
+	bech32PrefixAccPub = "fap"
+	// Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address
+	bech32PrefixValAddr = "fva"
+	// Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key
+	bech32PrefixValPub = "fvp"
+	// Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address
+	bech32PrefixConsAddr = "fca"
+	// Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key
+	bech32PrefixConsPub = "fcp"
 )
 
 var (
@@ -69,9 +85,15 @@ func NewApp() *App {
 
 	// Create the cdc with some standard codecs
 	cdc := codec.New()
+	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	auth.RegisterCodec(cdc)
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
+	config.Seal()
 
 	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
@@ -294,8 +316,7 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 	for i := 0; i < len(accts); i++ {
 		coins := make([]sdk.Coin, len(denoms), len(denoms))
 
-		amountStr := "100000000000000000000"
-		amount, _ := sdk.NewIntFromString(amountStr)
+		amount := sdk.NewIntWithDecimal(1, 2)
 		// generate a random coin for each denomination
 		for j := 0; j < len(denoms); j++ {
 			coins[j] = sdk.Coin{Denom: denoms[j],
