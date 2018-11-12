@@ -79,7 +79,7 @@ Committed at block 233 (tx hash: 2F5F44BAF09981D137EA667F9E872EB098A9B619, respo
    }
 }
 
-# Disable
+# Disable service binding
 iriscli service disable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
 
 # Result
@@ -91,7 +91,7 @@ Committed at block 241 (tx hash: 0EF936E1228F9838D0343D0FB3613F5E938602B7, respo
    }
 }
 
-# Enable
+# Enable service binding
 iriscli service enable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service --deposit=1iris
 
 # Result
@@ -119,13 +119,12 @@ Committed at block 1563 (tx hash: 748CEA6EA9DEFB384FFCFBE68A3CB6D8B643361B, resp
 ## CLI Command Details
 
 ```
-iriscli service define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --messaging=Unicast --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 ```
 * `--service-name`  The name of service
 * `--service-description`  The description of this service
 * `--author-description`  The self-description of the service creator which is optional
 * `--tags`  The keywords of this service
-* `--messaging`  The transfer type of this service{`Unicast`,`Multicast`}
 * `--idl-content`  The standardized definition of the methods for this service
 * `--file`  Idl-content can be replaced by files,if the item is not empty.
 
@@ -136,7 +135,7 @@ iriscli service definition --def-chain-id=service-test --service-name=test-servi
 * `--service-name`  The name of service
 
 ```
-iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
+iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 ```
 * `--def-chain-id` The ID of the blockchain defined of the service
 * `--service-name` The name of service
@@ -145,7 +144,6 @@ iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service
 * `--prices` Service prices, a list sorted by service method
 * `--avg-rsp-time` The average service response time in milliseconds
 * `--usable-time` An integer represents the number of usable service invocations per 10,000
-* `--expiration` Negative number used here means the unbonded blockchain height "never expire" 
 
 ```
 iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
@@ -161,9 +159,28 @@ iriscli service bindings --def-chain-id=service-test --service-name=test-service
 * Refer to iriscli service binding
 
 ```
-iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1
+iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
 ```
-* Refer to iriscli service bind
+* `--def-chain-id` The ID of the blockchain defined of the service
+* `--service-name` The name of service
+* `--bind-type` Set whether the service is local or global
+* `--deposit` Add to the current deposit balance of service provider
+* `--prices` Service prices, a list sorted by service method
+* `--avg-rsp-time` The average service response time in milliseconds
+* `--usable-time` An integer represents the number of usable service invocations per 10,000
+
+```
+iriscli service disable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
+```
+* `--def-chain-id` The ID of the blockchain defined of the service
+* `--service-name` The name of service
+
+```
+iriscli service enable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service --deposit=1iris
+```
+* `--def-chain-id` The ID of the blockchain defined of the service
+* `--service-name` The name of service
+* `--deposit` Add to the current deposit balance of service provider
 
 ```
 iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
