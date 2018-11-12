@@ -2,6 +2,7 @@ package keys
 
 import (
 	"fmt"
+	"net/http"
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -12,7 +13,6 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
-	"net/http"
 )
 
 // KeyDBName is the directory under root where we store the keys

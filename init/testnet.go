@@ -33,6 +33,7 @@ var (
 	flagNodeDaemonHome    = "node-daemon-home"
 	flagNodeCliHome       = "node-cli-home"
 	flagStartingIPAddress = "starting-ip-address"
+	flagChainID           = "chain-id"
 )
 
 const nodeDirPerm = 0755
@@ -50,13 +51,15 @@ necessary files (private validator, genesis, config, etc.).
 Note, strict routability for addresses is turned off in the config file.
 
 Example:
-	iris testnet --v 4 --output-dir ./output --starting-ip-address 192.168.10.2
+	iris testnet --v 4 --output-dir ./output --chain-id irishub-test --starting-ip-address 127.0.0.1
 	`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			config := ctx.Config
 			return initTestnet(config, cdc)
 		},
 	}
+
+	cmd.Flags().String(flagChainID, "", "Chain ID of tendermint node")
 
 	cmd.Flags().Int(flagNumValidators, 4,
 		"Number of validators to initialize the testnet with",
@@ -83,7 +86,10 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 	outDir := viper.GetString(flagOutputDir)
 	numValidators := viper.GetInt(flagNumValidators)
 
-	chainID := "chain-" + cmn.RandStr(6)
+	chainID := viper.GetString(flagChainID)
+	if chainID == "" {
+		chainID = "chain-" + cmn.RandStr(6)
+	}
 
 	monikers := make([]string, numValidators)
 	nodeIDs := make([]string, numValidators)

@@ -72,7 +72,7 @@ func ServeLCDStartCommand(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagListenAddr, "tcp://localhost:1317", "The address for the server to listen on")
 	cmd.Flags().String(flagCORS, "", "Set the domains that can make CORS requests (* for all)")
-	cmd.Flags().String(client.FlagChainID, "", "The chain ID to connect to")
+	cmd.Flags().String(client.FlagChainID, "", "Chain ID of tendermint node")
 	cmd.Flags().String(client.FlagNode, "tcp://localhost:26657", "Address of the node to connect to")
 	cmd.Flags().Int(flagMaxOpenConnections, 1000, "The number of maximum open connections")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Don't verify proofs for responses")

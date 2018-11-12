@@ -1,14 +1,13 @@
 package keys
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/client/utils"
-	"io/ioutil"
-	"github.com/gorilla/mux"
 )
 
 // NewKeyBody - the request body for create or recover new keys
