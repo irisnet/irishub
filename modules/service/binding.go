@@ -9,15 +9,16 @@ import (
 )
 
 type SvcBinding struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	BindingType BindingType    `json:"binding_type"`
-	Deposit     sdk.Coins      `json:"deposit"`
-	Expiration  int64          `json:"expiration"`
-	Prices      []sdk.Coin     `json:"price"`
-	Level       Level          `json:"level"`
+	DefName       string         `json:"def_name"`
+	DefChainID    string         `json:"def_chain_id"`
+	BindChainID   string         `json:"bind_chain_id"`
+	Provider      sdk.AccAddress `json:"provider"`
+	BindingType   BindingType    `json:"binding_type"`
+	Deposit       sdk.Coins      `json:"deposit"`
+	Prices        []sdk.Coin     `json:"price"`
+	Level         Level          `json:"level"`
+	Available     bool           `json:"available"`
+	DisableHeight int64          `json:"disable_height"`
 }
 
 type Level struct {
@@ -26,17 +27,18 @@ type Level struct {
 }
 
 // NewSvcBinding returns a new SvcBinding with the provided values.
-func NewSvcBinding(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, expiration int64) SvcBinding {
+func NewSvcBinding(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, available bool, disableHeight int64) SvcBinding {
 	return SvcBinding{
-		DefChainID:  defChainID,
-		DefName:     defName,
-		BindChainID: bindChainID,
-		Provider:    provider,
-		BindingType: bindingType,
-		Deposit:     deposit,
-		Expiration:  expiration,
-		Prices:      prices,
-		Level:       level,
+		DefChainID:    defChainID,
+		DefName:       defName,
+		BindChainID:   bindChainID,
+		Provider:      provider,
+		BindingType:   bindingType,
+		Deposit:       deposit,
+		Prices:        prices,
+		Level:         level,
+		Available:     available,
+		DisableHeight: disableHeight,
 	}
 }
 
@@ -50,7 +52,8 @@ func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 		bindingA.Level.AvgRspTime == bindingB.Level.AvgRspTime &&
 		bindingA.Level.UsableTime == bindingB.Level.UsableTime &&
 		len(bindingA.Prices) == len(bindingB.Prices) &&
-		bindingA.Expiration == bindingB.Expiration {
+		bindingA.Available == bindingB.Available &&
+		bindingA.DisableHeight == bindingB.DisableHeight {
 		for j, prices := range bindingA.Prices {
 			if !prices.IsEqual(bindingB.Prices[j]) {
 				return false
@@ -80,9 +83,8 @@ func validUpdateLevel(lv Level) bool {
 	return true
 }
 
-func (svcBind SvcBinding) isValid(height int64, minProviderDeposit sdk.Coins) bool {
-	return svcBind.Expiration > height &&
-		svcBind.Deposit.IsGTE(minProviderDeposit)
+func (svcBind SvcBinding) isValid() bool {
+	return svcBind.Available
 }
 
 type BindingType byte

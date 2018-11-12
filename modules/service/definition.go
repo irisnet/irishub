@@ -16,7 +16,6 @@ type SvcDef struct {
 	Author            sdk.AccAddress `json:"author"`
 	AuthorDescription string         `json:"author_description"`
 	IDLContent        string         `json:"idl_content"`
-	Messaging         MessagingType  `json:"messaging"`
 }
 
 type MethodProperty struct {
@@ -27,7 +26,7 @@ type MethodProperty struct {
 	OutputCached  OutputCachedEnum  `json:"output_cached"`
 }
 
-func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string, messaging MessagingType) SvcDef {
+func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) SvcDef {
 	return SvcDef{
 		Name:              name,
 		ChainId:           chainId,
@@ -36,7 +35,6 @@ func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccA
 		Author:            author,
 		AuthorDescription: authorDescription,
 		IDLContent:        idlContent,
-		Messaging:         messaging,
 	}
 }
 

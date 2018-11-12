@@ -23,7 +23,7 @@ type MsgSvcDef struct {
 	SvcDef
 }
 
-func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string, messaging MessagingType) MsgSvcDef {
+func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) MsgSvcDef {
 	return MsgSvcDef{
 		SvcDef{
 			Name:              name,
@@ -33,7 +33,6 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 			Author:            author,
 			AuthorDescription: authorDescription,
 			IDLContent:        idlContent,
-			Messaging:         messaging,
 		},
 	}
 }
@@ -64,9 +63,6 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	}
 	if len(msg.Author) == 0 {
 		return ErrInvalidAuthor(DefaultCodespace)
-	}
-	if !validMessagingType(msg.Messaging) {
-		return ErrInvalidMessagingType(DefaultCodespace, msg.Messaging)
 	}
 
 	if len(msg.IDLContent) == 0 {
@@ -156,22 +152,26 @@ func methodToMethodProperty(index int, method protoidl.Method) (methodProperty M
 
 // MsgSvcBinding - struct for bind a service
 type MsgSvcBind struct {
-	SvcBinding
+	DefName     string         `json:"def_name"`
+	DefChainID  string         `json:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+	BindingType BindingType    `json:"binding_type"`
+	Deposit     sdk.Coins      `json:"deposit"`
+	Prices      []sdk.Coin     `json:"price"`
+	Level       Level          `json:"level"`
 }
 
-func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, expiration int64) MsgSvcBind {
+func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level) MsgSvcBind {
 	return MsgSvcBind{
-		SvcBinding{
-			DefChainID:  defChainID,
-			DefName:     defName,
-			BindChainID: bindChainID,
-			Provider:    provider,
-			BindingType: bindingType,
-			Deposit:     deposit,
-			Expiration:  expiration,
-			Prices:      prices,
-			Level:       level,
-		},
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+		BindingType: bindingType,
+		Deposit:     deposit,
+		Prices:      prices,
+		Level:       level,
 	}
 }
 
@@ -216,9 +216,6 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if !validLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
-	if msg.Expiration == 0 {
-		return ErrInvalidExpiration(DefaultCodespace, msg.Expiration)
-	}
 	return nil
 }
 
@@ -230,22 +227,26 @@ func (msg MsgSvcBind) GetSigners() []sdk.AccAddress {
 
 // MsgSvcBindingUpdate - struct for update a service binding
 type MsgSvcBindingUpdate struct {
-	SvcBinding
+	DefName     string         `json:"def_name"`
+	DefChainID  string         `json:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+	BindingType BindingType    `json:"binding_type"`
+	Deposit     sdk.Coins      `json:"deposit"`
+	Prices      []sdk.Coin     `json:"price"`
+	Level       Level          `json:"level"`
 }
 
-func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, expiration int64) MsgSvcBindingUpdate {
+func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level) MsgSvcBindingUpdate {
 	return MsgSvcBindingUpdate{
-		SvcBinding{
-			DefChainID:  defChainID,
-			DefName:     defName,
-			BindChainID: bindChainID,
-			Provider:    provider,
-			BindingType: bindingType,
-			Deposit:     deposit,
-			Expiration:  expiration,
-			Prices:      prices,
-			Level:       level,
-		},
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+		BindingType: bindingType,
+		Deposit:     deposit,
+		Prices:      prices,
+		Level:       level,
 	}
 }
 func (msg MsgSvcBindingUpdate) Route() string { return MsgType }
@@ -286,13 +287,112 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if !validUpdateLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
-	if msg.Expiration == 0 {
-		return ErrInvalidExpiration(DefaultCodespace, msg.Expiration)
-	}
 	return nil
 }
 
 func (msg MsgSvcBindingUpdate) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
+}
+
+//______________________________________________________________________
+
+// MsgSvcDisable - struct for disable a service binding
+type MsgSvcDisable struct {
+	DefName     string         `json:"def_name"`
+	DefChainID  string         `json:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+}
+
+func NewMsgSvcDisable(defChainID, defName, bindChainID string, provider sdk.AccAddress) MsgSvcDisable {
+	return MsgSvcDisable{
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+	}
+}
+
+func (msg MsgSvcDisable) Route() string { return MsgType }
+func (msg MsgSvcDisable) Type() string  { return "service disable" }
+
+func (msg MsgSvcDisable) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
+	if len(msg.DefChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.BindChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.DefName) == 0 {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcDisable) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
+}
+
+//______________________________________________________________________
+
+// MsgSvcEnable - struct for disable a service binding
+type MsgSvcEnable struct {
+	DefName     string         `json:"def_name"`
+	DefChainID  string         `json:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+	Deposit     sdk.Coins      `json:"deposit"`
+}
+
+func NewMsgSvcEnable(defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) MsgSvcEnable {
+	return MsgSvcEnable{
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+		Deposit:     deposit,
+	}
+}
+
+func (msg MsgSvcEnable) Route() string { return MsgType }
+func (msg MsgSvcEnable) Type() string  { return "service enable" }
+
+func (msg MsgSvcEnable) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
+	if len(msg.DefChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.BindChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.DefName) == 0 {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcEnable) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 

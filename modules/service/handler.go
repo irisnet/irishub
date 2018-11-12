@@ -15,6 +15,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcBind(ctx, k, msg)
 		case MsgSvcBindingUpdate:
 			return handleMsgSvcBindUpdate(ctx, k, msg)
+		case MsgSvcDisable:
+			return handleMsgSvcDisable(ctx, k, msg)
+		case MsgSvcEnable:
+			return handleMsgSvcEnable(ctx, k, msg)
 		case MsgSvcRefundDeposit:
 			return handleMsgSvcRefundDeposit(ctx, k, msg)
 		default:
@@ -41,7 +45,9 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
-	err, _ := k.AddServiceBinding(ctx, msg.SvcBinding)
+	svcBinding := NewSvcBinding(msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
+		msg.Deposit, msg.Prices, msg.Level, true, 0)
+	err, _ := k.AddServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
@@ -54,12 +60,40 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 }
 
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
-	err, _ := k.UpdateServiceBinding(ctx, msg.SvcBinding)
+	svcBinding := NewSvcBinding(msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
+		msg.Deposit, msg.Prices, msg.Level, false, 0)
+	err, _ := k.UpdateServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcBindUpdate,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Result {
+	err, _ := k.Disable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	if err != nil {
+		return err.Result()
+	}
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcDisable,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result {
+	err, _ := k.Enable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit)
+	if err != nil {
+		return err.Result()
+	}
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcEnable,
 	)
 	return sdk.Result{
 		Tags: resTags,

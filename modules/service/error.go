@@ -21,15 +21,17 @@ const (
 	CodeMoreTags                 sdk.CodeType = 110
 	CodeDuplicateTags            sdk.CodeType = 111
 
-	CodeSvcBindingExists    sdk.CodeType = 112
-	CodeSvcBindingNotExists sdk.CodeType = 113
-	CodeInvalidDefChainId   sdk.CodeType = 114
-	CodeInvalidBindingType  sdk.CodeType = 115
-	CodeInvalidLevel        sdk.CodeType = 116
-	CodeInvalidPriceCount   sdk.CodeType = 117
-	CodeInvalidUpdate       sdk.CodeType = 118
-	CodeRefundDeposit       sdk.CodeType = 119
-	CodeInvalidExpiration   sdk.CodeType = 120
+	CodeSvcBindingExists     sdk.CodeType = 112
+	CodeSvcBindingNotExists  sdk.CodeType = 113
+	CodeInvalidDefChainId    sdk.CodeType = 114
+	CodeInvalidBindingType   sdk.CodeType = 115
+	CodeInvalidLevel         sdk.CodeType = 116
+	CodeInvalidPriceCount    sdk.CodeType = 117
+	CodeInvalidUpdate        sdk.CodeType = 118
+	CodeRefundDeposit        sdk.CodeType = 119
+	CodeLtMinProviderDeposit sdk.CodeType = 120
+	CodeDisable              sdk.CodeType = 121
+	CodeEnable               sdk.CodeType = 122
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -133,10 +135,14 @@ func ErrRefundDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeRefundDeposit, fmt.Sprintf("can't refund deposit, %s", msg))
 }
 
-func ErrInvalidExpiration(codespace sdk.CodespaceType, expiration int64) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("invalid expiration %v, can't be equal to zero", expiration))
+func ErrDisable(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeDisable, fmt.Sprintf("can't disable, %s", msg))
+}
+
+func ErrEnable(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeEnable, fmt.Sprintf("can't enable, %s", msg))
 }
 
 func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
+	return sdk.NewError(codespace, CodeLtMinProviderDeposit, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
 }

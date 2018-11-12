@@ -9,6 +9,8 @@ var (
 	ActionSvcBind          = []byte("service-bind")
 	ActionSvcBindUpdate    = []byte("service-update-binding")
 	ActionSvcRefundDeposit = []byte("service-refund-deposit")
+	ActionSvcDisable       = []byte("service-disable")
+	ActionSvcEnable        = []byte("service-enable")
 
 	Action = sdk.TagAction
 )

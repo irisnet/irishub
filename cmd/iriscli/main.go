@@ -186,6 +186,8 @@ func main() {
 		servicecmd.GetCmdScvDef(cdc),
 		servicecmd.GetCmdScvBind(cdc),
 		servicecmd.GetCmdScvBindUpdate(cdc),
+		servicecmd.GetCmdScvDisable(cdc),
+		servicecmd.GetCmdScvEnable(cdc),
 		servicecmd.GetCmdScvRefundDeposit(cdc),
 	)...)
 
