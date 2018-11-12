@@ -1,12 +1,14 @@
 package simulation
 
 import (
+	"bytes"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/cosmos/cosmos-sdk/x/stake/keeper"
 	"github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
@@ -19,7 +21,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper,
 	am auth.AccountKeeper) simulation.Invariant {
 
-	return func(app *baseapp.BaseApp, header abci.Header) error {
+	return func(app *baseapp.BaseApp) error {
 		//err := SupplyInvariants(ck, k, f, d, am)(app, header)
 		//if err != nil {
 		//	return err
@@ -39,7 +41,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 // nolint: unparam
 func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp, _ abci.Header) error {
+	return func(app *baseapp.BaseApp) error {
 		ctx := app.NewContext(false, abci.Header{})
 		pool := k.GetPool(ctx)
 
@@ -104,23 +106,33 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 
 // PositivePowerInvariant checks that all stored validators have > 0 power
 func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp, _ abci.Header) error {
+	return func(app *baseapp.BaseApp) error {
 		ctx := app.NewContext(false, abci.Header{})
-		var err error
-		k.IterateValidatorsBonded(ctx, func(_ int64, validator sdk.Validator) bool {
-			if !validator.GetPower().GT(sdk.ZeroDec()) {
-				err = fmt.Errorf("validator with non-positive power stored. (pubkey %v)", validator.GetConsPubKey())
-				return true
+
+		iterator := k.ValidatorsPowerStoreIterator(ctx)
+		pool := k.GetPool(ctx)
+
+		for ; iterator.Valid(); iterator.Next() {
+			validator, found := k.GetValidator(ctx, iterator.Value())
+			if !found {
+				panic(fmt.Sprintf("validator record not found for address: %X\n", iterator.Value()))
 			}
-			return false
-		})
-		return err
+
+			powerKey := keeper.GetValidatorsByPowerIndexKey(validator, pool)
+
+			if !bytes.Equal(iterator.Key(), powerKey) {
+				return fmt.Errorf("power store invariance:\n\tvalidator.Power: %v"+
+					"\n\tkey should be: %v\n\tkey in store: %v", validator.GetPower(), powerKey, iterator.Key())
+			}
+		}
+		iterator.Close()
+		return nil
 	}
 }
 
 // ValidatorSetInvariant checks equivalence of Tendermint validator set and SDK validator set
 func ValidatorSetInvariant(k stake.Keeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp, _ abci.Header) error {
+	return func(app *baseapp.BaseApp) error {
 		// TODO
 		return nil
 	}
