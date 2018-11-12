@@ -97,7 +97,7 @@ cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout v0.6.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_tools && get_vendor_deps && make install
+make get_tools get_vendor_deps install
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
