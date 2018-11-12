@@ -3,6 +3,7 @@ package service
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/tools/protoidl"
+	"regexp"
 )
 
 const (
@@ -55,8 +56,8 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if len(msg.ChainId) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-	if len(msg.Name) == 0 {
-		return ErrInvalidServiceName(DefaultCodespace)
+	if !validServiceName(msg.Name) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
 	}
 	if valid, err := validateTags(msg.Tags); !valid {
 		return err
@@ -193,8 +194,8 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-	if len(msg.DefName) == 0 {
-		return ErrInvalidServiceName(DefaultCodespace)
+	if !validServiceName(msg.DefName) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
@@ -267,8 +268,8 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-	if len(msg.DefName) == 0 {
-		return ErrInvalidServiceName(DefaultCodespace)
+	if !validServiceName(msg.DefName) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())
@@ -331,8 +332,8 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-	if len(msg.DefName) == 0 {
-		return ErrInvalidServiceName(DefaultCodespace)
+	if !validServiceName(msg.DefName) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())
@@ -383,8 +384,8 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-	if len(msg.DefName) == 0 {
-		return ErrInvalidServiceName(DefaultCodespace)
+	if !validServiceName(msg.DefName) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())
@@ -433,8 +434,8 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-	if len(msg.DefName) == 0 {
-		return ErrInvalidServiceName(DefaultCodespace)
+	if !validServiceName(msg.DefName) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())
@@ -444,4 +445,14 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 
 func (msg MsgSvcRefundDeposit) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
+}
+
+func validServiceName(name string) bool {
+	if len(name) == 0 || len(name) > 128 {
+		return false
+	}
+
+	// Must contain alphanumeric characters, _ and - only
+	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+	return !reg.Match([]byte(name))
 }

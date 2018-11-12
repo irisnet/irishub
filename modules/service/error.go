@@ -75,8 +75,8 @@ func ErrInvalidOutputCachedEnum(codespace sdk.CodespaceType, value string) sdk.E
 	return sdk.NewError(codespace, CodeInvalidOutputCachedEnum, fmt.Sprintf("invalid OutputCachedEnum %s", value))
 }
 
-func ErrInvalidServiceName(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidServiceName, fmt.Sprintf("service name is empty"))
+func ErrInvalidServiceName(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidServiceName, fmt.Sprintf("invalid service name %s, must contain alphanumeric characters, _ and - only，length greater than 0 and less than or equal to 128",msg))
 }
 
 func ErrInvalidChainId(codespace sdk.CodespaceType) sdk.Error {
