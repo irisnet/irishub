@@ -12,6 +12,7 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
+	"net/http"
 )
 
 // KeyDBName is the directory under root where we store the keys
@@ -197,4 +198,27 @@ func PrintInfos(cdc *codec.Codec, infos []keys.Info) {
 
 func printKeyOutput(ko KeyOutput) {
 	fmt.Printf("%s\t%s\t%s\t%s\n", ko.Name, ko.Type, ko.Address, ko.PubKey)
+}
+
+// PostProcessResponse performs post process for rest response
+func PostProcessResponse(w http.ResponseWriter, cdc *codec.Codec, response interface{}, indent bool) {
+	var output []byte
+	switch response.(type) {
+	default:
+		var err error
+		if indent {
+			output, err = cdc.MarshalJSONIndent(response, "", "  ")
+		} else {
+			output, err = cdc.MarshalJSON(response)
+		}
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	case []byte:
+		output = response.([]byte)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
 }
