@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"strings"
 )
 
 // query accountREST Handler
@@ -91,14 +92,7 @@ func QueryAccountRequestHandlerFn(storeName string, cdc *codec.Codec,
 			return
 		}
 
-		// print out whole account
-		output, err := cdc.MarshalJSONIndent(accountRes, "", "  ")
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't marshall query result. Error: %s", err.Error()))
-			return
-		}
-
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, accountRes, cliCtx.Indent)
 	}
 }
 
@@ -109,16 +103,14 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 		vars := mux.Vars(r)
 		coinType := vars["coin-type"]
 		res, err := cliCtx.GetCoinType(coinType)
-		if err != nil {
+		if strings.Contains(err.Error(),"unsupported coin type") {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		} else if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		output, err := codec.MarshalJSONIndent(cdc, res)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }

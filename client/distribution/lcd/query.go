@@ -32,7 +32,7 @@ func QueryWithdrawAddressHandlerFn(storeName string, cliCtx context.CLIContext) 
 			return
 		}
 		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNoContent, "No withdraw address specified. If the delegator does have valid delegations, then the withdraw address should be the same as the delegator address")
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
 			return
 		}
 		withdrawAddress := sdk.AccAddress(res)
