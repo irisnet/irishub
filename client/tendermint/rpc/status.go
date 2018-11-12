@@ -8,6 +8,8 @@ import (
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"net/http"
 	"strconv"
+	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 func StatusCommand() *cobra.Command {
@@ -22,7 +24,7 @@ func StatusCommand() *cobra.Command {
 	return cmd
 }
 
-func GetNodeStatus(cliCtx context.CLIContext) (*ctypes.ResultStatus, error) {
+func getNodeStatus(cliCtx context.CLIContext) (*ctypes.ResultStatus, error) {
 	// get the node
 	node, err := cliCtx.GetNode()
 	if err != nil {
@@ -35,13 +37,20 @@ func GetNodeStatus(cliCtx context.CLIContext) (*ctypes.ResultStatus, error) {
 // CMD
 
 func printNodeStatus(cmd *cobra.Command, args []string) error {
-	status, err := GetNodeStatus(context.NewCLIContext())
+	// No need to verify proof in getting node status
+	viper.Set(client.FlagTrustNode, true)
+	cliCtx := context.NewCLIContext()
+	status, err := getNodeStatus(cliCtx)
 	if err != nil {
 		return err
 	}
 
-	output, err := cdc.MarshalJSON(status)
-	// output, err := cdc.MarshalJSONIndent(res, "  ", "")
+	var output []byte
+	if cliCtx.Indent {
+		output, err = cdc.MarshalJSONIndent(status, "", "  ")
+	} else {
+		output, err = cdc.MarshalJSON(status)
+	}
 	if err != nil {
 		return err
 	}
@@ -53,38 +62,31 @@ func printNodeStatus(cmd *cobra.Command, args []string) error {
 // REST handler for node info
 func NodeInfoRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		status, err := GetNodeStatus(cliCtx)
+		status, err := getNodeStatus(cliCtx)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
 		nodeInfo := status.NodeInfo
-		output, err := cdc.MarshalJSONIndent(nodeInfo,"", "  ")
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte(err.Error()))
-			return
-		}
-
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, nodeInfo, cliCtx.Indent)
 	}
 }
 
 // REST handler for node syncing
 func NodeSyncingRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		status, err := GetNodeStatus(cliCtx)
+		status, err := getNodeStatus(cliCtx)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
 		syncing := status.SyncInfo.CatchingUp
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
