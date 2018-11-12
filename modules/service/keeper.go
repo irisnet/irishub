@@ -96,7 +96,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
-	err := k.ValidateMethodPrices(ctx, svcBinding)
+	err := k.validateMethodPrices(ctx, svcBinding)
 	if err != nil {
 		return err, false
 	}
@@ -132,7 +132,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 	}
 
 	if len(svcBinding.Prices) > 0 {
-		err := k.ValidateMethodPrices(ctx, svcBinding)
+		err := k.validateMethodPrices(ctx, svcBinding)
 		if err != nil {
 			return err, false
 		}
@@ -251,7 +251,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	return nil, true
 }
 
-func (k Keeper) ValidateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
+func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
 	methodIterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
 	var methods []MethodProperty
 	for ; methodIterator.Valid(); methodIterator.Next() {

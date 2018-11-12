@@ -12,7 +12,6 @@ const (
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
-	MaxTagsNum    = 200
 )
 
 var _ sdk.Msg = MsgSvcDef{}
@@ -59,13 +58,9 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if !validServiceName(msg.Name) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
 	}
-	if valid, err := validateTags(msg.Tags); !valid {
-		return err
-	}
 	if len(msg.Author) == 0 {
 		return ErrInvalidAuthor(DefaultCodespace)
 	}
-
 	if len(msg.IDLContent) == 0 {
 		return ErrInvalidIDL(DefaultCodespace, "content is empty")
 	}
@@ -99,22 +94,6 @@ func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
 			_, err := OutputCachedEnumFromString(method.Attributes[outputCached])
 			if err != nil {
 				return false, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
-			}
-		}
-	}
-	return true, nil
-}
-
-func validateTags(tags []string) (bool, sdk.Error) {
-	if len(tags) > MaxTagsNum {
-		return false, ErrMoreTags(DefaultCodespace, MaxTagsNum)
-	}
-	if len(tags) > 0 {
-		for i, tag := range tags {
-			for _, tag1 := range tags[i+1:] {
-				if tag == tag1 {
-					return false, ErrDuplicateTags(DefaultCodespace)
-				}
 			}
 		}
 	}
@@ -277,7 +256,7 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-	if msg.Deposit.Len() > 0 && !msg.Deposit.IsValid() {
+	if !msg.Deposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	for _, price := range msg.Prices {
@@ -347,7 +326,7 @@ func (msg MsgSvcDisable) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgSvcEnable - struct for disable a service binding
+// MsgSvcEnable - struct for enable a service binding
 type MsgSvcEnable struct {
 	DefName     string         `json:"def_name"`
 	DefChainID  string         `json:"def_chain_id"`
@@ -386,6 +365,9 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+	}
+	if !msg.Deposit.IsNotNegative() {
+		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())

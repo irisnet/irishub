@@ -174,7 +174,7 @@ func main() {
 	//Add service commands
 	serviceCmd := &cobra.Command{
 		Use:   "service",
-		Short: "service subcommands",
+		Short: "Service subcommands",
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(

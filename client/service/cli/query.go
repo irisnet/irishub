@@ -17,7 +17,7 @@ import (
 func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
-		Short:   "query service definition",
+		Short:   "Query service definition",
 		Example: "iriscli service definition --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
@@ -68,7 +68,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
-		Short:   "query service binding",
+		Short:   "Query service binding",
 		Example: "iriscli service binding --def-chain-id=<chain-id> --service-name=<service name> --bind-chain-id=<chain-id> --provider=<provider>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
@@ -109,7 +109,7 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
-		Short:   "query service bindings",
+		Short:   "Query service bindings",
 		Example: "iriscli service bindings --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).

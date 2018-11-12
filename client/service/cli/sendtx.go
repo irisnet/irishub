@@ -19,7 +19,7 @@ import (
 func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
-		Short: "create new service definition",
+		Short: "Create a new service definition",
 		Example: "iriscli service define --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --service-description=<service description> --author-description=<author description> " +
 			"--tags=tag1,tag2 --idl-content=<interface description content> --file=test.proto",
@@ -75,7 +75,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 func GetCmdScvBind(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bind",
-		Short: "create new service binding",
+		Short: "Create a new service binding",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --bind-type=Local " +
 			"--deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1",
@@ -138,7 +138,7 @@ func GetCmdScvBind(cdc *codec.Codec) *cobra.Command {
 func GetCmdScvBindUpdate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-binding",
-		Short: "update a service binding",
+		Short: "Update a service binding",
 		Example: "iriscli service update-binding --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --bind-type=Local " +
 			"--deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100 --expiration=-1",
@@ -207,7 +207,7 @@ func GetCmdScvBindUpdate(cdc *codec.Codec) *cobra.Command {
 func GetCmdScvDisable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "disable",
-		Short: "disable a available service binding",
+		Short: "Disable a available service binding",
 		Example: "iriscli service disable --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -240,7 +240,7 @@ func GetCmdScvDisable(cdc *codec.Codec) *cobra.Command {
 func GetCmdScvEnable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enable",
-		Short: "enable a unavailable service binding",
+		Short: "Enable a unavailable service binding",
 		Example: "iriscli service enable --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --deposit=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -280,7 +280,7 @@ func GetCmdScvEnable(cdc *codec.Codec) *cobra.Command {
 func GetCmdScvRefundDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund-deposit",
-		Short: "refund all deposit from a service binding",
+		Short: "Refund all deposit from a service binding",
 		Example: "iriscli service refund-deposit --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
