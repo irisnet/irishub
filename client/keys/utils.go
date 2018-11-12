@@ -124,7 +124,7 @@ func GetKey(name string) (keys.Info, error) {
 type KeyOutput struct {
 	Name    string         `json:"name"`
 	Type    string         `json:"type"`
-	Address sdk.AccAddress `json:"address"`
+	Address string         `json:"address"`
 	PubKey  string         `json:"pub_key"`
 	Seed    string         `json:"seed,omitempty"`
 }
@@ -152,7 +152,7 @@ func Bech32KeyOutput(info keys.Info) (KeyOutput, error) {
 	return KeyOutput{
 		Name:    info.GetName(),
 		Type:    info.GetType().String(),
-		Address: account,
+		Address: account.String(),
 		PubKey:  bechPubKey,
 	}, nil
 }

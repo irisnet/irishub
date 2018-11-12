@@ -154,6 +154,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
+			activeProposal.Execute(ctx,keeper)
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
