@@ -181,12 +181,7 @@ func delegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 			txs = append(txs, foundTxs...)
 		}
 
-		res, err := cdc.MarshalJSON(txs)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, txs, cliCtx.Indent)
 	}
 }
 
@@ -231,12 +226,7 @@ func validatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 			validatorOutputs[index] = validatorOutput
 		}
 
-		if res, err = codec.MarshalJSONIndent(cdc, validatorOutputs); err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, validatorOutputs, cliCtx.Indent)
 	}
 }
 

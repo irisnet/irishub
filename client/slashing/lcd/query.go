@@ -30,8 +30,7 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *code
 			return
 		}
 		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest,
-				fmt.Sprintf("the signing information of this validator %s is empty, please make sure its existence", vars["validator_pub"]))
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
 			return
 		}
 
