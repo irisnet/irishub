@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/bartekn/go-bip39"
+	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/hd"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/hd"
 )
 
 const (
@@ -46,7 +46,7 @@ output
 */
 func runNewCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
-	kb, err := GetKeyBaseWithWritePerm()
+	kb, err := keys.GetKeyBaseWithWritePerm()
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func runNewCmd(cmd *cobra.Command, args []string) error {
 	// If we're using ledger, only thing we need is the path. So generate key and
 	// we're done.
 	if viper.GetBool(client.FlagUseLedger) {
-		algo := keys.Secp256k1
+		algo := cryptokeys.Secp256k1
 		path := bip44Params.DerivationPath() // ccrypto.DerivationPath{44, 118, account, 0, index}
 
 		info, err := kb.CreateLedger(name, path, algo)

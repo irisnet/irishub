@@ -62,7 +62,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 			return errors.New("you must provide a name for the key")
 		}
 		name = args[0]
-		kb, err = keys.GetKeyBase()
+		kb, err = keys.GetKeyBaseWithWritePerm()
 		if err != nil {
 			return err
 		}
@@ -141,11 +141,16 @@ func printCreate(info cryptokeys.Info, seed string) {
 		if !viper.GetBool(flagNoBackup) {
 			out.Seed = seed
 		}
-		json, err := cdc.MarshalJSON(out)
+		var jsonString []byte
+		if viper.GetBool(client.FlagIndentResponse) {
+			jsonString, err = cdc.MarshalJSONIndent(out, "", "  ")
+		} else {
+			jsonString, err = cdc.MarshalJSON(out)
+		}
 		if err != nil {
 			panic(err) // really shouldn't happen...
 		}
-		fmt.Println(string(json))
+		fmt.Println(string(jsonString))
 	default:
 		panic(fmt.Sprintf("I can't speak: %s", output))
 	}
