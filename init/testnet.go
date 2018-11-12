@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -15,6 +16,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
+	clkeys "github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
@@ -150,7 +152,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			keyPass = app.DefaultKeyPass
 		}
 
-		addr, secret, err := server.GenerateSaveCoinKey(clientDir, nodeDirName, keyPass, true)
+		addr, secret, err := generateSaveCoinKey(clientDir, nodeDirName, keyPass, true)
 		if err != nil {
 			_ = os.RemoveAll(outDir)
 			return err
@@ -354,4 +356,32 @@ func calculateIP(ip string, i int) (string, error) {
 	}
 
 	return ipv4.String(), nil
+}
+
+// generateSaveCoinKey returns the address of a public key, along with the secret
+// phrase to recover the private key.
+func generateSaveCoinKey(clientRoot, keyName, keyPass string, overwrite bool) (sdk.AccAddress, string, error) {
+
+	// get the keystore from the client
+	keybase, err := clkeys.GetKeyBaseFromDirWithWritePerm(clientRoot)
+	if err != nil {
+		return sdk.AccAddress([]byte{}), "", err
+	}
+
+	// ensure no overwrite
+	if !overwrite {
+		_, err := keybase.Get(keyName)
+		if err == nil {
+			return sdk.AccAddress([]byte{}), "", fmt.Errorf(
+				"key already exists, overwrite is disabled (clientRoot: %s)", clientRoot)
+		}
+	}
+
+	// generate a private key, with recovery phrase
+	info, secret, err := keybase.CreateMnemonic(keyName, keys.English, keyPass, keys.Secp256k1)
+	if err != nil {
+		return sdk.AccAddress([]byte{}), "", err
+	}
+	addr := info.GetPubKey().Address()
+	return sdk.AccAddress(addr), secret, nil
 }

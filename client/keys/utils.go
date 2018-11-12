@@ -2,13 +2,16 @@ package keys
 
 import (
 	"fmt"
+	"path/filepath"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/viper"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
-	"path/filepath"
 )
 
 // KeyDBName is the directory under root where we store the keys
@@ -58,6 +61,28 @@ func GetPassphrase(name string) (string, error) {
 	}
 
 	return passphrase, nil
+}
+
+// GetKeyBaseWithWritePerm initialize a keybase based on the configuration with write permissions.
+func GetKeyBaseWithWritePerm() (keys.Keybase, error) {
+	rootDir := viper.GetString(cli.HomeFlag)
+	return GetKeyBaseFromDirWithWritePerm(rootDir)
+}
+
+// GetKeyBaseFromDirWithWritePerm initializes a keybase at a particular dir with write permissions.
+func GetKeyBaseFromDirWithWritePerm(rootDir string) (keys.Keybase, error) {
+	return getKeyBaseFromDirWithOpts(rootDir, nil)
+}
+
+func getKeyBaseFromDirWithOpts(rootDir string, o *opt.Options) (keys.Keybase, error) {
+	if keybase == nil {
+		db, err := dbm.NewGoLevelDBWithOpts(KeyDBName, filepath.Join(rootDir, "keys"), o)
+		if err != nil {
+			return nil, err
+		}
+		keybase = client.GetKeyBase(db)
+	}
+	return keybase, nil
 }
 
 // ReadPassphraseFromStdin attempts to read a passphrase from STDIN return an
