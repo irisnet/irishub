@@ -16,6 +16,8 @@ import (
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	irisInit "github.com/irisnet/irishub/init"
 )
 
 // rootCmd is the entry point for this binary
@@ -27,6 +29,11 @@ var (
 )
 
 func main() {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 

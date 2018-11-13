@@ -5,12 +5,12 @@ import (
 )
 
 type UpgradeInfoOutput struct {
-	CurrentProposalId           int64           `json:"current_proposal_id"` //  proposalID of the proposal
+	CurrentProposalId           uint64           `json:"current_proposal_id"` //  proposalID of the proposal
 	CurrentProposalAcceptHeight int64           `json:"current_proposal_accept_height"`
 	Verion                      upgrade.Version `json:"version"`
 }
 
-func ConvertUpgradeInfoToUpgradeOutput(version upgrade.Version, proposalId, hight int64) UpgradeInfoOutput {
+func ConvertUpgradeInfoToUpgradeOutput(version upgrade.Version, proposalId uint64, hight int64) UpgradeInfoOutput {
 
 	return UpgradeInfoOutput{
 		CurrentProposalId:           proposalId,
