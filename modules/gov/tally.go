@@ -107,7 +107,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	}
 	////////////////////  iris begin  ///////////////////////////
 	//if more than 1/3 of voters abstain, proposal fails
-	if results[OptionAbstain].Quo(totalVotingPower).GT(sdk.NewDecWithPrec(334, 3)){
+	if totalVotingPower.Sub(results[OptionAbstain]).Quo(totalVotingPower).LTE(tallyingProcedure.Participation){
 		return  false, tallyResults
 	}
 	////////////////////  iris end  ///////////////////////////

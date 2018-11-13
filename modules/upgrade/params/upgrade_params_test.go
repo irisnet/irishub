@@ -37,7 +37,7 @@ func TestCurrentUpgradeProposalIdParameter(t *testing.T) {
 	)
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 		SwitchPeriodParameter.GetStoreKey(), int64(0),
 	))
@@ -47,16 +47,16 @@ func TestCurrentUpgradeProposalIdParameter(t *testing.T) {
 	require.Equal(t, find, false)
 
 	CurrentUpgradeProposalIdParameter.InitGenesis(nil)
-	require.Equal(t, int64(-1), CurrentUpgradeProposalIdParameter.Value)
+	require.Equal(t, uint64(0), CurrentUpgradeProposalIdParameter.Value)
 
 	CurrentUpgradeProposalIdParameter.LoadValue(ctx)
-	require.Equal(t, int64(-1), CurrentUpgradeProposalIdParameter.Value)
+	require.Equal(t, uint64(0), CurrentUpgradeProposalIdParameter.Value)
 
 	CurrentUpgradeProposalIdParameter.Value = 3
 	CurrentUpgradeProposalIdParameter.SaveValue(ctx)
 
 	CurrentUpgradeProposalIdParameter.LoadValue(ctx)
-	require.Equal(t, int64(3), CurrentUpgradeProposalIdParameter.Value)
+	require.Equal(t, uint64(3), CurrentUpgradeProposalIdParameter.Value)
 }
 
 func TestProposalAcceptHeightParameter(t *testing.T) {
@@ -72,7 +72,7 @@ func TestProposalAcceptHeightParameter(t *testing.T) {
 	)
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 		SwitchPeriodParameter.GetStoreKey(), int64(0),
 	))
@@ -107,7 +107,7 @@ func TestSwitchPeriodParameter(t *testing.T) {
 	)
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 		SwitchPeriodParameter.GetStoreKey(), int64(0),
 	))
@@ -142,7 +142,7 @@ func TestUpgradeParameterSetAndGet(t *testing.T) {
 	)
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 		ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 		SwitchPeriodParameter.GetStoreKey(), int64(0),
 	))
@@ -160,7 +160,7 @@ func TestUpgradeParameterSetAndGet(t *testing.T) {
 	require.Equal(t, find, false)
 
 	SetCurrentUpgradeProposalId(ctx,5)
-	require.Equal(t,int64(5),GetCurrentUpgradeProposalId(ctx))
+	require.Equal(t,uint64(5),GetCurrentUpgradeProposalId(ctx))
 	SetProposalAcceptHeight(ctx,100)
 	require.Equal(t, int64(100),GetProposalAcceptHeight(ctx) )
 
