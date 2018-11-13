@@ -201,7 +201,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 
 	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
 	if !binding.Deposit.IsGTE(minDeposit) {
-		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit)), false
+		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit)), false
 	}
 
 	// Subtract coins from provider's account
