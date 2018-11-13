@@ -1,30 +1,30 @@
-
 package gov
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
 	"time"
-	"github.com/irisnet/irishub/iparam"
 )
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
-	StartingProposalID uint64                        `json:"starting_proposalID"`
-	Deposits           []DepositWithMetadata        `json:"deposits"`
-	Votes              []VoteWithMetadata           `json:"votes"`
-	Proposals          []Proposal                   `json:"proposals"`
-	DepositProcedure   govparams.DepositProcedure   `json:"deposit_period"`
-	VotingProcedure    govparams.VotingProcedure    `json:"voting_period"`
-	TallyingProcedure  govparams.TallyingProcedure  `json:"tallying_procedure"`
+	StartingProposalID uint64                      `json:"starting_proposalID"`
+	Deposits           []DepositWithMetadata       `json:"deposits"`
+	Votes              []VoteWithMetadata          `json:"votes"`
+	Proposals          []Proposal                  `json:"proposals"`
+	DepositProcedure   govparams.DepositProcedure  `json:"deposit_period"`
+	VotingProcedure    govparams.VotingProcedure   `json:"voting_period"`
+	TallyingProcedure  govparams.TallyingProcedure `json:"tallying_procedure"`
 }
 
 type DepositWithMetadata struct {
 	ProposalID uint64  `json:"proposal_id"`
 	Deposit    Deposit `json:"deposit"`
 }
+
 // VoteWithMetadata (just for genesis)
 type VoteWithMetadata struct {
 	ProposalID uint64 `json:"proposal_id"`
@@ -101,9 +101,10 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		TallyingProcedure:  tallyingProcedure,
 	}
 }
+
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
-	Denom  := "iris"
+	Denom := "iris"
 	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, Denom))
 	if err != nil {
@@ -119,16 +120,16 @@ func DefaultGenesisState() GenesisState {
 			VotingPeriod: time.Duration(172800) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewDecWithPrec(5, 1),
-			Veto:              sdk.NewDecWithPrec(334, 3),
-			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+			Threshold:     sdk.NewDecWithPrec(5, 1),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(667, 3),
 		},
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForCliTest() GenesisState {
-	Denom  := "iris"
+	Denom := "iris"
 	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	if err != nil {
@@ -144,16 +145,16 @@ func DefaultGenesisStateForCliTest() GenesisState {
 			VotingPeriod: time.Duration(60) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewDecWithPrec(5, 1),
-			Veto:              sdk.NewDecWithPrec(334, 3),
-			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+			Threshold:     sdk.NewDecWithPrec(5, 1),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(667, 3),
 		},
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForLCDTest() GenesisState {
-	Denom  := "iris"
+	Denom := "iris"
 	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	if err != nil {
@@ -169,9 +170,9 @@ func DefaultGenesisStateForLCDTest() GenesisState {
 			VotingPeriod: time.Duration(172800) * time.Second,
 		},
 		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:         sdk.NewDecWithPrec(5, 1),
-			Veto:              sdk.NewDecWithPrec(334, 3),
-			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+			Threshold:     sdk.NewDecWithPrec(5, 1),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(667, 3),
 		},
 	}
 }
