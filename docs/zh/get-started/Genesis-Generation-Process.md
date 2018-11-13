@@ -1,13 +1,16 @@
-# 参与到Genesis文件生成流程中
+# 参与Genesis文件生成
 
 
-1. 每个希望成为验证人的参与者确保安装了对应版本的软件：iris v0.7.0
+1. 每个希望成为验证人的参与者确保请根据一下[教程](Install-Iris.md) 在服务器上完成**Iris**的安装。
 
 2. 先创建账户,再执行gentx命令，获得一个gentx-node-ID.json的文件。这个操作将默认生成一个余额为150IRIS的账户，该账户默认绑定100IRIS成为一个验证人候选人。
 
 ```
-iriscli keys add your_name
-iris gentx --name=your_name --home=<path_to_home> --ip=Your_public_IP
+iris init gen-tx --name=your_name --home=<path_to_home> --ip=Your_public_IP
+```
+* 代码示例：
+```
+iris init gen-tx --name=alice 
 ```
 
 代码示例：
@@ -72,10 +75,9 @@ iris gentx --name=alice --home=iris --chain-id=irishub-stage --ip=1.1.1.1
 
 `msg` 是创建验证人节点的交易
 
-3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/testnets/fuxi-5000/config/gentx`目录下：
+3. 将上述提到的json文件以提交Pull Request的形式上传到`https://github.com/irisnet/testnets/tree/master/fuxi/fuxi-4000/config/gentx`目录下：
 
-   注意⚠️：json文中的IP改成公网IP
+> 注意:json文中的IP改成公网IP
 
-
-
+4. 在收集完参与者的gentx文件后，团队将在一下目录公布fuxi-4000测试网的配置文件：`https://github.com/irisnet/testnets/tree/master/fuxi/fuxi-4000/config`。然后你就可以下载genesis.json和config.toml文件了。
 

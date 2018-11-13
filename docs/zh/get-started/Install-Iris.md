@@ -88,9 +88,9 @@ source ~/.bash_profile
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.5.0
+cd irishub && git checkout v0.6.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_vendor_deps && make install
+make get_tools && get_vendor_deps && make install
 ```
 
 以上命令将完成 iris 和 iriscli的安装. 若出现对应的版本号则说明安装成功。
@@ -104,13 +104,14 @@ v0.6.0
 ```
 ### 如何升级IRISHub
 
-通过执行一下命令可以完成IRISHub从v0.3.4到v0.4.2的升级
+通过执行一下命令可以完成IRISHub从v0.4.2到v0.6.0的升级
 
 ```
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 rm Gopkg.lock
 git checkout v0.6.0
+make get_tools
 make get_vendor_deps
 make install
 ```

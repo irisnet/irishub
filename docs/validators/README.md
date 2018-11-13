@@ -87,9 +87,9 @@ fvp1zcjduepqcxd82mjnsnqfhwzja2d3y690ec6scw64xpg2uqkjx3rl0g0p2lwsprxnnf
 
 In summary, an example of the `create-validator` command to bond 10IRIS is the following:
 ```
-iriscli stake create-validator  --address-delegator={address1} --address-validator={address1} --name={name} --chain-id=fuxi-3001 --from=name --pubkey={pubkey} --gas=2000000 --fee=40000000000000000iris --amount=10000000000000000000iris 
+iriscli stake create-validator --pubkey=pub-key --amount=XXiris   --fee=0.05iris  --gas=2000000 --node=tcp://localhost:26657  --chain-id=fuxi-4000 --from=name --moniker=name
 ```
-* Edit Validator Information
+### Edit Validator Information
 
 Validators could edit its information.
 
@@ -102,28 +102,28 @@ The following parameters are optional:
 
 The command is the following:
 ```$xslt
-iriscli stake edit-validator --address-validator={address-validator} --chain-id=fuxi-3001 --from=name  --details=details --gas=2000000 --fee=40000000000000000iris 
+iriscli stake edit-validator --chain-id=fuxi-4000 --from=name  --details=details --gas=2000000 --fee=0.04iris 
 ```
 
 For each validator, the voting power is the sum of self-bonded token and delegated tokens. 
 
 
-* View Validator Description
+### View Validator Description
 
 Anyone can view certain validator's information with the following command:
 ```$xslt
-iriscli stake validator --address-validator={address-validator} --chain-id=fuxi-3001
+iriscli stake validator --address-validator={address-validator} --chain-id=fuxi-4000
 ```
  
-* Track Validator Signing Information
+### Track Validator Signing Information
 In order to keep track of a validator's signatures in the past you can do so by using the signing-info command:
 
 The command is the following:
 ```
-iriscli stake signing-information <validator-pubkey> --chain-id=fuxi-3001
+iriscli stake signing-information <validator-pubkey> --chain-id=fuxi-4000
 ```
 
-* Unrevoke Validator
+### Unrevoke Validator
 When a validator is Revoked for downtime, you must submit an Unrevoke transaction in order to be able to get block rewards again.
 In fuxi-3001, if your node missed the previous 5000 blocks in the last 10000 blocks, you will get revoked.
 To query your validator's info:
@@ -150,5 +150,5 @@ The `Revoked` field of an offline validator will be `true`.
 To unrevoke your validator node, the command is the following:
 
 ```
-iriscli stake unrevoke {address-validator} --from=name  --chain-id=fuxi-3001
+iriscli stake unrevoke  --from=name  --chain-id=fuxi-4000
 ```
