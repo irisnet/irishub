@@ -369,9 +369,13 @@ func (app *IrisApp) replay() int64 {
 	}
 	var loadHeight int64
 	if blockStore.Height() == curState.LastBlockHeight {
+		app.Logger.Info(fmt.Sprintf("blockstore height equals to current state height %d", curState.LastBlockHeight))
+		app.Logger.Info("Just reset state DB to last height")
 		sm.SaveState(stateDB, preState)
 		loadHeight = preState.LastBlockHeight
 	} else if blockStore.Height() == curState.LastBlockHeight+1 {
+		app.Logger.Info(fmt.Sprintf("blockstore height %d, current state height %d", blockStore.Height(), curState.LastBlockHeight))
+		app.Logger.Info(fmt.Sprintf("Retreat block %d in block store and reset state DB to last height", blockStore.Height()))
 		blockStore.RetreatLastBlock()
 		sm.SaveState(stateDB, preState)
 		loadHeight = preState.LastBlockHeight
