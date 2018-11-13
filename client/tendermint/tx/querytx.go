@@ -14,6 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/common"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"net/http"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 // QueryTxCmd implements the default command for a tx query.
@@ -73,7 +74,10 @@ func queryTx(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]
 		return nil, err
 	}
 
-	return cdc.MarshalJSONIndent(info, "", "  ")
+	if cliCtx.Indent {
+		return cdc.MarshalJSONIndent(info, "", "  ")
+	}
+	return cdc.MarshalJSON(info)
 }
 
 // ValidateTxResult performs transaction verification
@@ -131,11 +135,11 @@ func QueryTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 
 		output, err := queryTx(cdc, cliCtx, hashHexStr)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
 }

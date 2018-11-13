@@ -49,16 +49,16 @@ install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(BUILD_FLAGS) ./cmd/irislcd
-#	go install $(BUILD_FLAGS) ./cmd/irismon
+	go install $(BUILD_FLAGS) ./cmd/irismon
 
 install_debug:
 	go install ./cmd/irisdebug
 
 build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli
-#    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
-#    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
@@ -109,16 +109,16 @@ test_sim_modules:
 
 test_sim_benchmark:
 	@echo "Running benchmark test..."
-	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -SimulationCommit=true
+	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -timeout 24h
 
 test_sim_iris_nondeterminism:
 	@echo "Running nondeterminism test..."
-	@go test ./app -run TestAppStateDeterminism -SimulationEnabled=true -v -timeout 10m
+	@go test ./app -run TestAppStateDeterminism -v -SimulationEnabled=true -timeout 10m
 
 test_sim_iris_fast:
 	@echo "Running quick Iris simulation. This may take several minutes..."
-	@go test ./app -run TestFullIrisSimulation -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
+	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
 
 test_sim_iris_slow:
 	@echo "Running full Iris simulation. This may take awhile!"
-	@go test ./app -run TestFullIrisSimulation -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -v -timeout 24h
+	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h

@@ -4,26 +4,27 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	dbm "github.com/tendermint/tendermint/libs/db"
-	"github.com/tendermint/tendermint/libs/log"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/irisnet/irishub/modules/gov"
 	banksim "github.com/irisnet/irishub/simulation/bank"
 	govsim "github.com/irisnet/irishub/simulation/gov"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 	slashingsim "github.com/irisnet/irishub/simulation/slashing"
 	stakesim "github.com/irisnet/irishub/simulation/stake"
-	"os"
 )
 
 var (
@@ -39,40 +40,59 @@ func init() {
 	flag.Int64Var(&seed, "SimulationSeed", 42, "Simulation random seed")
 	flag.IntVar(&numBlocks, "SimulationNumBlocks", 500, "Number of blocks")
 	flag.IntVar(&blockSize, "SimulationBlockSize", 200, "Operations per block")
-	flag.BoolVar(&enabled, "SimulationEnabled", false, "Enable the simulation")
+	flag.BoolVar(&enabled, "SimulationEnabled", true, "Enable the simulation")
 	flag.BoolVar(&verbose, "SimulationVerbose", false, "Verbose log output")
 	flag.BoolVar(&commit, "SimulationCommit", false, "Have the simulation commit")
 }
 
 func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
+	stakeGenesis := stake.DefaultGenesisState()
+	fmt.Printf("Selected randomly generated staking parameters: %+v\n", stakeGenesis)
+
 	var genesisAccounts []GenesisAccount
 
-	amountStr := "1000000000000000000000000"
-	amt, ok := sdk.NewIntFromString(amountStr)
-	if ok {
-		fmt.Errorf("invalid token amont %s\n", amountStr)
+	amount := sdk.NewIntWithDecimal(100, 18)
+	stakeAmount := sdk.NewIntWithDecimal(1, 2)
+	numInitiallyBonded := int64(r.Intn(250))
+	//numInitiallyBonded := int64(4)
+	numAccs := int64(len(accs))
+	if numInitiallyBonded > numAccs {
+		numInitiallyBonded = numAccs
 	}
+	fmt.Printf("Selected randomly generated parameters for simulated genesis: {amount of iris-atto per account: %v, initially bonded validators: %v}\n", amount, numInitiallyBonded)
 
 	// Randomly generate some genesis accounts
 	for _, acc := range accs {
-		coins := sdk.Coins{sdk.Coin{"iris-atto", amt}}
+		coins := sdk.Coins{
+			{
+				Denom:  "iris-atto",
+				Amount: amount,
+			},
+			{
+				Denom:  stakeGenesis.Params.BondDenom,
+				Amount: stakeAmount,
+			},
+		}
 		genesisAccounts = append(genesisAccounts, GenesisAccount{
 			Address: acc.Address,
 			Coins:   coins,
 		})
 	}
 
-	// Default genesis state
+	// Random genesis states
 	govGenesis := gov.DefaultGenesisState()
-	stakeGenesis := stake.DefaultGenesisState()
+	fmt.Printf("Selected randomly generated governance parameters: %+v\n", govGenesis)
 	slashingGenesis := slashing.DefaultGenesisState()
-	var validators []stake.Validator
-	var delegations []stake.Delegation
+	fmt.Printf("Selected randomly generated slashing parameters: %+v\n", slashingGenesis)
+	mintGenesis := mint.DefaultGenesisState()
+	fmt.Printf("Selected randomly generated minting parameters: %v\n", mintGenesis)
+	var (
+		validators  []stake.Validator
+		delegations []stake.Delegation
+	)
 
-	// XXX Try different numbers of initially bonded validators
-	numInitiallyBonded := int64(50)
-	valAddrs := make([]sdk.ValAddress, numInitiallyBonded)
 	decAmt := sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 18))
+	valAddrs := make([]sdk.ValAddress, numInitiallyBonded)
 	for i := 0; i < int(numInitiallyBonded); i++ {
 		valAddr := sdk.ValAddress(accs[i].Address)
 		valAddrs[i] = valAddr
@@ -80,14 +100,18 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 		validator := stake.NewValidator(valAddr, accs[i].PubKey, stake.Description{})
 		validator.Tokens = decAmt
 		validator.DelegatorShares = decAmt
-		delegation := stake.Delegation{accs[i].Address, valAddr, decAmt, 0}
+		delegation := stake.Delegation{
+			DelegatorAddr: accs[i].Address,
+			ValidatorAddr: valAddr,
+			Shares:        decAmt,
+			Height:        0,
+		}
 		validators = append(validators, validator)
 		delegations = append(delegations, delegation)
 	}
-	stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 20))
+	stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 30))
 	stakeGenesis.Validators = validators
 	stakeGenesis.Bonds = delegations
-	mintGenesis := mint.DefaultGenesisState()
 
 	genesis := GenesisState{
 		Accounts:     genesisAccounts,
@@ -125,14 +149,12 @@ func invariants(app *IrisApp) []simulation.Invariant {
 	return []simulation.Invariant{}
 }
 
-// Profile with:
-// go test -benchmem -run=^$ ./app -bench ^BenchmarkFullIrisSimulation$ -SimulationCommit=true -cpuprofile cpu.out
 func BenchmarkFullIrisSimulation(b *testing.B) {
 	// Setup Iris application
 	var logger log.Logger
 	logger = log.NewNopLogger()
 	var db dbm.DB
-	dir := os.TempDir()
+	dir, _ := ioutil.TempDir("", "goleveldb-iris-sim")
 	db, _ = dbm.NewGoLevelDB("Simulation", dir)
 	defer func() {
 		db.Close()
@@ -174,7 +196,13 @@ func TestFullIrisSimulation(t *testing.T) {
 	} else {
 		logger = log.NewNopLogger()
 	}
-	db := dbm.NewMemDB()
+	var db dbm.DB
+	dir, _ := ioutil.TempDir("", "goleveldb-iris-sim")
+	db, _ = dbm.NewGoLevelDB("Simulation", dir)
+	defer func() {
+		db.Close()
+		os.RemoveAll(dir)
+	}()
 	app := NewIrisApp(logger, db, nil)
 	require.Equal(t, "IrisApp", app.Name())
 
@@ -186,12 +214,113 @@ func TestFullIrisSimulation(t *testing.T) {
 		invariants(app),
 		numBlocks,
 		blockSize,
-		false,
+		commit,
 	)
 	if commit {
-		fmt.Println("Database Size", db.Stats()["database.size"])
+		// for memdb:
+		// fmt.Println("Database Size", db.Stats()["database.size"])
+		fmt.Println("GoLevelDB Stats")
+		fmt.Println(db.Stats()["leveldb.stats"])
+		fmt.Println("GoLevelDB cached block size", db.Stats()["leveldb.cachedblock"])
 	}
 	require.Nil(t, err)
+}
+
+func TestIrisImportExport(t *testing.T) {
+	if !enabled {
+		t.Skip("Skipping Iris import/export simulation")
+	}
+
+	// Setup Iris application
+	var logger log.Logger
+	if verbose {
+		logger = log.TestingLogger()
+	} else {
+		logger = log.NewNopLogger()
+	}
+	var db dbm.DB
+	dir, _ := ioutil.TempDir("", "goleveldb-iris-sim")
+	db, _ = dbm.NewGoLevelDB("Simulation", dir)
+	defer func() {
+		db.Close()
+		os.RemoveAll(dir)
+	}()
+	app := NewIrisApp(logger, db, nil)
+	require.Equal(t, "IrisApp", app.Name())
+
+	// Run randomized simulation
+	err := simulation.SimulateFromSeed(
+		t, app.BaseApp, appStateFn, seed,
+		testAndRunTxs(app),
+		[]simulation.RandSetup{},
+		invariants(app),
+		numBlocks,
+		blockSize,
+		commit,
+	)
+	if commit {
+		// for memdb:
+		// fmt.Println("Database Size", db.Stats()["database.size"])
+		fmt.Println("GoLevelDB Stats")
+		fmt.Println(db.Stats()["leveldb.stats"])
+		fmt.Println("GoLevelDB cached block size", db.Stats()["leveldb.cachedblock"])
+	}
+	require.Nil(t, err)
+
+	fmt.Printf("Exporting genesis...\n")
+
+	appState, _, err := app.ExportAppStateAndValidators()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Importing genesis...\n")
+
+	newDir, _ := ioutil.TempDir("", "goleveldb-iris-sim-2")
+	newDB, _ := dbm.NewGoLevelDB("Simulation-2", dir)
+	defer func() {
+		newDB.Close()
+		os.RemoveAll(newDir)
+	}()
+	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil)
+	require.Equal(t, "IrisApp", newApp.Name())
+	request := abci.RequestInitChain{
+		AppStateBytes: appState,
+	}
+	newApp.InitChain(request)
+	newApp.Commit()
+
+	fmt.Printf("Comparing stores...\n")
+	ctxA := app.NewContext(true, abci.Header{})
+	ctxB := newApp.NewContext(true, abci.Header{})
+	type StoreKeysPrefixes struct {
+		A        sdk.StoreKey
+		B        sdk.StoreKey
+		Prefixes [][]byte
+	}
+	storeKeysPrefixes := []StoreKeysPrefixes{
+		{app.keyMain, newApp.keyMain, [][]byte{}},
+		{app.keyAccount, newApp.keyAccount, [][]byte{}},
+		{app.keyStake, newApp.keyStake, [][]byte{stake.UnbondingQueueKey, stake.RedelegationQueueKey, stake.ValidatorQueueKey}}, // ordering may change but it doesn't matter
+		{app.keySlashing, newApp.keySlashing, [][]byte{}},
+		{app.keyMint, newApp.keyMint, [][]byte{}},
+		{app.keyDistr, newApp.keyDistr, [][]byte{}},
+		{app.keyFeeCollection, newApp.keyFeeCollection, [][]byte{}},
+		{app.keyParams, newApp.keyParams, [][]byte{}},
+		{app.keyGov, newApp.keyGov, [][]byte{}},
+	}
+	for _, storeKeysPrefix := range storeKeysPrefixes {
+		storeKeyA := storeKeysPrefix.A
+		storeKeyB := storeKeysPrefix.B
+		prefixes := storeKeysPrefix.Prefixes
+		storeA := ctxA.KVStore(storeKeyA)
+		storeB := ctxB.KVStore(storeKeyB)
+		kvA, kvB, count, equal := sdk.DiffKVStores(storeA, storeB, prefixes)
+		fmt.Printf("Compared %d key/value pairs between %s and %s\n", count, storeKeyA, storeKeyB)
+		require.True(t, equal, "unequal stores: %s / %s:\nstore A %s (%X) => %s (%X)\nstore B %s (%X) => %s (%X)",
+			storeKeyA, storeKeyB, kvA.Key, kvA.Key, kvA.Value, kvA.Value, kvB.Key, kvB.Key, kvB.Value, kvB.Value)
+	}
+
 }
 
 // TODO: Make another test for the fuzzer itself, which just has noOp txs

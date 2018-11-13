@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.26.0-iris"
-  digest = "1:dc540b2f062c26d69b7821a1324ab7afaf04b8920da500e3378300d10e6db324"
+  digest = "1:06d4b3860be91d8d0bf1933758dda2ce0b5709506343c0656e033d2b69ffd776"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -903,6 +903,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/bartekn/go-bip39",
     "github.com/bgentry/speakeasy",
     "github.com/cosmos/cosmos-sdk/baseapp",
     "github.com/cosmos/cosmos-sdk/client",
@@ -912,6 +913,7 @@
     "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/cosmos-sdk/crypto",
     "github.com/cosmos/cosmos-sdk/crypto/keys",
+    "github.com/cosmos/cosmos-sdk/crypto/keys/hd",
     "github.com/cosmos/cosmos-sdk/crypto/keys/keyerror",
     "github.com/cosmos/cosmos-sdk/server",
     "github.com/cosmos/cosmos-sdk/server/mock",
@@ -953,6 +955,7 @@
     "github.com/spf13/viper",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
+    "github.com/syndtr/goleveldb/leveldb/opt",
     "github.com/tendermint/go-amino",
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",

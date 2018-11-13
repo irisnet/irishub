@@ -15,7 +15,7 @@ type Metrics struct {
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
-	tmMetrics := *mempool.PrometheusMetrics()
+	tmMetrics := *mempool.PrometheusMetrics("")
 	return &Metrics{
 		tmMetrics,
 	}
