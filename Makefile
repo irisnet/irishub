@@ -125,7 +125,7 @@ test_sim_iris_slow:
 
 testnet_start:
 	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
-	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then ./build/iris testnet --v 4 --output-dir build/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
+	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
 	docker-compose up -d
 
 testnet_stop:
