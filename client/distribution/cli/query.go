@@ -75,7 +75,7 @@ func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			var ddi types.DelegationDistInfo
-			err = cdc.UnmarshalBinary(res, &ddi)
+			err = cdc.UnmarshalBinaryLengthPrefixed(res, &ddi)
 			if err != nil {
 				return err
 			}
@@ -122,7 +122,7 @@ func GetAllDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command
 			var ddiList []types.DelegationDistInfo
 			for _, kv := range resKVs {
 				var ddi types.DelegationDistInfo
-				err = cdc.UnmarshalBinary(kv.Value, &ddi)
+				err = cdc.UnmarshalBinaryLengthPrefixed(kv.Value, &ddi)
 				if err != nil {
 					return err
 				}
@@ -166,7 +166,7 @@ func GetValidatorDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			var vdi types.ValidatorDistInfo
-			err = cdc.UnmarshalBinary(res, &vdi)
+			err = cdc.UnmarshalBinaryLengthPrefixed(res, &vdi)
 			if err != nil {
 				return err
 			}

@@ -39,7 +39,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 		if !iterator.Valid() {
 			break
 		}
-		keeper.cdc.MustUnmarshalBinary(iterator.Value(), &method)
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
 		require.Equal(t, method.Name, "SayHello")
 		require.Equal(t, method.Description, "sayHello")
 		require.Equal(t, method.OutputPrivacy.String(), "NoPrivacy")

@@ -37,11 +37,11 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
 			var versionID int64
-			cdc.MustUnmarshalBinary(res_versionID, &versionID)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_versionID, &versionID)
 
 			res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
 			var version upgrade.Version
-			cdc.MustUnmarshalBinary(res_version, &version)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_version, &version)
 
 			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(version, proposalID, height)
 
@@ -64,7 +64,7 @@ func GetCmdQuerySwitch(storeName string, cdc *codec.Codec) *cobra.Command {
 		Short: "query switch details",
 		Example: "iriscli upgrade query-switch --proposalID 1 --voter <voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 			voterStr := viper.GetString(flagVoter)
 
 			voter, err := sdk.AccAddressFromBech32(voterStr)
@@ -83,7 +83,7 @@ func GetCmdQuerySwitch(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var switchMsg upgrade.MsgSwitch
-			cdc.MustUnmarshalBinary(res, &switchMsg)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &switchMsg)
 			output, err := codec.MarshalJSONIndent(cdc, switchMsg)
 			if err != nil {
 				return err

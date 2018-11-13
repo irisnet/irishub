@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
 	"bufio"
 	"io"
 
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
@@ -34,6 +34,9 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/service"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"path/filepath"
+	"io/ioutil"
 )
 
 var (
@@ -43,10 +46,19 @@ var (
 	nodeID      = ""
 )
 
-//___________________________________________________________________________________
-// helper methods
+func init() {
+	irisHome, iriscliHome = getTestingHomeDirs()
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+}
 
-func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
+//___________________________________________________________________________________
+// irisnet helper methods
+
+func convertToIrisBaseAccount(t *testing.T, acc bank.BaseAccount) string {
 	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
 	cliCtx := context.NewCLIContext().
@@ -105,35 +117,11 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 	return nil
 }
 
-func modifyGenesisFile(irisHome string) error {
-	genesisFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", irisHome, string(os.PathSeparator), string(os.PathSeparator))
-
-	genesisDoc, err := types.GenesisDocFromFile(genesisFilePath)
-	if err != nil {
-		return err
-	}
-
-	var genesisState app.GenesisState
-
-	cdc := codec.New()
-	codec.RegisterCrypto(cdc)
-
-	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
-	if err != nil {
-		return err
-	}
-
+func modifyGenesisState(genesisState app.GenesisState) app.GenesisState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
-
-	bz, err := cdc.MarshalJSON(genesisState)
-	if err != nil {
-		return err
-	}
-
-	genesisDoc.AppState = bz
-	return genesisDoc.SaveAs(genesisFilePath)
+	return genesisState
 }
 
 func modifyConfigFile(configSrcPath, configDstPath string) error {
@@ -199,29 +187,68 @@ func copyFile(dstFile, srcFile string) error {
 	_, err = io.Copy(dst, src)
 	return err
 }
-
 //___________________________________________________________________________________
-// executors
+// helper methods
+
+
 
 func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
-
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
-	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
-
-	err := modifyGenesisFile(irisHome)
-	require.NoError(t, err)
-
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
-
+	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
+		"iriscli keys show foo --output=json --home=%s", iriscliHome))
+	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
+	genFile := filepath.Join(irisHome, "config", "genesis.json")
+	genDoc := readGenesisFile(t, genFile)
+	var appState app.GenesisState
+	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
+	require.NoError(t, err)
+	appState.Accounts = []app.GenesisAccount{app.NewDefaultGenesisAccount(fooAddr)}
+	appState = modifyGenesisState(appState)
+	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
+	require.NoError(t, err)
+	genDoc.AppState = appStateJSON
+	genDoc.SaveAs(genFile)
+	executeWrite(t, fmt.Sprintf(
+		"iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
+		app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), app.DefaultKeyPass)
 	// get a free port, also setup some common flags
 	servAddr, port, err = server.FreeTCPAddr()
 	require.NoError(t, err)
 	return
 }
 
-func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
+func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
+	cdc := app.MakeCodec()
+	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
+	return
+}
+
+func readGenesisFile(t *testing.T, genFile string) types.GenesisDoc {
+	var genDoc types.GenesisDoc
+	fp, err := os.Open(genFile)
+	require.NoError(t, err)
+	fileContents, err := ioutil.ReadAll(fp)
+	require.NoError(t, err)
+	defer fp.Close()
+	err = codec.Cdc.UnmarshalJSON(fileContents, &genDoc)
+	require.NoError(t, err)
+	return genDoc
+}
+
+//___________________________________________________________________________________
+// executors
+
+func executeWrite(t *testing.T, cmdStr string, writes ...string) (exitSuccess bool) {
+	exitSuccess, _, _ = executeWriteRetStdStreams(t, cmdStr, writes...)
+	return
+}
+
+func executeWriteRetStdStreams(t *testing.T, cmdStr string, writes ...string) (bool, string, string) {
 	proc := tests.GoExecuteT(t, cmdStr)
 
 	for _, write := range writes {
@@ -241,12 +268,10 @@ func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 	}
 
 	proc.Wait()
-	return proc.ExitState.Success()
-	//	bz := proc.StdoutBuffer.Bytes()
-	//	fmt.Println("EXEC WRITE", string(bz))
+	return proc.ExitState.Success(), string(stdout), string(stderr)
 }
 
-func executeInit(t *testing.T, cmdStr string) (chainID, nodeID string) {
+func executeInit(t *testing.T, cmdStr string) (chainID string) {
 	_, stderr := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
@@ -267,7 +292,26 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 	pk, err := sdk.GetAccPubKeyBech32(ko.PubKey)
 	require.NoError(t, err)
 
-	return ko.Address, pk
+	accAddr, err := sdk.AccAddressFromBech32(ko.Address)
+	require.NoError(t, err)
+
+	return accAddr, pk
+}
+
+// irisnet-module-helper function
+func executeGetAccount(t *testing.T, cmdStr string) (acc bank.BaseAccount) {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var initRes map[string]json.RawMessage
+	err := json.Unmarshal([]byte(out), &initRes)
+	require.NoError(t, err, "out %v, err %v", out, err)
+
+	cdc := codec.New()
+	codec.RegisterCrypto(cdc)
+
+	err = cdc.UnmarshalJSON([]byte(out), &acc)
+	require.NoError(t, err, "acc %v, err %v", string(out), err)
+
+	return acc
 }
 
 func executeGetValidatorPK(t *testing.T, cmdStr string) string {
@@ -311,21 +355,6 @@ func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclien
 
 	require.Empty(t, err)
 	return vdi
-}
-
-func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var initRes map[string]json.RawMessage
-	err := json.Unmarshal([]byte(out), &initRes)
-	require.NoError(t, err, "out %v, err %v", out, err)
-
-	cdc := codec.New()
-	codec.RegisterCrypto(cdc)
-
-	err = cdc.UnmarshalJSON([]byte(out), &acc)
-	require.NoError(t, err, "acc %v, err %v", string(out), err)
-
-	return acc
 }
 
 func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
@@ -507,3 +536,5 @@ func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force b
 	return true
 
 }
+
+

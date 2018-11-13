@@ -35,7 +35,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var svcDef service.SvcDef
-			cdc.MustUnmarshalBinary(res, &svcDef)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcDef)
 
 			res2, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
@@ -45,7 +45,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			var methods []service.MethodProperty
 			for i := 0; i < len(res2); i++ {
 				var method service.MethodProperty
-				cdc.MustUnmarshalBinary(res2[i].Value, &method)
+				cdc.MustUnmarshalBinaryLengthPrefixed(res2[i].Value, &method)
 				methods = append(methods, method)
 			}
 
@@ -92,7 +92,7 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var svcBinding service.SvcBinding
-			cdc.MustUnmarshalBinary(res, &svcBinding)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcBinding)
 			output, err := codec.MarshalJSONIndent(cdc, svcBinding)
 			fmt.Println(string(output))
 			return nil
@@ -125,8 +125,9 @@ func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			var bindings []service.SvcBinding
 			for i := 0; i < len(res); i++ {
+
 				var binding service.SvcBinding
-				cdc.MustUnmarshalBinary(res[i].Value, &binding)
+				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &binding)
 				bindings = append(bindings, binding)
 			}
 

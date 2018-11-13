@@ -110,14 +110,19 @@ func createVerifier() tmlite.Verifier {
 	}
 
 	node := rpcclient.NewHTTP(nodeURI, "/websocket")
+	cacheSize := 10 // TODO: determine appropriate cache size
+	verifier, err := tmliteProxy.NewVerifier(
+		chainID, home,
+		node, log.NewNopLogger(), cacheSize,
+	)
 
-	certifier, err := tmliteProxy.NewVerifier(chainID, home, node, log.NewNopLogger())
 	if err != nil {
-		fmt.Printf("Abort!! IRISLCD encountered fatal error in creating certifier: %s", err.Error())
+		fmt.Printf("Create verifier failed: %s\n", err.Error())
+		fmt.Printf("Please check network connection and verify the address of the node to connect to\n")
 		os.Exit(1)
 	}
 
-	return certifier
+	return verifier
 }
 
 func fromFields(from string) (fromAddr types.AccAddress, fromName string) {

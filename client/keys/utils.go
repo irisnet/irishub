@@ -2,17 +2,23 @@ package keys
 
 import (
 	"fmt"
+	"net/http"
+	"path/filepath"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/viper"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
-	"path/filepath"
 )
 
 // KeyDBName is the directory under root where we store the keys
 const KeyDBName = "keys"
+
+type BechKeyOutFn func(keyInfo keys.Info) (KeyOutput, error)
 
 // keybase is used to make GetKeyBase a singleton
 var keybase keys.Keybase
@@ -60,6 +66,28 @@ func GetPassphrase(name string) (string, error) {
 	return passphrase, nil
 }
 
+// GetKeyBaseWithWritePerm initialize a keybase based on the configuration with write permissions.
+func GetKeyBaseWithWritePerm() (keys.Keybase, error) {
+	rootDir := viper.GetString(cli.HomeFlag)
+	return GetKeyBaseFromDirWithWritePerm(rootDir)
+}
+
+// GetKeyBaseFromDirWithWritePerm initializes a keybase at a particular dir with write permissions.
+func GetKeyBaseFromDirWithWritePerm(rootDir string) (keys.Keybase, error) {
+	return getKeyBaseFromDirWithOpts(rootDir, nil)
+}
+
+func getKeyBaseFromDirWithOpts(rootDir string, o *opt.Options) (keys.Keybase, error) {
+	if keybase == nil {
+		db, err := dbm.NewGoLevelDBWithOpts(KeyDBName, filepath.Join(rootDir, "keys"), o)
+		if err != nil {
+			return nil, err
+		}
+		keybase = client.GetKeyBase(db)
+	}
+	return keybase, nil
+}
+
 // ReadPassphraseFromStdin attempts to read a passphrase from STDIN return an
 // error upon failure.
 func ReadPassphraseFromStdin(name string) (string, error) {
@@ -97,11 +125,11 @@ func GetKey(name string) (keys.Info, error) {
 
 // used for outputting keys.Info over REST
 type KeyOutput struct {
-	Name    string         `json:"name"`
-	Type    string         `json:"type"`
-	Address sdk.AccAddress `json:"address"`
-	PubKey  string         `json:"pub_key"`
-	Seed    string         `json:"seed,omitempty"`
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	Address string `json:"address"`
+	PubKey  string `json:"pub_key"`
+	Seed    string `json:"seed,omitempty"`
 }
 
 // create a list of KeyOutput in bech32 format
@@ -117,35 +145,73 @@ func Bech32KeysOutput(infos []keys.Info) ([]KeyOutput, error) {
 	return kos, nil
 }
 
-// create a KeyOutput in bech32 format
+// Bech32KeyOutput create a KeyOutput in bech32 format
 func Bech32KeyOutput(info keys.Info) (KeyOutput, error) {
-	account := sdk.AccAddress(info.GetPubKey().Address().Bytes())
+	accAddr := sdk.AccAddress(info.GetPubKey().Address().Bytes())
 	bechPubKey, err := sdk.Bech32ifyAccPub(info.GetPubKey())
 	if err != nil {
 		return KeyOutput{}, err
 	}
+
 	return KeyOutput{
 		Name:    info.GetName(),
 		Type:    info.GetType().String(),
-		Address: account,
+		Address: accAddr.String(),
 		PubKey:  bechPubKey,
 	}, nil
 }
 
-func PrintInfo(cdc *codec.Codec, info keys.Info) {
-	ko, err := Bech32KeyOutput(info)
+// Bech32ConsKeyOutput returns key output for a consensus node's key
+// information.
+func Bech32ConsKeyOutput(keyInfo keys.Info) (KeyOutput, error) {
+	consAddr := sdk.ConsAddress(keyInfo.GetPubKey().Address().Bytes())
+
+	bechPubKey, err := sdk.Bech32ifyConsPub(keyInfo.GetPubKey())
+	if err != nil {
+		return KeyOutput{}, err
+	}
+
+	return KeyOutput{
+		Name:    keyInfo.GetName(),
+		Type:    keyInfo.GetType().String(),
+		Address: consAddr.String(),
+		PubKey:  bechPubKey,
+	}, nil
+}
+
+// Bech32ValKeyOutput returns key output for a validator's key information.
+func Bech32ValKeyOutput(keyInfo keys.Info) (KeyOutput, error) {
+	valAddr := sdk.ValAddress(keyInfo.GetPubKey().Address().Bytes())
+
+	bechPubKey, err := sdk.Bech32ifyValPub(keyInfo.GetPubKey())
+	if err != nil {
+		return KeyOutput{}, err
+	}
+
+	return KeyOutput{
+		Name:    keyInfo.GetName(),
+		Type:    keyInfo.GetType().String(),
+		Address: valAddr.String(),
+		PubKey:  bechPubKey,
+	}, nil
+}
+
+func PrintKeyInfo(keyInfo keys.Info, bechKeyOut BechKeyOutFn) {
+	ko, err := bechKeyOut(keyInfo)
 	if err != nil {
 		panic(err)
 	}
+
 	switch viper.Get(cli.OutputFlag) {
 	case "text":
 		fmt.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
-		printKeyOutput(ko)
+		PrintKeyOutput(ko)
 	case "json":
-		out, err := cdc.MarshalJSON(ko)
+		out, err := MarshalJSON(ko)
 		if err != nil {
 			panic(err)
 		}
+
 		fmt.Println(string(out))
 	}
 }
@@ -159,7 +225,7 @@ func PrintInfos(cdc *codec.Codec, infos []keys.Info) {
 	case "text":
 		fmt.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
 		for _, ko := range kos {
-			printKeyOutput(ko)
+			PrintKeyOutput(ko)
 		}
 	case "json":
 		out, err := cdc.MarshalJSON(kos)
@@ -170,6 +236,60 @@ func PrintInfos(cdc *codec.Codec, infos []keys.Info) {
 	}
 }
 
-func printKeyOutput(ko KeyOutput) {
+func PrintKeyOutput(ko KeyOutput) {
 	fmt.Printf("%s\t%s\t%s\t%s\n", ko.Name, ko.Type, ko.Address, ko.PubKey)
+}
+
+func PrintKeyAddress(info keys.Info, bechKeyOut BechKeyOutFn) {
+	ko, err := bechKeyOut(info)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(ko.Address)
+}
+
+func PrintPubKey(info keys.Info, bechKeyOut BechKeyOutFn) {
+	ko, err := bechKeyOut(info)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(ko.PubKey)
+}
+
+func GetBechKeyOut(bechPrefix string) (BechKeyOutFn, error) {
+	switch bechPrefix {
+	case "acc":
+		return Bech32KeyOutput, nil
+	case "val":
+		return Bech32ValKeyOutput, nil
+	case "cons":
+		return Bech32ConsKeyOutput, nil
+	}
+
+	return nil, fmt.Errorf("invalid Bech32 prefix encoding provided: %s", bechPrefix)
+}
+
+// PostProcessResponse performs post process for rest response
+func PostProcessResponse(w http.ResponseWriter, cdc *codec.Codec, response interface{}, indent bool) {
+	var output []byte
+	switch response.(type) {
+	default:
+		var err error
+		if indent {
+			output, err = cdc.MarshalJSONIndent(response, "", "  ")
+		} else {
+			output, err = cdc.MarshalJSON(response)
+		}
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	case []byte:
+		output = response.([]byte)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
 }

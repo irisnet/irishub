@@ -78,7 +78,7 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			return
 		}
 
-		txBytes, err := cliCtx.Codec.MarshalBinary(m.Tx)
+		txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(m.Tx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -152,7 +152,7 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			Signatures: sig,
 			Memo:       sendTxBody.Memo,
 		}
-		txBytes, err := cdc.MarshalBinary(stdTx)
+		txBytes, err := cdc.MarshalBinaryLengthPrefixed(stdTx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

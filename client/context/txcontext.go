@@ -1,18 +1,19 @@
 package context
 
 import (
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/viper"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
-
-	"fmt"
-	"github.com/pkg/errors"
-	"github.com/spf13/viper"
-	"net/http"
-	"strings"
 )
 
 //----------------------------------------
@@ -190,7 +191,7 @@ func (txCtx TxContext) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]
 	if err != nil {
 		return nil, err
 	}
-	return txCtx.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, []auth.StdSignature{sig}, msg.Memo))
+	return txCtx.Codec.MarshalBinaryLengthPrefixed(auth.NewStdTx(msg.Msgs, msg.Fee, []auth.StdSignature{sig}, msg.Memo))
 }
 
 // BuildAndSign builds a single message to be signed, and signs a transaction
@@ -231,7 +232,7 @@ func (txCtx TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, err
 		PubKey:        info.GetPubKey(),
 	}}
 
-	return txCtx.Codec.MarshalBinary(auth.NewStdTx(msg.Msgs, msg.Fee, sigs, msg.Memo))
+	return txCtx.Codec.MarshalBinaryLengthPrefixed(auth.NewStdTx(msg.Msgs, msg.Fee, sigs, msg.Memo))
 }
 
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If append

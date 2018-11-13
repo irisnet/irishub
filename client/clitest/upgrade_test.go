@@ -18,10 +18,6 @@ var (
 	wg sync.WaitGroup
 )
 
-func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
-}
-
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	t.SkipNow()
 

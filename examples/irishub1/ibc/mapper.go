@@ -28,16 +28,16 @@ func NewMapper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) 
 // --------------------------
 // Functions for accessing the underlying KVStore.
 
-func marshalBinaryPanic(cdc *codec.Codec, value interface{}) []byte {
-	res, err := cdc.MarshalBinary(value)
+func MarshalBinaryLengthPrefixedPanic(cdc *codec.Codec, value interface{}) []byte {
+	res, err := cdc.MarshalBinaryLengthPrefixed(value)
 	if err != nil {
 		panic(err)
 	}
 	return res
 }
 
-func unmarshalBinaryPanic(cdc *codec.Codec, bz []byte, ptr interface{}) {
-	err := cdc.UnmarshalBinary(bz, ptr)
+func unMarshalBinaryLengthPrefixedPanic(cdc *codec.Codec, bz []byte, ptr interface{}) {
+	err := cdc.UnMarshalBinaryLengthPrefixed(bz, ptr)
 	if err != nil {
 		panic(err)
 	}
@@ -50,13 +50,13 @@ func (ibcm Mapper) GetIngressSequence(ctx sdk.Context, srcChain string) int64 {
 
 	bz := store.Get(key)
 	if bz == nil {
-		zero := marshalBinaryPanic(ibcm.cdc, int64(0))
+		zero := MarshalBinaryLengthPrefixedPanic(ibcm.cdc, int64(0))
 		store.Set(key, zero)
 		return 0
 	}
 
 	var res int64
-	unmarshalBinaryPanic(ibcm.cdc, bz, &res)
+	unMarshalBinaryLengthPrefixedPanic(ibcm.cdc, bz, &res)
 	return res
 }
 
@@ -65,7 +65,7 @@ func (ibcm Mapper) SetIngressSequence(ctx sdk.Context, srcChain string, sequence
 	store := ctx.KVStore(ibcm.key)
 	key := IngressSequenceKey(srcChain)
 
-	bz := marshalBinaryPanic(ibcm.cdc, sequence)
+	bz := MarshalBinaryLengthPrefixedPanic(ibcm.cdc, sequence)
 	store.Set(key, bz)
 }
 
@@ -73,12 +73,12 @@ func (ibcm Mapper) SetIngressSequence(ctx sdk.Context, srcChain string, sequence
 func (ibcm Mapper) getEgressLength(store sdk.KVStore, destChain string) int64 {
 	bz := store.Get(EgressLengthKey(destChain))
 	if bz == nil {
-		zero := marshalBinaryPanic(ibcm.cdc, int64(0))
+		zero := MarshalBinaryLengthPrefixedPanic(ibcm.cdc, int64(0))
 		store.Set(EgressLengthKey(destChain), zero)
 		return 0
 	}
 	var res int64
-	unmarshalBinaryPanic(ibcm.cdc, bz, &res)
+	unMarshalBinaryLengthPrefixedPanic(ibcm.cdc, bz, &res)
 	return res
 }
 
@@ -105,12 +105,12 @@ func (ibcm Mapper) Get(ctx sdk.Context) (string, bool) {
 		return " ", false
 	}
 	var Addr string
-	ibcm.cdc.MustUnmarshalBinary(bz, &Addr)
+	ibcm.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &Addr)
 	return Addr, true
 }
 
 func (ibcm Mapper) Set(ctx sdk.Context,Addr string) {
 	store := ctx.KVStore(ibcm.key)
-	bz := ibcm.cdc.MustMarshalBinary(Addr)
+	bz := ibcm.cdc.MustMarshalBinaryLengthPrefixed(Addr)
 	store.Set([]byte("ibcaddr"), bz)
 }
