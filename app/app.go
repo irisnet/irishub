@@ -172,15 +172,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&stakeKeeper, app.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		app.RegisterCodespace(slashing.DefaultCodespace),
 	)
-	app.upgradeKeeper = upgrade.NewKeeper(
-		app.cdc,
-		app.keyUpgrade, app.stakeKeeper,
-	)
 
 	app.govKeeper = gov.NewKeeper(
 		app.cdc,
 		app.keyGov,
-		app.bankKeeper, app.stakeKeeper,
+		app.bankKeeper, &stakeKeeper,
 		app.RegisterCodespace(gov.DefaultCodespace),
 	)
 
@@ -201,6 +197,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// so that it can be modified like below:
 	app.stakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
+
+	app.upgradeKeeper = upgrade.NewKeeper(
+		app.cdc,
+		app.keyUpgrade, app.stakeKeeper,
+	)
 
 	// register message routes
 	// need to update each module's msg type

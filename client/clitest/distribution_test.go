@@ -67,8 +67,8 @@ func TestIrisCLIDistribution(t *testing.T) {
 	vdi := executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
 	require.Equal(t, valAddr, vdi.OperatorAddr.String())
 	require.Equal(t, int64(0), vdi.FeePoolWithdrawalHeight)
-	require.Equal(t, "0.2084262892iris", vdi.DelPool)
-	require.Equal(t, "0.0000000000iris", vdi.ValCommission)
+	require.Equal(t, "0.1871786522iris", vdi.DelPool)
+	require.Equal(t, "0.0207976280iris", vdi.ValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.004iris %s", flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -112,8 +112,8 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	vdi := executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
 	require.Equal(t, valAddr, vdi.OperatorAddr.String())
 	require.Equal(t, int64(0), vdi.FeePoolWithdrawalHeight)
-	require.Equal(t, "0.6251262892iris", vdi.DelPool)
-	require.Equal(t, "0.0000000000iris", vdi.ValCommission)
+	require.Equal(t, "0.5613986522iris", vdi.DelPool)
+	require.Equal(t, "0.0623776280iris", vdi.ValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.004iris %s", valAddr, flags), app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)

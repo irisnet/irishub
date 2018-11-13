@@ -56,7 +56,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
-	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, uint64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
 
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
@@ -69,12 +69,12 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	vote := executeGetVote(t, fmt.Sprintf("iriscli gov query-vote --proposal-id=1 --voter=%s --output=json %v", fooAddr, flags))
-	require.Equal(t, int64(1), vote.ProposalID)
+	require.Equal(t, uint64(1), vote.ProposalID)
 	require.Equal(t, gov.OptionYes, vote.Option)
 
 	tests.WaitForNextNBlocksTM(15, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
-	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, uint64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
 
 	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/govDepositProcedure",flags))
