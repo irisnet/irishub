@@ -19,8 +19,6 @@ var (
 )
 
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
-	t.SkipNow()
-
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
@@ -39,7 +37,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	// check the upgrade info
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli upgrade info --output=json %v", flags))
-	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, uint64(0), upgradeInfo.CurrentProposalId)
 	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
 
 	/////////////////// Upgrade Proposal /////////////////////////////////
@@ -56,7 +54,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
-	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, uint64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusVotingPeriod, proposal1.Status)
 
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
@@ -70,12 +68,12 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	votes := executeGetVotes(t, fmt.Sprintf("iriscli gov query-votes --proposal-id=1 --output=json %v", flags))
 	require.Len(t, votes, 1)
-	require.Equal(t, int64(1), votes[0].ProposalID)
+	require.Equal(t, uint64(1), votes[0].ProposalID)
 	require.Equal(t, gov.OptionYes, votes[0].Option)
 
 	tests.WaitForNextNBlocksTM(12, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
-	require.Equal(t, int64(1), proposal1.ProposalID)
+	require.Equal(t, uint64(1), proposal1.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
 
 	/////////////// Stop and Run new version Software ////////////////////
@@ -91,7 +89,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	// check the upgrade info
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
-	require.Equal(t, int64(1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, uint64(1), upgradeInfo.CurrentProposalId)
 	//require.Equal(t, votingStartBlock1+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(0), upgradeInfo.Verion.Id)
 
@@ -107,7 +105,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	// check switch msg
 	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposalID=1 --voter=%v --output=json %v", fooAddr.String(), flags))
-	require.Equal(t, int64(1), switchMsg.ProposalID)
+	require.Equal(t, uint64(1), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
 	// check whether switched to the new version
@@ -115,7 +113,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForHeightTM(lastSwitchHeight, port)
 
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
-	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, uint64(0), upgradeInfo.CurrentProposalId)
 	//require.Equal(t, votingStartBlock1+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
@@ -135,7 +133,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	proposal2 := executeGetProposal(t, fmt.Sprintf("iriscli1 gov query-proposal --proposal-id=2 --output=json %v", flags))
-	require.Equal(t, int64(2), proposal2.ProposalID)
+	require.Equal(t, uint64(2), proposal2.ProposalID)
 	require.Equal(t, gov.StatusVotingPeriod, proposal2.Status)
 
 	//votingStartBlock2 := proposal2.VotingStartBlock
@@ -151,12 +149,12 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	votes = executeGetVotes(t, fmt.Sprintf("iriscli1 gov query-votes --proposal-id=2 --output=json %v", flags))
 	require.Len(t, votes, 1)
-	require.Equal(t, int64(2), votes[0].ProposalID)
+	require.Equal(t, uint64(2), votes[0].ProposalID)
 	require.Equal(t, gov.OptionYes, votes[0].Option)
 
 	tests.WaitForNextNBlocksTM(12, port)
 	proposal2 = executeGetProposal(t, fmt.Sprintf("iriscli1 gov query-proposal --proposal-id=2 --output=json %v", flags))
-	require.Equal(t, int64(2), proposal2.ProposalID)
+	require.Equal(t, uint64(2), proposal2.ProposalID)
 	require.Equal(t, gov.StatusPassed, proposal2.Status)
 
 	/////////////// Stop and Run new version Software ////////////////////
@@ -172,7 +170,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	// check the upgrade info
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
-	require.Equal(t, int64(2), upgradeInfo.CurrentProposalId)
+	require.Equal(t, uint64(2), upgradeInfo.CurrentProposalId)
 	//require.Equal(t, votingStartBlock2+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
@@ -188,7 +186,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 
 	// check switch msg
 	switchMsg = executeGetSwitch(t, fmt.Sprintf("iriscli2-bugfix upgrade query-switch --proposalID=2 --voter=%v --output=json %v", fooAddr.String(), flags))
-	require.Equal(t, int64(2), switchMsg.ProposalID)
+	require.Equal(t, uint64(2), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
 	// check whether switched to the new version
@@ -196,7 +194,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForHeightTM(lastSwitchHeight, port)
 
 	upgradeInfo = executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
-	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, uint64(0), upgradeInfo.CurrentProposalId)
 	//require.Equal(t, votingStartBlock2+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(2), upgradeInfo.Verion.Id)
 
@@ -237,7 +235,7 @@ func startNodeBToReplay(t *testing.T) {
 
 	// check the upgrade info
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
-	require.Equal(t, int64(-1), upgradeInfo.CurrentProposalId)
+	require.Equal(t, uint64(0), upgradeInfo.CurrentProposalId)
 	require.Equal(t, int64(2), upgradeInfo.Verion.Id)
 
 	wg.Done()

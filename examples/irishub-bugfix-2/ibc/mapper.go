@@ -69,7 +69,7 @@ func MarshalBinaryLengthPrefixedPanic(cdc *codec.Codec, value interface{}) []byt
 }
 
 func unMarshalBinaryLengthPrefixedPanic(cdc *codec.Codec, bz []byte, ptr interface{}) {
-	err := cdc.UnMarshalBinaryLengthPrefixed(bz, ptr)
+	err := cdc.UnmarshalBinaryLengthPrefixed(bz, ptr)
 	if err != nil {
 		panic(err)
 	}
