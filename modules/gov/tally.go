@@ -105,6 +105,12 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	if results[OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
 		return false, tallyResults
 	}
+	////////////////////  iris begin  ///////////////////////////
+	//if more than 1/3 of voters abstain, proposal fails
+	if results[OptionAbstain].Quo(totalVotingPower).GT(sdk.NewDecWithPrec(334, 3)){
+		return  false, tallyResults
+	}
+	////////////////////  iris end  ///////////////////////////
 	// If more than 1/2 of non-abstaining voters vote Yes, proposal passes
 	if results[OptionYes].Quo(totalVotingPower.Sub(results[OptionAbstain])).GT(tallyingProcedure.Threshold) {
 		return true, tallyResults
