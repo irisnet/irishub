@@ -213,7 +213,7 @@ var _ iparam.GovParameter = (*TallyingProcedureParam)(nil)
 type TallyingProcedure struct {
 	Threshold         sdk.Dec `json:"threshold"`          //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
 	Veto              sdk.Dec `json:"veto"`               //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
-	GovernancePenalty sdk.Dec `json:"governance_penalty"` //  Penalty if validator does not vote
+	Participation     sdk.Dec `json:"participation"`      //
 }
 
 type TallyingProcedureParam struct {
@@ -233,7 +233,7 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 		param.Value = TallyingProcedure{
 			Threshold:         sdk.NewDecWithPrec(5, 1),
 			Veto:              sdk.NewDecWithPrec(334, 3),
-			GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+			Participation:     sdk.NewDecWithPrec(667, 3),
 		}
 	}
 }
@@ -288,8 +288,8 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 		if param.Value.Threshold.LTE(sdk.ZeroDec()) || param.Value.Threshold.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidThreshold, fmt.Sprintf("Invalid Threshold ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
 		}
-		if param.Value.GovernancePenalty.LTE(sdk.ZeroDec()) || param.Value.GovernancePenalty.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid Penalty ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
+		if param.Value.Participation.LTE(sdk.ZeroDec()) || param.Value.Participation.GTE(sdk.NewDec(1)) {
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidParticipation, fmt.Sprintf("Invalid participation ( "+param.Value.Participation.String()+" ) should be between 0 and 1"))
 		}
 		if param.Value.Veto.LTE(sdk.ZeroDec()) || param.Value.Veto.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
