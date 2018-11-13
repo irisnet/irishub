@@ -2,12 +2,12 @@ package govparams
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -39,8 +39,8 @@ func TestInitGenesisParameter(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	Denom             := "iris"
-	IrisCt            := types.NewDefaultCoinType(Denom)
+	Denom := "iris"
+	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	require.NoError(t, err)
 
@@ -83,8 +83,8 @@ func TestRegisterParamMapping(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	Denom             := "iris"
-	IrisCt            := types.NewDefaultCoinType(Denom)
+	Denom := "iris"
+	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	require.NoError(t, err)
 
@@ -261,14 +261,14 @@ func TestTallyingProcedureParam(t *testing.T) {
 	)
 
 	p1 := TallyingProcedure{
-		Threshold:         sdk.NewDecWithPrec(5, 1),
-		Veto:              sdk.NewDecWithPrec(334, 3),
+		Threshold:     sdk.NewDecWithPrec(5, 1),
+		Veto:          sdk.NewDecWithPrec(334, 3),
 		Participation: sdk.NewDecWithPrec(667, 3),
 	}
 
 	p2 := TallyingProcedure{
-		Threshold:         sdk.NewDecWithPrec(5, 1),
-		Veto:              sdk.NewDecWithPrec(334, 3),
+		Threshold:     sdk.NewDecWithPrec(5, 1),
+		Veto:          sdk.NewDecWithPrec(334, 3),
 		Participation: sdk.NewDecWithPrec(2, 2),
 	}
 
