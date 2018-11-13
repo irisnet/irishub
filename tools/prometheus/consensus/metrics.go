@@ -117,7 +117,7 @@ type Metrics struct {
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
-	tmMetrics := *consensus.PrometheusMetrics()
+	tmMetrics := *consensus.PrometheusMetrics("")
 	irisMetrics := NewIrisMetrics()
 	return &Metrics{
 		TmMetrics:   tmMetrics,
@@ -267,7 +267,7 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec, block
 		cs.IrisMetrics.UpTime.Set(float64(cs.IrisMetrics.SignedCount) / float64(cs.IrisMetrics.blockInfo.Len()))
 		cs.IrisMetrics.MissedPrecommits.Set(float64(cs.IrisMetrics.MissedCount))
 	}
-	bz, _ := cdc.MarshalBinaryLengthPrefixedBare(block)
+	bz, _ := cdc.MarshalBinaryLengthPrefixed(block)
 	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 

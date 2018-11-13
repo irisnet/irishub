@@ -54,7 +54,7 @@ func (m *Metrics) Start(ctx context.CLIContext) {
 			if result, err := ctx.NetInfo(); err == nil {
 				connected := 0
 				for _, peer := range result.Peers {
-					if _, exist := m.persistent_peers[string(peer.ID)]; exist {
+					if _, exist := m.persistent_peers[string(peer.NodeInfo.ID())]; exist {
 						connected += 1
 					}
 				}
