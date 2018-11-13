@@ -122,3 +122,15 @@ test_sim_iris_fast:
 test_sim_iris_slow:
 	@echo "Running full Iris simulation. This may take awhile!"
 	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
+
+testnet_start:
+	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
+	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then ./build/iris testnet --v 4 --output-dir build/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
+	docker-compose up -d
+
+testnet_stop:
+	docker-compose down
+
+testnet_clean:
+	docker-compose down
+	sudo rm -rf build/*
