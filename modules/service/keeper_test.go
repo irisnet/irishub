@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestKeeper_IService_Definition(t *testing.T) {
+func TestKeeper_service_Definition(t *testing.T) {
 	mapp, keeper, _, addrs, _, _ := getMockApp(t, 3)
 	SortAddresses(addrs)
 	mapp.BeginBlock(abci.RequestBeginBlock{})
@@ -18,19 +18,17 @@ func TestKeeper_IService_Definition(t *testing.T) {
 
 	serviceDef := NewSvcDef("myService",
 		"testnet",
-		"the iservice for unit test",
+		"the service for unit test",
 		[]string{"test", "tutorial"},
 		addrs[0],
 		"unit test author",
-		idlContent,
-		Unicast)
+		idlContent)
 
 	keeper.AddServiceDefinition(ctx, serviceDef)
 	serviceDefB, _ := keeper.GetServiceDefinition(ctx, "testnet", "myService")
 
 	require.Equal(t, serviceDefB.IDLContent, idlContent)
 	require.Equal(t, serviceDefB.Name, "myService")
-	require.Equal(t, serviceDefB.Messaging, Unicast)
 
 	// test methods
 	keeper.AddMethods(ctx, serviceDef)
@@ -52,7 +50,7 @@ func TestKeeper_IService_Definition(t *testing.T) {
 	amount1, _ := sdk.NewIntFromString("1000000000000000000000")
 	svcBinding := NewSvcBinding("testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, 1000)
+		Level{AvgRspTime: 10000, UsableTime: 9999}, true, 0)
 	err, _ := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
@@ -64,10 +62,10 @@ func TestKeeper_IService_Definition(t *testing.T) {
 	require.True(t, SvcBindingEqual(svcBinding, gotSvcBinding))
 
 	// test binding update
-	svcBindingUpdate := NewMsgSvcBindingUpdate("testnet", "myService", "testnet",
+	svcBindingUpdate := NewSvcBinding("testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, 1000)
-	err, _ = keeper.UpdateServiceBinding(ctx, svcBindingUpdate.SvcBinding)
+		Level{AvgRspTime: 10000, UsableTime: 9999},true,0)
+	err, _ = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
 	require.NoError(t, err)
 
 	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(0))}))

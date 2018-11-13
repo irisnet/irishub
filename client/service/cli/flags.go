@@ -11,7 +11,6 @@ const (
 	FlagTags               = "tags"
 	FlagAuthorDescription  = "author-description"
 	FlagIdlContent         = "idl-content"
-	FlagMessaging          = "messaging"
 	FlagFile               = "file"
 	FlagProvider           = "provider"
 	FlagBindChainID        = "bind-chain-id"
@@ -30,7 +29,6 @@ var (
 	FsTags               = flag.NewFlagSet("", flag.ContinueOnError)
 	FsAuthorDescription  = flag.NewFlagSet("", flag.ContinueOnError)
 	FsIdlContent         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsMessaging          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFile               = flag.NewFlagSet("", flag.ContinueOnError)
 	FsProvider           = flag.NewFlagSet("", flag.ContinueOnError)
 	FsBindChainID        = flag.NewFlagSet("", flag.ContinueOnError)
@@ -43,21 +41,20 @@ var (
 )
 
 func init() {
-	FsDefChainID.String(FlagDefChainID, "", "the ID of the blockchain defined of the iService")
+	FsDefChainID.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")
 	FsServiceName.String(FlagServiceName, "", "service name")
 	FsServiceDescription.String(FlagServiceDescription, "", "service description")
 	FsTags.StringSlice(FlagTags, []string{}, "service tags")
 	FsAuthorDescription.String(FlagAuthorDescription, "", "service author description")
 	FsIdlContent.String(FlagIdlContent, "", "content of service interface description language")
-	FsMessaging.String(FlagMessaging, "", "service messaging type, valid values can be Unicast and Multicast")
 	FsFile.String(FlagFile, "", "path of file which contains service interface description language")
 
-	FsProvider.String(FlagProvider, "", "bech32 encoded account created the iService binding")
-	FsBindChainID.String(FlagBindChainID, "", "the ID of the blockchain bond of the iService")
+	FsProvider.String(FlagProvider, "", "bech32 encoded account created the service binding")
+	FsBindChainID.String(FlagBindChainID, "", "the ID of the blockchain bond of the service")
 	FsBindType.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
 	FsDeposit.String(FlagDeposit, "", "deposit of binding")
 	FsPrices.StringSlice(FlagPrices, []string{}, "prices of binding, will contains all method")
-	FsAvgRspTime.String(FlagAvgRspTime, "", "the average service response time in milliseconds")
-	FsUsableTime.String(FlagUsableTime, "", "an integer represents the number of usable service invocations per 10,000")
+	FsAvgRspTime.Int64(FlagAvgRspTime, 0, "the average service response time in milliseconds")
+	FsUsableTime.Int64(FlagUsableTime, 0, "an integer represents the number of usable service invocations per 10,000")
 	FsExpiration.String(FlagExpiration, "", "the blockchain height where this binding expires")
 }

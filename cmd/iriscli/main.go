@@ -11,7 +11,7 @@ import (
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
-	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
+	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
@@ -182,26 +182,28 @@ func main() {
 		upgradeCmd,
 	)
 
-	//Add iservice commands
-	iserviceCmd := &cobra.Command{
-		Use:   "iservice",
-		Short: "iservice subcommands",
+	//Add service commands
+	serviceCmd := &cobra.Command{
+		Use:   "service",
+		Short: "Service subcommands",
 	}
-	iserviceCmd.AddCommand(
+	serviceCmd.AddCommand(
 		client.GetCommands(
-			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
-			iservicecmd.GetCmdQueryScvBind("iservice", cdc),
-			iservicecmd.GetCmdQueryScvBinds("iservice", cdc),
+			servicecmd.GetCmdQueryScvDef("service", cdc),
+			servicecmd.GetCmdQueryScvBind("service", cdc),
+			servicecmd.GetCmdQueryScvBinds("service", cdc),
 		)...)
-	iserviceCmd.AddCommand(client.PostCommands(
-		iservicecmd.GetCmdScvDef(cdc),
-		iservicecmd.GetCmdScvBind(cdc),
-		iservicecmd.GetCmdScvBindUpdate(cdc),
-		iservicecmd.GetCmdScvRefundDeposit(cdc),
+	serviceCmd.AddCommand(client.PostCommands(
+		servicecmd.GetCmdScvDef(cdc),
+		servicecmd.GetCmdScvBind(cdc),
+		servicecmd.GetCmdScvBindUpdate(cdc),
+		servicecmd.GetCmdScvDisable(cdc),
+		servicecmd.GetCmdScvEnable(cdc),
+		servicecmd.GetCmdScvRefundDeposit(cdc),
 	)...)
 
 	rootCmd.AddCommand(
-		iserviceCmd,
+		serviceCmd,
 	)
 
 	//add record command

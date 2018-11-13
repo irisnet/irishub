@@ -5,20 +5,20 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/iservice"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	cmn "github.com/irisnet/irishub/client/iservice"
+	cmn "github.com/irisnet/irishub/client/service"
 )
 
 func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
-		Short:   "query service definition",
-		Example: "iriscli iservice definition --def-chain-id=<chain-id> --service-name=<service name>",
+		Short:   "Query service definition",
+		Example: "iriscli service definition --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -26,7 +26,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
 
-			res, err := cliCtx.QueryStore(iservice.GetServiceDefinitionKey(defChainId, name), storeName)
+			res, err := cliCtx.QueryStore(service.GetServiceDefinitionKey(defChainId, name), storeName)
 			if err != nil {
 				return err
 			}
@@ -34,17 +34,17 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("chain-id [%s] service [%s] is not existed", defChainId, name)
 			}
 
-			var svcDef iservice.SvcDef
+			var svcDef service.SvcDef
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcDef)
 
-			res2, err := cliCtx.QuerySubspace(iservice.GetMethodsSubspaceKey(defChainId, name), storeName)
+			res2, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
 				return err
 			}
 
-			var methods []iservice.MethodProperty
+			var methods []service.MethodProperty
 			for i := 0; i < len(res2); i++ {
-				var method iservice.MethodProperty
+				var method service.MethodProperty
 				cdc.MustUnmarshalBinaryLengthPrefixed(res2[i].Value, &method)
 				methods = append(methods, method)
 			}
@@ -68,8 +68,8 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
-		Short:   "query service binding",
-		Example: "iriscli iservice binding --def-chain-id=<chain-id> --service-name=<service name> --bind-chain-id=<chain-id> --provider=<provider>",
+		Short:   "Query service binding",
+		Example: "iriscli service binding --def-chain-id=<chain-id> --service-name=<service name> --bind-chain-id=<chain-id> --provider=<provider>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -83,7 +83,7 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			res, err := cliCtx.QueryStore(iservice.GetServiceBindingKey(defChainId, name, bindChainId, provider), storeName)
+			res, err := cliCtx.QueryStore(service.GetServiceBindingKey(defChainId, name, bindChainId, provider), storeName)
 			if err != nil {
 				return err
 			}
@@ -91,7 +91,7 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("def-chain-id [%s] service [%s] bind-chain-id [%s] provider [%s] is not existed", defChainId, name, bindChainId, provider)
 			}
 
-			var svcBinding iservice.SvcBinding
+			var svcBinding service.SvcBinding
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcBinding)
 			output, err := codec.MarshalJSONIndent(cdc, svcBinding)
 			fmt.Println(string(output))
@@ -109,8 +109,8 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
-		Short:   "query service bindings",
-		Example: "iriscli iservice bindings --def-chain-id=<chain-id> --service-name=<service name>",
+		Short:   "Query service bindings",
+		Example: "iriscli service bindings --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -118,14 +118,15 @@ func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
 
-			res, err := cliCtx.QuerySubspace(iservice.GetBindingsSubspaceKey(defChainId, name), storeName)
+			res, err := cliCtx.QuerySubspace(service.GetBindingsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
 				return err
 			}
 
-			var bindings []iservice.SvcBinding
+			var bindings []service.SvcBinding
 			for i := 0; i < len(res); i++ {
-				var binding iservice.SvcBinding
+
+				var binding service.SvcBinding
 				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &binding)
 				bindings = append(bindings, binding)
 			}

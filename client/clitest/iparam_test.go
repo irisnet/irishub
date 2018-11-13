@@ -10,10 +10,6 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 )
 
-func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
-}
-
 func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)

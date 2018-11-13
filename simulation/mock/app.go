@@ -13,7 +13,7 @@ import (
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -139,14 +139,14 @@ func NewApp() *App {
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			iserviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			iserviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
-		&iserviceparams.MaxRequestTimeoutParameter,
-		&iserviceparams.MinProviderDepositParameter)
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinProviderDepositParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,

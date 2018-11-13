@@ -13,10 +13,6 @@ import (
 	"time"
 )
 
-func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
-}
-
 func TestIrismon(t *testing.T) {
 	t.SkipNow()
 

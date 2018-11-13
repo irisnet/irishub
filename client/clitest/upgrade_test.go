@@ -18,12 +18,7 @@ var (
 	wg sync.WaitGroup
 )
 
-func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
-}
-
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
-
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 

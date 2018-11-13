@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
 	"bufio"
 	"io"
 
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
@@ -20,7 +20,7 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
-	iservicecli "github.com/irisnet/irishub/client/iservice"
+	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
 	stakecli "github.com/irisnet/irishub/client/stake"
@@ -33,7 +33,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/modules/iservice"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"path/filepath"
 	"io/ioutil"
@@ -45,6 +45,15 @@ var (
 	chainID     = ""
 	nodeID      = ""
 )
+
+func init() {
+	irisHome, iriscliHome = getTestingHomeDirs()
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+}
 
 //___________________________________________________________________________________
 // irisnet helper methods
@@ -111,7 +120,7 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 func modifyGenesisState(genesisState app.GenesisState) app.GenesisState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
-	genesisState.IserviceData = iservice.DefaultGenesisStateForTest()
+	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	return genesisState
 }
 
@@ -413,27 +422,27 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 	return switchMsg
 }
 
-func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.ServiceOutput {
+func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.ServiceOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceDef iservicecli.ServiceOutput
+	var serviceDef servicecli.ServiceOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceDef
 }
 
-func executeGetServiceBinding(t *testing.T, cmdStr string) iservice.SvcBinding {
+func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceBinding iservice.SvcBinding
+	var serviceBinding service.SvcBinding
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBinding)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBinding
 }
 
-func executeGetServiceBindings(t *testing.T, cmdStr string) []iservice.SvcBinding {
+func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceBindings []iservice.SvcBinding
+	var serviceBindings []service.SvcBinding
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

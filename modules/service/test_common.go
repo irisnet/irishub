@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	"bytes"
@@ -26,7 +26,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	stake.RegisterCodec(mapp.Cdc)
 	RegisterCodec(mapp.Cdc)
 
-	keyService := sdk.NewKVStoreKey("iservice")
+	keyService := sdk.NewKVStoreKey("service")
 
 	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
 	sk := stake.NewKeeper(
@@ -34,9 +34,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		mapp.RegisterCodespace(stake.DefaultCodespace))
-	ik := NewKeeper(mapp.Cdc, keyService,ck, DefaultCodespace)
+	ik := NewKeeper(mapp.Cdc, keyService, ck, DefaultCodespace)
 
-	mapp.Router().AddRoute("iservice", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
+	mapp.Router().AddRoute("service", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
 
 	mapp.SetEndBlocker(getEndBlocker())
 	mapp.SetInitChainer(getInitChainer(mapp, sk))

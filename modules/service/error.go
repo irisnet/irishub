@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,19 +17,17 @@ const (
 	CodeInvalidChainId           sdk.CodeType = 106
 	CodeInvalidAuthor            sdk.CodeType = 107
 	CodeInvalidMethodName        sdk.CodeType = 108
-	CodeInvalidMessagingType     sdk.CodeType = 109
-	CodeMoreTags                 sdk.CodeType = 110
-	CodeDuplicateTags            sdk.CodeType = 111
 
-	CodeSvcBindingExists    sdk.CodeType = 112
-	CodeSvcBindingNotExists sdk.CodeType = 113
-	CodeInvalidDefChainId   sdk.CodeType = 114
-	CodeInvalidBindingType  sdk.CodeType = 115
-	CodeInvalidLevel        sdk.CodeType = 116
-	CodeInvalidPriceCount   sdk.CodeType = 117
-	CodeInvalidUpdate       sdk.CodeType = 118
-	CodeRefundDeposit       sdk.CodeType = 119
-	CodeInvalidExpiration   sdk.CodeType = 120
+	CodeSvcBindingExists     sdk.CodeType = 109
+	CodeSvcBindingNotExists  sdk.CodeType = 110
+	CodeInvalidDefChainId    sdk.CodeType = 111
+	CodeInvalidBindingType   sdk.CodeType = 112
+	CodeInvalidLevel         sdk.CodeType = 113
+	CodeInvalidPriceCount    sdk.CodeType = 114
+	CodeInvalidRefundDeposit sdk.CodeType = 115
+	CodeLtMinProviderDeposit sdk.CodeType = 116
+	CodeInvalidDisable       sdk.CodeType = 117
+	CodeInvalidEnable        sdk.CodeType = 118
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -73,8 +71,8 @@ func ErrInvalidOutputCachedEnum(codespace sdk.CodespaceType, value string) sdk.E
 	return sdk.NewError(codespace, CodeInvalidOutputCachedEnum, fmt.Sprintf("invalid OutputCachedEnum %s", value))
 }
 
-func ErrInvalidServiceName(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidServiceName, fmt.Sprintf("service name is empty"))
+func ErrInvalidServiceName(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidServiceName, fmt.Sprintf("invalid service name %s, must contain alphanumeric characters, _ and - only，length greater than 0 and less than or equal to 128", msg))
 }
 
 func ErrInvalidChainId(codespace sdk.CodespaceType) sdk.Error {
@@ -87,18 +85,6 @@ func ErrInvalidAuthor(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidMethodName, fmt.Sprintf("method name is empty"))
-}
-
-func ErrInvalidMessagingType(codespace sdk.CodespaceType, value MessagingType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidMessagingType, fmt.Sprintf("invalid messaging type %s", value))
-}
-
-func ErrMoreTags(codespace sdk.CodespaceType, i int) sdk.Error {
-	return sdk.NewError(codespace, CodeMoreTags, fmt.Sprintf("tags are limited to %d", i))
-}
-
-func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeDuplicateTags, "tags contains duplicate tag")
 }
 
 func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
@@ -125,18 +111,18 @@ func ErrInvalidPriceCount(codespace sdk.CodespaceType, priceCount int, methodCou
 	return sdk.NewError(codespace, CodeInvalidPriceCount, fmt.Sprintf("invalid prices count %d, but methods count is %d", priceCount, methodCount))
 }
 
-func ErrInvalidUpdate(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidUpdate, fmt.Sprintf("invalid service binding update, %s", msg))
-}
-
 func ErrRefundDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeRefundDeposit, fmt.Sprintf("can't refund deposit, %s", msg))
+	return sdk.NewError(codespace, CodeInvalidRefundDeposit, fmt.Sprintf("can't refund deposit, %s", msg))
 }
 
-func ErrInvalidExpiration(codespace sdk.CodespaceType, expiration int64) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("invalid expiration %v, can't be equal to zero", expiration))
+func ErrDisable(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDisable, fmt.Sprintf("can't disable, %s", msg))
+}
+
+func ErrEnable(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidEnable, fmt.Sprintf("can't enable, %s", msg))
 }
 
 func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidExpiration, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
+	return sdk.NewError(codespace, CodeLtMinProviderDeposit, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
 }

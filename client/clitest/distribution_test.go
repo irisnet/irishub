@@ -10,10 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
-}
-
 func TestIrisCLIDistribution(t *testing.T) {
 	chainID, servAddr, port := initializeFixtures(t)
 

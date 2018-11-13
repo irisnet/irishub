@@ -1,4 +1,4 @@
-package iservice
+package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/tools/protoidl"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"fmt"
-	"github.com/irisnet/irishub/modules/iservice/params"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 type Keeper struct {
@@ -91,12 +91,12 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrSvcBindingExists(k.Codespace()), false
 	}
 
-	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
+	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
 	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
-	err := k.ValidateMethodPrices(ctx, svcBinding)
+	err := k.validateMethodPrices(ctx, svcBinding)
 	if err != nil {
 		return err, false
 	}
@@ -132,16 +132,11 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 	}
 
 	if len(svcBinding.Prices) > 0 {
-		err := k.ValidateMethodPrices(ctx, svcBinding)
+		err := k.validateMethodPrices(ctx, svcBinding)
 		if err != nil {
 			return err, false
 		}
 		oldBinding.Prices = svcBinding.Prices
-	}
-
-	// can't update type Global to Local
-	if oldBinding.BindingType == Global && svcBinding.BindingType == Local {
-		return ErrInvalidUpdate(k.Codespace(), "can't update binding type from Global to Local"), false
 	}
 
 	if svcBinding.BindingType != 0x00 {
@@ -153,25 +148,12 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
 	}
 
-	minDeposit := iserviceparams.GetMinProviderDeposit(ctx)
-	if !oldBinding.Deposit.IsAllGTE(minDeposit) {
-		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit)), false
-	}
-
 	// Subtract coins from provider's account
 	_, _, err := k.ck.SubtractCoins(ctx, svcBinding.Provider, svcBinding.Deposit)
 	if err != nil {
 		return err, false
 	}
 
-	if svcBinding.Expiration != 0 {
-		height := ctx.BlockHeader().Height
-		if svcBinding.Expiration >= 0 && svcBinding.Expiration < height {
-			oldBinding.Expiration = height
-		} else {
-			oldBinding.Expiration = svcBinding.Expiration
-		}
-	}
 	if svcBinding.Level.UsableTime != 0 {
 		oldBinding.Level.UsableTime = svcBinding.Level.UsableTime
 	}
@@ -184,6 +166,57 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 	return nil, true
 }
 
+func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (sdk.Error, bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+	if !found {
+		return ErrSvcBindingNotExists(k.Codespace()), false
+	}
+
+	if !binding.Available {
+		return ErrDisable(k.Codespace(), "service binding is unavailable"), false
+	}
+	binding.Available = false
+	binding.DisableHeight = ctx.BlockHeader().Height
+	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
+	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+	return nil, true
+}
+
+func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) (sdk.Error, bool) {
+	kvStore := ctx.KVStore(k.storeKey)
+	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+	if !found {
+		return ErrSvcBindingNotExists(k.Codespace()), false
+	}
+
+	if binding.Available {
+		return ErrEnable(k.Codespace(), "service binding is available"), false
+	}
+
+	// Add coins to svcBinding deposit
+	if deposit.IsNotNegative() {
+		binding.Deposit = binding.Deposit.Plus(deposit)
+	}
+
+	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
+	if !binding.Deposit.IsAllGTE(minDeposit) {
+		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit)), false
+	}
+
+	// Subtract coins from provider's account
+	_, _, err := k.ck.SubtractCoins(ctx, binding.Provider, deposit)
+	if err != nil {
+		return err, false
+	}
+
+	binding.Available = true
+	binding.DisableHeight = 0
+	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
+	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+	return nil, true
+}
+
 func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (sdk.Error, bool) {
 	kvStore := ctx.KVStore(k.storeKey)
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
@@ -191,8 +224,8 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 		return ErrSvcBindingNotExists(k.Codespace()), false
 	}
 
-	if binding.Expiration < 0 {
-		return ErrRefundDeposit(k.Codespace(), "service binding don`t set expiration height"), false
+	if binding.Available {
+		return ErrRefundDeposit(k.Codespace(), "can't refund from a available service binding"), false
 	}
 
 	if binding.Deposit.IsZero() {
@@ -200,7 +233,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	}
 
 	height := ctx.BlockHeader().Height
-	refundHeight := binding.Expiration + int64(iserviceparams.GetMaxRequestTimeout(ctx))
+	refundHeight := binding.DisableHeight + int64(serviceparams.GetMaxRequestTimeout(ctx))
 	if refundHeight >= height {
 		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", refundHeight)), false
 	}
@@ -218,7 +251,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	return nil, true
 }
 
-func (k Keeper) ValidateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
+func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
 	methodIterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
 	var methods []MethodProperty
 	for ; methodIterator.Valid(); methodIterator.Next() {
