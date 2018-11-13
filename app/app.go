@@ -372,7 +372,9 @@ func (app *IrisApp) replay() int64 {
 		sm.SaveState(stateDB, preState)
 		loadHeight = preState.LastBlockHeight
 	} else if blockStore.Height() == curState.LastBlockHeight+1 {
-		loadHeight = curState.LastBlockHeight
+		blockStore.RetreatLastBlock()
+		sm.SaveState(stateDB, preState)
+		loadHeight = preState.LastBlockHeight
 	} else {
 		panic(errors.New("tendermint block store height should be at most one ahead of the its state height"))
 	}
