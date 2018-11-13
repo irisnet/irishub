@@ -744,7 +744,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "164fd2a7e53bf2c47b447dfb1335ac1c1d443e42"
+  revision = "8fe0402585407cd4e3d6016b37641ee5dfaee662"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
@@ -932,6 +932,7 @@
     "github.com/cosmos/cosmos-sdk/x/slashing",
     "github.com/cosmos/cosmos-sdk/x/stake",
     "github.com/cosmos/cosmos-sdk/x/stake/client/rest",
+    "github.com/cosmos/cosmos-sdk/x/stake/keeper",
     "github.com/cosmos/cosmos-sdk/x/stake/tags",
     "github.com/cosmos/cosmos-sdk/x/stake/types",
     "github.com/emicklei/proto",
@@ -966,6 +967,7 @@
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/ed25519",
     "github.com/tendermint/tendermint/crypto/merkle",
+    "github.com/tendermint/tendermint/crypto/multisig",
     "github.com/tendermint/tendermint/crypto/secp256k1",
     "github.com/tendermint/tendermint/crypto/tmhash",
     "github.com/tendermint/tendermint/libs/cli",
