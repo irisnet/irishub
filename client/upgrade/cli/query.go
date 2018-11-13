@@ -31,7 +31,7 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 			res_height, _ := cliCtx.QueryStore(append([]byte(iparam.SignalParamspace + "/"), upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()...), "params")
 			res_proposalID, _ := cliCtx.QueryStore(append([]byte(iparam.SignalParamspace + "/"), upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()...), "params")
 			var height int64
-			var proposalID int64
+			var proposalID uint64
 			cdc.UnmarshalJSON(res_height, &height)
 			cdc.UnmarshalJSON(res_proposalID, &proposalID)
 
