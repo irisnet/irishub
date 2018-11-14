@@ -114,7 +114,7 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 		}
 
 		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod ("+strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds()))+") should be larger than 20s and less than ",THREE_DAYS,"s"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
@@ -197,7 +197,7 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod ("+strconv.Itoa(int(param.Value.VotingPeriod.Seconds()))+") should be larger than 20s and less than ",THREE_DAYS,"s"))
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
