@@ -2,20 +2,22 @@ package clitest
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/irisnet/irishub/app"
 	//sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov"
 	"sync"
+
+	"github.com/irisnet/irishub/modules/gov"
 )
 
 var (
 	lastSwitchHeight int64
-	wg sync.WaitGroup
+	wg               sync.WaitGroup
 )
 
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
@@ -96,7 +98,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	// submit switch msg
 	switchStr := fmt.Sprintf("iriscli1 upgrade submit-switch %v", flags)
 	switchStr += fmt.Sprintf(" --from=%s", "foo")
-	switchStr += fmt.Sprintf(" --proposalID=%s", "1")
+	switchStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -104,7 +106,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
-	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposalID=1 --voter=%v --output=json %v", fooAddr.String(), flags))
+	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposal-id=1 --voter=%v --output=json %v", fooAddr.String(), flags))
 	require.Equal(t, uint64(1), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
@@ -117,12 +119,9 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//require.Equal(t, votingStartBlock1+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
-
 	//////////////////// replay from version 0 for new coming node /////////////////////////////
 	/// start a old node with old version and then use a new version to start
 	startOldNodeBToReplay(t, chainID)
-
-
 
 	//////////////////////////////// Bugfix Software Upgrade ////////////////////////////////
 
@@ -184,7 +183,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	// submit switch msg
 	switchStr = fmt.Sprintf("iriscli2-bugfix upgrade submit-switch %v", flags)
 	switchStr += fmt.Sprintf(" --from=%s", "foo")
-	switchStr += fmt.Sprintf(" --proposalID=%s", "2")
+	switchStr += fmt.Sprintf(" --proposal-id=%s", "2")
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -192,7 +191,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
-	switchMsg = executeGetSwitch(t, fmt.Sprintf("iriscli2-bugfix upgrade query-switch --proposalID=2 --voter=%v --output=json %v", fooAddr.String(), flags))
+	switchMsg = executeGetSwitch(t, fmt.Sprintf("iriscli2-bugfix upgrade query-switch --proposal-id=2 --voter=%v --output=json %v", fooAddr.String(), flags))
 	require.Equal(t, uint64(2), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
@@ -208,14 +207,14 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//////////////////// replay from version 0 for new coming node /////////////////////////////
 	/// start a new node
 
-	go startNodeBToReplay(t,chainID)
+	go startNodeBToReplay(t, chainID)
 
 	wg.Add(1)
 	wg.Wait()
 	proc2.Stop(true)
 }
 
-func startOldNodeBToReplay(t *testing.T,chainID string) {
+func startOldNodeBToReplay(t *testing.T, chainID string) {
 	irisBHome, iriscliBHome := getTestingHomeDirsB()
 	require.True(t, irisBHome != irisHome)
 	require.True(t, iriscliBHome != iriscliHome)
@@ -234,27 +233,24 @@ func startOldNodeBToReplay(t *testing.T,chainID string) {
 	require.NoError(t, err)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliBHome, servAddr, chainID)
 
-
 	// start old iris server
-	tests.ExecuteT(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisBHome, servAddr),"")
-
+	tests.ExecuteT(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisBHome, servAddr), "")
 
 	// start new iris2-bugfix server
 	proc3 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris1 start --replay --home=%s --rpc.laddr=%v", irisBHome, servAddr))
 	defer proc3.Stop(false)
 
 	tests.WaitForTMStart(port)
-	tests.WaitForHeightTM(lastSwitchHeight + 10, port)
+	tests.WaitForHeightTM(lastSwitchHeight+10, port)
 
 	// check the upgrade info
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
 	require.Equal(t, uint64(0), upgradeInfo.CurrentProposalId)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
-	wg.Done()
 }
 
-func startNodeBToReplay(t *testing.T,chainID string) {
+func startNodeBToReplay(t *testing.T, chainID string) {
 	irisBHome, iriscliBHome := getTestingHomeDirsB()
 	require.True(t, irisBHome != irisHome)
 	require.True(t, iriscliBHome != iriscliHome)
@@ -278,7 +274,7 @@ func startNodeBToReplay(t *testing.T,chainID string) {
 	defer proc3.Stop(false)
 
 	tests.WaitForTMStart(port)
-	tests.WaitForHeightTM(lastSwitchHeight + 10, port)
+	tests.WaitForHeightTM(lastSwitchHeight+10, port)
 
 	// check the upgrade info
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
@@ -308,7 +304,7 @@ func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
 
 	//////////////////////// start node B ////////////////////////////
 
-	go irisStartNodeB(t,chainID)
+	go irisStartNodeB(t, chainID)
 
 	wg.Add(1)
 	wg.Wait()
@@ -342,7 +338,7 @@ func irisStartNodeB(t *testing.T, chainID string) {
 
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
 
- 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 

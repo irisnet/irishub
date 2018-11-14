@@ -22,10 +22,9 @@ import (
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
-
+	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/service/params"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"

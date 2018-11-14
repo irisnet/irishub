@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"net/http"
-	"strconv"
 	"github.com/spf13/viper"
 	"github.com/irisnet/irishub/client/utils"
 )
@@ -74,6 +73,9 @@ func NodeInfoRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+type nodeStaus struct {
+	Syncing bool `json:"syncing"`
+}
 // REST handler for node syncing
 func NodeSyncingRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +93,10 @@ func NodeSyncingRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		w.Write([]byte(strconv.FormatBool(syncing)))
+		nodeStaus := nodeStaus{
+			Syncing: syncing,
+		}
+
+		utils.PostProcessResponse(w, cdc, nodeStaus, cliCtx.Indent)
 	}
 }
