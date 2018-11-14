@@ -96,7 +96,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	// submit switch msg
 	switchStr := fmt.Sprintf("iriscli1 upgrade submit-switch %v", flags)
 	switchStr += fmt.Sprintf(" --from=%s", "foo")
-	switchStr += fmt.Sprintf(" --proposalID=%s", "1")
+	switchStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -104,7 +104,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
-	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposalID=1 --voter=%v --output=json %v", fooAddr.String(), flags))
+	switchMsg := executeGetSwitch(t, fmt.Sprintf("iriscli1 upgrade query-switch --proposal-id=1 --voter=%v --output=json %v", fooAddr.String(), flags))
 	require.Equal(t, uint64(1), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
@@ -177,7 +177,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	// submit switch msg
 	switchStr = fmt.Sprintf("iriscli2-bugfix upgrade submit-switch %v", flags)
 	switchStr += fmt.Sprintf(" --from=%s", "foo")
-	switchStr += fmt.Sprintf(" --proposalID=%s", "2")
+	switchStr += fmt.Sprintf(" --proposal-id=%s", "2")
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
@@ -185,7 +185,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
-	switchMsg = executeGetSwitch(t, fmt.Sprintf("iriscli2-bugfix upgrade query-switch --proposalID=2 --voter=%v --output=json %v", fooAddr.String(), flags))
+	switchMsg = executeGetSwitch(t, fmt.Sprintf("iriscli2-bugfix upgrade query-switch --proposal-id=2 --voter=%v --output=json %v", fooAddr.String(), flags))
 	require.Equal(t, uint64(2), switchMsg.ProposalID)
 	require.Equal(t, "Upgrade", switchMsg.Title)
 
