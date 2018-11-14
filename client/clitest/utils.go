@@ -201,6 +201,7 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
+	nodeID,_ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
 	var appState app.GenesisState
@@ -299,6 +300,7 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 }
 
 // irisnet-module-helper function
+
 func executeGetAccount(t *testing.T, cmdStr string) (acc bank.BaseAccount) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
