@@ -39,7 +39,7 @@ The `<account>` for `proposer` field should start with `faa` which corresponds t
 To add deposit to some proposal, you could execute this command to add `10IRIS` to the proposal's deposit:
 
 ```
-iriscli gov deposit --proposalID=1 --depositer=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-3001  --fee=400000000000000iris --gas=20000  --node=http://localhost:36657 
+iriscli gov deposit --proposalID=1 --depositor=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-3001  --fee=400000000000000iris --gas=20000  --node=http://localhost:36657 
 ```
 
 ##如何投票?

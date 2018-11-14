@@ -6,7 +6,7 @@ import (
 
 // Deposit
 type DepositOutput struct {
-	Depositer  sdk.AccAddress `json:"depositer"`   //  Address of the depositer
+	Depositor  sdk.AccAddress `json:"depositor"`   //  Address of the depositor
 	ProposalID int64          `json:"proposal_id"` //  proposalID of the proposal
 	Amount     []string       `json:"amount"`      //  Deposit amount
 }

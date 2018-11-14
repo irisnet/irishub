@@ -126,7 +126,7 @@ func queryProposal(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 // Params for query 'custom/gov/deposit'
 type QueryDepositParams struct {
 	ProposalID uint64
-	Depositer  sdk.AccAddress
+	Depositor  sdk.AccAddress
 }
 
 // nolint: unparam
@@ -137,7 +137,7 @@ func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	deposit, _ := keeper.GetDeposit(ctx, params.ProposalID, params.Depositer)
+	deposit, _ := keeper.GetDeposit(ctx, params.ProposalID, params.Depositor)
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, deposit)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
@@ -227,7 +227,7 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 // Params for query 'custom/gov/proposals'
 type QueryProposalsParams struct {
 	Voter              sdk.AccAddress
-	Depositer          sdk.AccAddress
+	Depositor          sdk.AccAddress
 	ProposalStatus     ProposalStatus
 	Limit              uint64
 }
@@ -240,7 +240,7 @@ func queryProposals(ctx sdk.Context, path []string, req abci.RequestQuery, keepe
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositer, params.ProposalStatus, params.Limit)
+	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositor, params.ProposalStatus, params.Limit)
 
 	proposalOutputs := ConvertProposalsToProposalOutputs(proposals)
 
