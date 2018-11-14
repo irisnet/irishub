@@ -7,7 +7,7 @@ import (
 )
 
 // Version - Iris Version
-const Version = "0.6.1"
+const Version = "0.6.2"
 
 // GitCommit set by build flags
 var GitCommit = ""
