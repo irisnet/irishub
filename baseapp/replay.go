@@ -1,16 +1,16 @@
 package baseapp
 
 import (
-	"github.com/spf13/viper"
 	"fmt"
+
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
-
-	"github.com/cosmos/cosmos-sdk/server"
 )
 
 func Replay(logger log.Logger) int64 {
