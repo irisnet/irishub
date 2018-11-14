@@ -214,14 +214,17 @@ func GetCoin(coinStr string) (denom, amount string, err error) {
 }
 
 func parseCoin(coinStr string) (coin sdk.Coin, err error) {
-	if denom, amount, err := GetCoin(coinStr); err == nil {
-		if amt, ok := sdk.NewIntFromString(amount); ok {
-			denom = strings.ToLower(denom)
-			coin := sdk.NewCoin(denom, amt)
-			return coin, err
-		}
+	denom, amount, err := GetCoin(coinStr);
+	if err != nil {
+		return sdk.Coin{}, err
 	}
-	return
+
+	amt, ok := sdk.NewIntFromString(amount)
+	if !ok {
+		return sdk.Coin{}, fmt.Errorf("invalid coin amount: %s", amount)
+	}
+	denom = strings.ToLower(denom)
+	return sdk.NewCoin(denom, amt), nil
 }
 
 func GetCoinName(coinStr string) (coinName string, err error) {
