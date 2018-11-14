@@ -139,7 +139,7 @@ func TestSetKVStoreKeylist(t *testing.T) {
 	router.AddRoute("upgrade-0", []*sdk.KVStoreKey{sdk.NewKVStoreKey("upgrade")}, nil)
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 		upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
 	))
@@ -185,7 +185,7 @@ func TestKeeper_InitGenesis_commidID(t *testing.T) {
 	fmt.Println(keeper.GetKVStoreKeylist(ctx))
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), int64((0)),
+		upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 		upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
 		upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
 	))

@@ -34,7 +34,7 @@ func queryRecordsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		}
 
 		var submitFile record.MsgSubmitRecord
-		cdc.MustUnmarshalBinary(res, &submitFile)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitFile)
 
 		recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
 		if err != nil {
@@ -73,7 +73,7 @@ func queryRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		}
 
 		var submitFile record.MsgSubmitRecord
-		cdc.MustUnmarshalBinary(res, &submitFile)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitFile)
 
 		recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
 		if err != nil {

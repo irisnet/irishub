@@ -30,14 +30,13 @@ func signingInfoHandlerFn(cliCtx context.CLIContext, storeName string, cdc *code
 			return
 		}
 		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusBadRequest,
-				fmt.Sprintf("the signing information of this validator %s is empty, please make sure its existence", vars["validator_pub"]))
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
 			return
 		}
 
 		var signingInfo slashing.ValidatorSigningInfo
 
-		err = cdc.UnmarshalBinary(res, &signingInfo)
+		err = cdc.UnmarshalBinaryLengthPrefixed(res, &signingInfo)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't decode signing info. Error: %s", err.Error()))
 			return

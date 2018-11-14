@@ -19,9 +19,17 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	irisInit "github.com/irisnet/irishub/init"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func main() {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
+
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false

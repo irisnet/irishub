@@ -5,6 +5,6 @@ const (
 	RestDepositer      = "depositer"
 	RestVoter          = "voter"
 	RestProposalStatus = "status"
-	RestNumLatest      = "latest"
+	RestNumLimit       = "limit"
 	storeName          = "gov"
 )

@@ -11,11 +11,11 @@ var _ sdk.Msg = MsgSwitch{}
 
 type MsgSwitch struct {
 	Title		string
-	ProposalID	int64
+	ProposalID	uint64
 	Voter		sdk.AccAddress
 }
 
-func NewMsgSwitch( title string, proposalID int64, voter sdk.AccAddress) MsgSwitch {
+func NewMsgSwitch( title string, proposalID uint64, voter sdk.AccAddress) MsgSwitch {
 	return MsgSwitch{
 		Title:title,
 		ProposalID: proposalID,

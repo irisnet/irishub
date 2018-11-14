@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
@@ -17,10 +16,8 @@ import (
 
 	"github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/simulation/mock"
+	"math/big"
 )
-
-// shamelessly copied from https://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang#31832326
-// TODO we should probably move this to tendermint/libs/common/random.go
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const (
@@ -69,7 +66,18 @@ func RandomAcc(r *rand.Rand, accs []Account) Account {
 
 // Generate a random amount
 func RandomAmount(r *rand.Rand, max sdk.Int) sdk.Int {
-	return sdk.NewInt(int64(r.Intn(int(max.Int64()))))
+	//return sdk.NewInt(int64(r.Intn(int(max.Int64()))))
+	if max.IsInt64() {
+		return sdk.NewInt(int64(r.Intn(int(max.Int64()))))
+	} else {
+		return sdk.NewInt(int64(r.Intn(int(int64(9223372036854775807)))))
+	}
+}
+
+// RandomDecAmount generates a random decimal amount
+func RandomDecAmount(r *rand.Rand, max sdk.Dec) sdk.Dec {
+	randInt := big.NewInt(0).Rand(r, max.Int)
+	return sdk.NewDecFromBigIntWithPrec(randInt, sdk.Precision)
 }
 
 // RandomAccounts generates n random accounts
@@ -104,11 +112,11 @@ func addLogMessage(testingmode bool, blockLogBuilders []*strings.Builder, height
 }
 
 // assertAllInvariants asserts a list of provided invariants against application state
-func assertAllInvariants(t *testing.T, app *baseapp.BaseApp, header abci.Header,
+func assertAllInvariants(t *testing.T, app *baseapp.BaseApp,
 	invariants []Invariant, where string, displayLogs func()) {
 
 	for i := 0; i < len(invariants); i++ {
-		err := invariants[i](app, header)
+		err := invariants[i](app)
 		if err != nil {
 			fmt.Printf("Invariants broken after %s\n", where)
 			fmt.Println(err.Error())
@@ -135,7 +143,7 @@ func logPrinter(testingmode bool, logs []*strings.Builder) func() {
 			for i := 0; i < len(logs); i++ {
 				// We're passed the last created block
 				if logs[i] == nil {
-					numLoggers = i - 1
+					numLoggers = i
 					break
 				}
 			}
@@ -147,7 +155,7 @@ func logPrinter(testingmode bool, logs []*strings.Builder) func() {
 			}
 			for i := 0; i < numLoggers; i++ {
 				if f != nil {
-					_, err := f.WriteString(fmt.Sprintf("Begin block %d\n", i))
+					_, err := f.WriteString(fmt.Sprintf("Begin block %d\n", i+1))
 					if err != nil {
 						panic("Failed to write logs to file")
 					}
@@ -156,7 +164,7 @@ func logPrinter(testingmode bool, logs []*strings.Builder) func() {
 						panic("Failed to write logs to file")
 					}
 				} else {
-					fmt.Printf("Begin block %d\n", i)
+					fmt.Printf("Begin block %d\n", i+1)
 					fmt.Println((*logs[i]).String())
 				}
 			}

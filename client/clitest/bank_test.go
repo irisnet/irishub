@@ -5,13 +5,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/stretchr/testify/require"
 	"testing"
-
 	"github.com/irisnet/irishub/app"
 )
-
-func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
-}
 
 func TestIrisCLIBankSend(t *testing.T) {
 	chainID, servAddr, port := initializeFixtures(t)

@@ -10,7 +10,6 @@ import (
 
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/types"
@@ -18,6 +17,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmliteErr "github.com/tendermint/tendermint/lite/errors"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
+	"github.com/tendermint/tendermint/crypto/merkle"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -60,7 +60,7 @@ func (cliCtx CLIContext) QuerySubspace(subspace []byte, storeName string) (res [
 		return res, err
 	}
 
-	cliCtx.Codec.MustUnmarshalBinary(resRaw, &res)
+	cliCtx.Codec.MustUnmarshalBinaryLengthPrefixed(resRaw, &res)
 	return
 }
 
@@ -164,7 +164,7 @@ func (cliCtx CLIContext) query(path string, key cmn.HexBytes) (res []byte, err e
 
 	opts := rpcclient.ABCIQueryOptions{
 		Height:  cliCtx.Height,
-		Trusted: cliCtx.TrustNode,
+		Prove: !cliCtx.TrustNode,
 	}
 
 	result, err := node.ABCIQueryWithOptions(path, key, opts)
@@ -204,7 +204,7 @@ func (cliCtx CLIContext) Verify(height int64) (tmtypes.SignedHeader, error) {
 }
 
 // verifyProof perform response proof verification.
-func (cliCtx CLIContext) verifyProof(_ string, resp abci.ResponseQuery) error {
+func (cliCtx CLIContext) verifyProof(queryPath string, resp abci.ResponseQuery) error {
 	if cliCtx.Verifier == nil {
 		return fmt.Errorf("missing valid certifier to verify data from distrusted node")
 	}
@@ -215,25 +215,22 @@ func (cliCtx CLIContext) verifyProof(_ string, resp abci.ResponseQuery) error {
 		return err
 	}
 
-	var multiStoreProof store.MultiStoreProof
-	cdc := codec.New()
+	// TODO: Instead of reconstructing, stash on CLIContext field?
+	prt := store.DefaultProofRuntime()
 
-	err = cdc.UnmarshalBinary(resp.Proof, &multiStoreProof)
+	// TODO: Better convention for path?
+	storeName, err := parseQueryStorePath(queryPath)
 	if err != nil {
-		return errors.Wrap(err, "failed to unmarshalBinary rangeProof")
+		return err
 	}
 
-	// verify the substore commit hash against trusted appHash
-	substoreCommitHash, err := store.VerifyMultiStoreCommitInfo(
-		multiStoreProof.StoreName, multiStoreProof.StoreInfos, commit.Header.AppHash,
-	)
-	if err != nil {
-		return errors.Wrap(err, "failed in verifying the proof against appHash")
-	}
+	kp := merkle.KeyPath{}
+	kp = kp.AppendKey([]byte(storeName), merkle.KeyEncodingURL)
+	kp = kp.AppendKey(resp.Key, merkle.KeyEncodingURL)
 
-	err = store.VerifyRangeProof(resp.Key, resp.Value, substoreCommitHash, multiStoreProof.RangeProof)
+	err = prt.VerifyValue(resp.Proof, commit.Header.AppHash, kp.String(), resp.Value)
 	if err != nil {
-		return errors.Wrap(err, "failed in the range proof verification")
+		return errors.Wrap(err, "failed to prove merkle proof")
 	}
 
 	return nil
@@ -253,14 +250,32 @@ func isQueryStoreWithProof(path string) bool {
 		return false
 	}
 	paths := strings.SplitN(path[1:], "/", 3)
-	if len(paths) != 3 {
+	switch {
+	case len(paths) != 3:
 		return false
-	}
-
-	if store.RequireProof("/" + paths[2]) {
+	case paths[0] != "store":
+		return false
+	case store.RequireProof("/" + paths[2]):
 		return true
 	}
 	return false
+}
+
+// parseQueryStorePath expects a format like /store/<storeName>/key.
+func parseQueryStorePath(path string) (storeName string, err error) {
+	if !strings.HasPrefix(path, "/") {
+		return "", errors.New("expected path to start with /")
+	}
+	paths := strings.SplitN(path[1:], "/", 3)
+	switch {
+	case len(paths) != 3:
+		return "", errors.New("expected format like /store/<storeName>/key")
+	case paths[0] != "store":
+		return "", errors.New("expected format like /store/<storeName>/key")
+	case paths[2] != "key":
+		return "", errors.New("expected format like /store/<storeName>/key")
+	}
+	return paths[1], nil
 }
 
 func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
@@ -282,7 +297,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		if err = cliCtx.Codec.UnmarshalBinary(bz, &coinType); err != nil {
+		if err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(bz, &coinType); err != nil {
 			return coinType, err
 		}
 	}

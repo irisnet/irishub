@@ -21,6 +21,8 @@ func TestStakeWithRandomMessages(t *testing.T) {
 	mapp := mock.NewApp()
 
 	bank.RegisterCodec(mapp.Cdc)
+	stake.RegisterCodec(mapp.Cdc)
+
 	mapper := mapp.AccountKeeper
 	bankKeeper := mapp.BankKeeper
 
@@ -49,13 +51,41 @@ func TestStakeWithRandomMessages(t *testing.T) {
 	}
 
 	appStateFn := func(r *rand.Rand, accs []simulation.Account) json.RawMessage {
-		simulation.RandomSetGenesis(r, mapp, accs, []string{"iris-atto"})
+		simulation.RandomSetGenesis(r, mapp, accs, []string{mock.DefaultStakeDenom})
 		return json.RawMessage("{}")
 	}
 
-	setup := func(r *rand.Rand, accs []simulation.Account) {
+	GenesisSetUp := func(r *rand.Rand, accs []simulation.Account) {
 		ctx := mapp.NewContext(false, abci.Header{})
 		distribution.InitGenesis(ctx, distrKeeper, distribution.DefaultGenesisState())
+
+		// init stake genesis
+		var (
+			validators  []stake.Validator
+			delegations []stake.Delegation
+		)
+		stakeGenesis := stake.DefaultGenesisState()
+
+		// XXX Try different numbers of initially bonded validators
+		numInitiallyBonded := int64(4)
+		valAddrs := make([]sdk.ValAddress, numInitiallyBonded)
+		decAmt := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 2))
+		for i := 0; i < int(numInitiallyBonded); i++ {
+			valAddr := sdk.ValAddress(accs[i].Address)
+			valAddrs[i] = valAddr
+
+			validator := stake.NewValidator(valAddr, accs[i].PubKey, stake.Description{})
+			validator.Tokens = decAmt
+			validator.DelegatorShares = decAmt
+			delegation := stake.Delegation{accs[i].Address, valAddr, decAmt, 0}
+			validators = append(validators, validator)
+			delegations = append(delegations, delegation)
+		}
+		stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 10))
+		stakeGenesis.Validators = validators
+		stakeGenesis.Bonds = delegations
+
+		stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 	}
 
 	simulation.Simulate(
@@ -67,8 +97,8 @@ func TestStakeWithRandomMessages(t *testing.T) {
 			{10, SimulateMsgBeginUnbonding(mapper, stakeKeeper)},
 			{10, SimulateMsgBeginRedelegate(mapper, stakeKeeper)},
 		}, []simulation.RandSetup{
-			Setup(mapp, stakeKeeper),
-			setup,
+			//Setup(mapp, stakeKeeper),
+			GenesisSetUp,
 		}, []simulation.Invariant{}, 10, 100,
 		false,
 	)

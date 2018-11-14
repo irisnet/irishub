@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	flagProposalID = "proposalID"
+	flagProposalID = "proposal-id"
 	flagTitle      = "title"
 	flagVoter      = "voter"
 )
@@ -23,10 +23,10 @@ func GetCmdSubmitSwitch(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit-switch",
 		Short: "Submit a switch msg for a upgrade propsal",
-		Example: "iriscli upgrade submit-switch --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposalID 1 --title <title>",
+		Example: "iriscli upgrade submit-switch --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposal-id 1 --title <title>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).

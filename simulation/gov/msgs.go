@@ -2,11 +2,11 @@ package simulation
 
 import (
 	"fmt"
-	"math/rand"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/gov"
 	"math"
+	"math/rand"
 	"time"
 
 	"github.com/irisnet/irishub/baseapp"
@@ -70,7 +70,7 @@ func SimulateSubmittingVotingAndSlashingForProposal(k gov.Keeper, sk stake.Keepe
 		fops := make([]simulation.FutureOperation, numVotes+1)
 		for i := 0; i < numVotes; i++ {
 			whenVote := ctx.BlockHeader().Time.Add(time.Duration(r.Int63n(int64(votingPeriod.Seconds()))) * time.Second)
-			fops[i] = simulation.FutureOperation{BlockTime: whenVote, Op: operationSimulateMsgVote(k, sk, accs[whoVotes[i]], proposalID)}
+			fops[i] = simulation.FutureOperation{BlockTime: whenVote, Op: operationSimulateMsgVote(k, sk, accs[whoVotes[i]], int64(proposalID))}
 		}
 		// 3) Make an operation to ensure slashes were done correctly. (Really should be a future invariant)
 		// TODO: Find a way to check if a validator was slashed other than just checking their balance a block
@@ -114,7 +114,7 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) (msg gov.MsgSubmitProposal, err error) {
 	deposit := randomDeposit(r)
 	param := gov.Param{
-		Key: "test",
+		Key:   "test",
 		Value: "value",
 	}
 	msg = gov.NewMsgSubmitProposal(
@@ -140,7 +140,7 @@ func SimulateMsgDeposit(k gov.Keeper, sk stake.Keeper) simulation.Operation {
 			return "no-operation", nil, nil
 		}
 		deposit := randomDeposit(r)
-		msg := gov.NewMsgDeposit(acc.Address, proposalID, deposit)
+		msg := gov.NewMsgDeposit(acc.Address, uint64(proposalID), deposit)
 		if msg.ValidateBasic() != nil {
 			return "", nil, fmt.Errorf("expected msg to pass ValidateBasic: %s", msg.GetSignBytes())
 		}
@@ -182,7 +182,7 @@ func operationSimulateMsgVote(k gov.Keeper, sk stake.Keeper, acc simulation.Acco
 		}
 		option := randomVotingOption(r)
 
-		msg := gov.NewMsgVote(acc.Address, proposalID, option)
+		msg := gov.NewMsgVote(acc.Address, uint64(proposalID), option)
 		if msg.ValidateBasic() != nil {
 			return "", nil, fmt.Errorf("expected msg to pass ValidateBasic: %s", msg.GetSignBytes())
 		}

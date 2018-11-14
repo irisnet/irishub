@@ -4,13 +4,14 @@ import (
 	"os"
 	"path"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
-	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
+	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
@@ -18,6 +19,7 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,6 +35,13 @@ var (
 )
 
 func main() {
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 
@@ -134,6 +143,8 @@ func main() {
 			stakecmd.GetCmdQueryDelegations("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
 			stakecmd.GetCmdQueryRedelegation("stake", cdc),
 			stakecmd.GetCmdQueryRedelegations("stake", cdc),
 			stakecmd.GetCmdQueryPool("stake", cdc),
@@ -171,26 +182,28 @@ func main() {
 		upgradeCmd,
 	)
 
-	//Add iservice commands
-	iserviceCmd := &cobra.Command{
-		Use:   "iservice",
-		Short: "iservice subcommands",
+	//Add service commands
+	serviceCmd := &cobra.Command{
+		Use:   "service",
+		Short: "Service subcommands",
 	}
-	iserviceCmd.AddCommand(
+	serviceCmd.AddCommand(
 		client.GetCommands(
-			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
-			iservicecmd.GetCmdQueryScvBind("iservice", cdc),
-			iservicecmd.GetCmdQueryScvBinds("iservice", cdc),
+			servicecmd.GetCmdQueryScvDef("service", cdc),
+			servicecmd.GetCmdQueryScvBind("service", cdc),
+			servicecmd.GetCmdQueryScvBinds("service", cdc),
 		)...)
-	iserviceCmd.AddCommand(client.PostCommands(
-		iservicecmd.GetCmdScvDef(cdc),
-		iservicecmd.GetCmdScvBind(cdc),
-		iservicecmd.GetCmdScvBindUpdate(cdc),
-		iservicecmd.GetCmdScvRefundDeposit(cdc),
+	serviceCmd.AddCommand(client.PostCommands(
+		servicecmd.GetCmdScvDef(cdc),
+		servicecmd.GetCmdScvBind(cdc),
+		servicecmd.GetCmdScvBindUpdate(cdc),
+		servicecmd.GetCmdScvDisable(cdc),
+		servicecmd.GetCmdScvEnable(cdc),
+		servicecmd.GetCmdScvRefundDeposit(cdc),
 	)...)
 
 	rootCmd.AddCommand(
-		iserviceCmd,
+		serviceCmd,
 	)
 
 	//add record command

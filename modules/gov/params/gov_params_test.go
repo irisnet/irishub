@@ -2,12 +2,12 @@ package govparams
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -39,8 +39,8 @@ func TestInitGenesisParameter(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	Denom             := "iris"
-	IrisCt            := types.NewDefaultCoinType(Denom)
+	Denom := "iris"
+	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	require.NoError(t, err)
 
@@ -83,8 +83,8 @@ func TestRegisterParamMapping(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	Denom             := "iris"
-	IrisCt            := types.NewDefaultCoinType(Denom)
+	Denom := "iris"
+	IrisCt := types.NewDefaultCoinType(Denom)
 	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
 	require.NoError(t, err)
 
@@ -261,15 +261,15 @@ func TestTallyingProcedureParam(t *testing.T) {
 	)
 
 	p1 := TallyingProcedure{
-		Threshold:         sdk.NewDecWithPrec(5, 1),
-		Veto:              sdk.NewDecWithPrec(334, 3),
-		GovernancePenalty: sdk.NewDecWithPrec(1, 2),
+		Threshold:     sdk.NewDecWithPrec(5, 1),
+		Veto:          sdk.NewDecWithPrec(334, 3),
+		Participation: sdk.NewDecWithPrec(667, 3),
 	}
 
 	p2 := TallyingProcedure{
-		Threshold:         sdk.NewDecWithPrec(5, 1),
-		Veto:              sdk.NewDecWithPrec(334, 3),
-		GovernancePenalty: sdk.NewDecWithPrec(2, 2),
+		Threshold:     sdk.NewDecWithPrec(5, 1),
+		Veto:          sdk.NewDecWithPrec(334, 3),
+		Participation: sdk.NewDecWithPrec(2, 2),
 	}
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
@@ -285,17 +285,17 @@ func TestTallyingProcedureParam(t *testing.T) {
 
 	TallyingProcedureParameter.InitGenesis(nil)
 	require.Equal(t, p1, TallyingProcedureParameter.Value)
-	require.Equal(t, "{\"threshold\":\"0.5000000000\",\"veto\":\"0.3340000000\",\"governance_penalty\":\"0.0100000000\"}", TallyingProcedureParameter.ToJson(""))
+	require.Equal(t, "{\"threshold\":\"0.5000000000\",\"veto\":\"0.3340000000\",\"participation\":\"0.6670000000\"}", TallyingProcedureParameter.ToJson(""))
 
-	TallyingProcedureParameter.Update(ctx, "{\"threshold\":\"0.5\",\"veto\":\"0.3340000000\",\"governance_penalty\":\"0.0200000000\"}")
+	TallyingProcedureParameter.Update(ctx, "{\"threshold\":\"0.5\",\"veto\":\"0.3340000000\",\"participation\":\"0.0200000000\"}")
 
 	require.NotEqual(t, p1, TallyingProcedureParameter.Value)
 	require.Equal(t, p2, TallyingProcedureParameter.Value)
 
-	result := TallyingProcedureParameter.Valid("{\"threshold\":\"1/1\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
+	result := TallyingProcedureParameter.Valid("{\"threshold\":\"1/1\",\"veto\":\"1/3\",\"participation\":\"1/100\"}")
 	require.Error(t, result)
 
-	result = TallyingProcedureParameter.Valid("{\"threshold\":\"abcd\",\"veto\":\"1/3\",\"governance_penalty\":\"1/100\"}")
+	result = TallyingProcedureParameter.Valid("{\"threshold\":\"abcd\",\"veto\":\"1/3\",\"participation\":\"1/100\"}")
 	require.Error(t, result)
 
 	TallyingProcedureParameter.InitGenesis(p2)

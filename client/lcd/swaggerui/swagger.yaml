@@ -466,7 +466,7 @@ paths:
           description: Not Found
         500:
           description: Internal Server Error
-  /bank/accounts/{address}:
+  /bank/balances/{address}:
     get:
       summary: Get the account information on blockchain
       tags:
@@ -483,30 +483,14 @@ paths:
         200:
           description: Account information on the blockchain
           schema:
-            type: object
-            properties:
-              type:
-                type: string
-              value:
-                type: object
-                properties:
-                  account_number:
-                    type: string
-                  address:
-                    type: string
-                  coins:
-                    type: array
-                    items:
-                      $ref: "#/definitions/Coin"
-                  public_key:
-                    type: string
-                  sequence:
-                    type: string
+            type: array
+            items:
+              $ref: "#/definitions/Coin"
         204:
           description: No content about this account address
         500:
           description: Server internel error
-  /bank/{address}/send:
+  /bank/accounts/{address}/transfers:
     post:
       summary: Send coins (build -> sign -> send)
       description: Send coins (build -> sign -> send)
@@ -615,6 +599,56 @@ paths:
           description: Key name confliction
         500:
           description: Server internal error
+  /keys/seed:
+    get:
+      summary: Create a new seed to create a new account with
+      tags:
+      - ICS1
+      responses:
+        200:
+          description: 24 word Seed
+          schema:
+            type: string
+            example: blossom pool issue kidney elevator blame furnace winter account merry vessel security depend exact travel bargain problem jelly rural net again mask roast chest
+    /keys/{name}/recover:
+      post:
+        summary: Recover a account from a seed
+        tags:
+        - ICS1
+        consumes:
+        - application/json
+        produces:
+        - application/json
+        parameters:
+        - in: path
+          name: name
+          description: Account name
+          required: true
+          type: string
+        - in: body
+          name: pwdAndSeed
+          description: Provide password and seed to recover a key
+          schema:
+            type: object
+            required:
+            - password
+            - seed
+            properties:
+              password:
+                type: string
+              seed:
+                type: string
+        responses:
+          200:
+            description: Returns account information of the recovered key
+            schema:
+              $ref: "#/definitions/KeyOutput"
+          400:
+            description: Invalid request
+          409:
+            description: Key name confliction
+          500:
+            description: Server internal error
   /keys/{name}:
     parameters:
     - in: path
@@ -686,6 +720,46 @@ paths:
           description: Key password is wrong
         404:
           description: Key doesn't exist
+  /auth/accounts/{address}:
+    get:
+      summary: Get the account information on blockchain
+      tags:
+      - ICS1
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: address
+        description: Account address
+        required: true
+        type: string
+      responses:
+        200:
+          description: Account information on the blockchain
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              value:
+                type: object
+                properties:
+                  account_number:
+                    type: string
+                  address:
+                    type: string
+                  coins:
+                    type: array
+                    items:
+                      $ref: "#/definitions/Coin"
+                  public_key:
+                    type: string
+                  sequence:
+                    type: string
+        204:
+          description: No content about this account address
+        500:
+          description: Server internel error
 
   /stake/delegators/{delegatorAddr}/delegate:
     parameters:
@@ -1390,6 +1464,11 @@ paths:
       - in: query
         name: status
         description: proposal status, valid values can be `"DepositPeriod"`, `"VotingPeriod"`, `"Passed"`, `"Rejected"`
+        required: false
+        type: string
+      - in: query
+        name: limit
+        description: limit to latest [number] proposals. Defaults to all proposals
         required: false
         type: string
       responses:

@@ -47,8 +47,6 @@ func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pa
 			if err != nil {
 				return err
 			}
-		default:
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
 		}
 	}
 

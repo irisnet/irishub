@@ -11,7 +11,7 @@ func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
 	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 
-	if proposalID != -1 {
+	if proposalID != 0 {
 
 		totalVotingPower := sdk.ZeroDec()
 		switchVotingPower := sdk.ZeroDec()

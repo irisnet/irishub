@@ -49,16 +49,16 @@ install: update_irislcd_swagger_docs
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(BUILD_FLAGS) ./cmd/irislcd
-#	go install $(BUILD_FLAGS) ./cmd/irismon
+	go install $(BUILD_FLAGS) ./cmd/irismon
 
 install_debug:
 	go install ./cmd/irisdebug
 
 build_linux: update_irislcd_swagger_docs
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli
-#    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
-#    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
 
 build_cur: update_irislcd_swagger_docs
 	go build -o build/iris ./cmd/iris  && \
@@ -109,16 +109,39 @@ test_sim_modules:
 
 test_sim_benchmark:
 	@echo "Running benchmark test..."
-	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -SimulationCommit=true
+	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -timeout 24h
 
 test_sim_iris_nondeterminism:
 	@echo "Running nondeterminism test..."
-	@go test ./app -run TestAppStateDeterminism -SimulationEnabled=true -v -timeout 10m
+	@go test ./app -run TestAppStateDeterminism -v -SimulationEnabled=true -timeout 10m
 
 test_sim_iris_fast:
 	@echo "Running quick Iris simulation. This may take several minutes..."
-	@go test ./app -run TestFullIrisSimulation -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
+	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
 
 test_sim_iris_slow:
 	@echo "Running full Iris simulation. This may take awhile!"
-	@go test ./app -run TestFullIrisSimulation -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -v -timeout 24h
+	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
+
+testnet_start:
+	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
+	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
+	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
+	@jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [{ "denom":"iris-atto","amount": "1000000000000000000000000"}], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json
+	@jq '.app_state.stake.pool.loose_tokens="1000600000000000000000000.0000000000"' build/genesis_temp.json > build/genesis_temp1.json
+	@sudo cp build/genesis_temp1.json build/nodecluster/node0/iris/config/genesis.json
+	@sudo cp build/genesis_temp1.json build/nodecluster/node1/iris/config/genesis.json
+	@sudo cp build/genesis_temp1.json build/nodecluster/node2/iris/config/genesis.json
+	@sudo cp build/genesis_temp1.json build/nodecluster/node3/iris/config/genesis.json
+	@rm build/genesis_temp.json build/genesis_temp1.json
+	@echo "Faucet address: faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm"
+	@echo "Faucet coin amount: 1000000iris"
+	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
+	docker-compose up -d
+
+testnet_stop:
+	docker-compose down
+
+testnet_clean:
+	docker-compose down
+	sudo rm -rf build/*

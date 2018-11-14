@@ -2,17 +2,18 @@ package keys
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
 )
 
 func deleteKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete <name>",
-		Short: "Delete the given key",
+		Use:     "delete <name>",
+		Short:   "Delete the given key",
 		Example: "iriscli keys delete <key name>",
-		RunE:  runDeleteCmd,
-		Args:  cobra.ExactArgs(1),
+		RunE:    runDeleteCmd,
+		Args:    cobra.ExactArgs(1),
 	}
 	return cmd
 }
@@ -20,7 +21,7 @@ func deleteKeyCommand() *cobra.Command {
 func runDeleteCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
-	kb, err := keys.GetKeyBase()
+	kb, err := keys.GetKeyBaseWithWritePerm()
 	if err != nil {
 		return err
 	}
