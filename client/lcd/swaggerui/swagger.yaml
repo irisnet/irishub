@@ -1468,8 +1468,8 @@ paths:
         required: false
         type: string
       - in: query
-        name: depositer
-        description: depositer address
+        name: depositor
+        description: depositor address
         required: false
         type: string
       - in: query
@@ -1533,7 +1533,7 @@ paths:
           properties:
             base_tx:
               "$ref": "#/definitions/BaseTx"
-            depositer:
+            depositor:
               "$ref": "#/definitions/Address"
             amount:
               type: string
@@ -1674,10 +1674,10 @@ paths:
           description: Invalid proposal id
         500:
           description: Internal Server Error
-  /gov/proposals/{proposalId}/deposits/{depositer}:
+  /gov/proposals/{proposalId}/deposits/{depositor}:
     get:
       summary: Query deposit
-      description: Query deposit by proposalId and depositer address
+      description: Query deposit by proposalId and depositor address
       produces:
       - application/json
       tags:
@@ -1689,8 +1689,8 @@ paths:
         required: true
         in: path
       - type: string
-        description: Bech32 depositer address
-        name: depositer
+        description: Bech32 depositor address
+        name: depositor
         required: true
         in: path
       responses:
@@ -1699,7 +1699,7 @@ paths:
           schema:
             $ref: "#/definitions/Deposit"
         400:
-          description: Invalid proposal id or depositer address
+          description: Invalid proposal id or depositor address
         404:
           description: Found no deposit
         500:
@@ -2363,7 +2363,7 @@ definitions:
         example: 10iris
       proposal_id:
         type: integer
-      depositer:
+      depositor:
         "$ref": "#/definitions/Address"
   Vote:
     type: object

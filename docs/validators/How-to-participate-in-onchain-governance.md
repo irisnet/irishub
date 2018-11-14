@@ -64,7 +64,7 @@ The `<account>` for `proposer` field should start with `faa` which corresponds t
 To add deposit to some proposal, you could execute this command to add `100IRIS` to the proposal's deposit:
 
 ```
-iriscli gov deposit --proposalID=1 --depositer=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-4000  --fee=0.05iris --gas=20000  --node=http://localhost:36657 
+iriscli gov deposit --proposalID=1 --depositor=<account> --deposit=1000000000000000000iris   --from=<name>  --chain-id=fuxi-4000  --fee=0.05iris --gas=20000  --node=http://localhost:36657 
 ```
 ## How to query proposals?
 

@@ -17,14 +17,14 @@ type postProposalReq struct {
 	Title          string           `json:"title"`           //  Title of the proposal
 	Description    string           `json:"description"`     //  Description of the proposal
 	ProposalType   string           `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
-	Proposer       sdk.AccAddress           `json:"proposer"`        //  Address of the proposer
+	Proposer       sdk.AccAddress   `json:"proposer"`        //  Address of the proposer
 	InitialDeposit string           `json:"initial_deposit"` // Coins to add to the proposal's deposit
 	Param          gov.Param        `json:"param"`
 }
 
 type depositReq struct {
 	BaseTx    context.BaseTx `json:"base_tx"`
-	Depositer sdk.AccAddress `json:"depositer"` // Address of the depositer
+	Depositor sdk.AccAddress `json:"depositor"` // Address of the depositor
 	Amount    string         `json:"amount"`    // Coins to add to the proposal's deposit
 }
 
@@ -109,7 +109,7 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 		// create the message
-		msg := gov.NewMsgDeposit(req.Depositer, proposalID, depositAmount)
+		msg := gov.NewMsgDeposit(req.Depositor, proposalID, depositAmount)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
