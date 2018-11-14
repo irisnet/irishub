@@ -96,7 +96,13 @@ paths:
       description: Get if the node is currently syning with other nodes
       responses:
         200:
-          description: '"true" or "false"'
+          description: node sync status
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: true
         500:
           description: Server internal error
   /blocks/latest:
@@ -604,12 +610,17 @@ paths:
       summary: Create a new seed to create a new account with
       tags:
       - ICS1
+      produces:
+      - application/json
       responses:
         200:
           description: 24 word Seed
           schema:
-            type: string
-            example: blossom pool issue kidney elevator blame furnace winter account merry vessel security depend exact travel bargain problem jelly rural net again mask roast chest
+            type: object
+            properties:
+              seed:
+                type: string
+                example: blossom pool issue kidney elevator blame furnace winter account merry vessel security depend exact travel bargain problem jelly rural net again mask roast chest
     /keys/{name}/recover:
       post:
         summary: Recover a account from a seed

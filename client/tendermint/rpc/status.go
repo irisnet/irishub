@@ -74,6 +74,9 @@ func NodeInfoRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+type nodeStaus struct {
+	Status string `json:"status"`
+}
 // REST handler for node syncing
 func NodeSyncingRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +94,10 @@ func NodeSyncingRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		w.Write([]byte(strconv.FormatBool(syncing)))
+		nodeStaus := nodeStaus{
+			Status: strconv.FormatBool(syncing),
+		}
+
+		utils.PostProcessResponse(w, cdc, nodeStaus, cliCtx.Indent)
 	}
 }

@@ -93,19 +93,26 @@ func getSeed(algo cryptokeys.SigningAlgo) string {
 	return seed
 }
 
+type seedOutput struct {
+	Seed string `json:"seed"`
+}
 // Seed REST request handler
-func SeedRequestHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	algoType := vars["type"]
-	// algo type defaults to secp256k1
-	if algoType == "" {
-		algoType = "secp256k1"
+func SeedRequestHandler(indent bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		algoType := vars["type"]
+		// algo type defaults to secp256k1
+		if algoType == "" {
+			algoType = "secp256k1"
+		}
+		algo := cryptokeys.SigningAlgo(algoType)
+
+		seed := getSeed(algo)
+		seedOutput := seedOutput{
+			Seed: seed,
+		}
+		keys.PostProcessResponse(w, cdc, seedOutput, indent)
 	}
-	algo := cryptokeys.SigningAlgo(algoType)
-
-	seed := getSeed(algo)
-
-	w.Write([]byte(seed))
 }
 
 // RecoverKeyBody is recover key request REST body
