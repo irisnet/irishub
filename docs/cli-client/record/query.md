@@ -33,7 +33,7 @@ iriscli record query --chain-id=test --record-id=MyRecordID
 
 After that, you will get detail info for the record which has the specfied record ID.
 
-```txt
+```json
 {
   "submit_time": "2018-11-13 15:31:36",
   "owner_addr": "faa122uzzpugtrzs09nf3uh8xfjaza59xvf9rvthdl",

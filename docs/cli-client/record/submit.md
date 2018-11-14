@@ -2,7 +2,7 @@
 
 ## Description
 
-Submit a record on chain
+Submit a record on the chain
 
 ## Usage
 
@@ -44,7 +44,7 @@ iriscli record submit [flags]
 iriscli record submit --chain-id="test" --onchain-data="this is my on chain data" --from=node0 --fee=0.1iris
 ```
 
-After that, you're done with submitting a new record, but remember to back up your record id, it's the only way to retrieve your on chain record.
+After that, you're done with submitting a new record, but remember to back up your record id, it's the only way to retrieve your record.
 
 ```txt
 Password to sign with 'node0':
