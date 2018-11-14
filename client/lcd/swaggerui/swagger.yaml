@@ -100,9 +100,9 @@ paths:
           schema:
             type: object
             properties:
-              status:
-                type: string
-                example: true
+              syncing:
+                type: boolean
+                example: false
         500:
           description: Server internal error
   /blocks/latest:
