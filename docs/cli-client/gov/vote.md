@@ -1,11 +1,17 @@
 # iriscli gov vote
- ## Description
- Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain
- ## Usage
- ```
+
+## Description
+
+Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain
+
+## Usage
+
+```
 iriscli gov vote [flags]
 ```
- ## Flags
+
+## Flags
+
 | Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --account-number |                            | [int] AccountNumber number to sign the tx                                                                                                            |          |
@@ -29,12 +35,17 @@ iriscli gov vote [flags]
 | --proposal-id    |                            | [string] proposalID of proposal voting on                                                                                                            | Yes      |
 | --sequence       |                            | [int] Sequence number to sign the tx                                                                                                                 |          |
 | --trust-node     | true                       | Don't verify proofs for responses                                                                                                                    |          |
- ## Examples
- ### Vote
- ```shell
+
+## Examples
+
+### Vote
+
+```shell
 
 ```
+
  After that, you're done with submitting a new proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
- ```txt
+
+```txt
 
 ```

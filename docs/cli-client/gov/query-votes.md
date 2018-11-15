@@ -1,11 +1,17 @@
 # iriscli gov query-votes
- ## Description
- Query votes on a proposal
- ## Usage
- ```
+
+## Description
+
+Query votes on a proposal
+
+## Usage
+
+```
 iriscli gov query-votes [flags]
 ```
- ## Flags
+
+## Flags
+
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
@@ -16,12 +22,17 @@ iriscli gov query-votes [flags]
 | --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
 | --proposal-id   |                            | [string] proposalID of proposal depositing on                                                                                                        | Yes      |
 | --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
- ## Examples
- ### Query votes
- ```shell
+
+## Examples
+
+### Query votes
+
+```shell
 
 ```
+
  After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
- ```txt
+ 
+```txt
 
 ```

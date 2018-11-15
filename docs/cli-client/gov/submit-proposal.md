@@ -1,11 +1,17 @@
 # iriscli gov submit-proposal
- ## Description
- Submit a proposal along with an initial deposit
- ## Usage
- ```
+
+## Description
+
+Submit a proposal along with an initial deposit
+
+## Usage
+
+```
 iriscli gov submit-proposal [flags]
 ```
- ## Flags
+
+## Flags
+
 | Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --account-number |                            | [int] AccountNumber number to sign the tx                                                                                                            |          |
@@ -35,13 +41,18 @@ iriscli gov submit-proposal [flags]
 | --title          |                            | [string] title of proposal                                                                                                                           | Yes      |
 | --trust-node     | true                       | Don't verify proofs for responses                                                                                                                    |          |
 | --type           |                            | [string] proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade                                                                            | Yes      |
- ## Examples
- ### Submit a proposal
- ```shell
+
+## Examples
+
+### Submit a proposal
+
+```shell
 iriscli gov submit-proposal --chain-id=test --title="test proposal" --type=Text --param="official notice" --description="a new text proposal" --from=node0 --fee=0.1iris
 ```
+
  After that, you're done with submitting a new proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
- ```txt
+
+```txt
 Password to sign with 'node0':
 Committed at block 44 (tx hash: 2C28A87A6262CACEDDB4EBBC60FE989D0DB2B7DEB1EC6795D2F4707DA32C7CBF, response: {Code:0 Data:[49] Log:Msg 0:  Info: GasWanted:200000 GasUsed:8091 Tags:[{Key:[97 99 116 105 111 110] Value:[115 117 98 109 105 116 45 112 114 111 112 111 115 97 108] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[112 114 111 112 111 115 101 114] Value:[102 97 97 49 115 108 116 106 120 100 103 107 48 48 115 56 54 50 57 50 122 48 99 110 55 97 53 100 106 99 99 116 54 101 115 115 110 97 118 100 121 122] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[112 114 111 112 111 115 97 108 45 105 100] Value:[49] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[112 97 114 97 109] Value:[] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 52 48 52 53 53 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
 {

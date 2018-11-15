@@ -1,11 +1,17 @@
 # iriscli gov query-proposals
- ## Description
- Query proposals with optional filters
- ## Usage
- ```
+
+## Description
+
+Query proposals with optional filters
+
+## Usage
+
+```
 iriscli gov query-proposals [flags]
 ```
- ## Flags
+
+## Flags
+
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
@@ -19,13 +25,18 @@ iriscli gov query-proposals [flags]
 | --status        |                            | [string] proposalID of proposal depositing on                                                                                                        |          |
 | --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
 | --voter         |                            | [string] (optional) filter by proposals voted on by voted                                                                                            |          |
- ## Examples
- ### Query proposals
- ```shell
+
+## Examples
+
+### Query proposals
+
+```shell
 iriscli gov query-proposals --chain-id=test
 ```
+
  After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
- ```txt
+
+```txt
   1 - test proposal
   2 - new proposal
 ```

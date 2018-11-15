@@ -37,6 +37,7 @@ iriscli gov [command]
 | --help, -h      |         | help for gov  |          |
 
 ## Global Flags
+
 | Name, shorthand | Default        | Description                            | Required |
 | --------------- | -------------- | -------------------------------------- | -------- |
 | --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
