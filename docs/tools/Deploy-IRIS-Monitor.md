@@ -1,56 +1,68 @@
-# How to deploy IRIS Monitor
+# How to deploy IRIShub Monitor
 
 Please make sure that iris is installed in your computer and added to $PATH.You can see this page for insturcion https://github.com/irisnet/irishub. You also need /bin/bash, wc, ps to ensure the monitor work properly.
 
-## Start IRIS Monitor
-
+1. Download the monitoring tools
 ```
-irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --chain-id=irishub-stage --node=http://localhost:36657
-```
-
-Parameters：
-
-- `address`：hex encoded validator address
-- `account-address`：bech32 encoded account address
-- `chain-id`：blockchain id that you want to monitor
-- `node`：listening address of the node that you want to monitor ("tcp://localhost:26657" by default, you should not change this if you didn't modify your rpc port)
-
-Then you can visit `http://localhost:36660/` to see metrics data。
-
-## Start Prometheus
-
-### Edit Prometheus config file
-
-You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) to download default `prometheus.yml` and save it.
-
-Then edit `prometheus.yml` and add `jobs` :
-
-```yaml
-      - job_name: fuxi-4000
-          static_configs:
-          - targets: ['localhost:36660']
-            labels:
-              instance: fuxi-4000
+wget https://raw.githubusercontent.com/programokey/monitor/master/monitor.tar.gz
 ```
 
-> Note：value of targets is ip:port which used by IRIS monitor 
-
-### Start Prometheus
-
-```bash
-docker run -d --name=prometheus -p 9090:9090 -v ~/volumes/prometheus:/etc/prometheus prom/prometheus
+2. Uncompress the monitoring tools:
+```
+tar -xzvf monitor.tar.gz
 ```
 
-> The above example, the path of `prometheus.yml` is `~/volumes/prometheus` on host machine
-
-You can visit `http://localhost:9090` to see prometheus data.
-
-## Start Grafana
+3. Edit the running parameters
 
 ```
-docker run -d --name=grafana -p 3000:3000 grafana/grafana
+cd monitor
+vim start.sh
 ```
 
-You can visit `http://localhost:3000/` to open grafana and create your own dashboard.
+4. Edit the third command in `start.sh`
 
-> Tips: The default username and password are both admin. We strongly recommend immediately changing your username & password after login.
+You could get hex encoded validator address by running:
+```
+iriscli status
+```
+
+It corresponds to `validator_info.address` field.
+
+modify
+```
+-a=378E63271D5BE927443E17CBAAFE68DEFF383DA7
+```
+
+to 
+```
+-a=<hex encoded validator address>
+```
+
+modify
+```
+--chain-id=fuxi-3001
+```
+to
+```
+--chain-id=<blockchain id that you want to monitor>
+```
+modify
+```
+--node="tcp://localhost:26657"
+```
+to
+```
+--node=<listening address of the node that you want to monitor ("tcp://localhost:26657" by default, you should not change this if you didn't modify your rpc port)>
+```
+5. start the monitoring tools
+```
+./start.sh
+```
+
+then, you can visit http://localhost:3000/ to see the grafana monitoring page. The default username and password are both admin. We strongly recommend immediately changing your username & password after login.
+Click the Home button, and open the IRIS HUB. Then you can see all the monitoring parameters.
+
+6. stop the monitor
+```
+./stop.sh
+```
