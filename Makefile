@@ -98,7 +98,10 @@ test_unit:
 	@go test $(PACKAGES_MODULES)
 
 test_cli:
-	@go test  -timeout 20m -count 1 -p 1 `go list github.com/irisnet/irishub/client/clitest` -tags=cli_test
+	@go test  -timeout 20m -count 1 -p 1 client/clitest/utils.go client/clitest/bank_test.go client/clitest/distribution_test.go client/clitest/gov_test.go client/clitest/iparam_test.go client/clitest/irismon_test.go client/clitest/record_test.go client/clitest/service_test.go client/clitest/stake_test.go
+
+test_upgrade_cli:
+	@go test  -timeout 20m -count 1 -p 1 client/clitest/utils.go client/clitest/bank_test.go
 
 test_lcd:
 	@go test `go list github.com/irisnet/irishub/client/lcd`
