@@ -120,7 +120,7 @@ type PoolOutput struct {
 	LooseTokens  string `json:"loose_tokens"`
 	BondedTokens string `json:"bonded_tokens"`
 	TokenSupply  string `json:"total_supply"`
-	BondedRatio  string `json:"bonded_ratil"`
+	BondedRatio  string `json:"bonded_ratio"`
 }
 
 func (p PoolOutput) HumanReadableString() string {
