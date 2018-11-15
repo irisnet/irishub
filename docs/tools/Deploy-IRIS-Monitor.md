@@ -16,7 +16,7 @@ Parameters：
 - `address`：hex encoded validator address
 - `account-address`：bech32 encoded account address
 - `chain-id`：blockchain id that you want to monitor
-- `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657)
+- `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657. If you want to monitor other irishub nodes, please change this value.)
 
 Then you can visit `http://localhost:36660/` to see metrics data。
 
