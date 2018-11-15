@@ -2,58 +2,61 @@
 
 确保已经安装了iris等工具，系统中需要有/bin/bash、wc、ps等命令。 你可以参考这个页面来安装iris工具:https://github.com/irisnet/irishub
 
-1. 下载打包好的监控工具。
-```
-wget https://raw.githubusercontent.com/programokey/monitor/master/monitor.tar.gz
-```
+## 获得修改运行参数
 
-2. 解压监控工具包
+* 验证人地址的hex编码
 
-```
-tar -xzvf monitor.tar.gz
-```
-
-3. 修改运行参数
-
-```
-cd monitor
-vim start.sh
-```
-
-将第三条命令中的
-
-```
--a=378E63271D5BE927443E17CBAAFE68DEFF383DA7
-```
-修改为
 ```
 -a=<你的验证人地址的hex编码>
 ```
 
-```
---chain-id=fuxi-test
-```
-修改为
+* 确定Chain-ID
+
 ```
 --chain-id=<你要监控的网络的ID>
 ```
 
-```
---node="tcp://localhost:26657"
-```
-修改为
+* 确定监控的节点
+
+
 ```
 --node=<你要监控的节点监听的rpc端口(默认为26657)>
 ```
 
-4. 启动监控工具
+## 启动IRIS Monitor
+
 ```
-./start.sh
+irismon --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 --chain-id=irishub-stage --node=http://localhost:36657&
 ```
+
+
+### 启动Prometheus
+
+在配置文件中添加 `jobs` :
+```$xslt
+      - job_name: fuxi-4000
+      
+          static_configs:
+      
+          - targets: ['localhost:36660']
+      
+            labels:
+      
+              instance: fuxi-4000
+```
+
+启动Prometheus后可以在本地36660端口看到监控数据。
+
+### 启动Grafana
+
+通过Docker启动Grafana
+```$xslt
+sudo docker run -p 3000:3000 grafana/grafana 1>grafana.log 2>grafana.error &
+```
+
 接下来就可以访问localhost:3000来查看grafana监控。打开网页后使用默认用户名admin，默认密码admin登录。建议登录之后立即修改密码。
-点击Home按钮，然后在general栏中打开IRIS HUB即可看到监控项。
 
 5. 关闭监控
-```
-./stop.sh
+```$xslt
+killl -9 <process-ID>
 ```
