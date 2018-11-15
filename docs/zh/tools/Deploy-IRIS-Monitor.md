@@ -5,7 +5,9 @@
 ## 启动 IRIS Monitor
 
 ```
-irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --chain-id=irishub-stage --node=http://localhost:36657
+irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
+--account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st \
+--chain-id=irishub-stage --node=http://localhost:36657
 ```
 
 参数说明：

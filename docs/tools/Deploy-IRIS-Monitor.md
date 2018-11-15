@@ -1,11 +1,13 @@
 # How to deploy IRIS Monitor
 
-Please make sure that iris is installed in your computer and added to $PATH.You can see this page for insturcion https://github.com/irisnet/irishub. You also need /bin/bash, wc, ps to ensure the monitor work properly.
+Please refer to [Install-IRIS](https://github.com/irisnet/irishub/blob/master/docs/get-started/Install-Iris.md) for deatiled instructions. Besides, please make sure your machine has these commands(bash, wc, ps) installed.
 
 ## Start IRIS Monitor
 
 ```
-irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st --chain-id=irishub-stage --node=http://localhost:36657
+irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
+--account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st \
+--chain-id=irishub-stage --node=http://localhost:26657
 ```
 
 Parameters：
@@ -13,7 +15,7 @@ Parameters：
 - `address`：hex encoded validator address
 - `account-address`：bech32 encoded account address
 - `chain-id`：blockchain id that you want to monitor
-- `node`：listening address of the node that you want to monitor ("tcp://localhost:26657" by default, you should not change this if you didn't modify your rpc port)
+- `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657. If you want to monitor other irishub nodes, please change this value)
 
 Then you can visit `http://localhost:36660/` to see metrics data。
 
@@ -21,7 +23,7 @@ Then you can visit `http://localhost:36660/` to see metrics data。
 
 ### Edit Prometheus config file
 
-You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) to download default `prometheus.yml` and save it.
+You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) to download default `prometheus.yml`.
 
 Then edit `prometheus.yml` and add `jobs` :
 
@@ -41,7 +43,7 @@ Then edit `prometheus.yml` and add `jobs` :
 docker run -d --name=prometheus -p 9090:9090 -v ~/volumes/prometheus:/etc/prometheus prom/prometheus
 ```
 
-> The above example, the path of `prometheus.yml` is `~/volumes/prometheus` on host machine
+> The above example, you can save `prometheus.yml` at `~/volumes/prometheus` on your host machine
 
 You can visit `http://localhost:9090` to see prometheus data.
 
