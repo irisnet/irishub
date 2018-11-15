@@ -44,7 +44,7 @@ iriscli record submit [flags]
 iriscli record submit --chain-id="test" --onchain-data="this is my on chain data" --from=node0 --fee=0.1iris
 ```
 
-在这之后你已经成功提交了一个存证，但是请记得备份你的存证ID，它是可以用来检索你的存证的唯一方法。
+运行成功以后，返回的结果如下：
 
 ```txt
 Password to sign with 'node0':
@@ -59,3 +59,10 @@ Committed at block 72 (tx hash: 7CCC8B4018D4447E6A496923944870E350A1A3AF9E15DB15
  }
 ```
 
+本次存证操作的record-id如下:
+
+```txt
+"record-id": "record:ab5602bac13f11737e8798dd57869c468194efad2db37625795f1efd8d9d63c6"
+```
+
+请务必备份record-id，以备将来查询本次存证。若丢失record-id，本次存证再也无法查询到。

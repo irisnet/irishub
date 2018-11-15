@@ -32,7 +32,7 @@ iriscli record download [record ID] [flags]
 iriscli record download --chain-id=test --record-id=MyRecordID --file-name="download.txt"
 ```
 
-在这之后，你将在iriscli的home目录下得到指定存证ID的下载文件。
+iriscli会先在home目录(default: ~/.irislci)中创建一个用户指定的文件(download.txt)，然后把从链上下载的数据保存在此文件中。
 
 ```txt
 [ONCHAIN] Downloading ~/.iriscli/download.txt from blockchain directly...

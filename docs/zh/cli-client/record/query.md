@@ -31,7 +31,7 @@ iriscli record query [flags]
 iriscli record query --chain-id=test --record-id=MyRecordID
 ```
 
-在这之后，你将得到存证ID指定的存证的详细信息。
+查询到的结果如下所示：
 
 ```json
 {
