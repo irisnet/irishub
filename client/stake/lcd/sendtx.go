@@ -29,20 +29,17 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 type (
 	msgDelegateInput struct {
-		DelegatorAddr string `json:"delegator_addr"` // in bech32
 		ValidatorAddr string `json:"validator_addr"` // in bech32
 		Delegation    string `json:"delegation"`
 	}
 
 	msgRedelegateInput struct {
-		DelegatorAddr    string `json:"delegator_addr"`     // in bech32
 		ValidatorSrcAddr string `json:"validator_src_addr"` // in bech32
 		ValidatorDstAddr string `json:"validator_dst_addr"` // in bech32
 		SharesAmount     string `json:"shares"`
 	}
 
 	msgUnbondInput struct {
-		DelegatorAddr string `json:"delegator_addr"` // in bech32
 		ValidatorAddr string `json:"validator_addr"` // in bech32
 		SharesAmount  string `json:"shares"`
 	}
@@ -70,6 +67,10 @@ type (
 // If not, we can just use CompleteAndBroadcastTxREST.
 func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+		vars := mux.Vars(r)
+		bech32delegator := vars["delegatorAddr"]
+
 		var req DelegationsReq
 
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -83,7 +84,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		}
 
 		// build messages
-		delAddr, err := sdk.AccAddressFromBech32(req.Delegation.DelegatorAddr)
+		delAddr, err := sdk.AccAddressFromBech32(bech32delegator)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -116,6 +117,10 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 // If not, we can just use CompleteAndBroadcastTxREST.
 func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+		vars := mux.Vars(r)
+		bech32delegator := vars["delegatorAddr"]
+
 		var req BeginRedelegatesReq
 
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -128,7 +133,7 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 			return
 		}
 
-		delAddr, err := sdk.AccAddressFromBech32(req.BeginRedelegate.DelegatorAddr)
+		delAddr, err := sdk.AccAddressFromBech32(bech32delegator)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -168,6 +173,10 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 // If not, we can just use CompleteAndBroadcastTxREST.
 func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+		vars := mux.Vars(r)
+		bech32delegator := vars["delegatorAddr"]
+
 		var req BeginUnbondingReq
 
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -180,7 +189,7 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 			return
 		}
 
-		delAddr, err := sdk.AccAddressFromBech32(req.BeginUnbond.DelegatorAddr)
+		delAddr, err := sdk.AccAddressFromBech32(bech32delegator)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
