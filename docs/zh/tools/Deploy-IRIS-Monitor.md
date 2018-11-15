@@ -1,6 +1,9 @@
 # 如何部署 IRIS Monitor
 
-确保已经安装了iris等工具，系统中需要有/bin/bash、wc、ps等命令。 你可以参考这个页面来安装iris工具: https://github.com/irisnet/irishub
+## 安装 IRIS Monitor
+
+你可以参考这个页面来安装 IRIS 及 IRIS Monitor : https://github.com/irisnet/irishub/blob/master/docs/get-started/Install-Iris.md。
+另外，系统中需要有/bin/bash、wc、ps等命令。 
 
 ## 启动 IRIS Monitor
 

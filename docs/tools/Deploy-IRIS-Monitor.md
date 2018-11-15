@@ -1,6 +1,7 @@
 # How to deploy IRIS Monitor
 
-Please refer to [Install-IRIS](https://github.com/irisnet/irishub/blob/master/docs/get-started/Install-Iris.md) for deatiled instructions. Besides, please make sure your machine has these commands(bash, wc, ps) installed.
+## Install IRIS Monitor 
+Please refer to this [document](https://github.com/irisnet/irishub/blob/master/docs/get-started/Install-Iris.md) for deatiled instructions. Besides, please make sure your machine has these commands(bash, wc, ps) installed.
 
 ## Start IRIS Monitor
 
@@ -15,7 +16,7 @@ Parameters：
 - `address`：hex encoded validator address
 - `account-address`：bech32 encoded account address
 - `chain-id`：blockchain id that you want to monitor
-- `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657. If you want to monitor other irishub nodes, please change this value)
+- `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657)
 
 Then you can visit `http://localhost:36660/` to see metrics data。
 
