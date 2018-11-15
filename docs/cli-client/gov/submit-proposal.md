@@ -1,13 +1,13 @@
 # iriscli gov submit-proposal
  ## Description
- Submit a governance proposal on the chain
+ Submit a proposal along with an initial deposit
  ## Usage
  ```
 iriscli gov submit-proposal [flags]
 ```
  ## Flags
- | Name, shorthand  | Default                    | Description                                                                                                                                         | Required |
-| ---------------  | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
+| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --account-number |                            | [int] AccountNumber number to sign the tx                                                                                                            |          |
 | --async          |                            | broadcast transactions asynchronously                                                                                                                |          |
 | --chain-id       |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
@@ -20,7 +20,7 @@ iriscli gov submit-proposal [flags]
 | --gas            | 200000                     | [string] gas limit to set per-transaction; set to "simulate" to calculate required gas automatically                                                 |          |
 | --gas-adjustment | 1                          | [float] adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |          |
 | --generate-only  |                            | Build an unsigned transaction and write it to STDOUT                                                                                                 |          |
-| -h, --help       |                            | help for submit-proposal                                                                                                                             |          |
+| --help, -h       |                            | help for submit-proposal                                                                                                                             |          |
 | --indent         |                            | Add indent to JSON response                                                                                                                          |          |
 | --json           |                            | return output in json format                                                                                                                         |          |
 | --key            |                            | the key of parameter                                                                                                                                 |          |
