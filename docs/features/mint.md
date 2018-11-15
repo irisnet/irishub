@@ -1,4 +1,6 @@
-# Introduction
+#IRISLCD User Guide
+
+## Introduction
 
 The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token which is the reward for producing block. As a POS blockchain network, the Irishub also has incentive mechanism. But it is much different. Strictly speaking, it is the inflation token which will be distributed to all the contributors.
 
@@ -6,21 +8,21 @@ As we all know, POW means proof of work. In each producing period, all miners co
 
 As for how to distribute inflation token to contributors, we will document and implement it in distribution module. Here we mainly introduce how to figure out the inflation token and what is the impact to users. 
 
-# Reward Calculation
+## Reward Calculation
 
 Unlike POW network, the inflation token will not be paid to contributors in each block. Instead, once an hour(`block time`) the inflation token is calculated and saved in global pool. Only when contributors explicitly send transactions to withdraw reward, then will the inflation token be transfered to users specified addresses.
 
-## Block Time
+### Block Time
 
 The block time is not the machine time, because different machines may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/tendermint/tendermint/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
 
-## Inflation Rate
+### Inflation Rate
 
 The inflation rate depends on the bonded ratio which means it always changes. The desired bonded ratio 67%. If the ratio is higher, the inflation rate will decrease. In contrast, if the bonded ratio is lower, the inflation rate will increase. Besides, the inflation rate should no more than 20% and no less than 7%. Otherwise, it will be truncated.
 
 Suppose the inflation rate is 10%, and total token amount is 10000iris, then the inflation token will be 0.114iris(10000iris*10%/8766, one year has 8766 hours). After this inflation, the total token amount will be 10000.114iris.
 
-# Impact to users
+## Impact to users
 
 The inflation calculation is an automatically process. Users have no directly interface to this process. However, users can send delegation or unboud transactions to change the bonded ratio, therefore the inflation rate will change accordingly.
 
