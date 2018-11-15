@@ -428,6 +428,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		distr.ExportGenesis(ctx, app.distrKeeper),
 		gov.ExportGenesis(ctx, app.govKeeper),
 		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
+		service.WriteGenesis(ctx),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
