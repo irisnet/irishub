@@ -22,7 +22,7 @@ Suppose the inflation rate is 10%, and total token amount is 10000iris, then the
 
 # Impact to users
 
-The inflation calculation is an automatically process. Users have no directly interaface to this process. However, users can send delegate or unbond transactions to change the bonded ratio, therefore the inflation rate will change accordingly.
+The inflation calculation is an automatically process. Users have no directly interface to this process. However, users can send delegation or unboud transactions to change the bonded ratio, therefore the inflation rate will change accordingly.
 
 Besides, the inflation process will increate the total token amount. Users can get the total token amount by this command:
 ```
