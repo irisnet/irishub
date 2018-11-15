@@ -23,7 +23,7 @@ func (d DelegationOutput) HumanReadableString() (string, error) {
 	resp := "Delegation \n"
 	resp += fmt.Sprintf("Delegator: %s\n", d.DelegatorAddr)
 	resp += fmt.Sprintf("Validator: %s\n", d.ValidatorAddr)
-	resp += fmt.Sprintf("Shares: %s", d.Shares)
+	resp += fmt.Sprintf("Shares: %s\n", d.Shares)
 	resp += fmt.Sprintf("Height: %d", d.Height)
 
 	return resp, nil
@@ -70,7 +70,7 @@ func (d RedelegationOutput) HumanReadableString() (string, error) {
 	resp += fmt.Sprintf("Destination Validator: %s\n", d.ValidatorDstAddr)
 	resp += fmt.Sprintf("Creation height: %v\n", d.CreationHeight)
 	resp += fmt.Sprintf("Min time to unbond (unix): %v\n", d.MinTime)
-	resp += fmt.Sprintf("Source shares: %s", d.SharesSrc)
+	resp += fmt.Sprintf("Source shares: %s\n", d.SharesSrc)
 	resp += fmt.Sprintf("Destination shares: %s", d.SharesDst)
 
 	return resp, nil
@@ -111,7 +111,7 @@ func (v ValidatorOutput) HumanReadableString() (string, error) {
 	resp += fmt.Sprintf("Bond Height: %d\n", v.BondHeight)
 	resp += fmt.Sprintf("Unbonding Height: %d\n", v.UnbondingHeight)
 	resp += fmt.Sprintf("Minimum Unbonding Time: %v\n", v.UnbondingMinTime)
-	resp += fmt.Sprintf("Commission: {%s}\n", v.Commission)
+	resp += fmt.Sprintf("Commission: {%s}", v.Commission)
 
 	return resp, nil
 }
@@ -129,7 +129,7 @@ func (p PoolOutput) HumanReadableString() string {
 	resp += fmt.Sprintf("Loose Tokens: %s\n", p.LooseTokens)
 	resp += fmt.Sprintf("Bonded Tokens: %s\n", p.BondedTokens)
 	resp += fmt.Sprintf("Token Supply: %s\n", p.TokenSupply)
-	resp += fmt.Sprintf("Bonded Ratio: %v\n", p.BondedRatio)
+	resp += fmt.Sprintf("Bonded Ratio: %v", p.BondedRatio)
 	return resp
 }
 

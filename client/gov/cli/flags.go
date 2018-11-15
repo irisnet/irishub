@@ -8,7 +8,7 @@ const (
 	flagDeposit           = "deposit"
 	flagVoter             = "voter"
 	flagOption            = "option"
-	flagDepositer         = "depositer"
+	flagDepositor         = "depositor"
 	flagStatus            = "status"
 	flagNumLimit          = "limit"
 	flagParam             = "param"

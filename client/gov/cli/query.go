@@ -57,7 +57,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "query proposals with optional filters",
 		Example: "iriscli gov query-proposals --status=Passed",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			bechDepositerAddr := viper.GetString(flagDepositer)
+			bechDepositorAddr := viper.GetString(flagDepositor)
 			bechVoterAddr := viper.GetString(flagVoter)
 			strProposalStatus := viper.GetString(flagStatus)
 			numLimit := uint64(viper.GetInt64(flagNumLimit))
@@ -66,12 +66,12 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				Limit:numLimit,
 			}
 
-			if len(bechDepositerAddr) != 0 {
-				depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
+			if len(bechDepositorAddr) != 0 {
+				depositorAddr, err := sdk.AccAddressFromBech32(bechDepositorAddr)
 				if err != nil {
 					return err
 				}
-				params.Depositer = depositerAddr
+				params.Depositor = depositorAddr
 			}
 
 			if len(bechVoterAddr) != 0 {
@@ -122,7 +122,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagNumLimit, "", "(optional) limit to latest [number] proposals. Defaults to all proposals")
-	cmd.Flags().String(flagDepositer, "", "(optional) filter by proposals deposited on by depositer")
+	cmd.Flags().String(flagDepositor, "", "(optional) filter by proposals deposited on by depositor")
 	cmd.Flags().String(flagVoter, "", "(optional) filter by proposals voted on by voted")
 	cmd.Flags().String(flagStatus, "", "(optional) filter proposals by proposal status")
 
@@ -209,17 +209,18 @@ func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-deposit",
 		Short: "Query details of a deposit",
+		Example: "iriscli gov query-deposit --proposal-id=1 --depositor=<depositor address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := uint64(viper.GetInt64(flagProposalID))
 
-			depositerAddr, err := sdk.AccAddressFromBech32(viper.GetString(flagDepositer))
+			depositorAddr, err := sdk.AccAddressFromBech32(viper.GetString(flagDepositor))
 			if err != nil {
 				return err
 			}
 
 			params := gov.QueryDepositParams{
-				Depositer:  depositerAddr,
+				Depositor:  depositorAddr,
 				ProposalID: proposalID,
 			}
 			bz, err := cdc.MarshalJSON(params)
@@ -238,7 +239,7 @@ func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal deposited on")
-	cmd.Flags().String(flagDepositer, "", "bech32 depositer address")
+	cmd.Flags().String(flagDepositor, "", "bech32 depositor address")
 
 	return cmd
 }
@@ -248,6 +249,7 @@ func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-deposits",
 		Short: "Query deposits on a proposal",
+		Example: "iriscli gov query-deposits --proposal-id=4",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := uint64(viper.GetInt64(flagProposalID))
@@ -280,6 +282,7 @@ func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-tally",
 		Short: "Get the tally of a proposal vote",
+		Example: "iriscli gov query-tally --proposal-id=4",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			proposalID := uint64(viper.GetInt64(flagProposalID))
