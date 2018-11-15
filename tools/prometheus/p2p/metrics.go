@@ -51,6 +51,8 @@ func (m *Metrics) Start(ctx context.CLIContext) {
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
+			// TODO: it will throw err when invoke NetInfo method of http client, This is tendermint bug. \
+			// We will fix it in next version
 			if result, err := ctx.NetInfo(); err == nil {
 				connected := 0
 				for _, peer := range result.Peers {
@@ -62,7 +64,7 @@ func (m *Metrics) Start(ctx context.CLIContext) {
 				m.ConnectedPersistentPeers.Set(float64(connected))
 				m.UnonnectedPersistentPeers.Set(float64(len(m.persistent_peers) - connected))
 			} else {
-				log.Println(err)
+				//log.Println(err)
 			}
 		}
 	}()

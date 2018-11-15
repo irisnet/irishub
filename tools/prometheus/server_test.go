@@ -2,9 +2,11 @@ package prometheus
 
 import (
 	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
+	irisInit "github.com/irisnet/irishub/init"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/shirou/gopsutil/cpu"
@@ -18,13 +20,19 @@ import (
 )
 
 func TestMetricsCmd(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cdc := app.MakeCodec()
 	comm := MonitorCommand(cdc)
-	viper.Set("node", "tcp://0.0.0.0:26657")
-	viper.Set("address", "25C2FA00D832E8BEC64E2B5CB4AD2066ADE79DB3")
-	viper.Set("account-address", "faa1gg37u8xhw5vhrfmr5mkfq8r5l4wgvd36t9hypd")
+	viper.Set("node", "tcp://35.235.123.127:26657")
+	viper.Set("address", "72064B0FD4456F92BE29503310BDC7B9B6220DC3")
+	viper.Set("account-address", "faa1usq8wafjt55ktsgxue8meqh6kmnck97s333u0j")
 	viper.Set("home", app.DefaultNodeHome)
-	viper.Set("chain-id", "test")
+	viper.Set("chain-id", "irishub-test")
 	viper.Set("recursively", true)
 	viper.Set("trust-node", true)
 	viper.Set("port", 36660)
