@@ -26,6 +26,12 @@ func UpdateKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(m.NewPassword) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("new password should not be empty"))
+		return
+	}
+
 	kb, err := keys.GetKeyBase()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
