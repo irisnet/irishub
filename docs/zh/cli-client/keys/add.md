@@ -2,7 +2,7 @@
 
 ## 描述
 
-创建一个新密钥，或通过密钥种子导入
+创建一个新密钥，或通过助记词导入已有密钥
 
 ## 使用方式
 
@@ -49,17 +49,17 @@ It is the only way to recover your account if you ever forget your password.
 oval green shrug term already arena pilot spirit jump gain useful symbol hover grid item concert kiss zero bleak farm capable peanut snack basket
 ```
 
-上面的24个字是一个助记词种子短语，例如，**不要**在生产中使用它。
+上面24个单词只是助记词的示例，**不要**在生产环境中使用。
 
-### 通过密钥种子恢复密钥
+### 通过助记词恢复密钥
 
-如果你忘记了密码或丢失了密钥，或者你想在其他地方使用密钥，则可以通过种子短语来恢复密钥。
+如果你忘记了密码或丢失了密钥，或者你想在其他地方使用密钥，则可以通过助记词短语来恢复。
 
 ```txt
 iriscli keys add MyKey --recover
 ```
 
-系统会要求你输入并确认密钥的新密码，然后输入种子短语。 这样就恢复了你的密钥。
+系统会要求你输入并确认密钥的新密码，然后输入助记词。这样就能恢复你的密钥。
 
 ```txt
 Enter a passphrase for your key:
