@@ -72,7 +72,9 @@ Committed at block 44 (tx hash: 2C28A87A6262CACEDDB4EBBC60FE989D0DB2B7DEB1EC6795
 iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
 ```
 
-After that, you're done with submitting a new 'ParameterChange' proposal. Notice, in this case, 'path' and 'param' can't be both empty. The details of changed parameters （get parameters through query-params, modify it and then add "update" on the "op", more details in usage scenarios）and other fields of proposal are similar with text proposal.
+After that, you're done with submitting a new 'ParameterChange' proposal. 
+The details of changed parameters （get parameters through query-params, modify it and then add "update" on the "op", more details in usage scenarios）and other fields of proposal are similar with text proposal.
+Note: in this case, --path and --param cannot be both empty.
 
 ### Submit a 'SoftwareUpgrade' type proposal
 
