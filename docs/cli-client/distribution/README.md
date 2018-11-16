@@ -10,7 +10,7 @@ By default, trust-node mode is enable. If you don't trust the connected node, ju
 
     For example:
     ```bash
-    ubuntu@ubuntu:~$ iriscli distribution withdraw-address faa1vm068fnjx28zv7k9kd9j85wrwhjn8vfsxfmcrz
+    iriscli distribution withdraw-address faa1vm068fnjx28zv7k9kd9j85wrwhjn8vfsxfmcrz
     ```
     If the given delegator doesn't specify other withdraw address, the query result will be empty.
 
@@ -18,7 +18,7 @@ By default, trust-node mode is enable. If you don't trust the connected node, ju
 
     For example:
     ```bash
-    ubuntu@ubuntu:~$ iriscli distribution delegation-distr-info --address-delegator=faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j \
+    iriscli distribution delegation-distr-info --address-delegator=faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j \
     --address-validator=fva1ezzh0humhy3329xg4avhcjtay985nll0hpyhf4
     ```
     Query result:
