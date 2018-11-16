@@ -141,8 +141,13 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 		}
 
 		keyValue := strings.Split(tag, "=")
-		key := keyValue[0]
+		if len(keyValue) != 2 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid tag, tag pattern should be something like key=value pair"))
+			return
+		}
 
+		key := keyValue[0]
 		value, err := url.QueryUnescape(keyValue[1])
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
