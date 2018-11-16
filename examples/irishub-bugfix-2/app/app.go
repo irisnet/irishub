@@ -13,7 +13,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/ibc"
 	ibcbugfix "github.com/irisnet/irishub/examples/irishub-bugfix-2/ibc"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -75,7 +74,6 @@ type IrisApp struct {
 	accountMapper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	bankKeeper          bank.Keeper
-	ibcMapper           ibc.Mapper
 	ibc1Mapper          ibcbugfix.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
@@ -141,10 +139,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.cdc,
 		app.keyParams, app.tkeyParams,
 	)
-	app.ibcMapper = ibc.NewMapper(
-		app.cdc,
-		app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace),
-	)
 	stakeKeeper := stake.NewKeeper(
 		app.cdc,
 		app.keyStake, app.tkeyStake,
@@ -205,7 +199,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// need to update each module's msg type
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("ibc-1", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibcbugfix.NewHandler(app.ibc1Mapper, app.bankKeeper,app.upgradeKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
@@ -281,7 +274,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 // custom tx codec
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
-	ibc.RegisterCodec(cdc)
 	ibcbugfix.RegisterCodec(cdc)
 	bank.RegisterCodec(cdc)
 	stake.RegisterCodec(cdc)
