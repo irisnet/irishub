@@ -14,7 +14,7 @@ iriscli keys mnemonic <name> [flags]
 
 | Name, shorthand  | Default   | Description                                                                   | Required |
 | ---------------- | --------- | ----------------------------------------------------------------------------- | -------- |
-| --help, -h       |           | help for add                                                                  |          |
+| --help, -h       |           | help for mnemonic                                                             |          |
 | --unsafe-entropy |           | Prompt the user to supply their own entropy, instead of relying on the system |          |
 
 ## Examples
