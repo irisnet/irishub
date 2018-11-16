@@ -16,7 +16,7 @@ iriscli keys show <name> [flags]
 | -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
 | --address            |                   | output the address only (overrides --output)                   |          |
 | --bech               | acc               | [string] The Bech32 prefix encoding for a key (acc|val|cons)   |          |
-| --help, -h           |                   | help for add                                                   |          |
+| --help, -h           |                   | help for show                                                  |          |
 | --multisig-threshold | 1                 | [uint] K out of N required signatures                          |          |
 | --pubkey             |                   | output the public key only (overrides --output)                |          |
 
