@@ -1,6 +1,7 @@
 vendor
 .DS_Store
 .idea
+irishub.iml
 build/
 .out
 docs/.vuepress/dist/
