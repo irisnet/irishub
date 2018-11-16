@@ -5,7 +5,7 @@
 IRIShub Gov module allows you to submit proposals, vote and query the governance information you care about on the chain:
 1. Any users can deposit some tokens to initiate a proposal. Once deposit reaches a certain value min_deposit, enter voting period, otherwise it will remain in the deposit period. Others can deposit the proposals on the deposit period. Once the sum of the deposit reaches min_deposit, enter voting period. However, if the block-time exceeds max_deposit_period in the deposit period, the proposal will be closed.
 2. The proposals which enter voting period only can be voted by validators and delegators. The vote of a delegator who hasn't vote will be the same as his validator's vote, and the vote of a delegator who has voted will be remained. The votes wil be tallyed when reach `voting_period'.
-3. More details about voting for proposals: CosmosSDK-Gov-spec
+3. More details about voting for proposals: [CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/governance/overview.md)
 
 This module provides the basic functions as described below:
 1. On-chain governance proposals on text
@@ -49,10 +49,3 @@ iriscli gov [command]
 | --home          | $HOME/.iriscli | [string] directory for config and data |          |
 | --output, -o    | text           | [string] Output format (text|json)     |          |
 | --trace         |                | print out full stack trace on errors   |          |
-
-## Extended description
-
-1. Any users can deposit some tokens to initiate a proposal. Once deposit reaches a certain value `min_deposit`, enter voting period, otherwise it will remain in the deposit period. Others can deposit the proposals on the deposit period. Once the sum of the deposit reaches `min_deposit`, enter voting period. However, if the block-time exceeds `max_deposit_period` in the deposit period, the proposal will be closed.
-2. The proposals which enter voting period only can be voted by validators and delegators. The vote of a delegator who hasn't vote will be the same as his validator's vote, and the vote of a delegator who has voted will be remained. The votes wil be tallyed when reach `voting_period'.
-3. More details about voting for proposals:
-[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/governance/overview.md)
