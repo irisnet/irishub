@@ -30,14 +30,14 @@ You'll be asked to enter the current password for your key.
 Enter the current passphrase:
 ```
 
-After this, you'll be asked to enter a new password.
+Then you'll be asked to enter a new password and repeat it.
 
 ```txt
 Enter the new passphrase:
 Repeat the new passphrase:
 ```
 
-After that, you're done with changing your password.
+It will be done if you enter a new password that meets the criteria.
 
 ```txt
 Password successfully updated!

@@ -25,12 +25,12 @@ iriscli keys show <name> [flags]
 ### Show a given key
 
 ```shell
-iriscli keys show test
+iriscli keys show MyKey
 ```
 
-After this, you will get the local public keys with 'address' and 'pubkey' element of a given key.
+You'll get the local public keys with 'address' and 'pubkey' element of a given key.
 
 ```txt
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
-test	local	faa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	fap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
+MyKey	local	faa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	fap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
 ```

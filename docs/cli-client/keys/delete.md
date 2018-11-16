@@ -24,13 +24,13 @@ iriscli keys delete <name> [flags]
 iriscli keys delete MyKey
 ```
 
-You'll be asked to enter a password for your key.
+You'll receive a danger warning and be asked to enter a password for your key.
 
 ```txt
 DANGER - enter password to permanently delete key:
 ```
 
-After that, you're done with deleting your key.
+After you enter the correct password, you're done with deleting your key.
 
 ```txt
 Password deleted forever (uh oh!)

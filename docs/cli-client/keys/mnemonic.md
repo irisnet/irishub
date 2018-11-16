@@ -22,10 +22,10 @@ iriscli keys mnemonic <name> [flags]
 ### Create a bip39 mnemonic
 
 ```shell
-iriscli keys mnemonic abc
+iriscli keys mnemonic MyKey
 ```
 
-After this, you'll get a bip39 mnemonic.
+You'll get a bip39 mnemonic with 24 words.
 
 ```txt
 police possible oval milk network indicate usual blossom spring wasp taste canal announce purpose rib mind river pet brown web response sting remain airport

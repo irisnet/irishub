@@ -17,7 +17,7 @@ iriscli keys new <name> [flags]
 
 | Name, shorthand | Default           | Description                                                     | Required |
 | --------------- | ----------------- | --------------------------------------------------------------- | -------- |
-| --bip44-path    | "44'/118'/0'/0/0" | BIP44 path from which to derive a private key                   |          |
+| --bip44-path    | 44'/118'/0'/0/0   | BIP44 path from which to derive a private key                   |          |
 | --default       |                   | Skip the prompts and just use the default values for everything |          |
 | --help, -h      |                   | help for add                                                    |          |
 | --ledger        |                   | Store a local reference to a private key on a Ledger device     |          |

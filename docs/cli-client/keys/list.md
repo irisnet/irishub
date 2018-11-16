@@ -25,7 +25,7 @@ iriscli keys list [flags]
 iriscli keys list
 ```
 
-After this, you will get all the local public keys with 'address' and 'pubkey' element.
+You'll get all the local public keys with 'address' and 'pubkey' element.
 
 ```txt
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
