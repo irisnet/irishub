@@ -1,16 +1,16 @@
-#IRISLCD User Guide
+# IRISLCD User Guide
 
 ## Introduction
 
-The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token which is the reward for producing block. As a POS blockchain network, the Irishub also has incentive mechanism. But it is much different. Strictly speaking, it is the inflation token which will be distributed to all the contributors.
+The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token as well as the accumulation of transaction fee in the block. As a POS blockchain network, the IRISHUB incentive mechanism is much different. 
 
-As we all know, POW means proof of work. In each producing period, all miners compete to submit their work proof and the fastest one will be the winner. Actually, all loser miners don't offer any positive help or collaboration to the winner miner, and they are only the competitors. So it is reasonable to grant all reward to the winner miner. However, in POS blockchain network, we can't do that. Because each block producing process is based on the collaboration of all validators and delegators, which means the benefit should be share by all these contributors.
+As we all know, POW means proof of work. In each block producing period, all miners compete to calculate their work proof and the fastest one will be the winner. Actually, all loser miners don't offer any positive help or collaboration to the winner miner, and they are only the competitors. So it is reasonable to grant all reward to the winner miner. However, in POS blockchain network, we can't do that. Because each block producing process is the collaboration of all validators and delegators, which means the benefit should be share by all these contributors. There are two sources of revenue, one is the transaction fee of the packaged transaction in the block. The other is regular inflation, which will produce new tokens.
 
 As for how to distribute inflation token to contributors, we will document and implement it in distribution module. Here we mainly introduce how to figure out the inflation token and what is the impact to users. 
 
-## Reward Calculation
+## Inflation Calculation
 
-Unlike POW network, the inflation token will not be paid to contributors in each block. Instead, once an hour(`block time`) the inflation token is calculated and saved in global pool. Only when contributors explicitly send transactions to withdraw reward, then will the inflation token be transfered to users specified addresses.
+Unlike POW network, the inflation token will not be paid to contributors in each block. Only when contributors explicitly send transactions to withdraw reward, then will the inflation token be transfered to users specified addresses. Besides, the token inflation is triggered once an hour, and the new produced token will be saved in global pool. 
 
 ### Block Time
 

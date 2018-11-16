@@ -1,7 +1,5 @@
 # IRISLCD User Guide
 
-## Introduction
-
 ## Basic Functionality Description
 
 1. Provide restful APIs and swagger-ui to show these APIs
@@ -84,7 +82,7 @@ Once the IRISLCD node is started successfully, then you can open `localhost:1317
 
     1. `POST /distribution/{delegatorAddr}/withdrawAddress`: Set withdraw address
     2. `GET /distribution/{delegatorAddr}/withdrawAddress`: Query withdraw address
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Set withdraw address
+    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw address
     4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: Query distribution information for a delegation
     5. `GET /distribution/{delegatorAddr}/distrInfos`: Query distribution information list for a given delegator
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: Query withdraw address
@@ -94,7 +92,7 @@ Once the IRISLCD node is started successfully, then you can open `localhost:1317
     1. `GET /version`: Version of irislcd
     2. `GET /node_version`: Version of the connected node
 
-## Options for post apis
+## Extra parameters for post apis
 
 1. `POST /bank/accounts/{address}/transfers`: Send tokens (build -> sign -> send)
 2. `POST /stake/delegators/{delegatorAddr}/delegate`: Submit delegation transaction
@@ -105,10 +103,10 @@ Once the IRISLCD node is started successfully, then you can open `localhost:1317
 7. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
 8. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
 
-| Option name   | Type | Default | Priority | Description                 |
+| parameter name   | Type | Default | Priority | Description                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
 | generate-only   | bool | false | 0 | Build an unsigned transaction and write it back |
 | simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
 | async           | bool | false | 2 | Broadcast transaction asynchronously   |
 
-The above eight post APIs have three query options which are shown in the above table. By default, their values are all false. Each option has its unique priority( Here `0` is the top priority). If multiple options are enabled, then the options with lower priority will be ignored. For instance, if `generate-only` is true, then other options, such as `simulate` and `async` will be ignored.  
+The above eight post APIs have three query parameter which are shown in the above table. By default, their values are all false. Each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified, then the parameters with lower priority will be ignored. For instance, if `generate-only` is true, then other parameters, such as `simulate` and `async` will be ignored.  

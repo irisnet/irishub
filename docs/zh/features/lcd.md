@@ -1,114 +1,113 @@
-# IRISLCD User Guide
+# IRISLCD用户文档
 
-## Introduction
+## 基本功能介绍
 
-## Basic Functionality Description
+1.提供restful API以及swagger-ui
+2.验证查询结果的有效性
 
-1. Provide restful APIs and swagger-ui to show these APIs
-2. Verify query proof
+## 使用场景
 
-## Usage Scenario
+假设有一个正在运行的IRISLCD节点，其swagger-ui页面url是`localhost:1317/swagger-ui/`。IRISLCD用户文档的默认home目录是`$HOME/.irislcd`。IRISLCD启动以后，首先它将在其主文件夹中创建存储密钥的文件。如果IRISLCD运行在非信任模式下，它将获取当前区块作为其信任基础，并且将其保存到其home目录下的`trust-base.db`。IRISLCD节点始终无条件信任这个区块。它将根据这个区块的验证人集合来验证此后所有查询结果，这意味着IRISLCD只能验证其信任区块之后的区块信息和交易。这也是IRISLCD的缺陷。当它尝试验证较低高度的某些交易和区块时，会有错误返回。因此，如果您想查询早期的区块和交易时，请以信任模式启动IRISLCD。有关详细的查询结果的验证算法，请参阅此[文档](https://github.com/tendermint/tendermint/blob/master/docs/tendermint-core/light-client-protocol.md)。
 
-Suppose an IRISLCD node is running and its swagger-ui page url is `localhost:1317/swagger-ui/`. The default home folder of irislcd is `$HOME/.irislcd`. Once an IRISLCD is started, firstly it will create key store in its home folder. If the IRISLCD is running in distrust mode, then ir will fetch the latest block as its trust basis and the trust basis will be saved to folder `trust-base.db` under its home folder. The IRISLCD node always trust the basis. It will verify all query proof against the trust basis, which means IRISLCD can only verify the proof on later height. However, this is also a defect of IRISLCD. When it tries to verify some transactions or blocks on lower height, it will report error. So if you want to query transactions or block on lower height, please start IRISLCD in trust mode. For detailed proof verification algorithm please refer to this [document](https://github.com/tendermint/tendermint/blob/master/docs/tendermint-core/light-client-protocol.md).
+IRISLCD节点成功启动后，在浏览器中打开`localhost1317/swagger-ui/`，您可以看到所有REST APIs。
 
-Once the IRISLCD node is started successfully, then you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown.
-
-1. Tendermint APIs, such as query blocks, transactions and validatorset
-    1. `GET /node_info`: The properties of the connected node
-    2. `GET /syncing`: Syncing state of node
-    3. `GET /blocks/latest`: Get the latest block
-    4. `GET /blocks/{height}`: Get a block at a certain height
-    5. `GET /validatorsets/latest`: Get the latest validator set
-    6. `GET /validatorsets/{height}`: Get a validator set a certain height
-    7. `GET /txs/{hash}`: Get a Tx by hash
-    8. `GET /txs`: Search transactions
-    9. `POST /txs`: Broadcast Tx
+1. Tendermint相关APIs, 例如查询区块，交易和验证人集
+    1. `GET /node_info`: 查询所连接全节点的信息
+    2. `GET /syncing`: 查询所连接全节点是否处于追赶区块的状态
+    3. `GET /blocks/latest`: 获取最新区块
+    4. `GET /blocks/{height}`: 获取某一高度的区块
+    5. `GET /validatorsets/latest`: 获取最新的验证人集合
+    6. `GET /validatorsets/{height}`: 获取某一高度的验证人集合
+    7. `GET /txs/{hash}`: 通过交易hash查询交易
+    8. `GET /txs`: 搜索交易
+    9. `POST /txs`: 广播交易
  
 2. Key management APIs
 
-    1. `GET /keys`: List of accounts stored locally
-    2. `POST /keys`: Create a new account locally
-    3. `GET /keys/seed`: Create a new seed to create a new account with
-    4. `GET /keys/{name}`: Get a certain locally stored account
-    5. `PUT /keys/{name}`: Update the password for this account in the KMS
-    6. `DELETE /keys/{name}`: Remove an account
-    7. `GET /auth/accounts/{address}`: Get the account information on blockchain
+    1. `GET /keys`: 列出所有本地的秘钥
+    2. `POST /keys`: 创建新的秘钥
+    3. `GET /keys/seed`: 创建新的助记词
+    4. `GET /keys/{name}`: 根据秘钥名称查询秘钥
+    5. `PUT /keys/{name}`: 更新秘钥的密码
+    6. `DELETE /keys/{name}`: 删除秘钥
+    7. `GET /auth/accounts/{address}`: 查询秘钥对象账户的信息
 
 3. Create, sign and broadcast transactions
 
-    1. `POST /tx/sign`: Sign a transation
-    2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
-    3. `POST /txs/send`: Send non-amino encoding transaction
-    4. `GET /bank/coin/{coin-type}`: Get coin type
-    5. `GET /bank/balances/{address}`: Get the account information on blockchain
-    6. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
+    1. `POST /tx/sign`: 签名交易
+    2. `POST /tx/broadcast`: 广播一个amino编码的交易
+    3. `POST /txs/send`: 广播一个非amino编码的交易
+    4. `GET /bank/coin/{coin-type}`: 查询coin的类型信息
+    5. `GET /bank/balances/{address}`: 查询账户的token数量
+    6. `POST /bank/accounts/{address}/transfers`: 发起转账交易
 
 4. Stake module APIs
 
-    1. `POST /stake/delegators/{delegatorAddr}/delegate`: Submit delegation transaction
-    2. `POST /stake/delegators/{delegatorAddr}/redelegate`: Submit redelegation transaction
-    3. `POST /stake/delegators/{delegatorAddr}/unbond`: Submit unbonding transaction
-    4. `GET /stake/delegators/{delegatorAddr}/delegations`: Get all delegations from a delegator
-    5. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations`: Get all unbonding delegations from a delegator
-    6. `GET /stake/delegators/{delegatorAddr}/redelegations`: Get all redelegations from a delegator
-    7. `GET /stake/delegators/{delegatorAddr}/validators`: Query all validators that a delegator is bonded to
-    8. `GET /stake/delegators/{delegatorAddr}/validators/{validatorAddr}`: Query a validator that a delegator is bonded to
-    9. `GET /stake/delegators/{delegatorAddr}/txs` :Get all staking txs (i.e msgs) from a delegator
-    10. `GET /stake/delegators/{delegatorAddr}/delegations/{validatorAddr}`: Query the current delegation between a delegator and a validator
-    11. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}`: Query all unbonding delegations between a delegator and a validator
-    12. `GET /stake/validators`: Get all validator candidates
-    13. `GET /stake/validators/{validatorAddr}`: Query the information from a single validator
-    14. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: Get all unbonding delegations from a validator
-    15. `GET /stake/validators/{validatorAddr}/redelegations`: Get all outgoing redelegations from a validator
-    16. `GET /stake/pool`: Get the current state of the staking pool
-    17. `GET /stake/parameters`: Get the current staking parameter values
+    1. `POST /stake/delegators/{delegatorAddr}/delegate`: 发起委托交易
+    2. `POST /stake/delegators/{delegatorAddr}/redelegate`: 发起转委托交易
+    3. `POST /stake/delegators/{delegatorAddr}/unbond`: 发起解委托交易
+    4. `GET /stake/delegators/{delegatorAddr}/delegations`: 查询委托人的所有委托记录
+    5. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations`: 查询委托人的所有解委托记录
+    6. `GET /stake/delegators/{delegatorAddr}/redelegations`: 查询委托人的所有转委托记录
+    7. `GET /stake/delegators/{delegatorAddr}/validators`: 查询委托人的所委托的所有验证人
+    8. `GET /stake/delegators/{delegatorAddr}/validators/{validatorAddr}`: 查询某个被委托的验证人上信息
+    9. `GET /stake/delegators/{delegatorAddr}/txs`: 查询所有委托人相关的委托交易
+    10. `GET /stake/delegators/{delegatorAddr}/delegations/{validatorAddr}`: 查询委托人在某个验证人上的委托记录
+    11. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}`: 查询委托人在某个验证人上所有的解委托记录
+    12. `GET /stake/validators`: 获取所有委托人信息
+    13. `GET /stake/validators/{validatorAddr}`: 获取某个委托人信息
+    14. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: 获取某个验证人上的所有解委托记录
+    15. `GET /stake/validators/{validatorAddr}/redelegations`: 获取某个验证人上的所有转委托记录
+    16. `GET /stake/pool`: 获取权益池信息
+    17. `GET /stake/parameters`: 获取权益证明的参数
 
 5. Governance module APIs
 
-    1. `POST /gov/proposal`: Submit a proposal
-    2. `GET /gov/proposals`: Query proposals
-    3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
-    4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
-    5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
-    6. `GET /gov/proposals/{proposalId}/votes`: Query voters
-    7. `GET /gov/proposals/{proposalId}`: Query a proposal
-    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
-    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
-    10. `GET/gov/params`: Query governance parameters
+    1. `POST /gov/proposal`: 发起提交提议交易
+    2. `GET /gov/proposals`: 查询提议
+    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
+    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
+    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
+    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
+    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
+    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
+    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
+    10. `GET/gov/params`: 查询可供治理的参数
 
 6. Slashing module APIs
-    1. `GET /slashing/validators/{validatorPubKey}/signing_info`: Get sign info of given validator
-    2. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
+
+    1. `GET /slashing/validators/{validatorPubKey}/signing_info`: 获取验证人的签名记录
+    2. `POST /slashing/validators/{validatorAddr}/unjail`: 赦免某个作恶的验证人节点
 
 7. Distribution module APIs
 
-    1. `POST /distribution/{delegatorAddr}/withdrawAddress`: Set withdraw address
-    2. `GET /distribution/{delegatorAddr}/withdrawAddress`: Query withdraw address
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Set withdraw address
-    4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: Query distribution information for a delegation
-    5. `GET /distribution/{delegatorAddr}/distrInfos`: Query distribution information list for a given delegator
-    6. `GET /distribution/{validatorAddr}/valDistrInfo`: Query withdraw address
+    1. `POST /distribution/{delegatorAddr}/withdrawAddress`: 设置收益撤回地址
+    2. `GET /distribution/{delegatorAddr}/withdrawAddress`: 查询收益撤回地址
+    3. `POST /distribution/{delegatorAddr}/withdrawReward`: 撤回收益
+    4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: 查询某个委托的收益分配信息
+    5. `GET /distribution/{delegatorAddr}/distrInfos`: 查询委托人所有委托的收益分配信息
+    6. `GET /distribution/{validatorAddr}/valDistrInfo`: 查询验证人的收益分配信息
 
 8. Query app version
 
-    1. `GET /version`: Version of irislcd
-    2. `GET /node_version`: Version of the connected node
+    1. `GET /version`: 获取IRISHUB的版本
+    2. `GET /node_version`: 查询全节点版本
 
 ## Options for post apis
 
-1. `POST /bank/accounts/{address}/transfers`: Send tokens (build -> sign -> send)
-2. `POST /stake/delegators/{delegatorAddr}/delegate`: Submit delegation transaction
-3. `POST /stake/delegators/{delegatorAddr}/redelegate`: Submit redelegation transaction
-4. `POST /stake/delegators/{delegatorAddr}/unbond`: Submit unbonding transaction
-5. `POST /gov/proposal`: Submit a proposal
-6. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
-7. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
-8. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
+1. `POST /bank/accounts/{address}/transfers`
+2. `POST /stake/delegators/{delegatorAddr}/delegate`
+3. `POST /stake/delegators/{delegatorAddr}/redelegate`
+4. `POST /stake/delegators/{delegatorAddr}/unbond`
+5. `POST /gov/proposal`
+6. `POST /gov/proposals/{proposalId}/deposits`
+7. `POST /gov/proposals/{proposalId}/votes`
+8. `POST /slashing/validators/{validatorAddr}/unjail`
 
-| Option name   | Type | Default | Priority | Description                 |
+| 参数名字        | 类型 | 默认值 | 优先级 | 功能描述                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
-| generate-only   | bool | false | 0 | Build an unsigned transaction and write it back |
-| simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
-| async           | bool | false | 2 | Broadcast transaction asynchronously   |
+| generate-only   | bool | false | 0 | 构建一个未签名的交易并返回 |
+| simulate        | bool | false | 1 | 用仿真的方式去执行交易 |
+| async           | bool | false | 2 | 用异步地方式广播交易  |
 
-The above eight post APIs have three query options which are shown in the above table. By default, their values are all false. Each option has its unique priority( Here `0` is the top priority). If multiple options are enabled, then the options with lower priority will be ignored. For instance, if `generate-only` is true, then other options, such as `simulate` and `async` will be ignored.  
+以上八个APIs都有三个额外的查询参数，如上表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级（这里`0`是最高优先级）。 如果指定了多个参数，则将忽略优先级较低的参数。 例如，如果`generate-only`为真，那么其他参数，例如`simulate`和`async`将被忽略。
