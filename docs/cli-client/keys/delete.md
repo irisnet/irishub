@@ -14,7 +14,7 @@ iriscli keys delete <name> [flags]
 
 | Name, shorthand | Default   | Description                                                  | Required |
 | --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --help, -h      |           | help for add                                                 |          |
+| --help, -h      |           | help for delete                                              |          |
 
 ## Examples
 
