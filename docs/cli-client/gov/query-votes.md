@@ -28,11 +28,17 @@ iriscli gov query-votes [flags]
 ### Query votes
 
 ```shell
-
+iriscli gov query-votes --chain-id=test --proposal-id=1
 ```
 
- After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
+You could query the voting of all the voters by specifying the proposal.
  
 ```txt
-
+[
+  {
+    "voter": "faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
+    "proposal_id": "1",
+    "option": "Yes"
+  }
+]
 ```

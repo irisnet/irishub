@@ -27,10 +27,16 @@ iriscli gov query-tally [flags]
 ### Query tally
 
 ```shell
-
+iriscli gov query-tally --chain-id=test --proposal-id=1
 ```
- After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
+
+You could query the statistics of each voting option.
 
 ```txt
-
+{
+  "yes": "100.0000000000",
+  "abstain": "0.0000000000",
+  "no": "0.0000000000",
+  "no_with_veto": "0.0000000000"
+}
 ```
