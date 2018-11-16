@@ -17,6 +17,7 @@ type UnjailBody struct {
 
 func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 
 		validatorAddr, err := sdk.ValAddressFromBech32(vars["validatorAddr"])
@@ -30,12 +31,11 @@ func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		if err != nil {
 			return
 		}
+
 		baseReq := m.BaseTx.Sanitize()
 		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
-
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
 		msg := slashing.NewMsgUnjail(validatorAddr)
 

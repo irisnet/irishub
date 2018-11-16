@@ -808,8 +808,6 @@ paths:
             delegate:
               type: object
               properties:
-                delegator_addr:
-                  $ref: "#/definitions/Address"
                 validator_addr:
                   $ref: "#/definitions/ValidatorAddress"
                 delegation:
@@ -869,8 +867,6 @@ paths:
             redelegate:
               type: object
               properties:
-                delegator_addr:
-                  $ref: "#/definitions/Address"
                 validator_src_addr:
                   $ref: "#/definitions/ValidatorAddress"
                 validator_dst_addr:
@@ -932,8 +928,6 @@ paths:
             unbond:
               type: object
               properties:
-                delegator_addr:
-                    $ref: "#/definitions/Address"
                 validator_addr:
                     $ref: "#/definitions/ValidatorAddress"
                 shares:
@@ -1270,13 +1264,9 @@ paths:
                 type: string
               bonded_tokens:
                 type: string
-              inflation_last_time:
+              total_supply:
                 type: string
-              inflation:
-                type: string
-              date_last_commission_reset:
-                type: string
-              prev_bonded_shares:
+              bonded_ratio:
                 type: string
         500:
           description: Internal Server Error
