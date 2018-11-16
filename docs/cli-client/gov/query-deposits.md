@@ -31,7 +31,7 @@ iriscli gov query-deposits [flags]
 iriscli gov query-deposits --chain-id=test --proposal-id=1
 ```
 
-After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
+You could query all the deposited tokens on a specific proposal, includes deposit details for each depositor.
 
 ```txt
 [

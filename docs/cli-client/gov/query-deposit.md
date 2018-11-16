@@ -15,7 +15,7 @@ iriscli gov query-deposit [flags]
 | Name, shorthand | Default               | Description                                                                                                                                          | Required |
 | --------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                       | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
-| --depositer     |                       | [string] bech32 depositer address                                                                                                                    |          |
+| --depositer     |                       | [string] bech32 depositer address                                                                                                                    | Yes      |
 | --height        |                       | [int] block height to query, omit to get most recent provable block                                                                                  |          |
 | --help, -h      |                       | help for submit-proposal                                                                                                                             |          |
 | --indent        |                       | Add indent to JSON response                                                                                                                          |          |
@@ -32,7 +32,7 @@ iriscli gov query-deposit [flags]
 iriscli gov query-deposit --chain-id=test --proposal-id=1 --depositer=faa1c4kjt586r3t353ek9jtzwxum9x9fcgwetyca07
 ```
 
-After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
+You could query the deposited tokens on a specific proposal.
 
 ```txt
 {
