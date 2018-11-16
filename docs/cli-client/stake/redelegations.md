@@ -16,7 +16,7 @@ iriscli stake redelegations [delegator-addr] [flags]
 | -------------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
 | --chain-id                 |                            | [string] Chain ID of tendermint node                                |          |
 | --height                   | most recent provable block | block height to query                                               |          |
-| --help, -h                 |                            | help for validator                                                  |          |
+| --help, -h                 |                            | help for redelegations                                              |          |
 | --indent                   |                            | Add indent to JSON response                                         |          |
 | --ledger                   |                            | Use a connected Ledger device                                       |          |
 | --node                     | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |

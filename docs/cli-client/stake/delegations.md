@@ -24,7 +24,7 @@ iriscli stake delegations [delegator-addr] [flags]
 
 ## Examples
 
-### Query a validator
+### Query all delegations made from one delegator
 
 ```shell
 iriscli stake delegations DelegatorAddress

@@ -31,7 +31,7 @@ iriscli stake edit-validator [flags]
 | --gas-adjustment             | 1                     | [float] Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignor |          |
 | --generate-only              |                       | Build an unsigned transaction and write it to STDOUT                |          |
 | --genesis-format             |                       | Export the transaction in gen-tx format; it implies --generate-only |          |
-| --help, -h                   |                       | Help for create-validator                                           |          |
+| --help, -h                   |                       | Help for edit-validator                                           |          |
 | --identity                   |                       | [string] Optional identity signature (ex. UPort or Keybase)         |          |
 | --indent                     |                       | Add indent to JSON response                                         |          |
 | --ip                         |                       | [string] Node's public IP. It takes effect only when used in combination with --genesis-format |           |

@@ -26,7 +26,7 @@ iriscli stake redelegate [flags]
 | --gas                        | 200000                | [string] Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically ||
 | --gas-adjustment             | 1                     | [float] Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ||
 | --generate-only              |                       | build an unsigned transaction and write it to STDOUT                |          |
-| --help, -h                   |                       | help for redelegate                                                 |          |
+| --help, -h                   |                       | help for unjail                                                 |          |
 | --indent                     |                       | Add indent to JSON response                                         |          |
 | --json                       |                       | return output in json format                                        |          |
 | --ledger                     |                       | Use a connected Ledger device                                       |          |

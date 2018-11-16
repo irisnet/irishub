@@ -18,7 +18,7 @@ iriscli stake unbonding-delegation [flags]
 | --address-validator |                            | [string] Bech address of the validator                              | Yes      |
 | --chain-id          |                            | [string] Chain ID of tendermint node                                |          |
 | --height            | most recent provable block | block height to query                                               |          |
-| --help, -h          |                            | help for validator                                                  |          |
+| --help, -h          |                            | help for unbonding-delegation                                       |          |
 | --indent            |                            | Add indent to JSON response                                         |          |
 | --ledger            |                            | Use a connected Ledger device                                       |          |
 | --node              | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
@@ -30,7 +30,7 @@ iriscli stake unbonding-delegation [flags]
 ### Query an unbonding-delegation
 
 ```shell
-iriscli stake unbonding-delegation --address-delegator=faa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx --address-validator=fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd
+iriscli stake unbonding-delegation --address-delegator=DelegatorAddress --address-validator=ValidatorAddress
 ```
 
 After that, you will get unbonding delegation's detailed info between specified validator and delegator.
