@@ -14,11 +14,11 @@ iriscli keys show <name> [flags]
 
 | 名称, 速记            | 默认值             | 描述                                                           | 是否必须  |
 | -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
-| --address            |                   | output the address only (overrides --output)                   |          |
-| --bech               | acc               | [string] The Bech32 prefix encoding for a key (acc|val|cons)   |          |
-| --help, -h           |                   | help for add                                                   |          |
+| --address            |                   | 仅输出地址                                                      |          |
+| --bech               | acc               | [string] 密钥的Bech32前缀编码 (acc|val|cons)                     |          |
+| --help, -h           |                   | 查询命令帮助                                                    |          |
 | --multisig-threshold | 1                 | [uint] K out of N required signatures                          |          |
-| --pubkey             |                   | output the public key only (overrides --output)                |          |
+| --pubkey             |                   | 仅输出公钥                                                      |          |
 
 ## 例子
 

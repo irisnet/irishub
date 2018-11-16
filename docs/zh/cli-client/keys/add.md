@@ -14,14 +14,14 @@ iriscli keys add <name> [flags]
 
 | 名称, 速记       | 默认值     | 描述                                                              | 是否必须  |
 | --------------- | --------- | ----------------------------------------------------------------- | -------- |
-| --account       |           | [uint32] Account number for HD derivation                         |          |
-| --dry-run       |           | Perform action, but don't add key to local keystore               |          |
-| --help, -h      |           | help for add                                                      |          |
-| --index         |           | [uint32] Index number for HD derivation                           |          |
-| --ledger        |           | Store a local reference to a private key on a Ledger device       |          |
-| --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
-| --recover       |           | Provide seed phrase to recover existing key instead of creating   |          |
-| --type, -t      | secp256k1 | [string] Type of private key (secp256k\|ed25519)                  |          |
+| --account       |           | [uint32] HD推导的账号                                              |          |
+| --dry-run       |           | 忽略--gas标志并进行本地的交易仿真                                     |          |
+| --help, -h      |           | 查询命令帮助                                                       |          |
+| --index         |           | [uint32] HD推导的索引号                                            |          |
+| --ledger        |           | 使用连接的硬件记账设备                                               |          |
+| --no-backup     |           | 不输出助记词（如果其他人正在看着操作终端）                              |          |
+| --recover       |           | 提供助记词以恢复现有密钥而不是新建                                     |          |
+| --type, -t      | secp256k1 | [string] 私钥类型 (secp256k\|ed25519)                              |          |
 
 ## 例子
 

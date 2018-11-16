@@ -14,8 +14,8 @@ iriscli keys mnemonic <name> [flags]
 
 | 名称, 速记        | 默认值     | 描述                                                                          | 是否必须  |
 | ---------------- | --------- | ----------------------------------------------------------------------------- | -------- |
-| --help, -h       |           | help for add                                                                  |          |
-| --unsafe-entropy |           | Prompt the user to supply their own entropy, instead of relying on the system |          |
+| --help, -h       |           | 查询命令帮助                                                                   |          |
+| --unsafe-entropy |           | 提示用户提供自己的熵，而不是依赖于系统生成                                          |          |
 
 ## 例子
 

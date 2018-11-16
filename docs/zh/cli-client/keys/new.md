@@ -14,10 +14,10 @@ iriscli keys new <name> [flags]
 
 | 名称, 速记       | 默认值             | 描述                                                            | 是否必须  |
 | --------------- | ----------------- | --------------------------------------------------------------- | -------- |
-| --bip44-path    | 44'/118'/0'/0/0   | BIP44 path from which to derive a private key                   |          |
-| --default       |                   | Skip the prompts and just use the default values for everything |          |
-| --help, -h      |                   | help for add                                                    |          |
-| --ledger        |                   | Store a local reference to a private key on a Ledger device     |          |
+| --bip44-path    | 44'/118'/0'/0/0   | 从中导出私钥的BIP44路径                                           |          |
+| --default       |                   | 跳过提示，只使用默认值                                             |          |
+| --help, -h      |                   | 查询命令帮助                                                     |          |
+| --ledger        |                   | 使用连接的硬件记账设备                                             |          |
 
 ## 例子
 
