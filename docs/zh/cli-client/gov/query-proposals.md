@@ -17,7 +17,7 @@ iriscli gov query-proposals [flags]
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
 | --depositer     |                            | [string] (optional) filter by proposals deposited on by depositer                                                                                    |          |
 | --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | help for submit-proposal                                                                                                                             |          |
+| --help, -h      |                            | Help for query-proposals                                                                                                                             |          |
 | --indent        |                            | Add indent to JSON response                                                                                                                          |          |
 | --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
 | --limit         |                            | [string] (optional) limit to latest [number] proposals. Defaults to all proposals                                                                    |          |

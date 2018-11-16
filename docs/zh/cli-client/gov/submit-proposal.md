@@ -26,7 +26,7 @@ iriscli gov submit-proposal [flags]
 | --gas            | 200000                     | [string] gas limit to set per-transaction; set to "simulate" to calculate required gas automatically                                                 |          |
 | --gas-adjustment | 1                          | [float] adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |          |
 | --generate-only  |                            | Build an unsigned transaction and write it to STDOUT                                                                                                 |          |
-| --help, -h       |                            | help for submit-proposal                                                                                                                             |          |
+| --help, -h       |                            | Help for submit-proposal                                                                                                                             |          |
 | --indent         |                            | Add indent to JSON response                                                                                                                          |          |
 | --json           |                            | return output in json format                                                                                                                         |          |
 | --key            |                            | the key of parameter                                                                                                                                 |          |

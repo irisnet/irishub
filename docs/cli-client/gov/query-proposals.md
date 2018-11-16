@@ -15,16 +15,16 @@ iriscli gov query-proposals [flags]
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
-| --depositer     |                            | [string] (optional) filter by proposals deposited on by depositer                                                                                    |          |
-| --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | help for submit-proposal                                                                                                                             |          |
+| --depositer     |                            | [string] (optional) Filter by proposals deposited on by depositer                                                                                    |          |
+| --height        |                            | [int] Block height to query, omit to get most recent provable block                                                                                  |          |
+| --help, -h      |                            | Help for query-proposals                                                                                                                             |          |
 | --indent        |                            | Add indent to JSON response                                                                                                                          |          |
 | --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
-| --limit         |                            | [string] (optional) limit to latest [number] proposals. Defaults to all proposals                                                                    |          |
+| --limit         |                            | [string] (optional) Limit to latest [number] proposals. Defaults to all proposals                                                                    |          |
 | --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --status        |                            | [string] proposalID of proposal depositing on                                                                                                        |          |
+| --status        |                            | [string] ProposalID of proposal depositing on                                                                                                        |          |
 | --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
-| --voter         |                            | [string] (optional) filter by proposals voted on by voted                                                                                            |          |
+| --voter         |                            | [string] (optional) Filter by proposals voted on by voted                                                                                            |          |
 
 ## Examples
 
@@ -34,9 +34,21 @@ iriscli gov query-proposals [flags]
 iriscli gov query-proposals --chain-id=test
 ```
 
- After that, you're done with depositing iris tokens for an activing proposal, and remember to back up your proposal-id, it's the only way to retrieve your proposal.
+You could query all the proposals by default.
 
 ```txt
   1 - test proposal
+  2 - new proposal
+```
+
+Also you can query proposal by filters, such as:
+
+```shell
+gov query-proposals --chain-id=test --depositer=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
+```
+
+Finally, here shows the proposal who's depositor address is faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd.
+
+```txt
   2 - new proposal
 ```

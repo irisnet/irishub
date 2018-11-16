@@ -16,7 +16,7 @@ iriscli gov query-params [flags]
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 |          |
 | --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | help for submit-proposal                                                                                                                             |          |
+| --help, -h      |                            | Help for query-params                                                                                                                                |          |
 | --indent        |                            | Add indent to JSON response                                                                                                                          |          |
 | --key           |                            | [string] key name of parameter                                                                                                                       |          |
 | --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |

@@ -15,13 +15,13 @@ iriscli gov query-deposit [flags]
 | Name, shorthand | Default               | Description                                                                                                                                          | Required |
 | --------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                       | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
-| --depositer     |                       | [string] bech32 depositer address                                                                                                                    | Yes      |
-| --height        |                       | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                       | help for submit-proposal                                                                                                                             |          |
+| --depositer     |                       | [string] Bech32 depositer address                                                                                                                    | Yes      |
+| --height        |                       | [int] Block height to query, omit to get most recent provable block                                                                                  |          |
+| --help, -h      |                       | Help for query-deposit                                                                                                                               |          |
 | --indent        |                       | Add indent to JSON response                                                                                                                          |          |
 | --ledger        |                       | Use a connected Ledger device                                                                                                                        |          |
 | --node          | tcp://localhost:26657 | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --proposal-id   |                       | [string] proposalID of proposal depositing on                                                                                                        | Yes      |
+| --proposal-id   |                       | [string] ProposalID of proposal depositing on                                                                                                        | Yes      |
 | --trust-node    | true                  | Don't verify proofs for responses                                                                                                                    |          |
  
 ## Examples

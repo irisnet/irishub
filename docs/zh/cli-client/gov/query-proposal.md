@@ -16,7 +16,7 @@ iriscli gov query-proposal [flags]
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
 | --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | help for submit-proposal                                                                                                                             |          |
+| --help, -h      |                            | Help for query-proposal                                                                                                                              |          |
 | --indent        |                            | Add indent to JSON response                                                                                                                          |          |
 | --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
 | --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |

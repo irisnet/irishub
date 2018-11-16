@@ -15,12 +15,12 @@ iriscli gov query-params [flags]
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 |          |
-| --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | help for submit-proposal                                                                                                                             |          |
+| --height        |                            | [int] Block height to query, omit to get most recent provable block                                                                                  |          |
+| --help, -h      |                            | Help for query-params                                                                                                                                |          |
 | --indent        |                            | Add indent to JSON response                                                                                                                          |          |
-| --key           |                            | [string] key name of parameter                                                                                                                       |          |
+| --key           |                            | [string] Key name of parameter                                                                                                                       |          |
 | --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
-| --module        |                            | [string] module name                                                                                                                                 |          |
+| --module        |                            | [string] Module name                                                                                                                                 |          |
 | --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
 | --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
 
