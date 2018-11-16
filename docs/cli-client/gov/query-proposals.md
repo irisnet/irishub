@@ -22,7 +22,7 @@ iriscli gov query-proposals [flags]
 | --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
 | --limit         |                            | [string] (optional) Limit to latest [number] proposals. Defaults to all proposals                                                                    |          |
 | --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --status        |                            | [string] ProposalID of proposal depositing on                                                                                                        |          |
+| --status        |                            | [string] (optional) filter proposals by proposal status                                                                                                        |          |
 | --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
 | --voter         |                            | [string] (optional) Filter by proposals voted on by voted                                                                                            |          |
 

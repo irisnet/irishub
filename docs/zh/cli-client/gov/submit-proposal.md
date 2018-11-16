@@ -14,33 +14,33 @@ iriscli gov submit-proposal [flags]
 
 | 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --account-number |                            | [int] AccountNumber number to sign the tx                                                                                                            |          |
-| --async          |                            | broadcast transactions asynchronously                                                                                                                |          |
-| --chain-id       |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
-| --deposit        |                            | [string] deposit of proposal                                                                                                                         |          |
-| --description    |                            | [string] description of proposal                                                                                                                     | Yes      |
-| --dry-run        |                            | ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it                                                              |          |
-| --fee            |                            | [string] Fee to pay along with transaction                                                                                                           | Yes      |
-| --from           |                            | [string] Name of private key with which to sign                                                                                                      | Yes      |
-| --from-addr      |                            | [string] Specify from address in generate-only mode                                                                                                  |          |
-| --gas            | 200000                     | [string] gas limit to set per-transaction; set to "simulate" to calculate required gas automatically                                                 |          |
-| --gas-adjustment | 1                          | [float] adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |          |
-| --generate-only  |                            | Build an unsigned transaction and write it to STDOUT                                                                                                 |          |
-| --help, -h       |                            | Help for submit-proposal                                                                                                                             |          |
-| --indent         |                            | Add indent to JSON response                                                                                                                          |          |
-| --json           |                            | return output in json format                                                                                                                         |          |
-| --key            |                            | the key of parameter                                                                                                                                 |          |
-| --ledger         |                            | Use a connected Ledger device                                                                                                                        |          |
-| --memo           |                            | [string] Memo to send along with transaction                                                                                                         |          |
-| --node           | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --op             |                            | [string] the operation of parameter                                                                                                                  |          |
-| --param          |                            | [string] parameter of proposal,eg. [{key:key,value:value,op:update}]                                                                                 |          |
-| --path           |                            | [string] the path of param.json                                                                                                                      |          |
-| --print-response |                            | return tx response (only works with async = false)                                                                                                   |          |
-| --sequence       |                            | [int] Sequence number to sign the tx                                                                                                                 |          |
-| --title          |                            | [string] title of proposal                                                                                                                           | Yes      |
-| --trust-node     | true                       | Don't verify proofs for responses                                                                                                                    |          |
-| --type           |                            | [string] proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade                                                                            | Yes      |
+| --account-number |                            | [int] 用来签名交易的AccountNumber                                                                                                            |          |
+| --async          |                            | 异步广播交易                                                                                                                |          |
+| --chain-id       |                            | [string] tendermint节点的链ID                                                                                                                 | Yes      |
+| --deposit        |                            | [string] 提议的保证金                                                                                                                         |          |
+| --description    |                            | [string] 提议的描述                                                                                                                     | Yes      |
+| --dry-run        |                            | 忽略--gas标志并进行本地的交易仿真                                                              |          |
+| --fee            |                            | [string] 支付的交易费用                                                                                                           | Yes      |
+| --from           |                            | [string] 用来签名的私钥名                                                                                                      | Yes      |
+| --from-addr      |                            | [string] 指定generate-only模式下的from address                                                                                                  |          |
+| --gas            | 200000                     | [string] 单次交易的gas上限; 设置为"simulate"将自动计算相应的阈值                                                 |          |
+| --gas-adjustment | 1                          | [float] 这个调整因子将乘以交易仿真返回的估计值; 如果手动设置了gas的上限，这个标志将被忽略 |          |
+| --generate-only  |                            | 构建一个未签名交易并将其打印到标准输出                                                                                                 |          |
+| --help, -h       |                            | 查询命令帮助                                                                                                                             |          |
+| --indent         |                            | 在JSON响应中添加缩进                                                                                                                          |          |
+| --json           |                            | 输出将以json格式返回                                                                                                                         |          |
+| --key            |                            | 参数的键名称                                                                                                                                 |          |
+| --ledger         |                            | 使用连接的硬件记账设备                                                                                                                        |          |
+| --memo           |                            | [string] 发送交易的备忘录                                                                                                         |          |
+| --node           | tcp://localhost:26657      | [string] tendermint节点开启的远程过程调用接口\<主机>:\<端口>                                                                                  |          |
+| --op             |                            | [string] 对参数的操作                                                                                                                  |          |
+| --param          |                            | [string] 提议参数,例如: [{key:key,value:value,op:update}]                                                                                 |          |
+| --path           |                            | [string] param.json文件路径                                                                                                                      |          |
+| --print-response |                            | 返回交易响应 (当且仅当同步模式下使用))                                                                                                   |          |
+| --sequence       |                            | [int] 用来签名交易的sequence number                                                                                                                 |          |
+| --title          |                            | [string] 提议标题                                                                                                                           | Yes      |
+| --trust-node     | true                       | 关闭响应结果校验                                                                                                                    |          |
+| --type           |                            | [string] 提议类型,例如:Text/ParameterChange/SoftwareUpgrade                                                                            | Yes      |
 
 ## 例子
 

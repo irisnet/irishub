@@ -14,15 +14,15 @@ iriscli gov query-params [flags]
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 |          |
-| --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | Help for query-params                                                                                                                                |          |
-| --indent        |                            | Add indent to JSON response                                                                                                                          |          |
-| --key           |                            | [string] key name of parameter                                                                                                                       |          |
-| --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
-| --module        |                            | [string] module name                                                                                                                                 |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
+| --chain-id      |                            | [string] tendermint节点的链ID                                                                                                                 |          |
+| --height        |                            | [int] 查询的区块高度                                                                                  |          |
+| --help, -h      |                            | 查询命令帮助                                                                                                                                |          |
+| --indent        |                            | 在JSON响应中添加缩进                                                                                                                          |          |
+| --key           |                            | [string] 参数的键名称                                                                                                                       |          |
+| --ledger        |                            | 使用连接的硬件记账设备                                                                                                                        |          |
+| --module        |                            | [string] 模块名称                                                                                                                                 |          |
+| --node          | tcp://localhost:26657      | [string] tendermint节点开启的远程过程调用接口\<主机>:\<端口>                                                                                  |          |
+| --trust-node    | true                       | 关闭响应结果校验                                                                                                                    |          |
 
 ## 例子
  

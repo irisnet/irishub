@@ -14,17 +14,17 @@ iriscli gov query-proposals [flags]
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
-| --depositer     |                            | [string] (optional) filter by proposals deposited on by depositer                                                                                    |          |
-| --height        |                            | [int] block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | Help for query-proposals                                                                                                                             |          |
-| --indent        |                            | Add indent to JSON response                                                                                                                          |          |
-| --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
-| --limit         |                            | [string] (optional) limit to latest [number] proposals. Defaults to all proposals                                                                    |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --status        |                            | [string] proposalID of proposal depositing on                                                                                                        |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
-| --voter         |                            | [string] (optional) filter by proposals voted on by voted                                                                                            |          |
+| --chain-id      |                            | [string] tendermint节点的链ID                                                                                                                 | Yes      |
+| --depositer     |                            | [string] （可选）按存款人过滤                                                                                    |          |
+| --height        |                            | [int] 查询的区块高度                                                                                  |          |
+| --help, -h      |                            | 查询命令帮助                                                                                                                             |          |
+| --indent        |                            | 在JSON响应中添加缩进                                                                                                                          |          |
+| --ledger        |                            | 使用连接的硬件记账设备                                                                                                                        |          |
+| --limit         |                            | [string] （可选）限制最新[数量]提议。 默认为所有提议                                                                    |          |
+| --node          | tcp://localhost:26657      | [string] tendermint节点开启的远程过程调用接口\<主机>:\<端口>                                                                                  |          |
+| --status        |                            | [string] （可选）按提议状态过滤提议                                                                                                        |          |
+| --trust-node    | true                       | 关闭响应结果校验                                                                                                                    |          |
+| --voter         |                            | [string] （可选）按投票人过滤                                                                                            |          |
 
 ## 例子
 
