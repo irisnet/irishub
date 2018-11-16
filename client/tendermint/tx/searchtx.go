@@ -8,14 +8,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"net/http"
 	"net/url"
-	"github.com/irisnet/irishub/client/utils"
 )
 
 const (
@@ -47,7 +47,9 @@ $ iriscli tendermint txs --tag test1,test2 --any
 			tags := viper.GetStringSlice(flagTags)
 			page := viper.GetInt(flagPage)
 			size := viper.GetInt(flagSize)
-
+			if page < 0 || size < 0 {
+				return fmt.Errorf("page or size should not be negative")
+			}
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			txs, err := searchTxs(cliCtx, cdc, tags, page, size)
@@ -72,8 +74,8 @@ $ iriscli tendermint txs --tag test1,test2 --any
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
 	cmd.Flags().StringSlice(flagTags, nil, "Comma-separated list of tags that must match")
 	cmd.Flags().Bool(flagAny, false, "Return transactions that match ANY tag, rather than ALL")
-	cmd.Flags().Int(flagPage, 0, "Return transactions that match ANY tag, rather than ALL")
-	cmd.Flags().Int(flagSize, 100, "Return transactions that match ANY tag, rather than ALL")
+	cmd.Flags().Int(flagPage, 0, "Pagination page")
+	cmd.Flags().Int(flagSize, 100, "Pagination size")
 	return cmd
 }
 
@@ -164,14 +166,14 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 		sizeString := r.FormValue("size")
 		page := int64(0)
 		size := int64(100)
-		if pageString!= "" {
+		if pageString != "" {
 			var ok bool
 			page, ok = utils.ParseInt64OrReturnBadRequest(w, pageString)
 			if !ok {
 				return
 			}
 		}
-		if sizeString!= "" {
+		if sizeString != "" {
 			var ok bool
 			size, ok = utils.ParseInt64OrReturnBadRequest(w, sizeString)
 			if !ok {
