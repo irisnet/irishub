@@ -41,18 +41,8 @@ module.exports = {
                         'The-IRIS-Network/'
                     ]
                 }],
-            '/software/': [{
-                title: 'Basic Concepts',
-                collapsable: false,
-                children: [
-                    ["basic-concepts/coin-type.md", 'Coin Type'],
-                    ["basic-concepts/fee.md", 'Fee'],
-                    ["basic-concepts/inflation.md", 'Infation'],
-                    ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
-                    ["basic-concepts/genesis-file.md", 'Genesis File'],
-                    ["basic-concepts/gov-params.md", 'Gov Params']
-                ]
-            }, {
+            '/software/': [
+                {
                 title: 'Node',
                 collapsable: false,
                 children: [
@@ -87,7 +77,18 @@ module.exports = {
                 ]
             }],
             '/features/': [{
-                title: 'Features',
+                title: 'Basic Concepts',
+                collapsable: false,
+                children: [
+                    ["basic-concepts/coin-type.md", 'Coin Type'],
+                    ["basic-concepts/fee.md", 'Fee'],
+                    ["basic-concepts/inflation.md", 'Infation'],
+                    ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
+                    ["basic-concepts/genesis-file.md", 'Genesis File'],
+                    ["basic-concepts/gov-params.md", 'Gov Params']
+                ]
+            },{
+                title: 'Modules',
                 collapsable: false,
                 children: [
                     ['bank.md', 'Bank'],
