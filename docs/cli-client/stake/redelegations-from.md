@@ -32,6 +32,24 @@ iriscli stake redelegations-from ValidatorAddress
 
 After that, you will get all outgoing redelegatations' from specified validator
 
-```txt
-TODO
+```json
+[
+  {
+    "delegator_addr": "faa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9sytjfk",
+    "validator_src_addr": "fva1dayujdfnxjggd5ydlvvgkerp2supknthajpch2",
+    "validator_dst_addr": "fva1h27xdw6t9l5jgvun76qdu45kgrx9lqede8hpcd",
+    "creation_height": "1130",
+    "min_time": "2018-11-16T07:22:48.740311064Z",
+    "initial_balance": {
+      "denom": "iris-atto",
+      "amount": "100000000000000000"
+    },
+    "balance": {
+      "denom": "iris-atto",
+      "amount": "100000000000000000"
+    },
+    "shares_src": "100000000000000000.0000000000",
+    "shares_dst": "100000000000000000.0000000000"
+  }
+]
 ```

@@ -48,6 +48,3 @@ iriscli stake unjail --from=KeyName --fee=Fee --chain-id=ChainID
 
 After that, you're done with unjailing specified validator.
 
-```txt
-TODO
-```

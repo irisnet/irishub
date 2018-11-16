@@ -14,8 +14,8 @@ iriscli stake unbonding-delegation [flags]
 
 | Name, shorthand     | Default                    | Description                                                         | Required |
 | ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --address-delegator |                            | [string] Bech address of the delegator                              |          |
-| --address-validator |                            | [string] Bech address of the validator                              |          |
+| --address-delegator |                            | [string] Bech address of the delegator                              | Yes      |
+| --address-validator |                            | [string] Bech address of the validator                              | Yes      |
 | --chain-id          |                            | [string] Chain ID of tendermint node                                |          |
 | --height            | most recent provable block | block height to query                                               |          |
 | --help, -h          |                            | help for validator                                                  |          |

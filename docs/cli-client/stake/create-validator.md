@@ -57,6 +57,3 @@ iriscli stake create-validator --chain-id=ChainID --from=KeyName --fee=Fee --pub
 
 After that, you're done with creating a new validator.
 
-```txt
-TODO
-```
