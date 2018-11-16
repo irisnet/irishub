@@ -8,10 +8,7 @@ This module is in charge of distributing collected transaction fee and inflated 
 
 1. Set withdraw address
 
-    A delegator may have multiple irishub wallet address. Suppose one of the wallets has many iris token and part of these tokens have been delegated to a validator. 
-    The delegator may hope the delegation reward can be paid to another wallet, thus the delegator will have explicit idea about how many tokens he/she has earned.
-    However, by default, the reward will be paid to the wallet(marked as `A`) address which send the delegation transaction. To set another wallet(marked as `B`) as the paid address,
-    delegator need to send another transaction from wallet `A`. The referenced command can be:
+    A delegator may have multiple irishub wallet address. Suppose one of the wallets has many iris token and part of these tokens have been delegated to a validator. The delegator may hope the delegation reward can be paid to another wallet, thus the delegator will have explicit idea about how many tokens he/she has earned.However, by default, the reward will be paid to the wallet(marked as `A`) address which send the delegation transaction. To set another wallet(marked as `B`) as the paid address, delegator need to send another transaction from wallet `A`. The referenced command can be:
     ```bash
     iriscli distribution set-withdraw-addr [address of wallet B] --fee=0.004iris --from=[key name of wallet A] --chain-id=[chain-id]
     ```  

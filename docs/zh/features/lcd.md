@@ -81,9 +81,9 @@ IRISLCD节点成功启动后，在浏览器中打开`localhost1317/swagger-ui/`�
 
 7. Distribution module APIs
 
-    1. `POST /distribution/{delegatorAddr}/withdrawAddress`: 设置收益撤回地址
-    2. `GET /distribution/{delegatorAddr}/withdrawAddress`: 查询收益撤回地址
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: 撤回收益
+    1. `POST /distribution/{delegatorAddr}/withdrawAddress`: 设置收益取回地址
+    2. `GET /distribution/{delegatorAddr}/withdrawAddress`: 查询收益取回地址
+    3. `POST /distribution/{delegatorAddr}/withdrawReward`: 取回收益
     4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: 查询某个委托的收益分配信息
     5. `GET /distribution/{delegatorAddr}/distrInfos`: 查询委托人所有委托的收益分配信息
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: 查询验证人的收益分配信息
