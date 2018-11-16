@@ -9,7 +9,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -19,7 +19,7 @@ import (
 )
 
 // GetCmdSubmitFile implements submitting upload file transaction command.
-func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitRecord(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "submit",
 		Short:   "Submit a new record",
@@ -28,10 +28,15 @@ func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 			description := viper.GetString(flagDescription)
 			onchainData := viper.GetString(flagOnchainData)
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+
+			if err := cliCtx.EnsureAccountExists(); err != nil {
+				return err
+			}
 
 			fromAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -62,13 +67,6 @@ func GetCmdSubmitRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 				dataSize,
 				onchainData,
 			)
-
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
-
-			// Build and sign the transaction, then broadcast to Tendermint
-			cliCtx.PrintResponse = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},

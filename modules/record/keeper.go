@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
 // nolint
@@ -15,15 +15,15 @@ type Keeper struct {
 	// The (unexposed) keys used to access the stores from the Context.
 	storeKey sdk.StoreKey
 
-	// The wire codec for binary encoding/decoding.
-	cdc *wire.Codec
+	// The codec codec for binary encoding/decoding.
+	cdc *codec.Codec
 
 	// Reserved codespace
 	codespace sdk.CodespaceType
 }
 
-// NewKeeper returns a mapper that uses go-wire to (binary) encode and decode record types.
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
+// NewKeeper returns a mapper that uses go-codec to (binary) encode and decode record types.
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
 		cdc:       cdc,
@@ -31,8 +31,8 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) K
 	}
 }
 
-// Returns the go-wire codec.
-func (keeper Keeper) WireCodec() *wire.Codec {
+// Returns the go-codec codec.
+func (keeper Keeper) WireCodec() *codec.Codec {
 	return keeper.cdc
 }
 

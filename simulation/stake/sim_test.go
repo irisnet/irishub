@@ -19,8 +19,8 @@ import (
 func TestStakeWithRandomMessages(t *testing.T) {
 	mapp := mock.NewApp()
 
-	bank.RegisterWire(mapp.Cdc)
-	mapper := mapp.AccountMapper
+	bank.RegisterCodec(mapp.Cdc)
+	mapper := mapp.AccountKeeper
 	coinKeeper := bank.NewKeeper(mapper)
 	stakeKey := sdk.NewKVStoreKey("stake")
 	stakeKeeper := stake.NewKeeper(mapp.Cdc, stakeKey, coinKeeper, stake.DefaultCodespace)
@@ -55,7 +55,7 @@ func TestStakeWithRandomMessages(t *testing.T) {
 		}, []simulation.RandSetup{
 			Setup(mapp, stakeKeeper),
 		}, []simulation.Invariant{
-			AllInvariants(coinKeeper, stakeKeeper, mapp.AccountMapper),
+			AllInvariants(coinKeeper, stakeKeeper, mapp.AccountKeeper),
 		}, 10, 100,
 		false,
 	)

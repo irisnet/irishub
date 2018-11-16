@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -23,7 +23,7 @@ const (
 )
 
 // default client command to search through tagged transactions
-func SearchTxCmd(cdc *wire.Codec) *cobra.Command {
+func SearchTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "txs",
 		Short: "Search for all transactions that match the given tags.",
@@ -33,12 +33,12 @@ passed to the --tags option. To match any transaction, use the --any option.
 
 For example:
 
-$ gaiacli tendermint txs --tag test1,test2
+$ iriscli tendermint txs --tag test1,test2
 
 will match any transaction tagged with both test1,test2. To match a transaction tagged with either
 test1 or test2, use:
 
-$ gaiacli tendermint txs --tag test1,test2 --any
+$ iriscli tendermint txs --tag test1,test2 --any
 `),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			tags := viper.GetStringSlice(flagTags)
@@ -68,7 +68,7 @@ $ gaiacli tendermint txs --tag test1,test2 --any
 	return cmd
 }
 
-func searchTxs(cliCtx context.CLIContext, cdc *wire.Codec, tags []string) ([]Info, error) {
+func searchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string) ([]Info, error) {
 	if len(tags) == 0 {
 		return nil, errors.New("must declare at least one tag to search")
 	}
@@ -110,7 +110,7 @@ func searchTxs(cliCtx context.CLIContext, cdc *wire.Codec, tags []string) ([]Inf
 }
 
 // parse the indexed txs into an array of Info
-func FormatTxResults(cdc *wire.Codec, res []*ctypes.ResultTx) ([]Info, error) {
+func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx) ([]Info, error) {
 	var err error
 	out := make([]Info, len(res))
 	for i := range res {
@@ -123,7 +123,7 @@ func FormatTxResults(cdc *wire.Codec, res []*ctypes.ResultTx) ([]Info, error) {
 }
 
 // Search Tx REST Handler
-func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tag := r.FormValue("tag")
 		if tag == "" {

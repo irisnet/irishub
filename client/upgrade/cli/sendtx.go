@@ -2,7 +2,7 @@ package cli
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -19,7 +19,7 @@ const (
 )
 
 // submit switch msg
-func GetCmdSubmitSwitch(cdc *wire.Codec) *cobra.Command {
+func GetCmdSubmitSwitch(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit-switch",
 		Short: "Submit a switch msg for a upgrade propsal",

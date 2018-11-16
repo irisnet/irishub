@@ -94,16 +94,16 @@ func appStateFn(r *rand.Rand, keys []crypto.PrivKey, accs []sdk.AccAddress) json
 
 func testAndRunTxs(app *IrisApp) []simulation.TestAndRunTx {
 	return []simulation.TestAndRunTx{
-		banksim.TestAndRunSingleInputMsgSend(app.accountMapper),
+		banksim.TestAndRunSingleInputMsgSend(app.AccountKeeper),
 		govsim.SimulateMsgSubmitProposal(app.govKeeper, app.stakeKeeper),
 		govsim.SimulateMsgDeposit(app.govKeeper, app.stakeKeeper),
 		govsim.SimulateMsgVote(app.govKeeper, app.stakeKeeper),
-		stakesim.SimulateMsgCreateValidator(app.accountMapper, app.stakeKeeper),
+		stakesim.SimulateMsgCreateValidator(app.AccountKeeper, app.stakeKeeper),
 		stakesim.SimulateMsgEditValidator(app.stakeKeeper),
-		stakesim.SimulateMsgDelegate(app.accountMapper, app.stakeKeeper),
-		stakesim.SimulateMsgBeginUnbonding(app.accountMapper, app.stakeKeeper),
+		stakesim.SimulateMsgDelegate(app.AccountKeeper, app.stakeKeeper),
+		stakesim.SimulateMsgBeginUnbonding(app.AccountKeeper, app.stakeKeeper),
 		stakesim.SimulateMsgCompleteUnbonding(app.stakeKeeper),
-		stakesim.SimulateMsgBeginRedelegate(app.accountMapper, app.stakeKeeper),
+		stakesim.SimulateMsgBeginRedelegate(app.AccountKeeper, app.stakeKeeper),
 		stakesim.SimulateMsgCompleteRedelegate(app.stakeKeeper),
 		slashingsim.SimulateMsgUnrevoke(app.slashingKeeper),
 	}
@@ -112,9 +112,9 @@ func testAndRunTxs(app *IrisApp) []simulation.TestAndRunTx {
 func invariants(app *IrisApp) []simulation.Invariant {
 	return []simulation.Invariant{
 		func(t *testing.T, baseapp *baseapp.BaseApp, log string) {
-			banksim.NonnegativeBalanceInvariant(app.accountMapper)(t, baseapp, log)
+			banksim.NonnegativeBalanceInvariant(app.AccountKeeper)(t, baseapp, log)
 			govsim.AllInvariants()(t, baseapp, log)
-			stakesim.AllInvariants(app.coinKeeper, app.stakeKeeper, app.accountMapper)(t, baseapp, log)
+			stakesim.AllInvariants(app.coinKeeper, app.stakeKeeper, app.AccountKeeper)(t, baseapp, log)
 			slashingsim.AllInvariants()(t, baseapp, log)
 		},
 	}

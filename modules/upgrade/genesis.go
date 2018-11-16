@@ -4,7 +4,7 @@ import (
 	bam "github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"fmt"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
@@ -32,6 +32,15 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState
 	iparam.InitGenesisParameter(&upgradeparams.SwitchPeriodParameter, ctx, data.SwitchPeriod)
 
 	InitGenesis_commitID(ctx, k)
+}
+
+
+// WriteGenesis - output genesis parameters
+func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
+
+	return GenesisState{
+		SwitchPeriod: upgradeparams.GetSwitchPeriod(ctx),
+	}
 }
 
 // get raw genesis raw message for testing

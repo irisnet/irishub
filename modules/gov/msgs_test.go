@@ -23,8 +23,8 @@ var (
 	}
 
 	param = Param{
-		Key:   "Gov/gov/DepositProcedure",
-		Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":1440}",
+		Key:   "Gov/govDepositProcedure",
+		Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}",
 		Op:    "update",
 	}
 )

@@ -11,13 +11,15 @@ import (
 	"bufio"
 	"io"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
-	govcli "github.com/irisnet/irishub/client/gov"
+	distributionclient "github.com/irisnet/irishub/client/distribution"
 	iservicecli "github.com/irisnet/irishub/client/iservice"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
@@ -44,8 +46,8 @@ var (
 // helper methods
 
 func convertToIrisBaseAccount(t *testing.T, acc *bank.BaseAccount) string {
-	cdc := wire.NewCodec()
-	wire.RegisterCrypto(cdc)
+	cdc := codec.New()
+	codec.RegisterCrypto(cdc)
 	cliCtx := context.NewCLIContext().
 		WithCodec(cdc)
 
@@ -112,8 +114,8 @@ func modifyGenesisFile(irisHome string) error {
 
 	var genesisState app.GenesisState
 
-	cdc := wire.NewCodec()
-	wire.RegisterCrypto(cdc)
+	cdc := codec.New()
+	codec.RegisterCrypto(cdc)
 
 	err = cdc.UnmarshalJSON(genesisDoc.AppState, &genesisState)
 	if err != nil {
@@ -199,6 +201,24 @@ func copyFile(dstFile, srcFile string) error {
 //___________________________________________________________________________________
 // executors
 
+func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
+
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
+	chainID, nodeID = executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisHome, iriscliHome))
+
+	err := modifyGenesisFile(irisHome)
+	require.NoError(t, err)
+
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err = server.FreeTCPAddr()
+	require.NoError(t, err)
+	return
+}
+
 func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 	proc := tests.GoExecuteT(t, cmdStr)
 
@@ -225,23 +245,20 @@ func executeWrite(t *testing.T, cmdStr string, writes ...string) bool {
 }
 
 func executeInit(t *testing.T, cmdStr string) (chainID, nodeID string) {
-	out := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
+	_, stderr := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
-	err := json.Unmarshal([]byte(out), &initRes)
+	err := json.Unmarshal([]byte(stderr), &initRes)
 	require.NoError(t, err)
 
 	err = json.Unmarshal(initRes["chain_id"], &chainID)
-	require.NoError(t, err)
-
-	err = json.Unmarshal(initRes["node_id"], &nodeID)
 	require.NoError(t, err)
 
 	return
 }
 
 func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKey) {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var ko keys.KeyOutput
 	keys.UnmarshalJSON([]byte(out), &ko)
 
@@ -251,14 +268,57 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 	return ko.Address, pk
 }
 
+func executeGetValidatorPK(t *testing.T, cmdStr string) string {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	return out
+}
+
+func executeGetDelegatorDistrInfo(t *testing.T, cmdStr string) []distributiontypes.DelegationDistInfo {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	cdc := app.MakeCodec()
+	var ddiList []distributiontypes.DelegationDistInfo
+	err := cdc.UnmarshalJSON([]byte(out), &ddiList)
+
+	require.Empty(t, err)
+	return ddiList
+}
+
+func executeGetDelegationDistrInfo(t *testing.T, cmdStr string) distributiontypes.DelegationDistInfo {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	cdc := app.MakeCodec()
+	var ddi distributiontypes.DelegationDistInfo
+	err := cdc.UnmarshalJSON([]byte(out), &ddi)
+
+	require.Empty(t, err)
+	return ddi
+}
+
+func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclient.ValidatorDistInfoOutput {
+	out, errMsg := tests.ExecuteT(t, cmdStr, "")
+	require.Empty(t, errMsg)
+
+	cdc := app.MakeCodec()
+	var vdi distributionclient.ValidatorDistInfoOutput
+	err := cdc.UnmarshalJSON([]byte(out), &vdi)
+
+	require.Empty(t, err)
+	return vdi
+}
+
 func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)
 	require.NoError(t, err, "out %v, err %v", out, err)
 
-	cdc := wire.NewCodec()
-	wire.RegisterCrypto(cdc)
+	cdc := codec.New()
+	codec.RegisterCrypto(cdc)
 
 	err = cdc.UnmarshalJSON([]byte(out), &acc)
 	require.NoError(t, err, "acc %v, err %v", string(out), err)
@@ -267,7 +327,7 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc *bank.BaseAccount) {
 }
 
 func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var validator stakecli.ValidatorOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &validator)
@@ -275,9 +335,9 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	return validator
 }
 
-func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
-	var proposal govcli.ProposalOutput
+func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var proposal gov.ProposalOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -285,7 +345,7 @@ func executeGetProposal(t *testing.T, cmdStr string) govcli.ProposalOutput {
 }
 
 func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var vote gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
@@ -294,7 +354,7 @@ func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
 }
 
 func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var votes []gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
@@ -303,7 +363,7 @@ func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 }
 
 func executeGetParam(t *testing.T, cmdStr string) gov.Param {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var param gov.Param
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
@@ -312,7 +372,7 @@ func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 }
 
 func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var info upgcli.UpgradeInfoOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &info)
@@ -322,7 +382,7 @@ func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput
 }
 
 func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var switchMsg upgrade.MsgSwitch
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &switchMsg)
@@ -332,7 +392,7 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 }
 
 func executeGetServiceDefinition(t *testing.T, cmdStr string) iservicecli.ServiceOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceDef iservicecli.ServiceOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
@@ -360,9 +420,9 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 	}
 
 	type toJSON struct {
-		Height   int64  `json:"Height"`
-		TxHash   string `json:"TxHash"`
-		Response string `json:"Response"`
+		Height int64  `json:"Height"`
+		TxHash string `json:"TxHash"`
+		//Response string `json:"Response"`
 	}
 	var res toJSON
 	cdc := app.MakeCodec()
@@ -373,7 +433,7 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 }
 
 func executeGetRecordID(t *testing.T, cmdStr string) string {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var info tx.Info
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &info)
@@ -387,7 +447,7 @@ func executeGetRecordID(t *testing.T, cmdStr string) string {
 }
 
 func executeGetRecord(t *testing.T, cmdStr string) recordCli.RecordOutput {
-	out := tests.ExecuteT(t, cmdStr, "")
+	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var record recordCli.RecordOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &record)

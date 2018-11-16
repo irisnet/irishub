@@ -2,19 +2,19 @@ package iservice
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/tools/protoidl"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      *wire.Codec
+	cdc      *codec.Codec
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,

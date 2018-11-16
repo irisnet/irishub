@@ -2,11 +2,11 @@ package gov
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/modules/iparam"
+	"github.com/irisnet/irishub/iparam"
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"path"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/irisnet/irishub/modules/gov/params"
 )
@@ -15,7 +15,7 @@ type ParameterConfigFile struct {
 	Govparams govparams.ParamSet `json:"gov"`
 }
 
-func (pd *ParameterConfigFile) ReadFile(cdc *wire.Codec, pathStr string) error {
+func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
 	pathStr = path.Join(pathStr, "config/params.json")
 
 	jsonBytes, err := cmn.ReadFile(pathStr)
@@ -29,19 +29,30 @@ func (pd *ParameterConfigFile) ReadFile(cdc *wire.Codec, pathStr string) error {
 	err = cdc.UnmarshalJSON(jsonBytes, &pd)
 	return err
 }
-func (pd *ParameterConfigFile) WriteFile(cdc *wire.Codec, res []sdk.KVPair , pathStr string) error {
+func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pathStr string) error {
 	for _, kv := range res {
 		switch string(kv.Key) {
-		case "Gov/gov/DepositProcedure":
-			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.DepositProcedure)
-		case "Gov/gov/VotingProcedure":
-			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.VotingProcedure)
-		case "Gov/gov/TallyingProcedure":
-			cdc.MustUnmarshalBinary(kv.Value, &pd.Govparams.TallyingProcedure)
+		case "Gov/govDepositProcedure":
+			err := cdc.UnmarshalJSON(kv.Value, &pd.Govparams.DepositProcedure)
+			if err != nil {
+				return err
+			}
+		case "Gov/govVotingProcedure":
+			err := cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
+			if err != nil {
+				return err
+			}
+		case "Gov/govTallyingProcedure":
+			err := cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
+			if err != nil {
+				return err
+			}
 		default:
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf(string(kv.Key)+" is not found"))
 		}
 	}
+
+
 	output, err := cdc.MarshalJSONIndent(pd, "", "  ")
 
 	if err != nil {
@@ -69,11 +80,11 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (Par
 	}
 
 	switch keyStr {
-	case "Gov/gov/DepositProcedure":
+	case "Gov/govDepositProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.DepositProcedure)
-	case "Gov/gov/VotingProcedure":
+	case "Gov/govVotingProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.VotingProcedure)
-	case "Gov/gov/TallyingProcedure":
+	case "Gov/govTallyingProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
 	default:
 		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))

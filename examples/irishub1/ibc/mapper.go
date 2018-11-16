@@ -4,19 +4,19 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	wire "github.com/cosmos/cosmos-sdk/wire"
+	codec "github.com/cosmos/cosmos-sdk/codec"
 )
 
 // IBC Mapper
 type Mapper struct {
 	key       sdk.StoreKey
-	cdc       *wire.Codec
+	cdc       *codec.Codec
 	codespace sdk.CodespaceType
 }
 
 // XXX: The Mapper should not take a CoinKeeper. Rather have the CoinKeeper
 // take an Mapper.
-func NewMapper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Mapper {
+func NewMapper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Mapper {
 	// XXX: How are these codecs supposed to work?
 	return Mapper{
 		key:       key,
@@ -25,42 +25,10 @@ func NewMapper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) M
 	}
 }
 
-// XXX: This is not the public API. This will change in MVP2 and will henceforth
-// only be invoked from another module directly and not through a user
-// transaction.
-// TODO: Handle invalid IBC packets and return errors.
-func (ibcm Mapper) PostIBCPacket(ctx sdk.Context, packet IBCPacket) sdk.Error {
-	// write everything into the state
-	store := ctx.KVStore(ibcm.key)
-	index := ibcm.getEgressLength(store, packet.DestChain)
-	bz, err := ibcm.cdc.MarshalBinary(packet)
-	if err != nil {
-		panic(err)
-	}
-
-	store.Set(EgressKey(packet.DestChain, index), bz)
-	bz, err = ibcm.cdc.MarshalBinary(index + 1)
-	if err != nil {
-		panic(err)
-	}
-	store.Set(EgressLengthKey(packet.DestChain), bz)
-
-	return nil
-}
-
-// XXX: In the future every module is able to register it's own handler for
-// handling it's own IBC packets. The "ibc" handler will only route the packets
-// to the appropriate callbacks.
-// XXX: For now this handles all interactions with the CoinKeeper.
-// XXX: This needs to do some authentication checking.
-func (ibcm Mapper) ReceiveIBCPacket(ctx sdk.Context, packet IBCPacket) sdk.Error {
-	return nil
-}
-
 // --------------------------
 // Functions for accessing the underlying KVStore.
 
-func marshalBinaryPanic(cdc *wire.Codec, value interface{}) []byte {
+func marshalBinaryPanic(cdc *codec.Codec, value interface{}) []byte {
 	res, err := cdc.MarshalBinary(value)
 	if err != nil {
 		panic(err)
@@ -68,7 +36,7 @@ func marshalBinaryPanic(cdc *wire.Codec, value interface{}) []byte {
 	return res
 }
 
-func unmarshalBinaryPanic(cdc *wire.Codec, bz []byte, ptr interface{}) {
+func unmarshalBinaryPanic(cdc *codec.Codec, bz []byte, ptr interface{}) {
 	err := cdc.UnmarshalBinary(bz, ptr)
 	if err != nil {
 		panic(err)

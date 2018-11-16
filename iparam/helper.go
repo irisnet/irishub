@@ -10,7 +10,7 @@ var ParamMapping = make(map[string]GovParameter)
 func RegisterGovParamMapping(gps ...GovParameter) {
 	for _, gp := range gps {
 		if gp != nil {
-			ParamMapping[gp.GetStoreKey()] = gp
+			ParamMapping[GovParamspace+"/"+string(gp.GetStoreKey())] = gp
 		}
 	}
 }
@@ -25,10 +25,10 @@ func InitGenesisParameter(p Parameter, ctx sdk.Context, genesisData interface{})
 	}
 }
 
-func SetParamReadWriter(setter params.Setter, ps ...Parameter) {
+func SetParamReadWriter(paramSpace params.Subspace, ps ...Parameter) {
 	for _, p := range ps {
 		if p != nil {
-			p.SetReadWriter(setter)
+			p.SetReadWriter(paramSpace)
 		}
 	}
 }

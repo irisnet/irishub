@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
@@ -15,7 +15,7 @@ import (
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
-func GetCmdDownload(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdDownload(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "download [record ID]",
 		Short:   "download related data with unique record ID to specified file",

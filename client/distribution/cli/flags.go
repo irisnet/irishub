@@ -1,6 +1,6 @@
 package cli
 
-// nolint
 const (
+	FlagAddressDelegator = "address-delegator"
 	FlagAddressValidator = "address-validator"
 )

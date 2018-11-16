@@ -3,7 +3,7 @@ package lcd
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
@@ -13,7 +13,7 @@ import (
 )
 
 // QueryAccountRequestHandlerFn performs account information query
-func QueryAccountRequestHandlerFn(storeName string, cdc *wire.Codec,
+func QueryAccountRequestHandlerFn(storeName string, cdc *codec.Codec,
 	decoder auth.AccountDecoder, cliCtx context.CLIContext,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +63,7 @@ func QueryAccountRequestHandlerFn(storeName string, cdc *wire.Codec,
 }
 
 // QueryCoinTypeRequestHandlerFn performs coin type query
-func QueryCoinTypeRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext,
+func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -73,7 +73,7 @@ func QueryCoinTypeRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext,
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		output, err := wire.MarshalJSONIndent(cdc, res)
+		output, err := codec.MarshalJSONIndent(cdc, res)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

@@ -3,7 +3,7 @@ package tx
 import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -26,7 +26,7 @@ type stdSignature struct {
 	Sequence      int64  `json:"sequence"`
 }
 
-func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec) http.HandlerFunc {
+func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var sendTxBody sendTx
 		body, err := ioutil.ReadAll(r.Body)
