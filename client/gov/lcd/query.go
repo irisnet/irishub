@@ -363,9 +363,6 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
 			case "Gov/govTallyingProcedure":
 				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
-			default:
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
 			}
 		}
 		utils.PostProcessResponse(w, cdc, pd, cliCtx.Indent)

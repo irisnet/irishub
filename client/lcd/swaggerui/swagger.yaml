@@ -231,11 +231,11 @@ paths:
         required: true
       - in: query
         name: page
-        description: Pagination page
+        description: Pagination page, default value 0
         type: integer
       - in: query
         name: size
-        description: Pagination size
+        description: Pagination size, default value 100
         type: integer
       responses:
         200:
@@ -1283,14 +1283,6 @@ paths:
           schema:
             type: object
             properties:
-              inflation_rate_change:
-                type: string
-              inflation_max:
-                type: string
-              inflation_min:
-                type: string
-              goal_bonded:
-                type: string
               unbonding_time:
                 type: string
               max_validators:
@@ -1815,7 +1807,7 @@ paths:
       required: true
       type: string
     post:
-      summary: Set withdraw address
+      summary: Withdraw rewards
       tags:
       - ICS24
       consumes:
