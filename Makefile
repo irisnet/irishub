@@ -126,7 +126,7 @@ test_sim_iris_slow:
 	@echo "Running full Iris simulation. This may take awhile!"
 	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
 
-testnet_start:
+testnet_init:
 	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
 	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
 	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
@@ -140,6 +140,8 @@ testnet_start:
 	@echo "Faucet address: faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm"
 	@echo "Faucet coin amount: 1000000iris"
 	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
+
+testnet_start:
 	docker-compose up -d
 
 testnet_stop:
@@ -148,3 +150,9 @@ testnet_stop:
 testnet_clean:
 	docker-compose down
 	sudo rm -rf build/*
+
+testnet_unsafe_reset:
+	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node0/iris
+	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node1/iris
+	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node2/iris
+	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node3/iris
