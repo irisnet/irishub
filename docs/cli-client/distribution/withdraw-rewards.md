@@ -12,7 +12,7 @@ iriscli distribution withdraw-rewards [flags]
 
 Print help messages:
 
-```shell
+```
 iriscli distribution withdraw-rewards --help
 ```
 

@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
+iriscli distribution set-withdraw-addr [withdraw-address] [flags]
 ```
 
 打印帮助信息:
@@ -16,13 +16,8 @@ iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
 iriscli distribution set-withdraw-addr --help
 ```
 
-## 特有的flags
-
-这个命令没有特有的flag，它有一个输入参数：收款地址
-
-
 ## 示例
 
 ```
-iriscli distribution set-withdraw-addr <address> --from <key name> --fee=0.004iris --chain-id=<chain-id>
+iriscli distribution set-withdraw-addr [withdraw-address] --from <key name> --fee=0.004iris --chain-id=<chain-id>
 ```

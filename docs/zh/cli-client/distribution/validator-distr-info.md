@@ -16,11 +16,6 @@ iriscli distribution validator-distr-info [flags]
 iriscli distribution validator-distr-info --help
 ```
 
-## 特有的flags
-
-这个命令没有特有的flag，它有一个输入参数：验证人地址
-
-
 ## 示例
 
 ```

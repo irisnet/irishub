@@ -10,7 +10,7 @@
 iriscli stake edit-validator [flags]
 ```
 打印帮助信息
-```shell
+```
 iriscli stake edit-validator --help
 ```
 
@@ -27,6 +27,6 @@ iriscli stake edit-validator --help
 
 ## 示例
 
-```shell
+```
 iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.004iris --commission-rate=0.15
 ```

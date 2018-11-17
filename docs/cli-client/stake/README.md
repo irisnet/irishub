@@ -6,12 +6,12 @@ Stake module provides a set of subcommands to query staking state and send staki
 
 ## Usage
 
-```shell
+```
 iriscli stake [subcommand] [flags]
 ```
 
 Print all supported subcommands and flags:
-```shell
+```
 iriscli stake --help
 ```
 

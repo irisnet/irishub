@@ -7,27 +7,18 @@ Query all outgoing redelegatations from a validator
 ## Usage
 
 ```
-iriscli stake redelegations-from [operator-addr] [flags]
+iriscli stake redelegations-from [validator-address] [flags]
 ```
-
-## Flags
-
-| Name, shorthand     | Default                    | Description                                                         | Required |
-| ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --chain-id          |                            | [string] Chain ID of tendermint node                                |          |
-| --height            | most recent provable block | block height to query                                               |          |
-| --help, -h          |                            | help for redelegations-from                                         |          |
-| --indent            |                            | Add indent to JSON response                                         |          |
-| --ledger            |                            | Use a connected Ledger device                                       |          |
-| --node              | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node        | true                       | Don't verify proofs for responses                                   |          |
+Print help messages:
+```
+iriscli stake redelegations-from --help
+```
 
 ## Examples
 
-### Query all outgoing redelegatations
-
-```shell
-iriscli stake redelegations-from ValidatorAddress
+Query all outgoing redelegatations
+```
+iriscli stake redelegations-from [validator-address]
 ```
 
 After that, you will get all outgoing redelegatations' from specified validator

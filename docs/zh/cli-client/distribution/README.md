@@ -6,13 +6,13 @@
 
 ## 用法
 
-```shell
+```
 iriscli distribution [subcommand]
 ```
 
 打印所以子命令和参数
 
-```shell
+```
 iriscli distribution --help
 ```
 

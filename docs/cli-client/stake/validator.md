@@ -7,27 +7,18 @@ Query a validator
 ## Usage
 
 ```
-iriscli stake validator [owner-addr] [flags]
+iriscli stake validator [validator-address] [flags]
 ```
-
-## Flags
-
-| Name, shorthand | Default                    | Description                                                         | Required |
-| --------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] Chain ID of tendermint node                                |          |
-| --height        | most recent provable block | block height to query                                               |          |
-| --help, -h      |                            | help for validator                                                  |          |
-| --indent        |                            | Add indent to JSON response                                         |          |
-| --ledger        |                            | Use a connected Ledger device                                       |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                   |          |
+Print help messages:
+```
+iriscli stake validator --help
+```
 
 ## Examples
 
-### Query a validator
-
-```shell
-iriscli stake validator YourValidatorOwnerAddress
+Query a validator
+```
+iriscli stake validator [validator-address]
 ```
 
 After that, you will get the specified validator's info.

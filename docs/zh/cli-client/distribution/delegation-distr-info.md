@@ -12,7 +12,7 @@ iriscli distribution delegation-distr-info [flags]
 
 打印帮助信息
 
-```shell
+```
 iriscli distribution delegation-distr-info --help
 ```
 
@@ -25,7 +25,7 @@ iriscli distribution delegation-distr-info --help
 
 ## 示例
 
-```shell
+```
 iriscli distribution delegation-distr-info --address-delegator=<delegator address> --address-validator=<validator address>
 ```
 执行结果示例
