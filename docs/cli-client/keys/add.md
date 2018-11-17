@@ -16,7 +16,7 @@ iriscli keys add <name> [flags]
 | --------------- | --------- | ----------------------------------------------------------------- | -------- |
 | --account       |           | [uint32] Account number for HD derivation                         |          |
 | --dry-run       |           | Perform action, but don't add key to local keystore               |          |
-| --help, -h      |           | help for add                                                      |          |
+| --help, -h      |           | Help for add                                                      |          |
 | --index         |           | [uint32] Index number for HD derivation                           |          |
 | --ledger        |           | Store a local reference to a private key on a Ledger device       |          |
 | --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
