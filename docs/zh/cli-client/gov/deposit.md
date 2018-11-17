@@ -53,7 +53,7 @@ Committed at block 473 (tx hash: 0309E969589F19A9D9E4BFC9479720487FBF929ED6A8882
    "tags": {
      "action": "deposit",
      "completeConsumedTxFee-iris-atto": "\"335500000000000\"",
-     "depositer": "faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
+     "depositor": "faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
      "proposal-id": "1"
    }
  }

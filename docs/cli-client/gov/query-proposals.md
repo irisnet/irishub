@@ -15,7 +15,7 @@ iriscli gov query-proposals [flags]
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
-| --depositer     |                            | [string] (optional) Filter by proposals deposited on by depositer                                                                                    |          |
+| --depositor     |                            | [string] (optional) Filter by proposals deposited on by depositor                                                                                    |          |
 | --height        |                            | [int] Block height to query, omit to get most recent provable block                                                                                  |          |
 | --help, -h      |                            | Help for query-proposals                                                                                                                             |          |
 | --indent        |                            | Add indent to JSON response                                                                                                                          |          |
@@ -44,7 +44,7 @@ You could query all the proposals by default.
 Also you can query proposal by filters, such as:
 
 ```shell
-gov query-proposals --chain-id=test --depositer=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
+gov query-proposals --chain-id=test --depositor=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
 ```
 
 Finally, here shows the proposal who's depositor address is faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd.
