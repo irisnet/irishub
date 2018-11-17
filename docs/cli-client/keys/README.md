@@ -26,16 +26,16 @@ iriscli keys [command]
 
 | Name, shorthand | Default | Description   | Required |
 | --------------- | ------- | ------------- | -------- |
-| --help, -h      |         | help for keys |          |
+| --help, -h      |         | Help for keys |          |
 
 ## Global Flags
 
 | Name, shorthand | Default        | Description                            | Required |
 | --------------- | -------------- | -------------------------------------- | -------- |
 | --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
-| --home          | $HOME/.iriscli | [string] directory for config and data |          |
+| --home          | $HOME/.iriscli | [string] Directory for config and data |          |
 | --output, -o    | text           | [string] Output format (text|json)     |          |
-| --trace         |                | print out full stack trace on errors   |          |
+| --trace         |                | Print out full stack trace on errors   |          |
 
 ## Extended description
 
