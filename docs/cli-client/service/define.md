@@ -68,5 +68,5 @@ Committed at block 65 (tx hash: 663B676E453F91BFCDC87B0308910501DD14DF79C88390FC
 
 * IDL file example
 
-    [test.proto](./test.proto)
+    [test.proto](../../features/test.proto)
 
