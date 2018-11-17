@@ -2,12 +2,17 @@
 
 ## Description
 
-Stake allows you to execute stake and validation subcommands
+Stake module provides a set of subcommands to query staking state and send staking transactions.
 
 ## Usage
 
 ```shell
-iriscli stake [command]
+iriscli stake [subcommand]
+```
+
+Print all supported subcommands and flags:
+```shell
+iriscli stake --help
 ```
 
 ## Available Commands
@@ -34,11 +39,3 @@ iriscli stake [command]
 | [redelegate](redelegate.md)                                   | Redelegate illiquid tokens from one validator to another                                      |
 | [unjail](unjail.md)                                           | Unjail validator previously jailed for downtime                                               |
 
-## Flags
-
-| Name, shorthand | Default | Description     | Required |
-| --------------- | ------- | --------------- | -------- |
-| --help, -h      |         | help for stake |          |
-
-<!-- ## Extended description
- -->

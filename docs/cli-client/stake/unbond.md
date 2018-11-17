@@ -10,32 +10,21 @@ Unbond shares from a validator
 iriscli stake unbond [flags]
 ```
 
-## Flags
+Print all help messages:
 
-| Name, shorthand       | Default               | Description                                                                                                   | Required |
-| --------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------- | -------- |
-| --account-number      |                       | [int] AccountNumber number to sign the tx                                                                     |          |
-| --address-validator   |                       | [string] Bech address of the validator                                                                        | Yes      |
-| --async               |                       | Broadcast transactions asynchronously                                                                         |          |
-| --chain-id            |                       | [string] Chain ID of tendermint node                                                                          | Yes      |
-| --dry-run             |                       | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it                       |          |
-| --fee                 |                       | [string] Fee to pay along with transaction                                                                    | Yes      |
-| --from                |                       | [string] Name of private key with which to sign                                                               | Yes      |
-| --from-addr           |                       | [string] Specify from address in generate-only mode                                                           |          |
-| --gas                 | 200000                | [string] Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically          |          |
-| --gas-adjustment      | 1                     | [float] Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |          |
-| --generate-only       |                       | build an unsigned transaction and write it to STDOUT                                                          |          |
-| --help, -h            |                       | help for unbond                                                                                               |          |
-| --indent              |                       | Add indent to JSON response                                                                                   |          |
-| --json                |                       | Return output in json format                                                                                  |          |
-| --ledger              |                       | Use a connected Ledger device                                                                                 |          |
-| --memo                |                       | [string] Memo to send along with transaction                                                                  |          |
-| --node                | tcp://localhost:26657 | [string] \<host>:\<port> to tendermint rpc interface for this chain                                           |          |
-| --print-response      |                       | Return tx response (only works with async = false)                                                            |          |
-| --sequence            |                       | [int] Sequence number to sign the tx                                                                          |          |
-| --shares-amount       |                       | [string] Amount of source-shares to either unbond or redelegate as a positive integer or decimal              |          |
-| --shares-percent      |                       | [string] Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1  |          |
-| --trust-node          | true                  | Don't verify proofs for responses                                                                             |          |
+```shell
+iriscli stake unbond --help
+```
+
+## Unique Flags
+
+| Name, shorthand     | type   | Required | Default  | Description                                                         |
+| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
+| --address-delegator | string | true     | ""       | Bech address of the delegator |
+| --shares-amount     | float  | false    | 0.0      | Amount of source-shares to either unbond or redelegate as a positive integer or decimal |
+| --shares-percent    | float  | false    | 0.0      | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
+
+Users must specify the unbond amount. There two options can do this: `--shares-amount` or `--shares-percent`. Keep in mind, don't specify them both.
 
 ## Examples
 
