@@ -1,6 +1,6 @@
 # iriscli stake unjail
 
-## Description
+## Introduction
 
 Unjail validator previously jailed for downtime
 
@@ -27,6 +27,3 @@ There is no unique flags.
 ```shell
 iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=<chain-id>
 ```
-
-After that, you're done with unjailing specified validator.
-

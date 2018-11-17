@@ -1,6 +1,6 @@
 # iriscli stake
 
-## Description
+## Introduction
 
 Stake module provides a set of subcommands to query staking state and send staking transactions.
 

@@ -18,10 +18,10 @@ iriscli distribution withdraw-rewards --help
 
 ## 特有的flags
 
-| Name, shorthand       | type   | Required | Default  | Description                                                         |
+| 名称                | 类型   | 是否必填 | 默认值  | 功能描述        |
 | --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --only-from-validator | string | false    | ""       | only withdraw from this validator address (in bech) |
-| --is-validator        | bool   | false    | false    | Also withdraw validator's commission |
+| --only-from-validator | string | false    | ""       | 验证人地址，仅取回在这个验证人上的委托收益 |
+| --is-validator        | bool   | false    | false    | 取回验证人佣金收益 |
 
 不能同时使用两个flags。
 
