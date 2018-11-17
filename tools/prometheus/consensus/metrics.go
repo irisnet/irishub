@@ -6,10 +6,11 @@ import (
 	cctx "context"
 	"encoding/hex"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/irisnet/irishub/client/context"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/consensus"
@@ -17,7 +18,6 @@ import (
 	"log"
 	"strings"
 	"time"
-	"github.com/irisnet/irishub/client/context"
 )
 
 // TODO
@@ -117,7 +117,7 @@ type Metrics struct {
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
 func PrometheusMetrics() *Metrics {
-	tmMetrics := *consensus.PrometheusMetrics()
+	tmMetrics := *consensus.PrometheusMetrics("")
 	irisMetrics := NewIrisMetrics()
 	return &Metrics{
 		TmMetrics:   tmMetrics,
@@ -179,7 +179,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 	}()
 }
 
-func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block *types.Block) {
+func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec, block *types.Block) {
 	var client = ctx.Client
 
 	cs.TmMetrics.Height.Set(float64(block.Height))
@@ -238,7 +238,7 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block 
 		lastBlockHight := block.Height - 1
 		lastBlock, _ := client.Block(&lastBlockHight)
 		interval := block.Time.Sub(lastBlock.BlockMeta.Header.Time).Seconds()
-		cs.TmMetrics.BlockIntervalSeconds.Observe(interval)
+		cs.TmMetrics.BlockIntervalSeconds.Set(interval)
 	}
 
 	cs.TmMetrics.NumTxs.Set(float64(block.NumTxs))
@@ -267,7 +267,7 @@ func (cs *Metrics) RecordMetrics(ctx context.CLIContext, cdc *wire.Codec, block 
 		cs.IrisMetrics.UpTime.Set(float64(cs.IrisMetrics.SignedCount) / float64(cs.IrisMetrics.blockInfo.Len()))
 		cs.IrisMetrics.MissedPrecommits.Set(float64(cs.IrisMetrics.MissedCount))
 	}
-	bz, _ := cdc.MarshalBinaryBare(block)
+	bz, _ := cdc.MarshalBinaryLengthPrefixed(block)
 	cs.TmMetrics.BlockSizeBytes.Set(float64(len(bz)))
 }
 

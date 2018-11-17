@@ -2,7 +2,7 @@ package prometheus
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irishub/app"
 )
 
-func MonitorCommand(cdc *wire.Codec) *cobra.Command {
+func MonitorCommand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "irismon",
 		Short:        "iris monitor tool",

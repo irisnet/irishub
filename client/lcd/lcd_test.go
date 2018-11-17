@@ -46,7 +46,7 @@ func init() {
 func TestKeys(t *testing.T) {
 	name, password := "test", "1234567890"
 	addr, seed := CreateAddr(t, "test", password, GetKeyBase(t))
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
 	defer cleanup()
 
 	newName := "test_newname"
@@ -115,7 +115,7 @@ func TestKeys(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 
 	// node info
@@ -138,7 +138,7 @@ func TestVersion(t *testing.T) {
 }
 
 func TestNodeStatus(t *testing.T) {
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 
 	// node info
@@ -160,7 +160,7 @@ func TestNodeStatus(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 
 	var resultBlock ctypes.ResultBlock
@@ -190,7 +190,7 @@ func TestBlock(t *testing.T) {
 }
 
 func TestValidators(t *testing.T) {
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 
 	var resultVals rpc.ResultValidatorsOutput
@@ -225,7 +225,7 @@ func TestValidators(t *testing.T) {
 func TestCoinSend(t *testing.T) {
 	name, password := "test", "1234567890"
 	addr, seed := CreateAddr(t, "test", password, GetKeyBase(t))
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
 	defer cleanup()
 
 	bz, err := hex.DecodeString("8FA6AB57AD6870F6B5B2E57735F38F2F30E73CB6")
@@ -267,7 +267,7 @@ func TestCoinSend(t *testing.T) {
 func TestTxs(t *testing.T) {
 	name, password := "test", "1234567890"
 	addr, seed := CreateAddr(t, "test", password, GetKeyBase(t))
-	cleanup, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
+	cleanup, _, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{addr})
 	defer cleanup()
 
 	// query wrong
@@ -324,7 +324,7 @@ func TestTxs(t *testing.T) {
 }
 
 func TestValidatorsQuery(t *testing.T) {
-	cleanup, pks, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, pks, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 	require.Equal(t, 1, len(pks))
 
@@ -341,7 +341,7 @@ func TestValidatorsQuery(t *testing.T) {
 }
 
 func TestValidatorQuery(t *testing.T) {
-	cleanup, pks, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, pks,_, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 	require.Equal(t, 1, len(pks))
 
@@ -591,11 +591,11 @@ func TestProposalsQuery(t *testing.T) {
 	require.Equal(t, proposalID3, (proposals[2]).ProposalID)
 
 	// Test query deposited by addr1
-	proposals = getProposalsFilterDepositer(t, port, addr)
+	proposals = getProposalsFilterDepositor(t, port, addr)
 	require.Equal(t, proposalID1, (proposals[0]).ProposalID)
 
 	// Test query deposited by addr2
-	proposals = getProposalsFilterDepositer(t, port, addr2)
+	proposals = getProposalsFilterDepositor(t, port, addr2)
 	require.Equal(t, proposalID2, (proposals[0]).ProposalID)
 	require.Equal(t, proposalID3, (proposals[1]).ProposalID)
 
@@ -609,7 +609,7 @@ func TestProposalsQuery(t *testing.T) {
 	require.Equal(t, proposalID3, (proposals[0]).ProposalID)
 
 	// Test query voted and deposited by addr1
-	proposals = getProposalsFilterVoterDepositer(t, port, addr, addr)
+	proposals = getProposalsFilterVoterDepositor(t, port, addr, addr)
 	require.Equal(t, proposalID2, (proposals[0]).ProposalID)
 
 	// Test query votes on Proposal 2
@@ -963,17 +963,17 @@ func getValidator(t *testing.T, port string, validatorAddr sdk.AccAddress) stake
 
 // ============= Governance Module ================
 
-func getProposal(t *testing.T, port string, proposalID int64) govcli.ProposalOutput {
+func getProposal(t *testing.T, port string, proposalID int64) gov.ProposalOutput {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	var proposal govcli.ProposalOutput
+	var proposal gov.ProposalOutput
 	err := cdc.UnmarshalJSON([]byte(body), &proposal)
 	require.Nil(t, err)
 	return proposal
 }
 
-func getDeposit(t *testing.T, port string, proposalID int64, depositerAddr sdk.AccAddress) govcli.DepositOutput {
-	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/deposits/%s", proposalID, depositerAddr), nil)
+func getDeposit(t *testing.T, port string, proposalID int64, depositorAddr sdk.AccAddress) govcli.DepositOutput {
+	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/deposits/%s", proposalID, depositorAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 	var deposit govcli.DepositOutput
 	err := cdc.UnmarshalJSON([]byte(body), &deposit)
@@ -999,51 +999,51 @@ func getVotes(t *testing.T, port string, proposalID int64) []gov.Vote {
 	return votes
 }
 
-func getProposalsAll(t *testing.T, port string) []govcli.ProposalOutput {
+func getProposalsAll(t *testing.T, port string) gov.ProposalOutputs {
 	res, body := Request(t, port, "GET", "/gov/proposals", nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []govcli.ProposalOutput
+	var proposals gov.ProposalOutputs
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterDepositer(t *testing.T, port string, depositerAddr sdk.AccAddress) []govcli.ProposalOutput {
-	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?depositer=%s", depositerAddr), nil)
+func getProposalsFilterDepositor(t *testing.T, port string, depositorAddr sdk.AccAddress) gov.ProposalOutputs {
+	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?depositor=%s", depositorAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []govcli.ProposalOutput
+	var proposals gov.ProposalOutputs
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterVoter(t *testing.T, port string, voterAddr sdk.AccAddress) []govcli.ProposalOutput {
+func getProposalsFilterVoter(t *testing.T, port string, voterAddr sdk.AccAddress) gov.ProposalOutputs {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?voter=%s", voterAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []govcli.ProposalOutput
+	var proposals gov.ProposalOutputs
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterVoterDepositer(t *testing.T, port string, voterAddr, depositerAddr sdk.AccAddress) []govcli.ProposalOutput {
-	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?depositer=%s&voter=%s", depositerAddr, voterAddr), nil)
+func getProposalsFilterVoterDepositor(t *testing.T, port string, voterAddr, depositorAddr sdk.AccAddress) gov.ProposalOutputs {
+	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?depositor=%s&voter=%s", depositorAddr, voterAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []govcli.ProposalOutput
+	var proposals gov.ProposalOutputs
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
 }
 
-func getProposalsFilterStatus(t *testing.T, port string, status gov.ProposalStatus) []govcli.ProposalOutput {
+func getProposalsFilterStatus(t *testing.T, port string, status gov.ProposalStatus) gov.ProposalOutputs {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals?status=%s", status), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
-	var proposals []govcli.ProposalOutput
+	var proposals gov.ProposalOutputs
 	err := cdc.UnmarshalJSON([]byte(body), &proposals)
 	require.Nil(t, err)
 	return proposals
@@ -1100,7 +1100,7 @@ func doDeposit(t *testing.T, port, seed, name, password string, proposerAddr sdk
 
 	// deposit on proposal
 	jsonStr := []byte(fmt.Sprintf(`{
-		"depositer": "%s",
+		"depositor": "%s",
 		"amount": "5iris",
 		"base_tx": {
 			"name": "%s",

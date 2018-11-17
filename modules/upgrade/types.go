@@ -33,12 +33,12 @@ func (mlist ModuleLifeTimeList) BuildModuleLifeTime(start int64, handler string,
 
 type Version struct {
     Id			int64
-    ProposalID  int64
+    ProposalID  uint64
     Start		int64
     ModuleList	ModuleLifeTimeList
 }
 
-func NewVersion(id int64, proposalID int64, start int64, moduleList ModuleLifeTimeList) Version {
+func NewVersion(id int64, proposalID uint64, start int64, moduleList ModuleLifeTimeList) Version {
     return Version{
         Id:         id,
         ProposalID: proposalID,
@@ -48,7 +48,7 @@ func NewVersion(id int64, proposalID int64, start int64, moduleList ModuleLifeTi
 }
 
 func (v Version) getMsgType(msg sdk.Msg) (string, sdk.Error) {
-    msgType := msg.Type()
+    msgType := msg.Route()
 
     for _, module := range v.ModuleList {
         if msgType == module.Handler {
