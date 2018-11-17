@@ -12,7 +12,7 @@
 
 1. 任何用户可以发起提议，并抵押一部分token，如果超过`min_deposit`,提议进入投票，否则留在抵押期。其他人可以对在抵押期的提议进行抵押token，如果提议的抵押token总和超过`min_deposit`,则进入投票期。但若提议在抵押期停留的出块数目超过`max_deposit_period`，则提议被关闭。
 2. 进入投票期的提议，只有验证人和委托人可以进行投票。如果委托人没投票，则他继承他委托的验证人的投票选项。如果委托人投票了，则覆盖他委托的验证人的投票选项。当提议到达`voting_perid`,统计投票结果。
-3. 我们统计结果有参与度的限制，其他逻辑细节见[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/develop/docs/spec/governance/overview.md)
+3. 我们统计结果有参与度的限制，其他逻辑细节见[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/v0.26.0/docs/spec/governance/overview.md)
 
 ## 使用场景
 
