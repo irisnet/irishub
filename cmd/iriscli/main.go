@@ -77,6 +77,7 @@ func main() {
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
 			bankcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc)),
+			bankcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,
