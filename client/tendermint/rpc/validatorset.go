@@ -13,6 +13,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"net/http"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 // TODO these next two functions feel kinda hacky based on their placement
@@ -73,12 +74,12 @@ func getValidators(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	}
 
 	if !cliCtx.TrustNode {
-		check, err := cliCtx.Certify(validatorsRes.BlockHeight)
+		check, err := cliCtx.Verify(validatorsRes.BlockHeight)
 		if err != nil {
 			return nil, err
 		}
 
-		if !bytes.Equal(check.ValidatorsHash(), tmtypes.NewValidatorSet(validatorsRes.Validators).Hash()) {
+		if !bytes.Equal(check.ValidatorsHash, tmtypes.NewValidatorSet(validatorsRes.Validators).Hash()) {
 			return nil, fmt.Errorf("got invalid validatorset")
 		}
 	}
@@ -95,12 +96,10 @@ func getValidators(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 		}
 	}
 
-	output, err := cdc.MarshalJSONIndent(outputValidatorsRes, "", "  ")
-	if err != nil {
-		return nil, err
+	if cliCtx.Indent {
+		return cdc.MarshalJSONIndent(outputValidatorsRes, "", "  ")
 	}
-
-	return output, nil
+	return cdc.MarshalJSON(outputValidatorsRes)
 }
 
 // CMD
@@ -135,26 +134,26 @@ func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		height, err := strconv.ParseInt(vars["height"], 10, 64)
 		if err != nil {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("ERROR: Couldn't parse block height. Assumed format is '/validatorsets/{height}'."))
 			return
 		}
 
 		chainHeight, err := GetChainHeight(cliCtx)
 		if height > chainHeight {
-			w.WriteHeader(404)
+			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("ERROR: Requested block height is bigger then the chain length."))
 			return
 		}
 
 		output, err := getValidators(cliCtx, &height)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
 }
 
@@ -163,18 +162,18 @@ func LatestValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerF
 	return func(w http.ResponseWriter, r *http.Request) {
 		height, err := GetChainHeight(cliCtx)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
 		output, err := getValidators(cliCtx, &height)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
 }

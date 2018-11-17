@@ -4,19 +4,19 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	wire "github.com/cosmos/cosmos-sdk/wire"
+	codec "github.com/cosmos/cosmos-sdk/codec"
 )
 
 // IBC Mapper
 type Mapper struct {
 	key       sdk.StoreKey
-	cdc       *wire.Codec
+	cdc       *codec.Codec
 	codespace sdk.CodespaceType
 }
 
 // XXX: The Mapper should not take a CoinKeeper. Rather have the CoinKeeper
 // take an Mapper.
-func NewMapper(cdc *wire.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Mapper {
+func NewMapper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Mapper {
 	// XXX: How are these codecs supposed to work?
 	return Mapper{
 		key:       key,
@@ -33,13 +33,13 @@ func (ibcm Mapper) PostIBCPacket(ctx sdk.Context, packet IBCPacket) sdk.Error {
 	// write everything into the state
 	store := ctx.KVStore(ibcm.key)
 	index := ibcm.getEgressLength(store, packet.DestChain)
-	bz, err := ibcm.cdc.MarshalBinary(packet)
+	bz, err := ibcm.cdc.MarshalBinaryLengthPrefixed(packet)
 	if err != nil {
 		panic(err)
 	}
 
 	store.Set(EgressKey(packet.DestChain, index), bz)
-	bz, err = ibcm.cdc.MarshalBinary(index + 1)
+	bz, err = ibcm.cdc.MarshalBinaryLengthPrefixed(index + 1)
 	if err != nil {
 		panic(err)
 	}
@@ -60,16 +60,16 @@ func (ibcm Mapper) ReceiveIBCPacket(ctx sdk.Context, packet IBCPacket) sdk.Error
 // --------------------------
 // Functions for accessing the underlying KVStore.
 
-func marshalBinaryPanic(cdc *wire.Codec, value interface{}) []byte {
-	res, err := cdc.MarshalBinary(value)
+func MarshalBinaryLengthPrefixedPanic(cdc *codec.Codec, value interface{}) []byte {
+	res, err := cdc.MarshalBinaryLengthPrefixed(value)
 	if err != nil {
 		panic(err)
 	}
 	return res
 }
 
-func unmarshalBinaryPanic(cdc *wire.Codec, bz []byte, ptr interface{}) {
-	err := cdc.UnmarshalBinary(bz, ptr)
+func unMarshalBinaryLengthPrefixedPanic(cdc *codec.Codec, bz []byte, ptr interface{}) {
+	err := cdc.UnmarshalBinaryLengthPrefixed(bz, ptr)
 	if err != nil {
 		panic(err)
 	}
@@ -82,13 +82,13 @@ func (ibcm Mapper) GetIngressSequence(ctx sdk.Context, srcChain string) int64 {
 
 	bz := store.Get(key)
 	if bz == nil {
-		zero := marshalBinaryPanic(ibcm.cdc, int64(0))
+		zero := MarshalBinaryLengthPrefixedPanic(ibcm.cdc, int64(0))
 		store.Set(key, zero)
 		return 0
 	}
 
 	var res int64
-	unmarshalBinaryPanic(ibcm.cdc, bz, &res)
+	unMarshalBinaryLengthPrefixedPanic(ibcm.cdc, bz, &res)
 	return res
 }
 
@@ -97,7 +97,7 @@ func (ibcm Mapper) SetIngressSequence(ctx sdk.Context, srcChain string, sequence
 	store := ctx.KVStore(ibcm.key)
 	key := IngressSequenceKey(srcChain)
 
-	bz := marshalBinaryPanic(ibcm.cdc, sequence)
+	bz := MarshalBinaryLengthPrefixedPanic(ibcm.cdc, sequence)
 	store.Set(key, bz)
 }
 
@@ -105,12 +105,12 @@ func (ibcm Mapper) SetIngressSequence(ctx sdk.Context, srcChain string, sequence
 func (ibcm Mapper) getEgressLength(store sdk.KVStore, destChain string) int64 {
 	bz := store.Get(EgressLengthKey(destChain))
 	if bz == nil {
-		zero := marshalBinaryPanic(ibcm.cdc, int64(0))
+		zero := MarshalBinaryLengthPrefixedPanic(ibcm.cdc, int64(0))
 		store.Set(EgressLengthKey(destChain), zero)
 		return 0
 	}
 	var res int64
-	unmarshalBinaryPanic(ibcm.cdc, bz, &res)
+	unMarshalBinaryLengthPrefixedPanic(ibcm.cdc, bz, &res)
 	return res
 }
 
@@ -138,12 +138,12 @@ func (ibcm Mapper) Get(ctx sdk.Context) (string, bool) {
 		return " ", false
 	}
 	var Addr string
-	ibcm.cdc.MustUnmarshalBinary(bz, &Addr)
+	ibcm.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &Addr)
 	return Addr, true
 }
 
 func (ibcm Mapper) Set(ctx sdk.Context,Addr string) {
 	store := ctx.KVStore(ibcm.key)
-	bz := ibcm.cdc.MustMarshalBinary(Addr)
+	bz := ibcm.cdc.MustMarshalBinaryLengthPrefixed(Addr)
 	store.Set([]byte("ibcaddr"), bz)
 }

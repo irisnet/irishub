@@ -12,16 +12,16 @@ iriscli keys add <name> [flags]
 
 ## Flags
 
-| Name, shorthand | Default   | Description                                                  | Required |
-| --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --account       |           | [uint32] Account number for HD derivation                    |          |
-| --dry-run       |           | Perform action, but don't add key to local keystore          |          |
-| --help, -h      |           | help for add                                                 |          |
-| --index         |           | [uint32] Index number for HD derivation                      |          |
-| --ledger        |           | Store a local reference to a private key on a Ledger device  |          |
+| Name, shorthand | Default   | Description                                                       | Required |
+| --------------- | --------- | ----------------------------------------------------------------- | -------- |
+| --account       |           | [uint32] Account number for HD derivation                         |          |
+| --dry-run       |           | Perform action, but don't add key to local keystore               |          |
+| --help, -h      |           | Help for add                                                      |          |
+| --index         |           | [uint32] Index number for HD derivation                           |          |
+| --ledger        |           | Store a local reference to a private key on a Ledger device       |          |
 | --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
-| --recover       |           | Provide seed phrase to recover existing key instead of creating |          |
-| --type, -t      | secp256k1 | [string] Type of private key (secp256k\|ed25519)             |          |
+| --recover       |           | Provide seed phrase to recover existing key instead of creating   |          |
+| --type, -t      | secp256k1 | [string] Type of private key (secp256k\|ed25519)                  |          |
 
 ## Examples
 
