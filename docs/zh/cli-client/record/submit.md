@@ -32,7 +32,7 @@ iriscli record submit [flags]
 | --memo           |                            | [string] 发送交易的备忘录                                                            |          |
 | --node           | tcp://localhost:26657      | [string] [string] tendermint节点开启的远程过程调用接口\<主机>:\<端口>                  |          |
 | --onchain-data   |                            | [string] 上链数据                                                                    | 是      |
-| --print-response |                            | 返回交易响应 (当且仅当同步模式下使用))                                                 |          |
+| --print-response |                            | 返回交易响应 (当且仅当同步模式下使用)                                                 |          |
 | --sequence       |                            | [int] 用来签名交易的sequence number                                                  |          |
 | --trust-node     | true                       | 关闭响应结果校验                                                                     |          |
 
