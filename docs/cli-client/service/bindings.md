@@ -17,13 +17,6 @@ iriscli service bindings [flags]
 | --def-chain-id  |                            | [string] the ID of the blockchain defined of the service            | Yes      |
 | --service-name  |                            | [string] service name                                               | Yes      |
 | --help, -h      |                            | help for bindings                                                   |          |
-| --chain-id      |                            | [string] Chain ID of tendermint node                                |          |
-| --height        | most recent provable block | [int] block height to query                                         |          |
-| --indent        |                            | Add indent to JSON response                                         |          |
-| --ledger        |                            | Use a connected Ledger device                                       |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                   |          |
-
 
 ## Examples
 
