@@ -17,7 +17,9 @@ var (
 	Proposer          = "proposer"
 	ProposalID        = "proposal-id"
 	VotingPeriodStart = "voting-period-start"
-	Depositer         = "depositer"
+	Depositor         = "depositor"
 	Voter             = "voter"
+	////////////////////  iris begin  ///////////////////////////
 	Param             = "param"
+	////////////////////  iris end  /////////////////////////////
 )

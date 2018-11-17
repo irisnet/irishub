@@ -9,6 +9,7 @@ import (
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	"net/http"
 	"strconv"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 //BlockCommand returns the verified block data for a given heights
@@ -42,7 +43,7 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	}
 
 	if !cliCtx.TrustNode {
-		check, err := cliCtx.Certify(res.Block.Height)
+		check, err := cliCtx.Verify(res.Block.Height)
 		if err != nil {
 			return nil, err
 		}
@@ -58,13 +59,10 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 		}
 	}
 
-	// TODO move maarshalling into cmd/rest functions
-	// output, err := tmcodec.MarshalJSON(res)
-	output, err := cdc.MarshalJSONIndent(res, "", "  ")
-	if err != nil {
-		return nil, err
+	if cliCtx.Indent {
+		return cdc.MarshalJSONIndent(res, "", "  ")
 	}
-	return output, nil
+	return cdc.MarshalJSON(res)
 }
 
 // get the current blockchain height
@@ -111,23 +109,23 @@ func BlockRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		height, err := strconv.ParseInt(vars["height"], 10, 64)
 		if err != nil {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("ERROR: Couldn't parse block height. Assumed format is '/block/{height}'."))
 			return
 		}
 		chainHeight, err := GetChainHeight(cliCtx)
 		if height > chainHeight {
-			w.WriteHeader(404)
+			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("ERROR: Requested block height is bigger then the chain length."))
 			return
 		}
 		output, err := getBlock(cliCtx, &height)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
 }
 
@@ -136,16 +134,16 @@ func LatestBlockRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		height, err := GetChainHeight(cliCtx)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 		output, err := getBlock(cliCtx, &height)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
 }

@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
@@ -21,7 +21,7 @@ type RecordMetadata struct {
 	//PinedNode    string
 }
 
-func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQureyRecord(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query",
 		Short:   "query specified record",
@@ -37,14 +37,14 @@ func GetCmdQureyRecord(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			var submitRecord record.MsgSubmitRecord
-			cdc.MustUnmarshalBinary(res, &submitRecord)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitRecord)
 
 			recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitRecord)
 			if err != nil {
 				return err
 			}
 
-			output, err := wire.MarshalJSONIndent(cdc, recordResponse)
+			output, err := codec.MarshalJSONIndent(cdc, recordResponse)
 			if err != nil {
 				return err
 			}

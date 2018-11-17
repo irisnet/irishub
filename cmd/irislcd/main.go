@@ -1,9 +1,11 @@
 package main
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/lcd"
 	_ "github.com/irisnet/irishub/client/lcd/statik"
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -18,6 +20,13 @@ var (
 )
 
 func main() {
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 

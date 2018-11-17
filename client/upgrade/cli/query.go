@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/client/context"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
@@ -13,9 +13,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"github.com/irisnet/irishub/iparam"
 )
 
-func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "info",
 		Short: "query the information of upgrade module",
@@ -27,24 +28,24 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			res_height, _ := cliCtx.QueryStore([]byte(upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")
-			res_proposalID, _ := cliCtx.QueryStore([]byte(upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
+			res_height, _ := cliCtx.QueryStore(append([]byte(iparam.SignalParamspace + "/"), upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()...), "params")
+			res_proposalID, _ := cliCtx.QueryStore(append([]byte(iparam.SignalParamspace + "/"), upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()...), "params")
 			var height int64
-			var proposalID int64
-			cdc.MustUnmarshalBinary(res_height, &height)
-			cdc.MustUnmarshalBinary(res_proposalID, &proposalID)
+			var proposalID uint64
+			cdc.UnmarshalJSON(res_height, &height)
+			cdc.UnmarshalJSON(res_proposalID, &proposalID)
 
 			res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
 			var versionID int64
-			cdc.MustUnmarshalBinary(res_versionID, &versionID)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_versionID, &versionID)
 
 			res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
 			var version upgrade.Version
-			cdc.MustUnmarshalBinary(res_version, &version)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_version, &version)
 
 			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(version, proposalID, height)
 
-			output, err := wire.MarshalJSONIndent(cdc, upgradeInfoOutput)
+			output, err := codec.MarshalJSONIndent(cdc, upgradeInfoOutput)
 			if err != nil {
 				return err
 			}
@@ -57,13 +58,13 @@ func GetInfoCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 }
 
 // Command to Get a Switch Information
-func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdQuerySwitch(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "query-switch",
 		Short: "query switch details",
-		Example: "iriscli upgrade query-switch --proposalID 1 --voter <voter address>",
+		Example: "iriscli upgrade query-switch --proposal-id 1 --voter <voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			proposalID := viper.GetInt64(flagProposalID)
+			proposalID := uint64(viper.GetInt64(flagProposalID))
 			voterStr := viper.GetString(flagVoter)
 
 			voter, err := sdk.AccAddressFromBech32(voterStr)
@@ -82,8 +83,8 @@ func GetCmdQuerySwitch(storeName string, cdc *wire.Codec) *cobra.Command {
 			}
 
 			var switchMsg upgrade.MsgSwitch
-			cdc.MustUnmarshalBinary(res, &switchMsg)
-			output, err := wire.MarshalJSONIndent(cdc, switchMsg)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res, &switchMsg)
+			output, err := codec.MarshalJSONIndent(cdc, switchMsg)
 			if err != nil {
 				return err
 			}

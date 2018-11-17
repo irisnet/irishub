@@ -5,19 +5,21 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
-var Threshold = sdk.NewRat(95, 100)
+var Threshold = sdk.NewDecWithPrec(95, 2)
 
 func tally(ctx sdk.Context, k Keeper) (passes bool) {
 
 	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
 
-	if proposalID != -1 {
+	if proposalID != 0 {
 
-		totalVotingPower := sdk.ZeroRat()
-		switchVotingPower := sdk.ZeroRat()
+		totalVotingPower := sdk.ZeroDec()
+		switchVotingPower := sdk.ZeroDec()
 		for _, validator := range k.sk.GetAllValidators(ctx) {
 			totalVotingPower = totalVotingPower.Add(validator.GetPower())
-			if _, ok := k.GetSwitch(ctx, proposalID, validator.Owner); ok {
+
+			valAcc := sdk.AccAddress(validator.OperatorAddr)
+			if _, ok := k.GetSwitch(ctx, proposalID, valAcc); ok {
 				switchVotingPower = switchVotingPower.Add(validator.GetPower())
 			}
 		}
@@ -25,7 +27,6 @@ func tally(ctx sdk.Context, k Keeper) (passes bool) {
 		if switchVotingPower.Quo(totalVotingPower).GT(Threshold) {
 			return true
 		}
-
 	}
 	return false
 }

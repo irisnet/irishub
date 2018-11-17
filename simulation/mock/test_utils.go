@@ -5,11 +5,12 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/irisnet/irishub/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
+
+	"github.com/irisnet/irishub/baseapp"
 )
 
 // BigInterval is a representation of the interval [lo, hi), where
@@ -41,7 +42,7 @@ func RandFromBigInterval(r *rand.Rand, intervals []BigInterval) sdk.Int {
 // CheckBalance checks the balance of an account.
 func CheckBalance(t *testing.T, app *App, addr sdk.AccAddress, exp sdk.Coins) {
 	ctxCheck := app.BaseApp.NewContext(true, abci.Header{})
-	res := app.AccountMapper.GetAccount(ctxCheck, addr)
+	res := app.AccountKeeper.GetAccount(ctxCheck, addr)
 
 	require.Equal(t, exp, res.GetCoins())
 }
@@ -71,13 +72,13 @@ func CheckGenTx(
 // returned.
 func SignCheckDeliver(
 	t *testing.T, app *baseapp.BaseApp, msgs []sdk.Msg, accNums []int64,
-	seq []int64, expPass bool, priv ...crypto.PrivKey,
+	seq []int64, expSimPass, expPass bool, priv ...crypto.PrivKey,
 ) sdk.Result {
 	tx := GenTx(msgs, accNums, seq, priv...)
 	// Must simulate now as CheckTx doesn't run Msgs anymore
 	res := app.Simulate(tx)
 
-	if expPass {
+	if expSimPass {
 		require.Equal(t, sdk.ABCICodeOK, res.Code, res.Log)
 	} else {
 		require.NotEqual(t, sdk.ABCICodeOK, res.Code, res.Log)
