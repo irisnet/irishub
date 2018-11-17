@@ -40,7 +40,7 @@
 
 每个发送交易的命令都包含上表中的flags，同时不同交易的命令还可能会有自己独有的flags。
 
-## Command list
+## 模块列表
 
 1. [bank command](./bank/README.md)
 2. [distribution command](./distribution/README.md)

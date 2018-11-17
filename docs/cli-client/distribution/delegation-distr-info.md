@@ -2,7 +2,7 @@
 
 ## introduction
 
-Query delegation distribution information
+Query a delegation distribution information
 
 ## Usage
 
@@ -11,7 +11,7 @@ iriscli distribution delegation-distr-info [flags]
 ```
 
 Print help messages:
-```shell
+```
 iriscli distribution delegation-distr-info --help
 ```
 
@@ -24,7 +24,7 @@ iriscli distribution delegation-distr-info --help
 
 ## Examples
 
-```shell
+```
 iriscli distribution delegation-distr-info --address-delegator=<delegator address> --address-validator=<validator address>
 ```
 Example response:

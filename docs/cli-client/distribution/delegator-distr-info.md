@@ -2,7 +2,7 @@
 
 ## Description
 
-Query delegator distribution information
+Query a delegator distribution information
 
 ## Usage
 
@@ -11,18 +11,18 @@ iriscli distribution delegator-distr-info [flags]
 ```
 
 Print help messages:
-```shell
+```
 iriscli distribution delegator-distr-info --help
 ```
 
 ## Unique Flags
 
-There is no unique option. But it requires a argument: delegator address
+There is no unique flag. But it requires a argument: delegator address
 
 ## Examples
 
-```shell
-iriscli distribution delegation-distr-info <delegator address> 
+```
+iriscli distribution delegator-distr-info <delegator address> 
 ```
 Example response:
 ```json

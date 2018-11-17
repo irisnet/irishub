@@ -2,7 +2,7 @@
 
 ## Description
 
-Set withdraw address of a delegator
+Set withdraw address for delegator
 
 ## Usage
 
@@ -11,17 +11,17 @@ iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
 Print help messages:
-```shell
+```
 iriscli distribution set-withdraw-addr --help
 ```
 
 ## Unique Flags
 
-There is no unique option. But it requires a argument: new withdraw address
+There is no unique flag. But it requires an argument: new withdraw address
 
 
 ## Examples
 
-```shell
-iriscli distribution set-withdraw-addr <address> --from <key name> --fee=0.004iris --chain-id=<chain-id>
+```
+iriscli distribution set-withdraw-addr <withdraw address> --from <key name> --fee=0.004iris --chain-id=<chain-id>
 ```

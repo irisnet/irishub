@@ -2,7 +2,7 @@
 
 ## Description
 
-Query withdraw address of a delegator
+Query the withdraw address of a delegator
 
 ## Usage
 
@@ -12,7 +12,7 @@ iriscli distribution withdraw-address [delegator address] [flags]
 
 Print help messages:
 
-```shell
+```
 iriscli distribution withdraw-address --help
 ```
 
@@ -23,8 +23,8 @@ There is no unique option. But it requires a argument: delegator address
 
 ## Examples
 
-```shell
-iriscli distribution withdraw-address <delegator address>
+```
+iriscli distribution withdraw-address
 ```
 Example response:
 ```text

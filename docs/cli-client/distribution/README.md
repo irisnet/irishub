@@ -2,7 +2,7 @@
 
 ## introduction
 
-This document describe how to use the the command line interfaces of distribution module.
+This document describes how to use the the command line interfaces of distribution module.
 
 ## Usage
 

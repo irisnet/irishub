@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Unjail validator previously jailed for downtime
+Unjail validator which may be jailed previously for downtime
 
 ## Usage
 
