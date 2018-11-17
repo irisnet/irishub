@@ -6,13 +6,13 @@ This document describes how to use the the command line interfaces of distributi
 
 ## Usage
 
-```shell
+```
 iriscli distribution [subcommand] [flags]
 ```
 
 Print all supported subcommands and flags:
 
-```shell
+```
 iriscli distribution --help
 ```
 

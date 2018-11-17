@@ -7,27 +7,18 @@ Query all delegations made from one delegator
 ## Usage
 
 ```
-iriscli stake delegations [delegator-addr] [flags]
+iriscli stake delegations [delegator-address] [flags]
 ```
-
-## Flags
-
-| Name, shorthand       | Default                    | Description                                                          | Required |
-| --------------------- | -------------------------- | -------------------------------------------------------------------- | -------- |
-| --chain-id            |                            | [string] Chain ID of tendermint node                                 |          |
-| --height              | most recent provable block | block height to query                                                |          |
-| --help, -h            |                            | help for delegations                                                 |          |
-| --indent              |                            | Add indent to JSON response                                          |          |
-| --ledger              |                            | Use a connected Ledger device                                        |          |
-| --node                | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain  |          |
-| --trust-node          | true                       | Don't verify proofs for responses                                    |          |
+Print help messages:
+```
+iriscli stake delegations --help
+```
 
 ## Examples
 
-### Query all delegations made from one delegator
-
-```shell
-iriscli stake delegations DelegatorAddress
+Query all delegations made from one delegator
+```
+iriscli stake delegations [delegator-address]
 ```
 
 After that, you will get all detailed info of delegations from the specified delegator address.

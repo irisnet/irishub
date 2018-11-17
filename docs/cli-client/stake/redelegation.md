@@ -9,27 +9,23 @@ Query a redelegation record based on delegator and a source and destination vali
 ```
 iriscli stake redelegation [flags]
 ```
+Print help messages:
+```
+iriscli stake redelegation --help
+```
 
-## Flags
+## Unique Flags
 
 | Name, shorthand            | Default                    | Description                                                         | Required |
 | -------------------------- | -------------------------- | ------------------------------------------------------------------- | -------- | 
 | --address-delegator        |                            | [string] Bech address of the delegator                              | Yes      |
 | --address-validator-dest   |                            | [string] Bech address of the destination validator                  | Yes      |
 | --address-validator-source |                            | [string] Bech address of the source validator                       | Yes      |
-| --chain-id                 |                            | [string] Chain ID of tendermint node                                |          |
-| --height                   | most recent provable block | block height to query                                               |          |
-| --help, -h                 |                            | help for redelegation                                               |          |
-| --indent                   |                            | Add indent to JSON response                                         |          |
-| --ledger                   |                            | Use a connected Ledger device                                       |          |
-| --node                     | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node               | true                       | Don't verify proofs for responses                                   |          |
 
 ## Examples
 
-### Query a redelegation record
-
-```shell
+Query a redelegation record
+```
 iriscli stake redelegation --address-validator-source=SourceValidatorAddress --address-validator-dest=DestinationValidatorAddress --address-delegator=DelegatorAddress
 ```
 

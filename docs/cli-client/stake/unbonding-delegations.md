@@ -7,27 +7,18 @@ Query all unbonding-delegations records for one delegator
 ## Usage
 
 ```
-iriscli stake unbonding-delegations [delegator-addr] [flags]
+iriscli stake unbonding-delegations [delegator-address] [flags]
 ```
-
-## Flags
-
-| Name, shorthand     | Default                    | Description                                                         | Required |
-| ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --chain-id          |                            | [string] Chain ID of tendermint node                                |          |
-| --height            | most recent provable block | block height to query                                               |          |
-| --help, -h          |                            | help for unbonding-delegations                                                  |          |
-| --indent            |                            | Add indent to JSON response                                         |          |
-| --ledger            |                            | Use a connected Ledger device                                       |          |
-| --node              | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node        | true                       | Don't verify proofs for responses                                   |          |
+Print help messages:
+```
+iriscli stake unbonding-delegations --help
+```
 
 ## Examples
 
-### Query an unbonding-delegation
-
-```shell
-iriscli stake unbonding-delegations DelegatorAddress
+Query an unbonding-delegation
+```
+iriscli stake unbonding-delegations [delegator-address]
 ```
 
 After that, you will get unbonding delegation's detailed info from specified delegator.

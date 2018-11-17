@@ -12,7 +12,7 @@ iriscli stake unjail [flags]
 
 打印帮助信息
 
-```shell
+```
 iriscli stake unjail --help
 ```
 
@@ -22,6 +22,6 @@ iriscli stake unjail --help
 
 ## 示例
 
-```shell
+```
 iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=<chain-id>
 ```

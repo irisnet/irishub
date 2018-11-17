@@ -7,23 +7,19 @@
 ## 用法
 
 ```
-iriscli distribution delegator-distr-info [flags]
+iriscli distribution delegator-distr-info [delegator address] [flags]
 ```
 
 打印帮助信息
 
-```shell
+```
 iriscli distribution delegator-distr-info --help
 ```
 
-## 特有的flags
-
-这个命令没有特有的flag，它有一个输入参数：delegator的地址
-
 ## 示例
 
-```shell
-iriscli distribution delegation-distr-info <delegator address> 
+```
+iriscli distribution delegation-distr-info [delegator address]
 ```
 执行结果示例
 ```json

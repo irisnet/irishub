@@ -11,7 +11,7 @@ iriscli stake create-validator [flags]
 ```
 
 Print help messages:
-```shell
+```
 iriscli stake create-validator --help
 ```
 
@@ -33,7 +33,7 @@ iriscli stake create-validator --help
 
 ## Examples
 
-```shell
+```
 iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 

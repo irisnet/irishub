@@ -11,7 +11,7 @@ iriscli stake delegate [flags]
 ```
 
 Print help messages:
-```shell
+```
 iriscli stake delegate --help
 ```
 
@@ -24,6 +24,6 @@ iriscli stake delegate --help
 
 ## Examples
 
-```shell
+```
 iriscli stake delegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --amount=100iris --address-validator=<ValidatorAddress>
 ```

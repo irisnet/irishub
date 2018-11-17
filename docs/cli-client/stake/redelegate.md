@@ -10,9 +10,9 @@ Transfer delegation from one validator to another one.
 iriscli stake redelegate [flags]
 ```
 
-Print all help messages:
+Print help messages:
 
-```shell
+```
 iriscli stake redelegate --help
 ```
 
@@ -29,6 +29,6 @@ Users must specify the redeleagtion token amount. There two options can do this:
 
 ## Examples
 
-```shell
+```
 iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<SourceValidatorAddress> --address-validator-dest=<DestinationValidatorAddress> --shares-percent=0.1
 ```

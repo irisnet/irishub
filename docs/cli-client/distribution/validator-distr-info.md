@@ -7,7 +7,7 @@ Query a validator distribution information
 ## Usage
 
 ```
-iriscli distribution validator-distr-info [flags]
+iriscli distribution validator-distr-info [validator address] [flags]
 ```
 
 Print help messages:
@@ -15,15 +15,10 @@ Print help messages:
 iriscli distribution validator-distr-info --help
 ```
 
-## Unique Flags
-
-There is no unique flag. But it requires an argument: validator address
-
-
 ## Examples
 
 ```
-iriscli distribution validator-distr-info <validator address>
+iriscli distribution validator-distr-info [validator address]
 ```
 Example response:
 ```json

@@ -9,26 +9,22 @@ Query a delegation based on address and validator address
 ```
 iriscli stake delegation [flags]
 ```
+Print help messages:
+```
+iriscli stake delegation --help
+```
 
-## Flags
+## Unique Flags
 
 | Name, shorthand       | Default                    | Description                                                          | Required |
 | --------------------- | -------------------------- | -------------------------------------------------------------------- | -------- |
 | --address-delegator   |                            | [string] Bech address of the delegator                               | Yes      |
 | --address-validator   |                            | [string] Bech address of the validator                               | Yes      |
-| --chain-id            |                            | [string] Chain ID of tendermint node                                 |          |
-| --height              | most recent provable block | block height to query                                                |          |
-| --help, -h            |                            | help for delegation                                                   |          |
-| --indent              |                            | Add indent to JSON response                                          |          |
-| --ledger              |                            | Use a connected Ledger device                                        |          |
-| --node                | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain  |          |
-| --trust-node          | true                       | Don't verify proofs for responses                                    |          |
 
 ## Examples
 
-### Query a validator
-
-```shell
+Query a validator
+```
 iriscli stake delegation --address-validator=ValidatorAddress --address-delegator=DelegatorAddress
 
 ```

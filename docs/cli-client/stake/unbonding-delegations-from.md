@@ -7,27 +7,18 @@ Query all unbonding delegatations from a validator
 ## Usage
 
 ```
-iriscli stake unbonding-delegations-from [operator-addr] [flags]
+iriscli stake unbonding-delegations-from [validator-address] [flags]
 ```
-
-## Flags
-
-| Name, shorthand     | Default                    | Description                                                         | Required |
-| ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --chain-id          |                            | [string] Chain ID of tendermint node                                |          |
-| --height            | most recent provable block | block height to query                                               |          |
-| --help, -h          |                            | help for unbonding-delegations-from                                 |          |
-| --indent            |                            | Add indent to JSON response                                         |          |
-| --ledger            |                            | Use a connected Ledger device                                       |          |
-| --node              | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node        | true                       | Don't verify proofs for responses                                   |          |
+Print help messages:
+```
+iriscli stake unbonding-delegations-from --help
+```
 
 ## Examples
 
-### Query all unbonding delegatations from a validator
-
-```shell
-iriscli stake unbonding-delegations ValidatorAddress
+Query all unbonding delegatations from a validator
+```
+iriscli stake unbonding-delegations [validator-address]
 ```
 
 After that, you will get unbonding delegation's detailed info from specified validator.
