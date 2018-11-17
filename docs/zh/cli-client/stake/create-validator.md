@@ -1,8 +1,8 @@
 # iriscli stake create-validator
 
-## 描述
+## 介绍
 
-以自委托的方式创建一个新的验证者 
+发送交易申请成为验证人，并在在此验证人上委托一定数额的token
 
 ## 用法
 
@@ -10,49 +10,31 @@
 iriscli stake create-validator [flags]
 ```
 
-## 标志
-
-| 名称, 速记                    | 默认值                | 描述                                                                 | 必需     |
-| ---------------------------- | --------------------- | ------------------------------------------------------------------- | -------- |
-| --account-number             |                       | [int] 用来签名交易的accountNumber                                    |          |
-| --address-delegator          |                       | [string] 委托者bech地址                                              |          |
-| --amount                     |                       | [string] 绑定的代币数量                                               | Yes      |
-| --async                      |                       | 是否异步广播交易                                                      |          |
-| --chain-id                   |                       | [string] Tendermint节点的链ID                                        | Yes      |
-| --commission-max-change-rate |                       | [string] 最大佣金变化率(每天)                                         | Yes      |
-| --commission-max-rate        |                       | [string] 最大佣金率                                                  | Yes      |
-| --commission-rate            |                       | [string] 初始佣金率                                                  | Yes      |
-| --details                    |                       | [string] 可选details                                                 |          |
-| --dry-run                    |                       | 忽略--gas标志并进行本地的交易仿真                                      |          |
-| --fee                        |                       | [string] 交易费用                                                    | Yes      |
-| --from                       |                       | [string] 用来签名的私钥名                                             | Yes      |
-| --from-addr                  |                       | [string] 指定generate-only模式下的from address                        |          |
-| --gas                        | 200000                | [string] 单次交易的gas上限; 设置为"simulate"将自动计算相应的阈值         |       |
-| --gas-adjustment             | 1                     | [float] 这个调整因子将乘以交易仿真返回的估计值; 如果手动设置了gas的上限，这个标志将被忽略 |          |
-| --generate-only              |                       | 构建一个未签名交易并将其打印到标准输出                                   |          |
-| --genesis-format             |                       | 以gen-tx的格式导出交易; 其暗含 --generate-only                          |          |
-| --help, -h                   |                       | create-validator命令帮助                                               |          |
-| --identity                   |                       | [string] 可选身份签名 (ex. UPort or Keybase)                           |          |
-| --indent                     |                       | 在JSON响应中添加缩进                                                   |          |
-| --ip                         |                       | [string] N节点的公有IP，仅开启--genesis-format时生效                    |           |
-| --json                       |                       | 以json形式输出                                                         |          |
-| --ledger                     |                       | 使用连接的硬件记账设备                                                  |          |
-| --memo                       |                       | [string] 发送交易时的备忘录                                             |          |
-| --moniker                    |                       | [string] 验证者名字                                                    |          |
-| --node                       | tcp://localhost:26657 | [string] Tendermint远程过程调用的接口\<主机>:\<端口>                     |          |
-| --node-id                    |                       | [string] 节点ID                                                        |          |
-| --print-response             |                       | 返回交易响应 (当且仅当同步模式下使用)                                     |          |
-| --pubkey                     |                       | [string] 验证者的Go-Amino编码的16进制公钥. 对于Ed25519，go-amino的16进制前缀为1624de6220 | Yes       |
-| --sequence                   |                       | [int] 用来签名交易的sequence                                            |          |
-| --trust-node                 | true                  | 关闭响应结果校验                                                        |          |
-| --website                    |                       | [string] 选填的网站                                                    |          |
-
-## 例子
-
-### 创建新的验证者
-
-```shell
-iriscli stake create-validator --chain-id=ChainID --from=KeyName --fee=Fee --pubkey=ValidatorPublicKey --commission-max-change-rate=CommissionMaxChangeRate --commission-max-rate=CommissionMaxRate --commission-rate=CommissionRate --amount=Coins
+打印帮助信息
+```
+iriscli stake create-validator --help
 ```
 
-运行上述命令之后，你便成功地创建了一个验证者。
+## 特有的flags
+
+| 名称                         | 类型   | 是否必填 | 默认值   | 功能描述         |
+| ---------------------------- | -----  | -------- | -------- | ------------------------------------ |
+| --amount                     | string | true     | ""       | 委托token的数量 |
+| --commission-max-change-rate | float  | true     | 0.0      | 佣金比率每天变化的最大数量 |
+| --commission-max-rate        | float  | true     | 0.0      | 最大佣金比例 |
+| --commission-rate            | float  | true     | 0.0      | 初始佣金比例 |
+| --details                    | string | false    | ""       | 验证人节点的详细信息 |
+| --genesis-format             | bool   | false    | false    | 是否已genesis transaction的方式倒出 |
+| --identity                   | string | false    | ""       | 身份信息的签名 |
+| --ip                         | string | false    | ""       | 验证人节点的IP |
+| --moniker                    | string | true     | ""       | 验证人节点名称 |
+| --pubkey                     | string | true     | ""       | Amino编码的验证人公钥 |
+| --website                    | string | false    | ""       | 验证人节点的网址 |
+
+## 示例
+
+```
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+```
+
+
