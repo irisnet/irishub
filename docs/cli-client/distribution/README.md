@@ -1,22 +1,22 @@
 # iriscli distribution 
 
-## Description
+## introduction
 
-This document description how to use the the command line interface of distribution module.
+This document describe how to use the the command line interfaces of distribution module.
 
 ## Usage
 
 ```shell
-iriscli distribution [subcommand]
+iriscli distribution [subcommand] [flags]
 ```
 
-Print all supported subcommands and options:
+Print all supported subcommands and flags:
 
 ```shell
 iriscli distribution --help
 ```
 
-## Available Commands
+## Available Subommands
 
 | Name                            | Description                                                   |
 | --------------------------------| --------------------------------------------------------------|

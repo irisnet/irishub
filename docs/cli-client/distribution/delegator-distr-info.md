@@ -10,8 +10,7 @@ Query delegator distribution information
 iriscli distribution delegator-distr-info [flags]
 ```
 
-Print all supported options:
-
+Print help messages:
 ```shell
 iriscli distribution delegator-distr-info --help
 ```

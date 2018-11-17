@@ -1,6 +1,6 @@
 # iriscli distribution delegation-distr-info
 
-## Description
+## introduction
 
 Query delegation distribution information
 
@@ -10,8 +10,7 @@ Query delegation distribution information
 iriscli distribution delegation-distr-info [flags]
 ```
 
-Print all supported options:
-
+Print help messages:
 ```shell
 iriscli distribution delegation-distr-info --help
 ```

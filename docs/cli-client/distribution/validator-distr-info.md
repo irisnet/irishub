@@ -10,8 +10,7 @@ Query validator distribution information
 iriscli distribution validator-distr-info [flags]
 ```
 
-Print all supported options:
-
+Print help messages:
 ```shell
 iriscli distribution validator-distr-info --help
 ```

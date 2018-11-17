@@ -10,7 +10,7 @@ Withdraw rewards
 iriscli distribution withdraw-rewards [flags]
 ```
 
-Print all supported options:
+Print help messages:
 
 ```shell
 iriscli distribution withdraw-rewards --help

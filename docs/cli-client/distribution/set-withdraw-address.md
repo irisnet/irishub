@@ -10,8 +10,7 @@ Set withdraw address of a delegator
 iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
-Print all supported options:
-
+Print help messages:
 ```shell
 iriscli distribution set-withdraw-addr --help
 ```

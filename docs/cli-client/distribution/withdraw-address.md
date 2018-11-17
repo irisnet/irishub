@@ -10,7 +10,7 @@ Query withdraw address of a delegator
 iriscli distribution withdraw-address [delegator address] [flags]
 ```
 
-Print all supported options:
+Print help messages:
 
 ```shell
 iriscli distribution withdraw-address --help
