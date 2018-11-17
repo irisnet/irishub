@@ -15,7 +15,7 @@ iriscli gov query-proposals [flags]
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --chain-id      |                            | [string] tendermint节点的链ID                                                                                                                 | Yes      |
-| --depositer     |                            | [string] （可选）按存款人过滤                                                                                    |          |
+| --depositor     |                            | [string] （可选）按存款人过滤                                                                                    |          |
 | --height        |                            | [int] 查询的区块高度                                                                                  |          |
 | --help, -h      |                            | 查询命令帮助                                                                                                                             |          |
 | --indent        |                            | 在JSON响应中添加缩进                                                                                                                          |          |
@@ -44,7 +44,7 @@ iriscli gov query-proposals --chain-id=test
 当然这里可以查询指定条件的提议。
 
 ```shell
-gov query-proposals --chain-id=test --depositer=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
+gov query-proposals --chain-id=test --depositor=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
 ```
 
 可以得到存款人是faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd地址的提议。
