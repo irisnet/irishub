@@ -12,11 +12,11 @@ iriscli upgrade [command]
 
 ## 相关命令
 
-| Name          | Description                           |
+| 命令                    | 描述                                               |
 | ------------- | ------------------------------------- |
-| [submit-switch](submit-switch.md) | Submit a switch msg for a upgrade propsal|
-| [query-switch](query-switch.md)   | query switch detail                      |
-| [info](info.md)                   | Query the information of upgrade module |
+| [submit-switch](submit-switch.md) | 针对软件升级提议发送switch消息|
+| [query-switch](query-switch.md)   | 查询switch信息                      |
+| [info](info.md)                   | 查询软件升级模块的信息|
 
 ## 标志
 
