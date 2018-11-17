@@ -1,8 +1,8 @@
 # The IRIS Network
 **Inter-chain service infrastructure and protocol for building trustworthy and distributed business applications**
 
-Haifeng Xi haifeng@bianjie.ai<br/>
-Harriet Cao harriet@bianjie.ai
+Harriet Cao harriet@bianjie.ai<br/>
+Haifeng Xi haifeng@bianjie.ai
 
 _NOTE: If you can read this on GitHub, then we're still actively developing this
 document.  Please check regularly for updates!_
@@ -883,43 +883,49 @@ Proceeds from the private sale of IRIS tokens will be used, first and foremost, 
 
 The expected IRIS project is set out below. We reiterate that the roadmap is indicative only, and subject to change.
 
-* **PANGU** (January 2018 \~ March 2019) The first stage of the IRIS project will focus on having the IRIS Hub up and running. We also intend to release an initial version of the mobile client for the IRIS network. In this stage we also  focus on building the fundamental IRIS Service Layer. This will involve enabling service definition, binding, invocation and query. We plan to collabrate with 1-2 ecosystem parteners to release i-Services to IRIShub.  
-
-* **NUWA** (April 2019 \~ December 2019) In this stage we are aiming to have a beta version of the IRIS SDK ready for developers. We plan to upgrade IRISnet mobile client to support i-Services. We plan to establish collabrations with application specific blockchains and enable them as zones connecting to IRIShub. We also plan to accomplish the connection with Cosmos Hub at this stage.
- 
- 
-* **KUAFU** (Oct 2019 \~ Dec 2019) The third stage will focus on incremental upgrades to the IRIS network in order to support our planned advanced IRIS Service governance features.
+* **PANGU** (January 2018 \~ July 2018) The first stage of the IRIS project will focus on having the IRIS Hub up and running and connected to the Cosmos Hub. We also intend to release an initial version of the mobile client for the IRIS network.
 
 
-* **HOUYI** (Beyond January 2020)
+* **NUWA** (July 2018 \~ November 2018)
+The second stage will focus on building the fundamental IRIS Service Layer. This will involve enabling service definition, binding, invocation and query.
+In this stage we are also aiming to have a beta version of the IRIS SDK ready for developers.
+
+* **KUAFU** (December 2018 \~ May 2019) The third stage will focus on incremental upgrades to the IRIS network in order to support our planned advanced IRIS Service governance features.
+
+
+* **HOUYI** (Beyond June 2019)
 The fourth stage will focus on further technology innovations to the IRIS network, IRIS SDK and mobile client, as well as developer engagement.
 
 <div STYLE="page-break-after: always;"></div>
 
 ## The Team ################################################################
 
-**Bianjie AI**
-is the core development team for the IRIS network, leveraging the team's experience established from building distributed applications. [Bianjie AI](https://www.bianjie.ai) is a Shanghai-based start-up established in 2016. It focuses on developing innovative products and solutions for healthcare and financial industries, using advanced Blockchain and AI technologies. Besides IRISnet, Bianjie's also building another core product ---  `BEAN (Blockchain Edge Analytics Network)` BEAN (Blockchain Edge Analytics Network), which is a permission chain which delivers distributed data analytics services for privacy preserving healthcare data analysis and exchange using NLP and machine learning technologies.
-**Bianjie AI**
-is also the operation and service partner of Cosmos Network in China.
-
 **Tendermint** (the team that developed the [Tendermint](https://www.tendermint.com) consensus engine and is currently building Cosmos), **Wancloud** (a subsidiary of [Wanxiang
-Blockchain](http://www.wxblockchain.com) are strategic parteners working together with **Bianjie AI** building the IRIS network's infrastructure.  
+Blockchain](http://www.wxblockchain.com) and **Bianjie AI** will work together to build the IRIS network's infrastructure.  
 
 Tendermint's intended role to give technical advice and development support to the IRIS project team in extending the Tendermint ABCI and the Cosmos IBC technologies.
 [Wancloud](https://www.wancloud.io) is envisaged as the key strategy partner to both the Cosmos and IRIS ecosystems, and we understand that it intends to participate in Cosmos and IRIS development across Asia.
 
+**Bianjie AI**
+will be the core development team for the IRIS network, leveraging the team's experience established from building distributed AI analytics services for healthcare data analysis and exchange. [Bianjie AI](https://www.bianjie.ai) is a Shanghai-based start-up established in 2016. It focuses on developing innovative products and solutions for healthcare and financial industries, using advanced Blockchain and AI technologies. One of Bianjie's core products,  `BEAN (Blockchain Edge Analytics Network)` BEAN (Blockchain Edge Analytics Network), is a permission chain which delivers distributed data analytics services for privacy preserving healthcare data analysis and exchange using NLP and machine learning technologies. Bianjie AI is
+currently extending `BEAN` capabilities to build the IRIS network.
+**Bianjie AI**
+is also the operation and service partner of Cosmos Network in China.
+
+
 ### Core Members
-
-**Haifeng Xi**
-
-[Haifeng](https://www.linkedin.com/in/haifengxi/) is a senior technologist and entrepreneur. Haifeng has an M.S degree in ECE from the University of Maryland. Haifeng worked as CTO for Wanxiang Blockchain Wancloud before starting IRISnet project. He also worked as senior architect for two leading financial companies In US (Tudor Investment & RBS Sempra), then he came back to China worked in the capacity of CTO for three companies, one of which is NASDAQ listed (China Finance Online).
-
 
 **Harriet Cao**
 
 [Harriet](https://www.linkedin.com/in/harrietcao/) is the founder of Bianjie AI, which a Shanghai-based start-up focusing on building smart services for blockchain that enable trustworthy and efficient business collaborations using distributed AI technology. Harriet is an award-winning practitioner of data analytics and artificial intelligence technologies, and was the recipient of 2010 INFORMS Daniel H. Wagner Prize. Prior to establishing Bianjie AI, Harriet worked for IBM Research for more than 16 years in various capacities including Director of IBM Research Shanghai Lab and Big Data Analytics Leader for IBM Global Labs.
 Harriet has an M.S degree in Robotics from Carnegie Mellon University and an M.S. degree in Automation Control from Tsinghua University.
+
+
+**Haifeng Xi**
+
+[Haifeng](https://www.linkedin.com/in/haifengxi/) is a senior technologist and entrepreneur. Since returning to China from the United States in 2009, he had worked in the capacity of Chief Technology Officer for three companies, one of which is NASDAQ listed. He also co-founded two start-ups in Shanghai, where he plays an active role of technical leader and engineering champion.
+Haifeng has a Master's degree in Electrical and Computer Engineering from the University of Maryland, and a Master's and Bachelor's degree in Automatic Control from Tsinghua University.
+
 
 **Jae Kwon**
 
@@ -937,10 +943,6 @@ Tom has been tracking trends in the blockchain, cloud computing, IoT and smart m
 
 ### Advisors
 
-**Dr. Shuo Bai**
-
-Dr. Bai is the director of ChinaLedger Technical Committee, and former Chief Architect of Shanghai Stock Exchange. He is a senior blockchain professional who graduated from Peking University with doctorate of science. He worked in various capacities including researcher, doctoral student advisor, director of software department, and chief scientist in the Institute of Computing Technology, Chinese Academy of Sciences. He also led the establishment of China National Internet Emergency Center (CNCERT/CC) since 2000. Dr. Bai has rich experiences in theoretical research and technical practices in the fields of financial exchanges, consortium and public blockchains.
-
 **Jim Yang**
 
 [Jim Yang](https://www.linkedin.com/in/jimyang/) runs Strategy for Tendermint. He was the founder and CEO at ChatX, mobile messaging studio. ChatX developed various mobile messaging/social apps. He also co-founded Identyx, where he served as CEO until its acquisition by Red Hat. Identyx developed an open source enterprise identity management software.
@@ -956,10 +958,6 @@ Dr. Bai is the director of ChinaLedger Technical Committee, and former Chief Arc
 **Michael Yuan**
 
 [Dr. Michael Yuan](http://www.michaelyuan.com) is the Director of the [CyberMiles Foundation](https://cm.5miles.com). Michael received a PhD in Astrophysics from University of Texas at Austin. He is the author of 5 books on software development, published by Prentice Hall, Addison-Wesley, and O'Reilly. Michael was an active code committer in large Open Source projects such as Firefox, Fedora, JBoss, and others. He is an expert on enterprise and mobile software, and was a Principle Investigator on multiple research projects funded by the US government.
-
-**Yubo Ruan**
-
-[Yubo](https://www.linkedin.com/in/yubo-ruan/) is the founder of 8 Decimal Capital. The fund invested in IRISnet，0x、Kyber、Ontology、Fcoin、Zilliqa、ICON、Wanchian、Bibox、BiShiJie. Yubo is the co-founder of Skylight Investment, a boston based venture fund backed by New Oriental(NYSE:EDU). Previously, Yubo started two highly successful companies, including Alisimba (Acquired by TopHacker Group) held 4 national patents and won the 2017 AACYF 30 under 30, Silver Medal Winner, iENA International Inventions Competition, 2012.
 
 <div STYLE="page-break-after: always;"></div>
 
