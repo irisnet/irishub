@@ -4,42 +4,69 @@ import (
 	"math/rand"
 	"os"
 
-	bam "github.com/irisnet/irishub/baseapp"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/modules/iparam"
-	"github.com/irisnet/irishub/modules/gov/params"
 )
 
-const chainID = ""
+const (
+	chainID           = ""
+	Denom             = "iris"
+	MiniDenom         = "iris-atto"
+	DefaultStakeDenom = "steak"
+)
+
+const (
+	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
+	bech32PrefixAccAddr = "faa"
+	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key
+	bech32PrefixAccPub = "fap"
+	// Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address
+	bech32PrefixValAddr = "fva"
+	// Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key
+	bech32PrefixValPub = "fvp"
+	// Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address
+	bech32PrefixConsAddr = "fca"
+	// Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key
+	bech32PrefixConsPub = "fcp"
+)
+
+var (
+	IrisCt = types.NewDefaultCoinType(Denom)
+)
 
 // App extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
 type App struct {
 	*bam.BaseApp
-	Cdc              *wire.Codec // Cdc is public since the codec is passed into the module anyways
+	Cdc              *codec.Codec // Cdc is public since the codec is passed into the module anyways
 	KeyMain          *sdk.KVStoreKey
 	KeyAccount       *sdk.KVStoreKey
-	KeyIBC           *sdk.KVStoreKey
-	KeyStake         *sdk.KVStoreKey
-	KeySlashing      *sdk.KVStoreKey
-	KeyGov           *sdk.KVStoreKey
 	KeyFeeCollection *sdk.KVStoreKey
+	KeyStake         *sdk.KVStoreKey
+	TkeyStake        *sdk.TransientStoreKey
 	KeyParams        *sdk.KVStoreKey
+	TkeyParams       *sdk.TransientStoreKey
 	KeyUpgrade       *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
-	AccountMapper       auth.AccountMapper
+	AccountKeeper       auth.AccountKeeper
+	BankKeeper          bank.Keeper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
 	ParamsKeeper        params.Keeper
 
@@ -57,54 +84,72 @@ func NewApp() *App {
 	db := dbm.NewMemDB()
 
 	// Create the cdc with some standard codecs
-	cdc := wire.NewCodec()
-	sdk.RegisterWire(cdc)
-	wire.RegisterCrypto(cdc)
-	auth.RegisterWire(cdc)
+	cdc := codec.New()
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
+	config.Seal()
+
+	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
 	// Create your application object
 	app := &App{
-		BaseApp:          bam.NewBaseApp("mock", cdc, logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing")),
+		BaseApp:          bApp,
 		Cdc:              cdc,
 		KeyMain:          sdk.NewKVStoreKey("main"),
 		KeyAccount:       sdk.NewKVStoreKey("acc"),
-		KeyIBC:           sdk.NewKVStoreKey("ibc"),
-		KeyStake:         sdk.NewKVStoreKey("stake"),
-		KeySlashing:      sdk.NewKVStoreKey("slashing"),
-		KeyGov:           sdk.NewKVStoreKey("gov"),
 		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
+		KeyStake:         sdk.NewKVStoreKey("stake"),
+		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
+		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
-	// Define the accountMapper
-	app.AccountMapper = auth.NewAccountMapper(
+	// Define the AccountKeeper
+	app.AccountKeeper = auth.NewAccountKeeper(
 		app.Cdc,
 		app.KeyAccount,
 		auth.ProtoBaseAccount,
 	)
 
-	paramsKeeper := params.NewKeeper(app.Cdc, app.KeyParams)
-	app.ParamsKeeper = paramsKeeper
-	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Setter())
-
-	// Initialize the app. The chainers and blockers can be overwritten before
-	// calling complete setup.
-	app.SetInitChainer(app.InitChainer)
+	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
 	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
-	app.SetAnteHandler(auth.NewAnteHandler(app.AccountMapper, app.FeeCollectionKeeper))
-	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountMapper, app.FeeCollectionKeeper, app.FeeManager))
+
+	app.ParamsKeeper = params.NewKeeper(
+		app.Cdc,
+		app.KeyParams, app.TkeyParams,
+	)
+
+	app.SetInitChainer(app.InitChainer)
+	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
+	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
 	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
 
-
 	// init iparam
-	iparam.SetParamReadWriter(paramsKeeper.Setter(),
+	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+		params.NewTypeTable(
+			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
+			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
+			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
-	iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinProviderDepositParameter)
+
+	iparam.RegisterGovParamMapping(
+		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)
 
@@ -113,13 +158,26 @@ func NewApp() *App {
 
 // CompleteSetup completes the application setup after the routes have been
 // registered.
-func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
+func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
 	newKeys = append(newKeys, app.KeyMain)
 	newKeys = append(newKeys, app.KeyAccount)
 	newKeys = append(newKeys, app.KeyParams)
+	newKeys = append(newKeys, app.KeyStake)
 	newKeys = append(newKeys, app.KeyFeeCollection)
+	newKeys = append(newKeys, app.TkeyParams)
+	newKeys = append(newKeys, app.TkeyStake)
 
-	app.MountStoresIAVL(newKeys...)
+	for _, key := range newKeys {
+		switch key.(type) {
+		case *sdk.KVStoreKey:
+			app.MountStore(key, sdk.StoreTypeIAVL)
+		case *sdk.TransientStoreKey:
+			app.MountStore(key, sdk.StoreTypeTransient)
+		default:
+			return fmt.Errorf("unsupported StoreKey: %+v", key)
+		}
+	}
+
 	err := app.LoadLatestVersion(app.KeyMain)
 
 	return err
@@ -129,16 +187,10 @@ func (app *App) CompleteSetup(newKeys []*sdk.KVStoreKey) error {
 func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.ResponseInitChain {
 	// Load the genesis accounts
 	for _, genacc := range app.GenesisAccounts {
-		acc := app.AccountMapper.NewAccountWithAddress(ctx, genacc.GetAddress())
+		acc := app.AccountKeeper.NewAccountWithAddress(ctx, genacc.GetAddress())
 		acc.SetCoins(genacc.GetCoins())
-		app.AccountMapper.SetAccount(ctx, acc)
+		app.AccountKeeper.SetAccount(ctx, acc)
 	}
-
-	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
-		FeeTokenNative:    types.NewDefaultCoinType("iris").MinUnit.Denom,
-		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
-	}
-	bam.InitGenesis(ctx, app.ParamsKeeper.Setter(), feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{}
 }
@@ -255,21 +307,21 @@ func GeneratePrivKeyAddressPairsFromRand(rand *rand.Rand, n int) (keys []crypto.
 // provided addresses and coin denominations.
 func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []string) {
 	accts := make([]auth.Account, len(addrs), len(addrs))
-	randCoinIntervals := []BigInterval{
-		{sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 1)},
-		{sdk.NewIntWithDecimal(1, 2), sdk.NewIntWithDecimal(1, 3)},
-		{sdk.NewIntWithDecimal(1, 40), sdk.NewIntWithDecimal(1, 50)},
-	}
+	//randCoinIntervals := []BigInterval{
+	//	{sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 1)},
+	//	{sdk.NewIntWithDecimal(1, 2), sdk.NewIntWithDecimal(1, 3)},
+	//	{sdk.NewIntWithDecimal(1, 40), sdk.NewIntWithDecimal(1, 50)},
+	//}
 
 	for i := 0; i < len(accts); i++ {
 		coins := make([]sdk.Coin, len(denoms), len(denoms))
 
-		amountStr := "100000000000000000000"
-		amount, _ := sdk.NewIntFromString(amountStr)
+		amount := sdk.NewIntWithDecimal(1, 2)
 		// generate a random coin for each denomination
 		for j := 0; j < len(denoms); j++ {
 			coins[j] = sdk.Coin{Denom: denoms[j],
-				Amount: RandFromBigInterval(r, randCoinIntervals).Add(amount),
+				//Amount: RandFromBigInterval(r, randCoinIntervals).Add(amount),
+				Amount: amount,
 			}
 		}
 
@@ -279,11 +331,12 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 		(&baseAcc).SetCoins(coins)
 		accts[i] = &baseAcc
 	}
+
 	app.GenesisAccounts = accts
 }
 
-// GetAllAccounts returns all accounts in the accountMapper.
-func GetAllAccounts(mapper auth.AccountMapper, ctx sdk.Context) []auth.Account {
+// GetAllAccounts returns all accounts in the AccountKeeper.
+func GetAllAccounts(mapper auth.AccountKeeper, ctx sdk.Context) []auth.Account {
 	accounts := []auth.Account{}
 	appendAccount := func(acc auth.Account) (stop bool) {
 		accounts = append(accounts, acc)

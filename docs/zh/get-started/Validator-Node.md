@@ -124,4 +124,4 @@ iriscli stake validator < address-validator-operator > --chain-id=fuxi-4000
 
 ### 部署IRISHub Monitor监控
 
-请根据以下[链接](../tools/Deploy-IRIS-Monitor.md) 部署一个Monitor监控验证人。
+请根据以下[链接](../../tools/Deploy-IRIS-Monitor.md) 部署一个Monitor监控验证人。

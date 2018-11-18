@@ -18,9 +18,11 @@ func Commands() *cobra.Command {
     needs to sign with a private key.`,
 	}
 	cmd.AddCommand(
+		mnemonicKeyCommand(),
+		newKeyCommand(),
 		addKeyCommand(),
 		listKeysCmd,
-		showKeysCmd,
+		showKeysCmd(),
 		client.LineBreak,
 		deleteKeyCommand(),
 		updateKeyCommand(),

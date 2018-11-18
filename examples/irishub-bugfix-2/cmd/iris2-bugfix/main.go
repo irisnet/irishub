@@ -6,12 +6,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/irisnet/irishub/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/examples/irishub-bugfix-2/app"
 	bam "github.com/irisnet/irishub/baseapp"
 
-	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -19,9 +18,18 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	irisInit "github.com/irisnet/irishub/init"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func main() {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
+
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
@@ -41,26 +49,27 @@ func main() {
 	tendermintCmd.AddCommand(
 		server.ShowNodeIDCmd(ctx),
 		server.ShowValidatorCmd(ctx),
+		server.ShowAddressCmd(ctx),
 	)
 
-	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
+	startCmd := server.StartCmd(ctx, newApp)
 	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
-		server.InitCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.GenTxCmd(ctx,cdc),
+		irisInit.TestnetFilesCmd(ctx,cdc,app.IrisAppInit()),
 		startCmd,
 		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
-		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
+		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
 		client.LineBreak,
 	)
 
 	rootCmd.AddCommand(
 		version.ServeVersionCommand(cdc),
 	)
-
-	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)

@@ -28,9 +28,9 @@ RUN cd $REPO_PATH && \
     make build_linux && \
     make install && \
     make install_examples && \
-    make test_cli && \
-    make test_lcd && \
-    make test_sim
+    make test_cli
+#    make test_lcd && \
+#    make test_sim
 
 FROM alpine:3.7
 
