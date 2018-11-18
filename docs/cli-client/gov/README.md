@@ -40,9 +40,9 @@ iriscli gov [command]
 
 | Name, shorthand | Default        | Description                            | Required |
 | --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
+| --encoding, -e  | hex            | [string] Binary encoding (hex &brvbar; b64 &brvbar; btc) |          |
 | --home          | $HOME/.iriscli | [string] directory for config and data |          |
-| --output, -o    | text           | [string] Output format (text|json)     |          |
+| --output, -o    | text           | [string] Output format (text &brvbar; json)     |          |
 | --trace         |                | print out full stack trace on errors   |          |
 
 ## Extended description
