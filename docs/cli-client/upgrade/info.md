@@ -10,17 +10,15 @@ Query the information of software version and upgrade module.
 iriscli upgrade info
 ```
 
+Print help messages:
+
+```
+iriscli upgrade info --help
+```
 ## Flags
 
 | Name, shorthand | Default                    | Description                                                       | Required |
 | --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] Chain ID of tendermint node                              |            |
-| --height        | most recent provable block | block height to query                                             |          |
-| --help, -h      |                            | help for query                                                    |          |
-| --indent        |                            | Add indent to JSON response                                       |          |
-| --ledger        |                            | Use a connected Ledger device                                     |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                 |          |
 
 ## Example
 

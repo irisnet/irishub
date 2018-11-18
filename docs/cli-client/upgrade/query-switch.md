@@ -9,19 +9,17 @@ Query the switch information to know if someone have send the switch message for
 iriscli upgrade query-switch --proposal-id <proposalID> --voter <voter address>
 ```
 
+Print help messages:
+
+```
+iriscli upgrade query-switch --help
+```
 ## Flags
 
 | Name, shorthand | Default                    | Description                                                       | Required |
 | --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
 | --proposal-id      |                            | proposalID of upgrade swtich being queried                              | Yes      |
 | --voter     |                            | Address sign the switch msg                              | Yes      |
-| --chain-id      |                            | [string] Chain ID of tendermint node                              |            |
-| --height        | most recent provable block | block height to query                                             |          |
-| --help, -h      |                            | help for query                                                    |          |
-| --indent        |                            | Add indent to JSON response                                       |          |
-| --ledger        |                            | Use a connected Ledger device                                     |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                 |          |
 
 ## Example
 
