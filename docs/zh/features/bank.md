@@ -189,7 +189,7 @@
     
 5. 广播交易
 
-    广播离线产生的已签名的交易，在这里，你只需使用上面的sign命令生成的交易。当然，您可以通过任何方法生成已签名的交易，例如：[irisnet-crypto](https://github.com/irisnet/irisnet-crypto)。
+    广播离线产生的已签名的交易，在这里，你可以使用上面的sign命令生成的交易。当然，您可以通过任何方法生成已签名的交易，例如：[irisnet-crypto](https://github.com/irisnet/irisnet-crypto)。
     ```bash
     iriscli bank broadcast [file]
     ```
