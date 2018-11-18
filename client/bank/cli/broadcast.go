@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"
 )
