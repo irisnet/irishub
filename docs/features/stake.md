@@ -12,11 +12,11 @@ This specification briefly introduces the functionality of stake module and what
 	
 2. Validator
 
-    Validator is a full IRISHUB node. As a full nodes, it will sync all blocks and execute all transactions, which will consume much storage and computation resoure. If its voting power is zero, it is just a normal full node or validator candidates or jailed validator. Once its voting power is positive, then it is a validator.
+    Validator is a full IRISHUB node. As a full nodes, it will sync all blocks and execute all transactions, which will consume much storage and computation resoure. If its voting power is zero, it is just a normal full node or a validator candidate. Once its voting power is positive, then it is a real validator.
      
 3. Delegator && Delegation
 
-	People that cannot, or do not want to run validator nodes, can still participate in the staking process as delegators. After delegators delegate some tokens to some validators, then these delegator will gain delegation from corresponding validators. Delegating tokens is called bonding tokens to validators. Later we will have detailed description on it. Besides, a validator operator is also a delegator. Usually, a validator operator only has delegation on its own validator. But it can also have delegation on other validators.
+	People that cannot, or do not want to run validator nodes, can still participate in the staking process as delegators. After delegating some tokens to validators, delegators will gain delegations from corresponding validators. Delegating tokens is also called bonding tokens to validators. Later we will have detailed description on it. Besides, a validator operator is also a delegator. Usually, a validator operator only has delegation on its own validator. But it can also have delegation on other validators.
 	
 4. Validator Candidates
  
@@ -46,29 +46,44 @@ This specification briefly introduces the functionality of stake module and what
 
 2. Apply to be validator
 
-	Firstly, you have a wallet which has a certain iris tokens. Here we assume you have import your wallet to iriscli key store. 
+	Firstly, you must have a wallet which has a certain amount of iris tokens. Here we assume you have import your wallet to iriscli key store. 
 
 	Then just send a create-validator transaction. This is an example command.
 	```
 	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.004iris --chain-id=<chain-id> --from=<key name> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1
 	```
-	The more tokens you specified by `--amount`, the more probability, you will be a real validator. Otherwise, you will just be validator candidate.
+	The more tokens specified by `--amount`, the more probability your full node will be a real validator. Otherwise, it will just be validator candidate.
 
-3. Query own validator
+3. Query your own validator
 	
-	Users can query own validators by their wallet address. But users have to convert their wallet addresses to validator operator address pattern:
+	Users can query their own validators by their wallet address. But firstly users have to convert their wallet addresses to validator operator address pattern:
 	```
 	iriscli keys show [key name] --bech=val
 	```
 	Example response:
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u	    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
+	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
 	```
 	Then, example command to query validator:
 	```
 	iriscli stake validator fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
 	```
+	Example response:
+	```text
+    Validator 
+    Operator Address: fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
+    Validator Consensus Pubkey: fvp1zcjduepq8fw9p4zfrl5fknrdd9tc2l24jnqel6waxlugn66y66dxasmeuzhsxl6m5e
+    Jailed: false
+    Status: Bonded
+    Tokens: 100.0000000000
+    Delegator Shares: 100.0000000000
+    Description: {node2   }
+    Bond Height: 0
+    Unbonding Height: 0
+    Minimum Unbonding Time: 1970-01-01 00:00:00 +0000 UTC
+    Commission: {{0.1000000000 0.2000000000 0.0100000000 0001-01-01 00:00:00 +0000 UTC}}
+    ```
 	
 4. Edit validator
 
@@ -93,7 +108,7 @@ This specification briefly introduces the functionality of stake module and what
 
 	Unbond half of total bonded token on a given validator
 	```
-	iriscli stake unbond --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.004iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.004iris  --amount=100iris --share-percent=0.5
 	```
 
 8. Redelegate tokens to another validator
@@ -103,4 +118,4 @@ This specification briefly introduces the functionality of stake module and what
 	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
 	```
 
-For other query stake state commands, please refer to [stake cli client](../cli-client/stake/REAMDME.md)
+For other query stake state commands, please refer to [stake cli client](../cli-client/stake/README.md)
