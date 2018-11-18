@@ -125,7 +125,7 @@
     
     发送签名交易:
     ```bash
-    iriscli bank sign [file] --chain-id=[chain-id]  --name [key name of from account] 
+    iriscli bank sign [file] --chain-id=[chain-id]  --name [key name] 
     ```
     将返回已签名的交易:
     ```json
@@ -189,7 +189,7 @@
     
 5. 广播交易
 
-    广播离线产生的已签名的交易，使用步骤4中最终生成的文件提交该交易:
+    广播离线产生的已签名的交易，在这里，你只需使用上面的sign命令生成的交易。当然，您可以通过任何方法生成已签名的交易，例如：[irisnet-crypto](https://github.com/irisnet/irisnet-crypto)。
     ```bash
     iriscli bank broadcast [file]
     ```
