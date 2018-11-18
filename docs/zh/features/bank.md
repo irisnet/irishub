@@ -1,11 +1,11 @@
 # Bank模块用户文档
 
 ## 简介 
-该模块主要用于账户之间转账、查询账户余额，同时提供了通用的签名方法，此外，irisnet使用[coin_type](./basic-concepts/coin-type.md)定义了iris-hub系统中代币的可用单位。
+该模块主要用于账户之间转账、查询账户余额，同时提供了通用的离线签名与交易广播方法，此外，使用[coin_type](./basic-concepts/coin-type.md)定义了IRIShub系统中代币的可用单位。
 
 ## 使用场景
 
-1. 查询某一代币coin_type
+1. 查询某一代币coin_type:
     ```bash
     iriscli bank coin-type [coin-name]
     ```
@@ -65,11 +65,11 @@
     ```bash
     iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.004iris --from=[key name of wallet A] --chain-id=[chain-id]
     ```
-    iris网络支持多种代币流通，在将来iris可以在同一交易个包含多种代币交换——代币种类可以为任意在iris网络中注册过的coin_type。
+    IRISnet支持多种代币流通，将来IRISnet可以在一个交易中包含多种代币交换——代币种类可以为任意在IRISnet中注册过的coin_type。
 
 4. 交易签名
 
-    为了提高账户安全性，iris提供离线签名保护账户的私钥。在任意交易中，使用参数--generate-only=true可以构建一个未签名的交易。使用转账交易作为示例:
+    为了提高账户安全性，IRISnet支持交易离线签名保护账户的私钥。在任意交易中，使用参数--generate-only=true可以构建一个未签名的交易。使用转账交易作为示例:
     ```bash
     iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.004iris --from=[key name of wallet A] --generate-only=true
     ```
@@ -193,5 +193,5 @@
     ```bash
     iriscli bank broadcast [file]
     ```
-    该交易将在iris网络中广播并执行。
+    该交易将在IRISnet中广播并执行。
      
