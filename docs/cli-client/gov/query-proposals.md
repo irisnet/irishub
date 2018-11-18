@@ -10,20 +10,20 @@ Query proposals with optional filters
 iriscli gov query-proposals [flags]
 ```
 
+
+Print help messages:
+
+```
+iriscli gov query-proposals --help
+```
+
 ## Flags
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 | Yes      |
 | --depositor     |                            | [string] (optional) Filter by proposals deposited on by depositor                                                                                    |          |
-| --height        |                            | [int] Block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | Help for query-proposals                                                                                                                             |          |
-| --indent        |                            | Add indent to JSON response                                                                                                                          |          |
-| --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
 | --limit         |                            | [string] (optional) Limit to latest [number] proposals. Defaults to all proposals                                                                    |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
 | --status        |                            | [string] (optional) filter proposals by proposal status                                                                                                        |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
 | --voter         |                            | [string] (optional) Filter by proposals voted on by voted                                                                                            |          |
 
 ## Examples
