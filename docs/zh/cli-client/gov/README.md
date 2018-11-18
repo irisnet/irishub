@@ -13,6 +13,11 @@
 iriscli gov [command]
 ```
 
+打印所以子命令和参数
+```
+iriscli distribution --help
+```
+
 ## 相关命令
 
 | 命令                                  | 描述                                                             |
@@ -29,21 +34,6 @@ iriscli gov [command]
 | [submit-proposal](submit-proposal.md) | 创建新密钥，或者通过助记词导入恢复                                   |
 | [deposit](deposit.md)                 | 充值保证金代币以激活提议                                            |
 | [vote](vote.md)                       | 为有效的提议投票，选项：Yes/No/NoWithVeto/Abstain                   |
-
-## 标志
-
-| 名称, 速记       | 默认值   | 描述          | 是否必须  |
-| --------------- | ------- | ------------- | -------- |
-| --help, -h      |         | help for gov  |          |
-
-## 全局标志
-
-| 名称, 速记       | 默认值          | 描述                                   | 是否必须  |
-| --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] Binary encoding (hex &brvbar; b64 &brvbar; btc) |          |
-| --home          | $HOME/.iriscli | [string] directory for config and data |          |
-| --output, -o    | text           | [string] Output format (text &brvbar; json)     |          |
-| --trace         |                | print out full stack trace on errors   |          |
 
 ## 补充描述
 
