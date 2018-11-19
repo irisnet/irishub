@@ -47,7 +47,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 | -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) | False    | String |
 | --home string         | /root/.iriscli | Directory for config and data               | False    | String |
 | -o, --output string   | text           | Output format (text \|json)                 | False    | String |
-| --trace               |                | print out full stack trace on errors        | False    |        |
+| --trace               |                | Print out full stack trace on errors        | False    |        |
 
 ## Examples
 
