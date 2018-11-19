@@ -4,16 +4,13 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/client"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -24,11 +21,7 @@ import (
 
 func main() {
 
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
-	config.Seal()
+	irisInit.InitBech32Prefix()
 
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()

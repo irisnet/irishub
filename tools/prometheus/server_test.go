@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
+	irisInit "github.com/irisnet/irishub/init"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/shirou/gopsutil/cpu"
@@ -18,6 +19,8 @@ import (
 )
 
 func TestMetricsCmd(t *testing.T) {
+	irisInit.InitBech32Prefix()
+
 	cdc := app.MakeCodec()
 	comm := MonitorCommand(cdc)
 	viper.Set("node", "tcp://0.0.0.0:26657")

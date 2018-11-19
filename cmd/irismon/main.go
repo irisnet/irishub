@@ -2,9 +2,11 @@ package main
 
 import (
 	"os"
-	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/tools/prometheus"
+
 	"github.com/irisnet/irishub/app"
+	irisInit "github.com/irisnet/irishub/init"
+	"github.com/irisnet/irishub/tools/prometheus"
+	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
@@ -18,6 +20,7 @@ func init() {
 var rootCmd *cobra.Command
 
 func main() {
+	irisInit.InitBech32Prefix()
 	executor := cli.PrepareMainCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	err := executor.Execute()
 	if err != nil {
