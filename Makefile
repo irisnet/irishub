@@ -5,10 +5,33 @@ PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 all: get_tools get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
-BUILD_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
+INSTALL_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
+
+Bech32PrefixAccAddr := $(shell if [ -z ${Bech32PrefixAccAddr} ]; then echo "faa"; else echo ${Bech32PrefixAccAddr}; fi)
+Bech32PrefixAccPub := $(shell if [ -z ${Bech32PrefixAccPub} ]; then echo "fap"; else echo ${Bech32PrefixAccPub}; fi)
+Bech32PrefixValAddr := $(shell if [ -z ${Bech32PrefixValAddr} ]; then echo "fva"; else echo ${Bech32PrefixValAddr}; fi)
+Bech32PrefixValPub := $(shell if [ -z ${Bech32PrefixValPub} ]; then echo "fvp"; else echo ${Bech32PrefixValPub}; fi)
+Bech32PrefixConsAddr := $(shell if [ -z ${Bech32PrefixConsAddr} ]; then echo "fca"; else echo ${Bech32PrefixConsAddr}; fi)
+Bech32PrefixConsPub := $(shell if [ -z ${Bech32PrefixConsPub} ]; then echo "fcp"; else echo ${Bech32PrefixConsPub}; fi)
+BUILD_FLAGS = -ldflags "\
+-X github.com/irisnet/irishub/init.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
+-X github.com/irisnet/irishub/init.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
+-X github.com/irisnet/irishub/init.Bech32PrefixValAddr=${Bech32PrefixValAddr} \
+-X github.com/irisnet/irishub/init.Bech32PrefixValPub=${Bech32PrefixValPub} \
+-X github.com/irisnet/irishub/init.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
+-X github.com/irisnet/irishub/init.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
 
 ########################################
 ### Tools & dependencies
+
+echo_bech32_prefix:
+	@echo "\"source tools/script/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
+	@echo Bech32PrefixAccAddr=${Bech32PrefixAccAddr}
+	@echo Bech32PrefixAccPub=${Bech32PrefixAccPub}
+	@echo Bech32PrefixValAddr=${Bech32PrefixValAddr}
+	@echo Bech32PrefixValPub=${Bech32PrefixValPub}
+	@echo Bech32PrefixConsAddr=${Bech32PrefixConsAddr}
+	@echo Bech32PrefixConsPub=${Bech32PrefixConsPub}
 
 check_tools:
 	cd deps_tools && $(MAKE) check_tools
@@ -45,46 +68,46 @@ update_irislcd_swagger_docs:
 
 ########################################
 ### Compile and Install
-install: update_irislcd_swagger_docs
-	go install $(BUILD_FLAGS) ./cmd/iris
-	go install $(BUILD_FLAGS) ./cmd/iriscli
-	go install $(BUILD_FLAGS) ./cmd/irislcd
-	go install $(BUILD_FLAGS) ./cmd/irismon
+install: update_irislcd_swagger_docs echo_bech32_prefix
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iris
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irismon
 
 install_debug:
-	go install ./cmd/irisdebug
+	go install $(BUILD_FLAGS) ./cmd/irisdebug
 
-build_linux: update_irislcd_swagger_docs
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iris ./cmd/iris && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/iriscli ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irislcd ./cmd/irislcd && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/irismon ./cmd/irismon
+build_linux: update_irislcd_swagger_docs echo_bech32_prefix
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irismon ./cmd/irismon
 
-build_cur: update_irislcd_swagger_docs
-	go build -o build/iris ./cmd/iris  && \
-	go build -o build/iriscli ./cmd/iriscli && \
-	go build -o build/irislcd ./cmd/irislcd && \
-	go build -o build/irismon ./cmd/irismon
+build_cur: update_irislcd_swagger_docs echo_bech32_prefix
+	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \
+	go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
+	go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
+	go build $(BUILD_FLAGS) -o build/irismon ./cmd/irismon
 
-build_examples: update_irislcd_swagger_docs
-	go build  -o build/iris1 ./examples/irishub1/cmd/iris1
-	go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	go build  -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	go build  -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
-
-
-install_examples: update_irislcd_swagger_docs
-	go install ./examples/irishub1/cmd/iris1
-	go install ./examples/irishub1/cmd/iriscli1
-	go install ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	go install ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
+build_examples: update_irislcd_swagger_docs echo_bech32_prefix
+	go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1
+	go build  $(BUILD_FLAGS) -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
+	go build  $(BUILD_FLAGS) -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
+	go build  $(BUILD_FLAGS) -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
 
 
-build_example_linux: update_irislcd_swagger_docs
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris1 ./examples/irishub1/cmd/iris1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
+install_examples: update_irislcd_swagger_docs echo_bech32_prefix
+	go install $(BUILD_FLAGS) ./examples/irishub1/cmd/iris1
+	go install $(BUILD_FLAGS) ./examples/irishub1/cmd/iriscli1
+	go install $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iris2-bugfix
+	go install $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
+
+
+build_example_linux: update_irislcd_swagger_docs echo_bech32_prefix
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
 
 ########################################
 ### Testing
@@ -127,6 +150,7 @@ test_sim_iris_slow:
 	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
 
 testnet_init:
+	@echo "Work well only when Bech32PrefixAccAddr equal faa"
 	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
 	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
 	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
