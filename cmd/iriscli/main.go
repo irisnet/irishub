@@ -4,16 +4,15 @@ import (
 	"os"
 	"path"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
-	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
+	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
@@ -36,11 +35,7 @@ var (
 
 func main() {
 
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
-	config.Seal()
+	irisInit.InitBech32Prefix()
 
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
