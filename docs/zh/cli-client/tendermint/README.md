@@ -18,7 +18,7 @@ iriscli tendermint [command]
 |block|获取给定高度的块的验证数据|
 |validator-set|在给定高度设置完整的tendermint验证器|
 
-##标志
+## 标志
 |名称,速记|描述|
 |---|---|
 |--help,-h|tendermint命令帮助|
