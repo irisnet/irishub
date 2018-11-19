@@ -2,7 +2,7 @@
 
 ## Description
 
-Query  a special  account detial. 
+Querying account information.
 
 ## Usage:
 
@@ -16,9 +16,9 @@ iriscli bank account [address] [flags]
 
 | Name,shorthand | Type   | Required | Default               | Description                                                  |
 | -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| -h, --help     |        | false    |                       | help for coin-type                                           |
+| -h, --help     |        | False    |                       | help for account                                             |
 | --chain-id     | String | False    |                       | Chain ID of tendermint node                                  |
-| --height       | Int    | False    |                       | block height to query, omit to get most recent provable block |
+| --height       | Int    | False    |                       | Block height to query, omit to get most recent provable block |
 | --ledger       | String | False    |                       | Use a connected Ledger device                                |
 | --node         | String | False    | tcp://localhost:26657 | <host>:<port> to tendermint rpc interface for this chain     |
 | --trust-node   | String | False    | True                  | Don't verify proofs for responses                            |
@@ -29,10 +29,10 @@ iriscli bank account [address] [flags]
 
 | Name,shorthand        | Default        | Description                                 | Required | Type   |
 | --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding string | hex            | string   Binary encoding (hex \|b64 \|btc ) | false    | String |
-| --home string         | /root/.iriscli | directory for config and data               | False    | String |
+| -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) | False    | String |
+| --home string         | /root/.iriscli | Directory for config and data               | False    | String |
 | -o, --output string   | text           | Output format (text \|json)                 | False    | String |
-| --trace               |                | print out full stack trace on errors        | False    |        |
+| --trace               |                | Print out full stack trace on errors        | False    |        |
 
 ## Examples
 
@@ -42,7 +42,7 @@ iriscli bank account [address] [flags]
  iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx
 ```
 
-After that, you will get the detail info for the special account
+After that, you will get the detail info for the account.
 
 ```
 {
@@ -72,9 +72,17 @@ After that, you will get the detail info for the special account
 
 
 ```
-
-
-
+If you query an wrrong account, you will get the fellow information.
+```
+ iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
+ERROR: decoding bech32 failed: checksum failed. Expected d429yx, got d429zz.
+```
+If you query an empty account, you will get the fellow information.
+```
+iriscli bank account faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7
+ERROR: No account with address faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7 was found in the state.
+Are you sure there has been a transaction involving it?
+```
 
 
 ## Extended description
