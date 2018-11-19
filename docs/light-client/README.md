@@ -1,22 +1,43 @@
-# IRISLCD User Guide
+# What is IRISLCD
 
-## Basic Functionality Description
+An IRISLCD node is a REST server which can connect to any full nodes and provide a set of rest APIs. By these APIs, users can send transactions and query blockchain data. 
 
-1. Provide restful APIs and swagger-ui to show these APIs
-2. Verify query proof
+## IRISLCD usage
 
-## Introduction
+IRISLCD has two subcommands:
 
-A IRISLCD node is a light node of IRISHUB. Unlike IRISHUB full node, it won't store all blocks and execute all transactions, which means it only requires minimal bandwidth, computing and storage resource. In distrust mode, it will track the evolution of validator set change and require full nodes to return consensus proof and merkle proof. Unless validators with more than 2/3 voting power do byzantine behavior, then IRISLCD proof verification algorithm can detect all potential malicious data, which means an IRISLCD node can provide the same security as full nodes.
+| subcommand      | Description                 | Example command |
+| --------------- | --------------------------- | --------------- |
+| version         | Print the IRISLCD version   | irislcd version |
+| start           | Start a IRISLCD node        | irislcd start --chain-id=<chain-id> |
 
-The default home folder of irislcd is `$HOME/.irislcd`. Once an IRISLCD is started, it will create two directories: `keys` and `trust-base.db`.The keys store db locates in `keys`. `trust-base.db` stores all trusted validator set and other verification related files.
+`start` subcommand has these options:
 
-When IRISLCD is started in distrust mode, it will check whether `trust-base.db` is empty. If true, it will fetch the latest block as its trust basis and save it under `trust-base.db`. The IRISLCD node always trust the basis. All query proof will be verified based on the trust basis, which means IRISLCD can only verify the proof on later height. If you want to query transactions or blocks on lower heights, please start IRISLCD in trust mode. For detailed proof verification algorithm please refer to [tendermint lite](https://github.com/tendermint/tendermint/blob/master/docs/tendermint-core/light-client-protocol.md).
+| Parameter       | Type      | Default                 | Required | Description                                          |
+| --------------- | --------- | ----------------------- | -------- | ---------------------------------------------------- |
+| chain-id        | string    | null                    | true     | Chain ID of Tendermint node |
+| home            | string    | "$HOME/.irislcd"        | false    | Directory for config and data, such as key and checkpoint |
+| node            | string    | "tcp://localhost:26657" | false    | Full node to connect to |
+| laddr           | string    | "tcp://localhost:1317"  | false    | Address for server to listen on |
+| trust-node      | bool      | false                   | false    | Trust connected  full nodes (Don't verify proofs for responses) |
+| max-open        | int       | 1000                    | false    | The number of maximum open connections |
+| cors            | string    | ""                      | false    | Set the domains that can make CORS requests |
 
+## Sample commands to start 
 
-## Usage Scenario
+1. By default, IRISLCD doesn't trust the connected full node. But if you are sure about that the connected full node is trustable, then you should run IRISLCD with `--trust-node` option:
+```bash
+irislcd start --chain-id=<chain-id> --trust-node
+```
 
-For how to start IRISLCD, please refer to [lcd start](../cli-client/lcd/README.md). After the IRISLCD node is started successfully, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown.
+2. If you want to access your IRISLCD in another machine, you have to specify `--laddr`, for instance:
+```bash
+irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
+```
+
+## REST APIs
+
+Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui· page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and briedly introduce their functionality.
 
 1. Tendermint APIs, such as query blocks, transactions and validatorset
     1. `GET /node_info`: The properties of the connected node
@@ -96,11 +117,12 @@ For how to start IRISLCD, please refer to [lcd start](../cli-client/lcd/README.m
 
 8. Query app version
 
-    1. `GET /version`: Version of irislcd
+    1. `GET /version`: Version of IRISLCD
     2. `GET /node_version`: Version of the connected node
 
-## Extra parameters for post apis
+## Special parameters
 
+These apis are picked out from above section. And they can be used to build and broadcast transactions:
 1. `POST /bank/accounts/{address}/transfers`: Send tokens (build -> sign -> send)
 2. `POST /stake/delegators/{delegatorAddr}/delegate`: Submit delegation transaction
 3. `POST /stake/delegators/{delegatorAddr}/redelegate`: Submit redelegation transaction
@@ -110,10 +132,11 @@ For how to start IRISLCD, please refer to [lcd start](../cli-client/lcd/README.m
 7. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
 8. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
 
+They all support the these special query parameters below. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `generate-only` is true, then all other parameters, such as `simulate` and `async` will be ignored.  
+
 | parameter name   | Type | Default | Priority | Description                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
 | generate-only   | bool | false | 0 | Build an unsigned transaction and write it back |
 | simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
 | async           | bool | false | 2 | Broadcast transaction asynchronously   |
 
-All the above eight APIs have the above query parameter. By default, their values are all false. Each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `generate-only` is true, then other parameters, such as `simulate` and `async` will be ignored.  

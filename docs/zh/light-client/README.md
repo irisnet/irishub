@@ -1,21 +1,43 @@
-# IRISLCD用户文档
+# 介绍
 
-## 基本功能介绍
+IRISLCD节点是一个提供REST APIs接口的服务器，它可以连接到任何IRISHUB的全节点。通过这些RESTAPIs，用户可以发送交易和查询区块链数据。
 
-1.提供restful API以及swagger-ui
-2.验证查询结果
+## IRISLCD的用法
 
-## 介绍
+IRISLCD有两个子命令:
 
-IRISLCD是IRISHUB的轻节点。与IRISHUB完整节点不同，它不会存储所有块并执行所有交易，这意味着它只需要最小的带宽，计算和存储资源。在不信任模式下，它将跟踪验证人集的演变，并要求完整节点返回共识证明和merkle证明。除非具有超过2/3投票权的验证者集体执行拜占庭行为，否则IRISLCD证明验证算法可以检测所有潜在的恶意数据，这意味着IRISLCD节点可以提供与完整节点相同的安全性。
+| 子命令      | 功能                 | 示例命令 |
+| --------------- | --------------------------- | --------------- |
+| version         | 打印版本信息   | irislcd version |
+| start           | 启动一个IRISLCD节点  | irislcd start --chain-id=<chain-id> |
 
-irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将创建两个目录：`keys`和`trust-base.db`。密钥存储db位于`keys`中。`trust-base.db`存储所有可信验证器集和其他验证相关文件。
+`start`子命令有如下参数可配置
 
-当IRISLCD在不信任模式下启动时，它将检查`trust-base.db`是否为空。如果是，那么它将获取最新块作为其信任基础并将其保存在`trust-base.db`下。IRISLCD节点无条件信任这个区块。所有查询证明都将已这个区块为基础进行验证，这意味着IRISLCD只能验证之后高度上的区块和交易。如果要查询较低高度的交易和区块，请以信任模式启动IRISLCD。有关详细的验证算法介绍，请参阅[tendermint lite](https://github.com/tendermint/tendermint/blob/master/docs/tendermint-core/light-client-protocol.md)。
+| 参数名称        | 类型      | 默认值                 | 是否必填 | 功能描述                                          |
+| --------------- | --------- | ----------------------- | -------- | ---------------------------------------------------- |
+| chain-id        | string    | null                    | true     | Tendermint节点的chain ID |
+| home            | string    | "$HOME/.irislcd"        | false    | 配置home目录，key和proof相关的信息都存于此 |
+| node            | string    | "tcp://localhost:26657" | false    | 全节点的rpc地址 |
+| laddr           | string    | "tcp://localhost:1317"  | false    | 侦听的地址和端口 |
+| trust-node      | bool      | false                   | false    | 是否信任全节点 |
+| max-open        | int       | 1000                    | false    | 最大连接数 |
+| cors            | string    | ""                      | false    | 允许跨域访问的地址 |
 
-## 使用场景
+## 示例命令
 
-有关如何启动IRISLCD，请参阅[lcd_start](../cli-client/lcd/README.md。IRISLCD节点成功启动后，在浏览器中打开`localhost1317/swagger-ui/`，您可以看到所有REST APIs。
+1. 默认情况下，IRISLCD不信任连接全节点。但是如果您确定连接的完整节点是可信的，那么您应该在启动IRISLCD时加上`--trust-node`：
+```bash
+irislcd start --chain-id=<chain-id> --trust-node
+```
+
+2. 如果需要在其他机器上访问此IRISLCD节点，还需要配置`--laddr`参数，例如：
+```bash
+irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
+```
+
+## REST APIs
+
+IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`，然后你将看到所有的REST APIs。`swagger-ui`页面有关于API功能和所需参数的详细描述。在这里，我们只列出所有API并简要介绍它们的功能。
 
 1. Tendermint相关APIs, 例如查询区块，交易和验证人集
     1. `GET /node_info`: 查询所连接全节点的信息
@@ -28,7 +50,7 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
     8. `GET /txs`: 搜索交易
     9. `POST /txs`: 广播交易
  
-2. Key management APIs
+2. Key management模块的APIs
 
     1. `GET /keys`: 列出所有本地的秘钥
     2. `POST /keys`: 创建新的秘钥
@@ -38,7 +60,7 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
     6. `DELETE /keys/{name}`: 删除秘钥
     7. `GET /auth/accounts/{address}`: 查询秘钥对象账户的信息
 
-3. Create, sign and broadcast transactions
+3. 创建、签名和广播交易的APIs
 
     1. `POST /tx/sign`: 签名交易
     2. `POST /tx/broadcast`: 广播一个amino编码的交易
@@ -47,7 +69,7 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
     5. `GET /bank/balances/{address}`: 查询账户的token数量
     6. `POST /bank/accounts/{address}/transfers`: 发起转账交易
 
-4. Stake module APIs
+4. Stake模块的APIs
 
     1. `POST /stake/delegators/{delegatorAddr}/delegate`: 发起委托交易
     2. `POST /stake/delegators/{delegatorAddr}/redelegate`: 发起转委托交易
@@ -67,7 +89,7 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
     16. `GET /stake/pool`: 获取权益池信息
     17. `GET /stake/parameters`: 获取权益证明的参数
 
-5. Governance module APIs
+5. Governance模块的APIs
 
     1. `POST /gov/proposal`: 发起提交提议交易
     2. `GET /gov/proposals`: 查询提议
@@ -80,12 +102,12 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
     10. `GET/gov/params`: 查询可供治理的参数
 
-6. Slashing module APIs
+6. Slashing模块的APIs
 
     1. `GET /slashing/validators/{validatorPubKey}/signing_info`: 获取验证人的签名记录
     2. `POST /slashing/validators/{validatorAddr}/unjail`: 赦免某个作恶的验证人节点
 
-7. Distribution module APIs
+7. Distribution模块的APIs
 
     1. `POST /distribution/{delegatorAddr}/withdrawAddress`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdrawAddress`: 查询收益取回地址
@@ -94,13 +116,14 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
     5. `GET /distribution/{delegatorAddr}/distrInfos`: 查询委托人所有委托的收益分配信息
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: 查询验证人的收益分配信息
 
-8. Query app version
+8. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node_version`: 查询全节点版本
 
-## Options for post apis
+## 特殊参数
 
+这些是从部分挑选出来的可用于构建和广播交易的APIs：
 1. `POST /bank/accounts/{address}/transfers`
 2. `POST /stake/delegators/{delegatorAddr}/delegate`
 3. `POST /stake/delegators/{delegatorAddr}/redelegate`
@@ -110,10 +133,10 @@ irislcd的默认主文件夹是`$HOME/.irislcd`。一旦IRISLCD启动，它将�
 7. `POST /gov/proposals/{proposalId}/votes`
 8. `POST /slashing/validators/{validatorAddr}/unjail`
 
+上述的API都有三个特殊的查询参数，如上下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`async`将被忽略。
+
 | 参数名字        | 类型 | 默认值 | 优先级 | 功能描述                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
 | generate-only   | bool | false | 0 | 构建一个未签名的交易并返回 |
 | simulate        | bool | false | 1 | 用仿真的方式去执行交易 |
 | async           | bool | false | 2 | 用异步地方式广播交易  |
-
-上述八个API都有三个额外的查询参数，如上表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级（这里`0`是最高优先级）。 如果多个参数的值都是`true`，则将忽略优先级较低的。 例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`async`将被忽略。
