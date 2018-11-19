@@ -1,6 +1,9 @@
-# 介绍
+# IRISLCD用户文档
 
-IRISLCD节点是一个提供REST APIs接口的服务器，它可以连接到任何IRISHUB的全节点。通过这些RESTAPIs，用户可以发送交易和查询区块链数据。
+## 基本功能介绍
+
+1.提供restful API以及swagger-ui
+2.验证查询结果
 
 ## IRISLCD的用法
 

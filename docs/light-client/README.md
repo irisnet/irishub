@@ -1,8 +1,11 @@
-# What is IRISLCD
+# IRISLCD User Guide
 
-An IRISLCD node is a REST server which can connect to any full nodes and provide a set of rest APIs. By these APIs, users can send transactions and query blockchain data. 
+## Basic Functionality Description
 
-## IRISLCD usage
+1. Provide restful APIs and swagger-ui to show these APIs
+2. Verify query proof
+
+## IRISLCD Usage
 
 IRISLCD has two subcommands:
 
@@ -23,7 +26,7 @@ IRISLCD has two subcommands:
 | max-open        | int       | 1000                    | false    | The number of maximum open connections |
 | cors            | string    | ""                      | false    | Set the domains that can make CORS requests |
 
-## Sample commands to start 
+## Sample Commands 
 
 1. By default, IRISLCD doesn't trust the connected full node. But if you are sure about that the connected full node is trustable, then you should run IRISLCD with `--trust-node` option:
 ```bash
@@ -120,7 +123,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     1. `GET /version`: Version of IRISLCD
     2. `GET /node_version`: Version of the connected node
 
-## Special parameters
+## Special Parameters
 
 These apis are picked out from above section. And they can be used to build and broadcast transactions:
 1. `POST /bank/accounts/{address}/transfers`: Send tokens (build -> sign -> send)

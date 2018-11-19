@@ -1,9 +1,4 @@
-# IRISLCD User Guide
-
-## Basic Functionality Description
-
-1. Provide restful APIs and swagger-ui to show these APIs
-2. Verify query proof
+# IRISLCD
 
 ## Introduction
 

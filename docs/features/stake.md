@@ -4,7 +4,7 @@
 
 This specification briefly introduces the functionality of stake module and what user should do with the provided commands.
 
-## Core Concept
+## Core Concepts
 
 1. Voting power
 
@@ -38,7 +38,7 @@ This specification briefly introduces the functionality of stake module and what
 
 	As a delegator, the more bonded tokens it has on validator, the more rewards it will earn. For a validator operator, it will have extra rewards: validator commission. The rewards comes from token inflation and transaction fee. As for how to calculate the rewards and how to get the rewards, please refer to [mint](mint.md) and [distribution](distribution.md).
 	
-## What users can do
+## What Users Can Do
 
 1. Create a full node
 
