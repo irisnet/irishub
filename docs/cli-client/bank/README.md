@@ -2,7 +2,7 @@
 
 ## Description
 
-Bank allows you to management your local account 
+Bank allows you to manage assets in your local account 
 
 ## Usage:
 
@@ -16,7 +16,7 @@ Bank allows you to management your local account
 
 | Name      | Description                         |
 | --------- | ----------------------------------- |
-| coin-type | query coin type                     |
+| coin-type | Query coin type                     |
 | account   | Query account balance               |
 | send      | Create and sign a send tx           |
 | sign      | Sign transactions generated offline |
@@ -31,17 +31,8 @@ Bank allows you to management your local account
 
 | Name,shorthand        | Default        | Description                                 | Required |
 | --------------------- | -------------- | ------------------------------------------- | -------- |
-| -e, --encoding string | hex            | string   Binary encoding (hex \|b64 \|btc ) |          |
-| --home string         | /root/.iriscli | directory for config and data               |          |
+| -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) |          |
+| --home string         | /root/.iriscli | Directory for config and data               |          |
 | -o, --output string   | text           | Output format (text \|json)                 |          |
-| --trace               |                | print out full stack trace on errors        |          |
+| --trace               |                | Print out full stack trace on errors        |          |
 
-## Extended description
-
-
-
-​    
-
-
-
-​       
