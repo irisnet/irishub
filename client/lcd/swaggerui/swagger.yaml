@@ -96,7 +96,13 @@ paths:
       description: Get if the node is currently syning with other nodes
       responses:
         200:
-          description: '"true" or "false"'
+          description: node sync status
+          schema:
+            type: object
+            properties:
+              syncing:
+                type: boolean
+                example: false
         500:
           description: Server internal error
   /blocks/latest:
@@ -225,11 +231,11 @@ paths:
         required: true
       - in: query
         name: page
-        description: Pagination page
+        description: Pagination page, default value 0
         type: integer
       - in: query
         name: size
-        description: Pagination size
+        description: Pagination size, default value 100
         type: integer
       responses:
         200:
@@ -604,12 +610,17 @@ paths:
       summary: Create a new seed to create a new account with
       tags:
       - ICS1
+      produces:
+      - application/json
       responses:
         200:
           description: 24 word Seed
           schema:
-            type: string
-            example: blossom pool issue kidney elevator blame furnace winter account merry vessel security depend exact travel bargain problem jelly rural net again mask roast chest
+            type: object
+            properties:
+              seed:
+                type: string
+                example: blossom pool issue kidney elevator blame furnace winter account merry vessel security depend exact travel bargain problem jelly rural net again mask roast chest
     /keys/{name}/recover:
       post:
         summary: Recover a account from a seed
@@ -797,8 +808,6 @@ paths:
             delegate:
               type: object
               properties:
-                delegator_addr:
-                  $ref: "#/definitions/Address"
                 validator_addr:
                   $ref: "#/definitions/ValidatorAddress"
                 delegation:
@@ -858,8 +867,6 @@ paths:
             redelegate:
               type: object
               properties:
-                delegator_addr:
-                  $ref: "#/definitions/Address"
                 validator_src_addr:
                   $ref: "#/definitions/ValidatorAddress"
                 validator_dst_addr:
@@ -921,8 +928,6 @@ paths:
             unbond:
               type: object
               properties:
-                delegator_addr:
-                    $ref: "#/definitions/Address"
                 validator_addr:
                     $ref: "#/definitions/ValidatorAddress"
                 shares:
@@ -1259,13 +1264,9 @@ paths:
                 type: string
               bonded_tokens:
                 type: string
-              inflation_last_time:
+              total_supply:
                 type: string
-              inflation:
-                type: string
-              date_last_commission_reset:
-                type: string
-              prev_bonded_shares:
+              bonded_ratio:
                 type: string
         500:
           description: Internal Server Error
@@ -1282,14 +1283,6 @@ paths:
           schema:
             type: object
             properties:
-              inflation_rate_change:
-                type: string
-              inflation_max:
-                type: string
-              inflation_min:
-                type: string
-              goal_bonded:
-                type: string
               unbonding_time:
                 type: string
               max_validators:
@@ -1457,8 +1450,8 @@ paths:
         required: false
         type: string
       - in: query
-        name: depositer
-        description: depositer address
+        name: depositor
+        description: depositor address
         required: false
         type: string
       - in: query
@@ -1522,7 +1515,7 @@ paths:
           properties:
             base_tx:
               "$ref": "#/definitions/BaseTx"
-            depositer:
+            depositor:
               "$ref": "#/definitions/Address"
             amount:
               type: string
@@ -1663,10 +1656,10 @@ paths:
           description: Invalid proposal id
         500:
           description: Internal Server Error
-  /gov/proposals/{proposalId}/deposits/{depositer}:
+  /gov/proposals/{proposalId}/deposits/{depositor}:
     get:
       summary: Query deposit
-      description: Query deposit by proposalId and depositer address
+      description: Query deposit by proposalId and depositor address
       produces:
       - application/json
       tags:
@@ -1678,8 +1671,8 @@ paths:
         required: true
         in: path
       - type: string
-        description: Bech32 depositer address
-        name: depositer
+        description: Bech32 depositor address
+        name: depositor
         required: true
         in: path
       responses:
@@ -1688,7 +1681,7 @@ paths:
           schema:
             $ref: "#/definitions/Deposit"
         400:
-          description: Invalid proposal id or depositer address
+          description: Invalid proposal id or depositor address
         404:
           description: Found no deposit
         500:
@@ -1814,7 +1807,7 @@ paths:
       required: true
       type: string
     post:
-      summary: Set withdraw address
+      summary: Withdraw rewards
       tags:
       - ICS24
       consumes:
@@ -2352,7 +2345,7 @@ definitions:
         example: 10iris
       proposal_id:
         type: integer
-      depositer:
+      depositor:
         "$ref": "#/definitions/Address"
   Vote:
     type: object

@@ -82,7 +82,7 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
-		bechDepositerAddr := vars[RestDepositer]
+		bechDepositorAddr := vars[RestDepositor]
 
 		if len(strProposalID) == 0 {
 			err := errors.New("proposalId required but not specified")
@@ -95,13 +95,13 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		if len(bechDepositerAddr) == 0 {
-			err := errors.New("depositer address required but not specified")
+		if len(bechDepositorAddr) == 0 {
+			err := errors.New("depositor address required but not specified")
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
+		depositorAddr, err := sdk.AccAddressFromBech32(bechDepositorAddr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -109,7 +109,7 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 
 		params := gov.QueryDepositParams{
 			ProposalID: proposalID,
-			Depositer:  depositerAddr,
+			Depositor:  depositorAddr,
 		}
 
 		bz, err := cdc.MarshalJSON(params)
@@ -133,7 +133,7 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 				utils.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 				return
 			}
-			err = errors.Errorf("depositer [%s] did not deposit on proposalID [%d]", bechDepositerAddr, proposalID)
+			err = errors.Errorf("depositor [%s] did not deposit on proposalID [%d]", bechDepositorAddr, proposalID)
 			utils.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
@@ -249,7 +249,7 @@ func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		bechVoterAddr := r.URL.Query().Get(RestVoter)
-		bechDepositerAddr := r.URL.Query().Get(RestDepositer)
+		bechDepositorAddr := r.URL.Query().Get(RestDepositor)
 		strProposalStatus := r.URL.Query().Get(RestProposalStatus)
 		strNumLimit := r.URL.Query().Get(RestNumLimit)
 
@@ -264,13 +264,13 @@ func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			params.Voter = voterAddr
 		}
 
-		if len(bechDepositerAddr) != 0 {
-			depositerAddr, err := sdk.AccAddressFromBech32(bechDepositerAddr)
+		if len(bechDepositorAddr) != 0 {
+			depositorAddr, err := sdk.AccAddressFromBech32(bechDepositorAddr)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			params.Depositer = depositerAddr
+			params.Depositor = depositorAddr
 		}
 
 		if len(strProposalStatus) != 0 {
@@ -363,9 +363,6 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
 			case "Gov/govTallyingProcedure":
 				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
-			default:
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
 			}
 		}
 		utils.PostProcessResponse(w, cdc, pd, cliCtx.Indent)

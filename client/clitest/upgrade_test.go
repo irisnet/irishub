@@ -2,20 +2,22 @@ package clitest
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/irisnet/irishub/app"
 	//sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov"
 	"sync"
+
+	"github.com/irisnet/irishub/modules/gov"
 )
 
 var (
 	lastSwitchHeight int64
-	wg sync.WaitGroup
+	wg               sync.WaitGroup
 )
 
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
@@ -117,6 +119,10 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//require.Equal(t, votingStartBlock1+10, upgradeInfo.CurrentProposalAcceptHeight)
 	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
 
+	//////////////////// replay from version 0 for new coming node /////////////////////////////
+	/// start a old node with old version and then use a new version to start
+	startOldNodeBToReplay(t, chainID)
+
 	//////////////////////////////// Bugfix Software Upgrade ////////////////////////////////
 
 	/////////////////// Upgrade Proposal /////////////////////////////////
@@ -201,14 +207,50 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	//////////////////// replay from version 0 for new coming node /////////////////////////////
 	/// start a new node
 
-	//go startNodeBToReplay(t)
-	//
-	//wg.Add(1)
-	//wg.Wait()
-	//proc2.Stop(true)
+	go startNodeBToReplay(t, chainID)
+
+	wg.Add(1)
+	wg.Wait()
+	proc2.Stop(true)
 }
 
-func startNodeBToReplay(t *testing.T) {
+func startOldNodeBToReplay(t *testing.T, chainID string) {
+	irisBHome, iriscliBHome := getTestingHomeDirsB()
+	require.True(t, irisBHome != irisHome)
+	require.True(t, iriscliBHome != iriscliHome)
+
+	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisBHome), "")
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisBHome))
+
+	err := setupGenesisAndConfig(irisHome, irisBHome)
+	require.NoError(t, err)
+
+	// get a free port, also setup some common flags
+	servAddr, port, err := server.FreeTCPAddr()
+	require.NoError(t, err)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliBHome, servAddr, chainID)
+
+	// start old iris server
+	tests.ExecuteT(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisBHome, servAddr), "")
+
+	// start new iris2-bugfix server
+	proc3 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris1 start --replay --home=%s --rpc.laddr=%v", irisBHome, servAddr))
+	defer proc3.Stop(false)
+
+	tests.WaitForTMStart(port)
+	tests.WaitForHeightTM(lastSwitchHeight+10, port)
+
+	// check the upgrade info
+	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli1 upgrade info --output=json %v", flags))
+	require.Equal(t, uint64(0), upgradeInfo.CurrentProposalId)
+	require.Equal(t, int64(1), upgradeInfo.Verion.Id)
+
+}
+
+func startNodeBToReplay(t *testing.T, chainID string) {
 	irisBHome, iriscliBHome := getTestingHomeDirsB()
 	require.True(t, irisBHome != irisHome)
 	require.True(t, iriscliBHome != iriscliHome)
@@ -216,7 +258,8 @@ func startNodeBToReplay(t *testing.T) {
 	tests.ExecuteT(t, fmt.Sprintf("iris2-bugfix --home=%s unsafe-reset-all", irisBHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
-	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --name=foo --home=%s --home-client=%s", irisBHome, iriscliBHome))
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys add --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --moniker=foo --home=%s", irisBHome))
 
 	err := setupGenesisAndConfig(irisHome, irisBHome)
 	require.NoError(t, err)
@@ -231,7 +274,7 @@ func startNodeBToReplay(t *testing.T) {
 	defer proc3.Stop(false)
 
 	tests.WaitForTMStart(port)
-	tests.WaitForHeightTM(lastSwitchHeight + 10, port)
+	tests.WaitForHeightTM(lastSwitchHeight+10, port)
 
 	// check the upgrade info
 	upgradeInfo := executeGetUpgradeInfo(t, fmt.Sprintf("iriscli2-bugfix upgrade info --output=json %v", flags))
@@ -242,8 +285,6 @@ func startNodeBToReplay(t *testing.T) {
 }
 
 func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
-
-	t.SkipNow()
 
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
@@ -263,7 +304,7 @@ func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
 
 	//////////////////////// start node B ////////////////////////////
 
-	go irisStartNodeB(t)
+	go irisStartNodeB(t, chainID)
 
 	wg.Add(1)
 	wg.Wait()
@@ -271,23 +312,22 @@ func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
 
 }
 
-func irisStartNodeB(t *testing.T) {
+func irisStartNodeB(t *testing.T, chainID string) {
 	irisBHome, iriscliBHome := getTestingHomeDirsB()
 	require.True(t, irisBHome != irisHome)
 	require.True(t, iriscliBHome != iriscliHome)
 
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisBHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
-	executeInit(t, fmt.Sprintf("iris init -o --name=foo --home=%s --home-client=%s", irisBHome, iriscliBHome))
-
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisBHome))
 	err := setupGenesisAndConfig(irisHome, irisBHome)
 	require.NoError(t, err)
 
 	// get a free port, also setup some common flags
 	servAddr, port, err := server.FreeTCPAddr()
 	require.NoError(t, err)
-	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliBHome, servAddr, chainID)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start new iris2-bugfix server
 	proc3 := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisBHome, servAddr))

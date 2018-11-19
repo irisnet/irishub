@@ -22,6 +22,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	results[OptionNoWithVeto] = sdk.ZeroDec()
 
 	totalVotingPower := sdk.ZeroDec()
+	systemVotingPower := sdk.ZeroDec()
 	currValidators := make(map[string]validatorGovInfo)
 
 	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
@@ -32,6 +33,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 			Minus:           sdk.ZeroDec(),
 			Vote:            OptionEmpty,
 		}
+		systemVotingPower = systemVotingPower.Add(validator.GetPower())
 		return false
 	})
 
@@ -100,17 +102,18 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	if totalVotingPower.Sub(results[OptionAbstain]).Equal(sdk.ZeroDec()) {
 		return false, tallyResults
 	}
+	////////////////////  iris begin  ///////////////////////////
+	//if more than 1/3 of voters abstain, proposal fails
+	if tallyingProcedure.Participation.GT(totalVotingPower.Quo(systemVotingPower)) {
+		return false, tallyResults
+	}
+	////////////////////  iris end  ///////////////////////////
 
 	// If more than 1/3 of voters veto, proposal fails
 	if results[OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
 		return false, tallyResults
 	}
-	////////////////////  iris begin  ///////////////////////////
-	//if more than 1/3 of voters abstain, proposal fails
-	if totalVotingPower.Sub(results[OptionAbstain]).Quo(totalVotingPower).LTE(tallyingProcedure.Participation){
-		return  false, tallyResults
-	}
-	////////////////////  iris end  ///////////////////////////
+
 	// If more than 1/2 of non-abstaining voters vote Yes, proposal passes
 	if results[OptionYes].Quo(totalVotingPower.Sub(results[OptionAbstain])).GT(tallyingProcedure.Threshold) {
 		return true, tallyResults

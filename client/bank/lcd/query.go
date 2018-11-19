@@ -103,7 +103,7 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 		vars := mux.Vars(r)
 		coinType := vars["coin-type"]
 		res, err := cliCtx.GetCoinType(coinType)
-		if strings.Contains(err.Error(),"unsupported coin type") {
+		if err != nil && strings.Contains(err.Error(),"unsupported coin type") {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		} else if err != nil {
