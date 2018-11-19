@@ -15,9 +15,18 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	irisInit "github.com/irisnet/irishub/init"
 )
 
 func TestMetricsCmd(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cdc := app.MakeCodec()
 	comm := MonitorCommand(cdc)
 	viper.Set("node", "tcp://0.0.0.0:26657")
