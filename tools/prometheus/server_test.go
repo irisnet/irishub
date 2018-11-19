@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
+	irisInit "github.com/irisnet/irishub/init"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/shirou/gopsutil/cpu"
@@ -15,17 +16,10 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	irisInit "github.com/irisnet/irishub/init"
 )
 
 func TestMetricsCmd(t *testing.T) {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
-	config.Seal()
+	irisInit.InitBech32Prefix()
 
 	cdc := app.MakeCodec()
 	comm := MonitorCommand(cdc)
