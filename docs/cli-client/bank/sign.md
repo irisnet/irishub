@@ -19,12 +19,12 @@ iriscli bank sign <file> [flags]
 | -h, --help       |        | False    |                       | Help for send                                                |
 | --append         | Boole  | True     | True                  | Append the signature to the existing ones. If disabled, old signatures would be overwritten |
 | --name           | String | True     |                       | Name of private key with which to sign                       |
-| --offline        | Boole  | True     | false                 | Offline mode. Do not query local cache.                      |
-| --print-sigs     | Boole  | True     | false                 | Print the addresses that must sign the transaction and those who have already signed it, then exit |
+| --offline        | Boole  | True     | False                 | Offline mode. Do not query local cache.                      |
+| --print-sigs     | Boole  | True     | False                 | Print the addresses that must sign the transaction and those who have already signed it, then exit |
 | --chain-id       | String | False    |                       | Chain ID of tendermint node                                  |
 | --account-number | Int    | False    |                       | AccountNumber number to sign the tx                          |
 | --amount         | String | True     |                       | Amount of coins to send, for instance: 10iris                |
-| --async          |        | False    | true                  | Broadcast transactions asynchronously                        |
+| --async          |        | False    | True                  | Broadcast transactions asynchronously                        |
 | --dry-run        |        | False    |                       | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it |
 | --fee            | String | True     |                       | Fee to pay along with transaction                            |
 | --from           | String | True     |                       | Name of private key with which to sign                       |
