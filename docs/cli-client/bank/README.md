@@ -25,7 +25,7 @@ Bank allows you to manage assets in your local account
 
 | Name,shorthand | Default | Description   | Required |
 | -------------- | ------- | ------------- | -------- |
-| -h, --help     |         | help for bank |          |
+| -h, --help     |         | Help for bank |          |
 
 ## Global Flags
 
