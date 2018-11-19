@@ -20,7 +20,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 | --chain-id       | String | False    |                       | Chain ID of tendermint node                                  |
 | --account-number | int    | False    |                       | AccountNumber number to sign the tx                          |
 | --amount         | String | True     |                       | Amount of coins to send, for instance: 10iris                |
-| --async          |        |          | true                  | Broadcast transactions asynchronously                        |
+| --async          |        |          | True                  | Broadcast transactions asynchronously                        |
 | --dry-run        |        | False    |                       | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it |
 | --fee            | String | True     |                       | Fee to pay along with transaction                            |
 | --from           | String | True     |                       | Name of private key with which to sign                       |
