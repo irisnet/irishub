@@ -14,6 +14,7 @@ iriscli record download [record ID] [flags]
 
 | Name, shorthand | Default                    | Description                                                       | Required |
 | --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
+| --path            |     $HOME/.iriscli          | the directory to store the downloads                               | Yes      |
 | --chain-id      |                            | [string] Chain ID of tendermint node                              | Yes      |
 | --file-name     |                            | [string] Download file name                                       | Yes      |
 | --height        | most recent provable block | [int] block height to query                                       |          |
