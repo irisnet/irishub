@@ -342,14 +342,12 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 	for _, coin := range coins {
 		normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
 		if err != nil {
-			fmt.Errorf("fatal error: genesis file contains invalid coin: %s", coin)
-			os.Exit(0)
+			panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
 		}
 		nativeCoin = nativeCoin.Plus(normalizeNativeToken)
 	}
 	if nativeCoin.Amount.IsZero() {
-		fmt.Errorf("invalid genesis file, found account with zero %s", StakeDenom)
-		os.Exit(0)
+		panic(fmt.Sprintf("invalid genesis file, found account with zero %s", StakeDenom))
 	}
 	return sdk.Coins{nativeCoin}
 }

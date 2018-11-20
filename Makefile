@@ -154,7 +154,7 @@ testnet_init:
 	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
 	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
 	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
-	jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json
+	@jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json
 	@jq '.app_state.stake.pool.loose_tokens="1000600000000000000000000.0000000000"' build/genesis_temp.json > build/genesis_temp1.json
 	@sudo cp build/genesis_temp1.json build/nodecluster/node0/iris/config/genesis.json
 	@sudo cp build/genesis_temp1.json build/nodecluster/node1/iris/config/genesis.json
