@@ -323,55 +323,56 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			if moduleStr != "" {
+				// There are four possible outputs if the --module parameter is not empty:
+				// 1.List of the module;
+				// 2.List of keys in the module;
+				// 3.Error: GovParameter of the module does not exist;
+				// 4.Error: The key in the module does not exist;
 				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
 				if err == nil {
-
 					if len(res) == 0 {
+						// Return an error directly if the --module parameter is incorrect.
 						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
 					}
 
-					var keys []string
-					for _, kv := range res {
-						keys = append(keys, string(kv.Key))
+					if keyStr != "" {
+						// There are two possible outputs if the --key parameter is not empty:
+						// 1.List of keys in the module;
+						// 2.Error: The key in the module does not exist;
+						iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+							&govparams.VotingProcedureParameter,
+							&govparams.TallyingProcedureParameter)
+
+						res, err := ctx.QueryStore([]byte(keyStr), storeName)
+						return printKeyJsonIfExists(err, keyStr, res, cdc)
 					}
 
-					output, err := json.MarshalIndent(keys, "", " ")
-
+					// Print module list
+					err := printModuleList(res)
 					if err != nil {
 						return err
 					}
-					fmt.Println(string(output))
 					return nil
 				} else {
-					return nil
+					// Throw RPC client query exception
+					return err
 				}
 			}
 
+			// Check --key parameter if the --module parameter is empty.
 			if keyStr != "" {
+				// There are two possible outputs if the --key parameter is not empty:
+				// 1.List of keys in the module;
+				// 2.Error: The key in the module does not exist;
 				iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 					&govparams.VotingProcedureParameter,
 					&govparams.TallyingProcedureParameter)
 
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
-				if err == nil {
-					if p, ok := iparam.ParamMapping[keyStr]; ok {
-
-						if len(res) == 0 {
-							return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
-						}
-
-						p.GetValueFromRawData(cdc, res)
-						printParamStr(p, keyStr)
-						return nil
-
-					} else {
-						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
-					}
-				} else {
-					return err
-				}
-
+				return printKeyJsonIfExists(err, keyStr, res, cdc)
 			}
+
+			// Return error if the --module & --key parameters are all empty.
 			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
 		},
 	}
@@ -379,6 +380,42 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagModule, "", "module name")
 	cmd.Flags().String(flagKey, "", "key name of parameter")
 	return cmd
+}
+
+func printKeyJsonIfExists(e error, keyStr string, res []byte, cdc *codec.Codec) (err error) {
+	if e == nil {
+		if p, ok := iparam.ParamMapping[keyStr]; ok {
+			if len(res) == 0 {
+				// Return an error directly if the --key parameter is incorrect.
+				return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
+			}
+			// Print key json in the module
+			p.GetValueFromRawData(cdc, res)
+			printParamStr(p, keyStr)
+			return nil
+		} else {
+			//
+			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
+		}
+	} else {
+		// Throw RPC client query exception
+		return e
+	}
+}
+
+func printModuleList(res []sdk.KVPair) (err error) {
+	var keys []string
+	for _, kv := range res {
+		keys = append(keys, string(kv.Key))
+	}
+
+	output, err := json.MarshalIndent(keys, "", " ")
+
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(output))
+	return nil
 }
 
 func printParamStr(p iparam.GovParameter, keyStr string) {
