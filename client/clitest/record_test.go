@@ -49,10 +49,10 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 	require.Equal(t, fooAddr, record1.OwnerAddress)
 	require.Equal(t, "record-test", record1.Data)
 
-	downloadOK := executeDownloadRecord(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s %v", recordID1, "download.txt", flags), iriscliHome+"/download.txt", true)
+	downloadOK := executeDownloadRecord(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s --path=%s %v", recordID1, "download.txt", iriscliHome, flags), iriscliHome+"/download.txt", true)
 	require.Equal(t, true, downloadOK)
 
-	res, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s %v", recordID1, "download.txt", flags), "")
+	res, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli record download --record-id=%s --file-name=%s --path=%s %v", recordID1, "download.txt", iriscliHome, flags), "")
 	//require.Equal(t, fmt.Sprintf("Warning: %s already exists, please try another file name.", iriscliHome+"/download.txt"), res)
 
 	// submit a second record onchain test
