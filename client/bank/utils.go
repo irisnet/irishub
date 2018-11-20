@@ -17,13 +17,19 @@ type BaseAccount struct {
 }
 
 func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.Account) (BaseAccount, error) {
-	coinsString, err := cliCtx.ConvertCoinToMainUnit(acc.GetCoins().String())
-	if err != nil {
-		return BaseAccount{}, err
+	var accCoins []string
+	for _, coin := range acc.GetCoins() {
+		coinString, err := cliCtx.ConvertCoinToMainUnit(coin.String())
+		if err == nil {
+			accCoins = append(accCoins, coinString[0])
+		} else {
+			accCoins = append(accCoins, coin.String())
+		}
+
 	}
 	return BaseAccount{
 		Address:       acc.GetAddress(),
-		Coins:         coinsString,
+		Coins:         accCoins,
 		PubKey:        acc.GetPubKey(),
 		AccountNumber: acc.GetAccountNumber(),
 		Sequence:      acc.GetSequence(),

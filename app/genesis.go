@@ -338,18 +338,39 @@ func createMintGenesisState() mint.GenesisState {
 
 // normalize stake token to mini-unit
 func normalizeNativeToken(coins []string) sdk.Coins {
+	var accountCoins sdk.Coins
 	nativeCoin := sdk.NewInt64Coin(StakeDenom, 0)
 	for _, coin := range coins {
-		normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
+		coinName, err := types.GetCoinName(coin)
 		if err != nil {
 			panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
 		}
-		nativeCoin = nativeCoin.Plus(normalizeNativeToken)
+		if coinName == Denom {
+			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, StakeDenom))
+			}
+			nativeCoin = nativeCoin.Plus(normalizeNativeToken)
+		} else {
+			// not native token
+			denom, amount, err := types.GetCoin(coin);
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
+			}
+
+			amt, ok := sdk.NewIntFromString(amount)
+			if !ok {
+				panic(fmt.Sprintf("non-native coin(%s) amount should be integer ", coin))
+			}
+			denom = strings.ToLower(denom)
+			accountCoins = append(accountCoins, sdk.NewCoin(denom, amt))
+		}
 	}
-	if nativeCoin.Amount.IsZero() {
-		panic(fmt.Sprintf("invalid genesis file, found account with zero %s", StakeDenom))
+	accountCoins = append(accountCoins, nativeCoin)
+	if accountCoins.IsZero() {
+		panic("invalid genesis file, found account without any token")
 	}
-	return sdk.Coins{nativeCoin}
+	return accountCoins
 }
 
 func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
