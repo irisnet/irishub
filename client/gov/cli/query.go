@@ -341,6 +341,9 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 					}
 
 					if keyStr != "" {
+						// There are two possible outputs if the --key parameter is not empty:
+						// 1.List of keys in the module;
+						// 2.Error: The key in the module does not exist;
 						iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 							&govparams.VotingProcedureParameter,
 							&govparams.TallyingProcedureParameter)
