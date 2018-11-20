@@ -8,4 +8,5 @@ const (
 	flagFileName    = "file-name"
 	flagTargetPath  = "target-path"
 	flagRecordID    = "record-id"
+	flagPath        = "path"
 )
