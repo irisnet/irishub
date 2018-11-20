@@ -20,7 +20,7 @@ iriscli gov pull-params --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --path          | $HOME/.iris                | [string] Directory of iris home                                                                                                                      |          |
+| --path          | $HOME/.iriscli                | [string] Directory of iris home                                                                                                                      |          |
 
 ## Examples
 
@@ -33,10 +33,10 @@ iriscli gov pull-params
 Then you'll receive a message as described below:
 
 ```txt
-Save the parameter config file in  /Users/trevorfu/.iris/config/params.json
+Save the parameter config file in  /Users/trevorfu/.iriscli/params.json
 ```
 
-If you open the params.json in the --path/config directory, you can see it's json format content.
+If you open the params.json in the --path directory, you can see it's json format content.
 
 ```txt
 {

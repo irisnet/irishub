@@ -14,6 +14,7 @@ iriscli record download [record ID] [flags]
 
 | 名称, 速记 | 默认值                    | 描述                                                             | 必需      |
 | --------------- | -------------------------- | --------------------------------------------------------- | -------- |
+| --path            |     $HOME/.iriscli          | [string]存储下载的目录                             | 是     |
 | --chain-id      |                            | [string] tendermint节点的链ID                              | 是       |
 | --file-name     |                            | [string] 下载文件名                                        | 是       |
 | --height        | 最近可证明区块高度           | [int] 查询的区块高度                                       |          |
