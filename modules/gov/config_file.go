@@ -16,7 +16,7 @@ type ParameterConfigFile struct {
 }
 
 func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
-	pathStr = path.Join(pathStr, "config/params.json")
+	pathStr = path.Join(pathStr, "params.json")
 
 	jsonBytes, err := cmn.ReadFile(pathStr)
 
@@ -57,7 +57,7 @@ func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pa
 		return err
 	}
 
-	pathStr = path.Join(pathStr, "config/params.json")
+	pathStr = path.Join(pathStr, "params.json")
 	err = cmn.WriteFile(pathStr, output, 0644)
 	if err != nil {
 
