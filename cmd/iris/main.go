@@ -71,7 +71,10 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewIrisApp(logger, db, traceStore, bam.SetPruning(viper.GetString("pruning")))
+	return app.NewIrisApp(logger, db, traceStore,
+		bam.SetPruning(viper.GetString("pruning")),
+		bam.SetMinimumFees(viper.GetString("minimum_fees")),
+	)
 }
 
 func exportAppStateAndTMValidators(

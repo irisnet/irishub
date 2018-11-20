@@ -198,7 +198,7 @@ func InitializeTestLCD(
 	for _, addr := range initAddrs {
 		accAuth := auth.NewBaseAccountWithAddress(addr)
 		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, 20))}
-		acc := irisapp.NewGenesisAccount(&accAuth)
+		acc := irisapp.NewGenesisFileAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
 		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 20)))
 	}
