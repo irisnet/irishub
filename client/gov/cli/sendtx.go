@@ -5,23 +5,25 @@ import (
 	"os"
 
 	"encoding/json"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
+	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	client "github.com/irisnet/irishub/client/gov"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
 func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "submit-proposal",
-		Short: "Submit a proposal along with an initial deposit",
+		Use:     "submit-proposal",
+		Short:   "Submit a proposal along with an initial deposit",
 		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.004iris --type=Text --description=test --title=test-proposal",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
@@ -64,7 +66,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			}
 			////////////////////  iris end  /////////////////////////////
 
-
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -79,10 +80,11 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
-	cmd.Flags().String(flagPath, "", "the path of param.json")
+	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
 	////////////////////  iris end  /////////////////////////////
 	return cmd
 }
+
 ////////////////////  iris begin  ///////////////////////////
 func getParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *codec.Codec) (gov.Param, error) {
 	var param gov.Param
@@ -104,14 +106,14 @@ func getParamFromString(paramStr string, pathStr string, keyStr string, opStr st
 		return param, errors.New("Path and param are both empty")
 	}
 }
-////////////////////  iris end  /////////////////////////////
 
+////////////////////  iris end  /////////////////////////////
 
 // GetCmdDeposit implements depositing tokens for an active proposal.
 func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deposit",
-		Short: "deposit tokens for activing proposal",
+		Use:     "deposit",
+		Short:   "deposit tokens for activing proposal",
 		Example: "iriscli gov deposit --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposal-id=1 --deposit=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -156,8 +158,8 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 // GetCmdVote implements creating a new vote command.
 func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "vote",
-		Short: "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
+		Use:     "vote",
+		Short:   "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
 		Example: "iriscli gov vote --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposal-id=1 --option=Yes",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -200,7 +202,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal voting on")
 	cmd.Flags().String(flagOption, "", "vote option {Yes, No, NoWithVeto, Abstain}")
-    cmd.MarkFlagRequired(flagProposalID)
+	cmd.MarkFlagRequired(flagProposalID)
 	cmd.MarkFlagRequired(flagOption)
 	return cmd
 }

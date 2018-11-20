@@ -10,22 +10,21 @@ import (
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tmlibs/cli"
-
-	shell "github.com/ipfs/go-ipfs-api"
+	"github.com/ipfs/go-ipfs-api"
+	"github.com/irisnet/irishub/app"
 )
 
 func GetCmdDownload(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "download [record ID]",
 		Short:   "download related data with unique record ID to specified file",
-		Example: "iriscli record download --chain-id=<chain-id> --file-name=<file name> --record-id=<record-id>",
+		Example: "iriscli record download --chain-id=<chain-id> --file-name=<file name> --record-id=<record-id> --path=<download-directory>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			pinedNode := viper.GetString(flagPinedNode)
 			downloadFileName := viper.GetString(flagFileName)
-			home := viper.GetString(cli.HomeFlag)
+			path := viper.GetString(flagPath)
 			recordID := viper.GetString(flagRecordID)
 
 			res, err := cliCtx.QueryStore([]byte(recordID), storeName)
@@ -36,7 +35,7 @@ func GetCmdDownload(storeName string, cdc *codec.Codec) *cobra.Command {
 			var submitFile record.MsgSubmitRecord
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitFile)
 
-			filePath := filepath.Join(home, downloadFileName)
+			filePath := filepath.Join(path, downloadFileName)
 			if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 				fmt.Printf("Warning: %v already exists, please try another file name.\n", filePath)
 				return err
@@ -80,6 +79,7 @@ func GetCmdDownload(storeName string, cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagRecordID, "", "record ID")
 	cmd.Flags().String(flagFileName, "", "download file name")
+	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory to store the downloads")
 
 	return cmd
 }

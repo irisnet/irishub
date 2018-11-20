@@ -3,23 +3,24 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/app"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
 func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-proposal",
-		Short: "Query details of a single proposal",
+		Use:     "query-proposal",
+		Short:   "Query details of a single proposal",
 		Example: "iriscli gov query-proposal --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -53,8 +54,8 @@ func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryProposals implements a query proposals command.
 func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-proposals",
-		Short: "query proposals with optional filters",
+		Use:     "query-proposals",
+		Short:   "query proposals with optional filters",
 		Example: "iriscli gov query-proposals --status=Passed",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bechDepositorAddr := viper.GetString(flagDepositor)
@@ -63,7 +64,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			numLimit := uint64(viper.GetInt64(flagNumLimit))
 
 			params := gov.QueryProposalsParams{
-				Limit:numLimit,
+				Limit: numLimit,
 			}
 
 			if len(bechDepositorAddr) != 0 {
@@ -133,8 +134,8 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryVote implements the query proposal vote command.
 func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-vote",
-		Short: "query vote",
+		Use:     "query-vote",
+		Short:   "query vote",
 		Example: "iriscli gov query-vote --proposal-id=1 --voter=<voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -173,8 +174,8 @@ func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryVotes implements the command to query for proposal votes.
 func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-votes",
-		Short: "query votes on a proposal",
+		Use:     "query-votes",
+		Short:   "query votes on a proposal",
 		Example: "iriscli gov query-votes --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -207,8 +208,8 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryDeposit implements the query proposal deposit command.
 func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-deposit",
-		Short: "Query details of a deposit",
+		Use:     "query-deposit",
+		Short:   "Query details of a deposit",
 		Example: "iriscli gov query-deposit --proposal-id=1 --depositor=<depositor address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -247,8 +248,8 @@ func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryDeposits implements the command to query for proposal deposits.
 func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-deposits",
-		Short: "Query deposits on a proposal",
+		Use:     "query-deposits",
+		Short:   "Query deposits on a proposal",
 		Example: "iriscli gov query-deposits --proposal-id=4",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -280,8 +281,8 @@ func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryDeposits implements the command to query for proposal deposits.
 func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-tally",
-		Short: "Get the tally of a proposal vote",
+		Use:     "query-tally",
+		Short:   "Get the tally of a proposal vote",
 		Example: "iriscli gov query-tally --proposal-id=4",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -310,16 +311,10 @@ func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-const (
-	flagModule = "module"
-	flagKey    = "key"
-	flagPath   = "path"
-)
-
 func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "query-params",
-		Short: "query parameter proposal's config",
+		Use:     "query-params",
+		Short:   "query parameter proposal's config",
 		Example: "iriscli gov query-params --module=<module name> --key=<key name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			moduleStr := viper.GetString(flagModule)
@@ -397,14 +392,14 @@ func printParamStr(p iparam.GovParameter, keyStr string) {
 
 func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pull-params",
-		Short: "generate param.json file",
+		Use:     "pull-params",
+		Short:   "generate param.json file",
 		Example: "iriscli gov pull-params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
-			if err == nil && len(res)!=0 {
+			if err == nil && len(res) != 0 {
 				var pd gov.ParameterConfigFile
 				pathStr := viper.GetString(flagPath)
 				err := pd.WriteFile(cdc, res, pathStr)
@@ -415,7 +410,6 @@ func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().String(flagPath, app.DefaultNodeHome, "directory of iris home")
+	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
 	return cmd
 }
-
