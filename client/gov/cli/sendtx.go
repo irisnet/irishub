@@ -80,7 +80,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
-	cmd.Flags().String(flagPath, app.DefaultNodeHome, "the path of param.json")
+	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
 	////////////////////  iris end  /////////////////////////////
 	return cmd
 }

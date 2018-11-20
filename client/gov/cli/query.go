@@ -410,6 +410,6 @@ func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().String(flagPath, app.DefaultNodeHome, "directory of iris home")
+	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
 	return cmd
 }
