@@ -20,7 +20,7 @@ iriscli gov pull-params --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --path          | $HOME/.iriscli                | [string] Directory of iris home                                                                                                                      |          |
+| --path          | $HOME/.iriscli                | [string] Directory of iriscli home                                                                                                                      |          |
 
 ## Examples
 

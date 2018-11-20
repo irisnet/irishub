@@ -13,37 +13,27 @@
 iriscli gov [command]
 ```
 
+打印子命令和参数
+```
+iriscli distribution --help
+```
+
 ## 相关命令
 
 | 命令                                  | 描述                                                             |
 | ------------------------------------- | --------------------------------------------------------------- |
-| [query-proposal](query-proposal.md)   | Query details of a single proposal                              |
-| [query-proposals](query-proposals.md) | Query proposals with optional filters                           |
-| [query-vote](query-vote.md)           | Query vote                                                      |
-| [query-votes](query-votes.md)         | Query votes on a proposal                                       |
-| [query-deposit](query-deposit.md)     | Query details of a deposit                                      |
-| [query-deposits](query-deposits.md)   | Query deposits on a proposal                                    |
-| [query-tally](query-tally.md)         | Get the tally of a proposal vote                                |
-| [query-params](query-params.md)       | Query parameter proposal's config                               |
-| [pull-params](pull-params.md)         | Generate param.json file                                        |
-| [submit-proposal](submit-proposal.md) | Create a new key, or import from seed                           |
-| [deposit](deposit.md)                 | Deposit tokens for activing proposal                            |
-| [vote](vote.md)                       | Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain |
-
-## 标志
-
-| 名称, 速记       | 默认值   | 描述          | 是否必须  |
-| --------------- | ------- | ------------- | -------- |
-| --help, -h      |         | help for gov  |          |
-
-## 全局标志
-
-| 名称, 速记       | 默认值          | 描述                                   | 是否必须  |
-| --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
-| --home          | $HOME/.iriscli | [string] directory for config and data |          |
-| --output, -o    | text           | [string] Output format (text|json)     |          |
-| --trace         |                | print out full stack trace on errors   |          |
+| [query-proposal](query-proposal.md)   | 查询单个提议的详细信息                                             |
+| [query-proposals](query-proposals.md) | 通过可选过滤器查询提议                                             |
+| [query-vote](query-vote.md)           | 查询投票信息                                                      |
+| [query-votes](query-votes.md)         | 查询提议的投票情况                                                 |
+| [query-deposit](query-deposit.md)     | 查询保证金详情                                                    |
+| [query-deposits](query-deposits.md)   | 查询提议的保证金                                                  |
+| [query-tally](query-tally.md)         | 查询提议投票的统计                                                 |
+| [query-params](query-params.md)       | 查询参数提议的配置                                                 |
+| [pull-params](pull-params.md)         | 生成param.json文件                                               |
+| [submit-proposal](submit-proposal.md) | 创建新密钥，或者通过助记词导入恢复                                   |
+| [deposit](deposit.md)                 | 充值保证金代币以激活提议                                            |
+| [vote](vote.md)                       | 为有效的提议投票，选项：Yes/No/NoWithVeto/Abstain                   |
 
 ## 补充描述
 

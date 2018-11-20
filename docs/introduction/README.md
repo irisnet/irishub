@@ -1,8 +1,10 @@
 # Introduction
 
-## The IRIS hub
+## IRIS Network
 
-## The IRIS Service
+## IRIS Hub
 
-## The IRIS Network
+## IRIS Tokens
+
+## IRIS Services
 

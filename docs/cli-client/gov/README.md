@@ -12,6 +12,10 @@ This module provides the basic functions as described below:
 ```shell
 iriscli gov [command]
 ```
+Print all supported subcommands and flags:
+```
+iriscli distribution --help
+```
 
 ## Available Commands
 
@@ -30,20 +34,6 @@ iriscli gov [command]
 | [deposit](deposit.md)                 | Deposit tokens for activing proposal                            |
 | [vote](vote.md)                       | vote for an active proposal, options: Yes/No/NoWithVeto/Abstain |
 
-## Flags
-
-| Name, shorthand | Default | Description   | Required |
-| --------------- | ------- | ------------- | -------- |
-| --help, -h      |         | help for gov  |          |
-
-## Global Flags
-
-| Name, shorthand | Default        | Description                            | Required |
-| --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
-| --home          | $HOME/.iriscli | [string] directory for config and data |          |
-| --output, -o    | text           | [string] Output format (text|json)     |          |
-| --trace         |                | print out full stack trace on errors   |          |
 
 ## Extended description
 

@@ -10,7 +10,7 @@
 iriscli distribution [subcommand]
 ```
 
-打印所以子命令和参数
+打印子命令和参数
 
 ```
 iriscli distribution --help
