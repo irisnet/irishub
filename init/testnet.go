@@ -96,7 +96,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 	valPubKeys := make([]crypto.PubKey, numValidators)
 
 	var (
-		accs     []app.GenesisAccount
+		accs     []app.GenesisFileAccount
 		genFiles []string
 	)
 
@@ -177,11 +177,9 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			return err
 		}
 
-		accs = append(accs, app.GenesisAccount{
+		accs = append(accs, app.GenesisFileAccount{
 			Address: addr,
-			Coins: sdk.Coins{
-				app.FreeFermionAcc,
-			},
+			Coins: []string{app.FreeFermionAcc.String()},
 		})
 
 		msg := stake.NewMsgCreateValidator(
@@ -231,11 +229,11 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 }
 
 func initGenFiles(
-	cdc *codec.Codec, chainID string, accs []app.GenesisAccount,
+	cdc *codec.Codec, chainID string, accs []app.GenesisFileAccount,
 	genFiles []string, numValidators int,
 ) error {
 
-	appGenState := app.NewDefaultGenesisState()
+	appGenState := app.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
 
 	appGenStateJSON, err := codec.MarshalJSONIndent(cdc, appGenState)

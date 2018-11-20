@@ -29,7 +29,7 @@ const (
 	defaultCommissionMaxChangeRate = "0.01"
 )
 
-// GenTxCmd builds the gaiad gentx command.
+// GenTxCmd builds the iris gentx command.
 // nolint: errcheck
 func GenTxCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -72,7 +72,7 @@ following delegation and commission default parameters:
 					return err
 				}
 			}
-			// Run gaiad tx create-validator
+			// Run iris tx create-validator
 			prepareFlagsForTxCreateValidator(config, nodeID, ip, genDoc.ChainID, valPubKey)
 			createValidatorCmd := stakecmd.GetCmdCreateValidator(cdc)
 

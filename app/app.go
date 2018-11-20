@@ -311,11 +311,12 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
-	var genesisState GenesisState
-	err := app.cdc.UnmarshalJSON(stateJSON, &genesisState)
+	var genesisFileState GenesisFileState
+	err := app.cdc.UnmarshalJSON(stateJSON, &genesisFileState)
 	if err != nil {
 		panic(err)
 	}
+	genesisState := convertToGenesisState(genesisFileState)
 	// sort by account number to maintain consistency
 	sort.Slice(genesisState.Accounts, func(i, j int) bool {
 		return genesisState.Accounts[i].AccountNumber < genesisState.Accounts[j].AccountNumber

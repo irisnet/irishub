@@ -117,7 +117,7 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 	return nil
 }
 
-func modifyGenesisState(genesisState app.GenesisState) app.GenesisState {
+func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
@@ -204,10 +204,10 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	nodeID,_ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState app.GenesisState
+	var appState app.GenesisFileState
 	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []app.GenesisAccount{app.NewDefaultGenesisAccount(fooAddr)}
+	appState.Accounts = []app.GenesisFileAccount{app.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)
