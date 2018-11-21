@@ -2,12 +2,12 @@
 
 ## Description
 
-在所有提交的块上匹配此txhash
+Matches this txhash over all committed blocks
 
 ## Usage
 
 ```
-Matches this txhash over all committed blocks
+iriscli tendermint tx [hash] [flags]
 
 ```
 
