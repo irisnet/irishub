@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
@@ -107,28 +106,6 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 	}
 }
 
-// NewDefaultGenesisState generates the default state for iris.
-func NewDefaultGenesisState() GenesisState {
-	return GenesisState{
-		Accounts:     nil,
-		StakeData:    createStakeGenesisState(),
-		MintData:     createMintGenesisState(),
-		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
-		UpgradeData:  upgrade.DefaultGenesisState(),
-		ServiceData:  service.DefaultGenesisState(),
-		SlashingData: slashing.DefaultGenesisState(),
-		GenTxs:       nil,
-	}
-}
-
-// get app init parameters for server init command
-func IrisAppInit() server.AppInit {
-	return server.AppInit{
-		AppGenState: IrisAppGenStateJSON,
-	}
-}
-
 // Create the core parameters for genesis initialization for iris
 // note that the pubkey input is this machines pubkey
 func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []json.RawMessage) (
@@ -162,15 +139,19 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	for _, acc := range genesisState.Accounts {
 		// create the genesis account, give'm few iris-atto and a buncha token with there name
 		for _, coin := range acc.Coins {
+			coinName, err := types.GetCoinName(coin)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
+			}
+			if coinName != Denom {
+				continue
+			}
 			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
-				fmt.Errorf("fatal error: genesis file contains invalid coin: %s", coin)
-				os.Exit(0)
+				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", StakeDenom, coin))
 			}
-			if stakeToken.Denom == StakeDenom {
-				stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
-					Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
-			}
+			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
+				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
 		}
 	}
 	genesisState.StakeData = stakeData
@@ -343,7 +324,7 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 	for _, coin := range coins {
 		coinName, err := types.GetCoinName(coin)
 		if err != nil {
-			panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
+			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 		}
 		if coinName == Denom {
 			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
@@ -428,6 +409,22 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 		Coins:         coins,
 		AccountNumber: acc.AccountNumber,
 		Sequence:      acc.Sequence,
+	}
+}
+
+func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+
+	return GenesisFileState{
+		Accounts:     accounts,
+		AuthData:     authData,
+		StakeData:    stakeData,
+		MintData:     mintData,
+		DistrData:    distrData,
+		GovData:      govData,
+		UpgradeData:  upgradeData,
+		ServiceData:  serviceData,
+		SlashingData: slashingData,
 	}
 }
 
