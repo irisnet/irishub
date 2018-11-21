@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
@@ -107,28 +106,6 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 	}
 }
 
-// NewDefaultGenesisState generates the default state for iris.
-func NewDefaultGenesisState() GenesisState {
-	return GenesisState{
-		Accounts:     nil,
-		StakeData:    createStakeGenesisState(),
-		MintData:     createMintGenesisState(),
-		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
-		UpgradeData:  upgrade.DefaultGenesisState(),
-		ServiceData:  service.DefaultGenesisState(),
-		SlashingData: slashing.DefaultGenesisState(),
-		GenTxs:       nil,
-	}
-}
-
-// get app init parameters for server init command
-func IrisAppInit() server.AppInit {
-	return server.AppInit{
-		AppGenState: IrisAppGenStateJSON,
-	}
-}
-
 // Create the core parameters for genesis initialization for iris
 // note that the pubkey input is this machines pubkey
 func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []json.RawMessage) (
@@ -164,13 +141,10 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 		for _, coin := range acc.Coins {
 			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
-				fmt.Errorf("fatal error: genesis file contains invalid coin: %s", coin)
-				os.Exit(0)
+				continue
 			}
-			if stakeToken.Denom == StakeDenom {
-				stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
-					Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
-			}
+			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
+				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
 		}
 	}
 	genesisState.StakeData = stakeData
