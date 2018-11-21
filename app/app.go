@@ -405,8 +405,22 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		return false
 	}
 	app.accountMapper.IterateAccounts(ctx, appendAccount)
-	genState := NewGenesisState(
-		accounts,
+	fileAccounts := []GenesisFileAccount{}
+	for _, acc := range accounts {
+		var coinsString []string
+		for _, coin := range acc.Coins {
+			coinsString = append(coinsString, coin.String())
+		}
+		fileAccounts = append(fileAccounts,
+			GenesisFileAccount{
+				Address:       acc.Address,
+				Coins:         coinsString,
+				Sequence:      acc.Sequence,
+				AccountNumber: acc.AccountNumber,
+			})
+	}
+	genState := NewGenesisFileState(
+		fileAccounts,
 		auth.ExportGenesis(ctx, app.feeCollectionKeeper),
 		stake.ExportGenesis(ctx, app.stakeKeeper),
 		mint.ExportGenesis(ctx, app.mintKeeper),

@@ -48,10 +48,10 @@ func main() {
 	startCmd := server.StartCmd(ctx, newApp)
 	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
-		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.InitCmd(ctx, cdc),
 		irisInit.GenTxCmd(ctx, cdc),
 		irisInit.AddGenesisAccountCmd(ctx, cdc),
-		irisInit.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.TestnetFilesCmd(ctx, cdc),
 		irisInit.CollectGenTxsCmd(ctx, cdc),
 		startCmd,
 		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),

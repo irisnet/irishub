@@ -108,5 +108,5 @@ func initializeEmptyGenesis(
 		return nil, fmt.Errorf("genesis.json file already exists: %v", genFile)
 	}
 
-	return codec.MarshalJSONIndent(cdc, app.NewDefaultGenesisState())
+	return codec.MarshalJSONIndent(cdc, app.NewDefaultGenesisFileState())
 }
