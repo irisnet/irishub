@@ -121,7 +121,7 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			xdepositorAddr, err := cliCtx.GetFromAddress()
+			depositorAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
@@ -130,7 +130,7 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 
 			////////////////////  iris begin  ///////////////////////////
 			amount, err := cliCtx.ParseCoins(viper.GetString(flagDeposit))
-			////////////////////  xxiris end  /////////////////////////////
+			////////////////////  iris end  /////////////////////////////
 
 			if err != nil {
 				return err

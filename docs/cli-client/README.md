@@ -30,15 +30,15 @@ All commands which can be used to send transactions have these global flags. The
 | --gas            | int    | false    | 200000                | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
 | --gas-adjustment | int    | false    | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
 | --generate-only  | bool   | false    | false                 | Build an unsigned transaction and write it to STDOUT |
-| --help, -h       | string | false    |                         | Print help message |
+| --help, -h       | string | false    |                       | Print help message |
 | --indent         | bool   | false    | false                 | Add indent to JSON response |
-| --json           | string | false    | false                  | Return output in json format |
+| --json           | string | false    | false                 | Return output in json format |
 | --ledger         | bool   | false    | false                 | Use a connected Ledger device |
 | --memo           | string | false    | ""                    | Memo to send along with transaction |
 | --node           | string | false    | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain |
-| --print-response | bool   | false    | false             | return tx response (only works with async = false)|
+| --print-response | bool   | false    | false                 | return tx response (only works with async = false)|
 | --sequence int   | int    | false    | 0                     | Sequence number to sign the tx |
-| --trust-node     | bool   | false    | true                | Don't verify proofs for responses | 
+| --trust-node     | bool   | false    | true                  | Don't verify proofs for responses | 
 
 ## Modules list
 
