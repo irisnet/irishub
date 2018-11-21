@@ -412,6 +412,22 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	}
 }
 
+func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+
+	return GenesisFileState{
+		Accounts:     accounts,
+		AuthData:     authData,
+		StakeData:    stakeData,
+		MintData:     mintData,
+		DistrData:    distrData,
+		GovData:      govData,
+		UpgradeData:  upgradeData,
+		ServiceData:  serviceData,
+		SlashingData: slashingData,
+	}
+}
+
 // NewDefaultGenesisState generates the default state for iris.
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
