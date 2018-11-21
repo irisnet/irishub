@@ -50,6 +50,7 @@ func main() {
 	rootCmd.AddCommand(
 		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
 		irisInit.GenTxCmd(ctx, cdc),
+		irisInit.AddGenesisAccountCmd(ctx, cdc),
 		irisInit.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		irisInit.CollectGenTxsCmd(ctx, cdc),
 		startCmd,
