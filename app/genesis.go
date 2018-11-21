@@ -139,9 +139,16 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	for _, acc := range genesisState.Accounts {
 		// create the genesis account, give'm few iris-atto and a buncha token with there name
 		for _, coin := range acc.Coins {
+			coinName, err := types.GetCoinName(coin)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
+			}
+			if coinName != Denom {
+				continue
+			}
 			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
-				continue
+				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", StakeDenom, coin))
 			}
 			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
 				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
@@ -317,7 +324,7 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 	for _, coin := range coins {
 		coinName, err := types.GetCoinName(coin)
 		if err != nil {
-			panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
+			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 		}
 		if coinName == Denom {
 			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
