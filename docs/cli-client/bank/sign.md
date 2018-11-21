@@ -30,14 +30,14 @@ iriscli bank sign <file> [flags]
 | --from           | String | True     |                       | Name of private key with which to sign                       |
 | --from-addr      | String | False    |                       | Specify from address in generate-only mode                   |
 | --gas            | String | False    | 20000                 | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
-| --gas-adjustment | Float  |          | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |
-| --generate-only  |        |          |                       | Build an unsigned transaction and write it to STDOUT         |
-| --indent         |        |          |                       | Add indent to JSON response                                  |
-| --json           |        |          |                       | Return output in json format                                 |
+| --gas-adjustment | Float  | False    | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |
+| --generate-only  |        | False    |                       | Build an unsigned transaction and write it to STDOUT         |
+| --indent         |        | False    |                       | Add indent to JSON response                                  |
+| --json           |        | False    |                       | Return output in json format                                 |
 | --memo           | String | False    |                       | Memo to send along with transaction                          |
-| --print-response |        |          |                       | Return tx response (only works with async = false)           |
-| --sequence       | Int    |          |                       | Sequence number to sign the tx                               |
-| --to             | String |          |                       | Bech32 encoding address to receive coins                     |
+| --print-response |        | False    |                       | Return tx response (only works with async = false)           |
+| --sequence       | Int    | False    |                       | Sequence number to sign the tx                               |
+| --to             | String | False    |                       | Bech32 encoding address to receive coins                     |
 | --ledger         | String | False    |                       | Use a connected Ledger device                                |
 | --node           | String | False    | tcp://localhost:26657 | <host>:<port> to tendermint rpc interface for this chain     |
 | --trust-node     | String | False    | True                  | Don't verify proofs for responses                            |
@@ -57,7 +57,7 @@ iriscli bank sign <file> [flags]
 
 ### Sign a send file 
 
-First you must use **iriscli bank send **cli with flag **--generate-only** to generate a send recorder. Just like this.
+First you must use **iriscli bank send**  command with flag **--generate-only** to generate a send recorder. Just like this.
 
 ```  
 iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.004iris --chain-id=irishub-test --amount=10iris --generate-only
@@ -69,15 +69,19 @@ iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  
 
 And then save the output in file  /root/output/output/node0/test_send_10iris.txt.
 
+Then you can sign the offline file.
+
 ```
 iriscli bank sign /root/output/output/node0/test_send_10iris.txt --name=test  --offline=false --print-sigs=false --append=true
 ```
 
-After that, you will get the detail info for the sign. 
+After that, you will get the detail info for the sign. Like the follow output you will see the signature 
+
+**ci+5QuYUVcsARBQWyPGDgmTKYu/SRj6TpCGvrC7AE3REMVdqFGFK3hzlgIphzOocGmOIa/wicXGlMK2G89tPJg==**
 
 ```
 iriscli bank sign /root/output/output/node0/test_send_10iris.txt --name=test  --offline=false --print-sigs=false --append=true
 Password to sign with 'test':
 {"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"4000000000000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"AzlCwiA5Tvxwi7lMB/Hihfp2qnaks5Wrrgkg/Jy7sEkF"},"signature":"ci+5QuYUVcsARBQWyPGDgmTKYu/SRj6TpCGvrC7AE3REMVdqFGFK3hzlgIphzOocGmOIa/wicXGlMK2G89tPJg==","account_number":"0","sequence":"2"}],"memo":""}}
 ```
-           
+
