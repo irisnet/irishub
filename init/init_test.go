@@ -2,7 +2,6 @@ package init
 
 import (
 	"bytes"
-	"github.com/tendermint/tendermint/libs/cli"
 	"io"
 	"io/ioutil"
 	"os"
@@ -11,14 +10,14 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/mock"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	abciServer "github.com/tendermint/tendermint/abci/server"
 	tcmd "github.com/tendermint/tendermint/cmd/tendermint/commands"
+	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
-
-	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/client"
 )
 
 func TestInitCmd(t *testing.T) {
@@ -30,10 +29,10 @@ func TestInitCmd(t *testing.T) {
 	require.Nil(t, err)
 	ctx := server.NewContext(cfg, logger)
 	cdc := app.MakeCodec()
-	appInit := server.AppInit{
-		AppGenState: mock.AppGenState,
-	}
-	cmd := InitCmd(ctx, cdc, appInit)
+	cmd := InitCmd(ctx, cdc)
+
+	viper.Set(flagMoniker, "irisnode-test")
+
 	err = cmd.RunE(nil, nil)
 	require.NoError(t, err)
 }
@@ -53,15 +52,16 @@ func setupClientHome(t *testing.T) func() {
 func TestEmptyState(t *testing.T) {
 	defer server.SetupViper(t)()
 	defer setupClientHome(t)()
+
 	logger := log.NewNopLogger()
 	cfg, err := tcmd.ParseConfig()
 	require.Nil(t, err)
+
 	ctx := server.NewContext(cfg, logger)
 	cdc := app.MakeCodec()
-	appInit := server.AppInit{
-		AppGenState: mock.AppGenStateEmpty,
-	}
-	cmd := InitCmd(ctx, cdc, appInit)
+	viper.Set(flagMoniker, "irisnode-test")
+
+	cmd := InitCmd(ctx, cdc)
 	err = cmd.RunE(nil, nil)
 	require.NoError(t, err)
 
@@ -69,6 +69,7 @@ func TestEmptyState(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 	cmd = server.ExportCmd(ctx, cdc, nil)
+
 	err = cmd.RunE(nil, nil)
 	require.NoError(t, err)
 
@@ -105,10 +106,7 @@ func TestStartStandAlone(t *testing.T) {
 	require.Nil(t, err)
 	ctx := server.NewContext(cfg, logger)
 	cdc := app.MakeCodec()
-	appInit := server.AppInit{
-		AppGenState: mock.AppGenState,
-	}
-	initCmd := InitCmd(ctx, cdc, appInit)
+	initCmd := InitCmd(ctx, cdc)
 	err = initCmd.RunE(nil, nil)
 	require.NoError(t, err)
 
