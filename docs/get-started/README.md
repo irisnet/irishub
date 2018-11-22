@@ -8,7 +8,7 @@ IRIS network (a.k.a. IRISnet) is named after Greek goddess **Iris**, said to be 
 
 ### Step 1: Install Iris on Your Server
 
-Please follow this [instruction](Install-Iris.md) to get **Iris** installed locally.
+Please follow this [instruction](Install-the-Software.md) to get **Iris** installed locally.
 
 ### Step 2: Run a Full Node
 
@@ -21,7 +21,7 @@ Please follow this [instruction](Validator-Node.md) to upgrade your full node to
 
 ### Deploy IRISHub Monitor
 
-Please follow this [guide](../tools/Deploy-IRIS-Monitor.md) to get IRIHub monitor running on your side.
+Please follow this [guide](../software/monitor.md) to get IRIHub monitor running on your side.
 
 
 ### Upgrade to Validator Node
