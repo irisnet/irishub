@@ -9,19 +9,16 @@
 ```
 iriscli gov pull-params [flags]
 ```
+打印帮助信息:
 
+```
+iriscli gov pull-params --help
+```
 ## 标志
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] tendermint节点的链ID                                                                                                                 |          |
-| --height        |                            | [int] 查询的区块高度                                                                                  |          |
-| --help, -h      |                            | 查询命令帮助                                                                                                                                 |          |
-| --indent        |                            | 在JSON响应中添加缩进                                                                                                                          |          |
-| --ledger        |                            | 使用连接的硬件记账设备                                                                                                                        |          |
-| --node          | tcp://localhost:26657      | [string] tendermint节点开启的远程过程调用接口\<主机>:\<端口>                                                                                  |          |
-| --path          | $HOME/.iris                | [string] iris home目录                                                                                                                      |          |
-| --trust-node    | true                       | 关闭响应结果校验                                                                                                                    |          |
+| --path          | $HOME/.iriscli                | [string] iriscli home目录                                                                                                                      
 
 ## 例子
 
@@ -34,10 +31,10 @@ iriscli gov pull-params
 执行该指令，你会收到如下提示信息：
 
 ```txt
-Save the parameter config file in  /Users/trevorfu/.iris/config/params.json
+Save the parameter config file in  /Users/trevorfu/.iriscli/params.json
 ```
 
-打开--path/config目录下的params.json文件，你可以看到json格式的文件内容。
+打开--path/目录下的params.json文件，你可以看到json格式的文件内容。
 
 ```txt
 {

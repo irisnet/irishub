@@ -10,7 +10,7 @@ Stake模块提供了一系列查询staking状态和发送staking交易的命令
 iriscli stake [subcommand]
 ```
 
-打印所以子命令和flags：
+打印子命令和flags：
 ```
 iriscli stake --help
 ```

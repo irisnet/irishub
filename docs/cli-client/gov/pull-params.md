@@ -10,18 +10,17 @@ Generate param.json file
 iriscli gov pull-params [flags]
 ```
 
+Print help messages:
+
+```
+iriscli gov pull-params --help
+```
+
 ## Flags
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --chain-id      |                            | [string] Chain ID of tendermint node                                                                                                                 |          |
-| --height        |                            | [int] Block height to query, omit to get most recent provable block                                                                                  |          |
-| --help, -h      |                            | Help for pull-params                                                                                                                                 |          |
-| --indent        |                            | Add indent to JSON response                                                                                                                          |          |
-| --ledger        |                            | Use a connected Ledger device                                                                                                                        |          |
-| --node          | tcp://localhost:26657      | [string] \<host>:\<port> to tendermint rpc interface for this chain                                                                                  |          |
-| --path          | $HOME/.iris                | [string] Directory of iris home                                                                                                                      |          |
-| --trust-node    | true                       | Don't verify proofs for responses                                                                                                                    |          |
+| --path          | $HOME/.iriscli                | [string] Directory of iriscli home                                                                                                                      |          |
 
 ## Examples
 
@@ -34,10 +33,10 @@ iriscli gov pull-params
 Then you'll receive a message as described below:
 
 ```txt
-Save the parameter config file in  /Users/trevorfu/.iris/config/params.json
+Save the parameter config file in  /Users/trevorfu/.iriscli/params.json
 ```
 
-If you open the params.json in the --path/config directory, you can see it's json format content.
+If you open the params.json in the --path directory, you can see it's json format content.
 
 ```txt
 {

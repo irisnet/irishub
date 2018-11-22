@@ -1,8 +1,9 @@
 # iriscli bank coin-type
 
-## 描述
+## Description
 
-查询IRIS网络某一个特殊通证. IRIShub的原始通证是 `iris`, 其有如下单位: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` 和 `iris-atto`. 
+Query  a special  kind of token in IRISnet. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. 
+
 
 ## Usage:
 
