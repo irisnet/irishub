@@ -66,11 +66,21 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (svc
 
 	serviceDefBytes := kvStore.Get(GetServiceDefinitionKey(chainId, name))
 	if serviceDefBytes != nil {
-		var serviceDef SvcDef
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(serviceDefBytes, &serviceDef)
-		return serviceDef, true
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(serviceDefBytes, &svcDef)
+		return svcDef, true
 	}
 	return svcDef, false
+}
+
+// Gets the method in a specific service and methodID
+func (k Keeper) GetMethod(ctx sdk.Context, chainId, name string, id int16) (method MethodProperty, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	methodBytes := store.Get(GetMethodPropertyKey(chainId, name, id))
+	if methodBytes != nil {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(methodBytes, &method)
+		return method, true
+	}
+	return method, false
 }
 
 // Gets all the methods in a specific service
@@ -264,4 +274,85 @@ func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk
 		return ErrInvalidPriceCount(k.Codespace(), len(svcBinding.Prices), len(methods))
 	}
 	return nil
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+
+	counter := k.GetIntraTxCounter(ctx)
+	req.RequestHeight = ctx.BlockHeight()
+	req.RequestIntraTxCounter = counter
+	k.SetIntraTxCounter(ctx, counter+1)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
+
+	store.Set(GetRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
+		req.RequestHeight, req.RequestIntraTxCounter), bz)
+
+	k.ck.SubtractCoins(ctx, req.Consumer, req.ServiceFee)
+}
+
+func (k Keeper) AddActiveRequest(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
+	store.Set(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
+		req.RequestHeight, req.RequestIntraTxCounter), bz)
+}
+
+func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
+		req.RequestHeight, req.RequestIntraTxCounter))
+}
+
+func (k Keeper) AddRequestExpiration(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
+	store.Set(GetRequstsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter), bz)
+}
+
+func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetRequstsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter))
+}
+
+func (k Keeper) GetActiveRequest(ctx sdk.Context, height int64, counter int16) (req SvcRequest, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetRequstsByExpirationIndexKey(height, counter))
+	if value == nil {
+		return req, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &req)
+	return req, true
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
+	store.Set(GetResponseKey(resp.ReqChainID, resp.Consumer, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
+}
+
+//__________________________________________________________________________
+
+// get the current in-block validator operation counter
+func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	store := ctx.KVStore(k.storeKey)
+	b := store.Get(IntraTxCounterKey)
+	if b == nil {
+		return 0
+	}
+	var counter int16
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
+	return counter
+}
+
+// set the current in-block request counter
+func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
+	store.Set(IntraTxCounterKey, bz)
 }

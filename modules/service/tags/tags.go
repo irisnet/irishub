@@ -12,5 +12,8 @@ var (
 	ActionSvcDisable       = []byte("service-disable")
 	ActionSvcEnable        = []byte("service-enable")
 
+	ActionSvcCall    = []byte("service-call")
+	ActionSvcRespond = []byte("service-respond")
+
 	Action = sdk.TagAction
 )

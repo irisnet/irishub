@@ -119,7 +119,7 @@ func methodToMethodProperty(index int, method protoidl.Method) (methodProperty M
 		}
 	}
 	methodProperty = MethodProperty{
-		ID:            index,
+		ID:            int16(index),
 		Name:          method.Name,
 		Description:   method.Attributes[description],
 		OutputPrivacy: opp,
@@ -426,6 +426,128 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSvcRefundDeposit) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
+}
+
+//______________________________________________________________________
+
+// MsgSvcRequest - struct for call a service
+type MsgSvcRequest struct {
+	DefChainID  string         `json:"def_chain_id"`
+	DefName     string         `json:"def_name"`
+	BindChainID string         `json:"bind_chain_id"`
+	ReqChainID  string         `json:"req_chain_id"`
+	MethodID    int16          `json:"method_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+	Consumer    sdk.AccAddress `json:"consumer"`
+	Input       []byte         `json:"input"`
+	ServiceFee  sdk.Coins      `json:"service_fee"`
+	Profiling   bool           `json:"profiling"`
+}
+
+func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer, provider sdk.AccAddress, methodID int16, input []byte, serviceFee sdk.Coins, profiling bool) MsgSvcRequest {
+	return MsgSvcRequest{
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		ReqChainID:  reqChainID,
+		Consumer:    consumer,
+		Provider:    provider,
+		MethodID:    methodID,
+		Input:       input,
+		ServiceFee:  serviceFee,
+		Profiling:   profiling,
+	}
+}
+
+func (msg MsgSvcRequest) Route() string { return MsgType }
+func (msg MsgSvcRequest) Type() string  { return "service request" }
+
+func (msg MsgSvcRequest) GetSignBytes() []byte {
+	if len(msg.Input) == 0 {
+		msg.Input = nil
+	}
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
+	if len(msg.DefChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.BindChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if !validServiceName(msg.DefName) {
+		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+	}
+	if len(msg.Consumer) == 0 {
+		sdk.ErrInvalidAddress(msg.Consumer.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcRequest) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgSvcResponse - struct for respond a service call
+type MsgSvcResponse struct {
+	ReqChainID            string         `json:"req_chain_id"`
+	RequestHeight         int64          `json:"request_height"`
+	RequestIntraTxCounter int16          `json:"request_intra_tx_counter"`
+	Provider              sdk.AccAddress `json:"provider"`
+	Output                []byte         `json:"output"`
+	ErrorMsg              []byte         `json:"error_msg"`
+}
+
+func NewMsgSvcResponse(reqChainID string, height int64, counter int16, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
+	return MsgSvcResponse{
+		ReqChainID:            reqChainID,
+		RequestHeight:         height,
+		RequestIntraTxCounter: counter,
+		Provider:              provider,
+		Output:                output,
+		ErrorMsg:              errorMsg,
+	}
+}
+
+func (msg MsgSvcResponse) Route() string { return MsgType }
+func (msg MsgSvcResponse) Type() string  { return "service response" }
+
+func (msg MsgSvcResponse) GetSignBytes() []byte {
+	if len(msg.Output) == 0 {
+		msg.Output = nil
+	}
+	if len(msg.ErrorMsg) == 0 {
+		msg.ErrorMsg = nil
+	}
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
+	if len(msg.ReqChainID) == 0 {
+		return ErrInvalidDefChainId(DefaultCodespace)
+	}
+	if len(msg.ReqChainID) == 0 {
+		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcResponse) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 

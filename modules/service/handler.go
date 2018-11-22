@@ -21,6 +21,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcEnable(ctx, k, msg)
 		case MsgSvcRefundDeposit:
 			return handleMsgSvcRefundDeposit(ctx, k, msg)
+		case MsgSvcRequest:
+			return handleMsgSvcRequest(ctx, k, msg)
+		case MsgSvcResponse:
+			return handleMsgSvcResponse(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in service module").Result()
 		}
@@ -107,6 +111,52 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	}
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRefundDeposit,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
+	_, bindingFound := k.GetServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	if !bindingFound {
+		return ErrSvcBindingNotExists(k.Codespace()).Result()
+	}
+
+	_, methodFound := k.GetMethod(ctx, msg.DefChainID, msg.DefName, msg.MethodID)
+	if !methodFound {
+		return ErrMethodNotExists(k.Codespace(), msg.MethodID).Result()
+	}
+
+	request := NewSvcRequest(msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID, msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
+
+	k.AddRequest(ctx, request)
+	k.AddActiveRequest(ctx, request)
+	k.AddRequestExpiration(ctx, request)
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcCall,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
+	request, found := k.GetActiveRequest(ctx, msg.RequestHeight, msg.RequestIntraTxCounter)
+	if !found {
+		return ErrRequestNotActive(k.Codespace()).Result()
+	}
+
+	response := NewSvcResponse(msg.ReqChainID, msg.RequestHeight, msg.RequestIntraTxCounter, msg.Provider,
+		request.Consumer, msg.Output, msg.ErrorMsg)
+
+	k.AddResponse(ctx, response)
+	k.DeleteActiveRequest(ctx, request)
+	k.DeleteRequestExpiration(ctx, request)
+	k.ck.AddCoins(ctx, response.Provider, request.ServiceFee)
+
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcRespond,
 	)
 	return sdk.Result{
 		Tags: resTags,

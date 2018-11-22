@@ -28,6 +28,9 @@ const (
 	CodeLtMinProviderDeposit sdk.CodeType = 116
 	CodeInvalidDisable       sdk.CodeType = 117
 	CodeInvalidEnable        sdk.CodeType = 118
+
+	CodeMethodNotExists  sdk.CodeType = 119
+	CodeRequestNotActive sdk.CodeType = 120
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -125,4 +128,12 @@ func ErrEnable(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
 	return sdk.NewError(codespace, CodeLtMinProviderDeposit, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
+}
+
+func ErrMethodNotExists(codespace sdk.CodespaceType, methodID int16) sdk.Error {
+	return sdk.NewError(codespace, CodeMethodNotExists, fmt.Sprintf("service method [%d] is not existed", methodID))
+}
+
+func ErrRequestNotActive(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestNotActive, fmt.Sprintf("can not find requst"))
 }
