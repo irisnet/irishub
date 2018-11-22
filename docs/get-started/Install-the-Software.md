@@ -97,7 +97,7 @@ cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout v0.7.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_tools && get_vendor_deps && make install
+make all
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
@@ -115,9 +115,9 @@ v0.7.0
 Get latest code (you can also `git fetch` only the version desired), ensure the dependencies are up to date, then recompile.
 
 ```
+iris unsafe_reset_all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-rm Gopkg.lock
 git checkout v0.7.0
 make get_vendor_deps
 make install
