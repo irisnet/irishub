@@ -38,7 +38,7 @@ estimated gas = 8370
 
 ## 异步模式
 
-iriscli的命令的交易默认是同步模式。同步模式指的是发送交易，然后会堵塞，直到收到回复或者超时整个命令才结束。如果想打开异步模式，就可以使用`--async`。发送交易之后，会立马返回交易的hash。
+iriscli发送的交易默认是同步模式。同步模式指的是发送交易，然后会堵塞，直到收到回复或者超时整个命令才结束。如果想打开异步模式，就可以使用`--async`。发送交易之后，会立马返回交易的hash。
 
 ## generate-only
 
@@ -94,7 +94,6 @@ iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --dep
 
 ```
 
-## trust-node模式
+## trust-node
 
-trust-node模式默认为true。当trust-node是true时， iriscli的客户端只查询数据并不对数据进行proof验证。
-
+trust-node默认为true。当trust-node是true时， iriscli的客户端只查询数据并不对数据进行默克尔证明。你也可以通过`--trust-node=false`, 对查询得到的数据进行默克尔证明。
