@@ -32,6 +32,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	//sm "github.com/tendermint/tendermint/state"
 )
 
 const (
@@ -221,7 +222,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	var err error
 	if viper.GetBool(FlagReplay) {
-		err = app.LoadVersion(lastHeight, app.keyMain)
+		err = app.LoadVersion(lastHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}
@@ -281,6 +282,10 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, app.keyMain, false)
+}
+
 // application updates every end block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
@@ -300,7 +305,10 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, app.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
-	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
+	tags = tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
+	//if ctx.BlockHeight() == 200 {
+	//	tags = tags.AppendTag(sm.TerminateTagKey, []byte(sm.TerminateTagValue))
+	//}
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,

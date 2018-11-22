@@ -28,8 +28,8 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "=v0.26.0-iris"
+  source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
+  branch = "irisnet/v0.26.0-iris"
 
 [[override]]
   name = "github.com/tendermint/iavl"
@@ -37,8 +37,8 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  source = "https://github.com/irisnet/tendermint.git"
-  version = "=v0.26.1-rc0-iris"
+  source = "https://github.com/HaoyangLiu/tendermint.git"
+  branch = "irisnet/v0.26.1-rc0-iris"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"
