@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"encoding/json"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // Handle all "gov" type messages.
@@ -30,8 +31,13 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
-	////////////////////  iris end  /////////////////////////////
 
+	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
+		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
+			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
+		}
+	}
+	////////////////////  iris end  /////////////////////////////
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
