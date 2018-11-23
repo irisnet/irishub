@@ -35,4 +35,3 @@ Bank allows you to manage assets in your local account
 | --home string         | /root/.iriscli | Directory for config and data               |          |
 | -o, --output string   | text           | Output format (text \|json)                 |          |
 | --trace               |                | Print out full stack trace on errors        |          |
-
