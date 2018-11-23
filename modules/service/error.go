@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 6
+	DefaultCodespace sdk.CodespaceType = 8
 
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101
