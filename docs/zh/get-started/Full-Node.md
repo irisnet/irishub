@@ -23,7 +23,7 @@ wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-5000/co
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：
 * 将`moniker`字段配置称为自定义的名称，这样便于区分不同的节点
-* `seed`字段用语设置种子节点，在fuxi-5000中的官方中字节点为：
+* `seed`字段用语设置种子节点，在fuxi-5000中的官方种子节点为：
 ```
 c16700520a810b270206d59f0f02ea9abd85a4fe@ts-1.bianjie.ai:26656
 a12cfb2f535210ea12731f94a76b691832056156@ts-2.bianjie.ai:26656
