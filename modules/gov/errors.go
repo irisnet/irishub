@@ -24,6 +24,7 @@ const (
 	////////////////////  iris begin  ///////////////////////////
 	CodeInvalidParam            sdk.CodeType = 12
 	CodeInvalidParamOp          sdk.CodeType = 13
+	CodeSwitchPeriodInProcess   sdk.CodeType = 14
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -77,5 +78,8 @@ func ErrInvalidParam(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrInvalidParamOp(codespace sdk.CodespaceType, opStr string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParamOp, fmt.Sprintf("Op '%s' is not valid", opStr))
+}
+func ErrSwitchPeriodInProcess(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSwitchPeriodInProcess, fmt.Sprintf("Software Upgrade Switch Period is in process."))
 }
 ////////////////////  iris end  /////////////////////////////
