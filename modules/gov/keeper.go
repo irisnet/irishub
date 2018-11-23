@@ -66,6 +66,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSoftwareUpgrade:
 		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
+	case ProposalTypeTerminator:
+		return keeper.NewTerminatorProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -131,6 +133,32 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 }
 
 func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var textProposal = TextProposal{
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+	var proposal Proposal = &SoftwareUpgradeProposal{
+		textProposal,
+	}
+
+	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
+	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
+	keeper.SetProposal(ctx, proposal)
+	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
+	return proposal
+}
+
+func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
