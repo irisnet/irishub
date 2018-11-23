@@ -86,7 +86,7 @@ You will get the following result.
           "sequence": "3"
         }
       ],
-      "memo": "人生第一次"
+      "memo": ""
     }
   },
   "result": {
