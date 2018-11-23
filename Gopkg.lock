@@ -69,7 +69,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "irisnet/v0.26.1-rc1-iris"
+  branch = "haoyang/v0.26.0-iris"
   digest = "1:08fed3beec9838cf294d87048eac763ba477e03615d8049ebcb70a00fdf78f95"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
@@ -114,8 +114,8 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "b7779d9cb56d86d936d6e029d63b76745e94273c"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
+  revision = "824158010a138259d91eb64fe8db26ee48cb3cec"
+  source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
 
 [[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"

@@ -32,9 +32,40 @@ func WriteErrorResponse(w http.ResponseWriter, status int, err string) {
 
 // WriteSimulationResponse prepares and writes an HTTP
 // response for transactions simulations.
-func WriteSimulationResponse(w http.ResponseWriter, gas int64) {
+type kvPair struct {
+	TagKey   string `json:"tag_key"`
+	TagValue string `json:"tag_value"`
+}
+type simulateResult struct {
+	GasEstimate int64    `json:"gas_estimate"`
+	Tags        []kvPair `json:"tags"`
+}
+
+func WriteSimulationResponse(w http.ResponseWriter, cliCtx context.CLIContext, gas int64, tags sdk.Tags) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf(`{"gas_estimate":%v}`, gas)))
+	var kvPairs []kvPair
+	for _, tag := range tags {
+		kvPairs = append(kvPairs, kvPair{
+			TagKey:   string(tag.Key),
+			TagValue: string(tag.Value),
+		})
+	}
+	simulateResult := simulateResult{
+		GasEstimate: gas,
+		Tags:        kvPairs,
+	}
+	var output []byte
+	var err error
+	if cliCtx.Indent {
+		output, err = cliCtx.Codec.MarshalJSONIndent(simulateResult, "", "  ")
+	} else {
+		output, err = cliCtx.Codec.MarshalJSON(simulateResult)
+	}
+	if err != nil {
+		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	w.Write(output)
 }
 
 // HasDryRunArg returns true if the request's URL query contains the dry run
@@ -186,14 +217,14 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	}
 
 	if cliCtx.DryRun || txCtx.SimulateGas {
-		newTxCtx, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
+		newTxCtx, tags, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
 		if err != nil {
 			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if cliCtx.DryRun {
-			WriteSimulationResponse(w, newTxCtx.Gas)
+			WriteSimulationResponse(w, cliCtx, newTxCtx.Gas, tags)
 			return
 		}
 
