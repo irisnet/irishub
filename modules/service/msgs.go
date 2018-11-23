@@ -551,6 +551,72 @@ func (msg MsgSvcResponse) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 
+//______________________________________________________________________
+
+// MsgSvcRefundFees - struct for refund fees
+type MsgSvcRefundFees struct {
+	Consumer sdk.AccAddress `json:"consumer"`
+}
+
+func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
+	return MsgSvcRefundFees{
+		Consumer: consumer,
+	}
+}
+
+func (msg MsgSvcRefundFees) Route() string { return MsgType }
+func (msg MsgSvcRefundFees) Type() string  { return "service refund fees" }
+
+func (msg MsgSvcRefundFees) GetSignBytes() []byte {
+	b := msgCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
+	if len(msg.Consumer) == 0 {
+		sdk.ErrInvalidAddress(msg.Consumer.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcRefundFees) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgSvcWithdrawFees - struct for withdraw fees
+type MsgSvcWithdrawFees struct {
+	Provider sdk.AccAddress `json:"provider"`
+}
+
+func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
+	return MsgSvcWithdrawFees{
+		Provider: provider,
+	}
+}
+
+func (msg MsgSvcWithdrawFees) Route() string { return MsgType }
+func (msg MsgSvcWithdrawFees) Type() string  { return "service withdraw fees" }
+
+func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
+	b := msgCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcWithdrawFees) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Provider}
+}
+
+//______________________________________________________________________
+
 func validServiceName(name string) bool {
 	if len(name) == 0 || len(name) > 128 {
 		return false

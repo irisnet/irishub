@@ -9,7 +9,7 @@ type SvcRequest struct {
 	DefName               string         `json:"def_name"`
 	BindChainID           string         `json:"bind_chain_id"`
 	ReqChainID            string         `json:"req_chain_id"`
-	MethodID              int64          `json:"method_id"`
+	MethodID              int16          `json:"method_id"`
 	Provider              sdk.AccAddress `json:"provider"`
 	Consumer              sdk.AccAddress `json:"consumer"`
 	Input                 []byte         `json:"input"`
@@ -54,5 +54,31 @@ func NewSvcResponse(reqChainID string, height int64, counter int16, provider, co
 		Consumer:              consumer,
 		Output:                out,
 		ErrorMsg:              errorMsg,
+	}
+}
+
+// return fee of a consumer
+type ReturnedFee struct {
+	Address sdk.AccAddress `json:"address"`
+	Coins   sdk.Coins      `json:"coins"`
+}
+
+func NewReturnedFee(address sdk.AccAddress, coins sdk.Coins) ReturnedFee {
+	return ReturnedFee{
+		Address: address,
+		Coins:   coins,
+	}
+}
+
+// incoming fee of a consumer
+type IncomingFee struct {
+	Address sdk.AccAddress `json:"address"`
+	Coins   sdk.Coins      `json:"coins"`
+}
+
+func NewIncomingFee(address sdk.AccAddress, coins sdk.Coins) IncomingFee {
+	return IncomingFee{
+		Address: address,
+		Coins:   coins,
 	}
 }

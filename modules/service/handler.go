@@ -25,6 +25,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcRequest(ctx, k, msg)
 		case MsgSvcResponse:
 			return handleMsgSvcResponse(ctx, k, msg)
+		case MsgSvcRefundFees:
+			return handleMsgSvcRefundFees(ctx, k, msg)
+		case MsgSvcWithdrawFees:
+			return handleMsgSvcWithdrawFees(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in service module").Result()
 		}
@@ -151,12 +155,35 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 		request.Consumer, msg.Output, msg.ErrorMsg)
 
 	k.AddResponse(ctx, response)
+
+	// delete request from active request list and expiration list
 	k.DeleteActiveRequest(ctx, request)
 	k.DeleteRequestExpiration(ctx, request)
-	k.ck.AddCoins(ctx, response.Provider, request.ServiceFee)
+
+	k.AddReturnFee(ctx, response.Provider, request.ServiceFee)
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRespond,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk.Result {
+	k.RefundFee(ctx, msg.Consumer)
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcRefundFees,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees) sdk.Result {
+	k.WithdrawFee(ctx, msg.Provider)
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcWithdrawFees,
 	)
 	return sdk.Result{
 		Tags: resTags,

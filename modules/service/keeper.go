@@ -338,10 +338,97 @@ func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
 
 //__________________________________________________________________________
 
+func (k Keeper) SetReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	store := ctx.KVStore(k.storeKey)
+	fee := ReturnedFee{
+		Address: address,
+		Coins:   coins,
+	}
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+	store.Set(GetReturnedFeeKey(address), bz)
+}
+
+func (k Keeper) GetReturnFee(ctx sdk.Context, address sdk.AccAddress) (fee ReturnedFee, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetReturnedFeeKey(address))
+	if value == nil {
+		return fee, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fee)
+	return fee, true
+}
+
+// Add return fee for a particular consumer, if it is not existed will create a new
+func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	fee, found := k.GetReturnFee(ctx, address)
+	if found {
+		k.SetReturnFee(ctx, address, coins)
+		return
+	}
+	fee.Coins.Plus(coins)
+	k.SetReturnFee(ctx, address, fee.Coins)
+}
+
+// refund fees from a particular consumer, and delete it
+func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
+	fee, found := k.GetReturnFee(ctx, address)
+	if !found {
+		return ErrReturnFeeNotExists(k.Codespace(), address)
+	}
+	k.ck.AddCoins(ctx, address, fee.Coins)
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetReturnedFeeKey(address))
+	return nil
+}
+
+func (k Keeper) SetIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	store := ctx.KVStore(k.storeKey)
+	fee := IncomingFee{
+		Address: address,
+		Coins:   coins,
+	}
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+	store.Set(GetIncomingFeeKey(address), bz)
+}
+
+func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee IncomingFee, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetIncomingFeeKey(address))
+	if value == nil {
+		return fee, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fee)
+	return fee, true
+}
+
+// Add return fee for a particular provider, if it is not existed will create a new
+func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	fee, found := k.GetIncomingFee(ctx, address)
+	if found {
+		k.SetIncomingFee(ctx, address, coins)
+	}
+	fee.Coins.Plus(coins)
+	k.SetIncomingFee(ctx, address, fee.Coins)
+}
+
+// withdraw fees from a particular provider, and delete it
+func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
+	fee, found := k.GetIncomingFee(ctx, address)
+	if !found {
+		return ErrWithdrawFeeNotExists(k.Codespace(), address)
+	}
+	k.ck.AddCoins(ctx, address, fee.Coins)
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetIncomingFeeKey(address))
+	return nil
+}
+
+//__________________________________________________________________________
+
 // get the current in-block validator operation counter
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
 	store := ctx.KVStore(k.storeKey)
-	b := store.Get(IntraTxCounterKey)
+	b := store.Get(intraTxCounterKey)
 	if b == nil {
 		return 0
 	}
@@ -354,5 +441,5 @@ func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
-	store.Set(IntraTxCounterKey, bz)
+	store.Set(intraTxCounterKey, bz)
 }

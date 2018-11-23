@@ -29,8 +29,10 @@ const (
 	CodeInvalidDisable       sdk.CodeType = 117
 	CodeInvalidEnable        sdk.CodeType = 118
 
-	CodeMethodNotExists  sdk.CodeType = 119
-	CodeRequestNotActive sdk.CodeType = 120
+	CodeMethodNotExists      sdk.CodeType = 119
+	CodeRequestNotActive     sdk.CodeType = 120
+	CodeReturnFeeNotExists   sdk.CodeType = 121
+	CodeWithdrawFeeNotExists sdk.CodeType = 122
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -136,4 +138,12 @@ func ErrMethodNotExists(codespace sdk.CodespaceType, methodID int16) sdk.Error {
 
 func ErrRequestNotActive(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestNotActive, fmt.Sprintf("can not find requst"))
+}
+
+func ErrReturnFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeReturnFeeNotExists, fmt.Sprintf("There is no service refund fees for [%s]", address))
+}
+
+func ErrWithdrawFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeWithdrawFeeNotExists, fmt.Sprintf("There is no service withdraw fees for [%s]", address))
 }
