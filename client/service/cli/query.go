@@ -49,8 +49,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 				methods = append(methods, method)
 			}
 
-			service := cmn.ServiceOutput{SvcDef: svcDef, Methods: methods}
-			output, err := codec.MarshalJSONIndent(cdc, service)
+			output, err := codec.MarshalJSONIndent(cdc, cmn.DefOutput{SvcDef: svcDef, Methods: methods})
 			if err != nil {
 				return err
 			}
@@ -139,5 +138,126 @@ func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(FsDefChainID)
 	cmd.Flags().AddFlagSet(FsServiceName)
 
+	return cmd
+}
+
+func GetCmdQueryScvRequests(storeName string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "requests",
+		Short: "Query service requests",
+		Example: "iriscli service requests --def-chain-id=<service-def-chain-id> --service-name=test " +
+			"--bind-chain-id=<bind-chain-id> --provider=<provider>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+
+			name := viper.GetString(FlagServiceName)
+			defChainId := viper.GetString(FlagDefChainID)
+			bindChainId := viper.GetString(FlagBindChainID)
+			providerStr := viper.GetString(FlagProvider)
+
+			provider, err := sdk.AccAddressFromBech32(providerStr)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QuerySubspace(service.GetSubActiveRequestKey(defChainId, name, bindChainId, provider), storeName)
+			if err != nil {
+				return err
+			}
+
+			var reqs []service.SvcRequest
+			for i := 0; i < len(res); i++ {
+
+				var req service.SvcRequest
+				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &req)
+				reqs = append(reqs, req)
+			}
+
+			output, err := cdc.MarshalJSONIndent(reqs, "", "")
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+	cmd.Flags().AddFlagSet(FsServiceName)
+	cmd.Flags().AddFlagSet(FsDefChainID)
+	cmd.Flags().AddFlagSet(FsBindChainID)
+	cmd.Flags().AddFlagSet(FsProvider)
+
+	return cmd
+}
+
+func GetCmdQueryScvResponse(storeName string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "response",
+		Short:   "Query a service response",
+		Example: "iriscli service response --req-chain-id=<req-chain-id> --req-id=<request-id>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+
+			reqChainId := viper.GetString(FlagReqChainId)
+			reqId := viper.GetString(FlagReqChainId)
+
+			height, counter, err := service.TransferRequestID(reqId)
+
+			res, err := cliCtx.QueryStore(service.GetResponseKey(reqChainId, height, counter), storeName)
+			var resp service.SvcResponse
+			if err != nil {
+				return err
+			}
+			if len(res) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(res, &resp)
+			}
+			output, err := cdc.MarshalJSONIndent(resp, "", "")
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+	cmd.Flags().AddFlagSet(FsReqChainId)
+	cmd.Flags().AddFlagSet(FsReqChainId)
+
+	return cmd
+}
+
+func GetCmdQueryScvFees(storeName string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "fees",
+		Short:   "Query return and incoming fee of a particular address",
+		Example: "iriscli service fees <account address>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+
+			// find the key to look up the account
+			addrString := args[0]
+
+			delAddr, err := sdk.AccAddressFromBech32(addrString)
+			if err != nil {
+				return err
+			}
+			res, err := cliCtx.QueryStore(service.GetReturnedFeeKey(delAddr), storeName)
+			var returnedFee service.ReturnedFee
+			if err != nil {
+				return err
+			}
+			if len(res) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(res, &returnedFee)
+			}
+
+			res1, err := cliCtx.QueryStore(service.GetIncomingFeeKey(delAddr), storeName)
+			var incomingFee service.IncomingFee
+			if err != nil {
+				return err
+			}
+			if len(res) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(res1, &incomingFee)
+			}
+
+			output, err := cdc.MarshalJSONIndent(cmn.FeesOutput{ReturnedFee: returnedFee, IncomingFee: incomingFee}, "", "")
+			fmt.Println(string(output))
+			return nil
+		},
+	}
 	return cmd
 }

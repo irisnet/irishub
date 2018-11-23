@@ -3,6 +3,7 @@ package service
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/service/tags"
+	"fmt"
 )
 
 // handle all "service" type messages.
@@ -188,4 +189,26 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	return sdk.Result{
 		Tags: resTags,
 	}
+}
+
+// Called every block, process inflation, update validator set
+func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
+
+	logger := ctx.Logger().With("module", "service")
+	resTags = sdk.NewTags()
+
+	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
+	for ; activeIterator.Valid(); activeIterator.Next() {
+		var req SvcRequest
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
+		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
+		keeper.DeleteActiveRequest(ctx, req)
+		keeper.DeleteRequestExpiration(ctx, req)
+
+		resTags = resTags.AppendTag(tags.Action, tags.ActionSvcCallTimeOut)
+		logger.Info(fmt.Sprintf("request %s from %s timeout",
+			req.RequestID(), req.Consumer))
+	}
+	activeIterator.Close()
+	return resTags
 }

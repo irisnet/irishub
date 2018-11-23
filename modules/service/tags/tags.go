@@ -17,5 +17,7 @@ var (
 	ActionSvcRefundFees   = []byte("service-refund-fees")
 	ActionSvcWithdrawFees = []byte("service-withdraw-fees")
 
+	ActionSvcCallTimeOut = []byte("service-call-expiration")
+
 	Action = sdk.TagAction
 )

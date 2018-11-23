@@ -310,17 +310,17 @@ func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req SvcRequest) {
 func (k Keeper) AddRequestExpiration(ctx sdk.Context, req SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetRequstsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter), bz)
+	store.Set(GetRequestsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter), bz)
 }
 
 func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetRequstsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter))
+	store.Delete(GetRequestsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter))
 }
 
 func (k Keeper) GetActiveRequest(ctx sdk.Context, height int64, counter int16) (req SvcRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	value := store.Get(GetRequstsByExpirationIndexKey(height, counter))
+	value := store.Get(GetRequestsByExpirationIndexKey(height, counter))
 	if value == nil {
 		return req, false
 	}
@@ -328,22 +328,25 @@ func (k Keeper) GetActiveRequest(ctx sdk.Context, height int64, counter int16) (
 	return req, true
 }
 
+// Returns an iterator for all the request in the Active Queue that expire by block height
+func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return store.Iterator(requestsByExpirationIndexKey, GetRequestsByExpirationPrefix(height))
+}
+
 //__________________________________________________________________________
 
 func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
-	store.Set(GetResponseKey(resp.ReqChainID, resp.Consumer, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
+	store.Set(GetResponseKey(resp.ReqChainID, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
 }
 
 //__________________________________________________________________________
 
 func (k Keeper) SetReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	store := ctx.KVStore(k.storeKey)
-	fee := ReturnedFee{
-		Address: address,
-		Coins:   coins,
-	}
+	fee := NewReturnedFee(address, coins)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
 	store.Set(GetReturnedFeeKey(address), bz)
 }
@@ -383,10 +386,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 
 func (k Keeper) SetIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	store := ctx.KVStore(k.storeKey)
-	fee := IncomingFee{
-		Address: address,
-		Coins:   coins,
-	}
+	fee := NewIncomingFee(address, coins)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
 	store.Set(GetIncomingFeeKey(address), bz)
 }

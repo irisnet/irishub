@@ -137,7 +137,7 @@ func ErrMethodNotExists(codespace sdk.CodespaceType, methodID int16) sdk.Error {
 }
 
 func ErrRequestNotActive(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeRequestNotActive, fmt.Sprintf("can not find requst"))
+	return sdk.NewError(codespace, CodeRequestNotActive, fmt.Sprintf("can not find request"))
 }
 
 func ErrReturnFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {

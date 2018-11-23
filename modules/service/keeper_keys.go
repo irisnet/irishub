@@ -26,7 +26,7 @@ func GetServiceDefinitionKey(chainId, name string) []byte {
 	return append(serviceDefinitionKey, getStringsKey([]string{chainId, name})...)
 }
 
-// id can not zero
+// id can not be zero
 func GetMethodPropertyKey(chainId, serviceName string, id int16) []byte {
 	return append(methodPropertyKey, getStringsKey([]string{chainId, serviceName, string(id)})...)
 }
@@ -55,18 +55,34 @@ func GetActiveRequestKey(defChainId, serviceName, bindChainId string, provider s
 		bindChainId, provider.String(), string(height), string(counter)})...)
 }
 
-func GetResponseKey(reqChainId string, consumer sdk.AccAddress, height int64, counter int16) []byte {
-	return append(responseKey, getStringsKey([]string{reqChainId, consumer.String(),
+func GetSubActiveRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress) []byte {
+	return append(append(
+		activeRequestKey, getStringsKey([]string{defChainId, serviceName,
+			bindChainId, provider.String()})...),
+		emptyByte...)
+}
+
+func GetResponseKey(reqChainId string, height int64, counter int16) []byte {
+	return append(responseKey, getStringsKey([]string{reqChainId,
 		string(height), string(counter)})...)
 }
 
 // get the expiration index of a request
-func GetRequstsByExpirationIndexKey(height int64, counter int16) []byte {
+func GetRequestsByExpirationIndexKey(height int64, counter int16) []byte {
 	// key is of format prefix || expirationHeight || counterBytes
 	key := make([]byte, 1+8+2)
 	key[0] = requestsByExpirationIndexKey[0]
 	binary.BigEndian.PutUint64(key[1:9], uint64(height))
 	binary.BigEndian.PutUint16(key[9:11], uint16(counter))
+	return key
+}
+
+// get the expiration prefix for all request of a block height
+func GetRequestsByExpirationPrefix(height int64) []byte {
+	// key is of format prefix || expirationHeight
+	key := make([]byte, 1+8)
+	key[0] = requestsByExpirationIndexKey[0]
+	binary.BigEndian.PutUint64(key[1:9], uint64(height))
 	return key
 }
 

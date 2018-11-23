@@ -2,6 +2,10 @@ package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"fmt"
+	"strings"
+	"errors"
+	"strconv"
 )
 
 type SvcRequest struct {
@@ -33,6 +37,27 @@ func NewSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer
 		ServiceFee:  serviceFee,
 		Profiling:   profiling,
 	}
+}
+
+// RequestID is of format request height-intraTxCounter
+func (req SvcRequest) RequestID() string {
+	return fmt.Sprintf("%d-%d", req.RequestHeight, req.RequestIntraTxCounter)
+}
+
+func TransferRequestID(requestId string) (height int64, counter int16, err error) {
+	ss := strings.Split(requestId, "-")
+	if len(ss) != 2 {
+		return height, counter, errors.New("invalid request id")
+	}
+	height, err = strconv.ParseInt(ss[0], 10, 64)
+	if err != nil {
+		return height, counter, err
+	}
+	counterInt, err := strconv.Atoi(ss[0])
+	if err != nil {
+		return height, counter, err
+	}
+	return height, int16(counterInt), err
 }
 
 type SvcResponse struct {
