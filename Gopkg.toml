@@ -29,7 +29,7 @@
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
   source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "=v0.26.0-iris"
+  version = "=v0.26.0-iris0.7.0"
 
 [[override]]
   name = "github.com/tendermint/iavl"
