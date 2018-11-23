@@ -32,7 +32,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	//sm "github.com/tendermint/tendermint/state"
+	sm "github.com/tendermint/tendermint/state"
 )
 
 const (
@@ -306,9 +306,9 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 	tags := gov.EndBlocker(ctx, app.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
-	//if ctx.BlockHeight() == 200 {
-	//	tags = tags.AppendTag(sm.TerminateTagKey, []byte(sm.TerminateTagValue))
-	//}
+	if ctx.BlockHeight() == 120 {
+		tags = tags.AppendTag(sm.TerminateTagKey, []byte(sm.TerminateTagValue))
+	}
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,

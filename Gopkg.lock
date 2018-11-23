@@ -744,7 +744,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "98408deb9302c81087d15483a805101b16bd9cf7"
+  revision = "cfd38fa1a29fb41d7b7cfd472183978c9cc32105"
   source = "https://github.com/HaoyangLiu/tendermint.git"
 
 [[projects]]
