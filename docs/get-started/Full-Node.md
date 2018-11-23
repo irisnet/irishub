@@ -1,6 +1,6 @@
 # Setup A Full-node
 
-Before setting up your validator node, make sure you already had **Iris** installed by following this [guide](Install-Iris.md)
+Before setting up your validator node, make sure you already had **Iris** installed by following this [guide](Install-the-Software.md)
 
 ## Init Your Node
 
@@ -27,8 +27,8 @@ After intializing your node, please download the genesis file and the config fil
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-4000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-4000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-5000/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-5000/config/genesis.json
 ```
 ## Edit Your Config File
 
