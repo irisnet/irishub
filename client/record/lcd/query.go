@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	recordClient "github.com/irisnet/irishub/client/record"
@@ -13,7 +13,7 @@ import (
 )
 
 // nolint: gocyclo
-func queryRecordsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryRecordsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		recordID := r.URL.Query().Get(RestRecordID)
@@ -34,7 +34,7 @@ func queryRecordsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) htt
 		}
 
 		var submitFile record.MsgSubmitRecord
-		cdc.MustUnmarshalBinary(res, &submitFile)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitFile)
 
 		recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
 		if err != nil {
@@ -42,7 +42,7 @@ func queryRecordsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) htt
 			return
 		}
 
-		output, err := wire.MarshalJSONIndent(cdc, recordResponse)
+		output, err := codec.MarshalJSONIndent(cdc, recordResponse)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -52,7 +52,7 @@ func queryRecordsWithParameterFn(cdc *wire.Codec, cliCtx context.CLIContext) htt
 	}
 }
 
-func queryRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func queryRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		recordID := vars[RestRecordID]
@@ -73,7 +73,7 @@ func queryRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		var submitFile record.MsgSubmitRecord
-		cdc.MustUnmarshalBinary(res, &submitFile)
+		cdc.MustUnmarshalBinaryLengthPrefixed(res, &submitFile)
 
 		recordResponse, err := recordClient.ConvertRecordToRecordOutput(cliCtx, submitFile)
 		if err != nil {
@@ -81,7 +81,7 @@ func queryRecordHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		output, err := wire.MarshalJSONIndent(cdc, recordResponse)
+		output, err := codec.MarshalJSONIndent(cdc, recordResponse)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

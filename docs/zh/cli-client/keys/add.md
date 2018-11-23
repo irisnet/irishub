@@ -1,44 +1,44 @@
 # iriscli keys add
 
-## Description
+## 描述
 
-Create a new key, or import from seed
+创建一个新密钥，或通过助记词导入已有密钥
 
-## Usage
+## 使用方式
 
 ```
 iriscli keys add <name> [flags]
 ```
 
-## Flags
+## 标志
 
-| Name, shorthand | Default   | Description                                                  | Required |
-| --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --account       |           | [uint32] Account number for HD derivation                    |          |
-| --dry-run       |           | Perform action, but don't add key to local keystore          |          |
-| --help, -h      |           | help for add                                                 |          |
-| --index         |           | [uint32] Index number for HD derivation                      |          |
-| --ledger        |           | Store a local reference to a private key on a Ledger device  |          |
-| --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
-| --recover       |           | Provide seed phrase to recover existing key instead of creating |          |
-| --type, -t      | secp256k1 | [string] Type of private key (secp256k\|ed25519)             |          |
+| 名称, 速记       | 默认值     | 描述                                                              | 是否必须  |
+| --------------- | --------- | ----------------------------------------------------------------- | -------- |
+| --account       |           | [uint32] HD推导的账号                                              |          |
+| --dry-run       |           | 忽略--gas标志并进行本地的交易仿真                                     |          |
+| --help, -h      |           | 查询命令帮助                                                       |          |
+| --index         |           | [uint32] HD推导的索引号                                            |          |
+| --ledger        |           | 使用连接的硬件记账设备                                               |          |
+| --no-backup     |           | 不输出助记词（如果其他人正在看着操作终端）                              |          |
+| --recover       |           | 提供助记词以恢复现有密钥而不是新建                                     |          |
+| --type, -t      | secp256k1 | [string] 私钥类型 (secp256k\|ed25519)                              |          |
 
-## Examples
+## 例子
 
-### Create a new key
+### 创建密钥
 
 ```shell
 iriscli keys add MyKey
 ```
 
-You'll be asked to enter a password for your key, note: password must be at least 8 characters.
+执行命令后，系统会要求你输入密钥密码，注意：密码必须至少为8个字符。
 
 ```txt
 Enter a passphrase for your key:
 Repeat the passphrase:
 ```
 
-After that, you're done with creating a new key, but remember to backup your seed phrase, it is the only way to recover your account if you ever forget your password or lose your key.
+之后，你已经完成了创建新密钥的工作，但请记住备份你的助记词短语，如果你不慎忘记密码或丢失了密钥，这是唯一能恢复帐户的方法。
 
 ```txt
 NAME:	TYPE:	ADDRESS:						PUBKEY:
@@ -49,17 +49,17 @@ It is the only way to recover your account if you ever forget your password.
 oval green shrug term already arena pilot spirit jump gain useful symbol hover grid item concert kiss zero bleak farm capable peanut snack basket
 ```
 
-The 24 words above is a seed phrase just for example, **DO NOT** use it in production.
+上面24个单词只是助记词的示例，**不要**在生产环境中使用。
 
-### Recover an existing key
+### 通过助记词恢复密钥
 
-If you forget your password or lose your key, or you wanna use your key in another place, you can recover your key by your seed phrase.
+如果你忘记了密码或丢失了密钥，或者你想在其他地方使用密钥，则可以通过助记词短语来恢复。
 
 ```txt
 iriscli keys add MyKey --recover
 ```
 
-You'll be asked to enter a new password for your key, and enter the seed phrase. Then you get your key back.
+系统会要求你输入并确认密钥的新密码，然后输入助记词。这样就能恢复你的密钥。
 
 ```txt
 Enter a passphrase for your key:

@@ -21,7 +21,7 @@ func runUpdateCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
 	buf := keys.BufferStdin()
-	kb, err := keys.GetKeyBase()
+	kb, err := keys.GetKeyBaseWithWritePerm()
 	if err != nil {
 		return err
 	}

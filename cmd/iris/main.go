@@ -6,11 +6,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/client"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -21,6 +23,13 @@ import (
 )
 
 func main() {
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.Seal()
+
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
@@ -40,18 +49,22 @@ func main() {
 	tendermintCmd.AddCommand(
 		server.ShowNodeIDCmd(ctx),
 		server.ShowValidatorCmd(ctx),
+		server.ShowAddressCmd(ctx),
 	)
 
-	startCmd := server.StartCmd(ctx, server.ConstructAppCreator(newApp, "iris"))
+	startCmd := server.StartCmd(ctx, newApp)
 	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
-		server.InitCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.GenTxCmd(ctx, cdc),
+		irisInit.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
+		irisInit.CollectGenTxsCmd(ctx, cdc),
 		startCmd,
 		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
-		server.ExportCmd(ctx, cdc, server.ConstructAppExporter(exportAppStateAndTMValidators, "iris")),
+		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
 		client.LineBreak,
 	)
 

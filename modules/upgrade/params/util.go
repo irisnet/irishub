@@ -5,7 +5,7 @@ import (
 
 )
 
-func GetCurrentUpgradeProposalId(ctx sdk.Context) int64 {
+func GetCurrentUpgradeProposalId(ctx sdk.Context) uint64 {
 	CurrentUpgradeProposalIdParameter.LoadValue(ctx)
 	return  CurrentUpgradeProposalIdParameter.Value
 }
@@ -20,7 +20,7 @@ func GetSwitchPeriod(ctx sdk.Context) int64 {
 	return  SwitchPeriodParameter.Value
 }
 
-func SetCurrentUpgradeProposalId(ctx sdk.Context, i int64) {
+func SetCurrentUpgradeProposalId(ctx sdk.Context, i uint64) {
 	CurrentUpgradeProposalIdParameter.Value = i
 	CurrentUpgradeProposalIdParameter.SaveValue(ctx)
 }
