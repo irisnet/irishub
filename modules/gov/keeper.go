@@ -173,7 +173,7 @@ func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, descri
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	var proposal Proposal = &SoftwareUpgradeProposal{
+	var proposal Proposal = &TerminatorProposal{
 		textProposal,
 	}
 

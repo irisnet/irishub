@@ -300,7 +300,7 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, app.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
-	tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
+	tags = tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
