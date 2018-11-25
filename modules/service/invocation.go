@@ -39,41 +39,47 @@ func NewSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer
 	}
 }
 
-// RequestID is of format request height-intraTxCounter
+// RequestID is of format request expirationHeight-requestHeight-intraTxCounter
 func (req SvcRequest) RequestID() string {
-	return fmt.Sprintf("%d-%d", req.RequestHeight, req.RequestIntraTxCounter)
+	return fmt.Sprintf("%d-%d-%d", req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
 }
 
-func TransferRequestID(requestId string) (height int64, counter int16, err error) {
+func TransferRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
 	ss := strings.Split(requestId, "-")
-	if len(ss) != 2 {
-		return height, counter, errors.New("invalid request id")
+	if len(ss) != 3 {
+		return eHeight, rHeight, counter, errors.New("invalid request id")
 	}
-	height, err = strconv.ParseInt(ss[0], 10, 64)
+	eHeight, err = strconv.ParseInt(ss[0], 10, 64)
 	if err != nil {
-		return height, counter, err
+		return eHeight, rHeight, counter, err
 	}
-	counterInt, err := strconv.Atoi(ss[0])
+	rHeight, err = strconv.ParseInt(ss[1], 10, 64)
 	if err != nil {
-		return height, counter, err
+		return eHeight, rHeight, counter, err
 	}
-	return height, int16(counterInt), err
+	counterInt, err := strconv.Atoi(ss[2])
+	if err != nil {
+		return eHeight, rHeight, counter, err
+	}
+	return eHeight, rHeight, int16(counterInt), err
 }
 
 type SvcResponse struct {
 	ReqChainID            string         `json:"req_chain_id"`
 	RequestHeight         int64          `json:"request_height"`
 	RequestIntraTxCounter int16          `json:"request_intra_tx_counter"`
+	ExpirationHeight      int64          `json:"expiration_height"`
 	Provider              sdk.AccAddress `json:"provider"`
 	Consumer              sdk.AccAddress `json:"consumer"`
 	Output                []byte         `json:"output"`
 	ErrorMsg              []byte         `json:"error_msg"`
 }
 
-func NewSvcResponse(reqChainID string, height int64, counter int16, provider, consumer sdk.AccAddress, out []byte, errorMsg []byte) SvcResponse {
+func NewSvcResponse(reqChainID string, eheight int64, rheight int64, counter int16, provider, consumer sdk.AccAddress, out []byte, errorMsg []byte) SvcResponse {
 	return SvcResponse{
 		ReqChainID:            reqChainID,
-		RequestHeight:         height,
+		ExpirationHeight:      eheight,
+		RequestHeight:         rheight,
 		RequestIntraTxCounter: counter,
 		Provider:              provider,
 		Consumer:              consumer,

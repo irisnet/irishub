@@ -498,22 +498,20 @@ func (msg MsgSvcRequest) GetSigners() []sdk.AccAddress {
 
 // MsgSvcResponse - struct for respond a service call
 type MsgSvcResponse struct {
-	ReqChainID            string         `json:"req_chain_id"`
-	RequestHeight         int64          `json:"request_height"`
-	RequestIntraTxCounter int16          `json:"request_intra_tx_counter"`
-	Provider              sdk.AccAddress `json:"provider"`
-	Output                []byte         `json:"output"`
-	ErrorMsg              []byte         `json:"error_msg"`
+	ReqChainID string         `json:"req_chain_id"`
+	RequestID  string         `json:"request_id"`
+	Provider   sdk.AccAddress `json:"provider"`
+	Output     []byte         `json:"output"`
+	ErrorMsg   []byte         `json:"error_msg"`
 }
 
-func NewMsgSvcResponse(reqChainID string, height int64, counter int16, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
+func NewMsgSvcResponse(reqChainID string, requestId string, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
 	return MsgSvcResponse{
-		ReqChainID:            reqChainID,
-		RequestHeight:         height,
-		RequestIntraTxCounter: counter,
-		Provider:              provider,
-		Output:                output,
-		ErrorMsg:              errorMsg,
+		ReqChainID: reqChainID,
+		RequestID:  requestId,
+		Provider:   provider,
+		Output:     output,
+		ErrorMsg:   errorMsg,
 	}
 }
 
@@ -542,8 +540,13 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+	_, _, _, err := TransferRequestID(msg.RequestID)
+	if err != nil {
+		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
+	}
+
 	return nil
 }
 

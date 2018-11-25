@@ -20,4 +20,8 @@ var (
 	ActionSvcCallTimeOut = []byte("service-call-expiration")
 
 	Action = sdk.TagAction
+
+	Provider = "provider"
+	Consumer = "consumer"
+	RequestID = "request-id"
 )

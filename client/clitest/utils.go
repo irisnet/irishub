@@ -424,9 +424,9 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 	return switchMsg
 }
 
-func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.ServiceOutput {
+func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceDef servicecli.ServiceOutput
+	var serviceDef servicecli.DefOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

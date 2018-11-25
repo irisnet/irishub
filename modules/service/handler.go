@@ -123,7 +123,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 }
 
 func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
-	_, bindingFound := k.GetServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	bind, bindingFound := k.GetServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
 	if !bindingFound {
 		return ErrSvcBindingNotExists(k.Codespace()).Result()
 	}
@@ -133,13 +133,29 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return ErrMethodNotExists(k.Codespace(), msg.MethodID).Result()
 	}
 
+	//Method id start at 1
+	if len(bind.Prices) >= int(msg.MethodID) && msg.ServiceFee.IsAllLT(sdk.Coins{bind.Prices[msg.MethodID-1]}) {
+		return ErrLtServiceFee(k.Codespace(), sdk.Coins{bind.Prices[msg.MethodID-1]}).Result()
+	}
+
 	request := NewSvcRequest(msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID, msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
 
-	k.AddRequest(ctx, request)
-	k.AddActiveRequest(ctx, request)
-	k.AddRequestExpiration(ctx, request)
+	// request service fee is equal to service binding service fee
+	if len(bind.Prices) >= int(msg.MethodID) {
+		request.ServiceFee = sdk.Coins{bind.Prices[msg.MethodID-1]}
+	} else {
+		request.ServiceFee = nil
+	}
+
+	request, err := k.AddRequest(ctx, request)
+	if err != nil {
+		return err.Result()
+	}
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcCall,
+		tags.RequestID, []byte(request.RequestID()),
+		tags.Provider, []byte(request.Provider.String()),
+		tags.Consumer, []byte(request.Consumer.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,
@@ -147,12 +163,16 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 }
 
 func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-	request, found := k.GetActiveRequest(ctx, msg.RequestHeight, msg.RequestIntraTxCounter)
+	eHeight, rHeight, counter, _ := TransferRequestID(msg.RequestID)
+	request, found := k.GetActiveRequest(ctx, eHeight, rHeight, counter)
 	if !found {
-		return ErrRequestNotActive(k.Codespace()).Result()
+		request.ExpirationHeight = eHeight
+		request.RequestHeight = rHeight
+		request.RequestIntraTxCounter = counter
+		return ErrRequestNotActive(k.Codespace(), request.RequestID()).Result()
 	}
 
-	response := NewSvcResponse(msg.ReqChainID, msg.RequestHeight, msg.RequestIntraTxCounter, msg.Provider,
+	response := NewSvcResponse(msg.ReqChainID, eHeight, rHeight, counter, msg.Provider,
 		request.Consumer, msg.Output, msg.ErrorMsg)
 
 	k.AddResponse(ctx, response)
@@ -161,7 +181,7 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	k.DeleteActiveRequest(ctx, request)
 	k.DeleteRequestExpiration(ctx, request)
 
-	k.AddReturnFee(ctx, response.Provider, request.ServiceFee)
+	k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRespond,
@@ -191,8 +211,11 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	}
 }
 
-// Called every block, process inflation, update validator set
+// Called every block, process inflation, update request status
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
+
+	// Reset the intra-transaction counter.
+	keeper.SetIntraTxCounter(ctx, 0)
 
 	logger := ctx.Logger().With("module", "service")
 	resTags = sdk.NewTags()
@@ -201,7 +224,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
+
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
+
 		keeper.DeleteActiveRequest(ctx, req)
 		keeper.DeleteRequestExpiration(ctx, req)
 
@@ -210,5 +235,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			req.RequestID(), req.Consumer))
 	}
 	activeIterator.Close()
+
+
 	return resTags
 }

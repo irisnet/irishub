@@ -14,7 +14,7 @@ import (
 	cmn "github.com/irisnet/irishub/client/service"
 )
 
-func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
 		Short:   "Query service definition",
@@ -64,7 +64,7 @@ func GetCmdQueryScvDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
 		Short:   "Query service binding",
@@ -105,7 +105,7 @@ func GetCmdQueryScvBind(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
 		Short:   "Query service bindings",
@@ -141,7 +141,7 @@ func GetCmdQueryScvBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryScvRequests(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "requests",
 		Short: "Query service requests",
@@ -187,21 +187,24 @@ func GetCmdQueryScvRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryScvResponse(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response",
 		Short:   "Query a service response",
-		Example: "iriscli service response --req-chain-id=<req-chain-id> --req-id=<request-id>",
+		Example: "iriscli service response --request-chain-id=<req-chain-id> --request-id=<request-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
 			reqChainId := viper.GetString(FlagReqChainId)
-			reqId := viper.GetString(FlagReqChainId)
+			reqId := viper.GetString(FlagReqId)
 
-			height, counter, err := service.TransferRequestID(reqId)
+			eHeight, rHeight, counter, err := service.TransferRequestID(reqId)
+			if err != nil {
+				return err
+			}
 
-			res, err := cliCtx.QueryStore(service.GetResponseKey(reqChainId, height, counter), storeName)
+			res, err := cliCtx.QueryStore(service.GetResponseKey(reqChainId, eHeight, rHeight, counter), storeName)
 			var resp service.SvcResponse
 			if err != nil {
 				return err
@@ -215,12 +218,12 @@ func GetCmdQueryScvResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsReqChainId)
-	cmd.Flags().AddFlagSet(FsReqChainId)
+	cmd.Flags().AddFlagSet(FsReqId)
 
 	return cmd
 }
 
-func GetCmdQueryScvFees(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees",
 		Short:   "Query return and incoming fee of a particular address",
@@ -250,7 +253,7 @@ func GetCmdQueryScvFees(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(res) > 0 {
+			if len(res1) > 0 {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res1, &incomingFee)
 			}
 

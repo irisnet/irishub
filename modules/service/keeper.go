@@ -278,7 +278,7 @@ func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk
 
 //__________________________________________________________________________
 
-func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) {
+func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) (SvcRequest, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
 	counter := k.GetIntraTxCounter(ctx)
@@ -286,12 +286,21 @@ func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) {
 	req.RequestIntraTxCounter = counter
 	k.SetIntraTxCounter(ctx, counter+1)
 
+	maxTimeout := serviceparams.GetMaxRequestTimeout(ctx)
+	req.ExpirationHeight = req.RequestHeight + maxTimeout
+
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
 
 	store.Set(GetRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
 		req.RequestHeight, req.RequestIntraTxCounter), bz)
 
-	k.ck.SubtractCoins(ctx, req.Consumer, req.ServiceFee)
+	_, _, err := k.ck.SubtractCoins(ctx, req.Consumer, req.ServiceFee)
+	if err != nil {
+		return req, err
+	}
+	k.AddActiveRequest(ctx, req)
+	k.AddRequestExpiration(ctx, req)
+	return req, nil
 }
 
 func (k Keeper) AddActiveRequest(ctx sdk.Context, req SvcRequest) {
@@ -310,17 +319,17 @@ func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req SvcRequest) {
 func (k Keeper) AddRequestExpiration(ctx sdk.Context, req SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetRequestsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter), bz)
+	store.Set(GetRequestsByExpirationIndexKeyByReq(req), bz)
 }
 
 func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetRequestsByExpirationIndexKey(req.RequestHeight, req.RequestIntraTxCounter))
+	store.Delete(GetRequestsByExpirationIndexKeyByReq(req))
 }
 
-func (k Keeper) GetActiveRequest(ctx sdk.Context, height int64, counter int16) (req SvcRequest, found bool) {
+func (k Keeper) GetActiveRequest(ctx sdk.Context, eHeight, rHeight int64, counter int16) (req SvcRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	value := store.Get(GetRequestsByExpirationIndexKey(height, counter))
+	value := store.Get(GetRequestsByExpirationIndexKey(eHeight, rHeight, counter))
 	if value == nil {
 		return req, false
 	}
@@ -331,7 +340,7 @@ func (k Keeper) GetActiveRequest(ctx sdk.Context, height int64, counter int16) (
 // Returns an iterator for all the request in the Active Queue that expire by block height
 func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return store.Iterator(requestsByExpirationIndexKey, GetRequestsByExpirationPrefix(height))
+	return sdk.KVStorePrefixIterator(store, GetRequestsByExpirationPrefix(height))
 }
 
 //__________________________________________________________________________
@@ -339,7 +348,7 @@ func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.It
 func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
-	store.Set(GetResponseKey(resp.ReqChainID, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
+	store.Set(GetResponseKey(resp.ReqChainID, resp.ExpirationHeight, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
 }
 
 //__________________________________________________________________________
@@ -364,12 +373,11 @@ func (k Keeper) GetReturnFee(ctx sdk.Context, address sdk.AccAddress) (fee Retur
 // Add return fee for a particular consumer, if it is not existed will create a new
 func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	fee, found := k.GetReturnFee(ctx, address)
-	if found {
+	if !found {
 		k.SetReturnFee(ctx, address, coins)
 		return
 	}
-	fee.Coins.Plus(coins)
-	k.SetReturnFee(ctx, address, fee.Coins)
+	k.SetReturnFee(ctx, address, fee.Coins.Plus(coins))
 }
 
 // refund fees from a particular consumer, and delete it
@@ -378,7 +386,10 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if !found {
 		return ErrReturnFeeNotExists(k.Codespace(), address)
 	}
-	k.ck.AddCoins(ctx, address, fee.Coins)
+	_, _, err := k.ck.AddCoins(ctx, address, fee.Coins)
+	if err != nil {
+		return err
+	}
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetReturnedFeeKey(address))
 	return nil
@@ -404,11 +415,10 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 // Add return fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	fee, found := k.GetIncomingFee(ctx, address)
-	if found {
+	if !found {
 		k.SetIncomingFee(ctx, address, coins)
 	}
-	fee.Coins.Plus(coins)
-	k.SetIncomingFee(ctx, address, fee.Coins)
+	k.SetIncomingFee(ctx, address, fee.Coins.Plus(coins))
 }
 
 // withdraw fees from a particular provider, and delete it
@@ -417,7 +427,10 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if !found {
 		return ErrWithdrawFeeNotExists(k.Codespace(), address)
 	}
-	k.ck.AddCoins(ctx, address, fee.Coins)
+	_, _, err := k.ck.AddCoins(ctx, address, fee.Coins)
+	if err != nil {
+		return err
+	}
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetIncomingFeeKey(address))
 	return nil

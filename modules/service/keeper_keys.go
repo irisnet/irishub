@@ -19,7 +19,7 @@ var (
 	intraTxCounterKey            = []byte{0x08} // key for intra-block tx index
 	activeRequestKey             = []byte{0x09} // key for active request
 	returnedFeeKey               = []byte{0x10}
-	incomingFeeKey               = []byte{0x10}
+	incomingFeeKey               = []byte{0x11}
 )
 
 func GetServiceDefinitionKey(chainId, name string) []byte {
@@ -33,7 +33,7 @@ func GetMethodPropertyKey(chainId, serviceName string, id int16) []byte {
 
 // Key for getting all methods on a service from the store
 func GetMethodsSubspaceKey(chainId, serviceName string) []byte {
-	return append(methodPropertyKey, getStringsKey([]string{chainId, serviceName})...)
+	return append(append(methodPropertyKey, getStringsKey([]string{chainId, serviceName})...), emptyByte...)
 }
 
 func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.AccAddress) []byte {
@@ -62,18 +62,23 @@ func GetSubActiveRequestKey(defChainId, serviceName, bindChainId string, provide
 		emptyByte...)
 }
 
-func GetResponseKey(reqChainId string, height int64, counter int16) []byte {
+func GetResponseKey(reqChainId string, eHeight, rHeight int64, counter int16) []byte {
 	return append(responseKey, getStringsKey([]string{reqChainId,
-		string(height), string(counter)})...)
+		string(eHeight), string(rHeight), string(counter)})...)
 }
 
 // get the expiration index of a request
-func GetRequestsByExpirationIndexKey(height int64, counter int16) []byte {
-	// key is of format prefix || expirationHeight || counterBytes
-	key := make([]byte, 1+8+2)
+func GetRequestsByExpirationIndexKeyByReq(req SvcRequest) []byte {
+	// key is of format prefix || expirationHeight || requestHeight || counterBytes
+	return GetRequestsByExpirationIndexKey(req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
+}
+
+func GetRequestsByExpirationIndexKey(eHeight, rHeight int64, counter int16) []byte {
+	key := make([]byte, 1+8+8+2)
 	key[0] = requestsByExpirationIndexKey[0]
-	binary.BigEndian.PutUint64(key[1:9], uint64(height))
-	binary.BigEndian.PutUint16(key[9:11], uint16(counter))
+	binary.BigEndian.PutUint64(key[1:9], uint64(eHeight))
+	binary.BigEndian.PutUint64(key[9:17], uint64(rHeight))
+	binary.BigEndian.PutUint16(key[17:19], uint16(counter))
 	return key
 }
 

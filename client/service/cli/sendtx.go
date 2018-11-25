@@ -17,7 +17,7 @@ import (
 	"encoding/hex"
 )
 
-func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
 		Short: "Create a new service definition",
@@ -73,7 +73,7 @@ func GetCmdScvDef(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvBind(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bind",
 		Short: "Create a new service binding",
@@ -136,7 +136,7 @@ func GetCmdScvBind(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvBindUpdate(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-binding",
 		Short: "Update a service binding",
@@ -205,7 +205,7 @@ func GetCmdScvBindUpdate(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvDisable(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "disable",
 		Short: "Disable a available service binding",
@@ -238,7 +238,7 @@ func GetCmdScvDisable(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvEnable(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enable",
 		Short: "Enable a unavailable service binding",
@@ -278,7 +278,7 @@ func GetCmdScvEnable(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvRefundDeposit(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund-deposit",
 		Short: "Refund all deposit from a service binding",
@@ -311,12 +311,12 @@ func GetCmdScvRefundDeposit(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvCall(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
 		Short: "Call a service method",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.004iris --def-chain-id=<bind-chain-id> " +
-			"--service-name=<service name> --method-id=<method-id> --bind-chain-id=<chain-id> --provider=<provider> --service-fee=1iris --input=<input>",
+			"--service-name=<service name> --method-id=<method-id> --bind-chain-id=<chain-id> --provider=<provider> --service-fee=1iris --request-data=<req>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -347,7 +347,7 @@ func GetCmdScvCall(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			inputString := viper.GetString(FlagInput)
+			inputString := viper.GetString(FlagReqData)
 			input, err := hex.DecodeString(inputString)
 			if err != nil {
 				return err
@@ -366,18 +366,18 @@ func GetCmdScvCall(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(FsMethodID)
 	cmd.Flags().AddFlagSet(FsProvider)
 	cmd.Flags().AddFlagSet(FsServiceFee)
-	cmd.Flags().AddFlagSet(FsInput)
+	cmd.Flags().AddFlagSet(FsReqData)
 	cmd.Flags().AddFlagSet(FsProfiling)
 
 	return cmd
 }
 
-func GetCmdScvRespond(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "Respond",
+		Use:   "respond",
 		Short: "Respond a service method invocation",
 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.004iris --req-chain-id=<call-chain-id> " +
-			"--request-id=<request-id> --output=<output>",
+			"--request-id=<request-id> --response-data=<resp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -390,7 +390,7 @@ func GetCmdScvRespond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			reqChainId := viper.GetString(FlagReqChainId)
-			outputString := viper.GetString(FlagOutput)
+			outputString := viper.GetString(FlagRespData)
 			output, err := hex.DecodeString(outputString)
 			if err != nil {
 				return err
@@ -403,25 +403,21 @@ func GetCmdScvRespond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			reqId := viper.GetString(FlagReqId)
-			height, counter, err := service.TransferRequestID(reqId)
-			if err != nil {
-				return err
-			}
 
-			msg := service.NewMsgSvcResponse(reqChainId, height, counter, fromAddr, output, errMsg)
+			msg := service.NewMsgSvcResponse(reqChainId, reqId, fromAddr, output, errMsg)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().AddFlagSet(FsReqChainId)
-	cmd.Flags().AddFlagSet(FsOutput)
+	cmd.Flags().AddFlagSet(FsRespData)
 	cmd.Flags().AddFlagSet(FsErrMsg)
 	cmd.Flags().AddFlagSet(FsReqId)
 
 	return cmd
 }
 
-func GetCmdScvRefundFees(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund-fees",
 		Short:   "Refund all fees from service call timeout",
@@ -444,7 +440,7 @@ func GetCmdScvRefundFees(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdScvWithdrawFees(cdc *codec.Codec) *cobra.Command {
+func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-fees",
 		Short:   "withdraw all fees from service call reward",
