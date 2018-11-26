@@ -42,7 +42,10 @@ iris gentx --name={account_name} --home={path_to_your_home}
       {
         "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
         "coins": [
-          "150iris"
+        {
+            "denom": "iris-atto",
+            "amount": "150000000000000000000"
+        }
         ],
         "sequence_number": "0",
         "account_number": "0"
