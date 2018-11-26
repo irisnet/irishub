@@ -21,6 +21,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&govparams.VotingProcedure{},"cosmos-sdk/VotingProcedure",nil)
 	cdc.RegisterConcrete(&ParameterProposal{}, "gov/ParameterProposal", nil)
 	cdc.RegisterConcrete(&SoftwareUpgradeProposal{}, "gov/SoftwareUpgradeProposal", nil)
+	cdc.RegisterConcrete(&TerminatorProposal{}, "gov/TerminatorProposal", nil)
 	////////////////////  iris end  ///////////////////////////
 }
 
