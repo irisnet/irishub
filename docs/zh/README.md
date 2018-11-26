@@ -1,4 +1,4 @@
-# IRISnet文档目录
+# IRISnet 文档
 ![irisnet](../pics/iris.jpg)
 
 IRIS网络是上海边界智能和Tendermint团队合作打造的跨链区块链网络，将是Cosmos网络生态中的第一个区域性枢纽(Hub)，并专注于为分布式商业应用提供基础设施和协议。
