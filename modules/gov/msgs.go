@@ -74,7 +74,6 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 		} else {
 			return ErrInvalidParam(DefaultCodespace)
 		}
-
 	}
 	////////////////////  iris end  /////////////////////////////
 	return nil

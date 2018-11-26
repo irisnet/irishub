@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"encoding/json"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
+	tmstate "github.com/tendermint/tendermint/state"
 )
 
 // Handle all "gov" type messages.
@@ -30,8 +32,13 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
-	////////////////////  iris end  /////////////////////////////
 
+	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
+		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
+			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
+		}
+	}
+	////////////////////  iris end  /////////////////////////////
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
@@ -119,6 +126,11 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	logger := ctx.Logger().With("module", "gov")
 
 	resTags = sdk.NewTags()
+
+	if ctx.BlockHeight() == keeper.GetTerminatorHeight(ctx) {
+		resTags = resTags.AppendTag(tmstate.TerminateTagKey,[]byte(tmstate.TerminateTagValue))
+		logger.Info(fmt.Sprintf("Terminator Start!!!"))
+	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
 	for ; inactiveIterator.Valid(); inactiveIterator.Next() {

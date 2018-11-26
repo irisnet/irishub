@@ -13,6 +13,7 @@ const (
 	CodeNotCurrentProposal      sdk.CodeType = 203
 	CodeNotValidator            sdk.CodeType = 204
 	CodeDoubleSwitch            sdk.CodeType = 205
+	CodeNotSwitch               sdk.CodeType = 206
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
