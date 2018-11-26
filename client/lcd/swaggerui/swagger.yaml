@@ -374,6 +374,11 @@ paths:
         description: if true, broadcast transaction asynchronously
         required: false
         type: boolean
+      - in: query
+        name: simulate
+        description: if true, perform a simulation for a transaction
+        required: false
+        type: boolean
       - description: stdTx
         name: sendTxBody
         in: body

@@ -158,6 +158,20 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			return
 		}
 
+		if cliCtx.DryRun {
+			rawRes, err := cliCtx.Query("/app/simulate", txBytes)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			var simulationResult sdk.Result
+			if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			utils.PostProcessResponse(w, cdc, simulationResult, cliCtx.Indent)
+			return
+		}
 		var res interface{}
 		if cliCtx.Async {
 			res, err = cliCtx.BroadcastTxAsync(txBytes)
