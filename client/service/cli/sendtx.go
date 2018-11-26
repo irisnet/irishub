@@ -241,7 +241,7 @@ func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enable",
-		Short: "Enable a unavailable service binding",
+		Short: "Enable an unavailable service binding",
 		Example: "iriscli service enable --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --deposit=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {

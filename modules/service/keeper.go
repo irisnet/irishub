@@ -412,7 +412,7 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 	return fee, true
 }
 
-// Add return fee for a particular provider, if it is not existed will create a new
+// Add incoming fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
@@ -438,7 +438,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 
 //__________________________________________________________________________
 
-// get the current in-block validator operation counter
+// get the current in-block request operation counter
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(intraTxCounterKey)

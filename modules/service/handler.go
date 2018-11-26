@@ -217,7 +217,7 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	}
 }
 
-// Called every block, process inflation, update request status
+// Called every block, update request status
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 	// Reset the intra-transaction counter.
