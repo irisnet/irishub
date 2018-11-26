@@ -484,6 +484,9 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+	if len(msg.Provider) == 0 {
+		sdk.ErrInvalidAddress(msg.Provider.String())
+	}
 	if len(msg.Consumer) == 0 {
 		sdk.ErrInvalidAddress(msg.Consumer.String())
 	}

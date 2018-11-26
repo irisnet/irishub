@@ -127,6 +127,9 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 	if !bindingFound {
 		return ErrSvcBindingNotExists(k.Codespace()).Result()
 	}
+	if !bind.Available {
+		return ErrSvcBindingIsAvailable(k.Codespace()).Result()
+	}
 
 	_, methodFound := k.GetMethod(ctx, msg.DefChainID, msg.DefName, msg.MethodID)
 	if !methodFound {
@@ -170,6 +173,9 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 		request.RequestHeight = rHeight
 		request.RequestIntraTxCounter = counter
 		return ErrRequestNotActive(k.Codespace(), request.RequestID()).Result()
+	}
+	if !(msg.Provider.Equals(request.Provider)) {
+		return ErrNotMatchingProvider(k.Codespace(), request.Provider).Result()
 	}
 
 	response := NewSvcResponse(msg.ReqChainID, eHeight, rHeight, counter, msg.Provider,
@@ -235,7 +241,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			req.RequestID(), req.Consumer))
 	}
 	activeIterator.Close()
-
 
 	return resTags
 }

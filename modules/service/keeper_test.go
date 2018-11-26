@@ -110,7 +110,7 @@ func TestKeeper_service_Call(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, svcRequest.RequestID(), svcRequest1.RequestID())
 
-	iterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
+	iterator := keeper.ActiveRequestQueueIterator(ctx, svcRequest.ExpirationHeight)
 	require.True(t, iterator.Valid())
 	for ; ; iterator.Next() {
 		var req SvcRequest

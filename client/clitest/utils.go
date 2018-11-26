@@ -187,10 +187,9 @@ func copyFile(dstFile, srcFile string) error {
 	_, err = io.Copy(dst, src)
 	return err
 }
+
 //___________________________________________________________________________________
 // helper methods
-
-
 
 func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
@@ -201,7 +200,7 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
-	nodeID,_ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
+	nodeID, _ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
 	var appState app.GenesisFileState
@@ -451,6 +450,24 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 	return serviceBindings
 }
 
+func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var svcRequests []service.SvcRequest
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return svcRequests
+}
+
+func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var feesOutput servicecli.FeesOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return feesOutput
+}
+
 func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...string) string {
 	proc := tests.GoExecuteT(t, cmdStr)
 
@@ -538,5 +555,3 @@ func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force b
 	return true
 
 }
-
-
