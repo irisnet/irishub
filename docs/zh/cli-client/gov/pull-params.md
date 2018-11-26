@@ -18,7 +18,7 @@ iriscli gov pull-params --help
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --path          | $HOME/.iris                | [string] iris home目录                                                                                                                      
+| --path          | $HOME/.iriscli                | [string] iriscli home目录                                                                                                                      
 
 ## 例子
 
@@ -31,10 +31,10 @@ iriscli gov pull-params
 执行该指令，你会收到如下提示信息：
 
 ```txt
-Save the parameter config file in  /Users/trevorfu/.iris/config/params.json
+Save the parameter config file in  /Users/trevorfu/.iriscli/params.json
 ```
 
-打开--path/config目录下的params.json文件，你可以看到json格式的文件内容。
+打开--path/目录下的params.json文件，你可以看到json格式的文件内容。
 
 ```txt
 {

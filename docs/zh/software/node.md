@@ -14,8 +14,8 @@ iriscli keys add {account_name}
 ```
 得到账户信息，包括账户地址、公钥地址、助记词
 ```
-NAME:    TYPE:    ADDRESS:                        PUBKEY:
-account_name    local    faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju    fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
+NAME:	TYPE:	ADDRESS:						PUBKEY:
+account_name	local	faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
@@ -38,16 +38,16 @@ iris gentx --name={account_name} --home={path_to_your_home}
 
 手动修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
 ```json
-"accounts": [
-{
-"address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
-"coins": [
-"150iris"
-],
-"sequence_number": "0",
-"account_number": "0"
-}
-],
+    "accounts": [
+      {
+        "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
+        "coins": [
+          "150iris"
+        ],
+        "sequence_number": "0",
+        "account_number": "0"
+      }
+    ],
 ```
 
 配置验证人信息
@@ -103,4 +103,3 @@ pri_validator.json为验证人在每一轮出块共识投票中对Pre-vote/Pre-c
 ### config.toml
 
 config.toml为该节点的非共识的配置信息，不同节点可根据自己的情况自行配置。常见修改项有`persistent_peers`/`moniker`/`laddr`等。
-
