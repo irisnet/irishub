@@ -139,7 +139,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.cdc,
 		app.keyStake, app.tkeyStake,
 		app.bankKeeper, app.paramsKeeper.Subspace(stake.DefaultParamspace),
-		app.RegisterCodespace(stake.DefaultCodespace),
+		stake.DefaultCodespace,
 	)
 	app.mintKeeper = mint.NewKeeper(app.cdc, app.keyMint,
 		app.paramsKeeper.Subspace(mint.DefaultParamspace),
@@ -150,32 +150,32 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.keyDistr,
 		app.paramsKeeper.Subspace(distr.DefaultParamspace),
 		app.bankKeeper, &stakeKeeper, app.feeCollectionKeeper,
-		app.RegisterCodespace(stake.DefaultCodespace),
+		distr.DefaultCodespace,
 	)
 	app.slashingKeeper = slashing.NewKeeper(
 		app.cdc,
 		app.keySlashing,
 		&stakeKeeper, app.paramsKeeper.Subspace(slashing.DefaultParamspace),
-		app.RegisterCodespace(slashing.DefaultCodespace),
+		slashing.DefaultCodespace,
 	)
 
 	app.govKeeper = gov.NewKeeper(
 		app.cdc,
 		app.keyGov,
 		app.bankKeeper, &stakeKeeper,
-		app.RegisterCodespace(gov.DefaultCodespace),
+		gov.DefaultCodespace,
 	)
 
 	app.recordKeeper = record.NewKeeper(
 		app.cdc,
 		app.keyRecord,
-		app.RegisterCodespace(record.DefaultCodespace),
+		record.DefaultCodespace,
 	)
 	app.serviceKeeper = service.NewKeeper(
 		app.cdc,
 		app.keyService,
 		app.bankKeeper,
-		app.RegisterCodespace(service.DefaultCodespace),
+		service.DefaultCodespace,
 	)
 
 	// register the staking hooks

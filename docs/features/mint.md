@@ -1,4 +1,4 @@
-# IRISLCD User Guide
+# Mint User Guide
 
 ## Introduction
 
