@@ -20,6 +20,14 @@ const (
 	FlagAvgRspTime         = "avg-rsp-time"
 	FlagUsableTime         = "usable-time"
 	FlagExpiration         = "expiration"
+	FlagMethodID           = "method-id"
+	FlagServiceFee         = "service-fee"
+	FlagReqData            = "request-data"
+	FlagRespData           = "response-data"
+	FlagErrMsg             = "error-msg"
+	FlagProfiling          = "profiling"
+	FlagReqChainId         = "request-chain-id"
+	FlagReqId              = "request-id"
 )
 
 var (
@@ -38,6 +46,14 @@ var (
 	FsAvgRspTime         = flag.NewFlagSet("", flag.ContinueOnError)
 	FsUsableTime         = flag.NewFlagSet("", flag.ContinueOnError)
 	FsExpiration         = flag.NewFlagSet("", flag.ContinueOnError)
+	FsMethodID           = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceFee         = flag.NewFlagSet("", flag.ContinueOnError)
+	FsReqData            = flag.NewFlagSet("", flag.ContinueOnError)
+	FsRespData           = flag.NewFlagSet("", flag.ContinueOnError)
+	FsErrMsg             = flag.NewFlagSet("", flag.ContinueOnError)
+	FsProfiling          = flag.NewFlagSet("", flag.ContinueOnError)
+	FsReqChainId         = flag.NewFlagSet("", flag.ContinueOnError)
+	FsReqId              = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -57,4 +73,13 @@ func init() {
 	FsAvgRspTime.Int64(FlagAvgRspTime, 0, "the average service response time in milliseconds")
 	FsUsableTime.Int64(FlagUsableTime, 0, "an integer represents the number of usable service invocations per 10,000")
 	FsExpiration.String(FlagExpiration, "", "the blockchain height where this binding expires")
+
+	FsMethodID.Int16(FlagMethodID, 0, "the method id called")
+	FsServiceFee.String(FlagServiceFee, "", "fee to pay for a service invocation")
+	FsReqData.BytesHex(FlagReqData, nil, "hex encoded request data of a service invocation")
+	FsRespData.BytesHex(FlagRespData, nil, "hex encoded response data of a service invocation")
+	FsErrMsg.BytesHex(FlagErrMsg, nil, "hex encoded response error msg of a service invocation")
+	FsProfiling.Bool(FlagProfiling, false, "service invocation profiling model, default false")
+	FsReqChainId.String(FlagReqChainId, "", "the ID of the blockchain that the service invocation initiated")
+	FsReqId.String(FlagReqId, "", "the ID of the service invocation")
 }

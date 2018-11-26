@@ -93,7 +93,6 @@ func NewApp() *App {
 	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
-	config.Seal()
 
 	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
