@@ -69,7 +69,7 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  branch = "haoyang/v0.26.0-iris"
+  branch = "irisnet/v0.26.1-rc1-iris"
   digest = "1:08fed3beec9838cf294d87048eac763ba477e03615d8049ebcb70a00fdf78f95"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
@@ -114,8 +114,8 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "824158010a138259d91eb64fe8db26ee48cb3cec"
-  source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
+  revision = "13bfe51e685d08282f22a3e24b208faada677f64"
+  source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"
@@ -744,7 +744,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "d18b38d0c5ceba201f34db3875ec6b73ad654b5c"
+  revision = "e1bfbff15b53a0dc96b862c5c1f23fe8eff7956d"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
