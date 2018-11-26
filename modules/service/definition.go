@@ -19,7 +19,7 @@ type SvcDef struct {
 }
 
 type MethodProperty struct {
-	ID            int               `json:"id"`
+	ID            int16             `json:"id"`
 	Name          string            `json:"name"`
 	Description   string            `json:"description"`
 	OutputPrivacy OutputPrivacyEnum `json:"output_privacy"`

@@ -28,6 +28,15 @@ const (
 	CodeLtMinProviderDeposit sdk.CodeType = 116
 	CodeInvalidDisable       sdk.CodeType = 117
 	CodeInvalidEnable        sdk.CodeType = 118
+
+	CodeMethodNotExists       sdk.CodeType = 119
+	CodeRequestNotActive      sdk.CodeType = 120
+	CodeReturnFeeNotExists    sdk.CodeType = 121
+	CodeWithdrawFeeNotExists  sdk.CodeType = 122
+	CodeLtServiceFee          sdk.CodeType = 123
+	CodeInvalidReqId          sdk.CodeType = 124
+	CodeSvcBindingIsAvailable sdk.CodeType = 125
+	CodeNotMatchingProvider   sdk.CodeType = 126
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -125,4 +134,36 @@ func ErrEnable(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
 	return sdk.NewError(codespace, CodeLtMinProviderDeposit, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
+}
+
+func ErrMethodNotExists(codespace sdk.CodespaceType, methodID int16) sdk.Error {
+	return sdk.NewError(codespace, CodeMethodNotExists, fmt.Sprintf("service method [%d] is not existed", methodID))
+}
+
+func ErrRequestNotActive(codespace sdk.CodespaceType, requestID string) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestNotActive, fmt.Sprintf("request [%s] is not existed", requestID))
+}
+
+func ErrReturnFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeReturnFeeNotExists, fmt.Sprintf("There is no service refund fees for [%s]", address))
+}
+
+func ErrWithdrawFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeWithdrawFeeNotExists, fmt.Sprintf("There is no service withdraw fees for [%s]", address))
+}
+
+func ErrLtServiceFee(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeLtServiceFee, fmt.Sprintf("service fee amount must be equal or greater than %s", coins.String()))
+}
+
+func ErrInvalidReqId(codespace sdk.CodespaceType, reqId string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidReqId, fmt.Sprintf("invalid request id [%s]", reqId))
+}
+
+func ErrSvcBindingIsAvailable(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcBindingIsAvailable, fmt.Sprintf("service binding is available"))
+}
+
+func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeNotMatchingProvider, fmt.Sprintf("[%s] is not a matching Provider", provider.String()))
 }

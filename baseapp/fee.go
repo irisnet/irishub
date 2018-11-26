@@ -41,7 +41,8 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 		txAccounts := auth.GetSigners(ctx)
 		// If this tx failed in anteHandler, txAccount length will be less than 1
 		if len(txAccounts) < 1 {
-			panic("invalid transaction, should not reach here")
+			//panic("invalid transaction, should not reach here")
+			return sdk.Coin{}, nil
 		}
 		firstAccount := txAccounts[0]
 
