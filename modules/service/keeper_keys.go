@@ -69,11 +69,11 @@ func GetResponseKey(reqChainId string, eHeight, rHeight int64, counter int16) []
 
 // get the expiration index of a request
 func GetRequestsByExpirationIndexKeyByReq(req SvcRequest) []byte {
-	// key is of format prefix || expirationHeight || requestHeight || counterBytes
 	return GetRequestsByExpirationIndexKey(req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
 }
 
 func GetRequestsByExpirationIndexKey(eHeight, rHeight int64, counter int16) []byte {
+	// key is of format prefix(1) || expirationHeight(8) || requestHeight(8) || counterBytes(2)
 	key := make([]byte, 1+8+8+2)
 	key[0] = requestsByExpirationIndexKey[0]
 	binary.BigEndian.PutUint64(key[1:9], uint64(eHeight))
