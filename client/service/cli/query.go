@@ -14,6 +14,8 @@ import (
 	cmn "github.com/irisnet/irishub/client/service"
 )
 
+const NULL = "null"
+
 func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
@@ -211,6 +213,9 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 			if len(res) > 0 {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res, &resp)
+			} else {
+				fmt.Println(NULL)
+				return nil
 			}
 			output, err := cdc.MarshalJSONIndent(resp, "", "")
 			fmt.Println(string(output))

@@ -37,6 +37,7 @@ const (
 	CodeInvalidReqId           sdk.CodeType = 124
 	CodeSvcBindingNotAvailable sdk.CodeType = 125
 	CodeNotMatchingProvider    sdk.CodeType = 126
+	CodeInvalidReqChainId      sdk.CodeType = 127
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -97,7 +98,7 @@ func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("def-chain-id is empty"))
+	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("defined chain id is empty"))
 }
 
 func ErrSvcBindingExists(codespace sdk.CodespaceType) sdk.Error {
@@ -166,4 +167,8 @@ func ErrSvcBindingNotAvailable(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeNotMatchingProvider, fmt.Sprintf("[%s] is not a matching Provider", provider.String()))
+}
+
+func ErrInvalidReqChainId(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidReqChainId, fmt.Sprintf("request chain id is empty"))
 }
