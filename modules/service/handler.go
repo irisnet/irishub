@@ -137,7 +137,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 	}
 
 	//Method id start at 1
-	if len(bind.Prices) >= int(msg.MethodID) && msg.ServiceFee.IsAllLT(sdk.Coins{bind.Prices[msg.MethodID-1]}) {
+	if len(bind.Prices) >= int(msg.MethodID) && !msg.ServiceFee.IsAllGTE(sdk.Coins{bind.Prices[msg.MethodID-1]}) {
 		return ErrLtServiceFee(k.Codespace(), sdk.Coins{bind.Prices[msg.MethodID-1]}).Result()
 	}
 

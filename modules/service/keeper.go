@@ -111,7 +111,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
 	}
 
-	if svcBinding.Deposit.IsAllLT(minDeposit) {
+	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
@@ -189,7 +189,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
 	}
 
-	if oldBinding.Deposit.IsAllLT(minDeposit) {
+	if !oldBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit).Plus(svcBinding.Deposit)), false
 	}
 
@@ -239,7 +239,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
 	}
 
-	if binding.Deposit.IsAllLT(minDeposit) {
+	if !binding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit)), false
 	}
 
