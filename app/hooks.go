@@ -5,16 +5,20 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 )
 
-const trigger = "stake"
-var _ sdk.StakingHooks = HooksHub{}
+type Hooks interface {}
 
-type hooks []sdk.StakingHooks
+const trigger = "stake"
+
+type hooks []Hooks
 type hooksVersion map[int64]hooks
 
 type HooksHub struct {
 	upgradeKeeper upgrade.Keeper
 	triggeredHook map[string]hooksVersion
 }
+
+var _ sdk.StakingHooks = HooksHub{}
+var _ Hooks = HooksHub{}
 
 func NewHooksHub(keeper upgrade.Keeper) HooksHub {
 	return HooksHub{
@@ -23,19 +27,19 @@ func NewHooksHub(keeper upgrade.Keeper) HooksHub {
 	}
 }
 
-func (hkhub *HooksHub) AddHook(trigger string, version int64, shk sdk.StakingHooks) (hkh *HooksHub)  {
+func (hkhub HooksHub) AddHook(trigger string, version int64, shk Hooks) (hkh HooksHub)  {
 	hkversion, ok := hkhub.triggeredHook[trigger]
 	if !ok {
 		hkversion = make(map[int64]hooks)
 	}
 
-	hkversion[version] = []sdk.StakingHooks(append(hkversion[version], shk))
+	hkversion[version] = []Hooks(append(hkversion[version], shk))
 	hkhub.triggeredHook[trigger] = hkversion
 
 	return hkhub
 }
 
-func (hkhub *HooksHub) GetHooks(trigger string, version int64) (hk *hooks) {
+func (hkhub HooksHub) GetHooks(trigger string, version int64) (hk hooks) {
 	hkversion, ok := hkhub.triggeredHook[trigger]
 	if !ok {
 		return nil
@@ -46,7 +50,7 @@ func (hkhub *HooksHub) GetHooks(trigger string, version int64) (hk *hooks) {
 		return nil
 	}
 
-	return &hks
+	return hks
 }
 
 func (h HooksHub) GetCurrentVersionHooks(ctx sdk.Context) hooks {
@@ -64,14 +68,14 @@ func (h HooksHub) OnValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) {
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnValidatorCreated(ctx, valAddr)
+		hook.(sdk.StakingHooks).OnValidatorCreated(ctx, valAddr)
 	}
 }
 func (h HooksHub) OnValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) {
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnValidatorModified(ctx, valAddr)
+		hook.(sdk.StakingHooks).OnValidatorModified(ctx, valAddr)
 	}
 }
 
@@ -79,7 +83,7 @@ func (h HooksHub) OnValidatorRemoved(ctx sdk.Context, consAddr sdk.ConsAddress, 
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnValidatorRemoved(ctx, consAddr, valAddr)
+		hook.(sdk.StakingHooks).OnValidatorRemoved(ctx, consAddr, valAddr)
 	}
 }
 
@@ -87,7 +91,7 @@ func (h HooksHub) OnValidatorBonded(ctx sdk.Context, consAddr sdk.ConsAddress, v
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnValidatorBonded(ctx, consAddr, valAddr)
+		hook.(sdk.StakingHooks).OnValidatorBonded(ctx, consAddr, valAddr)
 	}
 }
 
@@ -95,7 +99,7 @@ func (h HooksHub) OnValidatorPowerDidChange(ctx sdk.Context, consAddr sdk.ConsAd
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnValidatorPowerDidChange(ctx, consAddr, valAddr)
+		hook.(sdk.StakingHooks).OnValidatorPowerDidChange(ctx, consAddr, valAddr)
 	}
 }
 
@@ -103,7 +107,7 @@ func (h HooksHub) OnValidatorBeginUnbonding(ctx sdk.Context, consAddr sdk.ConsAd
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnValidatorBeginUnbonding(ctx, consAddr, valAddr)
+		hook.(sdk.StakingHooks).OnValidatorBeginUnbonding(ctx, consAddr, valAddr)
 	}
 }
 
@@ -111,7 +115,7 @@ func (h HooksHub) OnDelegationCreated(ctx sdk.Context, delAddr sdk.AccAddress, v
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnDelegationCreated(ctx, delAddr, valAddr)
+		hook.(sdk.StakingHooks).OnDelegationCreated(ctx, delAddr, valAddr)
 	}
 }
 
@@ -119,7 +123,7 @@ func (h HooksHub) OnDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAdd
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnDelegationSharesModified(ctx, delAddr, valAddr)
+		hook.(sdk.StakingHooks).OnDelegationSharesModified(ctx, delAddr, valAddr)
 	}
 }
 
@@ -127,7 +131,7 @@ func (h HooksHub) OnDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress, v
 	hks := h.GetCurrentVersionHooks(ctx)
 
 	for _, hook := range hks {
-		hook.OnDelegationRemoved(ctx, delAddr, valAddr)
+		hook.(sdk.StakingHooks).OnDelegationRemoved(ctx, delAddr, valAddr)
 	}
 }
 
