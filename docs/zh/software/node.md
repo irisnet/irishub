@@ -36,13 +36,17 @@ iris gentx --name={account_name} --home={path_to_your_home}
 
 ### 配置genesis
 
-手动修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
+使用下面命令修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
+```bash
+iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
+```
+
 ```json
     "accounts": [
       {
         "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
         "coins": [
-          "150iris"
+          "150000000000000000000iris-atto"
         ],
         "sequence_number": "0",
         "account_number": "0"
