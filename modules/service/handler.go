@@ -54,8 +54,8 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
-	svcBinding := NewSvcBinding(msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
-		msg.Deposit, msg.Prices, msg.Level, true, 0)
+	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
+		msg.Deposit, msg.Prices, msg.Level, true)
 	err, _ := k.AddServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
@@ -69,8 +69,8 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 }
 
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
-	svcBinding := NewSvcBinding(msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
-		msg.Deposit, msg.Prices, msg.Level, false, 0)
+	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
+		msg.Deposit, msg.Prices, msg.Level, false)
 	err, _ := k.UpdateServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
@@ -128,7 +128,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return ErrSvcBindingNotExists(k.Codespace()).Result()
 	}
 	if !bind.Available {
-		return ErrSvcBindingIsAvailable(k.Codespace()).Result()
+		return ErrSvcBindingNotAvailable(k.Codespace()).Result()
 	}
 
 	_, methodFound := k.GetMethod(ctx, msg.DefChainID, msg.DefName, msg.MethodID)
@@ -198,7 +198,10 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 }
 
 func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk.Result {
-	k.RefundFee(ctx, msg.Consumer)
+	err := k.RefundFee(ctx, msg.Consumer)
+	if err != nil {
+		return err.Result()
+	}
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRefundFees,
 	)
@@ -208,7 +211,10 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 }
 
 func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees) sdk.Result {
-	k.WithdrawFee(ctx, msg.Provider)
+	err := k.WithdrawFee(ctx, msg.Provider)
+	if err != nil {
+		return err.Result()
+	}
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcWithdrawFees,
 	)

@@ -257,7 +257,7 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res1, &incomingFee)
 			}
 
-			output, err := cdc.MarshalJSONIndent(cmn.FeesOutput{ReturnedFee: returnedFee, IncomingFee: incomingFee}, "", "")
+			output, err := cdc.MarshalJSONIndent(cmn.FeesOutput{ReturnedFee: returnedFee.Coins, IncomingFee: incomingFee.Coins}, "", "")
 			fmt.Println(string(output))
 			return nil
 		},

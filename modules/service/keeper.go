@@ -7,6 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"fmt"
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/arbitration/params"
+	"time"
 )
 
 type Keeper struct {
@@ -101,8 +103,15 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrSvcBindingExists(k.Codespace()), false
 	}
 
-	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
-	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
+	// min deposit must >= sum(method price) * minDepositMultiple
+	minDepositMultiple := serviceparams.GetMinDepositMultiple(ctx)
+	var minDeposit sdk.Coins
+	for _, price := range svcBinding.Prices {
+		minInt := price.Amount.Mul(sdk.NewInt(minDepositMultiple))
+		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
+	}
+
+	if svcBinding.Deposit.IsAllLT(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
@@ -117,6 +126,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return err, false
 	}
 
+	svcBinding.DisableTime = time.Time{}
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(svcBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
 	return nil, true
@@ -171,6 +181,18 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		oldBinding.Level.AvgRspTime = svcBinding.Level.AvgRspTime
 	}
 
+	// min deposit must >= sum(method price) * minDepositMultiple
+	minDepositMultiple := serviceparams.GetMinDepositMultiple(ctx)
+	var minDeposit sdk.Coins
+	for _, price := range oldBinding.Prices {
+		minInt := price.Amount.Mul(sdk.NewInt(minDepositMultiple))
+		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
+	}
+
+	if oldBinding.Deposit.IsAllLT(minDeposit) {
+		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit).Plus(svcBinding.Deposit)), false
+	}
+
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(oldBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
 	return nil, true
@@ -187,7 +209,7 @@ func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string
 		return ErrDisable(k.Codespace(), "service binding is unavailable"), false
 	}
 	binding.Available = false
-	binding.DisableHeight = ctx.BlockHeader().Height
+	binding.DisableTime = ctx.BlockHeader().Time
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
 	return nil, true
@@ -209,8 +231,15 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 		binding.Deposit = binding.Deposit.Plus(deposit)
 	}
 
-	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
-	if !binding.Deposit.IsAllGTE(minDeposit) {
+	// min deposit must >= sum(method price) * minDepositMultiple
+	minDepositMultiple := serviceparams.GetMinDepositMultiple(ctx)
+	var minDeposit sdk.Coins
+	for _, price := range binding.Prices {
+		minInt := price.Amount.Mul(sdk.NewInt(minDepositMultiple))
+		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
+	}
+
+	if binding.Deposit.IsAllLT(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit)), false
 	}
 
@@ -221,7 +250,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	binding.Available = true
-	binding.DisableHeight = 0
+	binding.DisableTime = time.Time{}
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
 	return nil, true
@@ -242,10 +271,10 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 		return ErrRefundDeposit(k.Codespace(), "service binding deposit is zero"), false
 	}
 
-	height := ctx.BlockHeader().Height
-	refundHeight := binding.DisableHeight + int64(serviceparams.GetMaxRequestTimeout(ctx))
-	if refundHeight >= height {
-		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", refundHeight)), false
+	blockTime := ctx.BlockHeader().Time
+	refundTime := binding.DisableTime.Add(arbitrationparams.GetArbitrationTimelimit(ctx)).Add(arbitrationparams.GetComplaintRetrospect(ctx))
+	if blockTime.Before(refundTime) {
+		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("can not refund deposit before %s", refundTime.Format("2006-01-02 15:04:05"))), false
 	}
 
 	// Add coins to provider's account

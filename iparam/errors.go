@@ -21,4 +21,6 @@ const (
 	CodeInvalidParamString              sdk.CodeType      = 112
 	CodeInvalidModule                   sdk.CodeType      = 113
 	CodeInvalidQueryParams              sdk.CodeType      = 114
+	CodeInvalidMaxRequestTimeout        sdk.CodeType      = 115
+	CodeInvalidMinDepositMultiple       sdk.CodeType      = 116
 )

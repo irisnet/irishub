@@ -37,6 +37,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"path/filepath"
 	"io/ioutil"
+	"github.com/irisnet/irishub/modules/arbitration"
 )
 
 var (
@@ -121,6 +122,7 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
+	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 	return genesisState
 }
 

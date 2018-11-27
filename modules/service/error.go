@@ -29,14 +29,14 @@ const (
 	CodeInvalidDisable       sdk.CodeType = 117
 	CodeInvalidEnable        sdk.CodeType = 118
 
-	CodeMethodNotExists       sdk.CodeType = 119
-	CodeRequestNotActive      sdk.CodeType = 120
-	CodeReturnFeeNotExists    sdk.CodeType = 121
-	CodeWithdrawFeeNotExists  sdk.CodeType = 122
-	CodeLtServiceFee          sdk.CodeType = 123
-	CodeInvalidReqId          sdk.CodeType = 124
-	CodeSvcBindingIsAvailable sdk.CodeType = 125
-	CodeNotMatchingProvider   sdk.CodeType = 126
+	CodeMethodNotExists        sdk.CodeType = 119
+	CodeRequestNotActive       sdk.CodeType = 120
+	CodeReturnFeeNotExists     sdk.CodeType = 121
+	CodeWithdrawFeeNotExists   sdk.CodeType = 122
+	CodeLtServiceFee           sdk.CodeType = 123
+	CodeInvalidReqId           sdk.CodeType = 124
+	CodeSvcBindingNotAvailable sdk.CodeType = 125
+	CodeNotMatchingProvider    sdk.CodeType = 126
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -160,8 +160,8 @@ func ErrInvalidReqId(codespace sdk.CodespaceType, reqId string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidReqId, fmt.Sprintf("invalid request id [%s]", reqId))
 }
 
-func ErrSvcBindingIsAvailable(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingIsAvailable, fmt.Sprintf("service binding is available"))
+func ErrSvcBindingNotAvailable(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcBindingNotAvailable, fmt.Sprintf("service binding is unavailable"))
 }
 
 func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {

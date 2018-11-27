@@ -48,9 +48,9 @@ func TestKeeper_service_Definition(t *testing.T) {
 
 	// test binding
 	amount1, _ := sdk.NewIntFromString("1000000000000000000000")
-	svcBinding := NewSvcBinding("testnet", "myService", "testnet",
+	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, true, 0)
+		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err, _ := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
@@ -62,9 +62,9 @@ func TestKeeper_service_Definition(t *testing.T) {
 	require.True(t, SvcBindingEqual(svcBinding, gotSvcBinding))
 
 	// test binding update
-	svcBindingUpdate := NewSvcBinding("testnet", "myService", "testnet",
+	svcBindingUpdate := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, true, 0)
+		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err, _ = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
 	require.NoError(t, err)
 
@@ -95,9 +95,9 @@ func TestKeeper_service_Call(t *testing.T) {
 	keeper.AddServiceDefinition(ctx, serviceDef)
 
 	amount1, _ := sdk.NewIntFromString("1000000000000000000000")
-	svcBinding := NewSvcBinding("testnet", "myService", "testnet",
+	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, true, 0)
+		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	keeper.AddServiceBinding(ctx, svcBinding)
 
 	// service request
