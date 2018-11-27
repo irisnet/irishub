@@ -84,7 +84,7 @@ type IrisApp struct {
 
 	// fee manager
 	feeManager bam.FeeManager
-	hooks       HooksHub			// handle Hooks callback of any version modules
+	hookHub    HookHub // handle Hook callback of any version modules
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -183,11 +183,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.keyUpgrade, app.stakeKeeper,
 	)
 
-	app.hooks = NewHooksHub(app.upgradeKeeper)
-	// register the staking hooks
+	app.hookHub = NewHooksHub(app.upgradeKeeper)
+	// register the staking hookHub
 	// NOTE: stakeKeeper above are passed by reference,
 	// so that it can be modified like below:
-	app.stakeKeeper = *stakeKeeper.SetHooks(app.hooks)
+	app.stakeKeeper = *stakeKeeper.SetHooks(app.hookHub)
 
 	// register message routes
 	// need to update each module's msg type
@@ -205,9 +205,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
 
-	app.hooks.
-		AddHook(trigger, 0, app.distrKeeper.Hooks()).
-		AddHook(trigger, 0, app.slashingKeeper.Hooks())
+	app.hookHub.
+		AddHook(stakeTrigger, 0, app.distrKeeper.Hooks()).
+		AddHook(stakeTrigger, 0, app.slashingKeeper.Hooks())
 
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
