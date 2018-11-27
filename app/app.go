@@ -221,7 +221,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	var err error
 	if viper.GetBool(FlagReplay) {
-		err = app.LoadVersion(lastHeight, app.keyMain)
+		err = app.LoadVersion(lastHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}
@@ -279,6 +279,10 @@ func MakeCodec() *codec.Codec {
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
+}
+
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, app.keyMain, false)
 }
 
 // application updates every end block
