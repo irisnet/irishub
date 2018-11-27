@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 )

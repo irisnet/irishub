@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func TestUpdateKeeper(t *testing.T) {

@@ -15,7 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	distributiontypes "github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
@@ -34,7 +34,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/service"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"path/filepath"
 	"io/ioutil"
 )

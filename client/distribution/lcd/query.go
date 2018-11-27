@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"

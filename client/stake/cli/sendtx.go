@@ -6,9 +6,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/stake/types"
+	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/types"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"

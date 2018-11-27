@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/client/context"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"

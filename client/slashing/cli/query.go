@@ -9,7 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec" // XXX fix
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/client/context"
 )
 

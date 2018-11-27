@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/tools/protoidl"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/bank"
 	"fmt"
 	"github.com/irisnet/irishub/modules/service/params"
 )

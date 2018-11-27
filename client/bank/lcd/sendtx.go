@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 	"io/ioutil"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"encoding/json"
 	"github.com/tendermint/tendermint/crypto"
 )

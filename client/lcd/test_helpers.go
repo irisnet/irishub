@@ -17,13 +17,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	txbuilder "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	txbuilder "github.com/irisnet/irishub/modules/auth/client/txbuilder"
+	"github.com/irisnet/irishub/modules/stake"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"

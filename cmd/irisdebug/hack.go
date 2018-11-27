@@ -20,12 +20,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/ibc"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/ibc"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 
 	iris "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/upgrade"

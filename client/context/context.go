@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client"
 
 	"bytes"

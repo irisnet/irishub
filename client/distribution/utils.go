@@ -2,7 +2,7 @@ package distribution
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"

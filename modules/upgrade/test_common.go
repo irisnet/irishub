@@ -2,12 +2,12 @@ package upgrade
 
 import (
 	"testing"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/stretchr/testify/require"
 	"os"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -16,7 +16,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"encoding/hex"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 var (

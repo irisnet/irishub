@@ -12,9 +12,9 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/simulation/mock"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
 	"fmt"
 )

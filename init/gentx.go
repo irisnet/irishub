@@ -19,7 +19,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	signcmd "github.com/irisnet/irishub/client/bank/cli"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
 )
 
 const (

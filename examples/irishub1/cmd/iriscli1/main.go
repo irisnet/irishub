@@ -1,7 +1,7 @@
 package main
 
 import (
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
 	"github.com/irisnet/irishub/examples/irishub1/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"

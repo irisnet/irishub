@@ -6,7 +6,7 @@ import (
 	"os"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
