@@ -13,8 +13,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	SortAddresses(addrs)
 	mapp.BeginBlock(abci.RequestBeginBlock{})
 	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
-	amount, _ := sdk.NewIntFromString("1100000000000000000000")
-	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris-atto", amount)})
+	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1100))})
 
 	serviceDef := NewSvcDef("myService",
 		"testnet",
@@ -47,15 +46,13 @@ func TestKeeper_service_Definition(t *testing.T) {
 	}
 
 	// test binding
-	amount1, _ := sdk.NewIntFromString("1000000000000000000000")
 	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
+		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1000))}, []sdk.Coin{{"iris", sdk.NewInt(1)}},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err, _ := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
-	amount2, _ := sdk.NewIntFromString("100000000000000000000")
-	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris-atto", amount2)}))
+	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}))
 
 	gotSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
 	require.True(t, found)
@@ -63,7 +60,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 
 	// test binding update
 	svcBindingUpdate := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
+		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(1)}},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err, _ = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
 	require.NoError(t, err)
@@ -80,9 +77,8 @@ func TestKeeper_service_Call(t *testing.T) {
 	SortAddresses(addrs)
 	mapp.BeginBlock(abci.RequestBeginBlock{})
 	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
-	amount, _ := sdk.NewIntFromString("1100000000000000000000")
-	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris-atto", amount)})
-	keeper.ck.AddCoins(ctx, addrs[2], sdk.Coins{sdk.NewCoin("iris-atto", amount)})
+	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1100))})
+	keeper.ck.AddCoins(ctx, addrs[2], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1100))})
 
 	serviceDef := NewSvcDef("myService",
 		"testnet",
@@ -94,15 +90,14 @@ func TestKeeper_service_Call(t *testing.T) {
 
 	keeper.AddServiceDefinition(ctx, serviceDef)
 
-	amount1, _ := sdk.NewIntFromString("1000000000000000000000")
 	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, []sdk.Coin{{"iris", sdk.NewInt(100)}},
+		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1000))}, []sdk.Coin{{"iris", sdk.NewInt(1)}},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	keeper.AddServiceBinding(ctx, svcBinding)
 
 	// service request
 	svcRequest := NewSvcRequest("testnet", "myService", "testnet", "testnet",
-		addrs[2], addrs[1], 1, []byte("1234"), sdk.Coins{sdk.NewCoin("iris-atto", amount1)}, false)
+		addrs[2], addrs[1], 1, []byte("1234"), sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1))}, false)
 	svcRequest, err := keeper.AddRequest(ctx, svcRequest)
 	require.NoError(t, err)
 
