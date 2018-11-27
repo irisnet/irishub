@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	txbuilder "github.com/irisnet/irishub/modules/auth/client/txbuilder"
+	txbuilder "github.com/irisnet/irishub/client/auth/txbuilder"
 	"github.com/irisnet/irishub/modules/stake"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"

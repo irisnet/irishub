@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/spf13/viper"
 	"github.com/irisnet/irishub/client"

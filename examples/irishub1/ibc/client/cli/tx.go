@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/examples/irishub1/ibc"
 	"os"
 )

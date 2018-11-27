@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtxb "github.com/irisnet/irishub/modules/auth/client/txbuilder"
+	authtxb "github.com/irisnet/irishub/client/auth/txbuilder"
 	"github.com/irisnet/irishub/modules/stake"
 
 	"github.com/gorilla/mux"

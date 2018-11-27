@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

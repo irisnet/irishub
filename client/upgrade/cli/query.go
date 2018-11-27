@@ -4,7 +4,7 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/client/context"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade"

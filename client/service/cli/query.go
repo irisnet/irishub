@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/irisnet/irishub/client/context"
-	authcmd "github.com/irisnet/irishub/modules/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	cmn "github.com/irisnet/irishub/client/service"
 )
 
