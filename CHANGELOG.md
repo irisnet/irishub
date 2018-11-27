@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.7.0
+
+*November 27th, 2018*
+
+- Add broadcast command in bank
+- Impose governance proposal with restrictions
+- Fix bech32 prefix error in irismon
+- Improve user documents
+
+## 0.7.0-rc0
+
+*November 19th, 2018*
+
+BREAKING CHANGES:
+* [iris] New genesis workflow
+* [iris] Validator.Owner renamed to Validator. Validator operator type has now changed to sdk.ValAddress
+* [iris] unsafe_reset_all, show_validator, and show_node_id have been renamed to unsafe-reset-all, show-validator, and show-node-id
+* [iris]Rename "revoked" to "jailed"
+* [iris]Removed CompleteUnbonding and CompleteRedelegation Msg types, and instead added unbonding/redelegation queues to endblocker
+* [iris]Removed slashing for governance non-voting validators
+* [iris]Validators are no longer deleted until they can no longer possibly be slashed
+* [iris]Remove ibc module
+* [iris]Validator set updates delayed by one block
+* [iris]Drop GenesisTx in favor of a signed StdTx with only one MsgCreateValidator message
+
+FEATURES:
+* Upgrade cosmos-sdk denpendency to v0.26.0
+* Upgrade tendermint denpendency to v0.26.1-rc0
+* [docs]Improve docs
+* [iris]Add token inflation
+* [iris]Add distribution module to distribute inflation token and collected transaction fee
+* [iriscli] --from can now be either an address or a key name
+* [iriscli] Passing --gas=simulate triggers a simulation of the tx before the actual execution. The gas estimate obtained via the simulation will be used as gas limit in the actual execution.
+* [iriscli]Add --bech to gaiacli keys show and respective REST endpoint to
+* [iriscli]Introduced new commission flags for validator commands create-validator and edit-validator
+* [iriscli]Add commands to query validator unbondings and redelegations
+* [iriscli]Add rest apis and commands for distribution
+
+BUG FIXES:
+* [iriscli]Mark --to and --amount as required flags for iriscli bank send
+* [iris]Add general merkle absence proof (also for empty substores)
+* [iris]Fix issue about consumed gas increasing rapidly
+* [iris]Return correct Tendermint validator update set on EndBlocker by not including non previously bonded validators that have zero power
+* [iris]Add commission data to MsgCreateValidator signature bytes
+
 ## 0.6.0
 
 *November 1st, 2018*

@@ -9,48 +9,7 @@
     ```bash
     iriscli bank coin-type [coin-name]
     ```
-    如coin-name为iris，将返回iris的coin_type:
-    ```json
-    {
-     "name": "iris",
-     "min_unit": {
-       "denom": "iris-atto",
-       "decimal": "18"
-     },
-     "units": [
-       {
-         "denom": "iris",
-         "decimal": "0"
-       },
-       {
-         "denom": "iris-milli",
-         "decimal": "3"
-       },
-       {
-         "denom": "iris-micro",
-         "decimal": "6"
-       },
-       {
-         "denom": "iris-nano",
-         "decimal": "9"
-       },
-       {
-         "denom": "iris-pico",
-         "decimal": "12"
-       },
-       {
-         "denom": "iris-femto",
-         "decimal": "15"
-       },
-       {
-         "denom": "iris-atto",
-         "decimal": "18"
-       }
-     ],
-     "origin": 1,
-     "desc": "IRIS Network"
-    }
-    ```
+    详细信息请参阅[查询代币coin_type](./basic-concepts/coin-type.md#查询代币coin_type)。
 
 2. 账户查询
 
@@ -78,44 +37,8 @@
     {
       "type": "auth/StdTx",
       "value": {
-        "msg": [
-          {
-            "type": "cosmos-sdk/Send",
-            "value": {
-              "inputs": [
-                {
-                  "address": "faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ],
-              "outputs": [
-                {
-                  "address": "faa1ut8aues05kq0nkcj3lzkyhk7eyfasrdfnf7wph",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ],
-        "fee": {
-          "amount": [
-            {
-              "denom": "iris-atto",
-              "amount": "40000000000000000"
-            }
-          ],
-          "gas": "200000"
-        },
+        "msg": [ "txMsg" ],
+        "fee": "fee",
         "signatures": null,
         "memo": ""
       }
@@ -132,44 +55,8 @@
     {
       "type": "auth/StdTx",
       "value": {
-        "msg": [
-          {
-            "type": "cosmos-sdk/Send",
-            "value": {
-              "inputs": [
-                {
-                  "address": "faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ],
-              "outputs": [
-                {
-                  "address": "faa1ut8aues05kq0nkcj3lzkyhk7eyfasrdfnf7wph",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ],
-        "fee": {
-          "amount": [
-            {
-              "denom": "iris-atto",
-              "amount": "40000000000000000"
-            }
-          ],
-          "gas": "200000"
-        },
+        "msg": [ "txMsg" ],
+        "fee": "fee",
         "signatures": [
           {
             "pub_key": {

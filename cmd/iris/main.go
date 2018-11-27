@@ -11,7 +11,6 @@ import (
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/client"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/viper"
@@ -24,11 +23,7 @@ import (
 
 func main() {
 
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
-	config.Seal()
+	irisInit.InitBech32Prefix()
 
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()
