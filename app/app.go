@@ -333,6 +333,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		app.accountMapper.SetAccount(ctx, acc)
 	}
 
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
+
 	// load the initial stake information
 	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
 	if err != nil {
@@ -389,7 +391,6 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		}
 	}
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 	service.InitGenesis(ctx, genesisState.ServiceData)
 
 	return abci.ResponseInitChain{
