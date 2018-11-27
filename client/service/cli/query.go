@@ -233,11 +233,11 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 		Use:     "fees",
 		Short:   "Query return and incoming fee of a particular address",
 		Example: "iriscli service fees <account address>",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			// find the key to look up the account
 			addrString := args[0]
 
 			delAddr, err := sdk.AccAddressFromBech32(addrString)
