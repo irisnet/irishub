@@ -5,7 +5,7 @@
 *November 27th, 2018*
 
 - Add broadcast command in bank
-- Impose upgrade proposal with restrictions
+- Impose governance proposal with restrictions
 - Fix bech32 prefix error in irismon
 - Improve user documents
 
