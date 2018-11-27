@@ -9,48 +9,7 @@ This module is mainly used to transfer coins between accounts、query account ba
     ```bash
     iriscli bank coin-type [coin-name]
     ```
-    For example, coin_type of iris will be returned if the coin-name is iris:
-    ```json
-    {
-     "name": "iris",
-     "min_unit": {
-       "denom": "iris-atto",
-       "decimal": "18"
-     },
-     "units": [
-       {
-         "denom": "iris",
-         "decimal": "0"
-       },
-       {
-         "denom": "iris-milli",
-         "decimal": "3"
-       },
-       {
-         "denom": "iris-micro",
-         "decimal": "6"
-       },
-       {
-         "denom": "iris-nano",
-         "decimal": "9"
-       },
-       {
-         "denom": "iris-pico",
-         "decimal": "12"
-       },
-       {
-         "denom": "iris-femto",
-         "decimal": "15"
-       },
-       {
-         "denom": "iris-atto",
-         "decimal": "18"
-       }
-     ],
-     "origin": 1,
-     "desc": "IRIS Network"
-    }
-    ```
+    Refer to [Query of coin_type](./basic-concepts/coin-type.md#query-of-coin_type) for details.
 
 2. Query account
 
@@ -78,44 +37,8 @@ This module is mainly used to transfer coins between accounts、query account ba
     {
       "type": "auth/StdTx",
       "value": {
-        "msg": [
-          {
-            "type": "cosmos-sdk/Send",
-            "value": {
-              "inputs": [
-                {
-                  "address": "faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ],
-              "outputs": [
-                {
-                  "address": "faa1ut8aues05kq0nkcj3lzkyhk7eyfasrdfnf7wph",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ],
-        "fee": {
-          "amount": [
-            {
-              "denom": "iris-atto",
-              "amount": "40000000000000000"
-            }
-          ],
-          "gas": "200000"
-        },
+        "msg": [ "txMsg" ],
+        "fee": "fee",
         "signatures": null,
         "memo": ""
       }
@@ -132,44 +55,8 @@ This module is mainly used to transfer coins between accounts、query account ba
     {
       "type": "auth/StdTx",
       "value": {
-        "msg": [
-          {
-            "type": "cosmos-sdk/Send",
-            "value": {
-              "inputs": [
-                {
-                  "address": "faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ],
-              "outputs": [
-                {
-                  "address": "faa1ut8aues05kq0nkcj3lzkyhk7eyfasrdfnf7wph",
-                  "coins": [
-                    {
-                      "denom": "iris-atto",
-                      "amount": "100000000000000000000"
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ],
-        "fee": {
-          "amount": [
-            {
-              "denom": "iris-atto",
-              "amount": "40000000000000000"
-            }
-          ],
-          "gas": "200000"
-        },
+        "msg": [ "txMsg" ],
+        "fee": "fee",
         "signatures": [
           {
             "pub_key": {

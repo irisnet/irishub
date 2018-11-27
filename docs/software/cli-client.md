@@ -100,4 +100,3 @@ Print：
 
 The trust-node is true by default. When the trust-node is true, the `iriscli` only queries the data and does not perform a Merkle verification on the data. You can also use the `--trust-node=false` to perform Merkle verification on the data obtained by the query.
 
-

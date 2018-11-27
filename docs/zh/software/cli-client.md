@@ -97,4 +97,3 @@ iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --dep
 ## trust-node
 
 trust-node默认为true。当trust-node是true时， iriscli的客户端只查询数据并不对数据进行默克尔证明。你也可以通过`--trust-node=false`, 对查询得到的数据进行默克尔证明。
-

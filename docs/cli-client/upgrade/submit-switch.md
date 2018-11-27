@@ -19,7 +19,7 @@ iriscli upgrade submit-switch --help
 
 | Name, shorthand  | Default   | Description                                                  | Required |
 | ---------------  | --------- | ------------------------------------------------------------ | -------- |
-| --proposal-id    |           | proposalID of upgrade proposal                               | Yes      |
+| --proposalID    |           | proposalID of upgrade proposal                               | Yes      |
 | --title          |           | title of switch                                              |          |
 
 ## Examples
