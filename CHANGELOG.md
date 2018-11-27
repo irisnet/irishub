@@ -2,10 +2,11 @@
 
 ## 0.7.0
 
-*November 22th, 2018*
+*November 27th, 2018*
 
 - Add broadcast command in bank
-- Update iris.toml
+- Impose upgrade proposal with restrictions
+- Fix bech32 prefix error in irismon
 - Improve user documents
 
 ## 0.7.0-rc0
