@@ -548,7 +548,7 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	_, _, _, err := TransferRequestID(msg.RequestID)
+	_, _, _, err := ConvertRequestID(msg.RequestID)
 	if err != nil {
 		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
 	}

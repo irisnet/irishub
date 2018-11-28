@@ -6,8 +6,8 @@ import (
 )
 
 type DefOutput struct {
-	service.SvcDef
-	Methods []service.MethodProperty `json:"methods"`
+	Definition service.SvcDef           `json:"definition"`
+	Methods    []service.MethodProperty `json:"methods"`
 }
 
 type FeesOutput struct {

@@ -166,7 +166,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 }
 
 func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-	eHeight, rHeight, counter, _ := TransferRequestID(msg.RequestID)
+	eHeight, rHeight, counter, _ := ConvertRequestID(msg.RequestID)
 	request, found := k.GetActiveRequest(ctx, eHeight, rHeight, counter)
 	if !found {
 		request.ExpirationHeight = eHeight
