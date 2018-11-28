@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 6
+	DefaultCodespace sdk.CodespaceType = 23
 
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101
@@ -29,14 +29,15 @@ const (
 	CodeInvalidDisable       sdk.CodeType = 117
 	CodeInvalidEnable        sdk.CodeType = 118
 
-	CodeMethodNotExists       sdk.CodeType = 119
-	CodeRequestNotActive      sdk.CodeType = 120
-	CodeReturnFeeNotExists    sdk.CodeType = 121
-	CodeWithdrawFeeNotExists  sdk.CodeType = 122
-	CodeLtServiceFee          sdk.CodeType = 123
-	CodeInvalidReqId          sdk.CodeType = 124
-	CodeSvcBindingIsAvailable sdk.CodeType = 125
-	CodeNotMatchingProvider   sdk.CodeType = 126
+	CodeMethodNotExists        sdk.CodeType = 119
+	CodeRequestNotActive       sdk.CodeType = 120
+	CodeReturnFeeNotExists     sdk.CodeType = 121
+	CodeWithdrawFeeNotExists   sdk.CodeType = 122
+	CodeLtServiceFee           sdk.CodeType = 123
+	CodeInvalidReqId           sdk.CodeType = 124
+	CodeSvcBindingNotAvailable sdk.CodeType = 125
+	CodeNotMatchingProvider    sdk.CodeType = 126
+	CodeInvalidReqChainId      sdk.CodeType = 127
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -97,7 +98,7 @@ func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("def-chain-id is empty"))
+	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("defined chain id is empty"))
 }
 
 func ErrSvcBindingExists(codespace sdk.CodespaceType) sdk.Error {
@@ -160,10 +161,14 @@ func ErrInvalidReqId(codespace sdk.CodespaceType, reqId string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidReqId, fmt.Sprintf("invalid request id [%s]", reqId))
 }
 
-func ErrSvcBindingIsAvailable(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingIsAvailable, fmt.Sprintf("service binding is available"))
+func ErrSvcBindingNotAvailable(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcBindingNotAvailable, fmt.Sprintf("service binding is unavailable"))
 }
 
 func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeNotMatchingProvider, fmt.Sprintf("[%s] is not a matching Provider", provider.String()))
+}
+
+func ErrInvalidReqChainId(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidReqChainId, fmt.Sprintf("request chain id is empty"))
 }

@@ -23,6 +23,7 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/modules/arbitration"
 )
 
 var (
@@ -42,31 +43,34 @@ const (
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts     []GenesisAccount      `json:"accounts"`
-	AuthData     auth.GenesisState     `json:"auth"`
-	StakeData    stake.GenesisState    `json:"stake"`
-	MintData     mint.GenesisState     `json:"mint"`
-	DistrData    distr.GenesisState    `json:"distr"`
-	GovData      gov.GenesisState      `json:"gov"`
-	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
-	SlashingData slashing.GenesisState `json:"slashing"`
-	ServiceData  service.GenesisState  `json:"service"`
-	GenTxs       []json.RawMessage     `json:"gentxs"`
+	Accounts        []GenesisAccount         `json:"accounts"`
+	AuthData        auth.GenesisState        `json:"auth"`
+	StakeData       stake.GenesisState       `json:"stake"`
+	MintData        mint.GenesisState        `json:"mint"`
+	DistrData       distr.GenesisState       `json:"distr"`
+	GovData         gov.GenesisState         `json:"gov"`
+	UpgradeData     upgrade.GenesisState     `json:"upgrade"`
+	SlashingData    slashing.GenesisState    `json:"slashing"`
+	ServiceData     service.GenesisState     `json:"service"`
+	ArbitrationData arbitration.GenesisState `json:"arbitration"`
+	GenTxs          []json.RawMessage        `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState, slashingData slashing.GenesisState) GenesisState {
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
+	arbitrationData arbitration.GenesisState, slashingData slashing.GenesisState) GenesisState {
 
 	return GenesisState{
-		Accounts:     accounts,
-		AuthData:     authData,
-		StakeData:    stakeData,
-		MintData:     mintData,
-		DistrData:    distrData,
-		GovData:      govData,
-		UpgradeData:  upgradeData,
-		ServiceData:  serviceData,
-		SlashingData: slashingData,
+		Accounts:        accounts,
+		AuthData:        authData,
+		StakeData:       stakeData,
+		MintData:        mintData,
+		DistrData:       distrData,
+		GovData:         govData,
+		UpgradeData:     upgradeData,
+		ServiceData:     serviceData,
+		ArbitrationData: arbitrationData,
+		SlashingData:    slashingData,
 	}
 }
 
@@ -366,30 +370,32 @@ func ConvertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		genesisAccounts = append(genesisAccounts, acc)
 	}
 	return GenesisState{
-		Accounts:     genesisAccounts,
-		AuthData:     genesisFileState.AuthData,
-		StakeData:    genesisFileState.StakeData,
-		MintData:     genesisFileState.MintData,
-		DistrData:    genesisFileState.DistrData,
-		GovData:      genesisFileState.GovData,
-		UpgradeData:  genesisFileState.UpgradeData,
-		SlashingData: genesisFileState.SlashingData,
-		ServiceData:  genesisFileState.ServiceData,
-		GenTxs:       genesisFileState.GenTxs,
+		Accounts:        genesisAccounts,
+		AuthData:        genesisFileState.AuthData,
+		StakeData:       genesisFileState.StakeData,
+		MintData:        genesisFileState.MintData,
+		DistrData:       genesisFileState.DistrData,
+		GovData:         genesisFileState.GovData,
+		UpgradeData:     genesisFileState.UpgradeData,
+		SlashingData:    genesisFileState.SlashingData,
+		ServiceData:     genesisFileState.ServiceData,
+		ArbitrationData: genesisFileState.ArbitrationData,
+		GenTxs:          genesisFileState.GenTxs,
 	}
 }
 
 type GenesisFileState struct {
-	Accounts     []GenesisFileAccount  `json:"accounts"`
-	AuthData     auth.GenesisState     `json:"auth"`
-	StakeData    stake.GenesisState    `json:"stake"`
-	MintData     mint.GenesisState     `json:"mint"`
-	DistrData    distr.GenesisState    `json:"distr"`
-	GovData      gov.GenesisState      `json:"gov"`
-	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
-	SlashingData slashing.GenesisState `json:"slashing"`
-	ServiceData  service.GenesisState  `json:"service"`
-	GenTxs       []json.RawMessage     `json:"gentxs"`
+	Accounts        []GenesisFileAccount     `json:"accounts"`
+	AuthData        auth.GenesisState        `json:"auth"`
+	StakeData       stake.GenesisState       `json:"stake"`
+	MintData        mint.GenesisState        `json:"mint"`
+	DistrData       distr.GenesisState       `json:"distr"`
+	GovData         gov.GenesisState         `json:"gov"`
+	UpgradeData     upgrade.GenesisState     `json:"upgrade"`
+	SlashingData    slashing.GenesisState    `json:"slashing"`
+	ServiceData     service.GenesisState     `json:"service"`
+	ArbitrationData arbitration.GenesisState `json:"arbitration"`
+	GenTxs          []json.RawMessage        `json:"gentxs"`
 }
 
 type GenesisFileAccount struct {
@@ -413,33 +419,36 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 }
 
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
+	arbitrationData arbitration.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
-		Accounts:     accounts,
-		AuthData:     authData,
-		StakeData:    stakeData,
-		MintData:     mintData,
-		DistrData:    distrData,
-		GovData:      govData,
-		UpgradeData:  upgradeData,
-		ServiceData:  serviceData,
-		SlashingData: slashingData,
+		Accounts:        accounts,
+		AuthData:        authData,
+		StakeData:       stakeData,
+		MintData:        mintData,
+		DistrData:       distrData,
+		GovData:         govData,
+		UpgradeData:     upgradeData,
+		ServiceData:     serviceData,
+		ArbitrationData: arbitrationData,
+		SlashingData:    slashingData,
 	}
 }
 
 // NewDefaultGenesisState generates the default state for iris.
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
-		Accounts:     nil,
-		StakeData:    createStakeGenesisState(),
-		MintData:     createMintGenesisState(),
-		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
-		UpgradeData:  upgrade.DefaultGenesisState(),
-		ServiceData:  service.DefaultGenesisState(),
-		SlashingData: slashing.DefaultGenesisState(),
-		GenTxs:       nil,
+		Accounts:        nil,
+		StakeData:       createStakeGenesisState(),
+		MintData:        createMintGenesisState(),
+		DistrData:       distr.DefaultGenesisState(),
+		GovData:         gov.DefaultGenesisState(),
+		UpgradeData:     upgrade.DefaultGenesisState(),
+		ServiceData:     service.DefaultGenesisState(),
+		ArbitrationData: arbitration.DefaultGenesisState(),
+		SlashingData:    slashing.DefaultGenesisState(),
+		GenTxs:          nil,
 	}
 }
 
