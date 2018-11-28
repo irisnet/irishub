@@ -18,14 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -33,6 +29,10 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
 )
@@ -122,6 +122,32 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = bam.Replay(app.Logger)
 	}
 
+	app.InitKeeper()
+	app.WireRouter()
+	app.MountStoreAndSetupBaseApp(lastHeight)
+	app.RegisterParams()
+
+	return app
+}
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
+}
+
+func (app *IrisApp) InitKeeper() {
 	// define the AccountKeeper
 	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
@@ -191,7 +217,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// NOTE: stakeKeeper above are passed by reference,
 	// so that it can be modified like below:
 	app.stakeKeeper = *stakeKeeper.SetHooks(app.hookHub)
+}
 
+func (app *IrisApp) WireRouter() {
 	// register message routes
 	// need to update each module's msg type
 	app.Router().
@@ -211,7 +239,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.hookHub.
 		AddHook(stakeTrigger, 0, app.distrKeeper.Hooks()).
 		AddHook(stakeTrigger, 0, app.slashingKeeper.Hooks())
+}
 
+func (app *IrisApp) MountStoreAndSetupBaseApp(lastHeight int64) {
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
@@ -238,7 +268,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
+}
 
+func (app *IrisApp) RegisterParams() {
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
@@ -273,25 +305,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
 		&serviceparams.MinDepositMultipleParameter)
-
-	return app
-}
-
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
