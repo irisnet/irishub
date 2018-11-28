@@ -114,7 +114,7 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "b7779d9cb56d86d936d6e029d63b76745e94273c"
+  revision = "2da54bffce52e3a1f50ec992ae8ad0da8e029f85"
   source = "https://github.com/irisnet/cosmos-sdk.git"
 
 [[projects]]
@@ -744,7 +744,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "d18b38d0c5ceba201f34db3875ec6b73ad654b5c"
+  revision = "e1bfbff15b53a0dc96b862c5c1f23fe8eff7956d"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]

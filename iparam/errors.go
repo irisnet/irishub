@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	DefaultCodespace                    sdk.CodespaceType = 6
+	DefaultCodespace                    sdk.CodespaceType = 20
 	CodeInvalidMinDeposit               sdk.CodeType      = 100
 	CodeInvalidMinDepositDenom          sdk.CodeType      = 101
 	CodeInvalidMinDepositAmount         sdk.CodeType      = 102
@@ -21,4 +21,6 @@ const (
 	CodeInvalidParamString              sdk.CodeType      = 112
 	CodeInvalidModule                   sdk.CodeType      = 113
 	CodeInvalidQueryParams              sdk.CodeType      = 114
+	CodeInvalidMaxRequestTimeout        sdk.CodeType      = 115
+	CodeInvalidMinDepositMultiple       sdk.CodeType      = 116
 )

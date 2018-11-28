@@ -7,6 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"fmt"
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/arbitration/params"
+	"time"
 )
 
 type Keeper struct {
@@ -66,11 +68,21 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (svc
 
 	serviceDefBytes := kvStore.Get(GetServiceDefinitionKey(chainId, name))
 	if serviceDefBytes != nil {
-		var serviceDef SvcDef
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(serviceDefBytes, &serviceDef)
-		return serviceDef, true
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(serviceDefBytes, &svcDef)
+		return svcDef, true
 	}
 	return svcDef, false
+}
+
+// Gets the method in a specific service and methodID
+func (k Keeper) GetMethod(ctx sdk.Context, chainId, name string, id int16) (method MethodProperty, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	methodBytes := store.Get(GetMethodPropertyKey(chainId, name, id))
+	if methodBytes != nil {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(methodBytes, &method)
+		return method, true
+	}
+	return method, false
 }
 
 // Gets all the methods in a specific service
@@ -91,7 +103,8 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrSvcBindingExists(k.Codespace()), false
 	}
 
-	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
+	minDeposit := getMinDeposit(ctx, svcBinding.Prices)
+
 	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
@@ -107,6 +120,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return err, false
 	}
 
+	svcBinding.DisableTime = time.Time{}
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(svcBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
 	return nil, true
@@ -161,6 +175,15 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 		oldBinding.Level.AvgRspTime = svcBinding.Level.AvgRspTime
 	}
 
+	// only check deposit if binding is available
+	if oldBinding.Available {
+		minDeposit := getMinDeposit(ctx, oldBinding.Prices)
+
+		if !oldBinding.Deposit.IsAllGTE(minDeposit) {
+			return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit).Plus(svcBinding.Deposit)), false
+		}
+	}
+
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(oldBinding)
 	kvStore.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
 	return nil, true
@@ -177,7 +200,7 @@ func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string
 		return ErrDisable(k.Codespace(), "service binding is unavailable"), false
 	}
 	binding.Available = false
-	binding.DisableHeight = ctx.BlockHeader().Height
+	binding.DisableTime = ctx.BlockHeader().Time
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
 	return nil, true
@@ -199,7 +222,8 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 		binding.Deposit = binding.Deposit.Plus(deposit)
 	}
 
-	minDeposit := serviceparams.GetMinProviderDeposit(ctx)
+	minDeposit := getMinDeposit(ctx, binding.Prices)
+
 	if !binding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit)), false
 	}
@@ -211,7 +235,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	binding.Available = true
-	binding.DisableHeight = 0
+	binding.DisableTime = time.Time{}
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
 	return nil, true
@@ -232,10 +256,10 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 		return ErrRefundDeposit(k.Codespace(), "service binding deposit is zero"), false
 	}
 
-	height := ctx.BlockHeader().Height
-	refundHeight := binding.DisableHeight + int64(serviceparams.GetMaxRequestTimeout(ctx))
-	if refundHeight >= height {
-		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("you can refund deposit util block height greater than %d", refundHeight)), false
+	blockTime := ctx.BlockHeader().Time
+	refundTime := binding.DisableTime.Add(arbitrationparams.GetArbitrationTimelimit(ctx)).Add(arbitrationparams.GetComplaintRetrospect(ctx))
+	if blockTime.Before(refundTime) {
+		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("can not refund deposit before %s", refundTime.Format("2006-01-02 15:04:05"))), false
 	}
 
 	// Add coins to provider's account
@@ -264,4 +288,196 @@ func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk
 		return ErrInvalidPriceCount(k.Codespace(), len(svcBinding.Prices), len(methods))
 	}
 	return nil
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) (SvcRequest, sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+
+	counter := k.GetIntraTxCounter(ctx)
+	req.RequestHeight = ctx.BlockHeight()
+	req.RequestIntraTxCounter = counter
+	k.SetIntraTxCounter(ctx, counter+1)
+
+	maxTimeout := serviceparams.GetMaxRequestTimeout(ctx)
+	req.ExpirationHeight = req.RequestHeight + maxTimeout
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
+
+	store.Set(GetRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
+		req.RequestHeight, req.RequestIntraTxCounter), bz)
+
+	_, _, err := k.ck.SubtractCoins(ctx, req.Consumer, req.ServiceFee)
+	if err != nil {
+		return req, err
+	}
+	k.AddActiveRequest(ctx, req)
+	k.AddRequestExpiration(ctx, req)
+	return req, nil
+}
+
+func (k Keeper) AddActiveRequest(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
+	store.Set(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
+		req.RequestHeight, req.RequestIntraTxCounter), bz)
+}
+
+func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
+		req.RequestHeight, req.RequestIntraTxCounter))
+}
+
+func (k Keeper) AddRequestExpiration(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
+	store.Set(GetRequestsByExpirationIndexKeyByReq(req), bz)
+}
+
+func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req SvcRequest) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetRequestsByExpirationIndexKeyByReq(req))
+}
+
+func (k Keeper) GetActiveRequest(ctx sdk.Context, eHeight, rHeight int64, counter int16) (req SvcRequest, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetRequestsByExpirationIndexKey(eHeight, rHeight, counter))
+	if value == nil {
+		return req, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &req)
+	return req, true
+}
+
+// Returns an iterator for all the request in the Active Queue that expire by block height
+func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetRequestsByExpirationPrefix(height))
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
+	store.Set(GetResponseKey(resp.ReqChainID, resp.ExpirationHeight, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) SetReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	store := ctx.KVStore(k.storeKey)
+	fee := NewReturnedFee(address, coins)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+	store.Set(GetReturnedFeeKey(address), bz)
+}
+
+func (k Keeper) GetReturnFee(ctx sdk.Context, address sdk.AccAddress) (fee ReturnedFee, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetReturnedFeeKey(address))
+	if value == nil {
+		return fee, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fee)
+	return fee, true
+}
+
+// Add return fee for a particular consumer, if it is not existed will create a new
+func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	fee, found := k.GetReturnFee(ctx, address)
+	if !found {
+		k.SetReturnFee(ctx, address, coins)
+		return
+	}
+	k.SetReturnFee(ctx, address, fee.Coins.Plus(coins))
+}
+
+// refund fees from a particular consumer, and delete it
+func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
+	fee, found := k.GetReturnFee(ctx, address)
+	if !found {
+		return ErrReturnFeeNotExists(k.Codespace(), address)
+	}
+	_, _, err := k.ck.AddCoins(ctx, address, fee.Coins)
+	if err != nil {
+		return err
+	}
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetReturnedFeeKey(address))
+	return nil
+}
+
+func (k Keeper) SetIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	store := ctx.KVStore(k.storeKey)
+	fee := NewIncomingFee(address, coins)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+	store.Set(GetIncomingFeeKey(address), bz)
+}
+
+func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee IncomingFee, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetIncomingFeeKey(address))
+	if value == nil {
+		return fee, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fee)
+	return fee, true
+}
+
+// Add incoming fee for a particular provider, if it is not existed will create a new
+func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	fee, found := k.GetIncomingFee(ctx, address)
+	if !found {
+		k.SetIncomingFee(ctx, address, coins)
+	}
+	k.SetIncomingFee(ctx, address, fee.Coins.Plus(coins))
+}
+
+// withdraw fees from a particular provider, and delete it
+func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
+	fee, found := k.GetIncomingFee(ctx, address)
+	if !found {
+		return ErrWithdrawFeeNotExists(k.Codespace(), address)
+	}
+	_, _, err := k.ck.AddCoins(ctx, address, fee.Coins)
+	if err != nil {
+		return err
+	}
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetIncomingFeeKey(address))
+	return nil
+}
+
+//__________________________________________________________________________
+
+// get the current in-block request operation counter
+func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	store := ctx.KVStore(k.storeKey)
+	b := store.Get(intraTxCounterKey)
+	if b == nil {
+		return 0
+	}
+	var counter int16
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
+	return counter
+}
+
+// set the current in-block request counter
+func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
+	store.Set(intraTxCounterKey, bz)
+}
+
+func getMinDeposit(ctx sdk.Context, prices []sdk.Coin) sdk.Coins {
+	// min deposit must >= sum(method price) * minDepositMultiple
+	minDepositMultiple := serviceparams.GetMinDepositMultiple(ctx)
+	var minDeposit sdk.Coins
+	for _, price := range prices {
+		minInt := price.Amount.Mul(sdk.NewInt(minDepositMultiple))
+		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
+	}
+	return minDeposit
 }
