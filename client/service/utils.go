@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/irisnet/irishub/modules/service"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type DefOutput struct {
@@ -10,6 +11,6 @@ type DefOutput struct {
 }
 
 type FeesOutput struct {
-	ReturnedFee service.ReturnedFee `json:"returned_fee"`
-	IncomingFee service.IncomingFee `json:"incoming_fee"`
+	ReturnedFee sdk.Coins `json:"returned_fee"`
+	IncomingFee sdk.Coins `json:"incoming_fee"`
 }

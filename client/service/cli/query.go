@@ -14,6 +14,8 @@ import (
 	cmn "github.com/irisnet/irishub/client/service"
 )
 
+const NULL = "null"
+
 func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
@@ -211,6 +213,9 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 			if len(res) > 0 {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res, &resp)
+			} else {
+				fmt.Println(NULL)
+				return nil
 			}
 			output, err := cdc.MarshalJSONIndent(resp, "", "")
 			fmt.Println(string(output))
@@ -228,11 +233,11 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 		Use:     "fees",
 		Short:   "Query return and incoming fee of a particular address",
 		Example: "iriscli service fees <account address>",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			// find the key to look up the account
 			addrString := args[0]
 
 			delAddr, err := sdk.AccAddressFromBech32(addrString)
@@ -257,7 +262,7 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res1, &incomingFee)
 			}
 
-			output, err := cdc.MarshalJSONIndent(cmn.FeesOutput{ReturnedFee: returnedFee, IncomingFee: incomingFee}, "", "")
+			output, err := cdc.MarshalJSONIndent(cmn.FeesOutput{ReturnedFee: returnedFee.Coins, IncomingFee: incomingFee.Coins}, "", "")
 			fmt.Println(string(output))
 			return nil
 		},

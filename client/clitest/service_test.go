@@ -120,7 +120,7 @@ func TestIrisCLIServiceDefine(t *testing.T) {
 	sdStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
 	sdStr += fmt.Sprintf(" --bind-type=%s", "Global")
 	sdStr += fmt.Sprintf(" --deposit=%s", "1iris")
-	sdStr += fmt.Sprintf(" --prices=%s", "5iris")
+	sdStr += fmt.Sprintf(" --prices=%s", "0.1iris")
 	sdStr += fmt.Sprintf(" --avg-rsp-time=%d", 99)
 	sdStr += fmt.Sprintf(" --usable-time=%d", 99)
 	sdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
@@ -198,20 +198,20 @@ func TestIrisCLIServiceDefine(t *testing.T) {
 	fooFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
 	barFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
-	require.Equal(t, "1000000000000000000iris-atto", fooFess.IncomingFee.Coins.String())
-	require.Nil(t, fooFess.ReturnedFee.Coins)
-	require.Nil(t, barFess.ReturnedFee.Coins)
-	require.Nil(t, barFess.IncomingFee.Coins)
+	require.Equal(t, "1000000000000000000iris-atto", fooFess.IncomingFee.String())
+	require.Nil(t, fooFess.ReturnedFee)
+	require.Nil(t, barFess.ReturnedFee)
+	require.Nil(t, barFess.IncomingFee)
 
 	executeWrite(t, caStr, app.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(12, port)
 
 	fooFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
 	barFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
-	require.Equal(t, "1000000000000000000iris-atto", fooFess.IncomingFee.Coins.String())
-	require.Nil(t, fooFess.ReturnedFee.Coins)
-	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.Coins.String())
-	require.Nil(t, barFess.IncomingFee.Coins)
+	require.Equal(t, "1000000000000000000iris-atto", fooFess.IncomingFee.String())
+	require.Nil(t, fooFess.ReturnedFee)
+	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.String())
+	require.Nil(t, barFess.IncomingFee)
 }
 
 const idlContent = `

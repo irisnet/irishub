@@ -481,6 +481,9 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+	if len(msg.ReqChainID) == 0 {
+		return ErrInvalidReqChainId(DefaultCodespace)
+	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
@@ -537,7 +540,7 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 
 func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidReqChainId(DefaultCodespace)
 	}
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)

@@ -21,6 +21,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 )
 
 const (
@@ -139,13 +140,17 @@ func NewApp() *App {
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), []byte{},
+			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), []byte{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinProviderDepositParameter)
+		&serviceparams.MinDepositMultipleParameter,
+		&arbitrationparams.ComplaintRetrospectParameter,
+		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
