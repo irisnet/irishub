@@ -87,6 +87,7 @@ type IrisApp struct {
 
 	// fee manager
 	feeManager bam.FeeManager
+	hookHub    HookHub // handle Hook callback of any version modules
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -180,17 +181,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.bankKeeper,
 		service.DefaultCodespace,
 	)
-
-	// register the staking hooks
-	// NOTE: stakeKeeper above are passed by reference,
-	// so that it can be modified like below:
-	app.stakeKeeper = *stakeKeeper.SetHooks(
-		NewHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
-
 	app.upgradeKeeper = upgrade.NewKeeper(
 		app.cdc,
 		app.keyUpgrade, app.stakeKeeper,
 	)
+
+	app.hookHub = NewHooksHub(app.upgradeKeeper)
+	// register the staking hookHub
+	// NOTE: stakeKeeper above are passed by reference,
+	// so that it can be modified like below:
+	app.stakeKeeper = *stakeKeeper.SetHooks(app.hookHub)
 
 	// register message routes
 	// need to update each module's msg type
@@ -208,6 +208,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
 
+	app.hookHub.
+		AddHook(stakeTrigger, 0, app.distrKeeper.Hooks()).
+		AddHook(stakeTrigger, 0, app.slashingKeeper.Hooks())
+
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
@@ -224,7 +228,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	var err error
 	if viper.GetBool(FlagReplay) {
-		err = app.LoadVersion(lastHeight, app.keyMain)
+		err = app.LoadVersion(lastHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}
@@ -290,6 +294,10 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, app.keyMain, false)
+}
+
 // application updates every end block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
@@ -338,6 +346,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		acc.AccountNumber = app.accountMapper.GetNextAccountNumber(ctx)
 		app.accountMapper.SetAccount(ctx, acc)
 	}
+
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
 	// load the initial stake information
 	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
@@ -395,7 +405,6 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		}
 	}
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 	service.InitGenesis(ctx, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 
@@ -511,62 +520,4 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 	}
 
 	return result
-}
-
-//______________________________________________________________________________________________
-
-// Combined Staking Hooks
-type Hooks struct {
-	dh distr.Hooks
-	sh slashing.Hooks
-}
-
-func NewHooks(dh distr.Hooks, sh slashing.Hooks) Hooks {
-	return Hooks{dh, sh}
-}
-
-var _ sdk.StakingHooks = Hooks{}
-
-func (h Hooks) OnValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorCreated(ctx, valAddr)
-	h.sh.OnValidatorCreated(ctx, valAddr)
-}
-func (h Hooks) OnValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorModified(ctx, valAddr)
-	h.sh.OnValidatorModified(ctx, valAddr)
-}
-
-func (h Hooks) OnValidatorRemoved(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorRemoved(ctx, consAddr, valAddr)
-	h.sh.OnValidatorRemoved(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnValidatorBonded(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorBonded(ctx, consAddr, valAddr)
-	h.sh.OnValidatorBonded(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnValidatorPowerDidChange(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorPowerDidChange(ctx, consAddr, valAddr)
-	h.sh.OnValidatorPowerDidChange(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnValidatorBeginUnbonding(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorBeginUnbonding(ctx, consAddr, valAddr)
-	h.sh.OnValidatorBeginUnbonding(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnDelegationCreated(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	h.dh.OnDelegationCreated(ctx, delAddr, valAddr)
-	h.sh.OnDelegationCreated(ctx, delAddr, valAddr)
-}
-
-func (h Hooks) OnDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	h.dh.OnDelegationSharesModified(ctx, delAddr, valAddr)
-	h.sh.OnDelegationSharesModified(ctx, delAddr, valAddr)
-}
-
-func (h Hooks) OnDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	h.dh.OnDelegationRemoved(ctx, delAddr, valAddr)
-	h.sh.OnDelegationRemoved(ctx, delAddr, valAddr)
 }
