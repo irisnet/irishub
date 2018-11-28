@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 7
+	DefaultCodespace sdk.CodespaceType = 22
 
 	CodeInvalidDataSize        sdk.CodeType = 1
 	CodeInvalidFileDescription sdk.CodeType = 2

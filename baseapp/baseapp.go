@@ -174,8 +174,8 @@ func (app *BaseApp) LoadLatestVersion(mainKey sdk.StoreKey) error {
 }
 
 // load application version
-func (app *BaseApp) LoadVersion(version int64, mainKey sdk.StoreKey) error {
-	err := app.cms.LoadVersion(version)
+func (app *BaseApp) LoadVersion(version int64, mainKey sdk.StoreKey, overwrite bool) error {
+	err := app.cms.LoadVersion(version, overwrite)
 	if err != nil {
 		return err
 	}

@@ -19,6 +19,8 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/record"
@@ -32,6 +34,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"time"
 )
 
 const (
@@ -84,6 +87,7 @@ type IrisApp struct {
 
 	// fee manager
 	feeManager bam.FeeManager
+	hookHub    HookHub // handle Hook callback of any version modules
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
@@ -118,6 +122,32 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = bam.Replay(app.Logger)
 	}
 
+	app.initKeeper()
+	app.wireRouterForAllVersion()
+	app.mountStoreAndSetupBaseApp(lastHeight)
+	app.registerParams()
+
+	return app
+}
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
+}
+
+func (app *IrisApp) initKeeper() {
 	// define the AccountKeeper
 	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
@@ -177,34 +207,19 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.bankKeeper,
 		service.DefaultCodespace,
 	)
-
-	// register the staking hooks
-	// NOTE: stakeKeeper above are passed by reference,
-	// so that it can be modified like below:
-	app.stakeKeeper = *stakeKeeper.SetHooks(
-		NewHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
-
 	app.upgradeKeeper = upgrade.NewKeeper(
 		app.cdc,
 		app.keyUpgrade, app.stakeKeeper,
 	)
 
-	// register message routes
-	// need to update each module's msg type
-	app.Router().
-		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("distr", []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
-		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
-		AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper))
+	app.hookHub = NewHooksHub(app.upgradeKeeper)
+	// register the staking hookHub
+	// NOTE: stakeKeeper above are passed by reference,
+	// so that it can be modified like below:
+	app.stakeKeeper = *stakeKeeper.SetHooks(app.hookHub)
+}
 
-	app.QueryRouter().
-		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
-		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
-
+func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
@@ -221,7 +236,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	var err error
 	if viper.GetBool(FlagReplay) {
-		err = app.LoadVersion(lastHeight, app.keyMain)
+		err = app.LoadVersion(lastHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}
@@ -231,7 +246,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
+}
 
+func (app *IrisApp) registerParams() {
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
@@ -248,37 +265,28 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
+			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinProviderDepositParameter)
+		&serviceparams.MinDepositMultipleParameter,
+		&arbitrationparams.ComplaintRetrospectParameter,
+		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
-
-	return app
+		&govparams.TallyingProcedureParameter,
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinDepositMultipleParameter)
 }
 
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, app.keyMain, false)
 }
 
 // application updates every end block
@@ -301,6 +309,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 	tags := gov.EndBlocker(ctx, app.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
+	tags = tags.AppendTags(service.EndBlocker(ctx, app.serviceKeeper))
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
@@ -328,6 +337,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		acc.AccountNumber = app.accountMapper.GetNextAccountNumber(ctx)
 		app.accountMapper.SetAccount(ctx, acc)
 	}
+
+	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 
 	// load the initial stake information
 	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
@@ -385,8 +396,8 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		}
 	}
 
-	upgrade.InitGenesis(ctx, app.upgradeKeeper, app.Router(), genesisState.UpgradeData)
 	service.InitGenesis(ctx, genesisState.ServiceData)
+	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,
@@ -427,7 +438,8 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		distr.ExportGenesis(ctx, app.distrKeeper),
 		gov.ExportGenesis(ctx, app.govKeeper),
 		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
-		service.WriteGenesis(ctx),
+		service.ExportGenesis(ctx),
+		arbitration.ExportGenesis(ctx),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
@@ -499,62 +511,4 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 	}
 
 	return result
-}
-
-//______________________________________________________________________________________________
-
-// Combined Staking Hooks
-type Hooks struct {
-	dh distr.Hooks
-	sh slashing.Hooks
-}
-
-func NewHooks(dh distr.Hooks, sh slashing.Hooks) Hooks {
-	return Hooks{dh, sh}
-}
-
-var _ sdk.StakingHooks = Hooks{}
-
-func (h Hooks) OnValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorCreated(ctx, valAddr)
-	h.sh.OnValidatorCreated(ctx, valAddr)
-}
-func (h Hooks) OnValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorModified(ctx, valAddr)
-	h.sh.OnValidatorModified(ctx, valAddr)
-}
-
-func (h Hooks) OnValidatorRemoved(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorRemoved(ctx, consAddr, valAddr)
-	h.sh.OnValidatorRemoved(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnValidatorBonded(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorBonded(ctx, consAddr, valAddr)
-	h.sh.OnValidatorBonded(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnValidatorPowerDidChange(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorPowerDidChange(ctx, consAddr, valAddr)
-	h.sh.OnValidatorPowerDidChange(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnValidatorBeginUnbonding(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) {
-	h.dh.OnValidatorBeginUnbonding(ctx, consAddr, valAddr)
-	h.sh.OnValidatorBeginUnbonding(ctx, consAddr, valAddr)
-}
-
-func (h Hooks) OnDelegationCreated(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	h.dh.OnDelegationCreated(ctx, delAddr, valAddr)
-	h.sh.OnDelegationCreated(ctx, delAddr, valAddr)
-}
-
-func (h Hooks) OnDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	h.dh.OnDelegationSharesModified(ctx, delAddr, valAddr)
-	h.sh.OnDelegationSharesModified(ctx, delAddr, valAddr)
-}
-
-func (h Hooks) OnDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	h.dh.OnDelegationRemoved(ctx, delAddr, valAddr)
-	h.sh.OnDelegationRemoved(ctx, delAddr, valAddr)
 }

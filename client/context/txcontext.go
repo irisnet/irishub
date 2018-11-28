@@ -56,7 +56,7 @@ func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx CLIContext) bool {
 		w.Write([]byte("name required but not specified"))
 		return false
 
-	case !cliCtx.GenerateOnly && len(br.Password) == 0:
+	case !cliCtx.DryRun && !cliCtx.GenerateOnly && len(br.Password) == 0:
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("password required but not specified"))
 		return false

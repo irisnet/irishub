@@ -37,6 +37,7 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"path/filepath"
 	"io/ioutil"
+	"github.com/irisnet/irishub/modules/arbitration"
 )
 
 var (
@@ -121,6 +122,7 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
+	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 	return genesisState
 }
 
@@ -187,10 +189,9 @@ func copyFile(dstFile, srcFile string) error {
 	_, err = io.Copy(dst, src)
 	return err
 }
+
 //___________________________________________________________________________________
 // helper methods
-
-
 
 func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
@@ -201,7 +202,7 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
-	nodeID,_ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
+	nodeID, _ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
 	var appState app.GenesisFileState
@@ -424,9 +425,9 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 	return switchMsg
 }
 
-func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.ServiceOutput {
+func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceDef servicecli.ServiceOutput
+	var serviceDef servicecli.DefOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -449,6 +450,24 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBindings
+}
+
+func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var svcRequests []service.SvcRequest
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return svcRequests
+}
+
+func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var feesOutput servicecli.FeesOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return feesOutput
 }
 
 func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...string) string {
@@ -538,5 +557,3 @@ func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force b
 	return true
 
 }
-
-

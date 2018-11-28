@@ -32,9 +32,61 @@ func WriteErrorResponse(w http.ResponseWriter, status int, err string) {
 
 // WriteSimulationResponse prepares and writes an HTTP
 // response for transactions simulations.
-func WriteSimulationResponse(w http.ResponseWriter, gas int64) {
+type kvPair struct {
+	TagKey   string `json:"tag_key"`
+	TagValue string `json:"tag_value"`
+}
+type abciResult struct {
+	Code      sdk.ABCICodeType `json:"code"`
+	Data      []byte           `json:"data"`
+	Log       string           `json:"log"`
+	GasWanted int64            `json:"gas_wanted"`
+	GasUsed   int64            `json:"gas_used"`
+	FeeAmount int64            `json:"fee_amount"`
+	FeeDenom  string           `json:"fee_denom"`
+	Tags      []kvPair         `json:"tagsy"`
+}
+type simulateResult struct {
+	GasEstimate int64      `json:"gas_estimate"`
+	Result      abciResult `json:"result"`
+}
+
+func WriteSimulationResponse(w http.ResponseWriter, cliCtx context.CLIContext, gas int64, result sdk.Result) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf(`{"gas_estimate":%v}`, gas)))
+	var kvPairs []kvPair
+	for _, tag := range result.Tags {
+		kvPairs = append(kvPairs, kvPair{
+			TagKey:   string(tag.Key),
+			TagValue: string(tag.Value),
+		})
+	}
+	abciResult := abciResult{
+		Code:      result.Code,
+		Data:      result.Data,
+		Log:       result.Log,
+		GasWanted: result.GasWanted,
+		GasUsed:   result.GasUsed,
+		FeeAmount: result.FeeAmount,
+		FeeDenom:  result.FeeDenom,
+		Tags:      kvPairs,
+	}
+
+	simulateResult := simulateResult{
+		GasEstimate: gas,
+		Result:      abciResult,
+	}
+	var output []byte
+	var err error
+	if cliCtx.Indent {
+		output, err = cliCtx.Codec.MarshalJSONIndent(simulateResult, "", "  ")
+	} else {
+		output, err = cliCtx.Codec.MarshalJSON(simulateResult)
+	}
+	if err != nil {
+		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	w.Write(output)
 }
 
 // HasDryRunArg returns true if the request's URL query contains the dry run
@@ -186,14 +238,14 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 	}
 
 	if cliCtx.DryRun || txCtx.SimulateGas {
-		newTxCtx, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
+		newTxCtx, result, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
 		if err != nil {
 			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if cliCtx.DryRun {
-			WriteSimulationResponse(w, newTxCtx.Gas)
+			WriteSimulationResponse(w, cliCtx, newTxCtx.Gas, result)
 			return
 		}
 

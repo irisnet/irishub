@@ -185,17 +185,24 @@ func main() {
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(
-			servicecmd.GetCmdQueryScvDef("service", cdc),
-			servicecmd.GetCmdQueryScvBind("service", cdc),
-			servicecmd.GetCmdQueryScvBinds("service", cdc),
+			servicecmd.GetCmdQuerySvcDef("service", cdc),
+			servicecmd.GetCmdQuerySvcBind("service", cdc),
+			servicecmd.GetCmdQuerySvcBinds("service", cdc),
+			servicecmd.GetCmdQuerySvcRequests("service", cdc),
+			servicecmd.GetCmdQuerySvcResponse("service", cdc),
+			servicecmd.GetCmdQuerySvcFees("service", cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
-		servicecmd.GetCmdScvDef(cdc),
-		servicecmd.GetCmdScvBind(cdc),
-		servicecmd.GetCmdScvBindUpdate(cdc),
-		servicecmd.GetCmdScvDisable(cdc),
-		servicecmd.GetCmdScvEnable(cdc),
-		servicecmd.GetCmdScvRefundDeposit(cdc),
+		servicecmd.GetCmdSvcDef(cdc),
+		servicecmd.GetCmdSvcBind(cdc),
+		servicecmd.GetCmdSvcBindUpdate(cdc),
+		servicecmd.GetCmdSvcDisable(cdc),
+		servicecmd.GetCmdSvcEnable(cdc),
+		servicecmd.GetCmdSvcRefundDeposit(cdc),
+		servicecmd.GetCmdSvcCall(cdc),
+		servicecmd.GetCmdSvcRespond(cdc),
+		servicecmd.GetCmdSvcRefundFees(cdc),
+		servicecmd.GetCmdSvcWithdrawFees(cdc),
 	)...)
 
 	rootCmd.AddCommand(
