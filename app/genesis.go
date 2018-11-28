@@ -220,7 +220,7 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	if err := cdc.UnmarshalJSON(genDoc.AppState, &appFileState); err != nil {
 		return appGenTxs, persistentPeers, err
 	}
-	appState := convertToGenesisState(appFileState)
+	appState := ConvertToGenesisState(appFileState)
 	addrMap := make(map[string]GenesisAccount, len(appState.Accounts))
 	for i := 0; i < len(appState.Accounts); i++ {
 		acc := appState.Accounts[i]
@@ -354,7 +354,7 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 	return accountCoins
 }
 
-func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
+func ConvertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 	var genesisAccounts []GenesisAccount
 	for _, gacc := range genesisFileState.Accounts {
 		acc := GenesisAccount{
