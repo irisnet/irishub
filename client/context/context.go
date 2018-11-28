@@ -224,3 +224,9 @@ func (ctx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
 	ctx.Verifier = verifier
 	return ctx
 }
+
+// WithHeight - return a copy of the context with an updated Height
+func (ctx CLIContext) WithHeight(height int64) CLIContext {
+	ctx.Height = height
+	return ctx
+}

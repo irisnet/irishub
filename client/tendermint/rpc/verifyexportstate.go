@@ -25,17 +25,20 @@ import (
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
 	"github.com/tendermint/tmlibs/cli"
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 )
 
 const (
 	remoteNodeRPC = "remote-node-rpc"
 	genesisFile   = "genesis-file"
 	exportHeight  = "export-height"
+
+	accountStore = "acc"
 )
 // VerifyExportState create a command to verify exported state file
 func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "start",
+		Use:   "verify",
 		Short: "start to verify exported genesis state",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			chainID := viper.GetString(client.FlagChainID)
@@ -69,15 +72,17 @@ func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("missing remote node rpc")
 			}
 			remoteRPC := rpcclient.NewHTTP(remoteURL, "/websocket")
-
-			verifier, err := newVerifier(log.NewNopLogger(), chainID, home, trustRPC, remoteRPC, exportHeight)
+			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
+			verifier, err := newVerifier(logger, chainID, home, trustRPC, remoteRPC, exportHeight)
 			if err != nil {
 				return err
 			}
 
+			// Disable verifier creation in NewCLIContext
 			viper.Set(client.FlagTrustNode, true)
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
-			cliCtx = cliCtx.WithCertifier(verifier).WithTrustNode(false).WithClient(remoteRPC)
+			// Set trust-node to false
+			cliCtx = cliCtx.WithCertifier(verifier).WithTrustNode(false).WithClient(remoteRPC).WithHeight(exportHeight)
 
 			genContents, err := ioutil.ReadFile(genesisFile)
 			if err != nil {
@@ -94,10 +99,11 @@ func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 			}
 			genesisState := app.ConvertToGenesisState(genesisFileState)
 
-			err = verifyExportGenesisnState(cliCtx, genesisState, exportHeight)
+			err = verifyExportGenesisnState(cliCtx, genesisState)
 			if err != nil {
 				return err
 			}
+			logger.Info("Verification passed")
 			return nil
 		},
 	}
@@ -114,64 +120,87 @@ func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func verifyExportGenesisnState(cliCtx context.CLIContext, genesisState app.GenesisState, exportHeight int64) error {
+func verifyExportGenesisnState(cliCtx context.CLIContext, genesisState app.GenesisState) error {
 	var err error
-	err = verifyAccountsState(cliCtx, genesisState.Accounts, exportHeight)
+	err = verifyAccountsState(cliCtx, genesisState.Accounts)
 	if err != nil {
 		return err
 	}
-	err = verifyAuthState(cliCtx, genesisState.AuthData, exportHeight)
+	err = verifyAuthState(cliCtx, genesisState.AuthData)
 	if err != nil {
 		return err
 	}
-	err = verifyStakeState(cliCtx, genesisState.StakeData, exportHeight)
+	err = verifyStakeState(cliCtx, genesisState.StakeData)
 	if err != nil {
 		return err
 	}
-	err = verifyMintState(cliCtx, genesisState.MintData, exportHeight)
+	err = verifyMintState(cliCtx, genesisState.MintData)
 	if err != nil {
 		return err
 	}
-	err = verifyDistrState(cliCtx, genesisState.DistrData, exportHeight)
+	err = verifyDistrState(cliCtx, genesisState.DistrData)
 	if err != nil {
 		return err
 	}
-	err = verifyGovState(cliCtx, genesisState.GovData, exportHeight)
+	err = verifyGovState(cliCtx, genesisState.GovData)
 	if err != nil {
 		return err
 	}
-	err = verifySlashingState(cliCtx, genesisState.SlashingData, exportHeight)
+	err = verifySlashingState(cliCtx, genesisState.SlashingData)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func verifyAccountsState(cliCtx context.CLIContext, accountsState []app.GenesisAccount, exportHeight int64) error {
+func verifyAccountsState(cliCtx context.CLIContext, accountsState []app.GenesisAccount) error {
+	decoder := authcmd.GetAccountDecoder(cliCtx.Codec)
+	for _, acc := range accountsState {
+		res, err := cliCtx.QueryStore(auth.AddressStoreKey(acc.Address), accountStore)
+		if err != nil {
+			return err
+		}
+		if len(res) == 0 {
+			return fmt.Errorf("account %s doesn't exist", acc.Address.String())
+		}
+		account, err := decoder(res)
+		if err != nil {
+			return fmt.Errorf("account %s: failed to decode account info", acc.Address.String())
+		}
+		if !acc.Coins.IsEqual(account.GetCoins()) {
+			return fmt.Errorf("account %s: token amount doesn't match, expect %s, got %s", acc.Address.String(), acc.Coins.String(), account.GetCoins().String())
+		}
+		if acc.AccountNumber !=  account.GetAccountNumber() {
+			return fmt.Errorf("account %s: account number doesn't match, expect %d, got %d", acc.Address.String(), acc.AccountNumber, account.GetAccountNumber())
+		}
+		if acc.Sequence != account.GetSequence() {
+			return fmt.Errorf("account %s: account sequence doesn't match, expect %d, got %d", acc.Address.String(), acc.Sequence, account.GetSequence())
+		}
+	}
 	return nil
 }
 
-func verifyAuthState(cliCtx context.CLIContext, AuthState auth.GenesisState, exportHeight int64) error {
+func verifyAuthState(cliCtx context.CLIContext, authState auth.GenesisState) error {
 	return nil
 }
 
-func verifyStakeState(cliCtx context.CLIContext, stakeState stake.GenesisState, exportHeight int64) error {
+func verifyStakeState(cliCtx context.CLIContext, stakeState stake.GenesisState) error {
 	return nil
 }
 
-func verifyMintState(cliCtx context.CLIContext, mintState mint.GenesisState, exportHeight int64) error {
+func verifyMintState(cliCtx context.CLIContext, mintState mint.GenesisState) error {
 	return nil
 }
 
-func verifyDistrState(cliCtx context.CLIContext, distrState distr.GenesisState, exportHeight int64) error {
+func verifyDistrState(cliCtx context.CLIContext, distrState distr.GenesisState) error {
 	return nil
 }
 
-func verifyGovState(cliCtx context.CLIContext, govState gov.GenesisState, exportHeight int64) error {
+func verifyGovState(cliCtx context.CLIContext, govState gov.GenesisState) error {
 	return nil
 }
 
-func verifySlashingState(cliCtx context.CLIContext, slashingState slashing.GenesisState, exportHeight int64) error {
+func verifySlashingState(cliCtx context.CLIContext, slashingState slashing.GenesisState) error {
 	return nil
 }
 
@@ -189,12 +218,12 @@ func newVerifier(logger log.Logger, chainID, rootDir string, trustClient lclient
 	verifier.SetLogger(logger) // Sets logger recursively.
 
 	fc, err := trust.LatestFullCommit(chainID, 1, exportHeight)
-	if fc.Height() < exportHeight || err != nil {
-		fc, err := trustSource.LatestFullCommit(chainID, 1, exportHeight)
+	if fc.SignedHeader.Header != nil && fc.Height() < exportHeight || err != nil {
+		newFc, err := trustSource.LatestFullCommit(chainID, 1, exportHeight)
 		if err != nil {
 			return nil, cmn.ErrorWrap(err, "fetching source full commit @ height 1")
 		}
-		err = trust.SaveFullCommit(fc)
+		err = trust.SaveFullCommit(newFc)
 		if err != nil {
 			return nil, cmn.ErrorWrap(err, "saving full commit to trusted")
 		}
