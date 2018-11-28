@@ -11,7 +11,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/modules/stake"

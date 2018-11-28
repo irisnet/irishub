@@ -2,8 +2,8 @@ package cli
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/client/context"
 	upgcli "github.com/irisnet/irishub/client/upgrade"

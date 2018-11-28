@@ -12,11 +12,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	crkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/tests"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	crkeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 
 	"github.com/spf13/viper"

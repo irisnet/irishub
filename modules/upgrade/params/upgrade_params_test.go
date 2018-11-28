@@ -3,13 +3,13 @@ package upgradeparams
 import (
 	"testing"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/stretchr/testify/require"
-	"github.com/cosmos/cosmos-sdk/store"
+	"github.com/irisnet/irishub/store"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/irisnet/irishub/iparam"
 	"encoding/json"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"path"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/irisnet/irishub/modules/gov/params"
 )

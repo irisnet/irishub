@@ -6,7 +6,7 @@ import (
 	cctx "context"
 	"encoding/hex"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"

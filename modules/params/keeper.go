@@ -1,8 +1,8 @@
 package params
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 
 	"github.com/irisnet/irishub/modules/params/subspace"
 )

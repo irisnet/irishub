@@ -3,7 +3,7 @@ package upgrade
 import (
 	"fmt"
 	"github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"

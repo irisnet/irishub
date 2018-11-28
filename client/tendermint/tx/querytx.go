@@ -3,8 +3,8 @@ package tx
 import (
 	"encoding/hex"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"

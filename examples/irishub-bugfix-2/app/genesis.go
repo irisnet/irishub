@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/server"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/mint"

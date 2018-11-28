@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Pool - dynamic parameters of the current state

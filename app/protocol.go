@@ -1,11 +1,11 @@
 package app
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/bank"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"

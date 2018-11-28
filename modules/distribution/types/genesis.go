@@ -1,6 +1,6 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import sdk "github.com/irisnet/irishub/types"
 
 // the address for where distributions rewards are withdrawn to by default
 // this struct is only used at genesis to feed in default withdraw addresses

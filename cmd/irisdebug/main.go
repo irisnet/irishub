@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	iris "github.com/irisnet/irishub/app"
 	irisInit "github.com/irisnet/irishub/init"

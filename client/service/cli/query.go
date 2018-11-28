@@ -4,11 +4,11 @@ import (
 	"os"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	cmn "github.com/irisnet/irishub/client/service"

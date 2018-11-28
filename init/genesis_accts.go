@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/server"
+	sdk "github.com/irisnet/irishub/types"
 	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/spf13/cobra"

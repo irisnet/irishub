@@ -3,8 +3,8 @@ package lcd
 import (
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"

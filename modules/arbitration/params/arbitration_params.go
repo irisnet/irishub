@@ -1,9 +1,9 @@
 package arbitrationparams
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/iparam"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"time"
 )
 

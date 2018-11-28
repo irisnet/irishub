@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 //-----------------------------------------------------------

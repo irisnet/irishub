@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
 	stake "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/tendermint/tendermint/crypto"

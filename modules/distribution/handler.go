@@ -1,7 +1,7 @@
 package distribution
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/keeper"
 	"github.com/irisnet/irishub/modules/distribution/tags"
 	"github.com/irisnet/irishub/modules/distribution/types"

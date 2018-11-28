@@ -1,7 +1,7 @@
 package mint
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // expected stake keeper

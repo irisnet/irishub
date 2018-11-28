@@ -1,14 +1,10 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
-
 // Handler defines the core of the state transition function of an application.
-type Handler func(ctx sdk.Context, msg sdk.Msg) sdk.Result
+type Handler func(ctx Context, msg Msg) Result
 
 // AnteHandler authenticates transactions, before their internal messages are handled.
 // If newCtx.IsZero(), ctx is used instead.
-type AnteHandler func(ctx sdk.Context, tx sdk.Tx) (newCtx sdk.Context, result sdk.Result, abort bool)
-type FeePreprocessHandler func(ctx sdk.Context, tx sdk.Tx) error
-type FeeRefundHandler func(ctx sdk.Context, tx sdk.Tx, result sdk.Result) (sdk.Coin, error)
+type AnteHandler func(ctx Context, tx Tx, simulate bool) (newCtx Context, result Result, abort bool)
+type FeePreprocessHandler func(ctx Context, tx Tx) error
+type FeeRefundHandler func(ctx Context, tx Tx, result Result) (Coin, error)

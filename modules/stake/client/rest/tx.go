@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/crypto/keys"
+	sdk "github.com/irisnet/irishub/types"
 	authtxb "github.com/irisnet/irishub/client/auth/txbuilder"
 	"github.com/irisnet/irishub/modules/stake"
 

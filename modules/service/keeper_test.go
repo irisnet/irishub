@@ -3,7 +3,7 @@ package service
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 )

@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/slashing"

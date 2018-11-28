@@ -1,8 +1,8 @@
 package auth
 
 import (
-	codec "github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	codec "github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
 

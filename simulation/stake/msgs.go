@@ -2,7 +2,7 @@ package simulation
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"

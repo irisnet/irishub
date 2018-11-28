@@ -3,14 +3,14 @@ package context
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 
 	"github.com/pkg/errors"
 
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"

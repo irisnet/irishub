@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/client/utils"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/tx"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/tags"
 
 	"github.com/gorilla/mux"

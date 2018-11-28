@@ -3,7 +3,7 @@ package stake
 import (
 	"bytes"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/tags"
 	"github.com/irisnet/irishub/modules/stake/types"

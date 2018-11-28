@@ -16,7 +16,7 @@ import (
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	irisInit "github.com/irisnet/irishub/init"
 )
 

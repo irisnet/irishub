@@ -3,13 +3,13 @@ package cli
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	recordClient "github.com/irisnet/irishub/client/record"
 )
 

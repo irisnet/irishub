@@ -1,8 +1,8 @@
 package querier
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	keep "github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
 	abci "github.com/tendermint/tendermint/abci/types"

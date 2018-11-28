@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // test ValidateBasic for MsgSubmitRecord

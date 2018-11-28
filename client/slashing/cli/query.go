@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/cosmos/cosmos-sdk/codec" // XXX fix
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec" // XXX fix
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/client/context"
 )

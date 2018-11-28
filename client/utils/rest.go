@@ -2,9 +2,9 @@ package utils
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/crypto/keys/keyerror"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"

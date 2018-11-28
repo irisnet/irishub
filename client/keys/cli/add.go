@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	ccrypto "github.com/cosmos/cosmos-sdk/crypto"
-	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	ccrypto "github.com/irisnet/irishub/crypto"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
 
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"

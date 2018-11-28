@@ -1,9 +1,9 @@
 package rest
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/crypto/keys"
 
 	"github.com/gorilla/mux"
 )

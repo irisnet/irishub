@@ -1,7 +1,7 @@
 package app
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/upgrade"
 )
 

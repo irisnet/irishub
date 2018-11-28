@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
 )
 
@@ -78,7 +78,7 @@ func getValidatorPowerRank(validator types.Validator) []byte {
 
 	potentialPower := validator.GetPotentialPower()
 
-	// todo: deal with cases above 2**64, ref https://github.com/cosmos/cosmos-sdk/issues/2439#issuecomment-427167556
+	// todo: deal with cases above 2**64, ref https://github.com/irisnet/irishub/issues/2439#issuecomment-427167556
 	tendermintPower := potentialPower.RoundInt64()
 	tendermintPowerBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(tendermintPowerBytes[:], uint64(tendermintPower))

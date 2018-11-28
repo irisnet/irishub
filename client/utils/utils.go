@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"

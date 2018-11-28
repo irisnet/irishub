@@ -3,8 +3,8 @@ package keys
 import (
 	"fmt"
 
-	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/crypto"

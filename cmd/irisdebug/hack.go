@@ -17,9 +17,9 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	bam "github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/ibc"
@@ -278,7 +278,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	var genesisState iris.GenesisState
 	err := app.cdc.UnmarshalJSON(stateJSON, &genesisState)
 	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468 // return sdk.ErrGenesisParse("").TraceCause(err, "")
+		panic(err) // TODO https://github.com/irisnet/irishub/issues/468 // return sdk.ErrGenesisParse("").TraceCause(err, "")
 	}
 
 	// load the accounts
@@ -290,7 +290,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// load the initial stake information
 	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
 	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468 // return sdk.ErrGenesisParse("").TraceCause(err, "")
+		panic(err) // TODO https://github.com/irisnet/irishub/issues/468 // return sdk.ErrGenesisParse("").TraceCause(err, "")
 	}
 
 	return abci.ResponseInitChain{

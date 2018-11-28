@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 )
 

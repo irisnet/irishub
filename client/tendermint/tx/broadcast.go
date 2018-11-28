@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"io/ioutil"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 )

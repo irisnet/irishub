@@ -6,9 +6,9 @@ import (
 	"testing"
 	"io/ioutil"
 
-	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/irisnet/irishub/tests"
 	"github.com/irisnet/irishub/app"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"strings"

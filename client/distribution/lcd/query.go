@@ -3,7 +3,7 @@ package lcd
 import (
 	"net/http"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/gorilla/mux"

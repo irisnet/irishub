@@ -2,7 +2,7 @@ package upgrade
 
 import (
 	bam "github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"fmt"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/upgrade/params"

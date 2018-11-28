@@ -1,7 +1,7 @@
 package slashing
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func NewHandler(k Keeper) sdk.Handler {

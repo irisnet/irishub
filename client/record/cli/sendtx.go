@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"

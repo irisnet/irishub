@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/irisnet/irishub/modules/service"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type DefOutput struct {
