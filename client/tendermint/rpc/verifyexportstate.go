@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -25,7 +27,6 @@ import (
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
 	"github.com/tendermint/tmlibs/cli"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 )
 
 const (
@@ -34,7 +35,9 @@ const (
 	exportHeight  = "export-height"
 
 	accountStore = "acc"
+	authStore    = "fee"
 )
+
 // VerifyExportState create a command to verify exported state file
 func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -99,7 +102,7 @@ func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 			}
 			genesisState := app.ConvertToGenesisState(genesisFileState)
 
-			err = verifyExportGenesisnState(cliCtx, genesisState)
+			err = verifyExportGenesisnState(logger, cliCtx, genesisState)
 			if err != nil {
 				return err
 			}
@@ -120,40 +123,42 @@ func VerifyExportState(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func verifyExportGenesisnState(cliCtx context.CLIContext, genesisState app.GenesisState) error {
+func verifyExportGenesisnState(logger log.Logger, cliCtx context.CLIContext, genesisState app.GenesisState) error {
 	var err error
-	err = verifyAccountsState(cliCtx, genesisState.Accounts)
+	err = verifyAccountsState(logger, cliCtx, genesisState.Accounts)
 	if err != nil {
 		return err
 	}
-	err = verifyAuthState(cliCtx, genesisState.AuthData)
+	err = verifyAuthState(logger, cliCtx, genesisState.AuthData)
 	if err != nil {
 		return err
 	}
-	err = verifyStakeState(cliCtx, genesisState.StakeData)
+	err = verifyStakeState(logger, cliCtx, genesisState.StakeData)
 	if err != nil {
 		return err
 	}
-	err = verifyMintState(cliCtx, genesisState.MintData)
+	err = verifyMintState(logger, cliCtx, genesisState.MintData)
 	if err != nil {
 		return err
 	}
-	err = verifyDistrState(cliCtx, genesisState.DistrData)
+	err = verifyDistrState(logger, cliCtx, genesisState.DistrData)
 	if err != nil {
 		return err
 	}
-	err = verifyGovState(cliCtx, genesisState.GovData)
+	err = verifyGovState(logger, cliCtx, genesisState.GovData)
 	if err != nil {
 		return err
 	}
-	err = verifySlashingState(cliCtx, genesisState.SlashingData)
+	err = verifySlashingState(logger, cliCtx, genesisState.SlashingData)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func verifyAccountsState(cliCtx context.CLIContext, accountsState []app.GenesisAccount) error {
+func verifyAccountsState(logger log.Logger, cliCtx context.CLIContext, accountsState []app.GenesisAccount) error {
+	logger.Info("-------------------------------------------------------------------------------")
+	logger.Info("Verifying account state")
 	decoder := authcmd.GetAccountDecoder(cliCtx.Codec)
 	for _, acc := range accountsState {
 		res, err := cliCtx.QueryStore(auth.AddressStoreKey(acc.Address), accountStore)
@@ -168,39 +173,59 @@ func verifyAccountsState(cliCtx context.CLIContext, accountsState []app.GenesisA
 			return fmt.Errorf("account %s: failed to decode account info", acc.Address.String())
 		}
 		if !acc.Coins.IsEqual(account.GetCoins()) {
-			return fmt.Errorf("account %s: token amount doesn't match, expect %s, got %s", acc.Address.String(), acc.Coins.String(), account.GetCoins().String())
+			return fmt.Errorf("account %s: token amount doesn't match, expect %s, got %s",
+				acc.Address.String(), acc.Coins.String(), account.GetCoins().String())
 		}
-		if acc.AccountNumber !=  account.GetAccountNumber() {
-			return fmt.Errorf("account %s: account number doesn't match, expect %d, got %d", acc.Address.String(), acc.AccountNumber, account.GetAccountNumber())
+		if acc.AccountNumber != account.GetAccountNumber() {
+			return fmt.Errorf("account %s: account number doesn't match, expect %d, got %d",
+				acc.Address.String(), acc.AccountNumber, account.GetAccountNumber())
 		}
 		if acc.Sequence != account.GetSequence() {
-			return fmt.Errorf("account %s: account sequence doesn't match, expect %d, got %d", acc.Address.String(), acc.Sequence, account.GetSequence())
+			return fmt.Errorf("account %s: account sequence doesn't match, expect %d, got %d",
+				acc.Address.String(), acc.Sequence, account.GetSequence())
 		}
 	}
+	logger.Info("Account state is verified")
 	return nil
 }
 
-func verifyAuthState(cliCtx context.CLIContext, authState auth.GenesisState) error {
+func verifyAuthState(logger log.Logger, cliCtx context.CLIContext, authState auth.GenesisState) error {
+	logger.Info("-------------------------------------------------------------------------------")
+	logger.Info("Verifying auth state")
+	collectedFeesKey := []byte("collectedFees")
+	res, err := cliCtx.QueryStore(collectedFeesKey, authStore)
+	if err != nil {
+		return err
+	}
+	var CollectedFees sdk.Coins
+	err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(res, &CollectedFees)
+	if err != nil {
+		return err
+	}
+	if !authState.CollectedFees.IsEqual(CollectedFees) {
+		return fmt.Errorf("CollectedFees doesn't match")
+	}
+	logger.Info("Auth state is verified")
 	return nil
 }
 
-func verifyStakeState(cliCtx context.CLIContext, stakeState stake.GenesisState) error {
+func verifyStakeState(logger log.Logger, cliCtx context.CLIContext, stakeState stake.GenesisState) error {
 	return nil
 }
 
-func verifyMintState(cliCtx context.CLIContext, mintState mint.GenesisState) error {
+func verifyMintState(logger log.Logger, cliCtx context.CLIContext, mintState mint.GenesisState) error {
 	return nil
 }
 
-func verifyDistrState(cliCtx context.CLIContext, distrState distr.GenesisState) error {
+func verifyDistrState(logger log.Logger, cliCtx context.CLIContext, distrState distr.GenesisState) error {
 	return nil
 }
 
-func verifyGovState(cliCtx context.CLIContext, govState gov.GenesisState) error {
+func verifyGovState(logger log.Logger, cliCtx context.CLIContext, govState gov.GenesisState) error {
 	return nil
 }
 
-func verifySlashingState(cliCtx context.CLIContext, slashingState slashing.GenesisState) error {
+func verifySlashingState(logger log.Logger, cliCtx context.CLIContext, slashingState slashing.GenesisState) error {
 	return nil
 }
 
