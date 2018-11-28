@@ -76,6 +76,8 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var req definition
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -106,6 +108,8 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 
 func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var req binding
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -158,6 +162,8 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 
 func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -221,6 +227,8 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 
 func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -256,6 +264,8 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 
 func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -297,6 +307,8 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 
 func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -332,6 +344,7 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 
 func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
 		var req serviceRequest
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -385,6 +398,7 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 
 func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
 		var req serviceResponse
 		err := utils.ReadPostBody(w, r, cdc, &req)
@@ -431,6 +445,8 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 
 func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		vars := mux.Vars(r)
 		bechConsumerAddr := vars[Consumer]
 
@@ -464,6 +480,8 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 
 func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		vars := mux.Vars(r)
 		bechProviderAddr := vars[Provider]
 

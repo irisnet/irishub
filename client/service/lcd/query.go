@@ -73,16 +73,16 @@ func definitionGetHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 		var svcDef service.SvcDef
 		cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcDef)
 
-		res2, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, serviceName), storeName)
+		res1, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, serviceName), storeName)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		var methods []service.MethodProperty
-		for i := 0; i < len(res2); i++ {
+		for _, re := range res1 {
 			var method service.MethodProperty
-			cdc.MustUnmarshalBinaryLengthPrefixed(res2[i].Value, &method)
+			cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &method)
 			methods = append(methods, method)
 		}
 
@@ -144,9 +144,9 @@ func bindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 			return
 		}
 		var bindings []service.SvcBinding
-		for i := 0; i < len(res); i++ {
+		for _, re := range res {
 			var binding service.SvcBinding
-			cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &binding)
+			cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &binding)
 			bindings = append(bindings, binding)
 		}
 
@@ -183,9 +183,9 @@ func requestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 			return
 		}
 		var reqs []service.SvcRequest
-		for i := 0; i < len(res); i++ {
+		for _, re := range res {
 			var req service.SvcRequest
-			cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &req)
+			cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &req)
 			reqs = append(reqs, req)
 		}
 

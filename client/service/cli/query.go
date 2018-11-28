@@ -39,15 +39,15 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			var svcDef service.SvcDef
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcDef)
 
-			res2, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
+			res1, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
 				return err
 			}
 
 			var methods []service.MethodProperty
-			for i := 0; i < len(res2); i++ {
+			for _, re := range res1 {
 				var method service.MethodProperty
-				cdc.MustUnmarshalBinaryLengthPrefixed(res2[i].Value, &method)
+				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &method)
 				methods = append(methods, method)
 			}
 
@@ -128,10 +128,9 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var bindings []service.SvcBinding
-			for i := 0; i < len(res); i++ {
-
+			for _, re := range res {
 				var binding service.SvcBinding
-				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &binding)
+				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &binding)
 				bindings = append(bindings, binding)
 			}
 
@@ -175,9 +174,9 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var reqs []service.SvcRequest
-			for i := 0; i < len(res); i++ {
+			for _, re := range res {
 				var req service.SvcRequest
-				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &req)
+				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &req)
 				reqs = append(reqs, req)
 			}
 
