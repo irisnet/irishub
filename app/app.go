@@ -19,6 +19,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/record"
@@ -32,8 +34,6 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
 )
 
@@ -122,6 +122,32 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = bam.Replay(app.Logger)
 	}
 
+	app.initKeeper()
+	app.wireRouterForAllVersion()
+	app.mountStoreAndSetupBaseApp(lastHeight)
+	app.registerParams()
+
+	return app
+}
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
+}
+
+func (app *IrisApp) initKeeper() {
 	// define the AccountKeeper
 	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
@@ -191,27 +217,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// NOTE: stakeKeeper above are passed by reference,
 	// so that it can be modified like below:
 	app.stakeKeeper = *stakeKeeper.SetHooks(app.hookHub)
+}
 
-	// register message routes
-	// need to update each module's msg type
-	app.Router().
-		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("distr", []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
-		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
-		AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper))
-
-	app.QueryRouter().
-		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
-		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
-
-	app.hookHub.
-		AddHook(stakeTrigger, 0, app.distrKeeper.Hooks()).
-		AddHook(stakeTrigger, 0, app.slashingKeeper.Hooks())
-
+func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
@@ -238,7 +246,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
+}
 
+func (app *IrisApp) registerParams() {
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
@@ -273,25 +283,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
 		&serviceparams.MinDepositMultipleParameter)
-
-	return app
-}
-
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
