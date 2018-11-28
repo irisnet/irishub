@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.26.1-rc1-iris"
-  digest = "1:08fed3beec9838cf294d87048eac763ba477e03615d8049ebcb70a00fdf78f95"
+  digest = "1:b1f99d9023889e20825ff9d27c0cd5da973bd8fdf059728d5c97cf67fed5da7d"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -678,7 +678,7 @@
 
 [[projects]]
   branch = "irisnet/v0.26.1-rc3-iris"
-  digest = "1:9397077ed8afd8204e14da7e40bed57c8b7a112d40b116484ee52a7cde994c49"
+  digest = "1:f17872c779ec9650459f273ca62f106a2bd5cd3fa75acef3c9f039bb4fcdd2c1"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -975,6 +975,7 @@
     "github.com/tendermint/tendermint/libs/db",
     "github.com/tendermint/tendermint/libs/log",
     "github.com/tendermint/tendermint/lite",
+    "github.com/tendermint/tendermint/lite/client",
     "github.com/tendermint/tendermint/lite/errors",
     "github.com/tendermint/tendermint/lite/proxy",
     "github.com/tendermint/tendermint/mempool",
