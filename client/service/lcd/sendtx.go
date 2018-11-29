@@ -2,12 +2,12 @@ package lcd
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	"net/http"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/service"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"fmt"
 	"encoding/hex"
 )
