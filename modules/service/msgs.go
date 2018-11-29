@@ -182,9 +182,6 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	if !msg.Deposit.IsValid() {
-		return sdk.ErrInvalidCoins(msg.Deposit.String())
-	}
 	if !msg.Deposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
