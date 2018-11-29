@@ -39,6 +39,8 @@ const (
 	CodeNotMatchingProvider    sdk.CodeType = 126
 	CodeInvalidReqChainId      sdk.CodeType = 127
 	CodeInvalidBindChainId     sdk.CodeType = 128
+
+	CodeIntOverflow sdk.CodeType = 129
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
