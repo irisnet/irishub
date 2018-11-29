@@ -3,7 +3,6 @@ package serviceparams
 import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/iparam"
 	"fmt"
 	"encoding/json"
 	"github.com/irisnet/irishub/codec"
@@ -11,7 +10,7 @@ import (
 
 var MaxRequestTimeoutParameter MaxRequestTimeoutParam
 
-var _ iparam.SignalParameter = (*MaxRequestTimeoutParam)(nil)
+var _ params.SignalParameter = (*MaxRequestTimeoutParam)(nil)
 
 type MaxRequestTimeoutParam struct {
 	Value      int64
@@ -74,16 +73,16 @@ func (param *MaxRequestTimeoutParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 		if param.Value <= 0{
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Invalid MaxRequestTimeout [%d] should be greater than 0",param.Value))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Invalid MaxRequestTimeout [%d] should be greater than 0",param.Value))
 		}
 		return nil
 
 	}
-	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Json is not valid"))
 }
 
 var MinDepositMultipleParameter MinDepositMultipleParam
-var _ iparam.SignalParameter = (*MinDepositMultipleParam)(nil)
+var _ params.SignalParameter = (*MinDepositMultipleParam)(nil)
 
 type MinDepositMultipleParam struct {
 	Value      int64
@@ -146,10 +145,10 @@ func (param *MinDepositMultipleParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 		if param.Value <= 0{
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be greater than 0",param.Value))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be greater than 0",param.Value))
 		}
 		return nil
 
 	}
-	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDepositMultiple, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Json is not valid"))
 }

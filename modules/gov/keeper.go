@@ -4,10 +4,10 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/tendermint/tendermint/crypto"
 	"time"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // nolint
@@ -118,7 +118,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
 
-	param.Value = iparam.ParamMapping[param.Key].ToJson(param.Value)
+	param.Value = params.ParamMapping[param.Key].ToJson(param.Value)
 
 	var proposal Proposal = &ParameterProposal{
 		textProposal,
