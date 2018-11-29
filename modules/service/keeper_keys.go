@@ -42,7 +42,7 @@ func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.Acc
 
 // Key for getting all methods on a service from the store
 func GetBindingsSubspaceKey(chainId, serviceName string) []byte {
-	return append(bindingPropertyKey, getStringsKey([]string{chainId, serviceName})...)
+	return append(append(bindingPropertyKey, getStringsKey([]string{chainId, serviceName})...), emptyByte...)
 }
 
 func GetRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {
