@@ -57,10 +57,10 @@ func (k Keeper) GetValidatorAccum(ctx sdk.Context, operatorAddr sdk.ValAddress) 
 }
 
 // withdrawal all the validator rewards including the commission
-func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.ValAddress) sdk.Error {
+func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.ValAddress) (types.DecCoins, sdk.Error) {
 
 	if !k.HasValidatorDistInfo(ctx, operatorAddr) {
-		return types.ErrNoValidatorDistInfo(k.codespace)
+		return nil, types.ErrNoValidatorDistInfo(k.codespace)
 	}
 
 	// withdraw self-delegation
@@ -75,7 +75,7 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	k.SetValidatorDistInfo(ctx, valInfo)
 
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
-	return nil
+	return withdraw, nil
 }
 
 // get all the validator rewards including the commission

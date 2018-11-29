@@ -127,10 +127,10 @@ func (k Keeper) WithdrawToDelegator(ctx sdk.Context, feePool types.FeePool,
 // NOTE: This gets called "onDelegationSharesModified",
 // meaning any changes to bonded coins
 func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress,
-	valAddr sdk.ValAddress) sdk.Error {
+	valAddr sdk.ValAddress) (types.DecCoins, sdk.Error) {
 
 	if !k.HasDelegationDistInfo(ctx, delAddr, valAddr) {
-		return types.ErrNoDelegationDistInfo(k.codespace)
+		return nil, types.ErrNoDelegationDistInfo(k.codespace)
 	}
 
 	feePool, valInfo, delInfo, withdraw :=
@@ -139,7 +139,7 @@ func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress
 	k.SetValidatorDistInfo(ctx, valInfo)
 	k.SetDelegationDistInfo(ctx, delInfo)
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
-	return nil
+	return withdraw, nil
 }
 
 // current rewards for a single delegation
@@ -157,10 +157,11 @@ func (k Keeper) CurrentDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress,
 //___________________________________________________________________________________________
 
 // return all rewards for all delegations of a delegator
-func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) {
+func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) types.DecCoins {
 	withdraw := k.withdrawDelegationRewardsAll(ctx, delAddr)
 	feePool := k.GetFeePool(ctx)
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
+	return withdraw
 }
 
 func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,

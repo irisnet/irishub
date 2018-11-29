@@ -103,7 +103,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	// withdraw all delegator & validator rewards
 	vdiIter = func(_ int64, valInfo distr.ValidatorDistInfo) (stop bool) {
-		err := app.distrKeeper.WithdrawValidatorRewardsAll(ctx, valInfo.OperatorAddr)
+		_, err := app.distrKeeper.WithdrawValidatorRewardsAll(ctx, valInfo.OperatorAddr)
 		if err != nil {
 			panic(err)
 		}
@@ -112,7 +112,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context) {
 	app.distrKeeper.IterateValidatorDistInfos(ctx, vdiIter)
 
 	ddiIter := func(_ int64, distInfo distr.DelegationDistInfo) (stop bool) {
-		err := app.distrKeeper.WithdrawDelegationReward(
+		_, err := app.distrKeeper.WithdrawDelegationReward(
 			ctx, distInfo.DelegatorAddr, distInfo.ValOperatorAddr)
 		if err != nil {
 			panic(err)
