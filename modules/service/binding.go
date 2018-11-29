@@ -4,21 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+	"time"
 )
 
 type SvcBinding struct {
-	DefName       string         `json:"def_name"`
-	DefChainID    string         `json:"def_chain_id"`
-	BindChainID   string         `json:"bind_chain_id"`
-	Provider      sdk.AccAddress `json:"provider"`
-	BindingType   BindingType    `json:"binding_type"`
-	Deposit       sdk.Coins      `json:"deposit"`
-	Prices        []sdk.Coin     `json:"price"`
-	Level         Level          `json:"level"`
-	Available     bool           `json:"available"`
-	DisableHeight int64          `json:"disable_height"`
+	DefName     string         `json:"def_name"`
+	DefChainID  string         `json:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider"`
+	BindingType BindingType    `json:"binding_type"`
+	Deposit     sdk.Coins      `json:"deposit"`
+	Prices      []sdk.Coin     `json:"price"`
+	Level       Level          `json:"level"`
+	Available   bool           `json:"available"`
+	DisableTime time.Time      `json:"disable_time"`
 }
 
 type Level struct {
@@ -27,18 +28,18 @@ type Level struct {
 }
 
 // NewSvcBinding returns a new SvcBinding with the provided values.
-func NewSvcBinding(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, available bool, disableHeight int64) SvcBinding {
+func NewSvcBinding(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level, available bool) SvcBinding {
 	return SvcBinding{
-		DefChainID:    defChainID,
-		DefName:       defName,
-		BindChainID:   bindChainID,
-		Provider:      provider,
-		BindingType:   bindingType,
-		Deposit:       deposit,
-		Prices:        prices,
-		Level:         level,
-		Available:     available,
-		DisableHeight: disableHeight,
+		DefChainID:  defChainID,
+		DefName:     defName,
+		BindChainID: bindChainID,
+		Provider:    provider,
+		BindingType: bindingType,
+		Deposit:     deposit,
+		Prices:      prices,
+		Level:       level,
+		Available:   available,
+		DisableTime: ctx.BlockHeader().Time,
 	}
 }
 
@@ -53,7 +54,7 @@ func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 		bindingA.Level.UsableTime == bindingB.Level.UsableTime &&
 		len(bindingA.Prices) == len(bindingB.Prices) &&
 		bindingA.Available == bindingB.Available &&
-		bindingA.DisableHeight == bindingB.DisableHeight {
+		bindingA.DisableTime.Equal(bindingB.DisableTime) {
 		for j, prices := range bindingA.Prices {
 			if !prices.IsEqual(bindingB.Prices[j]) {
 				return false

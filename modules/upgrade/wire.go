@@ -1,7 +1,7 @@
 package upgrade
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 )
 
 // Register concrete types on codec codec

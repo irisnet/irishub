@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/record"

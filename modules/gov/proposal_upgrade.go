@@ -2,7 +2,7 @@ package gov
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
@@ -10,6 +10,7 @@ var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
 	TextProposal
+
 }
 
 func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {

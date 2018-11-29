@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/server/mock"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/server/mock"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	"github.com/spf13/viper"

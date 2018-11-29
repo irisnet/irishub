@@ -2,15 +2,15 @@ package lcd
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"net/http"
 	"io/ioutil"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"encoding/json"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -81,6 +81,20 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(m.Tx)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if cliCtx.DryRun {
+			rawRes, err := cliCtx.Query("/app/simulate", txBytes)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			var simulationResult sdk.Result
+			if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			utils.WriteSimulationResponse(w, cliCtx, simulationResult.GasUsed, simulationResult)
 			return
 		}
 		res, err := cliCtx.BroadcastTx(txBytes)
@@ -158,11 +172,25 @@ func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			return
 		}
 
-		var res interface{}
-		if cliCtx.Async {
-			res, err = cliCtx.BroadcastTxAsync(txBytes)
-		} else {
-			res, err = cliCtx.BroadcastTx(txBytes)
+		if cliCtx.DryRun {
+			rawRes, err := cliCtx.Query("/app/simulate", txBytes)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			var simulationResult sdk.Result
+			if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			utils.WriteSimulationResponse(w, cliCtx, simulationResult.GasUsed, simulationResult)
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(txBytes)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)

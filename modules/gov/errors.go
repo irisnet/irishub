@@ -4,11 +4,11 @@ package gov
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 5
+	DefaultCodespace sdk.CodespaceType = 21
 
 	CodeUnknownProposal         sdk.CodeType = 1
 	CodeInactiveProposal        sdk.CodeType = 2

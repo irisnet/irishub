@@ -24,14 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-
-
-[[constraint]]
-  name = "github.com/cosmos/cosmos-sdk"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
-#  version = "=v0.26.0-iris"
-  branch = "irisnet/v0.26.1-rc1-iris"
-
 [[override]]
   name = "github.com/tendermint/iavl"
   version = "=v0.11.1"

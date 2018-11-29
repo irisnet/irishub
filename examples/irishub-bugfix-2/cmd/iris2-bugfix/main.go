@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/client"
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/examples/irishub-bugfix-2/app"
 	bam "github.com/irisnet/irishub/baseapp"
 
@@ -19,7 +19,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	irisInit "github.com/irisnet/irishub/init"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func main() {
@@ -86,8 +86,14 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 }
 
 func exportAppStateAndTMValidators(
-	logger log.Logger, db dbm.DB, traceStore io.Writer,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, traceStore)
+	if height != -1 {
+		err := gApp.LoadHeight(height)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
 	return gApp.ExportAppStateAndValidators()
 }

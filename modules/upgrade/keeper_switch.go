@@ -1,7 +1,7 @@
 package upgrade
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"strconv"

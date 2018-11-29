@@ -290,7 +290,7 @@ paths:
       - application/json
       parameters:
       - in: body
-        name: sendToken
+        name: stdTx
         description: sign tx
         required: true
         schema:
@@ -340,6 +340,11 @@ paths:
         description: if true, broadcast transaction asynchronously
         required: false
         type: boolean
+      - in: query
+        name: simulate
+        description: if true, perform a simulation for a transaction
+        required: false
+        type: boolean
       - in: body
         name: broadcastTxBody
         description: broadcast tx
@@ -372,6 +377,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, perform a simulation for a transaction
         required: false
         type: boolean
       - description: stdTx
@@ -528,8 +538,7 @@ paths:
         required: true
         type: string
       - in: body
-        name: account
-        description: The password of the account to remove from the KMS
+        name: transferTokens
         required: true
         schema:
           type: object

@@ -2,10 +2,10 @@ package govparams
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"

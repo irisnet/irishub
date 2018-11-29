@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
@@ -42,11 +42,21 @@ func SendOrPrintTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sd
 	}
 
 	if txCtx.SimulateGas || cliCtx.DryRun {
-		txCtx, err = EnrichCtxWithGas(txCtx, cliCtx, name, msgs)
+		var result sdk.Result
+		txCtx, result, err = EnrichCtxWithGas(txCtx, cliCtx, name, msgs)
 		if err != nil {
 			return err
 		}
 		fmt.Fprintf(os.Stderr, "estimated gas = %v\n", txCtx.Gas)
+		fmt.Fprintf(os.Stderr, "simulation code = %v\n", result.Code)
+		fmt.Fprintf(os.Stderr, "simulation log = %v\n", result.Log)
+		fmt.Fprintf(os.Stderr, "simulation gas wanted = %v\n", result.GasWanted)
+		fmt.Fprintf(os.Stderr, "simulation gas used = %v\n", result.GasUsed)
+		fmt.Fprintf(os.Stderr, "simulation fee amount = %v\n", result.FeeAmount)
+		fmt.Fprintf(os.Stderr, "simulation fee denom = %v\n", result.FeeDenom)
+		for _, tag := range result.Tags {
+			fmt.Fprintf(os.Stderr, "simulation tag %s = %s\n", string(tag.Key), string(tag.Value))
+		}
 	}
 	if cliCtx.DryRun {
 		return nil
@@ -69,27 +79,27 @@ func SendOrPrintTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sd
 
 // EnrichCtxWithGas calculates the gas estimate that would be consumed by the
 // transaction and set the transaction's respective value accordingly.
-func EnrichCtxWithGas(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (context.TxContext, error) {
-	_, adjusted, err := simulateMsgs(txCtx, cliCtx, name, msgs)
+func EnrichCtxWithGas(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (context.TxContext, sdk.Result, error) {
+	_, adjusted, result, err := simulateMsgs(txCtx, cliCtx, name, msgs)
 	if err != nil {
-		return txCtx, err
+		return txCtx, sdk.Result{}, err
 	}
-	return txCtx.WithGas(adjusted), nil
+	return txCtx.WithGas(adjusted), result, nil
 }
 
 // CalculateGas simulates the execution of a transaction and returns
 // both the estimate obtained by the query and the adjusted amount.
-func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *amino.Codec, txBytes []byte, adjustment float64) (estimate, adjusted int64, err error) {
+func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *amino.Codec, txBytes []byte, adjustment float64) (estimate, adjusted int64, simulationResult sdk.Result, err error) {
 	// run a simulation (via /app/simulate query) to
 	// estimate gas and update TxContext accordingly
 	rawRes, err := queryFunc("/app/simulate", txBytes)
 	if err != nil {
 		return
 	}
-	estimate, err = parseQueryResponse(cdc, rawRes)
-	if err != nil {
-		return
+	if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
+		return 0,0, sdk.Result{}, err
 	}
+	estimate = simulationResult.GasUsed
 	adjusted = adjustGasEstimate(estimate, adjustment)
 	return
 }
@@ -164,25 +174,17 @@ func SignStdTx(txCtx context.TxContext, cliCtx context.CLIContext, name string, 
 
 // nolint
 // SimulateMsgs simulates the transaction and returns the gas estimate and the adjusted value.
-func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted int64, err error) {
+func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted int64, result sdk.Result, err error) {
 	txBytes, err := txCtx.BuildWithPubKey(name, msgs)
 	if err != nil {
 		return
 	}
-	estimated, adjusted, err = CalculateGas(cliCtx.Query, cliCtx.Codec, txBytes, txCtx.GasAdjustment)
+	estimated, adjusted, result, err = CalculateGas(cliCtx.Query, cliCtx.Codec, txBytes, txCtx.GasAdjustment)
 	return
 }
 
 func adjustGasEstimate(estimate int64, adjustment float64) int64 {
 	return int64(adjustment * float64(estimate))
-}
-
-func parseQueryResponse(cdc *amino.Codec, rawRes []byte) (int64, error) {
-	var simulationResult sdk.Result
-	if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
-		return 0, err
-	}
-	return simulationResult.GasUsed, nil
 }
 
 func prepareTxContext(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
@@ -235,7 +237,7 @@ func buildUnsignedStdTxOffline(txCtx context.TxContext, cliCtx context.CLIContex
 			return
 		}
 
-		txCtx, err = EnrichCtxWithGas(txCtx, cliCtx, name, msgs)
+		txCtx, _, err = EnrichCtxWithGas(txCtx, cliCtx, name, msgs)
 		if err != nil {
 			return
 		}

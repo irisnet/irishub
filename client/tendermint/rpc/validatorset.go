@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"bytes"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"

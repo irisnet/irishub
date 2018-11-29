@@ -1,7 +1,7 @@
 package serviceparams
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func GetMaxRequestTimeout(ctx sdk.Context) int64 {
@@ -9,14 +9,14 @@ func GetMaxRequestTimeout(ctx sdk.Context) int64 {
 	return MaxRequestTimeoutParameter.Value
 }
 
-func GetMinProviderDeposit(ctx sdk.Context) sdk.Coins {
-	MinProviderDepositParameter.LoadValue(ctx)
-	return MinProviderDepositParameter.Value
+func GetMinDepositMultiple(ctx sdk.Context) int64 {
+	MinDepositMultipleParameter.LoadValue(ctx)
+	return MinDepositMultipleParameter.Value
 }
 
-func SetMinProviderDeposit(ctx sdk.Context, i sdk.Coins) {
-	MinProviderDepositParameter.Value = i
-	MinProviderDepositParameter.SaveValue(ctx)
+func SetMinProviderDeposit(ctx sdk.Context, i int64) {
+	MinDepositMultipleParameter.Value = i
+	MinDepositMultipleParameter.SaveValue(ctx)
 }
 
 func SetMaxRequestTimeout(ctx sdk.Context, i int64) {

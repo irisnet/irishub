@@ -1,9 +1,9 @@
 package bank
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/tendermint/tendermint/crypto"
 )

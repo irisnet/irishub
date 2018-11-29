@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/client"
@@ -79,8 +79,14 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 }
 
 func exportAppStateAndTMValidators(
-	logger log.Logger, db dbm.DB, traceStore io.Writer,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, traceStore)
+	if height != -1 {
+		err := gApp.LoadHeight(height)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
 	return gApp.ExportAppStateAndValidators()
 }

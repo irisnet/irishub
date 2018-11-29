@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/app"
-	//sdk "github.com/cosmos/cosmos-sdk/types"
+	//sdk "github.com/irisnet/irishub/types"
 	"sync"
 
 	"github.com/irisnet/irishub/modules/gov"

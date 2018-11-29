@@ -8,16 +8,16 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	distr "github.com/irisnet/irishub/modules/distribution"
 	ibc1 "github.com/irisnet/irishub/examples/irishub1/ibc"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov"
@@ -33,6 +33,9 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/arbitration/params"
+	"time"
 )
 
 const (
@@ -228,7 +231,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	var err error
 	if viper.GetBool(FlagReplay) {
-		err = app.LoadVersion(lastHeight, app.keyMain)
+		err = app.LoadVersion(lastHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}
@@ -255,18 +258,24 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
+			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinProviderDepositParameter)
+		&serviceparams.MinDepositMultipleParameter,
+		&arbitrationparams.ComplaintRetrospectParameter,
+		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	iparam.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&govparams.TallyingProcedureParameter,
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinDepositMultipleParameter)
 
 	return app
 }
@@ -287,6 +296,10 @@ func MakeCodec() *codec.Codec {
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
+}
+
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, app.keyMain, false)
 }
 
 // application updates every end block
@@ -420,7 +433,8 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		distr.ExportGenesis(ctx, app.distrKeeper),
 		gov.ExportGenesis(ctx, app.govKeeper),
 		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
-		service.WriteGenesis(ctx),
+		service.ExportGenesis(ctx),
+		arbitration.ExportGenesis(ctx),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
@@ -551,4 +565,3 @@ func (h Hooks) OnDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress, valA
 	h.dh.OnDelegationRemoved(ctx, delAddr, valAddr)
 	h.sh.OnDelegationRemoved(ctx, delAddr, valAddr)
 }
-

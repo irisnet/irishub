@@ -11,19 +11,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/server"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/modules/arbitration"
 )
 
 var (
@@ -43,31 +44,34 @@ const (
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts     []GenesisAccount      `json:"accounts"`
-	AuthData     auth.GenesisState     `json:"auth"`
-	StakeData    stake.GenesisState    `json:"stake"`
-	MintData     mint.GenesisState     `json:"mint"`
-	DistrData    distr.GenesisState    `json:"distr"`
-	GovData      gov.GenesisState      `json:"gov"`
-	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
-	SlashingData slashing.GenesisState `json:"slashing"`
-	ServiceData  service.GenesisState  `json:"service"`
-	GenTxs       []json.RawMessage     `json:"gentxs"`
+	Accounts        []GenesisAccount         `json:"accounts"`
+	AuthData        auth.GenesisState        `json:"auth"`
+	StakeData       stake.GenesisState       `json:"stake"`
+	MintData        mint.GenesisState        `json:"mint"`
+	DistrData       distr.GenesisState       `json:"distr"`
+	GovData         gov.GenesisState         `json:"gov"`
+	UpgradeData     upgrade.GenesisState     `json:"upgrade"`
+	SlashingData    slashing.GenesisState    `json:"slashing"`
+	ServiceData     service.GenesisState     `json:"service"`
+	ArbitrationData arbitration.GenesisState `json:"arbitration"`
+	GenTxs          []json.RawMessage        `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState, slashingData slashing.GenesisState) GenesisState {
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
+	arbitrationData arbitration.GenesisState, slashingData slashing.GenesisState) GenesisState {
 
 	return GenesisState{
-		Accounts:     accounts,
-		AuthData:     authData,
-		StakeData:    stakeData,
-		MintData:     mintData,
-		DistrData:    distrData,
-		GovData:      govData,
-		UpgradeData:  upgradeData,
-		ServiceData:  serviceData,
-		SlashingData: slashingData,
+		Accounts:        accounts,
+		AuthData:        authData,
+		StakeData:       stakeData,
+		MintData:        mintData,
+		DistrData:       distrData,
+		GovData:         govData,
+		UpgradeData:     upgradeData,
+		ServiceData:     serviceData,
+		ArbitrationData: arbitrationData,
+		SlashingData:    slashingData,
 	}
 }
 

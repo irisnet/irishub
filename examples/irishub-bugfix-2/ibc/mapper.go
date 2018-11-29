@@ -3,8 +3,8 @@ package ibc
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	codec "github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/irisnet/irishub/types"
+	codec "github.com/irisnet/irishub/codec"
 )
 
 // IBC Mapper

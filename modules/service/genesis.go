@@ -1,9 +1,7 @@
 package service
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"fmt"
-	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/service/params"
 )
@@ -11,57 +9,45 @@ import (
 // GenesisState - all service state that must be provided at genesis
 type GenesisState struct {
 	MaxRequestTimeout  int64
-	MinProviderDeposit sdk.Coins
+	MinDepositMultiple int64
 }
 
-func NewGenesisState(maxRequestTimeout int64, minProviderDeposit sdk.Coins) GenesisState {
+func NewGenesisState(maxRequestTimeout int64, minDepositMultiple int64) GenesisState {
 	return GenesisState{
 		MaxRequestTimeout:  maxRequestTimeout,
-		MinProviderDeposit: minProviderDeposit,
+		MinDepositMultiple: minDepositMultiple,
 	}
 }
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, data GenesisState) {
 	iparam.InitGenesisParameter(&serviceparams.MaxRequestTimeoutParameter, ctx, data.MaxRequestTimeout)
-	iparam.InitGenesisParameter(&serviceparams.MinProviderDepositParameter, ctx, data.MinProviderDeposit)
+	iparam.InitGenesisParameter(&serviceparams.MinDepositMultipleParameter, ctx, data.MinDepositMultiple)
 }
 
-// WriteGenesis - output genesis parameters
-func WriteGenesis(ctx sdk.Context) GenesisState {
+// ExportGenesis - output genesis parameters
+func ExportGenesis(ctx sdk.Context) GenesisState {
 	maxRequestTimeout := serviceparams.GetMaxRequestTimeout(ctx)
-	minProviderDeposit := serviceparams.GetMinProviderDeposit(ctx)
+	minDepositMultiple := serviceparams.GetMinDepositMultiple(ctx)
 
 	return GenesisState{
 		MaxRequestTimeout:  maxRequestTimeout,
-		MinProviderDeposit: minProviderDeposit,
+		MinDepositMultiple: minDepositMultiple,
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
-	Denom := "iris"
-	IrisCt := types.NewDefaultCoinType(Denom)
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, Denom))
-	if err != nil {
-		panic(err)
-	}
 	return GenesisState{
 		MaxRequestTimeout:  100,
-		MinProviderDeposit: sdk.Coins{minDeposit},
+		MinDepositMultiple: 1000,
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForTest() GenesisState {
-	Denom := "iris"
-	IrisCt := types.NewDefaultCoinType(Denom)
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
-	if err != nil {
-		panic(err)
-	}
 	return GenesisState{
 		MaxRequestTimeout:  10,
-		MinProviderDeposit: sdk.Coins{minDeposit},
+		MinDepositMultiple: 10,
 	}
 }
