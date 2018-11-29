@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"

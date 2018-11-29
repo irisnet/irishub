@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/cosmos/cosmos-sdk/tests"
-	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/tests"
+	"github.com/irisnet/irishub/server"
+	sdk "github.com/irisnet/irishub/types"
 	"encoding/hex"
 	"net/http"
 	"time"

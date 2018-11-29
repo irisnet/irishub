@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 //   "that's one big rat!"
@@ -38,36 +37,36 @@ func NewRat(Numerator int64, Denominator ...int64) Rat {
 	}
 }
 
-func getNumeratorDenominator(str []string, prec int) (numerator string, denom int64, err sdk.Error) {
+func getNumeratorDenominator(str []string, prec int) (numerator string, denom int64, err  Error) {
 	switch len(str) {
 	case 1:
 		if len(str[0]) == 0 {
-			return "", 0, sdk.ErrUnknownRequest("not a decimal string")
+			return "", 0,  ErrUnknownRequest("not a decimal string")
 		}
 		numerator = str[0]
 		return numerator, 1, nil
 	case 2:
 		if len(str[0]) == 0 || len(str[1]) == 0 {
-			return "", 0, sdk.ErrUnknownRequest("not a decimal string")
+			return "", 0,  ErrUnknownRequest("not a decimal string")
 		}
 		if len(str[1]) > prec {
-			return "", 0, sdk.ErrUnknownRequest("string has too many decimals")
+			return "", 0,  ErrUnknownRequest("string has too many decimals")
 		}
 		numerator = str[0] + str[1]
 		len := int64(len(str[1]))
 		denom = new(big.Int).Exp(big.NewInt(10), big.NewInt(len), nil).Int64()
 		return numerator, denom, nil
 	default:
-		return "", 0, sdk.ErrUnknownRequest("not a decimal string")
+		return "", 0,  ErrUnknownRequest("not a decimal string")
 	}
 }
 
 // create a rational from decimal string or integer string
 // precision is the number of values after the decimal point which should be read
-func NewRatFromDecimal(decimalStr string, prec int) (f Rat, err sdk.Error) {
+func NewRatFromDecimal(decimalStr string, prec int) (f Rat, err  Error) {
 	// first extract any negative symbol
 	if len(decimalStr) == 0 {
-		return f, sdk.ErrUnknownRequest("decimal string is empty")
+		return f,  ErrUnknownRequest("decimal string is empty")
 	}
 
 	neg := false
@@ -88,7 +87,7 @@ func NewRatFromDecimal(decimalStr string, prec int) (f Rat, err sdk.Error) {
 		// resort to big int, don't make this default option for efficiency
 		numBig, success := new(big.Int).SetString(numStr, 10)
 		if success != true {
-			return f, sdk.ErrUnknownRequest("not a decimal string")
+			return f,  ErrUnknownRequest("not a decimal string")
 		}
 
 		if neg {
@@ -97,7 +96,7 @@ func NewRatFromDecimal(decimalStr string, prec int) (f Rat, err sdk.Error) {
 
 		return NewRatFromBigInt(numBig, big.NewInt(denom)), nil
 	} else if errConv != nil {
-		return f, sdk.ErrUnknownRequest("not a decimal string")
+		return f,  ErrUnknownRequest("not a decimal string")
 	}
 
 	if neg {
@@ -120,7 +119,7 @@ func NewRatFromBigInt(num *big.Int, denom ...*big.Int) Rat {
 }
 
 // NewRatFromInt constructs Rat from Int
-func NewRatFromInt(num sdk.Int, denom ...sdk.Int) Rat {
+func NewRatFromInt(num  Int, denom ... Int) Rat {
 	switch len(denom) {
 	case 0:
 		return Rat{new(big.Rat).SetInt(num.BigInt())}
@@ -132,8 +131,8 @@ func NewRatFromInt(num sdk.Int, denom ...sdk.Int) Rat {
 }
 
 //nolint
-func (r Rat) Num() sdk.Int            { return sdk.NewIntFromBigInt(r.Rat.Num()) }   // Num - return the numerator
-func (r Rat) Denom() sdk.Int          { return sdk.NewIntFromBigInt(r.Rat.Denom()) } // Denom  - return the denominator
+func (r Rat) Num()  Int            { return  NewIntFromBigInt(r.Rat.Num()) }   // Num - return the numerator
+func (r Rat) Denom()  Int          { return  NewIntFromBigInt(r.Rat.Denom()) } // Denom  - return the denominator
 func (r Rat) IsZero() bool        { return r.Num().IsZero() }   // IsZero - Is the Rat equal to zero
 func (r Rat) Equal(r2 Rat) bool   { return (r.Rat).Cmp(r2.Rat) == 0 }
 func (r Rat) GT(r2 Rat) bool      { return (r.Rat).Cmp(r2.Rat) == 1 }             // greater than
@@ -208,8 +207,8 @@ func (r Rat) RoundInt64() int64 {
 }
 
 // RoundInt round the rational using bankers rounding
-func (r Rat) RoundInt() sdk.Int {
-	return sdk.NewIntFromBigInt(r.EvaluateBig())
+func (r Rat) RoundInt()  Int {
+	return  NewIntFromBigInt(r.EvaluateBig())
 }
 
 // round Rat with the provided precisionFactor

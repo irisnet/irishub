@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	recordClient "github.com/irisnet/irishub/client/record"

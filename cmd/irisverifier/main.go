@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/app"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/spf13/cobra"

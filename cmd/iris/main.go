@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/client"

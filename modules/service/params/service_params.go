@@ -1,12 +1,12 @@
 package serviceparams
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/iparam"
 	"fmt"
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 )
 
 var MaxRequestTimeoutParameter MaxRequestTimeoutParam
