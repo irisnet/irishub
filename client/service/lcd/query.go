@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	"github.com/gorilla/mux"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/client/utils"
 	cmn "github.com/irisnet/irishub/client/service"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const storeName = "service"
