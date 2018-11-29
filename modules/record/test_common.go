@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"

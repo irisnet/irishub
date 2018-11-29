@@ -6,9 +6,9 @@ import (
 	"testing"
 	"io/ioutil"
 
-	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/irisnet/irishub/tests"
 	"github.com/irisnet/irishub/app"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"strings"
@@ -63,7 +63,7 @@ func TestIrisCLIServiceDefine(t *testing.T) {
 	}
 
 	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
-	require.Equal(t, serviceName, serviceDef.Name)
+	require.Equal(t, serviceName, serviceDef.Definition.Name)
 
 	// method test
 	require.Equal(t, "SayHello", serviceDef.Methods[0].Name)

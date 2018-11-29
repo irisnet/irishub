@@ -2,12 +2,12 @@ package service
 
 import (
 	"github.com/irisnet/irishub/modules/service"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type DefOutput struct {
-	service.SvcDef
-	Methods []service.MethodProperty `json:"methods"`
+	Definition service.SvcDef           `json:"definition"`
+	Methods    []service.MethodProperty `json:"methods"`
 }
 
 type FeesOutput struct {

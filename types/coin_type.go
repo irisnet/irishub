@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"regexp"
 	"strings"
 )
@@ -94,8 +93,8 @@ func NewUnit(denom string, decimal int) Unit {
 		Decimal: decimal,
 	}
 }
-func (u Unit) GetPrecision() sdk.Int {
-	return sdk.NewIntWithDecimal(1, u.Decimal)
+func (u Unit) GetPrecision()  Int {
+	return  NewIntWithDecimal(1, u.Decimal)
 }
 
 type Units = []Unit
@@ -132,7 +131,7 @@ func (ct CoinType) Convert(orgCoinStr string, denom string) (destCoinStr string,
 }
 
 
-func (ct CoinType) ConvertToMinCoin(coinStr string) (coin sdk.Coin, err error) {
+func (ct CoinType) ConvertToMinCoin(coinStr string) (coin  Coin, err error) {
 	minUint := ct.GetMinUnit()
 
 	if destCoinStr, err := ct.Convert(coinStr, minUint.Denom); err == nil {
@@ -213,18 +212,18 @@ func GetCoin(coinStr string) (denom, amount string, err error) {
 	return
 }
 
-func parseCoin(coinStr string) (coin sdk.Coin, err error) {
+func parseCoin(coinStr string) (coin  Coin, err error) {
 	denom, amount, err := GetCoin(coinStr);
 	if err != nil {
-		return sdk.Coin{}, err
+		return  Coin{}, err
 	}
 
-	amt, ok := sdk.NewIntFromString(amount)
+	amt, ok :=  NewIntFromString(amount)
 	if !ok {
-		return sdk.Coin{}, fmt.Errorf("invalid coin amount: %s", amount)
+		return  Coin{}, fmt.Errorf("invalid coin amount: %s", amount)
 	}
 	denom = strings.ToLower(denom)
-	return sdk.NewCoin(denom, amt), nil
+	return  NewCoin(denom, amt), nil
 }
 
 func GetCoinName(coinStr string) (coinName string, err error) {

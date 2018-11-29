@@ -1,7 +1,7 @@
 package service
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/tools/protoidl"
 	"regexp"
 )
@@ -479,10 +479,10 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidBindChainId(DefaultCodespace)
 	}
 	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidReqChainId(DefaultCodespace)
+		return ErrInvalidChainId(DefaultCodespace)
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
@@ -542,13 +542,10 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidReqChainId(DefaultCodespace)
 	}
-	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
-	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	_, _, _, err := TransferRequestID(msg.RequestID)
+	_, _, _, err := ConvertRequestID(msg.RequestID)
 	if err != nil {
 		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/client"
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/examples/irishub1/app"
 	bam "github.com/irisnet/irishub/baseapp"
 
@@ -19,7 +19,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	irisInit "github.com/irisnet/irishub/init"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func main() {

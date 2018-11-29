@@ -1,7 +1,7 @@
 package service
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"fmt"
 )
 
@@ -38,6 +38,7 @@ const (
 	CodeSvcBindingNotAvailable sdk.CodeType = 125
 	CodeNotMatchingProvider    sdk.CodeType = 126
 	CodeInvalidReqChainId      sdk.CodeType = 127
+	CodeInvalidBindChainId     sdk.CodeType = 128
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -171,4 +172,8 @@ func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress
 
 func ErrInvalidReqChainId(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidReqChainId, fmt.Sprintf("request chain id is empty"))
+}
+
+func ErrInvalidBindChainId(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidBindChainId, fmt.Sprintf("bind chain id is empty"))
 }

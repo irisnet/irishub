@@ -2,10 +2,10 @@ package simulation
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/stake/keeper"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/simulation/mock/simulation"

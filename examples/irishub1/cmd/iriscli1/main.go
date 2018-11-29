@@ -1,7 +1,7 @@
 package main
 
 import (
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/examples/irishub1/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
@@ -16,7 +16,7 @@ import (
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	irisInit "github.com/irisnet/irishub/init"
 )
 

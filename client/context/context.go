@@ -3,16 +3,16 @@ package context
 import (
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client"
 
 	"bytes"
 	"fmt"
 	"os"
 
-	cskeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/types"
+	cskeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"

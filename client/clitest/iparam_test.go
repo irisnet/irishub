@@ -2,7 +2,7 @@ package clitest
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
 	"testing"
 

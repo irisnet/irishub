@@ -3,7 +3,7 @@ package record
 import (
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/record"
 )

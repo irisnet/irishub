@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bartekn/go-bip39"
-	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/hd"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/crypto/keys/hd"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/pkg/errors"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/app"

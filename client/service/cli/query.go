@@ -4,13 +4,13 @@ import (
 	"os"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	cmn "github.com/irisnet/irishub/client/service"
 )
 
@@ -39,19 +39,19 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			var svcDef service.SvcDef
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcDef)
 
-			res2, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
+			res1, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
 			if err != nil {
 				return err
 			}
 
 			var methods []service.MethodProperty
-			for i := 0; i < len(res2); i++ {
+			for _, re := range res1 {
 				var method service.MethodProperty
-				cdc.MustUnmarshalBinaryLengthPrefixed(res2[i].Value, &method)
+				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &method)
 				methods = append(methods, method)
 			}
 
-			output, err := codec.MarshalJSONIndent(cdc, cmn.DefOutput{SvcDef: svcDef, Methods: methods})
+			output, err := codec.MarshalJSONIndent(cdc, cmn.DefOutput{Definition: svcDef, Methods: methods})
 			if err != nil {
 				return err
 			}
@@ -95,6 +95,9 @@ func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			var svcBinding service.SvcBinding
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcBinding)
 			output, err := codec.MarshalJSONIndent(cdc, svcBinding)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(output))
 			return nil
 		},
@@ -125,14 +128,16 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var bindings []service.SvcBinding
-			for i := 0; i < len(res); i++ {
-
+			for _, re := range res {
 				var binding service.SvcBinding
-				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &binding)
+				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &binding)
 				bindings = append(bindings, binding)
 			}
 
-			output, err := cdc.MarshalJSONIndent(bindings, "", "")
+			output, err := codec.MarshalJSONIndent(cdc, bindings)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(output))
 			return nil
 		},
@@ -169,14 +174,16 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var reqs []service.SvcRequest
-			for i := 0; i < len(res); i++ {
-
+			for _, re := range res {
 				var req service.SvcRequest
-				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &req)
+				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &req)
 				reqs = append(reqs, req)
 			}
 
-			output, err := cdc.MarshalJSONIndent(reqs, "", "")
+			output, err := codec.MarshalJSONIndent(cdc, reqs)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(output))
 			return nil
 		},
@@ -201,7 +208,7 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 			reqChainId := viper.GetString(FlagReqChainId)
 			reqId := viper.GetString(FlagReqId)
 
-			eHeight, rHeight, counter, err := service.TransferRequestID(reqId)
+			eHeight, rHeight, counter, err := service.ConvertRequestID(reqId)
 			if err != nil {
 				return err
 			}
@@ -217,7 +224,10 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 				fmt.Println(NULL)
 				return nil
 			}
-			output, err := cdc.MarshalJSONIndent(resp, "", "")
+			output, err := codec.MarshalJSONIndent(cdc, resp)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(output))
 			return nil
 		},
@@ -233,7 +243,7 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 		Use:     "fees",
 		Short:   "Query return and incoming fee of a particular address",
 		Example: "iriscli service fees <account address>",
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
@@ -262,7 +272,10 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res1, &incomingFee)
 			}
 
-			output, err := cdc.MarshalJSONIndent(cmn.FeesOutput{ReturnedFee: returnedFee.Coins, IncomingFee: incomingFee.Coins}, "", "")
+			output, err := codec.MarshalJSONIndent(cdc, cmn.FeesOutput{ReturnedFee: returnedFee.Coins, IncomingFee: incomingFee.Coins})
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(output))
 			return nil
 		},

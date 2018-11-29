@@ -7,17 +7,19 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/record"
@@ -30,10 +32,8 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
-	"github.com/irisnet/irishub/client"
+	"bufio"
 )
 
 const (
@@ -123,6 +123,32 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		lastHeight = bam.Replay(app.Logger)
 	}
 
+	app.initKeeper()
+	app.wireRouterForAllVersion()
+	app.mountStoreAndSetupBaseApp(lastHeight)
+	app.registerParams()
+
+	return app
+}
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
+}
+
+func (app *IrisApp) initKeeper() {
 	// define the AccountKeeper
 	app.accountMapper = auth.NewAccountKeeper(
 		app.cdc,
@@ -192,27 +218,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	// NOTE: stakeKeeper above are passed by reference,
 	// so that it can be modified like below:
 	app.stakeKeeper = *stakeKeeper.SetHooks(app.hookHub)
+}
 
-	// register message routes
-	// need to update each module's msg type
-	app.Router().
-		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount, app.keyMint, app.keyDistr}, stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("distr", []*sdk.KVStoreKey{app.keyDistr}, distr.NewHandler(app.distrKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
-		AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
-		AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper))
-
-	app.QueryRouter().
-		AddRoute("gov", gov.NewQuerier(app.govKeeper)).
-		AddRoute("stake", stake.NewQuerier(app.stakeKeeper, app.cdc))
-
-	app.hookHub.
-		AddHook(stakeTrigger, 0, app.distrKeeper.Hooks()).
-		AddHook(stakeTrigger, 0, app.slashingKeeper.Hooks())
-
+func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
@@ -233,16 +241,16 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	} else if viper.GetInt64(FlagReplayHeight) > 0 {
 		replayHeight := viper.GetInt64(FlagReplayHeight)
 		loadHeight := int64(0)
-		logger.Info("Please make sure the replay height is less than block height")
+		app.Logger.Info("Please make sure the replay height is less than block height")
 		if replayHeight >= DefaultSyncableHeight {
 			loadHeight = replayHeight - replayHeight % DefaultSyncableHeight
 		} else {
 			// version 1 will always be kept
 			loadHeight = 1
 		}
-		logger.Info("This replay operation will change the application store, please spare your node home directory first")
-		logger.Info("Confirm that:(y/n)")
-		input, err := client.BufferStdin().ReadString('\n')
+		app.Logger.Info("This replay operation will change the application store, please spare your node home directory first")
+		app.Logger.Info("Confirm that:(y/n)")
+		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if err != nil {
 			cmn.Exit(err.Error())
 		}
@@ -250,7 +258,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		if confirm != "y" && confirm != "yes" {
 			cmn.Exit("Abort replay operation")
 		}
-		logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
 		err = app.LoadVersion(loadHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
@@ -261,7 +269,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
+}
 
+func (app *IrisApp) registerParams() {
 	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
@@ -296,25 +306,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
 		&serviceparams.MinDepositMultipleParameter)
-
-	return app
-}
-
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {

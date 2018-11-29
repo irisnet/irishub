@@ -3,20 +3,19 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	stake "github.com/cosmos/cosmos-sdk/x/stake"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/codec"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // export the state of gaia for a genesis file
@@ -104,7 +103,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	// withdraw all delegator & validator rewards
 	vdiIter = func(_ int64, valInfo distr.ValidatorDistInfo) (stop bool) {
-		_, err := app.distrKeeper.WithdrawValidatorRewardsAll(ctx, valInfo.OperatorAddr)
+		err := app.distrKeeper.WithdrawValidatorRewardsAll(ctx, valInfo.OperatorAddr)
 		if err != nil {
 			panic(err)
 		}
@@ -113,7 +112,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context) {
 	app.distrKeeper.IterateValidatorDistInfos(ctx, vdiIter)
 
 	ddiIter := func(_ int64, distInfo distr.DelegationDistInfo) (stop bool) {
-		_, err := app.distrKeeper.WithdrawDelegationReward(
+		err := app.distrKeeper.WithdrawDelegationReward(
 			ctx, distInfo.DelegatorAddr, distInfo.ValOperatorAddr)
 		if err != nil {
 			panic(err)

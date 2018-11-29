@@ -2,7 +2,7 @@ package version
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
 )
 
