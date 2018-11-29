@@ -19,7 +19,6 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/service"
