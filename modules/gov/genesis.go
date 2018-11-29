@@ -3,10 +3,10 @@ package gov
 import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
 	"time"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // GenesisState - all gov state that must be provided at genesis
@@ -55,9 +55,9 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 	//k.setDepositProcedure(ctx, data.DepositProcedure)
 	////////////////////  iris begin  ///////////////////////////
-	iparam.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
-	iparam.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
-	iparam.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
+	params.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
+	params.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
+	params.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
 	////////////////////  iris end  /////////////////////////////
 	for _, deposit := range data.Deposits {
 		k.setDeposit(ctx, deposit.ProposalID, deposit.Deposit.Depositor, deposit.Deposit)

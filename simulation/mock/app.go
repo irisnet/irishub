@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/types"
@@ -134,7 +133,7 @@ func NewApp() *App {
 	// Not sealing for custom extension
 
 	// init iparam
-	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
@@ -152,7 +151,7 @@ func NewApp() *App {
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
-	iparam.RegisterGovParamMapping(
+	params.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)

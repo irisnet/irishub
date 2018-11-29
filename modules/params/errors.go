@@ -1,4 +1,4 @@
-package iparam
+package params
 
 import (
 	sdk "github.com/irisnet/irishub/types"

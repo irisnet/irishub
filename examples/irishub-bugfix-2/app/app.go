@@ -242,7 +242,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	upgrade.RegisterModuleList(app.Router())
 	app.upgradeKeeper.RefreshVersionList(app.GetKVStore(app.keyUpgrade))
 
-	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
+	params.SetParamReadWriter(app.paramsKeeper.Subspace(params.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
@@ -252,7 +252,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&upgradeparams.ProposalAcceptHeightParameter,
 		&upgradeparams.SwitchPeriodParameter)
 
-	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+	params.SetParamReadWriter(app.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
@@ -270,7 +270,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
-	iparam.RegisterGovParamMapping(
+	params.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,

@@ -2,8 +2,8 @@ package service
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // GenesisState - all service state that must be provided at genesis
@@ -21,8 +21,8 @@ func NewGenesisState(maxRequestTimeout int64, minDepositMultiple int64) GenesisS
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, data GenesisState) {
-	iparam.InitGenesisParameter(&serviceparams.MaxRequestTimeoutParameter, ctx, data.MaxRequestTimeout)
-	iparam.InitGenesisParameter(&serviceparams.MinDepositMultipleParameter, ctx, data.MinDepositMultiple)
+	params.InitGenesisParameter(&serviceparams.MaxRequestTimeoutParameter, ctx, data.MaxRequestTimeout)
+	params.InitGenesisParameter(&serviceparams.MinDepositMultipleParameter, ctx, data.MinDepositMultiple)
 }
 
 // ExportGenesis - output genesis parameters

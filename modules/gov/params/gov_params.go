@@ -6,7 +6,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/types"
 	"strconv"
 	"time"
@@ -17,7 +16,7 @@ var DepositProcedureParameter DepositProcedureParam
 const LOWER_BOUND_AMOUNT = 10
 const UPPER_BOUND_AMOUNT = 10000
 const THREE_DAYS = 3*3600*24
-var _ iparam.GovParameter = (*DepositProcedureParam)(nil)
+var _ params.GovParameter = (*DepositProcedureParam)(nil)
 
 type ParamSet struct {
 	DepositProcedure  DepositProcedure  `json:"Gov/govDepositProcedure"`
@@ -102,29 +101,29 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.MinDeposit[0].Denom != "iris-atto" {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto!"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto!"))
 		}
 
 		LowerBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, "iris"))
 		UpperBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, "iris"))
 
 		if param.Value.MinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.MinDeposit[0].Amount.GT(UpperBound.Amount) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
 
 		}
 
 		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
 
 	}
-	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDeposit, fmt.Sprintf("Json is not valid"))
 }
 
 var VotingProcedureParameter VotingProcedureParam
-var _ iparam.GovParameter = (*VotingProcedureParam)(nil)
+var _ params.GovParameter = (*VotingProcedureParam)(nil)
 
 // Procedure around Voting in governance
 type VotingProcedure struct {
@@ -197,17 +196,17 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
 
 	}
-	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVotingProcedure, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingProcedure, fmt.Sprintf("Json is not valid"))
 }
 
 var TallyingProcedureParameter TallyingProcedureParam
-var _ iparam.GovParameter = (*TallyingProcedureParam)(nil)
+var _ params.GovParameter = (*TallyingProcedureParam)(nil)
 
 // Procedure around Tallying votes in governance
 type TallyingProcedure struct {
@@ -286,17 +285,17 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.Threshold.LTE(sdk.ZeroDec()) || param.Value.Threshold.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidThreshold, fmt.Sprintf("Invalid Threshold ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid Threshold ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
 		}
 		if param.Value.Participation.LTE(sdk.ZeroDec()) || param.Value.Participation.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidParticipation, fmt.Sprintf("Invalid participation ( "+param.Value.Participation.String()+" ) should be between 0 and 1"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid participation ( "+param.Value.Participation.String()+" ) should be between 0 and 1"))
 		}
 		if param.Value.Veto.LTE(sdk.ZeroDec()) || param.Value.Veto.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
 		}
 
 		return nil
 
 	}
-	return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidTallyingProcedure, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidTallyingProcedure, fmt.Sprintf("Json is not valid"))
 }
