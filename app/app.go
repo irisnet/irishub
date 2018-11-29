@@ -18,7 +18,6 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/gov"
@@ -249,7 +248,7 @@ func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 }
 
 func (app *IrisApp) registerParams() {
-	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.SignalParamspace).WithTypeTable(
+	params.SetParamReadWriter(app.paramsKeeper.Subspace(params.SignalParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
 			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
@@ -259,7 +258,7 @@ func (app *IrisApp) registerParams() {
 		&upgradeparams.ProposalAcceptHeightParameter,
 		&upgradeparams.SwitchPeriodParameter)
 
-	iparam.SetParamReadWriter(app.paramsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+	params.SetParamReadWriter(app.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
@@ -277,7 +276,7 @@ func (app *IrisApp) registerParams() {
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
-	iparam.RegisterGovParamMapping(
+	params.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,

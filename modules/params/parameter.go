@@ -1,9 +1,8 @@
-package iparam
+package params
 
 import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 const (
@@ -16,7 +15,7 @@ type Parameter interface {
 
 	GetStoreKey() []byte
 
-	SetReadWriter(paramSpace params.Subspace)
+	SetReadWriter(paramSpace Subspace)
 
 	SaveValue(ctx sdk.Context)
 

@@ -2,14 +2,13 @@ package arbitrationparams
 
 import (
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/iparam"
 	sdk "github.com/irisnet/irishub/types"
 	"time"
 )
 
 var ComplaintRetrospectParameter ComplaintRetrospectParam
 
-var _ iparam.SignalParameter = (*ComplaintRetrospectParam)(nil)
+var _ params.SignalParameter = (*ComplaintRetrospectParam)(nil)
 
 type ComplaintRetrospectParam struct {
 	Value      time.Duration
@@ -42,7 +41,7 @@ func (param *ComplaintRetrospectParam) LoadValue(ctx sdk.Context) bool {
 
 var ArbitrationTimelimitParameter ArbitrationTimelimitParam
 
-var _ iparam.SignalParameter = (*ArbitrationTimelimitParam)(nil)
+var _ params.SignalParameter = (*ArbitrationTimelimitParam)(nil)
 
 type ArbitrationTimelimitParam struct {
 	Value      time.Duration
