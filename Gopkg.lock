@@ -70,7 +70,7 @@
 
 [[projects]]
   branch = "irisnet/v0.26.1-rc1-iris"
-  digest = "1:b1f99d9023889e20825ff9d27c0cd5da973bd8fdf059728d5c97cf67fed5da7d"
+  digest = "1:7f65bf3e40cfa8ff00f0b9e34aab9b5015d2301e9cd333f07f93ef11ebb59ed2"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -114,8 +114,8 @@
     "x/stake/types",
   ]
   pruneopts = "UT"
-  revision = "2da54bffce52e3a1f50ec992ae8ad0da8e029f85"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
+  revision = "123bfa2296897c86a221c4a22ec81fdd64e6efa8"
+  source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
 
 [[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"
@@ -669,12 +669,13 @@
   version = "v0.14.0"
 
 [[projects]]
-  digest = "1:9f8c4c93658315a795ffd3e0c943d39f78067dd8382b8d7bcfaf6686b92f3978"
+  branch = "irisnet/v0.11.1-iris"
+  digest = "1:73fb794c1e807dbb5850a3481e52e3cd79330e9ff006df861e5ac80d659b9596"
   name = "github.com/tendermint/iavl"
   packages = ["."]
   pruneopts = "UT"
-  revision = "fa74114f764f9827c4ad5573f990ed25bf8c4bac"
-  version = "v0.11.1"
+  revision = "b0affbe26c39ae9e50bcf8127d124d160a1f156f"
+  source = "https://github.com/HaoyangLiu/iavl.git"
 
 [[projects]]
   branch = "irisnet/v0.26.1-rc3-iris"
@@ -744,8 +745,8 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "e1bfbff15b53a0dc96b862c5c1f23fe8eff7956d"
-  source = "https://github.com/irisnet/tendermint.git"
+  revision = "98edbfe2fbb1144336494dceba60581dc12ded66"
+  source = "https://github.com/HaoyangLiu/tendermint.git"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"

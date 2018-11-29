@@ -35,11 +35,14 @@ import (
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
+	"github.com/irisnet/irishub/client"
 )
 
 const (
 	appName    = "IrisApp"
 	FlagReplay = "replay"
+	FlagReplayHeight = "replay_height"
+	DefaultSyncableHeight = 10000
 )
 
 // default home directories for expected binaries
@@ -229,6 +232,28 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain, true)
+	} else if viper.GetInt64(FlagReplayHeight) > 0 {
+		replayHeight := viper.GetInt64(FlagReplayHeight)
+		loadHeight := int64(0)
+		logger.Info("Please make sure the replay height is less than block height")
+		if replayHeight >= DefaultSyncableHeight {
+			loadHeight = replayHeight - replayHeight % DefaultSyncableHeight
+		} else {
+			// version 1 will always be kept
+			loadHeight = 1
+		}
+		logger.Info("This replay operation will change the application store, please spare your node home directory first")
+		logger.Info("Confirm that:(y/n)")
+		input, err := client.BufferStdin().ReadString('\n')
+		if err != nil {
+			cmn.Exit(err.Error())
+		}
+		confirm := strings.TrimSpace(input)
+		if confirm != "y" && confirm != "yes" {
+			cmn.Exit("Abort replay operation")
+		}
+		logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+		err = app.LoadVersion(loadHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}

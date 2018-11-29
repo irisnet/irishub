@@ -28,17 +28,19 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
+  source = "https://github.com/HaoyangLiu/cosmos-sdk.git"
 #  version = "=v0.26.0-iris"
   branch = "irisnet/v0.26.1-rc1-iris"
 
 [[override]]
   name = "github.com/tendermint/iavl"
-  version = "=v0.11.1"
+#  version = "=v0.11.1"
+  source = "https://github.com/HaoyangLiu/iavl.git"
+  branch = "irisnet/v0.11.1-iris"
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  source = "https://github.com/irisnet/tendermint.git"
+  source = "https://github.com/HaoyangLiu/tendermint.git"
 #  version = "=v0.26.1-rc0-iris"
   branch = "irisnet/v0.26.1-rc3-iris"
 

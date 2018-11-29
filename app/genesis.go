@@ -352,18 +352,19 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 		}
 	}
 	accountCoins = append(accountCoins, nativeCoin)
-	if accountCoins.IsZero() {
-		panic("invalid genesis file, found account without any token")
-	}
 	return accountCoins
 }
 
 func ConvertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 	var genesisAccounts []GenesisAccount
 	for _, gacc := range genesisFileState.Accounts {
+		coins := normalizeNativeToken(gacc.Coins)
+		if coins.IsZero() {
+			continue
+		}
 		acc := GenesisAccount{
 			Address:       gacc.Address,
-			Coins:         normalizeNativeToken(gacc.Coins),
+			Coins:         coins,
 			AccountNumber: gacc.AccountNumber,
 			Sequence:      gacc.Sequence,
 		}
