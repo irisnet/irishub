@@ -17,6 +17,7 @@ import (
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
+	tenderminttxverify "github.com/irisnet/irishub/client/tendermint/stateverification"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
@@ -54,7 +55,7 @@ func main() {
 		tenderminttxcmd.SearchTxCmd(cdc),
 		tendermintrpccmd.BlockCommand(),
 		tendermintrpccmd.ValidatorCommand(),
-		tendermintrpccmd.VerifyExportState(cdc),
+		tenderminttxverify.VerifyExportState(cdc),
 	)
 	rootCmd.AddCommand(tendermintCmd)
 	rootCmd.AddCommand(client.LineBreak)
