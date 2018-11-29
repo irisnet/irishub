@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -31,7 +30,6 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
@@ -436,52 +434,6 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}
-}
-
-// export the state of iris for a genesis file
-func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
-	ctx := app.NewContext(true, abci.Header{})
-
-	// iterate to get the accounts
-	accounts := []GenesisAccount{}
-	appendAccount := func(acc auth.Account) (stop bool) {
-		account := NewGenesisAccountI(acc)
-		accounts = append(accounts, account)
-		return false
-	}
-	app.accountMapper.IterateAccounts(ctx, appendAccount)
-	fileAccounts := []GenesisFileAccount{}
-	for _, acc := range accounts {
-		var coinsString []string
-		for _, coin := range acc.Coins {
-			coinsString = append(coinsString, coin.String())
-		}
-		fileAccounts = append(fileAccounts,
-			GenesisFileAccount{
-				Address:       acc.Address,
-				Coins:         coinsString,
-				Sequence:      acc.Sequence,
-				AccountNumber: acc.AccountNumber,
-			})
-	}
-	genState := NewGenesisFileState(
-		fileAccounts,
-		auth.ExportGenesis(ctx, app.feeCollectionKeeper),
-		stake.ExportGenesis(ctx, app.stakeKeeper),
-		mint.ExportGenesis(ctx, app.mintKeeper),
-		distr.ExportGenesis(ctx, app.distrKeeper),
-		gov.ExportGenesis(ctx, app.govKeeper),
-		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
-		service.ExportGenesis(ctx),
-		arbitration.ExportGenesis(ctx),
-		slashing.ExportGenesis(ctx, app.slashingKeeper),
-	)
-	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
-	if err != nil {
-		return nil, nil, err
-	}
-	validators = stake.WriteValidators(ctx, app.stakeKeeper)
-	return appState, validators, nil
 }
 
 // Iterates through msgs and executes them
