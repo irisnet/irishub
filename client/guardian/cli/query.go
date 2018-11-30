@@ -13,7 +13,7 @@ import (
 
 func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "guardian",
+		Use:     "profilers",
 		Short:   "Query for all profilers",
 		Example: "iriscli guardian profilers",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -29,7 +29,7 @@ func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &profiler)
 				profilers = append(profilers, profiler)
 			}
-			output, err := codec.MarshalJSONIndent(cdc,profilers)
+			output, err := codec.MarshalJSONIndent(cdc, profilers)
 			fmt.Println(string(output))
 			return nil
 		},
@@ -39,7 +39,7 @@ func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryTrustees(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "guardian",
+		Use:     "trustees",
 		Short:   "Query for all trustees",
 		Example: "iriscli guardian trustees",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -49,13 +49,13 @@ func GetCmdQueryTrustees(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var profilers []guardian.Profiler
+			var trustees []guardian.Trustee
 			for i := 0; i < len(res); i++ {
-				var profiler guardian.Profiler
-				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &profiler)
-				profilers = append(profilers, profiler)
+				var trustee guardian.Trustee
+				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &trustee)
+				trustees = append(trustees, trustee)
 			}
-			output, err := codec.MarshalJSONIndent(cdc,profilers)
+			output, err := codec.MarshalJSONIndent(cdc, trustees)
 			fmt.Println(string(output))
 			return nil
 		},

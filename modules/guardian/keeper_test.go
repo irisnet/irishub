@@ -13,3 +13,12 @@ func TestKeeper_AddProfiler(t *testing.T) {
 	require.True(t, found)
 	require.True(t, ProfilerEqual(profiler, AddedProfiler))
 }
+
+func TestKeeper_AddTrustee(t *testing.T) {
+	ctx, keeper := createTestInput(t)
+	trustee := NewTrustee(addrs[0])
+	keeper.AddTrustee(ctx, trustee)
+	AddedTrustee, found := keeper.GetTrustee(ctx, addrs[0])
+	require.True(t, found)
+	require.True(t, TrusteeEqual(trustee, AddedTrustee))
+}

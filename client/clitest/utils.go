@@ -22,6 +22,7 @@ import (
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
+	servicecli "github.com/irisnet/irishub/client/service"
 	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
@@ -122,7 +123,7 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
-	genesisState.ProfilingData = guardian.DefaultGenesisStateForTest()
+	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
 	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
@@ -132,7 +133,7 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 			Addr:      genesisState.Accounts[0].Address,
 			AddedAddr: genesisState.Accounts[0].Address,
 		}
-		genesisState.ProfilingData.Profilers[0] = profiler
+		genesisState.GuardianData.Profilers[0] = profiler
 	}
 
 	return genesisState

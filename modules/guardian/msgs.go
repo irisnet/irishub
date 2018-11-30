@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-const MsgType = "profiling"
+const MsgType = "guardian"
 
 //______________________________________________________________________
 // MsgAddProfiler - struct for add a profiler

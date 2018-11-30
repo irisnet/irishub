@@ -69,7 +69,7 @@ type IrisApp struct {
 	tkeyParams       *sdk.TransientStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 	keyService       *sdk.KVStoreKey
-	keyProfiling     *sdk.KVStoreKey
+	keyGuardian      *sdk.KVStoreKey
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -84,7 +84,7 @@ type IrisApp struct {
 	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
 	serviceKeeper       service.Keeper
-	profilingKeeper     guardian.Keeper
+	guardianKeeper      guardian.Keeper
 	recordKeeper        record.Keeper
 
 	// fee manager
@@ -117,7 +117,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		keyService:       sdk.NewKVStoreKey("service"),
-		keyProfiling:     sdk.NewKVStoreKey("profiling"),
+		keyGuardian:      sdk.NewKVStoreKey("guardian"),
 	}
 
 	var lastHeight int64
@@ -211,9 +211,9 @@ func (app *IrisApp) initKeeper() {
 		app.bankKeeper,
 		service.DefaultCodespace,
 	)
-	app.profilingKeeper = guardian.NewKeeper(
+	app.guardianKeeper = guardian.NewKeeper(
 		app.cdc,
-		app.keyProfiling,
+		app.keyGuardian,
 		guardian.DefaultCodespace,
 	)
 	app.upgradeKeeper = upgrade.NewKeeper(
@@ -233,7 +233,7 @@ func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 
 	// initialize BaseApp
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyStake, app.keySlashing, app.keyGov, app.keyMint, app.keyDistr,
-		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyService, app.keyProfiling)
+		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyService, app.keyGuardian)
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
@@ -407,7 +407,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	service.InitGenesis(ctx, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
-	guardian.InitGenesis(ctx, app.profilingKeeper, genesisState.ProfilingData)
+	guardian.InitGenesis(ctx, app.guardianKeeper, genesisState.GuardianData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,
@@ -450,7 +450,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
 		service.ExportGenesis(ctx),
 		arbitration.ExportGenesis(ctx),
-		guardian.ExportGenesis(ctx, app.profilingKeeper),
+		guardian.ExportGenesis(ctx, app.guardianKeeper),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)

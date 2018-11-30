@@ -243,9 +243,16 @@ func initGenFiles(
 			Addr:      appGenState.Accounts[0].Address,
 			AddedAddr: appGenState.Accounts[0].Address,
 		}
-		appGenState.ProfilingData.Profilers[0] = profiler
+		appGenState.GuardianData.Profilers[0] = profiler
 	}
 
+	// genesis add a trustee
+	if len(appGenState.Accounts) > 0 {
+		trustee := guardian.Trustee{
+			Addr: appGenState.Accounts[0].Address,
+		}
+		appGenState.GuardianData.Trustees[0] = trustee
+	}
 
 	appGenStateJSON, err := codec.MarshalJSONIndent(cdc, appGenState)
 	if err != nil {

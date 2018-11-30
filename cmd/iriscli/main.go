@@ -212,12 +212,13 @@ func main() {
 
 	//add profiling command
 	profilingCmd := &cobra.Command{
-		Use:   "profiling",
-		Short: "Profiling subcommands",
+		Use:   "guardian",
+		Short: "Guardian subcommands",
 	}
 	profilingCmd.AddCommand(
 		client.GetCommands(
-			profilingcmd.GetCmdQueryProfilers("profiling", cdc),
+			profilingcmd.GetCmdQueryProfilers("guardian", cdc),
+			profilingcmd.GetCmdQueryTrustees("guardian", cdc),
 		)...)
 
 	profilingCmd.AddCommand(
