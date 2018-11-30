@@ -69,7 +69,7 @@ type IrisApp struct {
 	tkeyParams       *sdk.TransientStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 	keyService       *sdk.KVStoreKey
-	KeyProfiling     *sdk.KVStoreKey
+	keyProfiling     *sdk.KVStoreKey
 	keyRecord        *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
@@ -117,7 +117,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		keyService:       sdk.NewKVStoreKey("service"),
-		KeyProfiling:     sdk.NewKVStoreKey("profiling"),
+		keyProfiling:     sdk.NewKVStoreKey("profiling"),
 	}
 
 	var lastHeight int64
@@ -213,7 +213,7 @@ func (app *IrisApp) initKeeper() {
 	)
 	app.profilingKeeper = profiling.NewKeeper(
 		app.cdc,
-		app.KeyProfiling,
+		app.keyProfiling,
 		profiling.DefaultCodespace,
 	)
 	app.upgradeKeeper = upgrade.NewKeeper(
@@ -233,7 +233,7 @@ func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 
 	// initialize BaseApp
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyStake, app.keySlashing, app.keyGov, app.keyMint, app.keyDistr,
-		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyService, app.KeyProfiling)
+		app.keyFeeCollection, app.keyParams, app.keyUpgrade, app.keyRecord, app.keyService, app.keyProfiling)
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))

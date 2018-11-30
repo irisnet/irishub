@@ -14,7 +14,7 @@ import (
 func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "profilers",
-		Short:   "Query for all service profilers",
+		Short:   "Query for all profilers",
 		Example: "iriscli profiling profilers",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).

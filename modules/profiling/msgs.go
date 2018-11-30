@@ -2,6 +2,7 @@ package profiling
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"regexp"
 )
 
 const MsgType = "profiling"
@@ -22,7 +23,7 @@ func NewMsgAddProfiler(addr, addedAddr sdk.AccAddress, name string) MsgAddProfil
 	}
 }
 func (msg MsgAddProfiler) Route() string { return MsgType }
-func (msg MsgAddProfiler) Type() string  { return "service add-profiler" }
+func (msg MsgAddProfiler) Type() string  { return "profiling add-profiler" }
 func (msg MsgAddProfiler) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
@@ -30,7 +31,11 @@ func (msg MsgAddProfiler) GetSignBytes() []byte {
 	}
 	return sdk.MustSortJSON(b)
 }
+
 func (msg MsgAddProfiler) ValidateBasic() sdk.Error {
+	if !validName(msg.Name) {
+		return ErrInvalidProfilerName(DefaultCodespace, msg.Name)
+	}
 	if len(msg.Addr) == 0 {
 		return sdk.ErrInvalidAddress(msg.Addr.String())
 	}
@@ -39,6 +44,19 @@ func (msg MsgAddProfiler) ValidateBasic() sdk.Error {
 	}
 	return nil
 }
+
 func (msg MsgAddProfiler) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AddedAddr}
+}
+
+//______________________________________________________________________
+
+func validName(name string) bool {
+	if len(name) == 0 || len(name) > 128 {
+		return false
+	}
+
+	// Must contain alphanumeric characters, _ and - only
+	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+	return !reg.Match([]byte(name))
 }

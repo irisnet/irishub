@@ -39,7 +39,7 @@ func (app *IrisApp) wireRouterForVerion(version int) {
 			AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
 			AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
 			AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper)).
-			AddRoute("profiling", []*sdk.KVStoreKey{app.KeyProfiling}, profiling.NewHandler(app.profilingKeeper))
+			AddRoute("profiling", []*sdk.KVStoreKey{app.keyProfiling}, profiling.NewHandler(app.profilingKeeper))
 
 		app.QueryRouter().
 			AddRoute("gov", gov.NewQuerier(app.govKeeper)).

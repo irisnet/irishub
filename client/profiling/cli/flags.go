@@ -15,6 +15,6 @@ var (
 )
 
 func init() {
-	FsProfilerAddress.String(FlagProfilerAddress, "", "bech address of the profiler")
+	FsProfilerAddress.String(FlagProfilerAddress, "", "bech32 encoded account of the profiler")
 	FsProfilerName.String(FlagProfilerName, "", "name of the profiler")
 }
