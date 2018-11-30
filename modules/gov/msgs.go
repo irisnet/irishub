@@ -3,8 +3,8 @@ package gov
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // name to idetify transaction types
@@ -21,11 +21,16 @@ type MsgSubmitProposal struct {
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
 	////////////////////  iris begin  ///////////////////////////
-	Param          Param
+	Param Param
+
+	ProtocolID   uint64
+	Url          string
+	SwitchPeriod int64
 	////////////////////  iris end  /////////////////////////////
 }
 
-func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, param Param) MsgSubmitProposal {
+func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins,
+	param Param, protocolID uint64, Url string, SwitchPeriod int64) MsgSubmitProposal {
 	return MsgSubmitProposal{
 		Title:          title,
 		Description:    description,
@@ -33,7 +38,11 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
 		////////////////////  iris begin  ///////////////////////////
-		Param:          param,
+		Param: param,
+
+		ProtocolID:   protocolID,
+		Url:          Url,
+		SwitchPeriod: SwitchPeriod,
 		////////////////////  iris end  /////////////////////////////
 	}
 }
@@ -105,7 +114,7 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 //-----------------------------------------------------------
 // MsgDeposit
 type MsgDeposit struct {
-	ProposalID uint64          `json:"proposal_id"` // ID of the proposal
+	ProposalID uint64         `json:"proposal_id"` // ID of the proposal
 	Depositor  sdk.AccAddress `json:"depositor"`   // Address of the depositor
 	Amount     sdk.Coins      `json:"amount"`      // Coins to add to the proposal's deposit
 }
@@ -166,7 +175,7 @@ func (msg MsgDeposit) GetSigners() []sdk.AccAddress {
 //-----------------------------------------------------------
 // MsgVote
 type MsgVote struct {
-	ProposalID uint64          `json:"proposal_id"` // ID of the proposal
+	ProposalID uint64         `json:"proposal_id"` // ID of the proposal
 	Voter      sdk.AccAddress `json:"voter"`       //  address of the voter
 	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
 }

@@ -51,7 +51,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		proposalType, err := gov.ProposalTypeFromString(client.NormalizeProposalType(req.ProposalType))
-		if err != nil {
+		if err != nil || proposalType != gov.ProposalTypeText {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -63,7 +63,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		// create the message
-		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Param)
+		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Param ,uint64(0)," ",0)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

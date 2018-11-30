@@ -10,7 +10,9 @@ var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
 	TextProposal
-
+    ProtocolID   uint64
+    Url          string
+	SwitchPeriod int64
 }
 
 func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {

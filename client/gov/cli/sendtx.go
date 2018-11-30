@@ -6,14 +6,14 @@ import (
 
 	"encoding/json"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/app"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -64,9 +64,18 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 			}
+
+			var protocolID uint64
+			var url string
+			var switchPeriod int64
+			if proposalType == gov.ProposalTypeSoftwareUpgrade {
+				protocolID = uint64(viper.GetInt64(flagProtocolID))
+				url = viper.GetString(flagUrl)
+				switchPeriod = viper.GetInt64(flagSwitchPeriod)
+			}
 			////////////////////  iris end  /////////////////////////////
 
-			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
+			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param, protocolID, url, switchPeriod)
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -81,6 +90,10 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
 	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
+
+	cmd.Flags().String(flagProtocolID, "0", "the protocolID of the new version")
+	cmd.Flags().String(flagUrl, " ", "the url of the new version")
+	cmd.Flags().String(flagSwitchPeriod, "57600", "the switch_period of the new version")
 	////////////////////  iris end  /////////////////////////////
 	return cmd
 }

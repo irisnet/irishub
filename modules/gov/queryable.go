@@ -56,7 +56,10 @@ type ProposalOutput struct {
 
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-	Param        Param `json:"param"`
+	Param          Param `json:"param"`
+	ProtocolID     uint64 `json:"protocol_id"`
+	Url            string `json:"url""`
+	SwitchPeriod   int64  `json:"switch_period"`
 }
 
 type ProposalOutputs []ProposalOutput
@@ -84,6 +87,13 @@ func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
 	if proposal.GetProposalType() == ProposalTypeParameterChange {
 		proposalOutput.Param = proposal.(*ParameterProposal).Param
 	}
+
+	if proposal.GetProposalType() == ProposalTypeSoftwareUpgrade {
+		proposalOutput.ProtocolID = proposal.(*SoftwareUpgradeProposal).ProtocolID
+		proposalOutput.Url = proposal.(*SoftwareUpgradeProposal).Url
+		proposalOutput.SwitchPeriod = proposal.(*SoftwareUpgradeProposal).SwitchPeriod
+	}
+
 	return proposalOutput
 }
 

@@ -2,12 +2,12 @@ package gov
 
 import (
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 	"time"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 // nolint
@@ -58,14 +58,14 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.Delega
 // Proposals
 
 ////////////////////  iris begin  ///////////////////////////
-func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
+func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param, protocolID uint64, Url string, SwitchPeriod int64) Proposal {
 	switch proposalType {
 	case ProposalTypeText:
 		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	case ProposalTypeParameterChange:
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSoftwareUpgrade:
-		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
+		return keeper.NewUpgradeProposal(ctx, title, description, proposalType, protocolID, Url, SwitchPeriod)
 	case ProposalTypeTerminator:
 		return keeper.NewTerminatorProposal(ctx, title, description, proposalType)
 	}
@@ -79,11 +79,22 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 
 // Creates a NewProposal
 func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var proposal Proposal = &TextProposal{
+
+	proposal := newTextProposal(ctx, title, description, proposalType, proposalID)
+
+	keeper.SetProposal(ctx, &proposal)
+	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
+	return &proposal
+}
+
+func newTextProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, proposalID uint64) TextProposal {
+
+	var proposal = TextProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -93,11 +104,8 @@ func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description 
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	keeper.SetProposal(ctx, proposal)
 	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
-	keeper.SetProposal(ctx, proposal)
-	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
 	return proposal
 }
 
@@ -107,16 +115,8 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
-		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
-	}
+
+	textProposal := newTextProposal(ctx, title, description, proposalType, proposalID)
 
 	param.Value = params.ParamMapping[param.Key].ToJson(param.Value)
 
@@ -125,34 +125,21 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		param,
 	}
 
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
-	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
 	return proposal
 }
 
-func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, protocolID uint64, Url string, SwitchPeriod int64) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
-		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
-	}
-	var proposal Proposal = &SoftwareUpgradeProposal{
-		textProposal,
-	}
+	textProposal := newTextProposal(ctx, title, description, proposalType, proposalID)
 
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
-	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
+	var proposal Proposal = &SoftwareUpgradeProposal{
+		textProposal, protocolID, Url, SwitchPeriod,
+	}
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
 	return proposal
@@ -163,22 +150,12 @@ func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
-		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
-	}
+	textProposal := newTextProposal(ctx, title, description, proposalType, proposalID)
+
 	var proposal Proposal = &TerminatorProposal{
 		textProposal,
 	}
 
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
-	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
 	return proposal

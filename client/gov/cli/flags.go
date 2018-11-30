@@ -16,4 +16,8 @@ const (
 	flagModule            = "module"
 	flagKey               = "key"
 	flagPath              = "path"
+
+	flagProtocolID        = "protocol-id"
+	flagUrl               = "url"
+	flagSwitchPeriod      = "switch-period"
 )

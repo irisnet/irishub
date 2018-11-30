@@ -31,7 +31,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,
+		msg.Param, msg.ProtocolID, msg.Url , msg.SwitchPeriod)
 
 	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
 		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
