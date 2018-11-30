@@ -20,9 +20,9 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
-	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
+	servicecli "github.com/irisnet/irishub/client/service"
 	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
@@ -38,6 +38,7 @@ import (
 	"path/filepath"
 	"io/ioutil"
 	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -122,7 +123,19 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
+	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
 	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
+
+	// genesis add a profiler
+	if len(genesisState.Accounts) > 0 {
+		profiler := guardian.Profiler{
+			Name:      "genesis",
+			Addr:      genesisState.Accounts[0].Address,
+			AddedAddr: genesisState.Accounts[0].Address,
+		}
+		genesisState.GuardianData.Profilers[0] = profiler
+	}
+
 	return genesisState
 }
 
@@ -450,6 +463,15 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBindings
+}
+
+func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Profiler {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var profilers []guardian.Profiler
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &profilers)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return profilers
 }
 
 func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
