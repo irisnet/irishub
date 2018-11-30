@@ -6,41 +6,39 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
-	distr "github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/stake"
 	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"time"
-	"bufio"
 )
 
 const (
-	appName    = "IrisApp"
-	FlagReplay = "replay"
+	appName          = "IrisApp"
+	FlagReplay       = "replay"
 	FlagReplayHeight = "replay_height"
-	DefaultSyncableHeight = 10000
 )
 
 // default home directories for expected binaries
@@ -240,24 +238,7 @@ func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 		err = app.LoadVersion(lastHeight, app.keyMain, true)
 	} else if viper.GetInt64(FlagReplayHeight) > 0 {
 		replayHeight := viper.GetInt64(FlagReplayHeight)
-		loadHeight := int64(0)
-		app.Logger.Info("Please make sure the replay height is less than block height")
-		if replayHeight >= DefaultSyncableHeight {
-			loadHeight = replayHeight - replayHeight % DefaultSyncableHeight
-		} else {
-			// version 1 will always be kept
-			loadHeight = 1
-		}
-		app.Logger.Info("This replay operation will change the application store, please spare your node home directory first")
-		app.Logger.Info("Confirm that:(y/n)")
-		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-		if err != nil {
-			cmn.Exit(err.Error())
-		}
-		confirm := strings.TrimSpace(input)
-		if confirm != "y" && confirm != "yes" {
-			cmn.Exit("Abort replay operation")
-		}
+		loadHeight := bam.ReplayToHeight(replayHeight, app.Logger)
 		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
 		err = app.LoadVersion(loadHeight, app.keyMain, true)
 	} else {
