@@ -5,14 +5,14 @@ import (
 	"github.com/irisnet/irishub/modules/guardian/tags"
 )
 
-// handle all "profiling" type messages.
+// handle all "guardian" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case MsgAddProfiler:
 			return handleMsgAddProfiler(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parse in profiling module").Result()
+			return sdk.ErrTxDecode("invalid message parse in guardian module").Result()
 		}
 	}
 }

@@ -54,7 +54,7 @@ func createTestCodec() *codec.Codec {
 }
 
 func createTestInput(t *testing.T) (sdk.Context, Keeper) {
-	keyProf := sdk.NewKVStoreKey("profiling")
+	keyProf := sdk.NewKVStoreKey("guardian")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)

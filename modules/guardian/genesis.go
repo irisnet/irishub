@@ -4,7 +4,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// GenesisState - all profiling state that must be provided at genesis
+// GenesisState - all guardian state that must be provided at genesis
 type GenesisState struct {
 	Profilers []Profiler `json:"profilers"`
 	Trustees  []Trustee  `json:"trustees"`

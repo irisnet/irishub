@@ -18,7 +18,7 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-profiler",
 		Short: "Add a new profiler",
-		Example: "iriscli profiling create-profiler --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
+		Example: "iriscli guardian add-profiler --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--profiler-address=<added address> --profiler-name=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).

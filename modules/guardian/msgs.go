@@ -23,7 +23,7 @@ func NewMsgAddProfiler(addr, addedAddr sdk.AccAddress, name string) MsgAddProfil
 	}
 }
 func (msg MsgAddProfiler) Route() string { return MsgType }
-func (msg MsgAddProfiler) Type() string  { return "profiling add-profiler" }
+func (msg MsgAddProfiler) Type() string  { return "guardian add-profiler" }
 func (msg MsgAddProfiler) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
