@@ -32,8 +32,8 @@
   name = "github.com/tendermint/tendermint"
   source = "https://github.com/irisnet/tendermint.git"
 #  version = "=v0.26.1-rc0-iris"
-  branch = "irisnet/v0.26.1-rc3-iris"
-
+#  branch = "irisnet/v0.26.1-rc3-iris"
+  branch = "jiacheng/v0.26.1-rc3-iris"
 [[constraint]]
   name = "github.com/prometheus/client_golang"
   revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"

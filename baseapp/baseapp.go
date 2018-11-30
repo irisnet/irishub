@@ -253,6 +253,7 @@ func (app *BaseApp) Info(req abci.RequestInfo) abci.ResponseInfo {
 
 	return abci.ResponseInfo{
 		Data:             app.name,
+		AppVersion:       uint64(8),
 		LastBlockHeight:  lastCommitID.Version,
 		LastBlockAppHash: lastCommitID.Hash,
 	}
