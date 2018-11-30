@@ -1,8 +1,7 @@
-package iparam
+package params
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 var ParamMapping = make(map[string]GovParameter)
@@ -25,7 +24,7 @@ func InitGenesisParameter(p Parameter, ctx sdk.Context, genesisData interface{})
 	}
 }
 
-func SetParamReadWriter(paramSpace params.Subspace, ps ...Parameter) {
+func SetParamReadWriter(paramSpace Subspace, ps ...Parameter) {
 	for _, p := range ps {
 		if p != nil {
 			p.SetReadWriter(paramSpace)

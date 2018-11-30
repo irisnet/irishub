@@ -2,9 +2,9 @@ package arbitration
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // GenesisState - all arbitration state that must be provided at genesis
@@ -22,8 +22,8 @@ func NewGenesisState(complaintRetrospect, arbitrationTimelimit time.Duration) Ge
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, data GenesisState) {
-	iparam.InitGenesisParameter(&arbitrationparams.ComplaintRetrospectParameter, ctx, data.ComplaintRetrospect)
-	iparam.InitGenesisParameter(&arbitrationparams.ArbitrationTimelimitParameter, ctx, data.ArbitrationTimelimit)
+	params.InitGenesisParameter(&arbitrationparams.ComplaintRetrospectParameter, ctx, data.ComplaintRetrospect)
+	params.InitGenesisParameter(&arbitrationparams.ArbitrationTimelimitParameter, ctx, data.ArbitrationTimelimit)
 }
 
 // ExportGenesis - output genesis parameters

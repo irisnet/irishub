@@ -6,7 +6,6 @@ import (
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -61,13 +60,13 @@ func TestInitGenesisParameter(t *testing.T) {
 			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
 			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
 		))
-	iparam.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
-	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
+	params.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
+	params.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 
-	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, p2)
+	params.InitGenesisParameter(&DepositProcedureParameter, ctx, p2)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 }
 
@@ -105,14 +104,14 @@ func TestRegisterParamMapping(t *testing.T) {
 			VotingProcedureParameter.GetStoreKey(), VotingProcedure{},
 			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
 		))
-	iparam.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
-	iparam.RegisterGovParamMapping(&DepositProcedureParameter)
-	iparam.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
+	params.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
+	params.RegisterGovParamMapping(&DepositProcedureParameter)
+	params.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
-	require.Equal(t, iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	require.Equal(t, params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	iparam.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":172800000000000}")
 	DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 }

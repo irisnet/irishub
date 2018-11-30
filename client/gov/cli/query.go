@@ -9,11 +9,11 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -332,14 +332,14 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 				if err == nil {
 					if len(res) == 0 {
 						// Return an error directly if the --module parameter is incorrect.
-						return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
+						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
 					}
 
 					if keyStr != "" {
 						// There are two possible outputs if the --key parameter is not empty:
 						// 1.List of keys in the module;
 						// 2.Error: The key in the module does not exist;
-						iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+						params.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 							&govparams.VotingProcedureParameter,
 							&govparams.TallyingProcedureParameter)
 
@@ -364,7 +364,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 				// There are two possible outputs if the --key parameter is not empty:
 				// 1.List of keys in the module;
 				// 2.Error: The key in the module does not exist;
-				iparam.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
+				params.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
 					&govparams.VotingProcedureParameter,
 					&govparams.TallyingProcedureParameter)
 
@@ -373,7 +373,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Return error if the --module & --key parameters are all empty.
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
 		},
 	}
 
@@ -384,10 +384,10 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 func printKeyJsonIfExists(e error, keyStr string, res []byte, cdc *codec.Codec) (err error) {
 	if e == nil {
-		if p, ok := iparam.ParamMapping[keyStr]; ok {
+		if p, ok := params.ParamMapping[keyStr]; ok {
 			if len(res) == 0 {
 				// Return an error directly if the --key parameter is incorrect.
-				return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
+				return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
 			}
 			// Print key json in the module
 			p.GetValueFromRawData(cdc, res)
@@ -395,7 +395,7 @@ func printKeyJsonIfExists(e error, keyStr string, res []byte, cdc *codec.Codec) 
 			return nil
 		} else {
 			//
-			return sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 		}
 	} else {
 		// Throw RPC client query exception
@@ -418,7 +418,7 @@ func printModuleList(res []sdk.KVPair) (err error) {
 	return nil
 }
 
-func printParamStr(p iparam.GovParameter, keyStr string) {
+func printParamStr(p params.GovParameter, keyStr string) {
 	var param gov.Param
 	param.Key = keyStr
 	param.Value = p.ToJson("")

@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
-	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
@@ -28,8 +28,8 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 				WithLogger(os.Stdout).
 				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
-			res_height, _ := cliCtx.QueryStore(append([]byte(iparam.SignalParamspace + "/"), upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()...), "params")
-			res_proposalID, _ := cliCtx.QueryStore(append([]byte(iparam.SignalParamspace + "/"), upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()...), "params")
+			res_height, _ := cliCtx.QueryStore(append([]byte(params.SignalParamspace + "/"), upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()...), "params")
+			res_proposalID, _ := cliCtx.QueryStore(append([]byte(params.SignalParamspace + "/"), upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()...), "params")
 			var height int64
 			var proposalID uint64
 			cdc.UnmarshalJSON(res_height, &height)

@@ -346,7 +346,7 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
-		var req serviceRequest
+		var req serviceRequestWithBasic
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -358,41 +358,45 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		consumerStr := req.Consumer
-		consumer, err := sdk.AccAddressFromBech32(consumerStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		var msgs []sdk.Msg
+		for _, request := range req.Requests {
+			consumerStr := request.Consumer
+			consumer, err := sdk.AccAddressFromBech32(consumerStr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 
-		providerStr := req.Provider
-		provider, err := sdk.AccAddressFromBech32(providerStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+			providerStr := request.Provider
+			provider, err := sdk.AccAddressFromBech32(providerStr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 
-		inputString := req.Data
-		input, err := hex.DecodeString(inputString)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+			inputString := request.Data
+			input, err := hex.DecodeString(inputString)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 
-		serviceFeeStr := req.ServiceFee
-		serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+			serviceFeeStr := request.ServiceFee
+			serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 
-		msg := service.NewMsgSvcRequest(req.DefChainId, req.ServiceName, req.BindChainId, baseReq.ChainID, consumer, provider, req.MethodId, input, serviceFee, req.Profiling)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+			msg := service.NewMsgSvcRequest(request.DefChainId, request.ServiceName, request.BindChainId, baseReq.ChainID, consumer, provider, request.MethodId, input, serviceFee, request.Profiling)
+			err = msg.ValidateBasic()
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			msgs = append(msgs, msg)
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, msgs)
 	}
 }
 
@@ -538,7 +542,7 @@ type bindingUpdate struct {
 	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
 	BindingType string         `json:"binding_type"`
 	Deposit     string         `json:"deposit"`
-	Prices      []string       `json:"idl_content"`
+	Prices      []string       `json:"prices"`
 	Level       service.Level  `json:"level"`
 }
 
@@ -548,16 +552,20 @@ type bindingEnable struct {
 }
 
 type serviceRequest struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName string         `json:"service_name"`
-	BindChainId string         `json:"bind_chain_id"`
-	DefChainId  string         `json:"def_chain_id"`
-	MethodId    int16          `json:"method_id"`
-	Provider    string         `json:"provider"`
-	Consumer    string         `json:"consumer"`
-	ServiceFee  string         `json:"service_fee"`
-	Data        string         `json:"data"`
-	Profiling   bool           `json:"profiling"`
+	ServiceName string `json:"service_name"`
+	BindChainId string `json:"bind_chain_id"`
+	DefChainId  string `json:"def_chain_id"`
+	MethodId    int16  `json:"method_id"`
+	Provider    string `json:"provider"`
+	Consumer    string `json:"consumer"`
+	ServiceFee  string `json:"service_fee"`
+	Data        string `json:"data"`
+	Profiling   bool   `json:"profiling"`
+}
+
+type serviceRequestWithBasic struct {
+	BaseTx   context.BaseTx   `json:"base_tx"` // basic tx info
+	Requests []serviceRequest `json:"requests"`
 }
 
 type serviceResponse struct {

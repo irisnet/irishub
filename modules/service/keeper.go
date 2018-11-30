@@ -103,13 +103,16 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sdk.E
 		return ErrSvcBindingExists(k.Codespace()), false
 	}
 
-	minDeposit := getMinDeposit(ctx, svcBinding.Prices)
+	minDeposit, err := getMinDeposit(ctx, svcBinding.Prices)
+	if err != nil {
+		return err, false
+	}
 
 	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit), false
 	}
 
-	err := k.validateMethodPrices(ctx, svcBinding)
+	err = k.validateMethodPrices(ctx, svcBinding)
 	if err != nil {
 		return err, false
 	}
@@ -177,7 +180,10 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) (sd
 
 	// only check deposit if binding is available
 	if oldBinding.Available {
-		minDeposit := getMinDeposit(ctx, oldBinding.Prices)
+		minDeposit, err := getMinDeposit(ctx, oldBinding.Prices)
+		if err != nil {
+			return err, false
+		}
 
 		if !oldBinding.Deposit.IsAllGTE(minDeposit) {
 			return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit).Plus(svcBinding.Deposit)), false
@@ -222,14 +228,17 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 		binding.Deposit = binding.Deposit.Plus(deposit)
 	}
 
-	minDeposit := getMinDeposit(ctx, binding.Prices)
+	minDeposit, err := getMinDeposit(ctx, binding.Prices)
+	if err != nil {
+		return err, false
+	}
 
 	if !binding.Deposit.IsAllGTE(minDeposit) {
 		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit)), false
 	}
 
 	// Subtract coins from provider's account
-	_, _, err := k.ck.SubtractCoins(ctx, binding.Provider, deposit)
+	_, _, err = k.ck.SubtractCoins(ctx, binding.Provider, deposit)
 	if err != nil {
 		return err, false
 	}
@@ -471,13 +480,16 @@ func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	store.Set(intraTxCounterKey, bz)
 }
 
-func getMinDeposit(ctx sdk.Context, prices []sdk.Coin) sdk.Coins {
+func getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sdk.Error) {
 	// min deposit must >= sum(method price) * minDepositMultiple
-	minDepositMultiple := serviceparams.GetMinDepositMultiple(ctx)
+	minDepositMultiple := sdk.NewInt(serviceparams.GetMinDepositMultiple(ctx))
 	var minDeposit sdk.Coins
 	for _, price := range prices {
-		minInt := price.Amount.Mul(sdk.NewInt(minDepositMultiple))
+		if price.Amount.BigInt().BitLen()+minDepositMultiple.BigInt().BitLen()-1 > 255 {
+			return minDeposit, sdk.NewError(DefaultCodespace, CodeIntOverflow, fmt.Sprintf("Int Overflow"))
+		}
+		minInt := price.Amount.Mul(minDepositMultiple)
 		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
 	}
-	return minDeposit
+	return minDeposit, nil
 }

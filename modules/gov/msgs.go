@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // name to idetify transaction types
@@ -69,7 +69,7 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
 		}
 
-		if p, ok := iparam.ParamMapping[msg.Param.Key]; ok {
+		if p, ok := params.ParamMapping[msg.Param.Key]; ok {
 			return p.Valid(msg.Param.Value)
 		} else {
 			return ErrInvalidParam(DefaultCodespace)
