@@ -1,8 +1,8 @@
-package profiling
+package guardian
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/profiling/tags"
+	"github.com/irisnet/irishub/modules/guardian/tags"
 )
 
 // handle all "profiling" type messages.

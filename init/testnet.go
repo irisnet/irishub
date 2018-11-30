@@ -24,7 +24,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
-	"github.com/irisnet/irishub/modules/profiling"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -238,7 +238,7 @@ func initGenFiles(
 
 	// genesis add a profiler
 	if len(appGenState.Accounts) > 0 {
-		profiler := profiling.Profiler{
+		profiler := guardian.Profiler{
 			Name:      "genesis",
 			Addr:      appGenState.Accounts[0].Address,
 			AddedAddr: appGenState.Accounts[0].Address,

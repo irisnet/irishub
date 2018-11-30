@@ -34,7 +34,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"time"
-	"github.com/irisnet/irishub/modules/profiling"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 const (
@@ -84,7 +84,7 @@ type IrisApp struct {
 	paramsKeeper        params.Keeper
 	upgradeKeeper       upgrade.Keeper
 	serviceKeeper       service.Keeper
-	profilingKeeper     profiling.Keeper
+	profilingKeeper     guardian.Keeper
 	recordKeeper        record.Keeper
 
 	// fee manager
@@ -144,7 +144,7 @@ func MakeCodec() *codec.Codec {
 	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)
-	profiling.RegisterCodec(cdc)
+	guardian.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
@@ -211,10 +211,10 @@ func (app *IrisApp) initKeeper() {
 		app.bankKeeper,
 		service.DefaultCodespace,
 	)
-	app.profilingKeeper = profiling.NewKeeper(
+	app.profilingKeeper = guardian.NewKeeper(
 		app.cdc,
 		app.keyProfiling,
-		profiling.DefaultCodespace,
+		guardian.DefaultCodespace,
 	)
 	app.upgradeKeeper = upgrade.NewKeeper(
 		app.cdc,
@@ -407,7 +407,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 	service.InitGenesis(ctx, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
-	profiling.InitGenesis(ctx, app.profilingKeeper, genesisState.ProfilingData)
+	guardian.InitGenesis(ctx, app.profilingKeeper, genesisState.ProfilingData)
 
 	return abci.ResponseInitChain{
 		Validators: validators,
@@ -450,7 +450,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
 		service.ExportGenesis(ctx),
 		arbitration.ExportGenesis(ctx),
-		profiling.ExportGenesis(ctx, app.profilingKeeper),
+		guardian.ExportGenesis(ctx, app.profilingKeeper),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)

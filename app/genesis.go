@@ -24,7 +24,7 @@ import (
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/profiling"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -54,13 +54,13 @@ type GenesisState struct {
 	SlashingData    slashing.GenesisState    `json:"slashing"`
 	ServiceData     service.GenesisState     `json:"service"`
 	ArbitrationData arbitration.GenesisState `json:"arbitration"`
-	ProfilingData   profiling.GenesisState   `json:"profiling"`
+	ProfilingData   guardian.GenesisState    `json:"profiling"`
 	GenTxs          []json.RawMessage        `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	arbitrationData arbitration.GenesisState, profilingData profiling.GenesisState, slashingData slashing.GenesisState) GenesisState {
+	arbitrationData arbitration.GenesisState, profilingData guardian.GenesisState, slashingData slashing.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:        accounts,
@@ -398,7 +398,7 @@ type GenesisFileState struct {
 	UpgradeData     upgrade.GenesisState     `json:"upgrade"`
 	SlashingData    slashing.GenesisState    `json:"slashing"`
 	ServiceData     service.GenesisState     `json:"service"`
-	ProfilingData   profiling.GenesisState   `json:"profiling"`
+	ProfilingData   guardian.GenesisState    `json:"profiling"`
 	ArbitrationData arbitration.GenesisState `json:"arbitration"`
 	GenTxs          []json.RawMessage        `json:"gentxs"`
 }
@@ -425,7 +425,7 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	arbitrationData arbitration.GenesisState, profilingData profiling.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+	arbitrationData arbitration.GenesisState, profilingData guardian.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:        accounts,
@@ -452,7 +452,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		GovData:         gov.DefaultGenesisState(),
 		UpgradeData:     upgrade.DefaultGenesisState(),
 		ServiceData:     service.DefaultGenesisState(),
-		ProfilingData:   profiling.DefaultGenesisState(),
+		ProfilingData:   guardian.DefaultGenesisState(),
 		ArbitrationData: arbitration.DefaultGenesisState(),
 		SlashingData:    slashing.DefaultGenesisState(),
 		GenTxs:          nil,

@@ -13,7 +13,7 @@ import (
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
-	profilingcmd "github.com/irisnet/irishub/client/profiling/cli"
+	profilingcmd "github.com/irisnet/irishub/client/guardian/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"

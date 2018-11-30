@@ -1,4 +1,4 @@
-package profiling
+package guardian
 
 import (
 	"github.com/irisnet/irishub/codec"

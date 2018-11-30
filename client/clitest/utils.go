@@ -20,7 +20,6 @@ import (
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
-	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
 	stakecli "github.com/irisnet/irishub/client/stake"
@@ -38,7 +37,7 @@ import (
 	"path/filepath"
 	"io/ioutil"
 	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/profiling"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -123,12 +122,12 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
-	genesisState.ProfilingData = profiling.DefaultGenesisStateForTest()
+	genesisState.ProfilingData = guardian.DefaultGenesisStateForTest()
 	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
-		profiler := profiling.Profiler{
+		profiler := guardian.Profiler{
 			Name:      "genesis",
 			Addr:      genesisState.Accounts[0].Address,
 			AddedAddr: genesisState.Accounts[0].Address,
@@ -465,9 +464,9 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 	return serviceBindings
 }
 
-func executeGetProfilers(t *testing.T, cmdStr string) []profiling.Profiler {
+func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Profiler {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var profilers []profiling.Profiler
+	var profilers []guardian.Profiler
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &profilers)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

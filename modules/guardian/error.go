@@ -1,4 +1,4 @@
-package profiling
+package guardian
 
 import (
 	sdk "github.com/irisnet/irishub/types"

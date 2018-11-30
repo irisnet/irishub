@@ -11,13 +11,13 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/modules/profiling"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-profiler",
-		Short: "Create a new profiler",
+		Use:   "add-profiler",
+		Short: "Add a new profiler",
 		Example: "iriscli profiling create-profiler --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--profiler-address=<added address> --profiler-name=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -41,7 +41,7 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 			if len(paStr) == 0 {
 				return fmt.Errorf("must use --profiler-name flag")
 			}
-			msg := profiling.NewMsgAddProfiler(pAddr, fromAddr, name)
+			msg := guardian.NewMsgAddProfiler(pAddr, fromAddr, name)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
