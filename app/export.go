@@ -18,7 +18,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// export the state of gaia for a genesis file
+// export the state of irishub for a genesis file
 func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 

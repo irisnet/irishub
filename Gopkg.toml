@@ -27,12 +27,12 @@
 [[override]]
   name = "github.com/tendermint/iavl"
 #  version = "=v0.11.1"
-  source = "https://github.com/HaoyangLiu/iavl.git"
+  source = "https://github.com/irisnet/iavl.git"
   branch = "irisnet/v0.11.1-iris"
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  source = "https://github.com/HaoyangLiu/tendermint.git"
+  source = "https://github.com/irisnet/tendermint.git"
 #  version = "=v0.26.1-rc0-iris"
   branch = "irisnet/v0.26.1-rc3-iris"
 
