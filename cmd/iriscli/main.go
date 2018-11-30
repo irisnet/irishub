@@ -13,6 +13,7 @@ import (
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
+	profilingcmd "github.com/irisnet/irishub/client/profiling/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
@@ -207,6 +208,24 @@ func main() {
 
 	rootCmd.AddCommand(
 		serviceCmd,
+	)
+
+	//add profiling command
+	profilingCmd := &cobra.Command{
+		Use:   "profiling",
+		Short: "Profiling subcommands",
+	}
+	profilingCmd.AddCommand(
+		client.GetCommands(
+			profilingcmd.GetCmdQueryProfilers("profiling", cdc),
+		)...)
+
+	profilingCmd.AddCommand(
+		client.PostCommands(
+			profilingcmd.GetCmdCreateProfiler(cdc),
+		)...)
+	rootCmd.AddCommand(
+		profilingCmd,
 	)
 
 	//add record command

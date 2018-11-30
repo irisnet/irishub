@@ -24,6 +24,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
+	"github.com/irisnet/irishub/modules/profiling"
 )
 
 var (
@@ -178,7 +179,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 
 		accs = append(accs, app.GenesisFileAccount{
 			Address: addr,
-			Coins: []string{app.FreeFermionAcc.String()},
+			Coins:   []string{app.FreeFermionAcc.String()},
 		})
 
 		msg := stake.NewMsgCreateValidator(
@@ -234,6 +235,17 @@ func initGenFiles(
 
 	appGenState := app.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
+
+	// genesis add a profiler
+	if len(appGenState.Accounts) > 0 {
+		profiler := profiling.Profiler{
+			Name:      "genesis",
+			Addr:      appGenState.Accounts[0].Address,
+			AddedAddr: appGenState.Accounts[0].Address,
+		}
+		appGenState.ProfilingData.Profilers[0] = profiler
+	}
+
 
 	appGenStateJSON, err := codec.MarshalJSONIndent(cdc, appGenState)
 	if err != nil {
