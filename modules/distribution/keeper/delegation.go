@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/types"
+	"fmt"
 )
 
 // check whether a delegator distribution info exists
@@ -157,18 +158,19 @@ func (k Keeper) CurrentDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress,
 //___________________________________________________________________________________________
 
 // return all rewards for all delegations of a delegator
-func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) types.DecCoins {
-	withdraw := k.withdrawDelegationRewardsAll(ctx, delAddr)
+func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) (types.DecCoins, sdk.Tags) {
+	withdraw, tags := k.withdrawDelegationRewardsAll(ctx, delAddr)
 	feePool := k.GetFeePool(ctx)
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
-	return withdraw
+	return withdraw, tags
 }
 
 func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
-	delAddr sdk.AccAddress) types.DecCoins {
+	delAddr sdk.AccAddress) (types.DecCoins, sdk.Tags) {
 
 	// iterate over all the delegations
 	withdraw := types.DecCoins{}
+	var tags sdk.Tags
 	operationAtDelegation := func(_ int64, del sdk.Delegation) (stop bool) {
 
 		valAddr := del.GetValidatorAddr()
@@ -178,10 +180,11 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 		k.SetFeePool(ctx, feePool)
 		k.SetValidatorDistInfo(ctx, valInfo)
 		k.SetDelegationDistInfo(ctx, delInfo)
+		tags = tags.AppendTag(fmt.Sprintf(sdk.TagRewardFromValidator, valAddr.String()), []byte(diWithdraw.ToString()))
 		return false
 	}
 	k.stakeKeeper.IterateDelegations(ctx, delAddr, operationAtDelegation)
-	return withdraw
+	return withdraw, tags
 }
 
 // get all rewards for all delegations of a delegator
