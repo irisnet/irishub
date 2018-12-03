@@ -1,16 +1,7 @@
-# IRISTOOL User Guide
+# IRIS Command tool
 
-## Basic Functionality Description
-
-Iris tools include monitor and debug now.
-
-## monitor
-irishub blockchain monitoring tool;watches over one or more nodes, collecting and providing various statistics to the user.
-
-### Usage
-```bash
-iristool monitor --validator-address=[validator-address] --chain-id=[chain-id] --node=[node]  --account-address=[account-address]
-```
+## Introduction
+`iristool` include [monitor](./monitor.md) and debug now.
 
 ## debug
 Simple tool for simple debugging.
