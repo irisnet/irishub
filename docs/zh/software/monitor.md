@@ -20,7 +20,7 @@ iristool monitor --validator-address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
 - `chain-id`：要监测的链 id
 - `node`：要监控的节点地址（默认为 tcp://localhost:26657）
 
-启动之后, 你可以通过 `http://localhost:36660/` 能看到 Metrics 数据页面。
+启动之后, 你可以通过 `http://localhost:36660/` 看到 Metrics 数据页面。
 
 ## 启动 Prometheus
 
