@@ -45,20 +45,22 @@ func handleMsgModifyWithdrawAddress(ctx sdk.Context, msg types.MsgSetWithdrawAdd
 
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
 
-	k.WithdrawDelegationRewardsAll(ctx, msg.DelegatorAddr)
+	reward, withdrawTags := k.WithdrawDelegationRewardsAll(ctx, msg.DelegatorAddr)
 
-	tags := sdk.NewTags(
+	resultTags := sdk.NewTags(
 		tags.Action, tags.ActionWithdrawDelegatorRewardsAll,
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
+		tags.Reward, []byte(reward.ToString()),
 	)
+	resultTags = resultTags.AppendTags(withdrawTags)
 	return sdk.Result{
-		Tags: tags,
+		Tags: resultTags,
 	}
 }
 
 func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDelegatorReward, k keeper.Keeper) sdk.Result {
 
-	err := k.WithdrawDelegationReward(ctx, msg.DelegatorAddr, msg.ValidatorAddr)
+	reward, err := k.WithdrawDelegationReward(ctx, msg.DelegatorAddr, msg.ValidatorAddr)
 	if err != nil {
 		return err.Result()
 	}
@@ -67,6 +69,7 @@ func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDele
 		tags.Action, tags.ActionWithdrawDelegatorReward,
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
 		tags.Validator, []byte(msg.ValidatorAddr.String()),
+		tags.Reward, []byte(reward.ToString()),
 	)
 	return sdk.Result{
 		Tags: tags,
@@ -75,16 +78,18 @@ func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDele
 
 func handleMsgWithdrawValidatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawValidatorRewardsAll, k keeper.Keeper) sdk.Result {
 
-	err := k.WithdrawValidatorRewardsAll(ctx, msg.ValidatorAddr)
+	reward, withdrawTags, err := k.WithdrawValidatorRewardsAll(ctx, msg.ValidatorAddr)
 	if err != nil {
 		return err.Result()
 	}
 
-	tags := sdk.NewTags(
+	resultTags := sdk.NewTags(
 		tags.Action, tags.ActionWithdrawValidatorRewardsAll,
 		tags.Validator, []byte(msg.ValidatorAddr.String()),
+		tags.Reward, []byte(reward.ToString()),
 	)
+	resultTags = resultTags.AppendTags(withdrawTags)
 	return sdk.Result{
-		Tags: tags,
+		Tags: resultTags,
 	}
 }

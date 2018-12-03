@@ -14,4 +14,5 @@ var (
 	Action    = sdk.TagAction
 	Validator = sdk.TagSrcValidator
 	Delegator = sdk.TagDelegator
+	Reward    = sdk.TagReward
 )
