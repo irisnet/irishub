@@ -21,8 +21,9 @@ func init() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "iristool",
-	Short: "Iris tool",
+	Use:          "iristool",
+	Short:        "Iris tool",
+	SilenceUsage: true,
 }
 
 func main() {
