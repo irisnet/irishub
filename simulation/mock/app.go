@@ -125,6 +125,7 @@ func NewApp() *App {
 		app.Cdc,
 		app.KeyParams, app.TkeyParams,
 	)
+	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
 
 	app.SetInitChainer(app.InitChainer)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
@@ -195,6 +196,13 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
+	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+		FeeTokenNative:    IrisCt.MinUnit.Denom,
+		GasPriceThreshold: 0, // for mock test
+	}
+
+	bam.InitGenesis(ctx, app.FeeManager, feeTokenGensisConfig)
+
 	return abci.ResponseInitChain{}
 }
 
@@ -234,7 +242,7 @@ func SetGenesis(app *App, accs []auth.Account) {
 func GenTx(msgs []sdk.Msg, accnums []int64, seq []int64, priv ...crypto.PrivKey) auth.StdTx {
 	// Make the transaction free
 	fee := auth.StdFee{
-		Amount: sdk.Coins{sdk.NewInt64Coin("iris-atto", 40000000000000000)},
+		Amount: sdk.Coins{sdk.NewInt64Coin("iris-atto", 0)},
 		Gas:    20000,
 	}
 

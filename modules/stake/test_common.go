@@ -26,9 +26,9 @@ var (
 	commissionMsg = NewCommissionMsg(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec())
 )
 
-func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey crypto.PubKey, amt int64) MsgCreateValidator {
+func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey crypto.PubKey, amt sdk.Int) MsgCreateValidator {
 	return types.NewMsgCreateValidator(
-		address, pubKey, sdk.NewCoin("steak", sdk.NewInt(amt)), Description{}, commissionMsg,
+		address, pubKey, sdk.NewCoin("iris-atto", amt), Description{}, commissionMsg,
 	)
 }
 
@@ -38,25 +38,25 @@ func NewTestMsgCreateValidatorWithCommission(address sdk.ValAddress, pubKey cryp
 	commission := NewCommissionMsg(commissionRate, sdk.OneDec(), sdk.ZeroDec())
 
 	return types.NewMsgCreateValidator(
-		address, pubKey, sdk.NewCoin("steak", sdk.NewInt(amt)), Description{}, commission,
+		address, pubKey, sdk.NewCoin("iris-atto", sdk.NewInt(amt)), Description{}, commission,
 	)
 }
 
-func NewTestMsgDelegate(delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt int64) MsgDelegate {
+func NewTestMsgDelegate(delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt sdk.Int) MsgDelegate {
 	return MsgDelegate{
 		DelegatorAddr: delAddr,
 		ValidatorAddr: valAddr,
-		Delegation:    sdk.NewCoin("steak", sdk.NewInt(amt)),
+		Delegation:    sdk.NewCoin("iris-atto", amt),
 	}
 }
 
-func NewTestMsgCreateValidatorOnBehalfOf(delAddr sdk.AccAddress, valAddr sdk.ValAddress, valPubKey crypto.PubKey, amt int64) MsgCreateValidator {
+func NewTestMsgCreateValidatorOnBehalfOf(delAddr sdk.AccAddress, valAddr sdk.ValAddress, valPubKey crypto.PubKey, amt sdk.Int) MsgCreateValidator {
 	return MsgCreateValidator{
 		Description:   Description{},
 		Commission:    commissionMsg,
 		DelegatorAddr: delAddr,
 		ValidatorAddr: valAddr,
 		PubKey:        valPubKey,
-		Delegation:    sdk.NewCoin("steak", sdk.NewInt(amt)),
+		Delegation:    sdk.NewCoin("iris-atto", amt),
 	}
 }

@@ -75,7 +75,7 @@ func MakeTestCodec() *codec.Codec {
 }
 
 // hogpodge of all sorts of input required for testing
-func CreateTestInput(t *testing.T, isCheckTx bool, initCoins int64) (sdk.Context, auth.AccountKeeper, Keeper) {
+func CreateTestInput(t *testing.T, isCheckTx bool, initCoins sdk.Int) (sdk.Context, auth.AccountKeeper, Keeper) {
 
 	keyStake := sdk.NewKVStoreKey("stake")
 	tkeyStake := sdk.NewTransientStoreKey("transient_stake")
@@ -112,10 +112,10 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins int64) (sdk.Context
 	for _, addr := range Addrs {
 		pool := keeper.GetPool(ctx)
 		_, _, err := ck.AddCoins(ctx, addr, sdk.Coins{
-			{keeper.BondDenom(ctx), sdk.NewInt(initCoins)},
+			{keeper.BondDenom(ctx), initCoins},
 		})
 		require.Nil(t, err)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDec(initCoins))
+		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDecFromInt(initCoins))
 		keeper.SetPool(ctx, pool)
 	}
 
