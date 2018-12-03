@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // check whether a validator has distribution info
@@ -57,15 +57,15 @@ func (k Keeper) GetValidatorAccum(ctx sdk.Context, operatorAddr sdk.ValAddress) 
 }
 
 // withdrawal all the validator rewards including the commission
-func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.ValAddress) sdk.Error {
+func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.ValAddress) (types.DecCoins, sdk.Tags, sdk.Error) {
 
 	if !k.HasValidatorDistInfo(ctx, operatorAddr) {
-		return types.ErrNoValidatorDistInfo(k.codespace)
+		return nil, nil, types.ErrNoValidatorDistInfo(k.codespace)
 	}
 
 	// withdraw self-delegation
 	accAddr := sdk.AccAddress(operatorAddr.Bytes())
-	withdraw := k.withdrawDelegationRewardsAll(ctx, accAddr)
+	withdraw, resultTags := k.withdrawDelegationRewardsAll(ctx, accAddr)
 
 	// withdrawal validator commission rewards
 	valInfo := k.GetValidatorDistInfo(ctx, operatorAddr)
@@ -73,9 +73,9 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	valInfo, feePool, commission := valInfo.WithdrawCommission(wc)
 	withdraw = withdraw.Plus(commission)
 	k.SetValidatorDistInfo(ctx, valInfo)
-
+	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commission.ToString()))
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
-	return nil
+	return withdraw, resultTags, nil
 }
 
 // get all the validator rewards including the commission
