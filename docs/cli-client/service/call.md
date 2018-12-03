@@ -12,16 +12,16 @@ iriscli service call [flags]
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
-| --method-id           |                         | [int] the method id called                                                                                                                                 |  Yes     |
-| --bind-chain-id       |                         | [string] the ID of the blockchain bond of the service                                                                                                                                 |  Yes     |
-| --provider            |                         | [string] bech32 encoded account created the service binding                                                                       |  Yes     |
-| --service-fee         |                         | [string] fee to pay for a service invocation                                                                       |  Yes     |
-| --request-data        |                         | [string] hex encoded request data of a service invocation                                                                       |  Yes     |
-| -h, --help            |                         | help for call                                                                                                                                         |          |
+| Name, shorthand       | Default                 | Description                                                  | Required |
+| --------------------- | ----------------------- | ------------------------------------------------------------ | -------- |
+| --def-chain-id        |                         | [string] the ID of the blockchain defined of the service     |  Yes     |
+| --service-name        |                         | [string] service name                                        |  Yes     |
+| --method-id           |                         | [int] the method id called                                   |  Yes     |
+| --bind-chain-id       |                         | [string] the ID of the blockchain bond of the service        |  Yes     |
+| --provider            |                         | [string] bech32 encoded account created the service binding  |  Yes     |
+| --service-fee         |                         | [string] fee to pay for a service invocation                 |          |
+| --request-data        |                         | [string] hex encoded request data of a service invocation    |          |
+| -h, --help            |                         | help for call                                                |          |
 
 ## Examples
 

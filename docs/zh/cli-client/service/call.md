@@ -1,29 +1,29 @@
 # iriscli service call 
 
-## Description
+## 描述
 
 调用服务方法
 
-## Usage
+## 用法
 
 ```
 iriscli service call [flags]
 ```
 
-## Flags
+## 标志
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                                                              |  Yes     |
-| --service-name        |                         | [string] 服务名称                                                                                                                                 |  Yes     |
-| --method-id           |                         | [int] 调用的服务方法ID                                                                                                                                 |  Yes     |
-| --bind-chain-id       |                         | [string] 绑定该服务的区块链ID                                                                                                                                 |  Yes     |
-| --provider            |                         | [string] bech32编码的服务提供商账户地址                                                                       |  Yes     |
-| --service-fee         |                         | [string] 服务调用支付的服务费                                                                     |  Yes     |
-| --request-data        |                         | [string] hex编码的服务调用请求数据                                                                       |  Yes     |
-| -h, --help            |                         | 调用命令帮助                                                                                                                                         |          |
+| Name, shorthand       | Default                 | Description                          | Required |
+| --------------------- | ----------------------- | ------------------------------------ | -------- |
+| --def-chain-id        |                         | [string] 定义该服务的区块链ID           | 是       |
+| --service-name        |                         | [string] 服务名称                     | 是       |
+| --method-id           |                         | [int] 调用的服务方法ID                 | 是       |
+| --bind-chain-id       |                         | [string] 绑定该服务的区块链ID           | 是       |
+| --provider            |                         | [string] bech32编码的服务提供商账户地址  | 是       |
+| --service-fee         |                         | [string] 服务调用支付的服务费            |          |
+| --request-data        |                         | [string] hex编码的服务调用请求数据        |          |
+| -h, --help            |                         | 调用命令帮助                             |          |
 
-## Examples
+## 示例
 
 ### 发起一个服务调用请求
 ```shell

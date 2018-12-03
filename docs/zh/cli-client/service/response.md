@@ -1,24 +1,24 @@
 # iriscli service response 
 
-## Description
+## 描述
 
 查询服务响应
 
-## Usage
+## 用法
 
 ```
 iriscli service response [flags]
 ```
 
-## Flags
+## 标志
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | [string] 发起该服务调用的区块链ID                                                                                              |  Yes     |
-| --request-id          |                         | [string] 该服务调用的ID                                                                                                                                |  Yes     |
+| --request-chain-id    |                         | [string] 发起该服务调用的区块链ID                                                                                              | 是       |
+| --request-id          |                         | [string] 该服务调用的ID                                                                                                                                | 是       |
 | -h, --help            |                         | 查询响应命令帮助                                                                                                                                         |          |
 
-## Examples
+## 示例
 
 ### 查询服务响应
 ```shell
