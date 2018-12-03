@@ -1,6 +1,6 @@
 # 运行一个验证人节点
 
-在配置验证人节点之前，请保证已经按照此[文档](Install-Iris.md)正确安装了**Iris**
+在配置验证人节点之前，请保证已经按照此[文档](Install-the-Software.md)正确安装了**Iris**
 
 在IRISHub枢纽中，验证人负责将交易打包并提交区块。成为一个验证人需要满足很多条件，不仅仅是技术和硬件上的投资。同时，因为只有在有限验证人的条件下，Tendermint才能发挥最大的作用。目前，我们将IRISHub枢纽的验证人上限定为100。也就是说只有前100个验证人能够获得奖励，而大部分IRIS持有者不会成为验证人而是通过委托的方式决定谁会成为验证人。
 
@@ -56,7 +56,7 @@ iriscli status --node=tcp://localhost:26657
 ```
 若 `catching_up` 字段为 `false`那么你的节点就是同步的。
 
-你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fvp`为首字节，想要了解更多的编码信息，请参考以下 [文档](Bech32-on-IRISnet.md)
+你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fvp`为首字节，想要了解更多的编码信息，请参考以下 [文档](../features/basic-concepts/bech32-prefix.md)
 
 通过执行以下命令获得节点的公钥信息，公钥信息将以`fvp1`开头：
 
@@ -65,19 +65,19 @@ iris tendermint show_validator --home= < IRIS-HOME >
 ```
 示例输出:
 ```
-fvp1zcjduepqv7z2kgussh7ufe8e0prupwcm7l9jcn2fp90yeupaszmqjk73rjxq8yzw85
+fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
 ```
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator  --from= < name > --amount= < amount >iris --pubkey= < pubkey >  --moniker= < moniker > --fee=0.05iris  --gas=2000000 --chain-id=fuxi-4000   --node=http://localhost:26657
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
-> 注意：**amount** 应为整数， **Fee** 字段可以使用小数，例如`0。01iris` 。
+> 注意：**amount** 应为整数， **Fee** 字段可以使用小数，例如`0.01iris` 。
 
-也就是说，如果你想要抵押1IRIS,你可以执行以下操作：
+也就是说，如果你想要抵押100IRIS,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --pubkey=pubkey  --fee=0.04iris  --gas=2000000 --from= < name > --chain-id=fuxi-4000  --node=tcp://localhost:26657  --amount=1iris
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 
 ### 查询验证人信息
@@ -85,10 +85,10 @@ iriscli stake create-validator --pubkey=pubkey  --fee=0.04iris  --gas=2000000 --
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator  < address-validator-operator >  --chain-id=fuxi-4000 --node=tcp://localhost:26657 
+iriscli stake validator  {address-validator-operator}  --chain-id={chain-id} --node=tcp://localhost:26657 
 ```
 
-请注意 `<address-validator>` 字段是以`faa1`为首字母。
+请注意 `{address-validator-operator}` 字段是以`fva1`为首字母。
 
 
 ### 确认验证人是否在线
@@ -107,7 +107,7 @@ iriscli status --node=tcp://localhost:26657
 你应该在`details`字段注明自定义的信息。
 
 ```
-iriscli stake edit-validator --from= < name >  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-4000 
+iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id={chain-id} 
   --details="details"--node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
 ```
 ### 查询验证人信息
@@ -115,13 +115,9 @@ iriscli stake edit-validator --from= < name >  --moniker="choose a moniker"  --w
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator < address-validator-operator > --chain-id=fuxi-4000
+iriscli stake validator {address-validator-operator} --chain-id=<chain-id>
 ```
 
 ### 使用浏览器：IRISPlorer
 
 你可以通过[浏览器](https://testnet.irisplorer.io)确认验证人节点的运行状况。
-
-### 部署IRISHub Monitor监控
-
-请根据以下[链接](../../tools/Deploy-IRIS-Monitor.md) 部署一个Monitor监控验证人。
