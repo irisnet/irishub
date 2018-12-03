@@ -14,16 +14,16 @@ iriscli service bind [flags]
 
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | [int]  服务平均返回时间的毫秒数表示                                                     |  Yes     |
-| --bind-type           |                         | [string] 对服务是本地还是全局的设置，可选值Local/Global                                  |  Yes     |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                          |  Yes     |
-| --deposit             |                         | [string] 服务提供者的保证金                                                            |  Yes     |
+| --avg-rsp-time        |                         | [int]  服务平均返回时间的毫秒数表示                                                     | 是       |
+| --bind-type           |                         | [string] 对服务是本地还是全局的设置，可选值Local/Global                                  | 是       |
+| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                          | 是       |
+| --deposit             |                         | [string] 服务提供者的保证金                                                            | 是       |
 | --prices              |                         | [strings] 服务定价,按照服务方法排序的定价列表                                             |          |
-| --service-name        |                         | [string] 服务名称                                                                    |  Yes     |
-| --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  |  Yes     |
+| --service-name        |                         | [string] 服务名称                                                                    | 是       |
+| --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  | 是       |
 | -h, --help            |                         | 绑定命令帮助                                                                          |          |
 
-## 例子
+## 示例
 
 ### 添加服务绑定到已存在的服务定义
 ```shell
