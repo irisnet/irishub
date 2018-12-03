@@ -3,24 +3,29 @@ package main
 import (
 	"os"
 
-	"github.com/irisnet/irishub/app"
 	irisInit "github.com/irisnet/irishub/init"
-	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/spf13/cobra"
+	debugcmd "github.com/irisnet/irishub/cmd/iristool/debug"
+	"github.com/irisnet/irishub/tools/prometheus"
+	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
 func init() {
-	cobra.EnableCommandSorting = false
+
+	irisInit.InitBech32Prefix()
 	cdc := app.MakeCodec()
-	rootCmd = prometheus.MonitorCommand(cdc)
-	rootCmd.SilenceUsage = true
+
+	rootCmd.AddCommand(debugcmd.RootCmd)
+	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 }
 
-var rootCmd *cobra.Command
+var rootCmd = &cobra.Command{
+	Use:   "iristool",
+	Short: "Iris tool",
+}
 
 func main() {
-	irisInit.InitBech32Prefix()
 	executor := cli.PrepareMainCmd(rootCmd, "IRIS", app.DefaultNodeHome)
 	err := executor.Execute()
 	if err != nil {
