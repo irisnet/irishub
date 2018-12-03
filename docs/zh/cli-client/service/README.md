@@ -20,8 +20,16 @@ iriscli service [command]
 | [bindings](bindings.md)               | 查询服务绑定列表           |
 | [update-binding](update-binding.md)   | 更新一个存在的服务绑定      |
 | [disable](disable.md)                 | 禁用一个可用的服务绑定      |
-| [enable](enable.md)                   | 启用一个不可用的服务绑定     |
+| [enable](enable.md)                   | 启用一个不可用的服务绑定     
 | [refund-deposit](refund-deposit.md)   | 取回所有押金               |
+| [call](call.md)                       | 调用服务方法                     |
+| [requests](requests.md)               | 查询服务请求列表                     |
+| [respond](respond.md)                 | 响应服务调用       |
+| [response](response.md)               | 查询服务响应       |
+| [fees](fees.md)                       | 查询指定地址的服务费退款和收入      |
+| [refund-fees](refund-fees.md)         | 从服务费退款中退还所有费用  |
+| [withdraw-fees](withdraw-fees.md)     | 从服务费收入中取回所有费用 |
+
 
 ## 标志
 
