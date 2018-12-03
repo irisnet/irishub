@@ -39,8 +39,9 @@ const (
 	CodeNotMatchingProvider    sdk.CodeType = 126
 	CodeInvalidReqChainId      sdk.CodeType = 127
 	CodeInvalidBindChainId     sdk.CodeType = 128
+	CodeNotMatchingReqChainID  sdk.CodeType = 129
 
-	CodeIntOverflow sdk.CodeType = 129
+	CodeIntOverflow sdk.CodeType = 130
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -178,4 +179,8 @@ func ErrInvalidReqChainId(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrInvalidBindChainId(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidBindChainId, fmt.Sprintf("bind chain id is empty"))
+}
+
+func ErrNotMatchingReqChainID(codespace sdk.CodespaceType, reqChainID string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotMatchingReqChainID, fmt.Sprintf("[%s] is not a matching reqChainID", reqChainID))
 }
