@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
+	irisInit "github.com/irisnet/irishub/init"
 )
 
 func init() {

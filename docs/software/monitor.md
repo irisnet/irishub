@@ -8,7 +8,7 @@ Please refer to this [document](https://github.com/irisnet/irishub/blob/master/d
 ```
 irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
 --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st \
---chain-id=irishub-stage --node=http://localhost:26657
+--chain-id=<chain-id> --node=http://localhost:26657
 ```
 
 Parameters：
@@ -29,11 +29,11 @@ You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/mas
 Then edit `prometheus.yml` and add `jobs` :
 
 ```yaml
-      - job_name: fuxi-4000
+      - job_name: fuxi-5000
           static_configs:
           - targets: ['localhost:36660']
             labels:
-              instance: fuxi-4000
+              instance: fuxi-5000
 ```
 
 > Note：value of targets is ip:port which used by IRIS monitor 
