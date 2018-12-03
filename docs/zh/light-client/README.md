@@ -12,7 +12,7 @@ IRISLCD有两个子命令:
 | 子命令      | 功能                 | 示例命令 |
 | --------------- | --------------------------- | --------------- |
 | version         | 打印版本信息   | irislcd version |
-| start           | 启动一个IRISLCD节点  | irislcd start --chain-id=<chain-id> |
+| start           | 启动一个IRISLCD节点  | irislcd start --chain-id=`<chain-id>` |
 
 `start`子命令有如下参数可配置
 
@@ -52,7 +52,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `GET /txs/{hash}`: 通过交易hash查询交易
     8. `GET /txs`: 搜索交易
     9. `POST /txs`: 广播交易
- 
+
 2. Key management模块的APIs
 
     1. `GET /keys`: 列出所有本地的秘钥

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"bytes"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -175,4 +177,16 @@ func (coins DecCoins) AmountOf(denom string) sdk.Dec {
 			return coins[midIdx+1:].AmountOf(denom)
 		}
 	}
+}
+
+func (coins DecCoins) ToString() string {
+	var rewardBytes bytes.Buffer
+	for i, coin := range coins {
+		if i != 0 {
+			rewardBytes.WriteString(",")
+		}
+		rewardBytes.WriteString(coin.Amount.String())
+		rewardBytes.WriteString(coin.Denom)
+	}
+	return rewardBytes.String()
 }
