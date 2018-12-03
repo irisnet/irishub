@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/irisnet/irishub/types"
 	"bytes"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Coins which can have additional decimal points
