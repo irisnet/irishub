@@ -1,5 +1,28 @@
 # Changelog
 
+
+## 0.8.0-rc0
+
+*December 3rd, 2018*
+
+BREAKING CHANGES:
+
+- Genesis.json supports any unit format of IRIS CoinType
+- The configuration information of the bech32 prefix is dynamically specified by the environment variable
+- Improvement of File/directory path specification and the exception handler
+
+FEATURES:
+
+- Upgrade cosmos-sdk to v0.26.1-rc1 and remove the cosmos-sdk dependency
+- Upgrade tendermint denpendency to v0.26.1-rc3
+- View the current available withdraw balance by simulation mode
+- Command line and LCD interface for service invocation request and query
+- Implement guardian module for some governance proposal
+- Export blockchain snapshot at any height
+- Added command add-genesis-account to configure account for genesis.json
+- New proposal TerminatorProposal to terminate network consensus
+
+
 ## 0.7.0
 
 *November 27th, 2018*

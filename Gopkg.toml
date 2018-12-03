@@ -31,8 +31,7 @@
 [[override]]
   name = "github.com/tendermint/tendermint"
   source = "https://github.com/irisnet/tendermint.git"
-#  version = "=v0.26.1-rc0-iris"
-  branch = "irisnet/v0.26.1-rc3-iris"
+  version = "=v0.26.1-rc3-iris"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"
