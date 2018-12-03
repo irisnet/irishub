@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Create a new validator distribution record
@@ -25,7 +25,7 @@ func (k Keeper) onValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) {
 func (k Keeper) onValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) {
 	// This doesn't need to be run at genesis
 	if ctx.BlockHeight() > 0 {
-		if err := k.WithdrawValidatorRewardsAll(ctx, valAddr); err != nil {
+		if _, _, err := k.WithdrawValidatorRewardsAll(ctx, valAddr); err != nil {
 			panic(err)
 		}
 	}
@@ -72,7 +72,7 @@ func (k Keeper) onDelegationCreated(ctx sdk.Context, delAddr sdk.AccAddress,
 func (k Keeper) onDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAddress,
 	valAddr sdk.ValAddress) {
 
-	if err := k.WithdrawDelegationReward(ctx, delAddr, valAddr); err != nil {
+	if _, err := k.WithdrawDelegationReward(ctx, delAddr, valAddr); err != nil {
 		panic(err)
 	}
 }

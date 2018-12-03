@@ -2,9 +2,9 @@ package keeper
 
 import (
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // keeper of the stake store
