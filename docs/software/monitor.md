@@ -6,14 +6,14 @@ Please refer to this [document](https://github.com/irisnet/irishub/blob/master/d
 ## Start IRIS Monitor
 
 ```
-irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
+iristool monitor --validator-address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
 --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st \
 --chain-id=<chain-id> --node=http://localhost:26657
 ```
 
 Parameters：
 
-- `address`：hex encoded validator address
+- `validator-address`：hex encoded validator address
 - `account-address`：bech32 encoded account address
 - `chain-id`：blockchain id that you want to monitor
 - `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657. If you want to monitor other irishub nodes, please change this value.)

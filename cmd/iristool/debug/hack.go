@@ -1,4 +1,4 @@
-package main
+package debug
 
 import (
 	"encoding/base64"
@@ -22,7 +22,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/ibc"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
@@ -75,7 +74,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 	checkHeight := topHeight
 	for {
 		// load the given version of the state
-		err = app.LoadVersion(checkHeight, app.keyMain)
+		err = app.LoadVersion(checkHeight, app.keyMain,false)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -147,7 +146,6 @@ type IrisApp struct {
 	AccountKeeper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	bankKeeper          bank.Keeper
-	ibcMapper           ibc.Mapper
 	stakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	paramsKeeper        params.Keeper
@@ -170,7 +168,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
 		keyAccount:       sdk.NewKVStoreKey("acc"),
-		keyIBC:           sdk.NewKVStoreKey("ibc"),
 		keyStake:         sdk.NewKVStoreKey("stake"),
 		keySlashing:      sdk.NewKVStoreKey("slashing"),
 		keyGov:           sdk.NewKVStoreKey("gov"),
@@ -191,7 +188,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	// add handlers
 	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams, app.tkeyParams)
 	app.bankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
-	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = stake.NewKeeper(
 		app.cdc,
 		app.keyStake, app.tkeyStake,
@@ -215,7 +211,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	// register message routes
 	app.Router().
 		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
-		AddRoute("ibc", []*sdk.KVStoreKey{app.keyIBC, app.keyAccount}, ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
 		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyIparams, app.keyParams}, gov.NewHandler(app.govKeeper)).
@@ -240,7 +235,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 // custom tx codec
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
-	ibc.RegisterCodec(cdc)
 	bank.RegisterCodec(cdc)
 	stake.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)

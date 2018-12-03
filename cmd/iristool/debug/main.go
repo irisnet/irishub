@@ -1,4 +1,4 @@
-package main
+package debug
 
 import (
 	"bytes"
@@ -6,32 +6,27 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	iris "github.com/irisnet/irishub/app"
-	irisInit "github.com/irisnet/irishub/init"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 func init() {
-
-	irisInit.InitBech32Prefix()
-
-	rootCmd.AddCommand(txCmd)
-	rootCmd.AddCommand(pubkeyCmd)
-	rootCmd.AddCommand(addrCmd)
-	rootCmd.AddCommand(hackCmd)
-	rootCmd.AddCommand(rawBytesCmd)
+	RootCmd.AddCommand(txCmd)
+	RootCmd.AddCommand(pubkeyCmd)
+	RootCmd.AddCommand(addrCmd)
+	RootCmd.AddCommand(hackCmd)
+	RootCmd.AddCommand(rawBytesCmd)
 }
 
-var rootCmd = &cobra.Command{
-	Use:          "irisdebug",
+var RootCmd = &cobra.Command{
+	Use:          "debug",
 	Short:        "Iris debug tool",
 	SilenceUsage: true,
 }
@@ -182,8 +177,7 @@ func runAddrCmd(cmd *cobra.Command, args []string) error {
 	accAddr := sdk.AccAddress(addr)
 	valAddr := sdk.ValAddress(addr)
 
-	fmt.Println("Address:", addr)
-	fmt.Printf("Hex: %X\n", addr)
+	fmt.Printf("Address (Hex): %X\n", addr)
 	fmt.Printf("Bech32 Acc: %s\n", accAddr)
 	fmt.Printf("Bech32 Val: %s\n", valAddr)
 	return nil
@@ -230,12 +224,4 @@ func runTxCmd(cmd *cobra.Command, args []string) error {
 
 	fmt.Println(buf.String())
 	return nil
-}
-
-func main() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
-	os.Exit(0)
 }
