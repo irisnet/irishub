@@ -24,11 +24,12 @@ func TestGetValidatorPowerRank(t *testing.T) {
 	valAddr1 := sdk.ValAddress(addr1)
 	emptyDesc := types.Description{}
 	val1 := types.NewValidator(valAddr1, pk1, emptyDesc)
-	val1.Tokens = sdk.NewDec(0)
+	val1.Tokens = sdk.ZeroDec()
 	val2, val3, val4 := val1, val1, val1
-	val2.Tokens = sdk.NewDec(1)
-	val3.Tokens = sdk.NewDec(10)
+	val2.Tokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 18))
+	val3.Tokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18))
 	x := new(big.Int).Exp(big.NewInt(2), big.NewInt(40), big.NewInt(0))
+	x = new(big.Int).Mul(x, sdk.NewIntWithDecimal(1, 18).BigInt())
 	val4.Tokens = sdk.NewDecFromBigInt(x)
 
 	tests := []struct {

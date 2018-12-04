@@ -14,7 +14,7 @@ import (
 
 // tests GetDelegation, GetDelegatorDelegations, SetDelegation, RemoveDelegation, GetDelegatorDelegations
 func TestDelegation(t *testing.T) {
-	ctx, _, keeper := CreateTestInput(t, false, sdk.NewIntWithDecimal(10, 18))
+	ctx, _, keeper := CreateTestInput(t, false, sdk.NewIntWithDecimal(10, 0))
 	pool := keeper.GetPool(ctx)
 
 	//construct the validators
@@ -178,18 +178,18 @@ func TestUnbondingDelegation(t *testing.T) {
 func TestUnbondDelegation(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(10)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18))
 
 	//create a validator and a delegator to that validator
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 
 	pool = keeper.GetPool(ctx)
-	require.Equal(t, int64(10), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(10), validator.BondedTokens().RoundInt64())
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), validator.BondedTokens())
 
 	delegation := types.Delegation{
 		DelegatorAddr: addrDels[0],
@@ -198,9 +198,9 @@ func TestUnbondDelegation(t *testing.T) {
 	}
 	keeper.SetDelegation(ctx, delegation)
 
-	amount, err := keeper.unbond(ctx, addrDels[0], addrVals[0], sdk.NewDec(6))
+	amount, err := keeper.unbond(ctx, addrDels[0], addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
-	require.Equal(t, int64(6), amount.RoundInt64()) // shares to be added to an unbonding delegation / redelegation
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)), amount) // shares to be added to an unbonding delegation / redelegation
 
 	delegation, found := keeper.GetDelegation(ctx, addrDels[0], addrVals[0])
 	require.True(t, found)
@@ -208,10 +208,10 @@ func TestUnbondDelegation(t *testing.T) {
 	require.True(t, found)
 	pool = keeper.GetPool(ctx)
 
-	require.Equal(t, int64(4), delegation.Shares.RoundInt64())
-	require.Equal(t, int64(4), validator.BondedTokens().RoundInt64())
-	require.Equal(t, int64(6), pool.LooseTokens.RoundInt64(), "%v", pool)
-	require.Equal(t, int64(4), pool.BondedTokens.RoundInt64())
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), delegation.Shares)
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), validator.BondedTokens())
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)), pool.LooseTokens, "%v", pool)
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), pool.BondedTokens)
 }
 
 // test removing all self delegation from a validator which should
@@ -220,12 +220,12 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(20)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -238,8 +238,8 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -251,7 +251,7 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 	keeper.SetDelegation(ctx, delegation)
 
 	val0AccAddr := sdk.AccAddress(addrVals[0].Bytes())
-	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDec(10))
+	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -260,20 +260,20 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 
 	validator, found := keeper.GetValidator(ctx, addrVals[0])
 	require.True(t, found)
-	require.Equal(t, int64(10), validator.Tokens.RoundInt64())
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), validator.Tokens)
 	require.Equal(t, sdk.Unbonding, validator.Status)
 }
 
 func TestUndelegateFromUnbondingValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(20)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -286,8 +286,8 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -307,7 +307,7 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 
 	// unbond the all self-delegation to put validator in unbonding state
 	val0AccAddr := sdk.AccAddress(addrVals[0].Bytes())
-	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDec(10))
+	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -329,13 +329,13 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 	ctx = ctx.WithBlockHeader(header)
 
 	// unbond some of the other delegation's shares
-	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDec(6))
+	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
 	// retrieve the unbonding delegation
 	ubd, found := keeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
 	require.True(t, found)
-	require.True(t, ubd.Balance.IsEqual(sdk.NewInt64Coin(params.BondDenom, 6)))
+	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18))))
 	assert.Equal(t, blockHeight, ubd.CreationHeight)
 	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }
@@ -343,13 +343,13 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 func TestUndelegateFromUnbondedValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(20)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -363,8 +363,8 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -379,7 +379,7 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 	ctx = ctx.WithBlockTime(time.Unix(333, 0))
 
 	// unbond the all self-delegation to put validator in unbonding state
-	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDec(10))
+	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -402,7 +402,7 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 	require.Equal(t, validator.Status, sdk.Unbonded)
 
 	// unbond some of the other delegation's shares
-	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDec(6))
+	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
 	// no ubd should have been found, coins should have been returned direcly to account
@@ -410,7 +410,7 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 	require.False(t, found, "%v", ubd)
 
 	// unbond rest of the other delegation's shares
-	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDec(4))
+	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)))
 	require.NoError(t, err)
 
 	//  now validator should now be deleted from state
@@ -422,13 +422,13 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 func TestUnbondingAllDelegationFromValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(20)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -442,8 +442,8 @@ func TestUnbondingAllDelegationFromValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -458,7 +458,7 @@ func TestUnbondingAllDelegationFromValidator(t *testing.T) {
 	ctx = ctx.WithBlockTime(time.Unix(333, 0))
 
 	// unbond the all self-delegation to put validator in unbonding state
-	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDec(10))
+	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -466,7 +466,7 @@ func TestUnbondingAllDelegationFromValidator(t *testing.T) {
 	require.Equal(t, 1, len(updates))
 
 	// unbond all the remaining delegation
-	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDec(10))
+	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// validator should still be in state and still be in unbonding state
@@ -611,12 +611,12 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(30)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(30, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -630,16 +630,16 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 
 	// create a second validator
 	validator2 := types.NewValidator(addrVals[1], PKs[1], types.Description{})
-	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
-	pool.BondedTokens = pool.BondedTokens.Add(sdk.NewDec(10))
+	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
+	pool.BondedTokens = pool.BondedTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	keeper.SetPool(ctx, pool)
 	validator2 = TestingUpdateValidator(keeper, ctx, validator2)
 	require.Equal(t, sdk.Bonded, validator2.Status)
 
 	// create a second delegation to this validator
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -650,7 +650,7 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 	}
 	keeper.SetDelegation(ctx, delegation)
 
-	_, err := keeper.BeginRedelegation(ctx, val0AccAddr, addrVals[0], addrVals[1], sdk.NewDec(10))
+	_, err := keeper.BeginRedelegation(ctx, val0AccAddr, addrVals[0], addrVals[1], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -659,21 +659,21 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 
 	validator, found := keeper.GetValidator(ctx, addrVals[0])
 	require.True(t, found)
-	require.Equal(t, int64(10), validator.Tokens.RoundInt64())
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), validator.Tokens)
 	require.Equal(t, sdk.Unbonding, validator.Status)
 }
 
 func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(30)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(30, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 	validator.BondIntraTxCounter = 1
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -687,8 +687,8 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -702,8 +702,8 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	// create a second validator
 	validator2 := types.NewValidator(addrVals[1], PKs[1], types.Description{})
 	validator2.BondIntraTxCounter = 2
-	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator2 = TestingUpdateValidator(keeper, ctx, validator2)
 
@@ -715,7 +715,7 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	ctx = ctx.WithBlockHeader(header)
 
 	// unbond the all self-delegation to put validator in unbonding state
-	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDec(10))
+	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -737,13 +737,13 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	ctx = ctx.WithBlockHeader(header)
 
 	// unbond some of the other delegation's shares
-	_, err = keeper.BeginRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1], sdk.NewDec(6))
+	_, err = keeper.BeginRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
 	// retrieve the unbonding delegation
 	ubd, found := keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
 	require.True(t, found)
-	require.True(t, ubd.Balance.IsEqual(sdk.NewInt64Coin(params.BondDenom, 6)))
+	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18))))
 	assert.Equal(t, blockHeight, ubd.CreationHeight)
 	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }
@@ -751,13 +751,13 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(30)
+	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(30, 18))
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -771,9 +771,9 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewInt(10))
+	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
 	validator.BondIntraTxCounter = 1
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator)
 	pool = keeper.GetPool(ctx)
@@ -787,8 +787,8 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	// create a second validator
 	validator2 := types.NewValidator(addrVals[1], PKs[1], types.Description{})
 	validator2.BondIntraTxCounter = 2
-	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewInt(10))
-	require.Equal(t, int64(10), issuedShares.RoundInt64())
+	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator2 = TestingUpdateValidator(keeper, ctx, validator2)
 	require.Equal(t, sdk.Bonded, validator2.Status)
@@ -797,7 +797,7 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	ctx = ctx.WithBlockTime(time.Unix(333, 0))
 
 	// unbond the all self-delegation to put validator in unbonding state
-	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDec(10))
+	_, err := keeper.BeginUnbonding(ctx, val0AccAddr, addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	require.NoError(t, err)
 
 	// end block
@@ -814,7 +814,7 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	keeper.unbondingToUnbonded(ctx, validator)
 
 	// redelegate some of the delegation's shares
-	_, err = keeper.BeginRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1], sdk.NewDec(6))
+	_, err = keeper.BeginRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
 	// no red should have been found
