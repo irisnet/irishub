@@ -9,6 +9,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 func TestBankWithRandomMessages(t *testing.T) {
@@ -26,7 +27,7 @@ func TestBankWithRandomMessages(t *testing.T) {
 	}
 
 	appStateFn := func(r *rand.Rand, accs []simulation.Account) json.RawMessage {
-		simulation.RandomSetGenesis(r, mapp, accs, []string{"iris-atto"})
+		simulation.RandomSetGenesis(r, mapp, accs, []string{stakeTypes.StakeDenom})
 		return json.RawMessage("{}")
 	}
 

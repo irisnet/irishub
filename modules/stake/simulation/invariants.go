@@ -10,9 +10,9 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // AllInvariants runs all invariants of the stake module.
@@ -48,7 +48,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		loose := sdk.ZeroDec()
 		bonded := sdk.ZeroDec()
 		am.IterateAccounts(ctx, func(acc auth.Account) bool {
-			loose = loose.Add(sdk.NewDecFromInt(acc.GetCoins().AmountOf(mock.MiniDenom)))
+			loose = loose.Add(sdk.NewDecFromInt(acc.GetCoins().AmountOf(types.StakeDenom)))
 			return false
 		})
 		k.IterateUnbondingDelegations(ctx, func(_ int64, ubd stake.UnbondingDelegation) bool {
@@ -70,19 +70,19 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		feePool := d.GetFeePool(ctx)
 
 		// add outstanding fees
-		loose = loose.Add(sdk.NewDecFromInt(f.GetCollectedFees(ctx).AmountOf(mock.MiniDenom)))
+		loose = loose.Add(sdk.NewDecFromInt(f.GetCollectedFees(ctx).AmountOf(types.StakeDenom)))
 
 		// add community pool
-		loose = loose.Add(feePool.CommunityPool.AmountOf(mock.MiniDenom))
+		loose = loose.Add(feePool.CommunityPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution pool
-		loose = loose.Add(feePool.ValPool.AmountOf(mock.MiniDenom))
+		loose = loose.Add(feePool.ValPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution commission and yet-to-be-withdrawn-by-delegators
 		d.IterateValidatorDistInfos(ctx,
 			func(_ int64, distInfo distribution.ValidatorDistInfo) (stop bool) {
-				loose = loose.Add(distInfo.DelPool.AmountOf(mock.MiniDenom))
-				loose = loose.Add(distInfo.ValCommission.AmountOf(mock.MiniDenom))
+				loose = loose.Add(distInfo.DelPool.AmountOf(types.StakeDenom))
+				loose = loose.Add(distInfo.ValCommission.AmountOf(types.StakeDenom))
 				return false
 			},
 		)

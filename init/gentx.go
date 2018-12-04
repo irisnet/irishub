@@ -20,10 +20,11 @@ import (
 	"github.com/irisnet/irishub/client"
 	signcmd "github.com/irisnet/irishub/client/bank/cli"
 	authcmd "github.com/irisnet/irishub/client/auth/cli"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 const (
-	defaultAmount                  = "100iris"
+	defaultAmount                  = "100000000000000000000" + stakeTypes.StakeDenom
 	defaultCommissionRate          = "0.1"
 	defaultCommissionMaxRate       = "0.2"
 	defaultCommissionMaxChangeRate = "0.01"

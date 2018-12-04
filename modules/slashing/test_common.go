@@ -21,6 +21,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // TODO remove dependencies on staking (should only refer to validator set type from sdk)
@@ -120,7 +121,7 @@ func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey crypto.PubKey, amt
 		DelegatorAddr: sdk.AccAddress(address),
 		ValidatorAddr: address,
 		PubKey:        pubKey,
-		Delegation:    sdk.NewCoin("iris-atto", amt),
+		Delegation:    sdk.NewCoin(stakeTypes.StakeDenom, amt),
 	}
 }
 
@@ -128,6 +129,6 @@ func newTestMsgDelegate(delAddr sdk.AccAddress, valAddr sdk.ValAddress, delAmoun
 	return stake.MsgDelegate{
 		DelegatorAddr: delAddr,
 		ValidatorAddr: valAddr,
-		Delegation:    sdk.NewCoin("iris-atto", delAmount),
+		Delegation:    sdk.NewCoin(stakeTypes.StakeDenom, delAmount),
 	}
 }

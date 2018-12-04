@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // getMockApp returns an initialized mock application for this module.
@@ -94,8 +95,8 @@ func checkDelegation(
 func TestStakeMsgs(t *testing.T) {
 	mApp, keeper := getMockApp(t)
 
-	genCoin := sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(42,18))
-	bondCoin := sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(10,18))
+	genCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(42,18))
+	bondCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(10,18))
 
 	acc1 := &auth.BaseAccount{
 		Address: addr1,

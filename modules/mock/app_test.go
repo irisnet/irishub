@@ -10,6 +10,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 type (
@@ -38,10 +39,10 @@ var (
 	priv4 = ed25519.GenPrivKey()
 	addr4 = sdk.AccAddress(priv4.PubKey().Address())
 
-	coins     = sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)}
-	halfCoins = sdk.Coins{sdk.NewInt64Coin("iris-atto", 5)}
-	manyCoins = sdk.Coins{sdk.NewInt64Coin("iris-atto", 1), sdk.NewInt64Coin("barcoin", 1)}
-	freeFee   = auth.NewStdFee(100000, sdk.Coins{sdk.NewInt64Coin("iris-atto", 0)}...)
+	coins     = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}
+	halfCoins = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 5)}
+	manyCoins = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 1), sdk.NewInt64Coin("barcoin", 1)}
+	freeFee   = auth.NewStdFee(100000, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 0)}...)
 
 	sendMsg1 = bank.MsgSend{
 		Inputs:  []bank.Input{bank.NewInput(addr1, coins)},
@@ -93,7 +94,7 @@ func TestMsgSendWithAccounts(t *testing.T) {
 	mapp := getMockApp(t)
 	acc := &auth.BaseAccount{
 		Address: addr1,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 67)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 67)},
 	}
 
 	SetGenesis(mapp, []auth.Account{acc})
@@ -113,8 +114,8 @@ func TestMsgSendWithAccounts(t *testing.T) {
 			expPass:    true,
 			privKeys:   []crypto.PrivKey{priv1},
 			expectedBalances: []expectedBalance{
-				{addr1, sdk.Coins{sdk.NewInt64Coin("iris-atto", 57)}},
-				{addr2, sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)}},
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 57)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}},
 			},
 		},
 		{
@@ -153,11 +154,11 @@ func TestMsgSendMultipleOut(t *testing.T) {
 
 	acc1 := &auth.BaseAccount{
 		Address: addr1,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
 	acc2 := &auth.BaseAccount{
 		Address: addr2,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
 
 	SetGenesis(mapp, []auth.Account{acc1, acc2})
@@ -171,9 +172,9 @@ func TestMsgSendMultipleOut(t *testing.T) {
 			expPass:    true,
 			privKeys:   []crypto.PrivKey{priv1},
 			expectedBalances: []expectedBalance{
-				{addr1, sdk.Coins{sdk.NewInt64Coin("iris-atto", 32)}},
-				{addr2, sdk.Coins{sdk.NewInt64Coin("iris-atto", 47)}},
-				{addr3, sdk.Coins{sdk.NewInt64Coin("iris-atto", 5)}},
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 47)}},
+				{addr3, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 5)}},
 			},
 		},
 	}
@@ -192,15 +193,15 @@ func TestSengMsgMultipleInOut(t *testing.T) {
 
 	acc1 := &auth.BaseAccount{
 		Address: addr1,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
 	acc2 := &auth.BaseAccount{
 		Address: addr2,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
 	acc4 := &auth.BaseAccount{
 		Address: addr4,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
 
 	SetGenesis(mapp, []auth.Account{acc1, acc2, acc4})
@@ -214,10 +215,10 @@ func TestSengMsgMultipleInOut(t *testing.T) {
 			expPass:    true,
 			privKeys:   []crypto.PrivKey{priv1, priv4},
 			expectedBalances: []expectedBalance{
-				{addr1, sdk.Coins{sdk.NewInt64Coin("iris-atto", 32)}},
-				{addr4, sdk.Coins{sdk.NewInt64Coin("iris-atto", 32)}},
-				{addr2, sdk.Coins{sdk.NewInt64Coin("iris-atto", 52)}},
-				{addr3, sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)}},
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr4, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 52)}},
+				{addr3, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}},
 			},
 		},
 	}
@@ -236,7 +237,7 @@ func TestMsgSendDependent(t *testing.T) {
 
 	acc1 := &auth.BaseAccount{
 		Address: addr1,
-		Coins:   sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)},
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
 
 	SetGenesis(mapp, []auth.Account{acc1})
@@ -250,8 +251,8 @@ func TestMsgSendDependent(t *testing.T) {
 			expPass:    true,
 			privKeys:   []crypto.PrivKey{priv1},
 			expectedBalances: []expectedBalance{
-				{addr1, sdk.Coins{sdk.NewInt64Coin("iris-atto", 32)}},
-				{addr2, sdk.Coins{sdk.NewInt64Coin("iris-atto", 10)}},
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}},
 			},
 		},
 		{
@@ -262,7 +263,7 @@ func TestMsgSendDependent(t *testing.T) {
 			expPass:    true,
 			privKeys:   []crypto.PrivKey{priv2},
 			expectedBalances: []expectedBalance{
-				{addr1, sdk.Coins{sdk.NewInt64Coin("iris-atto", 42)}},
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)}},
 			},
 		},
 	}

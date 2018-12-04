@@ -19,6 +19,12 @@ const (
 	// if this is 1, the validator set at the end of a block will sign the block after the next.
 	// Constant as this should not change without a hard fork.
 	ValidatorUpdateDelay int64 = 1
+
+	// Stake coin denomination
+	StakeDenom = "iris-atto"
+
+	// Stake coin denomination name
+	StakeDenomName = "iris"
 )
 
 // nolint - Keys for parameter access
@@ -59,7 +65,7 @@ func DefaultParams() Params {
 	return Params{
 		UnbondingTime: defaultUnbondingTime,
 		MaxValidators: 100,
-		BondDenom:     "iris-atto",
+		BondDenom:     StakeDenom,
 	}
 }
 

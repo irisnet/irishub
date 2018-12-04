@@ -14,6 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // TestStakeWithRandomMessages
@@ -51,7 +52,7 @@ func TestStakeWithRandomMessages(t *testing.T) {
 	}
 
 	appStateFn := func(r *rand.Rand, accs []simulation.Account) json.RawMessage {
-		simulation.RandomSetGenesis(r, mapp, accs, []string{mock.DefaultStakeDenom})
+		simulation.RandomSetGenesis(r, mapp, accs, []string{types.StakeDenom})
 		return json.RawMessage("{}")
 	}
 

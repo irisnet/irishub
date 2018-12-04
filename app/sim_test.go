@@ -25,6 +25,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	slashingsim "github.com/irisnet/irishub/modules/slashing/simulation"
 	stakesim "github.com/irisnet/irishub/modules/stake/simulation"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var (
@@ -59,13 +60,13 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	if numInitiallyBonded > numAccs {
 		numInitiallyBonded = numAccs
 	}
-	fmt.Printf("Selected randomly generated parameters for simulated genesis: {amount of iris-atto per account: %v, initially bonded validators: %v}\n", amount, numInitiallyBonded)
+	fmt.Printf("Selected randomly generated parameters for simulated genesis: {amount of %s per account: %v, initially bonded validators: %v}\n", stakeTypes.StakeDenom, amount, numInitiallyBonded)
 
 	// Randomly generate some genesis accounts
 	for _, acc := range accs {
 		coins := sdk.Coins{
 			{
-				Denom:  "iris-atto",
+				Denom:  stakeTypes.StakeDenom,
 				Amount: amount,
 			},
 			{

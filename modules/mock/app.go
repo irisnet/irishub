@@ -21,13 +21,11 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/irisnet/irishub/modules/arbitration/params"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 const (
 	chainID           = ""
-	Denom             = "iris"
-	MiniDenom         = "iris-atto"
-	DefaultStakeDenom = "steak"
 )
 
 const (
@@ -46,7 +44,7 @@ const (
 )
 
 var (
-	IrisCt = types.NewDefaultCoinType(Denom)
+	IrisCt = types.NewDefaultCoinType(stakeTypes.StakeDenomName)
 )
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -242,7 +240,7 @@ func SetGenesis(app *App, accs []auth.Account) {
 func GenTx(msgs []sdk.Msg, accnums []int64, seq []int64, priv ...crypto.PrivKey) auth.StdTx {
 	// Make the transaction free
 	fee := auth.StdFee{
-		Amount: sdk.Coins{sdk.NewInt64Coin("iris-atto", 0)},
+		Amount: sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 0)},
 		Gas:    20000,
 	}
 

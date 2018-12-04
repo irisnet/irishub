@@ -28,7 +28,7 @@ var (
 
 func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey crypto.PubKey, amt sdk.Int) MsgCreateValidator {
 	return types.NewMsgCreateValidator(
-		address, pubKey, sdk.NewCoin("iris-atto", amt), Description{}, commissionMsg,
+		address, pubKey, sdk.NewCoin(types.StakeDenom, amt), Description{}, commissionMsg,
 	)
 }
 
@@ -38,7 +38,7 @@ func NewTestMsgCreateValidatorWithCommission(address sdk.ValAddress, pubKey cryp
 	commission := NewCommissionMsg(commissionRate, sdk.OneDec(), sdk.ZeroDec())
 
 	return types.NewMsgCreateValidator(
-		address, pubKey, sdk.NewCoin("iris-atto", amt), Description{}, commission,
+		address, pubKey, sdk.NewCoin(types.StakeDenom, amt), Description{}, commission,
 	)
 }
 
@@ -46,7 +46,7 @@ func NewTestMsgDelegate(delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt sdk.
 	return MsgDelegate{
 		DelegatorAddr: delAddr,
 		ValidatorAddr: valAddr,
-		Delegation:    sdk.NewCoin("iris-atto", amt),
+		Delegation:    sdk.NewCoin(types.StakeDenom, amt),
 	}
 }
 
@@ -57,6 +57,6 @@ func NewTestMsgCreateValidatorOnBehalfOf(delAddr sdk.AccAddress, valAddr sdk.Val
 		DelegatorAddr: delAddr,
 		ValidatorAddr: valAddr,
 		PubKey:        valPubKey,
-		Delegation:    sdk.NewCoin("iris-atto", amt),
+		Delegation:    sdk.NewCoin(types.StakeDenom, amt),
 	}
 }

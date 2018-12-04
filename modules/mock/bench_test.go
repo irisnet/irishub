@@ -7,6 +7,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // getBenchmarkMockApp initializes a mock application for this module, for purposes of benchmarking
@@ -29,7 +30,7 @@ func BenchmarkOneBankSendTxPerBlock(b *testing.B) {
 	acc := &auth.BaseAccount{
 		Address: addr1,
 		// Some value conceivably higher than the benchmarks would ever go
-		Coins: sdk.Coins{sdk.NewInt64Coin("iris-atto", 100000000000)},
+		Coins: sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 100000000000)},
 	}
 	accs := []auth.Account{acc}
 
