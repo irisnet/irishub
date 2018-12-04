@@ -177,8 +177,8 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	if !(msg.Provider.Equals(request.Provider)) {
 		return ErrNotMatchingProvider(k.Codespace(), request.Provider).Result()
 	}
-	if request.ReqChainID != msg.RequestID {
-		return ErrNotMatchingReqChainID(k.Codespace(), msg.RequestID).Result()
+	if request.ReqChainID != msg.ReqChainID {
+		return ErrNotMatchingReqChainID(k.Codespace(), msg.ReqChainID).Result()
 	}
 
 	response := NewSvcResponse(msg.ReqChainID, eHeight, rHeight, counter, msg.Provider,
