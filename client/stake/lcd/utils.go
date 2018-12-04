@@ -6,9 +6,9 @@ import (
 
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/tags"
 	"github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/modules/stake/querier"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
@@ -63,10 +63,7 @@ func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) ht
 			return
 		}
 
-		params := stake.QueryBondsParams{
-			DelegatorAddr: delegatorAddr,
-			ValidatorAddr: validatorAddr,
-		}
+		params := querier.NewQueryBondsParams(delegatorAddr, validatorAddr)
 
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
@@ -132,9 +129,7 @@ func queryDelegator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 			return
 		}
 
-		params := stake.QueryDelegatorParams{
-			DelegatorAddr: delegatorAddr,
-		}
+		params := querier.NewQueryDelegatorParams(delegatorAddr)
 
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
@@ -237,10 +232,7 @@ func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 			return
 		}
 
-		params := stake.QueryValidatorParams{
-			ValidatorAddr: validatorAddr,
-		}
-
+		params := querier.NewQueryValidatorParams(validatorAddr)
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

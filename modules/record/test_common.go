@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"

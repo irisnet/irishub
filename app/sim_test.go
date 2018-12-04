@@ -20,11 +20,11 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/irisnet/irishub/modules/gov"
-	banksim "github.com/irisnet/irishub/simulation/bank"
-	govsim "github.com/irisnet/irishub/simulation/gov"
-	"github.com/irisnet/irishub/simulation/mock/simulation"
-	slashingsim "github.com/irisnet/irishub/simulation/slashing"
-	stakesim "github.com/irisnet/irishub/simulation/stake"
+	banksim "github.com/irisnet/irishub/modules/bank/simulation"
+	govsim "github.com/irisnet/irishub/modules/gov/simulation"
+	"github.com/irisnet/irishub/modules/mock/simulation"
+	slashingsim "github.com/irisnet/irishub/modules/slashing/simulation"
+	stakesim "github.com/irisnet/irishub/modules/stake/simulation"
 )
 
 var (
@@ -49,7 +49,7 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	stakeGenesis := stake.DefaultGenesisState()
 	fmt.Printf("Selected randomly generated staking parameters: %+v\n", stakeGenesis)
 
-	var genesisAccounts []GenesisAccount
+	var genesisAccounts []GenesisFileAccount
 
 	amount := sdk.NewIntWithDecimal(100, 18)
 	stakeAmount := sdk.NewIntWithDecimal(1, 2)
@@ -73,9 +73,13 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 				Amount: stakeAmount,
 			},
 		}
-		genesisAccounts = append(genesisAccounts, GenesisAccount{
+		var coinsStringArray []string
+		for _, coin := range coins {
+			coinsStringArray = append(coinsStringArray, coin.String())
+		}
+		genesisAccounts = append(genesisAccounts, GenesisFileAccount{
 			Address: acc.Address,
-			Coins:   coins,
+			Coins:   coinsStringArray,
 		})
 	}
 
@@ -113,7 +117,7 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	stakeGenesis.Validators = validators
 	stakeGenesis.Bonds = delegations
 
-	genesis := GenesisState{
+	genesis := GenesisFileState{
 		Accounts:     genesisAccounts,
 		StakeData:    stakeGenesis,
 		MintData:     mintGenesis,

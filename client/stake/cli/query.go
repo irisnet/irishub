@@ -11,6 +11,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/modules/stake/querier"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 )
@@ -137,9 +138,7 @@ func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Code
 				return err
 			}
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			params := stake.QueryValidatorParams{
-				ValidatorAddr: valAddr,
-			}
+			params := querier.NewQueryValidatorParams(valAddr)
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
@@ -168,9 +167,7 @@ func GetCmdQueryValidatorRedelegations(queryRoute string, cdc *codec.Codec) *cob
 				return err
 			}
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			params := stake.QueryValidatorParams{
-				ValidatorAddr: valAddr,
-			}
+			params := querier.NewQueryValidatorParams(valAddr)
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
@@ -303,7 +300,7 @@ func GetCmdQueryValidatorDelegations(queryRoute string, cdc *codec.Codec) *cobra
 			if err != nil {
 				return err
 			}
-			params := stake.NewQueryValidatorParams(validatorAddr)
+			params := querier.NewQueryValidatorParams(validatorAddr)
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
