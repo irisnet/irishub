@@ -14,12 +14,12 @@ iriscli service enable [flags]
 
 | Name, shorthand       | Default                 | Description                                                                       | Required |
 | --------------------- | ----------------------- | --------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                         |  Yes     |
+| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                         | 是       |
 | --deposit string      |                         | [string] 绑定押金, 将会增加当前服务绑定押金                                             |          |
-| --service-name        |                         | [string] 服务名称                                                                   |  Yes     |
+| --service-name        |                         | [string] 服务名称                                                                   | 是       |
 | -h, --help            |                         | 启用命令帮助                                                                         |          |
 
-## 例子
+## 示例
 
 ### 启用一个不可用的服务绑定
 ```shell

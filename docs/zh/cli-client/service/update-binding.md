@@ -13,16 +13,16 @@ iriscli service update-binding [flags]
 ## 标志
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | [int]  服务平均返回时间的毫秒数表示                                                     |  Yes     |
-| --bind-type           |                         | [string] 对服务是本地还是全局的设置，可选值Local/Global                                  |  Yes     |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                          |  Yes     |
+| --avg-rsp-time        |                         | [int]  服务平均返回时间的毫秒数表示                                                     | 是       |
+| --bind-type           |                         | [string] 对服务是本地还是全局的设置，可选值Local/Global                                  | 是       |
+| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                          | 是       |
 | --deposit             |                         | [string] 绑定押金, 将会增加当前服务绑定押金                                               |          |
 | --prices              |                         | [strings] 服务定价,按照服务方法排序的定价列表                                             |          |
-| --service-name        |                         | [string] 服务名称                                                                    |  Yes     |
-| --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  |  Yes     |
+| --service-name        |                         | [string] 服务名称                                                                    | 是       |
+| --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  | 是       |
 | -h, --help            |                         | 绑定更新命令帮助                                                                       |          |
 
-## 例子
+## 示例
 
 ### 更新一个存在的服务绑定
 ```shell

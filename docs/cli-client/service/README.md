@@ -22,6 +22,13 @@ iriscli service [command]
 | [disable](disable.md)                 | Disable a available service binding       |
 | [enable](enable.md)                   | Enable an unavailable service binding     |
 | [refund-deposit](refund-deposit.md)   | Refund all deposit from a service binding |
+| [call](call.md)                       | Call a service method                     |
+| [requests](requests.md)                   | Query service requests                     |
+| [respond](respond.md)                 | Respond a service method invocation       |
+| [response](response.md)               | Query a service response       |
+| [fees](fees.md)                       | Query return and incoming fee of a particular address       |
+| [refund-fees](refund-fees.md)         | Refund all fees from service return fees  |
+| [withdraw-fees](withdraw-fees.md)     | Withdraw all fees from service incoming fees |
 
 ## Flags
 

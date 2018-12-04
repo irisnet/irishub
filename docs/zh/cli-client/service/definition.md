@@ -18,7 +18,7 @@ iriscli service definition [flags]
 | --service-name  |                            | [string] 服务名称                                        | 是        |
 | --help, -h      |                            | 查询定义命令帮助                                           |          |
 
-## 例子
+## 示例
 
 ### 查询服务定义
 
