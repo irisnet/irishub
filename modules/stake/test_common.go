@@ -33,12 +33,12 @@ func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey crypto.PubKey, amt
 }
 
 func NewTestMsgCreateValidatorWithCommission(address sdk.ValAddress, pubKey crypto.PubKey,
-	amt int64, commissionRate sdk.Dec) MsgCreateValidator {
+	amt sdk.Int, commissionRate sdk.Dec) MsgCreateValidator {
 
 	commission := NewCommissionMsg(commissionRate, sdk.OneDec(), sdk.ZeroDec())
 
 	return types.NewMsgCreateValidator(
-		address, pubKey, sdk.NewCoin("iris-atto", sdk.NewInt(amt)), Description{}, commission,
+		address, pubKey, sdk.NewCoin("iris-atto", amt), Description{}, commission,
 	)
 }
 

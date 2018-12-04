@@ -2,7 +2,7 @@ package simulation
 
 import (
 	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/simulation/mock/simulation"
+	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
 // TODO Any invariants to check here?

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/simulation/mock/simulation"
+	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
 const (

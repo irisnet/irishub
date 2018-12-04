@@ -15,7 +15,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 
 	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"math/big"
 )
 

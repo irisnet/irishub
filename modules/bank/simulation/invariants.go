@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/simulation/mock"
-	"github.com/irisnet/irishub/simulation/mock/simulation"
+	"github.com/irisnet/irishub/modules/mock"
+	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/baseapp"

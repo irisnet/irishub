@@ -6,7 +6,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"

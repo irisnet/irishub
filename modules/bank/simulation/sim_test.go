@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/simulation/mock"
-	"github.com/irisnet/irishub/simulation/mock/simulation"
+	"github.com/irisnet/irishub/modules/mock"
+	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
 func TestBankWithRandomMessages(t *testing.T) {
