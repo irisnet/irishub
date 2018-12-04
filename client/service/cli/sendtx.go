@@ -376,7 +376,7 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "respond",
 		Short: "Respond a service method invocation",
-		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.004iris --req-chain-id=<call-chain-id> " +
+		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.004iris --request-chain-id=<call-chain-id> " +
 			"--request-id=<request-id> --response-data=<resp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
