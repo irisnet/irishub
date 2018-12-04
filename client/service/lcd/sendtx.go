@@ -81,7 +81,6 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 		var req definition
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -113,7 +112,6 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		var req binding
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -178,7 +176,6 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		var req bindingUpdate
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -243,7 +240,6 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -280,7 +276,6 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		var req bindingEnable
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -323,7 +318,6 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -349,7 +343,6 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		var req serviceRequestWithBasic
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -407,7 +400,6 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		var req serviceResponse
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -463,7 +455,6 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -498,7 +489,6 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
