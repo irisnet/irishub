@@ -93,7 +93,7 @@ func transferComment(lines []string) (map[string]string, error) {
 			return attributes, fmt.Errorf("attribute has empty key at %s", line)
 		}
 		value := strings.TrimSpace(ss[1])
-		if key == "" {
+		if value == "" {
 			return attributes, fmt.Errorf("attribute has empty value at %s", line)
 		}
 		attributes[key] = value
