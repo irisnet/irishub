@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 const LastProtocolVersion = 0
@@ -37,7 +38,8 @@ func (app *IrisApp) wireRouterForVerion(version int) {
 			AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyParams}, gov.NewHandler(app.govKeeper)).
 			AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper)).
 			AddRoute("record", []*sdk.KVStoreKey{app.keyRecord}, record.NewHandler(app.recordKeeper)).
-			AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper))
+			AddRoute("service", []*sdk.KVStoreKey{app.keyService}, service.NewHandler(app.serviceKeeper)).
+			AddRoute("guardian", []*sdk.KVStoreKey{app.keyGuardian}, guardian.NewHandler(app.guardianKeeper))
 
 		app.QueryRouter().
 			AddRoute("gov", gov.NewQuerier(app.govKeeper)).

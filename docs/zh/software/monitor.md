@@ -8,19 +8,19 @@
 ## 启动 IRIS Monitor
 
 ```
-irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
+iristool monitor --validator-address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
 --account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st \
---chain-id=irishub-stage --node=http://localhost:36657
+--chain-id=<chain-id> --node=http://localhost:36657
 ```
 
 参数说明：
 
-- `address`：要监测的验证人地址（hex编码）
+- `validator-address`：要监测的验证人地址（hex编码）
 - `account-address`：要监测的账户地址（bech32 编码）
 - `chain-id`：要监测的链 id
 - `node`：要监控的节点地址（默认为 tcp://localhost:26657）
 
-启动之后, 你可以通过 `http://localhost:36660/` 能看到 Metrics 数据页面。
+启动之后, 你可以通过 `http://localhost:36660/` 看到 Metrics 数据页面。
 
 ## 启动 Prometheus
 
@@ -31,11 +31,11 @@ irismon --address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
 在配置文件 `prometheus.yml` 中添加以下 `jobs` :
 
 ```yaml
-      - job_name: fuxi-4000
+      - job_name: fuxi-5000
           static_configs:
           - targets: ['localhost:36660']
             labels:
-              instance: fuxi-4000
+              instance: fuxi-5000
 ```
 
 > Note：targets 配置项的值为 IRIS Monitor 启动后所占用的 ip 和 port。 
