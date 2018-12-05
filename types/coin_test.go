@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 func TestIsPositiveCoin(t *testing.T) {
@@ -50,8 +49,8 @@ func TestSameDenomAsCoin(t *testing.T) {
 		{NewInt64Coin("A", 1), NewInt64Coin("A", 1), true},
 		{NewInt64Coin("A", 1), NewInt64Coin("a", 1), false},
 		{NewInt64Coin("a", 1), NewInt64Coin("b", 1), false},
-		{NewInt64Coin(stakeTypes.DefaultBondDenom, 1), NewInt64Coin(stakeTypes.DefaultBondDenom, 10), true},
-		{NewInt64Coin(stakeTypes.DefaultBondDenom, -11), NewInt64Coin(stakeTypes.DefaultBondDenom, 10), true},
+		{NewInt64Coin("iris-atto", 1), NewInt64Coin("iris-atto", 10), true},
+		{NewInt64Coin("iris-atto", -11), NewInt64Coin("iris-atto", 10), true},
 	}
 
 	for tcIndex, tc := range cases {
@@ -108,8 +107,8 @@ func TestIsEqualCoin(t *testing.T) {
 		{NewInt64Coin("A", 1), NewInt64Coin("A", 1), true},
 		{NewInt64Coin("A", 1), NewInt64Coin("a", 1), false},
 		{NewInt64Coin("a", 1), NewInt64Coin("b", 1), false},
-		{NewInt64Coin(stakeTypes.DefaultBondDenom, 1), NewInt64Coin(stakeTypes.DefaultBondDenom, 10), false},
-		{NewInt64Coin(stakeTypes.DefaultBondDenom, -11), NewInt64Coin(stakeTypes.DefaultBondDenom, 10), false},
+		{NewInt64Coin("iris-atto", 1), NewInt64Coin("iris-atto", 10), false},
+		{NewInt64Coin("iris-atto", -11), NewInt64Coin("iris-atto", 10), false},
 	}
 
 	for tcIndex, tc := range cases {

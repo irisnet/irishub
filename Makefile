@@ -1,5 +1,6 @@
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
 PACKAGES_MODULES=$(shell go list ./... | grep 'modules')
+PACKAGES_TYPES=$(shell go list ./... | grep 'types')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 all: get_tools get_vendor_deps install
@@ -119,6 +120,7 @@ test_sim: test_sim_modules test_sim_benchmark test_sim_iris_nondeterminism test_
 test_unit:
 	#@go test $(PACKAGES_NOSIMULATION)
 	@go test $(PACKAGES_MODULES)
+	@go test $(PACKAGES_TYPES)
 
 test_cli:
 	@go test  -timeout 20m -count 1 -p 1 client/clitest/utils.go client/clitest/bank_test.go client/clitest/distribution_test.go client/clitest/gov_test.go client/clitest/iparam_test.go client/clitest/irismon_test.go client/clitest/record_test.go client/clitest/service_test.go client/clitest/stake_test.go

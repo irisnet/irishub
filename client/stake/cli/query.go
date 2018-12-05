@@ -19,9 +19,9 @@ import (
 // GetCmdQueryValidator implements the validator query command.
 func GetCmdQueryValidator(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "validator [owner-addr]",
+		Use:     "validator [validator-address]",
 		Short:   "Query a validator",
-		Example: "iriscli stake validator <validator owner address>",
+		Example: "iriscli stake validator <validator address>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			addr, err := sdk.ValAddressFromBech32(args[0])
@@ -129,8 +129,9 @@ func GetCmdQueryValidators(storeName string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryValidatorUnbondingDelegations implements the query all unbonding delegatations from a validator command.
 func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "unbonding-delegations-from [operator-addr]",
+		Use:   "unbonding-delegations-from [validator-address]",
 		Short: "Query all unbonding delegatations from a validator",
+		Example: "iriscli stake unbonding-delegations-from <validator address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valAddr, err := sdk.ValAddressFromBech32(args[0])
@@ -158,8 +159,9 @@ func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Code
 // GetCmdQueryValidatorRedelegations implements the query all redelegatations from a validator command.
 func GetCmdQueryValidatorRedelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "redelegations-from [operator-addr]",
+		Use:   "redelegations-from [validator-address]",
 		Short: "Query all outgoing redelegatations from a validator",
+		Example: "iriscli stake redelegations-from <validator address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valAddr, err := sdk.ValAddressFromBech32(args[0])
@@ -247,7 +249,7 @@ func GetCmdQueryDelegation(storeName string, cdc *codec.Codec) *cobra.Command {
 // made from one delegator.
 func GetCmdQueryDelegations(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delegations [delegator-addr]",
+		Use:     "delegations [delegator-address]",
 		Short:   "Query all delegations made from one delegator",
 		Example: "iriscli stake delegations <delegator address>",
 		Args:    cobra.ExactArgs(1),
@@ -292,8 +294,9 @@ func GetCmdQueryDelegations(storeName string, cdc *codec.Codec) *cobra.Command {
 // delegations to a specific validator.
 func GetCmdQueryValidatorDelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delegations-to [validator-addr]",
+		Use:   "delegations-to [validator-address]",
 		Short: "Query all delegations made to one validator",
+		Example: "iriscli stake delegations-to <validator address>",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			validatorAddr, err := sdk.ValAddressFromBech32(args[0])
@@ -381,7 +384,7 @@ func GetCmdQueryUnbondingDelegation(storeName string, cdc *codec.Codec) *cobra.C
 // unbonding-delegation records for a delegator.
 func GetCmdQueryUnbondingDelegations(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "unbonding-delegations [delegator-addr]",
+		Use:     "unbonding-delegations [delegator-address]",
 		Short:   "Query all unbonding-delegations records for one delegator",
 		Example: "iriscli stake unbonding-delegation <delegator address>",
 		Args:    cobra.ExactArgs(1),
@@ -491,7 +494,7 @@ func GetCmdQueryRedelegation(storeName string, cdc *codec.Codec) *cobra.Command 
 // redelegation records for a delegator.
 func GetCmdQueryRedelegations(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "redelegations [delegator-addr]",
+		Use:     "redelegations [delegator-address]",
 		Short:   "Query all redelegations records for one delegator",
 		Example: "iriscli stake redelegations <delegator address>",
 		Args:    cobra.ExactArgs(1),

@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	defaultAmount                  = "100000000000000000000" + stakeTypes.StakeDenom
+	defaultAmount                  = "100" + stakeTypes.StakeDenomName
 	defaultCommissionRate          = "0.1"
 	defaultCommissionMaxRate       = "0.2"
 	defaultCommissionMaxChangeRate = "0.01"
