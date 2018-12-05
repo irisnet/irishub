@@ -7,12 +7,12 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	irishubType "github.com/irisnet/irishub/types"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/common"
+	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // SendOrPrintTx implements a utility function that
@@ -260,7 +260,7 @@ func isTxSigner(user sdk.AccAddress, signers []sdk.AccAddress) bool {
 }
 
 func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) irishubType.Rat {
-	stakeTokenDenom, err := cliCtx.GetCoinType(app.Denom)
+	stakeTokenDenom, err := cliCtx.GetCoinType(types.StakeDenomName)
 	if err != nil {
 		panic(err)
 	}

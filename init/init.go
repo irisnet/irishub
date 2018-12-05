@@ -60,9 +60,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			if viper.GetString(flagMoniker) != "" {
-				config.Moniker = viper.GetString(flagMoniker)
-			}
+			config.Moniker = viper.GetString(flagMoniker)
 
 			var appState json.RawMessage
 			genFile := config.GenesisFile()
@@ -91,5 +89,6 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().BoolP(flagOverwrite, "o", false, "overwrite the genesis.json file")
 	cmd.Flags().String(client.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
 	cmd.Flags().String(flagMoniker, "", "set the validator's moniker")
+	cmd.MarkFlagRequired(flagMoniker)
 	return cmd
 }

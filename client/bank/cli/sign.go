@@ -40,6 +40,7 @@ recommended to set such parameters manually.`,
 	cmd.Flags().Bool(flagAppend, true, "Append the signature to the existing ones. If disabled, old signatures would be overwritten")
 	cmd.Flags().Bool(flagPrintSigs, false, "Print the addresses that must sign the transaction and those who have already signed it, then exit")
 	cmd.Flags().Bool(flagOffline, false, "Offline mode. Do not query local cache.")
+	cmd.MarkFlagRequired(client.FlagChainID)
 	return cmd
 }
 

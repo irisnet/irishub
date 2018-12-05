@@ -10,7 +10,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/types"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/utils"
@@ -299,7 +298,7 @@ func getShares(
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
 
-		stakeTokenDenom, err := cliCtx.GetCoinType(app.Denom)
+		stakeTokenDenom, err := cliCtx.GetCoinType(types.StakeDenomName)
 		if err != nil {
 			panic(err)
 		}

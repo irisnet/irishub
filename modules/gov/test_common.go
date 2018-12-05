@@ -13,10 +13,11 @@ import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // initialize the mock application for this module
@@ -42,8 +43,8 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
-
-	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
+	
+	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)
@@ -67,15 +68,15 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		mapp.InitChainer(ctx, req)
 
 		stakeGenesis := stake.DefaultGenesisState()
-		stakeGenesis.Params.BondDenom = "iris-atto"
+		stakeGenesis.Params.BondDenom = stakeTypes.StakeDenom
 		stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewInt(100000))
 
 		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 		if err != nil {
 			panic(err)
 		}
-		ct := types.NewDefaultCoinType("iris")
-		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+		ct := types.NewDefaultCoinType(stakeTypes.StakeDenomName)
+		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeDenomName))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
 			DepositProcedure: govparams.DepositProcedure{

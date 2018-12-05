@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"testing"
 
-	codec "github.com/irisnet/irishub/codec"
 	"github.com/stretchr/testify/require"
 )
 
@@ -69,7 +68,7 @@ func TestNewFromDecimal(t *testing.T) {
 	}
 }
 
-func TestEqualities(t *testing.T) {
+func TestEqualitiesRational(t *testing.T) {
 	tests := []struct {
 		r1, r2     Rat
 		gt, lt, eq bool
@@ -108,7 +107,7 @@ func TestEqualities(t *testing.T) {
 
 }
 
-func TestArithmetic(t *testing.T) {
+func TestArithmeticRational(t *testing.T) {
 	tests := []struct {
 		r1, r2                         Rat
 		resMul, resDiv, resAdd, resSub Rat
@@ -217,8 +216,6 @@ func TestToLeftPadded(t *testing.T) {
 	}
 }
 
-var cdc = codec.New() //var jsonCdc JSONCodec // TODO codec.Codec
-
 func TestZeroSerializationJSON(t *testing.T) {
 	r := NewRat(0, 1)
 	err := cdc.UnmarshalJSON([]byte(`"0/1"`), &r)
@@ -231,7 +228,7 @@ func TestZeroSerializationJSON(t *testing.T) {
 	require.NotNil(t, err)
 }
 
-func TestSerializationText(t *testing.T) {
+func TestSerializationTextRational(t *testing.T) {
 	r := NewRat(1, 3)
 
 	bz, err := r.MarshalText()
@@ -260,7 +257,7 @@ func TestSerializationGoWireBinary(t *testing.T) {
 	require.NoError(t, err)
 
 	var r2 Rat
-	err = cdc.UnMarshalBinaryLengthPrefixed(bz, &r2)
+	err = cdc.UnmarshalBinaryLengthPrefixed(bz, &r2)
 	require.NoError(t, err)
 	require.True(t, r.Equal(r2), "original: %v, unmarshalled: %v", r, r2)
 }
@@ -308,7 +305,7 @@ func TestRatsEqual(t *testing.T) {
 
 }
 
-func TestStringOverflow(t *testing.T) {
+func TestStringOverflowRational(t *testing.T) {
 	// two random 64 bit primes
 	rat1 := NewRat(5164315003622678713, 4389711697696177267)
 	rat2 := NewRat(-3179849666053572961, 8459429845579852627)

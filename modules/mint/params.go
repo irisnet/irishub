@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // mint parameters
@@ -18,7 +19,7 @@ type Params struct {
 // default minting module parameters
 func DefaultParams() Params {
 	return Params{
-		MintDenom:           "steak",
+		MintDenom:           stakeTypes.StakeDenom,
 		InflationRateChange: sdk.NewDecWithPrec(13, 2),
 		InflationMax:        sdk.NewDecWithPrec(20, 2),
 		InflationMin:        sdk.NewDecWithPrec(7, 2),
