@@ -8,7 +8,7 @@
 
 ### 软件升级提议治理流程
 1. 用户提交升级软件的提议
-2. 治理流程详细见GOV的[用户手册](../gov/README.md)
+2. 治理流程详细见GOV的[用户手册](governance.md)
 
 
 ### 升级软件流程  
@@ -92,7 +92,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 ```
 
 * `--type`  "SoftwareUpgrade" 软件升级提议的类型
-* 其他参数可参考GOV的[用户手册](../gov/README.md)
+* 其他参数可参考GOV的[用户手册](governance.md)
 
 ```
 iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
