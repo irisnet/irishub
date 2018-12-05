@@ -1,4 +1,4 @@
-package bank
+package fee
 
 import (
 	codec "github.com/irisnet/irishub/codec"

@@ -1,4 +1,4 @@
-package bank
+package fee
 
 
 import (
@@ -11,6 +11,8 @@ import (
 
 	codec "github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/store"
+	dbm "github.com/tendermint/tendermint/libs/db"
 )
 
 var (
@@ -18,6 +20,17 @@ var (
 	oneCoin    = sdk.Coins{sdk.NewInt64Coin("foocoin", 1)}
 	twoCoins   = sdk.Coins{sdk.NewInt64Coin("foocoin", 2)}
 )
+
+func SetupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
+	db := dbm.NewMemDB()
+	capKey := sdk.NewKVStoreKey("capkey")
+	capKey2 := sdk.NewKVStoreKey("capkey2")
+	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(capKey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(capKey2, sdk.StoreTypeIAVL, db)
+	ms.LoadLatestVersion()
+	return ms, capKey, capKey2
+}
 
 func TestFeeCollectionKeeperGetSet(t *testing.T) {
 	ms, _, capKey2 := SetupMultiStore()
