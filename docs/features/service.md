@@ -6,7 +6,7 @@ to work with the service standardized definitions to satisfy service invocations
 The currently supported IDL language is [protobuf](https://developers.google.com/protocol-buffers/). The main functions of this module are as follows:
 1. Service Definition
 2. Service Binding
-3. Service Invocation (TODO)
+3. Service Invocation
 4. Dispute Resolution (TODO)
 5. Service Analysis (TODO)
 
