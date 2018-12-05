@@ -8,7 +8,7 @@ In IRISnet, there are some special parameters can be modified through on-chain g
 * `VotingProcedure`    Parameters in voting period（Voting period）
 * `TallyingProcedure`  Parameters in tallying period（The standards of voting）
 
-Details in [gov](../governancemd)
+Details in [gov](../governance.md)
 
 ## Service Module
 
