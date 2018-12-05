@@ -13,6 +13,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const NULL = "null"
+
 // GetWithdrawAddress returns withdraw address of a given delegator address
 func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
@@ -74,6 +76,10 @@ func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if len(res) == 0 {
+				fmt.Println(NULL)
+				return nil
+			}
 			var ddi types.DelegationDistInfo
 			err = cdc.UnmarshalBinaryLengthPrefixed(res, &ddi)
 			if err != nil {
@@ -118,6 +124,10 @@ func GetAllDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command
 			resKVs, err := cliCtx.QuerySubspace(key, storeName)
 			if err != nil {
 				return err
+			}
+			if len(resKVs) == 0 {
+				fmt.Println(NULL)
+				return nil
 			}
 			var ddiList []types.DelegationDistInfo
 			for _, kv := range resKVs {
@@ -165,6 +175,11 @@ func GetValidatorDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if len(res) == 0 {
+				fmt.Println(NULL)
+				return nil
+			}
+
 			var vdi types.ValidatorDistInfo
 			err = cdc.UnmarshalBinaryLengthPrefixed(res, &vdi)
 			if err != nil {
