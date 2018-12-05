@@ -52,14 +52,14 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 		// Defensive.
 		// Simulation doesn't take unbonding periods into account, and
 		// Tendermint might break this assumption at some point.
-		return nil
+		return
 	}
 
 	// Double sign too old
 	maxEvidenceAge := k.MaxEvidenceAge(ctx)
 	if age > maxEvidenceAge {
 		logger.Info(fmt.Sprintf("Ignored double sign from %s at height %d, age of %d past max age of %d", pubkey.Address(), infractionHeight, age, maxEvidenceAge))
-		return nil
+		return
 	}
 
 	// Double sign confirmed
