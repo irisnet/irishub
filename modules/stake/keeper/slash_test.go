@@ -83,20 +83,20 @@ func TestSlashUnbondingDelegation(t *testing.T) {
 	keeper.SetUnbondingDelegation(ctx, ubd)
 
 	// unbonding started prior to the infraction height, stake didn't contribute
-	slashAmount := keeper.slashUnbondingDelegation(ctx, ubd, 1, fraction)
+	slashAmount, _ := keeper.slashUnbondingDelegation(ctx, ubd, 1, fraction)
 	require.Equal(t, int64(0), slashAmount.RoundInt64())
 
 	// after the expiration time, no longer eligible for slashing
 	ctx = ctx.WithBlockHeader(abci.Header{Time: time.Unix(10, 0)})
 	keeper.SetUnbondingDelegation(ctx, ubd)
-	slashAmount = keeper.slashUnbondingDelegation(ctx, ubd, 0, fraction)
+	slashAmount, _ = keeper.slashUnbondingDelegation(ctx, ubd, 0, fraction)
 	require.Equal(t, int64(0), slashAmount.RoundInt64())
 
 	// test valid slash, before expiration timestamp and to which stake contributed
 	oldPool := keeper.GetPool(ctx)
 	ctx = ctx.WithBlockHeader(abci.Header{Time: time.Unix(0, 0)})
 	keeper.SetUnbondingDelegation(ctx, ubd)
-	slashAmount = keeper.slashUnbondingDelegation(ctx, ubd, 0, fraction)
+	slashAmount, _ = keeper.slashUnbondingDelegation(ctx, ubd, 0, fraction)
 	require.Equal(t, int64(5), slashAmount.RoundInt64())
 	ubd, found := keeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
 	require.True(t, found)
@@ -141,7 +141,7 @@ func TestSlashRedelegation(t *testing.T) {
 	// started redelegating prior to the current height, stake didn't contribute to infraction
 	validator, found := keeper.GetValidator(ctx, addrVals[1])
 	require.True(t, found)
-	slashAmount := keeper.slashRedelegation(ctx, validator, rd, 1, fraction)
+	slashAmount, _ := keeper.slashRedelegation(ctx, validator, rd, 1, fraction)
 	require.Equal(t, sdk.ZeroDec(), slashAmount)
 
 	// after the expiration time, no longer eligible for slashing
@@ -149,7 +149,7 @@ func TestSlashRedelegation(t *testing.T) {
 	keeper.SetRedelegation(ctx, rd)
 	validator, found = keeper.GetValidator(ctx, addrVals[1])
 	require.True(t, found)
-	slashAmount = keeper.slashRedelegation(ctx, validator, rd, 0, fraction)
+	slashAmount, _ = keeper.slashRedelegation(ctx, validator, rd, 0, fraction)
 	require.Equal(t, sdk.ZeroDec(), slashAmount)
 
 	// test valid slash, before expiration timestamp and to which stake contributed
@@ -158,7 +158,7 @@ func TestSlashRedelegation(t *testing.T) {
 	keeper.SetRedelegation(ctx, rd)
 	validator, found = keeper.GetValidator(ctx, addrVals[1])
 	require.True(t, found)
-	slashAmount = keeper.slashRedelegation(ctx, validator, rd, 0, fraction)
+	slashAmount, _ = keeper.slashRedelegation(ctx, validator, rd, 0, fraction)
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), slashAmount)
 	rd, found = keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
 	require.True(t, found)
