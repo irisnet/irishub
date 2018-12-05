@@ -26,7 +26,7 @@
 
 	验证人节点的所有者必须将他们自己流通的token绑定到自己的验证人节点。验证人节点投票权重与绑定的token数量成正比，包括所有者自己绑定的token和来自其他委托人的token。验证人节点的所有者可以通过发送解绑交易来降低他们自己绑定的token。委托人同样可以通过发送解绑交易来降低绑定的token。但是，这些被解绑的token不会立即成为流通的token。执行解绑交易之后，在解绑期结束之前，相应的验证人节点的所有者或委托人不能再次在相同的验证人节点上发起解绑交易。通常，解绑期为三周。一旦解绑期结束，被解绑的token将自动成为流通的token。解绑期机制对POS区块链网络的安全性很重要。此外，如果验证人节点的所有者在自己的验证人节点上没有绑定token，则相应的验证人会被踢出验证人集。
 
-6. 再委托
+6. 转委托
 
 	委托人可以将其抵押的token从一个验证人转移到另一个验证人。这个可以分为两个步骤：从第一个验证人上解绑和把解绑的token绑定到另一个验证人上。正如我们上面所说，在解绑期结束之前，解绑操作不能立即完成，这意味着委托人不能立即发送再委托交易。
 
@@ -111,9 +111,9 @@
 	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.004iris  --amount=100iris --share-percent=0.5
 	```
 
-8. 再委托
+8. 转委托
 
-      再委托一半的token到另外一个验证人节点
+      转委托一半的token到另外一个验证人节点
 	```
 	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
 	```
