@@ -39,7 +39,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	mapp.Router().AddRoute("service", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
 
 	mapp.SetEndBlocker(getEndBlocker())
-	mapp.SetInitChainer(getInitChainer(mapp, sk))
+	mapp.SetInitChainer(getInitChainer(mapp, ik, sk))
 
 	require.NoError(t, mapp.CompleteSetup(keyService))
 
@@ -60,7 +60,7 @@ func getEndBlocker() sdk.EndBlocker {
 }
 
 // gov and stake initchainer
-func getInitChainer(mapp *mock.App, stakeKeeper stake.Keeper) sdk.InitChainer {
+func getInitChainer(mapp *mock.App, serviceKeeper Keeper, stakeKeeper stake.Keeper) sdk.InitChainer {
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 		mapp.InitChainer(ctx, req)
 
@@ -71,7 +71,7 @@ func getInitChainer(mapp *mock.App, stakeKeeper stake.Keeper) sdk.InitChainer {
 		if err != nil {
 			panic(err)
 		}
-		InitGenesis(ctx, DefaultGenesisState())
+		InitGenesis(ctx, serviceKeeper, DefaultGenesisState())
 		return abci.ResponseInitChain{
 			Validators: validators,
 		}

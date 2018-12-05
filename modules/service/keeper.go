@@ -437,11 +437,23 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 
 // Add incoming fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+	feeTax := k.GetServiceFeeTax(ctx)
+	var taxFee sdk.Coins
+	for _, coin := range coins {
+		taxFee.Plus(sdk.Coins{sdk.Coin{coin.Denom, sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
+	}
+
+	taxPool := k.GetServiceFeeTaxPool(ctx)
+	taxPool = taxPool.Plus(taxFee)
+	k.SetServiceFeeTaxPool(ctx, taxPool)
+
+	incomingFee := coins.Minus(taxFee)
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
 		k.SetIncomingFee(ctx, address, coins)
 	}
-	k.SetIncomingFee(ctx, address, fee.Coins.Plus(coins))
+
+	k.SetIncomingFee(ctx, address, fee.Coins.Plus(incomingFee))
 }
 
 // withdraw fees from a particular provider, and delete it
@@ -457,6 +469,42 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetIncomingFeeKey(address))
 	return nil
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) GetServiceFeeTax(ctx sdk.Context) sdk.Dec {
+	var percent sdk.Dec
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(serviceFeeTaxKey)
+	if value == nil {
+		return sdk.Dec{}
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &percent)
+	return percent
+}
+
+func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
+	store.Set(serviceFeeTaxKey, bz)
+}
+
+func (k Keeper) GetServiceFeeTaxPool(ctx sdk.Context) sdk.Coins {
+	var coins sdk.Coins
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(serviceFeeTaxPoolKey)
+	if value == nil {
+		return sdk.Coins{}
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &coins)
+	return coins
+}
+
+func (k Keeper) SetServiceFeeTaxPool(ctx sdk.Context, coins sdk.Coins) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(coins)
+	store.Set(serviceFeeTaxPoolKey, bz)
 }
 
 //__________________________________________________________________________
