@@ -9,6 +9,7 @@ import (
 	"github.com/irisnet/irishub/types"
 	"strconv"
 	"time"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var DepositProcedureParameter DepositProcedureParam
@@ -44,7 +45,7 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
 		param.Value = value
 	} else {
-		var minDeposit, _ = types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+		var minDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeDenomName))
 
 		param.Value = DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
@@ -100,12 +101,12 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.MinDeposit[0].Denom != "iris-atto" {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be iris-atto!"))
+		if param.Value.MinDeposit[0].Denom != stakeTypes.StakeDenom {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be %s!", stakeTypes.StakeDenom))
 		}
 
-		LowerBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, "iris"))
-		UpperBound, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, "iris"))
+		LowerBound, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
+		UpperBound, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
 
 		if param.Value.MinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.MinDeposit[0].Amount.GT(UpperBound.Amount) {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))

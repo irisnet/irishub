@@ -25,15 +25,14 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/guardian"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var (
-	Denom             = "iris"
-	StakeDenom        = Denom + "-" + types.Atto
 	FeeAmt            = int64(100)
-	IrisCt            = types.NewDefaultCoinType(Denom)
-	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", FeeAmt, Denom))
-	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), Denom))
+	IrisCt            = types.NewDefaultCoinType(stakeTypes.StakeDenomName)
+	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", FeeAmt, stakeTypes.StakeDenomName))
+	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), stakeTypes.StakeDenomName))
 )
 
 const (
@@ -144,18 +143,18 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	}
 
 	for _, acc := range genesisState.Accounts {
-		// create the genesis account, give'm few iris-atto and a buncha token with there name
+		// create the genesis account, give'm few stake token and a buncha token with there name
 		for _, coin := range acc.Coins {
 			coinName, err := types.GetCoinName(coin)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 			}
-			if coinName != Denom {
+			if coinName != stakeTypes.StakeDenomName {
 				continue
 			}
 			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
-				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", StakeDenom, coin))
+				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", stakeTypes.StakeDenom, coin))
 			}
 			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
 				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
@@ -306,7 +305,7 @@ func createStakeGenesisState() stake.GenesisState {
 		Params: stake.Params{
 			UnbondingTime: defaultUnbondingTime,
 			MaxValidators: 100,
-			BondDenom:     StakeDenom,
+			BondDenom:     stakeTypes.StakeDenom,
 		},
 	}
 }
@@ -315,7 +314,7 @@ func createMintGenesisState() mint.GenesisState {
 	return mint.GenesisState{
 		Minter: mint.InitialMinter(),
 		Params: mint.Params{
-			MintDenom:           StakeDenom,
+			MintDenom:           stakeTypes.StakeDenom,
 			InflationRateChange: sdk.NewDecWithPrec(13, 2),
 			InflationMax:        sdk.NewDecWithPrec(20, 2),
 			InflationMin:        sdk.NewDecWithPrec(7, 2),
@@ -327,16 +326,16 @@ func createMintGenesisState() mint.GenesisState {
 // normalize stake token to mini-unit
 func normalizeNativeToken(coins []string) sdk.Coins {
 	var accountCoins sdk.Coins
-	nativeCoin := sdk.NewInt64Coin(StakeDenom, 0)
+	nativeCoin := sdk.NewInt64Coin(stakeTypes.StakeDenom, 0)
 	for _, coin := range coins {
 		coinName, err := types.GetCoinName(coin)
 		if err != nil {
 			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 		}
-		if coinName == Denom {
+		if coinName == stakeTypes.StakeDenomName {
 			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
-				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, StakeDenom))
+				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, stakeTypes.StakeDenom))
 			}
 			nativeCoin = nativeCoin.Plus(normalizeNativeToken)
 		} else {

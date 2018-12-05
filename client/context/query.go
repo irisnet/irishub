@@ -2,28 +2,26 @@ package context
 
 import (
 	"fmt"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-
-	"github.com/pkg/errors"
-
+	"io/ioutil"
+	"net/http"
 	"strings"
 
-	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/modules/auth"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/merkle"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmliteErr "github.com/tendermint/tendermint/lite/errors"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
-	"github.com/tendermint/tendermint/crypto/merkle"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io/ioutil"
-	"net/http"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an
@@ -284,7 +282,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	if coinName == "" {
 		return types.CoinType{}, fmt.Errorf("coin name is empty")
 	}
-	if coinName == app.Denom {
+	if coinName == stakeTypes.StakeDenomName {
 		coinType = app.IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)

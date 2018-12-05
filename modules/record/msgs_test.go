@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/irisnet/irishub/types"

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 )
 
 // An sdk.Tx which is its own sdk.Msg.

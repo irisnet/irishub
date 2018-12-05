@@ -32,7 +32,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	slashAmount := sdk.NewDec(power).Mul(slashFactor)
 	// ref https://github.com/irisnet/irishub/issues/1348
 	// ref https://github.com/irisnet/irishub/issues/1471
-	//Multiply 1*10^18 to calculate equivalent iris-atto amount
+	//Multiply 1*10^18 to calculate equivalent stake denom amount
 	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
 	slashAmount = slashAmount.MulInt(tokenPrecision)
 
