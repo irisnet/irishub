@@ -128,7 +128,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	resTags = sdk.NewTags()
 
 	if ctx.BlockHeight() == keeper.GetTerminatorHeight(ctx) {
-		resTags = resTags.AppendTag(tmstate.TerminateTagKey,[]byte(tmstate.TerminateTagValue))
+		resTags = resTags.AppendTag(tmstate.HaltTagKey,[]byte(tmstate.HaltTagValue))
 		logger.Info(fmt.Sprintf("Terminator Start!!!"))
 	}
 
