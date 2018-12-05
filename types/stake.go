@@ -76,7 +76,7 @@ type ValidatorSet interface {
 	TotalPower(Context) Dec                             // total power of the validator set
 
 	// slash the validator and delegators of the validator, specifying offence height, offence power, and slash fraction
-	Slash(Context, ConsAddress, int64, int64, Dec)
+	Slash(Context, ConsAddress, int64, int64, Dec) Tags
 	Jail(Context, ConsAddress)   // jail a validator
 	Unjail(Context, ConsAddress) // unjail a validator
 
