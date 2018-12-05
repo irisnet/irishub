@@ -6,7 +6,7 @@ IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式
 简称IDL）对服务进行标准化定义来满足跨语言的服务调用。目前支持的IDL语言为[protobuf](https://developers.google.com/protocol-buffers/)。该模块的主要功能点如下：
 1. 服务定义
 2. 服务绑定
-3. 服务调用 (TODO)
+3. 服务调用
 4. 争议解决 (TODO)
 5. 服务分析 (TODO)
 
