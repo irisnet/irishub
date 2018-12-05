@@ -6,13 +6,13 @@ import (
 )
 
 // NewHandler returns a handler for "bank" type messages.
-func NewHandler(k Keeper) sdk.Handler {
+func NewHandler(bo BO) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case bank.MsgSend:
-			return handleMsgSend(ctx, k, msg)
+			return handleMsgSend(ctx, bo, msg)
 		case bank.MsgIssue:
-			return handleMsgIssue(ctx, k, msg)
+			return handleMsgIssue(ctx, bo, msg)
 		default:
 			errMsg := "Unrecognized bank Msg type: %s" + msg.Type()
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -21,10 +21,10 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 // Handle MsgSend.
-func handleMsgSend(ctx sdk.Context, k Keeper, msg bank.MsgSend) sdk.Result {
+func handleMsgSend(ctx sdk.Context, bo BO, msg bank.MsgSend) sdk.Result {
 	// NOTE: totalIn == totalOut should already have been checked
 
-	tags, err := k.InputOutputCoins(ctx, msg.Inputs, msg.Outputs)
+	tags, err := bo.InputOutputCoins(ctx, msg.Inputs, msg.Outputs)
 	if err != nil {
 		return err.Result()
 	}
@@ -35,7 +35,7 @@ func handleMsgSend(ctx sdk.Context, k Keeper, msg bank.MsgSend) sdk.Result {
 }
 
 // Handle MsgIssue.
-func handleMsgIssue(ctx sdk.Context, k Keeper, msg bank.MsgIssue) sdk.Result {
+func handleMsgIssue(ctx sdk.Context, bo BO, msg bank.MsgIssue) sdk.Result {
 	panic("not implemented yet")
 }
 
