@@ -2,7 +2,7 @@
 
 ##  定义
 
-coin_type 定义了iris-hub系统中代币的可用单位，只要是系统中已注册的coin_type类型，都可以使用该单位来进行交易。iris-hub中系统默认的代币为iris，iris存在以下几种可用单位:iris-milli,iris-micro,iris-nano,iris-pico,iris-femto,iris-atto。他们之间存在以下换算关系
+coin_type定义了IRIShub系统中代币的可用单位，只要是系统中已注册的coin_type类型，都可以使用该单位来进行交易。IRIShub中系统默认的代币为iris，iris存在以下几种可用单位:iris-milli,iris-micro,iris-nano,iris-pico,iris-femto,iris-atto。他们之间存在以下换算关系
 
 ```
 1 iris = 10^3 iris-milli
@@ -13,7 +13,7 @@ coin_type 定义了iris-hub系统中代币的可用单位，只要是系统中�
 1 iris = 10^18 iris-atto
 ```
 
-## coin_type的数据模型
+## coin_type的数据结构
 
 ```golang
 type CoinType struct {
@@ -35,7 +35,7 @@ type Unit struct {
 ```
 
 * `Name`:  代币名称，也是coin的主单位，例如iris
-* `MinUnit`: coin_type的最小单位，系统中存在的代币都是以最小单位的形式存在，例如iris代币，在iris-hub中存储的单位是iris-atto。当用户发送交易到iris-hub中，使用的必须是该代币的最小单位。但是如果你使用的是iris-hub提供的命令行工具，你可以使用任何系统识别的单位，系统将自动转化为该代币对应的最小单位形式。比如如果你使用send命令转移1iris，命令行将在后端处理为10^18 iris-atto，使用交易hash查询到的交易详情，你也只会看到10^18 iris-atto。
+* `MinUnit`: coin_type的最小单位，系统中存在的代币都是以最小单位的形式存在，例如iris代币，在IRIShub中存储的单位是iris-atto。当用户发送交易到IRIShub中，使用的必须是该代币的最小单位。但是如果你使用的是IRIShub提供的命令行工具，你可以使用任何系统识别的单位，系统将自动转化为该代币对应的最小单位形式。比如如果你使用send命令转移1iris，命令行将在后端处理为10^18 iris-atto，使用交易hash查询到的交易详情，你也只会看到10^18 iris-atto。
 
 
 其中:
