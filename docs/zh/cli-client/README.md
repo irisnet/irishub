@@ -16,8 +16,8 @@
 
 ## 发送交易命令的flags
 
-| 名称, 速记       | 类型         |必需          |默认值                | 描述                                                        | 
-| Name, shorthand  | type   | Required | Default               | Description                                                         |
+
+| 名称, 速记        | 类型         |必需          |默认值                | 描述                         |
 | -----------------| -----  | -------- | --------------------- | ------------------------------------------------------------------- |
 | --account-number | int    | false    | 0                     | 发起交易的账户的编号 |
 | --async          | bool   | false    | false                 | 是否异步广播交易 |
@@ -54,3 +54,7 @@
 9. [status command](./status/README.md)
 10. [tendermint command](./tendermint/README.md)
 11. [upgrade command](./upgrade/README.md)
+
+## iriscli config命令
+
+iriscli config命令可以交互式地配置一些默认参数，例如chain-id，home，fee 和 node。

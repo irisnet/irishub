@@ -2,11 +2,11 @@
 
 ## 基本功能描述
 IRIS Services（又名“iServices”）旨在对链下服务从定义、绑定（服务提供方注册）、调用到治理（分析和争端解决）的全生命周期传递，来跨越区块链世界和传统业务应用世界之间的鸿沟。 
-IRIS SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式商业服务在区块链互联网上可用。我们引入接口描述语言（[Interface description language](https://en.wikipedia.org/wiki/Interface_description_language)，
-简称IDL）对服务进行进行标准化的定义来满足跨语言的服务调用。目前支持的IDL语言为[protobuf](https://developers.google.com/protocol-buffers/)。该模块的主要功能点如下：
+IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式商业服务在区块链互联网上可用。我们引入接口描述语言（[Interface description language](https://en.wikipedia.org/wiki/Interface_description_language)，
+简称IDL）对服务进行标准化定义来满足跨语言的服务调用。目前支持的IDL语言为[protobuf](https://developers.google.com/protocol-buffers/)。该模块的主要功能点如下：
 1. 服务定义
 2. 服务绑定
-3. 服务调用 (TODO)
+3. 服务调用
 4. 争议解决 (TODO)
 5. 服务分析 (TODO)
 
@@ -143,8 +143,8 @@ iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service
 * `--bind-type` 对服务是本地还是全局的设置，可选值Local/Global
 * `--deposit` 服务提供者的保证金
 * `--prices` 服务定价,按照服务方法排序的定价列表
-* `--avg-rsp-time` 服务平均返回时间的毫秒数表示
-* `--usable-time` 每一万次服务调用的可用性的整数表示
+* `--avg-rsp-time` 服务平均返回时间的毫秒数
+* `--usable-time` 每一万次服务调用中的可用次数
 
 ```
 iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
@@ -167,8 +167,8 @@ iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris
 * `--bind-type` 对服务是本地还是全局的设置，可选值Local/Global
 * `--deposit` 追加的服务提供者保证金
 * `--prices` 服务定价,按照服务方法排序的定价列表
-* `--avg-rsp-time` 服务平均返回时间的毫秒数表示
-* `--usable-time` 每一万次服务调用可用次数的整数表示
+* `--avg-rsp-time` 服务平均返回时间的毫秒数
+* `--usable-time` 每一万次服务调用中的可用次数
 
 ```
 iriscli service disable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
@@ -207,4 +207,4 @@ iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris
 
 * IDL文件参照
 
-[test.proto](../../features/test.proto)
+[test.proto](https://github.com/shirleypyj/irishub/blob/develop/docs/features/test.proto)

@@ -39,6 +39,7 @@ A validator is under the risk of being attacked. You could follow this [guide](.
 ## Fuxi Incentivized Testnet
 IRIS foundation plans to reward all the testnet participants who took part in the testnet. In Fuxi-3001 testnet,the community members have finished the tasks and they will receive their rewards in genesis allocation.
 * Task List for Fuxi-4000： https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-4000/README.md
+* Results for Fuxi-4000 tasks: https://github.com/irisnet/testnets/issues/176
 
 To get more people involved, IRIS foundation decides to send out more tasks in the latest iteration of testnet:Fuxi-5000.
 * Task List for Fuxi-5000: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-5000/README.md

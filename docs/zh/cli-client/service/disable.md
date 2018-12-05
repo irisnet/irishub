@@ -14,11 +14,11 @@ iriscli service disable [flags]
 
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------  | -------- |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                         |  Yes     |
-| --service-name        |                         | [string] 服务名称                                                                   |  Yes     |
+| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                         | 是       |
+| --service-name        |                         | [string] 服务名称                                                                   | 是       |
 | -h, --help            |                         | 禁用命令帮助                                                                         |          |
 
-## 例子
+## 示例
 
 ### 禁用一个可用的服务绑定
 ```shell

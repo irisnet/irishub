@@ -12,7 +12,7 @@ IRISLCD has two subcommands:
 | subcommand      | Description                 | Example command |
 | --------------- | --------------------------- | --------------- |
 | version         | Print the IRISLCD version   | irislcd version |
-| start           | Start a IRISLCD node        | irislcd start --chain-id=<chain-id> |
+| start           | Start a IRISLCD node        | irislcd start --chain-id=`<chain-id>` |
 
 `start` subcommand has these options:
 
@@ -52,7 +52,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     7. `GET /txs/{hash}`: Get a Tx by hash
     8. `GET /txs`: Search transactions
     9. `POST /txs`: Broadcast Tx
- 
+
 2. Key management APIs
 
     1. `GET /keys`: List of accounts stored locally

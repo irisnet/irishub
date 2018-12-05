@@ -73,22 +73,19 @@ install: update_irislcd_swagger_docs echo_bech32_prefix
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iris
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
-	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irismon
-
-install_debug:
-	go install $(BUILD_FLAGS) ./cmd/irisdebug
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iristool
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irismon ./cmd/irismon
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
 build_cur: update_irislcd_swagger_docs echo_bech32_prefix
 	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \
 	go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
 	go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-	go build $(BUILD_FLAGS) -o build/irismon ./cmd/irismon
+	go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
 build_examples: update_irislcd_swagger_docs echo_bech32_prefix
 	go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1

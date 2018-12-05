@@ -1,8 +1,8 @@
 package guardian
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/guardian/tags"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // handle all "guardian" type messages.
@@ -16,7 +16,6 @@ func NewHandler(k Keeper) sdk.Handler {
 		}
 	}
 }
-
 func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Result {
 	if _, found := k.GetProfiler(ctx, msg.AddedAddr); !found {
 		return ErrProfilerNotExists(DefaultCodespace, msg.AddedAddr).Result()

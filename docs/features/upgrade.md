@@ -8,7 +8,7 @@ The module supports the infrastructure of the blockchain software upgrade. It wi
 
 ###  Governance process of software upgrade proposal
 1. Submit a software upgrade proposal
-2. More details about governance process is in GOV [User Guide](../gov/README.md)
+2. More details about governance process is in GOV [User Guide](governance.md)
 
 ### The process of software upgrade   
 1. Install a new software, send a switch message, and broadcast to the whole network.
@@ -92,7 +92,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 ```
 
 * `--type`  "SoftwareUpgrade" The type of Software upgrade proposals
-* Other parameters can be referrenced in [Gov User Guide](../gov/README.md)
+* Other parameters can be referrenced in [Gov User Guide](governance.md)
 
 ```
 iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000

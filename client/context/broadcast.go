@@ -127,7 +127,7 @@ func (cliCtx CLIContext) broadcastTxAsync(txBytes []byte) (*ctypes.ResultBroadca
 	return res, nil
 }
 
-func (cliCtx CLIContext)  broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	res, err := cliCtx.BroadcastTxAndAwaitCommit(txBytes)
 	if err != nil {
 		return res, err
@@ -161,8 +161,8 @@ func (cliCtx CLIContext)  broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroad
 
 		if cliCtx.PrintResponse {
 			jsonStr, _ := deliverTxMarshalIndentJSON(res.DeliverTx)
-			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n%s\n",
-				res.Height, res.Hash.String(), res.DeliverTx, string(jsonStr),
+			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n",
+				res.Height, res.Hash.String(), string(jsonStr),
 			)
 		}
 
@@ -180,8 +180,22 @@ func deliverTxMarshalIndentJSON(dtx abci.ResponseDeliverTx) ([]byte, error) {
 	}
 
 	return json.MarshalIndent(&struct {
-		Tags map[string]string `json:"tags,omitempty"`
+		Code      uint32            `json:"code"`
+		Data      []byte            `json:"data"`
+		Log       string            `json:"log"`
+		Info      string            `json:"info"`
+		GasWanted int64             `json:"gas_wanted"`
+		GasUsed   int64             `json:"gas_used"`
+		Codespace string            `json:"codespace"`
+		Tags      map[string]string `json:"tags,omitempty"`
 	}{
-		Tags: tags,
+		Code:      dtx.Code,
+		Data:      dtx.Data,
+		Log:       dtx.Log,
+		Info:      dtx.Info,
+		GasWanted: dtx.GasWanted,
+		GasUsed:   dtx.GasUsed,
+		Codespace: dtx.Codespace,
+		Tags:      tags,
 	}, " ", "  ")
 }
