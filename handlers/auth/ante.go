@@ -7,6 +7,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	banktype "github.com/irisnet/irishub/types/bank"
 	"github.com/irisnet/irishub/keepers/bank"
+	"github.com/irisnet/irishub/keepers/fee"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -25,7 +26,7 @@ const (
 // NewAnteHandler returns an AnteHandler that checks
 // and increments sequence numbers, checks signatures & account numbers,
 // and deducts fees from the first signer.
-func NewAnteHandler(am bank.AccountKeeper, fck bank.FeeCollectionKeeper) sdk.AnteHandler {
+func NewAnteHandler(am bank.AccountKeeper, fck fee.FeeCollectionKeeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
