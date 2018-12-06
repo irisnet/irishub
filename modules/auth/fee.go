@@ -1,10 +1,9 @@
-package baseapp
+package auth
 
 import (
 	"errors"
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/types"
 	"runtime/debug"
@@ -20,7 +19,7 @@ var (
 // NewFeePreprocessHandler creates a fee token preprocesser
 func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
 	return func(ctx sdk.Context, tx sdk.Tx) error {
-		stdTx, ok := tx.(auth.StdTx)
+		stdTx, ok := tx.(StdTx)
 		if !ok {
 			return sdk.ErrInternal("tx must be StdTx")
 		}
@@ -30,7 +29,7 @@ func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
 }
 
 // NewFeePreprocessHandler creates a fee token refund handler
-func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm FeeManager) types.FeeRefundHandler {
+func NewFeeRefundHandler(am AccountKeeper, fck FeeCollectionKeeper, fm FeeManager) types.FeeRefundHandler {
 	return func(ctx sdk.Context, tx sdk.Tx, txResult sdk.Result) (actualCostFee sdk.Coin, err error) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -38,7 +37,7 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 			}
 		}()
 
-		txAccounts := auth.GetSigners(ctx)
+		txAccounts := GetSigners(ctx)
 		// If this tx failed in anteHandler, txAccount length will be less than 1
 		if len(txAccounts) < 1 {
 			//panic("invalid transaction, should not reach here")
@@ -46,7 +45,7 @@ func NewFeeRefundHandler(am auth.AccountKeeper, fck auth.FeeCollectionKeeper, fm
 		}
 		firstAccount := txAccounts[0]
 
-		stdTx, ok := tx.(auth.StdTx)
+		stdTx, ok := tx.(StdTx)
 		if !ok {
 			return sdk.Coin{}, errors.New("transaction is not Stdtx")
 		}
@@ -169,14 +168,4 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("equivalent gas price (%s%s) is less than threshold (%s%s)", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken))
 	}
 	return nil
-}
-
-type FeeGenesisStateConfig struct {
-	FeeTokenNative    string `json:"fee_token_native"`
-	GasPriceThreshold int64  `json:"gas_price_threshold"`
-}
-
-func InitGenesis(ctx sdk.Context, ps FeeManager, data FeeGenesisStateConfig) {
-	ps.paramSpace.Set(ctx, nativeFeeTokenKey, data.FeeTokenNative)
-	ps.paramSpace.Set(ctx, nativeGasPriceThresholdKey, sdk.NewInt(data.GasPriceThreshold).String())
 }
