@@ -1,6 +1,5 @@
 package cli
 
-
 import (
 	"os"
 	"fmt"
@@ -46,7 +45,8 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-	cmd.Flags().AddFlagSet(FsProfilerAddress)
-	cmd.Flags().AddFlagSet(FsProfilerName)
+	cmd.Flags().AddFlagSet(FsProfiler)
+	cmd.MarkFlagRequired(FlagProfilerAddress)
+	cmd.MarkFlagRequired(FlagProfilerName)
 	return cmd
 }

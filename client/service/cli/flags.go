@@ -19,7 +19,6 @@ const (
 	FlagPrices             = "prices"
 	FlagAvgRspTime         = "avg-rsp-time"
 	FlagUsableTime         = "usable-time"
-	FlagExpiration         = "expiration"
 	FlagMethodID           = "method-id"
 	FlagServiceFee         = "service-fee"
 	FlagReqData            = "request-data"
@@ -28,58 +27,50 @@ const (
 	FlagProfiling          = "profiling"
 	FlagReqChainId         = "request-chain-id"
 	FlagReqId              = "request-id"
+	FlagDestAddress        = "dest-address"
+	FlagWithdrawAmount     = "withdraw-amount"
 )
 
 var (
-	FsDefChainID         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceName        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceDescription = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTags               = flag.NewFlagSet("", flag.ContinueOnError)
-	FsAuthorDescription  = flag.NewFlagSet("", flag.ContinueOnError)
-	FsIdlContent         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsFile               = flag.NewFlagSet("", flag.ContinueOnError)
-	FsProvider           = flag.NewFlagSet("", flag.ContinueOnError)
-	FsBindChainID        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsBindType           = flag.NewFlagSet("", flag.ContinueOnError)
-	FsDeposit            = flag.NewFlagSet("", flag.ContinueOnError)
-	FsPrices             = flag.NewFlagSet("", flag.ContinueOnError)
-	FsAvgRspTime         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsUsableTime         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsExpiration         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsMethodID           = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceFee         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsReqData            = flag.NewFlagSet("", flag.ContinueOnError)
-	FsRespData           = flag.NewFlagSet("", flag.ContinueOnError)
-	FsErrMsg             = flag.NewFlagSet("", flag.ContinueOnError)
-	FsProfiling          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsReqChainId         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsReqId              = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceDefinitionCreate = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBindingCreate    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceDefinition       = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBinding          = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceRequest          = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceResponse         = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceWithdrawTax      = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
-	FsDefChainID.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")
-	FsServiceName.String(FlagServiceName, "", "service name")
-	FsServiceDescription.String(FlagServiceDescription, "", "service description")
-	FsTags.StringSlice(FlagTags, []string{}, "service tags")
-	FsAuthorDescription.String(FlagAuthorDescription, "", "service author description")
-	FsIdlContent.String(FlagIdlContent, "", "content of service interface description language")
-	FsFile.String(FlagFile, "", "path of file which contains service interface description language")
+	FsServiceDefinitionCreate.String(FlagServiceName, "", "service name")
+	FsServiceDefinitionCreate.String(FlagServiceDescription, "", "service description")
+	FsServiceDefinitionCreate.StringSlice(FlagTags, []string{}, "service tags")
+	FsServiceDefinitionCreate.String(FlagAuthorDescription, "", "service author description")
+	FsServiceDefinitionCreate.String(FlagIdlContent, "", "content of service interface description language")
+	FsServiceDefinitionCreate.String(FlagFile, "", "path of file which contains service interface description language")
 
-	FsProvider.String(FlagProvider, "", "bech32 encoded account created the service binding")
-	FsBindChainID.String(FlagBindChainID, "", "the ID of the blockchain bond of the service")
-	FsBindType.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
-	FsDeposit.String(FlagDeposit, "", "deposit of binding")
-	FsPrices.StringSlice(FlagPrices, []string{}, "prices of binding, will contains all method")
-	FsAvgRspTime.Int64(FlagAvgRspTime, 0, "the average service response time in milliseconds")
-	FsUsableTime.Int64(FlagUsableTime, 0, "an integer represents the number of usable service invocations per 10,000")
-	FsExpiration.String(FlagExpiration, "", "the blockchain height where this binding expires")
+	FsServiceDefinition.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")
+	FsServiceDefinition.String(FlagServiceName, "", "service name")
 
-	FsMethodID.Int16(FlagMethodID, 0, "the method id called")
-	FsServiceFee.String(FlagServiceFee, "", "fee to pay for a service invocation")
-	FsReqData.BytesHex(FlagReqData, nil, "hex encoded request data of a service invocation")
-	FsRespData.BytesHex(FlagRespData, nil, "hex encoded response data of a service invocation")
-	FsErrMsg.BytesHex(FlagErrMsg, nil, "hex encoded response error msg of a service invocation")
-	FsProfiling.Bool(FlagProfiling, false, "service invocation profiling model, default false")
-	FsReqChainId.String(FlagReqChainId, "", "the ID of the blockchain that the service invocation initiated")
-	FsReqId.String(FlagReqId, "", "the ID of the service invocation")
+	FsServiceBindingCreate.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
+	FsServiceBindingCreate.String(FlagDeposit, "", "deposit of binding")
+	FsServiceBindingCreate.StringSlice(FlagPrices, []string{}, "prices of binding, will contains all method")
+	FsServiceBindingCreate.Int64(FlagAvgRspTime, 0, "the average service response time in milliseconds")
+	FsServiceBindingCreate.Int64(FlagUsableTime, 0, "an integer represents the number of usable service invocations per 10,000")
+
+	FsServiceBinding.String(FlagBindChainID, "", "the ID of the blockchain bond of the service")
+	FsServiceBinding.String(FlagProvider, "", "bech32 encoded account created the service binding")
+
+	FsServiceRequest.Int16(FlagMethodID, 0, "the method id called")
+	FsServiceRequest.String(FlagServiceFee, "", "fee to pay for a service invocation")
+	FsServiceRequest.BytesHex(FlagReqData, nil, "hex encoded request data of a service invocation")
+	FsServiceRequest.Bool(FlagProfiling, false, "service invocation profiling model, default false")
+
+	FsServiceResponse.BytesHex(FlagRespData, nil, "hex encoded response data of a service invocation")
+	FsServiceResponse.BytesHex(FlagErrMsg, nil, "hex encoded response error msg of a service invocation")
+	FsServiceResponse.String(FlagReqChainId, "", "the ID of the blockchain that the service invocation initiated")
+	FsServiceResponse.String(FlagReqId, "", "the ID of the service invocation")
+
+	FsServiceWithdrawTax.String(FlagDestAddress, "", "bech32 encoded address of the destination account")
+	FsServiceWithdrawTax.String(FlagWithdrawAmount, "", "withdraw amount")
 }

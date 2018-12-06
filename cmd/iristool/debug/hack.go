@@ -27,8 +27,8 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 
 	iris "github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/upgrade"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -74,7 +74,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 	checkHeight := topHeight
 	for {
 		// load the given version of the state
-		err = app.LoadVersion(checkHeight, app.keyMain,false)
+		err = app.LoadVersion(checkHeight, app.keyMain, false)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -153,7 +153,7 @@ type IrisApp struct {
 	upgradeKeeper       upgrade.Keeper
 
 	// fee manager
-	feeManager bam.FeeManager
+	feeManager auth.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {

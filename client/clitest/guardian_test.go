@@ -37,4 +37,9 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 			require.Equal(t, "bar", profiler.Name)
 		}
 	}
+
+	trustees := executeGetTrustees(t, fmt.Sprintf("iriscli guardian trustees %v", flags))
+	for _, trustee := range trustees {
+		require.Equal(t, fooAddr, trustee.Addr)
+	}
 }

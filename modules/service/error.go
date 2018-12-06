@@ -8,6 +8,12 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "service"
 
+	CodeInvalidDefiniton sdk.CodeType = 100
+	CodeInvalidBinding   sdk.CodeType = 101
+	CodeInvalidRequest   sdk.CodeType = 102
+	CodeInvalidResponse  sdk.CodeType = 103
+	CodeInvalidInput     sdk.CodeType = 104
+
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101
 	CodeSvcDefNotExists          sdk.CodeType = 102
@@ -183,4 +189,8 @@ func ErrInvalidBindChainId(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrNotMatchingReqChainID(codespace sdk.CodespaceType, reqChainID string) sdk.Error {
 	return sdk.NewError(codespace, CodeNotMatchingReqChainID, fmt.Sprintf("[%s] is not a matching reqChainID", reqChainID))
+}
+
+func ErrNotTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("[%s] is not a trustee address", trustee))
 }
