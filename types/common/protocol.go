@@ -1,19 +1,19 @@
 package common
 
 type ProtocolDefinition struct {
-	version 	uint	`json:"version"`
-	software	string	`json:"software"`
-	height		uint	`json:"height"`
+	Version 	uint64	`json:"version"`
+	Software	string	`json:"software"`
+	Height		uint64	`json:"height"`
 }
 
-func (pd ProtocolDefinition) GetVersion() uint {
-	return pd.version
+func (pd ProtocolDefinition) GetVersion() uint64 {
+	return pd.Version
 }
 
 func (pd ProtocolDefinition) GetSoftware() string {
-	return pd.software
+	return pd.Software
 }
 
-func (pd ProtocolDefinition) GetHeight() uint {
-	return pd.height
+func (pd ProtocolDefinition) GetHeight() uint64 {
+	return pd.Height
 }

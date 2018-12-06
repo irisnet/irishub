@@ -1,48 +1,46 @@
 package protocol
 
 import (
-	"github.com/irisnet/irishub/types/common"
 	"fmt"
+	sdk "github.com/irisnet/irishub/types"
 )
 
-type Protocol interface {
-	GetDefinition() common.ProtocolDefinition
-	Load()
-	Init()
-}
-
-type ProtocolBase struct {
-	definition	common.ProtocolDefinition
-//	engine 		*ProtocolEngine
-}
-
-func (pb ProtocolBase) GetDefinition() common.ProtocolDefinition {
-	return pb.definition
-}
 /*
 func (pb *ProtocolBase) GetEngine() *ProtocolEngine {
 	return pb.engine
 }
 */
 type ProtocolEngine struct {
-	protocols	map[uint]Protocol
-	next		uint
-	current		uint
-//	app			*app.IrisApp
+	protocols map[uint64]Protocol
+	next      uint64
+	current   uint64
+	//	app			*app.IrisApp
 }
 
 func NewProtocolEngine() ProtocolEngine {
 	engine := ProtocolEngine{
-		make(map[uint]Protocol),
+		make(map[uint64]Protocol),
 		0,
 		0,
-//		irisApp,
+		//		irisApp,
 	}
 	return engine
 }
 
+func (pe *ProtocolEngine) Start() {
+	//find the current version From DB( EngineKeeper?)
+	current := uint64(0)
+	next    := uint64(1)
+	p, flag := pe.protocols[current]
+	if flag == true {
+		p.Load()
+		pe.current = current
+		pe.next = next
+	}
+}
+
 // To be used for Protocol with version > 0
-func (pe *ProtocolEngine) Activate(version uint) bool {
+func (pe *ProtocolEngine) Activate(version uint64) bool {
 	p, flag := pe.protocols[version]
 	if flag == true {
 		p.Load()
@@ -65,7 +63,34 @@ func (pe *ProtocolEngine) Add(p Protocol) Protocol {
 	return p
 }
 
-func (pe *ProtocolEngine) GetByVersion(v uint) (Protocol, bool) {
+func (pe *ProtocolEngine) GetByVersion(v uint64) (Protocol, bool) {
 	p, flag := pe.protocols[v]
 	return p, flag
+}
+
+func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
+	return []*sdk.KVStoreKey{keyMain,
+		keyAccount,
+		keyStake,
+		keyMint,
+		keyDistr,
+		keySlashing,
+		keyGov,
+		keyRecord,
+		keyFeeCollection,
+		keyParams,
+		//keyUpgrade,
+		keyService,
+		keyGuardian}
+}
+
+func (pe *ProtocolEngine) GetTransientStoreKeys() []*sdk.TransientStoreKey {
+	return []*sdk.TransientStoreKey{
+		tkeyStake,
+		tkeyDistr,
+		tkeyParams}
+}
+
+func (pe *ProtocolEngine) GetKeyMain() *sdk.KVStoreKey {
+	return keyMain
 }
