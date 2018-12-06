@@ -9,6 +9,13 @@ type GenesisState struct {
 	CollectedFees sdk.Coins `json:"collected_fees"` // collected fees
 }
 
+
+type FeeGenesisStateConfig struct {
+	FeeTokenNative    string `json:"fee_token_native"`
+	GasPriceThreshold int64  `json:"gas_price_threshold"`
+}
+
+
 // Create a new genesis state
 func NewGenesisState(collectedFees sdk.Coins) GenesisState {
 	return GenesisState{
@@ -22,8 +29,11 @@ func DefaultGenesisState() GenesisState {
 }
 
 // Init store state from genesis data
-func InitGenesis(ctx sdk.Context, keeper FeeCollectionKeeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper FeeCollectionKeeper, data GenesisState, ps FeeManager, params FeeGenesisStateConfig) {
 	keeper.setCollectedFees(ctx, data.CollectedFees)
+
+	ps.paramSpace.Set(ctx, nativeFeeTokenKey, params.FeeTokenNative)
+	ps.paramSpace.Set(ctx, nativeGasPriceThresholdKey, sdk.NewInt(params.GasPriceThreshold).String())
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper

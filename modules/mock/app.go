@@ -5,27 +5,27 @@ import (
 	"os"
 
 	"fmt"
+	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/params"
-	bam "github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/service/params"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/arbitration/params"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 const (
-	chainID           = ""
+	chainID = ""
 )
 
 const (
@@ -72,7 +72,7 @@ type App struct {
 	TotalCoinsSupply sdk.Coins
 
 	// fee manager
-	FeeManager bam.FeeManager
+	FeeManager auth.FeeManager
 }
 
 // NewApp partially constructs a new app on the memstore for module and genesis
@@ -123,12 +123,12 @@ func NewApp() *App {
 		app.Cdc,
 		app.KeyParams, app.TkeyParams,
 	)
-	app.FeeManager = bam.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
+	app.FeeManager = auth.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
 
 	app.SetInitChainer(app.InitChainer)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
-	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
-	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.FeeManager))
+	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
+	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
 
 	// init iparam
@@ -194,12 +194,12 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		app.AccountKeeper.SetAccount(ctx, acc)
 	}
 
-	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
 		GasPriceThreshold: 0, // for mock test
 	}
 
-	bam.InitGenesis(ctx, app.FeeManager, feeTokenGensisConfig)
+	auth.InitGenesis(ctx, app.FeeCollectionKeeper, auth.DefaultGenesisState(), app.FeeManager, feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{}
 }
