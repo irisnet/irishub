@@ -440,11 +440,11 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 }
 
 // Add incoming fee for a particular provider, if it is not existed will create a new
-func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
 	feeTax := k.GetServiceFeeTax(ctx)
 	taxFee := sdk.Coins{}
 	for _, coin := range coins {
-		taxFee = taxFee.Plus(sdk.Coins{sdk.Coin{coin.Denom, sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
+		taxFee = taxFee.Plus(sdk.Coins{sdk.Coin{Denom: coin.Denom, Amount: sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
 	}
 
 	taxPool := k.GetServiceFeeTaxPool(ctx)
@@ -452,12 +452,16 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	k.SetServiceFeeTaxPool(ctx, taxPool)
 
 	incomingFee := coins.Minus(taxFee)
+	if !incomingFee.IsNotNegative() {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", incomingFee, taxFee))
+	}
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
 		k.SetIncomingFee(ctx, address, coins)
 	}
 
 	k.SetIncomingFee(ctx, address, fee.Coins.Plus(incomingFee))
+	return nil
 }
 
 // withdraw fees from a particular provider, and delete it

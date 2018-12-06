@@ -192,7 +192,10 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	k.DeleteActiveRequest(ctx, request)
 	k.DeleteRequestExpiration(ctx, request)
 
-	k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	err := k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	if err != nil {
+		return err.Result()
+	}
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRespond,
