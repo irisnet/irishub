@@ -20,6 +20,9 @@ var (
 	activeRequestKey             = []byte{0x09} // key for active request
 	returnedFeeKey               = []byte{0x10}
 	incomingFeeKey               = []byte{0x11}
+
+	serviceFeeTaxKey     = []byte{0x12}
+	serviceFeeTaxPoolKey = []byte{0x13}
 )
 
 func GetServiceDefinitionKey(chainId, name string) []byte {

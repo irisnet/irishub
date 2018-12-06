@@ -160,6 +160,11 @@ func (app *IrisApp) initKeeper() {
 	)
 
 	// add handlers
+	app.guardianKeeper = guardian.NewKeeper(
+		app.cdc,
+		app.keyGuardian,
+		guardian.DefaultCodespace,
+	)
 	app.bankKeeper = bank.NewBaseKeeper(app.accountMapper)
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
 		app.cdc,
@@ -209,12 +214,8 @@ func (app *IrisApp) initKeeper() {
 		app.cdc,
 		app.keyService,
 		app.bankKeeper,
+		app.guardianKeeper,
 		service.DefaultCodespace,
-	)
-	app.guardianKeeper = guardian.NewKeeper(
-		app.cdc,
-		app.keyGuardian,
-		guardian.DefaultCodespace,
 	)
 	app.upgradeKeeper = upgrade.NewKeeper(
 		app.cdc,
@@ -403,7 +404,7 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 		}
 	}
 
-	service.InitGenesis(ctx, genesisState.ServiceData)
+	service.InitGenesis(ctx, app.serviceKeeper, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 	guardian.InitGenesis(ctx, app.guardianKeeper, genesisState.GuardianData)
 
@@ -446,7 +447,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		distr.ExportGenesis(ctx, app.distrKeeper),
 		gov.ExportGenesis(ctx, app.govKeeper),
 		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
-		service.ExportGenesis(ctx),
+		service.ExportGenesis(ctx, app.serviceKeeper),
 		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, app.guardianKeeper),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),

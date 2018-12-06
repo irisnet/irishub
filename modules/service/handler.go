@@ -30,6 +30,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcRefundFees(ctx, k, msg)
 		case MsgSvcWithdrawFees:
 			return handleMsgSvcWithdrawFees(ctx, k, msg)
+		case MsgSvcWithdrawTax:
+			return handleMsgSvcWithdrawTax(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in service module").Result()
 		}
@@ -190,7 +192,10 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	k.DeleteActiveRequest(ctx, request)
 	k.DeleteRequestExpiration(ctx, request)
 
-	k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	err := k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	if err != nil {
+		return err.Result()
+	}
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRespond,
@@ -226,6 +231,31 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	}
 }
 
+func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
+	_, found := k.gk.GetTrustee(ctx, msg.Trustee)
+	if !found {
+		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
+	}
+	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
+	newTaxPool := oldTaxPool.Minus(msg.Amount)
+	if !newTaxPool.IsNotNegative() {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", oldTaxPool, msg.Amount)).Result()
+	}
+	_, _, err := k.ck.AddCoins(ctx, msg.DestAddress, msg.Amount)
+	if err != nil {
+		return err.Result()
+	}
+
+	k.SetServiceFeeTaxPool(ctx, newTaxPool)
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcWithdrawTax,
+		tags.Provider, []byte(msg.DestAddress.String()),
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
 // Called every block, update request status
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
@@ -236,6 +266,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	resTags = sdk.NewTags()
 
 	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
+	defer activeIterator.Close()
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
@@ -249,7 +280,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		logger.Info(fmt.Sprintf("request %s from %s timeout",
 			req.RequestID(), req.Consumer))
 	}
-	activeIterator.Close()
 
 	return resTags
 }

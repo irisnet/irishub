@@ -9,22 +9,25 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
 	ck       bank.Keeper
+	gk       guardian.Keeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
 		ck:        ck,
+		gk:        gk,
 		codespace: codespace,
 	}
 	return keeper
@@ -285,11 +288,12 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 }
 
 func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
-	methodIterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	iterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	defer iterator.Close()
 	var methods []MethodProperty
-	for ; methodIterator.Valid(); methodIterator.Next() {
+	for ; iterator.Valid(); iterator.Next() {
 		var method MethodProperty
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(methodIterator.Value(), &method)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
 		methods = append(methods, method)
 	}
 
@@ -436,12 +440,28 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 }
 
 // Add incoming fee for a particular provider, if it is not existed will create a new
-func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
+	feeTax := k.GetServiceFeeTax(ctx)
+	taxFee := sdk.Coins{}
+	for _, coin := range coins {
+		taxFee = taxFee.Plus(sdk.Coins{sdk.Coin{Denom: coin.Denom, Amount: sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
+	}
+
+	taxPool := k.GetServiceFeeTaxPool(ctx)
+	taxPool = taxPool.Plus(taxFee)
+	k.SetServiceFeeTaxPool(ctx, taxPool)
+
+	incomingFee := coins.Minus(taxFee)
+	if !incomingFee.IsNotNegative() {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", incomingFee, taxFee))
+	}
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
 		k.SetIncomingFee(ctx, address, coins)
 	}
-	k.SetIncomingFee(ctx, address, fee.Coins.Plus(coins))
+
+	k.SetIncomingFee(ctx, address, fee.Coins.Plus(incomingFee))
+	return nil
 }
 
 // withdraw fees from a particular provider, and delete it
@@ -457,6 +477,42 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetIncomingFeeKey(address))
 	return nil
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) GetServiceFeeTax(ctx sdk.Context) sdk.Dec {
+	var percent sdk.Dec
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(serviceFeeTaxKey)
+	if value == nil {
+		return sdk.Dec{}
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &percent)
+	return percent
+}
+
+func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
+	store.Set(serviceFeeTaxKey, bz)
+}
+
+func (k Keeper) GetServiceFeeTaxPool(ctx sdk.Context) sdk.Coins {
+	var coins sdk.Coins
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(serviceFeeTaxPoolKey)
+	if value == nil {
+		return sdk.Coins{}
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &coins)
+	return coins
+}
+
+func (k Keeper) SetServiceFeeTaxPool(ctx sdk.Context, coins sdk.Coins) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(coins)
+	store.Set(serviceFeeTaxPoolKey, bz)
 }
 
 //__________________________________________________________________________
