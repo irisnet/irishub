@@ -30,8 +30,8 @@ func getMockApp(t *testing.T) (*mock.App, stake.Keeper, Keeper) {
 	bankKeeper := bank.NewBaseKeeper(mApp.AccountKeeper)
 
 	paramsKeeper := params.NewKeeper(mApp.Cdc, mApp.KeyParams, mApp.TkeyParams)
-	stakeKeeper := stake.NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, paramsKeeper.Subspace(stake.DefaultParamspace), mApp.RegisterCodespace(stake.DefaultCodespace))
-	keeper := NewKeeper(mApp.Cdc, keySlashing, stakeKeeper, paramsKeeper.Subspace(DefaultParamspace), mApp.RegisterCodespace(DefaultCodespace))
+	stakeKeeper := stake.NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
+	keeper := NewKeeper(mApp.Cdc, keySlashing, stakeKeeper, paramsKeeper.Subspace(DefaultParamspace), DefaultCodespace)
 	mApp.Router().AddRoute("stake", []*sdk.KVStoreKey{mApp.KeyStake, mApp.KeyAccount, mApp.KeyParams}, stake.NewHandler(stakeKeeper))
 	mApp.Router().AddRoute("slashing", []*sdk.KVStoreKey{mApp.KeyStake, keySlashing, mApp.KeyParams}, NewHandler(keeper))
 
@@ -120,5 +120,6 @@ func TestSlashingMsgs(t *testing.T) {
 
 	// unjail should fail with unknown validator
 	res := mock.SignCheckDeliver(t, mapp.BaseApp, []sdk.Msg{unjailMsg}, []int64{0}, []int64{1}, false, false, priv1)
-	require.Equal(t, sdk.ToABCICode(DefaultCodespace, CodeValidatorNotJailed), res.Code)
+	require.EqualValues(t, CodeValidatorNotJailed, res.Code)
+	require.EqualValues(t, DefaultCodespace, res.Codespace)
 }

@@ -143,7 +143,8 @@ func TestMsgSendWithAccounts(t *testing.T) {
 	tx.Signatures[0].Sequence = 1
 
 	res := mapp.Deliver(tx)
-	require.Equal(t, sdk.ToABCICode(sdk.CodespaceRoot, sdk.CodeUnauthorized), res.Code, res.Log)
+	require.Equal(t, sdk.CodeUnauthorized, res.Code, res.Log)
+	require.Equal(t, sdk.CodespaceRoot, res.Codespace)
 
 	// resigning the tx with the bumped sequence should work
 	SignCheckDeliver(t, mapp.BaseApp, []sdk.Msg{sendMsg1, sendMsg2}, []int64{0}, []int64{1}, true, true, priv1)

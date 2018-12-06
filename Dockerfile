@@ -26,7 +26,8 @@ RUN cd $REPO_PATH && \
     make get_vendor_deps && \
     make test_unit && \
     make build_linux && \
-    make install
+    make install && \
+    make test_cli
 
 FROM alpine:3.7
 

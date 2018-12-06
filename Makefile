@@ -1,6 +1,7 @@
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
 PACKAGES_MODULES=$(shell go list ./... | grep 'modules')
-PACKAGES_TYPES=$(shell go list ./... | grep 'types')
+PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
+PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 all: get_tools get_vendor_deps install
@@ -74,7 +75,7 @@ install: update_irislcd_swagger_docs echo_bech32_prefix
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iristool
-	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/newiris
+#	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/newiris
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
@@ -100,6 +101,7 @@ test_unit:
 	#@go test $(PACKAGES_NOSIMULATION)
 	@go test $(PACKAGES_MODULES)
 	@go test $(PACKAGES_TYPES)
+	@go test $(PACKAGES_STORE)
 
 test_cli:
 	@go test  -timeout 20m -count 1 -p 1 client/clitest/utils.go client/clitest/bank_test.go client/clitest/distribution_test.go client/clitest/gov_test.go client/clitest/iparam_test.go client/clitest/irismon_test.go client/clitest/record_test.go client/clitest/service_test.go client/clitest/stake_test.go

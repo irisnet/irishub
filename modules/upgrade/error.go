@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 24
+	DefaultCodespace sdk.CodespaceType = "upgrade"
 
 	CodeInvalidMsgType			sdk.CodeType = 100
 	CodeUnSupportedMsgType		sdk.CodeType = 101

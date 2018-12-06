@@ -208,7 +208,8 @@ func copyFile(dstFile, srcFile string) error {
 // helper methods
 
 func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("rm -rf %s ", irisHome), "")
+	//tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), app.DefaultKeyPass)
