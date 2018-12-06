@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	DefaultCodespace                    sdk.CodespaceType = 20
+	DefaultCodespace                    sdk.CodespaceType = "params"
 	CodeInvalidMinDeposit               sdk.CodeType      = 100
 	CodeInvalidMinDepositDenom          sdk.CodeType      = 101
 	CodeInvalidMinDepositAmount         sdk.CodeType      = 102

@@ -22,7 +22,7 @@ func getMockApp(t *testing.T) (*mock.App, Keeper) {
 	bankKeeper := bank.NewBaseKeeper(mApp.AccountKeeper)
 	pk := params.NewKeeper(mApp.Cdc, mApp.KeyParams, mApp.TkeyParams)
 
-	keeper := NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, pk.Subspace(DefaultParamspace), mApp.RegisterCodespace(DefaultCodespace))
+	keeper := NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, pk.Subspace(DefaultParamspace), DefaultCodespace)
 
 	mApp.Router().AddRoute("stake", []*sdk.KVStoreKey{mApp.KeyStake, mApp.KeyAccount, mApp.KeyParams}, NewHandler(keeper))
 	mApp.SetEndBlocker(getEndBlocker(keeper))

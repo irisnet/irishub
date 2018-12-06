@@ -37,7 +37,7 @@ type kvPair struct {
 	TagValue string `json:"tag_value"`
 }
 type abciResult struct {
-	Code      sdk.ABCICodeType `json:"code"`
+	Code      sdk.CodeType     `json:"code"`
 	Data      []byte           `json:"data"`
 	Log       string           `json:"log"`
 	GasWanted int64            `json:"gas_wanted"`

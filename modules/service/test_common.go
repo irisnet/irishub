@@ -33,7 +33,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
-		mapp.RegisterCodespace(stake.DefaultCodespace))
+		stake.DefaultCodespace)
 	ik := NewKeeper(mapp.Cdc, keyService, ck, DefaultCodespace)
 
 	mapp.Router().AddRoute("service", []*sdk.KVStoreKey{keyService}, NewHandler(ik))

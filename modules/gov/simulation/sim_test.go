@@ -39,7 +39,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		mapp.Cdc,
 		govKey,
 		bankKeeper, stakeKeeper,
-		mapp.RegisterCodespace(gov.DefaultCodespace),
+		gov.DefaultCodespace,
 	)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))

@@ -467,7 +467,8 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 	logs := make([]string, 0, len(msgs))
 	var data []byte   // NOTE: we just append them all (?!)
 	var tags sdk.Tags // also just append them all
-	var code sdk.ABCICodeType
+	var code sdk.CodeType
+	var codespace sdk.CodespaceType
 	for msgIdx, msg := range msgs {
 		// Match route.
 		var msgType string
@@ -504,6 +505,7 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 		if !msgResult.IsOK() {
 			logs = append(logs, fmt.Sprintf("Msg %d failed: %s", msgIdx, msgResult.Log))
 			code = msgResult.Code
+			codespace = msgResult.Codespace
 			break
 		}
 
@@ -513,10 +515,11 @@ func (app *IrisApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode bam.RunTxMode)
 
 	// Set the final gas values.
 	result = sdk.Result{
-		Code:    code,
-		Data:    data,
-		Log:     strings.Join(logs, "\n"),
-		GasUsed: ctx.GasMeter().GasConsumed(),
+		Code:      code,
+		Codespace: codespace,
+		Data:      data,
+		Log:       strings.Join(logs, "\n"),
+		GasUsed:   ctx.GasMeter().GasConsumed(),
 		// TODO: FeeAmount/FeeDenom
 		Tags: tags,
 	}
