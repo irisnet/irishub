@@ -32,6 +32,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	// test methods
 	keeper.AddMethods(ctx, serviceDef)
 	iterator := keeper.GetMethods(ctx, "testnet", "myService")
+	defer iterator.Close()
 	require.True(t, iterator.Valid())
 	for ; ; iterator.Next() {
 		var method MethodProperty
@@ -106,6 +107,7 @@ func TestKeeper_service_Call(t *testing.T) {
 	require.Equal(t, svcRequest.RequestID(), svcRequest1.RequestID())
 
 	iterator := keeper.ActiveRequestQueueIterator(ctx, svcRequest.ExpirationHeight)
+	defer iterator.Close()
 	require.True(t, iterator.Valid())
 	for ; ; iterator.Next() {
 		var req SvcRequest

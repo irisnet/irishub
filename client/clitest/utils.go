@@ -134,6 +134,7 @@ func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState 
 			AddedAddr: genesisState.Accounts[0].Address,
 		}
 		genesisState.GuardianData.Profilers[0] = profiler
+		genesisState.GuardianData.Trustees[0].Addr = genesisState.Accounts[0].Address
 	}
 
 	return genesisState
@@ -472,6 +473,15 @@ func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Profiler {
 	err := cdc.UnmarshalJSON([]byte(out), &profilers)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return profilers
+}
+
+func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Trustee {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var trustees []guardian.Trustee
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &trustees)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return trustees
 }
 
 func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {

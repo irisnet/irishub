@@ -263,6 +263,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	resTags = sdk.NewTags()
 
 	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
+	defer activeIterator.Close()
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
@@ -276,7 +277,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		logger.Info(fmt.Sprintf("request %s from %s timeout",
 			req.RequestID(), req.Consumer))
 	}
-	activeIterator.Close()
 
 	return resTags
 }

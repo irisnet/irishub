@@ -288,11 +288,12 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 }
 
 func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
-	methodIterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	iterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
+	defer iterator.Close()
 	var methods []MethodProperty
-	for ; methodIterator.Valid(); methodIterator.Next() {
+	for ; iterator.Valid(); iterator.Next() {
 		var method MethodProperty
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(methodIterator.Value(), &method)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
 		methods = append(methods, method)
 	}
 
