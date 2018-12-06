@@ -12,20 +12,20 @@ import (
 	"time"
 
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
 	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/service"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/guardian"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var (
@@ -340,7 +340,7 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 			nativeCoin = nativeCoin.Plus(normalizeNativeToken)
 		} else {
 			// not native token
-			denom, amount, err := types.GetCoin(coin);
+			denom, amount, err := types.GetCoin(coin)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
 			}

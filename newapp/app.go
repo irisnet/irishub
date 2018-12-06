@@ -49,19 +49,21 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	var app = &IrisApp{
 		BaseApp:          bApp,
 	}
-
 	engine := protocol.NewProtocolEngine()
-	protocol1 := protocol.NewProtocolVersion0(cdc)
-	engine.Add(protocol1)
-	//	protocol2 := protocol.NewProtocolVersion0()
-	//	engine.Add(&protocol2)
-    engine.Start()
-	app.SetProtocolEngine(engine)
 
+
+	protocol0 := protocol.NewProtocolVersion0(cdc)
+	engine.Add(protocol0)
+	//	protocol1 := protocol.NewProtocolVersion1(cdc)
+	//	engine.Add(&protocol1)
+
+
+
+    engine.LoadCurrentProtocol()
+	app.SetProtocolEngine(engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 	err := app.LoadLatestVersion(engine.GetKeyMain())
-
 	if err != nil {
 		cmn.Exit(err.Error())
 	}

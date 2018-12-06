@@ -17,6 +17,6 @@ var (
 	keyParams        = sdk.NewKVStoreKey("params")
 	tkeyParams       = sdk.NewTransientStoreKey("transient_params")
 	//keyUpgrade       = sdk.NewKVStoreKey("upgrade")
-	keyService       = sdk.NewKVStoreKey("service")
-	keyGuardian      = sdk.NewKVStoreKey("guardian")
+	keyService  = sdk.NewKVStoreKey("service")
+	keyGuardian = sdk.NewKVStoreKey("guardian")
 )

@@ -70,10 +70,10 @@ update_irislcd_swagger_docs:
 ########################################
 ### Compile and Install
 install: update_irislcd_swagger_docs echo_bech32_prefix
-#	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iris
-#	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
-#	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
-#	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iristool
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iris
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iristool
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/newiris
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix

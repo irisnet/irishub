@@ -3,8 +3,8 @@ package baseapp
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 
 	"github.com/irisnet/irishub/newapp/protocol"
@@ -30,7 +30,6 @@ func SetPruning(pruning string) func(*BaseApp) {
 		bap.cms.SetPruning(pruningEnum)
 	}
 }
-
 
 // SetMinimumFees returns an option that sets the minimum fees on the app.
 func SetMinimumFees(minFees string) func(*BaseApp) {

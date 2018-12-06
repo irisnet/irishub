@@ -27,10 +27,10 @@ func NewProtocolEngine() ProtocolEngine {
 	return engine
 }
 
-func (pe *ProtocolEngine) Start() {
+func (pe *ProtocolEngine) LoadCurrentProtocol() {
 	//find the current version From DB( EngineKeeper?)
 	current := uint64(0)
-	next    := uint64(1)
+	next := uint64(1)
 	p, flag := pe.protocols[current]
 	if flag == true {
 		p.Load()

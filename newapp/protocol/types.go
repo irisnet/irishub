@@ -15,7 +15,7 @@ type Protocol interface {
 	GetFeePreprocessHandler() sdk.FeePreprocessHandler // fee handler for fee preprocessor
 
 	// may be nil
-	GetInitChainer() sdk.InitChainer1   // initialize state with validators and state blob
+	GetInitChainer() sdk.InitChainer1  // initialize state with validators and state blob
 	GetBeginBlocker() sdk.BeginBlocker // logic to run before any txs
 	GetEndBlocker() sdk.EndBlocker     // logic to run after all txs, and to determine valset changes
 	Load()

@@ -1,33 +1,31 @@
 package protocol
 
 import (
-	bam "github.com/irisnet/irishub/baseapp"
+	"fmt"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
+	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/irisnet/irishub/newapp/protocol/router"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"fmt"
 	"sort"
-	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/service/params"
-	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
 )
-
 
 var _ Protocol = (*ProtocolVersion0)(nil)
 
@@ -49,7 +47,7 @@ type ProtocolVersion0 struct {
 	guardianKeeper      guardian.Keeper
 	recordKeeper        record.Keeper
 	// fee manager
-	feeManager bam.FeeManager
+	feeManager auth.FeeManager
 
 	router      router.Router      // handle any kind of message
 	queryRouter router.QueryRouter // router for redirecting query calls
@@ -59,7 +57,7 @@ type ProtocolVersion0 struct {
 	feePreprocessHandler sdk.FeePreprocessHandler // fee handler for fee preprocessor
 
 	// may be nil
-	initChainer  sdk.InitChainer1  // initialize state with validators and state blob
+	initChainer  sdk.InitChainer1 // initialize state with validators and state blob
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 
@@ -75,8 +73,8 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 		//		engine: engine,
 	}
 	p0 := ProtocolVersion0{
-		pb: &base,
-		cdc: cdc,
+		pb:          &base,
+		cdc:         cdc,
 		router:      router.NewRouter(),
 		queryRouter: router.NewQueryRouter(),
 	}
@@ -173,7 +171,7 @@ func (p *ProtocolVersion0) configKeepers() {
 	// so that it can be modified like below:
 	p.stakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
-	p.feeManager = bam.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
+	p.feeManager = auth.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
 
 }
 
@@ -181,13 +179,13 @@ func (p *ProtocolVersion0) configKeepers() {
 func (p *ProtocolVersion0) configRouters() {
 	p.router.
 		AddRoute("bank", []*sdk.KVStoreKey{keyAccount}, bank.NewHandler(p.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{keyStake, keyAccount, keyMint,  keyDistr}, stake.NewHandler(p.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{keySlashing,  keyStake}, slashing.NewHandler(p.slashingKeeper)).
+		AddRoute("stake", []*sdk.KVStoreKey{keyStake, keyAccount, keyMint, keyDistr}, stake.NewHandler(p.stakeKeeper)).
+		AddRoute("slashing", []*sdk.KVStoreKey{keySlashing, keyStake}, slashing.NewHandler(p.slashingKeeper)).
 		AddRoute("distr", []*sdk.KVStoreKey{keyDistr}, distr.NewHandler(p.distrKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{ keyGov,  keyAccount,  keyStake,  keyParams}, gov.NewHandler(p.govKeeper)).
-		AddRoute("record", []*sdk.KVStoreKey{ keyRecord}, record.NewHandler(p.recordKeeper)).
-		AddRoute("service", []*sdk.KVStoreKey{ keyService}, service.NewHandler(p.serviceKeeper)).
-		AddRoute("guardian", []*sdk.KVStoreKey{ keyGuardian}, guardian.NewHandler(p.guardianKeeper))
+		AddRoute("gov", []*sdk.KVStoreKey{keyGov, keyAccount, keyStake, keyParams}, gov.NewHandler(p.govKeeper)).
+		AddRoute("record", []*sdk.KVStoreKey{keyRecord}, record.NewHandler(p.recordKeeper)).
+		AddRoute("service", []*sdk.KVStoreKey{keyService}, service.NewHandler(p.serviceKeeper)).
+		AddRoute("guardian", []*sdk.KVStoreKey{keyGuardian}, guardian.NewHandler(p.guardianKeeper))
 	p.queryRouter.
 		AddRoute("gov", gov.NewQuerier(p.govKeeper))
 
@@ -197,14 +195,15 @@ func (p *ProtocolVersion0) configRouters() {
 func (p *ProtocolVersion0) configFeeHandlers() {
 
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeCollectionKeeper)
-	p.feeRefundHandler = bam.NewFeeRefundHandler(p.accountMapper, p.feeCollectionKeeper, p.feeManager)
-	p.feePreprocessHandler = bam.NewFeePreprocessHandler(p.feeManager)
+	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeCollectionKeeper, p.feeManager)
+	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeManager)
 }
 
 // configure all Stores
 func (p *ProtocolVersion0) configStores() {
 
 }
+
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.SignalParamspace).WithTypeTable(
@@ -271,7 +270,7 @@ func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock)
 
 // custom logic for iris initialization
 // just 0 version need Initchainer
-func (p *ProtocolVersion0) InitChainer(ctx sdk.Context,DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
+func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	var genesisFileState GenesisFileState
@@ -302,15 +301,13 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context,DeliverTx sdk.DeliverTx, 
 	}
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
 
-	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	bam.InitGenesis(ctx, p.feeManager, feeTokenGensisConfig)
-
 	// load the address to pubkey map
-	auth.InitGenesis(ctx, p.feeCollectionKeeper, genesisState.AuthData)
+	auth.InitGenesis(ctx, p.feeCollectionKeeper, genesisState.AuthData, p.feeManager, feeTokenGensisConfig)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
 	mint.InitGenesis(ctx, p.mintKeeper, genesisState.MintData)
 	distr.InitGenesis(ctx, p.distrKeeper, genesisState.DistrData)
@@ -359,11 +356,6 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context,DeliverTx sdk.DeliverTx, 
 		Validators: validators,
 	}
 }
-
-
-
-
-
 
 func (p *ProtocolVersion0) GetRouter() router.Router {
 	return p.router

@@ -14,11 +14,11 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/newapp/protocol"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/version"
-	"github.com/irisnet/irishub/newapp/protocol"
 )
 
 // Key to store the header in the DB itself.
@@ -44,18 +44,17 @@ type RunMsg func(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) sdk.Result
 // BaseApp reflects the ABCI application implementation.
 type BaseApp struct {
 	// initialized on creation
-	Logger      log.Logger
-	name        string               // application name from abci.Info
-	db          dbm.DB               // common DB backend
-	cms         sdk.CommitMultiStore // Main (uncached) state
-	engine      protocol.ProtocolEngine
+	Logger log.Logger
+	name   string               // application name from abci.Info
+	db     dbm.DB               // common DB backend
+	cms    sdk.CommitMultiStore // Main (uncached) state
+	engine protocol.ProtocolEngine
 
-	codespacer  *sdk.Codespacer      // handle module codespacing
-	txDecoder   sdk.TxDecoder        // unmarshal []byte into sdk.Tx
+	codespacer *sdk.Codespacer // handle module codespacing
+	txDecoder  sdk.TxDecoder   // unmarshal []byte into sdk.Tx
 
-
-	addrPeerFilter   sdk.PeerFilter   // filter peers by address and port
-	pubkeyPeerFilter sdk.PeerFilter   // filter peers by public key
+	addrPeerFilter   sdk.PeerFilter // filter peers by address and port
+	pubkeyPeerFilter sdk.PeerFilter // filter peers by public key
 	runMsg           RunMsg
 
 	//--------------------
@@ -87,12 +86,12 @@ var _ abci.Application = (*BaseApp)(nil)
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
 func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:      logger,
-		name:        name,
-		db:          db,
-		cms:         store.NewCommitMultiStore(db),
-		codespacer:  sdk.NewCodespacer(),
-		txDecoder:   txDecoder,
+		Logger:     logger,
+		name:       name,
+		db:         db,
+		cms:        store.NewCommitMultiStore(db),
+		codespacer: sdk.NewCodespacer(),
+		txDecoder:  txDecoder,
 	}
 
 	// Register the undefined & root codespaces, which should not be used by
@@ -148,6 +147,7 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
 }
+
 ////////////////////  iris/cosmos-sdk end  ///////////////////////////
 
 func (app *BaseApp) SetRunMsg(runMsg RunMsg) {
@@ -266,7 +266,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	if initChainer == nil {
 		return
 	}
-	res = initChainer(app.deliverState.ctx,app.DeliverTx,req)
+	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
 
 	// NOTE: we don't commit, but BeginBlock for block 1
 	// starts from this deliverState
@@ -440,7 +440,6 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	if beginBlocker != nil {
 		res = beginBlocker(app.deliverState.ctx, req)
 	}
-
 	// set the signed validators for addition to context in deliverTx
 	// TODO: communicate this result to the address to pubkey map in slashing
 	app.voteInfos = req.LastCommitInfo.GetVotes()
@@ -676,7 +675,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	feePreprocessHandler:= app.engine.GetCurrent().GetFeePreprocessHandler()
+	feePreprocessHandler := app.engine.GetCurrent().GetFeePreprocessHandler()
 	// run the fee handler
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
@@ -733,7 +732,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
 
-    endBlocker := app.engine.GetCurrent().GetEndBlocker()
+	endBlocker := app.engine.GetCurrent().GetEndBlocker()
 	if endBlocker != nil {
 		res = endBlocker(app.deliverState.ctx, req)
 	}
