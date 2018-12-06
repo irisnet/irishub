@@ -53,7 +53,6 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	var genesisAccounts []GenesisFileAccount
 
 	amount := sdk.NewIntWithDecimal(100, 18)
-	stakeAmount := sdk.NewIntWithDecimal(1, 2)
 	numInitiallyBonded := int64(r.Intn(250))
 	//numInitiallyBonded := int64(4)
 	numAccs := int64(len(accs))
@@ -64,16 +63,7 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 
 	// Randomly generate some genesis accounts
 	for _, acc := range accs {
-		coins := sdk.Coins{
-			{
-				Denom:  stakeTypes.StakeDenom,
-				Amount: amount,
-			},
-			{
-				Denom:  stakeGenesis.Params.BondDenom,
-				Amount: stakeAmount,
-			},
-		}
+		coins := sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, amount)}
 		var coinsStringArray []string
 		for _, coin := range coins {
 			coinsStringArray = append(coinsStringArray, coin.String())
