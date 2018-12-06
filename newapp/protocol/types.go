@@ -1,15 +1,14 @@
 package protocol
 
 import (
-	"github.com/irisnet/irishub/newapp/protocol/router"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 )
 
 type Protocol interface {
 	GetDefinition() common.ProtocolDefinition
-	GetRouter() router.Router
-	GetQueryRouter() router.QueryRouter
+	GetRouter() Router
+	GetQueryRouter() QueryRouter
 	GetAnteHandler() sdk.AnteHandler                   // ante handler for fee and auth
 	GetFeeRefundHandler() sdk.FeeRefundHandler         // fee handler for fee refund
 	GetFeePreprocessHandler() sdk.FeePreprocessHandler // fee handler for fee preprocessor

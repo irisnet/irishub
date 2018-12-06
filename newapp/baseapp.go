@@ -1,4 +1,4 @@
-package baseapp
+package app
 
 import (
 	"fmt"
@@ -50,7 +50,6 @@ type BaseApp struct {
 	cms    sdk.CommitMultiStore // Main (uncached) state
 	engine protocol.ProtocolEngine
 
-	codespacer *sdk.Codespacer // handle module codespacing
 	txDecoder  sdk.TxDecoder   // unmarshal []byte into sdk.Tx
 
 	addrPeerFilter   sdk.PeerFilter // filter peers by address and port
@@ -90,13 +89,9 @@ func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecod
 		name:       name,
 		db:         db,
 		cms:        store.NewCommitMultiStore(db),
-		codespacer: sdk.NewCodespacer(),
 		txDecoder:  txDecoder,
 	}
 
-	// Register the undefined & root codespaces, which should not be used by
-	// any modules.
-	app.codespacer.RegisterOrPanic(sdk.CodespaceRoot)
 	for _, option := range options {
 		option(app)
 	}
@@ -112,11 +107,6 @@ func (app *BaseApp) Name() string {
 // CommitMultiStore.
 func (app *BaseApp) SetCommitMultiStoreTracer(w io.Writer) {
 	app.cms.WithTracer(w)
-}
-
-// Register the next available codespace through the baseapp's codespacer, starting from a default
-func (app *BaseApp) RegisterCodespace(codespace sdk.CodespaceType) sdk.CodespaceType {
-	return app.codespacer.RegisterNext(codespace)
 }
 
 // Mount IAVL stores to the provided keys in the BaseApp multistore
@@ -337,8 +327,9 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 			}
 		case "version":
 			return abci.ResponseQuery{
-				Code:  uint32(sdk.ABCICodeOK),
-				Value: []byte(version.GetVersion()),
+				Code:      uint32(sdk.CodeOK),
+				Codespace: string(sdk.CodespaceRoot),
+				Value:     []byte(version.GetVersion()),
 			}
 		default:
 			result = sdk.ErrUnknownRequest(fmt.Sprintf("Unknown query: %s", path)).Result()
@@ -347,8 +338,9 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 		// Encode with json
 		value := codec.Cdc.MustMarshalBinaryLengthPrefixed(result)
 		return abci.ResponseQuery{
-			Code:  uint32(sdk.ABCICodeOK),
-			Value: value,
+			Code:      uint32(sdk.CodeOK),
+			Codespace: string(sdk.CodespaceRoot),
+			Value:     value,
 		}
 	}
 	msg := "Expected second parameter to be either simulate or version, neither was present"
@@ -407,12 +399,13 @@ func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res 
 	resBytes, err := querier(ctx, path[2:], req)
 	if err != nil {
 		return abci.ResponseQuery{
-			Code: uint32(err.ABCICode()),
-			Log:  err.ABCILog(),
+			Code:      uint32(err.Code()),
+			Codespace: string(err.Codespace()),
+			Log:       err.ABCILog(),
 		}
 	}
 	return abci.ResponseQuery{
-		Code:  uint32(sdk.ABCICodeOK),
+		Code:  uint32(sdk.CodeOK),
 		Value: resBytes,
 	}
 }
@@ -469,6 +462,7 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 
 				return abci.ResponseCheckTx{
 					Code:      uint32(result.Code),
+					Codespace: string(result.Codespace),
 					Data:      result.Data,
 					Log:       result.Log,
 					GasWanted: result.GasWanted,
@@ -517,6 +511,7 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	// Tell the blockchain engine (i.e. Tendermint).
 	return abci.ResponseDeliverTx{
 		Code:      uint32(result.Code),
+		Codespace: string(result.Codespace),
 		Data:      result.Data,
 		Log:       result.Log,
 		GasWanted: result.GasWanted,
@@ -565,7 +560,8 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	logs := make([]string, 0, len(msgs))
 	var data []byte   // NOTE: we just append them all (?!)
 	var tags sdk.Tags // also just append them all
-	var code sdk.ABCICodeType
+	var code sdk.CodeType
+	var codespace sdk.CodespaceType
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgRoute := msg.Route()
@@ -592,6 +588,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		if !msgResult.IsOK() {
 			logs = append(logs, fmt.Sprintf("Msg %d failed: %s", msgIdx, msgResult.Log))
 			code = msgResult.Code
+			codespace = msgResult.Codespace
 			break
 		}
 
@@ -601,7 +598,8 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 
 	// Set the final gas values.
 	result = sdk.Result{
-		Code:    code,
+		Code:      code,
+		Codespace: codespace,
 		Data:    data,
 		Log:     strings.Join(logs, "\n"),
 		GasUsed: ctx.GasMeter().GasConsumed(),
