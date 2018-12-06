@@ -87,25 +87,6 @@ build_cur: update_irislcd_swagger_docs echo_bech32_prefix
 	go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
 	go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
-build_examples: update_irislcd_swagger_docs echo_bech32_prefix
-	go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1
-	go build  $(BUILD_FLAGS) -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	go build  $(BUILD_FLAGS) -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	go build  $(BUILD_FLAGS) -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
-
-
-install_examples: update_irislcd_swagger_docs echo_bech32_prefix
-	go install $(BUILD_FLAGS) ./examples/irishub1/cmd/iris1
-	go install $(BUILD_FLAGS) ./examples/irishub1/cmd/iriscli1
-	go install $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	go install $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
-
-
-build_example_linux: update_irislcd_swagger_docs echo_bech32_prefix
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
 
 ########################################
 ### Testing

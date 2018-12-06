@@ -21,6 +21,7 @@ var (
 )
 
 func TestIrisCLISoftwareUpgrade(t *testing.T) {
+	t.SkipNow()
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
@@ -285,6 +286,7 @@ func startNodeBToReplay(t *testing.T, chainID string) {
 }
 
 func TestIrisStartTwoNodesToSyncBlocks(t *testing.T) {
+	t.SkipNow()
 
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
