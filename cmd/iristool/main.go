@@ -5,7 +5,7 @@ import (
 
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/spf13/cobra"
-	debugcmd "github.com/irisnet/irishub/cmd/iristool/debug"
+	debugcmd "github.com/irisnet/irishub/tools/debug"
 	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/libs/cli"
