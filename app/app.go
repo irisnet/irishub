@@ -88,7 +88,7 @@ type IrisApp struct {
 	recordKeeper        record.Keeper
 
 	// fee manager
-	feeManager bam.FeeManager
+	feeManager auth.FeeManager
 	hookHub    HookHub // handle Hook callback of any version modules
 }
 
@@ -229,7 +229,7 @@ func (app *IrisApp) initKeeper() {
 }
 
 func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
-	app.feeManager = bam.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
+	app.feeManager = auth.NewFeeManager(app.paramsKeeper.Subspace("Fee"))
 
 	// initialize BaseApp
 	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyStake, app.keySlashing, app.keyGov, app.keyMint, app.keyDistr,
@@ -238,8 +238,8 @@ func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper, app.feeCollectionKeeper))
 	app.MountStoresTransient(app.tkeyParams, app.tkeyStake, app.tkeyDistr)
-	app.SetFeeRefundHandler(bam.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
-	app.SetFeePreprocessHandler(bam.NewFeePreprocessHandler(app.feeManager))
+	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountMapper, app.feeCollectionKeeper, app.feeManager))
+	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.feeManager))
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetRunMsg(app.runMsgs)
 
@@ -356,15 +356,13 @@ func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	}
 	gov.InitGenesis(ctx, app.govKeeper, genesisState.GovData)
 
-	feeTokenGensisConfig := bam.FeeGenesisStateConfig{
+	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
 		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
 	}
 
-	bam.InitGenesis(ctx, app.feeManager, feeTokenGensisConfig)
-
 	// load the address to pubkey map
-	auth.InitGenesis(ctx, app.feeCollectionKeeper, genesisState.AuthData)
+	auth.InitGenesis(ctx, app.feeCollectionKeeper, genesisState.AuthData, app.feeManager, feeTokenGensisConfig)
 	slashing.InitGenesis(ctx, app.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
 	mint.InitGenesis(ctx, app.mintKeeper, genesisState.MintData)
 	distr.InitGenesis(ctx, app.distrKeeper, genesisState.DistrData)

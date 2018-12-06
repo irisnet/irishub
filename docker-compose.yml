@@ -8,7 +8,7 @@ services:
     - "26656-26657:26656-26657"
     volumes:
     - ./build:/home
-    command: /bin/bash -c 'cd /home/nodecluster/node0 && ../../iris start --home iris'
+    command: /bin/bash -c 'cd /home/nodecluster/node0 && ../../iris start --home iris --log_level info'
     networks:
       localnet:
         ipv4_address: 192.168.10.2
@@ -20,7 +20,7 @@ services:
     - "26659-26660:26656-26657"
     volumes:
     - ./build:/home
-    command: /bin/bash -c 'cd /home/nodecluster/node1 && ../../iris start --home iris'
+    command: /bin/bash -c 'cd /home/nodecluster/node1 && ../../iris start --home iris --log_level info'
     networks:
       localnet:
         ipv4_address: 192.168.10.3
@@ -32,7 +32,7 @@ services:
     - "26661-26662:26656-26657"
     volumes:
     - ./build:/home
-    command: /bin/bash -c 'cd /home/nodecluster/node2 && ../../iris start --home iris'
+    command: /bin/bash -c 'cd /home/nodecluster/node2 && ../../iris start --home iris --log_level info'
     networks:
       localnet:
         ipv4_address: 192.168.10.4
@@ -44,7 +44,7 @@ services:
     - "26663-26664:26656-26657"
     volumes:
     - ./build:/home
-    command: /bin/bash -c 'cd /home/nodecluster/node3 && ../../iris start --home iris'
+    command: /bin/bash -c 'cd /home/nodecluster/node3 && ../../iris start --home iris --log_level info'
     networks:
       localnet:
         ipv4_address: 192.168.10.5
