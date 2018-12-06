@@ -30,6 +30,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcRefundFees(ctx, k, msg)
 		case MsgSvcWithdrawFees:
 			return handleMsgSvcWithdrawFees(ctx, k, msg)
+		case MsgSvcWithdrawTax:
+			return handleMsgSvcWithdrawTax(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in service module").Result()
 		}
@@ -220,6 +222,31 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	}
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcWithdrawFees,
+	)
+	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
+	_, found := k.gk.GetTrustee(ctx, msg.Trustee)
+	if !found {
+		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
+	}
+	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
+	newTaxPool := oldTaxPool.Minus(msg.Amount)
+	if !newTaxPool.IsNotNegative() {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", oldTaxPool, msg.Amount)).Result()
+	}
+	_, _, err := k.ck.AddCoins(ctx, msg.DestAddress, msg.Amount)
+	if err != nil {
+		return err.Result()
+	}
+
+	k.SetServiceFeeTaxPool(ctx, newTaxPool)
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSvcWithdrawTax,
+		tags.Provider, []byte(msg.DestAddress.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,

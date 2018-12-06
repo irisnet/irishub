@@ -205,6 +205,7 @@ func main() {
 		servicecmd.GetCmdSvcRespond(cdc),
 		servicecmd.GetCmdSvcRefundFees(cdc),
 		servicecmd.GetCmdSvcWithdrawFees(cdc),
+		servicecmd.GetCmdSvcWithdrawTax(cdc),
 	)...)
 
 	rootCmd.AddCommand(

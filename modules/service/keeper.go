@@ -9,22 +9,25 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"time"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
 	ck       bank.Keeper
+	gk       guardian.Keeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
 		ck:        ck,
+		gk:        gk,
 		codespace: codespace,
 	}
 	return keeper
@@ -438,9 +441,9 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 // Add incoming fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	feeTax := k.GetServiceFeeTax(ctx)
-	var taxFee sdk.Coins
+	taxFee := sdk.Coins{}
 	for _, coin := range coins {
-		taxFee.Plus(sdk.Coins{sdk.Coin{coin.Denom, sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
+		taxFee = taxFee.Plus(sdk.Coins{sdk.Coin{coin.Denom, sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
 	}
 
 	taxPool := k.GetServiceFeeTaxPool(ctx)

@@ -60,9 +60,9 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
 	return cmd
 }
 
@@ -102,11 +102,12 @@ func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
-	cmd.Flags().AddFlagSet(FsBindChainID)
-	cmd.Flags().AddFlagSet(FsProvider)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.Flags().AddFlagSet(FsServiceBinding)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
+	cmd.MarkFlagRequired(FlagBindChainID)
+	cmd.MarkFlagRequired(FlagProvider)
 	return cmd
 }
 
@@ -142,9 +143,9 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
 	return cmd
 }
 
@@ -188,11 +189,12 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceName)
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsBindChainID)
-	cmd.Flags().AddFlagSet(FsProvider)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.Flags().AddFlagSet(FsServiceBinding)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
+	cmd.MarkFlagRequired(FlagBindChainID)
+	cmd.MarkFlagRequired(FlagProvider)
 	return cmd
 }
 
@@ -232,9 +234,10 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsReqChainId)
-	cmd.Flags().AddFlagSet(FsReqId)
-
+	cmd.Flags().String(FlagReqChainId, "", "the ID of the blockchain that the service invocation initiated")
+	cmd.Flags().String(FlagReqId, "", "the ID of the service invocation")
+	cmd.MarkFlagRequired(FlagReqChainId)
+	cmd.MarkFlagRequired(FlagReqId)
 	return cmd
 }
 

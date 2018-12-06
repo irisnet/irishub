@@ -17,6 +17,7 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
 	"fmt"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 // initialize the mock application for this module
@@ -27,14 +28,16 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	RegisterCodec(mapp.Cdc)
 
 	keyService := sdk.NewKVStoreKey("service")
+	keyGuardian := sdk.NewKVStoreKey("guardian")
 
 	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
+	gk := guardian.NewKeeper(mapp.Cdc, keyGuardian, guardian.DefaultCodespace)
 	sk := stake.NewKeeper(
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		mapp.RegisterCodespace(stake.DefaultCodespace))
-	ik := NewKeeper(mapp.Cdc, keyService, ck, DefaultCodespace)
+	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace)
 
 	mapp.Router().AddRoute("service", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
 

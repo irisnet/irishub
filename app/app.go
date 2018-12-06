@@ -160,6 +160,11 @@ func (app *IrisApp) initKeeper() {
 	)
 
 	// add handlers
+	app.guardianKeeper = guardian.NewKeeper(
+		app.cdc,
+		app.keyGuardian,
+		guardian.DefaultCodespace,
+	)
 	app.bankKeeper = bank.NewBaseKeeper(app.accountMapper)
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
 		app.cdc,
@@ -209,12 +214,8 @@ func (app *IrisApp) initKeeper() {
 		app.cdc,
 		app.keyService,
 		app.bankKeeper,
+		app.guardianKeeper,
 		service.DefaultCodespace,
-	)
-	app.guardianKeeper = guardian.NewKeeper(
-		app.cdc,
-		app.keyGuardian,
-		guardian.DefaultCodespace,
 	)
 	app.upgradeKeeper = upgrade.NewKeeper(
 		app.cdc,

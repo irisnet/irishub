@@ -620,6 +620,48 @@ func (msg MsgSvcWithdrawFees) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
+// MsgSvcWithdrawTax - struct for withdraw tax
+type MsgSvcWithdrawTax struct {
+	Trustee     sdk.AccAddress `json:"trustee"`
+	DestAddress sdk.AccAddress `json:"dest_address"`
+	Amount      sdk.Coins      `json:"amount"`
+}
+
+func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins) MsgSvcWithdrawTax {
+	return MsgSvcWithdrawTax{
+		Trustee:     trustee,
+		DestAddress: destAddress,
+		Amount:      amount,
+	}
+}
+
+func (msg MsgSvcWithdrawTax) Route() string { return MsgType }
+func (msg MsgSvcWithdrawTax) Type() string  { return "service withdraw fees" }
+
+func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
+	b := msgCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(b)
+}
+
+func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
+	if len(msg.Trustee) == 0 {
+		sdk.ErrInvalidAddress(msg.Trustee.String())
+	}
+	if len(msg.DestAddress) == 0 {
+		sdk.ErrInvalidAddress(msg.DestAddress.String())
+	}
+	if !msg.Amount.IsValid() {
+		sdk.ErrInvalidCoins(msg.Amount.String())
+	}
+	return nil
+}
+
+func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Trustee}
+}
+
+//______________________________________________________________________
+
 func validServiceName(name string) bool {
 	if len(name) == 0 || len(name) > 128 {
 		return false
