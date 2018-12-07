@@ -19,7 +19,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/newapp/protocol"
-	"github.com/irisnet/irishub/newapp/protocol/v0"
+	"github.com/irisnet/irishub/newapp/v0"
 )
 
 const (
