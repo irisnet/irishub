@@ -1,15 +1,14 @@
 package context
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/pkg/errors"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	"strings"
-	"encoding/json"
 )
 
 // TODO: This should get deleted eventually, and perhaps

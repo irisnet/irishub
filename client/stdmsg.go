@@ -1,8 +1,8 @@
-package context
+package client
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // StdSignMsg is a convenience structure for passing along

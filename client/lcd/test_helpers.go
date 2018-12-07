@@ -22,7 +22,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	txbuilder "github.com/irisnet/irishub/client/auth/txbuilder"
 	"github.com/irisnet/irishub/modules/stake"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
@@ -177,7 +176,7 @@ func InitializeTestLCD(
 			stake.Description{Moniker: fmt.Sprintf("validator-%d", i+1)},
 			stake.NewCommissionMsg(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
 		)
-		stdSignMsg := txbuilder.StdSignMsg{
+		stdSignMsg := client.StdSignMsg{
 			ChainID: genDoc.ChainID,
 			Msgs:    []sdk.Msg{msg},
 		}
