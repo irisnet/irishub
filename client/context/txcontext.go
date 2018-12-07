@@ -25,8 +25,8 @@ type BaseTx struct {
 	Name          string `json:"name"`
 	Password      string `json:"password"`
 	ChainID       string `json:"chain_id"`
-	AccountNumber int64  `json:"account_number"`
-	Sequence      int64  `json:"sequence"`
+	AccountNumber uint64 `json:"account_number"`
+	Sequence      uint64 `json:"sequence"`
 	Gas           string `json:"gas"`
 	GasAdjustment string `json:"gas_adjustment"`
 	Fee           string `json:"fee"`
@@ -74,9 +74,9 @@ func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx CLIContext) bool {
 type TxContext struct {
 	Codec         *codec.Codec
 	cliCtx        CLIContext
-	AccountNumber int64
-	Sequence      int64
-	Gas           int64 // TODO: should this turn into uint64? requires further discussion - see #2173
+	AccountNumber uint64
+	Sequence      uint64
+	Gas           uint64
 	GasAdjustment float64
 	SimulateGas   bool
 	ChainID       string
@@ -98,10 +98,10 @@ func NewTxContextFromCLI() TxContext {
 
 	return TxContext{
 		ChainID:       chainID,
-		AccountNumber: viper.GetInt64(client.FlagAccountNumber),
+		AccountNumber: uint64(viper.GetInt64(client.FlagAccountNumber)),
 		Gas:           client.GasFlagVar.Gas,
 		GasAdjustment: viper.GetFloat64(client.FlagGasAdjustment),
-		Sequence:      viper.GetInt64(client.FlagSequence),
+		Sequence:      uint64(viper.GetInt64(client.FlagSequence)),
 		SimulateGas:   client.GasFlagVar.Simulate,
 		Fee:           viper.GetString(client.FlagFee),
 		Memo:          viper.GetString(client.FlagMemo),
@@ -127,7 +127,7 @@ func (txCtx TxContext) WithChainID(chainID string) TxContext {
 }
 
 // WithGas returns a copy of the context with an updated gas.
-func (txCtx TxContext) WithGas(gas int64) TxContext {
+func (txCtx TxContext) WithGas(gas uint64) TxContext {
 	txCtx.Gas = gas
 	return txCtx
 }
@@ -139,7 +139,7 @@ func (txCtx TxContext) WithFee(fee string) TxContext {
 }
 
 // WithSequence returns a copy of the context with an updated sequence number.
-func (txCtx TxContext) WithSequence(sequence int64) TxContext {
+func (txCtx TxContext) WithSequence(sequence uint64) TxContext {
 	txCtx.Sequence = sequence
 	return txCtx
 }
@@ -151,7 +151,7 @@ func (txCtx TxContext) WithMemo(memo string) TxContext {
 }
 
 // WithAccountNumber returns a copy of the context with an account number.
-func (txCtx TxContext) WithAccountNumber(accnum int64) TxContext {
+func (txCtx TxContext) WithAccountNumber(accnum uint64) TxContext {
 	txCtx.AccountNumber = accnum
 	return txCtx
 }

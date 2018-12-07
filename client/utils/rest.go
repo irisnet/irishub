@@ -40,18 +40,18 @@ type abciResult struct {
 	Code      sdk.CodeType     `json:"code"`
 	Data      []byte           `json:"data"`
 	Log       string           `json:"log"`
-	GasWanted int64            `json:"gas_wanted"`
-	GasUsed   int64            `json:"gas_used"`
+	GasWanted uint64           `json:"gas_wanted"`
+	GasUsed   uint64           `json:"gas_used"`
 	FeeAmount int64            `json:"fee_amount"`
 	FeeDenom  string           `json:"fee_denom"`
 	Tags      []kvPair         `json:"tagsy"`
 }
 type simulateResult struct {
-	GasEstimate int64      `json:"gas_estimate"`
+	GasEstimate uint64      `json:"gas_estimate"`
 	Result      abciResult `json:"result"`
 }
 
-func WriteSimulationResponse(w http.ResponseWriter, cliCtx context.CLIContext, gas int64, result sdk.Result) {
+func WriteSimulationResponse(w http.ResponseWriter, cliCtx context.CLIContext, gas uint64, result sdk.Result) {
 	w.WriteHeader(http.StatusOK)
 	var kvPairs []kvPair
 	for _, tag := range result.Tags {

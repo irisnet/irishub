@@ -89,7 +89,7 @@ func EnrichCtxWithGas(txCtx context.TxContext, cliCtx context.CLIContext, name s
 
 // CalculateGas simulates the execution of a transaction and returns
 // both the estimate obtained by the query and the adjusted amount.
-func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *amino.Codec, txBytes []byte, adjustment float64) (estimate, adjusted int64, simulationResult sdk.Result, err error) {
+func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *amino.Codec, txBytes []byte, adjustment float64) (estimate, adjusted uint64, simulationResult sdk.Result, err error) {
 	// run a simulation (via /app/simulate query) to
 	// estimate gas and update TxContext accordingly
 	rawRes, err := queryFunc("/app/simulate", txBytes)
@@ -174,7 +174,7 @@ func SignStdTx(txCtx context.TxContext, cliCtx context.CLIContext, name string, 
 
 // nolint
 // SimulateMsgs simulates the transaction and returns the gas estimate and the adjusted value.
-func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted int64, result sdk.Result, err error) {
+func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted uint64, result sdk.Result, err error) {
 	txBytes, err := txCtx.BuildWithPubKey(name, msgs)
 	if err != nil {
 		return
@@ -183,8 +183,8 @@ func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name strin
 	return
 }
 
-func adjustGasEstimate(estimate int64, adjustment float64) int64 {
-	return int64(adjustment * float64(estimate))
+func adjustGasEstimate(estimate uint64, adjustment float64) uint64 {
+	return uint64(adjustment * float64(estimate))
 }
 
 func prepareTxContext(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
