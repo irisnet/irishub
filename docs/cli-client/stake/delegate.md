@@ -27,3 +27,4 @@ iriscli stake delegate --help
 ```
 iriscli stake delegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --amount=100iris --address-validator=<ValidatorAddress>
 ```
+To get the address of your validator, you could use [iris tendermint show-address](../tendermint/show-address.md) command. 

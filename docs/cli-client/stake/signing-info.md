@@ -22,6 +22,8 @@ iriscli stake signing-info --help
 iriscli stake signing-info [validator-pubkey]
 ```
 
+To get the public key of your node, you could use [iris tendermint show-validator](../tendermint/show-validator.md) command. 
+
 After that, you will get specified validator's signing information.
 
 ```txt
