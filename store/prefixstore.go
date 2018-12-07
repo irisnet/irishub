@@ -108,7 +108,7 @@ func (s prefixStore) ReverseIterator(start, end []byte) Iterator {
 
 	var newend []byte
 	if end == nil {
-		newend = cpDecr(s.prefix)
+		newend = cpIncr(s.prefix)
 	} else {
 		newend = cloneAppend(s.prefix, end)
 	}
