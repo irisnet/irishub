@@ -22,10 +22,10 @@ type Protocol interface {
 }
 
 type ProtocolBase struct {
-	definition common.ProtocolDefinition
+	Definition common.ProtocolDefinition
 	//	engine 		*ProtocolEngine
 }
 
 func (pb ProtocolBase) GetDefinition() common.ProtocolDefinition {
-	return pb.definition
+	return pb.Definition
 }

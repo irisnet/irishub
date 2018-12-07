@@ -10,7 +10,6 @@ import (
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	bam "github.com/irisnet/irishub/newapp/baseapp"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
@@ -20,6 +19,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/newapp/protocol"
+	"github.com/irisnet/irishub/newapp/v0"
 )
 
 const (
@@ -36,13 +36,13 @@ var (
 
 // Extended ABCI application
 type IrisApp struct {
-	*bam.BaseApp
+	*BaseApp
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
 	cdc := MakeCodec()
 
-	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
@@ -52,7 +52,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	engine := protocol.NewProtocolEngine()
 
 
-	protocol0 := protocol.NewProtocolVersion0(cdc)
+	protocol0 := v0.NewProtocolVersion0(cdc)
 	engine.Add(protocol0)
 	//	protocol1 := protocol.NewProtocolVersion1(cdc)
 	//	engine.Add(&protocol1)

@@ -5,15 +5,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pkg/errors"
-	"github.com/spf13/viper"
-
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	authtxb "github.com/irisnet/irishub/client/auth/txbuilder"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 //----------------------------------------
@@ -25,8 +23,8 @@ type BaseTx struct {
 	Name          string `json:"name"`
 	Password      string `json:"password"`
 	ChainID       string `json:"chain_id"`
-	AccountNumber int64  `json:"account_number"`
-	Sequence      int64  `json:"sequence"`
+	AccountNumber uint64 `json:"account_number"`
+	Sequence      uint64 `json:"sequence"`
 	Gas           string `json:"gas"`
 	GasAdjustment string `json:"gas_adjustment"`
 	Fee           string `json:"fee"`
@@ -74,9 +72,9 @@ func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx CLIContext) bool {
 type TxContext struct {
 	Codec         *codec.Codec
 	cliCtx        CLIContext
-	AccountNumber int64
-	Sequence      int64
-	Gas           int64 // TODO: should this turn into uint64? requires further discussion - see #2173
+	AccountNumber uint64
+	Sequence      uint64
+	Gas           uint64
 	GasAdjustment float64
 	SimulateGas   bool
 	ChainID       string
@@ -98,10 +96,10 @@ func NewTxContextFromCLI() TxContext {
 
 	return TxContext{
 		ChainID:       chainID,
-		AccountNumber: viper.GetInt64(client.FlagAccountNumber),
+		AccountNumber: uint64(viper.GetInt64(client.FlagAccountNumber)),
 		Gas:           client.GasFlagVar.Gas,
 		GasAdjustment: viper.GetFloat64(client.FlagGasAdjustment),
-		Sequence:      viper.GetInt64(client.FlagSequence),
+		Sequence:      uint64(viper.GetInt64(client.FlagSequence)),
 		SimulateGas:   client.GasFlagVar.Simulate,
 		Fee:           viper.GetString(client.FlagFee),
 		Memo:          viper.GetString(client.FlagMemo),
@@ -127,7 +125,7 @@ func (txCtx TxContext) WithChainID(chainID string) TxContext {
 }
 
 // WithGas returns a copy of the context with an updated gas.
-func (txCtx TxContext) WithGas(gas int64) TxContext {
+func (txCtx TxContext) WithGas(gas uint64) TxContext {
 	txCtx.Gas = gas
 	return txCtx
 }
@@ -139,7 +137,7 @@ func (txCtx TxContext) WithFee(fee string) TxContext {
 }
 
 // WithSequence returns a copy of the context with an updated sequence number.
-func (txCtx TxContext) WithSequence(sequence int64) TxContext {
+func (txCtx TxContext) WithSequence(sequence uint64) TxContext {
 	txCtx.Sequence = sequence
 	return txCtx
 }
@@ -151,30 +149,30 @@ func (txCtx TxContext) WithMemo(memo string) TxContext {
 }
 
 // WithAccountNumber returns a copy of the context with an account number.
-func (txCtx TxContext) WithAccountNumber(accnum int64) TxContext {
+func (txCtx TxContext) WithAccountNumber(accnum uint64) TxContext {
 	txCtx.AccountNumber = accnum
 	return txCtx
 }
 
 // Build builds a single message to be signed from a TxContext given a set of
 // messages. It returns an error if a fee is supplied but cannot be parsed.
-func (txCtx TxContext) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
+func (txCtx TxContext) Build(msgs []sdk.Msg) (client.StdSignMsg, error) {
 	chainID := txCtx.ChainID
 	if chainID == "" {
-		return authtxb.StdSignMsg{}, errors.Errorf("chain ID required but not specified")
+		return client.StdSignMsg{}, errors.Errorf("chain ID required but not specified")
 	}
 
 	fee := sdk.Coins{}
 	if txCtx.Fee != "" {
 		parsedFee, err := txCtx.cliCtx.ParseCoins(txCtx.Fee)
 		if err != nil {
-			return authtxb.StdSignMsg{}, fmt.Errorf("encountered error in parsing transaction fee: %s", err.Error())
+			return client.StdSignMsg{}, fmt.Errorf("encountered error in parsing transaction fee: %s", err.Error())
 		}
 
 		fee = parsedFee
 	}
 
-	return authtxb.StdSignMsg{
+	return client.StdSignMsg{
 		ChainID:       txCtx.ChainID,
 		AccountNumber: txCtx.AccountNumber,
 		Sequence:      txCtx.Sequence,
@@ -186,7 +184,7 @@ func (txCtx TxContext) Build(msgs []sdk.Msg) (authtxb.StdSignMsg, error) {
 
 // Sign signs a transaction given a name, passphrase, and a single message to
 // signed. An error is returned if signing fails.
-func (txCtx TxContext) Sign(name, passphrase string, msg authtxb.StdSignMsg) ([]byte, error) {
+func (txCtx TxContext) Sign(name, passphrase string, msg client.StdSignMsg) ([]byte, error) {
 	sig, err := MakeSignature(name, passphrase, msg)
 	if err != nil {
 		return nil, err
@@ -238,7 +236,7 @@ func (txCtx TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, err
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If append
 // is false, it replaces the signatures already attached with the new signature.
 func (txCtx TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appendSig bool) (signedStdTx auth.StdTx, err error) {
-	stdSignature, err := MakeSignature(name, passphrase, authtxb.StdSignMsg{
+	stdSignature, err := MakeSignature(name, passphrase, client.StdSignMsg{
 		ChainID:       txCtx.ChainID,
 		AccountNumber: txCtx.AccountNumber,
 		Sequence:      txCtx.Sequence,
@@ -261,7 +259,7 @@ func (txCtx TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appe
 }
 
 // MakeSignature builds a StdSignature given key name, passphrase, and a StdSignMsg.
-func MakeSignature(name, passphrase string, msg authtxb.StdSignMsg) (sig auth.StdSignature, err error) {
+func MakeSignature(name, passphrase string, msg client.StdSignMsg) (sig auth.StdSignature, err error) {
 	keybase, err := keys.GetKeyBase()
 	if err != nil {
 		return

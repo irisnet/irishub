@@ -4,21 +4,21 @@ import (
 	"os"
 	"path"
 
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
+	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
-	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	"github.com/irisnet/irishub/client/utils"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
@@ -67,12 +67,12 @@ func main() {
 	bankCmd.AddCommand(
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
-			bankcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			bankcmd.GetAccountCmd("acc", cdc, utils.GetAccountDecoder(cdc)),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
-			bankcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc)),
+			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			bankcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(

@@ -1,8 +1,8 @@
-package context
+package client
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // StdSignMsg is a convenience structure for passing along
@@ -10,8 +10,8 @@ import (
 // it is signed. For use in the CLI.
 type StdSignMsg struct {
 	ChainID       string      `json:"chain_id"`
-	AccountNumber int64       `json:"account_number"`
-	Sequence      int64       `json:"sequence"`
+	AccountNumber uint64      `json:"account_number"`
+	Sequence      uint64      `json:"sequence"`
 	Fee           auth.StdFee `json:"fee"`
 	Msgs          []sdk.Msg   `json:"msgs"`
 	Memo          string      `json:"memo"`

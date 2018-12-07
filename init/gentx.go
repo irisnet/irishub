@@ -2,7 +2,18 @@ package init
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client"
+	signcmd "github.com/irisnet/irishub/client/bank/cli"
+	"github.com/irisnet/irishub/client/stake/cli"
+	stakecmd "github.com/irisnet/irishub/client/stake/cli"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/server"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
@@ -11,16 +22,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/common"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	stakecmd "github.com/irisnet/irishub/client/stake/cli"
-	"github.com/irisnet/irishub/client/stake/cli"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/client"
-	signcmd "github.com/irisnet/irishub/client/bank/cli"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 const (
@@ -90,7 +91,7 @@ following delegation and commission default parameters:
 			w.Close()
 
 			prepareFlagsForTxSign()
-			signCmd := signcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc))
+			signCmd := signcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc))
 			if w, err = prepareOutputFile(config.RootDir, nodeID); err != nil {
 				return err
 			}
@@ -102,7 +103,7 @@ following delegation and commission default parameters:
 	cmd.Flags().String(tmcli.HomeFlag, app.DefaultNodeHome, "node's home directory")
 	cmd.Flags().String(flagClientHome, app.DefaultCLIHome, "client's home directory")
 	cmd.Flags().String(client.FlagName, "", "name of private key with which to sign the gentx")
-	cmd.Flags().String(stakecmd.FlagIP,"",fmt.Sprintf("Node's public IP. It takes effect only when used in combination with --%s", stakecmd.FlagGenesisFormat))
+	cmd.Flags().String(stakecmd.FlagIP, "", fmt.Sprintf("Node's public IP. It takes effect only when used in combination with --%s", stakecmd.FlagGenesisFormat))
 	cmd.Flags().AddFlagSet(stakecmd.FsCommissionCreate)
 	cmd.Flags().AddFlagSet(stakecmd.FsAmount)
 	cmd.Flags().AddFlagSet(stakecmd.FsPk)
@@ -114,7 +115,7 @@ func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip, chainID st
 	valPubKey crypto.PubKey) {
 	viper.Set(tmcli.HomeFlag, viper.GetString(flagClientHome)) // --home
 	viper.Set(client.FlagChainID, chainID)
-	viper.Set(client.FlagFrom, viper.GetString(client.FlagName))   // --from
+	viper.Set(client.FlagFrom, viper.GetString(client.FlagName))        // --from
 	viper.Set(stakecmd.FlagNodeID, nodeID)                              // --node-id
 	viper.Set(stakecmd.FlagIP, ip)                                      // --ip
 	viper.Set(stakecmd.FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey)) // --pubkey

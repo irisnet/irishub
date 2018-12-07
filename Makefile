@@ -27,7 +27,7 @@ BUILD_FLAGS = -ldflags "\
 ### Tools & dependencies
 
 echo_bech32_prefix:
-	@echo "\"source tools/script/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
+	@echo "\"source scripts/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
 	@echo Bech32PrefixAccAddr=${Bech32PrefixAccAddr}
 	@echo Bech32PrefixAccPub=${Bech32PrefixAccPub}
 	@echo Bech32PrefixValAddr=${Bech32PrefixValAddr}
@@ -36,22 +36,22 @@ echo_bech32_prefix:
 	@echo Bech32PrefixConsPub=${Bech32PrefixConsPub}
 
 check_tools:
-	cd deps_tools && $(MAKE) check_tools
+	cd scripts && $(MAKE) check_tools
 
 check_dev_tools:
-	cd deps_tools && $(MAKE) check_dev_tools
+	cd scripts && $(MAKE) check_dev_tools
 
 update_tools:
-	cd deps_tools && $(MAKE) update_tools
+	cd scripts && $(MAKE) update_tools
 
 update_dev_tools:
-	cd deps_tools && $(MAKE) update_dev_tools
+	cd scripts && $(MAKE) update_dev_tools
 
 get_tools:
-	cd deps_tools && $(MAKE) get_tools
+	cd scripts && $(MAKE) get_tools
 
 get_dev_tools:
-	cd deps_tools && $(MAKE) get_dev_tools
+	cd scripts && $(MAKE) get_dev_tools
 
 get_vendor_deps:
 	@rm -rf vendor/
@@ -75,7 +75,9 @@ install: update_irislcd_swagger_docs echo_bech32_prefix
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
 	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iristool
-#	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/newiris
+
+install_newapp: update_irislcd_swagger_docs echo_bech32_prefix
+	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/newiris
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \

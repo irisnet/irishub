@@ -2,19 +2,19 @@ package init
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/server"
 	sdk "github.com/irisnet/irishub/types"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
-	"github.com/irisnet/irishub/modules/auth"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/common"
-	"os"
-	"github.com/irisnet/irishub/client/context"
 )
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command
@@ -34,7 +34,7 @@ func AddGenesisAccountCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command 
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			coins, err := cliCtx.ParseCoins(args[1])
 			if err != nil {

@@ -187,7 +187,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			valPubKeys[i],
 			app.FreeFermionVal,
 			stake.NewDescription(nodeDirName, "", "", ""),
-			stake.NewCommissionMsg(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
+			stake.NewCommissionMsg(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(20, 2), sdk.NewDecWithPrec(1, 2)),
 		)
 		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo)
 		txCtx := context.NewTxContextFromCLI().WithChainID(chainID).WithMemo(memo)

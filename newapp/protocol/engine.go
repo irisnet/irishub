@@ -69,28 +69,29 @@ func (pe *ProtocolEngine) GetByVersion(v uint64) (Protocol, bool) {
 }
 
 func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
-	return []*sdk.KVStoreKey{keyMain,
-		keyAccount,
-		keyStake,
-		keyMint,
-		keyDistr,
-		keySlashing,
-		keyGov,
-		keyRecord,
-		keyFeeCollection,
-		keyParams,
+	return []*sdk.KVStoreKey{
+		KeyMain,
+		KeyAccount,
+		KeyStake,
+		KeyMint,
+		KeyDistr,
+		KeySlashing,
+		KeyGov,
+		KeyRecord,
+		KeyFeeCollection,
+		KeyParams,
 		//keyUpgrade,
-		keyService,
-		keyGuardian}
+		KeyService,
+		KeyGuardian}
 }
 
 func (pe *ProtocolEngine) GetTransientStoreKeys() []*sdk.TransientStoreKey {
 	return []*sdk.TransientStoreKey{
-		tkeyStake,
-		tkeyDistr,
-		tkeyParams}
+		TkeyStake,
+		TkeyDistr,
+		TkeyParams}
 }
 
 func (pe *ProtocolEngine) GetKeyMain() *sdk.KVStoreKey {
-	return keyMain
+	return KeyMain
 }

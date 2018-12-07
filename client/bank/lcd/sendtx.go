@@ -117,8 +117,8 @@ type sendTx struct {
 type stdSignature struct {
 	PubKey        []byte `json:"pub_key"` // optional
 	Signature     []byte `json:"signature"`
-	AccountNumber int64  `json:"account_number"`
-	Sequence      int64  `json:"sequence"`
+	AccountNumber uint64 `json:"account_number"`
+	Sequence      uint64 `json:"sequence"`
 }
 
 func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {

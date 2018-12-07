@@ -96,7 +96,7 @@ func (cliCtx CLIContext) GetFromName() (string, error) {
 
 // GetAccountNumber returns the next account number for the given account
 // address.
-func (cliCtx CLIContext) GetAccountNumber(address []byte) (int64, error) {
+func (cliCtx CLIContext) GetAccountNumber(address []byte) (uint64, error) {
 	account, err := cliCtx.GetAccount(address)
 	if err != nil {
 		return 0, err
@@ -107,7 +107,7 @@ func (cliCtx CLIContext) GetAccountNumber(address []byte) (int64, error) {
 
 // GetAccountSequence returns the sequence number for the given account
 // address.
-func (cliCtx CLIContext) GetAccountSequence(address []byte) (int64, error) {
+func (cliCtx CLIContext) GetAccountSequence(address []byte) (uint64, error) {
 	account, err := cliCtx.GetAccount(address)
 	if err != nil {
 		return 0, err
@@ -363,6 +363,7 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 	for _, coin := range coinMap {
 		coins = append(coins, coin)
 	}
+	coins = coins.Sort()
 	return coins, nil
 }
 
