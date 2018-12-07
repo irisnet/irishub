@@ -27,7 +27,7 @@ BUILD_FLAGS = -ldflags "\
 ### Tools & dependencies
 
 echo_bech32_prefix:
-	@echo "\"source tools/script/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
+	@echo "\"source scripts/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
 	@echo Bech32PrefixAccAddr=${Bech32PrefixAccAddr}
 	@echo Bech32PrefixAccPub=${Bech32PrefixAccPub}
 	@echo Bech32PrefixValAddr=${Bech32PrefixValAddr}
