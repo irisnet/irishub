@@ -20,6 +20,9 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/newapp/protocol"
 	"github.com/irisnet/irishub/newapp/v0"
+	abci "github.com/tendermint/tendermint/abci/types"
+	tmtypes "github.com/tendermint/tendermint/types"
+	"encoding/json"
 )
 
 const (
@@ -88,4 +91,8 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
-
+// export the state of iris for a genesis file
+func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+	ctx := app.NewContext(true, abci.Header{})
+	return app.engine.GetCurrent().ExportAppStateAndValidators(ctx)
+}

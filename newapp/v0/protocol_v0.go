@@ -25,6 +25,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"sort"
 	"time"
+	"github.com/irisnet/irishub/modules/upgrade"
+	"encoding/json"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)
@@ -104,7 +107,7 @@ func (p *ProtocolVersion0) configKeepers() {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
-		protocol.KeyAccount,            // target store
+		protocol.KeyAccount,   // target store
 		auth.ProtoBaseAccount, // prototype
 	)
 
@@ -355,6 +358,52 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}
+}
+
+// export the state of iris for a genesis file
+func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+
+	// iterate to get the accounts
+	accounts := []GenesisAccount{}
+	appendAccount := func(acc auth.Account) (stop bool) {
+		account := NewGenesisAccountI(acc)
+		accounts = append(accounts, account)
+		return false
+	}
+	p.accountMapper.IterateAccounts(ctx, appendAccount)
+	fileAccounts := []GenesisFileAccount{}
+	for _, acc := range accounts {
+		var coinsString []string
+		for _, coin := range acc.Coins {
+			coinsString = append(coinsString, coin.String())
+		}
+		fileAccounts = append(fileAccounts,
+			GenesisFileAccount{
+				Address:       acc.Address,
+				Coins:         coinsString,
+				Sequence:      acc.Sequence,
+				AccountNumber: acc.AccountNumber,
+			})
+	}
+	genState := NewGenesisFileState(
+		fileAccounts,
+		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
+		stake.ExportGenesis(ctx, p.stakeKeeper),
+		mint.ExportGenesis(ctx, p.mintKeeper),
+		distr.ExportGenesis(ctx, p.distrKeeper),
+		gov.ExportGenesis(ctx, p.govKeeper),
+		upgrade.WriteGenesis(ctx),
+		service.ExportGenesis(ctx, p.serviceKeeper),
+		arbitration.ExportGenesis(ctx),
+		guardian.ExportGenesis(ctx, p.guardianKeeper),
+		slashing.ExportGenesis(ctx, p.slashingKeeper),
+	)
+	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
+	if err != nil {
+		return nil, nil, err
+	}
+	validators = stake.WriteValidators(ctx, p.stakeKeeper)
+	return appState, validators, nil
 }
 
 func (p *ProtocolVersion0) GetRouter() protocol.Router {

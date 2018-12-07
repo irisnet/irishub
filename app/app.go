@@ -446,7 +446,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 		mint.ExportGenesis(ctx, app.mintKeeper),
 		distr.ExportGenesis(ctx, app.distrKeeper),
 		gov.ExportGenesis(ctx, app.govKeeper),
-		upgrade.WriteGenesis(ctx, app.upgradeKeeper),
+		upgrade.WriteGenesis(ctx),
 		service.ExportGenesis(ctx, app.serviceKeeper),
 		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, app.guardianKeeper),

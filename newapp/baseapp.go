@@ -50,7 +50,7 @@ type BaseApp struct {
 	cms    sdk.CommitMultiStore // Main (uncached) state
 	engine protocol.ProtocolEngine
 
-	txDecoder  sdk.TxDecoder   // unmarshal []byte into sdk.Tx
+	txDecoder sdk.TxDecoder // unmarshal []byte into sdk.Tx
 
 	addrPeerFilter   sdk.PeerFilter // filter peers by address and port
 	pubkeyPeerFilter sdk.PeerFilter // filter peers by public key
@@ -85,11 +85,11 @@ var _ abci.Application = (*BaseApp)(nil)
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
 func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:     logger,
-		name:       name,
-		db:         db,
-		cms:        store.NewCommitMultiStore(db),
-		txDecoder:  txDecoder,
+		Logger:    logger,
+		name:      name,
+		db:        db,
+		cms:       store.NewCommitMultiStore(db),
+		txDecoder: txDecoder,
 	}
 
 	for _, option := range options {
@@ -488,8 +488,8 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 		Code:      uint32(result.Code),
 		Data:      result.Data,
 		Log:       result.Log,
-		GasWanted: result.GasWanted,
-		GasUsed:   result.GasUsed,
+		GasWanted: int64(result.GasWanted),
+		GasUsed:   int64(result.GasUsed),
 		Tags:      result.Tags,
 	}
 }
@@ -600,9 +600,9 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	result = sdk.Result{
 		Code:      code,
 		Codespace: codespace,
-		Data:    data,
-		Log:     strings.Join(logs, "\n"),
-		GasUsed: ctx.GasMeter().GasConsumed(),
+		Data:      data,
+		Log:       strings.Join(logs, "\n"),
+		GasUsed:   ctx.GasMeter().GasConsumed(),
 		// TODO: FeeAmount/FeeDenom
 		Tags: tags,
 	}

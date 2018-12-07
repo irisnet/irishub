@@ -5,7 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/baseapp"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -22,7 +22,7 @@ type (
 	//
 	// Operations can optionally provide a list of "FutureOperations" to run later
 	// These will be ran at the beginning of the corresponding block.
-	Operation func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
+	Operation func(r *rand.Rand, app *bam.BaseApp, ctx sdk.Context,
 		accounts []Account, event func(string),
 	) (action string, futureOperations []FutureOperation, err error)
 
@@ -33,7 +33,7 @@ type (
 	// If the invariant has been broken, it should return an error
 	// containing a descriptive message about what happened.
 	// The simulator will then halt and print the logs.
-	Invariant func(app *baseapp.BaseApp) error
+	Invariant func(app *bam.BaseApp) error
 
 	// Account contains a privkey, pubkey, address tuple
 	// eventually more useful data can be placed in here.
@@ -73,7 +73,7 @@ type (
 // a given invariant if the mock application's last block modulo the given
 // period is congruent to the given offset.
 func PeriodicInvariant(invariant Invariant, period int, offset int) Invariant {
-	return func(app *baseapp.BaseApp) error {
+	return func(app *bam.BaseApp) error {
 		if int(app.LastBlockHeight())%period == offset {
 			return invariant(app)
 		}
