@@ -1,4 +1,4 @@
-package router
+package protocol
 
 import (
 	sdk "github.com/irisnet/irishub/types"

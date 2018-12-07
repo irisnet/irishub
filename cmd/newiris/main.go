@@ -5,7 +5,7 @@ import (
 
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/newapp"
-	bam "github.com/irisnet/irishub/newapp/baseapp"
+	bam "github.com/irisnet/irishub/newapp"
 	"github.com/irisnet/irishub/client"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"

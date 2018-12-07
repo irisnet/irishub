@@ -1,4 +1,4 @@
-package protocol
+package v0
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/newapp/protocol/router"
+	"github.com/irisnet/irishub/newapp/protocol"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -27,10 +27,10 @@ import (
 	"time"
 )
 
-var _ Protocol = (*ProtocolVersion0)(nil)
+var _ protocol.Protocol = (*ProtocolVersion0)(nil)
 
 type ProtocolVersion0 struct {
-	pb  *ProtocolBase
+	pb  *protocol.ProtocolBase
 	cdc *codec.Codec
 
 	// Manage getting and setting accounts
@@ -49,8 +49,8 @@ type ProtocolVersion0 struct {
 	// fee manager
 	feeManager auth.FeeManager
 
-	router      router.Router      // handle any kind of message
-	queryRouter router.QueryRouter // router for redirecting query calls
+	router      protocol.Router      // handle any kind of message
+	queryRouter protocol.QueryRouter // router for redirecting query calls
 
 	anteHandler          sdk.AnteHandler          // ante handler for fee and auth
 	feeRefundHandler     sdk.FeeRefundHandler     // fee handler for fee refund
@@ -64,8 +64,8 @@ type ProtocolVersion0 struct {
 }
 
 func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
-	base := ProtocolBase{
-		definition: common.ProtocolDefinition{
+	base := protocol.ProtocolBase{
+		Definition: common.ProtocolDefinition{
 			uint64(0),
 			"https://github.com/irisnet/irishub/releases/tag/v0.7.0",
 			uint64(1),
@@ -75,8 +75,8 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 	p0 := ProtocolVersion0{
 		pb:          &base,
 		cdc:         cdc,
-		router:      router.NewRouter(),
-		queryRouter: router.NewQueryRouter(),
+		router:      protocol.NewRouter(),
+		queryRouter: protocol.NewQueryRouter(),
 	}
 	return &p0
 }
@@ -104,7 +104,7 @@ func (p *ProtocolVersion0) configKeepers() {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
-		keyAccount,            // target store
+		protocol.KeyAccount,            // target store
 		auth.ProtoBaseAccount, // prototype
 	)
 
@@ -112,57 +112,58 @@ func (p *ProtocolVersion0) configKeepers() {
 	p.bankKeeper = bank.NewBaseKeeper(p.accountMapper)
 	p.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
 		p.cdc,
-		keyFeeCollection,
+		protocol.KeyFeeCollection,
 	)
 	p.paramsKeeper = params.NewKeeper(
 		p.cdc,
-		keyParams, tkeyParams,
+		protocol.KeyParams, protocol.TkeyParams,
 	)
 	stakeKeeper := stake.NewKeeper(
 		p.cdc,
-		keyStake, tkeyStake,
+		protocol.KeyStake, protocol.TkeyStake,
 		p.bankKeeper, p.paramsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 	)
-	p.mintKeeper = mint.NewKeeper(p.cdc, keyMint,
+	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamspace),
 		&stakeKeeper, p.feeCollectionKeeper,
 	)
 	p.distrKeeper = distr.NewKeeper(
 		p.cdc,
-		keyDistr,
+		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
 		p.bankKeeper, &stakeKeeper, p.feeCollectionKeeper,
 		distr.DefaultCodespace,
 	)
 	p.slashingKeeper = slashing.NewKeeper(
 		p.cdc,
-		keySlashing,
+		protocol.KeySlashing,
 		&stakeKeeper, p.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		slashing.DefaultCodespace,
 	)
 
 	p.govKeeper = gov.NewKeeper(
 		p.cdc,
-		keyGov,
+		protocol.KeyGov,
 		p.bankKeeper, &stakeKeeper,
 		gov.DefaultCodespace,
 	)
 
 	p.recordKeeper = record.NewKeeper(
 		p.cdc,
-		keyRecord,
+		protocol.KeyRecord,
 		record.DefaultCodespace,
 	)
 	p.serviceKeeper = service.NewKeeper(
 		p.cdc,
-		keyService,
+		protocol.KeyService,
 		p.bankKeeper,
+		p.guardianKeeper,
 		service.DefaultCodespace,
 	)
 	p.guardianKeeper = guardian.NewKeeper(
 		p.cdc,
-		keyGuardian,
+		protocol.KeyGuardian,
 		guardian.DefaultCodespace,
 	)
 
@@ -178,17 +179,16 @@ func (p *ProtocolVersion0) configKeepers() {
 // configure all Routers
 func (p *ProtocolVersion0) configRouters() {
 	p.router.
-		AddRoute("bank", []*sdk.KVStoreKey{keyAccount}, bank.NewHandler(p.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{keyStake, keyAccount, keyMint, keyDistr}, stake.NewHandler(p.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{keySlashing, keyStake}, slashing.NewHandler(p.slashingKeeper)).
-		AddRoute("distr", []*sdk.KVStoreKey{keyDistr}, distr.NewHandler(p.distrKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{keyGov, keyAccount, keyStake, keyParams}, gov.NewHandler(p.govKeeper)).
-		AddRoute("record", []*sdk.KVStoreKey{keyRecord}, record.NewHandler(p.recordKeeper)).
-		AddRoute("service", []*sdk.KVStoreKey{keyService}, service.NewHandler(p.serviceKeeper)).
-		AddRoute("guardian", []*sdk.KVStoreKey{keyGuardian}, guardian.NewHandler(p.guardianKeeper))
+		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
+		AddRoute("stake", stake.NewHandler(p.stakeKeeper)).
+		AddRoute("slashing", slashing.NewHandler(p.slashingKeeper)).
+		AddRoute("distr", distr.NewHandler(p.distrKeeper)).
+		AddRoute("gov", gov.NewHandler(p.govKeeper)).
+		AddRoute("record", record.NewHandler(p.recordKeeper)).
+		AddRoute("service", service.NewHandler(p.serviceKeeper)).
+		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
 	p.queryRouter.
 		AddRoute("gov", gov.NewQuerier(p.govKeeper))
-
 }
 
 // configure all Stores
@@ -348,7 +348,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 		}
 	}
 
-	service.InitGenesis(ctx, genesisState.ServiceData)
+	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 
@@ -357,10 +357,10 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	}
 }
 
-func (p *ProtocolVersion0) GetRouter() router.Router {
+func (p *ProtocolVersion0) GetRouter() protocol.Router {
 	return p.router
 }
-func (p *ProtocolVersion0) GetQueryRouter() router.QueryRouter {
+func (p *ProtocolVersion0) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
 func (p *ProtocolVersion0) GetAnteHandler() sdk.AnteHandler {

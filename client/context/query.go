@@ -363,6 +363,7 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 	for _, coin := range coinMap {
 		coins = append(coins, coin)
 	}
+	coins = coins.Sort()
 	return coins, nil
 }
 
