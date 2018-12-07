@@ -96,3 +96,7 @@ func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, val
 	ctx := app.NewContext(true, abci.Header{})
 	return app.engine.GetCurrent().ExportAppStateAndValidators(ctx)
 }
+
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, protocol.KeyMain, false)
+}
