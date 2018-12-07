@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
-
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,7 +26,7 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
@@ -135,7 +133,7 @@ func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
@@ -190,7 +188,7 @@ func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
@@ -232,7 +230,7 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
@@ -319,7 +317,7 @@ func getShares(
 		key := stake.GetDelegationKey(delegatorAddr, validatorAddr)
 		cliCtx := context.NewCLIContext().
 			WithCodec(cdc).
-			WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+			WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 		resQuery, err := cliCtx.QueryStore(key, storeName)
 		if err != nil {
@@ -346,7 +344,7 @@ func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 

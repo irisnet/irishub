@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake/types"
 	irishubType "github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // SendOrPrintTx implements a utility function that
@@ -89,7 +90,7 @@ func EnrichCtxWithGas(txCtx context.TxContext, cliCtx context.CLIContext, name s
 
 // CalculateGas simulates the execution of a transaction and returns
 // both the estimate obtained by the query and the adjusted amount.
-func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *amino.Codec, txBytes []byte, adjustment float64) (estimate, adjusted int64, simulationResult sdk.Result, err error) {
+func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *amino.Codec, txBytes []byte, adjustment float64) (estimate, adjusted uint64, simulationResult sdk.Result, err error) {
 	// run a simulation (via /app/simulate query) to
 	// estimate gas and update TxContext accordingly
 	rawRes, err := queryFunc("/app/simulate", txBytes)
@@ -97,7 +98,7 @@ func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *
 		return
 	}
 	if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
-		return 0,0, sdk.Result{}, err
+		return 0, 0, sdk.Result{}, err
 	}
 	estimate = simulationResult.GasUsed
 	adjusted = adjustGasEstimate(estimate, adjustment)
@@ -174,7 +175,7 @@ func SignStdTx(txCtx context.TxContext, cliCtx context.CLIContext, name string, 
 
 // nolint
 // SimulateMsgs simulates the transaction and returns the gas estimate and the adjusted value.
-func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted int64, result sdk.Result, err error) {
+func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted uint64, result sdk.Result, err error) {
 	txBytes, err := txCtx.BuildWithPubKey(name, msgs)
 	if err != nil {
 		return
@@ -183,8 +184,8 @@ func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name strin
 	return
 }
 
-func adjustGasEstimate(estimate int64, adjustment float64) int64 {
-	return int64(adjustment * float64(estimate))
+func adjustGasEstimate(estimate uint64, adjustment float64) uint64 {
+	return uint64(adjustment * float64(estimate))
 }
 
 func prepareTxContext(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
@@ -275,4 +276,16 @@ func ConvertDecToRat(input sdk.Dec) irishubType.Rat {
 		panic(err.Error())
 	}
 	return output
+}
+
+// GetAccountDecoder gets the account decoder for auth.DefaultAccount.
+func GetAccountDecoder(cdc *codec.Codec) auth.AccountDecoder {
+	return func(accBytes []byte) (acct auth.Account, err error) {
+		err = cdc.UnmarshalBinaryBare(accBytes, &acct)
+		if err != nil {
+			panic(err)
+		}
+
+		return acct, err
+	}
 }

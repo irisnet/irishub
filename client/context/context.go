@@ -1,19 +1,17 @@
 package context
 
 import (
-	"io"
-
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/client"
-
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 
-	cskeys "github.com/irisnet/irishub/crypto/keys"
-	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	cskeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"

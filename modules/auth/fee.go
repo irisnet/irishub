@@ -64,7 +64,7 @@ func NewFeeRefundHandler(am AccountKeeper, fck FeeCollectionKeeper, fm FeeManage
 		unusedGas := txResult.GasWanted - txResult.GasUsed
 		refundCoin := sdk.Coin{
 			Denom:  totalNativeFee.Denom,
-			Amount: totalNativeFee.Amount.Mul(sdk.NewInt(unusedGas)).Div(sdk.NewInt(txResult.GasWanted)),
+			Amount: totalNativeFee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))),
 		}
 		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
 		err = firstAccount.SetCoins(coins.Plus(sdk.Coins{refundCoin}))
@@ -123,9 +123,9 @@ func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Co
 	}
 }
 
-func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit int64) sdk.Error {
-	if gasLimit <= 0 {
-		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be larger than 0", gasLimit))
+func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit uint64) sdk.Error {
+	if gasLimit == 0 {
+		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be positive", gasLimit))
 	}
 	var nativeFeeToken string
 	fck.paramSpace.Get(ctx, nativeFeeTokenKey, &nativeFeeToken)
@@ -163,7 +163,8 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit i
 		}
 	*/
 	equivalentTotalFee := coins[0].Amount
-	gasPrice := equivalentTotalFee.Div(sdk.NewInt(gasLimit))
+	//TODO change this when uint coin is implemented
+	gasPrice := equivalentTotalFee.Div(sdk.NewInt(int64(gasLimit)))
 	if gasPrice.LT(threshold) {
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("equivalent gas price (%s%s) is less than threshold (%s%s)", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken))
 	}

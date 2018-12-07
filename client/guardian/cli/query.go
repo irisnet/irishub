@@ -1,14 +1,14 @@
 package cli
 
 import (
-	"os"
 	"fmt"
+	"os"
 
-	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/spf13/cobra"
 )
 
 func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
@@ -18,7 +18,7 @@ func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli guardian profilers",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			res, err := cliCtx.QuerySubspace(guardian.GetProfilersSubspaceKey(), storeName)
 			if err != nil {
 				return err
@@ -44,7 +44,7 @@ func GetCmdQueryTrustees(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli guardian trustees",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			res, err := cliCtx.QuerySubspace(guardian.GetTrusteesSubspaceKey(), storeName)
 			if err != nil {
 				return err
