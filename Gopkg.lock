@@ -433,14 +433,16 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:c1a04665f9613e082e1209cf288bf64f4068dcd6c87a64bf1c4ff006ad422ba0"
+  digest = "1:26663fafdea73a38075b07e8e9d82fc0056379d2be8bb4e13899e8fda7c7dd23"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
+    "prometheus/internal",
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  revision = "abad2d1bd44235a26707c172eab6bca5bf2dbad3"
+  version = "v0.9.1"
 
 [[projects]]
   branch = "master"
@@ -489,6 +491,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
+
+[[projects]]
+  digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
+  name = "github.com/rs/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:3fb45284d554f369d08136a0fd4d01f50897f6f79469358c41fb5a30a6379dfe"
@@ -620,15 +630,15 @@
   version = "v0.14.0"
 
 [[projects]]
-  digest = "1:9f8c4c93658315a795ffd3e0c943d39f78067dd8382b8d7bcfaf6686b92f3978"
+  digest = "1:e1cc8dd891e64aab63b0c09f2f12456cbe2cd9cbd9d96dfae3281245f05c2428"
   name = "github.com/tendermint/iavl"
   packages = ["."]
   pruneopts = "UT"
-  revision = "fa74114f764f9827c4ad5573f990ed25bf8c4bac"
-  version = "v0.11.1"
+  revision = "de0740903a67b624d887f9055d4c60175dcfa758"
+  version = "v0.12.0"
 
 [[projects]]
-  digest = "1:d05123b0e2037d03251d777ea6cdb17b19fcfc5b6bc6b0d0dc2d2a6df6b60ac8"
+  digest = "1:0be8656e9d8eb385caa0f30b71158126b6b4294a3c8fb6f0eb5aab350bd74712"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -659,7 +669,6 @@
     "libs/clist",
     "libs/common",
     "libs/db",
-    "libs/errors",
     "libs/events",
     "libs/fail",
     "libs/flowrate",
@@ -694,9 +703,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "6c882b92f297ca99d26b6f8cda983ec0e969f6b7"
+  revision = "9dd2007de1363fa77f11f71d30b59e747d2c3d99"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.26.1-rc3-iris"
+  version = "v0.27.0-dev1-iris"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"

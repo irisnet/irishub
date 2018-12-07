@@ -51,10 +51,17 @@ func ServeLCDStartCommand(cdc *codec.Codec) *cobra.Command {
 			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "irislcd")
 			maxOpen := viper.GetInt(flagMaxOpenConnections)
 
-			listener, err := tmserver.StartHTTPServer(
-				listenAddr, router, logger,
+			listener, err := tmserver.Listen(
+				listenAddr,
 				tmserver.Config{MaxOpenConnections: maxOpen},
 			)
+			if err != nil {
+				return err
+			}
+
+			logger.Info("Starting IRISLCD service...")
+
+			err = tmserver.StartHTTPServer(listener, router, logger)
 			if err != nil {
 				return err
 			}
