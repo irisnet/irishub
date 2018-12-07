@@ -12,6 +12,8 @@ type StakeKeeper interface {
 	TotalPower(ctx sdk.Context) sdk.Dec
 	GetLastTotalPower(ctx sdk.Context) sdk.Int
 	GetLastValidatorPower(ctx sdk.Context, valAddr sdk.ValAddress) sdk.Int
+	BurnTokens(ctx sdk.Context, amount sdk.Dec)
+	GetStakeDenom(ctx sdk.Context) string
 }
 
 // expected coin keeper

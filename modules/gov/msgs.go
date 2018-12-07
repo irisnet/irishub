@@ -21,7 +21,7 @@ type MsgSubmitProposal struct {
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
 	////////////////////  iris begin  ///////////////////////////
-	Param          Param
+	Param Param
 	////////////////////  iris end  /////////////////////////////
 }
 
@@ -33,7 +33,7 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
 		////////////////////  iris begin  ///////////////////////////
-		Param:          param,
+		Param: param,
 		////////////////////  iris end  /////////////////////////////
 	}
 }
@@ -102,10 +102,39 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Proposer}
 }
 
+type MsgSubmitTxTaxUsageProposal struct {
+	MsgSubmitProposal
+	Usage       UsageType      `json:"usage"`
+	DestAddress sdk.AccAddress `json:"dest_address"`
+	Percent     sdk.Dec        `json:"percent"`
+}
+
+func NewMsgSubmitTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitTxTaxUsageProposal {
+	return MsgSubmitTxTaxUsageProposal{
+		MsgSubmitProposal: msgSubmitProposal,
+		DestAddress:       destAddress,
+		Percent:           percent,
+	}
+}
+
+func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
+	err := msg.MsgSubmitProposal.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	if len(msg.DestAddress) == 0 {
+		return sdk.ErrInvalidAddress(msg.Proposer.String())
+	}
+	if msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
+		return ErrInvalidPercent(DefaultCodespace, msg.Percent)
+	}
+	return nil
+}
+
 //-----------------------------------------------------------
 // MsgDeposit
 type MsgDeposit struct {
-	ProposalID uint64          `json:"proposal_id"` // ID of the proposal
+	ProposalID uint64         `json:"proposal_id"` // ID of the proposal
 	Depositor  sdk.AccAddress `json:"depositor"`   // Address of the depositor
 	Amount     sdk.Coins      `json:"amount"`      // Coins to add to the proposal's deposit
 }
@@ -166,7 +195,7 @@ func (msg MsgDeposit) GetSigners() []sdk.AccAddress {
 //-----------------------------------------------------------
 // MsgVote
 type MsgVote struct {
-	ProposalID uint64          `json:"proposal_id"` // ID of the proposal
+	ProposalID uint64         `json:"proposal_id"` // ID of the proposal
 	Voter      sdk.AccAddress `json:"voter"`       //  address of the voter
 	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
 }

@@ -46,3 +46,25 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	// clear the now distributed fees
 	k.feeCollectionKeeper.ClearCollectedFees(ctx)
 }
+
+// Allocate fee tax handles distribution of the community fee pool
+func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent sdk.Dec, burn bool) {
+	feePool := k.GetFeePool(ctx)
+	communityPool := feePool.CommunityPool
+	allocateCoins, decCoins := communityPool.MulDec(percent).TruncateDecimal()
+	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins).Plus(decCoins))
+	k.SetFeePool(ctx, feePool)
+
+	if burn {
+		stakeDenom := k.stakeKeeper.GetStakeDenom(ctx)
+		for _, coin := range allocateCoins {
+			if coin.Denom == stakeDenom {
+				k.stakeKeeper.BurnTokens(ctx, sdk.NewDecFromInt(coin.Amount))
+			}
+		}
+		return
+	}
+
+	k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
+
+}

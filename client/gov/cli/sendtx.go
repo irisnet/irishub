@@ -27,7 +27,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.004iris --type=Text --description=test --title=test-proposal",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
-			description := viper.GetString(flagDescription)
+					description := viper.GetString(flagDescription)
 			strProposalType := viper.GetString(flagProposalType)
 			initialDeposit := viper.GetString(flagDeposit)
 			////////////////////  iris begin  ///////////////////////////

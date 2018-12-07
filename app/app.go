@@ -201,6 +201,7 @@ func (app *IrisApp) initKeeper() {
 	app.govKeeper = gov.NewKeeper(
 		app.cdc,
 		app.keyGov,
+		app.distrKeeper,
 		app.bankKeeper, &stakeKeeper,
 		gov.DefaultCodespace,
 	)

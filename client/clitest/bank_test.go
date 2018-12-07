@@ -2,10 +2,11 @@ package clitest
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"github.com/irisnet/irishub/app"
 )
 
 func TestIrisCLIBankSend(t *testing.T) {

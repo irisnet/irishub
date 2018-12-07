@@ -10,7 +10,6 @@ var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
 	TextProposal
-
 }
 
 func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {

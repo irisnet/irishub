@@ -25,6 +25,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
+	distr "github.com/irisnet/irishub/modules/distribution"
 
 	iris "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/gov"
@@ -141,6 +142,7 @@ type IrisApp struct {
 	keyIparams       *sdk.KVStoreKey
 	tkeyParams       *sdk.TransientStoreKey
 	keyUpgrade       *sdk.KVStoreKey
+	keyDistr         *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	AccountKeeper       auth.AccountKeeper
@@ -151,6 +153,7 @@ type IrisApp struct {
 	paramsKeeper        params.Keeper
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
+	distrKeeper         distr.Keeper
 
 	// fee manager
 	feeManager auth.FeeManager
@@ -202,9 +205,17 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	)
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
 	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
+	app.distrKeeper = distr.NewKeeper(
+		app.cdc,
+		app.keyDistr,
+		app.paramsKeeper.Subspace(distr.DefaultParamspace),
+		app.bankKeeper, app.stakeKeeper, app.feeCollectionKeeper,
+		distr.DefaultCodespace,
+	)
 	app.govKeeper = gov.NewKeeper(
 		app.cdc,
 		app.keyGov,
+		app.distrKeeper,
 		app.bankKeeper, app.stakeKeeper,
 		gov.DefaultCodespace,
 	)
