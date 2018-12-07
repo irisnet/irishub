@@ -36,22 +36,22 @@ echo_bech32_prefix:
 	@echo Bech32PrefixConsPub=${Bech32PrefixConsPub}
 
 check_tools:
-	cd deps_tools && $(MAKE) check_tools
+	cd scripts && $(MAKE) check_tools
 
 check_dev_tools:
-	cd deps_tools && $(MAKE) check_dev_tools
+	cd scripts && $(MAKE) check_dev_tools
 
 update_tools:
-	cd deps_tools && $(MAKE) update_tools
+	cd scripts && $(MAKE) update_tools
 
 update_dev_tools:
-	cd deps_tools && $(MAKE) update_dev_tools
+	cd scripts && $(MAKE) update_dev_tools
 
 get_tools:
-	cd deps_tools && $(MAKE) get_tools
+	cd scripts && $(MAKE) get_tools
 
 get_dev_tools:
-	cd deps_tools && $(MAKE) get_dev_tools
+	cd scripts && $(MAKE) get_dev_tools
 
 get_vendor_deps:
 	@rm -rf vendor/
