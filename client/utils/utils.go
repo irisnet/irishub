@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake/types"
 	irishubType "github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // SendOrPrintTx implements a utility function that
@@ -97,7 +98,7 @@ func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *
 		return
 	}
 	if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
-		return 0,0, sdk.Result{}, err
+		return 0, 0, sdk.Result{}, err
 	}
 	estimate = simulationResult.GasUsed
 	adjusted = adjustGasEstimate(estimate, adjustment)
@@ -275,4 +276,16 @@ func ConvertDecToRat(input sdk.Dec) irishubType.Rat {
 		panic(err.Error())
 	}
 	return output
+}
+
+// GetAccountDecoder gets the account decoder for auth.DefaultAccount.
+func GetAccountDecoder(cdc *codec.Codec) auth.AccountDecoder {
+	return func(accBytes []byte) (acct auth.Account, err error) {
+		err = cdc.UnmarshalBinaryBare(accBytes, &acct)
+		if err != nil {
+			panic(err)
+		}
+
+		return acct, err
+	}
 }
