@@ -21,6 +21,7 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 // initialize the mock application for this module
@@ -50,7 +51,8 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, sk, DefaultCodespace)
+	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 

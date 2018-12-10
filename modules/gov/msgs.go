@@ -109,9 +109,10 @@ type MsgSubmitTxTaxUsageProposal struct {
 	Percent     sdk.Dec        `json:"percent"`
 }
 
-func NewMsgSubmitTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitTxTaxUsageProposal {
+func NewMsgSubmitTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage UsageType, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitTxTaxUsageProposal {
 	return MsgSubmitTxTaxUsageProposal{
 		MsgSubmitProposal: msgSubmitProposal,
+		Usage:             usage,
 		DestAddress:       destAddress,
 		Percent:           percent,
 	}
@@ -122,8 +123,11 @@ func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
 	if err != nil {
 		return err
 	}
-	if len(msg.DestAddress) == 0 {
-		return sdk.ErrInvalidAddress(msg.Proposer.String())
+	if !validUsageType(msg.Usage) {
+		return ErrInvalidUsageType(DefaultCodespace, msg.Usage)
+	}
+	if msg.Usage != UsageTypeBurn && len(msg.DestAddress) == 0 {
+		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
 	if msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
 		return ErrInvalidPercent(DefaultCodespace, msg.Percent)

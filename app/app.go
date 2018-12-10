@@ -202,7 +202,9 @@ func (app *IrisApp) initKeeper() {
 		app.cdc,
 		app.keyGov,
 		app.distrKeeper,
-		app.bankKeeper, &stakeKeeper,
+		app.bankKeeper,
+		app.guardianKeeper,
+		&stakeKeeper,
 		gov.DefaultCodespace,
 	)
 

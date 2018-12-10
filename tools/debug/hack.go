@@ -30,6 +30,7 @@ import (
 	iris "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -143,6 +144,7 @@ type IrisApp struct {
 	tkeyParams       *sdk.TransientStoreKey
 	keyUpgrade       *sdk.KVStoreKey
 	keyDistr         *sdk.KVStoreKey
+	keyGuardian      *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	AccountKeeper       auth.AccountKeeper
@@ -154,6 +156,7 @@ type IrisApp struct {
 	govKeeper           gov.Keeper
 	upgradeKeeper       upgrade.Keeper
 	distrKeeper         distr.Keeper
+	guardianKeeper      guardian.Keeper
 
 	// fee manager
 	feeManager auth.FeeManager
@@ -179,9 +182,15 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		keyIparams:       sdk.NewKVStoreKey("iparams"),
 		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
+		keyGuardian:      sdk.NewKVStoreKey("guardian"),
 	}
 
 	// define the AccountKeeper
+	app.guardianKeeper = guardian.NewKeeper(
+		app.cdc,
+		app.keyGuardian,
+		guardian.DefaultCodespace,
+	)
 	app.AccountKeeper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,        // target store
@@ -216,7 +225,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		app.cdc,
 		app.keyGov,
 		app.distrKeeper,
-		app.bankKeeper, app.stakeKeeper,
+		app.bankKeeper,
+		app.guardianKeeper,
+		app.stakeKeeper,
 		gov.DefaultCodespace,
 	)
 	// register message routes

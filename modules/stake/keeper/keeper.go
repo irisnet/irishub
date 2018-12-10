@@ -134,7 +134,7 @@ func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddres
 }
 
 // looseToken handle when burn tokens
-func (k Keeper) BurnTokens(ctx sdk.Context, amount sdk.Dec) {
+func (k Keeper) BurnAmount(ctx sdk.Context, amount sdk.Dec) {
 	pool := k.GetPool(ctx)
 	pool.LooseTokens = pool.LooseTokens.Sub(amount)
 	k.SetPool(ctx, pool)

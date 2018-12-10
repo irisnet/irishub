@@ -25,7 +25,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.004iris --type=Text --description=test --title=test-proposal",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
-					description := viper.GetString(flagDescription)
+			description := viper.GetString(flagDescription)
 			strProposalType := viper.GetString(flagProposalType)
 			initialDeposit := viper.GetString(flagDeposit)
 			////////////////////  iris begin  ///////////////////////////
@@ -65,6 +65,28 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			////////////////////  iris end  /////////////////////////////
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
+			if proposalType == gov.ProposalTypeTxTaxUsage {
+				usageStr := viper.GetString(flagUsage)
+				usage, err := gov.UsageTypeFromString(usageStr)
+				if err != nil {
+					return err
+				}
+				var destAddr sdk.AccAddress
+				if usage.String() != "Burn" {
+					destAddrStr := viper.GetString(flagDestAddress)
+					destAddr, err = sdk.AccAddressFromBech32(destAddrStr)
+					if err != nil {
+						return err
+					}
+				}
+				percentStr := viper.GetString(flagPercent)
+				percent, err := sdk.NewDecFromStr(percentStr)
+				if err != nil {
+					return err
+				}
+				taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, usage, destAddr, percent)
+				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
+			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -79,6 +101,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
 	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
+	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Local and Global")
+	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
+	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
 	////////////////////  iris end  /////////////////////////////
 	return cmd
 }

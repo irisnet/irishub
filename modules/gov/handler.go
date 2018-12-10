@@ -33,6 +33,12 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
+	if msg.ProposalType == ProposalTypeSoftwareUpgrade || msg.ProposalType == ProposalTypeSoftwareHalt {
+		_, found := keeper.gk.GetTrustee(ctx, msg.Proposer)
+		if !found {
+			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+		}
+	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
 	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
@@ -75,6 +81,11 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
+	_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
+	if !found {
+		return ErrNotTrustee(keeper.codespace, msg.Proposer).Result()
+	}
+
 	proposal := keeper.NewUsageProposal(ctx, msg)
 
 	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
@@ -91,19 +102,20 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
-	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
-	}
 	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
 		////////////////////  iris begin  ///////////////////////////
-		tags.Param, paramBytes,
+		tags.Usage, msg.Usage,
+		tags.Percent, msg.Percent,
 		////////////////////  iris end  /////////////////////////////
 	)
+
+	if msg.Usage != UsageTypeBurn {
+		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
+	}
 
 	if votingStarted {
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
