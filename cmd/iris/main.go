@@ -1,12 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"io"
 
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/app"
-	bam "github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/irisnet/irishub/version"
@@ -17,6 +16,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"encoding/json"
 )
 
 func main() {

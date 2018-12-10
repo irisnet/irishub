@@ -1,7 +1,9 @@
 package v0
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
@@ -18,16 +20,14 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/newapp/protocol"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"sort"
 	"time"
-	"github.com/irisnet/irishub/modules/upgrade"
-	"encoding/json"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)

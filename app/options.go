@@ -1,13 +1,13 @@
-package baseapp
+package app
 
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/store"
-	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 
+	"github.com/irisnet/irishub/app/protocol"
 )
 
 // File for storing in-package BaseApp optional functions,
@@ -30,7 +30,6 @@ func SetPruning(pruning string) func(*BaseApp) {
 		bap.cms.SetPruning(pruningEnum)
 	}
 }
-
 
 // SetMinimumFees returns an option that sets the minimum fees on the app.
 func SetMinimumFees(minFees string) func(*BaseApp) {
@@ -66,42 +65,6 @@ func (app *BaseApp) SetTxDecoder(txDecoder sdk.TxDecoder) {
 	}
 	app.txDecoder = txDecoder
 }
-func (app *BaseApp) SetInitChainer(initChainer sdk.InitChainer) {
-	if app.sealed {
-		panic("SetInitChainer() on sealed BaseApp")
-	}
-	app.initChainer = initChainer
-}
-func (app *BaseApp) SetBeginBlocker(beginBlocker sdk.BeginBlocker) {
-	if app.sealed {
-		panic("SetBeginBlocker() on sealed BaseApp")
-	}
-	app.beginBlocker = beginBlocker
-}
-func (app *BaseApp) SetEndBlocker(endBlocker sdk.EndBlocker) {
-	if app.sealed {
-		panic("SetEndBlocker() on sealed BaseApp")
-	}
-	app.endBlocker = endBlocker
-}
-func (app *BaseApp) SetAnteHandler(ah sdk.AnteHandler) {
-	if app.sealed {
-		panic("SetAnteHandler() on sealed BaseApp")
-	}
-	app.anteHandler = ah
-}
-func (app *BaseApp) SetFeeRefundHandler(fh types.FeeRefundHandler) {
-	if app.sealed {
-		panic("SetFeeRefundHandler() on sealed BaseApp")
-	}
-	app.feeRefundHandler = fh
-}
-func (app *BaseApp) SetFeePreprocessHandler(fh types.FeePreprocessHandler) {
-	if app.sealed {
-		panic("SetFeePreprocessHandler() on sealed BaseApp")
-	}
-	app.feePreprocessHandler = fh
-}
 func (app *BaseApp) SetAddrPeerFilter(pf sdk.PeerFilter) {
 	if app.sealed {
 		panic("SetAddrPeerFilter() on sealed BaseApp")
@@ -114,15 +77,12 @@ func (app *BaseApp) SetPubKeyPeerFilter(pf sdk.PeerFilter) {
 	}
 	app.pubkeyPeerFilter = pf
 }
-func (app *BaseApp) Router() Router {
-	//if app.sealed {
-	//	panic("Router() on sealed BaseApp")
-	//}
-	return app.router
-}
 
-func (app *BaseApp) QueryRouter() QueryRouter {
-	return app.queryRouter
+func (app *BaseApp) SetProtocolEngine(pe protocol.ProtocolEngine) {
+	if app.sealed {
+		panic("SetPubKeyPeerFilter() on sealed BaseApp")
+	}
+	app.Engine = pe
 }
 
 func (app *BaseApp) Seal()          { app.sealed = true }

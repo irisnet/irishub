@@ -14,8 +14,8 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/newapp/protocol"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
@@ -48,7 +48,7 @@ type BaseApp struct {
 	name   string               // application name from abci.Info
 	db     dbm.DB               // common DB backend
 	cms    sdk.CommitMultiStore // Main (uncached) state
-	engine protocol.ProtocolEngine
+	Engine protocol.ProtocolEngine
 
 	txDecoder sdk.TxDecoder // unmarshal []byte into sdk.Tx
 
@@ -252,7 +252,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
 
-	initChainer := app.engine.GetCurrent().GetInitChainer()
+	initChainer := app.Engine.GetCurrent().GetInitChainer()
 	if initChainer == nil {
 		return
 	}
@@ -387,7 +387,7 @@ func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res 
 	if len(path) < 2 || path[1] == "" {
 		return sdk.ErrUnknownRequest("No route for custom query specified").QueryResult()
 	}
-	querier := app.engine.GetCurrent().GetQueryRouter().Route(path[1])
+	querier := app.Engine.GetCurrent().GetQueryRouter().Route(path[1])
 	if querier == nil {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("no custom querier found for route %s", path[1])).QueryResult()
 	}
@@ -429,7 +429,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.WithBlockHeader(req.Header).WithBlockHeight(req.Header.Height)
 	}
-	beginBlocker := app.engine.GetCurrent().GetBeginBlocker()
+	beginBlocker := app.Engine.GetCurrent().GetBeginBlocker()
 	if beginBlocker != nil {
 		res = beginBlocker(app.deliverState.ctx, req)
 	}
@@ -508,7 +508,7 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	// Even though the Result.Code is not OK, there are still effects,
 	// namely fee deductions and sequence incrementing.
 
-	// Tell the blockchain engine (i.e. Tendermint).
+	// Tell the blockchain Engine (i.e. Tendermint).
 	return abci.ResponseDeliverTx{
 		Code:      uint32(result.Code),
 		Codespace: string(result.Codespace),
@@ -565,7 +565,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgRoute := msg.Route()
-		handler := app.engine.GetCurrent().GetRouter().Route(msgRoute)
+		handler := app.Engine.GetCurrent().GetRouter().Route(msgRoute)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgRoute).Result()
 		}
@@ -655,7 +655,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasWanted = gasWanted
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 
-		feeRefundHandler := app.engine.GetCurrent().GetFeeRefundHandler()
+		feeRefundHandler := app.Engine.GetCurrent().GetFeeRefundHandler()
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
 			_, err := feeRefundHandler(ctxWithNoCache, tx, result)
@@ -673,7 +673,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	feePreprocessHandler := app.engine.GetCurrent().GetFeePreprocessHandler()
+	feePreprocessHandler := app.Engine.GetCurrent().GetFeePreprocessHandler()
 	// run the fee handler
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
@@ -682,7 +682,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}
 
-	anteHandler := app.engine.GetCurrent().GetAnteHandler()
+	anteHandler := app.Engine.GetCurrent().GetAnteHandler()
 	// run the ante handler
 	if anteHandler != nil {
 		newCtx, result, abort := anteHandler(ctx, tx, (mode == RunTxModeSimulate))
@@ -730,7 +730,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
 
-	endBlocker := app.engine.GetCurrent().GetEndBlocker()
+	endBlocker := app.Engine.GetCurrent().GetEndBlocker()
 	if endBlocker != nil {
 		res = endBlocker(app.deliverState.ctx, req)
 	}

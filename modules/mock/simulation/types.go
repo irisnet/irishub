@@ -5,7 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
-	bam "github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/app"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 )

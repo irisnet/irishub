@@ -10,7 +10,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/app"
 )
 
 // BigInterval is a representation of the interval [lo, hi), where
@@ -42,7 +42,7 @@ func RandFromBigInterval(r *rand.Rand, intervals []BigInterval) sdk.Int {
 // CheckBalance checks the balance of an account.
 func CheckBalance(t *testing.T, app *App, addr sdk.AccAddress, exp sdk.Coins) {
 	ctxCheck := app.BaseApp.NewContext(true, abci.Header{})
-	res := app.AccountKeeper.GetAccount(ctxCheck, addr)
+	res := app.Engine.GetCurrent().(*ProtocolVersion0).AccountMapper.GetAccount(ctxCheck, addr)
 
 	require.Equal(t, exp, res.GetCoins())
 }
@@ -51,7 +51,7 @@ func CheckBalance(t *testing.T, app *App, addr sdk.AccAddress, exp sdk.Coins) {
 // compared against the parameter 'expPass'. A test assertion is made using the
 // parameter 'expPass' against the result. A corresponding result is returned.
 func CheckGenTx(
-	t *testing.T, app *baseapp.BaseApp, msgs []sdk.Msg, accNums []uint64,
+	t *testing.T, app *app.BaseApp, msgs []sdk.Msg, accNums []uint64,
 	seq []uint64, expPass bool, priv ...crypto.PrivKey,
 ) sdk.Result {
 	tx := GenTx(msgs, accNums, seq, priv...)
@@ -71,7 +71,7 @@ func CheckGenTx(
 // the parameter 'expPass' against the result. A corresponding result is
 // returned.
 func SignCheckDeliver(
-	t *testing.T, app *baseapp.BaseApp, msgs []sdk.Msg, accNums []uint64,
+	t *testing.T, app *app.BaseApp, msgs []sdk.Msg, accNums []uint64,
 	seq []uint64, expSimPass, expPass bool, priv ...crypto.PrivKey,
 ) sdk.Result {
 	tx := GenTx(msgs, accNums, seq, priv...)
