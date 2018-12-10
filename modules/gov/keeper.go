@@ -8,6 +8,8 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"time"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 // nolint
@@ -18,10 +20,11 @@ var (
 
 // Governance Keeper
 type Keeper struct {
-
 	// The reference to the CoinKeeper to modify balances
 	ck bank.Keeper
 
+	dk distribution.Keeper
+	gk guardian.Keeper
 	// The ValidatorSet to get information about validators
 	vs sdk.ValidatorSet
 
@@ -43,10 +46,12 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
 		ck:        ck,
+		dk:        dk,
+		gk:        gk,
 		ds:        ds,
 		vs:        ds.GetValidatorSet(),
 		cdc:       cdc,
@@ -66,8 +71,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSoftwareUpgrade:
 		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
-	case ProposalTypeTerminator:
-		return keeper.NewTerminatorProposal(ctx, title, description, proposalType)
+	case ProposalTypeSoftwareHalt:
+		return keeper.NewHaltProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -93,7 +98,6 @@ func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description 
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	keeper.SetProposal(ctx, proposal)
 	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
@@ -158,7 +162,7 @@ func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, descripti
 	return proposal
 }
 
-func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -173,7 +177,7 @@ func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, descri
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	var proposal Proposal = &TerminatorProposal{
+	var proposal Proposal = &HaltProposal{
 		textProposal,
 	}
 
@@ -182,6 +186,38 @@ func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, descri
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
 	return proposal
+}
+
+func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsageProposal) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var textProposal = TextProposal{
+		ProposalID:   proposalID,
+		Title:        msg.Title,
+		Description:  msg.Description,
+		ProposalType: msg.ProposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+	var proposal Proposal = &TaxUsageProposal{
+		textProposal,
+		msg.Usage,
+		msg.DestAddress,
+		msg.Percent,
+	}
+	keeper.saveProposal(ctx, proposal)
+	return proposal
+}
+
+func (keeper Keeper) saveProposal(ctx sdk.Context, proposal Proposal) {
+	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
+	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
+	keeper.SetProposal(ctx, proposal)
+	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
 }
 
 ////////////////////  iris end  /////////////////////////////

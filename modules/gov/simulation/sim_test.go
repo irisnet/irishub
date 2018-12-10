@@ -13,6 +13,8 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 // TestGovWithRandomMessages
@@ -27,6 +29,8 @@ func TestGovWithRandomMessages(t *testing.T) {
 	stakeTKey := mapp.TkeyStake
 	paramKey := mapp.KeyParams
 	govKey := sdk.NewKVStoreKey("gov")
+	distrKey := sdk.NewKVStoreKey("distr")
+	guardianKey := sdk.NewKVStoreKey("guardian")
 
 	paramKeeper := mapp.ParamsKeeper
 	stakeKeeper := stake.NewKeeper(
@@ -35,10 +39,25 @@ func TestGovWithRandomMessages(t *testing.T) {
 		paramKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 	)
+	distrKeeper := distr.NewKeeper(
+		mapp.Cdc,
+		distrKey,
+		mapp.ParamsKeeper.Subspace(distr.DefaultParamspace),
+		mapp.BankKeeper, &stakeKeeper, mapp.FeeCollectionKeeper,
+		distr.DefaultCodespace,
+	)
+	guardianKeeper := guardian.NewKeeper(
+		mapp.Cdc,
+		guardianKey,
+		guardian.DefaultCodespace,
+	)
 	govKeeper := gov.NewKeeper(
 		mapp.Cdc,
 		govKey,
-		bankKeeper, stakeKeeper,
+		distrKeeper,
+		bankKeeper,
+		guardianKeeper,
+		stakeKeeper,
 		gov.DefaultCodespace,
 	)
 

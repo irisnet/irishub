@@ -133,6 +133,17 @@ func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddres
 	store.Delete(GetLastValidatorPowerKey(operator))
 }
 
+// looseToken handle when burn tokens
+func (k Keeper) BurnAmount(ctx sdk.Context, amount sdk.Dec) {
+	pool := k.GetPool(ctx)
+	pool.LooseTokens = pool.LooseTokens.Sub(amount)
+	k.SetPool(ctx, pool)
+}
+
+func (k Keeper) GetStakeDenom(ctx sdk.Context) string {
+	return types.StakeDenom
+}
+
 //__________________________________________________________________________
 
 // get the current in-block validator operation counter

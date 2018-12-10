@@ -34,6 +34,7 @@ const (
 var (
 	FsServiceDefinitionCreate = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceBindingCreate    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBindingUpdate    = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceDefinition       = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceBinding          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceRequest          = flag.NewFlagSet("", flag.ContinueOnError)
@@ -57,6 +58,12 @@ func init() {
 	FsServiceBindingCreate.StringSlice(FlagPrices, []string{}, "prices of binding, will contains all method")
 	FsServiceBindingCreate.Int64(FlagAvgRspTime, 0, "the average service response time in milliseconds")
 	FsServiceBindingCreate.Int64(FlagUsableTime, 0, "an integer represents the number of usable service invocations per 10,000")
+
+	FsServiceBindingUpdate.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
+	FsServiceBindingUpdate.String(FlagDeposit, "", "deposit of binding")
+	FsServiceBindingUpdate.StringSlice(FlagPrices, []string{}, "prices of binding, will contains all method")
+	FsServiceBindingUpdate.Int64(FlagAvgRspTime, 0, "the average service response time in milliseconds")
+	FsServiceBindingUpdate.Int64(FlagUsableTime, 0, "an integer represents the number of usable service invocations per 10,000")
 
 	FsServiceBinding.String(FlagBindChainID, "", "the ID of the blockchain bond of the service")
 	FsServiceBinding.String(FlagProvider, "", "bech32 encoded account created the service binding")

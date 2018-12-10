@@ -22,9 +22,12 @@ const (
 	CodeInvalidGenesis          sdk.CodeType = 10
 	CodeInvalidProposalStatus   sdk.CodeType = 11
 	////////////////////  iris begin  ///////////////////////////
-	CodeInvalidParam            sdk.CodeType = 12
-	CodeInvalidParamOp          sdk.CodeType = 13
-	CodeSwitchPeriodInProcess   sdk.CodeType = 14
+	CodeInvalidParam          sdk.CodeType = 12
+	CodeInvalidParamOp        sdk.CodeType = 13
+	CodeSwitchPeriodInProcess sdk.CodeType = 14
+	CodeInvalidPercent        sdk.CodeType = 15
+	CodeInvalidUsageType      sdk.CodeType = 16
+	CodeInvalidInput          sdk.CodeType = 16
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -82,4 +85,21 @@ func ErrInvalidParamOp(codespace sdk.CodespaceType, opStr string) sdk.Error {
 func ErrSwitchPeriodInProcess(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeSwitchPeriodInProcess, fmt.Sprintf("Software Upgrade Switch Period is in process."))
 }
+
+func ErrInvalidPercent(codespace sdk.CodespaceType, percent sdk.Dec) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidPercent, fmt.Sprintf("invalid percent [%s], must >0 & <=1", percent))
+}
+
+func ErrInvalidUsageType(codespace sdk.CodespaceType, usageType UsageType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidUsageType, fmt.Sprintf("Usage Type '%s' is not valid", usageType))
+}
+
+func ErrNotTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("[%s] is not a trustee address", trustee))
+}
+
+func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("[%s] is not a profiler address", profiler))
+}
+
 ////////////////////  iris end  /////////////////////////////
