@@ -14,6 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
 )
 
@@ -88,7 +89,7 @@ func genAppStateFromConfig(
 	)
 
 	// process genesis transactions, else create default genesis.json
-	appGenTxs, persistentPeers, err = app.CollectStdTxs(
+	appGenTxs, persistentPeers, err = v0.CollectStdTxs(
 		cdc, config.Moniker, initCfg.GenTxsDir, genDoc,
 	)
 	if err != nil {
@@ -108,7 +109,7 @@ func genAppStateFromConfig(
 
 	cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
 
-	appState, err = app.IrisAppGenStateJSON(cdc, genDoc, genTxs)
+	appState, err = v0.IrisAppGenStateJSON(cdc, genDoc, genTxs)
 	if err != nil {
 		return
 	}

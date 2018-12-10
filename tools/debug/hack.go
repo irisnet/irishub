@@ -16,21 +16,26 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
-	bam "github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/protocol"
 	sdk "github.com/irisnet/irishub/types"
 
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	distr "github.com/irisnet/irishub/modules/distribution"
 
-	iris "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/record"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/guardian"
+	"encoding/json"
+	"github.com/irisnet/irishub/app/v0"
+	tmtypes "github.com/tendermint/tendermint/types"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -76,7 +81,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 	checkHeight := topHeight
 	for {
 		// load the given version of the state
-		err = app.LoadVersion(checkHeight, app.keyMain, false)
+		err = app.LoadVersion(checkHeight, protocol.KeyMain, false)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -84,9 +89,9 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 		ctx := app.NewContext(true, abci.Header{})
 
 		// check for the powerkey and the validator from the store
-		store := ctx.KVStore(app.keyStake)
+		store := ctx.KVStore(protocol.KeyStake)
 		res := store.Get(powerKey)
-		val, _ := app.stakeKeeper.GetValidator(ctx, trouble)
+		val, _ := app.Engine.GetCurrent().(*v0.ProtocolVersion0).StakeKeeper.GetValidator(ctx, trouble)
 		fmt.Println("checking height", checkHeight, res, val)
 		if res == nil {
 			bottomHeight = checkHeight
@@ -116,13 +121,15 @@ func hexToBytes(h string) []byte {
 // so we can access internal fields!
 
 const (
-	appName = "IrisApp"
+	appName    = "IrisApp"
+	FlagReplay = "replay"
 )
 
 // default home directories for expected binaries
 var (
-	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
+	DefaultLCDHome  = os.ExpandEnv("$HOME/.irislcd")
 	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 )
 
 // Extended ABCI application
@@ -166,91 +173,26 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	cdc := MakeCodec()
 
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
-	bApp.SetCommitMultiStoreTracer(os.Stdout)
 
 	// create your application object
 	var app = &IrisApp{
-		BaseApp:          bApp,
-		cdc:              cdc,
-		keyMain:          sdk.NewKVStoreKey("main"),
-		keyAccount:       sdk.NewKVStoreKey("acc"),
-		keyStake:         sdk.NewKVStoreKey("stake"),
-		keySlashing:      sdk.NewKVStoreKey("slashing"),
-		keyGov:           sdk.NewKVStoreKey("gov"),
-		keyFeeCollection: sdk.NewKVStoreKey("fee"),
-		keyParams:        sdk.NewKVStoreKey("params"),
-		keyIparams:       sdk.NewKVStoreKey("iparams"),
-		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
-		keyUpgrade:       sdk.NewKVStoreKey("upgrade"),
-		keyGuardian:      sdk.NewKVStoreKey("guardian"),
+		BaseApp: bApp,
 	}
+	engine := protocol.NewProtocolEngine()
 
-	// define the AccountKeeper
-	app.guardianKeeper = guardian.NewKeeper(
-		app.cdc,
-		app.keyGuardian,
-		guardian.DefaultCodespace,
-	)
-	app.AccountKeeper = auth.NewAccountKeeper(
-		app.cdc,
-		app.keyAccount,        // target store
-		auth.ProtoBaseAccount, // prototype
-	)
+	protocol0 := v0.NewProtocolVersion0(cdc)
+	engine.Add(protocol0)
+	//	protocol1 := protocol.NewProtocolVersion1(cdc)
+	//	Engine.Add(&protocol1)
 
-	// add handlers
-	app.paramsKeeper = params.NewKeeper(cdc, app.keyParams, app.tkeyParams)
-	app.bankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
-	app.stakeKeeper = stake.NewKeeper(
-		app.cdc,
-		app.keyStake, app.tkeyStake,
-		app.bankKeeper, app.paramsKeeper.Subspace(stake.DefaultParamspace),
-		stake.DefaultCodespace,
-	)
-	app.slashingKeeper = slashing.NewKeeper(
-		app.cdc,
-		app.keySlashing,
-		app.stakeKeeper, app.paramsKeeper.Subspace(slashing.DefaultParamspace),
-		slashing.DefaultCodespace,
-	)
-	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(app.cdc, app.keyFeeCollection)
-	app.upgradeKeeper = upgrade.NewKeeper(app.cdc, app.keyUpgrade, app.stakeKeeper)
-	app.distrKeeper = distr.NewKeeper(
-		app.cdc,
-		app.keyDistr,
-		app.paramsKeeper.Subspace(distr.DefaultParamspace),
-		app.bankKeeper, app.stakeKeeper, app.feeCollectionKeeper,
-		distr.DefaultCodespace,
-	)
-	app.govKeeper = gov.NewKeeper(
-		app.cdc,
-		app.keyGov,
-		app.distrKeeper,
-		app.bankKeeper,
-		app.guardianKeeper,
-		app.stakeKeeper,
-		gov.DefaultCodespace,
-	)
-	// register message routes
-	app.Router().
-		AddRoute("bank", []*sdk.KVStoreKey{app.keyAccount}, bank.NewHandler(app.bankKeeper)).
-		AddRoute("stake", []*sdk.KVStoreKey{app.keyStake, app.keyAccount}, stake.NewHandler(app.stakeKeeper)).
-		AddRoute("slashing", []*sdk.KVStoreKey{app.keySlashing, app.keyStake}, slashing.NewHandler(app.slashingKeeper)).
-		AddRoute("gov", []*sdk.KVStoreKey{app.keyGov, app.keyAccount, app.keyStake, app.keyIparams, app.keyParams}, gov.NewHandler(app.govKeeper)).
-		AddRoute("upgrade", []*sdk.KVStoreKey{app.keyUpgrade, app.keyStake}, upgrade.NewHandler(app.upgradeKeeper))
-
-	// initialize BaseApp
-	app.SetInitChainer(app.initChainer)
-	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetEndBlocker(app.EndBlocker)
-	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keySlashing)
-	err := app.LoadLatestVersion(app.keyMain)
+	engine.LoadCurrentProtocol()
+	app.SetProtocolEngine(engine)
+	app.MountStoresIAVL(engine.GetKVStoreKeys())
+	app.MountStoresTransient(engine.GetTransientStoreKeys())
+	err := app.LoadLatestVersion(engine.GetKeyMain())
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-
-	app.Seal()
-
 	return app
 }
 
@@ -259,57 +201,25 @@ func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
 	bank.RegisterCodec(cdc)
 	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	guardian.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	cdc.Seal()
 	return cdc
 }
 
-// application updates every end block
-func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	tags := slashing.BeginBlocker(ctx, req, app.slashingKeeper)
-
-	return abci.ResponseBeginBlock{
-		Tags: tags.ToKVPairs(),
-	}
+// export the state of iris for a genesis file
+func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+	ctx := app.NewContext(true, abci.Header{})
+	return app.Engine.GetCurrent().ExportAppStateAndValidators(ctx)
 }
 
-// application updates every end block
-// nolint: unparam
-func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
-
-	return abci.ResponseEndBlock{
-		ValidatorUpdates: validatorUpdates,
-	}
-}
-
-// custom logic for iris initialization
-func (app *IrisApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	stateJSON := req.AppStateBytes
-	// TODO is this now the whole genesis file?
-
-	var genesisState iris.GenesisState
-	err := app.cdc.UnmarshalJSON(stateJSON, &genesisState)
-	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468 // return sdk.ErrGenesisParse("").TraceCause(err, "")
-	}
-
-	// load the accounts
-	for _, gacc := range genesisState.Accounts {
-		acc := gacc.ToAccount()
-		app.AccountKeeper.SetAccount(ctx, acc)
-	}
-
-	// load the initial stake information
-	validators, err := stake.InitGenesis(ctx, app.stakeKeeper, genesisState.StakeData)
-	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468 // return sdk.ErrGenesisParse("").TraceCause(err, "")
-	}
-
-	return abci.ResponseInitChain{
-		Validators: validators,
-	}
+func (app *IrisApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, protocol.KeyMain, false)
 }

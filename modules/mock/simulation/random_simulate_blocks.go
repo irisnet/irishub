@@ -18,7 +18,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	bam "github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 )
 
 // Simulate tests application by sending random messages.

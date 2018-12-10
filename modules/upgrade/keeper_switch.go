@@ -2,7 +2,7 @@ package upgrade
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"strconv"
 	"strings"
@@ -13,20 +13,20 @@ var (
 	ModuleListBucket map[int64]ModuleLifeTimeList
 )
 
-func RegisterModuleList(router bam.Router) {
+func RegisterModuleList(router protocol.Router) {
 	if Inited {
 		return
 	}
 
 	moduleList := NewModuleLifeTimeList()
-	handlerList := router.RouteTable()
-
-	for _, handler := range handlerList {
-		hs := strings.Split(handler, "/")
-
-		stores := strings.Split(hs[1], ":")
-		moduleList = moduleList.BuildModuleLifeTime(0, hs[0], stores)
-	}
+	//handlerList := router.RouteTable()
+	//
+	//for _, handler := range handlerList {
+	//	hs := strings.Split(handler, "/")
+	//
+	//	stores := strings.Split(hs[1], ":")
+	//	moduleList = moduleList.BuildModuleLifeTime(0, hs[0], stores)
+	//}
 
 	buildModuleListBucket(moduleList)
 }

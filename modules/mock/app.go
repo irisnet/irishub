@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"fmt"
-	bam "github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"

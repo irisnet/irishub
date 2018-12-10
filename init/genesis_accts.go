@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/common"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command
@@ -49,13 +50,13 @@ func AddGenesisAccountCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command 
 			if err != nil {
 				return err
 			}
-			var genesisState app.GenesisFileState
+			var genesisState v0.GenesisFileState
 			if err = cdc.UnmarshalJSON(genDoc.AppState, &genesisState); err != nil {
 				return err
 			}
 			acc := auth.NewBaseAccountWithAddress(addr)
 			acc.Coins = coins
-			genesisState.Accounts = append(genesisState.Accounts, app.NewGenesisFileAccount(&acc))
+			genesisState.Accounts = append(genesisState.Accounts, v0.NewGenesisFileAccount(&acc))
 			appStateJSON, err := cdc.MarshalJSON(genesisState)
 			if err != nil {
 				return err

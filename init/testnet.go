@@ -13,7 +13,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	clkeys "github.com/irisnet/irishub/client/keys"
@@ -96,7 +96,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 	valPubKeys := make([]crypto.PubKey, numValidators)
 
 	var (
-		accs     []app.GenesisFileAccount
+		accs     []v0.GenesisFileAccount
 		genFiles []string
 	)
 
@@ -143,7 +143,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 
 		buf := client.BufferStdin()
 		prompt := fmt.Sprintf(
-			"Password for account '%s' (default %s):", nodeDirName, app.DefaultKeyPass,
+			"Password for account '%s' (default %s):", nodeDirName, v0.DefaultKeyPass,
 		)
 
 		keyPass, err := client.GetPassword(prompt, buf)
@@ -155,7 +155,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 		}
 
 		if keyPass == "" {
-			keyPass = app.DefaultKeyPass
+			keyPass = v0.DefaultKeyPass
 		}
 
 		addr, secret, err := generateSaveCoinKey(clientDir, nodeDirName, keyPass, true)
@@ -177,22 +177,22 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			return err
 		}
 
-		accs = append(accs, app.GenesisFileAccount{
+		accs = append(accs, v0.GenesisFileAccount{
 			Address: addr,
-			Coins:   []string{app.FreeFermionAcc.String()},
+			Coins:   []string{v0.FreeFermionAcc.String()},
 		})
 
 		msg := stake.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
-			app.FreeFermionVal,
+			v0.FreeFermionVal,
 			stake.NewDescription(nodeDirName, "", "", ""),
 			stake.NewCommissionMsg(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(20, 2), sdk.NewDecWithPrec(1, 2)),
 		)
 		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo)
 		txCtx := context.NewTxContextFromCLI().WithChainID(chainID).WithMemo(memo)
 
-		signedTx, err := txCtx.SignStdTx(nodeDirName, app.DefaultKeyPass, tx, false)
+		signedTx, err := txCtx.SignStdTx(nodeDirName, v0.DefaultKeyPass, tx, false)
 		if err != nil {
 			_ = os.RemoveAll(outDir)
 			return err
@@ -229,11 +229,11 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 }
 
 func initGenFiles(
-	cdc *codec.Codec, chainID string, accs []app.GenesisFileAccount,
+	cdc *codec.Codec, chainID string, accs []v0.GenesisFileAccount,
 	genFiles []string, numValidators int,
 ) error {
 
-	appGenState := app.NewDefaultGenesisFileState()
+	appGenState := v0.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
 
 	// genesis add a profiler

@@ -39,6 +39,7 @@ import (
 	"io/ioutil"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 var (
@@ -119,7 +120,7 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 	return nil
 }
 
-func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState {
+func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
@@ -210,20 +211,20 @@ func copyFile(dstFile, srcFile string) error {
 func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	tests.ExecuteT(t, fmt.Sprintf("rm -rf %s ", irisHome), "")
 	//tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), v0.DefaultKeyPass)
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	nodeID, _ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState app.GenesisFileState
+	var appState v0.GenesisFileState
 	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []app.GenesisFileAccount{app.NewDefaultGenesisFileAccount(fooAddr)}
+	appState.Accounts = []v0.GenesisFileAccount{v0.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)
@@ -231,8 +232,8 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	genDoc.SaveAs(genFile)
 	executeWrite(t, fmt.Sprintf(
 		"iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
-		app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), app.DefaultKeyPass)
+		v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), v0.DefaultKeyPass)
 	// get a free port, also setup some common flags
 	servAddr, port, err = server.FreeTCPAddr()
 	require.NoError(t, err)
@@ -289,7 +290,7 @@ func executeWriteRetStdStreams(t *testing.T, cmdStr string, writes ...string) (b
 }
 
 func executeInit(t *testing.T, cmdStr string) (chainID string) {
-	_, stderr := tests.ExecuteT(t, cmdStr, app.DefaultKeyPass)
+	_, stderr := tests.ExecuteT(t, cmdStr, v0.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(stderr), &initRes)

@@ -7,7 +7,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 
-	"github.com/irisnet/irishub/newapp/protocol"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
 // File for storing in-package BaseApp optional functions,
@@ -82,7 +82,7 @@ func (app *BaseApp) SetProtocolEngine(pe protocol.ProtocolEngine) {
 	if app.sealed {
 		panic("SetPubKeyPeerFilter() on sealed BaseApp")
 	}
-	app.engine = pe
+	app.Engine = pe
 }
 
 func (app *BaseApp) Seal()          { app.sealed = true }
