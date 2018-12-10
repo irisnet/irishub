@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+*December 10th, 2018*
+
+- Upgrade tendermint to v0.27.0-dev1
+
 
 ## 0.8.0-rc0
 
