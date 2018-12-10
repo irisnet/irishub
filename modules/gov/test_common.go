@@ -18,6 +18,10 @@ import (
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 // initialize the mock application for this module
@@ -28,6 +32,17 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	RegisterCodec(mapp.Cdc)
 
 	keyGov := sdk.NewKVStoreKey("gov")
+	keyDistr := sdk.NewKVStoreKey("distr")
+
+	paramsKeeper := params.NewKeeper(
+		mapp.Cdc,
+		sdk.NewKVStoreKey("params"),
+		sdk.NewTransientStoreKey("transient_params"),
+	)
+	feeCollectionKeeper := auth.NewFeeCollectionKeeper(
+		mapp.Cdc,
+		sdk.NewKVStoreKey("fee"),
+	)
 
 	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
 	sk := stake.NewKeeper(
@@ -35,7 +50,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
+	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, DefaultCodespace)
+	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -43,7 +60,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
-	
+
 	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
@@ -87,9 +104,9 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 				VotingPeriod: 30,
 			},
 			TallyingProcedure: govparams.TallyingProcedure{
-				Threshold:         sdk.NewDecWithPrec(5, 1),
-				Veto:              sdk.NewDecWithPrec(334, 3),
-				Participation:     sdk.NewDecWithPrec(667, 3),
+				Threshold:     sdk.NewDecWithPrec(5, 1),
+				Veto:          sdk.NewDecWithPrec(334, 3),
+				Participation: sdk.NewDecWithPrec(667, 3),
 			},
 		})
 		return abci.ResponseInitChain{

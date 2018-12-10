@@ -190,7 +190,7 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsServiceDefinition)
-	cmd.Flags().AddFlagSet(FsServiceBindingCreate)
+	cmd.Flags().AddFlagSet(FsServiceBindingUpdate)
 	cmd.MarkFlagRequired(FlagDefChainID)
 	cmd.MarkFlagRequired(FlagServiceName)
 	return cmd

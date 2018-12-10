@@ -112,6 +112,11 @@ func (p *ProtocolVersion0) configKeepers() {
 	)
 
 	// add handlers
+	p.guardianKeeper = guardian.NewKeeper(
+		p.cdc,
+		protocol.KeyGuardian,
+		guardian.DefaultCodespace,
+	)
 	p.bankKeeper = bank.NewBaseKeeper(p.accountMapper)
 	p.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
 		p.cdc,
@@ -148,7 +153,10 @@ func (p *ProtocolVersion0) configKeepers() {
 	p.govKeeper = gov.NewKeeper(
 		p.cdc,
 		protocol.KeyGov,
-		p.bankKeeper, &stakeKeeper,
+		p.distrKeeper,
+		p.bankKeeper,
+		p.guardianKeeper,
+		&stakeKeeper,
 		gov.DefaultCodespace,
 	)
 
@@ -163,11 +171,6 @@ func (p *ProtocolVersion0) configKeepers() {
 		p.bankKeeper,
 		p.guardianKeeper,
 		service.DefaultCodespace,
-	)
-	p.guardianKeeper = guardian.NewKeeper(
-		p.cdc,
-		protocol.KeyGuardian,
-		guardian.DefaultCodespace,
 	)
 
 	// register the staking hooks

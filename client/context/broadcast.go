@@ -160,7 +160,7 @@ func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadc
 
 		if cliCtx.PrintResponse {
 			jsonStr, _ := deliverTxMarshalIndentJSON(res.DeliverTx)
-			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n",
+			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response:\n %+v)\n",
 				res.Height, res.Hash.String(), string(jsonStr),
 			)
 		}

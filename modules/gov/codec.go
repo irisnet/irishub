@@ -9,6 +9,7 @@ import (
 func RegisterCodec(cdc *codec.Codec) {
 
 	cdc.RegisterConcrete(MsgSubmitProposal{}, "cosmos-sdk/MsgSubmitProposal", nil)
+	cdc.RegisterConcrete(MsgSubmitTxTaxUsageProposal{}, "gov/MsgSubmitTxTaxUsageProposal", nil)
 	cdc.RegisterConcrete(MsgDeposit{}, "cosmos-sdk/MsgDeposit", nil)
 	cdc.RegisterConcrete(MsgVote{}, "cosmos-sdk/MsgVote", nil)
 
@@ -16,12 +17,13 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&TextProposal{}, "gov/TextProposal", nil)
 
 	////////////////////  iris begin  ///////////////////////////
-	cdc.RegisterConcrete(&govparams.DepositProcedure{},"cosmos-sdk/DepositProcedure",nil)
-	cdc.RegisterConcrete(&govparams.TallyingProcedure{},"cosmos-sdk/TallyingProcedure",nil)
-	cdc.RegisterConcrete(&govparams.VotingProcedure{},"cosmos-sdk/VotingProcedure",nil)
+	cdc.RegisterConcrete(&govparams.DepositProcedure{}, "cosmos-sdk/DepositProcedure", nil)
+	cdc.RegisterConcrete(&govparams.TallyingProcedure{}, "cosmos-sdk/TallyingProcedure", nil)
+	cdc.RegisterConcrete(&govparams.VotingProcedure{}, "cosmos-sdk/VotingProcedure", nil)
 	cdc.RegisterConcrete(&ParameterProposal{}, "gov/ParameterProposal", nil)
 	cdc.RegisterConcrete(&SoftwareUpgradeProposal{}, "gov/SoftwareUpgradeProposal", nil)
-	cdc.RegisterConcrete(&TerminatorProposal{}, "gov/TerminatorProposal", nil)
+	cdc.RegisterConcrete(&HaltProposal{}, "gov/TerminatorProposal", nil)
+	cdc.RegisterConcrete(&TaxUsageProposal{}, "gov/TaxUsageProposal", nil)
 	////////////////////  iris end  ///////////////////////////
 }
 
