@@ -38,6 +38,7 @@ import (
 const (
 	appName    = "IrisApp"
 	FlagReplay = "replay"
+	FlagReplayHeight = "replay_height"
 )
 
 // default home directories for expected binaries
@@ -245,6 +246,11 @@ func (app *IrisApp) mountStoreAndSetupBaseApp(lastHeight int64) {
 	var err error
 	if viper.GetBool(FlagReplay) {
 		err = app.LoadVersion(lastHeight, app.keyMain, true)
+	} else if viper.GetInt64(FlagReplayHeight) > 0 {
+		replayHeight := viper.GetInt64(FlagReplayHeight)
+		loadHeight := bam.ReplayToHeight(replayHeight, app.Logger)
+		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+		err = app.LoadVersion(loadHeight, app.keyMain, true)
 	} else {
 		err = app.LoadLatestVersion(app.keyMain)
 	}

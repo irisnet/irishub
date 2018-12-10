@@ -1,15 +1,24 @@
 package baseapp
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/irisnet/irishub/server"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
+)
+
+const (
+	DefaultSyncableHeight = 10000
 )
 
 func Replay(logger log.Logger) int64 {
@@ -49,5 +58,27 @@ func Replay(logger log.Logger) int64 {
 		panic(fmt.Errorf("tendermint block store height should be at most one ahead of the its state height"))
 	}
 
+	return loadHeight
+}
+
+func ReplayToHeight(replayHeight int64, logger log.Logger) int64 {
+	loadHeight := int64(0)
+	logger.Info("Please make sure the replay height is less than block height")
+	if replayHeight >= DefaultSyncableHeight {
+		loadHeight = replayHeight - replayHeight%DefaultSyncableHeight
+	} else {
+		// version 1 will always be kept
+		loadHeight = 1
+	}
+	logger.Info("This replay operation will change the application store, please spare your node home directory first")
+	logger.Info("Confirm that:(y/n)")
+	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		cmn.Exit(err.Error())
+	}
+	confirm := strings.TrimSpace(input)
+	if confirm != "y" && confirm != "yes" {
+		cmn.Exit("Abort replay operation")
+	}
 	return loadHeight
 }
