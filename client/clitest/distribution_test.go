@@ -6,8 +6,8 @@ import (
 
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/app"
 	"github.com/stretchr/testify/require"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 func TestIrisCLIDistribution(t *testing.T) {
@@ -29,7 +29,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=2iris --to=%s --from=foo --gas=10000 --fee=10iris", flags, barAddr), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=2iris --to=%s --from=foo --gas=10000 --fee=10iris", flags, barAddr), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	valAddr := sdk.ValAddress(fooAddr).String()
@@ -38,7 +38,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	require.Empty(t, err)
 	require.Equal(t, "No withdraw address specified. If the delegator does have valid delegations, then the withdraw address should be the same as the delegator address", withdrawAddress)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution set-withdraw-addr %s --from=foo --fee=0.004iris %s", barAddr, flags), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution set-withdraw-addr %s --from=foo --fee=0.004iris %s", barAddr, flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	withdrawAddress, err = tests.ExecuteT(t, fmt.Sprintf("iriscli distribution withdraw-address %s %s", fooAddr, flags), "")
@@ -68,7 +68,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	numValCommission := getAmountFromCoinStr(vdi.ValCommission)
 	require.True(t, numDelPool>numValCommission)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.004iris %s", flags), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.004iris %s", flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -96,12 +96,12 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=2iris --to=%s --from=foo --gas=10000 --fee=30iris", flags, barAddr), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=2iris --to=%s --from=foo --gas=10000 --fee=30iris", flags, barAddr), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	valAddr := sdk.ValAddress(fooAddr).String()
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution set-withdraw-addr %s --from=foo --fee=0.004iris %s", barAddr, flags), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution set-withdraw-addr %s --from=foo --fee=0.004iris %s", barAddr, flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	vdi := executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
@@ -111,7 +111,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	numValCommission := getAmountFromCoinStr(vdi.ValCommission)
 	require.True(t, numDelPool>numValCommission)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.004iris %s", valAddr, flags), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.004iris %s", valAddr, flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -124,7 +124,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	numValCommission = getAmountFromCoinStr(vdi.ValCommission)
 	require.True(t, numValCommission>0)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.004iris %s", flags), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.004iris %s", flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
