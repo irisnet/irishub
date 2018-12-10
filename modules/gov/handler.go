@@ -108,8 +108,8 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
 		////////////////////  iris begin  ///////////////////////////
-		tags.Usage, msg.Usage,
-		tags.Percent, msg.Percent,
+		tags.Usage, []byte(msg.Usage.String()),
+		tags.Percent, []byte(msg.Percent.String()),
 		////////////////////  iris end  /////////////////////////////
 	)
 

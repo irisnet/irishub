@@ -87,7 +87,7 @@ func ErrSwitchPeriodInProcess(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidPercent(codespace sdk.CodespaceType, percent sdk.Dec) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidPercent, fmt.Sprintf("invalid percent [%s], must >0 & <=0", percent))
+	return sdk.NewError(codespace, CodeInvalidPercent, fmt.Sprintf("invalid percent [%s], must >0 & <=1", percent))
 }
 
 func ErrInvalidUsageType(codespace sdk.CodespaceType, usageType UsageType) sdk.Error {

@@ -23,6 +23,6 @@ var (
 	Param       = "param"
 	Usage       = "usage"
 	Percent     = "percent"
-	DestAddress = "des-address"
+	DestAddress = "dest-address"
 	////////////////////  iris end  /////////////////////////////
 )

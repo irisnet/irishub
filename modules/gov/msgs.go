@@ -10,7 +10,7 @@ import (
 // name to idetify transaction types
 const MsgRoute = "gov"
 
-var _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgDeposit{}, MsgVote{}
+var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitTxTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
 
 //-----------------------------------------------------------
 // MsgSubmitProposal

@@ -145,7 +145,10 @@ func (p *ProtocolVersion0) configKeepers() {
 	p.govKeeper = gov.NewKeeper(
 		p.cdc,
 		protocol.KeyGov,
-		p.bankKeeper, &stakeKeeper,
+		p.distrKeeper,
+		p.bankKeeper,
+		p.guardianKeeper,
+		&stakeKeeper,
 		gov.DefaultCodespace,
 	)
 
