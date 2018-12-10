@@ -40,7 +40,7 @@ type ProtocolVersion0 struct {
 	accountMapper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	bankKeeper          bank.Keeper
-	stakeKeeper         stake.Keeper
+	StakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	mintKeeper          mint.Keeper
 	distrKeeper         distr.Keeper
@@ -171,9 +171,9 @@ func (p *ProtocolVersion0) configKeepers() {
 	)
 
 	// register the staking hooks
-	// NOTE: stakeKeeper above are passed by reference,
+	// NOTE: StakeKeeper above are passed by reference,
 	// so that it can be modified like below:
-	p.stakeKeeper = *stakeKeeper.SetHooks(
+	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 	p.feeManager = auth.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
 
@@ -183,7 +183,7 @@ func (p *ProtocolVersion0) configKeepers() {
 func (p *ProtocolVersion0) configRouters() {
 	p.router.
 		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
-		AddRoute("stake", stake.NewHandler(p.stakeKeeper)).
+		AddRoute("stake", stake.NewHandler(p.StakeKeeper)).
 		AddRoute("slashing", slashing.NewHandler(p.slashingKeeper)).
 		AddRoute("distr", distr.NewHandler(p.distrKeeper)).
 		AddRoute("gov", gov.NewHandler(p.govKeeper)).
@@ -263,7 +263,7 @@ func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBl
 // application updates every end block
 func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, p.govKeeper)
-	validatorUpdates := stake.EndBlocker(ctx, p.stakeKeeper)
+	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
@@ -298,7 +298,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	//upgrade.InitGenesis(ctx, p.upgradeKeeper, p.Router(), genesisState.UpgradeData)
 
 	// load the initial stake information
-	validators, err := stake.InitGenesis(ctx, p.stakeKeeper, genesisState.StakeData)
+	validators, err := stake.InitGenesis(ctx, p.StakeKeeper, genesisState.StakeData)
 	if err != nil {
 		panic(err)
 	}
@@ -333,7 +333,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 			}
 		}
 
-		validators = p.stakeKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+		validators = p.StakeKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	}
 
 	// sanity check
@@ -388,7 +388,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context) (appStat
 	genState := NewGenesisFileState(
 		fileAccounts,
 		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
-		stake.ExportGenesis(ctx, p.stakeKeeper),
+		stake.ExportGenesis(ctx, p.StakeKeeper),
 		mint.ExportGenesis(ctx, p.mintKeeper),
 		distr.ExportGenesis(ctx, p.distrKeeper),
 		gov.ExportGenesis(ctx, p.govKeeper),
@@ -402,7 +402,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context) (appStat
 	if err != nil {
 		return nil, nil, err
 	}
-	validators = stake.WriteValidators(ctx, p.stakeKeeper)
+	validators = stake.WriteValidators(ctx, p.StakeKeeper)
 	return appState, validators, nil
 }
 

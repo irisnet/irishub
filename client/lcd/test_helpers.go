@@ -24,6 +24,7 @@ import (
 
 	"github.com/irisnet/irishub/modules/stake"
 	irisapp "github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/modules/gov"
@@ -190,14 +191,14 @@ func InitializeTestLCD(
 		valOperAddrs = append(valOperAddrs, sdk.ValAddress(operAddr))
 	}
 
-	genesisState, err := irisapp.IrisAppGenState(cdc, *genDoc, genTxs)
+	genesisState, err := v0.IrisAppGenState(cdc, *genDoc, genTxs)
 	require.NoError(t, err)
 
 	// add some tokens to init accounts
 	for _, addr := range initAddrs {
 		accAuth := auth.NewBaseAccountWithAddress(addr)
 		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, 20))}
-		acc := irisapp.NewGenesisFileAccount(&accAuth)
+		acc := v0.NewGenesisFileAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
 		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 20)))
 	}
