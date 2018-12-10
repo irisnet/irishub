@@ -51,8 +51,8 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent sdk.Dec, burn bool) {
 	feePool := k.GetFeePool(ctx)
 	communityPool := feePool.CommunityPool
-	allocateCoins, decCoins := communityPool.MulDec(percent).TruncateDecimal()
-	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins).Plus(decCoins))
+	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
+	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
 	k.SetFeePool(ctx, feePool)
 
 	if burn {

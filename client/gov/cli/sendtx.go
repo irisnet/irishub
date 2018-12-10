@@ -101,7 +101,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
 	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
-	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Local and Global")
+	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
 	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
 	////////////////////  iris end  /////////////////////////////
