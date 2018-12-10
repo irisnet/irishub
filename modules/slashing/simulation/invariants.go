@@ -1,7 +1,7 @@
 package simulation
 
 import (
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 

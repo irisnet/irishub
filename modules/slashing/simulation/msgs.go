@@ -3,7 +3,7 @@ package simulation
 import (
 	"fmt"
 	"math/rand"
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	"github.com/irisnet/irishub/modules/slashing"

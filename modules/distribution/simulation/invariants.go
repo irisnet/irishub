@@ -3,7 +3,7 @@ package simulation
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/mock/simulation"
