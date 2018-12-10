@@ -17,7 +17,7 @@ func (app *IrisApp) runtimeInvariants() []simulation.Invariant {
 		banksim.NonnegativeBalanceInvariant(app.accountMapper),
 		distrsim.ValAccumInvariants(app.distrKeeper, app.stakeKeeper),
 		stakesim.SupplyInvariants(app.bankKeeper, app.stakeKeeper,
-			app.feeCollectionKeeper, app.distrKeeper, app.accountMapper),
+			app.feeCollectionKeeper, app.distrKeeper, app.serviceKeeper, app.accountMapper),
 		stakesim.PositivePowerInvariant(app.stakeKeeper),
 	}
 }

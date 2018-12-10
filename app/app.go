@@ -324,7 +324,8 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 	validatorUpdates := stake.EndBlocker(ctx, app.stakeKeeper)
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, app.upgradeKeeper))
 	tags = tags.AppendTags(service.EndBlocker(ctx, app.serviceKeeper))
-
+	height := ctx.BlockHeight()
+	_=height
 	app.assertRuntimeInvariants()
 
 	return abci.ResponseEndBlock{

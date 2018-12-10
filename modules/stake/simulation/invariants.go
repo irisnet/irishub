@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/stake/keeper"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
@@ -17,11 +18,11 @@ import (
 // AllInvariants runs all invariants of the stake module.
 // Currently: total supply, positive power
 func AllInvariants(ck bank.Keeper, k stake.Keeper,
-	f auth.FeeCollectionKeeper, d distribution.Keeper,
+	f auth.FeeCollectionKeeper, d distribution.Keeper, s service.Keeper,
 	am auth.AccountKeeper) simulation.Invariant {
 
 	return func(ctx sdk.Context) error {
-		err := SupplyInvariants(ck, k, f, d, am)(ctx)
+		err := SupplyInvariants(ck, k, f, d, s, am)(ctx)
 		if err != nil {
 			return err
 		}
@@ -48,7 +49,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 // SupplyInvariants checks that the total supply reflects all held loose tokens, bonded tokens, and unbonding delegations
 // nolint: unparam
 func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
-	f auth.FeeCollectionKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
+	f auth.FeeCollectionKeeper, d distribution.Keeper, s service.Keeper, am auth.AccountKeeper) simulation.Invariant {
 	return func(ctx sdk.Context) error {
 		pool := k.GetPool(ctx)
 
@@ -86,6 +87,10 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 
 		// add validator distribution pool
 		loose = loose.Add(feePool.ValPool.AmountOf(stakeTypes.StakeDenom))
+
+		servicePool := s.GetServiceFeeTaxPool(ctx)
+
+		loose = loose.Add(sdk.NewDecFromInt(servicePool.AmountOf(stakeTypes.StakeDenom)))
 
 		// add validator distribution commission and yet-to-be-withdrawn-by-delegators
 		d.IterateValidatorDistInfos(ctx,

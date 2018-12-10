@@ -149,7 +149,7 @@ func invariants(app *IrisApp) []simulation.Invariant {
 		simulation.PeriodicInvariant(govsim.AllInvariants(), period, 0),
 		simulation.PeriodicInvariant(distrsim.AllInvariants(app.distrKeeper, app.stakeKeeper), period, 0),
 		simulation.PeriodicInvariant(stakesim.AllInvariants(app.bankKeeper, app.stakeKeeper,
-			app.feeCollectionKeeper, app.distrKeeper, app.accountMapper), period, 0),
+			app.feeCollectionKeeper, app.distrKeeper, app.serviceKeeper, app.accountMapper), period, 0),
 		simulation.PeriodicInvariant(slashingsim.AllInvariants(), period, 0),
 	}
 }
