@@ -14,10 +14,10 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -44,16 +44,24 @@ type RunMsg func(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) sdk.Result
 // BaseApp reflects the ABCI application implementation.
 type BaseApp struct {
 	// initialized on creation
-	Logger log.Logger
-	name   string               // application name from abci.Info
-	db     dbm.DB               // common DB backend
-	cms    sdk.CommitMultiStore // Main (uncached) state
-	Engine protocol.ProtocolEngine
+	Logger      log.Logger
+	name        string               // application name from abci.Info
+	db          dbm.DB               // common DB backend
+	cms         sdk.CommitMultiStore // Main (uncached) state
+	router      Router               // handle any kind of message
+	queryRouter QueryRouter          // router for redirecting query calls
+	txDecoder   sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
-	txDecoder sdk.TxDecoder // unmarshal []byte into sdk.Tx
+	anteHandler          sdk.AnteHandler            // ante handler for fee and auth
+	feeRefundHandler     types.FeeRefundHandler     // fee handler for fee refund
+	feePreprocessHandler types.FeePreprocessHandler // fee handler for fee preprocessor
 
-	addrPeerFilter   sdk.PeerFilter // filter peers by address and port
-	pubkeyPeerFilter sdk.PeerFilter // filter peers by public key
+	// may be nil
+	initChainer      sdk.InitChainer  // initialize state with validators and state blob
+	beginBlocker     sdk.BeginBlocker // logic to run before any txs
+	endBlocker       sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
+	addrPeerFilter   sdk.PeerFilter   // filter peers by address and port
+	pubkeyPeerFilter sdk.PeerFilter   // filter peers by public key
 	runMsg           RunMsg
 
 	//--------------------
@@ -85,11 +93,13 @@ var _ abci.Application = (*BaseApp)(nil)
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
 func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:    logger,
-		name:      name,
-		db:        db,
-		cms:       store.NewCommitMultiStore(db),
-		txDecoder: txDecoder,
+		Logger:      logger,
+		name:        name,
+		db:          db,
+		cms:         store.NewCommitMultiStore(db),
+		router:      NewRouter(),
+		queryRouter: NewQueryRouter(),
+		txDecoder:   txDecoder,
 	}
 
 	for _, option := range options {
@@ -110,14 +120,14 @@ func (app *BaseApp) SetCommitMultiStoreTracer(w io.Writer) {
 }
 
 // Mount IAVL stores to the provided keys in the BaseApp multistore
-func (app *BaseApp) MountStoresIAVL(keys []*sdk.KVStoreKey) {
+func (app *BaseApp) MountStoresIAVL(keys ...*sdk.KVStoreKey) {
 	for _, key := range keys {
 		app.MountStore(key, sdk.StoreTypeIAVL)
 	}
 }
 
 // Mount stores to the provided keys in the BaseApp multistore
-func (app *BaseApp) MountStoresTransient(keys []*sdk.TransientStoreKey) {
+func (app *BaseApp) MountStoresTransient(keys ...*sdk.TransientStoreKey) {
 	for _, key := range keys {
 		app.MountStore(key, sdk.StoreTypeTransient)
 	}
@@ -137,7 +147,6 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
 }
-
 ////////////////////  iris/cosmos-sdk end  ///////////////////////////
 
 func (app *BaseApp) SetRunMsg(runMsg RunMsg) {
@@ -252,11 +261,10 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
 
-	initChainer := app.Engine.GetCurrent().GetInitChainer()
-	if initChainer == nil {
+	if app.initChainer == nil {
 		return
 	}
-	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
+	res = app.initChainer(app.deliverState.ctx, req)
 
 	// NOTE: we don't commit, but BeginBlock for block 1
 	// starts from this deliverState
@@ -387,7 +395,7 @@ func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res 
 	if len(path) < 2 || path[1] == "" {
 		return sdk.ErrUnknownRequest("No route for custom query specified").QueryResult()
 	}
-	querier := app.Engine.GetCurrent().GetQueryRouter().Route(path[1])
+	querier := app.queryRouter.Route(path[1])
 	if querier == nil {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("no custom querier found for route %s", path[1])).QueryResult()
 	}
@@ -429,10 +437,11 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.WithBlockHeader(req.Header).WithBlockHeight(req.Header.Height)
 	}
-	beginBlocker := app.Engine.GetCurrent().GetBeginBlocker()
-	if beginBlocker != nil {
-		res = beginBlocker(app.deliverState.ctx, req)
+
+	if app.beginBlocker != nil {
+		res = app.beginBlocker(app.deliverState.ctx, req)
 	}
+
 	// set the signed validators for addition to context in deliverTx
 	// TODO: communicate this result to the address to pubkey map in slashing
 	app.voteInfos = req.LastCommitInfo.GetVotes()
@@ -508,7 +517,7 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	// Even though the Result.Code is not OK, there are still effects,
 	// namely fee deductions and sequence incrementing.
 
-	// Tell the blockchain Engine (i.e. Tendermint).
+	// Tell the blockchain engine (i.e. Tendermint).
 	return abci.ResponseDeliverTx{
 		Code:      uint32(result.Code),
 		Codespace: string(result.Codespace),
@@ -531,7 +540,6 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 		// Validate the Msg.
 		err := msg.ValidateBasic()
 		if err != nil {
-			err = err.WithDefaultCodespace(sdk.CodespaceRoot)
 			return err
 		}
 	}
@@ -565,7 +573,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgRoute := msg.Route()
-		handler := app.Engine.GetCurrent().GetRouter().Route(msgRoute)
+		handler := app.router.Route(msgRoute)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgRoute).Result()
 		}
@@ -655,10 +663,9 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasWanted = gasWanted
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 
-		feeRefundHandler := app.Engine.GetCurrent().GetFeeRefundHandler()
 		// Refund unspent fee
-		if mode != RunTxModeCheck && feeRefundHandler != nil {
-			_, err := feeRefundHandler(ctxWithNoCache, tx, result)
+		if mode != RunTxModeCheck && app.feeRefundHandler != nil {
+			_, err := app.feeRefundHandler(ctxWithNoCache, tx, result)
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
@@ -673,19 +680,17 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	feePreprocessHandler := app.Engine.GetCurrent().GetFeePreprocessHandler()
 	// run the fee handler
-	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
-		err := feePreprocessHandler(ctx, tx)
+	if app.feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
+		err := app.feePreprocessHandler(ctx, tx)
 		if err != nil {
 			return sdk.ErrInvalidCoins(err.Error()).Result()
 		}
 	}
 
-	anteHandler := app.Engine.GetCurrent().GetAnteHandler()
 	// run the ante handler
-	if anteHandler != nil {
-		newCtx, result, abort := anteHandler(ctx, tx, (mode == RunTxModeSimulate))
+	if app.anteHandler != nil {
+		newCtx, result, abort := app.anteHandler(ctx, tx, (mode == RunTxModeSimulate))
 		if abort {
 			return result
 		}
@@ -730,9 +735,8 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
 
-	endBlocker := app.Engine.GetCurrent().GetEndBlocker()
-	if endBlocker != nil {
-		res = endBlocker(app.deliverState.ctx, req)
+	if app.endBlocker != nil {
+		res = app.endBlocker(app.deliverState.ctx, req)
 	}
 
 	return

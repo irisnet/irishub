@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/irisnet/irishub/modules/mock/baseapp"
+	"github.com/irisnet/irishub/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/modules/auth"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/store"
@@ -283,7 +283,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 		return types.CoinType{}, fmt.Errorf("coin name is empty")
 	}
 	if coinName == stakeTypes.StakeDenomName {
-		coinType = app.IrisCt
+		coinType = v0.IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)
 		bz, err := cliCtx.QueryStore([]byte(key), "params")

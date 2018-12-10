@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
@@ -13,7 +14,13 @@ import (
 // Any long term API support commitments do not apply to this function.
 func getBenchmarkMockApp() (*App, error) {
 	mapp := NewApp()
-	return mapp, nil
+
+	bank.RegisterCodec(mapp.Cdc)
+	bankKeeper := bank.NewBaseKeeper(mapp.AccountKeeper)
+	mapp.Router().AddRoute("bank", []*sdk.KVStoreKey{mapp.KeyAccount}, bank.NewHandler(bankKeeper))
+
+	err := mapp.CompleteSetup()
+	return mapp, err
 }
 
 func BenchmarkOneBankSendTxPerBlock(b *testing.B) {

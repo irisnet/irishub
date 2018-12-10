@@ -4,12 +4,15 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/irisnet/irishub/app/protocol"
+	"fmt"
 	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/service/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -19,14 +22,6 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/record"
-	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/guardian"
-	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 const (
@@ -57,8 +52,27 @@ var (
 // capabilities aren't needed for testing.
 type App struct {
 	*bam.BaseApp
-	Cdc              *codec.Codec
+	Cdc              *codec.Codec // Cdc is public since the codec is passed into the module anyways
+	KeyMain          *sdk.KVStoreKey
+	KeyAccount       *sdk.KVStoreKey
+	KeyFeeCollection *sdk.KVStoreKey
+	KeyStake         *sdk.KVStoreKey
+	TkeyStake        *sdk.TransientStoreKey
+	KeyParams        *sdk.KVStoreKey
+	TkeyParams       *sdk.TransientStoreKey
+	KeyUpgrade       *sdk.KVStoreKey
+
+	// TODO: Abstract this out from not needing to be auth specifically
+	AccountKeeper       auth.AccountKeeper
+	BankKeeper          bank.Keeper
+	FeeCollectionKeeper auth.FeeCollectionKeeper
+	ParamsKeeper        params.Keeper
+
+	GenesisAccounts  []auth.Account
 	TotalCoinsSupply sdk.Coins
+
+	// fee manager
+	FeeManager auth.FeeManager
 }
 
 // NewApp partially constructs a new app on the memstore for module and genesis
@@ -67,81 +81,128 @@ func NewApp() *App {
 	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "sdk/app")
 	db := dbm.NewMemDB()
 
+	// Create the cdc with some standard codecs
+	cdc := codec.New()
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
 
-	cdc := MakeCodec()
-
 	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
-	// create your application object
-	var app = &App{
-		BaseApp: 		  bApp,
+	// Create your application object
+	app := &App{
+		BaseApp:          bApp,
 		Cdc:              cdc,
+		KeyMain:          sdk.NewKVStoreKey("main"),
+		KeyAccount:       sdk.NewKVStoreKey("acc"),
+		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
+		KeyStake:         sdk.NewKVStoreKey("stake"),
+		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
+		KeyParams:        sdk.NewKVStoreKey("params"),
+		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
+		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
-	engine := protocol.NewProtocolEngine()
 
-	protocol0 := NewProtocolVersion0(cdc)
-	engine.Add(protocol0)
+	// Define the AccountKeeper
+	app.AccountKeeper = auth.NewAccountKeeper(
+		app.Cdc,
+		app.KeyAccount,
+		auth.ProtoBaseAccount,
+	)
 
-	engine.LoadCurrentProtocol()
-	app.SetProtocolEngine(engine)
-	app.MountStoresIAVL(engine.GetKVStoreKeys())
-	app.MountStoresTransient(engine.GetTransientStoreKeys())
-	err := app.LoadLatestVersion(engine.GetKeyMain())
-	if err != nil {
-		cmn.Exit(err.Error())
-	}
+	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
+	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
+
+	app.ParamsKeeper = params.NewKeeper(
+		app.Cdc,
+		app.KeyParams, app.TkeyParams,
+	)
+	app.FeeManager = auth.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
+
+	app.SetInitChainer(app.InitChainer)
+	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
+	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
+	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.FeeManager))
+	// Not sealing for custom extension
+
+	// init iparam
+	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
+		params.NewTypeTable(
+			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
+			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
+			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
+			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), []byte{},
+			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), []byte{},
+		)),
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter,
+		&serviceparams.MaxRequestTimeoutParameter,
+		&serviceparams.MinDepositMultipleParameter,
+		&arbitrationparams.ComplaintRetrospectParameter,
+		&arbitrationparams.ArbitrationTimelimitParameter)
+
+	params.RegisterGovParamMapping(
+		&govparams.DepositProcedureParameter,
+		&govparams.VotingProcedureParameter,
+		&govparams.TallyingProcedureParameter)
+
 	return app
 }
 
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	guardian.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
+// CompleteSetup completes the application setup after the routes have been
+// registered.
+func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
+	newKeys = append(newKeys, app.KeyMain)
+	newKeys = append(newKeys, app.KeyAccount)
+	newKeys = append(newKeys, app.KeyParams)
+	newKeys = append(newKeys, app.KeyStake)
+	newKeys = append(newKeys, app.KeyFeeCollection)
+	newKeys = append(newKeys, app.TkeyParams)
+	newKeys = append(newKeys, app.TkeyStake)
+
+	for _, key := range newKeys {
+		switch key.(type) {
+		case *sdk.KVStoreKey:
+			app.MountStore(key, sdk.StoreTypeIAVL)
+		case *sdk.TransientStoreKey:
+			app.MountStore(key, sdk.StoreTypeTransient)
+		default:
+			return fmt.Errorf("unsupported StoreKey: %+v", key)
+		}
+	}
+
+	err := app.LoadLatestVersion(app.KeyMain)
+
+	return err
 }
 
-//// CompleteSetup completes the application setup after the routes have been
-//// registered.
-//func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
-//	newKeys = append(newKeys, protocol.KeyMain)
-//	newKeys = append(newKeys, protocol.KeyAccount)
-//	newKeys = append(newKeys, protocol.KeyParams)
-//	newKeys = append(newKeys, protocol.KeyStake)
-//	newKeys = append(newKeys, protocol.KeyFeeCollection)
-//	newKeys = append(newKeys, protocol.TkeyParams)
-//	newKeys = append(newKeys, protocol.TkeyStake)
-//
-//	for _, key := range newKeys {
-//		switch key.(type) {
-//		case *sdk.KVStoreKey:
-//			app.MountStore(key, sdk.StoreTypeIAVL)
-//		case *sdk.TransientStoreKey:
-//			app.MountStore(key, sdk.StoreTypeTransient)
-//		default:
-//			return fmt.Errorf("unsupported StoreKey: %+v", key)
-//		}
-//	}
-//
-//	err := app.LoadLatestVersion(protocol.KeyMain)
-//	return err
-//}
+// InitChainer performs custom logic for initialization.
+func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.ResponseInitChain {
+	// Load the genesis accounts
+	for _, genacc := range app.GenesisAccounts {
+		acc := app.AccountKeeper.NewAccountWithAddress(ctx, genacc.GetAddress())
+		acc.SetCoins(genacc.GetCoins())
+		app.AccountKeeper.SetAccount(ctx, acc)
+	}
 
+	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
+		FeeTokenNative:    IrisCt.MinUnit.Denom,
+		GasPriceThreshold: 0, // for mock test
+	}
+
+	auth.InitGenesis(ctx, app.FeeCollectionKeeper, auth.DefaultGenesisState(), app.FeeManager, feeTokenGensisConfig)
+
+	return abci.ResponseInitChain{}
+}
 
 // CreateGenAccounts generates genesis accounts loaded with coins, and returns
 // their addresses, pubkeys, and privkeys.
@@ -169,7 +230,7 @@ func CreateGenAccounts(numAccs int, genCoins sdk.Coins) (genAccs []auth.Account,
 func SetGenesis(app *App, accs []auth.Account) {
 	// Pass the accounts in via the application (lazy) instead of through
 	// RequestInitChain.
-	app.Engine.GetCurrent().(*ProtocolVersion0).GenesisAccounts = accs
+	app.GenesisAccounts = accs
 
 	app.InitChain(abci.RequestInitChain{})
 	app.Commit()
@@ -280,7 +341,7 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 		accts[i] = &baseAcc
 	}
 
-	app.Engine.GetCurrent().(*ProtocolVersion0).GenesisAccounts = accts
+	app.GenesisAccounts = accts
 }
 
 // GetAllAccounts returns all accounts in the AccountKeeper.
