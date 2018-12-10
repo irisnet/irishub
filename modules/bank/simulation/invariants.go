@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 )
 
 // NonnegativeBalanceInvariant checks that all accounts in the application have non-negative balances
