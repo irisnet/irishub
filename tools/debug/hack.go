@@ -35,7 +35,6 @@ import (
 	"github.com/irisnet/irishub/app/v0"
 	tmtypes "github.com/tendermint/tendermint/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -135,38 +134,6 @@ var (
 // Extended ABCI application
 type IrisApp struct {
 	*bam.BaseApp
-	cdc *codec.Codec
-
-	// keys to access the substores
-	keyMain          *sdk.KVStoreKey
-	keyAccount       *sdk.KVStoreKey
-	keyIBC           *sdk.KVStoreKey
-	keyStake         *sdk.KVStoreKey
-	tkeyStake        *sdk.TransientStoreKey
-	keySlashing      *sdk.KVStoreKey
-	keyGov           *sdk.KVStoreKey
-	keyFeeCollection *sdk.KVStoreKey
-	keyParams        *sdk.KVStoreKey
-	keyIparams       *sdk.KVStoreKey
-	tkeyParams       *sdk.TransientStoreKey
-	keyUpgrade       *sdk.KVStoreKey
-	keyDistr         *sdk.KVStoreKey
-	keyGuardian      *sdk.KVStoreKey
-
-	// Manage getting and setting accounts
-	AccountKeeper       auth.AccountKeeper
-	feeCollectionKeeper auth.FeeCollectionKeeper
-	bankKeeper          bank.Keeper
-	stakeKeeper         stake.Keeper
-	slashingKeeper      slashing.Keeper
-	paramsKeeper        params.Keeper
-	govKeeper           gov.Keeper
-	upgradeKeeper       upgrade.Keeper
-	distrKeeper         distr.Keeper
-	guardianKeeper      guardian.Keeper
-
-	// fee manager
-	feeManager auth.FeeManager
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
