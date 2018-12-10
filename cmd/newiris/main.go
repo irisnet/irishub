@@ -15,6 +15,8 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	tmtypes "github.com/tendermint/tendermint/types"
+	"encoding/json"
 )
 
 func main() {
@@ -56,6 +58,7 @@ func main() {
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
+		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
 		client.LineBreak,
 	)
 
@@ -75,3 +78,15 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 	)
 }
 
+func exportAppStateAndTMValidators(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64,
+) (json.RawMessage, []tmtypes.GenesisValidator, error) {
+	gApp := app.NewIrisApp(logger, db, traceStore)
+	if height != -1 {
+		err := gApp.LoadHeight(height)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	return gApp.ExportAppStateAndValidators()
+}
