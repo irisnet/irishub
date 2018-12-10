@@ -22,6 +22,7 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	banksim "github.com/irisnet/irishub/modules/bank/simulation"
 	govsim "github.com/irisnet/irishub/modules/gov/simulation"
+	distrsim "github.com/irisnet/irishub/modules/distribution/simulation"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	slashingsim "github.com/irisnet/irishub/modules/slashing/simulation"
 	stakesim "github.com/irisnet/irishub/modules/stake/simulation"
@@ -35,6 +36,7 @@ var (
 	enabled   bool
 	verbose   bool
 	commit    bool
+	period    int
 )
 
 func init() {
@@ -44,6 +46,7 @@ func init() {
 	flag.BoolVar(&enabled, "SimulationEnabled", true, "Enable the simulation")
 	flag.BoolVar(&verbose, "SimulationVerbose", false, "Verbose log output")
 	flag.BoolVar(&commit, "SimulationCommit", false, "Have the simulation commit")
+	flag.IntVar(&period, "SimulationPeriod", 100, "Run slow invariants only once every period assertions")
 }
 
 func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
@@ -104,7 +107,7 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 		validators = append(validators, validator)
 		delegations = append(delegations, delegation)
 	}
-	stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(100, 30))
+	stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(amount.MulRaw(numAccs).Add(amount.MulRaw(numInitiallyBonded)))
 	stakeGenesis.Validators = validators
 	stakeGenesis.Bonds = delegations
 
@@ -141,7 +144,14 @@ func testAndRunTxs(app *IrisApp) []simulation.WeightedOperation {
 }
 
 func invariants(app *IrisApp) []simulation.Invariant {
-	return []simulation.Invariant{}
+	return []simulation.Invariant{
+		simulation.PeriodicInvariant(banksim.NonnegativeBalanceInvariant(app.accountMapper), period, 0),
+		simulation.PeriodicInvariant(govsim.AllInvariants(), period, 0),
+		simulation.PeriodicInvariant(distrsim.AllInvariants(app.distrKeeper, app.stakeKeeper), period, 0),
+		simulation.PeriodicInvariant(stakesim.AllInvariants(app.bankKeeper, app.stakeKeeper,
+			app.feeCollectionKeeper, app.distrKeeper, app.accountMapper), period, 0),
+		simulation.PeriodicInvariant(slashingsim.AllInvariants(), period, 0),
+	}
 }
 
 func BenchmarkFullIrisSimulation(b *testing.B) {
@@ -159,11 +169,10 @@ func BenchmarkFullIrisSimulation(b *testing.B) {
 
 	// Run randomized simulation
 	// TODO parameterize numbers, save for a later PR
-	err := simulation.SimulateFromSeed(
+	_, err := simulation.SimulateFromSeed(
 		b, app.BaseApp, appStateFn, seed,
 		testAndRunTxs(app),
-		[]simulation.RandSetup{},
-		invariants(app), // these shouldn't get ran
+		invariants(app),
 		numBlocks,
 		blockSize,
 		commit,
@@ -202,10 +211,9 @@ func TestFullIrisSimulation(t *testing.T) {
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
-	err := simulation.SimulateFromSeed(
+	_, err := simulation.SimulateFromSeed(
 		t, app.BaseApp, appStateFn, seed,
 		testAndRunTxs(app),
-		[]simulation.RandSetup{},
 		invariants(app),
 		numBlocks,
 		blockSize,
@@ -244,10 +252,9 @@ func TestIrisImportExport(t *testing.T) {
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
-	err := simulation.SimulateFromSeed(
+	_, err := simulation.SimulateFromSeed(
 		t, app.BaseApp, appStateFn, seed,
 		testAndRunTxs(app),
-		[]simulation.RandSetup{},
 		invariants(app),
 		numBlocks,
 		blockSize,
@@ -264,7 +271,7 @@ func TestIrisImportExport(t *testing.T) {
 
 	fmt.Printf("Exporting genesis...\n")
 
-	appState, _, err := app.ExportAppStateAndValidators()
+	appState, _, err := app.ExportAppStateAndValidators(true)
 	if err != nil {
 		panic(err)
 	}
@@ -340,7 +347,6 @@ func TestAppStateDeterminism(t *testing.T) {
 			simulation.SimulateFromSeed(
 				t, app.BaseApp, appStateFn, seed,
 				testAndRunTxs(app),
-				[]simulation.RandSetup{},
 				[]simulation.Invariant{},
 				50,
 				100,

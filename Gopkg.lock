@@ -69,6 +69,14 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
+  digest = "1:3d43e35d7159c669fd70a9499170ad06a85bdb075f7db1e3b9cc604c17a9293b"
+  name = "github.com/cosmos/cosmos-sdk"
+  packages = ["codec"]
+  pruneopts = "UT"
+  revision = "dfd00a661a19df6efe7e0dde96b2fbeb883d1d80"
+  version = "v0.27.1"
+
+[[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"
   name = "github.com/cosmos/go-bip39"
   packages = ["."]
@@ -867,6 +875,7 @@
     "github.com/bartekn/go-bip39",
     "github.com/bgentry/speakeasy",
     "github.com/btcsuite/btcd/btcec",
+    "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/go-bip39",
     "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",

@@ -7,9 +7,7 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"math/rand"
 )
 
@@ -27,9 +25,9 @@ func SimulateMsgCreateValidator(m auth.AccountKeeper, k stake.Keeper) simulation
 
 		maxCommission := sdk.NewInt(10)
 		commission := stake.NewCommissionMsg(
-			sdk.NewDecWithPrec(simulation.RandomAmount(r, maxCommission).Int64(), 1),
-			sdk.NewDecWithPrec(simulation.RandomAmount(r, maxCommission).Int64(), 1),
-			sdk.NewDecWithPrec(simulation.RandomAmount(r, maxCommission).Int64(), 1),
+			sdk.NewDecWithPrec(maxCommission.Int64(), 1),
+			sdk.NewDecWithPrec(maxCommission.Int64(), 1),
+			sdk.NewDecWithPrec(maxCommission.Int64(), 1),
 		)
 
 		acc := simulation.RandomAcc(r, accs)
@@ -37,9 +35,6 @@ func SimulateMsgCreateValidator(m auth.AccountKeeper, k stake.Keeper) simulation
 
 		amount := m.GetAccount(ctx, acc.Address).GetCoins().AmountOf(denom)
 
-		if amount.GT(sdk.ZeroInt()) {
-			amount = simulation.RandomAmount(r, amount)
-		}
 
 		if amount.Equal(sdk.ZeroInt()) {
 			return "no-operation", nil, nil
@@ -87,7 +82,7 @@ func SimulateMsgEditValidator(k stake.Keeper) simulation.Operation {
 		}
 
 		maxCommission := sdk.NewInt(10)
-		newCommissionRate := sdk.NewDecWithPrec(simulation.RandomAmount(r, maxCommission).Int64(), 1)
+		newCommissionRate := sdk.NewDecWithPrec(maxCommission.Int64(), 1)
 
 		val := keeper.RandomValidator(r, k, ctx)
 		address := val.GetOperator()
@@ -203,9 +198,6 @@ func SimulateMsgBeginRedelegate(m auth.AccountKeeper, k stake.Keeper) simulation
 		delegatorAddress := delegatorAcc.Address
 		// TODO
 		amount := m.GetAccount(ctx, delegatorAddress).GetCoins().AmountOf(denom)
-		if amount.GT(sdk.ZeroInt()) {
-			amount = simulation.RandomAmount(r, amount)
-		}
 		if amount.Equal(sdk.ZeroInt()) {
 			return "no-operation", nil, nil
 		}
@@ -226,28 +218,5 @@ func SimulateMsgBeginRedelegate(m auth.AccountKeeper, k stake.Keeper) simulation
 		event(fmt.Sprintf("stake/MsgBeginRedelegate/%v", result.IsOK()))
 		action = fmt.Sprintf("TestMsgBeginRedelegate: %s", msg.GetSignBytes())
 		return action, nil, nil
-	}
-}
-
-// Setup
-// nolint: errcheck
-func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
-	return func(r *rand.Rand, accs []simulation.Account) {
-		ctx := mapp.NewContext(false, abci.Header{})
-		gen := stake.DefaultGenesisState()
-		stake.InitGenesis(ctx, k, gen)
-		params := k.GetParams(ctx)
-		denom := params.BondDenom
-		loose := sdk.ZeroInt()
-		mapp.AccountKeeper.IterateAccounts(ctx, func(acc auth.Account) bool {
-			balance := simulation.RandomAmount(r, sdk.NewInt(1000000))
-			acc.SetCoins(acc.GetCoins().Plus(sdk.Coins{sdk.NewCoin(denom, balance)}))
-			mapp.AccountKeeper.SetAccount(ctx, acc)
-			loose = loose.Add(balance)
-			return false
-		})
-		pool := k.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDec(loose.Int64()))
-		k.SetPool(ctx, pool)
 	}
 }

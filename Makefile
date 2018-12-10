@@ -120,7 +120,7 @@ test_sim_modules:
 
 test_sim_benchmark:
 	@echo "Running benchmark test..."
-	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -timeout 24h
+	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -SimulationCommit=true -timeout 24h
 
 test_sim_iris_nondeterminism:
 	@echo "Running nondeterminism test..."
@@ -128,11 +128,11 @@ test_sim_iris_nondeterminism:
 
 test_sim_iris_fast:
 	@echo "Running quick Iris simulation. This may take several minutes..."
-	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
+	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -SimulationBlockSize=200 -SimulationCommit=true -SimulationSeed=99 -timeout 24h
 
 test_sim_iris_slow:
 	@echo "Running full Iris simulation. This may take awhile!"
-	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
+	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationBlockSize=200 -SimulationCommit=true -SimulationSeed=99 -timeout 24h
 
 testnet_init:
 	@echo "Work well only when Bech32PrefixAccAddr equal faa"
