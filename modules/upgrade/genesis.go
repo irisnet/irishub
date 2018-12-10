@@ -36,7 +36,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState
 
 
 // WriteGenesis - output genesis parameters
-func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func WriteGenesis(ctx sdk.Context) GenesisState {
 
 	return GenesisState{
 		SwitchPeriod: upgradeparams.GetSwitchPeriod(ctx),
