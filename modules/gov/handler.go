@@ -34,7 +34,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
 	if msg.ProposalType == ProposalTypeSoftwareUpgrade || msg.ProposalType == ProposalTypeSoftwareHalt {
-		_, found := keeper.gk.GetTrustee(ctx, msg.Proposer)
+		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 		if !found {
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
@@ -80,37 +80,25 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 }
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
-	////////////////////  iris begin  ///////////////////////////
 	_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
 	if !found {
-		return ErrNotTrustee(keeper.codespace, msg.Proposer).Result()
+		return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
 	}
 
 	proposal := keeper.NewUsageProposal(ctx, msg)
-
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
-		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
-			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
-		}
-	}
-	////////////////////  iris end  /////////////////////////////
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
-	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
-	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-		////////////////////  iris begin  ///////////////////////////
 		tags.Usage, []byte(msg.Usage.String()),
 		tags.Percent, []byte(msg.Percent.String()),
-		////////////////////  iris end  /////////////////////////////
 	)
 
 	if msg.Usage != UsageTypeBurn {
