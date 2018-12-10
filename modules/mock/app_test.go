@@ -101,7 +101,7 @@ func TestMsgSendWithAccounts(t *testing.T) {
 
 	ctxCheck := mapp.BaseApp.NewContext(true, abci.Header{})
 
-	res1 := mapp.Engine.GetCurrent().(*ProtocolVersion0).AccountMapper.GetAccount(ctxCheck, addr1)
+	res1 := mapp.Engine.GetCurrent().(*ProtocolVersion0).AccountKeeper.GetAccount(ctxCheck, addr1)
 	require.NotNil(t, res1)
 	require.Equal(t, acc, res1.(*auth.BaseAccount))
 

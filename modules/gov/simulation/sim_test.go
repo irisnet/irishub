@@ -13,6 +13,7 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
 // TestGovWithRandomMessages
@@ -22,13 +23,12 @@ func TestGovWithRandomMessages(t *testing.T) {
 	bank.RegisterCodec(mapp.Cdc)
 	gov.RegisterCodec(mapp.Cdc)
 
-	bankKeeper := mapp.BankKeeper
-	stakeKey := mapp.KeyStake
-	stakeTKey := mapp.TkeyStake
-	paramKey := mapp.KeyParams
+	bankKeeper := mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).BankKeeper
+	stakeKey := protocol.KeyStake
+	stakeTKey := protocol.TkeyStake
 	govKey := sdk.NewKVStoreKey("gov")
 
-	paramKeeper := mapp.ParamsKeeper
+	paramKeeper := mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).ParamsKeeper
 	stakeKeeper := stake.NewKeeper(
 		mapp.Cdc, stakeKey,
 		stakeTKey, bankKeeper,
@@ -42,16 +42,16 @@ func TestGovWithRandomMessages(t *testing.T) {
 		gov.DefaultCodespace,
 	)
 
-	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))
-	mapp.SetEndBlocker(func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-		gov.EndBlocker(ctx, govKeeper)
-		return abci.ResponseEndBlock{}
-	})
-
-	err := mapp.CompleteSetup(govKey)
-	if err != nil {
-		panic(err)
-	}
+	//mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))
+	//mapp.SetEndBlocker(func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+	//	gov.EndBlocker(ctx, govKeeper)
+	//	return abci.ResponseEndBlock{}
+	//})
+	//
+	//err := mapp.CompleteSetup(govKey)
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	appStateFn := func(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 		simulation.RandomSetGenesis(r, mapp, accs, []string{"stake"})

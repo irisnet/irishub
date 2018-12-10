@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"math/big"
 	"github.com/irisnet/irishub/modules/mock"
-	bam "github.com/irisnet/irishub/app"
+	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
 )
 

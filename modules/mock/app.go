@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"os"
 
-	bam "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/protocol"
+	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"

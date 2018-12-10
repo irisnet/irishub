@@ -2,13 +2,13 @@ package gov
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
 	"testing"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
+	"github.com/irisnet/irishub/app/protocol"
 
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
@@ -29,20 +29,21 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	keyGov := sdk.NewKVStoreKey("gov")
 
-	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
+	ck := bank.NewBaseKeeper(mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).AccountKeeper)
 	sk := stake.NewKeeper(
 		mapp.Cdc,
-		mapp.KeyStake, mapp.TkeyStake,
-		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
+		protocol.KeyStake, protocol.TkeyStake,
+		mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).BankKeeper,
+		mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
 	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
 
-	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
+	mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).Router.AddRoute("gov",  NewHandler(gk))
 
-	mapp.SetEndBlocker(getEndBlocker(gk))
-	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
-
-	require.NoError(t, mapp.CompleteSetup(keyGov))
+	//mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).SetEndBlocker(getEndBlocker(gk))
+	//mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).SetInitChainer(getInitChainer(mapp, gk, sk))
+	//
+	//require.NoError(t, mapp.CompleteSetup(keyGov))
 	
 	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
@@ -65,7 +66,7 @@ func getEndBlocker(keeper Keeper) sdk.EndBlocker {
 // gov and stake initchainer
 func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk.InitChainer {
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-		mapp.InitChainer(ctx, req)
+		mapp.Engine.GetCurrent().(*mock.ProtocolVersion0).InitChainer(ctx, nil, req)
 
 		stakeGenesis := stake.DefaultGenesisState()
 		stakeGenesis.Params.BondDenom = stakeTypes.StakeDenom

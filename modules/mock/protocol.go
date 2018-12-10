@@ -33,7 +33,7 @@ type ProtocolVersion0 struct {
 	cdc *codec.Codec
 
 	// Manage getting and setting accounts
-	AccountMapper       auth.AccountKeeper
+	AccountKeeper       auth.AccountKeeper
 	FeeCollectionKeeper auth.FeeCollectionKeeper
 	BankKeeper          bank.Keeper
 	StakeKeeper         stake.Keeper
@@ -103,14 +103,14 @@ func (p *ProtocolVersion0) GetDefinition() common.ProtocolDefinition {
 // create all Keepers
 func (p *ProtocolVersion0) configKeepers() {
 	// define the AccountKeeper
-	p.AccountMapper = auth.NewAccountKeeper(
+	p.AccountKeeper = auth.NewAccountKeeper(
 		p.cdc,
 		protocol.KeyAccount,   // target store
 		auth.ProtoBaseAccount, // prototype
 	)
 
 	// add handlers
-	p.BankKeeper = bank.NewBaseKeeper(p.AccountMapper)
+	p.BankKeeper = bank.NewBaseKeeper(p.AccountKeeper)
 	p.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(
 		p.cdc,
 		protocol.KeyFeeCollection,
@@ -195,8 +195,8 @@ func (p *ProtocolVersion0) configRouters() {
 // configure all Stores
 func (p *ProtocolVersion0) configFeeHandlers() {
 
-	p.AnteHandler = auth.NewAnteHandler(p.AccountMapper, p.FeeCollectionKeeper)
-	p.FeeRefundHandler = auth.NewFeeRefundHandler(p.AccountMapper, p.FeeCollectionKeeper, p.FeeManager)
+	p.AnteHandler = auth.NewAnteHandler(p.AccountKeeper, p.FeeCollectionKeeper)
+	p.FeeRefundHandler = auth.NewFeeRefundHandler(p.AccountKeeper, p.FeeCollectionKeeper, p.FeeManager)
 	p.FeePreprocessHandler = auth.NewFeePreprocessHandler(p.FeeManager)
 }
 
@@ -278,9 +278,9 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context) (appStat
 func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	// Load the genesis accounts
 	for _, genacc := range p.GenesisAccounts {
-		acc := p.AccountMapper.NewAccountWithAddress(ctx, genacc.GetAddress())
+		acc := p.AccountKeeper.NewAccountWithAddress(ctx, genacc.GetAddress())
 		acc.SetCoins(genacc.GetCoins())
-		p.AccountMapper.SetAccount(ctx, acc)
+		p.AccountKeeper.SetAccount(ctx, acc)
 	}
 
 	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
