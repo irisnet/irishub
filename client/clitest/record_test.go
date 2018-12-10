@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 func TestIrisCLISubmitRecord(t *testing.T) {
@@ -35,7 +35,7 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 	srStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	srStr += " --json"
 
-	recordTxHash := executeSubmitRecordAndGetTxHash(t, srStr, app.DefaultKeyPass)
+	recordTxHash := executeSubmitRecordAndGetTxHash(t, srStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	recordID1 := executeGetRecordID(t, fmt.Sprintf("iriscli tendermint tx %v --output json --trust-node=true %v", recordTxHash, flags))
@@ -63,7 +63,7 @@ func TestIrisCLISubmitRecord(t *testing.T) {
 	srStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	srStr += " --json"
 
-	recordTxHash = executeSubmitRecordAndGetTxHash(t, srStr, app.DefaultKeyPass)
+	recordTxHash = executeSubmitRecordAndGetTxHash(t, srStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	recordID2 := executeGetRecordID(t, fmt.Sprintf("iriscli tendermint tx %v --output json --trust-node=true %v", recordTxHash, flags))
