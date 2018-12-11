@@ -79,7 +79,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 }
 
 func exportAppStateAndTMValidators(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, traceStore)
 	if height != -1 {
@@ -88,5 +88,5 @@ func exportAppStateAndTMValidators(
 			return nil, nil, err
 		}
 	}
-	return gApp.ExportAppStateAndValidators()
+	return gApp.ExportAppStateAndValidators(forZeroHeight)
 }
