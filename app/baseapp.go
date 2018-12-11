@@ -659,7 +659,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	var msCache sdk.CacheMultiStore
 	ctx := app.getContextForTx(mode, txBytes)
 	ms := ctx.MultiStore()
-	ctxWithNoCache := ctx
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -679,7 +678,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		feeRefundHandler := app.Engine.GetCurrent().GetFeeRefundHandler()
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
-			_, err := feeRefundHandler(ctxWithNoCache, tx, result)
+			_, err := feeRefundHandler(ctx, tx, result)
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				result.GasWanted = gasWanted
