@@ -10,6 +10,9 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	keep "github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 //______________________________________________________________________
@@ -155,6 +158,21 @@ func TestDuplicatesMsgCreateValidator(t *testing.T) {
 	assert.True(sdk.DecEq(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)), validator.Tokens))
 	assert.True(sdk.DecEq(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)), validator.DelegatorShares))
 	assert.Equal(t, Description{}, validator.Description)
+}
+
+func TestInvalidPubKeyTypeMsgCreateValidator(t *testing.T) {
+	ctx, _, keeper := keep.CreateTestInput(t, false, sdk.NewIntWithDecimal(1000,18))
+	addr := sdk.ValAddress(keep.Addrs[0])
+	invalidPk := secp256k1.GenPrivKey().PubKey()
+	// invalid pukKey type should not be allowed
+	msgCreateValidator := NewTestMsgCreateValidator(addr, invalidPk, sdk.NewIntWithDecimal(10,18))
+	got := handleMsgCreateValidator(ctx, msgCreateValidator, keeper)
+	require.False(t, got.IsOK(), "%v", got)
+	ctx = ctx.WithConsensusParams(&abci.ConsensusParams{
+		Validator: &abci.ValidatorParams{PubKeyTypes: []string{tmtypes.ABCIPubKeyTypeSecp256k1}},
+	})
+	got = handleMsgCreateValidator(ctx, msgCreateValidator, keeper)
+	require.True(t, got.IsOK(), "%v", got)
 }
 
 func TestDuplicatesMsgCreateValidatorOnBehalfOf(t *testing.T) {

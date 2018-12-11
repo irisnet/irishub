@@ -64,6 +64,10 @@ type BaseApp struct {
 	deliverState *state          // for DeliverTx
 	voteInfos    []abci.VoteInfo // absent validators from begin block
 
+	// consensus params
+	// TODO move this in the future to baseapp param store on main store.
+	consensusParams *abci.ConsensusParams
+
 	// minimum fees for spam prevention
 	minimumFees sdk.Coins
 
@@ -547,7 +551,8 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 func (app *BaseApp) getContextForTx(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
 	ctx = app.getState(mode).ctx.
 		WithTxBytes(txBytes).
-		WithVoteInfos(app.voteInfos)
+		WithVoteInfos(app.voteInfos).
+		WithConsensusParams(app.consensusParams)
 	if mode == RunTxModeSimulate {
 		ctx, _ = ctx.CacheContext()
 	}
