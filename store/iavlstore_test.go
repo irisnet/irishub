@@ -334,9 +334,14 @@ func testPruning(t *testing.T, numRecent int64, storeEvery int64, states []prune
 				ver, step, numRecent, storeEvery)
 		}
 		for _, ver := range state.deleted {
-			require.False(t, iavlStore.VersionExists(ver),
-				"Unpruned version %d with latest version %d. Should prune all but last %d and every %d",
-				ver, step, numRecent, storeEvery)
+			if ver == 1 {
+				require.True(t, iavlStore.VersionExists(ver),
+					"Version 1 should be kept anyway")
+			} else {
+				require.False(t, iavlStore.VersionExists(ver),
+					"Unpruned version %d with latest version %d. Should prune all but last %d and every %d",
+					ver, step, numRecent, storeEvery)
+			}
 		}
 		nextVersion(iavlStore)
 	}
@@ -364,9 +369,14 @@ func TestIAVLPruneEverything(t *testing.T) {
 	nextVersion(iavlStore)
 	for i := 1; i < 100; i++ {
 		for j := 1; j < i; j++ {
-			require.False(t, iavlStore.VersionExists(int64(j)),
-				"Unpruned version %d with latest version %d. Should prune all old versions",
-				j, i)
+			if j == 1 {
+				require.True(t, iavlStore.VersionExists(int64(j)),
+					"Version 1 should be kept anyway")
+			} else {
+				require.False(t, iavlStore.VersionExists(int64(j)),
+					"Unpruned version %d with latest version %d. Should prune all old versions",
+					j, i)
+			}
 		}
 		require.True(t, iavlStore.VersionExists(int64(i)),
 			"Missing current version on step %d, should not prune current state tree",

@@ -455,7 +455,11 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	taxPool = taxPool.Plus(taxFee)
 	k.SetServiceFeeTaxPool(ctx, taxPool)
 
-	incomingFee := coins.Minus(taxFee)
+	incomingFee, hasNeg := coins.SafeMinus(taxFee)
+	if hasNeg {
+		errMsg := fmt.Sprintf("%s < %s", coins, taxFee)
+		return sdk.ErrInsufficientFunds(errMsg)
+	}
 	if !incomingFee.IsNotNegative() {
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", incomingFee, taxFee))
 	}

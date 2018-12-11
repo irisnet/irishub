@@ -25,5 +25,4 @@ var (
 	Provider  = "provider"
 	Consumer  = "consumer"
 	RequestID = "request-id"
-
 )
