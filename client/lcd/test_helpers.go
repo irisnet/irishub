@@ -286,7 +286,16 @@ func startTM(
 //
 // NOTE: This causes the thread to block.
 func startLCD(logger log.Logger, listenAddr string, cdc *codec.Codec) (net.Listener, error) {
-	return tmrpc.StartHTTPServer(listenAddr, createHandler(cdc), logger, tmrpc.Config{})
+	listener, err := tmrpc.Listen(listenAddr, tmrpc.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	err = tmrpc.StartHTTPServer(listener, createHandler(cdc), logger)
+	if err != nil {
+		return nil, err
+	}
+	return listener, nil
 }
 
 // Request makes a test LCD test request. It returns a response object and a

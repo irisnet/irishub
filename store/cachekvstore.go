@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
 )
 
 // If value is nil but deleted is false, it means the parent doesn't have the
@@ -159,14 +160,14 @@ func (ci *cacheKVStore) iterator(start, end []byte, ascending bool) Iterator {
 		parent = ci.parent.ReverseIterator(start, end)
 	}
 
-	items := ci.dirtyItems(ascending)
+	items := ci.dirtyItems(start, end, ascending)
 	cache = newMemIterator(start, end, items)
 
 	return newCacheMergeIterator(parent, cache, ascending)
 }
 
 // Constructs a slice of dirty items, to use w/ memIterator.
-func (ci *cacheKVStore) dirtyItems(ascending bool) []cmn.KVPair {
+func (ci *cacheKVStore) dirtyItems(start, end []byte, ascending bool) []cmn.KVPair {
 	items := make([]cmn.KVPair, 0, len(ci.cache))
 
 	for key, cacheValue := range ci.cache {
@@ -174,7 +175,9 @@ func (ci *cacheKVStore) dirtyItems(ascending bool) []cmn.KVPair {
 			continue
 		}
 
-		items = append(items, cmn.KVPair{Key: []byte(key), Value: cacheValue.value})
+		if dbm.IsKeyInDomain([]byte(key), start, end) {
+			items = append(items, cmn.KVPair{Key: []byte(key), Value: cacheValue.value})
+		}
 	}
 
 	sort.Slice(items, func(i, j int) bool {
