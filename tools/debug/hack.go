@@ -182,9 +182,9 @@ func MakeCodec() *codec.Codec {
 }
 
 // export the state of iris for a genesis file
-func (app *IrisApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
-	return app.Engine.GetCurrent().ExportAppStateAndValidators(ctx)
+	return app.Engine.GetCurrent().ExportAppStateAndValidators(ctx, forZeroHeight)
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
