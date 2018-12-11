@@ -10,7 +10,7 @@ import (
 	"bufio"
 	"io"
 
-	irisInit "github.com/irisnet/irishub/init"
+	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/tests"

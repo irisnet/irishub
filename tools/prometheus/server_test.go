@@ -5,7 +5,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
-	irisInit "github.com/irisnet/irishub/init"
+	irisInit "github.com/irisnet/irishub/server/init"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/shirou/gopsutil/cpu"
