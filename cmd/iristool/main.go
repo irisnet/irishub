@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	irisInit "github.com/irisnet/irishub/init"
+	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/spf13/cobra"
 	debugcmd "github.com/irisnet/irishub/tools/debug"
 	"github.com/irisnet/irishub/tools/prometheus"

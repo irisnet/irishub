@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
-	irisInit "github.com/irisnet/irishub/init"
+	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
