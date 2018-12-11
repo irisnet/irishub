@@ -4,7 +4,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/lcd"
 	_ "github.com/irisnet/irishub/client/lcd/statik"
-	irisInit "github.com/irisnet/irishub/init"
+	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
