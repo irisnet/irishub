@@ -14,7 +14,7 @@ iriscli bank account [address] [flags]
 
 ## 标志
 
-| 命令，速记   | 类型   | 是否必须 | 默认值                | 描述                                      |
+| 命令，缩写   | 类型   | 是否必须 | 默认值                | 描述                                      |
 | ------------ | ------ | -------- | --------------------- | ----------------------------------------- |
 | -h, --help   |        | 否       |                       | 打印帮助信息                              |
 | --chain-id   | String | 否       |                       | tendermint 节点网络ID                     |
@@ -27,7 +27,7 @@ iriscli bank account [address] [flags]
 
 ## 全局标志
 
-| 命令，速记            | 默认值         | 描述                                | 是否必须 |
+| 命令，缩写             | 默认值         | 描述                                | 是否必须 |
 | --------------------- | -------------- | ----------------------------------- | -------- |
 | -e, --encoding string | hex            | 字符串二进制编码 (hex \|b64 \|btc ) | 否       |
 | --home string         | $HOME/.iriscli | 配置和数据存储目录                  | 否       |
@@ -87,11 +87,61 @@ Are you sure there has been a transaction involving it?
 ```
 
 
-## 扩展描述
+## 常见例子
 
-查询iris网络中的账户信息。
+查询fuxi-6000测试网中的账户信息。
+```
+iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --chain-id=fuxi-6000
+```
 
-​    
+示例输出：
+
+```
+{
+
+  "address": "faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx",
+
+  "coins": [
+
+    "50iris"
+
+  ],
+
+  "public_key": {
+
+    "type": "tendermint/PubKeySecp256k1",
+
+    "value": "AzlCwiA5Tvxwi7lMB/Hihfp2qnaks5Wrrgkg/Jy7sEkF"
+
+  },
+
+  "account_number": "0",
+
+  "sequence": "1"
+
+}
+
+```
+
+
+
+## 常见问题
+ 
+如果你的地址编码有问题，会提示以下错误： 
+
+ ```
+ iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
+ ERROR: decoding bech32 failed: checksum failed. Expected 100, got 0.
+ ```
+ 
+如果你的账户没有任何历史交易，会提示一下信息，请不要惊慌。 
+ 
+ ```
+ iriscli bank account faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7
+ ERROR: No account with address faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7 was found in the state.
+ Are you sure there has been a transaction involving it?
+ ```
+
 
 
 

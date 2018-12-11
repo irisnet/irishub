@@ -14,7 +14,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 
 ## 标志
 
-| 命令，速记       | 类型   | 是否必须 | 默认值                | 描述                                                         |
+| 命令，缩写       | 类型   | 是否必须 | 默认值                | 描述                                                         |
 | ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
 | -h, --help       |        | 否       |                       | 打印帮助                                                     |
 | --chain-id       | String | 否       |                       | tendermint 节点网络ID                                        |
@@ -50,8 +50,6 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 | --trace               |                | 出错时打印完整栈信息                | 否       |
 
 
-
-## 
 
 ## 例子
 

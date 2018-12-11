@@ -1,4 +1,4 @@
-# iriscli bank account
+# iriscli bank broadcast
 
 ## Description
 
