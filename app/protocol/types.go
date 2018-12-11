@@ -32,3 +32,4 @@ type ProtocolBase struct {
 func (pb ProtocolBase) GetDefinition() common.ProtocolDefinition {
 	return pb.Definition
 }
+

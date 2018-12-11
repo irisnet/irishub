@@ -1,8 +1,9 @@
 package protocol
 
 import (
-	"fmt"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 /*
@@ -12,30 +13,27 @@ func (pb *ProtocolBase) GetEngine() *ProtocolEngine {
 */
 type ProtocolEngine struct {
 	protocols map[uint64]Protocol
-	next      uint64
 	current   uint64
-	//	app			*app.IrisApp
+	pk        protocolKeeper.Keeper
 }
 
-func NewProtocolEngine() ProtocolEngine {
+func NewProtocolEngine(cdc *codec.Codec) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
 		0,
-		0,
+		protocolKeeper.NewKeeper(cdc,KeyProtocol),
 		//		irisApp,
 	}
 	return engine
 }
 
-func (pe *ProtocolEngine) LoadCurrentProtocol() {
+func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) {
 	//find the current version From DB( EngineKeeper?)
-	current := uint64(0)
-	next := uint64(1)
+	current := pe.pk.GetCurrentProtocolVersionByStore(kvStore)
 	p, flag := pe.protocols[current]
 	if flag == true {
 		p.Load()
 		pe.current = current
-		pe.next = next
 	}
 }
 
@@ -55,11 +53,7 @@ func (pe *ProtocolEngine) GetCurrent() Protocol {
 }
 
 func (pe *ProtocolEngine) Add(p Protocol) Protocol {
-	if pe.next != p.GetDefinition().GetVersion() {
-		panic(fmt.Errorf("The next protocol expected is %d", pe.next))
-	}
-	pe.protocols[pe.next] = p
-	pe.next++
+	pe.protocols[p.GetDefinition().GetVersion()] = p
 	return p
 }
 
@@ -71,6 +65,7 @@ func (pe *ProtocolEngine) GetByVersion(v uint64) (Protocol, bool) {
 func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		KeyMain,
+		KeyProtocol,
 		KeyAccount,
 		KeyStake,
 		KeyMint,

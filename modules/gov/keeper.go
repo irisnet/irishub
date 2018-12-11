@@ -24,6 +24,7 @@ type Keeper struct {
 	ck bank.Keeper
 
 	dk distribution.Keeper
+
 	gk guardian.Keeper
 	// The ValidatorSet to get information about validators
 	vs sdk.ValidatorSet

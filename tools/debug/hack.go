@@ -145,21 +145,22 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine()
-
-	protocol0 := v0.NewProtocolVersion0(cdc)
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
-
-	engine.LoadCurrentProtocol()
-	app.SetProtocolEngine(engine)
+	engine := protocol.NewProtocolEngine(cdc)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 	err := app.LoadLatestVersion(engine.GetKeyMain())
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+
+	protocol0 := v0.NewProtocolVersion0(cdc)
+	engine.Add(protocol0)
+	//	protocol1 := protocol.NewProtocolVersion1(cdc)
+	//	Engine.Add(&protocol1)
+
+	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+	app.SetProtocolEngine(&engine)
+
 	return app
 }
 

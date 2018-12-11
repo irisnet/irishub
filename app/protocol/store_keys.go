@@ -4,6 +4,7 @@ import sdk "github.com/irisnet/irishub/types"
 
 var (
 	KeyMain          = sdk.NewKVStoreKey("main")
+	KeyProtocol      = sdk.NewKVStoreKey("protocol")
 	KeyAccount       = sdk.NewKVStoreKey("acc")
 	KeyStake         = sdk.NewKVStoreKey("stake")
 	TkeyStake        = sdk.NewTransientStoreKey("transient_stake")
@@ -19,4 +20,5 @@ var (
 	//keyUpgrade       = sdk.NewKVStoreKey("upgrade")
 	KeyService  = sdk.NewKVStoreKey("service")
 	KeyGuardian = sdk.NewKVStoreKey("guardian")
+
 )

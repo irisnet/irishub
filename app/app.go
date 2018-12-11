@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
@@ -28,6 +27,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 const (
@@ -60,15 +60,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine()
-
-	protocol0 := v0.NewProtocolVersion0(cdc)
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
-
-	engine.LoadCurrentProtocol()
-	app.SetProtocolEngine(engine)
+	engine := protocol.NewProtocolEngine(cdc)
+	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 
@@ -84,6 +77,13 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+
+	protocol0 := v0.NewProtocolVersion0(cdc)
+	engine.Add(protocol0)
+	//	protocol1 := protocol.NewProtocolVersion1(cdc)
+	//	Engine.Add(&protocol1)
+	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+
 	return app
 }
 

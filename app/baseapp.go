@@ -48,7 +48,7 @@ type BaseApp struct {
 	name   string               // application name from abci.Info
 	db     dbm.DB               // common DB backend
 	cms    sdk.CommitMultiStore // Main (uncached) state
-	Engine protocol.ProtocolEngine
+	Engine *protocol.ProtocolEngine
 
 	txDecoder sdk.TxDecoder // unmarshal []byte into sdk.Tx
 
