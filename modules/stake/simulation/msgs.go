@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"

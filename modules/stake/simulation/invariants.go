@@ -9,7 +9,7 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/irisnet/irishub/modules/stake/types"

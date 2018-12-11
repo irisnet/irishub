@@ -1,19 +1,17 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
-	"encoding/json"
-
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +33,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			////////////////////  iris end  /////////////////////////////
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
@@ -67,6 +65,28 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			////////////////////  iris end  /////////////////////////////
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
+			if proposalType == gov.ProposalTypeTxTaxUsage {
+				usageStr := viper.GetString(flagUsage)
+				usage, err := gov.UsageTypeFromString(usageStr)
+				if err != nil {
+					return err
+				}
+				var destAddr sdk.AccAddress
+				if usage.String() != "Burn" {
+					destAddrStr := viper.GetString(flagDestAddress)
+					destAddr, err = sdk.AccAddressFromBech32(destAddrStr)
+					if err != nil {
+						return err
+					}
+				}
+				percentStr := viper.GetString(flagPercent)
+				percent, err := sdk.NewDecFromStr(percentStr)
+				if err != nil {
+					return err
+				}
+				taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, usage, destAddr, percent)
+				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
+			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -81,6 +101,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
 	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
+	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
+	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
+	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
 	////////////////////  iris end  /////////////////////////////
 	return cmd
 }
@@ -119,7 +142,7 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
@@ -165,7 +188,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 

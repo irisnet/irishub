@@ -1,7 +1,9 @@
 package v0
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
@@ -18,11 +20,12 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/newapp/protocol"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"sort"
 	"time"
 )
@@ -37,7 +40,7 @@ type ProtocolVersion0 struct {
 	accountMapper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	bankKeeper          bank.Keeper
-	stakeKeeper         stake.Keeper
+	StakeKeeper         stake.Keeper
 	slashingKeeper      slashing.Keeper
 	mintKeeper          mint.Keeper
 	distrKeeper         distr.Keeper
@@ -104,11 +107,16 @@ func (p *ProtocolVersion0) configKeepers() {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
-		protocol.KeyAccount,            // target store
+		protocol.KeyAccount,   // target store
 		auth.ProtoBaseAccount, // prototype
 	)
 
 	// add handlers
+	p.guardianKeeper = guardian.NewKeeper(
+		p.cdc,
+		protocol.KeyGuardian,
+		guardian.DefaultCodespace,
+	)
 	p.bankKeeper = bank.NewBaseKeeper(p.accountMapper)
 	p.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
 		p.cdc,
@@ -145,7 +153,10 @@ func (p *ProtocolVersion0) configKeepers() {
 	p.govKeeper = gov.NewKeeper(
 		p.cdc,
 		protocol.KeyGov,
-		p.bankKeeper, &stakeKeeper,
+		p.distrKeeper,
+		p.bankKeeper,
+		p.guardianKeeper,
+		&stakeKeeper,
 		gov.DefaultCodespace,
 	)
 
@@ -161,16 +172,11 @@ func (p *ProtocolVersion0) configKeepers() {
 		p.guardianKeeper,
 		service.DefaultCodespace,
 	)
-	p.guardianKeeper = guardian.NewKeeper(
-		p.cdc,
-		protocol.KeyGuardian,
-		guardian.DefaultCodespace,
-	)
 
 	// register the staking hooks
-	// NOTE: stakeKeeper above are passed by reference,
+	// NOTE: StakeKeeper above are passed by reference,
 	// so that it can be modified like below:
-	p.stakeKeeper = *stakeKeeper.SetHooks(
+	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 	p.feeManager = auth.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
 
@@ -180,7 +186,7 @@ func (p *ProtocolVersion0) configKeepers() {
 func (p *ProtocolVersion0) configRouters() {
 	p.router.
 		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
-		AddRoute("stake", stake.NewHandler(p.stakeKeeper)).
+		AddRoute("stake", stake.NewHandler(p.StakeKeeper)).
 		AddRoute("slashing", slashing.NewHandler(p.slashingKeeper)).
 		AddRoute("distr", distr.NewHandler(p.distrKeeper)).
 		AddRoute("gov", gov.NewHandler(p.govKeeper)).
@@ -260,7 +266,7 @@ func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBl
 // application updates every end block
 func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, p.govKeeper)
-	validatorUpdates := stake.EndBlocker(ctx, p.stakeKeeper)
+	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
@@ -295,7 +301,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	//upgrade.InitGenesis(ctx, p.upgradeKeeper, p.Router(), genesisState.UpgradeData)
 
 	// load the initial stake information
-	validators, err := stake.InitGenesis(ctx, p.stakeKeeper, genesisState.StakeData)
+	validators, err := stake.InitGenesis(ctx, p.StakeKeeper, genesisState.StakeData)
 	if err != nil {
 		panic(err)
 	}
@@ -330,7 +336,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 			}
 		}
 
-		validators = p.stakeKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+		validators = p.StakeKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	}
 
 	// sanity check
@@ -355,6 +361,52 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}
+}
+
+// export the state of iris for a genesis file
+func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+
+	// iterate to get the accounts
+	accounts := []GenesisAccount{}
+	appendAccount := func(acc auth.Account) (stop bool) {
+		account := NewGenesisAccountI(acc)
+		accounts = append(accounts, account)
+		return false
+	}
+	p.accountMapper.IterateAccounts(ctx, appendAccount)
+	fileAccounts := []GenesisFileAccount{}
+	for _, acc := range accounts {
+		var coinsString []string
+		for _, coin := range acc.Coins {
+			coinsString = append(coinsString, coin.String())
+		}
+		fileAccounts = append(fileAccounts,
+			GenesisFileAccount{
+				Address:       acc.Address,
+				Coins:         coinsString,
+				Sequence:      acc.Sequence,
+				AccountNumber: acc.AccountNumber,
+			})
+	}
+	genState := NewGenesisFileState(
+		fileAccounts,
+		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
+		stake.ExportGenesis(ctx, p.StakeKeeper),
+		mint.ExportGenesis(ctx, p.mintKeeper),
+		distr.ExportGenesis(ctx, p.distrKeeper),
+		gov.ExportGenesis(ctx, p.govKeeper),
+		upgrade.WriteGenesis(ctx),
+		service.ExportGenesis(ctx, p.serviceKeeper),
+		arbitration.ExportGenesis(ctx),
+		guardian.ExportGenesis(ctx, p.guardianKeeper),
+		slashing.ExportGenesis(ctx, p.slashingKeeper),
+	)
+	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
+	if err != nil {
+		return nil, nil, err
+	}
+	validators = stake.WriteValidators(ctx, p.StakeKeeper)
+	return appState, validators, nil
 }
 
 func (p *ProtocolVersion0) GetRouter() protocol.Router {

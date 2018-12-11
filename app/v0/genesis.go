@@ -80,8 +80,8 @@ func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stak
 type GenesisAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         sdk.Coins      `json:"coins"`
-	Sequence      int64          `json:"sequence_number"`
-	AccountNumber int64          `json:"account_number"`
+	Sequence      uint64         `json:"sequence_number"`
+	AccountNumber uint64         `json:"account_number"`
 }
 
 func NewGenesisAccount(acc *auth.BaseAccount) GenesisAccount {
@@ -405,8 +405,8 @@ type GenesisFileState struct {
 type GenesisFileAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         []string       `json:"coins"`
-	Sequence      int64          `json:"sequence_number"`
-	AccountNumber int64          `json:"account_number"`
+	Sequence      uint64         `json:"sequence_number"`
+	AccountNumber uint64         `json:"account_number"`
 }
 
 func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {

@@ -8,15 +8,12 @@ import (
 	"strings"
 	"testing"
 	"time"
-
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-
-	sdk "github.com/irisnet/irishub/types"
-
-	"github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/modules/mock"
 	"math/big"
+	"github.com/irisnet/irishub/modules/mock"
+	bam "github.com/irisnet/irishub/modules/mock/baseapp"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -112,7 +109,7 @@ func addLogMessage(testingmode bool, blockLogBuilders []*strings.Builder, height
 }
 
 // assertAllInvariants asserts a list of provided invariants against application state
-func assertAllInvariants(t *testing.T, app *baseapp.BaseApp,
+func assertAllInvariants(t *testing.T, app *bam.BaseApp,
 	invariants []Invariant, where string, displayLogs func()) {
 
 	for i := 0; i < len(invariants); i++ {

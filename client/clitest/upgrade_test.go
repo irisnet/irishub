@@ -8,11 +8,11 @@ import (
 	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/app"
 	//sdk "github.com/irisnet/irishub/types"
 	"sync"
 
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 var (
@@ -53,7 +53,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	spStr += fmt.Sprintf(" --description=%s", "test")
 	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, spStr, app.DefaultKeyPass)
+	executeWrite(t, spStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -66,7 +66,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	voteStr += fmt.Sprintf(" --option=%s", "Yes")
 	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, voteStr, app.DefaultKeyPass)
+	executeWrite(t, voteStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	votes := executeGetVotes(t, fmt.Sprintf("iriscli gov query-votes --proposal-id=1 --output=json %v", flags))
@@ -103,7 +103,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, switchStr, app.DefaultKeyPass)
+	executeWrite(t, switchStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
@@ -136,7 +136,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	spStr += fmt.Sprintf(" --description=%s", "test")
 	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, spStr, app.DefaultKeyPass)
+	executeWrite(t, spStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	proposal2 := executeGetProposal(t, fmt.Sprintf("iriscli1 gov query-proposal --proposal-id=2 --output=json %v", flags))
@@ -151,7 +151,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	voteStr += fmt.Sprintf(" --option=%s", "Yes")
 	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, voteStr, app.DefaultKeyPass)
+	executeWrite(t, voteStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	votes = executeGetVotes(t, fmt.Sprintf("iriscli1 gov query-votes --proposal-id=2 --output=json %v", flags))
@@ -188,7 +188,7 @@ func TestIrisCLISoftwareUpgrade(t *testing.T) {
 	switchStr += fmt.Sprintf(" --title=%s", "Upgrade")
 	switchStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, switchStr, app.DefaultKeyPass)
+	executeWrite(t, switchStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// check switch msg
@@ -221,9 +221,9 @@ func startOldNodeBToReplay(t *testing.T, chainID string) {
 	require.True(t, iriscliBHome != iriscliHome)
 
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisBHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliBHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliBHome), v0.DefaultKeyPass)
 	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisBHome))
 
 	err := setupGenesisAndConfig(irisHome, irisBHome)
@@ -257,9 +257,9 @@ func startNodeBToReplay(t *testing.T, chainID string) {
 	require.True(t, iriscliBHome != iriscliHome)
 
 	tests.ExecuteT(t, fmt.Sprintf("iris2-bugfix --home=%s unsafe-reset-all", irisBHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s bar", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys add --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s foo", iriscliBHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys delete --home=%s bar", iriscliBHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli2-bugfix keys add --home=%s foo", iriscliBHome), v0.DefaultKeyPass)
 	executeInit(t, fmt.Sprintf("iris2-bugfix init -o --moniker=foo --home=%s", irisBHome))
 
 	err := setupGenesisAndConfig(irisHome, irisBHome)
@@ -320,8 +320,8 @@ func irisStartNodeB(t *testing.T, chainID string) {
 	require.True(t, iriscliBHome != iriscliHome)
 
 	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisBHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), app.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliBHome), app.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliBHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliBHome), v0.DefaultKeyPass)
 	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisBHome))
 	err := setupGenesisAndConfig(irisHome, irisBHome)
 	require.NoError(t, err)

@@ -1,16 +1,16 @@
 package cli
 
 import (
-	"os"
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/spf13/cobra"
+	"os"
+
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
-	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
@@ -21,7 +21,7 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 			"--profiler-address=<added address> --profiler-name=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 			fromAddr, err := cliCtx.GetFromAddress()

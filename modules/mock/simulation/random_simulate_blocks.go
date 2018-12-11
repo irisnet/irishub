@@ -18,11 +18,11 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/irisnet/irishub/baseapp"
+	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 )
 
 // Simulate tests application by sending random messages.
-func Simulate(t *testing.T, app *baseapp.BaseApp,
+func Simulate(t *testing.T, app *bam.BaseApp,
 	appStateFn func(r *rand.Rand, accs []Account) json.RawMessage,
 	ops []WeightedOperation, setups []RandSetup,
 	invariants []Invariant, numBlocks int, blockSize int, commit bool) error {
@@ -31,7 +31,7 @@ func Simulate(t *testing.T, app *baseapp.BaseApp,
 	return SimulateFromSeed(t, app, appStateFn, time, ops, setups, invariants, numBlocks, blockSize, commit)
 }
 
-func initChain(r *rand.Rand, params Params, accounts []Account, setups []RandSetup, app *baseapp.BaseApp,
+func initChain(r *rand.Rand, params Params, accounts []Account, setups []RandSetup, app *bam.BaseApp,
 	appStateFn func(r *rand.Rand, accounts []Account) json.RawMessage) (validators map[string]mockValidator) {
 	res := app.InitChain(abci.RequestInitChain{AppStateBytes: appStateFn(r, accounts)})
 	validators = make(map[string]mockValidator)
@@ -58,7 +58,7 @@ func randTimestamp(r *rand.Rand) time.Time {
 
 // SimulateFromSeed tests an application by running the provided
 // operations, testing the provided invariants, but using the provided seed.
-func SimulateFromSeed(tb testing.TB, app *baseapp.BaseApp,
+func SimulateFromSeed(tb testing.TB, app *bam.BaseApp,
 	appStateFn func(r *rand.Rand, accs []Account) json.RawMessage,
 	seed int64, ops []WeightedOperation, setups []RandSetup, invariants []Invariant,
 	numBlocks int, blockSize int, commit bool) (simError error) {
@@ -202,7 +202,7 @@ func SimulateFromSeed(tb testing.TB, app *baseapp.BaseApp,
 }
 
 type blockSimFn func(
-	r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
+	r *rand.Rand, app *bam.BaseApp, ctx sdk.Context,
 	accounts []Account, header abci.Header, logWriter func(string),
 ) (opCount int)
 
@@ -234,7 +234,7 @@ func createBlockSimulator(testingMode bool, tb testing.TB, t *testing.T, params 
 		return ops[0].Op
 	}
 
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
+	return func(r *rand.Rand, app *bam.BaseApp, ctx sdk.Context,
 		accounts []Account, header abci.Header, logWriter func(string)) (opCount int) {
 		fmt.Printf("\rSimulating... block %d/%d, operation %d/%d. ", header.Height, totalNumBlocks, opCount, blocksize)
 		lastBlocksizeState, blocksize = getBlockSize(r, params, lastBlocksizeState, avgBlockSize)
@@ -315,7 +315,7 @@ func queueOperations(queuedOperations map[int][]Operation, queuedTimeOperations 
 }
 
 // nolint: errcheck
-func runQueuedOperations(queueOperations map[int][]Operation, height int, tb testing.TB, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
+func runQueuedOperations(queueOperations map[int][]Operation, height int, tb testing.TB, r *rand.Rand, app *bam.BaseApp, ctx sdk.Context,
 	accounts []Account, logWriter func(string), displayLogs func(), event func(string)) (numOpsRan int) {
 	if queuedOps, ok := queueOperations[height]; ok {
 		numOps := len(queuedOps)
@@ -336,7 +336,7 @@ func runQueuedOperations(queueOperations map[int][]Operation, height int, tb tes
 	return 0
 }
 
-func runQueuedTimeOperations(queueOperations []FutureOperation, currentTime time.Time, tb testing.TB, r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
+func runQueuedTimeOperations(queueOperations []FutureOperation, currentTime time.Time, tb testing.TB, r *rand.Rand, app *bam.BaseApp, ctx sdk.Context,
 	accounts []Account, logWriter func(string), displayLogs func(), event func(string)) (numOpsRan int) {
 
 	numOpsRan = 0

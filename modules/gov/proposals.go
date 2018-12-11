@@ -47,7 +47,7 @@ type Proposal interface {
 	SetVotingEndTime(time.Time)
 	////////////////////  iris begin  ///////////////////////////
 	Execute(ctx sdk.Context, k Keeper) error
-////////////////////  iris end  ///////////////////////////
+	////////////////////  iris end  ///////////////////////////
 }
 
 // checks if two proposals are equal
@@ -121,7 +121,8 @@ func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 }
 
 ////////////////////  iris begin  ///////////////////////////
-func (pp *TextProposal) Execute(ctx sdk.Context, k Keeper) (err error) {return nil}
+func (pp *TextProposal) Execute(ctx sdk.Context, k Keeper) (err error) { return nil }
+
 ////////////////////  iris end  /////////////////////////////
 
 //-----------------------------------------------------------
@@ -141,7 +142,8 @@ const (
 	ProposalTypeParameterChange ProposalKind = 0x02
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x03
 	////////////////////  iris begin  /////////////////////////////
-	ProposalTypeTerminator      ProposalKind = 0x04
+	ProposalTypeSoftwareHalt ProposalKind = 0x04
+	ProposalTypeTxTaxUsage   ProposalKind = 0x05
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -155,8 +157,10 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
 		////////////////////  iris begin  /////////////////////////////
-	case "Terminator":
-		return ProposalTypeTerminator, nil
+	case "SoftwareHalt":
+		return ProposalTypeSoftwareHalt, nil
+	case "TxTaxUsage":
+		return ProposalTypeTxTaxUsage, nil
 		////////////////////  iris end  /////////////////////////////
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
@@ -169,8 +173,9 @@ func validProposalType(pt ProposalKind) bool {
 		pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
 	////////////////////  iris begin  /////////////////////////////
-		pt == ProposalTypeTerminator  {
-	////////////////////  iris end  /////////////////////////////
+		pt == ProposalTypeSoftwareHalt ||
+		pt == ProposalTypeTxTaxUsage {
+		////////////////////  iris end  /////////////////////////////
 		return true
 	}
 	return false
@@ -218,8 +223,10 @@ func (pt ProposalKind) String() string {
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
 		////////////////////  iris begin  /////////////////////////////
-	case ProposalTypeTerminator:
-		return "Terminator"
+	case ProposalTypeSoftwareHalt:
+		return "SoftwareHalt"
+	case ProposalTypeTxTaxUsage:
+		return "TxTaxUsage"
 		////////////////////  iris end  /////////////////////////////
 	default:
 		return ""
@@ -363,8 +370,8 @@ func EmptyTallyResult() TallyResult {
 
 // checks if two proposals are equal
 func (resultA TallyResult) Equals(resultB TallyResult) bool {
-	return (resultA.Yes.Equal(resultB.Yes) &&
+	return resultA.Yes.Equal(resultB.Yes) &&
 		resultA.Abstain.Equal(resultB.Abstain) &&
 		resultA.No.Equal(resultB.No) &&
-		resultA.NoWithVeto.Equal(resultB.NoWithVeto))
+		resultA.NoWithVeto.Equal(resultB.NoWithVeto)
 }

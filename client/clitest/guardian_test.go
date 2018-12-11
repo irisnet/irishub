@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/tests"
-	"github.com/irisnet/irishub/app"
 	"github.com/stretchr/testify/require"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 func TestIrisCLIAddProfiler(t *testing.T) {
@@ -27,7 +27,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	scStr += fmt.Sprintf(" --profiler-name=%s", "bar")
 	scStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	scStr += fmt.Sprintf(" --from=%s", "foo")
-	executeWrite(t, scStr, app.DefaultKeyPass)
+	executeWrite(t, scStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 	profilers = executeGetProfilers(t, fmt.Sprintf("iriscli guardian profilers %v", flags))
 	for _, profiler := range profilers {

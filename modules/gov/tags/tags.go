@@ -20,6 +20,9 @@ var (
 	Depositor         = "depositor"
 	Voter             = "voter"
 	////////////////////  iris begin  ///////////////////////////
-	Param             = "param"
+	Param       = "param"
+	Usage       = "usage"
+	Percent     = "percent"
+	DestAddress = "dest-address"
 	////////////////////  iris end  /////////////////////////////
 )

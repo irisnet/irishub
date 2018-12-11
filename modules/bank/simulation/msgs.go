@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/modules/mock/baseapp"
 )
 
 // SingleInputSendTx tests and runs a single msg send w/ auth, with one input and one output, where both

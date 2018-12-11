@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"testing"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/app/v0"
 )
 
 func TestIrisCLIParameterChangeProposal(t *testing.T) {
@@ -40,7 +40,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	spStr += fmt.Sprintf(" --param=%s", "{\"key\":\"Gov/govDepositProcedure\",\"value\":\"{\\\"min_deposit\\\":[{\\\"denom\\\":\\\"iris-atto\\\",\\\"amount\\\":\\\"10000000000000000000\\\"}],\\\"max_deposit_period\\\":30000000000}\",\"op\":\"update\"}")
 
-	executeWrite(t, spStr, app.DefaultKeyPass)
+	executeWrite(t, spStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -61,7 +61,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	voteStr += fmt.Sprintf(" --option=%s", "Yes")
 	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, voteStr, app.DefaultKeyPass)
+	executeWrite(t, voteStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	vote := executeGetVote(t, fmt.Sprintf("iriscli gov query-vote --proposal-id=1 --voter=%s --output=json %v", fooAddr, flags))

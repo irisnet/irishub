@@ -5,13 +5,13 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-var _ Proposal = (*TerminatorProposal)(nil)
+var _ Proposal = (*HaltProposal)(nil)
 
-type TerminatorProposal struct {
+type HaltProposal struct {
 	TextProposal
 }
 
-func (sp *TerminatorProposal) Execute(ctx sdk.Context, k Keeper) error {
+func (sp *HaltProposal) Execute(ctx sdk.Context, k Keeper) error {
 	logger := ctx.Logger().With("module", "x/gov")
 
 	if k.GetTerminatorHeight(ctx) == -1 {

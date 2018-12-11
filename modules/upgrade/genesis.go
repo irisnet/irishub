@@ -1,8 +1,8 @@
 package upgrade
 
 import (
-	bam "github.com/irisnet/irishub/baseapp"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/app/protocol"
 	"fmt"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/irisnet/irishub/modules/params"
@@ -14,7 +14,7 @@ type GenesisState struct {
 }
 
 // InitGenesis - build the genesis version For first Version
-func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState) {
+func InitGenesis(ctx sdk.Context, k Keeper, router protocol.Router, data GenesisState) {
 
 	RegisterModuleList(router)
 
@@ -36,7 +36,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState
 
 
 // WriteGenesis - output genesis parameters
-func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func WriteGenesis(ctx sdk.Context) GenesisState {
 
 	return GenesisState{
 		SwitchPeriod: upgradeparams.GetSwitchPeriod(ctx),
