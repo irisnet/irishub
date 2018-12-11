@@ -4,20 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/slashing"
 	stake "github.com/irisnet/irishub/modules/stake"
-	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/app/protocol"
+	sdk "github.com/irisnet/irishub/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // export the state of gaia for a genesis file
