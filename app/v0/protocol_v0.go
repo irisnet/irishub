@@ -191,7 +191,8 @@ func (p *ProtocolVersion0) configRouters() {
 		AddRoute("service", service.NewHandler(p.serviceKeeper)).
 		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
 	p.queryRouter.
-		AddRoute("gov", gov.NewQuerier(p.govKeeper))
+		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
+		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc))
 }
 
 // configure all Stores
