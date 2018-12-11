@@ -73,12 +73,12 @@ After that, you will get the detail info for the account.
 ### Common Issue
 
 
-If you query an wrong account, you will get the fellow information.
+If you query an wrong account, you will get the follow information.
 ```
 iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
 ERROR: decoding bech32 failed: checksum failed. Expected 100, got 0.
 ```
-If you query an empty account, you will get the fellow error. But don't panic when you see the following error. 
+If you query an empty account, you will get the follow error. But don't panic when you see the following error. 
 ```
 iriscli bank account faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7
 ERROR: No account with address faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7 was found in the state.
