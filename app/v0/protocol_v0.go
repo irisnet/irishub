@@ -1,7 +1,6 @@
 package v0
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
@@ -20,12 +19,10 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 	"sort"
 	"time"
 )
@@ -194,7 +191,8 @@ func (p *ProtocolVersion0) configRouters() {
 		AddRoute("service", service.NewHandler(p.serviceKeeper)).
 		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
 	p.queryRouter.
-		AddRoute("gov", gov.NewQuerier(p.govKeeper))
+		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
+		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc))
 }
 
 // configure all Stores
@@ -361,52 +359,6 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}
-}
-
-// export the state of iris for a genesis file
-func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
-
-	// iterate to get the accounts
-	accounts := []GenesisAccount{}
-	appendAccount := func(acc auth.Account) (stop bool) {
-		account := NewGenesisAccountI(acc)
-		accounts = append(accounts, account)
-		return false
-	}
-	p.accountMapper.IterateAccounts(ctx, appendAccount)
-	fileAccounts := []GenesisFileAccount{}
-	for _, acc := range accounts {
-		var coinsString []string
-		for _, coin := range acc.Coins {
-			coinsString = append(coinsString, coin.String())
-		}
-		fileAccounts = append(fileAccounts,
-			GenesisFileAccount{
-				Address:       acc.Address,
-				Coins:         coinsString,
-				Sequence:      acc.Sequence,
-				AccountNumber: acc.AccountNumber,
-			})
-	}
-	genState := NewGenesisFileState(
-		fileAccounts,
-		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
-		stake.ExportGenesis(ctx, p.StakeKeeper),
-		mint.ExportGenesis(ctx, p.mintKeeper),
-		distr.ExportGenesis(ctx, p.distrKeeper),
-		gov.ExportGenesis(ctx, p.govKeeper),
-		upgrade.WriteGenesis(ctx),
-		service.ExportGenesis(ctx, p.serviceKeeper),
-		arbitration.ExportGenesis(ctx),
-		guardian.ExportGenesis(ctx, p.guardianKeeper),
-		slashing.ExportGenesis(ctx, p.slashingKeeper),
-	)
-	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
-	if err != nil {
-		return nil, nil, err
-	}
-	validators = stake.WriteValidators(ctx, p.StakeKeeper)
-	return appState, validators, nil
 }
 
 func (p *ProtocolVersion0) GetRouter() protocol.Router {

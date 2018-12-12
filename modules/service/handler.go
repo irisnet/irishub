@@ -138,6 +138,12 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return ErrMethodNotExists(k.Codespace(), msg.MethodID).Result()
 	}
 
+	if msg.Profiling {
+		if _, found := k.gk.GetProfiler(ctx, msg.Consumer); !found {
+			return ErrNotProfiler(k.Codespace(), msg.Consumer).Result()
+		}
+	}
+
 	//Method id start at 1
 	if len(bind.Prices) >= int(msg.MethodID) && !msg.ServiceFee.IsAllGTE(sdk.Coins{bind.Prices[msg.MethodID-1]}) {
 		return ErrLtServiceFee(k.Codespace(), sdk.Coins{bind.Prices[msg.MethodID-1]}).Result()
@@ -145,8 +151,8 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 
 	request := NewSvcRequest(msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID, msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
 
-	// request service fee is equal to service binding service fee
-	if len(bind.Prices) >= int(msg.MethodID) {
+	// request service fee is equal to service binding service fee if not profiling
+	if len(bind.Prices) >= int(msg.MethodID) && !msg.Profiling {
 		request.ServiceFee = sdk.Coins{bind.Prices[msg.MethodID-1]}
 	} else {
 		request.ServiceFee = nil
@@ -199,6 +205,9 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcRespond,
+		tags.RequestID, []byte(request.RequestID()),
+		tags.Consumer, []byte(response.Consumer.String()),
+		tags.Provider, []byte(response.Provider.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,
@@ -237,7 +246,11 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
 	}
 	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
-	newTaxPool := oldTaxPool.Minus(msg.Amount)
+	newTaxPool, hasNeg := oldTaxPool.SafeMinus(msg.Amount)
+	if hasNeg {
+		errMsg := fmt.Sprintf("%s < %s", oldTaxPool, msg.Amount)
+		return sdk.ErrInsufficientFunds(errMsg).Result()
+	}
 	if !newTaxPool.IsNotNegative() {
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", oldTaxPool, msg.Amount)).Result()
 	}
@@ -249,7 +262,6 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	k.SetServiceFeeTaxPool(ctx, newTaxPool)
 	resTags := sdk.NewTags(
 		tags.Action, tags.ActionSvcWithdrawTax,
-		tags.Provider, []byte(msg.DestAddress.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,

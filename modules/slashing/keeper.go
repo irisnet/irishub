@@ -96,7 +96,7 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 		panic(fmt.Sprintf("Expected signing info for validator %s but not found", consAddr))
 	}
 	signInfo.JailedUntil = time.Add(k.DoubleSignUnbondDuration(ctx))
-	k.setValidatorSigningInfo(ctx, consAddr, signInfo)
+	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
 	return
 }
 
@@ -170,7 +170,7 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 	}
 
 	// Set the updated signing info
-	k.setValidatorSigningInfo(ctx, consAddr, signInfo)
+	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
 	return
 }
 
