@@ -27,7 +27,7 @@ iris tendermint show-address [flags]
 
 ## Examples
 
-### Show Public Key of Your Node
+### Show Address of Your Node
 
 ```shell
 iris tendermint show-address --home={iris-home}
