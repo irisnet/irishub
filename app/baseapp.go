@@ -180,7 +180,7 @@ func (app *BaseApp) initFromMainStore(mainKey *sdk.KVStoreKey) error {
 	// load consensus params from the main store
 	consensusParamsBz := mainStore.Get(mainConsensusParamsKey)
 	if consensusParamsBz != nil {
-		var consensusParams= &abci.ConsensusParams{}
+		var consensusParams = &abci.ConsensusParams{}
 		err := proto.Unmarshal(consensusParamsBz, consensusParams)
 		if err != nil {
 			panic(err)
@@ -188,7 +188,9 @@ func (app *BaseApp) initFromMainStore(mainKey *sdk.KVStoreKey) error {
 		app.setConsensusParams(consensusParams)
 	} else {
 		// It will get saved later during InitChain.
-		// TODO assert that InitChain hasn't yet been called.
+		if app.LastBlockHeight() != 0 {
+			panic(errors.New("consensus params is empty"))
+		}
 	}
 
 	// Needed for `iris export`, which inits from store but never calls initchain
