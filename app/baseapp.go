@@ -177,12 +177,6 @@ func (app *BaseApp) initFromMainStore(mainKey *sdk.KVStoreKey) error {
 		return errors.New("baseapp expects MultiStore with 'main' KVStore")
 	}
 
-	// memoize mainKey
-	if protocol.KeyMain != nil {
-		panic("protocol.mainKey expected to be nil; duplicate init?")
-	}
-	protocol.KeyMain = mainKey
-
 	// load consensus params from the main store
 	consensusParamsBz := mainStore.Get(mainConsensusParamsKey)
 	if consensusParamsBz != nil {
@@ -515,36 +509,6 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	// Decode the Tx.
 	var result sdk.Result
-
-	////////////////////  iris/cosmos-sdk begin ///////////////////////////
-
-	upgradeKey := sdk.NewKVStoreKey("upgrade")
-	store := app.cms.GetStore(upgradeKey)
-
-	if store != nil {
-		kvStore, ok := store.(sdk.KVStore)
-		if ok {
-			bz := kvStore.Get([]byte("d"))
-			if len(bz) == 1 && bz[0] == byte(1) {
-				result = sdk.NewError(sdk.CodespaceUndefined, sdk.CodeOutOfService, "").Result()
-
-				return abci.ResponseCheckTx{
-					Code:      uint32(result.Code),
-					Codespace: string(result.Codespace),
-					Data:      result.Data,
-					Log:       result.Log,
-					GasWanted: int64(result.GasWanted),
-					GasUsed:   int64(result.GasUsed),
-					Tags:      result.Tags,
-				}
-			}
-		}
-	}
-
-	////////////////////  iris/cosmos-sdk end ///////////////////////////
-
-	// Decode the Tx.
-
 	var tx, err = app.txDecoder(txBytes)
 	if err != nil {
 		result = err.Result()
