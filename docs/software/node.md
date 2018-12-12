@@ -36,9 +36,18 @@ This commond will generate the transaction in the directory：{path_to_your_home
 
 ### Config genesis
 
-Manually modify the genesis.json file to assign the initial account balance to the above validator operator account, such as: 150 iris
+Use the following command to modify the genesis.json file to assign the initial account balance to the above validator operator account, such as: 150 iris
+```$xslt
+
+iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
+
+```
+
+Then you could see the account info has been added to genesis.json.
+
 ```json
-    "accounts": [
+    {
+    "accounts":[
       {
         "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
         "coins": [
@@ -47,7 +56,8 @@ Manually modify the genesis.json file to assign the initial account balance to t
         "sequence_number": "0",
         "account_number": "0"
       }
-    ],
+    ]
+    }
 ```
 
 Configuring validator information

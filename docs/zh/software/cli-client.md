@@ -4,6 +4,8 @@
 
 iriscli是参与IRISnet网络的客户端。IRISnet的用户都可以通过iriscli来发送各种不同的交易或者进行各种查询。
 
+有关`iriscli`的子命令的具体介绍在这个目录下：[cli-client](../cli-client)
+
 ## iriscli目录
 
 iriscli客户端的默认目录是`$HOME/.iriscli`，主要用来保存配置文件和数据。 IRISnet `key` 的数据就保存在iriscli的HOME目录下。也可以通过`--home`来指定客户端的HOME目录。

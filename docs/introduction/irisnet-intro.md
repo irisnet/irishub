@@ -18,11 +18,11 @@ Client-facing, programming language specific SDKs will also be available to make
 
 The IRIS hub has its own native token known as *IRIS*.  It is designed to serve three purposes in the network.
 
-* **Staking.**  Similar to the ATOM token in the Cosmos Hub, the IRIS token will be used as a staking token to secure the PoS blockchain.
+* **Staking**  Similar to the ATOM token in the Cosmos Hub, the IRIS token will be used as a staking token to secure the PoS blockchain.
 
-* **Transaction Fee.**  The IRIS token will also be used to pay fees for all transactions in the IRIS network.
+* **Transaction Fee**  The IRIS token will also be used to pay fees for all transactions in the IRIS network.
 
-* **Service Fee.**  It is required that service providers in the IRIS network charge service fees denominated in the IRIS token.
+* **Service Fee**  It is required that service providers in the IRIS network charge service fees denominated in the IRIS token.
 
 It is intended that the IRIS network will eventually support all whitelisted fee tokens from the Cosmos network, which can be used to pay the transaction fees and service fees.
 
@@ -32,11 +32,11 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 
 ## Lifecycle
 
-* **Definition.** Definition of what an off-chain iService can do in terms of an Interface Definition Language (IDL) file.
+* **Definition** Definition of what an off-chain iService can do in terms of an Interface Definition Language (IDL) file.
 
-* **Binding.** Declaration of the location (address), pricing and QoS of a provider endpoint that implements a given iService definition.
+* **Binding** Declaration of the location (address), pricing and QoS of a provider endpoint that implements a given iService definition.
 
-* **Invocation.** Handling of consumer requests to and provider responses from a given iService provider endpoint.
+* **Invocation** Handling of consumer requests to and provider responses from a given iService provider endpoint.
 
 ## Providers
 *Providers* are network users who offer the implementation of one or more iService definitions and often act as *adaptors* of off-chain services and resources located in other public and consortium chains, as well as in enterprise legacy systems.  Providers monitor and process incoming requests and send responses back to the network.  A provider could at the same time act as a consumer by sending requests to other providers.  As planned, providers would be required to charge a fee for any services they might offer, and the service fee, by default, would be priced in the IRIS token.
