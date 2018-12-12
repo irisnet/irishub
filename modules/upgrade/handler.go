@@ -3,6 +3,7 @@ package upgrade
 import (
 	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 	sdk "github.com/irisnet/irishub/types"
+	tmstate "github.com/tendermint/tendermint/state"
 )
 
 // do switch
@@ -23,6 +24,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 		}
 
 		keeper.pk.ClearUpgradeConfig(ctx)
+		tags.AppendTag(tmstate.UpgradeTagKey,[]byte("Please install the right protocol version from " + upgradeConfig.Definition.Software))
 	}
 	return tags
 }

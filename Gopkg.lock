@@ -647,8 +647,8 @@
   source = "https://github.com/irisnet/iavl.git"
 
 [[projects]]
-  branch = "irisnet/v0.27.0-dev1-iris"
-  digest = "1:0be8656e9d8eb385caa0f30b71158126b6b4294a3c8fb6f0eb5aab350bd74712"
+  branch = "jiacheng/v0.27.0-iris"
+  digest = "1:7c5994fe60694741b6877873a9df5c270a29a798e6c19b4f887fceba91d3d281"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -713,8 +713,8 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "9dd2007de1363fa77f11f71d30b59e747d2c3d99"
-  source = "https://github.com/irisnet/tendermint.git"
+  revision = "79f7453510a5c292f85e0a4c867960a820c7238f"
+  source = "https://github.com/MrXJC/tendermint.git"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
@@ -904,6 +904,7 @@
     "github.com/tendermint/iavl",
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
+    "github.com/tendermint/tendermint/blockchain",
     "github.com/tendermint/tendermint/cmd/tendermint/commands",
     "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",

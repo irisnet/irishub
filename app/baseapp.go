@@ -233,6 +233,7 @@ func (app *BaseApp) Info(req abci.RequestInfo) abci.ResponseInfo {
 	lastCommitID := app.cms.LastCommitID()
 
 	return abci.ResponseInfo{
+		AppVersion:       version.ProtocolVersion,
 		Data:             app.name,
 		LastBlockHeight:  lastCommitID.Version,
 		LastBlockAppHash: lastCommitID.Hash,
@@ -711,8 +712,8 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 	current := app.Engine.GetCurrentProtocolVersionByStore(app.GetKVStore(protocol.KeyProtocol))
 	if current != app.Engine.GetCurrent() {
 		success := app.Engine.Activate(current)
-		if !success {
-			res.Tags = sdk.Tags(res.Tags).AppendTag("",[]byte(""))
+		if success {
+			res.Tags = res.Tags[:len(res.Tags)-1]
 		}
 	}
 
