@@ -15,6 +15,7 @@ import (
 	"github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/server"
 )
 
 // ExportGenesisFile creates and writes the genesis configuration to disk. An
@@ -85,6 +86,25 @@ func InitializeNodeValidatorFiles(
 	valPubKey = ReadOrCreatePrivValidator(config.PrivValidatorFile())
 
 	return nodeID, valPubKey, nil
+}
+
+func LoadNodeValidatorFiles(
+	config *cfg.Config) (nodeID string, valPubKey crypto.PubKey, err error,
+) {
+
+	nodeKey, err := p2p.LoadNodeKey(config.NodeKeyFile())
+	if err != nil {
+		return nodeID, valPubKey, err
+	}
+
+	nodeID = string(nodeKey.ID())
+	pv, err := server.ReadPrivValidator(config.PrivValidatorFile())
+	if err != nil {
+		return nodeID, valPubKey, err
+	}
+	valPubKey = pv.GetPubKey()
+
+	return nodeID, valPubKey, err
 }
 
 func loadGenesisDoc(cdc *amino.Codec, genFile string) (genDoc types.GenesisDoc, err error) {

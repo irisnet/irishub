@@ -22,6 +22,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	tmflags "github.com/tendermint/tendermint/libs/cli/flags"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/tendermint/tendermint/privval"
 )
 
 // server context
@@ -242,4 +243,13 @@ func addrToIP(addr net.Addr) net.IP {
 		ip = v.IP
 	}
 	return ip
+}
+
+func ReadPrivValidator(privValFile string) (*privval.FilePV, error) {
+	_, err := os.Stat(privValFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return privval.LoadFilePV(privValFile), nil
 }
