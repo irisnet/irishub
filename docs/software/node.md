@@ -95,6 +95,8 @@ The home directory is the working directory of the iris node. The home directory
 
 In the iris command, you can specify the home directory of the node by using flag `--home`. If you run multiple nodes on the same machine, you need to specify a different home directory for them. If the `--home` flag is not specified in the iris command, the default value `$HOME/.iris` is used as the home directory used by this iris command.
 
+The `iris init` command is responsible for initializing the specified `--home` directory and creating the default configuration files. Except the `iris init` command, the home directory used by any other `iris` sub commands must be initialized, otherwise an error will be reported.
+
 The data of the iris node is stored in the `data` directory of the home, including blockchain data, application layer data, and index data. All configuration files are stored in the home/`config` directory:
 
 ### genesis.json
