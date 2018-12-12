@@ -2,7 +2,13 @@
 
 ## 配置
 
-### 设置软件运行的目录
+### 初始化节点
+
+通过执行以下操作完成节点的初始化：
+
+```
+iris init --moniker=<your_custom_name> --home=$IRISHOME --chain-id=<chain-id>
+```
 
 iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下，所以在运行iris前，需要指定一个目录作为\$IRISHOME。\$IRISHOME默认为：/Users/$user/.iris。
 

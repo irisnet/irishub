@@ -9,10 +9,10 @@ These instructions are for setting up a brand new full node from scratch.
 First, initialize the node and create the necessary config files:
 
 ```
-iris init --name=<your_custom_name> --home=$IRISHOME
+iris init --moniker=<your_custom_name> --home=$IRISHOME --chain-id=<chain-id>
 ```
 
-> Note: Only ASCII characters are supported for the `--name`. Using Unicode characters will render your node unreachable.
+> Note: Only ASCII characters are supported for the `--moniker`. Using Unicode characters will render your node unreachable.
 
 The default \$IRISHOME is `~/.iris` , You can edit this `name` later, in the `~/.iris/config/config.toml` file:
 
