@@ -28,6 +28,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/app/v0"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 const (
@@ -102,13 +103,14 @@ func MakeCodec() *codec.Codec {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	protocolKeeper.RegisterCodec(cdc)
 	return cdc
 }
 
 // export the state of iris for a genesis file
 func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
-	return app.Engine.GetCurrent().ExportAppStateAndValidators(ctx, forZeroHeight)
+	return app.Engine.GetCurrentProtocol().ExportAppStateAndValidators(ctx, forZeroHeight)
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {

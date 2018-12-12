@@ -252,7 +252,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
 
-	initChainer := app.Engine.GetCurrent().GetInitChainer()
+	initChainer := app.Engine.GetCurrentProtocol().GetInitChainer()
 	if initChainer == nil {
 		return
 	}
@@ -387,7 +387,7 @@ func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res 
 	if len(path) < 2 || path[1] == "" {
 		return sdk.ErrUnknownRequest("No route for custom query specified").QueryResult()
 	}
-	querier := app.Engine.GetCurrent().GetQueryRouter().Route(path[1])
+	querier := app.Engine.GetCurrentProtocol().GetQueryRouter().Route(path[1])
 	if querier == nil {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("no custom querier found for route %s", path[1])).QueryResult()
 	}
@@ -429,7 +429,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.WithBlockHeader(req.Header).WithBlockHeight(req.Header.Height)
 	}
-	beginBlocker := app.Engine.GetCurrent().GetBeginBlocker()
+	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 	if beginBlocker != nil {
 		res = beginBlocker(app.deliverState.ctx, req)
 	}
@@ -447,33 +447,6 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	// Decode the Tx.
 	var result sdk.Result
-
-	////////////////////  iris/cosmos-sdk begin ///////////////////////////
-
-	upgradeKey := sdk.NewKVStoreKey("upgrade")
-	store := app.cms.GetStore(upgradeKey)
-
-	if store != nil {
-		kvStore, ok := store.(sdk.KVStore)
-		if ok {
-			bz := kvStore.Get([]byte("d"))
-			if len(bz) == 1 && bz[0] == byte(1) {
-				result = sdk.NewError(sdk.CodespaceUndefined, sdk.CodeOutOfService, "").Result()
-
-				return abci.ResponseCheckTx{
-					Code:      uint32(result.Code),
-					Codespace: string(result.Codespace),
-					Data:      result.Data,
-					Log:       result.Log,
-					GasWanted: int64(result.GasWanted),
-					GasUsed:   int64(result.GasUsed),
-					Tags:      result.Tags,
-				}
-			}
-		}
-	}
-
-	////////////////////  iris/cosmos-sdk end ///////////////////////////
 
 	// Decode the Tx.
 
@@ -565,7 +538,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgRoute := msg.Route()
-		handler := app.Engine.GetCurrent().GetRouter().Route(msgRoute)
+		handler := app.Engine.GetCurrentProtocol().GetRouter().Route(msgRoute)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgRoute).Result()
 		}
@@ -655,7 +628,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		result.GasWanted = gasWanted
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 
-		feeRefundHandler := app.Engine.GetCurrent().GetFeeRefundHandler()
+		feeRefundHandler := app.Engine.GetCurrentProtocol().GetFeeRefundHandler()
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
 			_, err := feeRefundHandler(ctxWithNoCache, tx, result)
@@ -673,7 +646,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	feePreprocessHandler := app.Engine.GetCurrent().GetFeePreprocessHandler()
+	feePreprocessHandler := app.Engine.GetCurrentProtocol().GetFeePreprocessHandler()
 	// run the fee handler
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
@@ -682,7 +655,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}
 
-	anteHandler := app.Engine.GetCurrent().GetAnteHandler()
+	anteHandler := app.Engine.GetCurrentProtocol().GetAnteHandler()
 	// run the ante handler
 	if anteHandler != nil {
 		newCtx, result, abort := anteHandler(ctx, tx, (mode == RunTxModeSimulate))
@@ -730,9 +703,17 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
 
-	endBlocker := app.Engine.GetCurrent().GetEndBlocker()
+	endBlocker := app.Engine.GetCurrentProtocol().GetEndBlocker()
 	if endBlocker != nil {
 		res = endBlocker(app.deliverState.ctx, req)
+	}
+
+	current := app.Engine.GetCurrentProtocolVersionByStore(app.GetKVStore(protocol.KeyProtocol))
+	if current != app.Engine.GetCurrent() {
+		success := app.Engine.Activate(current)
+		if !success {
+			res.Tags = sdk.Tags(res.Tags).AppendTag("",[]byte(""))
+		}
 	}
 
 	return

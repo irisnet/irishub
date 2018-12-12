@@ -37,6 +37,10 @@ func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) {
 	}
 }
 
+func (pe *ProtocolEngine) GetCurrentProtocolVersionByStore(kvStore sdk.KVStore) uint64 {
+	return pe.pk.GetCurrentProtocolVersionByStore(kvStore)
+}
+
 // To be used for Protocol with version > 0
 func (pe *ProtocolEngine) Activate(version uint64) bool {
 	p, flag := pe.protocols[version]
@@ -48,8 +52,12 @@ func (pe *ProtocolEngine) Activate(version uint64) bool {
 	return flag
 }
 
-func (pe *ProtocolEngine) GetCurrent() Protocol {
+func (pe *ProtocolEngine) GetCurrentProtocol() Protocol {
 	return pe.protocols[pe.current]
+}
+
+func (pe *ProtocolEngine) GetCurrent() uint64 {
+	return pe.current
 }
 
 func (pe *ProtocolEngine) Add(p Protocol) Protocol {

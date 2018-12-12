@@ -28,7 +28,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk stake.Keeper, pk protocol.
 func (k Keeper) AddNewVersion(ctx sdk.Context, appVersion AppVersion) {
 	kvStore := ctx.KVStore(k.storeKey)
 
-	appVersionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion.protocol.Version)
+	appVersionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion)
 	if err != nil {
 		panic(err)
 	}
