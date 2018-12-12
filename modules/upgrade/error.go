@@ -7,12 +7,12 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "upgrade"
 
-	CodeInvalidMsgType			sdk.CodeType = 100
-	CodeUnSupportedMsgType		sdk.CodeType = 101
-	CodeUnknownRequest  		sdk.CodeType = sdk.CodeUnknownRequest
-	CodeNotCurrentProposal      sdk.CodeType = 102
-	CodeNotValidator            sdk.CodeType = 103
-	CodeDoubleSwitch            sdk.CodeType = 104
+	CodeInvalidMsgType     sdk.CodeType = 100
+	CodeUnSupportedMsgType sdk.CodeType = 101
+	CodeUnknownRequest     sdk.CodeType = sdk.CodeUnknownRequest
+	CodeNotCurrentProposal sdk.CodeType = 102
+	CodeNotValidator       sdk.CodeType = 103
+	CodeDoubleSwitch       sdk.CodeType = 104
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {

@@ -32,7 +32,7 @@ func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) {
 	current := pe.pk.GetCurrentProtocolVersionByStore(kvStore)
 	p, flag := pe.protocols[current]
 	if flag == true {
-		p.Load()
+		p.Load(pe.pk)
 		pe.current = current
 	}
 }
@@ -41,7 +41,7 @@ func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) {
 func (pe *ProtocolEngine) Activate(version uint64) bool {
 	p, flag := pe.protocols[version]
 	if flag == true {
-		p.Load()
+		p.Load(pe.pk)
 		p.Init()
 		pe.current = version
 	}
@@ -75,7 +75,7 @@ func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 		KeyRecord,
 		KeyFeeCollection,
 		KeyParams,
-		//keyUpgrade,
+		KeyUpgrade,
 		KeyService,
 		KeyGuardian}
 }

@@ -3,6 +3,7 @@ package v0
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/protocol"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
@@ -19,7 +20,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -46,6 +47,7 @@ type ProtocolVersion0 struct {
 	serviceKeeper       service.Keeper
 	guardianKeeper      guardian.Keeper
 	recordKeeper        record.Keeper
+	upgradeKeeper       upgrade.Keeper
 	// fee manager
 	feeManager auth.FeeManager
 
@@ -82,8 +84,8 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 }
 
 // load the configuration of this Protocol
-func (p *ProtocolVersion0) Load() {
-	p.configKeepers()
+func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
+	p.configKeepers(protocolkeeper)
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
@@ -100,7 +102,7 @@ func (p *ProtocolVersion0) GetDefinition() common.ProtocolDefinition {
 }
 
 // create all Keepers
-func (p *ProtocolVersion0) configKeepers() {
+func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
@@ -177,6 +179,7 @@ func (p *ProtocolVersion0) configKeepers() {
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 	p.feeManager = auth.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
 
+	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.StakeKeeper, protocolkeeper)
 }
 
 // configure all Routers
@@ -209,15 +212,6 @@ func (p *ProtocolVersion0) configStores() {
 
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
-	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.SignalParamspace).WithTypeTable(
-		params.NewTypeTable(
-			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
-			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
-			upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
-		)),
-		&upgradeparams.CurrentUpgradeProposalIdParameter,
-		&upgradeparams.ProposalAcceptHeightParameter,
-		&upgradeparams.SwitchPeriodParameter)
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
@@ -263,6 +257,8 @@ func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBl
 // application updates every end block
 func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, p.govKeeper)
+
+	upgrade.EndBlocker(ctx, p.upgradeKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	return abci.ResponseEndBlock{
@@ -354,7 +350,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
-
+	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}

@@ -479,7 +479,7 @@ func commitStores(version int64, storeMap map[StoreKey]CommitStore) commitInfo {
 		storemap[key.Name()] = store
 	}
 	upgrade := storemap["upgrade"]
-	if upgrade != nil {
+	if false {
 		upgradeStore := upgrade.(KVStore)
 		bz := upgradeStore.Get([]byte("k/")) //CurrentStoreKey
 		storekeys := string(bz)              //splitby":"

@@ -2,19 +2,18 @@ package upgrade
 
 import (
 	"github.com/irisnet/irishub/modules/upgrade"
+	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 type UpgradeInfoOutput struct {
-	CurrentProposalId           uint64           `json:"current_proposal_id"` //  proposalID of the proposal
-	CurrentProposalAcceptHeight int64           `json:"current_proposal_accept_height"`
-	Verion                      upgrade.Version `json:"version"`
+	AppVerion  upgrade.AppVersion `json:"version"`
+	UpgradeConfig protocol.UpgradeConfig `json:"upgrade_config"`
 }
 
-func ConvertUpgradeInfoToUpgradeOutput(version upgrade.Version, proposalId uint64, hight int64) UpgradeInfoOutput {
+func ConvertUpgradeInfoToUpgradeOutput(appVersion upgrade.AppVersion, upgradeConfig protocol.UpgradeConfig) UpgradeInfoOutput {
 
 	return UpgradeInfoOutput{
-		CurrentProposalId:           proposalId,
-		CurrentProposalAcceptHeight: hight,
-		Verion: version,
+        AppVerion:appVersion,
+        UpgradeConfig:upgradeConfig,
 	}
 }

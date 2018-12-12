@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"encoding/json"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	tmstate "github.com/tendermint/tendermint/state"
 )
 
@@ -41,11 +40,11 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
-		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
-			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
-		}
-	}
+	//if msg.ProposalType == ProposalTypeSoftwareUpgrade {
+	//	if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
+	//		return ErrSwitchPeriodInProcess(keeper.codespace).Result()
+	//	}
+	//}
 	////////////////////  iris end  /////////////////////////////
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)

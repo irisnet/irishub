@@ -5,7 +5,8 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
+	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 	"net/http"
 )
 
@@ -19,21 +20,22 @@ type VersionInfo struct {
 func InfoHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")
-		res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
-		var height int64
-		var proposalID int64
-		cdc.MustUnmarshalBinaryLengthPrefixed(res_height, &height)
-		cdc.MustUnmarshalBinaryLengthPrefixed(res_proposalID, &proposalID)
+		res_protocolVersion, _ := cliCtx.QueryStore(protocol.CurrentProtocolVersionKey, "protocol")
+		var protocolVersion uint64
+		cdc.UnmarshalJSON(res_protocolVersion, &protocolVersion)
 
-		res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
-		var versionID int64
-		cdc.MustUnmarshalBinaryLengthPrefixed(res_versionID, &versionID)
+		res_upgradeConfig, _ := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
+		var upgradeConfig protocol.UpgradeConfig
+		cdc.UnmarshalJSON(res_upgradeConfig, &upgradeConfig)
 
-		res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
-		var version upgrade.Version
-		cdc.MustUnmarshalBinaryLengthPrefixed(res_version, &version)
-		output, err := cdc.MarshalJSONIndent(version, "", "  ")
+
+		res_appVersion, _ := cliCtx.QueryStore(upgrade.GetAppVersionKey(protocolVersion), storeName)
+		var appVersion upgrade.AppVersion
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_appVersion, &appVersion)
+
+		upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(appVersion,upgradeConfig)
+
+		output, err := cdc.MarshalJSONIndent(upgradeInfoOutput, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

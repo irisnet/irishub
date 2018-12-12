@@ -17,8 +17,7 @@ var (
 	KeyFeeCollection = sdk.NewKVStoreKey("fee")
 	KeyParams        = sdk.NewKVStoreKey("params")
 	TkeyParams       = sdk.NewTransientStoreKey("transient_params")
-	//keyUpgrade       = sdk.NewKVStoreKey("upgrade")
-	KeyService  = sdk.NewKVStoreKey("service")
-	KeyGuardian = sdk.NewKVStoreKey("guardian")
-
+	KeyService       = sdk.NewKVStoreKey("service")
+	KeyGuardian      = sdk.NewKVStoreKey("guardian")
+	KeyUpgrade       = sdk.NewKVStoreKey("upgrade")
 )

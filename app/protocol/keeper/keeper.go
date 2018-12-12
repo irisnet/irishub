@@ -6,8 +6,8 @@ import (
 
 
 var (
-	currentProtocolVersionKey = []byte("currentProtocolVersionKey")
-	upgradeConfigkey  = []byte("upgradeConfigkey")
+	CurrentProtocolVersionKey = []byte("currentProtocolVersionKey")
+	UpgradeConfigkey  = []byte("upgradeConfigkey")
 )
 
 type Keeper struct {
@@ -24,7 +24,7 @@ func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
 
 func (keeper Keeper) GetCurrentProtocolVersion(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(keeper.storeKey)
-	bz := store.Get(currentProtocolVersionKey)
+	bz := store.Get(CurrentProtocolVersionKey)
 	if bz == nil {
 		return 0
 	}
@@ -34,7 +34,7 @@ func (keeper Keeper) GetCurrentProtocolVersion(ctx sdk.Context) uint64 {
 }
 
 func (keeper Keeper) GetCurrentProtocolVersionByStore(kvStore sdk.KVStore) uint64 {
-	bz := kvStore.Get(currentProtocolVersionKey)
+	bz := kvStore.Get(CurrentProtocolVersionKey)
 	if bz == nil {
 		return 0
 	}
@@ -46,12 +46,12 @@ func (keeper Keeper) GetCurrentProtocolVersionByStore(kvStore sdk.KVStore) uint6
 func (keeper Keeper) SetCurrentProtocolVersion(ctx sdk.Context, currentProtocolVersion uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(currentProtocolVersion)
-	store.Set(currentProtocolVersionKey, bz)
+	store.Set(CurrentProtocolVersionKey, bz)
 }
 
 func (keeper Keeper) GetUpgradeConfig(ctx sdk.Context) UpgradeConfig {
 	store := ctx.KVStore(keeper.storeKey)
-	bz := store.Get(upgradeConfigkey)
+	bz := store.Get(UpgradeConfigkey)
 	if bz == nil {
 		return UpgradeConfig{}
 	}
@@ -62,7 +62,13 @@ func (keeper Keeper) GetUpgradeConfig(ctx sdk.Context) UpgradeConfig {
 
 func (keeper Keeper) SetUpgradeConfig(ctx sdk.Context, upgradeConfig UpgradeConfig) {
 	store := ctx.KVStore(keeper.storeKey)
-	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(upgradeConfigkey)
-	store.Set(currentProtocolVersionKey, bz)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(upgradeConfig)
+	store.Set(UpgradeConfigkey, bz)
 }
 
+func (keeper Keeper) ClearUpgradeConfig(ctx sdk.Context) {
+	store := ctx.KVStore(keeper.storeKey)
+	upgradeConfig := UpgradeConfig{}
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(upgradeConfig)
+	store.Set(UpgradeConfigkey, bz)
+}

@@ -58,7 +58,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 		mint.ExportGenesis(ctx, p.mintKeeper),
 		distr.ExportGenesis(ctx, p.distrKeeper),
 		gov.ExportGenesis(ctx, p.govKeeper),
-		upgrade.WriteGenesis(ctx),
+		upgrade.ExportGenesis(ctx),
 		service.ExportGenesis(ctx, p.serviceKeeper),
 		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, p.guardianKeeper),

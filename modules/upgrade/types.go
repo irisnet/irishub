@@ -1,70 +1,20 @@
 package upgrade
 
 import (
-    sdk "github.com/irisnet/irishub/types"
-    "math"
+	protocol "github.com/irisnet/irishub/app/protocol/keeper"
+	"github.com/irisnet/irishub/types/common"
 )
 
-type ModuleLifeTime struct {
-    Start		int64
-    End			int64
-    Handler 	string
-    Store		[]string
+type AppVersion struct {
+	ProposalID uint64
+	Success    bool
+	protocol   common.ProtocolDefinition
 }
 
-func NewModuleLifeTime(start int64, end	int64, handler string, store []string) ModuleLifeTime {
-    return ModuleLifeTime{
-        Start:      start,
-        End:        end,
-        Handler:    handler,
-        Store:      store,
-    }
-}
-
-type ModuleLifeTimeList []ModuleLifeTime
-
-func NewModuleLifeTimeList() ModuleLifeTimeList {
-    return ModuleLifeTimeList{}
-}
-
-func (mlist ModuleLifeTimeList) BuildModuleLifeTime(start int64, handler string, store []string) ModuleLifeTimeList {
-    return append(mlist, NewModuleLifeTime(start, math.MaxInt64, handler, store))
-}
-
-type Version struct {
-    Id			int64
-    ProposalID  uint64
-    Start		int64
-    ModuleList	ModuleLifeTimeList
-}
-
-func NewVersion(id int64, proposalID uint64, start int64, moduleList ModuleLifeTimeList) Version {
-    return Version{
-        Id:         id,
-        ProposalID: proposalID,
-        Start:      start,
-        ModuleList: moduleList,
-    }
-}
-
-func (v Version) getMsgType(msg sdk.Msg) (string, sdk.Error) {
-    msgType := msg.Route()
-
-    for _, module := range v.ModuleList {
-        if msgType == module.Handler {
-            return msgType, nil
-        }
-    }
-
-    return "", NewError(DefaultCodespace, CodeUnSupportedMsgType, "")
-}
-
-type VersionList []Version
-
-func NewVersionList() VersionList {
-	return VersionList{}
-}
-
-func (m VersionList) AddVersion(v Version) {
-	m = append(m,v)
+func NewVersion(upgradeConfig protocol.UpgradeConfig, success bool) AppVersion {
+	return AppVersion{
+		ProposalID: upgradeConfig.ProposalID,
+		Success:    success,
+		protocol:   upgradeConfig.Definition,
+	}
 }

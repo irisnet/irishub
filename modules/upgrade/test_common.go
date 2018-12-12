@@ -1,22 +1,23 @@
 package upgrade
 
 import (
-	"testing"
+	"encoding/hex"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/store"
-	"github.com/stretchr/testify/require"
-	"os"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
-	"encoding/hex"
-	"github.com/irisnet/irishub/modules/params"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
+	"os"
+	"testing"
 )
 
 var (
@@ -62,16 +63,18 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 	keyIparams := sdk.NewKVStoreKey("iparams")
 	tkeyStake := sdk.NewTransientStoreKey("transient_stake")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+	keyProtocol := sdk.NewKVStoreKey("protocol")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
-    ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyIparams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyStake, sdk.StoreTypeTransient, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(keyProtocol, sdk.StoreTypeIAVL, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
@@ -90,7 +93,8 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 		ck, paramsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 	)
-	keeper := NewKeeper(cdc, keyUpdate, sk)
+	pk := protocolKeeper.NewKeeper(cdc, keyProtocol)
+	keeper := NewKeeper(cdc, keyUpdate, sk, pk)
 
 	return ctx, keeper, paramsKeeper
 }
