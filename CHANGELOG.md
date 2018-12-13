@@ -2,7 +2,7 @@
 
 ## 0.8.0
 
-*December 10th, 2018*
+*December 13th, 2018*
 
 - Upgrade tendermint to v0.27.0-dev1
 
@@ -24,7 +24,6 @@ FEATURES:
 - View the current available withdraw balance by simulation mode
 - Command line and LCD interface for service invocation request and query
 - Implement guardian module for some governance proposal
-- Export blockchain snapshot at any height
 - Added command add-genesis-account to configure account for genesis.json
 - New proposal TerminatorProposal to terminate network consensus
 

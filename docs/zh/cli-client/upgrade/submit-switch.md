@@ -26,5 +26,5 @@ iriscli upgrade submit-switch --help
 发送对软件升级提议（ID为5）switch消息
 
 ```
-iriscli upgrade submit-switch --chain-id=IRISnet --from=x --fee=0.004iris --proposalID 5 --title="Run new verison"
+iriscli upgrade submit-switch --chain-id=IRISnet --from=x --fee=0.004iris --proposal-id 5 --title="Run new verison"
 ```

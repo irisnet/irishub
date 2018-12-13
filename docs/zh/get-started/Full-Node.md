@@ -90,7 +90,7 @@ kill -9 <PID>
 
 2. 重置iris
 ```
-iris unsafe_reset_all --home=<home>
+iris unsafe-reset-all --home=<home>
 ```
 
 3. 重新启动

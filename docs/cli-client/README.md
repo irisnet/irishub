@@ -55,3 +55,7 @@ Each modules provides a set of command line interfaces. Here we sort these comma
 9. [status command](./status/README.md)
 10. [tendermint command](./tendermint/README.md)
 11. [upgrade command](./upgrade/README.md)
+
+## iriscli config command
+
+The `iriscli config` command interactively configures some default parameters, such as chain-id, home, fee, and node.

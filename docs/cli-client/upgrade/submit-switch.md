@@ -27,5 +27,5 @@ iriscli upgrade submit-switch --help
 Send a switch message for the software upgrade proposal whose `proposalID` is 5. 
 
 ```
-iriscli upgrade submit-switch --chain-id=IRISnet --from=x --fee=0.004iris --proposalID 5 --title="Run new verison"
+iriscli upgrade submit-switch --chain-id=IRISnet --from=x --fee=0.004iris --proposal-id 5 --title="Run new verison"
 ```

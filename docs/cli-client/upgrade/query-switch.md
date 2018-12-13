@@ -18,7 +18,7 @@ iriscli upgrade query-switch --help
 
 | Name, shorthand | Default                    | Description                                                       | Required |
 | --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
-| --proposal-id      |                            | proposalID of upgrade swtich being queried                              | Yes      |
+| --proposal-id     |                            | proposalID of upgrade swtich being queried                              | Yes      |
 | --voter     |                            | Address sign the switch msg                              | Yes      |
 
 ## Example

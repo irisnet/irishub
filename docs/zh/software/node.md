@@ -51,9 +51,7 @@ iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
      "accounts": [
       {
         "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
-        "coins": [
-          "150iris"
-        ],
+        "coins": ["150iris"],
         "sequence_number": "0",
         "account_number": "0"
       }
