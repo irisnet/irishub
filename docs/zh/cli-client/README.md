@@ -54,3 +54,7 @@
 9. [status command](./status/README.md)
 10. [tendermint command](./tendermint/README.md)
 11. [upgrade command](./upgrade/README.md)
+
+## iriscli config命令
+
+iriscli config命令可以交互式地配置一些默认参数，例如chain-id，home，fee 和 node。
