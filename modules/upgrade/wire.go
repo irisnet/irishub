@@ -6,7 +6,7 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(&AppVersion{}, "iris-hub/upgrade/Version", nil)
+	//cdc.RegisterConcrete(&AppVersion{}, "iris-hub/upgrade/Version", nil)
 }
 
 var msgCdc = codec.New()

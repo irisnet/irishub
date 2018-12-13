@@ -32,9 +32,9 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, appVersion AppVersion) {
 	if err != nil {
 		panic(err)
 	}
-	kvStore.Set(GetAppVersionKey(appVersion.protocol.Version), appVersionBytes)
+	kvStore.Set(GetAppVersionKey(appVersion.Protocol.Version), appVersionBytes)
 
-	protocolVersionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion.protocol.Version)
+	protocolVersionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion.Protocol.Version)
 	if err != nil {
 		panic(err)
 	}
@@ -42,8 +42,8 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, appVersion AppVersion) {
 	kvStore.Set(GetProposalIDKey(appVersion.ProposalID), protocolVersionBytes)
 
 	if appVersion.Success {
-		kvStore.Set(GetStartHeightKey(appVersion.protocol.Height), protocolVersionBytes)
-		k.pk.SetCurrentProtocolVersion(ctx, appVersion.protocol.Version)
+		kvStore.Set(GetStartHeightKey(appVersion.Protocol.Height), protocolVersionBytes)
+		k.pk.SetCurrentProtocolVersion(ctx, appVersion.Protocol.Version)
 	}
 
 }

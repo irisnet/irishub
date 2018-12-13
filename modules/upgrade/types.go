@@ -8,13 +8,13 @@ import (
 type AppVersion struct {
 	ProposalID uint64
 	Success    bool
-	protocol   common.ProtocolDefinition
+	Protocol   common.ProtocolDefinition
 }
 
 func NewVersion(upgradeConfig protocol.UpgradeConfig, success bool) AppVersion {
 	return AppVersion{
 		ProposalID: upgradeConfig.ProposalID,
 		Success:    success,
-		protocol:   upgradeConfig.Definition,
+		Protocol:   upgradeConfig.Definition,
 	}
 }

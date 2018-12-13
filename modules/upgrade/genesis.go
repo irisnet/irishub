@@ -16,7 +16,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	genesisVersion := data.GenesisVersion
 	k.AddNewVersion(ctx, genesisVersion)
 	k.pk.ClearUpgradeConfig(ctx)
-	k.pk.SetCurrentProtocolVersion(ctx, genesisVersion.protocol.Version)
+	k.pk.SetCurrentProtocolVersion(ctx, genesisVersion.Protocol.Version)
 }
 
 // WriteGenesis - output genesis parameters

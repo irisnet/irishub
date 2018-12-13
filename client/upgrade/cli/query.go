@@ -27,11 +27,11 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			res_protocolVersion, _ := cliCtx.QueryStore(protocol.CurrentProtocolVersionKey, "protocol")
 			var protocolVersion uint64
-			cdc.UnmarshalJSON(res_protocolVersion, &protocolVersion)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_protocolVersion, &protocolVersion)
 
 			res_upgradeConfig, _ := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
 			var upgradeConfig protocol.UpgradeConfig
-			cdc.UnmarshalJSON(res_upgradeConfig, &upgradeConfig)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig)
 
 
 			res_appVersion, _ := cliCtx.QueryStore(upgrade.GetAppVersionKey(protocolVersion), storeName)
