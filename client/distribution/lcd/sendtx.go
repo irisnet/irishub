@@ -3,17 +3,17 @@ package lcd
 import (
 	"net/http"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type setWithdrawAddressBody struct {
 	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
-	BaseTx          context.BaseTx `json:"base_tx"`
+	BaseTx          utils.BaseTx   `json:"base_tx"`
 }
 
 // SetWithdrawAddressHandlerFn - http request handler to set withdraw address
@@ -49,7 +49,7 @@ func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 type withdrawRewardsBody struct {
 	ValidatorAddress sdk.ValAddress `json:"validator_address"`
 	IsValidator      bool           `json:"is_validator"`
-	BaseTx           context.BaseTx `json:"base_tx"`
+	BaseTx           utils.BaseTx   `json:"base_tx"`
 }
 
 func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {

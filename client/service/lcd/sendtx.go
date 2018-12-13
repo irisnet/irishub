@@ -1,15 +1,16 @@
 package lcd
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/client/context"
+	"encoding/hex"
+	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/service"
 	sdk "github.com/irisnet/irishub/types"
-	"fmt"
-	"encoding/hex"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
@@ -508,37 +509,37 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 }
 
 type definition struct {
-	BaseTx             context.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName        string         `json:"service_name"`
-	ServiceDescription string         `json:"service_description"`
-	AuthorDescription  string         `json:"author_description"`
-	Tags               []string       `json:"tags"`
-	IdlContent         string         `json:"idl_content"`
-	AuthorAddr         string         `json:"author_addr"`
+	BaseTx             utils.BaseTx `json:"base_tx"` // basic tx info
+	ServiceName        string       `json:"service_name"`
+	ServiceDescription string       `json:"service_description"`
+	AuthorDescription  string       `json:"author_description"`
+	Tags               []string     `json:"tags"`
+	IdlContent         string       `json:"idl_content"`
+	AuthorAddr         string       `json:"author_addr"`
 }
 
 type binding struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName string         `json:"service_name"`
-	DefChainId  string         `json:"def_chain_id"`
-	BindingType string         `json:"binding_type"`
-	Deposit     string         `json:"deposit"`
-	Prices      []string       `json:"prices"`
-	Level       service.Level  `json:"level"`
-	Provider    string         `json:"provider"`
+	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
+	ServiceName string        `json:"service_name"`
+	DefChainId  string        `json:"def_chain_id"`
+	BindingType string        `json:"binding_type"`
+	Deposit     string        `json:"deposit"`
+	Prices      []string      `json:"prices"`
+	Level       service.Level `json:"level"`
+	Provider    string        `json:"provider"`
 }
 
 type bindingUpdate struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
-	BindingType string         `json:"binding_type"`
-	Deposit     string         `json:"deposit"`
-	Prices      []string       `json:"prices"`
-	Level       service.Level  `json:"level"`
+	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
+	BindingType string        `json:"binding_type"`
+	Deposit     string        `json:"deposit"`
+	Prices      []string      `json:"prices"`
+	Level       service.Level `json:"level"`
 }
 
 type bindingEnable struct {
-	BaseTx  context.BaseTx `json:"base_tx"` // basic tx info
-	Deposit string         `json:"deposit"`
+	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit string       `json:"deposit"`
 }
 
 type serviceRequest struct {
@@ -554,19 +555,19 @@ type serviceRequest struct {
 }
 
 type serviceRequestWithBasic struct {
-	BaseTx   context.BaseTx   `json:"base_tx"` // basic tx info
+	BaseTx   utils.BaseTx     `json:"base_tx"` // basic tx info
 	Requests []serviceRequest `json:"requests"`
 }
 
 type serviceResponse struct {
-	BaseTx     context.BaseTx `json:"base_tx"` // basic tx info
-	ReqChainId string         `json:"req_chain_id"`
-	RequestId  string         `json:"request_id"`
-	Data       string         `json:"data"`
-	Provider   string         `json:"provider"`
-	ErrorMsg   string         `json:"error_msg"`
+	BaseTx     utils.BaseTx `json:"base_tx"` // basic tx info
+	ReqChainId string       `json:"req_chain_id"`
+	RequestId  string       `json:"request_id"`
+	Data       string       `json:"data"`
+	Provider   string       `json:"provider"`
+	ErrorMsg   string       `json:"error_msg"`
 }
 
 type basicReq struct {
-	BaseTx context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
 }

@@ -32,7 +32,7 @@ func GetCmdSubmitSwitch(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			// get the from/to address

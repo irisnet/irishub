@@ -24,7 +24,7 @@ import (
 // supplied messages.  Finally, it broadcasts the signed
 // transaction to a node.
 // NOTE: Also see CompleteAndBroadcastTxREST.
-func SendOrPrintTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
+func SendOrPrintTx(txCtx TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) error {
 	if cliCtx.GenerateOnly {
 		return PrintUnsignedStdTx(txCtx, cliCtx, msgs, false)
 	}
@@ -80,7 +80,7 @@ func SendOrPrintTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sd
 
 // EnrichCtxWithGas calculates the gas estimate that would be consumed by the
 // transaction and set the transaction's respective value accordingly.
-func EnrichCtxWithGas(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (context.TxContext, sdk.Result, error) {
+func EnrichCtxWithGas(txCtx TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (TxContext, sdk.Result, error) {
 	_, adjusted, result, err := simulateMsgs(txCtx, cliCtx, name, msgs)
 	if err != nil {
 		return txCtx, sdk.Result{}, err
@@ -107,7 +107,7 @@ func CalculateGas(queryFunc func(string, common.HexBytes) ([]byte, error), cdc *
 
 // PrintUnsignedStdTx builds an unsigned StdTx and prints it to os.Stdout.
 // Don't perform online validation or lookups if offline is true.
-func PrintUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg, offline bool) (err error) {
+func PrintUnsignedStdTx(txCtx TxContext, cliCtx context.CLIContext, msgs []sdk.Msg, offline bool) (err error) {
 	var stdTx auth.StdTx
 	if offline {
 		stdTx, err = buildUnsignedStdTxOffline(txCtx, cliCtx, msgs)
@@ -132,7 +132,7 @@ func PrintUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If appendSig
 // is false, it replaces the signatures already attached with the new signature.
 // Don't perform online validation or lookups if offline is true.
-func SignStdTx(txCtx context.TxContext, cliCtx context.CLIContext, name string, stdTx auth.StdTx, appendSig bool, offline bool) (auth.StdTx, error) {
+func SignStdTx(txCtx TxContext, cliCtx context.CLIContext, name string, stdTx auth.StdTx, appendSig bool, offline bool) (auth.StdTx, error) {
 	var signedStdTx auth.StdTx
 
 	keybase, err := keys.GetKeyBase()
@@ -175,7 +175,7 @@ func SignStdTx(txCtx context.TxContext, cliCtx context.CLIContext, name string, 
 
 // nolint
 // SimulateMsgs simulates the transaction and returns the gas estimate and the adjusted value.
-func simulateMsgs(txCtx context.TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted uint64, result sdk.Result, err error) {
+func simulateMsgs(txCtx TxContext, cliCtx context.CLIContext, name string, msgs []sdk.Msg) (estimated, adjusted uint64, result sdk.Result, err error) {
 	txBytes, err := txCtx.BuildWithPubKey(name, msgs)
 	if err != nil {
 		return
@@ -188,7 +188,7 @@ func adjustGasEstimate(estimate uint64, adjustment float64) uint64 {
 	return uint64(adjustment * float64(estimate))
 }
 
-func prepareTxContext(txCtx context.TxContext, cliCtx context.CLIContext) (context.TxContext, error) {
+func prepareTxContext(txCtx TxContext, cliCtx context.CLIContext) (TxContext, error) {
 	if err := cliCtx.EnsureAccountExists(); err != nil {
 		return txCtx, err
 	}
@@ -222,7 +222,7 @@ func prepareTxContext(txCtx context.TxContext, cliCtx context.CLIContext) (conte
 
 // buildUnsignedStdTx builds a StdTx as per the parameters passed in the
 // contexts. Gas is automatically estimated if gas wanted is set to 0.
-func buildUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
+func buildUnsignedStdTx(txCtx TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
 	txCtx, err = prepareTxContext(txCtx, cliCtx)
 	if err != nil {
 		return
@@ -230,7 +230,7 @@ func buildUnsignedStdTx(txCtx context.TxContext, cliCtx context.CLIContext, msgs
 	return buildUnsignedStdTxOffline(txCtx, cliCtx, msgs)
 }
 
-func buildUnsignedStdTxOffline(txCtx context.TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
+func buildUnsignedStdTxOffline(txCtx TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {
 	if txCtx.SimulateGas {
 		var name string
 		name, err = cliCtx.GetFromName()
