@@ -6,7 +6,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/types"
-	"runtime/debug"
+	"math"
 )
 
 var (
@@ -31,12 +31,6 @@ func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
 // NewFeePreprocessHandler creates a fee token refund handler
 func NewFeeRefundHandler(am AccountKeeper, fck FeeCollectionKeeper, fm FeeManager) types.FeeRefundHandler {
 	return func(ctx sdk.Context, tx sdk.Tx, txResult sdk.Result) (actualCostFee sdk.Coin, err error) {
-		defer func() {
-			if r := recover(); r != nil {
-				err = fmt.Errorf("encountered panic error during fee refund, recovered: %v\nstack:\n%v", r, string(debug.Stack()))
-			}
-		}()
-
 		txAccounts := GetSigners(ctx)
 		// If this tx failed in anteHandler, txAccount length will be less than 1
 		if len(txAccounts) < 1 {
@@ -124,8 +118,8 @@ func (fck FeeManager) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Co
 }
 
 func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit uint64) sdk.Error {
-	if gasLimit == 0 {
-		return sdk.ErrInternal(fmt.Sprintf("gaslimit %d should be positive", gasLimit))
+	if gasLimit == 0 || int64(gasLimit) < 0 {
+		return sdk.ErrInvalidGas(fmt.Sprintf("gaslimit %d should be positive and no more than %d", gasLimit, math.MaxInt64))
 	}
 	var nativeFeeToken string
 	fck.paramSpace.Get(ctx, nativeFeeTokenKey, &nativeFeeToken)
@@ -139,7 +133,7 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit u
 	}
 
 	if len(coins) < 1 || coins[0].Denom != nativeFeeToken {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("no native fee token, expected native token is %s", nativeFeeToken))
+		return sdk.ErrInvalidTxFee(fmt.Sprintf("no native fee token, expected native token is %s", nativeFeeToken))
 	}
 	/*
 		equivalentTotalFee := sdk.NewInt(0)
@@ -163,10 +157,9 @@ func (fck FeeManager) feePreprocess(ctx sdk.Context, coins sdk.Coins, gasLimit u
 		}
 	*/
 	equivalentTotalFee := coins[0].Amount
-	//TODO change this when uint coin is implemented
 	gasPrice := equivalentTotalFee.Div(sdk.NewInt(int64(gasLimit)))
 	if gasPrice.LT(threshold) {
-		return sdk.ErrInsufficientCoins(fmt.Sprintf("equivalent gas price (%s%s) is less than threshold (%s%s)", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken))
+		return sdk.ErrGasPriceTooLow(fmt.Sprintf("equivalent gas price (%s%s) is less than threshold (%s%s)", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken))
 	}
 	return nil
 }
