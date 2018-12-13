@@ -46,12 +46,7 @@ iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
       "accounts": [
         {
           "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
-          "coins": [
-            {
-              "denom": "iris-atto",
-              "amount": "150000000000000000000"
-            }
-          ],
+          "coins": ["150iris"],
           "sequence_number": "0",
           "account_number": "0"
         }
@@ -94,6 +89,8 @@ To start the node to join the public IRIS Testnet, please refer to [Full-Node](.
 The home directory is the working directory of the iris node. The home directory contains all the configuration information and all the data that the node runs.
 
 In the iris command, you can specify the home directory of the node by using flag `--home`. If you run multiple nodes on the same machine, you need to specify a different home directory for them. If the `--home` flag is not specified in the iris command, the default value `$HOME/.iris` is used as the home directory used by this iris command.
+
+The `iris init` command is responsible for initializing the specified `--home` directory and creating the default configuration files. Except the `iris init` command, the home directory used by any other `iris` sub commands must be initialized, otherwise an error will be reported.
 
 The data of the iris node is stored in the `data` directory of the home, including blockchain data, application layer data, and index data. All configuration files are stored in the home/`config` directory:
 
