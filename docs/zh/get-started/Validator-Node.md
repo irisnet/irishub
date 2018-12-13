@@ -70,14 +70,14 @@ fvp1zcjduepqv7z2kgussh7ufe8e0prupwcm7l9jcn2fp90yeupaszmqjk73rjxq8yzw85
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator  --from= < name > --amount= < amount >iris --pubkey= < pubkey >  --moniker= < moniker > --fee=0.05iris  --gas=2000000 --chain-id=fuxi-4000   --node=http://localhost:26657
+iriscli stake create-validator  --from={key-name} --amount=XXiris --pubkey={pubkey} --moniker={moniker} --fee=0.05iris  --gas=2000000 --chain-id=fuxi-6000   --node=http://localhost:26657
 ```
 > 注意：**amount** 应为整数， **Fee** 字段可以使用小数，例如`0。01iris` 。
 
 也就是说，如果你想要抵押1IRIS,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --pubkey=pubkey  --fee=0.04iris  --gas=2000000 --from= < name > --chain-id=fuxi-4000  --node=tcp://localhost:26657  --amount=1iris
+iriscli stake create-validator --pubkey=pubkey  --fee=0.04iris  --gas=2000000 --from={name} --chain-id=fuxi-6000  --node=tcp://localhost:26657  --amount=1iris
 ```
 
 ### 查询验证人信息
@@ -85,7 +85,7 @@ iriscli stake create-validator --pubkey=pubkey  --fee=0.04iris  --gas=2000000 --
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator  < address-validator-operator >  --chain-id=fuxi-4000 --node=tcp://localhost:26657 
+iriscli stake validator  < address-validator-operator >  --chain-id=fuxi-6000 --node=tcp://localhost:26657 
 ```
 
 请注意 `<address-validator>` 字段是以`faa1`为首字母。
@@ -107,7 +107,7 @@ iriscli status --node=tcp://localhost:26657
 你应该在`details`字段注明自定义的信息。
 
 ```
-iriscli stake edit-validator --from= < name >  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-4000 
+iriscli stake edit-validator --from= < name >  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-6000 
   --details="details"--node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
 ```
 ### 查询验证人信息
@@ -115,7 +115,7 @@ iriscli stake edit-validator --from= < name >  --moniker="choose a moniker"  --w
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator < address-validator-operator > --chain-id=fuxi-4000
+iriscli stake validator < address-validator-operator > --chain-id=fuxi-6000
 ```
 
 ### 使用浏览器：IRISPlorer
