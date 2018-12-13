@@ -8,18 +8,18 @@ import (
 	"net/http"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/record"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type postRecordReq struct {
-	BaseTx      context.BaseTx `json:"base_tx"`   // basic tx info
-	Submitter   string         `json:"submitter"` //  Address of the submitter
-	Description string         `json:"description"`
-	Data        string         `json:"data"` // for onchain
+	BaseTx      utils.BaseTx `json:"base_tx"`   // basic tx info
+	Submitter   string       `json:"submitter"` //  Address of the submitter
+	Description string       `json:"description"`
+	Data        string       `json:"data"` // for onchain
 }
 
 func postRecordHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {

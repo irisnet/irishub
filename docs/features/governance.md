@@ -164,3 +164,26 @@ Detail in [Upgrade](upgrade.md)
 * `threshold` default: 0.5, scope（0，1）
 * `governance_penalty` default: 0.667, scope（0，1）
 *  Vote rules:If the ratio of all voters' `voting_power` to the total 'voting_power' in system less than “participation”, the proposal won't be passed. If the ratio of strongly opposed `voting_power` to all voters' `voting_power` more than “veto”, the proposal won't be passed. Then if the ratio of approved `voting_power` to all voter's `voting_power` except abstentions over “threshold”, the proposal will be passed. Otherwise, N/A.
+
+
+### Proposals on community funds usage
+There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to the destination trustee's account from community funds and then trustee will distribute or grant these tokens to others.
+```shell
+# Submit Burn usage proposal
+iriscli gov submit-proposal --title="burn tokens 5%" --description="test" --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Submit Distribute usage proposal
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Submit Grant usage proposal
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Deposit for a proposal
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Vote for a proposal
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Query the state of a proposal
+iriscli gov query-proposal --proposal-id=1
+```

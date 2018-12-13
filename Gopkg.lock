@@ -886,6 +886,7 @@
     "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
+    "github.com/gogo/protobuf/proto",
     "github.com/golang/protobuf/proto",
     "github.com/gorilla/mux",
     "github.com/ipfs/go-ipfs-api",

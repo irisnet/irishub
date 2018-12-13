@@ -16,10 +16,11 @@ Bank allows you to manage assets in your local account
 
 | Name      | Description                         |
 | --------- | ----------------------------------- |
-| coin-type | Query coin type                     |
-| account   | Query account balance               |
-| send      | Create and sign a send tx           |
-| sign      | Sign transactions generated offline |
+| [coin-type](coin-type.md) | Query coin type                     |
+| [account](account.md)   | Query account balance               |
+| [send](send.md)      | Create and sign a send tx           |
+| [sign](sign.md)     | Sign transactions generated offline |
+| [broadcast](broadcast.md)|Broadcast a signed transaction to the network|
 
 ## Flags
 

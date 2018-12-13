@@ -1,4 +1,4 @@
-package context
+package utils
 
 import (
 	"fmt"
@@ -12,6 +12,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/client/context"
 )
 
 //----------------------------------------
@@ -47,7 +48,7 @@ func (br BaseTx) Sanitize() BaseTx {
 // ValidateBasic performs basic validation of a BaseReq. If custom validation
 // logic is needed, the implementing request handler should perform those
 // checks manually.
-func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx CLIContext) bool {
+func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx context.CLIContext) bool {
 	switch {
 	case !cliCtx.GenerateOnly && len(br.Name) == 0:
 		w.WriteHeader(http.StatusBadRequest)
@@ -71,7 +72,7 @@ func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx CLIContext) bool {
 // TxContext implements a transaction context created in SDK modules.
 type TxContext struct {
 	Codec         *codec.Codec
-	cliCtx        CLIContext
+	cliCtx        context.CLIContext
 	AccountNumber uint64
 	Sequence      uint64
 	Gas           uint64
@@ -107,7 +108,7 @@ func NewTxContextFromCLI() TxContext {
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (txCtx TxContext) WithCliCtx(ctx CLIContext) TxContext {
+func (txCtx TxContext) WithCliCtx(ctx context.CLIContext) TxContext {
 	txCtx.cliCtx = ctx
 	return txCtx
 }
@@ -185,7 +186,7 @@ func (txCtx TxContext) Build(msgs []sdk.Msg) (client.StdSignMsg, error) {
 // Sign signs a transaction given a name, passphrase, and a single message to
 // signed. An error is returned if signing fails.
 func (txCtx TxContext) Sign(name, passphrase string, msg client.StdSignMsg) ([]byte, error) {
-	sig, err := MakeSignature(name, passphrase, msg)
+	sig, err := makeSignature(name, passphrase, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +237,7 @@ func (txCtx TxContext) BuildWithPubKey(name string, msgs []sdk.Msg) ([]byte, err
 // SignStdTx appends a signature to a StdTx and returns a copy of a it. If append
 // is false, it replaces the signatures already attached with the new signature.
 func (txCtx TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appendSig bool) (signedStdTx auth.StdTx, err error) {
-	stdSignature, err := MakeSignature(name, passphrase, client.StdSignMsg{
+	stdSignature, err := makeSignature(name, passphrase, client.StdSignMsg{
 		ChainID:       txCtx.ChainID,
 		AccountNumber: txCtx.AccountNumber,
 		Sequence:      txCtx.Sequence,
@@ -258,8 +259,8 @@ func (txCtx TxContext) SignStdTx(name, passphrase string, stdTx auth.StdTx, appe
 	return
 }
 
-// MakeSignature builds a StdSignature given key name, passphrase, and a StdSignMsg.
-func MakeSignature(name, passphrase string, msg client.StdSignMsg) (sig auth.StdSignature, err error) {
+// makeSignature builds a StdSignature given key name, passphrase, and a StdSignMsg.
+func makeSignature(name, passphrase string, msg client.StdSignMsg) (sig auth.StdSignature, err error) {
 	keybase, err := keys.GetKeyBase()
 	if err != nil {
 		return

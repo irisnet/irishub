@@ -46,12 +46,7 @@ iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
       "accounts": [
         {
           "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
-          "coins": [
-            {
-              "denom": "iris-atto",
-              "amount": "150000000000000000000"
-            }
-          ],
+          "coins": ["150iris"],
           "sequence_number": "0",
           "account_number": "0"
         }
@@ -94,6 +89,8 @@ iris testnet --v 4 --output-dir ./output --chain-id irishub-test --starting-ip-a
 home目录为iris节点的工作目录，home目录下包含了所有的配置信息和节点运行的所有数据。
 
 在iris命令中可以通过flag `--home` 来指定该节点的home目录，如果在同一台机器上运行多个节点，则需要为他们指定不同的home目录。如果在iris命令中没有指定`--home` flag，则使用默认值 `$HOME/.iris` 作为本次iris命令所使用的home目录。
+
+`iris init` 命令负责对所指定的`--home`目录进行初始化，创建默认的配置文件。除了`iris init` 命令外，其他任何`iris`相关命令所使用的home目录必须是被初始化过的，否则将会报错。
 
 home的`data`目录下存放iris节点运行的数据，包括区块链数据、应用层数据、索引数据等。home的`config`目录下存放所有配置文件：
 

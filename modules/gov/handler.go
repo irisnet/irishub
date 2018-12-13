@@ -77,9 +77,11 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 }
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
-	_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
-	if !found {
-		return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
+	if msg.Usage != UsageTypeBurn {
+		_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
+		if !found {
+			return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
+		}
 	}
 
 	proposal := keeper.NewUsageProposal(ctx, msg)

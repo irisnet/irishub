@@ -162,3 +162,25 @@ iriscli gov query-proposal --proposal-id=1 --trust-node
 * `threshold` 默认:0.500,范围（0，1）
 * `participation` 默认:0.667,范围（0，1）
 *  投票统计逻辑：如果所有投票者的`voting_power`占系统总的`voting_power`的比例没有超过participation，投票不通过。如果强烈反对的`voting_power`占所有投票者的`voting_power` 超过 veto,提议不通过。然后再看赞同的`voting_power`占排除投弃权以外的投票者的总`voting_power` 是否超过 threshold, 超过则提议通过,不超过则不通过。
+
+### 社区基金使用提议
+有三种使用方式, `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标受托人账户转移代币，然后受托人将这些代币分发或赠给其他账户。
+```shell
+# Submit Burn usage proposal
+iriscli gov submit-proposal --title="burn tokens 5%" --description="test" --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Submit Distribute usage proposal
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Submit Grant usage proposal
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Deposit for a proposal
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Vote for a proposal
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Query the state of a proposal
+iriscli gov query-proposal --proposal-id=1 --trust-node
+```

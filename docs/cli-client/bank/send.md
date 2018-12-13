@@ -72,3 +72,10 @@ Committed at block 2265 (tx hash: A60224C8433487D48C8B03B51CB7A2BCB014932A97A55D
  }
 
 ```
+### Common Issues
+
+* Wrong password
+
+```$xslt
+ERROR: Ciphertext decryption failed
+```
