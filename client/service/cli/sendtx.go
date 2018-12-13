@@ -455,7 +455,7 @@ func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-tax",
 		Short:   "withdraw service fee tax to a account",
-		Example: "iriscli service withdraw-tax --chain-id=<chain-id> --from=<key name> --fee=0.004iris --dest-address=<account address> --amount=1iris",
+		Example: "iriscli service withdraw-tax --chain-id=<chain-id> --from=<key name> --fee=0.004iris --dest-address=<account address> --withdraw-amount=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))

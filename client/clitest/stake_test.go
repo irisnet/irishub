@@ -25,6 +25,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	barAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show bar --output=json --home=%s", iriscliHome))
 
 	irisHomeB, _ := getTestingHomeDirsB()
+	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHomeB))
 	barCeshPubKey := executeGetValidatorPK(t, fmt.Sprintf("iris tendermint show-validator --home=%s", irisHomeB))
 
 	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), v0.DefaultKeyPass)

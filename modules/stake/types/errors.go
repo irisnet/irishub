@@ -6,6 +6,7 @@ import (
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 type CodeType = sdk.CodeType
@@ -42,6 +43,11 @@ func ErrValidatorOwnerExists(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrValidatorPubKeyExists(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidValidator, "validator already exist for this pubkey, must use new validator pubkey")
+}
+
+func ErrValidatorPubKeyTypeNotSupported(codespace sdk.CodespaceType, keyType string, supportedTypes []string) sdk.Error {
+	msg := fmt.Sprintf("validator pubkey type %s is not supported, must use %s", keyType, strings.Join(supportedTypes, ","))
+	return sdk.NewError(codespace, CodeInvalidValidator, msg)
 }
 
 func ErrValidatorJailed(codespace sdk.CodespaceType) sdk.Error {

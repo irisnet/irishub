@@ -36,7 +36,7 @@ func CollectGenTxsCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 			config.SetRoot(viper.GetString(cli.HomeFlag))
 			name := viper.GetString(client.FlagName)
 
-			nodeID, valPubKey, err := InitializeNodeValidatorFiles(config)
+			nodeID, valPubKey, err := LoadNodeValidatorFiles(config)
 			if err != nil {
 				return err
 			}

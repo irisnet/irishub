@@ -51,7 +51,7 @@ following delegation and commission default parameters:
 
 			config := ctx.Config
 			config.SetRoot(viper.GetString(tmcli.HomeFlag))
-			nodeID, valPubKey, err := InitializeNodeValidatorFiles(ctx.Config)
+			nodeID, valPubKey, err := LoadNodeValidatorFiles(ctx.Config)
 			if err != nil {
 				return err
 			}
