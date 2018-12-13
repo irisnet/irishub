@@ -43,30 +43,30 @@ module.exports = {
                 }],
             '/software/': [
                 {
-                title: 'Node',
-                collapsable: false,
-                children: [
-                    ['node.md', 'Node']
-                ]
-            }, {
-                title: 'CLI Client',
-                collapsable: false,
-                children: [
-                    ['cli-client.md', 'CLI Client']
-                ]
-            }, {
-                title: 'Light Client',
-                collapsable: false,
-                children: [
-                    ['light-client.md', 'Light Client']
-                ]
-            }, {
-                title: 'Monitor',
-                collapsable: false,
-                children: [
-                    ['monitor.md', 'Monitor']
-                ]
-            }],
+                    title: 'Node',
+                    collapsable: false,
+                    children: [
+                        ['node.md', 'Node']
+                    ]
+                }, {
+                    title: 'CLI Client',
+                    collapsable: false,
+                    children: [
+                        ['cli-client.md', 'CLI Client']
+                    ]
+                }, {
+                    title: 'Light Client',
+                    collapsable: false,
+                    children: [
+                        ['light-client.md', 'Light Client']
+                    ]
+                }, {
+                    title: 'Monitor',
+                    collapsable: false,
+                    children: [
+                        ['monitor.md', 'Monitor']
+                    ]
+                }],
             '/get-started/': [{
                 title: 'Getting Started',
                 collapsable: false,
@@ -98,6 +98,7 @@ module.exports = {
                     ['governance.md', 'Governance'],
                     ['upgrade.md', 'Upgrade'],
                     ['distribution.md', 'Distribution'],
+                    ['guardian.md', 'Guardian'],
                 ]
             }],
             '/cli-client/': [{
