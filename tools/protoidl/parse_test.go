@@ -62,6 +62,7 @@ func TestGetMethods(t *testing.T) {
 			assert.Error(t, err)
 			return
 		}
+		assert.NoError(t, err)
 		require.Len(t, methods, tc.methodNumber)
 		require.Equal(t, methods[0].Name, "SayHello")
 		require.Equal(t, methods[0].Attributes, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"})

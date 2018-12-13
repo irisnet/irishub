@@ -6,9 +6,9 @@ import (
 	"math/big"
 	"math/rand"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/simulation/mock"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
 	"github.com/tendermint/tendermint/crypto"

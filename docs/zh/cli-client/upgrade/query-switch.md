@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli upgrade query-switch --proposalID <proposalID> --voter <voter address>
+iriscli upgrade query-switch --proposal-id <proposalID> --voter <voter address>
 ```
 打印帮助信息:
 
@@ -19,7 +19,7 @@ iriscli upgrade query-switch  --help
 
 | 名称, 速记       | 默认值                     | 描述                                                        | 必需     |
 | --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
-| --proposalID      |        | 软件升级提议的ID                              | 是     |
+| --proposal-id      |        | 软件升级提议的ID                              | 是     |
 | --voter     |                            | 签名switch消息的地址                             | 是      |
 
 ## 例子
@@ -27,5 +27,5 @@ iriscli upgrade query-switch  --help
 查询用户`faa1qvt2r6hh9vyg3kh4tnwgx8wh0kpa7q2lsk03fe`是否对升级提议（ID为5）发送了switch消息
 
 ```
-iriscli upgrade query-switch --proposalID=5 --voter=faa1qvt2r6hh9vyg3kh4tnwgx8wh0kpa7q2lsk03fe
+iriscli upgrade query-switch --proposal-id=5 --voter=faa1qvt2r6hh9vyg3kh4tnwgx8wh0kpa7q2lsk03fe
 ```

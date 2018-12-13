@@ -2,12 +2,12 @@ package version
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
 )
 
 // Version - Iris Version
-const Version = "0.7.0"
+const Version = "0.8.0"
 
 // GitCommit set by build flags
 var GitCommit = ""

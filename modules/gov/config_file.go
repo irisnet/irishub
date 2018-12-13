@@ -2,13 +2,13 @@ package gov
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/iparam"
 	"encoding/json"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"path"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 type ParameterConfigFile struct {
@@ -16,7 +16,7 @@ type ParameterConfigFile struct {
 }
 
 func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
-	pathStr = path.Join(pathStr, "config/params.json")
+	pathStr = path.Join(pathStr, "params.json")
 
 	jsonBytes, err := cmn.ReadFile(pathStr)
 
@@ -57,7 +57,7 @@ func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pa
 		return err
 	}
 
-	pathStr = path.Join(pathStr, "config/params.json")
+	pathStr = path.Join(pathStr, "params.json")
 	err = cmn.WriteFile(pathStr, output, 0644)
 	if err != nil {
 
@@ -74,7 +74,7 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (Par
 	var jsonBytes []byte
 
 	if len(keyStr) == 0 {
-		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf("Key can't be empty!"))
+		return param, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("Key can't be empty!"))
 	}
 
 	switch keyStr {
@@ -85,7 +85,7 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (Par
 	case "Gov/govTallyingProcedure":
 		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
 	default:
-		return param, sdk.NewError(iparam.DefaultCodespace, iparam.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
+		return param, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 	}
 
 	if err != nil {

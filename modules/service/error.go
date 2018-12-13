@@ -1,12 +1,12 @@
 package service
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"fmt"
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 8
+	DefaultCodespace sdk.CodespaceType = 23
 
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101
@@ -28,6 +28,20 @@ const (
 	CodeLtMinProviderDeposit sdk.CodeType = 116
 	CodeInvalidDisable       sdk.CodeType = 117
 	CodeInvalidEnable        sdk.CodeType = 118
+
+	CodeMethodNotExists        sdk.CodeType = 119
+	CodeRequestNotActive       sdk.CodeType = 120
+	CodeReturnFeeNotExists     sdk.CodeType = 121
+	CodeWithdrawFeeNotExists   sdk.CodeType = 122
+	CodeLtServiceFee           sdk.CodeType = 123
+	CodeInvalidReqId           sdk.CodeType = 124
+	CodeSvcBindingNotAvailable sdk.CodeType = 125
+	CodeNotMatchingProvider    sdk.CodeType = 126
+	CodeInvalidReqChainId      sdk.CodeType = 127
+	CodeInvalidBindChainId     sdk.CodeType = 128
+	CodeNotMatchingReqChainID  sdk.CodeType = 129
+
+	CodeIntOverflow sdk.CodeType = 130
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -88,7 +102,7 @@ func ErrInvalidMethodName(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("def-chain-id is empty"))
+	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("defined chain id is empty"))
 }
 
 func ErrSvcBindingExists(codespace sdk.CodespaceType) sdk.Error {
@@ -125,4 +139,48 @@ func ErrEnable(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
 	return sdk.NewError(codespace, CodeLtMinProviderDeposit, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
+}
+
+func ErrMethodNotExists(codespace sdk.CodespaceType, methodID int16) sdk.Error {
+	return sdk.NewError(codespace, CodeMethodNotExists, fmt.Sprintf("service method [%d] is not existed", methodID))
+}
+
+func ErrRequestNotActive(codespace sdk.CodespaceType, requestID string) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestNotActive, fmt.Sprintf("request [%s] is not existed", requestID))
+}
+
+func ErrReturnFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeReturnFeeNotExists, fmt.Sprintf("There is no service refund fees for [%s]", address))
+}
+
+func ErrWithdrawFeeNotExists(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeWithdrawFeeNotExists, fmt.Sprintf("There is no service withdraw fees for [%s]", address))
+}
+
+func ErrLtServiceFee(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeLtServiceFee, fmt.Sprintf("service fee amount must be equal or greater than %s", coins.String()))
+}
+
+func ErrInvalidReqId(codespace sdk.CodespaceType, reqId string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidReqId, fmt.Sprintf("invalid request id [%s]", reqId))
+}
+
+func ErrSvcBindingNotAvailable(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeSvcBindingNotAvailable, fmt.Sprintf("service binding is unavailable"))
+}
+
+func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeNotMatchingProvider, fmt.Sprintf("[%s] is not a matching Provider", provider.String()))
+}
+
+func ErrInvalidReqChainId(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidReqChainId, fmt.Sprintf("request chain id is empty"))
+}
+
+func ErrInvalidBindChainId(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidBindChainId, fmt.Sprintf("bind chain id is empty"))
+}
+
+func ErrNotMatchingReqChainID(codespace sdk.CodespaceType, reqChainID string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotMatchingReqChainID, fmt.Sprintf("[%s] is not a matching reqChainID", reqChainID))
 }

@@ -16,9 +16,9 @@ iriscli upgrade submit-switch --help
 ```
 ## 标志
 
-| 名称, 速记       | 默认值    | 描述                                                         | 必需     |
+| 名称, 缩写       | 默认值    | 描述                                                         | 必需     |
 | ---------------  | --------- | ------------------------------------------------------------ | -------- |
-| --proposalID    |           | 软件升级提议的ID                                             | 是       |
+| --proposal-id    |           | 软件升级提议的ID                                             | 是       |
 | --title          |           | switch消息对标题                                             |          |
 
 ## 用例
@@ -26,5 +26,5 @@ iriscli upgrade submit-switch --help
 发送对软件升级提议（ID为5）switch消息
 
 ```
-iriscli upgrade submit-switch --chain-id=IRISnet --from=x --fee=0.004iris --proposalID 5 --title="Run new verison"
+iriscli upgrade submit-switch --chain-id=IRISnet --from=x --fee=0.004iris --proposal-id 5 --title="Run new verison"
 ```

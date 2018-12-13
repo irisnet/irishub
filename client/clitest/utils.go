@@ -11,18 +11,18 @@ import (
 	"io"
 
 	irisInit "github.com/irisnet/irishub/init"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/tests"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
+	distributiontypes "github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
-	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/keys"
 	recordCli "github.com/irisnet/irishub/client/record"
+	servicecli "github.com/irisnet/irishub/client/service"
 	stakecli "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
@@ -34,9 +34,11 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/modules/service"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/auth"
 	"path/filepath"
 	"io/ioutil"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -117,10 +119,23 @@ func setupGenesisAndConfig(srcHome, dstHome string) error {
 	return nil
 }
 
-func modifyGenesisState(genesisState app.GenesisState) app.GenesisState {
+func modifyGenesisState(genesisState app.GenesisFileState) app.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
+	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
+	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
+
+	// genesis add a profiler
+	if len(genesisState.Accounts) > 0 {
+		profiler := guardian.Profiler{
+			Name:      "genesis",
+			Addr:      genesisState.Accounts[0].Address,
+			AddedAddr: genesisState.Accounts[0].Address,
+		}
+		genesisState.GuardianData.Profilers[0] = profiler
+	}
+
 	return genesisState
 }
 
@@ -187,13 +202,12 @@ func copyFile(dstFile, srcFile string) error {
 	_, err = io.Copy(dst, src)
 	return err
 }
+
 //___________________________________________________________________________________
 // helper methods
 
-
-
 func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
-	tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
+	tests.ExecuteT(t, fmt.Sprintf("rm -rf %s", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), app.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), app.DefaultKeyPass)
@@ -201,13 +215,13 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
-	nodeID,_ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
+	nodeID, _ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState app.GenesisState
+	var appState app.GenesisFileState
 	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []app.GenesisAccount{app.NewDefaultGenesisAccount(fooAddr)}
+	appState.Accounts = []app.GenesisFileAccount{app.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)
@@ -424,9 +438,9 @@ func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
 	return switchMsg
 }
 
-func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.ServiceOutput {
+func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceDef servicecli.ServiceOutput
+	var serviceDef servicecli.DefOutput
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -449,6 +463,33 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBindings
+}
+
+func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Profiler {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var profilers []guardian.Profiler
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &profilers)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return profilers
+}
+
+func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var svcRequests []service.SvcRequest
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return svcRequests
+}
+
+func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var feesOutput servicecli.FeesOutput
+	cdc := app.MakeCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return feesOutput
 }
 
 func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...string) string {
@@ -538,5 +579,3 @@ func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force b
 	return true
 
 }
-
-

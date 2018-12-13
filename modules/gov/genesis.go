@@ -2,15 +2,16 @@ package gov
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/iparam"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
 	"time"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
+	TerminatorPeriod   int64                       `json:"terminator_period"`
 	StartingProposalID uint64                      `json:"starting_proposalID"`
 	Deposits           []DepositWithMetadata       `json:"deposits"`
 	Votes              []VoteWithMetadata          `json:"votes"`
@@ -42,16 +43,21 @@ func NewGenesisState(startingProposalID uint64, dp govparams.DepositProcedure, v
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+
 	err := k.setInitialProposalID(ctx, data.StartingProposalID)
 	if err != nil {
 		// TODO: Handle this with #870
 		panic(err)
 	}
+
+	k.SetTerminatorPeriod(ctx, data.TerminatorPeriod)
+	k.SetTerminatorHeight(ctx, -1)
+
 	//k.setDepositProcedure(ctx, data.DepositProcedure)
 	////////////////////  iris begin  ///////////////////////////
-	iparam.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
-	iparam.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
-	iparam.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
+	params.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
+	params.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
+	params.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
 	////////////////////  iris end  /////////////////////////////
 	for _, deposit := range data.Deposits {
 		k.setDeposit(ctx, deposit.ProposalID, deposit.Deposit.Depositor, deposit.Deposit)
@@ -111,6 +117,7 @@ func DefaultGenesisState() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
+		TerminatorPeriod:20000,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
@@ -136,6 +143,7 @@ func DefaultGenesisStateForCliTest() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
+		TerminatorPeriod:20,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
@@ -161,6 +169,7 @@ func DefaultGenesisStateForLCDTest() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
+		TerminatorPeriod:20,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},

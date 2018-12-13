@@ -4,11 +4,11 @@ package gov
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 5
+	DefaultCodespace sdk.CodespaceType = 21
 
 	CodeUnknownProposal         sdk.CodeType = 1
 	CodeInactiveProposal        sdk.CodeType = 2
@@ -79,7 +79,6 @@ func ErrInvalidParam(codespace sdk.CodespaceType) sdk.Error {
 func ErrInvalidParamOp(codespace sdk.CodespaceType, opStr string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParamOp, fmt.Sprintf("Op '%s' is not valid", opStr))
 }
-
 func ErrSwitchPeriodInProcess(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeSwitchPeriodInProcess, fmt.Sprintf("Software Upgrade Switch Period is in process."))
 }

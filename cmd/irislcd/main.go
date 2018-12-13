@@ -21,6 +21,7 @@ var (
 func main() {
 
 	irisInit.InitBech32Prefix()
+
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
 

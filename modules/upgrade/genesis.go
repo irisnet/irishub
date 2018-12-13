@@ -2,10 +2,10 @@ package upgrade
 
 import (
 	bam "github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"fmt"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // GenesisState - all upgrade state that must be provided at genesis
@@ -27,9 +27,9 @@ func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState
 	genesisVersion := NewVersion(0, 0, 0, moduleList)
 	k.AddNewVersion(ctx, genesisVersion)
 
-	iparam.InitGenesisParameter(&upgradeparams.ProposalAcceptHeightParameter, ctx, -1)
-	iparam.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, 0)
-	iparam.InitGenesisParameter(&upgradeparams.SwitchPeriodParameter, ctx, data.SwitchPeriod)
+	params.InitGenesisParameter(&upgradeparams.ProposalAcceptHeightParameter, ctx, -1)
+	params.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, 0)
+	params.InitGenesisParameter(&upgradeparams.SwitchPeriodParameter, ctx, data.SwitchPeriod)
 
 	InitGenesis_commitID(ctx, k)
 }

@@ -1,9 +1,9 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"

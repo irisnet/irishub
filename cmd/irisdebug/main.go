@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
 	iris "github.com/irisnet/irishub/app"
 	irisInit "github.com/irisnet/irishub/init"
 	"github.com/spf13/cobra"
@@ -20,6 +20,7 @@ import (
 )
 
 func init() {
+
 	irisInit.InitBech32Prefix()
 
 	rootCmd.AddCommand(txCmd)

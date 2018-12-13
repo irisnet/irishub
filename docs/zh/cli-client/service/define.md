@@ -22,7 +22,7 @@ iriscli service define [flags]
 | --file                |                         | [string] 对该服务描述的接口定义语言内容的文件路径                                         |          |
 | -h, --help            |                         | 服务定义命令帮助                                                                    |          |
 
-## 例子
+## 示例
 
 ### 创建一个新的服务定义
 ```shell

@@ -9,11 +9,11 @@ import (
 	"os"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	sdk "github.com/irisnet/irishub/types"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -49,10 +49,9 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	stakeGenesis := stake.DefaultGenesisState()
 	fmt.Printf("Selected randomly generated staking parameters: %+v\n", stakeGenesis)
 
-	var genesisAccounts []GenesisAccount
+	var genesisAccounts []GenesisFileAccount
 
 	amount := sdk.NewIntWithDecimal(100, 18)
-	stakeAmount := sdk.NewIntWithDecimal(1, 2)
 	numInitiallyBonded := int64(r.Intn(250))
 	//numInitiallyBonded := int64(4)
 	numAccs := int64(len(accs))
@@ -63,19 +62,14 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 
 	// Randomly generate some genesis accounts
 	for _, acc := range accs {
-		coins := sdk.Coins{
-			{
-				Denom:  "iris-atto",
-				Amount: amount,
-			},
-			{
-				Denom:  stakeGenesis.Params.BondDenom,
-				Amount: stakeAmount,
-			},
+		coins := sdk.Coins{sdk.NewCoin("iris-atto", amount)}
+		var coinsStringArray []string
+		for _, coin := range coins {
+			coinsStringArray = append(coinsStringArray, coin.String())
 		}
-		genesisAccounts = append(genesisAccounts, GenesisAccount{
+		genesisAccounts = append(genesisAccounts, GenesisFileAccount{
 			Address: acc.Address,
-			Coins:   coins,
+			Coins:   coinsStringArray,
 		})
 	}
 
@@ -113,7 +107,7 @@ func appStateFn(r *rand.Rand, accs []simulation.Account) json.RawMessage {
 	stakeGenesis.Validators = validators
 	stakeGenesis.Bonds = delegations
 
-	genesis := GenesisState{
+	genesis := GenesisFileState{
 		Accounts:     genesisAccounts,
 		StakeData:    stakeGenesis,
 		MintData:     mintGenesis,

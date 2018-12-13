@@ -69,55 +69,6 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:d7d3961eba6b55235b397574fa7915b0cf51148cb7eff2fcb36f249704ff02ba"
-  name = "github.com/cosmos/cosmos-sdk"
-  packages = [
-    "baseapp",
-    "client",
-    "client/context",
-    "client/keys",
-    "client/rpc",
-    "client/tx",
-    "client/utils",
-    "codec",
-    "crypto",
-    "crypto/keys",
-    "crypto/keys/hd",
-    "crypto/keys/keyerror",
-    "crypto/keys/mintkey",
-    "server",
-    "server/config",
-    "server/mock",
-    "store",
-    "tests",
-    "types",
-    "version",
-    "x/auth",
-    "x/auth/client/cli",
-    "x/auth/client/txbuilder",
-    "x/bank",
-    "x/distribution",
-    "x/distribution/keeper",
-    "x/distribution/tags",
-    "x/distribution/types",
-    "x/ibc",
-    "x/mint",
-    "x/params",
-    "x/params/subspace",
-    "x/slashing",
-    "x/stake",
-    "x/stake/client/rest",
-    "x/stake/keeper",
-    "x/stake/querier",
-    "x/stake/tags",
-    "x/stake/types",
-  ]
-  pruneopts = "UT"
-  revision = "c9d5ede3272b9285b030c4fef92c0209e80d28bf"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "v0.26.0-iris0.7.0"
-
-[[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"
   name = "github.com/cosmos/go-bip39"
   packages = ["."]
@@ -482,14 +433,16 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:c1a04665f9613e082e1209cf288bf64f4068dcd6c87a64bf1c4ff006ad422ba0"
+  digest = "1:26663fafdea73a38075b07e8e9d82fc0056379d2be8bb4e13899e8fda7c7dd23"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
+    "prometheus/internal",
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  revision = "abad2d1bd44235a26707c172eab6bca5bf2dbad3"
+  version = "v0.9.1"
 
 [[projects]]
   branch = "master"
@@ -538,6 +491,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
+
+[[projects]]
+  digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
+  name = "github.com/rs/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:3fb45284d554f369d08136a0fd4d01f50897f6f79469358c41fb5a30a6379dfe"
@@ -669,15 +630,15 @@
   version = "v0.14.0"
 
 [[projects]]
-  digest = "1:9f8c4c93658315a795ffd3e0c943d39f78067dd8382b8d7bcfaf6686b92f3978"
+  digest = "1:e1cc8dd891e64aab63b0c09f2f12456cbe2cd9cbd9d96dfae3281245f05c2428"
   name = "github.com/tendermint/iavl"
   packages = ["."]
   pruneopts = "UT"
-  revision = "fa74114f764f9827c4ad5573f990ed25bf8c4bac"
-  version = "v0.11.1"
+  revision = "de0740903a67b624d887f9055d4c60175dcfa758"
+  version = "v0.12.0"
 
 [[projects]]
-  digest = "1:945fd3f74b35e13f1f61883be160692d81ab0c168c812771c2e44ed9c12f9ae3"
+  digest = "1:0be8656e9d8eb385caa0f30b71158126b6b4294a3c8fb6f0eb5aab350bd74712"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -708,7 +669,6 @@
     "libs/clist",
     "libs/common",
     "libs/db",
-    "libs/errors",
     "libs/events",
     "libs/fail",
     "libs/flowrate",
@@ -743,9 +703,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "650b6ddd80d00b193b3ba47a87800e72f12dd619"
+  revision = "9dd2007de1363fa77f11f71d30b59e747d2c3d99"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.26.1-rc0-iris"
+  version = "v0.27.0-dev1-iris"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
@@ -905,39 +865,12 @@
   input-imports = [
     "github.com/bartekn/go-bip39",
     "github.com/bgentry/speakeasy",
-    "github.com/cosmos/cosmos-sdk/baseapp",
-    "github.com/cosmos/cosmos-sdk/client",
-    "github.com/cosmos/cosmos-sdk/client/keys",
-    "github.com/cosmos/cosmos-sdk/client/rpc",
-    "github.com/cosmos/cosmos-sdk/client/tx",
-    "github.com/cosmos/cosmos-sdk/codec",
-    "github.com/cosmos/cosmos-sdk/crypto",
-    "github.com/cosmos/cosmos-sdk/crypto/keys",
-    "github.com/cosmos/cosmos-sdk/crypto/keys/hd",
-    "github.com/cosmos/cosmos-sdk/crypto/keys/keyerror",
-    "github.com/cosmos/cosmos-sdk/server",
-    "github.com/cosmos/cosmos-sdk/server/mock",
-    "github.com/cosmos/cosmos-sdk/store",
-    "github.com/cosmos/cosmos-sdk/tests",
-    "github.com/cosmos/cosmos-sdk/types",
-    "github.com/cosmos/cosmos-sdk/x/auth",
-    "github.com/cosmos/cosmos-sdk/x/auth/client/cli",
-    "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
-    "github.com/cosmos/cosmos-sdk/x/bank",
-    "github.com/cosmos/cosmos-sdk/x/distribution",
-    "github.com/cosmos/cosmos-sdk/x/distribution/types",
-    "github.com/cosmos/cosmos-sdk/x/ibc",
-    "github.com/cosmos/cosmos-sdk/x/mint",
-    "github.com/cosmos/cosmos-sdk/x/params",
-    "github.com/cosmos/cosmos-sdk/x/slashing",
-    "github.com/cosmos/cosmos-sdk/x/stake",
-    "github.com/cosmos/cosmos-sdk/x/stake/client/rest",
-    "github.com/cosmos/cosmos-sdk/x/stake/keeper",
-    "github.com/cosmos/cosmos-sdk/x/stake/tags",
-    "github.com/cosmos/cosmos-sdk/x/stake/types",
+    "github.com/btcsuite/btcd/btcec",
+    "github.com/cosmos/go-bip39",
     "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
+    "github.com/golang/protobuf/proto",
     "github.com/gorilla/mux",
     "github.com/ipfs/go-ipfs-api",
     "github.com/mattn/go-isatty",
@@ -958,6 +891,7 @@
     "github.com/stretchr/testify/require",
     "github.com/syndtr/goleveldb/leveldb/opt",
     "github.com/tendermint/go-amino",
+    "github.com/tendermint/iavl",
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
     "github.com/tendermint/tendermint/blockchain",
@@ -965,12 +899,17 @@
     "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",
+    "github.com/tendermint/tendermint/crypto/armor",
     "github.com/tendermint/tendermint/crypto/ed25519",
+    "github.com/tendermint/tendermint/crypto/encoding/amino",
     "github.com/tendermint/tendermint/crypto/merkle",
     "github.com/tendermint/tendermint/crypto/multisig",
     "github.com/tendermint/tendermint/crypto/secp256k1",
     "github.com/tendermint/tendermint/crypto/tmhash",
+    "github.com/tendermint/tendermint/crypto/xsalsa20symmetric",
+    "github.com/tendermint/tendermint/libs/bech32",
     "github.com/tendermint/tendermint/libs/cli",
+    "github.com/tendermint/tendermint/libs/cli/flags",
     "github.com/tendermint/tendermint/libs/common",
     "github.com/tendermint/tendermint/libs/db",
     "github.com/tendermint/tendermint/libs/log",
@@ -984,11 +923,14 @@
     "github.com/tendermint/tendermint/proxy",
     "github.com/tendermint/tendermint/rpc/client",
     "github.com/tendermint/tendermint/rpc/core/types",
+    "github.com/tendermint/tendermint/rpc/lib/client",
     "github.com/tendermint/tendermint/rpc/lib/server",
     "github.com/tendermint/tendermint/state",
     "github.com/tendermint/tendermint/types",
     "github.com/tendermint/tendermint/types/time",
     "github.com/tendermint/tmlibs/cli",
+    "github.com/zondax/ledger-goclient",
+    "golang.org/x/crypto/bcrypt",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

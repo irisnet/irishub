@@ -3,11 +3,10 @@ package baseapp
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
-	qr "github.com/cosmos/cosmos-sdk/baseapp"
 
 )
 
@@ -122,7 +121,7 @@ func (app *BaseApp) Router() Router {
 	return app.router
 }
 
-func (app *BaseApp) QueryRouter() qr.QueryRouter {
+func (app *BaseApp) QueryRouter() QueryRouter {
 	return app.queryRouter
 }
 

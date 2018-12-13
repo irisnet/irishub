@@ -24,25 +24,14 @@
 #   go-tests = true
 #   unused-packages = true
 
-
-
-[[constraint]]
-  name = "github.com/cosmos/cosmos-sdk"
-  source = "https://github.com/irisnet/cosmos-sdk.git"
-  version = "=v0.26.0-iris0.7.0"
-
 [[override]]
   name = "github.com/tendermint/iavl"
-  version = "=v0.11.1"
+  version = "=v0.12.0"
 
 [[override]]
   name = "github.com/tendermint/tendermint"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "=v0.26.1-rc0-iris"
-
-[[constraint]]
-  name = "github.com/prometheus/client_golang"
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  version = "=v0.27.0-dev1-iris"
 
 [[constraint]]
   name = "github.com/emicklei/proto"

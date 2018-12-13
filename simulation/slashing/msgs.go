@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math/rand"
 	"github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/simulation/mock/simulation"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/irisnet/irishub/modules/slashing"
 )
 
 // SimulateMsgUnjail

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type SvcDef struct {
@@ -19,7 +19,7 @@ type SvcDef struct {
 }
 
 type MethodProperty struct {
-	ID            int               `json:"id"`
+	ID            int16             `json:"id"`
 	Name          string            `json:"name"`
 	Description   string            `json:"description"`
 	OutputPrivacy OutputPrivacyEnum `json:"output_privacy"`

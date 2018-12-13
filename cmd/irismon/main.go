@@ -2,9 +2,10 @@ package main
 
 import (
 	"os"
-	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/tools/prometheus"
+
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/tools/prometheus"
+	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
 	irisInit "github.com/irisnet/irishub/init"
 )

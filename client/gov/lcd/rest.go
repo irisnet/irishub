@@ -1,7 +1,7 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"fmt"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/gorilla/mux"

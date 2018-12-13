@@ -1,6 +1,6 @@
 # Genesis
 
-Genesis文件是整个网络初始化的基础。它包含了创建创世块的大部分信息(比如ChainID，共识的参数),初始化账户余额，每个模块的参数，validators信息。
+Genesis文件是整个网络初始化的基础。它包含了创建创世区块的大部分信息(比如ChainID，共识的参数),初始化账户余额，每个模块的参数，validators信息。
 
 ## Basic State
 

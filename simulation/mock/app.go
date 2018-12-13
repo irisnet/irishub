@@ -5,13 +5,12 @@ import (
 	"os"
 
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/params"
 	bam "github.com/irisnet/irishub/baseapp"
-	"github.com/irisnet/irishub/iparam"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/types"
@@ -21,6 +20,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/modules/arbitration/params"
 )
 
 const (
@@ -93,7 +93,6 @@ func NewApp() *App {
 	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
-	config.Seal()
 
 	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
@@ -134,21 +133,25 @@ func NewApp() *App {
 	// Not sealing for custom extension
 
 	// init iparam
-	iparam.SetParamReadWriter(app.ParamsKeeper.Subspace(iparam.GovParamspace).WithTypeTable(
+	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), []byte{},
+			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), []byte{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinProviderDepositParameter)
+		&serviceparams.MinDepositMultipleParameter,
+		&arbitrationparams.ComplaintRetrospectParameter,
+		&arbitrationparams.ArbitrationTimelimitParameter)
 
-	iparam.RegisterGovParamMapping(
+	params.RegisterGovParamMapping(
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter)

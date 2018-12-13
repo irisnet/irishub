@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/client"
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/examples/irishub1/app"
 	bam "github.com/irisnet/irishub/baseapp"
 
@@ -19,7 +19,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	irisInit "github.com/irisnet/irishub/init"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func main() {
@@ -53,9 +53,11 @@ func main() {
 	startCmd := server.StartCmd(ctx, newApp)
 	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
-		irisInit.InitCmd(ctx, cdc, app.IrisAppInit()),
-		irisInit.GenTxCmd(ctx,cdc),
-		irisInit.TestnetFilesCmd(ctx,cdc,app.IrisAppInit()),
+		irisInit.InitCmd(ctx, cdc),
+		irisInit.GenTxCmd(ctx, cdc),
+		irisInit.AddGenesisAccountCmd(ctx, cdc),
+		irisInit.TestnetFilesCmd(ctx, cdc),
+		irisInit.CollectGenTxsCmd(ctx, cdc),
 		startCmd,
 		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
 		server.UnsafeResetAllCmd(ctx),
@@ -75,12 +77,21 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewIrisApp(logger, db, traceStore, bam.SetPruning(viper.GetString("pruning")))
+	return app.NewIrisApp(logger, db, traceStore,
+		bam.SetPruning(viper.GetString("pruning")),
+		bam.SetMinimumFees(viper.GetString("minimum_fees")),
+	)
 }
 
 func exportAppStateAndTMValidators(
-	logger log.Logger, db dbm.DB, traceStore io.Writer,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, traceStore)
+	if height != -1 {
+		err := gApp.LoadHeight(height)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
 	return gApp.ExportAppStateAndValidators()
 }

@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 //-----------------------------------------------------------
@@ -140,6 +140,9 @@ const (
 	ProposalTypeText            ProposalKind = 0x01
 	ProposalTypeParameterChange ProposalKind = 0x02
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x03
+	////////////////////  iris begin  /////////////////////////////
+	ProposalTypeTerminator      ProposalKind = 0x04
+	////////////////////  iris end  /////////////////////////////
 )
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -151,6 +154,10 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 		return ProposalTypeParameterChange, nil
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
+		////////////////////  iris begin  /////////////////////////////
+	case "Terminator":
+		return ProposalTypeTerminator, nil
+		////////////////////  iris end  /////////////////////////////
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
@@ -160,7 +167,10 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 func validProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeText ||
 		pt == ProposalTypeParameterChange ||
-		pt == ProposalTypeSoftwareUpgrade {
+		pt == ProposalTypeSoftwareUpgrade ||
+	////////////////////  iris begin  /////////////////////////////
+		pt == ProposalTypeTerminator  {
+	////////////////////  iris end  /////////////////////////////
 		return true
 	}
 	return false
@@ -207,6 +217,10 @@ func (pt ProposalKind) String() string {
 		return "ParameterChange"
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
+		////////////////////  iris begin  /////////////////////////////
+	case ProposalTypeTerminator:
+		return "Terminator"
+		////////////////////  iris end  /////////////////////////////
 	default:
 		return ""
 	}

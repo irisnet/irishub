@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/server"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
@@ -24,6 +24,7 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -39,8 +40,7 @@ var (
 const nodeDirPerm = 0755
 
 // get cmd to initialize all files for tendermint testnet and application
-func TestnetFilesCmd(ctx *server.Context, cdc *codec.Codec,
-	appInit server.AppInit) *cobra.Command {
+func TestnetFilesCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "testnet",
@@ -96,7 +96,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 	valPubKeys := make([]crypto.PubKey, numValidators)
 
 	var (
-		accs     []app.GenesisAccount
+		accs     []app.GenesisFileAccount
 		genFiles []string
 	)
 
@@ -177,11 +177,9 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			return err
 		}
 
-		accs = append(accs, app.GenesisAccount{
+		accs = append(accs, app.GenesisFileAccount{
 			Address: addr,
-			Coins: sdk.Coins{
-				app.FreeFermionAcc,
-			},
+			Coins:   []string{app.FreeFermionAcc.String()},
 		})
 
 		msg := stake.NewMsgCreateValidator(
@@ -231,12 +229,30 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 }
 
 func initGenFiles(
-	cdc *codec.Codec, chainID string, accs []app.GenesisAccount,
+	cdc *codec.Codec, chainID string, accs []app.GenesisFileAccount,
 	genFiles []string, numValidators int,
 ) error {
 
-	appGenState := app.NewDefaultGenesisState()
+	appGenState := app.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
+
+	// genesis add a profiler
+	if len(appGenState.Accounts) > 0 {
+		profiler := guardian.Profiler{
+			Name:      "genesis",
+			Addr:      appGenState.Accounts[0].Address,
+			AddedAddr: appGenState.Accounts[0].Address,
+		}
+		appGenState.GuardianData.Profilers[0] = profiler
+	}
+
+	// genesis add a trustee
+	if len(appGenState.Accounts) > 0 {
+		trustee := guardian.Trustee{
+			Addr: appGenState.Accounts[0].Address,
+		}
+		appGenState.GuardianData.Trustees[0] = trustee
+	}
 
 	appGenStateJSON, err := codec.MarshalJSONIndent(cdc, appGenState)
 	if err != nil {

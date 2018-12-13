@@ -8,11 +8,11 @@
 * `VotingProcedure`   投票阶段的参数（投票期）
 * `TallyingProcedure` 统计阶段的参数（投票是否通过的标准）
 
-详细见[gov](gov.md)
+详细见[gov](../governance.md)
 
 ## Service Module
 
 * `MaxRequestTimeout`   服务调用最大等待区块个数
 * `MinProviderDeposit`  服务绑定最小抵押金额
 
-详细见[service](serivice.md)
+详细见[service](../service.md)

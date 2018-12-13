@@ -4,15 +4,16 @@ import (
 	"os"
 	"path"
 
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
-	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
+	servicecmd "github.com/irisnet/irishub/client/service/cli"
+	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
@@ -185,21 +186,47 @@ func main() {
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(
-			servicecmd.GetCmdQueryScvDef("service", cdc),
-			servicecmd.GetCmdQueryScvBind("service", cdc),
-			servicecmd.GetCmdQueryScvBinds("service", cdc),
+			servicecmd.GetCmdQuerySvcDef("service", cdc),
+			servicecmd.GetCmdQuerySvcBind("service", cdc),
+			servicecmd.GetCmdQuerySvcBinds("service", cdc),
+			servicecmd.GetCmdQuerySvcRequests("service", cdc),
+			servicecmd.GetCmdQuerySvcResponse("service", cdc),
+			servicecmd.GetCmdQuerySvcFees("service", cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
-		servicecmd.GetCmdScvDef(cdc),
-		servicecmd.GetCmdScvBind(cdc),
-		servicecmd.GetCmdScvBindUpdate(cdc),
-		servicecmd.GetCmdScvDisable(cdc),
-		servicecmd.GetCmdScvEnable(cdc),
-		servicecmd.GetCmdScvRefundDeposit(cdc),
+		servicecmd.GetCmdSvcDef(cdc),
+		servicecmd.GetCmdSvcBind(cdc),
+		servicecmd.GetCmdSvcBindUpdate(cdc),
+		servicecmd.GetCmdSvcDisable(cdc),
+		servicecmd.GetCmdSvcEnable(cdc),
+		servicecmd.GetCmdSvcRefundDeposit(cdc),
+		servicecmd.GetCmdSvcCall(cdc),
+		servicecmd.GetCmdSvcRespond(cdc),
+		servicecmd.GetCmdSvcRefundFees(cdc),
+		servicecmd.GetCmdSvcWithdrawFees(cdc),
 	)...)
 
 	rootCmd.AddCommand(
 		serviceCmd,
+	)
+
+	//add guardian command
+	guardianCmd := &cobra.Command{
+		Use:   "guardian",
+		Short: "Guardian subcommands",
+	}
+	guardianCmd.AddCommand(
+		client.GetCommands(
+			guardiancmd.GetCmdQueryProfilers("guardian", cdc),
+			guardiancmd.GetCmdQueryTrustees("guardian", cdc),
+		)...)
+
+	guardianCmd.AddCommand(
+		client.PostCommands(
+			guardiancmd.GetCmdCreateProfiler(cdc),
+		)...)
+	rootCmd.AddCommand(
+		guardianCmd,
 	)
 
 	//add record command

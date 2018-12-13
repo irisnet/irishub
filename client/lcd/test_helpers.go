@@ -12,18 +12,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	crkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/tests"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/codec"
+	crkeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	txbuilder "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	txbuilder "github.com/irisnet/irishub/client/auth/txbuilder"
+	"github.com/irisnet/irishub/modules/stake"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
@@ -198,7 +198,7 @@ func InitializeTestLCD(
 	for _, addr := range initAddrs {
 		accAuth := auth.NewBaseAccountWithAddress(addr)
 		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, 20))}
-		acc := irisapp.NewGenesisAccount(&accAuth)
+		acc := irisapp.NewGenesisFileAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
 		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 20)))
 	}
@@ -286,7 +286,16 @@ func startTM(
 //
 // NOTE: This causes the thread to block.
 func startLCD(logger log.Logger, listenAddr string, cdc *codec.Codec) (net.Listener, error) {
-	return tmrpc.StartHTTPServer(listenAddr, createHandler(cdc), logger, tmrpc.Config{})
+	listener, err := tmrpc.Listen(listenAddr, tmrpc.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	err = tmrpc.StartHTTPServer(listener, createHandler(cdc), logger)
+	if err != nil {
+		return nil, err
+	}
+	return listener, nil
 }
 
 // Request makes a test LCD test request. It returns a response object and a

@@ -6,10 +6,12 @@ import (
 	"testing"
 	"io/ioutil"
 
-	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/irisnet/irishub/tests"
 	"github.com/irisnet/irishub/app"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+	"regexp"
+	"strings"
 )
 
 func TestIrisCLIServiceDefine(t *testing.T) {
@@ -61,7 +63,7 @@ func TestIrisCLIServiceDefine(t *testing.T) {
 	}
 
 	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
-	require.Equal(t, serviceName, serviceDef.Name)
+	require.Equal(t, serviceName, serviceDef.Definition.Name)
 
 	// method test
 	require.Equal(t, "SayHello", serviceDef.Methods[0].Name)
@@ -118,7 +120,7 @@ func TestIrisCLIServiceDefine(t *testing.T) {
 	sdStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
 	sdStr += fmt.Sprintf(" --bind-type=%s", "Global")
 	sdStr += fmt.Sprintf(" --deposit=%s", "1iris")
-	sdStr += fmt.Sprintf(" --prices=%s", "5iris")
+	sdStr += fmt.Sprintf(" --prices=%s", "0.1iris")
 	sdStr += fmt.Sprintf(" --avg-rsp-time=%d", 99)
 	sdStr += fmt.Sprintf(" --usable-time=%d", 99)
 	sdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
@@ -152,6 +154,64 @@ func TestIrisCLIServiceDefine(t *testing.T) {
 	if !(barNum > 19 && barNum < 20) {
 		t.Error("Test Failed: (19, 20) expected, recieved: {}", barNum)
 	}
+
+	// call test
+	caStr := fmt.Sprintf("iriscli service call %v", flags)
+	caStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
+	caStr += fmt.Sprintf(" --service-name=%s", serviceName)
+	caStr += fmt.Sprintf(" --bind-chain-id=%s", chainID)
+	caStr += fmt.Sprintf(" --method-id=%d", 1)
+	caStr += fmt.Sprintf(" --provider=%s", fooAddr.String())
+	caStr += fmt.Sprintf(" --request-data=%s", "1234")
+	caStr += fmt.Sprintf(" --service-fee=%s", "2iris")
+	caStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	caStr += fmt.Sprintf(" --from=%s", "bar")
+	_, outString, _ := executeWriteRetStdStreams(t, caStr, app.DefaultKeyPass)
+	var digitsRegexp = regexp.MustCompile(`\"request-id\": \".*\"`)
+	requestTag := string(digitsRegexp.Find([]byte(outString)))
+	requestId := strings.TrimSpace(strings.Split(requestTag, ":")[1])
+	requestId = requestId[1 : len(requestId)-1]
+	tests.WaitForNextNBlocksTM(2, port)
+
+	serviceRequests := executeGetServiceRequests(t, fmt.Sprintf("iriscli service requests --def-chain-id=%s --service-name=%s --bind-chain-id=%s --provider=%s %v", chainID, serviceName, chainID, fooAddr.String(), flags))
+	require.Equal(t, 1, len(serviceRequests))
+
+	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
+	barCoin = convertToIrisBaseAccount(t, barAcc)
+	barNum = getAmountFromCoinStr(barCoin)
+	if !(barNum > 18 && barNum < 19) {
+		t.Error("Test Failed: (18, 19) expected, recieved: {}", barNum)
+	}
+
+	// respond test
+	reStr := fmt.Sprintf("iriscli service respond %v", flags)
+	reStr += fmt.Sprintf(" --request-chain-id=%s", chainID)
+	reStr += fmt.Sprintf(" --request-id=%s", requestId)
+	reStr += fmt.Sprintf(" --response-data=%s", "1234")
+	reStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	reStr += fmt.Sprintf(" --from=%s", "foo")
+
+	executeWrite(t, reStr, app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// fees test
+	fooFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
+	barFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
+
+	require.Equal(t, "1000000000000000000iris-atto", fooFess.IncomingFee.String())
+	require.Nil(t, fooFess.ReturnedFee)
+	require.Nil(t, barFess.ReturnedFee)
+	require.Nil(t, barFess.IncomingFee)
+
+	executeWrite(t, caStr, app.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(12, port)
+
+	fooFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
+	barFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
+	require.Equal(t, "1000000000000000000iris-atto", fooFess.IncomingFee.String())
+	require.Nil(t, fooFess.ReturnedFee)
+	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.String())
+	require.Nil(t, barFess.IncomingFee)
 }
 
 const idlContent = `

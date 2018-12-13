@@ -2,7 +2,7 @@ package baseapp
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/irisnet/irishub/server"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"

@@ -11,19 +11,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/stake"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/modules/arbitration"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 var (
@@ -43,31 +44,36 @@ const (
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts     []GenesisAccount      `json:"accounts"`
-	AuthData     auth.GenesisState     `json:"auth"`
-	StakeData    stake.GenesisState    `json:"stake"`
-	MintData     mint.GenesisState     `json:"mint"`
-	DistrData    distr.GenesisState    `json:"distr"`
-	GovData      gov.GenesisState      `json:"gov"`
-	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
-	SlashingData slashing.GenesisState `json:"slashing"`
-	ServiceData  service.GenesisState  `json:"service"`
-	GenTxs       []json.RawMessage     `json:"gentxs"`
+	Accounts        []GenesisAccount         `json:"accounts"`
+	AuthData        auth.GenesisState        `json:"auth"`
+	StakeData       stake.GenesisState       `json:"stake"`
+	MintData        mint.GenesisState        `json:"mint"`
+	DistrData       distr.GenesisState       `json:"distr"`
+	GovData         gov.GenesisState         `json:"gov"`
+	UpgradeData     upgrade.GenesisState     `json:"upgrade"`
+	SlashingData    slashing.GenesisState    `json:"slashing"`
+	ServiceData     service.GenesisState     `json:"service"`
+	ArbitrationData arbitration.GenesisState `json:"arbitration"`
+	GuardianData    guardian.GenesisState    `json:"guardian"`
+	GenTxs          []json.RawMessage        `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState, slashingData slashing.GenesisState) GenesisState {
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
+	arbitrationData arbitration.GenesisState, guardianData guardian.GenesisState, slashingData slashing.GenesisState) GenesisState {
 
 	return GenesisState{
-		Accounts:     accounts,
-		AuthData:     authData,
-		StakeData:    stakeData,
-		MintData:     mintData,
-		DistrData:    distrData,
-		GovData:      govData,
-		UpgradeData:  upgradeData,
-		ServiceData:  serviceData,
-		SlashingData: slashingData,
+		Accounts:        accounts,
+		AuthData:        authData,
+		StakeData:       stakeData,
+		MintData:        mintData,
+		DistrData:       distrData,
+		GovData:         govData,
+		UpgradeData:     upgradeData,
+		ServiceData:     serviceData,
+		ArbitrationData: arbitrationData,
+		GuardianData:    guardianData,
+		SlashingData:    slashingData,
 	}
 }
 
@@ -107,32 +113,10 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 	}
 }
 
-// NewDefaultGenesisState generates the default state for gaia.
-func NewDefaultGenesisState() GenesisState {
-	return GenesisState{
-		Accounts:     nil,
-		StakeData:    createStakeGenesisState(),
-		MintData:     createMintGenesisState(),
-		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
-		UpgradeData:  upgrade.DefaultGenesisState(),
-		ServiceData:  service.DefaultGenesisState(),
-		SlashingData: slashing.DefaultGenesisState(),
-		GenTxs:       nil,
-	}
-}
-
-// get app init parameters for server init command
-func IrisAppInit() server.AppInit {
-	return server.AppInit{
-		AppGenState: IrisAppGenStateJSON,
-	}
-}
-
 // Create the core parameters for genesis initialization for iris
 // note that the pubkey input is this machines pubkey
 func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []json.RawMessage) (
-	genesisState GenesisState, err error) {
+	genesisState GenesisFileState, err error) {
 	if err = cdc.UnmarshalJSON(genDoc.AppState, &genesisState); err != nil {
 		return genesisState, err
 	}
@@ -162,24 +146,25 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	for _, acc := range genesisState.Accounts {
 		// create the genesis account, give'm few iris-atto and a buncha token with there name
 		for _, coin := range acc.Coins {
-			if coin.Denom == StakeDenom {
-				stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
-					Add(sdk.NewDecFromInt(coin.Amount)) // increase the supply
+			coinName, err := types.GetCoinName(coin)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 			}
+			if coinName != Denom {
+				continue
+			}
+			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", StakeDenom, coin))
+			}
+			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
+				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
 		}
 	}
 	genesisState.StakeData = stakeData
 	genesisState.GenTxs = appGenTxs
 	genesisState.UpgradeData = genesisState.UpgradeData
 	return genesisState, nil
-}
-
-func genesisAccountFromMsgCreateValidator(msg stake.MsgCreateValidator, amount sdk.Int) GenesisAccount {
-	accAuth := auth.NewBaseAccountWithAddress(sdk.AccAddress(msg.ValidatorAddr))
-	accAuth.Coins = []sdk.Coin{
-		{StakeDenom, amount},
-	}
-	return NewGenesisAccount(&accAuth)
 }
 
 // IrisValidateGenesisState ensures that the genesis state obeys the expected invariants
@@ -238,10 +223,11 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 
 	// prepare a map of all accounts in genesis state to then validate
 	// against the validators addresses
-	var appState GenesisState
-	if err := cdc.UnmarshalJSON(genDoc.AppState, &appState); err != nil {
+	var appFileState GenesisFileState
+	if err := cdc.UnmarshalJSON(genDoc.AppState, &appFileState); err != nil {
 		return appGenTxs, persistentPeers, err
 	}
+	appState := convertToGenesisState(appFileState)
 	addrMap := make(map[string]GenesisAccount, len(appState.Accounts))
 	for i := 0; i < len(appState.Accounts); i++ {
 		acc := appState.Accounts[i]
@@ -311,14 +297,6 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	return appGenTxs, persistentPeers, nil
 }
 
-func NewDefaultGenesisAccount(addr sdk.AccAddress) GenesisAccount {
-	accAuth := auth.NewBaseAccountWithAddress(addr)
-	accAuth.Coins = []sdk.Coin{
-		FreeFermionAcc,
-	}
-	return NewGenesisAccount(&accAuth)
-}
-
 func createStakeGenesisState() stake.GenesisState {
 	return stake.GenesisState{
 		Pool: stake.Pool{
@@ -344,4 +322,147 @@ func createMintGenesisState() mint.GenesisState {
 			GoalBonded:          sdk.NewDecWithPrec(67, 2),
 		},
 	}
+}
+
+// normalize stake token to mini-unit
+func normalizeNativeToken(coins []string) sdk.Coins {
+	var accountCoins sdk.Coins
+	nativeCoin := sdk.NewInt64Coin(StakeDenom, 0)
+	for _, coin := range coins {
+		coinName, err := types.GetCoinName(coin)
+		if err != nil {
+			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
+		}
+		if coinName == Denom {
+			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, StakeDenom))
+			}
+			nativeCoin = nativeCoin.Plus(normalizeNativeToken)
+		} else {
+			// not native token
+			denom, amount, err := types.GetCoin(coin);
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
+			}
+
+			amt, ok := sdk.NewIntFromString(amount)
+			if !ok {
+				panic(fmt.Sprintf("non-native coin(%s) amount should be integer ", coin))
+			}
+			denom = strings.ToLower(denom)
+			accountCoins = append(accountCoins, sdk.NewCoin(denom, amt))
+		}
+	}
+	accountCoins = append(accountCoins, nativeCoin)
+	if accountCoins.IsZero() {
+		panic("invalid genesis file, found account without any token")
+	}
+	return accountCoins
+}
+
+func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
+	var genesisAccounts []GenesisAccount
+	for _, gacc := range genesisFileState.Accounts {
+		acc := GenesisAccount{
+			Address:       gacc.Address,
+			Coins:         normalizeNativeToken(gacc.Coins),
+			AccountNumber: gacc.AccountNumber,
+			Sequence:      gacc.Sequence,
+		}
+		genesisAccounts = append(genesisAccounts, acc)
+	}
+	return GenesisState{
+		Accounts:        genesisAccounts,
+		AuthData:        genesisFileState.AuthData,
+		StakeData:       genesisFileState.StakeData,
+		MintData:        genesisFileState.MintData,
+		DistrData:       genesisFileState.DistrData,
+		GovData:         genesisFileState.GovData,
+		UpgradeData:     genesisFileState.UpgradeData,
+		SlashingData:    genesisFileState.SlashingData,
+		ServiceData:     genesisFileState.ServiceData,
+		ArbitrationData: genesisFileState.ArbitrationData,
+		GuardianData:    genesisFileState.GuardianData,
+		GenTxs:          genesisFileState.GenTxs,
+	}
+}
+
+type GenesisFileState struct {
+	Accounts        []GenesisFileAccount     `json:"accounts"`
+	AuthData        auth.GenesisState        `json:"auth"`
+	StakeData       stake.GenesisState       `json:"stake"`
+	MintData        mint.GenesisState        `json:"mint"`
+	DistrData       distr.GenesisState       `json:"distr"`
+	GovData         gov.GenesisState         `json:"gov"`
+	UpgradeData     upgrade.GenesisState     `json:"upgrade"`
+	SlashingData    slashing.GenesisState    `json:"slashing"`
+	ServiceData     service.GenesisState     `json:"service"`
+	GuardianData    guardian.GenesisState    `json:"guardian"`
+	ArbitrationData arbitration.GenesisState `json:"arbitration"`
+	GenTxs          []json.RawMessage        `json:"gentxs"`
+}
+
+type GenesisFileAccount struct {
+	Address       sdk.AccAddress `json:"address"`
+	Coins         []string       `json:"coins"`
+	Sequence      int64          `json:"sequence_number"`
+	AccountNumber int64          `json:"account_number"`
+}
+
+func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
+	var coins []string
+	for _, coin := range acc.Coins {
+		coins = append(coins, coin.String())
+	}
+	return GenesisFileAccount{
+		Address:       acc.Address,
+		Coins:         coins,
+		AccountNumber: acc.AccountNumber,
+		Sequence:      acc.Sequence,
+	}
+}
+
+func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
+	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
+	arbitrationData arbitration.GenesisState, guardianData guardian.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+
+	return GenesisFileState{
+		Accounts:        accounts,
+		AuthData:        authData,
+		StakeData:       stakeData,
+		MintData:        mintData,
+		DistrData:       distrData,
+		GovData:         govData,
+		UpgradeData:     upgradeData,
+		ServiceData:     serviceData,
+		ArbitrationData: arbitrationData,
+		GuardianData:    guardianData,
+		SlashingData:    slashingData,
+	}
+}
+
+// NewDefaultGenesisState generates the default state for iris.
+func NewDefaultGenesisFileState() GenesisFileState {
+	return GenesisFileState{
+		Accounts:        nil,
+		StakeData:       createStakeGenesisState(),
+		MintData:        createMintGenesisState(),
+		DistrData:       distr.DefaultGenesisState(),
+		GovData:         gov.DefaultGenesisState(),
+		UpgradeData:     upgrade.DefaultGenesisState(),
+		ServiceData:     service.DefaultGenesisState(),
+		GuardianData:    guardian.DefaultGenesisState(),
+		ArbitrationData: arbitration.DefaultGenesisState(),
+		SlashingData:    slashing.DefaultGenesisState(),
+		GenTxs:          nil,
+	}
+}
+
+func NewDefaultGenesisFileAccount(addr sdk.AccAddress) GenesisFileAccount {
+	accAuth := auth.NewBaseAccountWithAddress(addr)
+	accAuth.Coins = []sdk.Coin{
+		FreeFermionAcc,
+	}
+	return NewGenesisFileAccount(&accAuth)
 }

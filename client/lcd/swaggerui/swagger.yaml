@@ -2,7 +2,7 @@
 swagger: '2.0'
 info:
   description: A REST interface for state queries, transaction generation, signing, and broadcast.
-  version: '1.0'
+  version: "0.8.0"
   title: IRISLCD Swagger-UI
   termsOfService: https://www.irisnet.org
   contact:
@@ -27,6 +27,8 @@ tags:
   description: Slashing module APIs
 - name: ICS24
   description: Distribution module APIs
+- name: ICS25
+  description: Service module APIs
 - name: version
   description: Query app version
 paths:
@@ -621,45 +623,45 @@ paths:
               seed:
                 type: string
                 example: blossom pool issue kidney elevator blame furnace winter account merry vessel security depend exact travel bargain problem jelly rural net again mask roast chest
-    /keys/{name}/recover:
-      post:
-        summary: Recover a account from a seed
-        tags:
-        - ICS1
-        consumes:
-        - application/json
-        produces:
-        - application/json
-        parameters:
-        - in: path
-          name: name
-          description: Account name
-          required: true
-          type: string
-        - in: body
-          name: pwdAndSeed
-          description: Provide password and seed to recover a key
+  /keys/{name}/recover:
+    post:
+      summary: Recover a account from a seed
+      tags:
+      - ICS1
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: name
+        description: Account name
+        required: true
+        type: string
+      - in: body
+        name: pwdAndSeed
+        description: Provide password and seed to recover a key
+        schema:
+          type: object
+          required:
+          - password
+          - seed
+          properties:
+            password:
+              type: string
+            seed:
+              type: string
+      responses:
+        200:
+          description: Returns account information of the recovered key
           schema:
-            type: object
-            required:
-            - password
-            - seed
-            properties:
-              password:
-                type: string
-              seed:
-                type: string
-        responses:
-          200:
-            description: Returns account information of the recovered key
-            schema:
-              $ref: "#/definitions/KeyOutput"
-          400:
-            description: Invalid request
-          409:
-            description: Key name confliction
-          500:
-            description: Server internal error
+            $ref: "#/definitions/KeyOutput"
+        400:
+          description: Invalid request
+        409:
+          description: Key name confliction
+        500:
+          description: Server internal error
   /keys/{name}:
     parameters:
     - in: path
@@ -1944,6 +1946,988 @@ paths:
           description: Invalid delegator address
         204:
           description: Invalid delegator address
+        500:
+          description: Internal Server Error
+
+  /service/definition:
+    post:
+      summary: Add a service definition
+      description: Send transaction to define a service
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - name: service_define_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            service_name:
+              type: string
+            service_description:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+            idl_content:
+              type: string
+            author_addr:
+              "$ref": "#/definitions/Address"
+            author_description:
+              type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service define body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/definition/{defChainId}/{serviceName}:
+    parameters:
+    - in: path
+      name: defChainId
+      description: service defined chain id
+      required: true
+      type: string
+    - in: path
+      name: serviceName
+      description: service name
+      required: true
+      type: string
+    get:
+      summary: Query service definition
+      description: Query a service definition
+      tags:
+      - ICS25
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              definition:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  chain_id:
+                    type: string
+                  description:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  author:
+                    type: string
+                  author_description:
+                    type: string
+                  idl_content:
+                    type: string
+              methods:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    output_privacy:
+                      type: string
+                    output_cached:
+                      type: string
+        400:
+          description: Bad Request
+        204:
+          description: No service definition
+        500:
+          description: Internal Server Error
+
+  /service/binding:
+    post:
+      summary: Add a service binding
+      description: Send transaction to add a binding to a service definition
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - name: service_bind_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            def_chain_id:
+              type: string
+            service_name:
+              type: string
+            binding_type:
+              type: string
+            deposit:
+              type: string
+              example: "1iris"
+            prices:
+              type: array
+              items:
+                type: string
+                example: "1iris"
+            level:
+              type: object
+              properties:
+                avg_rsp_time:
+                  type: integer
+                usable_time:
+                  type: integer
+            provider:
+              $ref: "#/definitions/Address"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service bind body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/binding/{defChainId}/{serviceName}/{bindChainId}/{provider}:
+    parameters:
+    - in: path
+      name: defChainId
+      description: service defined chain id
+      required: true
+      type: string
+    - in: path
+      name: serviceName
+      description: service name
+      required: true
+      type: string
+    - in: path
+      name: bindChainId
+      description: service bound chain id
+      required: true
+      type: string
+    - in: path
+      name: provider
+      description: service provider address
+      required: true
+      type: string
+    get:
+      summary: Query service binding
+      description: Query a service binding
+      tags:
+      - ICS25
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              value:
+                type: object
+                properties:
+                  def_name:
+                    type: string
+                  def_chain_id:
+                    type: string
+                  bind_chain_id:
+                    type: string
+                  provider:
+                    type: string
+                  binding_type:
+                    type: string
+                  deposit:
+                    type: string
+                    example: "1iris"
+                  prices:
+                    type: array
+                    items:
+                      type: string
+                      example: "1iris"
+                  level:
+                    type: object
+                    properties:
+                      avg_rsp_time:
+                        type: integer
+                      usable_time:
+                        type: integer
+                  available:
+                    type: boolean
+                  disable_time:
+                    type: string
+        400:
+          description: Bad Request
+        204:
+          description: No service binding
+        500:
+          description: Internal Server Error
+
+  /service/bindings/{defChainId}/{serviceName}:
+    parameters:
+    - in: path
+      name: defChainId
+      description: service defined chain id
+      required: true
+      type: string
+    - in: path
+      name: serviceName
+      description: service name
+      required: true
+      type: string
+    get:
+      summary: Query service binding list
+      description: Query service binding list
+      tags:
+      - ICS25
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              properties:
+                type:
+                  type: string
+                value:
+                  type: object
+                  properties:
+                    def_name:
+                      type: string
+                    def_chain_id:
+                      type: string
+                    bind_chain_id:
+                      type: string
+                    provider:
+                      type: string
+                    binding_type:
+                      type: string
+                    deposit:
+                      type: string
+                      example: "1iris"
+                    prices:
+                      type: array
+                      items:
+                        type: string
+                        example: "1iris"
+                    level:
+                      type: object
+                      properties:
+                        avg_rsp_time:
+                          type: integer
+                        usable_time:
+                          type: integer
+                    available:
+                      type: boolean
+                    disable_time:
+                      type: string
+        400:
+          description: Bad Request
+        204:
+          description: No service binding
+        500:
+          description: Internal Server Error
+
+  /service/binding/{defChainId}/{serviceName}/{provider}:
+    put:
+      summary: Update a service binding
+      description: Send transaction to update a service binding
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: path
+        name: defChainId
+        description: service defined chain id
+        required: true
+        type: string
+      - in: path
+        name: serviceName
+        description: service name
+        required: true
+        type: string
+      - in: path
+        name: provider
+        description: service provider address
+        required: true
+        type: string
+      - name: service_binding_update_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            def_chain_id:
+              type: string
+            service_name:
+              type: string
+            binding_type:
+              type: string
+            deposit:
+              type: string
+              example: "1iris"
+            prices:
+              type: array
+              items:
+                type: string
+                example: "1iris"
+            level:
+              type: object
+              properties:
+                avg_rsp_time:
+                  type: integer
+                usable_time:
+                  type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service binding update body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/binding/{defChainId}/{serviceName}/{provider}/disable:
+    put:
+      summary: Disable service binding
+      description: Send transaction to diasble a service binding
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: path
+        name: defChainId
+        description: service defined chain id
+        required: true
+        type: string
+      - in: path
+        name: serviceName
+        description: service name
+        required: true
+        type: string
+      - in: path
+        name: provider
+        description: service provider address
+        required: true
+        type: string
+      - name: service_binding_disable_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service binding disable body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/binding/{defChainId}/{serviceName}/{provider}/enable:
+    put:
+      summary: Enable service binding
+      description: Send transaction to enable a service binding
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: path
+        name: defChainId
+        description: service defined chain id
+        required: true
+        type: string
+      - in: path
+        name: serviceName
+        description: service name
+        required: true
+        type: string
+      - in: path
+        name: provider
+        description: service provider address
+        required: true
+        type: string
+      - name: service_binding_enable_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            deposit:
+              type: string
+              example: "1iris"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service binding enable body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/binding/{defChainId}/{serviceName}/{provider}/deposit/refund:
+    put:
+      summary: Refund deposit from a service binding
+      description: Send transaction to refund deposit from a service binding
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: path
+        name: defChainId
+        description: service defined chain id
+        required: true
+        type: string
+      - in: path
+        name: serviceName
+        description: service name
+        required: true
+        type: string
+      - in: path
+        name: provider
+        description: service provider address
+        required: true
+        type: string
+      - name: service_binding_deposit_refund_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            deposit:
+              type: string
+              example: "1iris"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service binding deposit refund body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/request:
+    post:
+      summary: Call service
+      description: Send transaction to call a method of service which a provider bound it
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - name: service_request_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            requests:
+              type: array
+              items:
+                properties:
+                  def_chain_id:
+                    type: string
+                  service_name:
+                    type: string
+                  bind_chain_id:
+                    type: string
+                  method_id:
+                    type: integer
+                  service_fee:
+                    type: string
+                    example: "1iris"
+                  data:
+                    type: string
+                  provider:
+                    "$ref": "#/definitions/Address"
+                  consumer:
+                    "$ref": "#/definitions/Address"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service request body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}:
+    parameters:
+    - in: path
+      name: defChainId
+      description: service defined chain id
+      required: true
+      type: string
+    - in: path
+      name: serviceName
+      description: service name
+      required: true
+      type: string
+    - in: path
+      name: bindChainId
+      description: service bound chain id
+      required: true
+      type: string
+    - in: path
+      name: provider
+      description: service provider address
+      required: true
+      type: string
+    get:
+      summary: Query service requests of a provider
+      description: Query service requests of a provider
+      tags:
+      - ICS25
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                def_chain_id:
+                  type: string
+                def_name:
+                  type: string
+                bind_chain_id:
+                  type: string
+                req_chain_id:
+                  type: string
+                method_id:
+                  type: integer
+                provider:
+                  "$ref": "#/definitions/Address"
+                consumer:
+                  "$ref": "#/definitions/Address"
+                input:
+                  type: string
+                service_fee:
+                  type: array
+                  items:
+                    "$ref": "#/definitions/Coin"
+                profiling:
+                  type: boolean
+                request_height:
+                  type: number
+                request_intra_tx_counter:
+                  type: number
+                expiration_height:
+                  type: number
+        400:
+          description: Bad Request
+        204:
+          description: No service request
+        500:
+          description: Internal Server Error
+
+  /service/response:
+    post:
+      summary: Respond service call
+      description: Send transaction to respond a service call
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - name: service_request_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+            req_chain_id:
+              type: string
+            request_id:
+              type: string
+            data:
+              type: string
+            provider:
+              "$ref": "#/definitions/Address"
+            error_msg:
+              type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service response body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/response/{reqChainId}/{reqId}:
+    parameters:
+    - in: path
+      name: reqChainId
+      description: service request chain id
+      required: true
+      type: string
+    - in: path
+      name: reqId
+      description: request id
+      required: true
+      type: string
+    get:
+      summary: Query service response
+      description: Query service response
+      tags:
+      - ICS25
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              value:
+                type: object
+                properties:
+                  req_chain_id:
+                    type: string
+                  request_height:
+                    type: integer
+                  request_intra_tx_counter:
+                    type: integer
+                  expiration_height:
+                    type: integer
+                  provider:
+                    "$ref": "#/definitions/Address"
+                  consumer:
+                    "$ref": "#/definitions/Address"
+                  output:
+                    type: string
+                  error_msg:
+                    type: string
+        400:
+          description: Bad Request
+        204:
+          description: No service request
+        500:
+          description: Internal Server Error
+
+  /service/fees/{address}:
+    parameters:
+    - in: path
+      name: address
+      description: account address
+      required: true
+      type: string
+    get:
+      summary: Query service fees of a address
+      description: Query service fees of a address
+      tags:
+      - ICS25
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              returned_fee:
+                type: array
+                items:
+                  "$ref": "#/definitions/Coin"
+              incoming_fee:
+                type: array
+                items:
+                  "$ref": "#/definitions/Coin"
+        400:
+          description: Bad Request
+        204:
+          description: No service request
+        500:
+          description: Internal Server Error
+
+  /service/fees/{address}/refund:
+    post:
+      summary: Refund service return fee of consumer
+      description: Send transaction to refund service return fee of consumer
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: path
+        name: address
+        description: address of consumer
+        required: true
+        type: string
+      - name: service_fees_refund_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service fees refund body
+        401:
+          description: Key password is wrong
+        500:
+          description: Internal Server Error
+
+  /service/fees/{address}/withdraw:
+    post:
+      summary: Withdraw service incoming fee of provider
+      description: Send transaction to withdraw service incoming fee of provider
+      tags:
+      - ICS25
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: path
+        name: address
+        description: address of provider
+        required: true
+        type: string
+      - name: service_fees_withdraw_body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              "$ref": "#/definitions/BaseTx"
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid service fees withdraw body
+        401:
+          description: Key password is wrong
         500:
           description: Internal Server Error
 

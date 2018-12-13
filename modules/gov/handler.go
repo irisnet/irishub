@@ -3,12 +3,13 @@ package gov
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/gov/tags"
 	"strconv"
 	"encoding/json"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/upgrade/params"
+	tmstate "github.com/tendermint/tendermint/state"
 )
 
 // Handle all "gov" type messages.
@@ -31,6 +32,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType,msg.Param)
+
 	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
 		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
 			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
@@ -124,6 +126,11 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	logger := ctx.Logger().With("module", "gov")
 
 	resTags = sdk.NewTags()
+
+	if ctx.BlockHeight() == keeper.GetTerminatorHeight(ctx) {
+		resTags = resTags.AppendTag(tmstate.HaltTagKey,[]byte(tmstate.HaltTagValue))
+		logger.Info(fmt.Sprintf("Terminator Start!!!"))
+	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
 	for ; inactiveIterator.Valid(); inactiveIterator.Next() {

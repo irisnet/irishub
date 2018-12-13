@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/client/utils"

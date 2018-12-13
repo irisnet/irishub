@@ -3,12 +3,12 @@ package upgrade
 import (
 	"fmt"
 	"github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func TestUpdateKeeper(t *testing.T) {

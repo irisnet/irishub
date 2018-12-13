@@ -3,9 +3,9 @@ package lcd
 import (
 	"net/http"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
@@ -58,6 +58,10 @@ func QueryDelegatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+		if len(resKVs) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
+			return
+		}
 
 		var ddiList []types.DelegationDistInfo
 		for _, kv := range resKVs {
@@ -98,7 +102,6 @@ func QueryDelegationDistInfoHandlerFn(storeName string, cliCtx context.CLIContex
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
 		if len(res) == 0 {
 			utils.WriteErrorResponse(w, http.StatusNoContent, "")
 			return

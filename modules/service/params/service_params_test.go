@@ -1,17 +1,15 @@
 package serviceparams
 
 import (
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"testing"
-	"github.com/irisnet/irishub/types"
-	"fmt"
 )
 
 func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Context {
@@ -39,7 +37,7 @@ func TestMaxRequestTimeoutParameter(t *testing.T) {
 
 	subspace := paramKeeper.Subspace("Service").WithTypeTable(params.NewTypeTable(
 		MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-		MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+		MinDepositMultipleParameter.GetStoreKey(), int64(0),
 	))
 
 	MaxRequestTimeoutParameter.SetReadWriter(subspace)
@@ -73,24 +71,22 @@ func TestMinProviderDepositParameter(t *testing.T) {
 
 	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
 		MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-		MinProviderDepositParameter.GetStoreKey(), sdk.Coins{},
+		MinDepositMultipleParameter.GetStoreKey(), int64(0),
 	))
 
-	MinProviderDepositParameter.SetReadWriter(subspace)
-	find := MinProviderDepositParameter.LoadValue(ctx)
+	MinDepositMultipleParameter.SetReadWriter(subspace)
+	find := MinDepositMultipleParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
-	p1deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
-	p2deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, "iris"))
-	MinProviderDepositParameter.InitGenesis(sdk.Coins{p1deposit})
-	require.Equal(t, sdk.Coins{p1deposit}, MinProviderDepositParameter.Value)
+	MinDepositMultipleParameter.InitGenesis(int64(12345))
+	require.Equal(t, int64(12345), MinDepositMultipleParameter.Value)
 
-	MinProviderDepositParameter.LoadValue(ctx)
-	require.Equal(t, sdk.Coins{p1deposit}, MinProviderDepositParameter.Value)
+	MinDepositMultipleParameter.LoadValue(ctx)
+	require.Equal(t, int64(12345), MinDepositMultipleParameter.Value)
 
-	MinProviderDepositParameter.Value = sdk.Coins{p2deposit}
-	MinProviderDepositParameter.SaveValue(ctx)
+	MinDepositMultipleParameter.Value = 30
+	MinDepositMultipleParameter.SaveValue(ctx)
 
-	MinProviderDepositParameter.LoadValue(ctx)
-	require.Equal(t, sdk.Coins{p2deposit}, MinProviderDepositParameter.Value)
+	MinDepositMultipleParameter.LoadValue(ctx)
+	require.Equal(t, int64(30), MinDepositMultipleParameter.Value)
 }

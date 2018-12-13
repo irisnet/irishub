@@ -1,13 +1,13 @@
 package gov
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/iparam"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/tendermint/tendermint/crypto"
 	"time"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // nolint
@@ -66,6 +66,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSoftwareUpgrade:
 		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
+	case ProposalTypeTerminator:
+		return keeper.NewTerminatorProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -116,7 +118,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
 
-	param.Value = iparam.ParamMapping[param.Key].ToJson(param.Value)
+	param.Value = params.ParamMapping[param.Key].ToJson(param.Value)
 
 	var proposal Proposal = &ParameterProposal{
 		textProposal,
@@ -146,6 +148,32 @@ func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, descripti
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
+		textProposal,
+	}
+
+	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
+	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
+	keeper.SetProposal(ctx, proposal)
+	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
+	return proposal
+}
+
+func (keeper Keeper) NewTerminatorProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var textProposal = TextProposal{
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+	var proposal Proposal = &TerminatorProposal{
 		textProposal,
 	}
 

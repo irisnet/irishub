@@ -13,4 +13,7 @@ const (
 	flagNumLimit          = "limit"
 	flagParam             = "param"
 	flagOp                = "op"
+	flagModule            = "module"
+	flagKey               = "key"
+	flagPath              = "path"
 )

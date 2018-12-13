@@ -5,7 +5,7 @@ import (
 
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
@@ -14,6 +14,7 @@ import (
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
 	recordhandle "github.com/irisnet/irishub/client/record/lcd"
+	servicehandle "github.com/irisnet/irishub/client/service/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
@@ -50,10 +51,17 @@ func ServeLCDStartCommand(cdc *codec.Codec) *cobra.Command {
 			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout)).With("module", "irislcd")
 			maxOpen := viper.GetInt(flagMaxOpenConnections)
 
-			listener, err := tmserver.StartHTTPServer(
-				listenAddr, router, logger,
+			listener, err := tmserver.Listen(
+				listenAddr,
 				tmserver.Config{MaxOpenConnections: maxOpen},
 			)
+			if err != nil {
+				return err
+			}
+
+			logger.Info("Starting IRISLCD service...")
+
+			err = tmserver.StartHTTPServer(listener, router, logger)
 			if err != nil {
 				return err
 			}
@@ -96,6 +104,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	recordhandle.RegisterRoutes(cliCtx, r, cdc)
+	servicehandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)

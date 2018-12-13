@@ -14,10 +14,9 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	qr "github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 )
@@ -50,7 +49,7 @@ type BaseApp struct {
 	db          dbm.DB               // common DB backend
 	cms         sdk.CommitMultiStore // Main (uncached) state
 	router      Router               // handle any kind of message
-	queryRouter qr.QueryRouter          // router for redirecting query calls
+	queryRouter QueryRouter          // router for redirecting query calls
 	codespacer  *sdk.Codespacer      // handle module codespacing
 	txDecoder   sdk.TxDecoder        // unmarshal []byte into sdk.Tx
 
@@ -100,7 +99,7 @@ func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecod
 		db:          db,
 		cms:         store.NewCommitMultiStore(db),
 		router:      NewRouter(),
-		queryRouter: qr.NewQueryRouter(),
+		queryRouter: NewQueryRouter(),
 		codespacer:  sdk.NewCodespacer(),
 		txDecoder:   txDecoder,
 	}
@@ -174,8 +173,8 @@ func (app *BaseApp) LoadLatestVersion(mainKey sdk.StoreKey) error {
 }
 
 // load application version
-func (app *BaseApp) LoadVersion(version int64, mainKey sdk.StoreKey) error {
-	err := app.cms.LoadVersion(version)
+func (app *BaseApp) LoadVersion(version int64, mainKey sdk.StoreKey, overwrite bool) error {
+	err := app.cms.LoadVersion(version, overwrite)
 	if err != nil {
 		return err
 	}

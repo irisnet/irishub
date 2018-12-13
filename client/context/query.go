@@ -3,14 +3,14 @@ package context
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
 
 	"github.com/pkg/errors"
 
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -163,8 +163,8 @@ func (cliCtx CLIContext) query(path string, key cmn.HexBytes) (res []byte, err e
 	}
 
 	opts := rpcclient.ABCIQueryOptions{
-		Height:  cliCtx.Height,
-		Prove: !cliCtx.TrustNode,
+		Height: cliCtx.Height,
+		Prove:  !cliCtx.TrustNode,
 	}
 
 	result, err := node.ABCIQueryWithOptions(path, key, opts)
@@ -349,11 +349,20 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 	}
 
 	coinStrs := strings.Split(coinsStr, ",")
+	coinMap := make(map[string]sdk.Coin)
 	for _, coinStr := range coinStrs {
 		coin, err := cliCtx.ParseCoin(coinStr)
 		if err != nil {
-			return coins, err
+			return sdk.Coins{}, err
 		}
+		if _, ok := coinMap[coin.Denom]; ok {
+			coinMap[coin.Denom] = coinMap[coin.Denom].Plus(coin)
+		} else {
+			coinMap[coin.Denom] = coin
+		}
+	}
+
+	for _, coin := range coinMap {
 		coins = append(coins, coin)
 	}
 	return coins, nil
