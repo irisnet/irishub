@@ -508,7 +508,7 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 }
 
 type definition struct {
-	BaseTx             context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx             utils.BaseTx `json:"base_tx"` // basic tx info
 	ServiceName        string         `json:"service_name"`
 	ServiceDescription string         `json:"service_description"`
 	AuthorDescription  string         `json:"author_description"`
@@ -518,7 +518,7 @@ type definition struct {
 }
 
 type binding struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx      utils.BaseTx `json:"base_tx"` // basic tx info
 	ServiceName string         `json:"service_name"`
 	DefChainId  string         `json:"def_chain_id"`
 	BindingType string         `json:"binding_type"`
@@ -529,7 +529,7 @@ type binding struct {
 }
 
 type bindingUpdate struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx      utils.BaseTx `json:"base_tx"` // basic tx info
 	BindingType string         `json:"binding_type"`
 	Deposit     string         `json:"deposit"`
 	Prices      []string       `json:"prices"`
@@ -537,7 +537,7 @@ type bindingUpdate struct {
 }
 
 type bindingEnable struct {
-	BaseTx  context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
 	Deposit string         `json:"deposit"`
 }
 
@@ -554,12 +554,12 @@ type serviceRequest struct {
 }
 
 type serviceRequestWithBasic struct {
-	BaseTx   context.BaseTx   `json:"base_tx"` // basic tx info
+	BaseTx   utils.BaseTx   `json:"base_tx"` // basic tx info
 	Requests []serviceRequest `json:"requests"`
 }
 
 type serviceResponse struct {
-	BaseTx     context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx     utils.BaseTx `json:"base_tx"` // basic tx info
 	ReqChainId string         `json:"req_chain_id"`
 	RequestId  string         `json:"request_id"`
 	Data       string         `json:"data"`
@@ -568,5 +568,5 @@ type serviceResponse struct {
 }
 
 type basicReq struct {
-	BaseTx context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
 }

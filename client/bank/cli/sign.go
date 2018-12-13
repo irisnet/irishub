@@ -58,7 +58,7 @@ func makeSignCmd(cdc *amino.Codec, decoder auth.AccountDecoder) func(cmd *cobra.
 
 		name := viper.GetString(client.FlagName)
 		cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
-		txCtx := context.NewTxContextFromCLI()
+		txCtx := utils.NewTxContextFromCLI()
 
 		newTx, err := utils.SignStdTx(txCtx, cliCtx, name, stdTx, viper.GetBool(flagAppend), viper.GetBool(flagOffline))
 		if err != nil {

@@ -46,17 +46,17 @@ type (
 
 	// the request body for edit delegations
 	DelegationsReq struct {
-		BaseReq       context.BaseTx      `json:"base_tx"`
+		BaseReq       utils.BaseTx      `json:"base_tx"`
 		Delegation    msgDelegateInput    `json:"delegate"`
 	}
 
 	BeginUnbondingReq struct {
-		BaseReq        context.BaseTx  `json:"base_tx"`
+		BaseReq        utils.BaseTx  `json:"base_tx"`
 		BeginUnbond    msgUnbondInput  `json:"unbond"`
 	}
 
 	BeginRedelegatesReq struct {
-		BaseReq         context.BaseTx     `json:"base_tx"`
+		BaseReq         utils.BaseTx     `json:"base_tx"`
 		BeginRedelegate msgRedelegateInput `json:"redelegate"`
 	}
 )

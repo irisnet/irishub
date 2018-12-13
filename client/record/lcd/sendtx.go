@@ -16,7 +16,7 @@ import (
 )
 
 type postRecordReq struct {
-	BaseTx      context.BaseTx `json:"base_tx"`   // basic tx info
+	BaseTx      utils.BaseTx `json:"base_tx"`   // basic tx info
 	Submitter   string         `json:"submitter"` //  Address of the submitter
 	Description string         `json:"description"`
 	Data        string         `json:"data"` // for onchain

@@ -18,7 +18,7 @@ import (
 type sendBody struct {
 	Amount string         `json:"amount"`
 	Sender string         `json:"sender"`
-	BaseTx context.BaseTx `json:"base_tx"`
+	BaseTx utils.BaseTx   `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address

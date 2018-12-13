@@ -13,7 +13,7 @@ import (
 )
 
 type postProposalReq struct {
-	BaseTx         context.BaseTx `json:"base_tx"`
+	BaseTx         utils.BaseTx `json:"base_tx"`
 	Title          string         `json:"title"`           //  Title of the proposal
 	Description    string         `json:"description"`     //  Description of the proposal
 	ProposalType   string         `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
@@ -26,13 +26,13 @@ type postProposalReq struct {
 }
 
 type depositReq struct {
-	BaseTx    context.BaseTx `json:"base_tx"`
+	BaseTx    utils.BaseTx `json:"base_tx"`
 	Depositor sdk.AccAddress `json:"depositor"` // Address of the depositor
 	Amount    string         `json:"amount"`    // Coins to add to the proposal's deposit
 }
 
 type voteReq struct {
-	BaseTx context.BaseTx `json:"base_tx"`
+	BaseTx utils.BaseTx `json:"base_tx"`
 	Voter  sdk.AccAddress `json:"voter"`  //  address of the voter
 	Option string         `json:"option"` //  option from OptionSet chosen by the voter
 }

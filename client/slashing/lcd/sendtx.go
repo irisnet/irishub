@@ -12,7 +12,7 @@ import (
 
 // Unrevoke TX body
 type UnjailBody struct {
-	BaseTx        context.BaseTx `json:"base_tx"`
+	BaseTx        utils.BaseTx `json:"base_tx"`
 }
 
 func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {

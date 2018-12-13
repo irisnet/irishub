@@ -31,7 +31,7 @@ func SignTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx := context.TxContext{
+		txCtx := utils.TxContext{
 			Codec:         cliCtx.Codec,
 			ChainID:       m.ChainID,
 			AccountNumber: m.AccountNumber,
