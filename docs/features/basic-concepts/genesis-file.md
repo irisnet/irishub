@@ -11,7 +11,7 @@ The Genesis file is the basis for the entire network initialization，which cont
 
 * **block_size** 
   * `max_bytes` The max size of a block
-  * `max_gas`  The max Gas number of a block, default value is -1 and means no gas limit. If the block gas limit exceed, the transaction and subsequent transactions will fail to deliver. 
+  * `max_gas`  The maximum Gas quantity of a block. Its default value is -1 which means no gas limit. If the accumulation of comsumed gas exceeds the block gas limit, the transaction and all subsequent transactions in the same block will fail to deliver. 
 * **evidence**   The lifecycle of deception evidence in the block
 
 ## App State
