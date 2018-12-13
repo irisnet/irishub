@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Unjail validator which may be jailed previously for downtime
+In Proof-of-Stake blockchain, validators will get block provisions by staking their token. But if they failed to keep online, they will be punished by slashing a small portion of their staked tokens. The offline validators will be removed from the validator set and put into jail, which means their voting power is zero. During the jail period, these nodes are not event validator candidates . Once the jail period is end, they can send unjail transactions to free themselves and become validator candidates again.
 
 ## Usage
 
