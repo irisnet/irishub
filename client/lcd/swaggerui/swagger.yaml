@@ -673,6 +673,12 @@ paths:
       summary: Get a certain locally stored account
       tags:
       - ICS1
+      parameters:
+      - in: query
+        name: bech
+        description: Bech32 prefix encoding, valid prefix `"acc"`, `"val"`, `"cons"`
+        required: false
+        type: string
       produces:
       - application/json
       responses:
@@ -931,10 +937,10 @@ paths:
               type: object
               properties:
                 validator_addr:
-                    $ref: "#/definitions/ValidatorAddress"
+                  $ref: "#/definitions/ValidatorAddress"
                 shares:
-                    type: string
-                    example: "100"
+                  type: string
+                  example: "100"
       tags:
       - ICS21
       consumes:
