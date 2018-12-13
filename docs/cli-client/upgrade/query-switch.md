@@ -6,7 +6,7 @@ Query the switch information to know if someone have send the switch message for
 ## Usage
 
 ```
-iriscli upgrade query-switch --proposalID <proposalID> --voter <voter address>
+iriscli upgrade query-switch --proposal-id <proposalID> --voter <voter address>
 ```
 
 Print help messages:
@@ -18,7 +18,7 @@ iriscli upgrade query-switch --help
 
 | Name, shorthand | Default                    | Description                                                       | Required |
 | --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
-| --proposalID     |                            | proposalID of upgrade swtich being queried                              | Yes      |
+| --proposal-id     |                            | proposalID of upgrade swtich being queried                              | Yes      |
 | --voter     |                            | Address sign the switch msg                              | Yes      |
 
 ## Example
@@ -26,5 +26,5 @@ iriscli upgrade query-switch --help
 Query if the address `faa1qvt2r6hh9vyg3kh4tnwgx8wh0kpa7q2lsk03fe` send the switch message for the software upgrade proposal whose ID is 5.
 
 ```
-iriscli upgrade query-switch --proposalID=5 --voter=faa1qvt2r6hh9vyg3kh4tnwgx8wh0kpa7q2lsk03fe
+iriscli upgrade query-switch --proposal-id=5 --voter=faa1qvt2r6hh9vyg3kh4tnwgx8wh0kpa7q2lsk03fe
 ```

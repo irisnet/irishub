@@ -50,12 +50,7 @@ Then you could see the account info has been added to genesis.json.
     "accounts":[
       {
         "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
-        "coins": [
-        {
-            "denom": "iris-atto",
-            "amount": "150000000000000000000"
-        }
-        ],
+        "coins": ["150iris"],
         "sequence_number": "0",
         "account_number": "0"
       }
