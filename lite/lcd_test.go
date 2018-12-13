@@ -1,4 +1,4 @@
-package lcd
+package lite
 
 import (
 	"encoding/hex"

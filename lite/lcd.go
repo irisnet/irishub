@@ -1,11 +1,9 @@
-package lcd
+package lite
 
 import (
+	"net/http"
 	"os"
 
-	"net/http"
-
-	"github.com/irisnet/irishub/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
@@ -15,10 +13,11 @@ import (
 	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
 	recordhandle "github.com/irisnet/irishub/client/record/lcd"
 	servicehandle "github.com/irisnet/irishub/client/service/lcd"
-	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
-	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
+	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
+	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
+	"github.com/irisnet/irishub/codec"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
