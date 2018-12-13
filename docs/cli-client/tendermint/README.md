@@ -1,27 +1,36 @@
-# iriscli tendermint
+# iris tendermint
 
 ## Description
 
-Tendermint state querying subcommands
+This command will return some Tendermint related info to you. 
 
 ## Usage
 
-```
-iriscli tendermint [command]
+```shell
+iris tendermint [command]
 ```
 
 ## Available Commands
 
-| Name, shorthand | Description        |
-| --------------- | -------------------------- |
-| [tx](tx.md)            |  Matches this txhash over all committed blocks           |  
-| txs   | Search for all transactions that match the given tags  |                            
-| [block](block.md)| 	Get verified data for a the block at given height    |   
-| [validator-set](validator-set.md) | Get the full tendermint validator set at given height  |   
-
+| Name                    | Description                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| [show-node-id](show-node-id.md) |  |
+| [show-validator](show-validator.md) |  |
+| [show-address](show-address.md)           |                                                      |
 
 ## Flags
 
-|Name, shorthand|Description|
-|---			|---		|
-|--help,-h		|help for tendermint|
+| Name, shorthand | Default | Description   | Required |
+| --------------- | ------- | ------------- | -------- |
+| --help, -h      |         | Help for keys |          |
+
+## Global Flags
+
+| Name, shorthand | Default        | Description                            | Required |
+| --------------- | -------------- | -------------------------------------- | -------- |
+| --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
+| --home          | $HOME/.iriscli | [string] Directory for config and data |          |
+| --output, -o    | text           | [string] Output format (text|json)     |          |
+| --trace         |                | Print out full stack trace on errors   |          |
+
+
