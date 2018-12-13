@@ -169,8 +169,14 @@ Detail in [Upgrade](upgrade.md)
 ### Proposals on community funds usage
 There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to the destination trustee's account from community funds and then trustee will distribute or grant these tokens to others.
 ```shell
-# Send proposals, return changed parameters
+# Submit Burn usage proposal
+iriscli gov submit-proposal --title="burn tokens 5%" --description="test" --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Submit Distribute usage proposal
 iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+
+# Submit Grant usage proposal
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
 
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
