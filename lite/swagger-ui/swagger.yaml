@@ -2,7 +2,7 @@
 swagger: '2.0'
 info:
   description: A REST interface for state queries, transaction generation, signing, and broadcast.
-  version: "0.8.0"
+  version: "0.9.0"
   title: IRISLCD Swagger-UI
   termsOfService: https://www.irisnet.org
   contact:
