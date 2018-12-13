@@ -6,11 +6,10 @@ import (
 
 var Threshold = sdk.NewDecWithPrec(90, 2)
 
-func tally(ctx sdk.Context, k Keeper) (passes bool) {
+func tally(ctx sdk.Context,versionProtocol uint64, k Keeper) (passes bool) {
 
 	totalVotingPower := sdk.ZeroDec()
 	switchVotingPower := sdk.ZeroDec()
-	versionProtocol := k.pk.GetCurrentProtocolVersion(ctx)
 
 	for _, validator := range k.sk.GetAllValidators(ctx) {
 		totalVotingPower = totalVotingPower.Add(validator.GetPower())

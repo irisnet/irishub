@@ -88,6 +88,13 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
 			}
 
+			if proposalType == gov.ProposalTypeSoftwareUpgrade {
+				version := uint64(viper.GetInt64(flagVersion))
+				software := viper.GetString(flagSoftware)
+				switchHeight := uint64(viper.GetInt64(flagSwitchHeight))
+				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight)
+				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -104,6 +111,10 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
 	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
+
+	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
+	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
+	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	////////////////////  iris end  /////////////////////////////
 	return cmd
 }

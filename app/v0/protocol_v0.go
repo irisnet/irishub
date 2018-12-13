@@ -156,6 +156,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		p.bankKeeper,
 		p.guardianKeeper,
 		&stakeKeeper,
+		protocolkeeper,
 		gov.DefaultCodespace,
 	)
 

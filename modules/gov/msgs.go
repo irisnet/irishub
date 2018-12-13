@@ -102,6 +102,31 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Proposer}
 }
 
+type MsgSubmitSoftwareUpgradeProposal struct {
+	MsgSubmitProposal
+	Version      uint64        `json:"version"`
+	Software     string        `json:"software"`
+	SwitchHeight uint64        `json:"switch_height"`
+}
+
+func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64) MsgSubmitSoftwareUpgradeProposal {
+	return MsgSubmitSoftwareUpgradeProposal {
+		MsgSubmitProposal: msgSubmitProposal,
+		Version:             version,
+		Software:       software,
+		SwitchHeight:           switchHeight,
+	}
+}
+
+func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
+	err := msg.MsgSubmitProposal.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 type MsgSubmitTxTaxUsageProposal struct {
 	MsgSubmitProposal
 	Usage       UsageType      `json:"usage"`

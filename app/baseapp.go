@@ -19,6 +19,7 @@ import (
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
+	"strconv"
 )
 
 // Key to store the header in the DB itself.
@@ -709,14 +710,16 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = endBlocker(app.deliverState.ctx, req)
 	}
 
-	current := app.Engine.GetCurrentProtocolVersionByStore(app.GetKVStore(protocol.KeyProtocol))
+	current,_ := strconv.ParseUint(string(res.Tags[len(res.Tags)-1].Value),10,64)
+
 	if current != app.Engine.GetCurrent() {
 		success := app.Engine.Activate(current)
 		if success {
-			res.Tags = res.Tags[:len(res.Tags)-1]
+			res.Tags = res.Tags[:len(res.Tags)-2]
+			return
 		}
 	}
-
+	res.Tags = res.Tags[:len(res.Tags)-1]
 	return
 }
 
