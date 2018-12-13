@@ -1,18 +1,19 @@
 package lcd
 
 import (
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/slashing"
+	"net/http"
+
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"net/http"
-	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/slashing"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Unrevoke TX body
 type UnjailBody struct {
-	BaseTx        context.BaseTx `json:"base_tx"`
+	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
 func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {

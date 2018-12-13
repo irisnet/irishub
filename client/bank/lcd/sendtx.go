@@ -1,24 +1,25 @@
 package lcd
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"net/http"
-	"io/ioutil"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
-	"encoding/json"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
 
 type sendBody struct {
-	Amount string         `json:"amount"`
-	Sender string         `json:"sender"`
-	BaseTx context.BaseTx `json:"base_tx"`
+	Amount string       `json:"amount"`
+	Sender string       `json:"sender"`
+	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
 // SendRequestHandlerFn - http request handler to send coins to a address
