@@ -1,4 +1,4 @@
-package lcd
+package lite
 
 import (
 	"bytes"
@@ -12,23 +12,21 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/irisnet/irishub/codec"
-	crkeys "github.com/irisnet/irishub/crypto/keys"
-	"github.com/irisnet/irishub/server"
-	"github.com/irisnet/irishub/tests"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-
-	"github.com/spf13/viper"
-	"github.com/stretchr/testify/require"
-
-	"github.com/irisnet/irishub/modules/stake"
 	irisapp "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	crkeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmcfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"

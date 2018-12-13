@@ -1,8 +1,8 @@
-package lcd
+package lite
 
 import (
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/irisnet/irishub/codec"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 var cdc = codec.New()

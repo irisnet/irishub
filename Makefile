@@ -74,7 +74,7 @@ draw_deps:
 ########################################
 ### Generate swagger docs for irislcd
 update_irislcd_swagger_docs:
-	@statik -src=client/lcd/swaggerui -dest=client/lcd -f
+	@statik -src=lite/swagger-ui -dest=lite -f
 
 ########################################
 ### Compile and Install

@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/client/lcd"
-	_ "github.com/irisnet/irishub/client/lcd/statik"
+	"github.com/irisnet/irishub/lite"
+	_ "github.com/irisnet/irishub/lite/statik"
 	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
@@ -26,7 +26,7 @@ func main() {
 	cdc := app.MakeCodec()
 
 	rootCmd.AddCommand(
-		lcd.ServeLCDStartCommand(cdc),
+		lite.ServeLCDStartCommand(cdc),
 		version.ServeVersionCommand(cdc),
 	)
 

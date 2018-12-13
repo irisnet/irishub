@@ -7,8 +7,6 @@ docs/.vuepress/dist/
 node_modules/
 package.json
 yarn.lock
-client/lcd/statik/statik.go
+lite/statik/statik.go
 dependency-graph.png
-tools/protobuf/*.a
-tools/protobuf/*.o
-tools/protobuf/*.so
+
