@@ -100,18 +100,18 @@ func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId uint64) *AppV
 	return nil
 }
 
-func (k Keeper) SetSignal(ctx sdk.Context, propsalID uint64, address string) {
+func (k Keeper) SetSignal(ctx sdk.Context, protocol uint64, address string) {
 	kvStore := ctx.KVStore(k.storeKey)
 	cmsgBytes, err := k.cdc.MarshalBinaryLengthPrefixed(true)
 	if err != nil {
 		panic(err)
 	}
-	kvStore.Set(GetSiganlKey(propsalID, address), cmsgBytes)
+	kvStore.Set(GetSiganlKey(protocol, address), cmsgBytes)
 }
 
-func (k Keeper) GetSignal(ctx sdk.Context, propsalID uint64, address string) bool {
+func (k Keeper) GetSignal(ctx sdk.Context, protocol uint64, address string) bool {
 	kvStore := ctx.KVStore(k.storeKey)
-	flagBytes := kvStore.Get(GetSiganlKey(propsalID, address))
+	flagBytes := kvStore.Get(GetSiganlKey(protocol, address))
 	if flagBytes != nil {
 		var flag bool
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(flagBytes, &flag)
