@@ -248,11 +248,11 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
 	newTaxPool, hasNeg := oldTaxPool.SafeMinus(msg.Amount)
 	if hasNeg {
-		errMsg := fmt.Sprintf("%s < %s", oldTaxPool, msg.Amount)
+		errMsg := fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)
 		return sdk.ErrInsufficientFunds(errMsg).Result()
 	}
 	if !newTaxPool.IsNotNegative() {
-		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", oldTaxPool, msg.Amount)).Result()
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)).Result()
 	}
 	_, _, err := k.ck.AddCoins(ctx, msg.DestAddress, msg.Amount)
 	if err != nil {

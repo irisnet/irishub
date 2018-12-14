@@ -199,7 +199,7 @@ func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, 
 	oldCoins := getCoins(ctx, am, addr)
 	newCoins, hasNeg := oldCoins.SafeMinus(amt)
 	if hasNeg {
-		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", oldCoins, amt))
+		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
 	}
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("sender", []byte(addr.String()))
@@ -212,7 +212,7 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 	oldCoins := getCoins(ctx, am, addr)
 	newCoins := oldCoins.Plus(amt)
 	if !newCoins.IsNotNegative() {
-		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", oldCoins, amt))
+		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
 	}
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("recipient", []byte(addr.String()))

@@ -457,11 +457,11 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 
 	incomingFee, hasNeg := coins.SafeMinus(taxFee)
 	if hasNeg {
-		errMsg := fmt.Sprintf("%s < %s", coins, taxFee)
+		errMsg := fmt.Sprintf("%s is less than %s", coins, taxFee)
 		return sdk.ErrInsufficientFunds(errMsg)
 	}
 	if !incomingFee.IsNotNegative() {
-		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s < %s", incomingFee, taxFee))
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", incomingFee, taxFee))
 	}
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
