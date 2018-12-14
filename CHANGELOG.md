@@ -14,7 +14,7 @@ FEATURES:
 - [iriscli] Optimize the way tags are displayed
 - [iriscli] Add `iriscli stake delegations-to [validator-addr]` and `/stake/validators/{validatorAddr}/delegations` interfaces
 - [iris] Application framework code refactoring
-- [iris] Service module added ServiceTaxPool command
+- [iris] Add a new mechanism to distribute service fee tax
 - [iris] Slashing module supports querying slashing history
 - [iris] Gov module adds TxTaxUsageProposal/SoftwareHaltProposal proposals
 - [iris] Export and import blockchain snapshot at any block height
