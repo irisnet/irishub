@@ -156,7 +156,7 @@ func fromFields(from string) (fromAddr types.AccAddress, fromName string) {
 	} else {
 		info, err = keybase.Get(from)
 		if err != nil {
-			fmt.Printf("could not find key %s\n", from)
+			fmt.Fprint(os.Stderr, fmt.Sprintf("could not find key %s\n", from))
 			os.Exit(1)
 		}
 	}
