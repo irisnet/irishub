@@ -2567,9 +2567,6 @@ paths:
           properties:
             base_tx:
               "$ref": "#/definitions/BaseTx"
-            deposit:
-              type: string
-              example: "1iris"
       responses:
         200:
           description: OK
