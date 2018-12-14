@@ -2,7 +2,7 @@
 
 ## 基本功能描述
 
-该模块支持区块链软件平滑升级的基础设施，通过UpgradeProposal和switch两阶段的投票来在约定高度切换到新版的代码，并对历史版本的链上数据完全兼容。
+该模块支持区块链软件平滑升级的基础设施，通过UpgradeProposal在约定高度切换到新版的代码，并对历史版本的链上数据完全兼容。
 
 ## 交互流程
 
@@ -32,7 +32,7 @@ iris start --home=iris
 
 ```
 # 发送升级提议
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80
 
 # 对提议进行抵押
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
@@ -48,7 +48,7 @@ iriscli gov query-proposal --proposal-id=1 --trust-node
 
 * 场景一
 
-用户在限定的时间内（2天 57600个区块高度），完成以下动作：
+用户在指定的高度（例如80），完成以下动作：
 
 ```
 # 1. 下载新版本iris1
@@ -59,18 +59,15 @@ kill -f iris
 # 3. 安装新版本 iris1 并启动（copy to bin）
 iris1 start --home=iris
 
-# 4. 发送switch消息，广播全网自己已经安装新软件。
-iriscli1 upgrade submit-switch --from=x --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
+# 4. 到达规定的时间，自动升级
 
-# 5. 到达规定的时间，自动升级
-
-# 6. 查询当前版本是否升级成功
+# 5. 查询当前版本是否升级成功
 iriscli upgrade info --trust-node
 ```
 
 * 场景二
 
-用户未在限定的时间内（2天 57600个区块高度），执行场景一中的动作，导致新版本全网生效后该节点的共识报错：
+用户在指定的高度（例如80），没有安装新软件，软件无法继续运行：
 
 ```
 # 1. 下载新版本iris1
@@ -78,8 +75,8 @@ iriscli upgrade info --trust-node
 # 2. 关闭旧软件
 kill -f iris
 
-# 3. 安装新版本 iris1 并通过以下命令方式启动（copy to bin）
-iris1 start --replay --home=iris
+# 3. 安装新版本 iris1 并启动
+iris1 start --home=iris
 
 # 4. 查询当前版本是否升级成功
 iriscli upgrade info --trust-node
@@ -88,10 +85,13 @@ iriscli upgrade info --trust-node
 ## 命令详情
 
 ```
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80
 ```
 
 * `--type`  "SoftwareUpgrade" 软件升级提议的类型
+* `--version`  "Version" 新软件协议版本号
+* `--software`  新软件的下载地址
+* `--switch-height` 新软件升级的高度
 * 其他参数可参考GOV的[用户手册](governance.md)
 
 ```

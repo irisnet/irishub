@@ -26,6 +26,9 @@ iriscli gov submit-proposal --help
 | --path           |                            | [string] param.json文件路径                                                                                                                      |          |
 | --title          |                            | [string] 提议标题                                                                                                                           | Yes      |
 | --type           |                            | [string] 提议类型,例如:Text/ParameterChange/SoftwareUpgrade                                                                            | Yes      |
+| --version           |            0                | [uint64] 新协议的版本信息                                                                           |       |
+| --software           |           " "                 | [string] 新协议的软件地址                                                                       |       |
+| --switch-height           |       0                     | [string] 新版本协议升级的高度                                                     |       |
 
 ## 例子
 
@@ -64,7 +67,7 @@ iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal"
 ### 提交一个'SoftwareUpgrade'类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris
+iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80
 ```
 
 在这种场景下，提议的 --title、--type 和--description参数必不可少，另外你也应该保留好提议ID，这是检索所提交提议的唯一方法。
