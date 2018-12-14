@@ -180,7 +180,7 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	if !msg.Deposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
@@ -248,7 +248,7 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
@@ -312,7 +312,7 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	return nil
 }
@@ -367,7 +367,7 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	return nil
 }
@@ -417,7 +417,7 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	return nil
 }
@@ -485,10 +485,10 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	if len(msg.Consumer) == 0 {
-		sdk.ErrInvalidAddress(msg.Consumer.String())
+		return sdk.ErrInvalidAddress(msg.Consumer.String())
 	}
 	return nil
 }
@@ -577,7 +577,7 @@ func (msg MsgSvcRefundFees) GetSignBytes() []byte {
 
 func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
-		sdk.ErrInvalidAddress(msg.Consumer.String())
+		return sdk.ErrInvalidAddress(msg.Consumer.String())
 	}
 	return nil
 }
@@ -609,7 +609,7 @@ func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
 
 func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
-		sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	return nil
 }
@@ -645,13 +645,16 @@ func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
 
 func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.Trustee) == 0 {
-		sdk.ErrInvalidAddress(msg.Trustee.String())
+		return sdk.ErrInvalidAddress(msg.Trustee.String())
 	}
 	if len(msg.DestAddress) == 0 {
-		sdk.ErrInvalidAddress(msg.DestAddress.String())
+		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
 	if !msg.Amount.IsValid() {
-		sdk.ErrInvalidCoins(msg.Amount.String())
+		return sdk.ErrInvalidCoins(msg.Amount.String())
+	}
+	if !msg.Amount.IsPositive() {
+		return sdk.ErrInvalidCoins(msg.Amount.String())
 	}
 	return nil
 }
