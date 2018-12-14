@@ -1,34 +1,36 @@
-# iriscli tendermint tx
+# iriscli tendermint txs
 
-## Description
+## 介绍
 
-Matches this txhash over all committed blocks
+搜索查询所有符合指定匹配条件的交易
 
-## Usage
-
-```
-iriscli tendermint tx [hash] [flags]
+## 用法
 
 ```
+iriscli tendermint txs [flags]
+```
 
-## Flags
+## 标志
 
-| Name, shorthand | Default                    |Description                                                             | Required     |
-| --------------- | -------------------------- | --------------------------------------------------------- | -------- |
-| --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to (default "tcp://localhost:26657")  |                 
-| --help, -h      |       | 	help for tx|    |
-| --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
+| 名称，速记 | 默认值              |功能介绍                                                             | 是否必填     |
+| --------------- | -------------------- | --------------------------------------------------------- | -------- |
+| --chain-id      | ""                   | 区块链网络ID   | yes     |
+| --node string   | tcp://localhost:26657| 节点查询rpc接口|
+| --help, -h      |                      | 帮助信息 |    |
+| --trust-node    | true                 | 是否信任查询节点     |          |
+| --tags          | ""                   | 匹配条件     |          |
+| --page          | 0                    | 分页的页码     |          |
+| --size          | 100                  | 分页的大小     |          |
 
-## Examples
+## 示例
 
-### tx
+### 查询交易
 
 ```shell
-iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=fuxi-4000 --trust-node=true
+iriscli tendermint txs --tags action=send&sender=faa1c6al0vufl8efggzsvw34hszua9pr4qqyry37jn --chain-id=fuxi-4000 --trust-node=true
 ```
 
-You will get the following result.
+示例结果：
 
 ```
 {

@@ -1,31 +1,34 @@
-# iriscli tendermint tx
+# iriscli tendermint txs
 
 ## Description
 
-Matches this txhash over all committed blocks
+Search all transactions which match the given tag list
 
 ## Usage
 
 ```
-iriscli tendermint tx [hash] [flags]
+iriscli tendermint txs [flags]
 
 ```
 
 ## Flags
 
-| Name, shorthand | Default                    |Description                                                             | Required     |
-| --------------- | -------------------------- | --------------------------------------------------------- | -------- |
-| --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to (default "tcp://localhost:26657")  |                 
-| --help, -h      |       | 	help for tx|    |
-| --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
+| Name, shorthand | Default              |Description                                                             | Required     |
+| --------------- | -------------------- | --------------------------------------------------------- | -------- |
+| --chain-id      | ""                   | Chain ID of Tendermint node   | yes     |
+| --node string   | tcp://localhost:26657| Node to connect to (default "tcp://localhost:26657")  |
+| --help, -h      |                      | 	help for txs|    |
+| --trust-node    | true                 | Trust connected full node (don't verify proofs for responses)     |          |
+| --tags          | ""                   | tag:value list of tags that must match     |          |
+| --page          | 0                    | Pagination page     |          |
+| --size          | 100                  | Pagination size     |          |
 
 ## Examples
 
-### tx
+### Search transactions
 
 ```shell
-iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=fuxi-4000 --trust-node=true
+iriscli tendermint txs --tags action=send&sender=faa1c6al0vufl8efggzsvw34hszua9pr4qqyry37jn --chain-id=fuxi-4000 --trust-node=true
 ```
 
 You will get the following result.
