@@ -24,7 +24,7 @@ witness exotic fantasy gaze brass zebra adapt guess drip quote space payment far
 
 初始化genesis.json和config.toml等配置文件
 ```bash
-iris init --home={path_to_your_home} --chain-id={your_chain_id}
+iris init --home={path_to_your_home} --chain-id={your_chain_id} --moniker={your node name}
 ```
 该命令会在home目录下创建相应文件
 

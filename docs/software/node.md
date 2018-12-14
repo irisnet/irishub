@@ -24,7 +24,7 @@ witness exotic fantasy gaze brass zebra adapt guess drip quote space payment far
 
 Initialize the configuration files such as genesis.json and config.toml
 ```bash
-iris init --home={path_to_your_home} --chain-id={your_chain_id}
+iris init --home={path_to_your_home} --chain-id={your_chain_id} --moniker={your_node_name}
 ```
 This command will create the corresponding files in the home directory.
 
