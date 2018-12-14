@@ -24,6 +24,24 @@ iriscli stake delegate --help
 
 ## 示例
 
+在chain-id为test的链上执行委托10iris的命令：
 ```
-iriscli stake delegate --chain-id=ChainID --from=KeyName --fee=Fee --amount=CoinstoBond --address-validator=ValidatorOwnerAddress
+iriscli stake delegate --chain-id=test --from=KeyName --fee=0.04iris --amount=10iris --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
+```
+输出信息：
+```json
+ {
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 16462,
+   "codespace": "",
+   "tags": {
+     "action": "delegate",
+     "delegator": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2",
+     "destination-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd"
+   }
+ })
 ```

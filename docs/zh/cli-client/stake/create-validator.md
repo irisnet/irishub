@@ -37,4 +37,22 @@ iriscli stake create-validator --help
 iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 
+返回信息：
 
+```json
+ {
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 12050,
+   "codespace": "",
+   "tags": {
+     "action": "create_validator",
+     "destination-validator": "fva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll",
+     "identity": "",
+     "moniker": "test"
+   }
+ })
+```

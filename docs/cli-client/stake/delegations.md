@@ -18,7 +18,7 @@ iriscli stake delegations --help
 
 Query all delegations made from one delegator
 ```
-iriscli stake delegations [delegator-address]
+iriscli stake delegations faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2
 ```
 
 After that, you will get all detailed info of delegations from the specified delegator address.

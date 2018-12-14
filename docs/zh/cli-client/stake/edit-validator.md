@@ -30,3 +30,20 @@ iriscli stake edit-validator --help
 ```
 iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.004iris --commission-rate=0.15
 ```
+```json
+{
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 3482,
+   "codespace": "",
+   "tags": {
+     "action": "edit_validator",
+     "destination-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd",
+     "identity": "",
+     "moniker": "test2"
+   }
+ })
+```
