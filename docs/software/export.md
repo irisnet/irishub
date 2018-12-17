@@ -38,7 +38,7 @@ ERROR: error exporting state: failed to load rootMultiStore: wanted to load targ
 ```
 When you started your node, your pruning strategy might be the default value: `syncable`, which means your node will only keep the state of the latest 100 heights and every 10000 block in older heights(10000,20000,30000). So you need to replay some blocks on your node to rebuild the state of target height from the nearest older height.
 ```
-iris start --home=[your_home] --replay-height=105000
+iris start --home=[your_home] --replay_height=105000
 ```
 Execute the above command, and your node will rebuild state of height 105000 from height 100000. Finally, you try this command again:
 ```

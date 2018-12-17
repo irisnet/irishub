@@ -38,7 +38,7 @@ ERROR: error exporting state: failed to load rootMultiStore: wanted to load targ
 ```
 默认情况下，节点启动时设置的历史数据删除策略是`syncable`。这就意味着此节点只会保存最近100块的区块链状态，对于更老的状态则每10000块保留一个，比如高度为10000,20000和30000的状态会被永久保留。这种情况下用户需要在节点上发起replay的操作：
 ```
-iris start --home=[your_home] --replay-height=105000
+iris start --home=[your_home] --replay_height=105000
 ```
 执行上面这个命令，节点会从高度100000开始replay到105000，这时105000的状态会被重建出来，然后再次尝试导出高度为105000的区块链状态：
 ```
