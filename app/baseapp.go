@@ -712,17 +712,26 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 		result.GasWanted = gasWanted
 		result.GasUsed = ctx.GasMeter().GasConsumed()
+	}()
 
+	// Add cache in fee refund. If an error is returned or panic happes during refund,
+	// no value will be written into blockchain state.
+	defer func() {
+
+		result.GasUsed = ctx.GasMeter().GasConsumed()
+		var refundCtx sdk.Context
+		var refundCache sdk.CacheMultiStore
+		refundCtx, refundCache = app.cacheTxContext(ctx, txBytes)
 		feeRefundHandler := app.Engine.GetCurrentProtocol().GetFeeRefundHandler()
+
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
-			_, err := feeRefundHandler(ctx, tx, result)
+			_, err := feeRefundHandler(refundCtx, tx, result)
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
-				result.GasWanted = gasWanted
-				result.GasUsed = ctx.GasMeter().GasConsumed()
 				return
 			}
+			refundCache.Write()
 		}
 	}()
 

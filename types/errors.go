@@ -43,6 +43,9 @@ const (
 	CodeInsufficientFee   CodeType = 14
 	CodeOutOfService      CodeType = 15
 	CodeTooManySignatures CodeType = 16
+	CodeGasPriceTooLow    CodeType = 17
+	CodeInvalidGas        CodeType = 18
+	CodeInvalidTxFee      CodeType = 19
 
 	// CodespaceRoot is a codespace for error codes in this file only.
 	// Notice that 0 is an "unset" codespace, which can be overridden with
@@ -90,6 +93,12 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "out of service"
 	case CodeTooManySignatures:
 		return "maximum numer of signatures exceeded"
+	case CodeGasPriceTooLow:
+		return "gas price is too low"
+	case CodeInvalidGas:
+		return "invalid gas"
+	case CodeInvalidTxFee:
+		return "invalid tx fee"
 	default:
 		return unknownCodeMsg(code)
 	}
@@ -145,7 +154,15 @@ func ErrInsufficientFee(msg string) Error {
 func ErrTooManySignatures(msg string) Error {
 	return newErrorWithRootCodespace(CodeTooManySignatures, msg)
 }
-
+func ErrGasPriceTooLow(msg string) Error {
+	return newErrorWithRootCodespace(CodeGasPriceTooLow, msg)
+}
+func ErrInvalidGas(msg string) Error {
+	return newErrorWithRootCodespace(CodeInvalidGas, msg)
+}
+func ErrInvalidTxFee(msg string) Error {
+	return newErrorWithRootCodespace(CodeInvalidTxFee, msg)
+}
 //----------------------------------------
 // Error & sdkError
 

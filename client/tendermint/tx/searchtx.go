@@ -33,7 +33,7 @@ func SearchTxCmd(cdc *codec.Codec) *cobra.Command {
 		Long: strings.TrimSpace(`
 Search for transactions that match exactly the given tags. For example:
 
-$ gaiacli query txs --tags '<tag1>:<value1>&<tag2>:<value2>'
+$ iriscli query txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 `),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			tagsStr := viper.GetString(flagTags)

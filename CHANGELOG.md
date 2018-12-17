@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.9.0-Beta
+
+*December 14th, 2018*
+
+BREAKING CHANGES:
+
+- Use `iristool` to replace the original `irisdebug` and `irismon`
+- `iris init` must specify moniker
+ 
+FEATURES:
+
+- [iriscli] Optimize the way tags are displayed
+- [iriscli] Add `iriscli stake delegations-to [validator-addr]` and `/stake/validators/{validatorAddr}/delegations` interfaces
+- [iris] Application framework code refactoring
+- [iris] Add a new mechanism to distribute service fee tax
+- [iris] Slashing module supports querying slashing history
+- [iris] Gov module adds TxTaxUsageProposal/SoftwareHaltProposal proposals
+- [iris] Export and import blockchain snapshot at any block height
+- [iris] Restrict the block gas limit
+- [iris] Improve tx search to support multiple tags
+- [iris] Improve the default behavior of iris --home
+- [iris] `iris tendermint show-address` output begins with `fca`
+- [iris] Restrict the number of signatures on the transaction
+- [iris] Add a check for the validator private key type and reject the unsupported private key type
+- [tendermint] Update tendermint to v0.27.0
+ 
+PENDING:
+ - [iris] Redesigned to implement class 2 software upgrade
+
+
+## 0.8.0
+
+*December 13th, 2018*
+
+- Upgrade tendermint to v0.27.0-dev1
+
 
 ## 0.8.0-rc0
 
@@ -18,7 +54,6 @@ FEATURES:
 - View the current available withdraw balance by simulation mode
 - Command line and LCD interface for service invocation request and query
 - Implement guardian module for some governance proposal
-- Export blockchain snapshot at any height
 - Added command add-genesis-account to configure account for genesis.json
 - New proposal TerminatorProposal to terminate network consensus
 
