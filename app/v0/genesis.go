@@ -230,7 +230,7 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	addrMap := make(map[string]GenesisAccount, len(appState.Accounts))
 	for i := 0; i < len(appState.Accounts); i++ {
 		acc := appState.Accounts[i]
-		strAddr := string(acc.Address)
+		strAddr := acc.Address.String()
 		addrMap[strAddr] = acc
 	}
 
@@ -273,11 +273,11 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 
 		// validate the validator address and funds against the accounts in the state
 		msg := msgs[0].(stake.MsgCreateValidator)
-		addr := string(sdk.AccAddress(msg.ValidatorAddr))
+		addr := sdk.AccAddress(msg.ValidatorAddr).String()
 		acc, ok := addrMap[addr]
 		if !ok {
 			return appGenTxs, persistentPeers, fmt.Errorf(
-				"account %v not in genesis.json: %+v", addr, addrMap)
+				"account %v in gentx(%s) is not exist in genesis.json accounts: %+v", addr, fo.Name(), addrMap)
 		}
 		if acc.Coins.AmountOf(msg.Delegation.Denom).LT(msg.Delegation.Amount) {
 			err = fmt.Errorf("insufficient fund for the delegation: %v < %v",
