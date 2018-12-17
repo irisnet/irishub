@@ -33,7 +33,6 @@ Idl-content can be replaced by file if the file item is not empty.  [Example of 
 After that, you're done with defining a new service.
 
 ```txt
-Password to sign with 'node0':
 Committed at block 65 (tx hash: 663B676E453F91BFCDC87B0308910501DD14DF79C88390FC15E06C4CC9612422, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:7968 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 100 101 102 105 110 101] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 49 53 57 51 54 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
 {
    "tags": {
