@@ -28,7 +28,7 @@ cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
 wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-6000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-56000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-6000/config/genesis.json
 ```
 ## Edit Your Config File
 
