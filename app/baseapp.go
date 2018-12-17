@@ -823,15 +823,20 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 	}
 
 	//Todo: appVersion Tag.util
-	if appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersion); ok {
+	if appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag); ok {
 		appVersion,_ := strconv.ParseUint(string(appVersionStr.Value),10,64)
-		if appVersion != app.Engine.GetCurrentVersion() {
+		if appVersion > app.Engine.GetCurrentVersion() {
 			success := app.Engine.Activate(appVersion)
 			if !success {
 				if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
 					res.Tags = append(res.Tags,
 						sdk.MakeTag(tmstate.UpgradeFailureTagKey,
 							[]byte("Please install the right protocol version from " + upgradeConfig.Definition.Software)))
+					return
+				} else {
+					res.Tags = append(res.Tags,
+						sdk.MakeTag(tmstate.UpgradeFailureTagKey,
+							[]byte("Please install the right protocol version")))
 					return
 				}
 			}

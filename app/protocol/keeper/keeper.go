@@ -107,16 +107,8 @@ func (Keeper Keeper) IsValidProtocolVersion(ctx sdk.Context, protocolVersion uin
 
 func isValidProtocolVersion(currentProtocolVersion uint64, lastFailureVersion uint64, protocolVersion uint64) bool {
 	if currentProtocolVersion >= lastFailureVersion {
-		if currentProtocolVersion+1 == protocolVersion {
-			return true
-		} else {
-			return false
-		}
+		return currentProtocolVersion+1 == protocolVersion
 	} else {
-		if lastFailureVersion == protocolVersion || lastFailureVersion+1 == protocolVersion {
-			return true
-		} else {
-			return false
-		}
+		return lastFailureVersion == protocolVersion || lastFailureVersion+1 == protocolVersion
 	}
 }

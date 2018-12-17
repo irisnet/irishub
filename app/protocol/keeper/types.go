@@ -3,7 +3,7 @@ package keeper
 
 import "github.com/irisnet/irishub/types/common"
 
-const AppVersion = "app_version"
+const AppVersionTag = "app_version"
 
 type UpgradeConfig struct {
 	ProposalID   uint64

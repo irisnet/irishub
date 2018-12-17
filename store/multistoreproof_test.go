@@ -16,7 +16,7 @@ func TestVerifyIAVLStoreQueryProof(t *testing.T) {
 	store := iStore.(*iavlStore)
 	require.Nil(t, err)
 	store.Set([]byte("MYKEY"), []byte("MYVALUE"))
-	cid := store.Commit()
+	cid := store.Commit(nil)
 
 	// Get Proof
 	res := store.Query(abci.RequestQuery{
@@ -63,7 +63,7 @@ func TestVerifyMultiStoreQueryProof(t *testing.T) {
 
 	iavlStore := store.GetCommitStore(iavlStoreKey).(*iavlStore)
 	iavlStore.Set([]byte("MYKEY"), []byte("MYVALUE"))
-	cid := store.Commit()
+	cid := store.Commit(nil)
 
 	// Get Proof
 	res := store.Query(abci.RequestQuery{
@@ -115,7 +115,7 @@ func TestVerifyMultiStoreQueryProofEmptyStore(t *testing.T) {
 
 	store.MountStoreWithDB(iavlStoreKey, sdk.StoreTypeIAVL, nil)
 	store.LoadVersion(0, false)
-	cid := store.Commit() // Commit with empty iavl store.
+	cid := store.Commit(nil) // Commit with empty iavl store.
 
 	// Get Proof
 	res := store.Query(abci.RequestQuery{
@@ -147,7 +147,7 @@ func TestVerifyMultiStoreQueryProofAbsence(t *testing.T) {
 
 	iavlStore := store.GetCommitStore(iavlStoreKey).(*iavlStore)
 	iavlStore.Set([]byte("MYKEY"), []byte("MYVALUE"))
-	cid := store.Commit() // Commit with empty iavl store.
+	cid := store.Commit(nil) // Commit with empty iavl store.
 
 	// Get Proof
 	res := store.Query(abci.RequestQuery{

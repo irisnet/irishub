@@ -33,7 +33,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	}
 
 	// TODO: const CurrentVersionTagKey CurrentSoftwareTagKey
-	tags = tags.AppendTag(protocolKeeper.AppVersion, []byte(strconv.FormatUint(keeper.pk.GetCurrentProtocolVersion(ctx),10)))
+	tags = tags.AppendTag(protocolKeeper.AppVersionTag, []byte(strconv.FormatUint(keeper.pk.GetCurrentProtocolVersion(ctx),10)))
 
 	return tags
 }

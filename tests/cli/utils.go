@@ -431,16 +431,6 @@ func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput
 	return info
 }
 
-func executeGetSwitch(t *testing.T, cmdStr string) upgrade.MsgSwitch {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var switchMsg upgrade.MsgSwitch
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &switchMsg)
-
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return switchMsg
-}
-
 func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceDef servicecli.DefOutput
