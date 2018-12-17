@@ -26,7 +26,7 @@ iriscli gov submit-proposal --help
 | --param          |                            | [string] Parameter of proposal,eg. [{key:key,value:value,op:update}]                                                                                 |          |
 | --path           |                            | [string] The path of param.json                                                                                                                      |          |
 | --title          |                            | [string] Title of proposal                                                                                                                           | Yes      |
-| --type           |                            | [string] ProposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade                                                                            | Yes      |
+| --type           |                            | [string] ProposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | [uint64] the version of the new protocol                                                                            |       |
 | --software           |           " "                 | [string] the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | [string] the switchheight of the new protocol                                                         |       |
