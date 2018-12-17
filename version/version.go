@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 // Version - Iris Version
@@ -17,7 +18,7 @@ var GitCommit = ""
 func GetVersion() string {
 	v := Version
 	if GitCommit != "" {
-		v = v + "-" + GitCommit
+		v = v + "-" + GitCommit + "-" + strconv.Itoa(ProtocolVersion)
 	}
 	return v
 }

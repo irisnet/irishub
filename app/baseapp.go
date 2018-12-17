@@ -822,26 +822,30 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = endBlocker(app.deliverState.ctx, req)
 	}
 
-	//Todo: appVersion Tag.util
-	if appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag); ok {
-		appVersion,_ := strconv.ParseUint(string(appVersionStr.Value),10,64)
-		if appVersion > app.Engine.GetCurrentVersion() {
-			success := app.Engine.Activate(appVersion)
-			if !success {
-				if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
-					res.Tags = append(res.Tags,
-						sdk.MakeTag(tmstate.UpgradeFailureTagKey,
-							[]byte("Please install the right protocol version from " + upgradeConfig.Definition.Software)))
-					return
-				} else {
-					res.Tags = append(res.Tags,
-						sdk.MakeTag(tmstate.UpgradeFailureTagKey,
-							[]byte("Please install the right protocol version")))
-					return
-				}
-			}
-		}
+	appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag);
+	if !ok {
+		return
 	}
+
+	appVersion,_ := strconv.ParseUint(string(appVersionStr.Value),10,64)
+	if appVersion <= app.Engine.GetCurrentVersion() {
+		return
+	}
+
+	success := app.Engine.Activate(appVersion)
+	if success {
+		return
+	}
+
+	if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
+		res.Tags = append(res.Tags,
+			sdk.MakeTag(tmstate.UpgradeFailureTagKey,
+				[]byte("Please install the right protocol version from " + upgradeConfig.Definition.Software)))
+	} else {
+		res.Tags = append(res.Tags,
+			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right protocol version")))
+	}
+
 	return
 }
 
