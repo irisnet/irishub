@@ -1,9 +1,9 @@
 package protocol
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 /*
@@ -21,7 +21,7 @@ func NewProtocolEngine(cdc *codec.Codec) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
 		0,
-		protocolKeeper.NewKeeper(cdc,KeyProtocol),
+		protocolKeeper.NewKeeper(cdc, KeyProtocol),
 		//		irisApp,
 	}
 	return engine
@@ -41,10 +41,9 @@ func (pe *ProtocolEngine) GetCurrentProtocolVersionByStore(kvStore sdk.KVStore) 
 	return pe.pk.GetCurrentProtocolVersionByStore(kvStore)
 }
 
-func (pe *ProtocolEngine) GetUpgradeConfigByStore(kvStore sdk.KVStore) (protocolKeeper.UpgradeConfig,bool) {
+func (pe *ProtocolEngine) GetUpgradeConfigByStore(kvStore sdk.KVStore) (protocolKeeper.UpgradeConfig, bool) {
 	return pe.pk.GetUpgradeConfigByStore(kvStore)
 }
-
 
 // To be used for Protocol with version > 0
 func (pe *ProtocolEngine) Activate(version uint64) bool {

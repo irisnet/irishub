@@ -13,15 +13,15 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
-	"strconv"
-	"github.com/gogo/protobuf/proto"
 	tmstate "github.com/tendermint/tendermint/state"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	"strconv"
 )
 
 // Key to store the consensus params in the main store.
@@ -822,12 +822,12 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = endBlocker(app.deliverState.ctx, req)
 	}
 
-	appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag);
+	appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag)
 	if !ok {
 		return
 	}
 
-	appVersion,_ := strconv.ParseUint(string(appVersionStr.Value),10,64)
+	appVersion, _ := strconv.ParseUint(string(appVersionStr.Value), 10, 64)
 	if appVersion <= app.Engine.GetCurrentVersion() {
 		return
 	}
@@ -840,7 +840,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 	if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
 		res.Tags = append(res.Tags,
 			sdk.MakeTag(tmstate.UpgradeFailureTagKey,
-				[]byte("Please install the right protocol version from " + upgradeConfig.Definition.Software)))
+				[]byte("Please install the right protocol version from "+upgradeConfig.Definition.Software)))
 	} else {
 		res.Tags = append(res.Tags,
 			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right protocol version")))

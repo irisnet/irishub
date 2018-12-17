@@ -1,11 +1,11 @@
 package protocol
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/types/common"
 	"encoding/json"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/types/common"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 type Protocol interface {
@@ -35,4 +35,3 @@ type ProtocolBase struct {
 func (pb ProtocolBase) GetDefinition() common.ProtocolDefinition {
 	return pb.Definition
 }
-

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/client/context"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/spf13/cobra"
-	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
@@ -39,19 +39,19 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			res_upgradeConfig, _ := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
 			var upgradeConfig protocol.UpgradeConfig
-			if err == nil && len(res_upgradeConfig) != 0{
+			if err == nil && len(res_upgradeConfig) != 0 {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig)
 			}
 
-			res_LastFailureVersion, err := cliCtx.QueryStore(protocol.LastFailureVersionKey,"protocol")
+			res_LastFailureVersion, err := cliCtx.QueryStore(protocol.LastFailureVersionKey, "protocol")
 			var lastFailureVersion uint64
-			if err == nil  && len(res_LastFailureVersion) != 0{
+			if err == nil && len(res_LastFailureVersion) != 0 {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res_LastFailureVersion, &lastFailureVersion)
 			} else {
 				lastFailureVersion = 0
 			}
 
-			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(appVersion, upgradeConfig,lastFailureVersion)
+			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(appVersion, upgradeConfig, lastFailureVersion)
 
 			output, err := codec.MarshalJSONIndent(cdc, upgradeInfoOutput)
 			if err != nil {
@@ -64,4 +64,3 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	}
 	return cmd
 }
-
