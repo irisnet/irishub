@@ -32,13 +32,18 @@ iriscli service update-binding --chain-id=test --from=node0 --fee=0.004iris --se
 运行成功以后，返回的结果如下:
 
 ```txt
-Password to sign with 'node0':
-Committed at block 417 (tx hash: 8C9969A2BF3F7A8C13C2E0B57CE4FD7BE43454280559831D7E39B0FD3C1FCD28, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:5042 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 117 112 100 97 116 101 45 98 105 110 100 105 110 103] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 49 48 48 56 52 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
+Committed at block 579 (tx hash: D95E002AF467A7C4E7F298664E8C1951522B4CB61D26B01AC9705703E75557AB, response:
+ {
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 5449,
+   "codespace": "",
    "tags": {
-     "action": "service-update-binding",
-     "completeConsumedTxFee-iris-atto": "\"100840000000000\""
+     "action": "service_binding_update"
    }
- }
+ })
 ```
 
