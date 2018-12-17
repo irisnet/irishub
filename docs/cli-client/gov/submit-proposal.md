@@ -39,17 +39,22 @@ iriscli gov submit-proposal --chain-id=test --title="notice proposal" --type=Tex
 After you enter the correct password, you're done with submitting a new proposal, and then remember to back up your proposal-id, it's the only way to retrieve your proposal.
 
 ```txt
-Password to sign with 'node0':
-Committed at block 44 (tx hash: 2C28A87A6262CACEDDB4EBBC60FE989D0DB2B7DEB1EC6795D2F4707DA32C7CBF, response: {Code:0 Data:[49] Log:Msg 0:  Info: GasWanted:200000 GasUsed:8091 Tags:[{Key:[97 99 116 105 111 110] Value:[115 117 98 109 105 116 45 112 114 111 112 111 115 97 108] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[112 114 111 112 111 115 101 114] Value:[102 97 97 49 115 108 116 106 120 100 103 107 48 48 115 56 54 50 57 50 122 48 99 110 55 97 53 100 106 99 99 116 54 101 115 115 110 97 118 100 121 122] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[112 114 111 112 111 115 97 108 45 105 100] Value:[49] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[112 97 114 97 109] Value:[] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 52 48 52 53 53 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
+Committed at block 13 (tx hash: 234463E89B5641F9271113D72B28CA088F641DD8A63DB57257B7CAF90ED5A1C3, response:
+ {
+   "code": 0,
+   "data": "MQ==",
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 6608,
+   "codespace": "",
    "tags": {
-     "action": "submit-proposal",
-     "completeConsumedTxFee-iris-atto": "\"4045500000000000\"",
+     "action": "submit_proposal",
      "param": "",
      "proposal-id": "1",
-     "proposer": "faa1sltjxdgk00s86292z0cn7a5djcct6essnavdyz"
+     "proposer": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz"
    }
- }
+ })
 ```
 
 ### Submit a 'ParameterChange' type proposal
