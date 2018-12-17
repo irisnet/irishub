@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake/tags"
-	"github.com/irisnet/irishub/modules/stake/types"
-	"github.com/irisnet/irishub/modules/stake/querier"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/tags"
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
 
@@ -63,7 +63,7 @@ func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) ht
 			return
 		}
 
-		params := querier.NewQueryBondsParams(delegatorAddr, validatorAddr)
+		params := stake.NewQueryBondsParams(delegatorAddr, validatorAddr)
 
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
@@ -129,7 +129,7 @@ func queryDelegator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 			return
 		}
 
-		params := querier.NewQueryDelegatorParams(delegatorAddr)
+		params := stake.NewQueryDelegatorParams(delegatorAddr)
 
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
@@ -232,7 +232,7 @@ func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 			return
 		}
 
-		params := querier.NewQueryValidatorParams(validatorAddr)
+		params := stake.NewQueryValidatorParams(validatorAddr)
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -277,19 +277,36 @@ func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 			}
 
 		case "custom/stake/validatorRedelegations":
-			var relegations []types.Redelegation
-			if err = cdc.UnmarshalJSON(res, &relegations); err != nil {
+			var redelegations []types.Redelegation
+			if err = cdc.UnmarshalJSON(res, &redelegations); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			relegationsOutputs := make([]stakeClient.RedelegationOutput, len(relegations))
-			for index, relegation := range relegations {
-				relegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, relegation)
-				relegationsOutputs[index] = relegationOutput
+			redelegationsOutputs := make([]stakeClient.RedelegationOutput, len(redelegations))
+			for index, redelegation := range redelegations {
+				redelegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, redelegation)
+				redelegationsOutputs[index] = redelegationOutput
 			}
 
-			if res, err = codec.MarshalJSONIndent(cdc, relegationsOutputs); err != nil {
+			if res, err = codec.MarshalJSONIndent(cdc, redelegationsOutputs); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		case "custom/stake/validatorDelegations":
+			var delegations []types.Delegation
+			if err = cdc.UnmarshalJSON(res, &delegations); err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			delegationOutputs := make([]stakeClient.DelegationOutput, len(delegations))
+			for index, delegation := range delegations {
+				delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
+				delegationOutputs[index] = delegationOutput
+			}
+
+			if res, err = codec.MarshalJSONIndent(cdc, delegationOutputs); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
