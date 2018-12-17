@@ -54,7 +54,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 ### Send token to a address 
 
 ```
- iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.004iris --chain-id=irishub-test --amount=10iris
+ iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.004iris --chain-id=test-irishub --amount=10iris
 ```
 
 After that, you will get the detail info for the send

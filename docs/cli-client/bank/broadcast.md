@@ -40,6 +40,6 @@ iriscli bank broadcast [tx-file] [flags]
 ### Broadcast your transaction
 
 ```
-iriscli bank broadcast sign.json --chain-id=irishub-stage 
+iriscli bank broadcast sign.json --chain-id=test-irishub
 
 ```

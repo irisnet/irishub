@@ -22,7 +22,7 @@ iriscli service response [flags]
 
 ### Query a service response
 ```shell
-iriscli service response --request-chain-id=test --request-id=635-535-0
+iriscli service response --request-chain-id=test-irishub --request-id=635-535-0
 ```
 
 After that, you will get the response by specified parameters.

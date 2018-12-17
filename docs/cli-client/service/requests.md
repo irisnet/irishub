@@ -24,7 +24,7 @@ iriscli service requests [flags]
 
 ### Query service request list
 ```shell
-iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
+iriscli service requests --def-chain-id=test-irishub --service-name=test-service --bind-chain-id=test-irishub --provider=faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
 ```
 
 After that, you will get the active request list of the specified provider.

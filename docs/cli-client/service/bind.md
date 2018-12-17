@@ -27,7 +27,7 @@ iriscli service bind [flags]
 
 ### Add a binding to an existing service definition
 ```shell
-iriscli service bind --chain-id=test --from=node0 --fee=0.004iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=test-irishub --from=node0 --fee=0.004iris --service-name=test-service --def-chain-id=test-irishub --bind-type=Local --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 ```
 
 After that, you're done with adding a binding to an existing service definition.

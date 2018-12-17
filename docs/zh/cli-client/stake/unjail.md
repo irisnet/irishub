@@ -48,7 +48,7 @@ ERROR: Msg 0 failed: {"codespace":10,"code":102,"abci_code":655462,"message":"va
 过了jail状态的截止时间后，你可以发送一个 `unjail` 交易. 
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=test-irishub
 ```
 
 输出:

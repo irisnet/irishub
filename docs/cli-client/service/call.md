@@ -27,7 +27,7 @@ iriscli service call [flags]
 
 ### Initiate a service invocation request 
 ```shell
-iriscli service call --chain-id=test --from=node0 --fee=0.004iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
+iriscli service call --chain-id=test-irishub --from=node0 --fee=0.004iris --def-chain-id=test-irishub --service-name=test-service --method-id=1 --bind-chain-id=test-irishub --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
 ```
 
 After that, you're done with initiating a service invocation request.

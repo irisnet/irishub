@@ -26,7 +26,7 @@ iriscli service define [flags]
 
 ### define a service
 ```shell
-iriscli service define --chain-id=test  --from=node0 --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=test-irishub  --from=node0 --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 ```
 Idl-content can be replaced by file if the file item is not empty.  [Example of IDL content](#idl-content-example).
 

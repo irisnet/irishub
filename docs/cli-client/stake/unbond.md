@@ -28,7 +28,7 @@ Users must specify the unbond amount. There two options can do this: `--shares-a
 ## Examples
 
 ```
-iriscli stake unbond --address-validator=<ValidatorAddress> --shares-percent=0.1 --from=<key name> --chain-id=<chain-id> --fee=0.004iris
+iriscli stake unbond --address-validator=<ValidatorAddress> --shares-percent=0.1 --from=<key name> --chain-id=test-irishub --fee=0.004iris
 ```
 ```json
  {

@@ -60,7 +60,7 @@ iriscli bank sign <file> [flags]
 First you must use **iriscli bank send**  command with flag **--generate-only** to generate a send recorder. Just like this.
 
 ```shell  
-iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.004iris --chain-id=irishub-test --amount=10iris --generate-only > tx.json
+iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.004iris --chain-id=test-irishub--amount=10iris --generate-only > tx.json
 ```
 
 

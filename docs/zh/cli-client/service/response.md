@@ -22,7 +22,7 @@ iriscli service response [flags]
 
 ### 查询服务响应
 ```shell
-iriscli service response --request-chain-id=test --request-id=635-535-0
+iriscli service response --request-chain-id=test-irishub --request-id=635-535-0
 ```
 
 运行成功以后，返回的结果如下:

@@ -23,7 +23,7 @@ iriscli service enable [flags]
 
 ### 启用一个不可用的服务绑定
 ```shell
-iriscli service enable --chain-id=test  --from=node0 --fee=0.004iris --def-chain-id=test --service-name=test-service
+iriscli service enable --chain-id=test-irishub  --from=node0 --fee=0.004iris --def-chain-id=test-irishub --service-name=test-service
 ```
 
 运行成功以后，返回的结果如下:

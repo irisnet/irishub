@@ -23,7 +23,7 @@ iriscli service bindings [flags]
 ### 查询服务绑定列表
 
 ```shell
-iriscli service bindings --def-chain-id=test --service-name=test-service
+iriscli service bindings --def-chain-id=test-irishub --service-name=test-service
 ```
 
 运行成功以后，返回的结果如下:

@@ -28,7 +28,7 @@ iriscli stake edit-validator --help
 ## Examples
 
 ```
-iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.004iris --commission-rate=0.15
+iriscli stake edit-validator --from=<key name> --chain-id=test-irishub --fee=0.004iris --commission-rate=0.15
 ```
 
 ```json

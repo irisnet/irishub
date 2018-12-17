@@ -25,7 +25,7 @@ iriscli service binding [flags]
 ### Query a service binding
 
 ```shell
-iriscli service binding --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd
+iriscli service binding --def-chain-id=test-irishub --service-name=test-service --bind-chain-id=test --provider=faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd
 ```
 
 After that, you will get detail info for the service binding.
