@@ -23,6 +23,7 @@ iriscli stake --help
 | [validators](validators.md)                                   | 查询所有的验证者 |
 | [delegation](delegation.md)                                   | 基于委托者地址和验证者地址的委托查询 |
 | [delegations](delegations.md)                                 | 基于委托者地址的所有委托查询 |
+| [delegations-to](delegations-to.md)                           | 查询在某个验证人上的所有委托      |
 | [unbonding-delegation](unbonding-delegation.md)               | 基于委托者地址和验证者地址的unbonding-delegation记录查询 |
 | [unbonding-delegations](unbonding-delegations.md)             | 基于委托者地址的所有unbonding-delegation记录查询 |
 | [unbonding-delegations-from](unbonding-delegations-from.md)   | 基于验证者地址的所有unbonding-delegation记录查询|

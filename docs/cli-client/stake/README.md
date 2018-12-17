@@ -23,6 +23,7 @@ iriscli stake --help
 | [validators](validators.md)     | Query for all validators                                      |
 | [delegation](delegation.md)     | Query a delegation based on address and validator address     |
 | [delegations](delegations.md)   | Query all delegations made from one delegator                 |
+| [delegations-to](delegations-to.md)   | Query all delegations to one validator                 |
 | [unbonding-delegation](unbonding-delegation.md)               | Query an unbonding-delegation record based on delegator and validator address                 |
 | [unbonding-delegations](unbonding-delegations.md)             | Query all unbonding-delegations records for one delegator                                     |
 | [unbonding-delegations-from](unbonding-delegations-from.md)   | Query all unbonding delegatations from a validator                                            |

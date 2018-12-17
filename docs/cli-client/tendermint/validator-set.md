@@ -2,15 +2,17 @@
 
 ## Description
 
-Get the full tendermint validator set at given height
+Get the full tendermint validator set at given height. If no height is specified, the latest height will be used as default.
 
 
 ## Usage
 
 ```
-  Get the full tendermint validator set at given height
-
-
+  iriscli tendermint validator-set [height] [flags]
+```
+or
+```
+  iriscli tendermint validator-set
 ```
 
 ## Flags
@@ -24,10 +26,17 @@ Get the full tendermint validator set at given height
 
 ## Examples
 
-### tx
+### Get validator-set at height 114360
 
 ```shell
  iriscli tendermint validator-set 114360 --chain-id=fuxi-4000 --trust-node=true
+
+```
+
+### Get the latest validator-set
+
+```shell
+ iriscli tendermint validator-set --chain-id=fuxi-4000 --trust-node=true
 
 ```
 
