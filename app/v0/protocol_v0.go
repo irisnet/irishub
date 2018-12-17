@@ -89,7 +89,6 @@ func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
-	p.configStores()
 }
 
 // verison0 don't need the init
@@ -201,15 +200,28 @@ func (p *ProtocolVersion0) configRouters() {
 
 // configure all Stores
 func (p *ProtocolVersion0) configFeeHandlers() {
-
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeCollectionKeeper)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeCollectionKeeper, p.feeManager)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeManager)
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) configStores() {
-
+func (p *ProtocolVersion0) GetKVStoreKeyList()  []*sdk.KVStoreKey {
+   return []*sdk.KVStoreKey{
+	   protocol.KeyMain,
+	   protocol.KeyProtocol,
+	   protocol.KeyAccount,
+	   protocol.KeyStake,
+	   protocol.KeyMint,
+	   protocol.KeyDistr,
+	   protocol.KeySlashing,
+	   protocol.KeyGov,
+	   protocol.KeyRecord,
+	   protocol.KeyFeeCollection,
+	   protocol.KeyParams,
+	   protocol.KeyUpgrade,
+	   protocol.KeyService,
+	   protocol.KeyGuardian}
 }
 
 // configure all Stores

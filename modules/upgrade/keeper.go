@@ -32,49 +32,17 @@ func (k Keeper) AddNewVersion(ctx sdk.Context, appVersion AppVersion) {
 	if err != nil {
 		panic(err)
 	}
-	kvStore.Set(GetAppVersionKey(appVersion.Protocol.Version), appVersionBytes)
+	kvStore.Set(GetProposalIDKey(appVersion.ProposalID), appVersionBytes)
 
-	protocolVersionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion.Protocol.Version)
+	proposalIDBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion.ProposalID)
 	if err != nil {
 		panic(err)
 	}
-
-	kvStore.Set(GetProposalIDKey(appVersion.ProposalID), protocolVersionBytes)
+	kvStore.Set(GetAppVersionKey(appVersion.Protocol.Version, appVersion.ProposalID), proposalIDBytes)
 
 	if appVersion.Success {
-		kvStore.Set(GetStartHeightKey(appVersion.Protocol.Height), protocolVersionBytes)
-		k.pk.SetCurrentProtocolVersion(ctx, appVersion.Protocol.Version)
+		kvStore.Set(GetSuccessAppVersionKey(appVersion.Protocol.Version), proposalIDBytes)
 	}
-
-}
-
-func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight uint64) *AppVersion {
-	kvStore := ctx.KVStore(k.storeKey)
-	iterator := kvStore.ReverseIterator(GetStartHeightKey(0), GetStartHeightKey(blockHeight+1))
-	defer iterator.Close()
-
-	if iterator.Valid() {
-		versionIDBytes := iterator.Value()
-		if versionIDBytes == nil {
-			return nil
-		}
-		var protocolVersion uint64
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionIDBytes, &protocolVersion)
-		if err != nil {
-			panic(err)
-		}
-		versionBytes := kvStore.Get(GetAppVersionKey(protocolVersion))
-		if versionBytes == nil {
-			return nil
-		}
-		var version AppVersion
-		err = k.cdc.UnmarshalBinaryLengthPrefixed(versionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		return &version
-	}
-	return nil
 }
 
 func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId uint64) *AppVersion {
@@ -88,7 +56,7 @@ func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId uint64) *AppV
 	if err != nil {
 		panic(err)
 	}
-	versionBytes := kvStore.Get(GetAppVersionKey(versionID))
+	versionBytes := kvStore.Get(GetAppVersionKey(versionID,proposalId))
 	if versionBytes != nil {
 		var version AppVersion
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionBytes, &version)
@@ -121,4 +89,11 @@ func (k Keeper) GetSignal(ctx sdk.Context, protocol uint64, address string) bool
 		return true
 	}
 	return false
+}
+
+func (k Keeper) DeleteSignal(ctx sdk.Context, protocol uint64, address string) {
+	if ok := k.GetSignal(ctx, protocol, address); ok {
+		kvStore := ctx.KVStore(k.storeKey)
+		kvStore.Delete(GetSiganlKey(protocol, address))
+	}
 }

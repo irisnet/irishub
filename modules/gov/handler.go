@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"github.com/irisnet/irishub/modules/gov/params"
 	tmstate "github.com/tendermint/tendermint/state"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 // Handle all "gov" type messages.
@@ -116,18 +115,19 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
 
+	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version)  {
+		return ErrCodeInvalidVersion(keeper.codespace, msg.Version, keeper.pk.GetCurrentProtocolVersion(ctx)).Result()
+	}
+
 	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 	if !found {
 		return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 	}
 
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
-		emptyUpgradeConfig := protocolKeeper.UpgradeConfig{}
-		if keeper.pk.GetUpgradeConfig(ctx) != emptyUpgradeConfig {
-			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
-		}
-	}
 
+	if _ , ok := keeper.pk.GetUpgradeConfig(ctx) ; ok {
+		return ErrSwitchPeriodInProcess(keeper.codespace).Result()
+	}
 
 	proposal := keeper.NewSoftwareUpgradeProposal(ctx, msg)
 

@@ -1,13 +1,14 @@
 package keeper
-import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
-)
 
+import (
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+)
 
 var (
 	CurrentProtocolVersionKey = []byte("currentProtocolVersionKey")
-	UpgradeConfigkey  = []byte("upgradeConfigkey")
+	UpgradeConfigkey          = []byte("upgradeConfigkey")
+	LastFailureVersionKey     = []byte("lastFailureVersionKey")
 )
 
 type Keeper struct {
@@ -17,8 +18,8 @@ type Keeper struct {
 
 func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
 	return Keeper{
-		storeKey:storeKey,
-		cdc:cdc,
+		storeKey: storeKey,
+		cdc:      cdc,
 	}
 }
 
@@ -49,15 +50,40 @@ func (keeper Keeper) SetCurrentProtocolVersion(ctx sdk.Context, currentProtocolV
 	store.Set(CurrentProtocolVersionKey, bz)
 }
 
-func (keeper Keeper) GetUpgradeConfig(ctx sdk.Context) UpgradeConfig {
+func (keeper Keeper) GetLastFailureVersion(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := store.Get(LastFailureVersionKey)
+	if bz == nil {
+		return 0
+	}
+	var lastFailureVersion uint64
+	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &lastFailureVersion)
+	return lastFailureVersion
+}
+
+func (keeper Keeper) SetLastFailureVersion(ctx sdk.Context, lastFailureVersion uint64) {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(lastFailureVersion)
+	store.Set(LastFailureVersionKey, bz)
+}
+
+func (keeper Keeper) GetUpgradeConfig(ctx sdk.Context) (upgradeConfig UpgradeConfig, found bool) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(UpgradeConfigkey)
 	if bz == nil {
-		return UpgradeConfig{}
+		return upgradeConfig, false
 	}
-	var upgradeConfig UpgradeConfig
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &upgradeConfig)
-	return upgradeConfig
+	return upgradeConfig, true
+}
+
+func (keeper Keeper) GetUpgradeConfigByStore(kvStore sdk.KVStore) (upgradeConfig UpgradeConfig, found bool) {
+	bz := kvStore.Get(UpgradeConfigkey)
+	if bz == nil {
+		return upgradeConfig, false
+	}
+	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &upgradeConfig)
+	return upgradeConfig, true
 }
 
 func (keeper Keeper) SetUpgradeConfig(ctx sdk.Context, upgradeConfig UpgradeConfig) {
@@ -68,7 +94,29 @@ func (keeper Keeper) SetUpgradeConfig(ctx sdk.Context, upgradeConfig UpgradeConf
 
 func (keeper Keeper) ClearUpgradeConfig(ctx sdk.Context) {
 	store := ctx.KVStore(keeper.storeKey)
-	upgradeConfig := UpgradeConfig{}
-	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(upgradeConfig)
-	store.Set(UpgradeConfigkey, bz)
+	store.Delete(UpgradeConfigkey)
+}
+
+func (Keeper Keeper) IsValidProtocolVersion(ctx sdk.Context, protocolVersion uint64) bool {
+
+	currentProtocolVersion := Keeper.GetCurrentProtocolVersion(ctx)
+	lastFailureVersion := Keeper.GetLastFailureVersion(ctx)
+
+	return isValidProtocolVersion(currentProtocolVersion, lastFailureVersion, protocolVersion)
+}
+
+func isValidProtocolVersion(currentProtocolVersion uint64, lastFailureVersion uint64, protocolVersion uint64) bool {
+	if currentProtocolVersion >= lastFailureVersion {
+		if currentProtocolVersion+1 == protocolVersion {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		if lastFailureVersion == protocolVersion || lastFailureVersion+1 == protocolVersion {
+			return true
+		} else {
+			return false
+		}
+	}
 }

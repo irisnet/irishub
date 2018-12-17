@@ -21,7 +21,7 @@ const (
 )
 
 // Returns components for testing
-func DefaultTestComponents(t *testing.T, table TypeTable) (sdk.Context, Subspace, func() sdk.CommitID) {
+func DefaultTestComponents(t *testing.T, table TypeTable) (sdk.Context, Subspace, func([]*sdk.KVStoreKey) sdk.CommitID) {
 	cdc := codec.New()
 	key := sdk.NewKVStoreKey("params")
 	tkey := sdk.NewTransientStoreKey("tparams")

@@ -7,22 +7,22 @@ import (
 )
 
 var (
-	appVersionKey  = "v/%s"    // v/<protocol.version>
+	appVersionKey  = "v/%s/%s"    // v/<protocol.version>/<proposalID>
 	proposalIDKey  = "p/%s"    // p/<proposalId>
-	startHeightKey = "h/%s"    // h/<height>
+	successAppVersionKey = "success/%s"    // h/<protocol.version>
 	siganlKey      = "s/%s/%s" // s/<proposalId>/<switchVoterAddress>
 )
 
-func GetAppVersionKey(versionID uint64) []byte {
-	return []byte(fmt.Sprintf(appVersionKey, UintToHexString(versionID)))
+func GetAppVersionKey(versionID uint64, proposalID uint64) []byte {
+	return []byte(fmt.Sprintf(appVersionKey, UintToHexString(versionID), UintToHexString(proposalID)))
+}
+
+func GetSuccessAppVersionKey(versionID uint64) []byte {
+	return []byte(fmt.Sprintf(successAppVersionKey, UintToHexString(versionID)))
 }
 
 func GetProposalIDKey(proposalID uint64) []byte {
 	return []byte(fmt.Sprintf(proposalIDKey, UintToHexString(proposalID)))
-}
-
-func GetStartHeightKey(height uint64) []byte {
-	return []byte(fmt.Sprintf(startHeightKey, UintToHexString(height)))
 }
 
 func GetSiganlKey(proposalID uint64, switchVoterAddr string) []byte {

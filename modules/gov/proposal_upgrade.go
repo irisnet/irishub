@@ -19,17 +19,27 @@ type SoftwareUpgradeProposal struct {
 func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {
 
 	logger := ctx.Logger().With("module", "x/gov")
-	emptyUpgradeConfig := protocolKeeper.UpgradeConfig{}
-	if k.pk.GetUpgradeConfig(ctx) == emptyUpgradeConfig {
-		k.pk.SetUpgradeConfig(ctx,
-			protocolKeeper.UpgradeConfig{sp.ProposalID,
-				common.ProtocolDefinition{sp.Version, sp.Software, sp.SwitchHeight}})
-		logger.Info("Execute SoftwareProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
 
+	if _, ok := k.pk.GetUpgradeConfig(ctx); !ok {
+
+		if !k.pk.IsValidProtocolVersion(ctx, sp.Version) {
+
+			if uint64(ctx.BlockHeight())+1 < sp.SwitchHeight {
+				k.pk.SetUpgradeConfig(ctx,
+					protocolKeeper.UpgradeConfig{sp.ProposalID,
+						common.ProtocolDefinition{sp.Version, sp.Software, sp.SwitchHeight}})
+
+				logger.Info("Execute SoftwareProposal Success", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
+
+			} else {
+				logger.Info("Execute SoftwareProposal Failure", "info", fmt.Sprint("switch height must be more than blockHeight + 1"))
+			}
+		} else {
+			logger.Info("Execute SoftwareProposal Failure", "info", fmt.Sprint("version [%s] in SoftwareUpgradeProposal isn't valid ", sp.ProposalID))
+
+		}
 	} else {
-		logger.Info("Software Upgrade Switch Period is in process.", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-
+		logger.Info("Execute SoftwareProposal Failure", "info", fmt.Sprintf("Software Upgrade Switch Period is in process. current height:%d", ctx.BlockHeight()))
 	}
-
 	return nil
 }

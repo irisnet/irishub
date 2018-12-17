@@ -41,6 +41,11 @@ func (pe *ProtocolEngine) GetCurrentProtocolVersionByStore(kvStore sdk.KVStore) 
 	return pe.pk.GetCurrentProtocolVersionByStore(kvStore)
 }
 
+func (pe *ProtocolEngine) GetUpgradeConfigByStore(kvStore sdk.KVStore) (protocolKeeper.UpgradeConfig,bool) {
+	return pe.pk.GetUpgradeConfigByStore(kvStore)
+}
+
+
 // To be used for Protocol with version > 0
 func (pe *ProtocolEngine) Activate(version uint64) bool {
 	p, flag := pe.protocols[version]
@@ -56,7 +61,7 @@ func (pe *ProtocolEngine) GetCurrentProtocol() Protocol {
 	return pe.protocols[pe.current]
 }
 
-func (pe *ProtocolEngine) GetCurrent() uint64 {
+func (pe *ProtocolEngine) GetCurrentVersion() uint64 {
 	return pe.current
 }
 

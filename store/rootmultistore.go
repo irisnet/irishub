@@ -190,11 +190,11 @@ func (rs *rootMultiStore) LastCommitID() CommitID {
 }
 
 // Implements Committer/CommitStore.
-func (rs *rootMultiStore) Commit() CommitID {
+func (rs *rootMultiStore) Commit(KVStoreList []*sdk.KVStoreKey) CommitID {
 
 	// Commit stores.
 	version := rs.lastCommitID.Version + 1
-	commitInfo := commitStores(version, rs.stores)
+	commitInfo := commitStores(version, rs.stores, KVStoreList)
 
 	// Need to update atomically.
 	batch := rs.db.NewBatch()
@@ -478,28 +478,20 @@ func setLatestVersion(batch dbm.Batch, version int64) {
 }
 
 // Commits each store and returns a new commitInfo.
-func commitStores(version int64, storeMap map[StoreKey]CommitStore) commitInfo {
-	storemap := make(map[string]CommitStore)
-	for key, store := range storeMap {
-		storemap[key.Name()] = store
-	}
-	upgrade := storemap["upgrade"]
-	if false {
-		upgradeStore := upgrade.(KVStore)
-		bz := upgradeStore.Get([]byte("k/")) //CurrentStoreKey
-		storekeys := string(bz)              //splitby":"
-		storekeyslist := strings.Split(storekeys, ":")
-		storeInfos := make([]storeInfo, 0, len(storekeyslist))
-		for _, key := range storekeyslist {
-			if store, ok := storemap[key]; ok {
+func commitStores(version int64, storeMap map[StoreKey]CommitStore, KVStoreList []*sdk.KVStoreKey) commitInfo {
+
+	if len(KVStoreList) > 0 {
+		storeInfos := make([]storeInfo, 0, len(KVStoreList))
+		for _, key := range KVStoreList {
+			if store, ok := storeMap[key]; ok {
 				// Commit
-				commitID := store.Commit()
+				commitID := store.Commit([]*sdk.KVStoreKey{})
 				if store.GetStoreType() == sdk.StoreTypeTransient {
 					continue
 				}
 				// Record CommitID
 				si := storeInfo{}
-				si.Name = key
+				si.Name = key.Name()
 				si.Core.CommitID = commitID
 				// si.Core.StoreType = store.GetStoreType()
 				storeInfos = append(storeInfos, si)
@@ -514,7 +506,7 @@ func commitStores(version int64, storeMap map[StoreKey]CommitStore) commitInfo {
 		storeInfos := make([]storeInfo, 0, len(storeMap))
 		for key, store := range storeMap {
 			// Commit
-			commitID := store.Commit()
+			commitID := store.Commit([]*sdk.KVStoreKey{})
 			if store.GetStoreType() == sdk.StoreTypeTransient {
 				continue
 			}
