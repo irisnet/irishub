@@ -22,7 +22,7 @@ func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {
 
 	if _, ok := k.pk.GetUpgradeConfig(ctx); !ok {
 
-		if !k.pk.IsValidProtocolVersion(ctx, sp.Version) {
+		if k.pk.IsValidProtocolVersion(ctx, sp.Version) {
 
 			if uint64(ctx.BlockHeight())+1 < sp.SwitchHeight {
 				k.pk.SetUpgradeConfig(ctx,

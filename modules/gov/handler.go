@@ -115,10 +115,13 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
 
-	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version)  {
-		return ErrCodeInvalidVersion(keeper.codespace, msg.Version, keeper.pk.GetCurrentProtocolVersion(ctx)).Result()
+	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
+		return ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
 	}
 
+	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
+		return ErrCodeInvalidSwitchHeight(keeper.codespace,uint64(ctx.BlockHeight()),msg.SwitchHeight).Result()
+	}
 	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 	if !found {
 		return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
