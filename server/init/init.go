@@ -61,6 +61,9 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 			}
 
 			config.Moniker = viper.GetString(flagMoniker)
+			if len(config.Moniker) == 0 {
+				return fmt.Errorf("--moniker should not be empty")
+			}
 
 			var appState json.RawMessage
 			genFile := config.GenesisFile()
