@@ -27,7 +27,9 @@ const (
 	CodeSwitchPeriodInProcess sdk.CodeType = 14
 	CodeInvalidPercent        sdk.CodeType = 15
 	CodeInvalidUsageType      sdk.CodeType = 16
-	CodeInvalidInput          sdk.CodeType = 16
+	CodeInvalidInput          sdk.CodeType = 17
+	CodeInvalidVersion        sdk.CodeType = 18
+	CodeInvalidSwitchHeight   sdk.CodeType = 19
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -100,6 +102,13 @@ func ErrNotTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Erro
 
 func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("[%s] is not a profiler address", profiler))
+}
+
+func ErrCodeInvalidVersion(codespace sdk.CodespaceType, version uint64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidVersion, fmt.Sprintf("Version [%v] in SoftwareUpgradeProposal isn't valid", version))
+}
+func ErrCodeInvalidSwitchHeight(codespace sdk.CodespaceType, blockHeight uint64, switchHeight uint64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidVersion, fmt.Sprintf("Protocol switchHeight [%v] in SoftwareUpgradeProposal isn't large than current block height [%v]", switchHeight, blockHeight))
 }
 
 ////////////////////  iris end  /////////////////////////////

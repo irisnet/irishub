@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"encoding/json"
 	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	tmstate "github.com/tendermint/tendermint/state"
 )
 
@@ -22,6 +21,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgSubmitProposal(ctx, keeper, msg)
 		case MsgSubmitTxTaxUsageProposal:
 			return handleMsgSubmitTxTaxUsageProposal(ctx, keeper, msg)
+		case MsgSubmitSoftwareUpgradeProposal:
+			return handleMsgSubmitSoftwareUpgradeProposal(ctx, keeper, msg)
 		case MsgVote:
 			return handleMsgVote(ctx, keeper, msg)
 		default:
@@ -33,7 +34,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade || msg.ProposalType == ProposalTypeSoftwareHalt {
+	if msg.ProposalType == ProposalTypeSoftwareHalt {
 		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 		if !found {
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
@@ -41,11 +42,6 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
-		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
-			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
-		}
-	}
 	////////////////////  iris end  /////////////////////////////
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
@@ -106,6 +102,49 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 	if msg.Usage != UsageTypeBurn {
 		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
 	}
+
+	if votingStarted {
+		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
+	}
+
+	return sdk.Result{
+		Data: proposalIDBytes,
+		Tags: resTags,
+	}
+}
+
+func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
+
+	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
+		return ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
+	}
+
+	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
+		return ErrCodeInvalidSwitchHeight(keeper.codespace,uint64(ctx.BlockHeight()),msg.SwitchHeight).Result()
+	}
+	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
+	if !found {
+		return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+	}
+
+
+	if _ , ok := keeper.pk.GetUpgradeConfig(ctx) ; ok {
+		return ErrSwitchPeriodInProcess(keeper.codespace).Result()
+	}
+
+	proposal := keeper.NewSoftwareUpgradeProposal(ctx, msg)
+
+	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
+	if err != nil {
+		return err.Result()
+	}
+	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
+
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSubmitProposal,
+		tags.Proposer, []byte(msg.Proposer.String()),
+		tags.ProposalID, proposalIDBytes,
+	)
 
 	if votingStarted {
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)

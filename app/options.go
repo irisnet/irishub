@@ -78,7 +78,7 @@ func (app *BaseApp) SetPubKeyPeerFilter(pf sdk.PeerFilter) {
 	app.pubkeyPeerFilter = pf
 }
 
-func (app *BaseApp) SetProtocolEngine(pe protocol.ProtocolEngine) {
+func (app *BaseApp) SetProtocolEngine(pe *protocol.ProtocolEngine) {
 	if app.sealed {
 		panic("SetPubKeyPeerFilter() on sealed BaseApp")
 	}

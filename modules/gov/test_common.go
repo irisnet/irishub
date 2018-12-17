@@ -22,6 +22,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/guardian"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 // initialize the mock application for this module
@@ -33,7 +34,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	keyGov := sdk.NewKVStoreKey("gov")
 	keyDistr := sdk.NewKVStoreKey("distr")
+    keyProtocol := sdk.NewKVStoreKey("protocol")
 
+    pk := protocolKeeper.NewKeeper(mapp.Cdc,keyProtocol)
 	paramsKeeper := params.NewKeeper(
 		mapp.Cdc,
 		sdk.NewKVStoreKey("params"),
@@ -52,7 +55,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.DefaultCodespace)
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 

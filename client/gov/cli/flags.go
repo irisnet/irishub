@@ -19,4 +19,7 @@ const (
 	flagUsage        = "usage"
 	flagDestAddress  = "dest-address"
 	flagPercent      = "percent"
+	flagVersion      = "version"
+	flagSoftware     = "software"
+	flagSwitchHeight = "switch-height"
 )

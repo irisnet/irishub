@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 // nolint
@@ -24,6 +25,7 @@ type Keeper struct {
 	ck bank.Keeper
 
 	dk distribution.Keeper
+
 	gk guardian.Keeper
 	// The ValidatorSet to get information about validators
 	vs sdk.ValidatorSet
@@ -31,6 +33,7 @@ type Keeper struct {
 	// The reference to the DelegationSet to get information about delegators
 	ds sdk.DelegationSet
 
+	pk protocolKeeper.Keeper
 	// The (unexposed) keys used to access the stores from the Context.
 	storeKey sdk.StoreKey
 
@@ -46,7 +49,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet,pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
 		ck:        ck,
@@ -54,6 +57,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck ba
 		gk:        gk,
 		ds:        ds,
 		vs:        ds.GetValidatorSet(),
+		pk:        pk,
 		cdc:       cdc,
 		codespace: codespace,
 	}
@@ -69,8 +73,6 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	case ProposalTypeParameterChange:
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
-	case ProposalTypeSoftwareUpgrade:
-		return keeper.NewUpgradeProposal(ctx, title, description, proposalType)
 	case ProposalTypeSoftwareHalt:
 		return keeper.NewHaltProposal(ctx, title, description, proposalType)
 	}
@@ -136,32 +138,6 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	return proposal
 }
 
-func (keeper Keeper) NewUpgradeProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
-	proposalID, err := keeper.getNewProposalID(ctx)
-	if err != nil {
-		return nil
-	}
-	var textProposal = TextProposal{
-		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
-	}
-	var proposal Proposal = &SoftwareUpgradeProposal{
-		textProposal,
-	}
-
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
-	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
-	keeper.SetProposal(ctx, proposal)
-	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
-	return proposal
-}
-
 func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
@@ -208,6 +184,31 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 		msg.Usage,
 		msg.DestAddress,
 		msg.Percent,
+	}
+	keeper.saveProposal(ctx, proposal)
+	return proposal
+}
+
+func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSoftwareUpgradeProposal) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var textProposal = TextProposal{
+		ProposalID:   proposalID,
+		Title:        msg.Title,
+		Description:  msg.Description,
+		ProposalType: msg.ProposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+	var proposal Proposal = &SoftwareUpgradeProposal{
+		textProposal,
+		msg.Version,
+		msg.Software,
+		msg.SwitchHeight,
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal

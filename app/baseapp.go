@@ -13,12 +13,15 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
-	"github.com/gogo/protobuf/proto"
+	tmstate "github.com/tendermint/tendermint/state"
+	"strconv"
 )
 
 // Key to store the consensus params in the main store.
@@ -45,7 +48,7 @@ type BaseApp struct {
 	name   string               // application name from abci.Info
 	db     dbm.DB               // common DB backend
 	cms    sdk.CommitMultiStore // Main (uncached) state
-	Engine protocol.ProtocolEngine
+	Engine *protocol.ProtocolEngine
 
 	txDecoder sdk.TxDecoder // unmarshal []byte into sdk.Tx
 
@@ -273,6 +276,7 @@ func (app *BaseApp) Info(req abci.RequestInfo) abci.ResponseInfo {
 	lastCommitID := app.cms.LastCommitID()
 
 	return abci.ResponseInfo{
+		AppVersion:       version.ProtocolVersion,
 		Data:             app.name,
 		LastBlockHeight:  lastCommitID.Version,
 		LastBlockAppHash: lastCommitID.Hash,
@@ -298,7 +302,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
 
-	initChainer := app.Engine.GetCurrent().GetInitChainer()
+	initChainer := app.Engine.GetCurrentProtocol().GetInitChainer()
 	if initChainer == nil {
 		return
 	}
@@ -438,7 +442,7 @@ func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res 
 	if len(path) < 2 || path[1] == "" {
 		return sdk.ErrUnknownRequest("No route for custom query specified").QueryResult()
 	}
-	querier := app.Engine.GetCurrent().GetQueryRouter().Route(path[1])
+	querier := app.Engine.GetCurrentProtocol().GetQueryRouter().Route(path[1])
 	if querier == nil {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("no custom querier found for route %s", path[1])).QueryResult()
 	}
@@ -493,7 +497,8 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter)
 
-	beginBlocker := app.Engine.GetCurrent().GetBeginBlocker()
+	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
+
 	if beginBlocker != nil {
 		res = beginBlocker(app.deliverState.ctx, req)
 	}
@@ -511,6 +516,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	// Decode the Tx.
 	var result sdk.Result
+
 	var tx, err = app.txDecoder(txBytes)
 	if err != nil {
 		result = err.Result()
@@ -600,7 +606,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	for msgIdx, msg := range msgs {
 		// Match route.
 		msgRoute := msg.Route()
-		handler := app.Engine.GetCurrent().GetRouter().Route(msgRoute)
+		handler := app.Engine.GetCurrentProtocol().GetRouter().Route(msgRoute)
 		if handler == nil {
 			return sdk.ErrUnknownRequest("Unrecognized Msg type: " + msgRoute).Result()
 		}
@@ -711,12 +717,13 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// Add cache in fee refund. If an error is returned or panic happes during refund,
 	// no value will be written into blockchain state.
 	defer func() {
-		result.GasUsed = ctx.GasMeter().GasConsumed()
 
+		result.GasUsed = ctx.GasMeter().GasConsumed()
 		var refundCtx sdk.Context
 		var refundCache sdk.CacheMultiStore
 		refundCtx, refundCache = app.cacheTxContext(ctx, txBytes)
-		feeRefundHandler := app.Engine.GetCurrent().GetFeeRefundHandler()
+		feeRefundHandler := app.Engine.GetCurrentProtocol().GetFeeRefundHandler()
+
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
 			_, err := feeRefundHandler(refundCtx, tx, result)
@@ -745,7 +752,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	feePreprocessHandler := app.Engine.GetCurrent().GetFeePreprocessHandler()
+	feePreprocessHandler := app.Engine.GetCurrentProtocol().GetFeePreprocessHandler()
 	// run the fee handler
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
@@ -754,7 +761,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}
 
-	anteHandler := app.Engine.GetCurrent().GetAnteHandler()
+	anteHandler := app.Engine.GetCurrentProtocol().GetAnteHandler()
 	// run the ante handler
 	if anteHandler != nil {
 		var anteCtx sdk.Context
@@ -810,9 +817,33 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
 
-	endBlocker := app.Engine.GetCurrent().GetEndBlocker()
+	endBlocker := app.Engine.GetCurrentProtocol().GetEndBlocker()
 	if endBlocker != nil {
 		res = endBlocker(app.deliverState.ctx, req)
+	}
+
+	appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag)
+	if !ok {
+		return
+	}
+
+	appVersion, _ := strconv.ParseUint(string(appVersionStr.Value), 10, 64)
+	if appVersion <= app.Engine.GetCurrentVersion() {
+		return
+	}
+
+	success := app.Engine.Activate(appVersion)
+	if success {
+		return
+	}
+
+	if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
+		res.Tags = append(res.Tags,
+			sdk.MakeTag(tmstate.UpgradeFailureTagKey,
+				[]byte("Please install the right protocol version from "+upgradeConfig.Definition.Software)))
+	} else {
+		res.Tags = append(res.Tags,
+			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right protocol version")))
 	}
 
 	return
@@ -824,7 +855,7 @@ func (app *BaseApp) Commit() (res abci.ResponseCommit) {
 
 	// Write the Deliver state and commit the MultiStore
 	app.deliverState.ms.Write()
-	commitID := app.cms.Commit()
+	commitID := app.cms.Commit(app.Engine.GetCurrentProtocol().GetKVStoreKeyList())
 	// TODO: this is missing a module identifier and dumps byte array
 	app.Logger.Debug("Commit synced",
 		"commit", commitID,

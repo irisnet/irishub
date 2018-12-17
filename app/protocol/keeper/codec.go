@@ -1,4 +1,4 @@
-package upgrade
+package keeper
 
 import (
 	"github.com/irisnet/irishub/codec"
@@ -6,7 +6,7 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	//cdc.RegisterConcrete(&AppVersion{}, "iris-hub/upgrade/Version", nil)
+	cdc.RegisterConcrete(&UpgradeConfig{}, "iris-hub/protocol/upgradeConfig", nil)
 }
 
 var msgCdc = codec.New()
