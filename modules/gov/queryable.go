@@ -137,7 +137,20 @@ func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	deposit, _ := keeper.GetDeposit(ctx, params.ProposalID, params.Depositor)
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+		return  nil, ErrCodeDepositDeleted(DefaultCodespace, params.ProposalID)
+	}
+
+	deposit, bool := keeper.GetDeposit(ctx, params.ProposalID, params.Depositor)
+	if !bool {
+		return nil, ErrCodeDepositNotExisted(DefaultCodespace,params.Depositor,params.ProposalID)
+	}
+
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, deposit)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
@@ -159,7 +172,21 @@ func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	vote, _ := keeper.GetVote(ctx, params.ProposalID, params.Voter)
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+		return  nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
+	}
+
+	vote, bool := keeper.GetVote(ctx, params.ProposalID, params.Voter)
+	if !bool {
+		return  nil, ErrCodeVoteNotExisted(DefaultCodespace,params.Voter,params.ProposalID)
+	}
+
+
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, vote)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
@@ -178,6 +205,15 @@ func queryDeposits(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 	err2 := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err2 != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
+	}
+
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+		return  nil, ErrCodeDepositDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	var deposits []Deposit
@@ -207,6 +243,15 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 
 	if err2 != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
+	}
+
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+		return  nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	var votes []Vote

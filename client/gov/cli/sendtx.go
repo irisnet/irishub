@@ -116,6 +116,11 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	////////////////////  iris end  /////////////////////////////
+
+	cmd.MarkFlagRequired(flagTitle)
+	cmd.MarkFlagRequired(flagDescription)
+	cmd.MarkFlagRequired(flagProposalType)
+	cmd.MarkFlagRequired(flagDeposit)
 	return cmd
 }
 
