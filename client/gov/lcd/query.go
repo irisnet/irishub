@@ -1,15 +1,17 @@
 package lcd
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
+	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/modules/gov"
-	"net/http"
-	"github.com/irisnet/irishub/client/utils"
-	"github.com/pkg/errors"
 	client "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/gov"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -241,6 +243,10 @@ func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
+		if res == nil {
+			res = []byte(fmt.Sprintf("No one votes for the proposal [%v].\n", proposalID))
+		}
+
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
@@ -344,7 +350,6 @@ func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
-
 
 // nolint: gocyclo
 func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
