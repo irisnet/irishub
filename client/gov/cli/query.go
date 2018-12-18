@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -46,7 +46,7 @@ func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal being queried")
-    cmd.MarkFlagRequired(flagProposalID)
+	cmd.MarkFlagRequired(flagProposalID)
 	return cmd
 }
 
@@ -167,7 +167,7 @@ func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal voting on")
 	cmd.Flags().String(flagVoter, "", "bech32 voter address")
-    cmd.MarkFlagRequired(flagProposalID)
+	cmd.MarkFlagRequired(flagProposalID)
 	cmd.MarkFlagRequired(flagVoter)
 	return cmd
 }

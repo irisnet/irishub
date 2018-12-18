@@ -42,13 +42,13 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 type ProposalOutput struct {
-	ProposalID   uint64            `json:"proposal_id"`   //  ID of the proposal
-	Title        string           `json:"title"`         //  Title of the proposal
-	Description  string           `json:"description"`   //  Description of the proposal
+	ProposalID   uint64       `json:"proposal_id"`   //  ID of the proposal
+	Title        string       `json:"title"`         //  Title of the proposal
+	Description  string       `json:"description"`   //  Description of the proposal
 	ProposalType ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 
-	Status       ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
-	TallyResult  TallyResult    `json:"tally_result"`    //  Result of Tallys
+	Status      ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
+	TallyResult TallyResult    `json:"tally_result"`    //  Result of Tallys
 
 	SubmitTime     time.Time `json:"submit_time"`      //  Time of the block where TxGovSubmitProposal was included
 	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
@@ -56,7 +56,7 @@ type ProposalOutput struct {
 
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-	Param        Param `json:"param"`
+	Param           Param     `json:"param"`
 }
 
 type ProposalOutputs []ProposalOutput
@@ -72,9 +72,9 @@ func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
 		Status:      proposal.GetStatus(),
 		TallyResult: proposal.GetTallyResult(),
 
-		SubmitTime:  proposal.GetSubmitTime(),
+		SubmitTime:     proposal.GetSubmitTime(),
 		DepositEndTime: proposal.GetDepositEndTime(),
-		TotalDeposit: proposal.GetTotalDeposit(),
+		TotalDeposit:   proposal.GetTotalDeposit(),
 
 		VotingStartTime: proposal.GetVotingStartTime(),
 		VotingEndTime:   proposal.GetVotingEndTime(),
@@ -89,11 +89,11 @@ func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
 
 func ConvertProposalsToProposalOutputs(proposals []Proposal) ProposalOutputs {
 
-     var proposalOutputs ProposalOutputs
-     for _,proposal :=range proposals{
-		 proposalOutputs= append(proposalOutputs,ConvertProposalToProposalOutput(proposal))
+	var proposalOutputs ProposalOutputs
+	for _, proposal := range proposals {
+		proposalOutputs = append(proposalOutputs, ConvertProposalToProposalOutput(proposal))
 	}
-	return  proposalOutputs
+	return proposalOutputs
 }
 
 // Params for query 'custom/gov/proposal'
@@ -143,12 +143,12 @@ func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 	}
 
 	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
-		return  nil, ErrCodeDepositDeleted(DefaultCodespace, params.ProposalID)
+		return nil, ErrCodeDepositDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	deposit, bool := keeper.GetDeposit(ctx, params.ProposalID, params.Depositor)
 	if !bool {
-		return nil, ErrCodeDepositNotExisted(DefaultCodespace,params.Depositor,params.ProposalID)
+		return nil, ErrCodeDepositNotExisted(DefaultCodespace, params.Depositor, params.ProposalID)
 	}
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, deposit)
@@ -178,14 +178,13 @@ func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 	}
 
 	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
-		return  nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
+		return nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	vote, bool := keeper.GetVote(ctx, params.ProposalID, params.Voter)
 	if !bool {
-		return  nil, ErrCodeVoteNotExisted(DefaultCodespace,params.Voter,params.ProposalID)
+		return nil, ErrCodeVoteNotExisted(DefaultCodespace, params.Voter, params.ProposalID)
 	}
-
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, vote)
 	if err2 != nil {
@@ -213,7 +212,7 @@ func queryDeposits(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 	}
 
 	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
-		return  nil, ErrCodeDepositDeleted(DefaultCodespace, params.ProposalID)
+		return nil, ErrCodeDepositDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	var deposits []Deposit
@@ -251,7 +250,7 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	}
 
 	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
-		return  nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
+		return nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	var votes []Vote
@@ -271,10 +270,10 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 
 // Params for query 'custom/gov/proposals'
 type QueryProposalsParams struct {
-	Voter              sdk.AccAddress
-	Depositor          sdk.AccAddress
-	ProposalStatus     ProposalStatus
-	Limit              uint64
+	Voter          sdk.AccAddress
+	Depositor      sdk.AccAddress
+	ProposalStatus ProposalStatus
+	Limit          uint64
 }
 
 // nolint: unparam
