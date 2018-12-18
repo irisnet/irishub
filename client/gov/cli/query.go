@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -46,7 +46,7 @@ func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal being queried")
-
+	cmd.MarkFlagRequired(flagProposalID)
 	return cmd
 }
 
@@ -167,7 +167,8 @@ func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal voting on")
 	cmd.Flags().String(flagVoter, "", "bech32 voter address")
-
+	cmd.MarkFlagRequired(flagProposalID)
+	cmd.MarkFlagRequired(flagVoter)
 	return cmd
 }
 
@@ -194,13 +195,18 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			if res == nil {
+				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
+				return  nil
+			}
+
 			fmt.Println(string(res))
 			return nil
 		},
 	}
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal's votes are being queried")
-
+	cmd.MarkFlagRequired(flagProposalID)
 	return cmd
 }
 
@@ -241,7 +247,8 @@ func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of proposal deposited on")
 	cmd.Flags().String(flagDepositor, "", "bech32 depositor address")
-
+	cmd.MarkFlagRequired(flagProposalID)
+	cmd.MarkFlagRequired(flagDeposit)
 	return cmd
 }
 
@@ -274,7 +281,7 @@ func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal's deposits are being queried")
-
+	cmd.MarkFlagRequired(flagProposalID)
 	return cmd
 }
 
