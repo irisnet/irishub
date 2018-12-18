@@ -126,6 +126,13 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	return nil
 }
 
+func (msg MsgSubmitSoftwareUpgradeProposal) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
 
 type MsgSubmitTxTaxUsageProposal struct {
 	MsgSubmitProposal
@@ -158,6 +165,14 @@ func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
 		return ErrInvalidPercent(DefaultCodespace, msg.Percent)
 	}
 	return nil
+}
+
+func (msg MsgSubmitTxTaxUsageProposal) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
 }
 
 //-----------------------------------------------------------
