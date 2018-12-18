@@ -69,7 +69,7 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 	base := protocol.ProtocolBase{
 		Definition: common.ProtocolDefinition{
 			uint64(0),
-			"https://github.com/irisnet/irishub/releases/tag/v0.7.0",
+			"",
 			uint64(1),
 		},
 		//		engine: engine,
