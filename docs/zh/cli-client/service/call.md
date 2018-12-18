@@ -27,23 +27,27 @@ iriscli service call [flags]
 
 ### 发起一个服务调用请求
 ```shell
-iriscli service call --chain-id=test-irishub --from=node0 --fee=0.004iris --def-chain-id=test-irishub --service-name=test-service --method-id=1 --bind-chain-id=test-irishub --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
+iriscli service call --chain-id=test --from=node0 --fee=0.004iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
 ```
 
 运行成功以后，返回的结果如下:
-```txt
-Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314B1EE6A31729A22450, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:3398 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 119 105 116 104 100 114 97 119 45 102 101 101 115] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 54 55 57 54 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-```
 
-```json
-{
+```txt
+Committed at block 54 (tx hash: F972ACA7DF74A6C076DFB01E7DD49D8694BF5AA1BA25A1F1B875113DFC8857C3, response:
+ {
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 7614,
+   "codespace": "",
    "tags": {
-     "action": "service-call",
-     "completeConsumedTxFee-iris-atto": "\"162880000000000\"",
-     "consumer": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
-     "provider": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
-     "request-id": "230-130-0"
+     "action": "service_call",
+     "consumer": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
+     "provider": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
+     "request-id": "64-54-0"
    }
- }
+ })
 ```
 

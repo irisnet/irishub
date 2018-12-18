@@ -23,7 +23,7 @@ iriscli service definition [flags]
 ### 查询服务定义
 
 ```shell
-iriscli service definition --def-chain-id=test-irishub --service-name=test-service
+iriscli service definition --def-chain-id=test --service-name=test-service
 ```
 
 运行成功以后，返回的结果如下:
