@@ -21,7 +21,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 // WriteGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context) GenesisState {
-
 	return GenesisState{
 		GenesisVersion: NewVersion(
 			keeper.UpgradeConfig{0,
@@ -39,7 +38,7 @@ func DefaultGenesisState() GenesisState {
 			keeper.UpgradeConfig{0,
 				common.ProtocolDefinition{
 					uint64(0),
-					"https://github.com/irisnet/irishub/releases/tag/v0.7.0",
+					"https://github.com/irisnet/irishub/releases/tag/v0.9.0",
 					uint64(1),
 				}}, true)}
 }
@@ -51,7 +50,7 @@ func DefaultGenesisStateForTest() GenesisState {
 			keeper.UpgradeConfig{0,
 				common.ProtocolDefinition{
 					uint64(0),
-					"https://github.com/irisnet/irishub/releases/tag/v0.7.0",
+					"https://github.com/irisnet/irishub/releases/tag/v0.9.0",
 					uint64(1),
 				}}, true)}
 }
