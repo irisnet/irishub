@@ -35,7 +35,6 @@ const (
 	CodeDepositDeleted    sdk.CodeType = 21
 	CodeVoteNotExisted    sdk.CodeType = 22
 	CodeDepositNotExisted sdk.CodeType = 23
-
 	////////////////////  iris end  /////////////////////////////
 )
 

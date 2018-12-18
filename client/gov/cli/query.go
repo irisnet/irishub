@@ -195,6 +195,11 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			if res == nil {
+				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
+				return  nil
+			}
+
 			fmt.Println(string(res))
 			return nil
 		},
