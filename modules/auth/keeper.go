@@ -1,12 +1,23 @@
 package auth
 
 import (
+	"fmt"
+
 	codec "github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
 
-var globalAccountNumberKey = []byte("globalAccountNumber")
+var (
+	// Prefix for account-by-address store
+	AddressStoreKeyPrefix = []byte{0x01}
+
+	globalAccountNumberKey = []byte("globalAccountNumber")
+
+	totalLoosenTokenKey = []byte("totalLoosenToken")
+
+	burnTokenKey = []byte("burnToken")
+)
 
 // This AccountKeeper encodes/decodes accounts using the
 // go-amino (binary) encoding/decoding library.
@@ -49,19 +60,9 @@ func (am AccountKeeper) NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddre
 	return acc
 }
 
-// New Account
-func (am AccountKeeper) NewAccount(ctx sdk.Context, acc Account) Account {
-	err := acc.SetAccountNumber(am.GetNextAccountNumber(ctx))
-	if err != nil {
-		// TODO: Handle with #870
-		panic(err)
-	}
-	return acc
-}
-
 // Turn an address to key used to get it from the account store
 func AddressStoreKey(addr sdk.AccAddress) []byte {
-	return append([]byte("account:"), addr.Bytes()...)
+	return append(AddressStoreKeyPrefix, addr.Bytes()...)
 }
 
 // Implements sdk.AccountKeeper.
@@ -73,6 +74,12 @@ func (am AccountKeeper) GetAccount(ctx sdk.Context, addr sdk.AccAddress) Account
 	}
 	acc := am.decodeAccount(bz)
 	return acc
+}
+
+// Implements sdk.AccountKeeper.
+func (am AccountKeeper) SetGenesisAccount(ctx sdk.Context, acc Account) {
+	am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
+	am.SetAccount(ctx, acc)
 }
 
 // Implements sdk.AccountKeeper.
@@ -93,7 +100,7 @@ func (am AccountKeeper) RemoveAccount(ctx sdk.Context, acc Account) {
 // Implements sdk.AccountKeeper.
 func (am AccountKeeper) IterateAccounts(ctx sdk.Context, process func(Account) (stop bool)) {
 	store := ctx.KVStore(am.key)
-	iter := sdk.KVStorePrefixIterator(store, []byte("account:"))
+	iter := sdk.KVStorePrefixIterator(store, AddressStoreKeyPrefix)
 	defer iter.Close()
 	for {
 		if !iter.Valid() {
@@ -158,6 +165,128 @@ func (am AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	store.Set(globalAccountNumberKey, bz)
 
 	return accNumber
+}
+
+func (am AccountKeeper) GetBurnToken(ctx sdk.Context) sdk.Coins {
+	// read from db
+	var burnToken sdk.Coins
+	store := ctx.KVStore(am.key)
+	bz := store.Get(burnTokenKey)
+	if bz == nil {
+		burnToken = nil
+	} else {
+		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &burnToken)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return burnToken
+}
+
+func (am AccountKeeper) IncreaseBurnToken(ctx sdk.Context, coins sdk.Coins) {
+	// parameter checking
+	if coins == nil || !coins.IsValid() {
+		return
+	}
+	// read from db
+	var burnToken sdk.Coins
+	store := ctx.KVStore(am.key)
+	bz := store.Get(burnTokenKey)
+	if bz == nil {
+		burnToken = nil
+	} else {
+		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &burnToken)
+		if err != nil {
+			panic(err)
+		}
+	}
+	// increase totalLoosenToken
+	burnToken = burnToken.Plus(coins)
+	if !burnToken.IsNotNegative() {
+		panic(fmt.Errorf("burn token is negative"))
+	}
+	// write back to db
+	bzNew, err := am.cdc.MarshalBinaryBare(burnToken)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(globalAccountNumberKey, bzNew)
+}
+
+func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
+	// read from db
+	var totalLoosenToken sdk.Coins
+	store := ctx.KVStore(am.key)
+	bz := store.Get(totalLoosenTokenKey)
+	if bz == nil {
+		totalLoosenToken = nil
+	} else {
+		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return totalLoosenToken
+}
+
+func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
+	// parameter checking
+	if coins == nil || !coins.IsValid() {
+		return
+	}
+	// read from db
+	var totalLoosenToken sdk.Coins
+	store := ctx.KVStore(am.key)
+	bz := store.Get(totalLoosenTokenKey)
+	if bz == nil {
+		totalLoosenToken = nil
+	} else {
+		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
+		if err != nil {
+			panic(err)
+		}
+	}
+	// increase totalLoosenToken
+	totalLoosenToken = totalLoosenToken.Plus(coins)
+	if !totalLoosenToken.IsNotNegative() {
+		panic(fmt.Errorf("total loosen token is negative"))
+	}
+	// write back to db
+	bzNew, err := am.cdc.MarshalBinaryBare(totalLoosenToken)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(globalAccountNumberKey, bzNew)
+}
+
+func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
+	// parameter checking
+	if coins == nil || !coins.IsValid() {
+		return
+	}
+	// read from db
+	var totalLoosenToken sdk.Coins
+	store := ctx.KVStore(am.key)
+	bz := store.Get(totalLoosenTokenKey)
+	if bz == nil {
+		totalLoosenToken = nil
+	} else {
+		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
+		if err != nil {
+			panic(err)
+		}
+	}
+	// decrease totalLoosenToken
+	totalLoosenToken, negative := totalLoosenToken.SafeMinus(coins)
+	if negative {
+		panic(fmt.Errorf("total loosen token is negative"))
+	}
+	// write back to db
+	bzNew, err := am.cdc.MarshalBinaryBare(totalLoosenToken)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(globalAccountNumberKey, bzNew)
 }
 
 //----------------------------------------

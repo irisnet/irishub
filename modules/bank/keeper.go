@@ -3,25 +3,31 @@ package bank
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
-	costGetCoins      sdk.Gas = 10
-	costHasCoins      sdk.Gas = 10
-	costSetCoins      sdk.Gas = 100
-	costSubtractCoins sdk.Gas = 10
-	costAddCoins      sdk.Gas = 10
+	costGetCoins       sdk.Gas = 10
+	costGetLoosenCoins sdk.Gas = 10
+	costGetBurnCoins   sdk.Gas = 10
+	costBurnCoins      sdk.Gas = 100
+	costHasCoins       sdk.Gas = 10
+	costSetCoins       sdk.Gas = 100
+	costSubtractCoins  sdk.Gas = 10
+	costAddCoins       sdk.Gas = 10
 )
 
 // Keeper defines a module interface that facilitates the transfer of coins
 // between accounts.
 type Keeper interface {
 	SendKeeper
-	SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) sdk.Error
+	LoosenTokenToBond(ctx sdk.Context, amt sdk.Coins)
+	BondTokenToLoosen(ctx sdk.Context, amt sdk.Coins)
 	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
+	BurnCoinsFromAddr(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
+	BurnCoinsFromPool(ctx sdk.Context, pool string, amt sdk.Coins) (sdk.Tags, sdk.Error)
 }
 
 var _ Keeper = (*BaseKeeper)(nil)
@@ -42,9 +48,14 @@ func (keeper BaseKeeper) GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coin
 	return getCoins(ctx, keeper.am, addr)
 }
 
-// SetCoins sets the coins at the addr.
-func (keeper BaseKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) sdk.Error {
-	return setCoins(ctx, keeper.am, addr, amt)
+// GetLoosenCoins returns the total loosen coins
+func (keeper BaseKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
+	return getLoosenCoins(ctx, keeper.am)
+}
+
+// GetLoosenCoins returns the burned coins
+func (keeper BaseKeeper) GetBurnCoins(ctx sdk.Context) sdk.Coins {
+	return getBurnCoins(ctx, keeper.am)
 }
 
 // HasCoins returns whether or not an account has at least amt coins.
@@ -74,6 +85,36 @@ func (keeper BaseKeeper) SendCoins(
 ) (sdk.Tags, sdk.Error) {
 
 	return sendCoins(ctx, keeper.am, fromAddr, toAddr, amt)
+}
+
+// SendCoins moves coins from one account to another
+func (keeper BaseKeeper) LoosenTokenToBond(
+	ctx sdk.Context, amt sdk.Coins) {
+	keeper.am.DecreaseTotalLoosenToken(ctx, amt)
+}
+
+// SendCoins moves coins from one account to another
+func (keeper BaseKeeper) BondTokenToLoosen(
+	ctx sdk.Context, amt sdk.Coins) {
+	keeper.am.IncreaseTotalLoosenToken(ctx, amt)
+}
+
+// BurnCoins burns coins from one account
+func (keeper BaseKeeper) BurnCoinsFromAddr(
+	ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins,
+) (sdk.Tags, sdk.Error) {
+	_, _, err := subtractCoins(ctx, keeper.am, fromAddr, amt)
+	if err != nil {
+		return nil, err
+	}
+	return burnCoins(ctx, keeper.am, fromAddr.String(), amt)
+}
+
+// BurnCoins burns coins from one account
+func (keeper BaseKeeper) BurnCoinsFromPool(
+	ctx sdk.Context, pool string, amt sdk.Coins,
+) (sdk.Tags, sdk.Error) {
+	return burnCoins(ctx, keeper.am, pool, amt)
 }
 
 // InputOutputCoins handles a list of inputs and outputs
@@ -109,6 +150,16 @@ func (keeper BaseSendKeeper) GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.
 	return getCoins(ctx, keeper.am, addr)
 }
 
+// GetLoosenCoins returns the total loosen coins
+func (keeper BaseSendKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
+	return getLoosenCoins(ctx, keeper.am)
+}
+
+// GetLoosenCoins returns the burned coins
+func (keeper BaseSendKeeper) GetBurnCoins(ctx sdk.Context) sdk.Coins {
+	return getBurnCoins(ctx, keeper.am)
+}
+
 // HasCoins returns whether or not an account has at least amt coins.
 func (keeper BaseSendKeeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) bool {
 	return hasCoins(ctx, keeper.am, addr, amt)
@@ -136,6 +187,8 @@ func (keeper BaseSendKeeper) InputOutputCoins(
 // account balances.
 type ViewKeeper interface {
 	GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+	GetLoosenCoins(ctx sdk.Context) sdk.Coins
+	GetBurnCoins(ctx sdk.Context) sdk.Coins
 	HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) bool
 }
 
@@ -156,6 +209,16 @@ func (keeper BaseViewKeeper) GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.
 	return getCoins(ctx, keeper.am, addr)
 }
 
+// GetLoosenCoins returns the total loosen coins
+func (keeper BaseViewKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
+	return getLoosenCoins(ctx, keeper.am)
+}
+
+// GetLoosenCoins returns the burned coins
+func (keeper BaseViewKeeper) GetBurnCoins(ctx sdk.Context) sdk.Coins {
+	return getBurnCoins(ctx, keeper.am)
+}
+
 // HasCoins returns whether or not an account has at least amt coins.
 func (keeper BaseViewKeeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) bool {
 	return hasCoins(ctx, keeper.am, addr, amt)
@@ -170,6 +233,16 @@ func getCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress) sdk.C
 		return sdk.Coins{}
 	}
 	return acc.GetCoins()
+}
+
+func getLoosenCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
+	ctx.GasMeter().ConsumeGas(costGetLoosenCoins, "getCoins")
+	return am.GetTotalLoosenToken(ctx)
+}
+
+func getBurnCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
+	ctx.GasMeter().ConsumeGas(costGetBurnCoins, "getCoins")
+	return am.GetBurnToken(ctx)
 }
 
 func setCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) sdk.Error {
@@ -233,6 +306,20 @@ func sendCoins(ctx sdk.Context, am auth.AccountKeeper, fromAddr sdk.AccAddress, 
 	}
 
 	return subTags.AppendTags(addTags), nil
+}
+
+// burnCoins moves coins from burn address
+// NOTE: Make sure to revert state changes from tx on error
+func burnCoins(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coins) (sdk.Tags, sdk.Error) {
+	ctx.GasMeter().ConsumeGas(costBurnCoins, "burnCoins")
+	am.DecreaseTotalLoosenToken(ctx, amt)
+	am.IncreaseBurnToken(ctx, amt)
+	burnTags := sdk.NewTags(
+		"burnFrom", []byte(from),
+		"burnAmount", []byte(amt.String()),
+	)
+
+	return burnTags, nil
 }
 
 // InputOutputCoins handles a list of inputs and outputs
