@@ -167,7 +167,7 @@ func (am AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	return accNumber
 }
 
-func (am AccountKeeper) GetBurnToken(ctx sdk.Context) sdk.Coins {
+func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 	// read from db
 	var burnToken sdk.Coins
 	store := ctx.KVStore(am.key)
@@ -183,23 +183,12 @@ func (am AccountKeeper) GetBurnToken(ctx sdk.Context) sdk.Coins {
 	return burnToken
 }
 
-func (am AccountKeeper) IncreaseBurnToken(ctx sdk.Context, coins sdk.Coins) {
+func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 	// parameter checking
 	if coins == nil || !coins.IsValid() {
 		return
 	}
-	// read from db
-	var burnToken sdk.Coins
-	store := ctx.KVStore(am.key)
-	bz := store.Get(burnTokenKey)
-	if bz == nil {
-		burnToken = nil
-	} else {
-		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &burnToken)
-		if err != nil {
-			panic(err)
-		}
-	}
+	burnToken := am.GetBurnedToken(ctx)
 	// increase burn token amount
 	burnToken = burnToken.Plus(coins)
 	if !burnToken.IsNotNegative() {
@@ -210,6 +199,7 @@ func (am AccountKeeper) IncreaseBurnToken(ctx sdk.Context, coins sdk.Coins) {
 	if err != nil {
 		panic(err)
 	}
+	store := ctx.KVStore(am.key)
 	store.Set(burnTokenKey, bzNew)
 }
 
@@ -235,17 +225,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		return
 	}
 	// read from db
-	var totalLoosenToken sdk.Coins
-	store := ctx.KVStore(am.key)
-	bz := store.Get(totalLoosenTokenKey)
-	if bz == nil {
-		totalLoosenToken = nil
-	} else {
-		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
-		if err != nil {
-			panic(err)
-		}
-	}
+	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// increase totalLoosenToken
 	totalLoosenToken = totalLoosenToken.Plus(coins)
 	if !totalLoosenToken.IsNotNegative() {
@@ -256,6 +236,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	if err != nil {
 		panic(err)
 	}
+	store := ctx.KVStore(am.key)
 	store.Set(totalLoosenTokenKey, bzNew)
 }
 
@@ -265,17 +246,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		return
 	}
 	// read from db
-	var totalLoosenToken sdk.Coins
-	store := ctx.KVStore(am.key)
-	bz := store.Get(totalLoosenTokenKey)
-	if bz == nil {
-		totalLoosenToken = nil
-	} else {
-		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
-		if err != nil {
-			panic(err)
-		}
-	}
+	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// decrease totalLoosenToken
 	totalLoosenToken, negative := totalLoosenToken.SafeMinus(coins)
 	if negative {
@@ -286,6 +257,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	if err != nil {
 		panic(err)
 	}
+	store := ctx.KVStore(am.key)
 	store.Set(totalLoosenTokenKey, bzNew)
 }
 

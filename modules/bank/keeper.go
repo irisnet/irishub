@@ -54,8 +54,8 @@ func (keeper BaseKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
 }
 
 // GetLoosenCoins returns the burned coins
-func (keeper BaseKeeper) GetBurnCoins(ctx sdk.Context) sdk.Coins {
-	return getBurnCoins(ctx, keeper.am)
+func (keeper BaseKeeper) GetBurnedCoins(ctx sdk.Context) sdk.Coins {
+	return getBurnedCoins(ctx, keeper.am)
 }
 
 // HasCoins returns whether or not an account has at least amt coins.
@@ -155,8 +155,8 @@ func (keeper BaseSendKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
 }
 
 // GetLoosenCoins returns the burned coins
-func (keeper BaseSendKeeper) GetBurnCoins(ctx sdk.Context) sdk.Coins {
-	return getBurnCoins(ctx, keeper.am)
+func (keeper BaseSendKeeper) GetBurnedCoins(ctx sdk.Context) sdk.Coins {
+	return getBurnedCoins(ctx, keeper.am)
 }
 
 // HasCoins returns whether or not an account has at least amt coins.
@@ -187,7 +187,7 @@ func (keeper BaseSendKeeper) InputOutputCoins(
 type ViewKeeper interface {
 	GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	GetLoosenCoins(ctx sdk.Context) sdk.Coins
-	GetBurnCoins(ctx sdk.Context) sdk.Coins
+	GetBurnedCoins(ctx sdk.Context) sdk.Coins
 	HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) bool
 }
 
@@ -214,8 +214,8 @@ func (keeper BaseViewKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
 }
 
 // GetLoosenCoins returns the burned coins
-func (keeper BaseViewKeeper) GetBurnCoins(ctx sdk.Context) sdk.Coins {
-	return getBurnCoins(ctx, keeper.am)
+func (keeper BaseViewKeeper) GetBurnedCoins(ctx sdk.Context) sdk.Coins {
+	return getBurnedCoins(ctx, keeper.am)
 }
 
 // HasCoins returns whether or not an account has at least amt coins.
@@ -239,9 +239,9 @@ func getLoosenCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
 	return am.GetTotalLoosenToken(ctx)
 }
 
-func getBurnCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
+func getBurnedCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
 	ctx.GasMeter().ConsumeGas(costGetBurnCoins, "getCoins")
-	return am.GetBurnToken(ctx)
+	return am.GetBurnedToken(ctx)
 }
 
 func setCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) sdk.Error {
@@ -312,7 +312,7 @@ func sendCoins(ctx sdk.Context, am auth.AccountKeeper, fromAddr sdk.AccAddress, 
 func burnCoins(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coins) (sdk.Tags, sdk.Error) {
 	ctx.GasMeter().ConsumeGas(costBurnCoins, "burnCoins")
 	am.DecreaseTotalLoosenToken(ctx, amt)
-	am.IncreaseBurnToken(ctx, amt)
+	am.IncreaseBurnedToken(ctx, amt)
 	burnTags := sdk.NewTags(
 		"burnFrom", []byte(from),
 		"burnAmount", []byte(amt.String()),
