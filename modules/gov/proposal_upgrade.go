@@ -25,7 +25,7 @@ func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {
 			fmt.Sprintf("Software Upgrade Switch Period is in process. current height:%d", ctx.BlockHeight()))
 		return nil
 	}
-	if k.pk.IsValidProtocolVersion(ctx, sp.Version) {
+	if !k.pk.IsValidProtocolVersion(ctx, sp.Version) {
 		logger.Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("version [%v] in SoftwareUpgradeProposal isn't valid ", sp.ProposalID))
 		return nil
