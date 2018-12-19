@@ -200,17 +200,17 @@ func (am AccountKeeper) IncreaseBurnToken(ctx sdk.Context, coins sdk.Coins) {
 			panic(err)
 		}
 	}
-	// increase totalLoosenToken
+	// increase burn token amount
 	burnToken = burnToken.Plus(coins)
 	if !burnToken.IsNotNegative() {
 		panic(fmt.Errorf("burn token is negative"))
 	}
 	// write back to db
-	bzNew, err := am.cdc.MarshalBinaryBare(burnToken)
+	bzNew, err := am.cdc.MarshalBinaryLengthPrefixed(burnToken)
 	if err != nil {
 		panic(err)
 	}
-	store.Set(globalAccountNumberKey, bzNew)
+	store.Set(burnTokenKey, bzNew)
 }
 
 func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
@@ -252,11 +252,11 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		panic(fmt.Errorf("total loosen token is negative"))
 	}
 	// write back to db
-	bzNew, err := am.cdc.MarshalBinaryBare(totalLoosenToken)
+	bzNew, err := am.cdc.MarshalBinaryLengthPrefixed(totalLoosenToken)
 	if err != nil {
 		panic(err)
 	}
-	store.Set(globalAccountNumberKey, bzNew)
+	store.Set(totalLoosenTokenKey, bzNew)
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
@@ -282,11 +282,11 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		panic(fmt.Errorf("total loosen token is negative"))
 	}
 	// write back to db
-	bzNew, err := am.cdc.MarshalBinaryBare(totalLoosenToken)
+	bzNew, err := am.cdc.MarshalBinaryLengthPrefixed(totalLoosenToken)
 	if err != nil {
 		panic(err)
 	}
-	store.Set(globalAccountNumberKey, bzNew)
+	store.Set(totalLoosenTokenKey, bzNew)
 }
 
 //----------------------------------------

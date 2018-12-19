@@ -22,8 +22,8 @@ const (
 // between accounts.
 type Keeper interface {
 	SendKeeper
-	LoosenTokenToBond(ctx sdk.Context, amt sdk.Coins)
-	BondTokenToLoosen(ctx sdk.Context, amt sdk.Coins)
+	IncreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
+	DecreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	BurnCoinsFromAddr(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
@@ -87,16 +87,15 @@ func (keeper BaseKeeper) SendCoins(
 	return sendCoins(ctx, keeper.am, fromAddr, toAddr, amt)
 }
 
-// SendCoins moves coins from one account to another
-func (keeper BaseKeeper) LoosenTokenToBond(
+func (keeper BaseKeeper) IncreaseLoosenToken(
 	ctx sdk.Context, amt sdk.Coins) {
-	keeper.am.DecreaseTotalLoosenToken(ctx, amt)
+	keeper.am.IncreaseTotalLoosenToken(ctx, amt)
 }
 
 // SendCoins moves coins from one account to another
-func (keeper BaseKeeper) BondTokenToLoosen(
+func (keeper BaseKeeper) DecreaseLoosenToken(
 	ctx sdk.Context, amt sdk.Coins) {
-	keeper.am.IncreaseTotalLoosenToken(ctx, amt)
+	keeper.am.DecreaseTotalLoosenToken(ctx, amt)
 }
 
 // BurnCoins burns coins from one account
