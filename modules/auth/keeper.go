@@ -10,7 +10,7 @@ import (
 
 var (
 	// Prefix for account-by-address store
-	AddressStoreKeyPrefix = []byte{0x01}
+	addressStoreKeyPrefix = []byte{0x01}
 
 	globalAccountNumberKey = []byte("globalAccountNumber")
 
@@ -62,7 +62,7 @@ func (am AccountKeeper) NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddre
 
 // Turn an address to key used to get it from the account store
 func AddressStoreKey(addr sdk.AccAddress) []byte {
-	return append(AddressStoreKeyPrefix, addr.Bytes()...)
+	return append(addressStoreKeyPrefix, addr.Bytes()...)
 }
 
 // Implements sdk.AccountKeeper.
@@ -100,7 +100,7 @@ func (am AccountKeeper) RemoveAccount(ctx sdk.Context, acc Account) {
 // Implements sdk.AccountKeeper.
 func (am AccountKeeper) IterateAccounts(ctx sdk.Context, process func(Account) (stop bool)) {
 	store := ctx.KVStore(am.key)
-	iter := sdk.KVStorePrefixIterator(store, AddressStoreKeyPrefix)
+	iter := sdk.KVStorePrefixIterator(store, addressStoreKeyPrefix)
 	defer iter.Close()
 	for {
 		if !iter.Valid() {
