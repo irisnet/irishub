@@ -10,7 +10,7 @@ import (
 
 var (
 	// Prefix for account-by-address store
-	addressStoreKeyPrefix = []byte{0x01}
+	addressStoreKeyPrefix = []byte("account:")
 
 	globalAccountNumberKey = []byte("globalAccountNumber")
 
