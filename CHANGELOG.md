@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.9.0-Beta
+## 0.9.0-rc0
 
-*December 14th, 2018*
+*December 19th, 2018*
 
 BREAKING CHANGES:
 
@@ -18,6 +18,7 @@ FEATURES:
 - [iris] Slashing module supports querying slashing history
 - [iris] Gov module adds TxTaxUsageProposal/SoftwareHaltProposal proposals
 - [iris] Export and import blockchain snapshot at any block height
+- [iris] Redesigned to implement class 2 software upgrade
 - [iris] Restrict the block gas limit
 - [iris] Improve tx search to support multiple tags
 - [iris] Improve the default behavior of iris --home
@@ -25,9 +26,11 @@ FEATURES:
 - [iris] Restrict the number of signatures on the transaction
 - [iris] Add a check for the validator private key type and reject the unsupported private key type
 - [tendermint] Update tendermint to v0.27.0
- 
-PENDING:
- - [iris] Redesigned to implement class 2 software upgrade
+
+BUG FIXES:
+
+- Add chain-id value checking for sign command
+- Specify the required flags for cmds `query-proposal`, `query-deposit` and `query-vote`
 
 
 ## 0.8.0
