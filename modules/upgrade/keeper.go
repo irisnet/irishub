@@ -74,12 +74,12 @@ func (k Keeper) SetSignal(ctx sdk.Context, protocol uint64, address string) {
 	if err != nil {
 		panic(err)
 	}
-	kvStore.Set(GetSiganlKey(protocol, address), cmsgBytes)
+	kvStore.Set(GetSignalKey(protocol, address), cmsgBytes)
 }
 
 func (k Keeper) GetSignal(ctx sdk.Context, protocol uint64, address string) bool {
 	kvStore := ctx.KVStore(k.storeKey)
-	flagBytes := kvStore.Get(GetSiganlKey(protocol, address))
+	flagBytes := kvStore.Get(GetSignalKey(protocol, address))
 	if flagBytes != nil {
 		var flag bool
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(flagBytes, &flag)
@@ -94,6 +94,6 @@ func (k Keeper) GetSignal(ctx sdk.Context, protocol uint64, address string) bool
 func (k Keeper) DeleteSignal(ctx sdk.Context, protocol uint64, address string) {
 	if ok := k.GetSignal(ctx, protocol, address); ok {
 		kvStore := ctx.KVStore(k.storeKey)
-		kvStore.Delete(GetSiganlKey(protocol, address))
+		kvStore.Delete(GetSignalKey(protocol, address))
 	}
 }

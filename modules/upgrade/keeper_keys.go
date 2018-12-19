@@ -10,7 +10,7 @@ var (
 	appVersionKey  = "v/%s/%s"    // v/<protocol.version>/<proposalID>
 	proposalIDKey  = "p/%s"    // p/<proposalId>
 	successAppVersionKey = "success/%s"    // h/<protocol.version>
-	siganlKey      = "s/%s/%s" // s/<proposalId>/<switchVoterAddress>
+	signalKey      = "s/%s/%s" // s/<protocol.version>/<switchVoterAddress>
 )
 
 func GetAppVersionKey(versionID uint64, proposalID uint64) []byte {
@@ -25,8 +25,12 @@ func GetProposalIDKey(proposalID uint64) []byte {
 	return []byte(fmt.Sprintf(proposalIDKey, UintToHexString(proposalID)))
 }
 
-func GetSiganlKey(proposalID uint64, switchVoterAddr string) []byte {
-	return []byte(fmt.Sprintf(siganlKey, UintToHexString(proposalID), switchVoterAddr))
+func GetSignalKey(versionID uint64, switchVoterAddr string) []byte {
+	return []byte(fmt.Sprintf(signalKey, UintToHexString(versionID), switchVoterAddr))
+}
+
+func GetPrefixSignalKey(versionID uint64) []byte {
+	return []byte(fmt.Sprintf(signalKey, UintToHexString(versionID)))
 }
 
 func IntToHexString(i int64) string {
