@@ -77,3 +77,9 @@ func KeyInactiveProposalQueueProposal(endTime time.Time, proposalID uint64) []by
 		sdk.Uint64ToBigEndian(proposalID),
 	}, KeyDelimiter)
 }
+
+// Key for getting a the next available proposalID from the store
+var (
+	KeyTerminatorHeight = []byte("TerminatorHeight")
+	KeyTerminatorPeriod = []byte("TerminatorPeriod")
+)

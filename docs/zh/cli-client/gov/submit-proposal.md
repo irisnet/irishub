@@ -25,39 +25,12 @@ iriscli gov submit-proposal --help
 | --param          |                            | [string] 提议参数,例如: [{key:key,value:value,op:update}]                                                                                 |          |
 | --path           |                            | [string] param.json文件路径                                                                                                                      |          |
 | --title          |                            | [string] 提议标题                                                                                                                           | Yes      |
-| --type           |                            | [string] 提议类型,例如:Text/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | [string] 提议类型,例如:ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | [uint64] 新协议的版本信息                                                                           |       |
 | --software           |           " "                 | [string] 新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     | [string] 新版本协议升级的高度                                                     |       |
 
 ## 例子
-
-### 提交一个'Text'类型的提议
-
-```shell
-iriscli gov submit-proposal --chain-id=test --title="notice proposal" --type=Text --description="a new text proposal" --from=node0 --fee=0.01iris
-```
-
-输入正确的密码之后，你就完成提交了一个提议，需要注意的是要记下你的提议ID，这是可以检索你的提议的唯一要素。
-
-```txt
-Committed at block 13 (tx hash: 234463E89B5641F9271113D72B28CA088F641DD8A63DB57257B7CAF90ED5A1C3, response:
- {
-   "code": 0,
-   "data": "MQ==",
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 200000,
-   "gas_used": 6608,
-   "codespace": "",
-   "tags": {
-     "action": "submit_proposal",
-     "param": "",
-     "proposal-id": "1",
-     "proposer": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz"
-   }
- })
-```
 
 ### 提交一个'ParameterChange'类型的提议
 

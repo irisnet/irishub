@@ -11,7 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
@@ -26,6 +26,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"sort"
 	"time"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)
@@ -156,7 +157,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		p.guardianKeeper,
 		&stakeKeeper,
 		protocolkeeper,
-		gov.DefaultCodespace,
+		govtypes.DefaultCodespace,
 	)
 
 	p.recordKeeper = record.NewKeeper(

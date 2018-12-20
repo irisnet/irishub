@@ -45,9 +45,7 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
-	////////////////////  iris begin  ///////////////////////////
-	Execute(ctx sdk.Context, k Keeper) error
-	////////////////////  iris end  ///////////////////////////
+
 }
 
 // checks if two proposals are equal
@@ -120,11 +118,6 @@ func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
 
-////////////////////  iris begin  ///////////////////////////
-func (pp *TextProposal) Execute(ctx sdk.Context, k Keeper) (err error) { return nil }
-
-////////////////////  iris end  /////////////////////////////
-
 //-----------------------------------------------------------
 // ProposalQueue
 type ProposalQueue []uint64
@@ -138,20 +131,17 @@ type ProposalKind byte
 //nolint
 const (
 	ProposalTypeNil             ProposalKind = 0x00
-	ProposalTypeText            ProposalKind = 0x01
-	ProposalTypeParameterChange ProposalKind = 0x02
-	ProposalTypeSoftwareUpgrade ProposalKind = 0x03
+	ProposalTypeParameterChange ProposalKind = 0x01
+	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
 	////////////////////  iris begin  /////////////////////////////
-	ProposalTypeSoftwareHalt ProposalKind = 0x04
-	ProposalTypeTxTaxUsage   ProposalKind = 0x05
+	ProposalTypeSoftwareHalt ProposalKind = 0x03
+	ProposalTypeTxTaxUsage   ProposalKind = 0x04
 	////////////////////  iris end  /////////////////////////////
 )
 
 // String to proposalType byte.  Returns ff if invalid.
 func ProposalTypeFromString(str string) (ProposalKind, error) {
 	switch str {
-	case "Text":
-		return ProposalTypeText, nil
 	case "ParameterChange":
 		return ProposalTypeParameterChange, nil
 	case "SoftwareUpgrade":
@@ -168,9 +158,8 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 }
 
 // is defined ProposalType?
-func validProposalType(pt ProposalKind) bool {
-	if pt == ProposalTypeText ||
-		pt == ProposalTypeParameterChange ||
+func ValidProposalType(pt ProposalKind) bool {
+	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
 	////////////////////  iris begin  /////////////////////////////
 		pt == ProposalTypeSoftwareHalt ||
@@ -216,8 +205,6 @@ func (pt *ProposalKind) UnmarshalJSON(data []byte) error {
 // Turns VoteOption byte to String
 func (pt ProposalKind) String() string {
 	switch pt {
-	case ProposalTypeText:
-		return "Text"
 	case ProposalTypeParameterChange:
 		return "ParameterChange"
 	case ProposalTypeSoftwareUpgrade:
@@ -279,7 +266,7 @@ func ProposalStatusFromString(str string) (ProposalStatus, error) {
 }
 
 // is defined ProposalType?
-func validProposalStatus(status ProposalStatus) bool {
+func ValidProposalStatus(status ProposalStatus) bool {
 	if status == StatusDepositPeriod ||
 		status == StatusVotingPeriod ||
 		status == StatusPassed ||
