@@ -235,24 +235,32 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	return coinName, nil
 }
 
-
-func JudgeCoinType(coinStr string) (error) {
-	denom, _, err := GetCoin(coinStr)
+func ParseCoinStr(coinStr string) (Coin, error) {
+	mainUnit, err := GetCoinName(coinStr)
+	coinType, err := GetCoinType(mainUnit)
 	if err != nil {
-		return err
+		return Coin{}, err
 	}
-	coinName := strings.ToLower(denom)
-	coin := "iris"
-	switch coinName {
-	case coin:
-	case coin + "-" + Milli:
-	case coin + "-" + Micro:
-	case coin + "-" + Nano:
-	case coin + "-" + Pico:
-	case coin + "-" + Femto:
-	case coin + "-" + Atto:
-	default:
-		return fmt.Errorf("unsupported coin type \"%s\"", coinName)
+
+	coin, err := coinType.ConvertToMinCoin(coinStr)
+	if err != nil {
+		return Coin{}, err
 	}
-	return nil
+	return coin, nil
 }
+
+func GetCoinType(coinName string) (CoinType, error) {
+	var coinType CoinType
+	coinName = strings.ToLower(coinName)
+	if coinName == "" {
+		return CoinType{}, fmt.Errorf("coin name is empty")
+	}
+	if coinName == "iris" {
+		coinType = NewDefaultCoinType(coinName)
+	} else {
+		return coinType, fmt.Errorf("coin name is unsupported")
+	}
+
+	return coinType, nil
+}
+
