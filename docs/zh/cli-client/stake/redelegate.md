@@ -1,4 +1,4 @@
-# iriscli stake redelegate
+      # iriscli stake redelegate
 
 ## 介绍
 
@@ -28,7 +28,28 @@ iriscli stake redelegate --help
 
 ## 示例
 
-```
-iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<SourceValidatorAddress> --address-validator-dest=<DestinationValidatorAddress> --shares-percent=0.1
-```
+执行如下在chain-id为test的网络上重新委托10iris的命令：
 
+```
+iriscli stake redelegate --chain-id=test-irishub --from=fuxi --fee=0.004iris --address-validator-source=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-validator-dest=fva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
+```
+输出信息：
+```$xslt
+Committed at block 1089 (tx hash: D9A60074B1E15ED33D1C0591AF7B6AD967B13409D342980DC0C858F811021C41, response:
+ {
+   "code": 0,
+   "data": "DAiX2MzgBRCAtK+tAQ==",
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 27011,
+   "codespace": "",
+   "tags": {
+     "action": "begin_redelegate",
+     "delegator": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2",
+     "destination-validator": "fva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll",
+     "end-time": "\u000c\u0008\ufffd\ufffd\ufffd\ufffd\u0005\u0010\ufffd\ufffd\ufffd\ufffd\u0001",
+     "source-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd"
+   }
+ })
+```

@@ -94,10 +94,10 @@ that your balance is above 0.
 ​    
 ### Query your account in Fuxi testnet
 
-If you want to query your account in Fuxi-6000 testnet, you should use the following: 
+If you want to query your account in test-irishub, you should use the following: 
 
 ```
-iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --chain-id=fuxi-6000
+iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --chain-id=test-irishub
 ```
 
 After that, you will get the detail info for the account.
