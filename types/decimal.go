@@ -176,6 +176,7 @@ func NewDecFromStr(str string) (d Dec, err Error) {
 //nolint
 func (d Dec) IsNil() bool       { return d.Int == nil }                 // is decimal nil
 func (d Dec) IsZero() bool      { return (d.Int).Sign() == 0 }          // is equal to zero
+func (d Dec) IsNegative() bool  { return (d.Int).Sign() == -1 }         // is negative
 func (d Dec) Equal(d2 Dec) bool { return (d.Int).Cmp(d2.Int) == 0 }     // equal decimals
 func (d Dec) GT(d2 Dec) bool    { return (d.Int).Cmp(d2.Int) > 0 }      // greater than
 func (d Dec) GTE(d2 Dec) bool   { return (d.Int).Cmp(d2.Int) >= 0 }     // greater than or equal
@@ -372,6 +373,11 @@ func (d Dec) TruncateInt64() int64 {
 // TruncateInt truncates the decimals from the number and returns an Int
 func (d Dec) TruncateInt() Int {
 	return NewIntFromBigInt(chopPrecisionAndTruncateNonMutative(d.Int))
+}
+
+// TruncateDec truncates the decimals from the number and returns an Dec
+func (d Dec) TruncateDec() Dec {
+	return NewDecFromInt(NewIntFromBigInt(chopPrecisionAndTruncateNonMutative(d.Int)))
 }
 
 //___________________________________________________________________________________

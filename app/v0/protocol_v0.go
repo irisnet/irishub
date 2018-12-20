@@ -132,7 +132,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	)
 	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamspace),
-		&stakeKeeper, p.feeCollectionKeeper,
+		p.bankKeeper, p.feeCollectionKeeper,
 	)
 	p.distrKeeper = distr.NewKeeper(
 		p.cdc,

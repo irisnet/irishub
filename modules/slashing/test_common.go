@@ -76,8 +76,6 @@ func createTestInput(t *testing.T, defaults Params) (sdk.Context, bank.Keeper, s
 	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
 	genesis := stake.DefaultGenesisState()
 
-	genesis.Pool.LooseTokens = sdk.NewDecFromInt(initCoins.MulRaw(int64(len(addrs))))
-
 	_, err = stake.InitGenesis(ctx, sk, genesis)
 	require.Nil(t, err)
 

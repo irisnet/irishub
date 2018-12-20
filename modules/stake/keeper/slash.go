@@ -44,7 +44,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	// ref https://github.com/irisnet/irishub/issues/1471
 	//Multiply 1*10^18 to calculate equivalent stake denom amount
 	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	slashAmount = slashAmount.MulInt(tokenPrecision)
+	slashAmount = slashAmount.MulInt(tokenPrecision).TruncateDec()
 
 	validator, found := k.GetValidatorByConsAddr(ctx, consAddr)
 	if !found {
@@ -118,10 +118,6 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	// Deduct from validator's bonded tokens and update the validator.
 	// The deducted tokens are returned to pool.LooseTokens.
 	validator = k.RemoveValidatorTokens(ctx, validator, tokensToBurn)
-	pool := k.GetPool(ctx)
-	// Burn the slashed tokens, which are now loose.
-	pool.LooseTokens = pool.LooseTokens.Sub(tokensToBurn)
-	k.SetPool(ctx, pool)
 
 	// Log that a slash occurred!
 	logger.Info(fmt.Sprintf(
@@ -187,12 +183,10 @@ func (k Keeper) slashUnbondingDelegation(ctx sdk.Context, unbondingDelegation ty
 		unbondingDelegation.Balance.Amount = unbondingDelegation.Balance.Amount.Sub(unbondingSlashAmount)
 		tags = tags.AppendTag(fmt.Sprintf(SlashUnbondindDelegation, unbondingDelegation.DelegatorAddr, unbondingDelegation.ValidatorAddr),[]byte(unbondingSlashAmount.String()))
 		k.SetUnbondingDelegation(ctx, unbondingDelegation)
-		pool := k.GetPool(ctx)
-
-		// Burn loose tokens
-		// Ref https://github.com/irisnet/irishub/pull/1278#discussion_r198657760
-		pool.LooseTokens = pool.LooseTokens.Sub(sdk.NewDecFromInt(unbondingSlashAmount))
-		k.SetPool(ctx, pool)
+		k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.Coin{
+			Denom: types.StakeDenom,
+			Amount: unbondingSlashAmount,
+		}})
 	}
 
 	return
@@ -253,10 +247,6 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 			panic(fmt.Errorf("error unbonding delegator: %v", err))
 		}
 		tags = tags.AppendTag(fmt.Sprintf(SlashValidatorRedelegation, redelegation.ValidatorDstAddr, redelegation.ValidatorSrcAddr, redelegation.DelegatorAddr), []byte(tokensToBurn.String()))
-		// Burn loose tokens
-		pool := k.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Sub(tokensToBurn)
-		k.SetPool(ctx, pool)
 	}
 
 	return

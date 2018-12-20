@@ -198,7 +198,6 @@ func InitializeTestLCD(
 		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, 20))}
 		acc := v0.NewGenesisFileAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
-		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 20)))
 	}
 
 	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()

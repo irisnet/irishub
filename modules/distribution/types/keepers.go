@@ -12,13 +12,12 @@ type StakeKeeper interface {
 	TotalPower(ctx sdk.Context) sdk.Dec
 	GetLastTotalPower(ctx sdk.Context) sdk.Int
 	GetLastValidatorPower(ctx sdk.Context, valAddr sdk.ValAddress) sdk.Int
-	BurnAmount(ctx sdk.Context, amount sdk.Dec)
-	GetStakeDenom(ctx sdk.Context) string
 }
 
 // expected coin keeper
 type BankKeeper interface {
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
+	BurnCoinsFromPool(ctx sdk.Context, pool string, amt sdk.Coins) (sdk.Tags, sdk.Error)
 }
 
 // from ante handler

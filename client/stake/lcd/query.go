@@ -265,13 +265,13 @@ func poolHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc
 			return
 		}
 
-		var pool types.Pool
-		if err = cdc.UnmarshalJSON(res, &pool); err != nil {
+		var poolStatus types.PoolStatus
+		if err = cdc.UnmarshalJSON(res, &poolStatus); err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, pool)
+		poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, poolStatus)
 		if res, err = codec.MarshalJSONIndent(cdc, poolOutput); err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

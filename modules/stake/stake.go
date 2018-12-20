@@ -18,6 +18,8 @@ type (
 	Redelegation         = types.Redelegation
 	Params               = types.Params
 	Pool                 = types.Pool
+	PoolMgr              = types.PoolMgr
+	PoolStatus           = types.PoolStatus
 	MsgCreateValidator   = types.MsgCreateValidator
 	MsgEditValidator     = types.MsgEditValidator
 	MsgDelegate          = types.MsgDelegate

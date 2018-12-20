@@ -217,7 +217,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	// increase totalLoosenToken
 	totalLoosenToken = totalLoosenToken.Plus(coins)
 	if !totalLoosenToken.IsNotNegative() {
-		panic(fmt.Errorf("total loosen token is negative"))
+		panic(fmt.Errorf("total loosen token is overflow"))
 	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
