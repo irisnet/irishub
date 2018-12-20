@@ -156,4 +156,8 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 		p.slashingKeeper.SetValidatorSigningInfo(ctx, addr, info)
 		return false
 	})
+
+	/* Handle gov state. */
+
+	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
 }
