@@ -155,10 +155,7 @@ func (am AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	if bz == nil {
 		accNumber = 0
 	} else {
-		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &accNumber)
-		if err != nil {
-			panic(err)
-		}
+		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &accNumber)
 	}
 
 	bz = am.cdc.MustMarshalBinaryLengthPrefixed(accNumber + 1)
@@ -175,10 +172,7 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 	if bz == nil {
 		burnToken = nil
 	} else {
-		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &burnToken)
-		if err != nil {
-			panic(err)
-		}
+		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &burnToken)
 	}
 	return burnToken
 }
@@ -195,10 +189,7 @@ func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 		panic(fmt.Errorf("burn token is negative"))
 	}
 	// write back to db
-	bzNew, err := am.cdc.MarshalBinaryLengthPrefixed(burnToken)
-	if err != nil {
-		panic(err)
-	}
+	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
 	store := ctx.KVStore(am.key)
 	store.Set(burnTokenKey, bzNew)
 }
@@ -211,10 +202,7 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 	if bz == nil {
 		totalLoosenToken = nil
 	} else {
-		err := am.cdc.UnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
-		if err != nil {
-			panic(err)
-		}
+		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &totalLoosenToken)
 	}
 	return totalLoosenToken
 }
@@ -232,10 +220,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		panic(fmt.Errorf("total loosen token is negative"))
 	}
 	// write back to db
-	bzNew, err := am.cdc.MarshalBinaryLengthPrefixed(totalLoosenToken)
-	if err != nil {
-		panic(err)
-	}
+	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
 	store.Set(totalLoosenTokenKey, bzNew)
 }
@@ -253,10 +238,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		panic(fmt.Errorf("total loosen token is negative"))
 	}
 	// write back to db
-	bzNew, err := am.cdc.MarshalBinaryLengthPrefixed(totalLoosenToken)
-	if err != nil {
-		panic(err)
-	}
+	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
 	store.Set(totalLoosenTokenKey, bzNew)
 }
@@ -265,17 +247,11 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 // misc.
 
 func (am AccountKeeper) encodeAccount(acc Account) []byte {
-	bz, err := am.cdc.MarshalBinaryBare(acc)
-	if err != nil {
-		panic(err)
-	}
+	bz := am.cdc.MustMarshalBinaryBare(acc)
 	return bz
 }
 
 func (am AccountKeeper) decodeAccount(bz []byte) (acc Account) {
-	err := am.cdc.UnmarshalBinaryBare(bz, &acc)
-	if err != nil {
-		panic(err)
-	}
+	am.cdc.MustUnmarshalBinaryBare(bz, &acc)
 	return
 }
