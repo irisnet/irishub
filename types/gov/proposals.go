@@ -45,7 +45,6 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
-
 }
 
 // checks if two proposals are equal
@@ -165,7 +164,7 @@ func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeText ||
 		pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
-	////////////////////  iris begin  /////////////////////////////
+		////////////////////  iris begin  /////////////////////////////
 		pt == ProposalTypeSoftwareHalt ||
 		pt == ProposalTypeTxTaxUsage {
 		////////////////////  iris end  /////////////////////////////
