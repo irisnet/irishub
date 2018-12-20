@@ -9,11 +9,12 @@ import (
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -84,7 +85,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(strProposalStatus) != 0 {
-				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
+				proposalStatus, err := govtypes.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 				if err != nil {
 					return err
 				}
@@ -426,7 +427,7 @@ func printModuleList(res []sdk.KVPair) (err error) {
 }
 
 func printParamStr(p params.GovParameter, keyStr string) {
-	var param gov.Param
+	var param govtypes.Param
 	param.Key = keyStr
 	param.Value = p.ToJson("")
 	param.Op = ""
@@ -444,7 +445,7 @@ func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
 			if err == nil && len(res) != 0 {
-				var pd gov.ParameterConfigFile
+				var pd govtypes.ParameterConfigFile
 				pathStr := viper.GetString(flagPath)
 				err := pd.WriteFile(cdc, res, pathStr)
 				return err

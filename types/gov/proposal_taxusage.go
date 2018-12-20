@@ -1,10 +1,10 @@
 package gov
 
 import (
+	"encoding/json"
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
-	"encoding/json"
 )
 
 type UsageType byte
@@ -30,7 +30,7 @@ func UsageTypeFromString(str string) (UsageType, error) {
 }
 
 // is defined UsageType?
-func validUsageType(ut UsageType) bool {
+func ValidUsageType(ut UsageType) bool {
 	if ut == UsageTypeBurn ||
 		ut == UsageTypeDistribute ||
 		ut == UsageTypeGrant {
@@ -104,13 +104,4 @@ type TaxUsageProposal struct {
 	Usage       UsageType
 	DestAddress sdk.AccAddress
 	Percent     sdk.Dec
-}
-
-func (p *TaxUsageProposal) Execute(ctx sdk.Context, k Keeper) (err error) {
-	burn := false
-	if p.Usage == UsageTypeBurn {
-		burn = true
-	}
-	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
-	return
 }

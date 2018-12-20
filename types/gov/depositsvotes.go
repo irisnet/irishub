@@ -11,7 +11,7 @@ import (
 // Vote
 type Vote struct {
 	Voter      sdk.AccAddress `json:"voter"`       //  address of the voter
-	ProposalID uint64          `json:"proposal_id"` //  proposalID of the proposal
+	ProposalID uint64         `json:"proposal_id"` //  proposalID of the proposal
 	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
 }
 
@@ -29,7 +29,7 @@ func (voteA Vote) Empty() bool {
 // Deposit
 type Deposit struct {
 	Depositor  sdk.AccAddress `json:"depositor"`   //  Address of the depositor
-	ProposalID uint64          `json:"proposal_id"` //  proposalID of the proposal
+	ProposalID uint64         `json:"proposal_id"` //  proposalID of the proposal
 	Amount     sdk.Coins      `json:"amount"`      //  Deposit amount
 }
 
@@ -73,7 +73,7 @@ func VoteOptionFromString(str string) (VoteOption, error) {
 }
 
 // Is defined VoteOption
-func validVoteOption(option VoteOption) bool {
+func ValidVoteOption(option VoteOption) bool {
 	if option == OptionYes ||
 		option == OptionAbstain ||
 		option == OptionNo ||

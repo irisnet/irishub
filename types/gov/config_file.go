@@ -1,14 +1,14 @@
 package gov
 
 import (
-	"fmt"
 	"encoding/json"
-	sdk "github.com/irisnet/irishub/types"
-	"path"
+	"fmt"
 	"github.com/irisnet/irishub/codec"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/types/gov/params"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"path"
 )
 
 type ParameterConfigFile struct {
@@ -29,7 +29,7 @@ func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error 
 	err = cdc.UnmarshalJSON(jsonBytes, &pd)
 	return err
 }
-func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pathStr string) error {
+func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair, pathStr string) error {
 	for _, kv := range res {
 		switch string(kv.Key) {
 		case "Gov/govDepositProcedure":
@@ -49,7 +49,6 @@ func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pa
 			}
 		}
 	}
-
 
 	output, err := cdc.MarshalJSONIndent(pd, "", "  ")
 

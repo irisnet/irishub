@@ -3,10 +3,11 @@ package gov
 import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/types"
 	"time"
 	"github.com/irisnet/irishub/modules/params"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // GenesisState - all gov state that must be provided at genesis
@@ -15,7 +16,7 @@ type GenesisState struct {
 	StartingProposalID uint64                      `json:"starting_proposalID"`
 	Deposits           []DepositWithMetadata       `json:"deposits"`
 	Votes              []VoteWithMetadata          `json:"votes"`
-	Proposals          []Proposal                  `json:"proposals"`
+	Proposals          []govtypes.Proposal                  `json:"proposals"`
 	DepositProcedure   govparams.DepositProcedure  `json:"deposit_period"`
 	VotingProcedure    govparams.VotingProcedure   `json:"voting_period"`
 	TallyingProcedure  govparams.TallyingProcedure `json:"tallying_procedure"`
@@ -23,13 +24,13 @@ type GenesisState struct {
 
 type DepositWithMetadata struct {
 	ProposalID uint64  `json:"proposal_id"`
-	Deposit    Deposit `json:"deposit"`
+	Deposit    govtypes.Deposit `json:"deposit"`
 }
 
 // VoteWithMetadata (just for genesis)
 type VoteWithMetadata struct {
 	ProposalID uint64 `json:"proposal_id"`
-	Vote       Vote   `json:"vote"`
+	Vote       govtypes.Vote   `json:"vote"`
 }
 
 func NewGenesisState(startingProposalID uint64, dp govparams.DepositProcedure, vp govparams.VotingProcedure, tp govparams.TallyingProcedure) GenesisState {
@@ -81,18 +82,18 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 	var deposits []DepositWithMetadata
 	var votes []VoteWithMetadata
-	proposals := k.GetProposalsFiltered(ctx, nil, nil, StatusNil, 0)
+	proposals := k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusNil, 0)
 	for _, proposal := range proposals {
 		proposalID := proposal.GetProposalID()
 		depositsIterator := k.GetDeposits(ctx, proposalID)
 		for ; depositsIterator.Valid(); depositsIterator.Next() {
-			var deposit Deposit
+			var deposit govtypes.Deposit
 			k.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), &deposit)
 			deposits = append(deposits, DepositWithMetadata{proposalID, deposit})
 		}
 		votesIterator := k.GetVotes(ctx, proposalID)
 		for ; votesIterator.Valid(); votesIterator.Next() {
-			var vote Vote
+			var vote govtypes.Vote
 			k.cdc.MustUnmarshalBinaryLengthPrefixed(votesIterator.Value(), &vote)
 			votes = append(votes, VoteWithMetadata{proposalID, vote})
 		}

@@ -45,9 +45,6 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
-	////////////////////  iris begin  ///////////////////////////
-	Execute(ctx sdk.Context, k Keeper) error
-	////////////////////  iris end  ///////////////////////////
 }
 
 // checks if two proposals are equal
@@ -120,11 +117,6 @@ func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
 
-////////////////////  iris begin  ///////////////////////////
-func (pp *TextProposal) Execute(ctx sdk.Context, k Keeper) (err error) { return nil }
-
-////////////////////  iris end  /////////////////////////////
-
 //-----------------------------------------------------------
 // ProposalQueue
 type ProposalQueue []uint64
@@ -168,11 +160,11 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 }
 
 // is defined ProposalType?
-func validProposalType(pt ProposalKind) bool {
+func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeText ||
 		pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
-	////////////////////  iris begin  /////////////////////////////
+		////////////////////  iris begin  /////////////////////////////
 		pt == ProposalTypeSoftwareHalt ||
 		pt == ProposalTypeTxTaxUsage {
 		////////////////////  iris end  /////////////////////////////
@@ -279,7 +271,7 @@ func ProposalStatusFromString(str string) (ProposalStatus, error) {
 }
 
 // is defined ProposalType?
-func validProposalStatus(status ProposalStatus) bool {
+func ValidProposalStatus(status ProposalStatus) bool {
 	if status == StatusDepositPeriod ||
 		status == StatusVotingPeriod ||
 		status == StatusPassed ||
