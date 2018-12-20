@@ -7,7 +7,7 @@ import (
 	"path"
 	"github.com/irisnet/irishub/codec"
 	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 )
 

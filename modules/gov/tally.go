@@ -2,7 +2,8 @@ package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // validatorGovInfo used for tallying
@@ -11,15 +12,15 @@ type validatorGovInfo struct {
 	Power           sdk.Dec        // Power of a Validator
 	DelegatorShares sdk.Dec        // Total outstanding delegator shares
 	Minus           sdk.Dec        // Minus of validator, used to compute validator's voting power
-	Vote            VoteOption     // Vote of the validator
+	Vote            govtypes.VoteOption     // Vote of the validator
 }
 
-func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tallyResults TallyResult) {
-	results := make(map[VoteOption]sdk.Dec)
-	results[OptionYes] = sdk.ZeroDec()
-	results[OptionAbstain] = sdk.ZeroDec()
-	results[OptionNo] = sdk.ZeroDec()
-	results[OptionNoWithVeto] = sdk.ZeroDec()
+func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (passes bool, tallyResults govtypes.TallyResult) {
+	results := make(map[govtypes.VoteOption]sdk.Dec)
+	results[govtypes.OptionYes] = sdk.ZeroDec()
+	results[govtypes.OptionAbstain] = sdk.ZeroDec()
+	results[govtypes.OptionNo] = sdk.ZeroDec()
+	results[govtypes.OptionNoWithVeto] = sdk.ZeroDec()
 
 	totalVotingPower := sdk.ZeroDec()
 	systemVotingPower := sdk.ZeroDec()
@@ -31,7 +32,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 			Power:           validator.GetPower(),
 			DelegatorShares: validator.GetDelegatorShares(),
 			Minus:           sdk.ZeroDec(),
-			Vote:            OptionEmpty,
+			Vote:            govtypes.OptionEmpty,
 		}
 		systemVotingPower = systemVotingPower.Add(validator.GetPower())
 		return false
@@ -41,7 +42,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	votesIterator := keeper.GetVotes(ctx, proposal.GetProposalID())
 	defer votesIterator.Close()
 	for ; votesIterator.Valid(); votesIterator.Next() {
-		vote := &Vote{}
+		vote := &govtypes.Vote{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(votesIterator.Value(), vote)
 
 		// if validator, just record it in the map
@@ -75,7 +76,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 
 	// iterate over the validators again to tally their voting power
 	for _, val := range currValidators {
-		if val.Vote == OptionEmpty {
+		if val.Vote == govtypes.OptionEmpty {
 			continue
 		}
 
@@ -91,15 +92,15 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
 	////////////////////  iris end  /////////////////////////////
 
-	tallyResults = TallyResult{
-		Yes:        results[OptionYes],
-		Abstain:    results[OptionAbstain],
-		No:         results[OptionNo],
-		NoWithVeto: results[OptionNoWithVeto],
+	tallyResults = govtypes.TallyResult{
+		Yes:        results[govtypes.OptionYes],
+		Abstain:    results[govtypes.OptionAbstain],
+		No:         results[govtypes.OptionNo],
+		NoWithVeto: results[govtypes.OptionNoWithVeto],
 	}
 
 	// If no one votes, proposal fails
-	if totalVotingPower.Sub(results[OptionAbstain]).Equal(sdk.ZeroDec()) {
+	if totalVotingPower.Sub(results[govtypes.OptionAbstain]).Equal(sdk.ZeroDec()) {
 		return false, tallyResults
 	}
 	////////////////////  iris begin  ///////////////////////////
@@ -110,12 +111,12 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 	////////////////////  iris end  ///////////////////////////
 
 	// If more than 1/3 of voters veto, proposal fails
-	if results[OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
+	if results[govtypes.OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
 		return false, tallyResults
 	}
 
 	// If more than 1/2 of non-abstaining voters vote Yes, proposal passes
-	if results[OptionYes].Quo(totalVotingPower.Sub(results[OptionAbstain])).GT(tallyingProcedure.Threshold) {
+	if results[govtypes.OptionYes].Quo(totalVotingPower.Sub(results[govtypes.OptionAbstain])).GT(tallyingProcedure.Threshold) {
 		return true, tallyResults
 	}
 	// If more than 1/2 of non-abstaining voters vote No, proposal fails
