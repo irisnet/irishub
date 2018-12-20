@@ -143,24 +143,3 @@ func (k Keeper) BurnAmount(ctx sdk.Context, amount sdk.Dec) {
 func (k Keeper) GetStakeDenom(ctx sdk.Context) string {
 	return types.StakeDenom
 }
-
-//__________________________________________________________________________
-
-// get the current in-block validator operation counter
-func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
-	store := ctx.KVStore(k.storeKey)
-	b := store.Get(IntraTxCounterKey)
-	if b == nil {
-		return 0
-	}
-	var counter int16
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
-	return counter
-}
-
-// set the current in-block validator operation counter
-func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
-	store.Set(IntraTxCounterKey, bz)
-}
