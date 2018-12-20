@@ -43,7 +43,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
 	return func(app *baseapp.BaseApp) error {
 		ctx := app.NewContext(false, abci.Header{})
-		poolMgr := k.GetPool(ctx)
+		pool := k.GetPool(ctx)
 
 		loose := sdk.ZeroDec()
 		bonded := sdk.ZeroDec()
@@ -89,15 +89,15 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 
 		// Loose tokens should equal coin supply plus unbonding delegations
 		// plus tokens on unbonded validators
-		if !poolMgr.GetLoosenTokenAmount(ctx).Equal(loose) {
+		if !pool.GetLoosenTokenAmount(ctx).Equal(loose) {
 			return fmt.Errorf("loose token invariance:\n\tpool.LooseTokens: %v"+
-				"\n\tsum of account tokens: %v", poolMgr.GetLoosenTokenAmount(ctx), loose)
+				"\n\tsum of account tokens: %v", pool.GetLoosenTokenAmount(ctx), loose)
 		}
 
 		// Bonded tokens should equal sum of tokens with bonded validators
-		if !poolMgr.BondedPool.BondedTokens.Equal(bonded) {
+		if !pool.BondedPool.BondedTokens.Equal(bonded) {
 			return fmt.Errorf("bonded token invariance:\n\tpool.BondedTokens: %v"+
-				"\n\tsum of account tokens: %v", poolMgr.BondedPool.BondedTokens, bonded)
+				"\n\tsum of account tokens: %v", pool.BondedPool.BondedTokens, bonded)
 		}
 
 		return nil

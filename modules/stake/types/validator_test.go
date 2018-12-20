@@ -294,30 +294,30 @@ func TestUpdateStatus(t *testing.T) {
 	bankKeeper := bank.NewBaseKeeper(accountKeeper)
 
 	bondedPool := InitialBondedPool()
-	poolMgr := Pool{
+	pool := Pool{
 		BondedPool: bondedPool,
 		BankKeeper:bankKeeper,
 	}
-	poolMgr.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(100))})
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(100))})
 
 	validator := NewValidator(addr1, pk1, Description{})
-	validator, poolMgr, _ = validator.AddTokensFromDel(ctx, poolMgr, sdk.NewInt(100))
+	validator, pool, _ = validator.AddTokensFromDel(ctx, pool, sdk.NewInt(100))
 	require.Equal(t, sdk.Unbonded, validator.Status)
 	require.Equal(t, int64(100), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(0), poolMgr.BondedPool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(100), poolMgr.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
+	require.Equal(t, int64(0), pool.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(100), pool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
-	validator, poolMgr = validator.UpdateStatus(ctx, poolMgr, sdk.Bonded)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Bonded)
 	require.Equal(t, sdk.Bonded, validator.Status)
 	require.Equal(t, int64(100), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(100), poolMgr.BondedPool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(0), poolMgr.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
+	require.Equal(t, int64(100), pool.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(0), pool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
-	validator, poolMgr = validator.UpdateStatus(ctx, poolMgr, sdk.Unbonding)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Unbonding)
 	require.Equal(t, sdk.Unbonding, validator.Status)
 	require.Equal(t, int64(100), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(0), poolMgr.BondedPool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(100), poolMgr.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
+	require.Equal(t, int64(0), pool.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(100), pool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 }
 
 func TestPossibleOverflow(t *testing.T) {

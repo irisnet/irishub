@@ -181,19 +181,19 @@ func (k Keeper) unjailValidator(ctx sdk.Context, validator types.Validator) {
 // perform all the store operations for when a validator status becomes bonded
 func (k Keeper) bondValidator(ctx sdk.Context, validator types.Validator) types.Validator {
 
-	poolMgr := k.GetPool(ctx)
+	pool := k.GetPool(ctx)
 
-	k.DeleteValidatorByPowerIndex(ctx, validator, poolMgr)
+	k.DeleteValidatorByPowerIndex(ctx, validator, pool)
 
 	validator.BondHeight = ctx.BlockHeight()
 
 	// set the status
-	validator, poolMgr = validator.UpdateStatus(ctx, poolMgr, sdk.Bonded)
-	k.SetPool(ctx, poolMgr)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Bonded)
+	k.SetPool(ctx, pool)
 
 	// save the now bonded validator record to the two referenced stores
 	k.SetValidator(ctx, validator)
-	k.SetValidatorByPowerIndex(ctx, validator, poolMgr)
+	k.SetValidatorByPowerIndex(ctx, validator, pool)
 
 	// delete from queue if present
 	k.DeleteValidatorQueue(ctx, validator)
@@ -209,10 +209,10 @@ func (k Keeper) bondValidator(ctx sdk.Context, validator types.Validator) types.
 // perform all the store operations for when a validator status begins unbonding
 func (k Keeper) beginUnbondingValidator(ctx sdk.Context, validator types.Validator) types.Validator {
 
-	poolMgr := k.GetPool(ctx)
+	pool := k.GetPool(ctx)
 	params := k.GetParams(ctx)
 
-	k.DeleteValidatorByPowerIndex(ctx, validator, poolMgr)
+	k.DeleteValidatorByPowerIndex(ctx, validator, pool)
 
 	// sanity check
 	if validator.Status != sdk.Bonded {
@@ -220,15 +220,15 @@ func (k Keeper) beginUnbondingValidator(ctx sdk.Context, validator types.Validat
 	}
 
 	// set the status
-	validator, poolMgr = validator.UpdateStatus(ctx, poolMgr, sdk.Unbonding)
-	k.SetPool(ctx, poolMgr)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Unbonding)
+	k.SetPool(ctx, pool)
 
 	validator.UnbondingMinTime = ctx.BlockHeader().Time.Add(params.UnbondingTime)
 	validator.UnbondingHeight = ctx.BlockHeader().Height
 
 	// save the now unbonded validator record and power index
 	k.SetValidator(ctx, validator)
-	k.SetValidatorByPowerIndex(ctx, validator, poolMgr)
+	k.SetValidatorByPowerIndex(ctx, validator, pool)
 
 	// Adds to unbonding validator queue
 	k.InsertValidatorQueue(ctx, validator)
@@ -243,9 +243,9 @@ func (k Keeper) beginUnbondingValidator(ctx sdk.Context, validator types.Validat
 
 // perform all the store operations for when a validator status becomes unbonded
 func (k Keeper) completeUnbondingValidator(ctx sdk.Context, validator types.Validator) types.Validator {
-	poolMgr := k.GetPool(ctx)
-	validator, poolMgr = validator.UpdateStatus(ctx, poolMgr, sdk.Unbonded)
-	k.SetPool(ctx, poolMgr)
+	pool := k.GetPool(ctx)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Unbonded)
+	k.SetPool(ctx, pool)
 	k.SetValidator(ctx, validator)
 	return validator
 }

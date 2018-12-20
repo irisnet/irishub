@@ -127,17 +127,17 @@ func (k Keeper) SetNewValidatorByPowerIndex(ctx sdk.Context, validator types.Val
 func (k Keeper) AddValidatorTokensAndShares(ctx sdk.Context, validator types.Validator,
 	tokensToAdd sdk.Int) (valOut types.Validator, addedShares sdk.Dec) {
 
-	poolMgr := k.GetPool(ctx)
-	k.DeleteValidatorByPowerIndex(ctx, validator, poolMgr)
-	validator, poolMgr, addedShares = validator.AddTokensFromDel(ctx, poolMgr, tokensToAdd)
+	pool := k.GetPool(ctx)
+	k.DeleteValidatorByPowerIndex(ctx, validator, pool)
+	validator, pool, addedShares = validator.AddTokensFromDel(ctx, pool, tokensToAdd)
 	// increment the intra-tx counter
 	// in case of a conflict, the validator which least recently changed power takes precedence
 	counter := k.GetIntraTxCounter(ctx)
 	validator.BondIntraTxCounter = counter
 	k.SetIntraTxCounter(ctx, counter+1)
 	k.SetValidator(ctx, validator)
-	k.SetPool(ctx, poolMgr)
-	k.SetValidatorByPowerIndex(ctx, validator, poolMgr)
+	k.SetPool(ctx, pool)
+	k.SetValidatorByPowerIndex(ctx, validator, pool)
 	return validator, addedShares
 }
 

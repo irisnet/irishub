@@ -31,17 +31,17 @@ func TestAddBondedTokens(t *testing.T) {
 	bankKeeper := bank.NewBaseKeeper(accountKeeper)
 
 	bondedPool := InitialBondedPool()
-	poolMgrA := Pool{
+	poolA := Pool{
 		BondedPool: bondedPool,
 		BankKeeper: bankKeeper,
 	}
-	poolMgrA.BondedPool.BondedTokens = sdk.NewDec(10)
-	poolMgrA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+	poolA.BondedPool.BondedTokens = sdk.NewDec(10)
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 
-	poolMgrA = poolMgrA.loosenTokenToBonded(ctx, sdk.NewDec(10))
+	poolA = poolA.loosenTokenToBonded(ctx, sdk.NewDec(10))
 
-	require.True(sdk.DecEq(t, sdk.NewDec(20), poolMgrA.BondedPool.BondedTokens))
-	require.True(sdk.DecEq(t, sdk.NewDec(0), poolMgrA.GetLoosenTokenAmount(ctx)))
+	require.True(sdk.DecEq(t, sdk.NewDec(20), poolA.BondedPool.BondedTokens))
+	require.True(sdk.DecEq(t, sdk.NewDec(0), poolA.GetLoosenTokenAmount(ctx)))
 }
 
 func TestRemoveBondedTokens(t *testing.T) {
@@ -54,15 +54,15 @@ func TestRemoveBondedTokens(t *testing.T) {
 	bankKeeper := bank.NewBaseKeeper(accountKeeper)
 
 	bondedPool := InitialBondedPool()
-	poolMgrA := Pool{
+	poolA := Pool{
 		BondedPool: bondedPool,
 		BankKeeper: bankKeeper,
 	}
-	poolMgrA.BondedPool.BondedTokens = sdk.NewDec(10)
-	poolMgrA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+	poolA.BondedPool.BondedTokens = sdk.NewDec(10)
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 
-	poolMgrA = poolMgrA.bondedTokenToLoosen(ctx, sdk.NewDec(5))
+	poolA = poolA.bondedTokenToLoosen(ctx, sdk.NewDec(5))
 
-	require.True(sdk.DecEq(t, sdk.NewDec(5), poolMgrA.BondedPool.BondedTokens))
-	require.True(sdk.DecEq(t, sdk.NewDec(15), poolMgrA.GetLoosenTokenAmount(ctx)))
+	require.True(sdk.DecEq(t, sdk.NewDec(5), poolA.BondedPool.BondedTokens))
+	require.True(sdk.DecEq(t, sdk.NewDec(15), poolA.GetLoosenTokenAmount(ctx)))
 }

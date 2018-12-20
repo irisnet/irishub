@@ -247,7 +247,7 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 			loose = loose.Add(balance)
 			return false
 		})
-		poolMgr := k.GetPool(ctx)
-		poolMgr.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, loose)})
+		pool := k.GetPool(ctx)
+		pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, loose)})
 	}
 }
