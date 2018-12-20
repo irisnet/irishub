@@ -106,11 +106,4 @@ type TaxUsageProposal struct {
 	Percent     sdk.Dec
 }
 
-//func (p *TaxUsageProposal) Execute(ctx sdk.Context, k Keeper) (err error) {
-//	burn := false
-//	if p.Usage == UsageTypeBurn {
-//		burn = true
-//	}
-//	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
-//	return
-//}
+

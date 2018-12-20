@@ -117,11 +117,12 @@ func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) 
 	param := govtypes.Param{
 		Key:   "test",
 		Value: "value",
+		Op: "insert",
 	}
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
 		simulation.RandStringOfLength(r, 5),
-		govtypes.ProposalTypeText,
+		govtypes.ProposalTypeSoftwareHalt,
 		sender.Address,
 		deposit,
 		param,

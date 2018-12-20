@@ -70,8 +70,6 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck ba
 ////////////////////  iris begin  ///////////////////////////
 func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType govtypes.ProposalKind, param govtypes.Param) govtypes.Proposal {
 	switch proposalType {
-	case govtypes.ProposalTypeText:
-		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	case govtypes.ProposalTypeParameterChange:
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case govtypes.ProposalTypeSoftwareHalt:
@@ -86,28 +84,6 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 // Proposals
 
 // Creates a NewProposal
-func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description string, proposalType govtypes.ProposalKind) govtypes.Proposal {
-	proposalID, err := keeper.getNewProposalID(ctx)
-	if err != nil {
-		return nil
-	}
-	var proposal govtypes.Proposal = &govtypes.TextProposal{
-		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
-		Status:       govtypes.StatusDepositPeriod,
-		TallyResult:  govtypes.EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
-	}
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
-	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
-	keeper.SetProposal(ctx, proposal)
-	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
-	return proposal
-}
-
 ////////////////////  iris begin  ///////////////////////////
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType govtypes.ProposalKind, param govtypes.Param) govtypes.Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
