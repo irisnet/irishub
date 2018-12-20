@@ -11,6 +11,8 @@ import (
 )
 
 func TestIrisCLISubmitProposal(t *testing.T) {
+	t.SkipNow()
+
 	chainID, servAddr, port := initializeFixtures(t)
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
