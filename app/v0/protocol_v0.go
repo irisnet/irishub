@@ -301,7 +301,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	for _, gacc := range genesisState.Accounts {
 		acc := gacc.ToAccount()
 		acc.AccountNumber = p.accountMapper.GetNextAccountNumber(ctx)
-		p.accountMapper.SetAccount(ctx, acc)
+		p.accountMapper.SetGenesisAccount(ctx, acc)
 	}
 
 	//upgrade.InitGenesis(ctx, p.upgradeKeeper, p.Router(), genesisState.UpgradeData)
