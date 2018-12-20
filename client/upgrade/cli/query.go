@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
@@ -68,7 +67,7 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 
 func GetStatusCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "status",
+		Use:     "query-signals",
 		Short:   "query the information of signals",
 		Example: "iriscli upgrade status",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -79,36 +78,35 @@ func GetStatusCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			res_upgradeConfig, err := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
-			var upgradeConfig protocol.UpgradeConfig
-
 			if err != nil {
 				return err
 			}
-
 			if len(res_upgradeConfig) == 0 {
 				fmt.Println("No Software Upgrade Switch Period is in process.")
 				return err
 			}
 
-			cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig)
+			var upgradeConfig protocol.UpgradeConfig
+			if err = cdc.UnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig); err != nil {
+				return err
+			}
 
-			var validatorAddr []string
+			var validatorAddrs []string
 			res, err := cliCtx.QuerySubspace(upgrade.GetSignalPrefixKey(upgradeConfig.Definition.Version), storeName)
-
 			if err != nil {
 				return err
 			}
 
 			for _, kv := range res {
-				validatorAddr = append(validatorAddr, strings.Split(string(kv.Key), "/")[2])
+				validatorAddrs = append(validatorAddrs, upgrade.GetAddressFromSignalKey(kv.Key))
 			}
 
-			if len(validatorAddr) == 0 {
+			if len(validatorAddrs) == 0 {
 				fmt.Println("No validators have started the new version.")
 				return nil
 			}
 
-			output, err := codec.MarshalJSONIndent(cdc, validatorAddr)
+			output, err := codec.MarshalJSONIndent(cdc, validatorAddrs)
 			if err != nil {
 				return err
 			}

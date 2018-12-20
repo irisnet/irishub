@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -32,6 +33,10 @@ func GetSignalKey(versionID uint64, switchVoterAddr string) []byte {
 
 func GetSignalPrefixKey(versionID uint64) []byte {
 	return []byte(fmt.Sprintf(signalPrefixKey, UintToHexString(versionID)))
+}
+
+func GetAddressFromSignalKey(key []byte) string {
+	return strings.Split(string(key), "/")[2]
 }
 
 func IntToHexString(i int64) string {
