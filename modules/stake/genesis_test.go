@@ -19,7 +19,7 @@ func TestInitGenesis(t *testing.T) {
 	ctx, _, keeper := keep.CreateTestInput(t, false, sdk.NewIntWithDecimal(1000, 18))
 
 	pool := keeper.GetPool(ctx)
-	pool.BondedTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(2, 18))
+	pool.BondedPool.BondedTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(2, 18))
 
 	params := keeper.GetParams(ctx)
 	validators := make([]Validator, 2)
@@ -39,12 +39,12 @@ func TestInitGenesis(t *testing.T) {
 	validators[1].Tokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 18))
 	validators[1].DelegatorShares = sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 18))
 
-	genesisState := types.NewGenesisState(pool, params, validators, delegations)
+	genesisState := types.NewGenesisState(pool.BondedPool, params, validators, delegations)
 	vals, err := InitGenesis(ctx, keeper, genesisState)
 	require.NoError(t, err)
 
 	actualGenesis := ExportGenesis(ctx, keeper)
-	require.Equal(t, genesisState.Pool, actualGenesis.Pool)
+	require.Equal(t, genesisState.BondedPool, actualGenesis.BondedPool)
 	require.Equal(t, genesisState.Params, actualGenesis.Params)
 	require.Equal(t, genesisState.Bonds, actualGenesis.Bonds)
 	require.EqualValues(t, keeper.GetAllValidators(ctx), actualGenesis.Validators)
@@ -76,7 +76,7 @@ func TestInitGenesisLargeValidatorSet(t *testing.T) {
 
 	// Assigning 2 to the first 100 vals, 1 to the rest
 	pool := keeper.GetPool(ctx)
-	pool.BondedTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(int64(200 + (size - 100)), 18))
+	pool.BondedPool.BondedTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(int64(200 + (size - 100)), 18))
 
 	params := keeper.GetParams(ctx)
 	delegations := []Delegation{}
@@ -95,7 +95,7 @@ func TestInitGenesisLargeValidatorSet(t *testing.T) {
 		}
 	}
 
-	genesisState := types.NewGenesisState(pool, params, validators, delegations)
+	genesisState := types.NewGenesisState(pool.BondedPool, params, validators, delegations)
 	vals, err := InitGenesis(ctx, keeper, genesisState)
 	require.NoError(t, err)
 

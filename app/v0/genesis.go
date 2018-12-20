@@ -311,7 +311,7 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 
 func createStakeGenesisState() stake.GenesisState {
 	return stake.GenesisState{
-		Pool: stake.Pool{
+		BondedPool: stake.BondedPool{
 			BondedTokens: sdk.ZeroDec(),
 		},
 		Params: stake.Params{

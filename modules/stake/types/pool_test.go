@@ -5,34 +5,64 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+	"github.com/irisnet/irishub/codec"
+	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/modules/auth"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/irisnet/irishub/modules/bank"
 )
 
 func TestPoolEqual(t *testing.T) {
-	p1 := InitialPool()
-	p2 := InitialPool()
+	p1 := InitialBondedPool()
+	p2 := InitialBondedPool()
 	require.True(t, p1.Equal(p2))
 	p2.BondedTokens = sdk.NewDec(3)
 	require.False(t, p1.Equal(p2))
 }
 
 func TestAddBondedTokens(t *testing.T) {
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
-	pool.BondedTokens = sdk.NewDec(10)
 
-	pool = pool.looseTokensToBonded(sdk.NewDec(10))
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
 
-	require.True(sdk.DecEq(t, sdk.NewDec(20), pool.BondedTokens))
-	require.True(sdk.DecEq(t, sdk.NewDec(0), pool.LooseTokens))
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+	bondedPool := InitialBondedPool()
+	poolMgrA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper: bankKeeper,
+	}
+	poolMgrA.BondedPool.BondedTokens = sdk.NewDec(10)
+	poolMgrA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+
+	poolMgrA = poolMgrA.loosenTokenToBonded(ctx, sdk.NewDec(10))
+
+	require.True(sdk.DecEq(t, sdk.NewDec(20), poolMgrA.BondedPool.BondedTokens))
+	require.True(sdk.DecEq(t, sdk.NewDec(0), poolMgrA.GetLoosenTokenAmount(ctx)))
 }
 
 func TestRemoveBondedTokens(t *testing.T) {
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
-	pool.BondedTokens = sdk.NewDec(10)
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
 
-	pool = pool.bondedTokensToLoose(sdk.NewDec(5))
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
 
-	require.True(sdk.DecEq(t, sdk.NewDec(5), pool.BondedTokens))
-	require.True(sdk.DecEq(t, sdk.NewDec(15), pool.LooseTokens))
+	bondedPool := InitialBondedPool()
+	poolMgrA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper: bankKeeper,
+	}
+	poolMgrA.BondedPool.BondedTokens = sdk.NewDec(10)
+	poolMgrA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+
+	poolMgrA = poolMgrA.bondedTokenToLoosen(ctx, sdk.NewDec(5))
+
+	require.True(sdk.DecEq(t, sdk.NewDec(5), poolMgrA.BondedPool.BondedTokens))
+	require.True(sdk.DecEq(t, sdk.NewDec(15), poolMgrA.GetLoosenTokenAmount(ctx)))
 }

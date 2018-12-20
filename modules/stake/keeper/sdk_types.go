@@ -90,13 +90,13 @@ func (k Keeper) ValidatorByConsAddr(ctx sdk.Context, addr sdk.ConsAddress) sdk.V
 
 // total power from the bond (not last, but current)
 func (k Keeper) TotalPower(ctx sdk.Context) sdk.Dec {
-	pool := k.GetPoolMgr(ctx).Pool
+	pool := k.GetPool(ctx).BondedPool
 	return pool.BondedTokens
 }
 
 // total power from the bond
 func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
-	pool := k.GetPoolMgr(ctx).Pool
+	pool := k.GetPool(ctx).BondedPool
 	loosenCoins := k.bankKeeper.GetLoosenCoins(ctx)
 	loosenAmount := sdk.NewDecFromInt(loosenCoins.AmountOf(types.StakeDenom))
 

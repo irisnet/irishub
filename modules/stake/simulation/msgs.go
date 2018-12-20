@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"math/rand"
+	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // SimulateMsgCreateValidator
@@ -246,8 +247,7 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 			loose = loose.Add(balance)
 			return false
 		})
-		pool := k.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDec(loose.Int64()))
-		k.SetPool(ctx, pool)
+		poolMgr := k.GetPool(ctx)
+		poolMgr.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, loose)})
 	}
 }

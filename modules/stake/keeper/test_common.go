@@ -105,8 +105,8 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins sdk.Int) (sdk.Conte
 
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
 	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(DefaultParamspace), types.DefaultCodespace)
-	keeper.SetPoolMgr(ctx, types.PoolMgr{
-		Pool:types.InitialPool(),
+	keeper.SetPool(ctx, types.Pool{
+		BondedPool:types.InitialBondedPool(),
 	})
 	keeper.SetParams(ctx, types.DefaultParams())
 
@@ -203,7 +203,7 @@ func ValidatorByPowerIndexExists(ctx sdk.Context, keeper Keeper, power []byte) b
 
 // update validator for testing
 func TestingUpdateValidator(keeper Keeper, ctx sdk.Context, validator types.Validator) types.Validator {
-	poolMgr := keeper.GetPoolMgr(ctx)
+	poolMgr := keeper.GetPool(ctx)
 	keeper.SetValidator(ctx, validator)
 	keeper.SetValidatorByPowerIndex(ctx, validator, poolMgr)
 	keeper.ApplyAndReturnValidatorSetUpdates(ctx)

@@ -247,6 +247,10 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 			panic(fmt.Errorf("error unbonding delegator: %v", err))
 		}
 		tags = tags.AppendTag(fmt.Sprintf(SlashValidatorRedelegation, redelegation.ValidatorDstAddr, redelegation.ValidatorSrcAddr, redelegation.DelegatorAddr), []byte(tokensToBurn.String()))
+		k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.Coin{
+			Denom: types.StakeDenom,
+			Amount: tokensToBurn.TruncateInt(),
+		}})
 	}
 
 	return

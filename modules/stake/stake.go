@@ -18,7 +18,7 @@ type (
 	Redelegation         = types.Redelegation
 	Params               = types.Params
 	Pool                 = types.Pool
-	PoolMgr              = types.PoolMgr
+	BondedPool           = types.BondedPool
 	PoolStatus           = types.PoolStatus
 	MsgCreateValidator   = types.MsgCreateValidator
 	MsgEditValidator     = types.MsgEditValidator
@@ -69,7 +69,7 @@ var (
 	KeyBondDenom      = types.KeyBondDenom
 
 	DefaultParams         = types.DefaultParams
-	InitialPool           = types.InitialPool
+	InitialBondedPool     = types.InitialBondedPool
 	NewValidator          = types.NewValidator
 	NewDescription        = types.NewDescription
 	NewCommission         = types.NewCommission

@@ -112,7 +112,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	accountKeeper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewBaseKeeper(accountKeeper)
 	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
-	sk.SetPoolMgr(ctx, stake.PoolMgr{Pool:stake.InitialPool()})
+	sk.SetPool(ctx, stake.Pool{BondedPool: stake.InitialBondedPool()})
 	sk.SetParams(ctx, stake.DefaultParams())
 
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously

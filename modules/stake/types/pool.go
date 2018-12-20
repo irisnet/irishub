@@ -8,20 +8,20 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-type Pool struct {
+type BondedPool struct {
 	BondedTokens sdk.Dec `json:"bonded_tokens"` // reserve of bonded tokens
 }
 
 // nolint
-func (p Pool) Equal(p2 PoolMgr) bool {
+func (p BondedPool) Equal(p2 BondedPool) bool {
 	bz1 := MsgCdc.MustMarshalBinaryLengthPrefixed(&p)
 	bz2 := MsgCdc.MustMarshalBinaryLengthPrefixed(&p2)
 	return bytes.Equal(bz1, bz2)
 }
 
 // initial pool for testing
-func InitialPool() Pool {
-	return Pool{
+func InitialBondedPool() BondedPool {
+	return BondedPool{
 		BondedTokens: sdk.ZeroDec(),
 	}
 }
@@ -29,35 +29,39 @@ func InitialPool() Pool {
 //_______________________________________________________________________
 
 // Pool - dynamic parameters of the current state
-type PoolMgr struct {
-	BankKeeper   bank.Keeper
-	Pool 		 Pool
+type Pool struct {
+	BankKeeper bank.Keeper
+	BondedPool BondedPool
 }
 
-func (p PoolMgr) increaseBondedToken(ctx sdk.Context, bondedTokens sdk.Dec) PoolMgr {
+func (p Pool) loosenTokenToBonded(ctx sdk.Context, bondedTokens sdk.Dec) Pool {
 	round := bondedTokens.TruncateInt()
 	change := bondedTokens.Sub(sdk.NewDecFromInt(round))
 	if !change.IsZero() {
 		panic("token is not integer")
 	}
 
-	p.Pool.BondedTokens = p.Pool.BondedTokens.Add(bondedTokens)
+	p.BondedPool.BondedTokens = p.BondedPool.BondedTokens.Add(bondedTokens)
 	balance := sdk.NewCoin(StakeDenom, round)
 	p.BankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{balance})
 	return p
 }
 
-func (p PoolMgr) decreaseBondedTokens(ctx sdk.Context, bondedTokens sdk.Dec) PoolMgr {
+func (p Pool) bondedTokenToLoosen(ctx sdk.Context, bondedTokens sdk.Dec) Pool {
 	round := bondedTokens.TruncateInt()
 	change := bondedTokens.Sub(sdk.NewDecFromInt(round))
 	if !change.IsZero() {
 		panic("token is not integer")
 	}
 
-	p.Pool.BondedTokens = p.Pool.BondedTokens.Sub(bondedTokens)
+	p.BondedPool.BondedTokens = p.BondedPool.BondedTokens.Sub(bondedTokens)
 	balance := sdk.NewCoin(StakeDenom, round)
 	p.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{balance})
 	return p
+}
+
+func (p Pool) GetLoosenTokenAmount(ctx sdk.Context) sdk.Dec {
+	return sdk.NewDecFromInt(p.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom))
 }
 
 type PoolStatus struct {

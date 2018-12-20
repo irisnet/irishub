@@ -20,14 +20,14 @@ func setupHelper(t *testing.T, amt sdk.Int) (sdk.Context, Keeper, types.Params) 
 	params := keeper.GetParams(ctx)
 	pool := keeper.GetPool(ctx)
 	numVals := 3
-	pool.LooseTokens = sdk.NewDecFromInt(amt.Mul(sdk.NewInt(int64(numVals))))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, amt.Mul(sdk.NewInt(int64(numVals))))})
 
 	// add numVals validators
 	for i := 0; i < numVals; i++ {
 		validator := types.NewValidator(addrVals[i], PKs[i], types.Description{})
-		validator, pool, _ = validator.AddTokensFromDel(pool, amt)
+		validator, pool, _ = validator.AddTokensFromDel(ctx, pool, amt)
 		validator.BondIntraTxCounter = int16(i)
-		pool.BondedTokens = pool.BondedTokens.Add(sdk.NewDecFromInt(amt))
+		pool.BondedPool.BondedTokens = pool.BondedPool.BondedTokens.Add(sdk.NewDecFromInt(amt))
 		keeper.SetPool(ctx, pool)
 		validator = TestingUpdateValidator(keeper, ctx, validator)
 		keeper.SetValidatorByConsAddr(ctx, validator)
@@ -94,6 +94,7 @@ func TestSlashUnbondingDelegation(t *testing.T) {
 
 	// test valid slash, before expiration timestamp and to which stake contributed
 	oldPool := keeper.GetPool(ctx)
+	oldPoolLoosenToken := oldPool.GetLoosenTokenAmount(ctx)
 	ctx = ctx.WithBlockHeader(abci.Header{Time: time.Unix(0, 0)})
 	keeper.SetUnbondingDelegation(ctx, ubd)
 	slashAmount, _ = keeper.slashUnbondingDelegation(ctx, ubd, 0, fraction)
@@ -107,7 +108,7 @@ func TestSlashUnbondingDelegation(t *testing.T) {
 	// balance decreased
 	require.Equal(t, sdk.NewInt64Coin(params.BondDenom, 5), ubd.Balance)
 	newPool := keeper.GetPool(ctx)
-	require.Equal(t, int64(5), oldPool.LooseTokens.Sub(newPool.LooseTokens).RoundInt64())
+	require.Equal(t, int64(5), oldPoolLoosenToken.Sub(newPool.GetLoosenTokenAmount(ctx)).RoundInt64())
 }
 
 // tests slashRedelegation
@@ -180,7 +181,7 @@ func TestSlashRedelegation(t *testing.T) {
 
 	// pool bonded tokens decreased
 	newPool := keeper.GetPool(ctx)
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 }
 
 // tests Slash at a future height (must panic)
@@ -216,7 +217,7 @@ func TestSlashAtNegativeHeight(t *testing.T) {
 	// power decreased
 	require.Equal(t, sdk.NewDec(5), validator.GetPower())
 	// pool bonded shares decreased
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 }
 
 // tests Slash at the current height
@@ -243,7 +244,7 @@ func TestSlashValidatorAtCurrentHeight(t *testing.T) {
 	// power decreased
 	require.Equal(t, sdk.NewDec(5), validator.GetPower())
 	// pool bonded shares decreased
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 }
 
 // tests Slash at a previous height with an unbonding delegation
@@ -283,7 +284,7 @@ func TestSlashWithUnbondingDelegation(t *testing.T) {
 	// read updated pool
 	newPool := keeper.GetPool(ctx)
 	// bonded tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(3, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(3, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	validator, found = keeper.GetValidatorByConsAddr(ctx, consAddr)
 	require.True(t, found)
@@ -303,7 +304,7 @@ func TestSlashWithUnbondingDelegation(t *testing.T) {
 	// read updated pool
 	newPool = keeper.GetPool(ctx)
 	// bonded tokens burned again
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	validator, found = keeper.GetValidatorByConsAddr(ctx, consAddr)
 	require.True(t, found)
@@ -323,7 +324,7 @@ func TestSlashWithUnbondingDelegation(t *testing.T) {
 	// read updated pool
 	newPool = keeper.GetPool(ctx)
 	// bonded tokens burned again
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(9, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(9, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	validator, found = keeper.GetValidatorByConsAddr(ctx, consAddr)
 	require.True(t, found)
@@ -343,7 +344,7 @@ func TestSlashWithUnbondingDelegation(t *testing.T) {
 	// read updated pool
 	newPool = keeper.GetPool(ctx)
 	// just 1 bonded token burned again since that's all the validator now has
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// apply TM updates
 	keeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	// read updated validator
@@ -383,7 +384,7 @@ func TestSlashWithRedelegation(t *testing.T) {
 
 	// update bonded tokens
 	pool := keeper.GetPool(ctx)
-	pool.BondedTokens = pool.BondedTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
+	pool.BondedPool.BondedTokens = pool.BondedPool.BondedTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	keeper.SetPool(ctx, pool)
 
 	// slash validator
@@ -401,7 +402,7 @@ func TestSlashWithRedelegation(t *testing.T) {
 	// read updated pool
 	newPool := keeper.GetPool(ctx)
 	// bonded tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(5, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	validator, found = keeper.GetValidatorByConsAddr(ctx, consAddr)
 	require.True(t, found)
@@ -425,7 +426,7 @@ func TestSlashWithRedelegation(t *testing.T) {
 	// read updated pool
 	newPool = keeper.GetPool(ctx)
 	// seven bonded tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(12, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(12, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	validator, found = keeper.GetValidatorByConsAddr(ctx, consAddr)
 	require.True(t, found)
@@ -446,7 +447,7 @@ func TestSlashWithRedelegation(t *testing.T) {
 	// read updated pool
 	newPool = keeper.GetPool(ctx)
 	// four more bonded tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(16, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(16, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// apply TM updates
 	keeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	// read updated validator
@@ -470,7 +471,7 @@ func TestSlashWithRedelegation(t *testing.T) {
 	// read updated pool
 	newPool = keeper.GetPool(ctx)
 	// no more bonded tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(16, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(16, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	// power still zero, still in unbonding period
 	validator, _ = keeper.GetValidatorByConsAddr(ctx, consAddr)
@@ -520,6 +521,7 @@ func TestSlashBoth(t *testing.T) {
 	// slash validator
 	ctx = ctx.WithBlockHeight(12)
 	oldPool := keeper.GetPool(ctx)
+	oldPoolLoosenToken := oldPool.GetLoosenTokenAmount(ctx)
 	validator, found := keeper.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(PKs[0]))
 	require.True(t, found)
 	consAddr0 := sdk.ConsAddress(PKs[0].Address())
@@ -533,9 +535,9 @@ func TestSlashBoth(t *testing.T) {
 	// read updated pool
 	newPool := keeper.GetPool(ctx)
 	// loose tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(2, 18)), oldPool.LooseTokens.Sub(newPool.LooseTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(2, 18)), oldPoolLoosenToken.Sub(newPool.GetLoosenTokenAmount(ctx)))
 	// bonded tokens burned
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(3, 18)), oldPool.BondedTokens.Sub(newPool.BondedTokens))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(3, 18)), oldPool.BondedPool.BondedTokens.Sub(newPool.BondedPool.BondedTokens))
 	// read updated validator
 	validator, found = keeper.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(PKs[0]))
 	require.True(t, found)

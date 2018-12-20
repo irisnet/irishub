@@ -6,7 +6,7 @@ import (
 
 // GenesisState - all staking state that must be provided at genesis
 type GenesisState struct {
-	Pool                 Pool                  `json:"pool"`
+	BondedPool           BondedPool            `json:"pool"`
 	Params               Params                `json:"params"`
 	IntraTxCounter       int16                 `json:"intra_tx_counter"`
 	LastTotalPower       sdk.Int               `json:"last_total_power"`
@@ -24,9 +24,9 @@ type LastValidatorPower struct {
 	Power   sdk.Int
 }
 
-func NewGenesisState(pool Pool, params Params, validators []Validator, bonds []Delegation) GenesisState {
+func NewGenesisState(bondedPool BondedPool, params Params, validators []Validator, bonds []Delegation) GenesisState {
 	return GenesisState{
-		Pool:       pool,
+		BondedPool: bondedPool,
 		Params:     params,
 		Validators: validators,
 		Bonds:      bonds,
@@ -36,7 +36,7 @@ func NewGenesisState(pool Pool, params Params, validators []Validator, bonds []D
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		Pool:   InitialPool(),
-		Params: DefaultParams(),
+		BondedPool: InitialBondedPool(),
+		Params:     DefaultParams(),
 	}
 }

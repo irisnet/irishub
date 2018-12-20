@@ -54,25 +54,25 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 //_______________________________________________________________________
 
 // load the pool
-func (k Keeper) GetPoolMgr(ctx sdk.Context) (poolMgr types.PoolMgr) {
-	var pool types.Pool
+func (k Keeper) GetPool(ctx sdk.Context) (pool types.Pool) {
+	var bondedPool types.BondedPool
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(PoolKey)
 	if b == nil {
 		panic("stored pool should not have been nil")
 	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &pool)
-	poolMgr = types.PoolMgr{
-		Pool:       pool,
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &bondedPool)
+	pool = types.Pool{
+		BondedPool: bondedPool,
 		BankKeeper: k.bankKeeper,
 	}
 	return
 }
 
 // set the pool
-func (k Keeper) SetPoolMgr(ctx sdk.Context, poolMgr types.PoolMgr) {
+func (k Keeper) SetPool(ctx sdk.Context, pool types.Pool) {
 	store := ctx.KVStore(k.storeKey)
-	b := k.cdc.MustMarshalBinaryLengthPrefixed(poolMgr.Pool)
+	b := k.cdc.MustMarshalBinaryLengthPrefixed(pool.BondedPool)
 	store.Set(PoolKey, b)
 }
 
@@ -83,11 +83,11 @@ func (k Keeper) GetPoolStatus(ctx sdk.Context) (poolStatus types.PoolStatus) {
 	if b == nil {
 		panic("stored pool should not have been nil")
 	}
-	var pool types.Pool
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &pool)
+	var bondedPool types.BondedPool
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &bondedPool)
 	poolStatus = types.PoolStatus{
 		LooseTokens:  sdk.NewDecFromInt(k.bankKeeper.GetLoosenCoins(ctx).AmountOf(types.StakeDenom)),
-		BondedTokens: pool.BondedTokens,
+		BondedTokens: bondedPool.BondedTokens,
 	}
 	return
 }
