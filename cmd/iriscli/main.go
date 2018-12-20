@@ -170,6 +170,7 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetInfoCmd("upgrade", cdc),
+			upgradecmd.GetStatusCmd("upgrade", cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,

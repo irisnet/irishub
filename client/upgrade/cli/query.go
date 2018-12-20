@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
@@ -54,6 +55,60 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 			upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(appVersion, upgradeConfig, lastFailureVersion)
 
 			output, err := codec.MarshalJSONIndent(cdc, upgradeInfoOutput)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+	return cmd
+}
+
+func GetStatusCmd(storeName string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "status",
+		Short:   "query the information of signals",
+		Example: "iriscli upgrade status",
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+
+			res_upgradeConfig, err := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
+			var upgradeConfig protocol.UpgradeConfig
+
+			if err != nil {
+				return err
+			}
+
+			if len(res_upgradeConfig) == 0 {
+				fmt.Println("No Software Upgrade Switch Period is in process.")
+				return err
+			}
+
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig)
+
+			var validatorAddr []string
+			res, err := cliCtx.QuerySubspace(upgrade.GetSignalPrefixKey(upgradeConfig.Definition.Version), storeName)
+
+			if err != nil {
+				return err
+			}
+
+			for _, kv := range res {
+				validatorAddr = append(validatorAddr, strings.Split(string(kv.Key), "/")[2])
+			}
+
+			if len(validatorAddr) == 0 {
+				fmt.Println("No validators have started the new version.")
+				return nil
+			}
+
+			output, err := codec.MarshalJSONIndent(cdc, validatorAddr)
 			if err != nil {
 				return err
 			}
