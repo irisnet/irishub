@@ -235,20 +235,6 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	return coinName, nil
 }
 
-func ParseCoinStr(coinStr string) (Coin, error) {
-	mainUnit, err := GetCoinName(coinStr)
-	coinType, err := GetCoinType(mainUnit)
-	if err != nil {
-		return Coin{}, err
-	}
-
-	coin, err := coinType.ConvertToMinCoin(coinStr)
-	if err != nil {
-		return Coin{}, err
-	}
-	return coin, nil
-}
-
 func GetCoinType(coinName string) (CoinType, error) {
 	var coinType CoinType
 	coinName = strings.ToLower(coinName)
