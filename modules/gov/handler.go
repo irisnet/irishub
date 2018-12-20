@@ -7,8 +7,9 @@ import (
 	"github.com/irisnet/irishub/modules/gov/tags"
 	"strconv"
 	"encoding/json"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	tmstate "github.com/tendermint/tendermint/state"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // Handle all "gov" type messages.
@@ -34,10 +35,10 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
-	if msg.ProposalType == ProposalTypeSoftwareHalt {
+	if msg.ProposalType == govtypes.ProposalTypeSoftwareHalt {
 		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 		if !found {
-			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+			return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
 	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
@@ -52,8 +53,8 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
+	if msg.ProposalType == govtypes.ProposalTypeParameterChange {
+		paramBytes, _ = json.Marshal(proposal.(*govtypes.ParameterProposal).Param)
 	}
 	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
@@ -76,10 +77,10 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 }
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
-	if msg.Usage != UsageTypeBurn {
+	if msg.Usage != govtypes.UsageTypeBurn {
 		_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
 		if !found {
-			return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
+			return govtypes.ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
 		}
 	}
 
@@ -99,7 +100,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 		tags.Percent, []byte(msg.Percent.String()),
 	)
 
-	if msg.Usage != UsageTypeBurn {
+	if msg.Usage != govtypes.UsageTypeBurn {
 		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
 	}
 
@@ -116,20 +117,20 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
 
 	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
-		return ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
+		return govtypes.ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
 	}
 
 	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
-		return ErrCodeInvalidSwitchHeight(keeper.codespace,uint64(ctx.BlockHeight()),msg.SwitchHeight).Result()
+		return govtypes.ErrCodeInvalidSwitchHeight(keeper.codespace,uint64(ctx.BlockHeight()),msg.SwitchHeight).Result()
 	}
 	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 	if !found {
-		return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+		return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 	}
 
 
 	if _ , ok := keeper.pk.GetUpgradeConfig(ctx) ; ok {
-		return ErrSwitchPeriodInProcess(keeper.codespace).Result()
+		return govtypes.ErrSwitchPeriodInProcess(keeper.codespace).Result()
 	}
 
 	proposal := keeper.NewSoftwareUpgradeProposal(ctx, msg)
@@ -248,12 +249,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var action []byte
 		if passes {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(StatusPassed)
+			activeProposal.SetStatus(govtypes.StatusPassed)
 			action = tags.ActionProposalPassed
-			activeProposal.Execute(ctx, keeper)
+			//activeProposal.Execute(ctx, keeper)
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(StatusRejected)
+			activeProposal.SetStatus(govtypes.StatusRejected)
 			action = tags.ActionProposalRejected
 		}
 		activeProposal.SetTallyResult(tallyResults)

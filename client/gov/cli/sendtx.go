@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -47,13 +48,13 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			proposalType, err := gov.ProposalTypeFromString(strProposalType)
+			proposalType, err := govtypes.ProposalTypeFromString(strProposalType)
 			if err != nil {
 				return err
 			}
 			////////////////////  iris begin  ///////////////////////////
-			var param gov.Param
-			if proposalType == gov.ProposalTypeParameterChange {
+			var param govtypes.Param
+			if proposalType == govtypes.ProposalTypeParameterChange {
 				pathStr := viper.GetString(flagPath)
 				keyStr := viper.GetString(flagKey)
 				opStr := viper.GetString(flagOp)
@@ -65,9 +66,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			////////////////////  iris end  /////////////////////////////
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
-			if proposalType == gov.ProposalTypeTxTaxUsage {
+			if proposalType == govtypes.ProposalTypeTxTaxUsage {
 				usageStr := viper.GetString(flagUsage)
-				usage, err := gov.UsageTypeFromString(usageStr)
+				usage, err := govtypes.UsageTypeFromString(usageStr)
 				if err != nil {
 					return err
 				}
@@ -88,7 +89,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
 			}
 
-			if proposalType == gov.ProposalTypeSoftwareUpgrade {
+			if proposalType == govtypes.ProposalTypeSoftwareUpgrade {
 				version := uint64(viper.GetInt64(flagVersion))
 				software := viper.GetString(flagSoftware)
 				switchHeight := uint64(viper.GetInt64(flagSwitchHeight))
@@ -125,15 +126,15 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 }
 
 ////////////////////  iris begin  ///////////////////////////
-func getParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *codec.Codec) (gov.Param, error) {
-	var param gov.Param
+func getParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *codec.Codec) (govtypes.Param, error) {
+	var param govtypes.Param
 
 	if paramStr != "" {
 		err := json.Unmarshal([]byte(paramStr), &param)
 		return param, err
 
 	} else if pathStr != "" {
-		paramDoc := gov.ParameterConfigFile{}
+		paramDoc := govtypes.ParameterConfigFile{}
 		err := paramDoc.ReadFile(cdc, pathStr)
 		if err != nil {
 			return param, err
@@ -216,7 +217,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 			proposalID := uint64(viper.GetInt64(flagProposalID))
 			option := viper.GetString(flagOption)
 
-			byteVoteOption, err := gov.VoteOptionFromString(client.NormalizeVoteOption(option))
+			byteVoteOption, err := govtypes.VoteOptionFromString(client.NormalizeVoteOption(option))
 			if err != nil {
 				return err
 			}

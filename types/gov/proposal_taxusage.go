@@ -30,7 +30,7 @@ func UsageTypeFromString(str string) (UsageType, error) {
 }
 
 // is defined UsageType?
-func validUsageType(ut UsageType) bool {
+func ValidUsageType(ut UsageType) bool {
 	if ut == UsageTypeBurn ||
 		ut == UsageTypeDistribute ||
 		ut == UsageTypeGrant {
@@ -106,11 +106,11 @@ type TaxUsageProposal struct {
 	Percent     sdk.Dec
 }
 
-func (p *TaxUsageProposal) Execute(ctx sdk.Context, k Keeper) (err error) {
-	burn := false
-	if p.Usage == UsageTypeBurn {
-		burn = true
-	}
-	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
-	return
-}
+//func (p *TaxUsageProposal) Execute(ctx sdk.Context, k Keeper) (err error) {
+//	burn := false
+//	if p.Usage == UsageTypeBurn {
+//		burn = true
+//	}
+//	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
+//	return
+//}
