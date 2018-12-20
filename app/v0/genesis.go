@@ -150,8 +150,14 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 				panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 			}
 			if coinName != stakeTypes.StakeDenomName {
-				continue
+				return genesisState, errors.New("unsupported coin type")
 			}
+
+			err = types.JudgeCoinType(coin)
+			if err != nil {
+				return genesisState, err
+			}
+
 			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", stakeTypes.StakeDenom, coin))

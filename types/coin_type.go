@@ -234,3 +234,25 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	coinName = strings.ToLower(coinName)
 	return coinName, nil
 }
+
+
+func JudgeCoinType(coinStr string) (error) {
+	denom, _, err := GetCoin(coinStr)
+	if err != nil {
+		return err
+	}
+	coinName := strings.ToLower(denom)
+	coin := "iris"
+	switch coinName {
+	case coin:
+	case coin + "-" + Milli:
+	case coin + "-" + Micro:
+	case coin + "-" + Nano:
+	case coin + "-" + Pico:
+	case coin + "-" + Femto:
+	case coin + "-" + Atto:
+	default:
+		return fmt.Errorf("unsupported coin type \"%s\"", coinName)
+	}
+	return nil
+}
