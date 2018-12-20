@@ -65,7 +65,7 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetStatusCmd(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-signals",
 		Short:   "query the information of signals",
