@@ -29,13 +29,13 @@ func TestPool(t *testing.T) {
 	expPool := types.InitialBondedPool()
 
 	//check that the empty keeper loads the default
-	resPoolMgr := keeper.GetPool(ctx)
-	require.True(t, expPool.Equal(resPoolMgr.BondedPool))
+	resPool := keeper.GetPool(ctx)
+	require.True(t, expPool.Equal(resPool.BondedPool))
 
 	//modify a params, save, and retrieve
 	expPool.BondedTokens = sdk.NewDec(777)
-	resPoolMgr.BondedPool = expPool
-	keeper.SetPool(ctx, resPoolMgr)
-	resPoolMgr = keeper.GetPool(ctx)
-	require.True(t, expPool.Equal(resPoolMgr.BondedPool))
+	resPool.BondedPool = expPool
+	keeper.SetPool(ctx, resPool)
+	resPool = keeper.GetPool(ctx)
+	require.True(t, expPool.Equal(resPool.BondedPool))
 }
