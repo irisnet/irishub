@@ -7,7 +7,7 @@ The module supports the infrastructure of the blockchain software upgrade. It wi
 ## Interaction Process
 
 ###  Governance process of software upgrade proposal
-1. Submit a software upgrade proposal
+1. Submit a software upgrade proposal and vote to make the proposal pass
 2. More details about governance process is in GOV [User Guide](governance.md)
 
 ### The process of software upgrade   

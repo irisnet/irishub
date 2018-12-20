@@ -15,6 +15,7 @@ iriscli upgrade [command]
 | Name          | Description                           |
 | ------------- | ------------------------------------- |
 | [info](info.md)                   | Query the information of upgrade module |
+|[query-signals](query-signals.md)|Query the information of signals     |
 
 ## Flags
 
