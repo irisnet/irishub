@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
@@ -119,6 +118,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	if err = cdc.UnmarshalJSON(genDoc.AppState, &genesisState); err != nil {
 		return genesisState, err
 	}
+
 
 	// if there are no gen txs to be processed, return the default empty state
 	if len(appGenTxs) == 0 {
