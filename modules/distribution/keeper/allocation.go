@@ -16,6 +16,8 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	// get the fees which have been getting collected through all the
 	// transactions in the block
 	feesCollected := k.feeCollectionKeeper.GetCollectedFees(ctx)
+	feeString := feesCollected.String()
+	_ = feeString
 	feesCollectedDec := types.NewDecCoins(feesCollected)
 
 	feePool := k.GetFeePool(ctx)

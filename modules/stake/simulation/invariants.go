@@ -9,9 +9,7 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/irisnet/irishub/modules/stake/types"
 )
 
@@ -21,7 +19,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper,
 	am auth.AccountKeeper) simulation.Invariant {
 
-	return func(app *baseapp.BaseApp) error {
+	return func(ctx sdk.Context) error {
 		//err := SupplyInvariants(ck, k, f, d, am)(app, header)
 		//if err != nil {
 		//	return err
@@ -41,8 +39,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 // nolint: unparam
 func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		ctx := app.NewContext(false, abci.Header{})
+	return func(ctx sdk.Context) error {
 		pool := k.GetPool(ctx)
 
 		loose := sdk.ZeroDec()
@@ -58,7 +55,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
 			switch validator.GetStatus() {
 			case sdk.Bonded:
-				bonded = bonded.Add(validator.GetPower())
+				bonded = bonded.Add(validator.GetPower().MulInt(sdk.NewIntWithDecimal(1, 18)))
 			case sdk.Unbonding:
 				loose = loose.Add(validator.GetTokens())
 			case sdk.Unbonded:
@@ -70,17 +67,27 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		feePool := d.GetFeePool(ctx)
 
 		// add outstanding fees
+		collectCoinsString := f.GetCollectedFees(ctx).String()
+		_ = collectCoinsString
 		loose = loose.Add(sdk.NewDecFromInt(f.GetCollectedFees(ctx).AmountOf(types.StakeDenom)))
 
 		// add community pool
+		coinsString1 := feePool.CommunityPool.ToString()
+		_= coinsString1
 		loose = loose.Add(feePool.CommunityPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution pool
+		coinsString2 := feePool.ValPool.ToString()
+		_=coinsString2
 		loose = loose.Add(feePool.ValPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution commission and yet-to-be-withdrawn-by-delegators
 		d.IterateValidatorDistInfos(ctx,
 			func(_ int64, distInfo distribution.ValidatorDistInfo) (stop bool) {
+				coinsString3 := distInfo.DelPool.ToString()
+				coinsString4 := distInfo.ValCommission.ToString()
+				_=coinsString3
+				_=coinsString4
 				loose = loose.Add(distInfo.DelPool.AmountOf(types.StakeDenom))
 				loose = loose.Add(distInfo.ValCommission.AmountOf(types.StakeDenom))
 				return false
@@ -90,8 +97,8 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		// Loose tokens should equal coin supply plus unbonding delegations
 		// plus tokens on unbonded validators
 		if !pool.GetLoosenTokenAmount(ctx).Equal(loose) {
-			return fmt.Errorf("loose token invariance:\n\tpool.LooseTokens: %v"+
-				"\n\tsum of account tokens: %v", pool.GetLoosenTokenAmount(ctx), loose)
+			return fmt.Errorf("loose token invariance:\n\tbank.LooseTokens: %v"+
+				"\n\tsum of account tokens: %v", pool.GetLoosenTokenAmount(ctx).TruncateInt(), loose.TruncateInt())
 		}
 
 		// Bonded tokens should equal sum of tokens with bonded validators
@@ -106,8 +113,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 
 // PositivePowerInvariant checks that all stored validators have > 0 power
 func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		ctx := app.NewContext(false, abci.Header{})
+	return func(ctx sdk.Context) error {
 
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
 		pool := k.GetPool(ctx)
@@ -132,7 +138,7 @@ func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
 
 // ValidatorSetInvariant checks equivalence of Tendermint validator set and SDK validator set
 func ValidatorSetInvariant(k stake.Keeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
+	return func(ctx sdk.Context) error {
 		// TODO
 		return nil
 	}

@@ -258,11 +258,11 @@ func (p *ProtocolVersion0) configParams() {
 func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	tags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
 
-	// distribute rewards from previous block
-	distr.BeginBlocker(ctx, req, p.distrKeeper)
-
 	// mint new tokens for this new block
 	mint.BeginBlocker(ctx, p.mintKeeper)
+
+	// distribute rewards from previous block
+	distr.BeginBlocker(ctx, req, p.distrKeeper)
 
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
@@ -275,6 +275,9 @@ func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
+
+	p.assertRuntimeInvariants(ctx)
+
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
