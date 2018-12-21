@@ -54,7 +54,8 @@ func GetMinDeposit(ctx sdk.Context, p govtypes.Proposal) sdk.Coins {
 	case ProposalLevelNormal:
 		return govparams.DepositProcedureParameter.Value.NormalMinDeposit
 	default:
-		return govparams.DepositProcedureParameter.Value.NormalMinDeposit
+		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		return nil
 	}
 }
 

@@ -24,6 +24,7 @@ const (
 	LOWER_BOUND_AMOUNT = 10
 	UPPER_BOUND_AMOUNT = 10000
 	THREE_DAYS         = 3 * 3600 * 24
+	TWO_DAYS           = 2 * 3600 * 24 //
 )
 
 var _ params.GovParameter = (*DepositProcedureParam)(nil)
@@ -56,7 +57,7 @@ func NewDepositProcedure() DepositProcedure {
 		CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
 		ImportantMinDeposit: sdk.Coins{importantMinDeposit},
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-		MaxDepositPeriod:    time.Duration(172800) * time.Second}
+		MaxDepositPeriod:    time.Duration(TWO_DAYS) * time.Second}
 }
 
 func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -75,7 +76,7 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 			CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
 			ImportantMinDeposit: sdk.Coins{importantMinDeposit},
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-			MaxDepositPeriod:    time.Duration(172800) * time.Second}
+			MaxDepositPeriod:    time.Duration(TWO_DAYS) * time.Second}
 	}
 }
 
@@ -149,7 +150,7 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 		}
 
 		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be larger than 20s and less than %ds", strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
@@ -232,7 +233,7 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
 		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be larger than 20s and less than %ds", strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil

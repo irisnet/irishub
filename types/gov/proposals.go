@@ -362,34 +362,3 @@ func (resultA TallyResult) Equals(resultB TallyResult) bool {
 		resultA.No.Equal(resultB.No) &&
 		resultA.NoWithVeto.Equal(resultB.NoWithVeto)
 }
-
-//-----------------------------------------------------------
-// ProposalLevel
-
-// Type that represents Proposal Level as a byte
-type ProposalLevel byte
-
-//nolint
-const (
-	ProposalLevelNil        ProposalLevel = 0x00
-	ProposalLevelCritical   ProposalLevel = 0x01
-	ProposalLevelImportant  ProposalLevel = 0x02
-	////////////////////  iris begin  /////////////////////////////
-	ProposalLevelNormal     ProposalLevel = 0x03
-	////////////////////  iris end  /////////////////////////////
-)
-
-func GetProposalLevel(p Proposal) ProposalLevel {
-	switch p.GetProposalType(){
-	case ProposalTypeTxTaxUsage:
-		return ProposalLevelNormal
-	case ProposalTypeParameterChange:
-		return ProposalLevelImportant
-	case ProposalTypeSoftwareHalt:
-		return ProposalLevelCritical
-	case ProposalTypeSoftwareUpgrade:
-		return ProposalLevelCritical
-	default:
-		return  ProposalLevelNil
-	}
-}
