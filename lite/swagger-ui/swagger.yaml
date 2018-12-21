@@ -342,6 +342,11 @@ paths:
         description: if true, broadcast transaction asynchronously
         required: false
         type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
       - in: body
         name: broadcastTxBody
         description: broadcast tx
@@ -374,6 +379,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
         type: boolean
       - description: stdTx
