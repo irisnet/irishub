@@ -222,7 +222,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
-		keeper.DeleteDeposits(ctx, proposalID) // delete any associated deposits (burned)
+		keeper.RefundDeposits(ctx, proposalID) // delete any associated deposits (burned)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
@@ -243,26 +243,31 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &proposalID)
 		activeProposal := keeper.GetProposal(ctx, proposalID)
-		passes, tallyResults := tally(ctx, keeper, activeProposal)
+		result, tallyResults := tally(ctx, keeper, activeProposal)
 
 		var action []byte
-		if passes {
+		if result == PASS {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(govtypes.StatusPassed)
 			action = tags.ActionProposalPassed
 			Execute(ctx, keeper,activeProposal)
+		} else if(result == REJECT) {
+			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
+			activeProposal.SetStatus(govtypes.StatusRejected)
+			action = tags.ActionProposalRejected
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(govtypes.StatusRejected)
 			action = tags.ActionProposalRejected
 		}
+
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
 
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 
-		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; passed: %v",
-			activeProposal.GetProposalID(), activeProposal.GetTitle(), passes))
+		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
+			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
 
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
