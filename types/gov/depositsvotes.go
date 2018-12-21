@@ -73,7 +73,7 @@ func VoteOptionFromString(str string) (VoteOption, error) {
 }
 
 // Is defined VoteOption
-func validVoteOption(option VoteOption) bool {
+func ValidVoteOption(option VoteOption) bool {
 	if option == OptionYes ||
 		option == OptionAbstain ||
 		option == OptionNo ||

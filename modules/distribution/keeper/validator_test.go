@@ -107,17 +107,20 @@ func TestWithdrawValidatorRewardsAllMultipleValidator(t *testing.T) {
 	stakeHandler := stake.NewHandler(sk)
 	denom := sk.GetParams(ctx).BondDenom
 
-	//make some  validators with different commissions
+	// Make some  validators with different commissions.
+	// Bond 10 of 100 with 0.1 commission.
 	msgCreateValidator := stake.NewTestMsgCreateValidatorWithCommission(
 		valOpAddr1, valConsPk1, sdk.NewIntWithDecimal(10, 18), sdk.NewDecWithPrec(1, 1))
 	got := stakeHandler(ctx, msgCreateValidator)
 	require.True(t, got.IsOK(), "expected msg to be ok, got %v", got)
 
+	// Bond 50 of 100 with 0.2 commission.
 	msgCreateValidator = stake.NewTestMsgCreateValidatorWithCommission(
 		valOpAddr2, valConsPk2, sdk.NewIntWithDecimal(50, 18), sdk.NewDecWithPrec(2, 1))
 	got = stakeHandler(ctx, msgCreateValidator)
 	require.True(t, got.IsOK(), "expected msg to be ok, got %v", got)
 
+	// Bond 40 of 100 with 0.3 commission.
 	msgCreateValidator = stake.NewTestMsgCreateValidatorWithCommission(
 		valOpAddr3, valConsPk3, sdk.NewIntWithDecimal(40, 18), sdk.NewDecWithPrec(3, 1))
 	got = stakeHandler(ctx, msgCreateValidator)
@@ -125,7 +128,7 @@ func TestWithdrawValidatorRewardsAllMultipleValidator(t *testing.T) {
 
 	_ = sk.ApplyAndReturnValidatorSetUpdates(ctx)
 
-	// allocate 100 denom of fees
+	// allocate 1000 denom of fees
 	feeInputs := sdk.NewIntWithDecimal(1000, 18)
 	fck.SetCollectedFees(sdk.Coins{sdk.NewCoin(denom, feeInputs)})
 	require.Equal(t, feeInputs, fck.GetCollectedFees(ctx).AmountOf(denom))
@@ -139,9 +142,9 @@ func TestWithdrawValidatorRewardsAllMultipleValidator(t *testing.T) {
 	feesInNonProposer := sdk.NewDecFromInt(feeInputs).Mul(sdk.NewDecWithPrec(95, 2))
 	feesInProposer := sdk.NewDecFromInt(feeInputs).Mul(sdk.NewDecWithPrec(5, 2))
 	expRes := sdk.NewDecFromInt(sdk.NewIntWithDecimal(90, 18)). // orig tokens (100 - 10)
-					Add(feesInNonProposer.Quo(sdk.NewDec(10))). // validator 1 has 1/10 total power
-					Add(feesInProposer).
-					TruncateInt()
+		Add(feesInNonProposer.Quo(sdk.NewDec(10))). // validator 1 has 1/10 total power (non-proposer rewards = 95)
+		Add(feesInProposer). // (proposer rewards = 50)
+		TruncateInt()
 	require.True(sdk.IntEq(t, expRes, amt))
 }
 

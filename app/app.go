@@ -29,6 +29,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 const (
@@ -96,6 +97,7 @@ func MakeCodec() *codec.Codec {
 	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
+	govtypes.RegisterCodec(cdc)
 	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)

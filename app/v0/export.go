@@ -138,7 +138,6 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 			panic("expected validator, not found")
 		}
 		validator.BondHeight = 0
-		validator.BondIntraTxCounter = counter
 		validator.UnbondingHeight = 0
 		p.StakeKeeper.SetValidator(ctx, validator)
 		counter++
@@ -156,4 +155,8 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 		p.slashingKeeper.SetValidatorSigningInfo(ctx, addr, info)
 		return false
 	})
+
+	/* Handle gov state. */
+
+	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
 }
