@@ -5,16 +5,24 @@ import (
 	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
+type ProposalResult string
+
+const (
+	PASS       ProposalResult = "pass"
+	REJECT     ProposalResult = "reject"
+	REJECTVETO ProposalResult = "reject-veto"
+)
+
 // validatorGovInfo used for tallying
 type validatorGovInfo struct {
-	Address         sdk.ValAddress // address of the validator operator
-	Power           sdk.Dec        // Power of a Validator
-	DelegatorShares sdk.Dec        // Total outstanding delegator shares
-	Minus           sdk.Dec        // Minus of validator, used to compute validator's voting power
-	Vote            govtypes.VoteOption     // Vote of the validator
+	Address         sdk.ValAddress      // address of the validator operator
+	Power           sdk.Dec             // Power of a Validator
+	DelegatorShares sdk.Dec             // Total outstanding delegator shares
+	Minus           sdk.Dec             // Minus of validator, used to compute validator's voting power
+	Vote            govtypes.VoteOption // Vote of the validator
 }
 
-func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (passes bool, tallyResults govtypes.TallyResult) {
+func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result ProposalResult, tallyResults govtypes.TallyResult) {
 	results := make(map[govtypes.VoteOption]sdk.Dec)
 	results[govtypes.OptionYes] = sdk.ZeroDec()
 	results[govtypes.OptionAbstain] = sdk.ZeroDec()
@@ -100,25 +108,25 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (passes b
 
 	// If no one votes, proposal fails
 	if totalVotingPower.Sub(results[govtypes.OptionAbstain]).Equal(sdk.ZeroDec()) {
-		return false, tallyResults
+		return REJECT, tallyResults
 	}
 	////////////////////  iris begin  ///////////////////////////
 	//if more than 1/3 of voters abstain, proposal fails
 	if tallyingProcedure.Participation.GT(totalVotingPower.Quo(systemVotingPower)) {
-		return false, tallyResults
+		return REJECT, tallyResults
 	}
 	////////////////////  iris end  ///////////////////////////
 
 	// If more than 1/3 of voters veto, proposal fails
 	if results[govtypes.OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
-		return false, tallyResults
+		return REJECTVETO, tallyResults
 	}
 
 	// If more than 1/2 of non-abstaining voters vote Yes, proposal passes
-	if results[govtypes.OptionYes].Quo(totalVotingPower.Sub(results[govtypes.OptionAbstain])).GT(tallyingProcedure.Threshold) {
-		return true, tallyResults
+	if results[govtypes.OptionYes].Quo(totalVotingPower).GT(tallyingProcedure.Threshold) {
+		return PASS, tallyResults
 	}
 	// If more than 1/2 of non-abstaining voters vote No, proposal fails
 
-	return false, tallyResults
+	return REJECT, tallyResults
 }
