@@ -178,7 +178,7 @@ func NewVotingProcedure() VotingProcedure {
 	return VotingProcedure{
 		CriticalVotingPeriod:  time.Duration(TWO_DAYS) * time.Second,
 		ImportantVotingPeriod: time.Duration(TWO_DAYS) * time.Second,
-		NormalVotingPeriod:    time.Duration(TWO_DAYS) * time.Second,
+		NormalVotingPeriod:    time.Duration(THREE_DAYS) * time.Second,
 	}
 }
 
