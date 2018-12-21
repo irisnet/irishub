@@ -2,7 +2,7 @@
 
 ## 简介
 
-该模块负责将收集的交易费和通胀的令牌分发给所有验证员和委托人。为了减少计算压力，引入了一种惰性分配策略。`惰性`意味着不会直接向贡献者自动支付利益。贡委托人或者验证人必须手动发送交易以取回其收益，否则，他们的收益将保留在全局收益池中。
+该模块负责将收集的交易费和通胀的代币分发给所有验证人和委托人。为了减少计算压力，引入了一种被动分配策略。`被动`意味着不会直接向贡献者自动支付利益。贡委托人或者验证人必须手动发送交易以取回其收益，否则，他们的收益将保留在全局收益池中。
 
 ## 使用场景
 
@@ -36,7 +36,27 @@
 
 3. 查询收益
 
-    Execute the command to get the earned tokens:
-    ```bash
-    iriscli bank account [withdraw address]
-    ```
+委托人或验证人都可以在dry-run模式下查询预计收益。
+
+执行以下查询语句：
+```bash
+iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris
+```
+
+返回如下，`withdraw-reward-total`就是预计的抵押获益：
+
+```bash
+estimated gas = 6032
+simulation code = 0
+simulation log = Msg 0:
+simulation gas wanted = 200000
+simulation gas used = 6032
+simulation fee amount = 0
+simulation fee denom =
+simulation tag action = withdraw-delegator-rewards-all
+simulation tag delegator = faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd
+simulation tag withdraw-reward-total = 1308135156755646.7440000000iris-atto
+simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646.7440000000iris-atto
+simulation tag action = withdraw_delegation_rewards_all    
+
+```
