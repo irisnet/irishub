@@ -25,7 +25,7 @@ func (k Keeper) onValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) {
 func (k Keeper) onValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) {
 	// This doesn't need to be run at genesis
 	if ctx.BlockHeight() > 0 {
-		if _, _, err := k.WithdrawValidatorRewardsAll(ctx, valAddr); err != nil {
+		if err := k.takeValidatorFeePoolRewards(ctx, valAddr); err != nil {
 			panic(err)
 		}
 	}

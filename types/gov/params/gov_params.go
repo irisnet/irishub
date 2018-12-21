@@ -3,20 +3,30 @@ package govparams
 import (
 	"encoding/json"
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	"strconv"
 	"time"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var DepositProcedureParameter DepositProcedureParam
 
-const LOWER_BOUND_AMOUNT = 10
-const UPPER_BOUND_AMOUNT = 10000
-const THREE_DAYS = 3*3600*24
+const (
+	CRITICAL_DEPOSIT   = 5000
+	IMPORTANT_DEPOSIT  = 2000
+	NORMAL_DEPOSIT     = 1000
+	CRITICAL           = "Critical"
+	IMPORTANT          = "Important"
+	NORMAL             = "normal"
+	LOWER_BOUND_AMOUNT = 10
+	UPPER_BOUND_AMOUNT = 10000
+	THREE_DAYS         = 3 * 3600 * 24
+	TWO_DAYS           = 2 * 3600 * 24 //
+)
+
 var _ params.GovParameter = (*DepositProcedureParam)(nil)
 
 type ParamSet struct {
@@ -27,13 +37,27 @@ type ParamSet struct {
 
 // Procedure around Deposits for governance
 type DepositProcedure struct {
-	MinDeposit       sdk.Coins        `json:"min_deposit"`        //  Minimum deposit for a proposal to enter voting period.
-	MaxDepositPeriod time.Duration    `json:"max_deposit_period"` //  Maximum period for Atom holders to deposit on a proposal. Initial value: 2 months
+	CriticalMinDeposit  sdk.Coins     `json:"critical_min_deposit"`  //  Minimum deposit for a critical proposal to enter voting period.
+	ImportantMinDeposit sdk.Coins     `json:"important_min_deposit"` //  Minimum deposit for a important proposal to enter voting period.
+	NormalMinDeposit    sdk.Coins     `json:"normal_min_deposit"`    //  Minimum deposit for a normal proposal to enter voting period.
+	MaxDepositPeriod    time.Duration `json:"max_deposit_period"`    //  Maximum period for Atom holders to deposit on a proposal. Initial value: 2 months
 }
 
 type DepositProcedureParam struct {
-	Value   DepositProcedure
+	Value      DepositProcedure
 	paramSpace params.Subspace
+}
+
+func NewDepositProcedure() DepositProcedure {
+	var ciriticalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeDenomName))
+	var importantMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeDenomName))
+	var normalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeDenomName))
+
+	return DepositProcedure{
+		CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
+		ImportantMinDeposit: sdk.Coins{importantMinDeposit},
+		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
+		MaxDepositPeriod:    time.Duration(TWO_DAYS) * time.Second}
 }
 
 func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -45,11 +69,14 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
 		param.Value = value
 	} else {
-		var minDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeDenomName))
-
+		var ciriticalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeDenomName))
+		var importantMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeDenomName))
+		var normalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeDenomName))
 		param.Value = DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: time.Duration(172800) * time.Second}
+			CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
+			ImportantMinDeposit: sdk.Coins{importantMinDeposit},
+			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
+			MaxDepositPeriod:    time.Duration(TWO_DAYS) * time.Second}
 	}
 }
 
@@ -78,12 +105,12 @@ func (param *DepositProcedureParam) ToJson(jsonStr string) string {
 	var jsonBytes []byte
 
 	if len(jsonStr) == 0 {
-		jsonBytes, _  = json.Marshal(param.Value)
+		jsonBytes, _ = json.Marshal(param.Value)
 		return string(jsonBytes)
 	}
 
 	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-		jsonBytes, _  = json.Marshal(param.Value)
+		jsonBytes, _ = json.Marshal(param.Value)
 		return string(jsonBytes)
 	}
 	return string(jsonBytes)
@@ -101,20 +128,29 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.MinDeposit[0].Denom != stakeTypes.StakeDenom {
+		if param.Value.CriticalMinDeposit[0].Denom != stakeTypes.StakeDenom ||
+			param.Value.ImportantMinDeposit[0].Denom != stakeTypes.StakeDenom ||
+			param.Value.NormalMinDeposit[0].Denom != stakeTypes.StakeDenom {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be %s!", stakeTypes.StakeDenom))
 		}
 
 		LowerBound, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
 		UpperBound, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
 
-		if param.Value.MinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.MinDeposit[0].Amount.GT(UpperBound.Amount) {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf("MinDepositAmount"+param.Value.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
+		if param.Value.CriticalMinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.CriticalMinDeposit[0].Amount.GT(UpperBound.Amount) {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(CRITICAL+"MinDepositAmount"+param.Value.CriticalMinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
+		}
 
+		if param.Value.ImportantMinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.ImportantMinDeposit[0].Amount.GT(UpperBound.Amount) {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(IMPORTANT+"MinDepositAmount"+param.Value.CriticalMinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
+		}
+
+		if param.Value.NormalMinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.NormalMinDeposit[0].Amount.GT(UpperBound.Amount) {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(NORMAL+"MinDepositAmount"+param.Value.CriticalMinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
 		}
 
 		if param.Value.MaxDepositPeriod.Seconds() < 20 || param.Value.MaxDepositPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf("MaxDepositPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.MaxDepositPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
@@ -128,12 +164,22 @@ var _ params.GovParameter = (*VotingProcedureParam)(nil)
 
 // Procedure around Voting in governance
 type VotingProcedure struct {
-	VotingPeriod time.Duration `json:"voting_period"` //  Length of the voting period.
+	CriticalVotingPeriod  time.Duration `json:"critical_voting_period"`  //  Length of the critical voting period.
+	ImportantVotingPeriod time.Duration `json:"important_voting_period"` //  Length of the important voting period.
+	NormalVotingPeriod    time.Duration `json:"normal_voting_period"`    //  Length of the normal voting period.
 }
 
 type VotingProcedureParam struct {
-	Value   VotingProcedure
+	Value      VotingProcedure
 	paramSpace params.Subspace
+}
+
+func NewVotingProcedure() VotingProcedure {
+	return VotingProcedure{
+		CriticalVotingPeriod:  time.Duration(TWO_DAYS) * time.Second,
+		ImportantVotingPeriod: time.Duration(TWO_DAYS) * time.Second,
+		NormalVotingPeriod:    time.Duration(THREE_DAYS) * time.Second,
+	}
 }
 
 func (param *VotingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -145,7 +191,7 @@ func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(VotingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = VotingProcedure{VotingPeriod: time.Duration(172800) * time.Second}
+		param.Value = NewVotingProcedure()
 	}
 }
 
@@ -173,12 +219,12 @@ func (param *VotingProcedureParam) ToJson(jsonStr string) string {
 	var jsonBytes []byte
 
 	if len(jsonStr) == 0 {
-		jsonBytes, _  = json.Marshal(param.Value)
+		jsonBytes, _ = json.Marshal(param.Value)
 		return string(jsonBytes)
 	}
 
 	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-		jsonBytes, _  = json.Marshal(param.Value)
+		jsonBytes, _ = json.Marshal(param.Value)
 		return string(jsonBytes)
 	}
 	return string(jsonBytes)
@@ -196,8 +242,16 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be larger than 20s and less than %ds",strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
+		if param.Value.CriticalVotingPeriod.Seconds() < 20 || param.Value.CriticalVotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(CRITICAL+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.CriticalVotingPeriod.Seconds())), THREE_DAYS))
+		}
+
+		if param.Value.ImportantVotingPeriod.Seconds() < 20 || param.Value.ImportantVotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(IMPORTANT+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.ImportantVotingPeriod.Seconds())), THREE_DAYS))
+		}
+
+		if param.Value.NormalVotingPeriod.Seconds() < 20 || param.Value.NormalVotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(NORMAL+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.NormalVotingPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil
@@ -211,13 +265,13 @@ var _ params.GovParameter = (*TallyingProcedureParam)(nil)
 
 // Procedure around Tallying votes in governance
 type TallyingProcedure struct {
-	Threshold         sdk.Dec `json:"threshold"`          //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
-	Veto              sdk.Dec `json:"veto"`               //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
-	Participation     sdk.Dec `json:"participation"`      //
+	Threshold     sdk.Dec `json:"threshold"`     //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
+	Veto          sdk.Dec `json:"veto"`          //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
+	Participation sdk.Dec `json:"participation"` //
 }
 
 type TallyingProcedureParam struct {
-	Value   TallyingProcedure
+	Value      TallyingProcedure
 	paramSpace params.Subspace
 }
 
@@ -231,9 +285,9 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 		param.Value = value
 	} else {
 		param.Value = TallyingProcedure{
-			Threshold:         sdk.NewDecWithPrec(5, 1),
-			Veto:              sdk.NewDecWithPrec(334, 3),
-			Participation:     sdk.NewDecWithPrec(667, 3),
+			Threshold:     sdk.NewDecWithPrec(5, 1),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(667, 3),
 		}
 	}
 }
@@ -262,12 +316,12 @@ func (param *TallyingProcedureParam) ToJson(jsonStr string) string {
 	var jsonBytes []byte
 
 	if len(jsonStr) == 0 {
-		jsonBytes, _  = json.Marshal(param.Value)
+		jsonBytes, _ = json.Marshal(param.Value)
 		return string(jsonBytes)
 	}
 
 	if err := json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
-		jsonBytes, _  = json.Marshal(param.Value)
+		jsonBytes, _ = json.Marshal(param.Value)
 		return string(jsonBytes)
 	}
 	return string(jsonBytes)

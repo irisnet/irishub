@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/modules/gov/tags"
 	"strconv"
 	"encoding/json"
-	"github.com/irisnet/irishub/types/gov/params"
 	tmstate "github.com/tendermint/tendermint/state"
 	govtypes "github.com/irisnet/irishub/types/gov"
 )
@@ -232,7 +231,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %s (had only %s); deleted",
 				inactiveProposal.GetProposalID(),
 				inactiveProposal.GetTitle(),
-				govparams.GetDepositProcedure(ctx).MinDeposit,
+				GetMinDeposit(ctx,inactiveProposal),
 				inactiveProposal.GetTotalDeposit(),
 			),
 		)

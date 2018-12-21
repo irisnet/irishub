@@ -1,9 +1,7 @@
 package gov
 
 import (
-	"fmt"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/gov/params"
 	govtypes "github.com/irisnet/irishub/types/gov"
@@ -48,9 +46,9 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	startingProposalID, _ := k.peekCurrentProposalID(ctx)
-	depositProcedure := govparams.GetDepositProcedure(ctx)
-	votingProcedure := govparams.GetVotingProcedure(ctx)
-	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
+	depositProcedure := GetDepositProcedure(ctx)
+	votingProcedure := GetVotingProcedure(ctx)
+	tallyingProcedure := GetTallyingProcedure(ctx)
 
 	return GenesisState{
 		StartingProposalID: startingProposalID,
@@ -62,22 +60,11 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
-	Denom := "iris"
-	IrisCt := types.NewDefaultCoinType(Denom)
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 1000, Denom))
-	if err != nil {
-		panic(err)
-	}
 	return GenesisState{
 		TerminatorPeriod:   20000,
 		StartingProposalID: 1,
-		DepositProcedure: govparams.DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: time.Duration(172800) * time.Second,
-		},
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: time.Duration(172800) * time.Second,
-		},
+		DepositProcedure: govparams.NewDepositProcedure(),
+		VotingProcedure: govparams.NewVotingProcedure(),
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:     sdk.NewDecWithPrec(5, 1),
 			Veto:          sdk.NewDecWithPrec(334, 3),
@@ -88,48 +75,14 @@ func DefaultGenesisState() GenesisState {
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForCliTest() GenesisState {
-	Denom := "iris"
-	IrisCt := types.NewDefaultCoinType(Denom)
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
-	if err != nil {
-		panic(err)
-	}
-	return GenesisState{
-		TerminatorPeriod:   20,
-		StartingProposalID: 1,
-		DepositProcedure: govparams.DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: time.Duration(60) * time.Second,
-		},
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: time.Duration(60) * time.Second,
-		},
-		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:     sdk.NewDecWithPrec(5, 1),
-			Veto:          sdk.NewDecWithPrec(334, 3),
-			Participation: sdk.NewDecWithPrec(667, 3),
-		},
-	}
-}
 
-// get raw genesis raw message for testing
-func DefaultGenesisStateForLCDTest() GenesisState {
-	Denom := "iris"
-	IrisCt := types.NewDefaultCoinType(Denom)
-	minDeposit, err := IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, Denom))
-	if err != nil {
-		panic(err)
-	}
+	depositProcedure := govparams.NewDepositProcedure()
+	depositProcedure.MaxDepositPeriod = time.Duration(60) * time.Second
 	return GenesisState{
 		TerminatorPeriod:   20,
 		StartingProposalID: 1,
-		DepositProcedure: govparams.DepositProcedure{
-			MinDeposit:       sdk.Coins{minDeposit},
-			MaxDepositPeriod: time.Duration(172800) * time.Second,
-		},
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: time.Duration(172800) * time.Second,
-		},
+		DepositProcedure: depositProcedure,
+		VotingProcedure: govparams.NewVotingProcedure(),
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:     sdk.NewDecWithPrec(5, 1),
 			Veto:          sdk.NewDecWithPrec(334, 3),

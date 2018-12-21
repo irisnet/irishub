@@ -2,7 +2,7 @@
 swagger: '2.0'
 info:
   description: A REST interface for state queries, transaction generation, signing, and broadcast.
-  version: "0.9.0"
+  version: "0.10.0"
   title: IRISLCD Swagger-UI
   termsOfService: https://www.irisnet.org
   contact:
@@ -342,6 +342,11 @@ paths:
         description: if true, broadcast transaction asynchronously
         required: false
         type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
       - in: body
         name: broadcastTxBody
         description: broadcast tx
@@ -374,6 +379,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
         type: boolean
       - description: stdTx
