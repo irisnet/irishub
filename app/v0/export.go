@@ -138,7 +138,6 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 			panic("expected validator, not found")
 		}
 		validator.BondHeight = 0
-		validator.BondIntraTxCounter = counter
 		validator.UnbondingHeight = 0
 		p.StakeKeeper.SetValidator(ctx, validator)
 		counter++
