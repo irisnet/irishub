@@ -28,38 +28,26 @@ iriscli upgrade info --help
 iriscli upgrade info 
 ```
 
-然后它会打印如下内容：
+然后它会打印当前生效的协议版本信息和当前正在准备升级的协议信息：
 
 ```
 {
-  "current_proposal_id": "0",
-  "current_proposal_accept_height": "-1",
   "version": {
-    "Id": "0",
-    "ProposalID": "0",
-    "Start": "0",
-    "ModuleList": [
-      {
-        "Start": "0",
-        "End": "9223372036854775807",
-        "Handler": "bank",
-        "Store": [
-          "acc"
-        ]
-      },
-      {
-        "Start": "0",
-        "End": "9223372036854775807",
-        "Handler": "stake",
-        "Store": [
-          "stake",
-          "acc",
-          "mint",
-          "distr"
-        ]
-      },
-      .......
-    ]
+    "ProposalID": "1",
+    "Success": true,
+    "Protocol": {
+      "version": "1",
+      "software": "https://github.com/irisnet/irishub/tree/v0.7.0",
+      "height": "30"
+    }
+  },
+  "upgrade_config": {
+    "ProposalID": "3",
+    "Definition": {
+      "version": "2",
+      "software": "https://github.com/irisnet/irishub/tree/v0.9.0",
+      "height": "80"
+    }
   }
 }
 ```

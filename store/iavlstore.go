@@ -72,7 +72,7 @@ func newIAVLStore(tree *iavl.MutableTree, numRecent int64, storeEvery int64) *ia
 }
 
 // Implements Committer.
-func (st *iavlStore) Commit() CommitID {
+func (st *iavlStore) Commit([]*sdk.KVStoreKey) CommitID {
 	// Save a new version.
 	hash, version, err := st.tree.SaveVersion()
 	if err != nil {

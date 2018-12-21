@@ -19,7 +19,7 @@ func newTransientStore() *transientStore {
 
 // Implements CommitStore
 // Commit cleans up transientStore.
-func (ts *transientStore) Commit() (id CommitID) {
+func (ts *transientStore) Commit([]*sdk.KVStoreKey) (id CommitID) {
 	ts.dbStoreAdapter = dbStoreAdapter{dbm.NewMemDB()}
 	return
 }

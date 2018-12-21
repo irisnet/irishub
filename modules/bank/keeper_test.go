@@ -42,7 +42,7 @@ func TestKeeper(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{}))
 
-	bankKeeper.SetCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
 	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
 
 	// Test HasCoins
@@ -128,7 +128,8 @@ func TestSendKeeper(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{}))
 
-	bankKeeper.SetCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
+	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
 	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
 
 	// Test HasCoins
@@ -137,8 +138,9 @@ func TestSendKeeper(t *testing.T) {
 	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)}))
 	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 5)}))
 
-	bankKeeper.SetCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
-
+	bankKeeper.BurnCoinsFromAddr(ctx, addr, bankKeeper.GetCoins(ctx, addr))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
+	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
 	// Test SendCoins
 	sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 5)})
 	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
@@ -150,6 +152,8 @@ func TestSendKeeper(t *testing.T) {
 	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
 
 	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 30)})
+	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("barcoin", 30)})
+
 	sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 5)})
 	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 20), sdk.NewInt64Coin("foocoin", 5)}))
 	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 10)}))
@@ -195,7 +199,8 @@ func TestViewKeeper(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	require.True(t, viewKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{}))
 
-	bankKeeper.SetCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
+	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
 	require.True(t, viewKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
 
 	// Test HasCoins

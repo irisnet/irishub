@@ -47,16 +47,21 @@ iriscli record submit --chain-id="test" --onchain-data="this is my on chain data
 运行成功以后，返回的结果如下：
 
 ```txt
-Password to sign with 'node0':
-Committed at block 72 (tx hash: 7CCC8B4018D4447E6A496923944870E350A1A3AF9E15DB15B8943DAD7B5D782B, response: {Code:0 Data:[114 101 99 111 114 100 58 97 98 53 54 48 50 98 97 99 49 51 102 49 49 55 51 55 101 56 55 57 56 100 100 53 55 56 54 57 99 52 54 56 49 57 52 101 102 97 100 50 100 98 51 55 54 50 53 55 57 53 102 49 101 102 100 56 100 57 100 54 51 99 54] Log:Msg 0:  Info: GasWanted:200000 GasUsed:4090 Tags:[{Key:[97 99 116 105 111 110] Value:[115 117 98 109 105 116 45 114 101 99 111 114 100] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[111 119 110 101 114 65 100 100 114 101 115 115] Value:[102 97 97 49 50 50 117 122 122 112 117 103 116 114 122 115 48 57 110 102 51 117 104 56 120 102 106 97 122 97 53 57 120 118 102 57 114 118 116 104 100 108] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[114 101 99 111 114 100 45 105 100] Value:[114 101 99 111 114 100 58 97 98 53 54 48 50 98 97 99 49 51 102 49 49 55 51 55 101 56 55 57 56 100 100 53 55 56 54 57 99 52 54 56 49 57 52 101 102 97 100 50 100 98 51 55 54 50 53 55 57 53 102 49 101 102 100 56 100 57 100 54 51 99 54] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 50 48 52 53 48 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
+Committed at block 486 (tx hash: 8AB91BF0E61AD2C860402B88579EE83167506E7C3A8597E873976915D82D4F1B, response:
+ {
+   "code": 0,
+   "data": "cmVjb3JkOmFiNTYwMmJhYzEzZjExNzM3ZTg3OThkZDU3ODY5YzQ2ODE5NGVmYWQyZGIzNzYyNTc5NWYxZWZkOGQ5ZDYzYzY=",
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 3764,
+   "codespace": "",
    "tags": {
-     "action": "submit-record",
-     "completeConsumedTxFee-iris-atto": "\"2045000000000000\"",
-     "ownerAddress": "faa122uzzpugtrzs09nf3uh8xfjaza59xvf9rvthdl",
+     "action": "submit_record",
+     "ownerAddress": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
      "record-id": "record:ab5602bac13f11737e8798dd57869c468194efad2db37625795f1efd8d9d63c6"
    }
- }
+ })
 ```
 
 本次存证操作的record-id如下:

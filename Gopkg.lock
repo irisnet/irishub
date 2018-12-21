@@ -648,7 +648,7 @@
 
 [[projects]]
   branch = "irisnet/v0.27.0-iris"
-  digest = "1:3f99f19e5edfd0d3b9cbfd6e687be1d02af05f84e3d0c7fb2c861ac1739bfae8"
+  digest = "1:141818a9e0d1b5e0559605b6014621199327a3a23e64369f9039eb68f99a640f"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -713,7 +713,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "b31a2e724c0b0df951d792c16c69f0c539783dcc"
+  revision = "afb2a33bca018b99bc11dfc2e5e8332baa23f557"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
@@ -880,6 +880,7 @@
     "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
+    "github.com/gogo/protobuf/proto",
     "github.com/golang/protobuf/proto",
     "github.com/gorilla/mux",
     "github.com/ipfs/go-ipfs-api",

@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"os"
+
 	"github.com/irisnet/irishub/client/context"
 	"github.com/spf13/cobra"
-	amino "github.com/tendermint/go-amino"
+	"github.com/tendermint/go-amino"
 )
 
 // GetSignCommand returns the sign command
@@ -14,9 +16,9 @@ func GetBroadcastCommand(codec *amino.Codec) *cobra.Command {
 		Long: `Broadcast transactions created with the --generate-only flag and signed with the sign command.
 Read a transaction from <file> and broadcast it to a node.`,
 		Example: "iriscli bank broadcast <file>",
-		Args: cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			cliCtx := context.NewCLIContext().WithCodec(codec)
+			cliCtx := context.NewCLIContext().WithLogger(os.Stdout).WithCodec(codec)
 			stdTx, err := readAndUnmarshalStdTx(cliCtx.Codec, args[0])
 			if err != nil {
 				return
@@ -26,7 +28,7 @@ Read a transaction from <file> and broadcast it to a node.`,
 			if err != nil {
 				return
 			}
-
+			cliCtx.PrintResponse = true
 			_, err = cliCtx.BroadcastTx(txBytes)
 			return err
 		},

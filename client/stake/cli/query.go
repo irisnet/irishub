@@ -3,17 +3,15 @@ package cli
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
-
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
-	"github.com/irisnet/irishub/modules/stake/querier"
-	"github.com/irisnet/irishub/client/context"
-	stakeClient "github.com/irisnet/irishub/client/stake"
 )
 
 // GetCmdQueryValidator implements the validator query command.
@@ -129,17 +127,17 @@ func GetCmdQueryValidators(storeName string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryValidatorUnbondingDelegations implements the query all unbonding delegatations from a validator command.
 func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "unbonding-delegations-from [validator-address]",
-		Short: "Query all unbonding delegatations from a validator",
+		Use:     "unbonding-delegations-from [validator-address]",
+		Short:   "Query all unbonding delegatations from a validator",
 		Example: "iriscli stake unbonding-delegations-from <validator address>",
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valAddr, err := sdk.ValAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			params := querier.NewQueryValidatorParams(valAddr)
+			params := stake.NewQueryValidatorParams(valAddr)
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
@@ -156,20 +154,21 @@ func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Code
 	}
 	return cmd
 }
+
 // GetCmdQueryValidatorRedelegations implements the query all redelegatations from a validator command.
 func GetCmdQueryValidatorRedelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "redelegations-from [validator-address]",
-		Short: "Query all outgoing redelegatations from a validator",
+		Use:     "redelegations-from [validator-address]",
+		Short:   "Query all outgoing redelegatations from a validator",
 		Example: "iriscli stake redelegations-from <validator address>",
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			valAddr, err := sdk.ValAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			params := querier.NewQueryValidatorParams(valAddr)
+			params := stake.NewQueryValidatorParams(valAddr)
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
@@ -294,16 +293,16 @@ func GetCmdQueryDelegations(storeName string, cdc *codec.Codec) *cobra.Command {
 // delegations to a specific validator.
 func GetCmdQueryValidatorDelegations(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delegations-to [validator-address]",
-		Short: "Query all delegations made to one validator",
+		Use:     "delegations-to [validator-address]",
+		Short:   "Query all delegations made to one validator",
 		Example: "iriscli stake delegations-to <validator address>",
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			validatorAddr, err := sdk.ValAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
-			params := querier.NewQueryValidatorParams(validatorAddr)
+			params := stake.NewQueryValidatorParams(validatorAddr)
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
@@ -313,7 +312,22 @@ func GetCmdQueryValidatorDelegations(queryRoute string, cdc *codec.Codec) *cobra
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(res))
+			var delegations []stake.Delegation
+			err = cdc.UnmarshalJSON(res, &delegations)
+			if err != nil {
+				return err
+			}
+			// parse out the validators
+			var delegationsOutput []stakeClient.DelegationOutput
+			for _, delegation := range delegations {
+				delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
+				delegationsOutput = append(delegationsOutput, delegationOutput)
+			}
+			output, err := codec.MarshalJSONIndent(cdc, delegationsOutput)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(output))
 			return nil
 		},
 	}

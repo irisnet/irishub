@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
@@ -119,6 +118,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	if err = cdc.UnmarshalJSON(genDoc.AppState, &genesisState); err != nil {
 		return genesisState, err
 	}
+
 
 	// if there are no gen txs to be processed, return the default empty state
 	if len(appGenTxs) == 0 {
@@ -230,7 +230,7 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	addrMap := make(map[string]GenesisAccount, len(appState.Accounts))
 	for i := 0; i < len(appState.Accounts); i++ {
 		acc := appState.Accounts[i]
-		strAddr := string(acc.Address)
+		strAddr := acc.Address.String()
 		addrMap[strAddr] = acc
 	}
 
@@ -271,17 +271,30 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 				"each genesis transaction must provide a single genesis message")
 		}
 
-		// validate the validator address and funds against the accounts in the state
 		msg := msgs[0].(stake.MsgCreateValidator)
-		addr := string(sdk.AccAddress(msg.ValidatorAddr))
-		acc, ok := addrMap[addr]
-		if !ok {
-			return appGenTxs, persistentPeers, fmt.Errorf(
-				"account %v not in genesis.json: %+v", addr, addrMap)
+		// validate delegator and validator addresses and funds against the accounts in the state
+		delAddr := msg.DelegatorAddr.String()
+		valAddr := sdk.AccAddress(msg.ValidatorAddr).String()
+
+		delAcc, delOk := addrMap[delAddr]
+		_, valOk := addrMap[valAddr]
+
+		accsNotInGenesis := []string{}
+		if !delOk {
+			accsNotInGenesis = append(accsNotInGenesis, delAddr)
 		}
-		if acc.Coins.AmountOf(msg.Delegation.Denom).LT(msg.Delegation.Amount) {
-			err = fmt.Errorf("insufficient fund for the delegation: %s < %s",
-				acc.Coins.AmountOf(msg.Delegation.Denom), msg.Delegation.Amount)
+		if !valOk {
+			accsNotInGenesis = append(accsNotInGenesis, valAddr)
+		}
+		if len(accsNotInGenesis) != 0 {
+			return appGenTxs, persistentPeers, fmt.Errorf(
+				"account(s) %v not in genesis.json: %+v", strings.Join(accsNotInGenesis, " "), addrMap)
+		}
+
+		if delAcc.Coins.AmountOf(msg.Delegation.Denom).LT(msg.Delegation.Amount) {
+			return appGenTxs, persistentPeers, fmt.Errorf(
+				"insufficient fund for delegation %v: %v < %v",
+				delAcc.Address, delAcc.Coins.AmountOf(msg.Delegation.Denom), msg.Delegation.Amount)
 		}
 
 		// exclude itself from persistent peers

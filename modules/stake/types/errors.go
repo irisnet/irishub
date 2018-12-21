@@ -104,7 +104,7 @@ func ErrBadDelegationAddr(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrBadDelegationAmount(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDelegation, "amount must be > 0")
+	return sdk.NewError(codespace, CodeInvalidDelegation, "amount must be greater than 0")
 }
 
 func ErrNoDelegation(codespace sdk.CodespaceType) sdk.Error {
@@ -136,7 +136,7 @@ func ErrBadSharesAmount(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrBadSharesPercent(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDelegation, "shares percent must be >0 and <=1")
+	return sdk.NewError(codespace, CodeInvalidDelegation, "shares percent must be greater than 0 and less than or equal to 1")
 }
 
 func ErrNotMature(codespace sdk.CodespaceType, operation, descriptor string, got, min time.Time) sdk.Error {

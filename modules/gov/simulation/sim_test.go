@@ -15,6 +15,8 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // TestGovWithRandomMessages
@@ -31,6 +33,8 @@ func TestGovWithRandomMessages(t *testing.T) {
 	govKey := sdk.NewKVStoreKey("gov")
 	distrKey := sdk.NewKVStoreKey("distr")
 	guardianKey := sdk.NewKVStoreKey("guardian")
+    protocolKey := sdk.NewKVStoreKey("protocol")
+	protocolKeeper := protocolKeeper.NewKeeper(mapp.Cdc,protocolKey)
 
 	paramKeeper := mapp.ParamsKeeper
 	stakeKeeper := stake.NewKeeper(
@@ -58,7 +62,8 @@ func TestGovWithRandomMessages(t *testing.T) {
 		bankKeeper,
 		guardianKeeper,
 		stakeKeeper,
-		gov.DefaultCodespace,
+		protocolKeeper,
+		govtypes.DefaultCodespace,
 	)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))
@@ -67,7 +72,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		return abci.ResponseEndBlock{}
 	})
 
-	err := mapp.CompleteSetup(govKey)
+	err := mapp.CompleteSetup(govKey,protocolKey)
 	if err != nil {
 		panic(err)
 	}

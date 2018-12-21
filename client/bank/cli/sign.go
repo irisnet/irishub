@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/spf13/viper"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/tendermint/go-amino"
 )
 
@@ -33,19 +32,21 @@ The --offline flag makes sure that the client will not reach out to the local ca
 Thus account number or sequence number lookups will not be performed and it is
 recommended to set such parameters manually.`,
 		Example: "iriscli bank sign <file> --name <key name> --chain-id=<chain-id>",
-		RunE: makeSignCmd(codec, decoder),
-		Args: cobra.ExactArgs(1),
+		RunE:    makeSignCmd(codec, decoder),
+		Args:    cobra.ExactArgs(1),
 	}
 	cmd.Flags().String(client.FlagName, "", "Name of private key with which to sign")
 	cmd.Flags().Bool(flagAppend, true, "Append the signature to the existing ones. If disabled, old signatures would be overwritten")
 	cmd.Flags().Bool(flagPrintSigs, false, "Print the addresses that must sign the transaction and those who have already signed it, then exit")
 	cmd.Flags().Bool(flagOffline, false, "Offline mode. Do not query local cache.")
-	cmd.MarkFlagRequired(client.FlagChainID)
 	return cmd
 }
 
 func makeSignCmd(cdc *amino.Codec, decoder auth.AccountDecoder) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) (err error) {
+		if len(viper.GetString(client.FlagChainID)) == 0 {
+			return fmt.Errorf("missing chain-id")
+		}
 		stdTx, err := readAndUnmarshalStdTx(cdc, args[0])
 		if err != nil {
 			return
@@ -58,7 +59,7 @@ func makeSignCmd(cdc *amino.Codec, decoder auth.AccountDecoder) func(cmd *cobra.
 
 		name := viper.GetString(client.FlagName)
 		cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
-		txCtx := context.NewTxContextFromCLI()
+		txCtx := utils.NewTxContextFromCLI()
 
 		newTx, err := utils.SignStdTx(txCtx, cliCtx, name, stdTx, viper.GetBool(flagAppend), viper.GetBool(flagOffline))
 		if err != nil {

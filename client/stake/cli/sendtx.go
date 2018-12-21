@@ -27,7 +27,7 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			amounstStr := viper.GetString(FlagAmount)
@@ -128,13 +128,13 @@ func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit-validator",
 		Short:   "edit and existing validator account",
-		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --moniker=<validator name>",
+		Example: "iriscli stake edit-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --moniker=<validator name> --details=<optional details> --website=<optional website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			valAddr, err := cliCtx.GetFromAddress()
@@ -189,7 +189,7 @@ func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			amount, err := cliCtx.ParseCoin(viper.GetString(FlagAmount))
@@ -225,13 +225,13 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "redelegate",
 		Short:   "redelegate illiquid tokens from one validator to another",
-		Example: "iriscli stake redelegation --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5",
+		Example: "iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			var err error
@@ -345,7 +345,7 @@ func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			delegatorAddr, err := cliCtx.GetFromAddress()

@@ -27,7 +27,7 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			name := viper.GetString(FlagServiceName)
@@ -78,7 +78,7 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -141,7 +141,7 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -205,7 +205,7 @@ func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -238,7 +238,7 @@ func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -278,7 +278,7 @@ func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -311,7 +311,7 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -371,7 +371,7 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -413,7 +413,7 @@ func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -436,7 +436,7 @@ func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -459,7 +459,7 @@ func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()

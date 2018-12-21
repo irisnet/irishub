@@ -3,6 +3,7 @@ package v0
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/protocol"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/arbitration/params"
@@ -10,7 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
@@ -19,12 +20,13 @@ import (
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"sort"
 	"time"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)
@@ -46,6 +48,7 @@ type ProtocolVersion0 struct {
 	serviceKeeper       service.Keeper
 	guardianKeeper      guardian.Keeper
 	recordKeeper        record.Keeper
+	upgradeKeeper       upgrade.Keeper
 	// fee manager
 	feeManager auth.FeeManager
 
@@ -67,7 +70,7 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 	base := protocol.ProtocolBase{
 		Definition: common.ProtocolDefinition{
 			uint64(0),
-			"https://github.com/irisnet/irishub/releases/tag/v0.7.0",
+			"",
 			uint64(1),
 		},
 		//		engine: engine,
@@ -82,12 +85,11 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 }
 
 // load the configuration of this Protocol
-func (p *ProtocolVersion0) Load() {
-	p.configKeepers()
+func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
+	p.configKeepers(protocolkeeper)
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
-	p.configStores()
 }
 
 // verison0 don't need the init
@@ -100,7 +102,7 @@ func (p *ProtocolVersion0) GetDefinition() common.ProtocolDefinition {
 }
 
 // create all Keepers
-func (p *ProtocolVersion0) configKeepers() {
+func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
@@ -154,7 +156,8 @@ func (p *ProtocolVersion0) configKeepers() {
 		p.bankKeeper,
 		p.guardianKeeper,
 		&stakeKeeper,
-		gov.DefaultCodespace,
+		protocolkeeper,
+		govtypes.DefaultCodespace,
 	)
 
 	p.recordKeeper = record.NewKeeper(
@@ -177,6 +180,7 @@ func (p *ProtocolVersion0) configKeepers() {
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 	p.feeManager = auth.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
 
+	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.StakeKeeper, protocolkeeper)
 }
 
 // configure all Routers
@@ -197,28 +201,32 @@ func (p *ProtocolVersion0) configRouters() {
 
 // configure all Stores
 func (p *ProtocolVersion0) configFeeHandlers() {
-
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeCollectionKeeper)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeCollectionKeeper, p.feeManager)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeManager)
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) configStores() {
-
+func (p *ProtocolVersion0) GetKVStoreKeyList()  []*sdk.KVStoreKey {
+   return []*sdk.KVStoreKey{
+	   protocol.KeyMain,
+	   protocol.KeyProtocol,
+	   protocol.KeyAccount,
+	   protocol.KeyStake,
+	   protocol.KeyMint,
+	   protocol.KeyDistr,
+	   protocol.KeySlashing,
+	   protocol.KeyGov,
+	   protocol.KeyRecord,
+	   protocol.KeyFeeCollection,
+	   protocol.KeyParams,
+	   protocol.KeyUpgrade,
+	   protocol.KeyService,
+	   protocol.KeyGuardian}
 }
 
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
-	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.SignalParamspace).WithTypeTable(
-		params.NewTypeTable(
-			upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey(), uint64((0)),
-			upgradeparams.ProposalAcceptHeightParameter.GetStoreKey(), int64(0),
-			upgradeparams.SwitchPeriodParameter.GetStoreKey(), int64(0),
-		)),
-		&upgradeparams.CurrentUpgradeProposalIdParameter,
-		&upgradeparams.ProposalAcceptHeightParameter,
-		&upgradeparams.SwitchPeriodParameter)
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
@@ -266,6 +274,7 @@ func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock)
 	tags := gov.EndBlocker(ctx, p.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
+	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
@@ -293,7 +302,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	for _, gacc := range genesisState.Accounts {
 		acc := gacc.ToAccount()
 		acc.AccountNumber = p.accountMapper.GetNextAccountNumber(ctx)
-		p.accountMapper.SetAccount(ctx, acc)
+		p.accountMapper.SetGenesisAccount(ctx, acc)
 	}
 
 	//upgrade.InitGenesis(ctx, p.upgradeKeeper, p.Router(), genesisState.UpgradeData)
@@ -355,7 +364,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
 	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
-
+	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}

@@ -90,7 +90,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 		// check for the powerkey and the validator from the store
 		store := ctx.KVStore(protocol.KeyStake)
 		res := store.Get(powerKey)
-		val, _ := app.Engine.GetCurrent().(*v0.ProtocolVersion0).StakeKeeper.GetValidator(ctx, trouble)
+		val, _ := app.Engine.GetCurrentProtocol().(*v0.ProtocolVersion0).StakeKeeper.GetValidator(ctx, trouble)
 		fmt.Println("checking height", checkHeight, res, val)
 		if res == nil {
 			bottomHeight = checkHeight
@@ -145,21 +145,22 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine()
-
-	protocol0 := v0.NewProtocolVersion0(cdc)
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
-
-	engine.LoadCurrentProtocol()
-	app.SetProtocolEngine(engine)
+	engine := protocol.NewProtocolEngine(cdc)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 	err := app.LoadLatestVersion(engine.GetKeyMain())
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+
+	protocol0 := v0.NewProtocolVersion0(cdc)
+	engine.Add(protocol0)
+	//	protocol1 := protocol.NewProtocolVersion1(cdc)
+	//	Engine.Add(&protocol1)
+
+	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+	app.SetProtocolEngine(&engine)
+
 	return app
 }
 
@@ -184,7 +185,7 @@ func MakeCodec() *codec.Codec {
 // export the state of iris for a genesis file
 func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
-	return app.Engine.GetCurrent().ExportAppStateAndValidators(ctx, forZeroHeight)
+	return app.Engine.GetCurrentProtocol().ExportAppStateAndValidators(ctx, forZeroHeight)
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {

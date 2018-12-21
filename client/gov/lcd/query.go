@@ -1,15 +1,18 @@
 package lcd
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
+	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/modules/gov"
-	"net/http"
-	"github.com/irisnet/irishub/client/utils"
-	"github.com/pkg/errors"
 	client "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/gov"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -124,7 +127,7 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		var deposit gov.Deposit
+		var deposit govtypes.Deposit
 		cdc.UnmarshalJSON(res, &deposit)
 		if deposit.Empty() {
 			res, err := cliCtx.QueryWithData("custom/gov/proposal", cdc.MustMarshalBinaryLengthPrefixed(gov.QueryProposalParams{params.ProposalID}))
@@ -187,7 +190,7 @@ func queryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		var vote gov.Vote
+		var vote govtypes.Vote
 		cdc.UnmarshalJSON(res, &vote)
 		if vote.Empty() {
 			bz, err := cdc.MarshalJSON(gov.QueryProposalParams{params.ProposalID})
@@ -241,6 +244,10 @@ func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
+		if res == nil {
+			res = []byte(fmt.Sprintf("No one votes for the proposal [%v].\n", proposalID))
+		}
+
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
@@ -274,7 +281,7 @@ func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 		}
 
 		if len(strProposalStatus) != 0 {
-			proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
+			proposalStatus, err := govtypes.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -345,7 +352,6 @@ func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-
 // nolint: gocyclo
 func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -354,7 +360,7 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		var pd gov.ParameterConfigFile
+		var pd govtypes.ParameterConfigFile
 		for _, kv := range res {
 			switch string(kv.Key) {
 			case "Gov/govDepositProcedure":

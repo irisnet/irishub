@@ -40,7 +40,7 @@ func GetCmdWithdrawRewards(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
 			var msg sdk.Msg
 			switch {
@@ -93,7 +93,7 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
 			delAddr, err := cliCtx.GetFromAddress()
 			if err != nil {

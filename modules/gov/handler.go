@@ -7,9 +7,9 @@ import (
 	"github.com/irisnet/irishub/modules/gov/tags"
 	"strconv"
 	"encoding/json"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	tmstate "github.com/tendermint/tendermint/state"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // Handle all "gov" type messages.
@@ -22,6 +22,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgSubmitProposal(ctx, keeper, msg)
 		case MsgSubmitTxTaxUsageProposal:
 			return handleMsgSubmitTxTaxUsageProposal(ctx, keeper, msg)
+		case MsgSubmitSoftwareUpgradeProposal:
+			return handleMsgSubmitSoftwareUpgradeProposal(ctx, keeper, msg)
 		case MsgVote:
 			return handleMsgVote(ctx, keeper, msg)
 		default:
@@ -33,19 +35,14 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 	////////////////////  iris begin  ///////////////////////////
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade || msg.ProposalType == ProposalTypeSoftwareHalt {
+	if msg.ProposalType == govtypes.ProposalTypeSoftwareHalt {
 		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 		if !found {
-			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+			return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
 	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
 
-	if msg.ProposalType == ProposalTypeSoftwareUpgrade {
-		if upgradeparams.GetCurrentUpgradeProposalId(ctx) != 0 {
-			return ErrSwitchPeriodInProcess(keeper.codespace).Result()
-		}
-	}
 	////////////////////  iris end  /////////////////////////////
 
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
@@ -56,8 +53,8 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
+	if msg.ProposalType == govtypes.ProposalTypeParameterChange {
+		paramBytes, _ = json.Marshal(proposal.(*govtypes.ParameterProposal).Param)
 	}
 	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
@@ -80,9 +77,11 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 }
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
-	_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
-	if !found {
-		return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
+	if msg.Usage != govtypes.UsageTypeBurn {
+		_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
+		if !found {
+			return govtypes.ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
+		}
 	}
 
 	proposal := keeper.NewUsageProposal(ctx, msg)
@@ -101,9 +100,52 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 		tags.Percent, []byte(msg.Percent.String()),
 	)
 
-	if msg.Usage != UsageTypeBurn {
+	if msg.Usage != govtypes.UsageTypeBurn {
 		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
 	}
+
+	if votingStarted {
+		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
+	}
+
+	return sdk.Result{
+		Data: proposalIDBytes,
+		Tags: resTags,
+	}
+}
+
+func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
+
+	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
+		return govtypes.ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
+	}
+
+	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
+		return govtypes.ErrCodeInvalidSwitchHeight(keeper.codespace,uint64(ctx.BlockHeight()),msg.SwitchHeight).Result()
+	}
+	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
+	if !found {
+		return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+	}
+
+
+	if _ , ok := keeper.pk.GetUpgradeConfig(ctx) ; ok {
+		return govtypes.ErrSwitchPeriodInProcess(keeper.codespace).Result()
+	}
+
+	proposal := keeper.NewSoftwareUpgradeProposal(ctx, msg)
+
+	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
+	if err != nil {
+		return err.Result()
+	}
+	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
+
+	resTags := sdk.NewTags(
+		tags.Action, tags.ActionSubmitProposal,
+		tags.Proposer, []byte(msg.Proposer.String()),
+		tags.ProposalID, proposalIDBytes,
+	)
 
 	if votingStarted {
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
@@ -207,12 +249,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var action []byte
 		if passes {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(StatusPassed)
+			activeProposal.SetStatus(govtypes.StatusPassed)
 			action = tags.ActionProposalPassed
-			activeProposal.Execute(ctx, keeper)
+			Execute(ctx, keeper,activeProposal)
 		} else {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(StatusRejected)
+			activeProposal.SetStatus(govtypes.StatusRejected)
 			action = tags.ActionProposalRejected
 		}
 		activeProposal.SetTallyResult(tallyResults)

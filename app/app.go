@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -28,6 +29,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 const (
@@ -60,15 +62,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine()
-
-	protocol0 := v0.NewProtocolVersion0(cdc)
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
-
-	engine.LoadCurrentProtocol()
-	app.SetProtocolEngine(engine)
+	engine := protocol.NewProtocolEngine(cdc)
+	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 
@@ -84,6 +79,13 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+
+	protocol0 := v0.NewProtocolVersion0(cdc)
+	engine.Add(protocol0)
+	//	protocol1 := protocol.NewProtocolVersion1(cdc)
+	//	Engine.Add(&protocol1)
+	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+
 	return app
 }
 
@@ -95,6 +97,7 @@ func MakeCodec() *codec.Codec {
 	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
+	govtypes.RegisterCodec(cdc)
 	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)
@@ -102,13 +105,14 @@ func MakeCodec() *codec.Codec {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	protocolKeeper.RegisterCodec(cdc)
 	return cdc
 }
 
 // export the state of iris for a genesis file
 func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
-	return app.Engine.GetCurrent().ExportAppStateAndValidators(ctx, forZeroHeight)
+	return app.Engine.GetCurrentProtocol().ExportAppStateAndValidators(ctx, forZeroHeight)
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {

@@ -2,7 +2,7 @@
 
 ## Description
 
-Shows this node's tendermint validator address, this could be used for staking commands like: `iriscli stake validator`
+Shows this node's tendermint validator address
 
 ## Usage
 
@@ -35,9 +35,7 @@ iris tendermint show-address --home={iris-home}
 
 The sample output could be:
 ```$xslt
-fva17vgjsua3309q6cvhpqcf8zstqxfjrumj4t26jh
+fca1jhax359kz6hm70swxpxumpgkaglr7yq80qhwvv
 ```
 
 The output is encoded in Bech32, to read more about this encoding method, read [this](../../features/basic-concepts/bech32-prefix.md)
-
-The result could be used to query a validators info. Read more [here](../stake/validator.md)

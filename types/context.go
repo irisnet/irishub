@@ -131,7 +131,7 @@ func (c Context) withValue(key interface{}, value interface{}) Context {
 type contextKey int // local to the context module
 
 const (
-	contextKeyMultiStore contextKey = iota
+	contextKeyMultiStore      contextKey = iota
 	contextKeyBlockHeader
 	contextKeyBlockHeight
 	contextKeyConsensusParams
@@ -141,6 +141,7 @@ const (
 	contextKeyLogger
 	contextKeyVoteInfos
 	contextKeyGasMeter
+	contextKeyBlockGasMeter
 	contextKeyMinimumFees
 )
 
@@ -170,6 +171,8 @@ func (c Context) VoteInfos() []abci.VoteInfo {
 }
 
 func (c Context) GasMeter() GasMeter { return c.Value(contextKeyGasMeter).(GasMeter) }
+
+func (c Context) BlockGasMeter() GasMeter { return c.Value(contextKeyBlockGasMeter).(GasMeter) }
 
 func (c Context) IsCheckTx() bool { return c.Value(contextKeyIsCheckTx).(bool) }
 
@@ -215,6 +218,10 @@ func (c Context) WithVoteInfos(VoteInfos []abci.VoteInfo) Context {
 }
 
 func (c Context) WithGasMeter(meter GasMeter) Context { return c.withValue(contextKeyGasMeter, meter) }
+
+func (c Context) WithBlockGasMeter(meter GasMeter) Context {
+	return c.withValue(contextKeyBlockGasMeter, meter)
+}
 
 func (c Context) WithIsCheckTx(isCheckTx bool) Context {
 	return c.withValue(contextKeyIsCheckTx, isCheckTx)

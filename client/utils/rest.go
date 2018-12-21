@@ -37,17 +37,17 @@ type kvPair struct {
 	TagValue string `json:"tag_value"`
 }
 type abciResult struct {
-	Code      sdk.CodeType     `json:"code"`
-	Data      []byte           `json:"data"`
-	Log       string           `json:"log"`
-	GasWanted uint64           `json:"gas_wanted"`
-	GasUsed   uint64           `json:"gas_used"`
-	FeeAmount int64            `json:"fee_amount"`
-	FeeDenom  string           `json:"fee_denom"`
-	Tags      []kvPair         `json:"tagsy"`
+	Code      sdk.CodeType `json:"code"`
+	Data      []byte       `json:"data"`
+	Log       string       `json:"log"`
+	GasWanted uint64       `json:"gas_wanted"`
+	GasUsed   uint64       `json:"gas_used"`
+	FeeAmount int64        `json:"fee_amount"`
+	FeeDenom  string       `json:"fee_denom"`
+	Tags      []kvPair     `json:"tags"`
 }
 type simulateResult struct {
-	GasEstimate uint64      `json:"gas_estimate"`
+	GasEstimate uint64     `json:"gas_estimate"`
 	Result      abciResult `json:"result"`
 }
 
@@ -149,7 +149,7 @@ func ParseFloat64OrReturnBadRequest(w http.ResponseWriter, s string, defaultIfEm
 }
 
 // WriteGenerateStdTxResponse writes response for the generate_only mode.
-func WriteGenerateStdTxResponse(w http.ResponseWriter, txCtx context.TxContext, msgs []sdk.Msg) {
+func WriteGenerateStdTxResponse(w http.ResponseWriter, txCtx TxContext, msgs []sdk.Msg) {
 	stdMsg, err := txCtx.Build(msgs)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -207,7 +207,7 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 //
 // NOTE: Also see SendOrPrintTx.
 // NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
-func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx context.BaseTx, msgs []sdk.Msg) {
+func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx BaseTx, msgs []sdk.Msg) {
 
 	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
 	if err != nil {
@@ -220,7 +220,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		return
 	}
 
-	txCtx := context.TxContext{
+	txCtx := TxContext{
 		Codec:         cliCtx.Codec,
 		Gas:           gas,
 		Fee:           baseTx.Fee,

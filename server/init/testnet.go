@@ -15,7 +15,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/context"
 	clkeys "github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,6 +24,7 @@ import (
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 var (
@@ -190,7 +190,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			stake.NewCommissionMsg(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(20, 2), sdk.NewDecWithPrec(1, 2)),
 		)
 		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo)
-		txCtx := context.NewTxContextFromCLI().WithChainID(chainID).WithMemo(memo)
+		txCtx := utils.NewTxContextFromCLI().WithChainID(chainID).WithMemo(memo)
 
 		signedTx, err := txCtx.SignStdTx(nodeDirName, v0.DefaultKeyPass, tx, false)
 		if err != nil {

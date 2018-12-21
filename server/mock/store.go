@@ -42,7 +42,7 @@ func (ms multiStore) WithTracer(w io.Writer) sdk.MultiStore {
 	panic("not implemented")
 }
 
-func (ms multiStore) Commit() sdk.CommitID {
+func (ms multiStore) Commit([]*sdk.KVStoreKey) sdk.CommitID {
 	panic("not implemented")
 }
 

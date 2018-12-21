@@ -33,7 +33,7 @@ type Store interface { //nolint
 
 // something that can persist to disk
 type Committer interface {
-	Commit() CommitID
+	Commit([]*KVStoreKey) CommitID
 	LastCommitID() CommitID
 	SetPruning(PruningStrategy)
 }
@@ -64,6 +64,7 @@ type MultiStore interface { //nolint
 	CacheMultiStore() CacheMultiStore
 
 	// Convenience for fetching substores.
+	// If the store does not exist, panics.
 	GetStore(StoreKey) Store
 	GetKVStore(StoreKey) KVStore
 

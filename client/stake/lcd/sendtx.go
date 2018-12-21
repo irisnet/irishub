@@ -1,13 +1,14 @@
 package lcd
 
 import (
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"net/http"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
@@ -46,17 +47,17 @@ type (
 
 	// the request body for edit delegations
 	DelegationsReq struct {
-		BaseReq       context.BaseTx      `json:"base_tx"`
-		Delegation    msgDelegateInput    `json:"delegate"`
+		BaseReq    utils.BaseTx     `json:"base_tx"`
+		Delegation msgDelegateInput `json:"delegate"`
 	}
 
 	BeginUnbondingReq struct {
-		BaseReq        context.BaseTx  `json:"base_tx"`
-		BeginUnbond    msgUnbondInput  `json:"unbond"`
+		BaseReq     utils.BaseTx   `json:"base_tx"`
+		BeginUnbond msgUnbondInput `json:"unbond"`
 	}
 
 	BeginRedelegatesReq struct {
-		BaseReq         context.BaseTx     `json:"base_tx"`
+		BaseReq         utils.BaseTx       `json:"base_tx"`
 		BeginRedelegate msgRedelegateInput `json:"redelegate"`
 	}
 )

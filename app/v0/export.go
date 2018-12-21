@@ -58,7 +58,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 		mint.ExportGenesis(ctx, p.mintKeeper),
 		distr.ExportGenesis(ctx, p.distrKeeper),
 		gov.ExportGenesis(ctx, p.govKeeper),
-		upgrade.WriteGenesis(ctx),
+		upgrade.ExportGenesis(ctx),
 		service.ExportGenesis(ctx, p.serviceKeeper),
 		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, p.guardianKeeper),
@@ -138,7 +138,6 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 			panic("expected validator, not found")
 		}
 		validator.BondHeight = 0
-		validator.BondIntraTxCounter = counter
 		validator.UnbondingHeight = 0
 		p.StakeKeeper.SetValidator(ctx, validator)
 		counter++
@@ -156,4 +155,8 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 		p.slashingKeeper.SetValidatorSigningInfo(ctx, addr, info)
 		return false
 	})
+
+	/* Handle gov state. */
+
+	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
 }

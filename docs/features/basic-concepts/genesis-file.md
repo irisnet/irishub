@@ -4,13 +4,15 @@ The Genesis file is the basis for the entire network initialization，which cont
 
 ## Basic State
 
-* genesis_time The time to build Genesis file
-* chain_id     Blockchain’s ID
+* **genesis_time** The time to build Genesis file
+* **chain_id**     Blockchain’s ID
 
 ## Consensus Params
 
-* block_size Block size and config params of the number of Gas in the block
-* evidence   The lifecycle of deception evidence in the block
+* **block_size** 
+  * `max_bytes` The max size of a block
+  * `max_gas`  The maximum Gas quantity of a block. Its default value is -1 which means no gas limit. If the accumulation of comsumed gas exceeds the block gas limit, the transaction and all subsequent transactions in the same block will fail to deliver. 
+* **evidence**   The lifecycle of deception evidence in the block
 
 ## App State
 
@@ -37,9 +39,14 @@ The Genesis file is the basis for the entire network initialization，which cont
 
 * **slashing** Params related to slashing validators
 
-* **service**  Params related to Service
+* **service**  Params related to service
   * `MaxRequestTimeout`   The max of waiting blocks for service invocation
   * `MinProviderDeposit`  The min deposit for service binding
+  * `ServiceFeeTax` The service fee tax
+  
+* **guardian** Params related to guardian
+  * `profilers` The profiler list
+  * `trustees` The trustees list
   
 ## Gentxs
 

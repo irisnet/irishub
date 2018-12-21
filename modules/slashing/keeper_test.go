@@ -416,13 +416,13 @@ func TestValidatorDippingInAndOut(t *testing.T) {
 	ctx = ctx.WithBlockHeight(height)
 
 	// validator added back in
-	got = sh(ctx, newTestMsgDelegate(sdk.AccAddress(addrs[2]), addrs[0], sdk.NewIntWithDecimal(2, 18)))
+	got = sh(ctx, newTestMsgDelegate(sdk.AccAddress(addrs[2]), addrs[0], sdk.NewIntWithDecimal(3, 18)))
 	require.True(t, got.IsOK())
 	validatorUpdates = stake.EndBlocker(ctx, sk)
 	require.Equal(t, 2, len(validatorUpdates))
 	validator, _ = sk.GetValidator(ctx, addr)
 	require.Equal(t, sdk.Bonded, validator.Status)
-	newAmt = int64(102)
+	newAmt = int64(103)
 
 	// validator misses a block
 	keeper.handleValidatorSignature(ctx, val.Address(), newAmt, false)

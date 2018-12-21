@@ -25,7 +25,7 @@ func (k Keeper) onValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) {
 func (k Keeper) onValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) {
 	// This doesn't need to be run at genesis
 	if ctx.BlockHeight() > 0 {
-		if _, _, err := k.WithdrawValidatorRewardsAll(ctx, valAddr); err != nil {
+		if err := k.takeValidatorFeePoolRewards(ctx, valAddr); err != nil {
 			panic(err)
 		}
 	}
@@ -80,7 +80,10 @@ func (k Keeper) onDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAddre
 // Withdrawal all validator distribution rewards and cleanup the distribution record
 func (k Keeper) onDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress,
 	valAddr sdk.ValAddress) {
-
+	if valAddr.Equals(sdk.ValAddress(delAddr)) {
+		feePool, commission := k.withdrawValidatorCommission(ctx, valAddr)
+		k.WithdrawToDelegator(ctx, feePool, delAddr, commission)
+	}
 	k.RemoveDelegationDistInfo(ctx, delAddr, valAddr)
 }
 

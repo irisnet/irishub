@@ -2,34 +2,21 @@ package gov
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/types"
-	"time"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/types/gov/params"
+	govtypes "github.com/irisnet/irishub/types/gov"
+	"time"
 )
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
 	TerminatorPeriod   int64                       `json:"terminator_period"`
 	StartingProposalID uint64                      `json:"starting_proposalID"`
-	Deposits           []DepositWithMetadata       `json:"deposits"`
-	Votes              []VoteWithMetadata          `json:"votes"`
-	Proposals          []Proposal                  `json:"proposals"`
 	DepositProcedure   govparams.DepositProcedure  `json:"deposit_period"`
 	VotingProcedure    govparams.VotingProcedure   `json:"voting_period"`
 	TallyingProcedure  govparams.TallyingProcedure `json:"tallying_procedure"`
-}
-
-type DepositWithMetadata struct {
-	ProposalID uint64  `json:"proposal_id"`
-	Deposit    Deposit `json:"deposit"`
-}
-
-// VoteWithMetadata (just for genesis)
-type VoteWithMetadata struct {
-	ProposalID uint64 `json:"proposal_id"`
-	Vote       Vote   `json:"vote"`
 }
 
 func NewGenesisState(startingProposalID uint64, dp govparams.DepositProcedure, vp govparams.VotingProcedure, tp govparams.TallyingProcedure) GenesisState {
@@ -53,55 +40,20 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	k.SetTerminatorPeriod(ctx, data.TerminatorPeriod)
 	k.SetTerminatorHeight(ctx, -1)
 
-	//k.setDepositProcedure(ctx, data.DepositProcedure)
-	////////////////////  iris begin  ///////////////////////////
 	params.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
 	params.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
 	params.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
-	////////////////////  iris end  /////////////////////////////
-	for _, deposit := range data.Deposits {
-		k.setDeposit(ctx, deposit.ProposalID, deposit.Deposit.Depositor, deposit.Deposit)
-	}
-	for _, vote := range data.Votes {
-		k.setVote(ctx, vote.ProposalID, vote.Vote.Voter, vote.Vote)
-	}
-	for _, proposal := range data.Proposals {
-		k.SetProposal(ctx, proposal)
-	}
 }
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	startingProposalID, _ := k.peekCurrentProposalID(ctx)
-	////////////////////  iris begin  ///////////////////////////
 	depositProcedure := govparams.GetDepositProcedure(ctx)
 	votingProcedure := govparams.GetVotingProcedure(ctx)
 	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
-	////////////////////  iris end  /////////////////////////////
 
-	var deposits []DepositWithMetadata
-	var votes []VoteWithMetadata
-	proposals := k.GetProposalsFiltered(ctx, nil, nil, StatusNil, 0)
-	for _, proposal := range proposals {
-		proposalID := proposal.GetProposalID()
-		depositsIterator := k.GetDeposits(ctx, proposalID)
-		for ; depositsIterator.Valid(); depositsIterator.Next() {
-			var deposit Deposit
-			k.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), &deposit)
-			deposits = append(deposits, DepositWithMetadata{proposalID, deposit})
-		}
-		votesIterator := k.GetVotes(ctx, proposalID)
-		for ; votesIterator.Valid(); votesIterator.Next() {
-			var vote Vote
-			k.cdc.MustUnmarshalBinaryLengthPrefixed(votesIterator.Value(), &vote)
-			votes = append(votes, VoteWithMetadata{proposalID, vote})
-		}
-	}
 	return GenesisState{
 		StartingProposalID: startingProposalID,
-		Deposits:           deposits,
-		Votes:              votes,
-		Proposals:          proposals,
 		DepositProcedure:   depositProcedure,
 		VotingProcedure:    votingProcedure,
 		TallyingProcedure:  tallyingProcedure,
@@ -117,7 +69,7 @@ func DefaultGenesisState() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
-		TerminatorPeriod:20000,
+		TerminatorPeriod:   20000,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
@@ -143,7 +95,7 @@ func DefaultGenesisStateForCliTest() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
-		TerminatorPeriod:20,
+		TerminatorPeriod:   20,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
@@ -169,7 +121,7 @@ func DefaultGenesisStateForLCDTest() GenesisState {
 		panic(err)
 	}
 	return GenesisState{
-		TerminatorPeriod:20,
+		TerminatorPeriod:   20,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.DepositProcedure{
 			MinDeposit:       sdk.Coins{minDeposit},
@@ -183,5 +135,19 @@ func DefaultGenesisStateForLCDTest() GenesisState {
 			Veto:          sdk.NewDecWithPrec(334, 3),
 			Participation: sdk.NewDecWithPrec(667, 3),
 		},
+	}
+}
+
+func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
+	proposals := k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusDepositPeriod, 0)
+	for _, proposal := range proposals {
+		proposalID := proposal.GetProposalID()
+		k.RefundDeposits(ctx, proposalID)
+	}
+
+	proposals = k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusVotingPeriod, 0)
+	for _, proposal := range proposals {
+		proposalID := proposal.GetProposalID()
+		k.RefundDeposits(ctx, proposalID)
 	}
 }

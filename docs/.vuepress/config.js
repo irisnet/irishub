@@ -59,6 +59,7 @@ module.exports = {
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
+                            ['guardian.md', 'Guardian'],
                         ]
                     }],
                     '/cli-client/': [{
@@ -179,6 +180,7 @@ module.exports = {
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
+                            ['guardian.md', 'Guardian'],
                         ]
                     }],
                     '/zh/cli-client/': [{

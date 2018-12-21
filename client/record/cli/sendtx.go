@@ -31,7 +31,7 @@ func GetCmdSubmitRecord(storeName string, cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
 			if err := cliCtx.EnsureAccountExists(); err != nil {
 				return err
