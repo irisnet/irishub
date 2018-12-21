@@ -223,7 +223,7 @@ func handleMsgBeginUnbonding(ctx sdk.Context, msg types.MsgBeginUnbonding, k kee
 		tags.Action, tags.ActionBeginUnbonding,
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
 		tags.SrcValidator, []byte(msg.ValidatorAddr.String()),
-		tags.EndTime, finishTime,
+		tags.EndTime, []byte(ubd.MinTime.String()),
 	)
 	return sdk.Result{Data: finishTime, Tags: tags}
 }
@@ -242,7 +242,7 @@ func handleMsgBeginRedelegate(ctx sdk.Context, msg types.MsgBeginRedelegate, k k
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
 		tags.SrcValidator, []byte(msg.ValidatorSrcAddr.String()),
 		tags.DstValidator, []byte(msg.ValidatorDstAddr.String()),
-		tags.EndTime, finishTime,
+		tags.EndTime, []byte(red.MinTime.String()),
 	)
 	return sdk.Result{Data: finishTime, Tags: tags}
 }
