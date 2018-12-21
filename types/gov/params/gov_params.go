@@ -164,12 +164,22 @@ var _ params.GovParameter = (*VotingProcedureParam)(nil)
 
 // Procedure around Voting in governance
 type VotingProcedure struct {
-	VotingPeriod time.Duration `json:"voting_period"` //  Length of the voting period.
+	CriticalVotingPeriod  time.Duration `json:"critical_voting_period"`  //  Length of the critical voting period.
+	ImportantVotingPeriod time.Duration `json:"important_voting_period"` //  Length of the important voting period.
+	NormalVotingPeriod    time.Duration `json:"normal_voting_period"`    //  Length of the normal voting period.
 }
 
 type VotingProcedureParam struct {
 	Value      VotingProcedure
 	paramSpace params.Subspace
+}
+
+func NewVotingProcedure() VotingProcedure {
+	return VotingProcedure{
+		CriticalVotingPeriod:  time.Duration(TWO_DAYS) * time.Second,
+		ImportantVotingPeriod: time.Duration(TWO_DAYS) * time.Second,
+		NormalVotingPeriod:    time.Duration(TWO_DAYS) * time.Second,
+	}
 }
 
 func (param *VotingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -181,7 +191,7 @@ func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(VotingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = VotingProcedure{VotingPeriod: time.Duration(172800) * time.Second}
+		param.Value = NewVotingProcedure()
 	}
 }
 
@@ -232,8 +242,16 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.VotingPeriod.Seconds() < 20 || param.Value.VotingPeriod.Seconds() > THREE_DAYS {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf("VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.VotingPeriod.Seconds())), THREE_DAYS))
+		if param.Value.CriticalVotingPeriod.Seconds() < 20 || param.Value.CriticalVotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(CRITICAL+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.CriticalVotingPeriod.Seconds())), THREE_DAYS))
+		}
+
+		if param.Value.ImportantVotingPeriod.Seconds() < 20 || param.Value.ImportantVotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(IMPORTANT+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.ImportantVotingPeriod.Seconds())), THREE_DAYS))
+		}
+
+		if param.Value.NormalVotingPeriod.Seconds() < 20 || param.Value.NormalVotingPeriod.Seconds() > THREE_DAYS {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(NORMAL+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.NormalVotingPeriod.Seconds())), THREE_DAYS))
 		}
 
 		return nil

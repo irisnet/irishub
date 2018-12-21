@@ -99,9 +99,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
 			DepositProcedure: govparams.NewDepositProcedure(),
-			VotingProcedure: govparams.VotingProcedure{
-				VotingPeriod: 30,
-			},
+			VotingProcedure: govparams.NewVotingProcedure(),
 			TallyingProcedure: govparams.TallyingProcedure{
 				Threshold:     sdk.NewDecWithPrec(5, 1),
 				Veto:          sdk.NewDecWithPrec(334, 3),

@@ -10,7 +10,6 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"testing"
-	"time"
 )
 
 func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Context {
@@ -177,13 +176,9 @@ func TestVotingProcedureParam(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	p1 := VotingProcedure{
-		VotingPeriod: time.Duration(172800) * time.Second,
-	}
+	p1 := NewVotingProcedure()
 
-	p2 := VotingProcedure{
-		VotingPeriod: time.Duration(192800) * time.Second,
-	}
+	p2 := NewVotingProcedure()
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
 		params.NewTypeTable(
