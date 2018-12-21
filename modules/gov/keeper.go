@@ -4,7 +4,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/tendermint/tendermint/crypto"
 	"time"
 	"github.com/irisnet/irishub/modules/params"
@@ -108,7 +107,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		param,
 	}
 
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
+	depositPeriod := GetDepositPeriod(ctx)
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -134,7 +133,7 @@ func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description 
 		textProposal,
 	}
 
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
+	depositPeriod := GetDepositPeriod(ctx)
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -192,7 +191,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 }
 
 func (keeper Keeper) saveProposal(ctx sdk.Context, proposal govtypes.Proposal) {
-	depositPeriod := govparams.GetDepositProcedure(ctx).MaxDepositPeriod
+	depositPeriod := GetDepositPeriod(ctx)
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
@@ -322,7 +321,7 @@ func (keeper Keeper) peekCurrentProposalID(ctx sdk.Context) (proposalID uint64, 
 
 func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal govtypes.Proposal) {
 	proposal.SetVotingStartTime(ctx.BlockHeader().Time)
-	votingPeriod := govparams.GetVotingProcedure(ctx).VotingPeriod
+	votingPeriod := GetVotingProcedure(ctx).VotingPeriod
 	proposal.SetVotingEndTime(proposal.GetVotingStartTime().Add(votingPeriod))
 	proposal.SetStatus(govtypes.StatusVotingPeriod)
 	keeper.SetProposal(ctx, proposal)
@@ -435,7 +434,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetStatus() == govtypes.StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(govparams.GetDepositProcedure(ctx).MinDeposit) {
+	if proposal.GetStatus() == govtypes.StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(GetMinDeposit(ctx,proposal)) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}
