@@ -19,7 +19,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	crkeys "github.com/irisnet/irishub/crypto/keys"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/server"
@@ -200,7 +199,6 @@ func InitializeTestLCD(
 		genesisState.Accounts = append(genesisState.Accounts, acc)
 	}
 
-	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	appState, err := codec.MarshalJSONIndent(cdc, genesisState)
