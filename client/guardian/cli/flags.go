@@ -10,11 +10,10 @@ const (
 )
 
 var (
-	FsProfilerAddress = flag.NewFlagSet("", flag.ContinueOnError)
-	FsProfilerName    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsProfiler = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
-	FsProfilerAddress.String(FlagProfilerAddress, "", "bech32 encoded account of the profiler")
-	FsProfilerName.String(FlagProfilerName, "", "name of the profiler")
+	FsProfiler.String(FlagProfilerAddress, "", "bech32 encoded account of the profiler")
+	FsProfiler.String(FlagProfilerName, "", "name of the profiler")
 }

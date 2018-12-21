@@ -3,11 +3,11 @@ package lcd
 import (
 	"net/http"
 
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/utils"
 )
 
 // SignBody defines the properties of a sign request's body.
@@ -16,8 +16,8 @@ type SignBody struct {
 	Name          string     `json:"name"`
 	Password      string     `json:"password"`
 	ChainID       string     `json:"chain_id"`
-	AccountNumber int64      `json:"account_number"`
-	Sequence      int64      `json:"sequence"`
+	AccountNumber uint64     `json:"account_number"`
+	Sequence      uint64     `json:"sequence"`
 	AppendSig     bool       `json:"append_sig"`
 }
 
@@ -31,7 +31,7 @@ func SignTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx := context.TxContext{
+		txCtx := utils.TxContext{
 			Codec:         cliCtx.Codec,
 			ChainID:       m.ChainID,
 			AccountNumber: m.AccountNumber,

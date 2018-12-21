@@ -69,6 +69,14 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
+  digest = "1:3d43e35d7159c669fd70a9499170ad06a85bdb075f7db1e3b9cc604c17a9293b"
+  name = "github.com/cosmos/cosmos-sdk"
+  packages = ["codec"]
+  pruneopts = "UT"
+  revision = "dfd00a661a19df6efe7e0dde96b2fbeb883d1d80"
+  version = "v0.27.1"
+
+[[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"
   name = "github.com/cosmos/go-bip39"
   packages = ["."]
@@ -433,14 +441,16 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:c1a04665f9613e082e1209cf288bf64f4068dcd6c87a64bf1c4ff006ad422ba0"
+  digest = "1:26663fafdea73a38075b07e8e9d82fc0056379d2be8bb4e13899e8fda7c7dd23"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
+    "prometheus/internal",
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  revision = "abad2d1bd44235a26707c172eab6bca5bf2dbad3"
+  version = "v0.9.1"
 
 [[projects]]
   branch = "master"
@@ -489,6 +499,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
+
+[[projects]]
+  digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
+  name = "github.com/rs/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:3fb45284d554f369d08136a0fd4d01f50897f6f79469358c41fb5a30a6379dfe"
@@ -620,15 +638,17 @@
   version = "v0.14.0"
 
 [[projects]]
-  digest = "1:9f8c4c93658315a795ffd3e0c943d39f78067dd8382b8d7bcfaf6686b92f3978"
+  branch = "irisnet/v0.12.0-iris"
+  digest = "1:bfbae02a6a9430f804a8a7fee56edbb93c38e08a777ab4a6a33b03b4780b97f6"
   name = "github.com/tendermint/iavl"
   packages = ["."]
   pruneopts = "UT"
-  revision = "fa74114f764f9827c4ad5573f990ed25bf8c4bac"
-  version = "v0.11.1"
+  revision = "4114c0fad8f5909e46327dc967259e33e0e80508"
+  source = "https://github.com/irisnet/iavl.git"
 
 [[projects]]
-  digest = "1:d05123b0e2037d03251d777ea6cdb17b19fcfc5b6bc6b0d0dc2d2a6df6b60ac8"
+  branch = "irisnet/v0.27.0-iris"
+  digest = "1:141818a9e0d1b5e0559605b6014621199327a3a23e64369f9039eb68f99a640f"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -659,7 +679,6 @@
     "libs/clist",
     "libs/common",
     "libs/db",
-    "libs/errors",
     "libs/events",
     "libs/fail",
     "libs/flowrate",
@@ -694,9 +713,8 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "6c882b92f297ca99d26b6f8cda983ec0e969f6b7"
+  revision = "afb2a33bca018b99bc11dfc2e5e8332baa23f557"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.26.1-rc3-iris"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
@@ -857,10 +875,12 @@
     "github.com/bartekn/go-bip39",
     "github.com/bgentry/speakeasy",
     "github.com/btcsuite/btcd/btcec",
+    "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/go-bip39",
     "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
+    "github.com/gogo/protobuf/proto",
     "github.com/golang/protobuf/proto",
     "github.com/gorilla/mux",
     "github.com/ipfs/go-ipfs-api",
@@ -885,7 +905,6 @@
     "github.com/tendermint/iavl",
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
-    "github.com/tendermint/tendermint/blockchain",
     "github.com/tendermint/tendermint/cmd/tendermint/commands",
     "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",

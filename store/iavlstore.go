@@ -72,7 +72,7 @@ func newIAVLStore(tree *iavl.MutableTree, numRecent int64, storeEvery int64) *ia
 }
 
 // Implements Committer.
-func (st *iavlStore) Commit() CommitID {
+func (st *iavlStore) Commit([]*sdk.KVStoreKey) CommitID {
 	// Save a new version.
 	hash, version, err := st.tree.SaveVersion()
 	if err != nil {
@@ -85,6 +85,13 @@ func (st *iavlStore) Commit() CommitID {
 	if st.numRecent < previous {
 		toRelease := previous - st.numRecent
 		if st.storeEvery == 0 || toRelease%st.storeEvery != 0 {
+			// Keep version 1
+			if toRelease == 1 {
+				return CommitID{
+					Version: version,
+					Hash:    hash,
+				}
+			}
 			err := st.tree.DeleteVersion(toRelease)
 			if err != nil && err.(cmn.Error).Data() != iavl.ErrVersionDoesNotExist {
 				panic(err)

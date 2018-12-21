@@ -1,11 +1,12 @@
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
 PACKAGES_MODULES=$(shell go list ./... | grep 'modules')
+PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
+PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 all: get_tools get_vendor_deps install
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
-INSTALL_FLAGS = -ldflags "-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH}"
 
 Bech32PrefixAccAddr := $(shell if [ -z ${Bech32PrefixAccAddr} ]; then echo "faa"; else echo ${Bech32PrefixAccAddr}; fi)
 Bech32PrefixAccPub := $(shell if [ -z ${Bech32PrefixAccPub} ]; then echo "fap"; else echo ${Bech32PrefixAccPub}; fi)
@@ -14,18 +15,27 @@ Bech32PrefixValPub := $(shell if [ -z ${Bech32PrefixValPub} ]; then echo "fvp"; 
 Bech32PrefixConsAddr := $(shell if [ -z ${Bech32PrefixConsAddr} ]; then echo "fca"; else echo ${Bech32PrefixConsAddr}; fi)
 Bech32PrefixConsPub := $(shell if [ -z ${Bech32PrefixConsPub} ]; then echo "fcp"; else echo ${Bech32PrefixConsPub}; fi)
 BUILD_FLAGS = -ldflags "\
--X github.com/irisnet/irishub/init.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
--X github.com/irisnet/irishub/init.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
--X github.com/irisnet/irishub/init.Bech32PrefixValAddr=${Bech32PrefixValAddr} \
--X github.com/irisnet/irishub/init.Bech32PrefixValPub=${Bech32PrefixValPub} \
--X github.com/irisnet/irishub/init.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
--X github.com/irisnet/irishub/init.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
+-X github.com/irisnet/irishub/server/init.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixValAddr=${Bech32PrefixValAddr} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixValPub=${Bech32PrefixValPub} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
+
+INSTALL_FLAGS = -ldflags "\
+-X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixValAddr=${Bech32PrefixValAddr} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixValPub=${Bech32PrefixValPub} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
+-X github.com/irisnet/irishub/server/init.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
 
 ########################################
 ### Tools & dependencies
 
 echo_bech32_prefix:
-	@echo "\"source tools/script/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
+	@echo "\"source scripts/setBechPrefix.sh\" to set bech prefix for your own application, or default values will be applied"
 	@echo Bech32PrefixAccAddr=${Bech32PrefixAccAddr}
 	@echo Bech32PrefixAccPub=${Bech32PrefixAccPub}
 	@echo Bech32PrefixValAddr=${Bech32PrefixValAddr}
@@ -34,22 +44,22 @@ echo_bech32_prefix:
 	@echo Bech32PrefixConsPub=${Bech32PrefixConsPub}
 
 check_tools:
-	cd deps_tools && $(MAKE) check_tools
+	cd scripts && $(MAKE) check_tools
 
 check_dev_tools:
-	cd deps_tools && $(MAKE) check_dev_tools
+	cd scripts && $(MAKE) check_dev_tools
 
 update_tools:
-	cd deps_tools && $(MAKE) update_tools
+	cd scripts && $(MAKE) update_tools
 
 update_dev_tools:
-	cd deps_tools && $(MAKE) update_dev_tools
+	cd scripts && $(MAKE) update_dev_tools
 
 get_tools:
-	cd deps_tools && $(MAKE) get_tools
+	cd scripts && $(MAKE) get_tools
 
 get_dev_tools:
-	cd deps_tools && $(MAKE) get_dev_tools
+	cd scripts && $(MAKE) get_dev_tools
 
 get_vendor_deps:
 	@rm -rf vendor/
@@ -64,15 +74,15 @@ draw_deps:
 ########################################
 ### Generate swagger docs for irislcd
 update_irislcd_swagger_docs:
-	@statik -src=client/lcd/swaggerui -dest=client/lcd -f
+	@statik -src=lite/swagger-ui -dest=lite -f
 
 ########################################
 ### Compile and Install
 install: update_irislcd_swagger_docs echo_bech32_prefix
-	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iris
-	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iriscli
-	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/irislcd
-	go install $(INSTALL_FLAGS) $(BUILD_FLAGS) ./cmd/iristool
+	go install $(INSTALL_FLAGS) ./cmd/iris
+	go install $(INSTALL_FLAGS) ./cmd/iriscli
+	go install $(INSTALL_FLAGS) ./cmd/irislcd
+	go install $(INSTALL_FLAGS) ./cmd/iristool
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
@@ -86,25 +96,6 @@ build_cur: update_irislcd_swagger_docs echo_bech32_prefix
 	go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
 	go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
-build_examples: update_irislcd_swagger_docs echo_bech32_prefix
-	go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1
-	go build  $(BUILD_FLAGS) -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	go build  $(BUILD_FLAGS) -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	go build  $(BUILD_FLAGS) -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
-
-
-install_examples: update_irislcd_swagger_docs echo_bech32_prefix
-	go install $(BUILD_FLAGS) ./examples/irishub1/cmd/iris1
-	go install $(BUILD_FLAGS) ./examples/irishub1/cmd/iriscli1
-	go install $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	go install $(BUILD_FLAGS) ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
-
-
-build_example_linux: update_irislcd_swagger_docs echo_bech32_prefix
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iris1 ./examples/irishub1/cmd/iris1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iriscli1 ./examples/irishub1/cmd/iriscli1
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iris2-bugfix ./examples/irishub-bugfix-2/cmd/iris2-bugfix
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  $(BUILD_FLAGS) -o build/iriscli2-bugfix ./examples/irishub-bugfix-2/cmd/iriscli2-bugfix
 
 ########################################
 ### Testing
@@ -116,12 +107,14 @@ test_sim: test_sim_modules test_sim_benchmark test_sim_iris_nondeterminism test_
 test_unit:
 	#@go test $(PACKAGES_NOSIMULATION)
 	@go test $(PACKAGES_MODULES)
+	@go test $(PACKAGES_TYPES)
+	@go test $(PACKAGES_STORE)
 
 test_cli:
-	@go test  -timeout 20m -count 1 -p 1 client/clitest/utils.go client/clitest/bank_test.go client/clitest/distribution_test.go client/clitest/gov_test.go client/clitest/iparam_test.go client/clitest/irismon_test.go client/clitest/record_test.go client/clitest/service_test.go client/clitest/stake_test.go
+	@go test  -timeout 20m -count 1 -p 1 tests/cli/utils.go tests/cli/bank_test.go tests/cli/distribution_test.go tests/cli/gov_test.go tests/cli/iparam_test.go tests/cli/irismon_test.go tests/cli/record_test.go tests/cli/service_test.go tests/cli/stake_test.go
 
 test_upgrade_cli:
-	@go test  -timeout 20m -count 1 -p 1 client/clitest/utils.go client/clitest/bank_test.go
+	@go test  -timeout 20m -count 1 -p 1 tests/cli/utils.go tests/cli/bank_test.go
 
 test_lcd:
 	@go test `go list github.com/irisnet/irishub/client/lcd`

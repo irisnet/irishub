@@ -1,85 +1,39 @@
 package upgrade
 
 import (
-	"fmt"
 	sdk "github.com/irisnet/irishub/types"
-	"reflect"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	"strconv"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
-
-func NewHandler(k Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
-		switch msg := msg.(type) {
-		case MsgSwitch:
-			return handlerSwitch(ctx, msg, k)
-		default:
-			errMsg := "Unrecognized Upgrade Msg type: " + reflect.TypeOf(msg).Name()
-			return sdk.ErrUnknownRequest(errMsg).Result()
-		}
-	}
-}
-
-func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
-
-	msgSwitch, ok := msg.(MsgSwitch)
-	if !ok {
-		return NewError(DefaultCodespace, CodeInvalidMsgType, "Handler should only receive MsgSwitch").Result()
-	}
-
-	proposalID := msgSwitch.ProposalID
-
-	CurrentProposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
-
-	if proposalID != CurrentProposalID {
-		return NewError(DefaultCodespace, CodeNotCurrentProposal, "It isn't the current SoftwareUpgradeProposal").Result()
-
-	}
-
-	voter := msgSwitch.Voter
-	valAcc := sdk.ValAddress(voter)
-	if _, ok := k.sk.GetValidator(ctx, valAcc); !ok {
-		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
-	}
-
-	if _, ok := k.GetSwitch(ctx, proposalID, voter); ok {
-		return NewError(DefaultCodespace, CodeDoubleSwitch, "You have sent the switch msg").Result()
-	}
-
-	k.SetSwitch(ctx, proposalID, voter, msgSwitch)
-
-	return sdk.Result{
-		Code: 0,
-		Log:  fmt.Sprintf("Switch %s by %s", msgSwitch.Title, msgSwitch.Voter.String()),
-	}
-}
 
 // do switch
 func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
-
-	height := upgradeparams.GetProposalAcceptHeight(ctx)
-	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
-	switchPeriod := upgradeparams.GetSwitchPeriod(ctx)
-
-	if (proposalID != 0) && (ctx.BlockHeight() == height + switchPeriod) {
-		switchPasses := tally(ctx, keeper)
-		if switchPasses {
-			tags.AppendTag("action", []byte("switchPassed"))
-
-			keeper.DoSwitchBegin(ctx)
+	upgradeConfig,ok := keeper.pk.GetUpgradeConfig(ctx)
+	if ok {
+		if ctx.BlockHeader().Version.App == upgradeConfig.Definition.Version {
+			keeper.SetSignal(ctx, upgradeConfig.Definition.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
 		} else {
-			tags.AppendTag("action", []byte("switchDropped"))
+			keeper.DeleteSignal(ctx, upgradeConfig.Definition.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
+		}
 
-			upgradeparams.SetCurrentUpgradeProposalId(ctx,0)
+		if uint64(ctx.BlockHeight())+1 == upgradeConfig.Definition.Height {
+			success := tally(ctx, upgradeConfig.Definition.Version, keeper)
+
+			if success {
+				keeper.pk.SetCurrentProtocolVersion(ctx, upgradeConfig.Definition.Version)
+			} else {
+				keeper.pk.SetLastFailureVersion(ctx, upgradeConfig.Definition.Version)
+			}
+
+			appVersion := NewVersion(upgradeConfig, success)
+			keeper.AddNewVersion(ctx, appVersion)
+			keeper.pk.ClearUpgradeConfig(ctx)
 		}
 	}
 
-	blockHeader := ctx.BlockHeader()
-	if keeper.GetDoingSwitch(ctx) && (&blockHeader).GetNumTxs() == 0 {
-		tags.AppendTag("action", []byte("readyToDoSwitch"))
+	// TODO: const CurrentVersionTagKey CurrentSoftwareTagKey
+	tags = tags.AppendTag(protocolKeeper.AppVersionTag, []byte(strconv.FormatUint(keeper.pk.GetCurrentProtocolVersion(ctx),10)))
 
-		keeper.DoSwitchEnd(ctx)
-	}
-    fmt.Println(keeper.GetCurrentVersion(ctx))
 	return tags
 }

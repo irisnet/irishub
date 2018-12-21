@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
@@ -68,8 +68,8 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
-		mapp.RegisterCodespace(stake.DefaultCodespace))
-	rk := NewKeeper(mapp.Cdc, keyRecord, mapp.RegisterCodespace(DefaultCodespace))
+		stake.DefaultCodespace)
+	rk := NewKeeper(mapp.Cdc, keyRecord, DefaultCodespace)
 
 	mapp.Router().AddRoute("record", []*sdk.KVStoreKey{keyRecord}, NewHandler(rk))
 

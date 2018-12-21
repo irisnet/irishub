@@ -2,15 +2,17 @@
 
 ## Description
 
-Get verified data for a the block at given height
+Get verified data for a the block at given height. If no height is specified, the latest height will be used as default.
 
 
 ## Usage
 
 ```
   iriscli tendermint block [height] [flags]
-
-
+```
+or 
+```
+  iriscli tendermint block [flags]
 ```
 
 ## Flags
@@ -24,10 +26,17 @@ Get verified data for a the block at given height
 
 ## Examples
 
-### tx
+### Get block at height 114263
 
 ```shell
 iriscli tendermint block 114263  --chain-id=fuxi-4000 --trust-node=true
+
+```
+
+### Get the latest block
+
+```shell
+iriscli tendermint block  --chain-id=fuxi-4000 --trust-node=true
 
 ```
 

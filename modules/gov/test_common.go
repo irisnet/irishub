@@ -13,10 +13,17 @@ import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/simulation/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/guardian"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // initialize the mock application for this module
@@ -24,17 +31,32 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	mapp := mock.NewApp()
 
 	stake.RegisterCodec(mapp.Cdc)
-	RegisterCodec(mapp.Cdc)
+	govtypes.RegisterCodec(mapp.Cdc)
 
 	keyGov := sdk.NewKVStoreKey("gov")
+	keyDistr := sdk.NewKVStoreKey("distr")
+    keyProtocol := sdk.NewKVStoreKey("protocol")
+
+    pk := protocolKeeper.NewKeeper(mapp.Cdc,keyProtocol)
+	paramsKeeper := params.NewKeeper(
+		mapp.Cdc,
+		sdk.NewKVStoreKey("params"),
+		sdk.NewTransientStoreKey("transient_params"),
+	)
+	feeCollectionKeeper := auth.NewFeeCollectionKeeper(
+		mapp.Cdc,
+		sdk.NewKVStoreKey("fee"),
+	)
 
 	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
 	sk := stake.NewKeeper(
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
-		mapp.RegisterCodespace(stake.DefaultCodespace))
-	gk := NewKeeper(mapp.Cdc, keyGov, ck, sk, DefaultCodespace)
+		stake.DefaultCodespace)
+	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, govtypes.DefaultCodespace)
+	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, pk, govtypes.DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -43,7 +65,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
+	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)
@@ -67,15 +89,15 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		mapp.InitChainer(ctx, req)
 
 		stakeGenesis := stake.DefaultGenesisState()
-		stakeGenesis.Params.BondDenom = "iris-atto"
+		stakeGenesis.Params.BondDenom = stakeTypes.StakeDenom
 		stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewInt(100000))
 
 		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 		if err != nil {
 			panic(err)
 		}
-		ct := types.NewDefaultCoinType("iris")
-		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
+		ct := types.NewDefaultCoinType(stakeTypes.StakeDenomName)
+		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeDenomName))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
 			DepositProcedure: govparams.DepositProcedure{
@@ -86,9 +108,9 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 				VotingPeriod: 30,
 			},
 			TallyingProcedure: govparams.TallyingProcedure{
-				Threshold:         sdk.NewDecWithPrec(5, 1),
-				Veto:              sdk.NewDecWithPrec(334, 3),
-				Participation:     sdk.NewDecWithPrec(667, 3),
+				Threshold:     sdk.NewDecWithPrec(5, 1),
+				Veto:          sdk.NewDecWithPrec(334, 3),
+				Participation: sdk.NewDecWithPrec(667, 3),
 			},
 		})
 		return abci.ResponseInitChain{

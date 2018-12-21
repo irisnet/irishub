@@ -1,15 +1,16 @@
 package lcd
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/client/context"
+	"encoding/hex"
+	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/service"
 	sdk "github.com/irisnet/irishub/types"
-	"fmt"
-	"encoding/hex"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
@@ -81,7 +82,6 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 		var req definition
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -113,7 +113,6 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		var req binding
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -178,7 +177,6 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		var req bindingUpdate
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -243,7 +241,6 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -280,7 +277,6 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		var req bindingEnable
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -323,7 +319,6 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -349,7 +344,6 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		var req serviceRequestWithBasic
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -407,7 +401,6 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		var req serviceResponse
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -463,7 +456,6 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -498,7 +490,6 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		var req basicReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -518,37 +509,37 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 }
 
 type definition struct {
-	BaseTx             context.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName        string         `json:"service_name"`
-	ServiceDescription string         `json:"service_description"`
-	AuthorDescription  string         `json:"author_description"`
-	Tags               []string       `json:"tags"`
-	IdlContent         string         `json:"idl_content"`
-	AuthorAddr         string         `json:"author_addr"`
+	BaseTx             utils.BaseTx `json:"base_tx"` // basic tx info
+	ServiceName        string       `json:"service_name"`
+	ServiceDescription string       `json:"service_description"`
+	AuthorDescription  string       `json:"author_description"`
+	Tags               []string     `json:"tags"`
+	IdlContent         string       `json:"idl_content"`
+	AuthorAddr         string       `json:"author_addr"`
 }
 
 type binding struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName string         `json:"service_name"`
-	DefChainId  string         `json:"def_chain_id"`
-	BindingType string         `json:"binding_type"`
-	Deposit     string         `json:"deposit"`
-	Prices      []string       `json:"prices"`
-	Level       service.Level  `json:"level"`
-	Provider    string         `json:"provider"`
+	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
+	ServiceName string        `json:"service_name"`
+	DefChainId  string        `json:"def_chain_id"`
+	BindingType string        `json:"binding_type"`
+	Deposit     string        `json:"deposit"`
+	Prices      []string      `json:"prices"`
+	Level       service.Level `json:"level"`
+	Provider    string        `json:"provider"`
 }
 
 type bindingUpdate struct {
-	BaseTx      context.BaseTx `json:"base_tx"` // basic tx info
-	BindingType string         `json:"binding_type"`
-	Deposit     string         `json:"deposit"`
-	Prices      []string       `json:"prices"`
-	Level       service.Level  `json:"level"`
+	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
+	BindingType string        `json:"binding_type"`
+	Deposit     string        `json:"deposit"`
+	Prices      []string      `json:"prices"`
+	Level       service.Level `json:"level"`
 }
 
 type bindingEnable struct {
-	BaseTx  context.BaseTx `json:"base_tx"` // basic tx info
-	Deposit string         `json:"deposit"`
+	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit string       `json:"deposit"`
 }
 
 type serviceRequest struct {
@@ -564,19 +555,19 @@ type serviceRequest struct {
 }
 
 type serviceRequestWithBasic struct {
-	BaseTx   context.BaseTx   `json:"base_tx"` // basic tx info
+	BaseTx   utils.BaseTx     `json:"base_tx"` // basic tx info
 	Requests []serviceRequest `json:"requests"`
 }
 
 type serviceResponse struct {
-	BaseTx     context.BaseTx `json:"base_tx"` // basic tx info
-	ReqChainId string         `json:"req_chain_id"`
-	RequestId  string         `json:"request_id"`
-	Data       string         `json:"data"`
-	Provider   string         `json:"provider"`
-	ErrorMsg   string         `json:"error_msg"`
+	BaseTx     utils.BaseTx `json:"base_tx"` // basic tx info
+	ReqChainId string       `json:"req_chain_id"`
+	RequestId  string       `json:"request_id"`
+	Data       string       `json:"data"`
+	Provider   string       `json:"provider"`
+	ErrorMsg   string       `json:"error_msg"`
 }
 
 type basicReq struct {
-	BaseTx context.BaseTx `json:"base_tx"` // basic tx info
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
 }

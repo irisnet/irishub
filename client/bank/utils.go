@@ -12,8 +12,8 @@ type BaseAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         []string       `json:"coins"`
 	PubKey        crypto.PubKey  `json:"public_key"`
-	AccountNumber int64          `json:"account_number"`
-	Sequence      int64          `json:"sequence"`
+	AccountNumber uint64         `json:"account_number"`
+	Sequence      uint64         `json:"sequence"`
 }
 
 func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.Account) (BaseAccount, error) {

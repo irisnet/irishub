@@ -16,12 +16,13 @@ var (
 	ActionSvcRespond      = []byte("service-respond")
 	ActionSvcRefundFees   = []byte("service-refund-fees")
 	ActionSvcWithdrawFees = []byte("service-withdraw-fees")
+	ActionSvcWithdrawTax  = []byte("service-withdraw-tax")
 
 	ActionSvcCallTimeOut = []byte("service-call-expiration")
 
 	Action = sdk.TagAction
 
-	Provider = "provider"
-	Consumer = "consumer"
+	Provider  = "provider"
+	Consumer  = "consumer"
 	RequestID = "request-id"
 )

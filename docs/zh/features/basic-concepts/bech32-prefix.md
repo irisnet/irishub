@@ -1,6 +1,6 @@
 # Bech32 on IRISnet
 
-Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除了比特币之外,bech32可以编码任何短二进制数据。在IRISnet里，私钥和地址可能指的是一些在网络中不同的角色，例如普通账户和验证人账户等。IRISnet设计使用Bech32地址格式来提供对数据鲁棒的完整性检查。  用户可读部分(human readable part) 使得用户更有效率的理解地址和阅读错误信息。Bech32更多细节见 [bip-0173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki)
+Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除了比特币之外,bech32可以编码任何短二进制数据。在IRISnet里，私钥和地址可能指的是一些在网络中不同的角色，例如普通账户和验证人账户等。IRISnet设计使用Bech32地址格式来提供对数据鲁棒的完整性检查。用户可读部分(human readable part) 可帮助用户有效理解地址和阅读错误信息。Bech32更多细节见 [bip-0173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki)
 
 
 ## 用户可读部分表

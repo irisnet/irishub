@@ -58,6 +58,10 @@ func QueryDelegatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+		if len(resKVs) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNoContent, "")
+			return
+		}
 
 		var ddiList []types.DelegationDistInfo
 		for _, kv := range resKVs {
@@ -98,7 +102,6 @@ func QueryDelegationDistInfoHandlerFn(storeName string, cliCtx context.CLIContex
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
 		if len(res) == 0 {
 			utils.WriteErrorResponse(w, http.StatusNoContent, "")
 			return

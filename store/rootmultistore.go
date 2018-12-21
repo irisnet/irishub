@@ -190,11 +190,11 @@ func (rs *rootMultiStore) LastCommitID() CommitID {
 }
 
 // Implements Committer/CommitStore.
-func (rs *rootMultiStore) Commit() CommitID {
+func (rs *rootMultiStore) Commit(KVStoreList []*sdk.KVStoreKey) CommitID {
 
 	// Commit stores.
 	version := rs.lastCommitID.Version + 1
-	commitInfo := commitStores(version, rs.stores)
+	commitInfo := commitStores(version, rs.stores, KVStoreList)
 
 	// Need to update atomically.
 	batch := rs.db.NewBatch()
@@ -229,14 +229,19 @@ func (rs *rootMultiStore) CacheMultiStore() CacheMultiStore {
 	return newCacheMultiStoreFromRMS(rs)
 }
 
-// Implements MultiStore.
+// If the store does not exist, panics.
 func (rs *rootMultiStore) GetStore(key StoreKey) Store {
-	return rs.getStoreByName(key.Name())
+	store := rs.stores[key]
+	if store == nil {
+		panic("Could not load store " + key.String())
+	}
+	return store
 }
 
 // GetKVStore implements the MultiStore interface. If tracing is enabled on the
 // rootMultiStore, a wrapped TraceKVStore will be returned with the given
 // tracer, otherwise, the original KVStore will be returned.
+// If the store does not exist, panics.
 func (rs *rootMultiStore) GetKVStore(key StoreKey) KVStore {
 	store := rs.stores[key].(KVStore)
 
@@ -473,28 +478,20 @@ func setLatestVersion(batch dbm.Batch, version int64) {
 }
 
 // Commits each store and returns a new commitInfo.
-func commitStores(version int64, storeMap map[StoreKey]CommitStore) commitInfo {
-	storemap := make(map[string]CommitStore)
-	for key, store := range storeMap {
-		storemap[key.Name()] = store
-	}
-	upgrade := storemap["upgrade"]
-	if upgrade != nil {
-		upgradeStore := upgrade.(KVStore)
-		bz := upgradeStore.Get([]byte("k/")) //CurrentStoreKey
-		storekeys := string(bz)              //splitby":"
-		storekeyslist := strings.Split(storekeys, ":")
-		storeInfos := make([]storeInfo, 0, len(storekeyslist))
-		for _, key := range storekeyslist {
-			if store, ok := storemap[key]; ok {
+func commitStores(version int64, storeMap map[StoreKey]CommitStore, KVStoreList []*sdk.KVStoreKey) commitInfo {
+
+	if len(KVStoreList) > 0 {
+		storeInfos := make([]storeInfo, 0, len(KVStoreList))
+		for _, key := range KVStoreList {
+			if store, ok := storeMap[key]; ok {
 				// Commit
-				commitID := store.Commit()
+				commitID := store.Commit([]*sdk.KVStoreKey{})
 				if store.GetStoreType() == sdk.StoreTypeTransient {
 					continue
 				}
 				// Record CommitID
 				si := storeInfo{}
-				si.Name = key
+				si.Name = key.Name()
 				si.Core.CommitID = commitID
 				// si.Core.StoreType = store.GetStoreType()
 				storeInfos = append(storeInfos, si)
@@ -509,7 +506,7 @@ func commitStores(version int64, storeMap map[StoreKey]CommitStore) commitInfo {
 		storeInfos := make([]storeInfo, 0, len(storeMap))
 		for key, store := range storeMap {
 			// Commit
-			commitID := store.Commit()
+			commitID := store.Commit([]*sdk.KVStoreKey{})
 			if store.GetStoreType() == sdk.StoreTypeTransient {
 				continue
 			}

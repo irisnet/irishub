@@ -8,6 +8,8 @@ import (
 	"github.com/irisnet/irishub/modules/stake/tags"
 	"github.com/irisnet/irishub/modules/stake/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/common"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
@@ -101,6 +103,13 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator, k k
 
 	if msg.Delegation.Denom != k.GetParams(ctx).BondDenom {
 		return ErrBadDenom(k.Codespace()).Result()
+	}
+
+	if ctx.ConsensusParams() != nil {
+		tmPubKey := tmtypes.TM2PB.PubKey(msg.PubKey)
+		if !common.StringInSlice(tmPubKey.Type, ctx.ConsensusParams().Validator.PubKeyTypes) {
+			return ErrValidatorPubKeyTypeUnsupported(k.Codespace(), tmPubKey.Type, ctx.ConsensusParams().Validator.PubKeyTypes).Result()
+		}
 	}
 
 	validator := NewValidator(msg.ValidatorAddr, msg.PubKey, msg.Description)

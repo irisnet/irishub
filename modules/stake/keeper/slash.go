@@ -7,6 +7,16 @@ import (
 	"github.com/irisnet/irishub/modules/stake/types"
 )
 
+const (
+	// slash-unbondind-[delegatorAddr]-[validatorAddr]
+	SlashUnbondindDelegation = "slash-unbondind-%s-%s"
+	// slash-redelegation-[delegatorAddr]-[validatorAddrSrc]-[validatorAddrDst]
+	SlashRedelegation = "slash-redelegation-%s-%s-%s"
+	// slash-validator-[validatorAddr]
+	SlashValidator = "slash-validator-%s"
+	// slash-validator-redelegation-[validatorAddrDst]-[validatorAddrSrc]-[delegatorAddr]
+	SlashValidatorRedelegation = "slash-validator-redelegation-%s-%s-%s"
+)
 // Slash a validator for an infraction committed at a known height
 // Find the contributing stake at that height and burn the specified slashFactor
 // of it, updating unbonding delegation & redelegations appropriately
@@ -21,7 +31,7 @@ import (
 // CONTRACT:
 //    Infraction committed at the current height or at a past height,
 //    not at a height in the future
-func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeight int64, power int64, slashFactor sdk.Dec) {
+func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeight int64, power int64, slashFactor sdk.Dec) (tags sdk.Tags) {
 	logger := ctx.Logger().With("module", "x/stake")
 
 	if slashFactor.LT(sdk.ZeroDec()) {
@@ -32,7 +42,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	slashAmount := sdk.NewDec(power).Mul(slashFactor)
 	// ref https://github.com/irisnet/irishub/issues/1348
 	// ref https://github.com/irisnet/irishub/issues/1471
-	//Multiply 1*10^18 to calculate equivalent iris-atto amount
+	//Multiply 1*10^18 to calculate equivalent stake denom amount
 	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
 	slashAmount = slashAmount.MulInt(tokenPrecision)
 
@@ -81,7 +91,8 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		// Iterate through unbonding delegations from slashed validator
 		unbondingDelegations := k.GetUnbondingDelegationsFromValidator(ctx, operatorAddress)
 		for _, unbondingDelegation := range unbondingDelegations {
-			amountSlashed := k.slashUnbondingDelegation(ctx, unbondingDelegation, infractionHeight, slashFactor)
+			amountSlashed, slashUnbondingTags := k.slashUnbondingDelegation(ctx, unbondingDelegation, infractionHeight, slashFactor)
+			tags = tags.AppendTags(slashUnbondingTags)
 			if amountSlashed.IsZero() {
 				continue
 			}
@@ -91,7 +102,8 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		// Iterate through redelegations from slashed validator
 		redelegations := k.GetRedelegationsFromValidator(ctx, operatorAddress)
 		for _, redelegation := range redelegations {
-			amountSlashed := k.slashRedelegation(ctx, validator, redelegation, infractionHeight, slashFactor)
+			amountSlashed, slashRedelegationTags := k.slashRedelegation(ctx, validator, redelegation, infractionHeight, slashFactor)
+			tags = tags.AppendTags(slashRedelegationTags)
 			if amountSlashed.IsZero() {
 				continue
 			}
@@ -102,7 +114,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	// cannot decrease balance below zero
 	tokensToBurn := sdk.MinDec(remainingSlashAmount, validator.Tokens)
 	tokensToBurn = sdk.MaxDec(tokensToBurn, sdk.ZeroDec()) // defensive.
-
+	tags = tags.AppendTag(fmt.Sprintf(SlashValidator, validator.OperatorAddr),[]byte(tokensToBurn.String()))
 	// Deduct from validator's bonded tokens and update the validator.
 	// The deducted tokens are returned to pool.LooseTokens.
 	validator = k.RemoveValidatorTokens(ctx, validator, tokensToBurn)
@@ -146,19 +158,19 @@ func (k Keeper) Unjail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 // (the amount actually slashed may be less if there's
 // insufficient stake remaining)
 func (k Keeper) slashUnbondingDelegation(ctx sdk.Context, unbondingDelegation types.UnbondingDelegation,
-	infractionHeight int64, slashFactor sdk.Dec) (slashAmount sdk.Dec) {
+	infractionHeight int64, slashFactor sdk.Dec) (slashAmount sdk.Dec, tags sdk.Tags) {
 
 	now := ctx.BlockHeader().Time
 
 	// If unbonding started before this height, stake didn't contribute to infraction
 	if unbondingDelegation.CreationHeight < infractionHeight {
-		return sdk.ZeroDec()
+		return sdk.ZeroDec(), nil
 	}
 
 	if unbondingDelegation.MinTime.Before(now) {
 		// Unbonding delegation no longer eligible for slashing, skip it
 		// TODO Settle and delete it automatically?
-		return sdk.ZeroDec()
+		return sdk.ZeroDec(), nil
 	}
 
 	// Calculate slash amount proportional to stake contributing to infraction
@@ -173,6 +185,7 @@ func (k Keeper) slashUnbondingDelegation(ctx sdk.Context, unbondingDelegation ty
 	// Update unbonding delegation if necessary
 	if !unbondingSlashAmount.IsZero() {
 		unbondingDelegation.Balance.Amount = unbondingDelegation.Balance.Amount.Sub(unbondingSlashAmount)
+		tags = tags.AppendTag(fmt.Sprintf(SlashUnbondindDelegation, unbondingDelegation.DelegatorAddr, unbondingDelegation.ValidatorAddr),[]byte(unbondingSlashAmount.String()))
 		k.SetUnbondingDelegation(ctx, unbondingDelegation)
 		pool := k.GetPool(ctx)
 
@@ -192,19 +205,19 @@ func (k Keeper) slashUnbondingDelegation(ctx sdk.Context, unbondingDelegation ty
 // insufficient stake remaining)
 // nolint: unparam
 func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, redelegation types.Redelegation,
-	infractionHeight int64, slashFactor sdk.Dec) (slashAmount sdk.Dec) {
+	infractionHeight int64, slashFactor sdk.Dec) (slashAmount sdk.Dec, tags sdk.Tags) {
 
 	now := ctx.BlockHeader().Time
 
 	// If redelegation started before this height, stake didn't contribute to infraction
 	if redelegation.CreationHeight < infractionHeight {
-		return sdk.ZeroDec()
+		return sdk.ZeroDec(), nil
 	}
 
 	if redelegation.MinTime.Before(now) {
 		// Redelegation no longer eligible for slashing, skip it
 		// TODO Delete it automatically?
-		return sdk.ZeroDec()
+		return sdk.ZeroDec(), nil
 	}
 
 	// Calculate slash amount proportional to stake contributing to infraction
@@ -220,6 +233,7 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 	if !redelegationSlashAmount.IsZero() {
 		redelegation.Balance.Amount = redelegation.Balance.Amount.Sub(redelegationSlashAmount)
 		k.SetRedelegation(ctx, redelegation)
+		tags = tags.AppendTag(fmt.Sprintf(SlashRedelegation, redelegation.DelegatorAddr, redelegation.ValidatorSrcAddr, redelegation.ValidatorDstAddr), []byte(redelegationSlashAmount.String()))
 	}
 
 	// Unbond from target validator
@@ -228,7 +242,7 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 		delegation, found := k.GetDelegation(ctx, redelegation.DelegatorAddr, redelegation.ValidatorDstAddr)
 		if !found {
 			// If deleted, delegation has zero shares, and we can't unbond any more
-			return slashAmount
+			return slashAmount, nil
 		}
 		if sharesToUnbond.GT(delegation.Shares) {
 			sharesToUnbond = delegation.Shares
@@ -238,12 +252,12 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 		if err != nil {
 			panic(fmt.Errorf("error unbonding delegator: %v", err))
 		}
-
+		tags = tags.AppendTag(fmt.Sprintf(SlashValidatorRedelegation, redelegation.ValidatorDstAddr, redelegation.ValidatorSrcAddr, redelegation.DelegatorAddr), []byte(tokensToBurn.String()))
 		// Burn loose tokens
 		pool := k.GetPool(ctx)
 		pool.LooseTokens = pool.LooseTokens.Sub(tokensToBurn)
 		k.SetPool(ctx, pool)
 	}
 
-	return slashAmount
+	return
 }

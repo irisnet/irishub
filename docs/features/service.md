@@ -6,7 +6,7 @@ to work with the service standardized definitions to satisfy service invocations
 The currently supported IDL language is [protobuf](https://developers.google.com/protocol-buffers/). The main functions of this module are as follows:
 1. Service Definition
 2. Service Binding
-3. Service Invocation (TODO)
+3. Service Invocation
 4. Dispute Resolution (TODO)
 5. Service Analysis (TODO)
 
@@ -202,8 +202,9 @@ When using proto file to standardize the definition of the service's method, its
 
 ### IDL content example
 * idl-content example
-> syntax = \"proto3\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output_privacy: NoPrivacy\n    //@Attribute output_cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n
+
+    > syntax = \"proto3\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output_privacy: NoPrivacy\n    //@Attribute output_cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n
 
 * IDL file example
 
-[test.proto](./test.proto)
+    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)

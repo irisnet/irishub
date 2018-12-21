@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	flagTags = "tag"
+	flagTags = "tags"
 	flagAny  = "any"
 	flagPage = "page"
 	flagSize = "size"
@@ -31,28 +31,42 @@ func SearchTxCmd(cdc *codec.Codec) *cobra.Command {
 		Use:   "txs",
 		Short: "Search for all transactions that match the given tags.",
 		Long: strings.TrimSpace(`
-Search for transactions that match the given tags. By default, transactions must match ALL tags 
-passed to the --tags option. To match any transaction, use the --any option.
+Search for transactions that match exactly the given tags. For example:
 
-For example:
-
-$ iriscli tendermint txs --tag test1,test2
-
-will match any transaction tagged with both test1,test2. To match a transaction tagged with either
-test1 or test2, use:
-
-$ iriscli tendermint txs --tag test1,test2 --any
+$ iriscli query txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 `),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			tags := viper.GetStringSlice(flagTags)
+			tagsStr := viper.GetString(flagTags)
 			page := viper.GetInt(flagPage)
 			size := viper.GetInt(flagSize)
+
+			tagsStr = strings.Trim(tagsStr, "'")
+			var tags []string
+			if strings.Contains(tagsStr, "&") {
+				tags = strings.Split(tagsStr, "&")
+			} else {
+				tags = append(tags, tagsStr)
+			}
+
 			if page < 0 || size < 0 {
 				return fmt.Errorf("page or size should not be negative")
 			}
+
+			var tmTags []string
+			for _, tag := range tags {
+				if !strings.Contains(tag, ":") {
+					return fmt.Errorf("%s should be of the format <key>:<value>", tagsStr)
+				} else if strings.Count(tag, ":") > 1 {
+					return fmt.Errorf("%s should only contain one <key>:<value> pair", tagsStr)
+				}
+				keyValue := strings.Split(tag, ":")
+				tag = fmt.Sprintf("%s='%s'", keyValue[0], keyValue[1])
+				tmTags = append(tmTags, tag)
+			}
+
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			txs, err := searchTxs(cliCtx, cdc, tags, page, size)
+			txs, err := searchTxs(cliCtx, cdc, tmTags, page, size)
 			if err != nil {
 				return err
 			}
@@ -72,8 +86,7 @@ $ iriscli tendermint txs --tag test1,test2 --any
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
-	cmd.Flags().StringSlice(flagTags, nil, "Comma-separated list of tags that must match")
-	cmd.Flags().Bool(flagAny, false, "Return transactions that match ANY tag, rather than ALL")
+	cmd.Flags().String(flagTags, "", "tag:value list of tags that must match")
 	cmd.Flags().Int(flagPage, 0, "Pagination page")
 	cmd.Flags().Int(flagSize, 100, "Pagination size")
 	return cmd
@@ -133,39 +146,28 @@ func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx) ([]Info, error) {
 // Search Tx REST Handler
 func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tag := r.FormValue("tag")
-		if tag == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("You need to provide at least a tag as a key=value pair to search for. Postfix the key with _bech32 to search bech32-encoded addresses or public keys"))
-			return
-		}
-
-		keyValue := strings.Split(tag, "=")
-		if len(keyValue) != 2 {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("Invalid tag, tag pattern should be something like key=value pair"))
-			return
-		}
-
-		key := keyValue[0]
-		value, err := url.QueryUnescape(keyValue[1])
+		var tags []string
+		var txs []Info
+		err := r.ParseForm()
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("Could not decode address: " + err.Error()))
+			utils.WriteErrorResponse(w, http.StatusBadRequest, sdk.AppendMsgToErr("could not parse query parameters", err.Error()))
 			return
 		}
 
-		if strings.HasSuffix(key, "_bech32") {
-			bech32address := strings.Trim(value, "'")
-			prefix := strings.Split(bech32address, "1")[0]
-			bz, err := sdk.GetFromBech32(bech32address, prefix)
+		if len(r.Form) == 0 {
+			utils.PostProcessResponse(w, cdc, txs, cliCtx.Indent)
+			return
+		}
+
+		for key, values := range r.Form {
+			value, err := url.QueryUnescape(values[0])
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(err.Error()))
+				utils.WriteErrorResponse(w, http.StatusBadRequest, sdk.AppendMsgToErr("could not decode query value", err.Error()))
 				return
 			}
 
-			tag = strings.TrimRight(key, "_bech32") + "='" + sdk.AccAddress(bz).String() + "'"
+			tag := fmt.Sprintf("%s='%s'", key, value)
+			tags = append(tags, tag)
 		}
 		pageString := r.FormValue("page")
 		sizeString := r.FormValue("size")
@@ -191,15 +193,10 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		txs, err := searchTxs(cliCtx, cdc, []string{tag}, int(page), int(size))
+		txs, err = searchTxs(cliCtx, cdc, tags, int(page), int(size))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
-			return
-		}
-
-		if len(txs) == 0 {
-			w.Write([]byte("[]"))
 			return
 		}
 
