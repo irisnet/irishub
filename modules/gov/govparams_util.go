@@ -55,7 +55,6 @@ func GetMinDeposit(ctx sdk.Context, p govtypes.Proposal) sdk.Coins {
 		return govparams.DepositProcedureParameter.Value.NormalMinDeposit
 	default:
 		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
-		return nil
 	}
 }
 
@@ -69,6 +68,20 @@ func GetDepositPeriod(ctx sdk.Context) time.Duration {
 func GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
 	govparams.VotingProcedureParameter.LoadValue(ctx)
 	return govparams.VotingProcedureParameter.Value
+}
+
+func GetVotingPeriod(ctx sdk.Context, p govtypes.Proposal) time.Duration {
+	govparams.VotingProcedureParameter.LoadValue(ctx)
+	switch GetProposalLevel(p) {
+	case ProposalLevelCritical:
+		return govparams.VotingProcedureParameter.Value.CriticalVotingPeriod
+	case ProposalLevelImportant:
+		return govparams.VotingProcedureParameter.Value.ImportantVotingPeriod
+	case ProposalLevelNormal:
+		return govparams.VotingProcedureParameter.Value.NormalVotingPeriod
+	default:
+		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+	}
 }
 
 // Returns the current Tallying Procedure from the global param store

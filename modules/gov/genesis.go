@@ -64,9 +64,7 @@ func DefaultGenesisState() GenesisState {
 		TerminatorPeriod:   20000,
 		StartingProposalID: 1,
 		DepositProcedure: govparams.NewDepositProcedure(),
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: time.Duration(172800) * time.Second,
-		},
+		VotingProcedure: govparams.NewVotingProcedure(),
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:     sdk.NewDecWithPrec(5, 1),
 			Veto:          sdk.NewDecWithPrec(334, 3),
@@ -84,9 +82,7 @@ func DefaultGenesisStateForCliTest() GenesisState {
 		TerminatorPeriod:   20,
 		StartingProposalID: 1,
 		DepositProcedure: depositProcedure,
-		VotingProcedure: govparams.VotingProcedure{
-			VotingPeriod: time.Duration(60) * time.Second,
-		},
+		VotingProcedure: govparams.NewVotingProcedure(),
 		TallyingProcedure: govparams.TallyingProcedure{
 			Threshold:     sdk.NewDecWithPrec(5, 1),
 			Veto:          sdk.NewDecWithPrec(334, 3),
