@@ -3,12 +3,12 @@ package gov
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/gov/tags"
-	"strconv"
 	"encoding/json"
-	tmstate "github.com/tendermint/tendermint/state"
+	"github.com/irisnet/irishub/modules/gov/tags"
+	sdk "github.com/irisnet/irishub/types"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	tmstate "github.com/tendermint/tendermint/state"
+	"strconv"
 )
 
 // Handle all "gov" type messages.
@@ -115,20 +115,19 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
 
-	if  !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
+	if !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
 		return govtypes.ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
 	}
 
 	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
-		return govtypes.ErrCodeInvalidSwitchHeight(keeper.codespace,uint64(ctx.BlockHeight()),msg.SwitchHeight).Result()
+		return govtypes.ErrCodeInvalidSwitchHeight(keeper.codespace, uint64(ctx.BlockHeight()), msg.SwitchHeight).Result()
 	}
 	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 	if !found {
 		return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 	}
 
-
-	if _ , ok := keeper.pk.GetUpgradeConfig(ctx) ; ok {
+	if _, ok := keeper.pk.GetUpgradeConfig(ctx); ok {
 		return govtypes.ErrSwitchPeriodInProcess(keeper.codespace).Result()
 	}
 
@@ -222,7 +221,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
-		keeper.RefundDeposits(ctx, proposalID) // delete any associated deposits (burned)
+		keeper.RefundDeposits(ctx, proposalID)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
@@ -231,7 +230,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %s (had only %s); deleted",
 				inactiveProposal.GetProposalID(),
 				inactiveProposal.GetTitle(),
-				GetMinDeposit(ctx,inactiveProposal),
+				GetMinDeposit(ctx, inactiveProposal),
 				inactiveProposal.GetTotalDeposit(),
 			),
 		)
@@ -250,12 +249,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(govtypes.StatusPassed)
 			action = tags.ActionProposalPassed
-			Execute(ctx, keeper,activeProposal)
-		} else if(result == REJECT) {
+			Execute(ctx, keeper, activeProposal)
+		} else if result == REJECT {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(govtypes.StatusRejected)
 			action = tags.ActionProposalRejected
-		} else {
+		} else if result == REJECTVETO {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(govtypes.StatusRejected)
 			action = tags.ActionProposalRejected

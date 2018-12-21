@@ -5,11 +5,12 @@ import (
 	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
+type ProposalResult string
 
 const (
-	PASS       = "pass"
-	REJECT     = "reject"
-	REJECTVETO = "reject-veto"
+	PASS       ProposalResult = "pass"
+	REJECT     ProposalResult = "reject"
+	REJECTVETO ProposalResult = "reject-veto"
 )
 
 // validatorGovInfo used for tallying
@@ -21,7 +22,7 @@ type validatorGovInfo struct {
 	Vote            govtypes.VoteOption // Vote of the validator
 }
 
-func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result string, tallyResults govtypes.TallyResult) {
+func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result ProposalResult, tallyResults govtypes.TallyResult) {
 	results := make(map[govtypes.VoteOption]sdk.Dec)
 	results[govtypes.OptionYes] = sdk.ZeroDec()
 	results[govtypes.OptionAbstain] = sdk.ZeroDec()
