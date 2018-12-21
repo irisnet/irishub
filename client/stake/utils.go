@@ -148,18 +148,17 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		UpdateTime:    v.Commission.UpdateTime,
 	}
 	return ValidatorOutput{
-		OperatorAddr:       v.OperatorAddr,
-		ConsPubKey:         bechValPubkey,
-		Jailed:             v.Jailed,
-		Status:             v.Status,
-		Tokens:             utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
-		DelegatorShares:    utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
-		Description:        v.Description,
-		BondHeight:         v.UnbondingHeight,
-		BondIntraTxCounter: v.BondIntraTxCounter,
-		UnbondingHeight:    v.UnbondingHeight,
-		UnbondingMinTime:   v.UnbondingMinTime,
-		Commission:         commission,
+		OperatorAddr:     v.OperatorAddr,
+		ConsPubKey:       bechValPubkey,
+		Jailed:           v.Jailed,
+		Status:           v.Status,
+		Tokens:           utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
+		DelegatorShares:  utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
+		Description:      v.Description,
+		BondHeight:       v.UnbondingHeight,
+		UnbondingHeight:  v.UnbondingHeight,
+		UnbondingMinTime: v.UnbondingMinTime,
+		Commission:       commission,
 	}
 }
 
