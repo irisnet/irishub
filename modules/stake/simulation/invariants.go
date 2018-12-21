@@ -9,9 +9,7 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/irisnet/irishub/modules/stake/types"
 )
 
@@ -21,7 +19,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper,
 	am auth.AccountKeeper) simulation.Invariant {
 
-	return func(app *baseapp.BaseApp) error {
+	return func(ctx sdk.Context) error {
 		//err := SupplyInvariants(ck, k, f, d, am)(app, header)
 		//if err != nil {
 		//	return err
@@ -41,8 +39,7 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 // nolint: unparam
 func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeCollectionKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		ctx := app.NewContext(false, abci.Header{})
+	return func(ctx sdk.Context) error {
 		pool := k.GetPool(ctx)
 
 		loose := sdk.ZeroDec()
@@ -58,7 +55,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
 			switch validator.GetStatus() {
 			case sdk.Bonded:
-				bonded = bonded.Add(validator.GetPower())
+				bonded = bonded.Add(validator.GetPower().MulInt(sdk.NewIntWithDecimal(1, 18)))
 			case sdk.Unbonding:
 				loose = loose.Add(validator.GetTokens())
 			case sdk.Unbonded:
@@ -89,15 +86,15 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 
 		// Loose tokens should equal coin supply plus unbonding delegations
 		// plus tokens on unbonded validators
-		if !pool.LooseTokens.Equal(loose) {
-			return fmt.Errorf("loose token invariance:\n\tpool.LooseTokens: %v"+
-				"\n\tsum of account tokens: %v", pool.LooseTokens, loose)
+		if !pool.GetLoosenTokenAmount(ctx).Equal(loose) {
+			return fmt.Errorf("loose token invariance:\n\tbank.LooseTokens: %v"+
+				"\n\tsum of account tokens: %v", pool.GetLoosenTokenAmount(ctx).TruncateInt(), loose.TruncateInt())
 		}
 
 		// Bonded tokens should equal sum of tokens with bonded validators
-		if !pool.BondedTokens.Equal(bonded) {
+		if !pool.BondedPool.BondedTokens.Equal(bonded) {
 			return fmt.Errorf("bonded token invariance:\n\tpool.BondedTokens: %v"+
-				"\n\tsum of account tokens: %v", pool.BondedTokens, bonded)
+				"\n\tsum of account tokens: %v", pool.BondedPool.BondedTokens, bonded)
 		}
 
 		return nil
@@ -106,8 +103,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 
 // PositivePowerInvariant checks that all stored validators have > 0 power
 func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		ctx := app.NewContext(false, abci.Header{})
+	return func(ctx sdk.Context) error {
 
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
 		pool := k.GetPool(ctx)
@@ -132,7 +128,7 @@ func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
 
 // ValidatorSetInvariant checks equivalence of Tendermint validator set and SDK validator set
 func ValidatorSetInvariant(k stake.Keeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
+	return func(ctx sdk.Context) error {
 		// TODO
 		return nil
 	}

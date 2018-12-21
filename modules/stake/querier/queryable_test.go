@@ -26,7 +26,7 @@ func TestNewQuerier(t *testing.T) {
 	var validators [2]types.Validator
 	for i, amt := range amts {
 		validators[i] = types.NewValidator(sdk.ValAddress(keep.Addrs[i]), keep.PKs[i], types.Description{})
-		validators[i], pool, _ = validators[i].AddTokensFromDel(pool, amt)
+		validators[i], pool, _ = validators[i].AddTokensFromDel(ctx, pool, amt)
 		keeper.SetValidator(ctx, validators[i])
 		keeper.SetValidatorByPowerIndex(ctx, validators[i], pool)
 	}
@@ -103,10 +103,11 @@ func TestQueryParametersPool(t *testing.T) {
 	res, err = queryPool(ctx, cdc, keeper)
 	require.Nil(t, err)
 
-	var pool types.Pool
-	errRes = cdc.UnmarshalJSON(res, &pool)
+	var poolStatus types.PoolStatus
+	errRes = cdc.UnmarshalJSON(res, &poolStatus)
 	require.Nil(t, errRes)
-	require.Equal(t, keeper.GetPool(ctx), pool)
+	require.Equal(t, keeper.GetPool(ctx).BondedPool.BondedTokens, poolStatus.BondedTokens)
+	require.Equal(t, keeper.GetPool(ctx).GetLoosenTokenAmount(ctx), poolStatus.LooseTokens)
 }
 
 func TestQueryValidators(t *testing.T) {
@@ -120,7 +121,7 @@ func TestQueryValidators(t *testing.T) {
 	var validators [2]types.Validator
 	for i, amt := range amts {
 		validators[i] = types.NewValidator(sdk.ValAddress(keep.Addrs[i]), keep.PKs[i], types.Description{})
-		validators[i], pool, _ = validators[i].AddTokensFromDel(pool, amt)
+		validators[i], pool, _ = validators[i].AddTokensFromDel(ctx, pool, amt)
 	}
 	keeper.SetPool(ctx, pool)
 	keeper.SetValidator(ctx, validators[0])

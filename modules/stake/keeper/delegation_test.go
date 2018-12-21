@@ -22,7 +22,7 @@ func TestDelegation(t *testing.T) {
 	var validators [3]types.Validator
 	for i, amt := range amts {
 		validators[i] = types.NewValidator(addrVals[i], PKs[i], types.Description{})
-		validators[i], pool, _ = validators[i].AddTokensFromDel(pool, amt)
+		validators[i], pool, _ = validators[i].AddTokensFromDel(ctx, pool, amt)
 	}
 
 	keeper.SetPool(ctx, pool)
@@ -181,17 +181,17 @@ func TestUnbondingDelegation(t *testing.T) {
 func TestUnbondDelegation(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(10, 18))})
 
 	//create a validator and a delegator to that validator
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
 
 	pool = keeper.GetPool(ctx)
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), pool.BondedPool.BondedTokens)
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), validator.BondedTokens())
 
 	delegation := types.Delegation{
@@ -213,8 +213,8 @@ func TestUnbondDelegation(t *testing.T) {
 
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), delegation.Shares)
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), validator.BondedTokens())
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)), pool.LooseTokens, "%v", pool)
-	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)), pool.GetLoosenTokenAmount(ctx), "%v", pool.GetLoosenTokenAmount(ctx))
+	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(4, 18)), pool.BondedPool.BondedTokens)
 }
 
 // test removing all self delegation from a validator which should
@@ -223,11 +223,11 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(20, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -241,7 +241,7 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -270,12 +270,12 @@ func TestUndelegateSelfDelegation(t *testing.T) {
 func TestUndelegateFromUnbondingValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(20, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -289,7 +289,7 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -346,12 +346,12 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 func TestUndelegateFromUnbondedValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(20, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -366,7 +366,7 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -425,12 +425,12 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 func TestUnbondingAllDelegationFromValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(20, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(20, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -445,7 +445,7 @@ func TestUnbondingAllDelegationFromValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -588,11 +588,11 @@ func TestRedelegateToSameValidator(t *testing.T) {
 
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDec(30)
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewInt(30))})
 
 	// create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewInt(10))
 	require.Equal(t, int64(10), issuedShares.RoundInt64())
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -614,11 +614,11 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(30, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(30, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -633,15 +633,15 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 
 	// create a second validator
 	validator2 := types.NewValidator(addrVals[1], PKs[1], types.Description{})
-	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator2, pool, issuedShares = validator2.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
-	pool.BondedTokens = pool.BondedTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
+	pool.BondedPool.BondedTokens = pool.BondedPool.BondedTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	keeper.SetPool(ctx, pool)
 	validator2 = TestingUpdateValidator(keeper, ctx, validator2, true)
 	require.Equal(t, sdk.Bonded, validator2.Status)
 
 	// create a second delegation to this validator
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -669,12 +669,12 @@ func TestRedelegateSelfDelegation(t *testing.T) {
 func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(30, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(30, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -689,7 +689,7 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -703,7 +703,7 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 
 	// create a second validator
 	validator2 := types.NewValidator(addrVals[1], PKs[1], types.Description{})
-	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator2, pool, issuedShares = validator2.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator2 = TestingUpdateValidator(keeper, ctx, validator2, true)
@@ -752,12 +752,12 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
-	pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(30, 18))
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(30, 18))})
 
 	//create a validator with a self-delegation
 	validator := types.NewValidator(addrVals[0], PKs[0], types.Description{})
 
-	validator, pool, issuedShares := validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares := validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -772,7 +772,7 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 
 	// create a second delegation to this validator
 	keeper.DeleteValidatorByPowerIndex(ctx, validator, pool)
-	validator, pool, issuedShares = validator.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator, pool, issuedShares = validator.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator = TestingUpdateValidator(keeper, ctx, validator, true)
@@ -786,7 +786,7 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 
 	// create a second validator
 	validator2 := types.NewValidator(addrVals[1], PKs[1], types.Description{})
-	validator2, pool, issuedShares = validator2.AddTokensFromDel(pool, sdk.NewIntWithDecimal(10, 18))
+	validator2, pool, issuedShares = validator2.AddTokensFromDel(ctx, pool, sdk.NewIntWithDecimal(10, 18))
 	require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), issuedShares)
 	keeper.SetPool(ctx, pool)
 	validator2 = TestingUpdateValidator(keeper, ctx, validator2, true)

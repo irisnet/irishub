@@ -7,7 +7,7 @@ import (
 
 // InitGenesis sets distribution information for genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) {
-	keeper.SetFeePool(ctx, data.FeePool)
+	keeper.SetGenesisFeePool(ctx, data.FeePool)
 	keeper.SetCommunityTax(ctx, data.CommunityTax)
 	keeper.SetBaseProposerReward(ctx, data.BaseProposerReward)
 	keeper.SetBonusProposerReward(ctx, data.BonusProposerReward)

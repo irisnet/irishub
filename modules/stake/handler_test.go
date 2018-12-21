@@ -335,7 +335,7 @@ func TestIncrementsMsgDelegate(t *testing.T) {
 	pool := keeper.GetPool(ctx)
 	exRate := validator.DelegatorShareExRate()
 	require.True(t, exRate.Equal(sdk.OneDec()), "expected exRate 1 got %v", exRate)
-	require.Equal(t, sdk.NewDecFromInt(bondAmount), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(bondAmount), pool.BondedPool.BondedTokens)
 
 	// just send the same msgbond multiple times
 	msgDelegate := NewTestMsgDelegate(delegatorAddr, validatorAddr, bondAmount)

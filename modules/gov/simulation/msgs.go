@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	denom = "steak"
+	denom = "iris-atto"
 )
 
 // SimulateSubmittingVotingAndSlashingForProposal simulates creating a msg Submit Proposal
@@ -103,7 +103,7 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 	if ok {
 		// Update pool to keep invariants
 		pool := sk.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Sub(sdk.NewDecFromInt(msg.InitialDeposit.AmountOf(denom)))
+		pool.BankKeeper.DecreaseLoosenToken(ctx, msg.InitialDeposit)
 		sk.SetPool(ctx, pool)
 		write()
 	}
@@ -151,7 +151,7 @@ func SimulateMsgDeposit(k gov.Keeper, sk stake.Keeper) simulation.Operation {
 		if result.IsOK() {
 			// Update pool to keep invariants
 			pool := sk.GetPool(ctx)
-			pool.LooseTokens = pool.LooseTokens.Sub(sdk.NewDecFromInt(deposit.AmountOf(denom)))
+			pool.BankKeeper.DecreaseLoosenToken(ctx, deposit)
 			sk.SetPool(ctx, pool)
 			write()
 		}

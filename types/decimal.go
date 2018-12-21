@@ -376,6 +376,11 @@ func (d Dec) TruncateInt() Int {
 	return NewIntFromBigInt(chopPrecisionAndTruncateNonMutative(d.Int))
 }
 
+// TruncateDec truncates the decimals from the number and returns an Dec
+func (d Dec) TruncateDec() Dec {
+	return NewDecFromInt(NewIntFromBigInt(chopPrecisionAndTruncateNonMutative(d.Int)))
+}
+
 //___________________________________________________________________________________
 
 // reuse nil values

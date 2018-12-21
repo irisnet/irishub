@@ -22,7 +22,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	// e.g. with a one-block offset - the first TM block is at height 0, so state updates applied from genesis.json are in block -1.
 	ctx = ctx.WithBlockHeight(1 - types.ValidatorUpdateDelay)
 
-	keeper.SetPool(ctx, data.Pool)
+	keeper.SetPool(ctx, types.Pool{BondedPool: data.BondedPool})
 	keeper.SetParams(ctx, data.Params)
 	keeper.SetLastTotalPower(ctx, data.LastTotalPower)
 
@@ -31,7 +31,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 
 		// Manually set indices for the first time
 		keeper.SetValidatorByConsAddr(ctx, validator)
-		keeper.SetValidatorByPowerIndex(ctx, validator, data.Pool)
+		keeper.SetValidatorByPowerIndex(ctx, validator, types.Pool{BondedPool:	data.BondedPool})
 		keeper.OnValidatorCreated(ctx, validator.OperatorAddr)
 
 		// Set timeslice if necessary
@@ -84,7 +84,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 // GenesisState will contain the pool, params, validators, and bonds found in
 // the keeper.
 func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
-	pool := keeper.GetPool(ctx)
+	pool := keeper.GetPool(ctx).BondedPool
 	params := keeper.GetParams(ctx)
 	lastTotalPower := keeper.GetLastTotalPower(ctx)
 	validators := keeper.GetAllValidators(ctx)
@@ -107,7 +107,7 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
 	})
 
 	return types.GenesisState{
-		Pool:                 pool,
+		BondedPool:           pool,
 		Params:               params,
 		LastTotalPower:       lastTotalPower,
 		LastValidatorPowers:  lastValidatorPowers,
