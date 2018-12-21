@@ -18,6 +18,7 @@ type StakeKeeper interface {
 type BankKeeper interface {
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	BurnCoinsFromPool(ctx sdk.Context, pool string, amt sdk.Coins) (sdk.Tags, sdk.Error)
+	IncreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 }
 
 // from ante handler
