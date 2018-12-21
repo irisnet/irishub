@@ -37,17 +37,17 @@ type kvPair struct {
 	TagValue string `json:"tag_value"`
 }
 type abciResult struct {
-	Code      sdk.CodeType     `json:"code"`
-	Data      []byte           `json:"data"`
-	Log       string           `json:"log"`
-	GasWanted uint64           `json:"gas_wanted"`
-	GasUsed   uint64           `json:"gas_used"`
-	FeeAmount int64            `json:"fee_amount"`
-	FeeDenom  string           `json:"fee_denom"`
-	Tags      []kvPair         `json:"tagsy"`
+	Code      sdk.CodeType `json:"code"`
+	Data      []byte       `json:"data"`
+	Log       string       `json:"log"`
+	GasWanted uint64       `json:"gas_wanted"`
+	GasUsed   uint64       `json:"gas_used"`
+	FeeAmount int64        `json:"fee_amount"`
+	FeeDenom  string       `json:"fee_denom"`
+	Tags      []kvPair     `json:"tags"`
 }
 type simulateResult struct {
-	GasEstimate uint64      `json:"gas_estimate"`
+	GasEstimate uint64     `json:"gas_estimate"`
 	Result      abciResult `json:"result"`
 }
 
