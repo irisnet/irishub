@@ -67,27 +67,17 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		feePool := d.GetFeePool(ctx)
 
 		// add outstanding fees
-		collectCoinsString := f.GetCollectedFees(ctx).String()
-		_ = collectCoinsString
 		loose = loose.Add(sdk.NewDecFromInt(f.GetCollectedFees(ctx).AmountOf(types.StakeDenom)))
 
 		// add community pool
-		coinsString1 := feePool.CommunityPool.ToString()
-		_= coinsString1
 		loose = loose.Add(feePool.CommunityPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution pool
-		coinsString2 := feePool.ValPool.ToString()
-		_=coinsString2
 		loose = loose.Add(feePool.ValPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution commission and yet-to-be-withdrawn-by-delegators
 		d.IterateValidatorDistInfos(ctx,
 			func(_ int64, distInfo distribution.ValidatorDistInfo) (stop bool) {
-				coinsString3 := distInfo.DelPool.ToString()
-				coinsString4 := distInfo.ValCommission.ToString()
-				_=coinsString3
-				_=coinsString4
 				loose = loose.Add(distInfo.DelPool.AmountOf(types.StakeDenom))
 				loose = loose.Add(distInfo.ValCommission.AmountOf(types.StakeDenom))
 				return false
