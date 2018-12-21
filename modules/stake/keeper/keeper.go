@@ -78,16 +78,10 @@ func (k Keeper) SetPool(ctx sdk.Context, pool types.Pool) {
 
 // load the pool status
 func (k Keeper) GetPoolStatus(ctx sdk.Context) (poolStatus types.PoolStatus) {
-	store := ctx.KVStore(k.storeKey)
-	b := store.Get(PoolKey)
-	if b == nil {
-		panic("stored pool should not have been nil")
-	}
-	var bondedPool types.BondedPool
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &bondedPool)
+	pool := k.GetPool(ctx)
 	poolStatus = types.PoolStatus{
-		LooseTokens:  sdk.NewDecFromInt(k.bankKeeper.GetLoosenCoins(ctx).AmountOf(types.StakeDenom)),
-		BondedTokens: bondedPool.BondedTokens,
+		LooseTokens:  pool.GetLoosenTokenAmount(ctx),
+		BondedTokens: pool.BondedPool.BondedTokens,
 	}
 	return
 }
