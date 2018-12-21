@@ -96,14 +96,9 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		if err != nil {
 			panic(err)
 		}
-		ct := types.NewDefaultCoinType(stakeTypes.StakeDenomName)
-		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeDenomName))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: govparams.DepositProcedure{
-				MinDeposit:       sdk.Coins{minDeposit},
-				MaxDepositPeriod: 1440,
-			},
+			DepositProcedure: govparams.NewDepositProcedure(),
 			VotingProcedure: govparams.VotingProcedure{
 				VotingPeriod: 30,
 			},

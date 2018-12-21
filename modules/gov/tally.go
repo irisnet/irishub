@@ -2,7 +2,6 @@ package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/gov/params"
 	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
@@ -89,7 +88,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (passes b
 	}
 
 	////////////////////  iris begin  ///////////////////////////
-	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
+	tallyingProcedure := GetTallyingProcedure(ctx)
 	////////////////////  iris end  /////////////////////////////
 
 	tallyResults = govtypes.TallyResult{
