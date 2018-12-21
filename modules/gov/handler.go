@@ -57,7 +57,6 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	}
 	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
 		////////////////////  iris begin  ///////////////////////////
@@ -92,7 +91,6 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
 		tags.Usage, []byte(msg.Usage.String()),
@@ -140,7 +138,6 @@ func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg 
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSubmitProposal,
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
 	)
@@ -168,7 +165,6 @@ func handleMsgDeposit(ctx sdk.Context, keeper Keeper, msg MsgDeposit) sdk.Result
 
 	// TODO: Add tag for if voting period started
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionDeposit,
 		tags.Depositor, []byte(msg.Depositor.String()),
 		tags.ProposalID, proposalIDBytes,
 	)
@@ -194,7 +190,6 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 	////////////////////  iris end  /////////////////////////////
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionVote,
 		tags.Voter, []byte(msg.Voter.String()),
 		tags.ProposalID, proposalIDBytes,
 	)

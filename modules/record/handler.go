@@ -25,7 +25,6 @@ func handleMsgSubmitFile(ctx sdk.Context, keeper Keeper, msg MsgSubmitRecord) sd
 	recordIDBytes := []byte(msg.RecordID)
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSubmitRecord,
 		tags.OwnerAddress, []byte(msg.OwnerAddress.String()),
 		tags.RecordID, recordIDBytes,
 	)
