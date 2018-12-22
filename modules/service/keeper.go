@@ -15,6 +15,7 @@ import (
 
 var DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
 var RequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
+var TaxCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
 
 type Keeper struct {
 	storeKey sdk.StoreKey
@@ -458,9 +459,10 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	taxCoins = taxCoins.Sort()
 	taxFee = taxFee.Plus(taxCoins)
 
-	taxPool := k.GetServiceFeeTaxPool(ctx)
-	taxPool = taxPool.Plus(taxFee)
-	k.SetServiceFeeTaxPool(ctx, taxPool)
+	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, TaxCoinsAccAddr, taxFee)
+	if err != nil {
+		return err
+	}
 
 	incomingFee, hasNeg := coins.SafeMinus(taxFee)
 	if hasNeg {
@@ -511,23 +513,6 @@ func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
 	store.Set(serviceFeeTaxKey, bz)
-}
-
-func (k Keeper) GetServiceFeeTaxPool(ctx sdk.Context) sdk.Coins {
-	var coins sdk.Coins
-	store := ctx.KVStore(k.storeKey)
-	value := store.Get(serviceFeeTaxPoolKey)
-	if value == nil {
-		return sdk.Coins{}
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &coins)
-	return coins
-}
-
-func (k Keeper) SetServiceFeeTaxPool(ctx sdk.Context, coins sdk.Coins) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(coins)
-	store.Set(serviceFeeTaxPoolKey, bz)
 }
 
 //__________________________________________________________________________
