@@ -447,9 +447,16 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
 	feeTax := k.GetServiceFeeTax(ctx)
 	taxFee := sdk.Coins{}
+	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
-		taxFee = taxFee.Plus(sdk.Coins{sdk.Coin{Denom: coin.Denom, Amount: sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
+		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
+		taxCoins = append(taxCoins, sdk.Coin{
+			Denom: coin.Denom,
+			Amount: taxAmount,
+		})
 	}
+	taxCoins = taxCoins.Sort()
+	taxFee = taxFee.Plus(taxCoins)
 
 	taxPool := k.GetServiceFeeTaxPool(ctx)
 	taxPool = taxPool.Plus(taxFee)
