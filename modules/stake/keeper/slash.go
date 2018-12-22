@@ -118,7 +118,13 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	// Deduct from validator's bonded tokens and update the validator.
 	// The deducted tokens are returned to pool.LooseTokens.
 	validator = k.RemoveValidatorTokens(ctx, validator, tokensToBurn)
-
+	if !tokensToBurn.Sub(tokensToBurn.TruncateDec()).IsZero() {
+		panic("slash decimal token in redelegation")
+	}
+	k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.Coin{
+		Denom: types.StakeDenom,
+		Amount: tokensToBurn.TruncateInt(),
+	}})
 	// Log that a slash occurred!
 	logger.Info(fmt.Sprintf(
 		"validator %s slashed by slash factor of %s; burned %v tokens",
