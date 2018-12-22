@@ -22,7 +22,6 @@ var (
 	incomingFeeKey               = []byte{0x11}
 
 	serviceFeeTaxKey     = []byte{0x12}
-	serviceFeeTaxPoolKey = []byte{0x13}
 )
 
 func GetServiceDefinitionKey(chainId, name string) []byte {
