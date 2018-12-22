@@ -55,7 +55,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
 			switch validator.GetStatus() {
 			case sdk.Bonded:
-				bonded = bonded.Add(validator.GetPower().MulInt(sdk.NewIntWithDecimal(1, 18)))
+				bonded = bonded.Add(validator.GetTokens())
 			case sdk.Unbonding:
 				loose = loose.Add(validator.GetTokens())
 			case sdk.Unbonded:
