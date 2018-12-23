@@ -74,6 +74,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
 
+	keeper.BeginProposal(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,
 		Tags: resTags,
@@ -117,6 +118,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
 
+	keeper.BeginProposal(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,
 		Tags: resTags,
@@ -163,6 +165,7 @@ func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg 
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
 
+	keeper.BeginProposal(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,
 		Tags: resTags,
@@ -234,6 +237,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
+		keeper.EndProposal(ctx, inactiveProposal)
 		keeper.DeleteProposal(ctx, proposalID)
 		keeper.RefundDeposits(ctx, proposalID)
 
@@ -284,6 +288,8 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
+
+		keeper.EndProposal(ctx, activeProposal)
 	}
 	activeIterator.Close()
 

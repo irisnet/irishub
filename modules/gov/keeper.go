@@ -215,6 +215,7 @@ func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64) govtypes.Pr
 
 // Implements sdk.AccountKeeper.
 func (keeper Keeper) SetProposal(ctx sdk.Context, proposal govtypes.Proposal) {
+
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposal)
 	store.Set(KeyProposal(proposal.GetProposalID()), bz)
