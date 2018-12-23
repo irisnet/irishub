@@ -37,6 +37,7 @@ const (
 	CodeDepositNotExisted  sdk.CodeType = 23
 	CodeNotInDepositPeriod sdk.CodeType = 24
 	CodeAlreadyVote        sdk.CodeType = 25
+	CodeOnlyValidatorVote  sdk.CodeType = 26
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -137,8 +138,13 @@ func ErrCodeDepositNotExisted(codespace sdk.CodespaceType, address sdk.AccAddres
 func ErrNotInDepositPeriod(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
 	return sdk.NewError(codespace, CodeNotInDepositPeriod, fmt.Sprintf("Proposal %d isn't in deposit period", proposalID))
 }
+
 func ErrAlreadyVote(codespace sdk.CodespaceType, address sdk.AccAddress, proposalID uint64) sdk.Error {
 	return sdk.NewError(codespace, CodeAlreadyVote, fmt.Sprintf("Address %s has voted for the proposal [%d]", address, proposalID))
+}
+
+func OnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeOnlyValidatorVote, fmt.Sprintf("Address %s isn't a validator, so can't vote.", address))
 }
 
 ////////////////////  iris end  /////////////////////////////

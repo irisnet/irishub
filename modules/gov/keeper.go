@@ -342,6 +342,11 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	if proposal.GetStatus() != govtypes.StatusVotingPeriod {
 		return govtypes.ErrInactiveProposal(keeper.codespace, proposalID)
 	}
+
+	if keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr)) == nil {
+       return  govtypes.OnlyValidatorVote(keeper.codespace, voterAddr)
+	}
+
 	if _, ok := keeper.GetVote(ctx, proposalID, voterAddr); ok {
 		return govtypes.ErrAlreadyVote(keeper.codespace, voterAddr, proposalID)
 	}
