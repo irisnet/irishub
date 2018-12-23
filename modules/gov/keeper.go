@@ -417,8 +417,8 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Check if proposal is still depositable
-	if (proposal.GetStatus() != govtypes.StatusDepositPeriod) && (proposal.GetStatus() != govtypes.StatusVotingPeriod) {
-		return govtypes.ErrAlreadyFinishedProposal(keeper.codespace, proposalID), false
+	if proposal.GetStatus() != govtypes.StatusDepositPeriod {
+		return govtypes.ErrNotInDepositPeriod(keeper.codespace, proposalID), false
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account

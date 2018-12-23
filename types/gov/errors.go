@@ -35,6 +35,7 @@ const (
 	CodeDepositDeleted    sdk.CodeType = 21
 	CodeVoteNotExisted    sdk.CodeType = 22
 	CodeDepositNotExisted sdk.CodeType = 23
+	CodeNotInDepositPeriod sdk.CodeType =24
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -132,4 +133,7 @@ func ErrCodeDepositNotExisted(codespace sdk.CodespaceType, address sdk.AccAddres
 	return sdk.NewError(codespace, CodeDepositNotExisted, fmt.Sprintf("Address %s hasn't deposited on the proposal [%d", address, proposalID))
 }
 
+func ErrNotInDepositPeriod(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
+	return sdk.NewError(codespace, CodeNotInDepositPeriod, fmt.Sprintf("Proposal %d isn't in deposit period", proposalID))
+}
 ////////////////////  iris end  /////////////////////////////
