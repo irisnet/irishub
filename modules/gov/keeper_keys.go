@@ -82,4 +82,7 @@ func KeyInactiveProposalQueueProposal(endTime time.Time, proposalID uint64) []by
 var (
 	KeyTerminatorHeight = []byte("TerminatorHeight")
 	KeyTerminatorPeriod = []byte("TerminatorPeriod")
+	KeyCriticalProposal = []byte("CriticalProposalList")
+	KeyImportantProposalNum = []byte("ImportantProposalNum")
+	KeyNormalProposalNum = []byte("NormalProposalNum")
 )

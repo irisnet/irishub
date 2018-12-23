@@ -344,7 +344,7 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	}
 
 	if keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr)) == nil {
-       return  govtypes.OnlyValidatorVote(keeper.codespace, voterAddr)
+		return govtypes.ErrOnlyValidatorVote(keeper.codespace, voterAddr)
 	}
 
 	if _, ok := keeper.GetVote(ctx, proposalID, voterAddr); ok {
@@ -581,4 +581,130 @@ func (keeper Keeper) SetTerminatorPeriod(ctx sdk.Context, height int64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(height)
 	store.Set(KeyTerminatorPeriod, bz)
+}
+
+func (keeper Keeper) GetCriticalProposal(ctx sdk.Context) (uint64, bool) {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := store.Get(KeyCriticalProposal)
+	if bz == nil {
+		return 0, false
+	}
+	var proposalID uint64
+	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &proposalID)
+	return proposalID, true
+}
+
+func (keeper Keeper) SetCriticalProposal(ctx sdk.Context, proposalID uint64) {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
+	store.Set(KeyCriticalProposal, bz)
+}
+
+func (keeper Keeper) GetCriticalProposalNum(ctx sdk.Context) uint64 {
+	if _, ok := keeper.GetCriticalProposal(ctx); ok {
+		return 1
+	}
+	return 0
+}
+
+func (keeper Keeper) AddCriticalProposalNum(ctx sdk.Context, proposalID uint64) {
+        keeper.SetCriticalProposal(ctx,proposalID)
+}
+
+func (keeper Keeper) SubCriticalProposalNum(ctx sdk.Context){
+       store := ctx.KVStore(keeper.storeKey)
+       store.Delete(KeyCriticalProposal)
+}
+
+func (keeper Keeper) GetImportantProposalNum(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := store.Get(KeyImportantProposalNum)
+	if bz == nil {
+		keeper.SetImportantProposalNum(ctx, 0)
+		return 0
+	}
+	var num uint64
+	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &num)
+	return num
+}
+
+func (keeper Keeper) SetImportantProposalNum(ctx sdk.Context, num uint64){
+	store := ctx.KVStore(keeper.storeKey)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(num)
+	store.Set(KeyImportantProposalNum, bz)
+}
+
+func (keeper Keeper) AddImportantProposalNum(ctx sdk.Context) {
+      keeper.SetImportantProposalNum(ctx, keeper.GetImportantProposalNum(ctx)+1)
+}
+
+func (keeper Keeper) SubImportantProposalNum(ctx sdk.Context) {
+	keeper.SetImportantProposalNum(ctx, keeper.GetImportantProposalNum(ctx)-1)
+}
+
+func (keeper Keeper) GetNormalProposalNum(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(keeper.storeKey)
+	bz := store.Get(KeyNormalProposalNum)
+	if bz == nil {
+		keeper.SetImportantProposalNum(ctx, 0)
+		return 0
+	}
+	var num uint64
+	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &num)
+	return num
+}
+
+func (keeper Keeper) SetNormalProposalNum(ctx sdk.Context, num uint64){
+	store := ctx.KVStore(keeper.storeKey)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(num)
+	store.Set(KeyNormalProposalNum, bz)
+}
+
+func (keeper Keeper) AddNormalProposalNum(ctx sdk.Context) {
+	  keeper.SetNormalProposalNum(ctx, keeper.GetNormalProposalNum(ctx)+1)
+}
+
+func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
+	keeper.SetNormalProposalNum(ctx, keeper.GetNormalProposalNum(ctx)-1)
+}
+
+
+
+func (keeper Keeper) IsMoreThanMaxProposal(ctx sdk.Context, pl ProposalLevel) (uint64,bool) {
+	switch pl {
+	case ProposalLevelCritical:
+		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) >= 1
+	case ProposalLevelImportant:
+		return keeper.GetImportantProposalNum(ctx),keeper.GetImportantProposalNum(ctx) >= 3
+	case ProposalLevelNormal:
+		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) >= 5
+	default:
+		panic("There is no level for this proposal")
+	}
+}
+
+func (keeper Keeper) BeginProposal(ctx sdk.Context, p govtypes.Proposal) {
+	switch GetProposalLevel(p) {
+	case ProposalLevelCritical:
+		keeper.AddCriticalProposalNum(ctx,p.GetProposalID())
+	case ProposalLevelImportant:
+		keeper.AddImportantProposalNum(ctx)
+	case ProposalLevelNormal:
+		keeper.AddNormalProposalNum(ctx)
+	default:
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
+	}
+}
+
+func (keeper Keeper) EndProposal(ctx sdk.Context, p govtypes.Proposal) {
+	switch GetProposalLevel(p) {
+	case ProposalLevelCritical:
+		keeper.SubCriticalProposalNum(ctx)
+	case ProposalLevelImportant:
+		keeper.SubImportantProposalNum(ctx)
+	case ProposalLevelNormal:
+		keeper.SubNormalProposalNum(ctx)
+	default:
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
+	}
 }

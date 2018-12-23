@@ -33,6 +33,11 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
+
+	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
+	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
+		return govtypes.ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	}
 	////////////////////  iris begin  ///////////////////////////
 	if msg.ProposalType == govtypes.ProposalTypeSoftwareHalt {
 		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
@@ -76,6 +81,11 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 }
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
+	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
+	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
+		return govtypes.ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	}
+
 	if msg.Usage != govtypes.UsageTypeBurn {
 		_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
 		if !found {
@@ -114,6 +124,10 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 }
 
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
+	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
+	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
+		return govtypes.ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	}
 
 	if !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
 		return govtypes.ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()

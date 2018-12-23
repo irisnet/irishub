@@ -31,13 +31,14 @@ const (
 	CodeInvalidVersion        sdk.CodeType = 18
 	CodeInvalidSwitchHeight   sdk.CodeType = 19
 
-	CodeVoteDeleted        sdk.CodeType = 20
-	CodeDepositDeleted     sdk.CodeType = 21
-	CodeVoteNotExisted     sdk.CodeType = 22
-	CodeDepositNotExisted  sdk.CodeType = 23
-	CodeNotInDepositPeriod sdk.CodeType = 24
-	CodeAlreadyVote        sdk.CodeType = 25
-	CodeOnlyValidatorVote  sdk.CodeType = 26
+	CodeVoteDeleted         sdk.CodeType = 20
+	CodeDepositDeleted      sdk.CodeType = 21
+	CodeVoteNotExisted      sdk.CodeType = 22
+	CodeDepositNotExisted   sdk.CodeType = 23
+	CodeNotInDepositPeriod  sdk.CodeType = 24
+	CodeAlreadyVote         sdk.CodeType = 25
+	CodeOnlyValidatorVote   sdk.CodeType = 26
+	CodeMoreThanMaxProposal sdk.CodeType = 27
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -143,8 +144,12 @@ func ErrAlreadyVote(codespace sdk.CodespaceType, address sdk.AccAddress, proposa
 	return sdk.NewError(codespace, CodeAlreadyVote, fmt.Sprintf("Address %s has voted for the proposal [%d]", address, proposalID))
 }
 
-func OnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+func ErrOnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeOnlyValidatorVote, fmt.Sprintf("Address %s isn't a validator, so can't vote.", address))
+}
+
+func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLevel string) sdk.Error {
+	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal is more than the maximum %v.", proposalLevel, num))
 }
 
 ////////////////////  iris end  /////////////////////////////
