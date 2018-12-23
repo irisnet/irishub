@@ -584,7 +584,7 @@ func (keeper Keeper) SetTerminatorPeriod(ctx sdk.Context, height int64) {
 	store.Set(KeyTerminatorPeriod, bz)
 }
 
-func (keeper Keeper) GetCriticalProposal(ctx sdk.Context) (uint64, bool) {
+func (keeper Keeper) GetCriticalProposalID(ctx sdk.Context) (uint64, bool) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyCriticalProposal)
 	if bz == nil {
@@ -595,21 +595,21 @@ func (keeper Keeper) GetCriticalProposal(ctx sdk.Context) (uint64, bool) {
 	return proposalID, true
 }
 
-func (keeper Keeper) SetCriticalProposal(ctx sdk.Context, proposalID uint64) {
+func (keeper Keeper) SetCriticalProposalID(ctx sdk.Context, proposalID uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyCriticalProposal, bz)
 }
 
 func (keeper Keeper) GetCriticalProposalNum(ctx sdk.Context) uint64 {
-	if _, ok := keeper.GetCriticalProposal(ctx); ok {
+	if _, ok := keeper.GetCriticalProposalID(ctx); ok {
 		return 1
 	}
 	return 0
 }
 
 func (keeper Keeper) AddCriticalProposalNum(ctx sdk.Context, proposalID uint64) {
-        keeper.SetCriticalProposal(ctx,proposalID)
+        keeper.SetCriticalProposalID(ctx,proposalID)
 }
 
 func (keeper Keeper) SubCriticalProposalNum(ctx sdk.Context){

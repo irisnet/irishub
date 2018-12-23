@@ -293,5 +293,37 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	}
 	activeIterator.Close()
 
+	if proposalID,ok :=keeper.GetCriticalProposalID(ctx); ok {
+		activeProposal := keeper.GetProposal(ctx, proposalID)
+		result, tallyResults := tally(ctx, keeper, activeProposal)
+
+		var action []byte
+		if result == PASS {
+			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
+			activeProposal.SetStatus(govtypes.StatusPassed)
+			action = tags.ActionProposalPassed
+			Execute(ctx, keeper, activeProposal)
+		} else if result == REJECTVETO {
+			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
+			activeProposal.SetStatus(govtypes.StatusRejected)
+			action = tags.ActionProposalRejected
+		} else {
+			return resTags
+		}
+
+		activeProposal.SetTallyResult(tallyResults)
+		activeProposal.SetVotingEndTime(ctx.BlockHeader().Time)
+		keeper.SetProposal(ctx, activeProposal)
+
+		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
+
+		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
+			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
+
+		resTags = resTags.AppendTag(tags.Action, action)
+		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
+
+		keeper.EndProposal(ctx, activeProposal)
+	}
 	return resTags
 }
