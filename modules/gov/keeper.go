@@ -1,16 +1,16 @@
 package gov
 
 import (
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/tendermint/tendermint/crypto"
-	"time"
-	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/tendermint/tendermint/crypto"
+	"time"
 )
 
 // nolint
@@ -49,7 +49,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet,pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,
 		ck:        ck,
@@ -342,6 +342,9 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	if proposal.GetStatus() != govtypes.StatusVotingPeriod {
 		return govtypes.ErrInactiveProposal(keeper.codespace, proposalID)
 	}
+	if _, ok := keeper.GetVote(ctx, proposalID, voterAddr); ok {
+		return govtypes.ErrAlreadyVote(keeper.codespace, voterAddr, proposalID)
+	}
 
 	if !govtypes.ValidVoteOption(option) {
 		return govtypes.ErrInvalidVote(keeper.codespace, option)
@@ -434,7 +437,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetStatus() == govtypes.StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(GetMinDeposit(ctx,proposal)) {
+	if proposal.GetStatus() == govtypes.StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(GetMinDeposit(ctx, proposal)) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}
