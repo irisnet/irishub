@@ -277,12 +277,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			activeProposal.SetStatus(govtypes.StatusRejected)
 			action = tags.ActionProposalRejected
 		}
-
+		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
-
-		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
-
 		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
 			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
 
@@ -310,12 +307,10 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		} else {
 			return resTags
 		}
-
+		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 		activeProposal.SetTallyResult(tallyResults)
 		activeProposal.SetVotingEndTime(ctx.BlockHeader().Time)
 		keeper.SetProposal(ctx, activeProposal)
-
-		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 
 		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
 			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
