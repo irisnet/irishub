@@ -14,4 +14,5 @@ var (
 	Consumer   = "consumer"
 	RequestID  = "request-id"
 	ServiceFee = "service-fee"
+	SlashCoins = "service-slash-coins"
 )

@@ -259,6 +259,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.DeleteRequestExpiration(ctx, req)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionSvcCallTimeOut)
+		resTags = resTags.AppendTag(tags.RequestID, []byte(req.RequestID()))
+		resTags = resTags.AppendTag(tags.Provider, []byte(req.Provider))
+		resTags = resTags.AppendTag(tags.SlashCoins, []byte(slashCoins.String()))
 		logger.Info(fmt.Sprintf("request %s from %s timeout",
 			req.RequestID(), req.Consumer))
 	}
