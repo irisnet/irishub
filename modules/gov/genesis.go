@@ -3,8 +3,8 @@ package gov
 import (
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/gov/params"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/irisnet/irishub/types/gov/params"
 	"time"
 )
 
@@ -63,13 +63,9 @@ func DefaultGenesisState() GenesisState {
 	return GenesisState{
 		TerminatorPeriod:   20000,
 		StartingProposalID: 1,
-		DepositProcedure: govparams.NewDepositProcedure(),
-		VotingProcedure: govparams.NewVotingProcedure(),
-		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:     sdk.NewDecWithPrec(5, 1),
-			Veto:          sdk.NewDecWithPrec(334, 3),
-			Participation: sdk.NewDecWithPrec(667, 3),
-		},
+		DepositProcedure:   govparams.NewDepositProcedure(),
+		VotingProcedure:    govparams.NewVotingProcedure(),
+		TallyingProcedure:  govparams.NewTallyingProcedure(),
 	}
 }
 
@@ -81,13 +77,9 @@ func DefaultGenesisStateForCliTest() GenesisState {
 	return GenesisState{
 		TerminatorPeriod:   20,
 		StartingProposalID: 1,
-		DepositProcedure: depositProcedure,
-		VotingProcedure: govparams.NewVotingProcedure(),
-		TallyingProcedure: govparams.TallyingProcedure{
-			Threshold:     sdk.NewDecWithPrec(5, 1),
-			Veto:          sdk.NewDecWithPrec(334, 3),
-			Participation: sdk.NewDecWithPrec(667, 3),
-		},
+		DepositProcedure:   depositProcedure,
+		VotingProcedure:    govparams.NewVotingProcedure(),
+		TallyingProcedure:  govparams.NewTallyingProcedure(),
 	}
 }
 
