@@ -61,6 +61,7 @@ var (
 	TagDstValidator        = "destination-validator"
 	TagDelegator           = "delegator"
 	TagReward              = "withdraw-reward-total"
+	TagWithdrawAddr        = "withdraw-address"
 	TagRewardFromValidator = "withdraw-reward-from-validator-%s"
 	TagRewardCommission    = "withdraw-reward-commission"
 )
