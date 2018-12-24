@@ -11,19 +11,22 @@ type GenesisState struct {
 	MaxRequestTimeout  int64
 	MinDepositMultiple int64
 	ServiceFeeTax      sdk.Dec
+	SlashFraction      sdk.Dec
 }
 
-func NewGenesisState(maxRequestTimeout int64, minDepositMultiple int64, serviceFeeTax sdk.Dec) GenesisState {
+func NewGenesisState(maxRequestTimeout int64, minDepositMultiple int64, serviceFeeTax, slashFraction sdk.Dec) GenesisState {
 	return GenesisState{
 		MaxRequestTimeout:  maxRequestTimeout,
 		MinDepositMultiple: minDepositMultiple,
 		ServiceFeeTax:      serviceFeeTax,
+		SlashFraction:      slashFraction,
 	}
 }
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	k.SetServiceFeeTax(ctx, data.ServiceFeeTax)
+	k.SetServiceSlashFraction(ctx, data.SlashFraction)
 	params.InitGenesisParameter(&serviceparams.MaxRequestTimeoutParameter, ctx, data.MaxRequestTimeout)
 	params.InitGenesisParameter(&serviceparams.MinDepositMultipleParameter, ctx, data.MinDepositMultiple)
 }
@@ -37,6 +40,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		MaxRequestTimeout:  maxRequestTimeout,
 		MinDepositMultiple: minDepositMultiple,
 		ServiceFeeTax:      k.GetServiceFeeTax(ctx),
+		SlashFraction:      k.GetServiceSlashFraction(ctx),
 	}
 }
 
@@ -46,6 +50,7 @@ func DefaultGenesisState() GenesisState {
 		MaxRequestTimeout:  100,
 		MinDepositMultiple: 1000,
 		ServiceFeeTax:      sdk.NewDecWithPrec(2, 2), //2%
+		SlashFraction:      sdk.NewDecWithPrec(1, 2), //1%
 	}
 }
 
@@ -55,5 +60,6 @@ func DefaultGenesisStateForTest() GenesisState {
 		MaxRequestTimeout:  10,
 		MinDepositMultiple: 10,
 		ServiceFeeTax:      sdk.NewDecWithPrec(2, 2), //2%
+		SlashFraction:      sdk.NewDecWithPrec(1, 2), //1%
 	}
 }
