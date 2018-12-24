@@ -118,7 +118,7 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 	}
 }
 
-// QueryCoinTypeRequestHandlerFn performs coin type query
+// QueryTokenStatsRequestHandlerFn performs token statistic query
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext, accStore, stakeStore string,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
