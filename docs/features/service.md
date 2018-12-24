@@ -207,4 +207,4 @@ When using proto file to standardize the definition of the service's method, its
 
 * IDL file example
 
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)
+    [test.proto](./test.proto)

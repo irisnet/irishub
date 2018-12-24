@@ -208,4 +208,4 @@ iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris
 
 * IDL文件参照
 
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)
+    [test.proto](./test.proto)

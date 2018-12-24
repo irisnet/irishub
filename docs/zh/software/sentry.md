@@ -6,11 +6,11 @@
 
 为了搭建哨兵节点，首先我们需要初始化一些全节点。执行以下命令创建一个全节点(建议在多台不同的服务器上创建多个哨兵节点以提高可用性和安全性)
 ```
-iris  init --name=<your name> --home=<sentry home>
+iris  init --moniker=<your name> --home=<sentry home>
 ```
 `<sentry home>`是你指定的哨兵节点的地址。示例：
 ```
-iris init --name="sentry" --home=sentry --home-client=sentry
+iris init --moniker="sentry" --home=sentry --home-client=sentry
 {
   "chain_id": "test-chain-hfuDmL",
   "node_id": "937efdf8526e3d9e8b5e887fa953ff1645cc096d",
