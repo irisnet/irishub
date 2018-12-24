@@ -38,6 +38,9 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 	p.accountMapper.IterateAccounts(ctx, appendAccount)
 	fileAccounts := []GenesisFileAccount{}
 	for _, acc := range accounts {
+		if acc.Coins == nil {
+			continue
+		}
 		var coinsString []string
 		for _, coin := range acc.Coins {
 			coinsString = append(coinsString, coin.String())
