@@ -215,21 +215,10 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	if !found {
 		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
 	}
-	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
-	newTaxPool, hasNeg := oldTaxPool.SafeMinus(msg.Amount)
-	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)
-		return sdk.ErrInsufficientFunds(errMsg).Result()
-	}
-	if !newTaxPool.IsNotNegative() {
-		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)).Result()
-	}
-	_, _, err := k.ck.AddCoins(ctx, msg.DestAddress, msg.Amount)
+	_, err := k.ck.SendCoins(ctx, TaxCoinsAccAddr, msg.DestAddress, msg.Amount)
 	if err != nil {
 		return err.Result()
 	}
-
-	k.SetServiceFeeTaxPool(ctx, newTaxPool)
 	return sdk.Result{
 	}
 }

@@ -15,6 +15,7 @@ import (
 
 var DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
 var RequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
+var TaxCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
 
 type Keeper struct {
 	storeKey sdk.StoreKey
@@ -447,13 +448,21 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
 	feeTax := k.GetServiceFeeTax(ctx)
 	taxFee := sdk.Coins{}
+	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
-		taxFee = taxFee.Plus(sdk.Coins{sdk.Coin{Denom: coin.Denom, Amount: sdk.NewDecFromBigInt(coin.Amount.BigInt()).Mul(feeTax).TruncateInt()}})
+		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
+		taxCoins = append(taxCoins, sdk.Coin{
+			Denom: coin.Denom,
+			Amount: taxAmount,
+		})
 	}
+	taxCoins = taxCoins.Sort()
+	taxFee = taxFee.Plus(taxCoins)
 
-	taxPool := k.GetServiceFeeTaxPool(ctx)
-	taxPool = taxPool.Plus(taxFee)
-	k.SetServiceFeeTaxPool(ctx, taxPool)
+	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, TaxCoinsAccAddr, taxFee)
+	if err != nil {
+		return err
+	}
 
 	incomingFee, hasNeg := coins.SafeMinus(taxFee)
 	if hasNeg {
@@ -504,23 +513,6 @@ func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
 	store.Set(serviceFeeTaxKey, bz)
-}
-
-func (k Keeper) GetServiceFeeTaxPool(ctx sdk.Context) sdk.Coins {
-	var coins sdk.Coins
-	store := ctx.KVStore(k.storeKey)
-	value := store.Get(serviceFeeTaxPoolKey)
-	if value == nil {
-		return sdk.Coins{}
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &coins)
-	return coins
-}
-
-func (k Keeper) SetServiceFeeTaxPool(ctx sdk.Context, coins sdk.Coins) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(coins)
-	store.Set(serviceFeeTaxPoolKey, bz)
 }
 
 //__________________________________________________________________________
