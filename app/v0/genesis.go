@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
@@ -118,7 +119,6 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	if err = cdc.UnmarshalJSON(genDoc.AppState, &genesisState); err != nil {
 		return genesisState, err
 	}
-
 
 	// if there are no gen txs to be processed, return the default empty state
 	if len(appGenTxs) == 0 {
@@ -308,11 +308,7 @@ func createMintGenesisState() mint.GenesisState {
 	return mint.GenesisState{
 		Minter: mint.InitialMinter(),
 		Params: mint.Params{
-			MintDenom:           stakeTypes.StakeDenom,
-			InflationRateChange: sdk.NewDecWithPrec(13, 2),
-			InflationMax:        sdk.NewDecWithPrec(20, 2),
-			InflationMin:        sdk.NewDecWithPrec(7, 2),
-			GoalBonded:          sdk.NewDecWithPrec(67, 2),
+			Inflation:         sdk.NewDecWithPrec(4, 2),
 		},
 	}
 }
