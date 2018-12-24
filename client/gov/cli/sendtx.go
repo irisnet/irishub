@@ -121,7 +121,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)
 	cmd.MarkFlagRequired(flagProposalType)
-	cmd.MarkFlagRequired(flagDeposit)
 	return cmd
 }
 
