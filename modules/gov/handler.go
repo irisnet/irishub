@@ -233,6 +233,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
+	defer inactiveIterator.Close()
 	for ; inactiveIterator.Valid(); inactiveIterator.Next() {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
@@ -253,9 +254,10 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			),
 		)
 	}
-	inactiveIterator.Close()
+
 
 	activeIterator := keeper.ActiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
+	defer activeIterator.Close()
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &proposalID)
@@ -294,7 +296,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
 						val.GetPower().RoundInt64(),
-						GetTallyingProcedure(ctx).GovernancePenalty)
+						activeProposal.GetTallyingProcedure().GovernancePenalty)
 				}
 			}
 		}
@@ -302,7 +304,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.SubProposalNum(ctx, activeProposal)
 		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
 	}
-	activeIterator.Close()
+
 
 	if proposalID, ok := keeper.GetCriticalProposalID(ctx); ok {
 		activeProposal := keeper.GetProposal(ctx, proposalID)
