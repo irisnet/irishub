@@ -383,6 +383,24 @@ func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
 	return httpClient.NetInfo()
 }
 
+func (cliCtx CLIContext) GetLatestHeight() (int64, error) {
+	client, err := cliCtx.GetNode()
+	if err != nil {
+		return 0, err
+	}
+	httpClient := client.(*tmclient.HTTP)
+
+	status, err := httpClient.Status()
+	if err != nil {
+		return 0, err
+	}
+	if status.SyncInfo.CatchingUp {
+		return 0, fmt.Errorf("the connected full node is still syncing blocks")
+	}
+	return status.SyncInfo.LatestBlockHeight, nil
+}
+
+
 func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 	client := &http.Client{}
 	url := strings.Replace(cliCtx.NodeURI, "tcp", "http", 1)

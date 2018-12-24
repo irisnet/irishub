@@ -122,6 +122,14 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext, accStore, stakeStore string,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		//Get latest height
+		latestHeight, err := cliCtx.GetLatestHeight()
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		cliCtx = cliCtx.WithHeight(latestHeight)
 		// Query acc store
 		var loosenToken sdk.Coins
 		var burnedToken sdk.Coins

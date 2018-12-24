@@ -95,6 +95,12 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, accStore, stakeStore string) *cobra
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			//Get latest height
+			latestHeight, err := cliCtx.GetLatestHeight()
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithHeight(latestHeight)
 			// Query acc store
 			var loosenToken sdk.Coins
 			var burnedToken sdk.Coins
