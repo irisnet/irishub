@@ -23,8 +23,25 @@ const (
 	////////////////////  iris end  /////////////////////////////
 )
 
+func (p ProposalLevel) string() string {
+	switch p {
+	case ProposalLevelCritical:
+		return "ciritical"
+	case ProposalLevelImportant:
+		return  "important"
+	case ProposalLevelNormal:
+		return "normal"
+	default:
+		return  " "
+	}
+}
+
 func GetProposalLevel(p govtypes.Proposal) ProposalLevel {
-	switch p.GetProposalType(){
+	return GetProposalLevelByProposalKind(p.GetProposalType())
+}
+
+func GetProposalLevelByProposalKind(p govtypes.ProposalKind) ProposalLevel {
+	switch p {
 	case govtypes.ProposalTypeTxTaxUsage:
 		return ProposalLevelNormal
 	case govtypes.ProposalTypeParameterChange:

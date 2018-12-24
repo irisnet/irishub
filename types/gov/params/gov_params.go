@@ -15,16 +15,19 @@ import (
 var DepositProcedureParameter DepositProcedureParam
 
 const (
-	CRITICAL_DEPOSIT   = 5000
-	IMPORTANT_DEPOSIT  = 2000
-	NORMAL_DEPOSIT     = 1000
-	CRITICAL           = "Critical"
-	IMPORTANT          = "Important"
-	NORMAL             = "normal"
-	LOWER_BOUND_AMOUNT = 10
-	UPPER_BOUND_AMOUNT = 10000
-	THREE_DAYS         = 3 * 3600 * 24
-	TWO_DAYS           = 2 * 3600 * 24 //
+	CRITICAL_DEPOSIT     = 5000
+	IMPORTANT_DEPOSIT    = 2000
+	NORMAL_DEPOSIT       = 1000
+	CRITICAL             = "Critical"
+	IMPORTANT            = "Important"
+	NORMAL               = "normal"
+	LOWER_BOUND_AMOUNT   = 10
+	UPPER_BOUND_AMOUNT   = 10000
+	THREE_DAYS           = 3 * 3600 * 24
+	TWO_DAYS             = 2 * 3600 * 24 //
+	STABLE_CRITIACAL_NUM = 1
+	MIN_IMPORTANT_NUM    = 3
+	MIN_NORMAL_NUM       = 5
 )
 
 var _ params.GovParameter = (*DepositProcedureParam)(nil)
@@ -167,6 +170,9 @@ type VotingProcedure struct {
 	CriticalVotingPeriod  time.Duration `json:"critical_voting_period"`  //  Length of the critical voting period.
 	ImportantVotingPeriod time.Duration `json:"important_voting_period"` //  Length of the important voting period.
 	NormalVotingPeriod    time.Duration `json:"normal_voting_period"`    //  Length of the normal voting period.
+	CriticalMaxNum        uint64        `json:"critical_max_num"`
+	ImportantMaxNum       uint64        `json:"important_max_num"`
+	NormalMaxNum          uint64        `json:"normal_max_num"`
 }
 
 type VotingProcedureParam struct {
@@ -179,6 +185,9 @@ func NewVotingProcedure() VotingProcedure {
 		CriticalVotingPeriod:  time.Duration(TWO_DAYS) * time.Second,
 		ImportantVotingPeriod: time.Duration(TWO_DAYS) * time.Second,
 		NormalVotingPeriod:    time.Duration(THREE_DAYS) * time.Second,
+		CriticalMaxNum:        STABLE_CRITIACAL_NUM,
+		ImportantMaxNum:       MIN_IMPORTANT_NUM,
+		NormalMaxNum:          MIN_NORMAL_NUM,
 	}
 }
 
@@ -254,6 +263,17 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(NORMAL+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(param.Value.NormalVotingPeriod.Seconds())), THREE_DAYS))
 		}
 
+		if param.Value.CriticalMaxNum != STABLE_CRITIACAL_NUM {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+CRITICAL+"Proposal  only can be %v.", STABLE_CRITIACAL_NUM))
+		}
+
+		if param.Value.ImportantMaxNum < MIN_IMPORTANT_NUM {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+IMPORTANT+"Proposal must be more than %v.", MIN_IMPORTANT_NUM))
+		}
+
+		if param.Value.NormalMaxNum < MIN_NORMAL_NUM {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+NORMAL+"Proposal should be no less than %v.", MIN_NORMAL_NUM))
+		}
 		return nil
 
 	}
@@ -265,14 +285,24 @@ var _ params.GovParameter = (*TallyingProcedureParam)(nil)
 
 // Procedure around Tallying votes in governance
 type TallyingProcedure struct {
-	Threshold     sdk.Dec `json:"threshold"`     //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
-	Veto          sdk.Dec `json:"veto"`          //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
-	Participation sdk.Dec `json:"participation"` //
+	Threshold         sdk.Dec `json:"threshold"`          //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
+	Veto              sdk.Dec `json:"veto"`               //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
+	Participation     sdk.Dec `json:"participation"`      //
+	GovernancePenalty sdk.Dec `json:"governance_penalty"` //  Penalty if validator does not vote
 }
 
 type TallyingProcedureParam struct {
 	Value      TallyingProcedure
 	paramSpace params.Subspace
+}
+
+func NewTallyingProcedure() TallyingProcedure {
+	return TallyingProcedure{
+		Threshold:         sdk.NewDecWithPrec(5, 1),
+		Veto:              sdk.NewDecWithPrec(334, 3),
+		Participation:     sdk.NewDecWithPrec(667, 3),
+		GovernancePenalty: sdk.NewDecWithPrec(1, 3),
+	}
 }
 
 func (param *TallyingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -285,9 +315,10 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 		param.Value = value
 	} else {
 		param.Value = TallyingProcedure{
-			Threshold:     sdk.NewDecWithPrec(5, 1),
-			Veto:          sdk.NewDecWithPrec(334, 3),
-			Participation: sdk.NewDecWithPrec(667, 3),
+			Threshold:         sdk.NewDecWithPrec(5, 1),
+			Veto:              sdk.NewDecWithPrec(334, 3),
+			Participation:     sdk.NewDecWithPrec(667, 3),
+			GovernancePenalty: sdk.NewDecWithPrec(1, 3),
 		}
 	}
 }
@@ -348,7 +379,9 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 		if param.Value.Veto.LTE(sdk.ZeroDec()) || param.Value.Veto.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
 		}
-
+		if param.Value.GovernancePenalty.LTE(sdk.ZeroDec()) || param.Value.GovernancePenalty.GTE(sdk.NewDec(1)) {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid GovernancePenalty ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
+		}
 		return nil
 
 	}
