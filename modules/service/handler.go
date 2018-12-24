@@ -238,7 +238,25 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
-		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
+		slashFraction := keeper.GetServiceSlashFraction(ctx)
+		slashCoins := sdk.Coins{}
+		for _, coin := range req.ServiceFee {
+			taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+			slashCoins = append(slashCoins, sdk.Coin{
+				Denom:  coin.Denom,
+				Amount: taxAmount,
+			})
+		}
+		slashCoins = slashCoins.Sort()
+
+		keeper.ck.BurnCoinsFromAddr(ctx, RequestCoinsAccAddr, slashCoins)
+
+		returnFee, hasNeg := req.ServiceFee.SafeMinus(slashCoins)
+		if hasNeg {
+			errMsg := fmt.Sprintf("%s is less than %s", slashCoins, req.ServiceFee)
+			panic(errMsg)
+		}
+		keeper.AddReturnFee(ctx, req.Consumer, returnFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
 		keeper.DeleteRequestExpiration(ctx, req)

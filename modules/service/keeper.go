@@ -447,31 +447,27 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 // Add incoming fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
 	feeTax := k.GetServiceFeeTax(ctx)
-	taxFee := sdk.Coins{}
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
 		taxCoins = append(taxCoins, sdk.Coin{
-			Denom: coin.Denom,
+			Denom:  coin.Denom,
 			Amount: taxAmount,
 		})
 	}
 	taxCoins = taxCoins.Sort()
-	taxFee = taxFee.Plus(taxCoins)
 
-	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, TaxCoinsAccAddr, taxFee)
+	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, TaxCoinsAccAddr, taxCoins)
 	if err != nil {
 		return err
 	}
 
-	incomingFee, hasNeg := coins.SafeMinus(taxFee)
+	incomingFee, hasNeg := coins.SafeMinus(taxCoins)
 	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", coins, taxFee)
+		errMsg := fmt.Sprintf("%s is less than %s", coins, taxCoins)
 		return sdk.ErrInsufficientFunds(errMsg)
 	}
-	if !incomingFee.IsNotNegative() {
-		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", incomingFee, taxFee))
-	}
+
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
 		k.SetIncomingFee(ctx, address, coins)
@@ -513,6 +509,25 @@ func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
 	store.Set(serviceFeeTaxKey, bz)
+}
+
+//__________________________________________________________________________
+
+func (k Keeper) GetServiceSlashFraction(ctx sdk.Context) sdk.Dec {
+	var fraction sdk.Dec
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(serviceSlashFractionKey)
+	if value == nil {
+		return sdk.Dec{}
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fraction)
+	return fraction
+}
+
+func (k Keeper) SetServiceSlashFraction(ctx sdk.Context, fraction sdk.Dec) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fraction)
+	store.Set(serviceSlashFractionKey, bz)
 }
 
 //__________________________________________________________________________
