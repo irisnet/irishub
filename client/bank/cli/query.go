@@ -113,7 +113,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, accStore, stakeStore string) *cobra
 			} else {
 				cdc.MustUnmarshalBinaryLengthPrefixed(res, &loosenToken)
 			}
-			res, err = cliCtx.QueryStore(auth.BurnTokenKey, accStore)
+			res, err = cliCtx.QueryStore(auth.BurnedTokenKey, accStore)
 			if err != nil {
 				return err
 			}

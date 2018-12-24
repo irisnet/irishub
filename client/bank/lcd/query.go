@@ -143,7 +143,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext
 		} else {
 			cdc.MustUnmarshalBinaryLengthPrefixed(res, &loosenToken)
 		}
-		res, err = cliCtx.QueryStore(auth.BurnTokenKey, accStore)
+		res, err = cliCtx.QueryStore(auth.BurnedTokenKey, accStore)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

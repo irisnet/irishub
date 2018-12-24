@@ -16,7 +16,7 @@ var (
 
 	TotalLoosenTokenKey = []byte("totalLoosenToken")
 
-	BurnTokenKey = []byte("burnToken")
+	BurnedTokenKey = []byte("burnedToken")
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -168,7 +168,7 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 	// read from db
 	var burnToken sdk.Coins
 	store := ctx.KVStore(am.key)
-	bz := store.Get(BurnTokenKey)
+	bz := store.Get(BurnedTokenKey)
 	if bz == nil {
 		burnToken = nil
 	} else {
@@ -191,7 +191,7 @@ func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
 	store := ctx.KVStore(am.key)
-	store.Set(BurnTokenKey, bzNew)
+	store.Set(BurnedTokenKey, bzNew)
 }
 
 func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
