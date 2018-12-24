@@ -256,14 +256,15 @@ func (p *ProtocolVersion0) configParams() {
 
 // application updates every end block
 func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	tags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
-
 	// mint new tokens for this new block
-	mint.BeginBlocker(ctx, p.mintKeeper)
+	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
 	// distribute rewards from previous block
 	distr.BeginBlocker(ctx, req, p.distrKeeper)
 
+	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
+
+	tags = tags.AppendTags(slashTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
 	}
