@@ -10,7 +10,7 @@ import (
 )
 
 func TestNextInflation(t *testing.T) {
-	minter := NewMinter(time.Now(), sdk.ZeroDec())
+	minter := NewMinter(time.Now(), stakeTypes.StakeDenom, sdk.NewIntWithDecimal(100, 18))
 	tests := []struct {
 		params        Params
 		blockInterval time.Duration
@@ -19,19 +19,19 @@ func TestNextInflation(t *testing.T) {
 		{DefaultParams(), 10},
 		{DefaultParams(), 20},
 		{DefaultParams(), 100},
-		{Params{stakeTypes.StakeDenom, sdk.NewDecWithPrec(5, 2), sdk.NewIntWithDecimal(100, 18)}, 5},
-		{Params{stakeTypes.StakeDenom, sdk.NewDecWithPrec(10, 2), sdk.NewIntWithDecimal(100, 18)}, 5},
-		{Params{stakeTypes.StakeDenom, sdk.NewDecWithPrec(5, 2), sdk.NewIntWithDecimal(1, 18)}, 5},
+		{Params{sdk.NewDecWithPrec(20, 2)}, 5},
+		{Params{sdk.NewDecWithPrec(10, 2)}, 5},
+		{Params{sdk.NewDecWithPrec(5, 2)}, 5},
 	}
 	for _, tc := range tests {
 		time.Sleep(tc.blockInterval * time.Millisecond)
 		blockTime := time.Now()
-		minter.AnnualProvisions = minter.NextAnnualProvisions(tc.params)
-		mintCoin := minter.BlockProvision(tc.params, blockTime)
+		annualProvisions := minter.NextAnnualProvisions(tc.params)
+		mintCoin := minter.BlockProvision(tc.params, annualProvisions, blockTime)
 
 		blockDurationMili := tc.blockInterval.Nanoseconds() / int64(miliSecondPerYear)
 		blockTimePercent := sdk.NewDec(blockDurationMili).Quo(sdk.NewDec(int64(60 * 60 * 8766 * 1000)))
 
-		require.True(t, mintCoin.Amount.GT(blockTimePercent.MulInt(tc.params.InflationBasement).TruncateInt()))
+		require.True(t, mintCoin.Amount.GT(blockTimePercent.MulInt(minter.InflationBasement).TruncateInt()))
 	}
 }

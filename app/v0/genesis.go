@@ -308,8 +308,6 @@ func createMintGenesisState() mint.GenesisState {
 	return mint.GenesisState{
 		Minter: mint.InitialMinter(),
 		Params: mint.Params{
-			MintDenom:         stakeTypes.StakeDenom,
-			InflationBasement: sdk.NewIntWithDecimal(2, 9).Mul(sdk.NewIntWithDecimal(1, 18)), // 2*(10^9)iris, 2*(10^9)*(10^18)iris-atto
 			Inflation:         sdk.NewDecWithPrec(4, 2),
 		},
 	}
