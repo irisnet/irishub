@@ -43,6 +43,7 @@ type Validator interface {
 	GetConsPubKey() crypto.PubKey // validation consensus pubkey
 	GetConsAddr() ConsAddress     // validation consensus address
 	GetPower() Dec                // validation power
+	GetPotentialPower() Dec       // validation potential power
 	GetTokens() Dec               // validation tokens
 	GetCommission() Dec           // validator commission rate
 	GetDelegatorShares() Dec      // Total out standing delegator shares

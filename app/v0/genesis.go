@@ -142,24 +142,6 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 		}
 	}
 
-	for _, acc := range genesisState.Accounts {
-		// create the genesis account, give'm few stake token and a buncha token with there name
-		for _, coin := range acc.Coins {
-			coinName, err := types.GetCoinName(coin)
-			if err != nil {
-				panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
-			}
-			if coinName != stakeTypes.StakeDenomName {
-				continue
-			}
-			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
-			if err != nil {
-				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", stakeTypes.StakeDenom, coin))
-			}
-			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
-				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
-		}
-	}
 	genesisState.StakeData = stakeData
 	genesisState.GenTxs = appGenTxs
 	genesisState.UpgradeData = genesisState.UpgradeData
@@ -311,8 +293,7 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 
 func createStakeGenesisState() stake.GenesisState {
 	return stake.GenesisState{
-		Pool: stake.Pool{
-			LooseTokens:  sdk.ZeroDec(),
+		BondedPool: stake.BondedPool{
 			BondedTokens: sdk.ZeroDec(),
 		},
 		Params: stake.Params{

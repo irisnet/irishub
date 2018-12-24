@@ -318,7 +318,7 @@ func (v Validator) ABCIValidatorUpdateZero() abci.ValidatorUpdate {
 
 // UpdateStatus updates the location of the shares within a validator
 // to reflect the new status
-func (v Validator) UpdateStatus(pool Pool, NewStatus sdk.BondStatus) (Validator, Pool) {
+func (v Validator) UpdateStatus(ctx sdk.Context, pool Pool, NewStatus sdk.BondStatus) (Validator, Pool) {
 
 	switch v.Status {
 	case sdk.Unbonded:
@@ -327,7 +327,7 @@ func (v Validator) UpdateStatus(pool Pool, NewStatus sdk.BondStatus) (Validator,
 		case sdk.Unbonded:
 			return v, pool
 		case sdk.Bonded:
-			pool = pool.looseTokensToBonded(v.Tokens)
+			pool = pool.loosenTokenToBonded(ctx, v.Tokens)
 		}
 	case sdk.Unbonding:
 
@@ -335,7 +335,7 @@ func (v Validator) UpdateStatus(pool Pool, NewStatus sdk.BondStatus) (Validator,
 		case sdk.Unbonding:
 			return v, pool
 		case sdk.Bonded:
-			pool = pool.looseTokensToBonded(v.Tokens)
+			pool = pool.loosenTokenToBonded(ctx, v.Tokens)
 		}
 	case sdk.Bonded:
 
@@ -343,7 +343,7 @@ func (v Validator) UpdateStatus(pool Pool, NewStatus sdk.BondStatus) (Validator,
 		case sdk.Bonded:
 			return v, pool
 		default:
-			pool = pool.bondedTokensToLoose(v.Tokens)
+			pool = pool.bondedTokenToLoosen(ctx, v.Tokens)
 		}
 	}
 
@@ -352,12 +352,17 @@ func (v Validator) UpdateStatus(pool Pool, NewStatus sdk.BondStatus) (Validator,
 }
 
 // removes tokens from a validator
-func (v Validator) RemoveTokens(pool Pool, tokens sdk.Dec) (Validator, Pool) {
-	if v.Status == sdk.Bonded {
-		pool = pool.bondedTokensToLoose(tokens)
+func (v Validator) RemoveTokens(ctx sdk.Context, pool Pool, tokens sdk.Dec) (Validator, Pool) {
+	if tokens.IsNegative() {
+		panic(fmt.Sprintf("should not happen: trying to remove negative tokens %v", tokens))
 	}
-
+	if v.Tokens.LT(tokens) {
+		panic(fmt.Sprintf("should not happen: only have %v tokens, trying to remove %v", v.Tokens, tokens))
+	}
 	v.Tokens = v.Tokens.Sub(tokens)
+	if v.Status == sdk.Bonded {
+		pool = pool.bondedTokenToLoosen(ctx, tokens)
+	}
 	return v, pool
 }
 
@@ -375,14 +380,14 @@ func (v Validator) SetInitialCommission(commission Commission) (Validator, sdk.E
 //_________________________________________________________________________________________________________
 
 // AddTokensFromDel adds tokens to a validator
-func (v Validator) AddTokensFromDel(pool Pool, amount sdk.Int) (Validator, Pool, sdk.Dec) {
+func (v Validator) AddTokensFromDel(ctx sdk.Context, pool Pool, amount sdk.Int) (Validator, Pool, sdk.Dec) {
 
 	// bondedShare/delegatedShare
 	exRate := v.DelegatorShareExRate()
 	amountDec := sdk.NewDecFromInt(amount)
 
 	if v.Status == sdk.Bonded {
-		pool = pool.looseTokensToBonded(amountDec)
+		pool = pool.loosenTokenToBonded(ctx, amountDec)
 	}
 
 	if exRate.IsZero() {
@@ -396,16 +401,17 @@ func (v Validator) AddTokensFromDel(pool Pool, amount sdk.Int) (Validator, Pool,
 }
 
 // RemoveDelShares removes delegator shares from a validator.
-func (v Validator) RemoveDelShares(pool Pool, delShares sdk.Dec) (Validator, Pool, sdk.Dec) {
-	issuedTokens := v.DelegatorShareExRate().Mul(delShares)
-	v.Tokens = v.Tokens.Sub(issuedTokens)
+func (v Validator) RemoveDelShares(ctx sdk.Context, pool Pool, delShares sdk.Dec) (Validator, Pool, sdk.Dec) {
+	issuedAmount := v.DelegatorShareExRate().Mul(delShares).TruncateDec()
+
+	v.Tokens = v.Tokens.Sub(issuedAmount)
 	v.DelegatorShares = v.DelegatorShares.Sub(delShares)
 
 	if v.Status == sdk.Bonded {
-		pool = pool.bondedTokensToLoose(issuedTokens)
+		pool = pool.bondedTokenToLoosen(ctx, issuedAmount)
 	}
 
-	return v, pool, issuedTokens
+	return v, pool, issuedAmount
 }
 
 // DelegatorShareExRate gets the exchange rate of tokens over delegator shares.

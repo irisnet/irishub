@@ -5,6 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // current inflation state
@@ -34,13 +35,14 @@ func validateMinter(minter Minter) error {
 var hrsPerYr = sdk.NewDec(8766) // as defined by a julian year of 365.25 days
 
 // process provisions for an hour period
-func (m Minter) ProcessProvisions(params Params, totalSupply, bondedRatio sdk.Dec) (
+func (m Minter) ProcessProvisions(params Params) (
 	minter Minter, provisions sdk.Coin) {
 
-	m.Inflation = m.NextInflation(params, bondedRatio)
-	provisionsDec := m.Inflation.Mul(totalSupply).Quo(hrsPerYr)
-	provisions = sdk.NewCoin(params.MintDenom, provisionsDec.TruncateInt())
-
+	totalSupplyAmount := sdk.NewIntWithDecimal(2, 9).Mul(sdk.NewIntWithDecimal(1, 18))
+	inflationRatePerYear := sdk.NewDecWithPrec(4,2)
+	inflationRatePerHour := inflationRatePerYear.Quo(hrsPerYr)
+	provisionsAmount := inflationRatePerHour.MulInt(totalSupplyAmount).TruncateInt()
+	provisions = sdk.NewCoin(stakeTypes.StakeDenom, provisionsAmount)
 	return m, provisions
 }
 

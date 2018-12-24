@@ -10,7 +10,7 @@ import (
 const (
 	costGetCoins       sdk.Gas = 10
 	costGetLoosenCoins sdk.Gas = 10
-	costGetBurnCoins   sdk.Gas = 10
+	costGetBurnedCoins sdk.Gas = 10
 	costBurnCoins      sdk.Gas = 100
 	costHasCoins       sdk.Gas = 10
 	costSetCoins       sdk.Gas = 100
@@ -235,12 +235,12 @@ func getCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress) sdk.C
 }
 
 func getLoosenCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
-	ctx.GasMeter().ConsumeGas(costGetLoosenCoins, "getCoins")
+	ctx.GasMeter().ConsumeGas(costGetLoosenCoins, "getLoosenCoins")
 	return am.GetTotalLoosenToken(ctx)
 }
 
 func getBurnedCoins(ctx sdk.Context, am auth.AccountKeeper) sdk.Coins {
-	ctx.GasMeter().ConsumeGas(costGetBurnCoins, "getCoins")
+	ctx.GasMeter().ConsumeGas(costGetBurnedCoins, "getBurnedCoins")
 	return am.GetBurnedToken(ctx)
 }
 

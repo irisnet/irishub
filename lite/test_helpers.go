@@ -19,7 +19,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	crkeys "github.com/irisnet/irishub/crypto/keys"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/server"
@@ -198,10 +197,8 @@ func InitializeTestLCD(
 		accAuth.Coins = sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewIntWithDecimal(1, 20))}
 		acc := v0.NewGenesisFileAccount(&accAuth)
 		genesisState.Accounts = append(genesisState.Accounts, acc)
-		genesisState.StakeData.Pool.LooseTokens = genesisState.StakeData.Pool.LooseTokens.Add(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 20)))
 	}
 
-	genesisState.GovData = gov.DefaultGenesisStateForLCDTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 
 	appState, err := codec.MarshalJSONIndent(cdc, genesisState)

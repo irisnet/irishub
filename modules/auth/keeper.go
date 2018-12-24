@@ -14,9 +14,9 @@ var (
 
 	globalAccountNumberKey = []byte("globalAccountNumber")
 
-	totalLoosenTokenKey = []byte("totalLoosenToken")
+	TotalLoosenTokenKey = []byte("totalLoosenToken")
 
-	burnTokenKey = []byte("burnToken")
+	BurnedTokenKey = []byte("burnedToken")
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -168,7 +168,7 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 	// read from db
 	var burnToken sdk.Coins
 	store := ctx.KVStore(am.key)
-	bz := store.Get(burnTokenKey)
+	bz := store.Get(BurnedTokenKey)
 	if bz == nil {
 		burnToken = nil
 	} else {
@@ -191,14 +191,14 @@ func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
 	store := ctx.KVStore(am.key)
-	store.Set(burnTokenKey, bzNew)
+	store.Set(BurnedTokenKey, bzNew)
 }
 
 func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 	// read from db
 	var totalLoosenToken sdk.Coins
 	store := ctx.KVStore(am.key)
-	bz := store.Get(totalLoosenTokenKey)
+	bz := store.Get(TotalLoosenTokenKey)
 	if bz == nil {
 		totalLoosenToken = nil
 	} else {
@@ -217,12 +217,12 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	// increase totalLoosenToken
 	totalLoosenToken = totalLoosenToken.Plus(coins)
 	if !totalLoosenToken.IsNotNegative() {
-		panic(fmt.Errorf("total loosen token is negative"))
+		panic(fmt.Errorf("total loosen token is overflow"))
 	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
-	store.Set(totalLoosenTokenKey, bzNew)
+	store.Set(TotalLoosenTokenKey, bzNew)
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
@@ -240,7 +240,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
-	store.Set(totalLoosenTokenKey, bzNew)
+	store.Set(TotalLoosenTokenKey, bzNew)
 }
 
 //----------------------------------------

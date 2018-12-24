@@ -16,11 +16,9 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 	}
 
 	params := k.GetParams(ctx)
-	totalSupply := k.sk.TotalPower(ctx)
-	bondedRatio := k.sk.BondedRatio(ctx)
 	minter.InflationLastTime = blockTime
-	minter, mintedCoin := minter.ProcessProvisions(params, totalSupply, bondedRatio)
+	minter, mintedCoin := minter.ProcessProvisions(params)
+	k.bk.IncreaseLoosenToken(ctx, sdk.Coins{mintedCoin})
 	k.fck.AddCollectedFees(ctx, sdk.Coins{mintedCoin})
-	k.sk.InflateSupply(ctx, sdk.NewDecFromInt(mintedCoin.Amount))
 	k.SetMinter(ctx, minter)
 }

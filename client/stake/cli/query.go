@@ -557,16 +557,18 @@ func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli stake pool",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			key := stake.PoolKey
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, err := cliCtx.QueryStore(key, storeName)
+			res, err := cliCtx.QueryWithData("custom/stake/pool", nil)
 			if err != nil {
 				return err
 			}
-
-			pool := types.MustUnmarshalPool(cdc, res)
-			poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, pool)
+			var poolStatus types.PoolStatus
+			err = cdc.UnmarshalJSON(res, &poolStatus)
+			if err != nil {
+				return err
+			}
+			poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, poolStatus)
 
 			switch viper.Get(cli.OutputFlag) {
 			case "text":

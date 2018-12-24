@@ -322,9 +322,9 @@ func queryUnbondingDelegation(ctx sdk.Context, cdc *codec.Codec, req abci.Reques
 }
 
 func queryPool(ctx sdk.Context, cdc *codec.Codec, k keep.Keeper) (res []byte, err sdk.Error) {
-	pool := k.GetPool(ctx)
+	poolStatus := k.GetPoolStatus(ctx)
 
-	res, errRes := codec.MarshalJSONIndent(cdc, pool)
+	res, errRes := codec.MarshalJSONIndent(cdc, poolStatus)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
 	}

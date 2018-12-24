@@ -47,80 +47,56 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDef,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
 		msg.Deposit, msg.Prices, msg.Level, true)
-	err, _ := k.AddServiceBinding(ctx, svcBinding)
+	err := k.AddServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBind,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
 	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
 		msg.Deposit, msg.Prices, msg.Level, false)
-	err, _ := k.UpdateServiceBinding(ctx, svcBinding)
+	err := k.UpdateServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBindUpdate,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
 func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Result {
-	err, _ := k.Disable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	err := k.Disable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDisable,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
 func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result {
-	err, _ := k.Enable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit)
+	err := k.Enable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcEnable,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
 func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposit) sdk.Result {
-	err, _ := k.RefundDeposit(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	err := k.RefundDeposit(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRefundDeposit,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -163,10 +139,10 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return err.Result()
 	}
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcCall,
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Provider, []byte(request.Provider.String()),
 		tags.Consumer, []byte(request.Consumer.String()),
+		tags.ServiceFee, []byte(request.ServiceFee.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,
@@ -204,7 +180,6 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	}
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRespond,
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Consumer, []byte(response.Consumer.String()),
 		tags.Provider, []byte(response.Provider.String()),
@@ -219,11 +194,7 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRefundFees,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -232,11 +203,7 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcWithdrawFees,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -245,26 +212,11 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	if !found {
 		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
 	}
-	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
-	newTaxPool, hasNeg := oldTaxPool.SafeMinus(msg.Amount)
-	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)
-		return sdk.ErrInsufficientFunds(errMsg).Result()
-	}
-	if !newTaxPool.IsNotNegative() {
-		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)).Result()
-	}
-	_, _, err := k.ck.AddCoins(ctx, msg.DestAddress, msg.Amount)
+	_, err := k.ck.SendCoins(ctx, TaxCoinsAccAddr, msg.DestAddress, msg.Amount)
 	if err != nil {
 		return err.Result()
 	}
-
-	k.SetServiceFeeTaxPool(ctx, newTaxPool)
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcWithdrawTax,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -283,12 +235,33 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
+		slashFraction := keeper.GetServiceSlashFraction(ctx)
+		slashCoins := sdk.Coins{}
+		binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
+		if found {
+			for _, coin := range binding.Deposit {
+				taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+				slashCoins = append(slashCoins, sdk.Coin{
+					Denom:  coin.Denom,
+					Amount: taxAmount,
+				})
+			}
+		}
+
+		slashCoins = slashCoins.Sort()
+
+		keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, slashCoins)
+		keeper.Slash(ctx, binding, slashCoins)
+
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
 		keeper.DeleteRequestExpiration(ctx, req)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionSvcCallTimeOut)
+		resTags = resTags.AppendTag(tags.RequestID, []byte(req.RequestID()))
+		resTags = resTags.AppendTag(tags.Provider, []byte(req.Provider))
+		resTags = resTags.AppendTag(tags.SlashCoins, []byte(slashCoins.String()))
 		logger.Info(fmt.Sprintf("request %s from %s timeout",
 			req.RequestID(), req.Consumer))
 	}

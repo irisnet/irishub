@@ -4,42 +4,78 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/bank"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// Pool - dynamic parameters of the current state
-type Pool struct {
-	LooseTokens  sdk.Dec `json:"loose_tokens"`  // tokens which are not bonded in a validator
+type BondedPool struct {
 	BondedTokens sdk.Dec `json:"bonded_tokens"` // reserve of bonded tokens
 }
 
 // nolint
-func (p Pool) Equal(p2 Pool) bool {
+func (p BondedPool) Equal(p2 BondedPool) bool {
 	bz1 := MsgCdc.MustMarshalBinaryLengthPrefixed(&p)
 	bz2 := MsgCdc.MustMarshalBinaryLengthPrefixed(&p2)
 	return bytes.Equal(bz1, bz2)
 }
 
 // initial pool for testing
-func InitialPool() Pool {
-	return Pool{
-		LooseTokens:  sdk.ZeroDec(),
+func InitialBondedPool() BondedPool {
+	return BondedPool{
 		BondedTokens: sdk.ZeroDec(),
 	}
 }
 
-//____________________________________________________________________
+//_______________________________________________________________________
+
+// Pool - dynamic parameters of the current state
+type Pool struct {
+	BankKeeper bank.Keeper
+	BondedPool BondedPool
+}
+
+func (p Pool) loosenTokenToBonded(ctx sdk.Context, bondedTokens sdk.Dec) Pool {
+	round := bondedTokens.TruncateInt()
+	change := bondedTokens.Sub(sdk.NewDecFromInt(round))
+	if !change.IsZero() {
+		panic("token is not integer")
+	}
+
+	p.BondedPool.BondedTokens = p.BondedPool.BondedTokens.Add(bondedTokens)
+	balance := sdk.NewCoin(StakeDenom, round)
+	p.BankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{balance})
+	return p
+}
+
+func (p Pool) bondedTokenToLoosen(ctx sdk.Context, bondedTokens sdk.Dec) Pool {
+	round := bondedTokens.TruncateInt()
+	change := bondedTokens.Sub(sdk.NewDecFromInt(round))
+	if !change.IsZero() {
+		panic("token is not integer")
+	}
+
+	p.BondedPool.BondedTokens = p.BondedPool.BondedTokens.Sub(bondedTokens)
+	balance := sdk.NewCoin(StakeDenom, round)
+	p.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{balance})
+	return p
+}
+
+func (p Pool) GetLoosenTokenAmount(ctx sdk.Context) sdk.Dec {
+	return sdk.NewDecFromInt(p.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom))
+}
+
+type PoolStatus struct {
+	LooseTokens  sdk.Dec `json:"loose_tokens"`  // tokens which are not bonded in a validator
+	BondedTokens sdk.Dec `json:"bonded_tokens"` // reserve of bonded tokens
+}
 
 // Sum total of all staking tokens in the pool
-func (p Pool) TokenSupply() sdk.Dec {
+func (p PoolStatus) TokenSupply() sdk.Dec {
 	return p.LooseTokens.Add(p.BondedTokens)
 }
 
-//____________________________________________________________________
-
 // get the bond ratio of the global state
-func (p Pool) BondedRatio() sdk.Dec {
+func (p PoolStatus) BondedRatio() sdk.Dec {
 	supply := p.TokenSupply()
 	if supply.GT(sdk.ZeroDec()) {
 		return p.BondedTokens.Quo(supply)
@@ -47,29 +83,9 @@ func (p Pool) BondedRatio() sdk.Dec {
 	return sdk.ZeroDec()
 }
 
-//_______________________________________________________________________
-
-func (p Pool) looseTokensToBonded(bondedTokens sdk.Dec) Pool {
-	p.BondedTokens = p.BondedTokens.Add(bondedTokens)
-	p.LooseTokens = p.LooseTokens.Sub(bondedTokens)
-	if p.LooseTokens.LT(sdk.ZeroDec()) {
-		panic(fmt.Sprintf("sanity check: loose tokens negative, pool: %v", p))
-	}
-	return p
-}
-
-func (p Pool) bondedTokensToLoose(bondedTokens sdk.Dec) Pool {
-	p.BondedTokens = p.BondedTokens.Sub(bondedTokens)
-	p.LooseTokens = p.LooseTokens.Add(bondedTokens)
-	if p.BondedTokens.LT(sdk.ZeroDec()) {
-		panic(fmt.Sprintf("sanity check: bonded tokens negative, pool: %v", p))
-	}
-	return p
-}
-
 // HumanReadableString returns a human readable string representation of a
 // pool.
-func (p Pool) HumanReadableString() string {
+func (p PoolStatus) HumanReadableString() string {
 
 	resp := "Pool \n"
 	resp += fmt.Sprintf("Loose Tokens: %s\n", p.LooseTokens)
@@ -77,22 +93,4 @@ func (p Pool) HumanReadableString() string {
 	resp += fmt.Sprintf("Token Supply: %s\n", p.TokenSupply())
 	resp += fmt.Sprintf("Bonded Ratio: %v\n", p.BondedRatio())
 	return resp
-}
-
-// unmarshal the current pool value from store key or panics
-func MustUnmarshalPool(cdc *codec.Codec, value []byte) Pool {
-	pool, err := UnmarshalPool(cdc, value)
-	if err != nil {
-		panic(err)
-	}
-	return pool
-}
-
-// unmarshal the current pool value from store key
-func UnmarshalPool(cdc *codec.Codec, value []byte) (pool Pool, err error) {
-	err = cdc.UnmarshalBinaryLengthPrefixed(value, &pool)
-	if err != nil {
-		return
-	}
-	return
 }
