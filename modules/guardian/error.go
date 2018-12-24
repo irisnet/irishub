@@ -8,10 +8,16 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "guardian"
 
-	CodeProfilerExists      sdk.CodeType = 100
-	CodeProfilerNotExists   sdk.CodeType = 101
-	CodeInvalidProfilerName sdk.CodeType = 102
+	CodeProfilerExists     sdk.CodeType = 100
+	CodeProfilerNotExists  sdk.CodeType = 101
+	CodeTrusteeExists      sdk.CodeType = 102
+	CodeTrusteeNotExists   sdk.CodeType = 103
+	CodeInvalidDescription sdk.CodeType = 104
 )
+
+func ErrInvalidOperator(codespace sdk.CodespaceType, operator sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeProfilerNotExists, fmt.Sprintf("%s is not valid operator", operator))
+}
 
 func ErrProfilerNotExists(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeProfilerNotExists, fmt.Sprintf("profiler %s is not existed", profiler))
@@ -21,6 +27,14 @@ func ErrProfilerExists(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk
 	return sdk.NewError(codespace, CodeProfilerExists, fmt.Sprintf("profiler %s already exists", profiler))
 }
 
-func ErrInvalidProfilerName(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidProfilerName, fmt.Sprintf("invalid profiler name %s, must contain alphanumeric characters, _ and - only，length greater than 0 and less than or equal to 128", msg))
+func ErrTrusteeExists(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeTrusteeExists, fmt.Sprintf("trustee %s already exists", trustee))
+}
+
+func ErrTrusteeNotExists(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeTrusteeNotExists, fmt.Sprintf("trustee %s is not existed", profiler))
+}
+
+func ErrInvalidDescription(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDescription, "description is empty")
 }

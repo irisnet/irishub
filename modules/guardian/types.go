@@ -2,37 +2,101 @@ package guardian
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
+	"fmt"
+	"encoding/json"
 )
 
-type Profiler struct {
-	Name      string         `json:"name"`
-	Addr      sdk.AccAddress `json:"addr"`
-	AddedAddr sdk.AccAddress `json:"added_addr"`
+type Guardian struct {
+	Description  string         `json:"description"`
+	AccountType  AccountType    `json:"type"`
+	Address      sdk.AccAddress `json:"address"`
+	AddedAddress sdk.AccAddress `json:"added_address"`
 }
 
-func NewProfiler(addr, addedAddr sdk.AccAddress) Profiler {
-	return Profiler{
-		Addr:      addr,
-		AddedAddr: addedAddr,
+func NewGuardian(description string, accountType AccountType, address, addedAddress sdk.AccAddress) Guardian {
+	return Guardian{
+		Description:  description,
+		AccountType:  accountType,
+		Address:      address,
+		AddedAddress: addedAddress,
 	}
 }
 
-func ProfilerEqual(profilerA, profilerB Profiler) bool {
-	return profilerA.Addr.Equals(profilerB.Addr) &&
-		profilerA.AddedAddr.Equals(profilerB.AddedAddr) &&
-		profilerA.Name == profilerB.Name
+func (g Guardian) Equal(guardian Guardian) bool {
+	return g.Address.Equals(guardian.Address) &&
+		g.AddedAddress.Equals(guardian.AddedAddress) &&
+		g.Description == guardian.Description &&
+		g.AccountType == guardian.AccountType
 }
 
-type Trustee struct {
-	Addr sdk.AccAddress `json:"addr"`
-}
+type AccountType byte
 
-func NewTrustee(addr sdk.AccAddress) Trustee {
-	return Trustee{
-		Addr: addr,
+const (
+	Genesis  AccountType = 0x01
+	Ordinary AccountType = 0x02
+)
+
+// String to AccountType byte, Returns ff if invalid.
+func AccountTypeFromString(str string) (AccountType, error) {
+	switch str {
+	case "Genesis":
+		return Genesis, nil
+	case "Ordinary":
+		return Ordinary, nil
+	default:
+		return AccountType(0xff), errors.Errorf("'%s' is not a valid account type", str)
 	}
 }
 
-func TrusteeEqual(trusteeA, trusteeB Trustee) bool {
-	return trusteeA.Addr.Equals(trusteeB.Addr)
+// is defined AccountType?
+func validAccountType(bt AccountType) bool {
+	if bt == Genesis ||
+		bt == Ordinary {
+		return true
+	}
+	return false
+}
+
+// For Printf / Sprintf, returns bech32 when using %s
+func (bt AccountType) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		s.Write([]byte(fmt.Sprintf("%s", bt.String())))
+	default:
+		s.Write([]byte(fmt.Sprintf("%v", byte(bt))))
+	}
+}
+
+// Turns BindingType byte to String
+func (bt AccountType) String() string {
+	switch bt {
+	case Genesis:
+		return "genesis"
+	case Ordinary:
+		return "ordinary"
+	default:
+		return ""
+	}
+}
+
+// Marshals to JSON using string
+func (bt AccountType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(bt.String())
+}
+
+// Unmarshals from JSON assuming Bech32 encoding
+func (bt *AccountType) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz2, err := AccountTypeFromString(s)
+	if err != nil {
+		return err
+	}
+	*bt = bz2
+	return nil
 }
