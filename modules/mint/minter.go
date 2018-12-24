@@ -54,6 +54,8 @@ func (m Minter) NextAnnualProvisions(params Params) (provisions sdk.Dec) {
 func (m Minter) BlockProvision(params Params, annualProvisions sdk.Dec, inflationTime time.Time) sdk.Coin {
 	inflationPeriod := inflationTime.Sub(m.LastUpdate)
 	millisecond := inflationPeriod.Nanoseconds() / int64(nanoToMiliSecond)
-	blockInflationAmount := annualProvisions.Mul(sdk.NewDec(millisecond)).Quo(sdk.NewDec(int64(miliSecondPerYear)))
+	blockTimeAnnualPercent := sdk.NewDec(millisecond).Quo(sdk.NewDec(int64(miliSecondPerYear)))
+
+	blockInflationAmount := annualProvisions.Mul(blockTimeAnnualPercent)
 	return sdk.NewCoin(m.MintDenom, blockInflationAmount.TruncateInt())
 }
