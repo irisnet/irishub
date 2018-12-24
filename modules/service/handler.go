@@ -237,23 +237,23 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		slashFraction := keeper.GetServiceSlashFraction(ctx)
 		slashCoins := sdk.Coins{}
-		for _, coin := range req.ServiceFee {
-			taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-			slashCoins = append(slashCoins, sdk.Coin{
-				Denom:  coin.Denom,
-				Amount: taxAmount,
-			})
+		binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
+		if found {
+			for _, coin := range binding.Deposit {
+				taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+				slashCoins = append(slashCoins, sdk.Coin{
+					Denom:  coin.Denom,
+					Amount: taxAmount,
+				})
+			}
 		}
+
 		slashCoins = slashCoins.Sort()
 
-		keeper.ck.BurnCoinsFromAddr(ctx, RequestCoinsAccAddr, slashCoins)
+		keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, slashCoins)
+		keeper.Slash(ctx, binding, slashCoins)
 
-		returnFee, hasNeg := req.ServiceFee.SafeMinus(slashCoins)
-		if hasNeg {
-			errMsg := fmt.Sprintf("%s is less than %s", slashCoins, req.ServiceFee)
-			panic(errMsg)
-		}
-		keeper.AddReturnFee(ctx, req.Consumer, returnFee)
+		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
 		keeper.DeleteRequestExpiration(ctx, req)

@@ -530,6 +530,27 @@ func (k Keeper) SetServiceSlashFraction(ctx sdk.Context, fraction sdk.Dec) {
 	store.Set(serviceSlashFractionKey, bz)
 }
 
+func (k Keeper) Slash(ctx sdk.Context, binding SvcBinding, slashCoins sdk.Coins) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+	deposit, hasNeg := binding.Deposit.SafeMinus(slashCoins)
+	if hasNeg {
+		errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashCoins)
+		panic(errMsg)
+	}
+	binding.Deposit = deposit
+	minDeposit, err := getMinDeposit(ctx, binding.Prices)
+	if err != nil {
+		return err
+	}
+	if !binding.Deposit.IsAllGTE(minDeposit) {
+		binding.Available = false
+		binding.DisableTime = ctx.BlockHeader().Time
+	}
+	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
+	store.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+	return nil
+}
+
 //__________________________________________________________________________
 
 // get the current in-block request operation counter
