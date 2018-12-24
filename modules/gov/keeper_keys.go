@@ -82,12 +82,12 @@ func KeyInactiveProposalQueueProposal(endTime time.Time, proposalID uint64) []by
 var (
 	KeyTerminatorHeight     = []byte("TerminatorHeight")
 	KeyTerminatorPeriod     = []byte("TerminatorPeriod")
-	KeyCriticalProposal     = []byte("CriticalProposalList")
+	KeyCriticalProposal     = []byte("CriticalProposal")
 	KeyImportantProposalNum = []byte("ImportantProposalNum")
 	KeyNormalProposalNum    = []byte("NormalProposalNum")
-	PrefixValidatorSet         = []byte("vs")
+	PrefixValidatorSet      = []byte("vs")
 )
 
 func KeyValidatorSet(proposalID uint64) []byte {
-	return bytes.Join([][]byte{PrefixValidatorSet,sdk.Uint64ToBigEndian(proposalID)},KeyDelimiter)
+	return bytes.Join([][]byte{PrefixValidatorSet, sdk.Uint64ToBigEndian(proposalID)}, KeyDelimiter)
 }

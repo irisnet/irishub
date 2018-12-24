@@ -329,7 +329,7 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal govtypes.Pro
 
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
 	keeper.InsertActiveProposalQueue(ctx, proposal.GetVotingEndTime(), proposal.GetProposalID())
-	keeper.SetValidatorSet(ctx,proposal.GetProposalID())
+	keeper.SetValidatorSet(ctx, proposal.GetProposalID())
 }
 
 // =====================================================
@@ -610,12 +610,12 @@ func (keeper Keeper) GetCriticalProposalNum(ctx sdk.Context) uint64 {
 }
 
 func (keeper Keeper) AddCriticalProposalNum(ctx sdk.Context, proposalID uint64) {
-        keeper.SetCriticalProposalID(ctx,proposalID)
+	keeper.SetCriticalProposalID(ctx, proposalID)
 }
 
-func (keeper Keeper) SubCriticalProposalNum(ctx sdk.Context){
-       store := ctx.KVStore(keeper.storeKey)
-       store.Delete(KeyCriticalProposal)
+func (keeper Keeper) SubCriticalProposalNum(ctx sdk.Context) {
+	store := ctx.KVStore(keeper.storeKey)
+	store.Delete(KeyCriticalProposal)
 }
 
 func (keeper Keeper) GetImportantProposalNum(ctx sdk.Context) uint64 {
@@ -630,14 +630,14 @@ func (keeper Keeper) GetImportantProposalNum(ctx sdk.Context) uint64 {
 	return num
 }
 
-func (keeper Keeper) SetImportantProposalNum(ctx sdk.Context, num uint64){
+func (keeper Keeper) SetImportantProposalNum(ctx sdk.Context, num uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(num)
 	store.Set(KeyImportantProposalNum, bz)
 }
 
 func (keeper Keeper) AddImportantProposalNum(ctx sdk.Context) {
-      keeper.SetImportantProposalNum(ctx, keeper.GetImportantProposalNum(ctx)+1)
+	keeper.SetImportantProposalNum(ctx, keeper.GetImportantProposalNum(ctx)+1)
 }
 
 func (keeper Keeper) SubImportantProposalNum(ctx sdk.Context) {
@@ -656,39 +656,38 @@ func (keeper Keeper) GetNormalProposalNum(ctx sdk.Context) uint64 {
 	return num
 }
 
-func (keeper Keeper) SetNormalProposalNum(ctx sdk.Context, num uint64){
+func (keeper Keeper) SetNormalProposalNum(ctx sdk.Context, num uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(num)
 	store.Set(KeyNormalProposalNum, bz)
 }
 
 func (keeper Keeper) AddNormalProposalNum(ctx sdk.Context) {
-	  keeper.SetNormalProposalNum(ctx, keeper.GetNormalProposalNum(ctx)+1)
+	keeper.SetNormalProposalNum(ctx, keeper.GetNormalProposalNum(ctx)+1)
 }
 
 func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 	keeper.SetNormalProposalNum(ctx, keeper.GetNormalProposalNum(ctx)-1)
 }
 
-
-
-func (keeper Keeper) IsMoreThanMaxProposal(ctx sdk.Context, pl ProposalLevel) (uint64,bool) {
+func (keeper Keeper) IsMoreThanMaxProposal(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
+	votingProcedure := GetVotingProcedure(ctx)
 	switch pl {
 	case ProposalLevelCritical:
-		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) >= 1
+		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) >= votingProcedure.CriticalMaxNum
 	case ProposalLevelImportant:
-		return keeper.GetImportantProposalNum(ctx),keeper.GetImportantProposalNum(ctx) >= 3
+		return keeper.GetImportantProposalNum(ctx), keeper.GetImportantProposalNum(ctx) >= votingProcedure.ImportantMaxNum
 	case ProposalLevelNormal:
-		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) >= 5
+		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) >= votingProcedure.NormalMaxNum
 	default:
 		panic("There is no level for this proposal")
 	}
 }
 
-func (keeper Keeper) BeginProposal(ctx sdk.Context, p govtypes.Proposal) {
+func (keeper Keeper) AddProposalNum(ctx sdk.Context, p govtypes.Proposal) {
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
-		keeper.AddCriticalProposalNum(ctx,p.GetProposalID())
+		keeper.AddCriticalProposalNum(ctx, p.GetProposalID())
 	case ProposalLevelImportant:
 		keeper.AddImportantProposalNum(ctx)
 	case ProposalLevelNormal:
@@ -698,7 +697,7 @@ func (keeper Keeper) BeginProposal(ctx sdk.Context, p govtypes.Proposal) {
 	}
 }
 
-func (keeper Keeper) EndProposal(ctx sdk.Context, p govtypes.Proposal) {
+func (keeper Keeper) SubProposalNum(ctx sdk.Context, p govtypes.Proposal) {
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
 		keeper.SubCriticalProposalNum(ctx)
@@ -711,9 +710,7 @@ func (keeper Keeper) EndProposal(ctx sdk.Context, p govtypes.Proposal) {
 	}
 }
 
-
-
-func (keeper Keeper) SetValidatorSet(ctx sdk.Context,proposalID uint64) {
+func (keeper Keeper) SetValidatorSet(ctx sdk.Context, proposalID uint64) {
 
 	valAddrs := []sdk.ValAddress{}
 	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
@@ -725,7 +722,7 @@ func (keeper Keeper) SetValidatorSet(ctx sdk.Context,proposalID uint64) {
 	store.Set(KeyValidatorSet(proposalID), bz)
 }
 
-func (keeper Keeper) GetValidatorSet(ctx sdk.Context,proposalID uint64) []sdk.ValAddress{
+func (keeper Keeper) GetValidatorSet(ctx sdk.Context, proposalID uint64) []sdk.ValAddress {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyValidatorSet(proposalID))
 	if bz == nil {
@@ -733,10 +730,10 @@ func (keeper Keeper) GetValidatorSet(ctx sdk.Context,proposalID uint64) []sdk.Va
 	}
 	valAddrs := []sdk.ValAddress{}
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &valAddrs)
-	return  valAddrs
+	return valAddrs
 }
 
-func (keeper Keeper) DeleteValidatorSet(ctx sdk.Context,proposalID uint64) {
-    store := ctx.KVStore(keeper.storeKey)
-    store.Delete(KeyValidatorSet(proposalID))
+func (keeper Keeper) DeleteValidatorSet(ctx sdk.Context, proposalID uint64) {
+	store := ctx.KVStore(keeper.storeKey)
+	store.Delete(KeyValidatorSet(proposalID))
 }

@@ -51,7 +51,6 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result P
 		valAddrStr := sdk.ValAddress(vote.Voter).String()
 		if val, ok := currValidators[valAddrStr]; ok {
 			val.Vote = vote.Option
-			currValidators[valAddrStr] = val
 			results[val.Vote] = results[val.Vote].Add(val.Power)
 			totalVotingPower = totalVotingPower.Add(val.Power)
 			votingVals[valAddrStr] = true

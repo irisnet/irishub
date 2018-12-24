@@ -74,7 +74,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
 
-	keeper.BeginProposal(ctx, proposal)
+	keeper.AddProposalNum(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,
 		Tags: resTags,
@@ -118,7 +118,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
 
-	keeper.BeginProposal(ctx, proposal)
+	keeper.AddProposalNum(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,
 		Tags: resTags,
@@ -165,7 +165,7 @@ func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg 
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
 
-	keeper.BeginProposal(ctx, proposal)
+	keeper.AddProposalNum(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,
 		Tags: resTags,
@@ -237,7 +237,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
-		keeper.EndProposal(ctx, inactiveProposal)
+		keeper.SubProposalNum(ctx, inactiveProposal)
 		keeper.DeleteProposal(ctx, proposalID)
 		keeper.RefundDeposits(ctx, proposalID)
 
@@ -260,7 +260,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &proposalID)
 		activeProposal := keeper.GetProposal(ctx, proposalID)
-		result, tallyResults,votingVals := tally(ctx, keeper, activeProposal)
+		result, tallyResults, votingVals := tally(ctx, keeper, activeProposal)
 
 		var action []byte
 		if result == PASS {
@@ -286,25 +286,27 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
-        for _, valAddr := range keeper.GetValidatorSet(ctx,proposalID){
-        	if _,ok := votingVals[valAddr.String()]; !ok {
+		for _, valAddr := range keeper.GetValidatorSet(ctx, proposalID) {
+			if _, ok := votingVals[valAddr.String()]; !ok {
 				val := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
-				keeper.ds.GetValidatorSet().Slash(ctx,
-					val.GetConsAddr(),
-					ctx.BlockHeight(),
-					val.GetPower().RoundInt64(),
-					GetTallyingProcedure(ctx).GovernancePenalty)
+				if val != nil {
+					keeper.ds.GetValidatorSet().Slash(ctx,
+						val.GetConsAddr(),
+						ctx.BlockHeight(),
+						val.GetPower().RoundInt64(),
+						GetTallyingProcedure(ctx).GovernancePenalty)
+				}
 			}
 		}
 
-		keeper.EndProposal(ctx, activeProposal)
-		keeper.DeleteValidatorSet(ctx,activeProposal.GetProposalID())
+		keeper.SubProposalNum(ctx, activeProposal)
+		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
 	}
 	activeIterator.Close()
 
-	if proposalID,ok :=keeper.GetCriticalProposalID(ctx); ok {
+	if proposalID, ok := keeper.GetCriticalProposalID(ctx); ok {
 		activeProposal := keeper.GetProposal(ctx, proposalID)
-		result, tallyResults,_ := tally(ctx, keeper, activeProposal)
+		result, tallyResults, _ := tally(ctx, keeper, activeProposal)
 
 		var action []byte
 		if result == PASS {
@@ -321,7 +323,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		}
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 
-
 		activeProposal.SetTallyResult(tallyResults)
 		activeProposal.SetVotingEndTime(ctx.BlockHeader().Time)
 		keeper.SetProposal(ctx, activeProposal)
@@ -332,8 +333,8 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
-		keeper.EndProposal(ctx, activeProposal)
-		keeper.DeleteValidatorSet(ctx,activeProposal.GetProposalID())
+		keeper.SubProposalNum(ctx, activeProposal)
+		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
 	}
 	return resTags
 }
