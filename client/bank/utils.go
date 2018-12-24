@@ -43,3 +43,9 @@ func BuildMsg(from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 	msg := bank.NewMsgSend([]bank.Input{input}, []bank.Output{output})
 	return msg
 }
+
+type TokenStats struct {
+	LoosenToken []string `json:"loosen_token"`
+	BurnedToken []string `json:"burned_token"`
+	BondedToken string   `json:"bonded_token"`
+}
