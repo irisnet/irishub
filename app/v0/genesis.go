@@ -4,6 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
@@ -19,12 +26,6 @@ import (
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"sort"
-	"strings"
-	"time"
 )
 
 var (
