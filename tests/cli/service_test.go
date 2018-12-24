@@ -211,7 +211,7 @@ func TestIrisCLIService(t *testing.T) {
 	barFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 	require.Equal(t, "980000000000000000iris-atto", fooFess.IncomingFee.String())
 	require.Nil(t, fooFess.ReturnedFee)
-	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.String())
+	require.Equal(t, "990000000000000000iris-atto", barFess.ReturnedFee.String())
 	require.Nil(t, barFess.IncomingFee)
 
 	// refund fees

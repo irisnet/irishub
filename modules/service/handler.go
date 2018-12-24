@@ -47,18 +47,14 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDef,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
 		msg.Deposit, msg.Prices, msg.Level, true)
-	err, _ := k.AddServiceBinding(ctx, svcBinding)
+	err := k.AddServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
@@ -69,7 +65,7 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
 	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
 		msg.Deposit, msg.Prices, msg.Level, false)
-	err, _ := k.UpdateServiceBinding(ctx, svcBinding)
+	err := k.UpdateServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
@@ -78,7 +74,7 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 }
 
 func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Result {
-	err, _ := k.Disable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	err := k.Disable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
 	if err != nil {
 		return err.Result()
 	}
@@ -87,7 +83,7 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 }
 
 func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result {
-	err, _ := k.Enable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit)
+	err := k.Enable(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit)
 	if err != nil {
 		return err.Result()
 	}
@@ -96,7 +92,7 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 }
 
 func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposit) sdk.Result {
-	err, _ := k.RefundDeposit(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
+	err := k.RefundDeposit(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
 	if err != nil {
 		return err.Result()
 	}
@@ -146,6 +142,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Provider, []byte(request.Provider.String()),
 		tags.Consumer, []byte(request.Consumer.String()),
+		tags.ServiceFee, []byte(request.ServiceFee.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,
