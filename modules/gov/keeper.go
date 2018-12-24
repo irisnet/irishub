@@ -329,6 +329,7 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal govtypes.Pro
 
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
 	keeper.InsertActiveProposalQueue(ctx, proposal.GetVotingEndTime(), proposal.GetProposalID())
+	keeper.SetValidatorSet(ctx,proposal.GetProposalID())
 }
 
 // =====================================================
@@ -708,4 +709,34 @@ func (keeper Keeper) EndProposal(ctx sdk.Context, p govtypes.Proposal) {
 	default:
 		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
+}
+
+
+
+func (keeper Keeper) SetValidatorSet(ctx sdk.Context,proposalID uint64) {
+
+	valAddrs := []sdk.ValAddress{}
+	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
+		valAddrs = append(valAddrs, validator.GetOperator())
+		return false
+	})
+	store := ctx.KVStore(keeper.storeKey)
+	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(valAddrs)
+	store.Set(KeyValidatorSet(proposalID), bz)
+}
+
+func (keeper Keeper) GetValidatorSet(ctx sdk.Context,proposalID uint64) []sdk.ValAddress{
+	store := ctx.KVStore(keeper.storeKey)
+	bz := store.Get(KeyValidatorSet(proposalID))
+	if bz == nil {
+		return []sdk.ValAddress{}
+	}
+	valAddrs := []sdk.ValAddress{}
+	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &valAddrs)
+	return  valAddrs
+}
+
+func (keeper Keeper) DeleteValidatorSet(ctx sdk.Context,proposalID uint64) {
+    store := ctx.KVStore(keeper.storeKey)
+    store.Delete(KeyValidatorSet(proposalID))
 }

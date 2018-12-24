@@ -268,11 +268,21 @@ type TallyingProcedure struct {
 	Threshold     sdk.Dec `json:"threshold"`     //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
 	Veto          sdk.Dec `json:"veto"`          //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
 	Participation sdk.Dec `json:"participation"` //
+	GovernancePenalty sdk.Dec `json:"governance_penalty"` //  Penalty if validator does not vote
 }
 
 type TallyingProcedureParam struct {
 	Value      TallyingProcedure
 	paramSpace params.Subspace
+}
+
+func NewTallyingProcedureParam() TallyingProcedure {
+	return TallyingProcedure{
+		Threshold:     sdk.NewDecWithPrec(5, 1),
+		Veto:          sdk.NewDecWithPrec(334, 3),
+		Participation: sdk.NewDecWithPrec(667, 3),
+		GovernancePenalty: sdk.NewDecWithPrec(1,3),
+	}
 }
 
 func (param *TallyingProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -288,6 +298,7 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 			Threshold:     sdk.NewDecWithPrec(5, 1),
 			Veto:          sdk.NewDecWithPrec(334, 3),
 			Participation: sdk.NewDecWithPrec(667, 3),
+			GovernancePenalty: sdk.NewDecWithPrec(1,3),
 		}
 	}
 }
@@ -348,7 +359,9 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 		if param.Value.Veto.LTE(sdk.ZeroDec()) || param.Value.Veto.GTE(sdk.NewDec(1)) {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
 		}
-
+		if param.Value.GovernancePenalty.LTE(sdk.ZeroDec()) || param.Value.GovernancePenalty.GTE(sdk.NewDec(1)) {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid GovernancePenalty ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
+		}
 		return nil
 
 	}

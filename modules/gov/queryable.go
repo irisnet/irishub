@@ -328,7 +328,7 @@ func queryTally(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	} else if proposal.GetStatus() == govtypes.StatusPassed || proposal.GetStatus() == govtypes.StatusRejected {
 		tallyResult = proposal.GetTallyResult()
 	} else {
-		_, tallyResult = tally(ctx, keeper, proposal)
+		_, tallyResult,_ = tally(ctx, keeper, proposal)
 	}
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, tallyResult)

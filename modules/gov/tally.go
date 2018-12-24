@@ -15,12 +15,12 @@ const (
 
 // validatorGovInfo used for tallying
 type validatorGovInfo struct {
-	Address         sdk.ValAddress      // address of the validator operator
-	Power           sdk.Dec             // Power of a Validator
-	Vote            govtypes.VoteOption // Vote of the validator
+	Address sdk.ValAddress      // address of the validator operator
+	Power   sdk.Dec             // Power of a Validator
+	Vote    govtypes.VoteOption // Vote of the validator
 }
 
-func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result ProposalResult, tallyResults govtypes.TallyResult) {
+func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result ProposalResult, tallyResults govtypes.TallyResult, votingVals map[string]bool) {
 	results := make(map[govtypes.VoteOption]sdk.Dec)
 	results[govtypes.OptionYes] = sdk.ZeroDec()
 	results[govtypes.OptionAbstain] = sdk.ZeroDec()
@@ -30,17 +30,16 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result P
 	totalVotingPower := sdk.ZeroDec()
 	systemVotingPower := sdk.ZeroDec()
 	currValidators := make(map[string]validatorGovInfo)
-
+	votingVals = make(map[string]bool)
 	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
 		currValidators[validator.GetOperator().String()] = validatorGovInfo{
-			Address:         validator.GetOperator(),
-			Power:           validator.GetPower(),
-			Vote:            govtypes.OptionEmpty,
+			Address: validator.GetOperator(),
+			Power:   validator.GetPower(),
+			Vote:    govtypes.OptionEmpty,
 		}
 		systemVotingPower = systemVotingPower.Add(validator.GetPower())
 		return false
 	})
-
 	// iterate over all the votes
 	votesIterator := keeper.GetVotes(ctx, proposal.GetProposalID())
 	defer votesIterator.Close()
@@ -55,6 +54,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result P
 			currValidators[valAddrStr] = val
 			results[val.Vote] = results[val.Vote].Add(val.Power)
 			totalVotingPower = totalVotingPower.Add(val.Power)
+			votingVals[valAddrStr] = true
 		}
 	}
 
@@ -71,25 +71,25 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result P
 
 	// If no one votes, proposal fails
 	if totalVotingPower.Sub(results[govtypes.OptionAbstain]).Equal(sdk.ZeroDec()) {
-		return REJECT, tallyResults
+		return REJECT, tallyResults, votingVals
 	}
 	////////////////////  iris begin  ///////////////////////////
 	//if more than 1/3 of voters abstain, proposal fails
 	if tallyingProcedure.Participation.GT(totalVotingPower.Quo(systemVotingPower)) {
-		return REJECT, tallyResults
+		return REJECT, tallyResults, votingVals
 	}
 	////////////////////  iris end  ///////////////////////////
 
 	// If more than 1/3 of voters veto, proposal fails
 	if results[govtypes.OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
-		return REJECTVETO, tallyResults
+		return REJECTVETO, tallyResults, votingVals
 	}
 
 	// If more than 1/2 of non-abstaining voters vote Yes, proposal passes
 	if results[govtypes.OptionYes].Quo(totalVotingPower).GT(tallyingProcedure.Threshold) {
-		return PASS, tallyResults
+		return PASS, tallyResults, votingVals
 	}
 	// If more than 1/2 of non-abstaining voters vote No, proposal fails
 
-	return REJECT, tallyResults
+	return REJECT, tallyResults, votingVals
 }
