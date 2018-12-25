@@ -63,12 +63,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	k.SetFeePool(ctx, feePool)
 
 	if burn {
-		stakeDenom := k.stakeKeeper.GetStakeDenom(ctx)
-		for _, coin := range allocateCoins {
-			if coin.Denom == stakeDenom {
-				k.stakeKeeper.BurnAmount(ctx, sdk.NewDecFromInt(coin.Amount))
-			}
-		}
+		k.bankKeeper.BurnCoinsFromPool(ctx, "communityTax", allocateCoins)
 	} else {
 		k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
 	}

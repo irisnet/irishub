@@ -90,23 +90,15 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 
 		stakeGenesis := stake.DefaultGenesisState()
 		stakeGenesis.Params.BondDenom = stakeTypes.StakeDenom
-		stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewInt(100000))
 
 		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 		if err != nil {
 			panic(err)
 		}
-		ct := types.NewDefaultCoinType(stakeTypes.StakeDenomName)
-		minDeposit, _ := ct.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeDenomName))
 		InitGenesis(ctx, keeper, GenesisState{
 			StartingProposalID: 1,
-			DepositProcedure: govparams.DepositProcedure{
-				MinDeposit:       sdk.Coins{minDeposit},
-				MaxDepositPeriod: 1440,
-			},
-			VotingProcedure: govparams.VotingProcedure{
-				VotingPeriod: 30,
-			},
+			DepositProcedure: govparams.NewDepositProcedure(),
+			VotingProcedure: govparams.NewVotingProcedure(),
 			TallyingProcedure: govparams.TallyingProcedure{
 				Threshold:     sdk.NewDecWithPrec(5, 1),
 				Veto:          sdk.NewDecWithPrec(334, 3),

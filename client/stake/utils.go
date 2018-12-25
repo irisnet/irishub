@@ -214,7 +214,7 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 	}
 }
 
-func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.Pool) PoolOutput {
+func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.PoolStatus) PoolOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return PoolOutput{
 		LooseTokens:  utils.ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),

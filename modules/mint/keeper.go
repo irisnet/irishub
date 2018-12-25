@@ -4,6 +4,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/bank"
 )
 
 // keeper of the stake store
@@ -11,18 +12,18 @@ type Keeper struct {
 	storeKey   sdk.StoreKey
 	cdc        *codec.Codec
 	paramSpace params.Subspace
-	sk         StakeKeeper
+	bk         bank.Keeper
 	fck        FeeCollectionKeeper
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
-	paramSpace params.Subspace, sk StakeKeeper, fck FeeCollectionKeeper) Keeper {
+	paramSpace params.Subspace, bk bank.Keeper, fck FeeCollectionKeeper) Keeper {
 
 	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
-		sk:         sk,
+		bk:         bk,
 		fck:        fck,
 	}
 	return keeper

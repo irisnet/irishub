@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
@@ -119,7 +120,6 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 		return genesisState, err
 	}
 
-
 	// if there are no gen txs to be processed, return the default empty state
 	if len(appGenTxs) == 0 {
 		return genesisState, errors.New("there must be at least one genesis tx")
@@ -141,23 +141,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 				"Genesis transaction %v does not contain a MsgCreateValidator", i)
 		}
 	}
-
-	for _, acc := range genesisState.Accounts {
-		// create the genesis account, give'm few stake token and a buncha token with there name
-		for _, coin := range acc.Coins {
-			_, err := types.GetCoinName(coin)
-			if err != nil {
-				return genesisState, err
-			}
-
-			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
-			if err != nil {
-				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", stakeTypes.StakeDenom, coin))
-			}
-			stakeData.Pool.LooseTokens = stakeData.Pool.LooseTokens.
-				Add(sdk.NewDecFromInt(stakeToken.Amount)) // increase the supply
-		}
-	}
+	
 	genesisState.StakeData = stakeData
 	genesisState.GenTxs = appGenTxs
 	genesisState.UpgradeData = genesisState.UpgradeData
@@ -309,8 +293,7 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 
 func createStakeGenesisState() stake.GenesisState {
 	return stake.GenesisState{
-		Pool: stake.Pool{
-			LooseTokens:  sdk.ZeroDec(),
+		BondedPool: stake.BondedPool{
 			BondedTokens: sdk.ZeroDec(),
 		},
 		Params: stake.Params{
@@ -325,11 +308,7 @@ func createMintGenesisState() mint.GenesisState {
 	return mint.GenesisState{
 		Minter: mint.InitialMinter(),
 		Params: mint.Params{
-			MintDenom:           stakeTypes.StakeDenom,
-			InflationRateChange: sdk.NewDecWithPrec(13, 2),
-			InflationMax:        sdk.NewDecWithPrec(20, 2),
-			InflationMin:        sdk.NewDecWithPrec(7, 2),
-			GoalBonded:          sdk.NewDecWithPrec(67, 2),
+			Inflation:         sdk.NewDecWithPrec(4, 2),
 		},
 	}
 }

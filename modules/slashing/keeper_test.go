@@ -184,7 +184,7 @@ func TestHandleAbsentValidator(t *testing.T) {
 	validator, _ := sk.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(val))
 	require.Equal(t, sdk.Bonded, validator.GetStatus())
 	pool := sk.GetPool(ctx)
-	require.Equal(t, sdk.NewDecFromInt(amt), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(amt), pool.BondedPool.BondedTokens)
 
 	// 501st block missed
 	ctx = ctx.WithBlockHeight(height)
@@ -249,7 +249,7 @@ func TestHandleAbsentValidator(t *testing.T) {
 
 	// validator should have been slashed
 	pool = sk.GetPool(ctx)
-	require.Equal(t, sdk.NewDecFromInt(amt).Sub(slashAmt).Sub(secondSlashAmt), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(amt).Sub(slashAmt).Sub(secondSlashAmt), pool.BondedPool.BondedTokens)
 
 	// validator start height should not have been changed
 	info, found = keeper.getValidatorSigningInfo(ctx, sdk.ConsAddress(val.Address()))
@@ -327,7 +327,7 @@ func TestHandleNewValidator(t *testing.T) {
 	validator, _ := sk.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(val))
 	require.Equal(t, sdk.Bonded, validator.GetStatus())
 	pool := sk.GetPool(ctx)
-	require.Equal(t, sdk.NewDecFromInt(amt), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(amt), pool.BondedPool.BondedTokens)
 }
 
 // Test a jailed validator being "down" twice

@@ -26,15 +26,16 @@ func TestParams(t *testing.T) {
 
 func TestPool(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
-	expPool := types.InitialPool()
+	expPool := types.InitialBondedPool()
 
 	//check that the empty keeper loads the default
 	resPool := keeper.GetPool(ctx)
-	require.True(t, expPool.Equal(resPool))
+	require.True(t, expPool.Equal(resPool.BondedPool))
 
 	//modify a params, save, and retrieve
 	expPool.BondedTokens = sdk.NewDec(777)
-	keeper.SetPool(ctx, expPool)
+	resPool.BondedPool = expPool
+	keeper.SetPool(ctx, resPool)
 	resPool = keeper.GetPool(ctx)
-	require.True(t, expPool.Equal(resPool))
+	require.True(t, expPool.Equal(resPool.BondedPool))
 }

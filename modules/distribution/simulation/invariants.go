@@ -3,18 +3,16 @@ package simulation
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/modules/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // AllInvariants runs all invariants of the distribution module
 // Currently: total supply, positive power
 func AllInvariants(d distr.Keeper, sk distr.StakeKeeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		err := ValAccumInvariants(d, sk)(app)
+	return func(ctx sdk.Context) error {
+		err := ValAccumInvariants(d, sk)(ctx)
 		if err != nil {
 			return err
 		}
@@ -25,9 +23,7 @@ func AllInvariants(d distr.Keeper, sk distr.StakeKeeper) simulation.Invariant {
 // ValAccumInvariants checks that the fee pool accum == sum all validators' accum
 func ValAccumInvariants(k distr.Keeper, sk distr.StakeKeeper) simulation.Invariant {
 
-	return func(app *baseapp.BaseApp) error {
-		mockHeader := abci.Header{Height: app.LastBlockHeight() + 1}
-		ctx := app.NewContext(false, mockHeader)
+	return func(ctx sdk.Context) error {
 		height := ctx.BlockHeight()
 
 		valAccum := sdk.ZeroDec()

@@ -484,6 +484,32 @@ paths:
           description: Not Found
         500:
           description: Internal Server Error
+  /bank/token-stats:
+    get:
+      tags:
+      - ICS20
+      summary: Get token statistics
+      description: Get token statistics, such as total loosen token, total bonded token and total burned token
+      produces:
+      - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              loosen_token:
+                type: array
+                items:
+                  type: string
+              bonded_token:
+                type: string
+              burned_token:
+                type: array
+                items:
+                  type: string
+        500:
+          description: Internal Server Error
   /bank/balances/{address}:
     get:
       summary: Get the account information on blockchain

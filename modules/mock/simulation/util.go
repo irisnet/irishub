@@ -14,6 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock"
 	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -111,9 +112,9 @@ func addLogMessage(testingmode bool, blockLogBuilders []*strings.Builder, height
 // assertAllInvariants asserts a list of provided invariants against application state
 func assertAllInvariants(t *testing.T, app *bam.BaseApp,
 	invariants []Invariant, where string, displayLogs func()) {
-
+	ctx := app.NewContext(false, abci.Header{Height: app.LastBlockHeight() + 1})
 	for i := 0; i < len(invariants); i++ {
-		err := invariants[i](app)
+		err := invariants[i](ctx)
 		if err != nil {
 			fmt.Printf("Invariants broken after %s\n", where)
 			fmt.Println(err.Error())

@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/types/gov/params"
 )
 
 //-----------------------------------------------------------
@@ -45,7 +46,6 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
-
 }
 
 // checks if two proposals are equal
@@ -83,6 +83,8 @@ type TextProposal struct {
 
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+
+	TallyProcedure  govparams.TallyingProcedure `json:"tallying_procedure"`
 }
 
 // Implements Proposal Interface
@@ -161,7 +163,7 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
-	////////////////////  iris begin  /////////////////////////////
+		////////////////////  iris begin  /////////////////////////////
 		pt == ProposalTypeSoftwareHalt ||
 		pt == ProposalTypeTxTaxUsage {
 		////////////////////  iris end  /////////////////////////////

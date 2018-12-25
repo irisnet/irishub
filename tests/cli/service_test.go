@@ -168,9 +168,9 @@ func TestIrisCLIService(t *testing.T) {
 	caStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	caStr += fmt.Sprintf(" --from=%s", "bar")
 	_, outString, _ := executeWriteRetStdStreams(t, caStr, v0.DefaultKeyPass)
-	var digitsRegexp = regexp.MustCompile(`\"request-id\": \".*\"`)
+	var digitsRegexp = regexp.MustCompile(`\"key\": \"request-id\",\n       \"value\": \".*\"`)
 	requestTag := string(digitsRegexp.Find([]byte(outString)))
-	requestId := strings.TrimSpace(strings.Split(requestTag, ":")[1])
+	requestId := strings.TrimSpace(strings.Split(requestTag, ":")[2])
 	requestId = requestId[1 : len(requestId)-1]
 	tests.WaitForNextNBlocksTM(2, port)
 
@@ -213,6 +213,10 @@ func TestIrisCLIService(t *testing.T) {
 	require.Nil(t, fooFess.ReturnedFee)
 	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.String())
 	require.Nil(t, barFess.IncomingFee)
+	serviceBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
+	require.NotNil(t, serviceBinding)
+	require.Equal(t, "9900000000000000000iris-atto", serviceBinding.Deposit.String())
+	require.Equal(t, false, serviceBinding.Available)
 
 	// refund fees
 	executeWrite(t, fmt.Sprintf("iriscli service refund-fees %v --fee=%s --from=%s", flags, "0.004iris", "bar"), v0.DefaultKeyPass)

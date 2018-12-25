@@ -82,7 +82,6 @@ func TestStakeWithRandomMessages(t *testing.T) {
 			validators = append(validators, validator)
 			delegations = append(delegations, delegation)
 		}
-		stakeGenesis.Pool.LooseTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 10))
 		stakeGenesis.Validators = validators
 		stakeGenesis.Bonds = delegations
 

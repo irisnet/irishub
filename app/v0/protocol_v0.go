@@ -133,7 +133,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	)
 	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamspace),
-		&stakeKeeper, p.feeCollectionKeeper,
+		p.bankKeeper, p.feeCollectionKeeper,
 	)
 	p.distrKeeper = distr.NewKeeper(
 		p.cdc,
@@ -256,14 +256,15 @@ func (p *ProtocolVersion0) configParams() {
 
 // application updates every end block
 func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	tags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
+	// mint new tokens for this new block
+	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
 	// distribute rewards from previous block
 	distr.BeginBlocker(ctx, req, p.distrKeeper)
 
-	// mint new tokens for this new block
-	mint.BeginBlocker(ctx, p.mintKeeper)
+	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
 
+	tags = tags.AppendTags(slashTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
 	}
@@ -275,6 +276,9 @@ func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
+
+	p.assertRuntimeInvariants(ctx)
+
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,

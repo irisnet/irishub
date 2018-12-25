@@ -8,15 +8,11 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	abci "github.com/tendermint/tendermint/abci/types"
-
-	"github.com/irisnet/irishub/modules/mock/baseapp"
 )
 
 // NonnegativeBalanceInvariant checks that all accounts in the application have non-negative balances
 func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		ctx := app.NewContext(false, abci.Header{})
+	return func(ctx sdk.Context) error {
 		accts := mock.GetAllAccounts(mapper, ctx)
 		for _, acc := range accts {
 			coins := acc.GetCoins()
@@ -33,8 +29,7 @@ func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) simulation.Invariant
 // TotalCoinsInvariant checks that the sum of the coins across all accounts
 // is what is expected
 func TotalCoinsInvariant(mapper auth.AccountKeeper, totalSupplyFn func() sdk.Coins) simulation.Invariant {
-	return func(app *baseapp.BaseApp) error {
-		ctx := app.NewContext(false, abci.Header{})
+	return func(ctx sdk.Context) error {
 		totalCoins := sdk.Coins{}
 
 		chkAccount := func(acc auth.Account) bool {

@@ -5,12 +5,26 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	dbm "github.com/tendermint/tendermint/libs/db"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/modules/auth"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/irisnet/irishub/modules/bank"
 )
+
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
+	db := dbm.NewMemDB()
+	authKey := sdk.NewKVStoreKey("authkey")
+	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, db)
+	ms.LoadLatestVersion()
+	return ms, authKey
+}
 
 func TestValidatorEqual(t *testing.T) {
 	val1 := NewValidator(addr1, pk1, Description{})
@@ -72,6 +86,14 @@ func TestABCIValidatorUpdateZero(t *testing.T) {
 
 func TestRemoveTokens(t *testing.T) {
 
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
 	validator := Validator{
 		OperatorAddr:    addr1,
 		ConsPubKey:      pk1,
@@ -80,37 +102,55 @@ func TestRemoveTokens(t *testing.T) {
 		DelegatorShares: sdk.NewDec(100),
 	}
 
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
-	pool.BondedTokens = validator.BondedTokens()
+	bondedPool := InitialBondedPool()
+	poolA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
+	}
+	poolA.BondedPool.BondedTokens = validator.BondedTokens()
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 
-	validator, pool = validator.UpdateStatus(pool, sdk.Bonded)
+	validator, poolA = validator.UpdateStatus(ctx, poolA, sdk.Bonded)
 	require.Equal(t, sdk.Bonded, validator.Status)
 
 	// remove tokens and test check everything
-	validator, pool = validator.RemoveTokens(pool, sdk.NewDec(10))
+	validator, poolA = validator.RemoveTokens(ctx, poolA, sdk.NewDec(10))
 	require.Equal(t, int64(90), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(90), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(20), pool.LooseTokens.RoundInt64())
+	require.Equal(t, int64(90), poolA.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(20), poolA.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
 	// update validator to unbonded and remove some more tokens
-	validator, pool = validator.UpdateStatus(pool, sdk.Unbonded)
+	validator, poolA = validator.UpdateStatus(ctx, poolA, sdk.Unbonded)
 	require.Equal(t, sdk.Unbonded, validator.Status)
-	require.Equal(t, int64(0), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(110), pool.LooseTokens.RoundInt64())
+	require.Equal(t, int64(0), poolA.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(110), poolA.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
-	validator, pool = validator.RemoveTokens(pool, sdk.NewDec(10))
+	validator, poolA = validator.RemoveTokens(ctx, poolA, sdk.NewDec(10))
 	require.Equal(t, int64(80), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(0), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(110), pool.LooseTokens.RoundInt64())
+	require.Equal(t, int64(0), poolA.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(110), poolA.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 }
 
 func TestAddTokensValidatorBonded(t *testing.T) {
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
+
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+	bondedPool := InitialBondedPool()
+	poolA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
+	}
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+
 	validator := NewValidator(addr1, pk1, Description{})
-	validator, pool = validator.UpdateStatus(pool, sdk.Bonded)
-	validator, pool, delShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
+	validator, poolA = validator.UpdateStatus(ctx, poolA, sdk.Bonded)
+	validator, poolA, delShares := validator.AddTokensFromDel(ctx, poolA, sdk.NewInt(10))
 
 	require.Equal(t, sdk.OneDec(), validator.DelegatorShareExRate())
 
@@ -119,11 +159,25 @@ func TestAddTokensValidatorBonded(t *testing.T) {
 }
 
 func TestAddTokensValidatorUnbonding(t *testing.T) {
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
+
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+	bondedPool := InitialBondedPool()
+	poolA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
+	}
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+
 	validator := NewValidator(addr1, pk1, Description{})
-	validator, pool = validator.UpdateStatus(pool, sdk.Unbonding)
-	validator, pool, delShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
+	validator, poolA = validator.UpdateStatus(ctx, poolA, sdk.Unbonding)
+	validator, poolA, delShares := validator.AddTokensFromDel(ctx, poolA, sdk.NewInt(10))
 
 	require.Equal(t, sdk.OneDec(), validator.DelegatorShareExRate())
 
@@ -133,11 +187,25 @@ func TestAddTokensValidatorUnbonding(t *testing.T) {
 }
 
 func TestAddTokensValidatorUnbonded(t *testing.T) {
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
+
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+	bondedPool := InitialBondedPool()
+	poolA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
+	}
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
+
 	validator := NewValidator(addr1, pk1, Description{})
-	validator, pool = validator.UpdateStatus(pool, sdk.Unbonded)
-	validator, pool, delShares := validator.AddTokensFromDel(pool, sdk.NewInt(10))
+	validator, poolA = validator.UpdateStatus(ctx, poolA, sdk.Unbonded)
+	validator, poolA, delShares := validator.AddTokensFromDel(ctx, poolA, sdk.NewInt(10))
 
 	require.Equal(t, sdk.OneDec(), validator.DelegatorShareExRate())
 
@@ -148,6 +216,15 @@ func TestAddTokensValidatorUnbonded(t *testing.T) {
 
 // TODO refactor to make simpler like the AddToken tests above
 func TestRemoveDelShares(t *testing.T) {
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+
 	valA := Validator{
 		OperatorAddr:    addr1,
 		ConsPubKey:      pk1,
@@ -155,23 +232,28 @@ func TestRemoveDelShares(t *testing.T) {
 		Tokens:          sdk.NewDec(100),
 		DelegatorShares: sdk.NewDec(100),
 	}
-	poolA := InitialPool()
-	poolA.LooseTokens = sdk.NewDec(10)
-	poolA.BondedTokens = valA.BondedTokens()
+	bondedPool := InitialBondedPool()
+	poolA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
+	}
+	poolA.BondedPool.BondedTokens = valA.BondedTokens()
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 	require.Equal(t, valA.DelegatorShareExRate(), sdk.OneDec())
 
 	// Remove delegator shares
-	valB, poolB, coinsB := valA.RemoveDelShares(poolA, sdk.NewDec(10))
+	valB, poolB, coinsB := valA.RemoveDelShares(ctx, poolA, sdk.NewDec(10))
 	assert.Equal(t, int64(10), coinsB.RoundInt64())
 	assert.Equal(t, int64(90), valB.DelegatorShares.RoundInt64())
 	assert.Equal(t, int64(90), valB.BondedTokens().RoundInt64())
-	assert.Equal(t, int64(90), poolB.BondedTokens.RoundInt64())
-	assert.Equal(t, int64(20), poolB.LooseTokens.RoundInt64())
+	assert.Equal(t, int64(90), poolB.BondedPool.BondedTokens.RoundInt64())
+	assert.Equal(t, int64(20), poolB.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
+	poolA.BondedPool.BondedTokens = poolA.BondedPool.BondedTokens.Sub(sdk.NewDec(10))
 	// conservation of tokens
 	require.True(sdk.DecEq(t,
-		poolB.LooseTokens.Add(poolB.BondedTokens),
-		poolA.LooseTokens.Add(poolA.BondedTokens)))
+		sdk.NewDecFromInt(poolB.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom)).Add(poolB.BondedPool.BondedTokens),
+		sdk.NewDecFromInt(poolA.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom)).Add(poolA.BondedPool.BondedTokens)))
 
 	// specific case from random tests
 	poolTokens := sdk.NewDec(5102)
@@ -183,48 +265,72 @@ func TestRemoveDelShares(t *testing.T) {
 		Tokens:          poolTokens,
 		DelegatorShares: delShares,
 	}
-	pool := Pool{
-		BondedTokens: sdk.NewDec(248305),
-		LooseTokens:  sdk.NewDec(232147),
+	poolC := Pool{
+		BondedPool: BondedPool {
+			BondedTokens: sdk.NewDec(248305),
+		},
+		BankKeeper:bankKeeper,
 	}
 	shares := sdk.NewDec(29)
-	_, newPool, tokens := validator.RemoveDelShares(pool, shares)
+	_, newPool, tokens := validator.RemoveDelShares(ctx, poolC, shares)
 
-	exp, err := sdk.NewDecFromStr("1286.5913043477")
+	exp, err := sdk.NewDecFromStr("1286")
 	require.NoError(t, err)
 
 	require.True(sdk.DecEq(t, exp, tokens))
-
+	poolC.BondedPool.BondedTokens = poolC.BondedPool.BondedTokens.Sub(sdk.NewDec(1286))
 	require.True(sdk.DecEq(t,
-		newPool.LooseTokens.Add(newPool.BondedTokens),
-		pool.LooseTokens.Add(pool.BondedTokens)))
+		sdk.NewDecFromInt(newPool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom)).Add(newPool.BondedPool.BondedTokens),
+		sdk.NewDecFromInt(poolC.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom)).Add(poolC.BondedPool.BondedTokens)))
 }
 
 func TestUpdateStatus(t *testing.T) {
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(100)
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+	bondedPool := InitialBondedPool()
+	pool := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
+	}
+	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(100))})
 
 	validator := NewValidator(addr1, pk1, Description{})
-	validator, pool, _ = validator.AddTokensFromDel(pool, sdk.NewInt(100))
+	validator, pool, _ = validator.AddTokensFromDel(ctx, pool, sdk.NewInt(100))
 	require.Equal(t, sdk.Unbonded, validator.Status)
 	require.Equal(t, int64(100), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(0), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(100), pool.LooseTokens.RoundInt64())
+	require.Equal(t, int64(0), pool.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(100), pool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
-	validator, pool = validator.UpdateStatus(pool, sdk.Bonded)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Bonded)
 	require.Equal(t, sdk.Bonded, validator.Status)
 	require.Equal(t, int64(100), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(100), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(0), pool.LooseTokens.RoundInt64())
+	require.Equal(t, int64(100), pool.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(0), pool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 
-	validator, pool = validator.UpdateStatus(pool, sdk.Unbonding)
+	validator, pool = validator.UpdateStatus(ctx, pool, sdk.Unbonding)
 	require.Equal(t, sdk.Unbonding, validator.Status)
 	require.Equal(t, int64(100), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(0), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(100), pool.LooseTokens.RoundInt64())
+	require.Equal(t, int64(0), pool.BondedPool.BondedTokens.RoundInt64())
+	require.Equal(t, int64(100), pool.BankKeeper.GetLoosenCoins(ctx).AmountOf(StakeDenom).Int64())
 }
 
 func TestPossibleOverflow(t *testing.T) {
+	ms, authKey := setupMultiStore()
+	cdc := codec.New()
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+
+
+
 	poolTokens := sdk.NewDec(2159)
 	delShares := sdk.NewDec(391432570689183511).Quo(sdk.NewDec(40113011844664))
 	validator := Validator{
@@ -234,13 +340,17 @@ func TestPossibleOverflow(t *testing.T) {
 		Tokens:          poolTokens,
 		DelegatorShares: delShares,
 	}
-	pool := Pool{
-		LooseTokens:  sdk.NewDec(100),
-		BondedTokens: poolTokens,
+	bondedPool := InitialBondedPool()
+	poolA := Pool{
+		BondedPool: bondedPool,
+		BankKeeper:bankKeeper,
 	}
+	poolA.BondedPool.BondedTokens = poolTokens
+	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, poolTokens.TruncateInt())})
+
 	tokens := int64(71)
 	msg := fmt.Sprintf("validator %#v", validator)
-	newValidator, _, _ := validator.AddTokensFromDel(pool, sdk.NewInt(tokens))
+	newValidator, _, _ := validator.AddTokensFromDel(ctx, poolA, sdk.NewInt(tokens))
 
 	msg = fmt.Sprintf("Added %d tokens to %s", tokens, msg)
 	require.False(t, newValidator.DelegatorShareExRate().LT(sdk.ZeroDec()),
