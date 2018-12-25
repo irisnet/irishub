@@ -16,11 +16,13 @@ import (
 )
 
 func TestIrisCLIService(t *testing.T) {
-	chainID, servAddr, port := initializeFixtures(t)
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
+
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
-	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
 	defer proc.Stop(false)
 	tests.WaitForTMStart(port)

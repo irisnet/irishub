@@ -111,10 +111,7 @@ test_unit:
 	@go test $(PACKAGES_STORE)
 
 test_cli:
-	@go test  -timeout 20m -count 1 -p 1 tests/cli/utils.go tests/cli/bank_test.go tests/cli/distribution_test.go tests/cli/gov_test.go tests/cli/iparam_test.go tests/cli/irismon_test.go tests/cli/record_test.go tests/cli/service_test.go tests/cli/stake_test.go
-
-test_upgrade_cli:
-	@go test  -timeout 20m -count 1 -p 1 tests/cli/utils.go tests/cli/bank_test.go
+	@go test  -timeout 20m -count 1 -p 4 tests/cli/*
 
 test_lcd:
 	@go test `go list github.com/irisnet/irishub/client/lcd`
