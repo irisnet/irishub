@@ -208,7 +208,8 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 		k.SetFeePool(ctx, feePool)
 		k.SetValidatorDistInfo(ctx, valInfo)
 		k.SetDelegationDistInfo(ctx, delInfo)
-		tags = tags.AppendTag(fmt.Sprintf(sdk.TagRewardFromValidator, valAddr.String()), []byte(diWithdraw.ToString()))
+		diWithdrawTruncated, _ := diWithdraw.TruncateDecimal()
+		tags = tags.AppendTag(fmt.Sprintf(sdk.TagRewardFromValidator, valAddr.String()), []byte(diWithdrawTruncated.String()))
 		return false
 	}
 	k.stakeKeeper.IterateDelegations(ctx, delAddr, operationAtDelegation)

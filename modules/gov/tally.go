@@ -58,7 +58,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal govtypes.Proposal) (result P
 	}
 
 	////////////////////  iris begin  ///////////////////////////
-	tallyingProcedure := GetTallyingProcedure(ctx)
+	tallyingProcedure := GetTallyingCondition(ctx, proposal)
 	////////////////////  iris end  /////////////////////////////
 
 	tallyResults = govtypes.TallyResult{

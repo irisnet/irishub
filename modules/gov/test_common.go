@@ -99,11 +99,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			StartingProposalID: 1,
 			DepositProcedure: govparams.NewDepositProcedure(),
 			VotingProcedure: govparams.NewVotingProcedure(),
-			TallyingProcedure: govparams.TallyingProcedure{
-				Threshold:     sdk.NewDecWithPrec(5, 1),
-				Veto:          sdk.NewDecWithPrec(334, 3),
-				Participation: sdk.NewDecWithPrec(667, 3),
-			},
+			TallyingProcedure: govparams.NewTallyingProcedure(),
 		})
 		return abci.ResponseInitChain{
 			Validators: validators,

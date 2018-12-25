@@ -45,10 +45,10 @@ func handleMsgModifyWithdrawAddress(ctx sdk.Context, msg types.MsgSetWithdrawAdd
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
 
 	reward, withdrawTags := k.WithdrawDelegationRewardsAll(ctx, msg.DelegatorAddr)
-
+	rewardTruncate, _  :=	reward.TruncateDecimal()
 	resultTags := sdk.NewTags(
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
-		tags.Reward, []byte(reward.ToString()),
+		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr).String()),
 	)
 	resultTags = resultTags.AppendTags(withdrawTags)
@@ -63,10 +63,11 @@ func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDele
 	if err != nil {
 		return err.Result()
 	}
+	rewardTruncate, _  :=	reward.TruncateDecimal()
 	tags := sdk.NewTags(
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
 		tags.Validator, []byte(msg.ValidatorAddr.String()),
-		tags.Reward, []byte(reward.ToString()),
+		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr).String()),
 	)
 	return sdk.Result{
@@ -80,10 +81,10 @@ func handleMsgWithdrawValidatorRewardsAll(ctx sdk.Context, msg types.MsgWithdraw
 	if err != nil {
 		return err.Result()
 	}
-
+	rewardTruncate, _  :=	reward.TruncateDecimal()
 	resultTags := sdk.NewTags(
 		tags.Validator, []byte(msg.ValidatorAddr.String()),
-		tags.Reward, []byte(reward.ToString()),
+		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, sdk.AccAddress(msg.ValidatorAddr)).String()),
 	)
 	resultTags = resultTags.AppendTags(withdrawTags)

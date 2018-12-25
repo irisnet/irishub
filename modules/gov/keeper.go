@@ -1,23 +1,24 @@
 package gov
 
 import (
+	"time"
+
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/params"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	govtypes "github.com/irisnet/irishub/types/gov"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/tendermint/tendermint/crypto"
-	"time"
 )
 
 // nolint
 var (
-	DepositedCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
-	BurnDeposit               = sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(200, 18))// 2*10^20 iris-atto
+	DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
+	BurnRate              = sdk.NewDecWithPrec(2, 1)
 )
 
 // Governance Keeper
@@ -474,24 +475,26 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	depositsIterator := keeper.GetDeposits(ctx, proposalID)
 	defer depositsIterator.Close()
-    depositSum := sdk.Coins{}
-    deposits := []*govtypes.Deposit{}
+	depositSum := sdk.Coins{}
+	deposits := []*govtypes.Deposit{}
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
 		deposit := &govtypes.Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
-		deposits = append(deposits,deposit)
+		deposits = append(deposits, deposit)
 		depositSum = depositSum.Plus(deposit.Amount)
 		store.Delete(depositsIterator.Key())
 	}
 
-
-	rate := sdk.NewDecFromInt(BurnDeposit.Amount).Quo(sdk.NewDecFromInt(depositSum.AmountOf(stakeTypes.StakeDenom)))
-	burnAmountDec := sdk.NewDecWithPrec(0,0)
+	proposal := keeper.GetProposal(ctx, proposalID)
+	BurnAmountDec := sdk.NewDecFromInt(GetMinDeposit(ctx, proposal).AmountOf(stakeTypes.StakeDenom)).Mul(BurnRate)
+	DepositSumInt := depositSum.AmountOf(stakeTypes.StakeDenom)
+	rate := BurnAmountDec.Quo(sdk.NewDecFromInt(DepositSumInt))
+	RefundSumInt := sdk.NewInt(0)
 	for _, deposit := range deposits {
 		AmountDec := sdk.NewDecFromInt(deposit.Amount.AmountOf(stakeTypes.StakeDenom))
-		burnAmountDec = burnAmountDec.Add(AmountDec.Mul(rate))
-		leftAmountDec := AmountDec.Sub(AmountDec.Mul(rate))
-		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,leftAmountDec.TruncateInt())}
+		RefundAmountInt := AmountDec.Sub(AmountDec.Mul(rate)).RoundInt()
+		RefundSumInt = RefundSumInt.Add(RefundAmountInt)
+		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, RefundAmountInt)}
 
 		_, err := keeper.ck.SendCoins(ctx, DepositedCoinsAccAddr, deposit.Depositor, deposit.Amount)
 		if err != nil {
@@ -499,7 +502,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 		}
 	}
 
-	_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr,sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,burnAmountDec.TruncateInt())})
+	_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, DepositSumInt.Sub(RefundSumInt))})
 	if err != nil {
 		panic(err)
 	}
