@@ -238,15 +238,4 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	return coinName, nil
 }
 
-func GetCoinType(coinName string) (CoinType, error) {
-	var coinType CoinType
-	coinName = strings.ToLower(coinName)
-	if coinName == "iris" {
-		coinType = NewDefaultCoinType(coinName)
-	} else {
-		return coinType, fmt.Errorf("coin name is unsupported")
-	}
-
-	return coinType, nil
-}
 

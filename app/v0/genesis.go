@@ -145,13 +145,12 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 	for _, acc := range genesisState.Accounts {
 		// create the genesis account, give'm few stake token and a buncha token with there name
 		for _, coin := range acc.Coins {
-			coinName, err := types.GetCoinName(coin)
-			coinType, err := types.GetCoinType(coinName)
+			_, err := types.GetCoinName(coin)
 			if err != nil {
 				return genesisState, err
 			}
 
-			stakeToken, err := coinType.ConvertToMinCoin(coin)
+			stakeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error: failed to convert %s to stake token: %s", stakeTypes.StakeDenom, coin))
 			}
@@ -341,12 +340,11 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 	nativeCoin := sdk.NewInt64Coin(stakeTypes.StakeDenom, 0)
 	for _, coin := range coins {
 		coinName, err := types.GetCoinName(coin)
-		coinType, err := types.GetCoinType(coinName)
 		if err != nil {
 			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 		}
 		if coinName == stakeTypes.StakeDenomName {
-			normalizeNativeToken, err := coinType.ConvertToMinCoin(coin)
+			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, stakeTypes.StakeDenom))
 			}
