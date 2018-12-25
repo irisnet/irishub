@@ -3,7 +3,6 @@ package gov
 import (
 	"fmt"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/types/common"
 	sdk "github.com/irisnet/irishub/types"
 	govtypes "github.com/irisnet/irishub/types/gov"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
@@ -67,7 +66,7 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp *govtypes.Soft
 
 	k.pk.SetUpgradeConfig(ctx,
 		protocolKeeper.UpgradeConfig{sp.ProposalID,
-			common.ProtocolDefinition{sp.Version, sp.Software, sp.SwitchHeight}})
+			sdk.ProtocolDefinition{sp.Version, sp.Software, sp.SwitchHeight}})
 
 	logger.Info("Execute SoftwareProposal Success", "info",
 		fmt.Sprintf("current height:%d", ctx.BlockHeight()))

@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/common"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 type Protocol interface {
-	GetDefinition() common.ProtocolDefinition
+	GetDefinition() sdk.ProtocolDefinition
 	GetRouter() Router
 	GetQueryRouter() QueryRouter
 	GetAnteHandler() sdk.AnteHandler                   // ante handler for fee and auth
@@ -28,10 +27,10 @@ type Protocol interface {
 }
 
 type ProtocolBase struct {
-	Definition common.ProtocolDefinition
+	Definition sdk.ProtocolDefinition
 	//	engine 		*ProtocolEngine
 }
 
-func (pb ProtocolBase) GetDefinition() common.ProtocolDefinition {
+func (pb ProtocolBase) GetDefinition() sdk.ProtocolDefinition {
 	return pb.Definition
 }
