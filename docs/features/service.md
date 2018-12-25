@@ -48,6 +48,8 @@ iriscli service definition --def-chain-id=service-test --service-name=test-servi
 ```
 
 ### Service Binding
+
+In service binding, you need to define `deposit`, minimum deposit = `price` of this service * `MinDepositMultiple` in genesis file
 ```
 # Service Binding
 iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
@@ -207,4 +209,4 @@ When using proto file to standardize the definition of the service's method, its
 
 * IDL file example
 
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)
+    [test.proto](./test.proto)

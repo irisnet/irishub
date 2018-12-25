@@ -7,7 +7,7 @@
 ## 交互流程
 
 ### 软件升级提议治理流程
-1. 用户提交升级软件的提议
+1. 用户提交升级软件的提议并且进过投票使该提议通过
 2. 治理流程详细见GOV的[用户手册](governance.md)
 
 
@@ -15,7 +15,7 @@
 1. 用户安装新软件，并发送switch消息，广播全网已经安装新软件。
 2. 到达限定的时间，链上会统计升级到新软件的voting power比例是否超过95%。
 3. 如果超过95%，软件进行升级，否则升级失败。
-4. 对于没有及时参与升级的节点,需要重新下载新软件，同步区块。
+4. 对于没有及时参与升级的节点，需要安装并运行新版本软件。
 
 ## 使用场景
 
@@ -92,19 +92,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * `--version`  "Version" 新软件协议版本号
 * `--software`  新软件的下载地址
 * `--switch-height` 新软件升级的高度
-* 其他参数可参考GOV的[用户手册](governance.md)
-
-```
-iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
-```
-
-* `--proposalID` 当前通过的软件升级提议的ID
-
-```
-iris start --replay
-```
-
-* 重新同步区块，清理因升级而写脏的AppHash
+* 其他参数可参考Governance的[用户手册](governance.md)
 
 ```
 iriscli upgrade info --trust-node
