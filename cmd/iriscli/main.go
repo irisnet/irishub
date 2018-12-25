@@ -223,6 +223,9 @@ func main() {
 	guardianCmd.AddCommand(
 		client.PostCommands(
 			guardiancmd.GetCmdCreateProfiler(cdc),
+			guardiancmd.GetCmdDeleteProfiler(cdc),
+			guardiancmd.GetCmdCreateTrustee(cdc),
+			guardiancmd.GetCmdDeleteTrustee(cdc),
 		)...)
 	rootCmd.AddCommand(
 		guardianCmd,

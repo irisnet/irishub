@@ -239,10 +239,10 @@ func initGenFiles(
 	// genesis add a profiler
 	if len(appGenState.Accounts) > 0 {
 		profiler := guardian.Guardian{
-			Description:  "genesis",
-			AccountType:  guardian.Genesis,
-			Address:      appGenState.Accounts[0].Address,
-			AddedAddress: appGenState.Accounts[0].Address,
+			Description: "genesis",
+			AccountType: guardian.Genesis,
+			Address:     appGenState.Accounts[0].Address,
+			AddedBy:     appGenState.Accounts[0].Address,
 		}
 		appGenState.GuardianData.Profilers[0] = profiler
 	}
@@ -250,10 +250,10 @@ func initGenFiles(
 	// genesis add a trustee
 	if len(appGenState.Accounts) > 0 {
 		trustee := guardian.Guardian{
-			Description:  "genesis",
-			AccountType:  guardian.Genesis,
-			Address:      appGenState.Accounts[0].Address,
-			AddedAddress: appGenState.Accounts[0].Address,
+			Description: "genesis",
+			AccountType: guardian.Genesis,
+			Address:     appGenState.Accounts[0].Address,
+			AddedBy:     appGenState.Accounts[0].Address,
 		}
 		appGenState.GuardianData.Trustees[0] = trustee
 	}

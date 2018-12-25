@@ -8,19 +8,26 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "guardian"
 
-	CodeProfilerExists     sdk.CodeType = 100
-	CodeProfilerNotExists  sdk.CodeType = 101
-	CodeTrusteeExists      sdk.CodeType = 102
-	CodeTrusteeNotExists   sdk.CodeType = 103
-	CodeInvalidDescription sdk.CodeType = 104
+	CodeInvalidOperator       sdk.CodeType = 100
+	CodeProfilerExists        sdk.CodeType = 101
+	CodeProfilerNotExists     sdk.CodeType = 102
+	CodeTrusteeExists         sdk.CodeType = 103
+	CodeTrusteeNotExists      sdk.CodeType = 104
+	CodeInvalidDescription    sdk.CodeType = 105
+	CodeDeleteGenesisProfiler sdk.CodeType = 106
+	CodeDeleteGenesisTrustee  sdk.CodeType = 107
 )
 
 func ErrInvalidOperator(codespace sdk.CodespaceType, operator sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeProfilerNotExists, fmt.Sprintf("%s is not valid operator", operator))
+	return sdk.NewError(codespace, CodeInvalidOperator, fmt.Sprintf("%s is not a valid operator", operator))
 }
 
 func ErrProfilerNotExists(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeProfilerNotExists, fmt.Sprintf("profiler %s is not existed", profiler))
+}
+
+func ErrDeleteGenesisProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeDeleteGenesisProfiler, fmt.Sprintf("can't delete profiler %s that in genesis", profiler))
 }
 
 func ErrProfilerExists(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
@@ -31,8 +38,12 @@ func ErrTrusteeExists(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.E
 	return sdk.NewError(codespace, CodeTrusteeExists, fmt.Sprintf("trustee %s already exists", trustee))
 }
 
-func ErrTrusteeNotExists(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeTrusteeNotExists, fmt.Sprintf("trustee %s is not existed", profiler))
+func ErrTrusteeNotExists(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeTrusteeNotExists, fmt.Sprintf("trustee %s is not existed", trustee))
+}
+
+func ErrDeleteGenesisTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeDeleteGenesisTrustee, fmt.Sprintf("can't delete trustee %s that in genesis", trustee))
 }
 
 func ErrInvalidDescription(codespace sdk.CodespaceType) sdk.Error {

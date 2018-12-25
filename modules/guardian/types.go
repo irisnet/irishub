@@ -8,24 +8,24 @@ import (
 )
 
 type Guardian struct {
-	Description  string         `json:"description"`
-	AccountType  AccountType    `json:"type"`
-	Address      sdk.AccAddress `json:"address"`
-	AddedAddress sdk.AccAddress `json:"added_address"`
+	Description string         `json:"description"`
+	AccountType AccountType    `json:"type"`
+	Address     sdk.AccAddress `json:"address"`  // this guardian's address
+	AddedBy     sdk.AccAddress `json:"added_by"` // address that initiated the AddGuardian tx
 }
 
-func NewGuardian(description string, accountType AccountType, address, addedAddress sdk.AccAddress) Guardian {
+func NewGuardian(description string, accountType AccountType, address, addedBy sdk.AccAddress) Guardian {
 	return Guardian{
-		Description:  description,
-		AccountType:  accountType,
-		Address:      address,
-		AddedAddress: addedAddress,
+		Description: description,
+		AccountType: accountType,
+		Address:     address,
+		AddedBy:     addedBy,
 	}
 }
 
 func (g Guardian) Equal(guardian Guardian) bool {
 	return g.Address.Equals(guardian.Address) &&
-		g.AddedAddress.Equals(guardian.AddedAddress) &&
+		g.AddedBy.Equals(guardian.AddedBy) &&
 		g.Description == guardian.Description &&
 		g.AccountType == guardian.AccountType
 }
@@ -72,9 +72,9 @@ func (bt AccountType) Format(s fmt.State, verb rune) {
 func (bt AccountType) String() string {
 	switch bt {
 	case Genesis:
-		return "genesis"
+		return "Genesis"
 	case Ordinary:
-		return "ordinary"
+		return "Ordinary"
 	default:
 		return ""
 	}

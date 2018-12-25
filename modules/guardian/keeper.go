@@ -62,7 +62,7 @@ func (k Keeper) AddTrustee(ctx sdk.Context, guardian Guardian) sdk.Error {
 
 func (k Keeper) DeleteTrustee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetProfilerKey(address))
+	store.Delete(GetTrusteeKey(address))
 	return nil
 }
 

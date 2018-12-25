@@ -12,12 +12,12 @@ type MsgAddProfiler struct {
 	AddGuardian
 }
 
-func NewMsgAddProfiler(description string, address, addedAddress sdk.AccAddress) MsgAddProfiler {
+func NewMsgAddProfiler(description string, address, addedBy sdk.AccAddress) MsgAddProfiler {
 	return MsgAddProfiler{
 		AddGuardian: AddGuardian{
-			Description:  description,
-			Address:      address,
-			AddedAddress: addedAddress,
+			Description: description,
+			Address:     address,
+			AddedBy:     addedBy,
 		},
 	}
 }
@@ -36,7 +36,7 @@ func (msg MsgAddProfiler) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddProfiler) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.AddedAddress}
+	return []sdk.AccAddress{msg.AddedBy}
 }
 
 //______________________________________________________________________
@@ -45,11 +45,11 @@ type MsgDeleteProfiler struct {
 	DeleteGuardian
 }
 
-func NewMsgDeleteProfiler(address, deletedAddress sdk.AccAddress) MsgDeleteProfiler {
+func NewMsgDeleteProfiler(address, deletedBy sdk.AccAddress) MsgDeleteProfiler {
 	return MsgDeleteProfiler{
 		DeleteGuardian: DeleteGuardian{
-			Address:        address,
-			DeletedAddress: deletedAddress,
+			Address:   address,
+			DeletedBy: deletedBy,
 		},
 	}
 }
@@ -68,7 +68,7 @@ func (msg MsgDeleteProfiler) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgDeleteProfiler) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.DeletedAddress}
+	return []sdk.AccAddress{msg.DeletedBy}
 }
 
 //______________________________________________________________________
@@ -77,12 +77,12 @@ type MsgAddTrustee struct {
 	AddGuardian
 }
 
-func NewMsgAddTrustee(description string, accountType AccountType, address, addedAddress sdk.AccAddress) MsgAddTrustee {
+func NewMsgAddTrustee(description string, address, addedAddress sdk.AccAddress) MsgAddTrustee {
 	return MsgAddTrustee{
 		AddGuardian: AddGuardian{
-			Description:  description,
-			Address:      address,
-			AddedAddress: addedAddress,
+			Description: description,
+			Address:     address,
+			AddedBy:     addedAddress,
 		},
 	}
 }
@@ -101,7 +101,7 @@ func (msg MsgAddTrustee) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddTrustee) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.AddedAddress}
+	return []sdk.AccAddress{msg.AddedBy}
 }
 
 //______________________________________________________________________
@@ -110,11 +110,11 @@ type MsgDeleteTrustee struct {
 	DeleteGuardian
 }
 
-func NewMsgDeleteTrustee(address, deletedAddress sdk.AccAddress) MsgDeleteTrustee {
+func NewMsgDeleteTrustee(address, deletedBy sdk.AccAddress) MsgDeleteTrustee {
 	return MsgDeleteTrustee{
 		DeleteGuardian: DeleteGuardian{
-			Address:        address,
-			DeletedAddress: deletedAddress,
+			Address:   address,
+			DeletedBy: deletedBy,
 		},
 	}
 }
@@ -133,20 +133,20 @@ func (msg MsgDeleteTrustee) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.DeletedAddress}
+	return []sdk.AccAddress{msg.DeletedBy}
 }
 
 //______________________________________________________________________
 
 type AddGuardian struct {
-	Description  string         `json:"description"`
-	Address      sdk.AccAddress `json:"address"`
-	AddedAddress sdk.AccAddress `json:"added_address"`
+	Description string         `json:"description"`
+	Address     sdk.AccAddress `json:"address"`  // address added
+	AddedBy     sdk.AccAddress `json:"added_by"` // address that initiated the tx
 }
 
 type DeleteGuardian struct {
-	Address        sdk.AccAddress `json:"address"`
-	DeletedAddress sdk.AccAddress `json:"deleted_address"`
+	Address   sdk.AccAddress `json:"address"`    // address deleted
+	DeletedBy sdk.AccAddress `json:"deleted_by"` // address that initiated the tx
 }
 
 func (g AddGuardian) ValidateBasic() sdk.Error {
@@ -154,10 +154,10 @@ func (g AddGuardian) ValidateBasic() sdk.Error {
 		return ErrInvalidDescription(DefaultCodespace)
 	}
 	if len(g.Address) == 0 {
-		return sdk.ErrInvalidAddress(g.AddedAddress.String())
+		return sdk.ErrInvalidAddress(g.AddedBy.String())
 	}
-	if len(g.AddedAddress) == 0 {
-		return sdk.ErrInvalidAddress(g.AddedAddress.String())
+	if len(g.AddedBy) == 0 {
+		return sdk.ErrInvalidAddress(g.AddedBy.String())
 	}
 	return nil
 }
@@ -166,8 +166,8 @@ func (g DeleteGuardian) ValidateBasic() sdk.Error {
 	if len(g.Address) == 0 {
 		return sdk.ErrInvalidAddress(g.Address.String())
 	}
-	if len(g.DeletedAddress) == 0 {
-		return sdk.ErrInvalidAddress(g.DeletedAddress.String())
+	if len(g.DeletedBy) == 0 {
+		return sdk.ErrInvalidAddress(g.DeletedBy.String())
 	}
 	return nil
 }

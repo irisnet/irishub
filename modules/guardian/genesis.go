@@ -46,20 +46,13 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}
-	return GenesisState{
-		Profilers: profilers,
-		Trustees:  trustees,
-	}
+	return NewGenesisState(profilers, trustees)
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
-	profiler := Guardian{Description: "genessis"}
-	trustee := Guardian{Description: "genessis"}
-	return GenesisState{
-		Profilers: []Guardian{profiler},
-		Trustees:  []Guardian{trustee},
-	}
+	guardian := Guardian{Description: "genesis", AccountType: Genesis}
+	return NewGenesisState([]Guardian{guardian}, []Guardian{guardian})
 }
 
 // get raw genesis raw message for testing
