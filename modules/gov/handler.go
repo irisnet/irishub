@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"encoding/json"
+	"strconv"
+
 	"github.com/irisnet/irishub/modules/gov/tags"
 	sdk "github.com/irisnet/irishub/types"
 	govtypes "github.com/irisnet/irishub/types/gov"
 	tmstate "github.com/tendermint/tendermint/state"
-	"strconv"
 )
 
 // Handle all "gov" type messages.
@@ -254,7 +255,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			),
 		)
 	}
-
 
 	activeIterator := keeper.ActiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
 	defer activeIterator.Close()

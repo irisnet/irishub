@@ -1,6 +1,8 @@
 package gov
 
 import (
+	"time"
+
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/bank"
@@ -11,7 +13,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	govtypes "github.com/irisnet/irishub/types/gov"
 	"github.com/tendermint/tendermint/crypto"
-	"time"
 )
 
 // nolint

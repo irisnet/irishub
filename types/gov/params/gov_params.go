@@ -3,13 +3,14 @@ package govparams
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
-	"time"
 )
 
 var DepositProcedureParameter DepositProcedureParam
@@ -380,13 +381,13 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if err := validaTallyCondition(param.Value.CriticalCondition, CRITICAL); err != nil {
+		if err := validTallyCondition(param.Value.CriticalCondition, CRITICAL); err != nil {
 			return err
 		}
-		if err := validaTallyCondition(param.Value.ImportantCondition, IMPORTANT); err != nil {
+		if err := validTallyCondition(param.Value.ImportantCondition, IMPORTANT); err != nil {
 			return err
 		}
-		if err := validaTallyCondition(param.Value.NormalCondition, NORMAL); err != nil {
+		if err := validTallyCondition(param.Value.NormalCondition, NORMAL); err != nil {
 			return err
 		}
 
@@ -396,7 +397,7 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidTallyingProcedure, fmt.Sprintf("Json is not valid"))
 }
 
-func validaTallyCondition(tc TallyCondition, str string) sdk.Error {
+func validTallyCondition(tc TallyCondition, str string) sdk.Error {
 	if tc.Threshold.LTE(sdk.ZeroDec()) || tc.Threshold.GTE(sdk.NewDec(1)) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+str+" Threshold ( "+tc.Threshold.String()+" ) should be between 0 and 1"))
 	}
