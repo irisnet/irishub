@@ -1,4 +1,4 @@
-package common
+package types
 
 type ProtocolDefinition struct {
 	Version 	uint64	`json:"version"`

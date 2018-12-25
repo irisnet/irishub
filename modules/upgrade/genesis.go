@@ -3,7 +3,6 @@ package upgrade
 import (
 	"github.com/irisnet/irishub/app/protocol/keeper"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/common"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -25,7 +24,7 @@ func ExportGenesis(ctx sdk.Context) GenesisState {
 	return GenesisState{
 		GenesisVersion: NewVersion(
 			keeper.UpgradeConfig{0,
-				common.ProtocolDefinition{
+				sdk.ProtocolDefinition{
 					uint64(0),
 					" ",
 					uint64(1),
@@ -37,7 +36,7 @@ func DefaultGenesisState() GenesisState {
 	return GenesisState{
 		GenesisVersion: NewVersion(
 			keeper.UpgradeConfig{0,
-				common.ProtocolDefinition{
+				sdk.ProtocolDefinition{
 					uint64(0),
 					"https://github.com/irisnet/irishub/releases/tag/v" + version.Version,
 					uint64(1),
@@ -49,7 +48,7 @@ func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
 		GenesisVersion: NewVersion(
 			keeper.UpgradeConfig{0,
-				common.ProtocolDefinition{
+				sdk.ProtocolDefinition{
 					uint64(0),
 					"https://github.com/irisnet/irishub/releases/tag/v" + version.Version,
 					uint64(1),

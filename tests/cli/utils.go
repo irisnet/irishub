@@ -9,7 +9,6 @@ import (
 	"testing"
 	"io"
 
-	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/tests"
@@ -44,9 +43,9 @@ import (
 
 func init() {
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
 	config.Seal()
 }
 

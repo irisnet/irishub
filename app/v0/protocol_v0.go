@@ -22,7 +22,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/common"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"sort"
 	"time"
@@ -68,7 +67,7 @@ type ProtocolVersion0 struct {
 
 func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 	base := protocol.ProtocolBase{
-		Definition: common.ProtocolDefinition{
+		Definition: sdk.ProtocolDefinition{
 			uint64(0),
 			"",
 			uint64(1),
@@ -97,7 +96,7 @@ func (p *ProtocolVersion0) Init() {
 
 }
 
-func (p *ProtocolVersion0) GetDefinition() common.ProtocolDefinition {
+func (p *ProtocolVersion0) GetDefinition() sdk.ProtocolDefinition {
 	return p.pb.GetDefinition()
 }
 
