@@ -17,7 +17,7 @@ import (
 // nolint
 var (
 	DepositedCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
-	BurnDeposit               = sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(2, 18))// 200iris
+	BurnDeposit               = sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(200, 18))// 2*10^20 iris-atto
 )
 
 // Governance Keeper
@@ -325,7 +325,6 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal govtypes.Pro
 	proposal.SetVotingStartTime(ctx.BlockHeader().Time)
 	votingPeriod := GetVotingPeriod(ctx, proposal)
 	proposal.SetVotingEndTime(proposal.GetVotingStartTime().Add(votingPeriod))
-	proposal.SetTallyingProcedure(GetTallyingProcedure(ctx))
 	proposal.SetStatus(govtypes.StatusVotingPeriod)
 	keeper.SetProposal(ctx, proposal)
 
@@ -487,16 +486,12 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 
 
 	rate := sdk.NewDecFromInt(BurnDeposit.Amount).Quo(sdk.NewDecFromInt(depositSum.AmountOf(stakeTypes.StakeDenom)))
-	if rate.IsNegative(){
-		panic("Burn deposit must be less than deposit sum .")
-	}
-
 	burnAmountDec := sdk.NewDecWithPrec(0,0)
 	for _, deposit := range deposits {
 		AmountDec := sdk.NewDecFromInt(deposit.Amount.AmountOf(stakeTypes.StakeDenom))
 		burnAmountDec = burnAmountDec.Add(AmountDec.Mul(rate))
 		leftAmountDec := AmountDec.Sub(AmountDec.Mul(rate))
-		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,leftAmountDec.RoundInt())}
+		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,leftAmountDec.TruncateInt())}
 
 		_, err := keeper.ck.SendCoins(ctx, DepositedCoinsAccAddr, deposit.Depositor, deposit.Amount)
 		if err != nil {
@@ -504,7 +499,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 		}
 	}
 
-	_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr,sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,burnAmountDec.RoundInt())})
+	_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr,sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,burnAmountDec.TruncateInt())})
 	if err != nil {
 		panic(err)
 	}

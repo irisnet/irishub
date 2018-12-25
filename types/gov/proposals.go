@@ -46,9 +46,6 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
-
-    GetTallyingProcedure() govparams.TallyingProcedure
-    SetTallyingProcedure(tallyProcedure govparams.TallyingProcedure)
 }
 
 // checks if two proposals are equal
@@ -121,11 +118,6 @@ func (tp *TextProposal) SetVotingStartTime(votingStartTime time.Time) {
 func (tp TextProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
 func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
-}
-
-func (tp TextProposal) GetTallyingProcedure() govparams.TallyingProcedure { return tp.TallyProcedure }
-func (tp *TextProposal) SetTallyingProcedure(tallyProcedure govparams.TallyingProcedure) {
-	tp.TallyProcedure = tallyProcedure
 }
 
 //-----------------------------------------------------------
