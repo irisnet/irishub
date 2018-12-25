@@ -232,5 +232,8 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	}
 	coinName = strings.Split(denom, "-")[0]
 	coinName = strings.ToLower(coinName)
+	if coinName == "" {
+		return coinName, fmt.Errorf("coin name is empty")
+	}
 	return coinName, nil
 }

@@ -38,6 +38,9 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 	p.accountMapper.IterateAccounts(ctx, appendAccount)
 	fileAccounts := []GenesisFileAccount{}
 	for _, acc := range accounts {
+		if acc.Coins == nil {
+			continue
+		}
 		var coinsString []string
 		for _, coin := range acc.Coins {
 			coinsString = append(coinsString, coin.String())
@@ -68,6 +71,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 	if err != nil {
 		return nil, nil, err
 	}
+	sdk.MustSortJSON(appState)
 	validators = stake.WriteValidators(ctx, p.StakeKeeper)
 	return appState, validators, nil
 }
@@ -127,12 +131,25 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle stake state. */
 
+	// iterate through redelegations, reset creation height
+	p.StakeKeeper.IterateRedelegations(ctx, func(_ int64, red stake.Redelegation) (stop bool) {
+		red.CreationHeight = 0
+		p.StakeKeeper.SetRedelegation(ctx, red)
+		return false
+	})
+
+	// iterate through unbonding delegations, reset creation height
+	p.StakeKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stake.UnbondingDelegation) (stop bool) {
+		ubd.CreationHeight = 0
+		p.StakeKeeper.SetUnbondingDelegation(ctx, ubd)
+		return false
+	})
 	// iterate through validators by power descending, reset bond height, update bond intra-tx counter
 	store := ctx.KVStore(protocol.KeyStake)
-	iter := sdk.KVStoreReversePrefixIterator(store, stake.ValidatorsByPowerIndexKey)
+	iter := sdk.KVStoreReversePrefixIterator(store, stake.ValidatorsKey)
 	counter := int16(0)
 	for ; iter.Valid(); iter.Next() {
-		addr := sdk.ValAddress(iter.Value())
+		addr := sdk.ValAddress(iter.Key()[1:])
 		validator, found := p.StakeKeeper.GetValidator(ctx, addr)
 		if !found {
 			panic("expected validator, not found")
