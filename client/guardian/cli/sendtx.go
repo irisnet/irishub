@@ -41,7 +41,6 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("must use --description flag")
 			}
 			msg := guardian.NewMsgAddProfiler(description, pAddr, fromAddr)
-			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -75,7 +74,6 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			msg := guardian.NewMsgDeleteProfiler(pAddr, fromAddr)
-			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -112,7 +110,6 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("must use --description flag")
 			}
 			msg := guardian.NewMsgAddTrustee(description, tAddr, fromAddr)
-			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -144,7 +141,6 @@ func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			msg := guardian.NewMsgDeleteTrustee(tAddr, fromAddr)
-			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
