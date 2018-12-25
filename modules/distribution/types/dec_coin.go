@@ -77,6 +77,16 @@ func (coins DecCoins) TruncateDecimal() (sdk.Coins, DecCoins) {
 	return out, changeSum
 }
 
+// return the coins with trunctated coins
+func (coins DecCoins) TruncateToCoins() (sdk.Coins) {
+	out := make(sdk.Coins, len(coins))
+	for i, coin := range coins {
+		truncated, _ := coin.TruncateDecimal()
+		out[i] = truncated
+	}
+	return out
+}
+
 // Plus combines two sets of coins
 // CONTRACT: Plus will never return Coins where one Coin has a 0 amount.
 func (coins DecCoins) Plus(coinsB DecCoins) DecCoins {

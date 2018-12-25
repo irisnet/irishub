@@ -108,7 +108,7 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	// withdraw validator commission rewards
 	feePool, commission := k.withdrawValidatorCommission(ctx, operatorAddr)
 	withdraw = withdraw.Plus(commission)
-	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commission.ToString()))
+	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commission.TruncateToCoins().String()))
 
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
 	return withdraw, resultTags, nil
