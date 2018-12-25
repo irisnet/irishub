@@ -296,44 +296,10 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
 						val.GetPower().RoundInt64(),
-						GetTallyingProcedure(ctx).GovernancePenalty)
+						GetPenalty(ctx, activeProposal))
 				}
 			}
 		}
-
-		keeper.SubProposalNum(ctx, activeProposal)
-		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
-	}
-
-
-	if proposalID, ok := keeper.GetCriticalProposalID(ctx); ok {
-		activeProposal := keeper.GetProposal(ctx, proposalID)
-		result, tallyResults, _ := tally(ctx, keeper, activeProposal)
-
-		var action []byte
-		if result == PASS {
-			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusPassed)
-			action = tags.ActionProposalPassed
-			Execute(ctx, keeper, activeProposal)
-		} else if result == REJECTVETO {
-			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusRejected)
-			action = tags.ActionProposalRejected
-		} else {
-			return resTags
-		}
-		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
-
-		activeProposal.SetTallyResult(tallyResults)
-		activeProposal.SetVotingEndTime(ctx.BlockHeader().Time)
-		keeper.SetProposal(ctx, activeProposal)
-
-		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
-			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
-
-		resTags = resTags.AppendTag(tags.Action, action)
-		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
 		keeper.SubProposalNum(ctx, activeProposal)
 		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
