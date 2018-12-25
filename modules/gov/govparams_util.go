@@ -106,3 +106,16 @@ func GetTallyingProcedure(ctx sdk.Context) govparams.TallyingProcedure {
 	govparams.TallyingProcedureParameter.LoadValue(ctx)
 	return govparams.TallyingProcedureParameter.Value
 }
+
+func GetTallyingCondition(ctx sdk.Context,p govtypes.Proposal) govparams.TallyCondition {
+	switch GetProposalLevel(p) {
+	case ProposalLevelCritical:
+		return govparams.TallyingProcedureParameter.Value.CriticalCondition
+	case ProposalLevelImportant:
+		return govparams.TallyingProcedureParameter.Value.ImportantCondition
+	case ProposalLevelNormal:
+		return govparams.TallyingProcedureParameter.Value.NormalCondition
+	default:
+		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+	}
+}
