@@ -320,7 +320,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 
 	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
 		FeeTokenNative:    IrisCt.MinUnit.Denom,
-		GasPriceThreshold: 20000000000, // 20(glue), 20*10^9, 1 glue = 10^9 lue/gas, 1 iris = 10^18 lue
+		GasPriceThreshold: 20000000000, // 20*10^9 iris-atto per gas, 20 iris-nano per gas, 2*10^(-8) iris per gas
 	}
 
 	// load the address to pubkey map
