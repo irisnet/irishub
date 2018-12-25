@@ -3,31 +3,34 @@ package govparams
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
-	"time"
 )
 
 var DepositProcedureParameter DepositProcedureParam
 
 const (
-	CRITICAL_DEPOSIT     = 5000
+	CRITICAL_DEPOSIT     = 4000
 	IMPORTANT_DEPOSIT    = 2000
 	NORMAL_DEPOSIT       = 1000
 	CRITICAL             = "Critical"
 	IMPORTANT            = "Important"
-	NORMAL               = "normal"
+	NORMAL               = "Normal"
 	LOWER_BOUND_AMOUNT   = 10
 	UPPER_BOUND_AMOUNT   = 10000
 	THREE_DAYS           = 3 * 3600 * 24
+	SIXTY_HOURS          = 60 * 3600
 	TWO_DAYS             = 2 * 3600 * 24 //
+	ONE_DAY              = 1 * 3600 * 24
 	STABLE_CRITIACAL_NUM = 1
-	MIN_IMPORTANT_NUM    = 3
-	MIN_NORMAL_NUM       = 5
+	MIN_IMPORTANT_NUM    = 2
+	MIN_NORMAL_NUM       = 1
 )
 
 var _ params.GovParameter = (*DepositProcedureParam)(nil)
@@ -60,7 +63,7 @@ func NewDepositProcedure() DepositProcedure {
 		CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
 		ImportantMinDeposit: sdk.Coins{importantMinDeposit},
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-		MaxDepositPeriod:    time.Duration(TWO_DAYS) * time.Second}
+		MaxDepositPeriod:    time.Duration(ONE_DAY) * time.Second}
 }
 
 func (param *DepositProcedureParam) GetValueFromRawData(cdc *codec.Codec, res []byte) interface{} {
@@ -72,14 +75,7 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
 		param.Value = value
 	} else {
-		var ciriticalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeDenomName))
-		var importantMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeDenomName))
-		var normalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeDenomName))
-		param.Value = DepositProcedure{
-			CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
-			ImportantMinDeposit: sdk.Coins{importantMinDeposit},
-			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-			MaxDepositPeriod:    time.Duration(TWO_DAYS) * time.Second}
+		param.Value = NewDepositProcedure()
 	}
 }
 
@@ -182,9 +178,9 @@ type VotingProcedureParam struct {
 
 func NewVotingProcedure() VotingProcedure {
 	return VotingProcedure{
-		CriticalVotingPeriod:  time.Duration(TWO_DAYS) * time.Second,
-		ImportantVotingPeriod: time.Duration(TWO_DAYS) * time.Second,
-		NormalVotingPeriod:    time.Duration(THREE_DAYS) * time.Second,
+		CriticalVotingPeriod:  time.Duration(THREE_DAYS) * time.Second,
+		ImportantVotingPeriod: time.Duration(SIXTY_HOURS) * time.Second,
+		NormalVotingPeriod:    time.Duration(TWO_DAYS) * time.Second,
 		CriticalMaxNum:        STABLE_CRITIACAL_NUM,
 		ImportantMaxNum:       MIN_IMPORTANT_NUM,
 		NormalMaxNum:          MIN_NORMAL_NUM,
@@ -283,12 +279,18 @@ func (param *VotingProcedureParam) Valid(jsonStr string) sdk.Error {
 var TallyingProcedureParameter TallyingProcedureParam
 var _ params.GovParameter = (*TallyingProcedureParam)(nil)
 
+type TallyCondition struct {
+	Threshold     sdk.Dec `json:"threshold"`     //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
+	Veto          sdk.Dec `json:"veto"`          //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
+	Participation sdk.Dec `json:"participation"` //
+	Penalty       sdk.Dec `json:"penalty"`       //  Penalty if validator does not vote
+}
+
 // Procedure around Tallying votes in governance
 type TallyingProcedure struct {
-	Threshold         sdk.Dec `json:"threshold"`          //  Minimum propotion of Yes votes for proposal to pass. Initial value: 0.5
-	Veto              sdk.Dec `json:"veto"`               //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
-	Participation     sdk.Dec `json:"participation"`      //
-	GovernancePenalty sdk.Dec `json:"governance_penalty"` //  Penalty if validator does not vote
+	CriticalCondition  TallyCondition `json:"critical_condition"`
+	ImportantCondition TallyCondition `json:"important_condition"`
+	NormalCondition    TallyCondition `json:"normal_condition"`
 }
 
 type TallyingProcedureParam struct {
@@ -298,10 +300,24 @@ type TallyingProcedureParam struct {
 
 func NewTallyingProcedure() TallyingProcedure {
 	return TallyingProcedure{
-		Threshold:         sdk.NewDecWithPrec(5, 1),
-		Veto:              sdk.NewDecWithPrec(334, 3),
-		Participation:     sdk.NewDecWithPrec(667, 3),
-		GovernancePenalty: sdk.NewDecWithPrec(1, 3),
+		CriticalCondition: TallyCondition{
+			Threshold:     sdk.NewDecWithPrec(834, 3),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(8572, 4),
+			Penalty:       sdk.NewDecWithPrec(9, 4),
+		},
+		ImportantCondition: TallyCondition{
+			Threshold:     sdk.NewDecWithPrec(8, 1),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(834, 3),
+			Penalty:       sdk.NewDecWithPrec(7, 4),
+		},
+		NormalCondition: TallyCondition{
+			Threshold:     sdk.NewDecWithPrec(667, 3),
+			Veto:          sdk.NewDecWithPrec(334, 3),
+			Participation: sdk.NewDecWithPrec(75, 2),
+			Penalty:       sdk.NewDecWithPrec(5, 4),
+		},
 	}
 }
 
@@ -314,12 +330,7 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(TallyingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = TallyingProcedure{
-			Threshold:         sdk.NewDecWithPrec(5, 1),
-			Veto:              sdk.NewDecWithPrec(334, 3),
-			Participation:     sdk.NewDecWithPrec(667, 3),
-			GovernancePenalty: sdk.NewDecWithPrec(1, 3),
-		}
+		param.Value = NewTallyingProcedure()
 	}
 }
 
@@ -370,20 +381,34 @@ func (param *TallyingProcedureParam) Valid(jsonStr string) sdk.Error {
 
 	if err = json.Unmarshal([]byte(jsonStr), &param.Value); err == nil {
 
-		if param.Value.Threshold.LTE(sdk.ZeroDec()) || param.Value.Threshold.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid Threshold ( "+param.Value.Threshold.String()+" ) should be between 0 and 1"))
+		if err := validTallyCondition(param.Value.CriticalCondition, CRITICAL); err != nil {
+			return err
 		}
-		if param.Value.Participation.LTE(sdk.ZeroDec()) || param.Value.Participation.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid participation ( "+param.Value.Participation.String()+" ) should be between 0 and 1"))
+		if err := validTallyCondition(param.Value.ImportantCondition, IMPORTANT); err != nil {
+			return err
 		}
-		if param.Value.Veto.LTE(sdk.ZeroDec()) || param.Value.Veto.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid Veto ( "+param.Value.Veto.String()+" ) should be between 0 and 1"))
+		if err := validTallyCondition(param.Value.NormalCondition, NORMAL); err != nil {
+			return err
 		}
-		if param.Value.GovernancePenalty.LTE(sdk.ZeroDec()) || param.Value.GovernancePenalty.GTE(sdk.NewDec(1)) {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid GovernancePenalty ( "+param.Value.GovernancePenalty.String()+" ) should be between 0 and 1"))
-		}
+
 		return nil
 
 	}
 	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidTallyingProcedure, fmt.Sprintf("Json is not valid"))
+}
+
+func validTallyCondition(tc TallyCondition, str string) sdk.Error {
+	if tc.Threshold.LTE(sdk.ZeroDec()) || tc.Threshold.GTE(sdk.NewDec(1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+str+" Threshold ( "+tc.Threshold.String()+" ) should be between 0 and 1"))
+	}
+	if tc.Participation.LTE(sdk.ZeroDec()) || tc.Participation.GTE(sdk.NewDec(1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+str+" participation ( "+tc.Participation.String()+" ) should be between 0 and 1"))
+	}
+	if tc.Veto.LTE(sdk.ZeroDec()) || tc.Veto.GTE(sdk.NewDec(1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+str+" Veto ( "+tc.Veto.String()+" ) should be between 0 and 1"))
+	}
+	if tc.Penalty.LTE(sdk.ZeroDec()) || tc.Penalty.GTE(sdk.NewDec(1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+str+" GovernancePenalty ( "+tc.Penalty.String()+" ) should be between 0 and 1"))
+	}
+	return nil
 }

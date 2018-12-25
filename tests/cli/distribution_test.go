@@ -11,12 +11,13 @@ import (
 )
 
 func TestIrisCLIDistribution(t *testing.T) {
-	chainID, servAddr, port := initializeFixtures(t)
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
 
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
-	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
 	defer proc.Stop(false)
 	tests.WaitForTMStart(port)
@@ -66,7 +67,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	require.Equal(t, int64(0), vdi.FeePoolWithdrawalHeight)
 	numDelPool := getAmountFromCoinStr(vdi.DelPool)
 	numValCommission := getAmountFromCoinStr(vdi.ValCommission)
-	require.True(t, numDelPool>numValCommission)
+	require.True(t, numDelPool > numValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.004iris %s", flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -74,16 +75,17 @@ func TestIrisCLIDistribution(t *testing.T) {
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	numNew := getAmountFromCoinStr(barCoin)
-	require.True(t, numNew>num)
+	require.True(t, numNew > num)
 }
 
 func TestIrisCLIWithdrawReward(t *testing.T) {
-	chainID, servAddr, port := initializeFixtures(t)
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
 
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
-	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
 	defer proc.Stop(false)
 	tests.WaitForTMStart(port)
@@ -109,7 +111,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	require.Equal(t, int64(0), vdi.FeePoolWithdrawalHeight)
 	numDelPool := getAmountFromCoinStr(vdi.DelPool)
 	numValCommission := getAmountFromCoinStr(vdi.ValCommission)
-	require.True(t, numDelPool>numValCommission)
+	require.True(t, numDelPool > numValCommission)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.004iris %s", valAddr, flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -122,7 +124,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	vdi = executeGetValidatorDistrInfo(t, fmt.Sprintf("iriscli distribution validator-distr-info %s %s", valAddr, flags))
 	require.Equal(t, valAddr, vdi.OperatorAddr.String())
 	numValCommission = getAmountFromCoinStr(vdi.ValCommission)
-	require.True(t, numValCommission>0)
+	require.True(t, numValCommission > 0)
 
 	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.004iris %s", flags), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)

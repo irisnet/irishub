@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"bufio"
 	"io"
 
 	irisInit "github.com/irisnet/irishub/server/init"
@@ -43,15 +42,7 @@ import (
 	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
-var (
-	irisHome    = ""
-	iriscliHome = ""
-	chainID     = ""
-	nodeID      = ""
-)
-
 func init() {
-	irisHome, iriscliHome = getTestingHomeDirs()
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
@@ -94,33 +85,6 @@ func getAmountFromCoinStr(coinStr string) float64 {
 	return num
 }
 
-func setupGenesisAndConfig(srcHome, dstHome string) error {
-	genesisSrcFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", srcHome, string(os.PathSeparator), string(os.PathSeparator))
-	configSrcFilePath := fmt.Sprintf("%s%sconfig%sconfig.toml", srcHome, string(os.PathSeparator), string(os.PathSeparator))
-
-	genesisDstFilePath := fmt.Sprintf("%s%sconfig%sgenesis.json", dstHome, string(os.PathSeparator), string(os.PathSeparator))
-	configDstFilePath := fmt.Sprintf("%s%sconfig%sconfig.toml", dstHome, string(os.PathSeparator), string(os.PathSeparator))
-
-	err := os.Remove(genesisDstFilePath)
-	if err != nil {
-		return err
-	}
-	err = os.Remove(configDstFilePath)
-	if err != nil {
-		return err
-	}
-
-	err = copyFile(genesisDstFilePath, genesisSrcFilePath)
-	if err != nil {
-		return err
-	}
-	err = modifyConfigFile(configSrcFilePath, configDstFilePath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
@@ -142,43 +106,10 @@ func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 	return genesisState
 }
 
-func modifyConfigFile(configSrcPath, configDstPath string) error {
-	fsrc, err := os.Open(configSrcPath)
-	if err != nil {
-		return err
-	}
-	defer fsrc.Close()
-
-	fdst, err := os.Create(configDstPath)
-	if err != nil {
-		return err
-	}
-	defer fdst.Close()
-
-	w := bufio.NewWriter(fdst)
-	br := bufio.NewReader(fsrc)
-
-	for {
-		line, _, err := br.ReadLine()
-		if err == io.EOF {
-			break
-		}
-
-		newline := strings.Replace(string(line), "266", "366", -1)
-
-		if strings.Index(newline, "persistent_peers") != -1 {
-			newline = fmt.Sprintf("persistent_peers = \"%s@127.0.0.1:26656\"", nodeID)
-		}
-		fmt.Fprintln(w, newline)
-	}
-
-	return w.Flush()
-}
-
-func getTestingHomeDirs() (string, string) {
+func getTestingHomeDirs(name string) (string, string) {
 	tmpDir := os.TempDir()
-	irisHome := fmt.Sprintf("%s%s.test_iris", tmpDir, string(os.PathSeparator))
-	iriscliHome := fmt.Sprintf("%s%s.test_iriscli", tmpDir, string(os.PathSeparator))
+	irisHome := fmt.Sprintf("%s%s%s%s.test_iris", tmpDir, string(os.PathSeparator), name, string(os.PathSeparator))
+	iriscliHome := fmt.Sprintf("%s%s%s%s.test_iriscli", tmpDir, string(os.PathSeparator), name, string(os.PathSeparator))
 	return irisHome, iriscliHome
 }
 
@@ -209,17 +140,17 @@ func copyFile(dstFile, srcFile string) error {
 //___________________________________________________________________________________
 // helper methods
 
-func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
+func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscliHome, p2pAddr string) {
+	irisHome, iriscliHome = getTestingHomeDirs(t.Name())
 	tests.ExecuteT(t, fmt.Sprintf("rm -rf %s ", irisHome), "")
 	//tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), v0.DefaultKeyPass)
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), v0.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), v0.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), v0.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), v0.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), v0.DefaultKeyPass)
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
-	nodeID, _ = tests.ExecuteT(t, fmt.Sprintf("iris tendermint show-node-id --home=%s ", irisHome), "")
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
 	var appState v0.GenesisFileState
@@ -231,12 +162,14 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port string) {
 	require.NoError(t, err)
 	genDoc.AppState = appStateJSON
 	genDoc.SaveAs(genFile)
-	executeWrite(t, fmt.Sprintf(
+	executeWriteCheckErr(t, fmt.Sprintf(
 		"iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
 		v0.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), v0.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), v0.DefaultKeyPass)
 	// get a free port, also setup some common flags
 	servAddr, port, err = server.FreeTCPAddr()
+	require.NoError(t, err)
+	p2pAddr, _, err = server.FreeTCPAddr()
 	require.NoError(t, err)
 	return
 }
@@ -581,4 +514,8 @@ func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force b
 	}
 	return true
 
+}
+
+func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
+	require.True(t, executeWrite(t, cmdStr, writes...))
 }

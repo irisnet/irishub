@@ -10,6 +10,8 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"testing"
+	"fmt"
+	"time"
 )
 
 func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Context {
@@ -24,7 +26,6 @@ func defaultContext(key sdk.StoreKey, tkeyParams *sdk.TransientStoreKey) sdk.Con
 }
 
 func TestInitGenesisParameter(t *testing.T) {
-	t.SkipNow()
 	skey := sdk.NewKVStoreKey("params")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
@@ -48,15 +49,15 @@ func TestInitGenesisParameter(t *testing.T) {
 	params.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
 	params.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
+	fmt.Println(DepositProcedureParameter.ToJson(""))
 	require.Equal(t, p1, DepositProcedureParameter.Value)
-	require.Equal(t, DepositProcedureParameter.ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	require.Equal(t, DepositProcedureParameter.ToJson(""), `{"critical_min_deposit":[{"denom":"iris-atto","amount":"4000000000000000000000"}],"important_min_deposit":[{"denom":"iris-atto","amount":"2000000000000000000000"}],"normal_min_deposit":[{"denom":"iris-atto","amount":"1000000000000000000000"}],"max_deposit_period":86400000000000}`)
 
 	params.InitGenesisParameter(&DepositProcedureParameter, ctx, p2)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 }
 
 func TestRegisterParamMapping(t *testing.T) {
-	t.SkipNow()
 	skey := sdk.NewKVStoreKey("params")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
@@ -70,7 +71,7 @@ func TestRegisterParamMapping(t *testing.T) {
 
 	p1 := NewDepositProcedure()
 	p2 := NewDepositProcedure()
-
+    p2.MaxDepositPeriod = time.Duration(THREE_DAYS) * time.Second
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
 		params.NewTypeTable(
 			DepositProcedureParameter.GetStoreKey(), DepositProcedure{},
@@ -81,10 +82,10 @@ func TestRegisterParamMapping(t *testing.T) {
 	params.RegisterGovParamMapping(&DepositProcedureParameter)
 	params.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
 
-	require.Equal(t, params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""), "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	require.Equal(t, params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""),`{"critical_min_deposit":[{"denom":"iris-atto","amount":"4000000000000000000000"}],"important_min_deposit":[{"denom":"iris-atto","amount":"2000000000000000000000"}],"normal_min_deposit":[{"denom":"iris-atto","amount":"1000000000000000000000"}],"max_deposit_period":86400000000000}`)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
 
-	params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"30000000000000000000\"}],\"max_deposit_period\":172800000000000}")
+	params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].Update(ctx, `{"critical_min_deposit":[{"denom":"iris-atto","amount":"4000000000000000000000"}],"important_min_deposit":[{"denom":"iris-atto","amount":"2000000000000000000000"}],"normal_min_deposit":[{"denom":"iris-atto","amount":"1000000000000000000000"}],"max_deposit_period":259200000000000}`)
 	DepositProcedureParameter.LoadValue(ctx)
 	require.Equal(t, p2, DepositProcedureParameter.Value)
 }
@@ -102,9 +103,6 @@ func TestDepositProcedureParam(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	//p1deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 10, "iris"))
-	//p2Deposit, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 200, "iris"))
-	//
 	p1 := NewDepositProcedure()
 
 	p2 := NewDepositProcedure()
@@ -228,17 +226,9 @@ func TestTallyingProcedureParam(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	p1 := TallyingProcedure{
-		Threshold:     sdk.NewDecWithPrec(5, 1),
-		Veto:          sdk.NewDecWithPrec(334, 3),
-		Participation: sdk.NewDecWithPrec(667, 3),
-	}
+	p1 := NewTallyingProcedure()
 
-	p2 := TallyingProcedure{
-		Threshold:     sdk.NewDecWithPrec(5, 1),
-		Veto:          sdk.NewDecWithPrec(334, 3),
-		Participation: sdk.NewDecWithPrec(2, 2),
-	}
+	p2 := NewTallyingProcedure()
 
 	subspace := paramKeeper.Subspace("Gov").WithTypeTable(
 		params.NewTypeTable(

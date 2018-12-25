@@ -12,11 +12,13 @@ import (
 func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	t.SkipNow()
 
-	chainID, servAddr, port := initializeFixtures(t)
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
+
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
-	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
 	defer proc.Stop(false)
 	tests.WaitForTMStart(port)
@@ -74,19 +76,20 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, uint64(1), proposal1.ProposalID)
 	require.Equal(t, govtypes.StatusPassed, proposal1.Status)
 
-	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/govDepositProcedure",flags))
-	require.Equal(t,param,govtypes.Param{Key:"Gov/govDepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":30000000000}",Op:""})
+	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ", "Gov/govDepositProcedure", flags))
+	require.Equal(t, param, govtypes.Param{Key: "Gov/govDepositProcedure", Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":30000000000}", Op: ""})
 }
-
 
 func TestIrisCLIQueryParams(t *testing.T) {
 	t.SkipNow()
 
-	chainID, servAddr, port := initializeFixtures(t)
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
+
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
-	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
 	defer proc.Stop(false)
 	tests.WaitForTMStart(port)
@@ -98,18 +101,20 @@ func TestIrisCLIQueryParams(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ","Gov/govDepositProcedure",flags))
-	require.Equal(t,param,govtypes.Param{Key:"Gov/govDepositProcedure",Value:"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":60000000000}",Op:""})
+	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ", "Gov/govDepositProcedure", flags))
+	require.Equal(t, param, govtypes.Param{Key: "Gov/govDepositProcedure", Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":60000000000}", Op: ""})
 }
 
 func TestIrisCLIPullParams(t *testing.T) {
 	t.SkipNow()
 
-	chainID, servAddr, port := initializeFixtures(t)
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
+
 	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
 
 	// start iris server
-	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v", irisHome, servAddr))
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
 	defer proc.Stop(false)
 	tests.WaitForTMStart(port)
@@ -121,5 +126,5 @@ func TestIrisCLIPullParams(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	tests.ExecuteT(t, fmt.Sprintf("iriscli gov pull-params --path=%v --output=json %v ",irisHome,flags), "")
+	tests.ExecuteT(t, fmt.Sprintf("iriscli gov pull-params --path=%v --output=json %v ", irisHome, flags), "")
 }
