@@ -296,7 +296,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
 						val.GetPower().RoundInt64(),
-						GetPenalty(ctx, activeProposal))
+						GetTallyingCondition(ctx, activeProposal).Penalty)
 				}
 			}
 		}

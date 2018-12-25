@@ -119,19 +119,3 @@ func GetTallyingCondition(ctx sdk.Context,p govtypes.Proposal) govparams.TallyCo
 		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
 	}
 }
-
-
-
-func GetPenalty(ctx sdk.Context, p govtypes.Proposal) sdk.Dec {
-	govparams.TallyingProcedureParameter.LoadValue(ctx)
-	switch GetProposalLevel(p) {
-	case ProposalLevelCritical:
-		return govparams.TallyingProcedureParameter.Value.CriticalCondition.Penalty
-	case ProposalLevelImportant:
-		return govparams.TallyingProcedureParameter.Value.ImportantCondition.Penalty
-	case ProposalLevelNormal:
-		return govparams.TallyingProcedureParameter.Value.NormalCondition.Penalty
-	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
-	}
-}
