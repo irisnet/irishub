@@ -71,6 +71,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 	if err != nil {
 		return nil, nil, err
 	}
+	sdk.MustSortJSON(appState)
 	validators = stake.WriteValidators(ctx, p.StakeKeeper)
 	return appState, validators, nil
 }
