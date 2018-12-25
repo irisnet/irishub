@@ -104,10 +104,10 @@ v0.9.0
 ```
 ### 如何升级IRISHub
 
-通过执行一下命令可以完成IRISHub从v0.6.2到v0.7.0的升级
+通过执行一下命令可以完成IRISHub从v0.8.0到v0.9.0的升级
 
 ```
-iris unsafe_reset_all --home
+iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 rm Gopkg.lock

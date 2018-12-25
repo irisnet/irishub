@@ -41,7 +41,7 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 IRIS基金会通过推出测试网激励计划来鼓励更多的人加入到Fuxi测试网中。在Fuxi-3001中，很多社区成员完成了激励任务。
 
 * Fuxi-6000 任务列表：https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-6000/README.md
-* Fuxi-6000任务完成情况: https://github.com/irisnet/testnets/issues/209
+* Fuxi-6000任务完成情况: https://github.com/irisnet/testnets/issues/211
 
 
 在Fuxi-7000测试网中， IRIS基金会决定推出更多的测试网激励计划。
