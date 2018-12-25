@@ -237,5 +237,3 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	}
 	return coinName, nil
 }
-
-

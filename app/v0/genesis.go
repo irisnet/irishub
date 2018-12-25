@@ -141,7 +141,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 				"Genesis transaction %v does not contain a MsgCreateValidator", i)
 		}
 	}
-	
+
 	genesisState.StakeData = stakeData
 	genesisState.GenTxs = appGenTxs
 	genesisState.UpgradeData = genesisState.UpgradeData
