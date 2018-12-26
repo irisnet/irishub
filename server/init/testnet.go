@@ -16,6 +16,7 @@ import (
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
 	clkeys "github.com/irisnet/irishub/client/keys"
+	srvconfig "github.com/irisnet/irishub/server/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
@@ -99,6 +100,8 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 		accs     []v0.GenesisFileAccount
 		genFiles []string
 	)
+
+	irisConfig := srvconfig.DefaultConfig()
 
 	// generate private keys, node IDs, and initial transactions
 	for i := 0; i < numValidators; i++ {
@@ -210,6 +213,9 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			_ = os.RemoveAll(outDir)
 			return err
 		}
+
+		irisConfigFilePath := filepath.Join(nodeDir, "config/iris.toml")
+		srvconfig.WriteConfigFile(irisConfigFilePath, irisConfig)
 	}
 
 	if err := initGenFiles(cdc, chainID, accs, genFiles, numValidators); err != nil {

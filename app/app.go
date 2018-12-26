@@ -23,18 +23,19 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
+	govtypes "github.com/irisnet/irishub/types/gov"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 const (
-	appName          = "IrisApp"
-	FlagReplayHeight = "replay_height"
+	appName             = "IrisApp"
+	FlagReplayHeight    = "replay_height"
+	FlagEnableInvariant = "enable-invariant"
 	//Keep snapshot every at syncable height
 	DefaultSyncableHeight = 10000
 )
@@ -78,8 +79,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-
-	protocol0 := v0.NewProtocolVersion0(cdc)
+	protocol0 := v0.NewProtocolVersion0(cdc, logger, app.invariantLevel)
 	engine.Add(protocol0)
 	//	protocol1 := protocol.NewProtocolVersion1(cdc)
 	//	Engine.Add(&protocol1)

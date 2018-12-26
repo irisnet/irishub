@@ -121,7 +121,6 @@ func hexToBytes(h string) []byte {
 
 const (
 	appName    = "IrisApp"
-	FlagReplay = "replay"
 )
 
 // default home directories for expected binaries
@@ -153,7 +152,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		cmn.Exit(err.Error())
 	}
 
-	protocol0 := v0.NewProtocolVersion0(cdc)
+	protocol0 := v0.NewProtocolVersion0(cdc, logger, "")
 	engine.Add(protocol0)
 	//	protocol1 := protocol.NewProtocolVersion1(cdc)
 	//	Engine.Add(&protocol1)

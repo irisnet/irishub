@@ -14,6 +14,7 @@ var _ sdk.ValidatorSet = Keeper{}
 func (k Keeper) IterateValidators(ctx sdk.Context, fn func(index int64, validator sdk.Validator) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, ValidatorsKey)
+	defer iterator.Close()
 	i := int64(0)
 	for ; iterator.Valid(); iterator.Next() {
 		addr := iterator.Key()[1:]
@@ -24,7 +25,6 @@ func (k Keeper) IterateValidators(ctx sdk.Context, fn func(index int64, validato
 		}
 		i++
 	}
-	iterator.Close()
 }
 
 // iterate through the active validator set and perform the provided function
