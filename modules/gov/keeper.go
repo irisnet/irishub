@@ -470,6 +470,25 @@ func (keeper Keeper) GetDeposits(ctx sdk.Context, proposalID uint64) sdk.Iterato
 	return sdk.KVStorePrefixIterator(store, KeyDepositsSubspace(proposalID))
 }
 
+func (keeper Keeper) RefundDepositsWithoutFee(ctx sdk.Context, proposalID uint64) {
+	store := ctx.KVStore(keeper.storeKey)
+	depositsIterator := keeper.GetDeposits(ctx, proposalID)
+
+	for ; depositsIterator.Valid(); depositsIterator.Next() {
+		deposit := &govtypes.Deposit{}
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
+
+		_, err := keeper.ck.SendCoins(ctx, DepositedCoinsAccAddr, deposit.Depositor, deposit.Amount)
+		if err != nil {
+			panic("should not happen")
+		}
+
+		store.Delete(depositsIterator.Key())
+	}
+
+	depositsIterator.Close()
+}
+
 // Returns and deletes all the deposits on a specific proposal
 func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	store := ctx.KVStore(keeper.storeKey)
