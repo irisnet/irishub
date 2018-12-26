@@ -69,8 +69,9 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     2. `POST /tx/broadcast`: 广播一个amino编码的交易
     3. `POST /txs/send`: 广播一个非amino编码的交易
     4. `GET /bank/coin/{coin-type}`: 查询coin的类型信息
-    5. `GET /bank/balances/{address}`: 查询账户的token数量
-    6. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    5. `GET /bank/token-stats`: 查询token统计信息
+    6. `GET /bank/balances/{address}`: 查询账户的token数量
+    7. `POST /bank/accounts/{address}/transfers`: 发起转账交易
 
 4. Stake模块的APIs
 

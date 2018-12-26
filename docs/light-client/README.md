@@ -69,8 +69,9 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
     3. `POST /txs/send`: Send non-amino encoding transaction
     4. `GET /bank/coin/{coin-type}`: Get coin type
-    5. `GET /bank/balances/{address}`: Get the account information on blockchain
-    6. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
+    5. `GET /bank/token-stats`: Get token statistic
+    6. `GET /bank/balances/{address}`: Get the account information on blockchain
+    7. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
 
 4. Stake module APIs
 

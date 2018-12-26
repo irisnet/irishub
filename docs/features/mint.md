@@ -2,15 +2,13 @@
 
 ## Introduction
 
-The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token as well as the accumulation of transaction fee in the block. As a POS blockchain network, the IRISHUB incentive mechanism is much different. 
+The incentive mechanism of POW is widely known and explicit: once a new block is produced, the block miner will acquire a certain amount of token as well as the accumulation of transaction fee in the block. As a POS blockchain network, the IRISHUB has similar way to produce reward token but much different mechanism to distribute the reward to each contributor.
 
-As we all know, POW means proof of work. In each block producing period, all miners compete to calculate their work proof and the fastest one will be the winner. Actually, all loser miners don't offer any positive help or collaboration to the winner miner, and they are only the competitors. So it is reasonable to grant all reward to the winner miner. However, in POS blockchain network, we can't do that. Because each block producing process is the collaboration of all validators and delegators, which means the benefit should be share by all these contributors. There are two sources of revenue, one is the transaction fee of the packaged transaction in the block. The other is regular inflation, which will produce new tokens.
+In each block producing period, all POW miners compete to calculate their work proof and the fastest one will be the winner. Actually, all loser miners don't offer any positive help or collaboration to the winner miner, and they are only the competitors. So it is reasonable to grant all reward to the winner miner. However, in POS blockchain network, we can't do that. Because each block producing process is the collaboration of all validators and delegators, which means the benefit should be share by all these contributors. As for how to distribute reward token to contributors, we will document and implement it in distribution module.
 
-As for how to distribute inflation token to contributors, we will document and implement it in distribution module. Here we mainly introduce how to figure out the inflation token and what is the impact to users. 
+The reward is composed by two parts, one is the collected transaction fee from the transactions in each block. Another one is regular inflation in each block, which will produce new tokens. The mint module is in charge of calculating the inflated token amount and add the inflated token to reward pool.
 
 ## Inflation Calculation
-
-Unlike POW network, the inflation token will not be paid to contributors in each block. Only when contributors explicitly send transactions to withdraw reward, then will the inflation token be transfered to users specified addresses. Besides, the token inflation is triggered once an hour, and the new produced token will be saved in global pool. 
 
 ### Block Time
 
@@ -18,21 +16,51 @@ The block time is not the machine time, because different machines may not have 
 
 ### Inflation Rate
 
-The inflation rate depends on the bonded ratio which means it always changes. The desired bonded ratio 67%. If the ratio is higher, the inflation rate will decrease. In contrast, if the bonded ratio is lower, the inflation rate will increase. Besides, the inflation rate should no more than 20% and no less than 7%. Otherwise, it will be truncated.
+The inflation rate is assigned to 4% per year in genesis file. This value can be modified by governance. As for how to change the value by governance, please refer to [governance](governance.md).
 
-Suppose the inflation rate is 10%, and total token amount is 10000iris, then the inflation token will be 0.114iris(10000iris*10%/8766, one year has 8766 hours). After this inflation, the total token amount will be 10000.114iris.
+### Calculation
+
+This is the calculation equation:
+```
+ blockCostTime  = (current block BFT time) - (last block BFT time)
+ AnnualInflationAmount = inflationBasement * inflationRate
+ blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
+```
+The value of `inflationBasement` is specified in genesis file. By default its value `2000000000iris`(2 billion iris, `1 iris` equal `1*10^18 iris-atto`), and its value will never be changed.
+Suppose `blockCostTime` is 5000 milisecond, and `inflationRate` is `4%`, then the inflation amount will be `12675235125611580094iris-atto` (`12.675235125611580094iris`)
 
 ## Impact to users
 
-The inflation calculation is an automatically process. Users have no directly interface to this process. However, users can send delegation or unboud transactions to change the bonded ratio, therefore the inflation rate will change accordingly.
+The inflation calculation is automatically trigged by each block. So once a new block is produces, new tokens will be created and the loosen token will increase accordingly. Users have no directly interface to affect this process. 
 
-Besides, the inflation process will increate the total token amount. Users can get the total token amount by this command:
-```
-ubuntu@ubuntu:~$ iriscli stake pool --node=<iris node url>
-Pool 
-Loose Tokens: 200.1186409166
-Bonded Tokens: 400.0000000000
-Token Supply: 600.1186409166
-Bonded Ratio: 0.6665348695
-```
+There are two command line interfaces and two LCD restful APIs which can query total loosen token amount.
 
+1. `iriscli stake pool`
+
+    This is much fast, but it can get merkle proof and verify proof. So if you doesn't trust the connected full node, please don't use this interface.
+    ```
+    ubuntu@ubuntu:~$ iriscli stake pool --node=<iris node url>
+    Pool
+    Loose Tokens: 1846663.900384156921391687
+    Bonded Tokens: 425182.329615843078608313
+    Token Supply: 2271846.230000000000000000
+    Bonded Ratio: 0.187152776500000000
+    ```
+
+2. `iriscli bank token-stats`
+    
+    You can use `--trust-node` flag to indicate whether the connected full node is trustable or not. If you can't access to a trustable node, this command line is very helpful.
+    ```
+    ubuntu@ubuntu:~$ iriscli bank token-stats --trust-node=false --chain-id [chain-id] --node=[iris node url]
+    {
+      "loosen_token": [
+        "1864477.596384156921391687iris"
+      ],
+      "burned_token": null,
+      "bonded_token": "425182.329615843078608313iris"
+    }
+    ```
+    
+3. `/stake/pool` and `/bank/token-state`
+
+    Please refer to LCD swagger document. As for how to run a LCD node please refer to [LCD document](../light-client/README.md).
