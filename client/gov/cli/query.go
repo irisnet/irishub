@@ -15,6 +15,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/irisnet/irishub/modules/upgrade/params"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -347,9 +349,10 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 						// There are two possible outputs if the --key parameter is not empty:
 						// 1.List of keys in the module;
 						// 2.Error: The key in the module does not exist;
-						params.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-							&govparams.VotingProcedureParameter,
-							&govparams.TallyingProcedureParameter)
+						params.RegisterGovParamMapping(
+							&upgradeparams.UpgradeParameter,
+							&serviceparams.MaxRequestTimeoutParameter,
+							&serviceparams.MinDepositMultipleParameter)
 
 						res, err := ctx.QueryStore([]byte(keyStr), storeName)
 						return printKeyJsonIfExists(err, keyStr, res, cdc)

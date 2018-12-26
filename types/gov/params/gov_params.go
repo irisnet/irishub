@@ -35,7 +35,7 @@ const (
 
 var _ params.GovParameter = (*DepositProcedureParam)(nil)
 
-type ParamSet struct {
+type Params struct {
 	DepositProcedure  DepositProcedure  `json:"Gov/govDepositProcedure"`
 	VotingProcedure   VotingProcedure   `json:"Gov/govVotingProcedure"`
 	TallyingProcedure TallyingProcedure `json:"Gov/govTallyingProcedure"`
