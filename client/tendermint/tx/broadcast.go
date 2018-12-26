@@ -42,7 +42,7 @@ func BroadcastTxRequest(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 		var res interface{}
 		switch m.Return {
 		case flagBlock:
-			res, err = cliCtx.BroadcastTx(m.TxBytes)
+			res, err = cliCtx.BroadcastTxAndAwaitCommit(m.TxBytes)
 		case flagSync:
 			res, err = cliCtx.BroadcastTxSync(m.TxBytes)
 		case flagAsync:
