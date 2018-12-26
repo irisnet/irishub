@@ -44,7 +44,7 @@ type Params struct {
 	BondDenom     string `json:"bond_denom"`     // bondable coin denomination
 }
 
-// Implements params.ParamSet
+// Implements params.Params
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
 		{KeyUnbondingTime, &p.UnbondingTime},

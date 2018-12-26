@@ -26,6 +26,7 @@ import (
 	"sort"
 	"time"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)
@@ -232,6 +233,7 @@ func (p *ProtocolVersion0) configParams() {
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
+			upgradeparams.UpgradeParameter.GetStoreKey(), sdk.Dec{},
 			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
 			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
@@ -240,12 +242,14 @@ func (p *ProtocolVersion0) configParams() {
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
+		&upgradeparams.UpgradeParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
 		&serviceparams.MinDepositMultipleParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	params.RegisterGovParamMapping(
+		&upgradeparams.UpgradeParameter,
 		&serviceparams.MaxRequestTimeoutParameter,
 		&serviceparams.MinDepositMultipleParameter)
 }

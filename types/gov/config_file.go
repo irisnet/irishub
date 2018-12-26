@@ -1,18 +1,18 @@
 package gov
 
 import (
-	"fmt"
 	"encoding/json"
-	sdk "github.com/irisnet/irishub/types"
-	"path"
+	"fmt"
 	"github.com/irisnet/irishub/codec"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
+	sdk "github.com/irisnet/irishub/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"path"
 )
 
 type ParameterConfigFile struct {
-	Govparams govparams.ParamSet `json:"gov"`
+	Upgradeparams upgradeparams.Params `json:"gov"`
 }
 
 func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
@@ -29,27 +29,16 @@ func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error 
 	err = cdc.UnmarshalJSON(jsonBytes, &pd)
 	return err
 }
-func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair , pathStr string) error {
+func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair, pathStr string) error {
 	for _, kv := range res {
 		switch string(kv.Key) {
-		case "Gov/govDepositProcedure":
-			err := cdc.UnmarshalJSON(kv.Value, &pd.Govparams.DepositProcedure)
-			if err != nil {
-				return err
-			}
-		case "Gov/govVotingProcedure":
-			err := cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
-			if err != nil {
-				return err
-			}
-		case "Gov/govTallyingProcedure":
-			err := cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
+		case "Gov/"+upgradeparams.UpgradeParamsKey:
+			err := cdc.UnmarshalJSON(kv.Value, &pd.Upgradeparams)
 			if err != nil {
 				return err
 			}
 		}
 	}
-
 
 	output, err := cdc.MarshalJSONIndent(pd, "", "  ")
 
@@ -78,12 +67,8 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (Par
 	}
 
 	switch keyStr {
-	case "Gov/govDepositProcedure":
-		jsonBytes, err = json.Marshal(pd.Govparams.DepositProcedure)
-	case "Gov/govVotingProcedure":
-		jsonBytes, err = json.Marshal(pd.Govparams.VotingProcedure)
-	case "Gov/govTallyingProcedure":
-		jsonBytes, err = json.Marshal(pd.Govparams.TallyingProcedure)
+	case "Gov/"+upgradeparams.UpgradeParamsKey:
+		jsonBytes, err = json.Marshal(pd.Upgradeparams)
 	default:
 		return param, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 	}

@@ -6,6 +6,7 @@ import (
 
 const (
 	DefaultCodespace                    sdk.CodespaceType = "params"
+	//gov
 	CodeInvalidMinDeposit               sdk.CodeType      = 100
 	CodeInvalidMinDepositDenom          sdk.CodeType      = 101
 	CodeInvalidMinDepositAmount         sdk.CodeType      = 102
@@ -20,7 +21,10 @@ const (
 	CodeInvalidKey                      sdk.CodeType      = 111
 	CodeInvalidModule                   sdk.CodeType      = 112
 	CodeInvalidQueryParams              sdk.CodeType      = 113
-	CodeInvalidMaxRequestTimeout        sdk.CodeType      = 114
-	CodeInvalidMinDepositMultiple       sdk.CodeType      = 115
-	CodeInvalidMaxProposalNum           sdk.CodeType      = 116
+	CodeInvalidMaxProposalNum           sdk.CodeType      = 114
+    //service
+	CodeInvalidMaxRequestTimeout        sdk.CodeType      = 200
+	CodeInvalidMinDepositMultiple       sdk.CodeType      = 201
+	//upgrade
+	CodeInvalidUpgradeParams        sdk.CodeType      = 300
 )
