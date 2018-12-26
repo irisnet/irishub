@@ -7,8 +7,9 @@ import (
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgAddProfiler{}, "iris-hub/guardian/MsgAddProfiler", nil)
-	cdc.RegisterConcrete(Profiler{}, "iris-hub/guardian/Profiler", nil)
-	cdc.RegisterConcrete(Trustee{}, "iris-hub/guardian/Trustee", nil)
+	cdc.RegisterConcrete(MsgAddTrustee{}, "iris-hub/guardian/MsgAddTrustee", nil)
+	cdc.RegisterConcrete(MsgDeleteProfiler{}, "iris-hub/guardian/MsgDeleteProfiler", nil)
+	cdc.RegisterConcrete(MsgDeleteTrustee{}, "iris-hub/guardian/MsgDeleteTrustee", nil)
 }
 
 var msgCdc = codec.New()

@@ -5,15 +5,18 @@ import (
 )
 
 const (
-	FlagProfilerAddress = "profiler-address"
-	FlagProfilerName    = "profiler-name"
+	FlagAddress     = "address"
+	FlagDescription = "description"
 )
 
 var (
-	FsProfiler = flag.NewFlagSet("", flag.ContinueOnError)
+	FsAddGuardian    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsDeleteGuardian = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
-	FsProfiler.String(FlagProfilerAddress, "", "bech32 encoded account of the profiler")
-	FsProfiler.String(FlagProfilerName, "", "name of the profiler")
+	FsAddGuardian.String(FlagAddress, "", "bech32 encoded account address")
+	FsAddGuardian.String(FlagDescription, "", "description of account")
+
+	FsDeleteGuardian.String(FlagAddress, "", "bech32 encoded account address")
 }

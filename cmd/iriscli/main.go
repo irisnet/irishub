@@ -19,7 +19,7 @@ import (
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
-	irisInit "github.com/irisnet/irishub/server/init"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -36,7 +36,7 @@ var (
 
 func main() {
 
-	irisInit.InitBech32Prefix()
+	sdk.InitBech32Prefix()
 
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
@@ -223,6 +223,9 @@ func main() {
 	guardianCmd.AddCommand(
 		client.PostCommands(
 			guardiancmd.GetCmdCreateProfiler(cdc),
+			guardiancmd.GetCmdDeleteProfiler(cdc),
+			guardiancmd.GetCmdCreateTrustee(cdc),
+			guardiancmd.GetCmdDeleteTrustee(cdc),
 		)...)
 	rootCmd.AddCommand(
 		guardianCmd,

@@ -6,11 +6,11 @@ import (
 
 // GenesisState - all guardian state that must be provided at genesis
 type GenesisState struct {
-	Profilers []Profiler `json:"profilers"`
-	Trustees  []Trustee  `json:"trustees"`
+	Profilers []Guardian `json:"profilers"`
+	Trustees  []Guardian `json:"trustees"`
 }
 
-func NewGenesisState(profilers []Profiler, trustees []Trustee) GenesisState {
+func NewGenesisState(profilers, trustees []Guardian) GenesisState {
 	return GenesisState{
 		Profilers: profilers,
 		Trustees:  trustees,
@@ -29,35 +29,30 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	profilersIterator := k.GetProfilers(ctx)
-	var profilers []Profiler
+	profilersIterator := k.ProfilersIterator(ctx)
+	defer profilersIterator.Close()
+	var profilers []Guardian
 	for ; profilersIterator.Valid(); profilersIterator.Next() {
-		var profiler Profiler
+		var profiler Guardian
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
 		profilers = append(profilers, profiler)
 	}
 
-	trusteesIterator := k.GetTrustees(ctx)
-	var trustees []Trustee
+	trusteesIterator := k.TrusteesIterator(ctx)
+	defer trusteesIterator.Close()
+	var trustees []Guardian
 	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
-		var trustee Trustee
+		var trustee Guardian
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}
-	return GenesisState{
-		Profilers: profilers,
-		Trustees:  trustees,
-	}
+	return NewGenesisState(profilers, trustees)
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
-	profiler := Profiler{Name: "genessis"}
-	trustee := Trustee{}
-	return GenesisState{
-		Profilers: []Profiler{profiler},
-		Trustees:  []Trustee{trustee},
-	}
+	guardian := Guardian{Description: "genesis", AccountType: Genesis}
+	return NewGenesisState([]Guardian{guardian}, []Guardian{guardian})
 }
 
 // get raw genesis raw message for testing

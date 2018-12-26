@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
-	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,11 +16,12 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"encoding/json"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func main() {
 
-	irisInit.InitBech32Prefix()
+	sdk.InitBech32Prefix()
 
 	cdc := app.MakeCodec()
 	ctx := server.NewDefaultContext()

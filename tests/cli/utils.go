@@ -9,7 +9,6 @@ import (
 	"testing"
 	"io"
 
-	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/tests"
@@ -44,9 +43,9 @@ import (
 
 func init() {
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(irisInit.Bech32PrefixAccAddr, irisInit.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(irisInit.Bech32PrefixValAddr, irisInit.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(irisInit.Bech32PrefixConsAddr, irisInit.Bech32PrefixConsPub)
+	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
 	config.Seal()
 }
 
@@ -94,13 +93,14 @@ func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
-		profiler := guardian.Profiler{
-			Name:      "genesis",
-			Addr:      genesisState.Accounts[0].Address,
-			AddedAddr: genesisState.Accounts[0].Address,
+		gd := guardian.Guardian{
+			Description: "genesis",
+			AccountType: guardian.Genesis,
+			Address:     genesisState.Accounts[0].Address,
+			AddedBy:     genesisState.Accounts[0].Address,
 		}
-		genesisState.GuardianData.Profilers[0] = profiler
-		genesisState.GuardianData.Trustees[0].Addr = genesisState.Accounts[0].Address
+		genesisState.GuardianData.Profilers[0] = gd
+		genesisState.GuardianData.Trustees[0] = gd
 	}
 
 	return genesisState
@@ -392,18 +392,18 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 	return serviceBindings
 }
 
-func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Profiler {
+func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var profilers []guardian.Profiler
+	var profilers []guardian.Guardian
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &profilers)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return profilers
 }
 
-func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Trustee {
+func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var trustees []guardian.Trustee
+	var trustees []guardian.Guardian
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &trustees)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	irisInit "github.com/irisnet/irishub/server/init"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	debugcmd "github.com/irisnet/irishub/tools/debug"
 	"github.com/irisnet/irishub/tools/prometheus"
@@ -13,7 +13,7 @@ import (
 
 func init() {
 
-	irisInit.InitBech32Prefix()
+	sdk.InitBech32Prefix()
 	cdc := app.MakeCodec()
 
 	rootCmd.AddCommand(debugcmd.RootCmd)
