@@ -343,6 +343,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -379,6 +384,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -548,6 +558,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -832,6 +847,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -888,6 +908,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -949,6 +974,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -1411,6 +1441,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1460,6 +1495,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -1560,6 +1600,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1636,6 +1681,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -1821,6 +1871,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1886,6 +1941,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2032,6 +2092,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2153,6 +2218,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2364,6 +2434,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2446,6 +2521,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2504,6 +2584,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2571,6 +2656,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2629,6 +2719,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2766,6 +2861,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2909,6 +3009,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2957,6 +3062,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
