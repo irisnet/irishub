@@ -33,9 +33,8 @@ import (
 )
 
 const (
-	appName             = "IrisApp"
-	FlagReplayHeight    = "replay_height"
-	FlagEnableInvariant = "enable-invariant"
+	appName          = "IrisApp"
+	FlagReplayHeight = "replay_height"
 	//Keep snapshot every at syncable height
 	DefaultSyncableHeight = 10000
 )

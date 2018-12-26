@@ -71,7 +71,7 @@ type BaseApp struct {
 
 	// minimum fees for spam prevention
 	minimumFees sdk.Coins
-	// enable invariant checking
+	// invariant checking level
 	invariantLevel string
 
 	// flag for sealing
@@ -209,7 +209,7 @@ func (app *BaseApp) initFromMainStore(mainKey *sdk.KVStoreKey) error {
 // SetMinimumFees sets the minimum fees.
 func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
 
-// SetInvariant sets the invariant checking config.
+// SetInvariantLevel sets the invariant checking config.
 func (app *BaseApp) SetInvariantLevel(invariantLevel string) { app.invariantLevel = invariantLevel }
 
 // NewContext returns a new Context with the correct store, the given header, and nil txBytes.
