@@ -9,10 +9,12 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"path"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 type ParameterConfigFile struct {
-	Upgradeparams upgradeparams.Params `json:"upgrade"`
+	UpgradeParams upgradeparams.Params `json:"upgrade"`
+	ServiceParams serviceparams.Params `json:"service"`
 }
 
 func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
@@ -33,7 +35,12 @@ func (pd *ParameterConfigFile) WriteFile(cdc *codec.Codec, res []sdk.KVPair, pat
 	for _, kv := range res {
 		switch string(kv.Key) {
 		case "Gov/"+upgradeparams.UpgradeParamsKey:
-			err := cdc.UnmarshalJSON(kv.Value, &pd.Upgradeparams)
+			err := cdc.UnmarshalJSON(kv.Value, &pd.UpgradeParams)
+			if err != nil {
+				return err
+			}
+		case "Gov/"+serviceparams.ServiceParamsKey:
+			err := cdc.UnmarshalJSON(kv.Value, &pd.ServiceParams)
 			if err != nil {
 				return err
 			}
@@ -68,7 +75,9 @@ func (pd *ParameterConfigFile) GetParamFromKey(keyStr string, opStr string) (Par
 
 	switch keyStr {
 	case "Gov/"+upgradeparams.UpgradeParamsKey:
-		jsonBytes, err = json.Marshal(pd.Upgradeparams)
+		jsonBytes, err = json.Marshal(pd.UpgradeParams)
+	case "Gov/"+serviceparams.ServiceParamsKey:
+		jsonBytes, err = json.Marshal(pd.ServiceParams)
 	default:
 		return param, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 	}
