@@ -33,26 +33,34 @@ Suppose `blockCostTime` is 5000 milisecond, and `inflationRate` is `4%`, then th
 
 The inflation calculation is automatically trigged by each block. So once a new block is produces, new tokens will be created and the loosen token will increase accordingly. Users have no directly interface to affect this process. 
 
-Here we provide two interfaces to query the total loosen token.
+There are two command line interfaces and two LCD restful APIs which can query total loosen token amount.
 
 1. `iriscli stake pool`
-```
-ubuntu@ubuntu:~$ iriscli stake pool --node=<iris node url>
-Pool
-Loose Tokens: 1846663.900384156921391687
-Bonded Tokens: 425182.329615843078608313
-Token Supply: 2271846.230000000000000000
-Bonded Ratio: 0.187152776500000000
-```
+
+    This is much fast, but it can get merkle proof and verify proof. So if you doesn't trust the connected full node, please don't use this interface.
+    ```
+    ubuntu@ubuntu:~$ iriscli stake pool --node=<iris node url>
+    Pool
+    Loose Tokens: 1846663.900384156921391687
+    Bonded Tokens: 425182.329615843078608313
+    Token Supply: 2271846.230000000000000000
+    Bonded Ratio: 0.187152776500000000
+    ```
 
 2. `iriscli bank token-stats`
-```
-ubuntu@ubuntu:~$ iriscli bank token-stats --trust-node=false --chain-id [chain-id] --node=[iris node url]
-{
-  "loosen_token": [
-    "1864477.596384156921391687iris"
-  ],
-  "burned_token": null,
-  "bonded_token": "425182.329615843078608313iris"
-}
-```
+    
+    You can use `--trust-node` flag to indicate whether the connected full node is trustable or not. If you can't access to a trustable node, this command line is very helpful.
+    ```
+    ubuntu@ubuntu:~$ iriscli bank token-stats --trust-node=false --chain-id [chain-id] --node=[iris node url]
+    {
+      "loosen_token": [
+        "1864477.596384156921391687iris"
+      ],
+      "burned_token": null,
+      "bonded_token": "425182.329615843078608313iris"
+    }
+    ```
+    
+3. `/stake/pool` and `/bank/token-state`
+
+    Please refer to LCD swagger document. As for how to run a LCD node please refer to [LCD document](../light-client/README.md).

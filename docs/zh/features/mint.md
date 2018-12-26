@@ -34,26 +34,34 @@ genesis中指定的初始通胀率是4%，这个值可以通过governance的参�
 
 通胀计算是一个自动过程，没有用户接口能直接干预此过程。每产生一个新的区块，就会增发一定数量的token，loosen token的数量也会因此增加。
 
-这里我们提供两个接口来查询总的loosen token的数量：
+这里有两个命令行接口和两个restful api来查询总的loosen token的数量：
 
 1. `iriscli stake pool`
-```
-ubuntu@ubuntu:~$ iriscli stake pool --node=<iris node url>
-Pool
-Loose Tokens: 1846663.900384156921391687
-Bonded Tokens: 425182.329615843078608313
-Token Supply: 2271846.230000000000000000
-Bonded Ratio: 0.187152776500000000
-```
+    
+    这个接口执行速度比较快，但是不能做默克尔证明，因此如果连接不上可信的全节点，请不要使用此接口。
+    ```
+    ubuntu@ubuntu:~$ iriscli stake pool --node=<iris node url>
+    Pool
+    Loose Tokens: 1846663.900384156921391687
+    Bonded Tokens: 425182.329615843078608313
+    Token Supply: 2271846.230000000000000000
+    Bonded Ratio: 0.187152776500000000
+    ```
 
 2. `iriscli bank token-stats`
-```
-ubuntu@ubuntu:~$ iriscli bank token-stats --trust-node=false --chain-id [chain-id] --node=[iris node url]
-{
-  "loosen_token": [
-    "1864477.596384156921391687iris"
-  ],
-  "burned_token": null,
-  "bonded_token": "425182.329615843078608313iris"
-}
-```
+
+    如果不信任连接的全节点，请加上`--trust-node`这个标志。如果连接不上可信的全节点，这个接口十分必要。
+    ```
+    ubuntu@ubuntu:~$ iriscli bank token-stats --trust-node=false --chain-id [chain-id] --node=[iris node url]
+    {
+      "loosen_token": [
+        "1864477.596384156921391687iris"
+      ],
+      "burned_token": null,
+      "bonded_token": "425182.329615843078608313iris"
+    }
+    ```
+
+3. `/stake/pool`和`/bank/token-state`
+
+    关于这两个restful api的用法请参阅LCD swagger文档。至于如何运行一个LCD节点，请参阅[LCD文档](../light-client/README.md)。
