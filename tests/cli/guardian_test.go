@@ -35,6 +35,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	paStr += fmt.Sprintf(" --description=%s", "bar")
 	paStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	paStr += fmt.Sprintf(" --from=%s", "foo")
+	paStr += " --wait-commit"
 	require.True(t, executeWrite(t, paStr, v0.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 	profilers = executeGetProfilers(t, fmt.Sprintf("iriscli guardian profilers %v", flags))
@@ -58,6 +59,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	taStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	taStr += fmt.Sprintf(" --address=%s", barAddr)
 	taStr += fmt.Sprintf(" --from=%s", "foo")
+	taStr += " --wait-commit"
 	require.True(t, executeWrite(t, taStr, v0.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 	trustees = executeGetProfilers(t, fmt.Sprintf("iriscli guardian trustees %v", flags))
@@ -75,6 +77,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	pdStr := fmt.Sprintf("iriscli guardian delete-profiler %v", flags)
 	pdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	pdStr += fmt.Sprintf(" --from=%s", "foo")
+	pdStr += " --wait-commit"
 
 	pdbStr := pdStr + fmt.Sprintf(" --address=%s", barAddr)
 	pdfStr := pdStr + fmt.Sprintf(" --address=%s", fooAddr)
@@ -90,6 +93,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	tdStr := fmt.Sprintf("iriscli guardian delete-trustee %v", flags)
 	tdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	tdStr += fmt.Sprintf(" --from=%s", "foo")
+	tdStr += " --wait-commit"
 
 	tdbStr := tdStr + fmt.Sprintf(" --address=%s", barAddr)
 	tdfStr := tdStr + fmt.Sprintf(" --address=%s", fooAddr)

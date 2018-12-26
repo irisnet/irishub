@@ -89,9 +89,6 @@ func (cliCtx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTxCo
 			Log:  res.Log,
 		},
 	}
-	if err != nil {
-		return result, err
-	}
 
 	return result, err
 }
