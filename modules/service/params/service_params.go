@@ -109,5 +109,5 @@ func (param *ServiceParams) Valid(jsonStr string) sdk.Error {
 		return nil
 
 	}
-	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Json is not valid"))
+	return sdk.NewError(params.DefaultCodespace, params.CodeInvalidServiceParams, fmt.Sprintf("ServiceParams Json is not valid. "))
 }

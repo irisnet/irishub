@@ -1,10 +1,10 @@
 package serviceparams
 
 import (
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -46,6 +46,6 @@ func TestMaxRequestTimeoutParameter(t *testing.T) {
 	ServiceParameter.InitGenesis(NewSericeParams())
 	require.Equal(t, int64(100), GetMaxRequestTimeout(ctx))
 
-	SetMaxRequestTimeout(ctx,1000)
+	SetMaxRequestTimeout(ctx, 1000)
 	require.Equal(t, int64(1000), GetMaxRequestTimeout(ctx))
 }

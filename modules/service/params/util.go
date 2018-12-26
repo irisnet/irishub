@@ -4,7 +4,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-
 func GetSericeParams(ctx sdk.Context) Params {
 	ServiceParameter.LoadValue(ctx)
 	return ServiceParameter.Value
@@ -49,6 +48,3 @@ func SetSlashFraction(ctx sdk.Context, i sdk.Dec) {
 	ServiceParameter.Value.SlashFraction = i
 	ServiceParameter.SaveValue(ctx)
 }
-
-
-
