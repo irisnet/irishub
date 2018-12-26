@@ -169,7 +169,7 @@ func TestIrisCLIService(t *testing.T) {
 	caStr += fmt.Sprintf(" --service-fee=%s", "2iris")
 	caStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	caStr += fmt.Sprintf(" --from=%s", "bar")
-	caStr += " --wait-commit"
+	caStr += " --commit"
 	_, outString, _ := executeWriteRetStdStreams(t, caStr, v0.DefaultKeyPass)
 	var digitsRegexp = regexp.MustCompile(`\"key\": \"request-id\",\n       \"value\": \".*\"`)
 	requestTag := string(digitsRegexp.Find([]byte(outString)))

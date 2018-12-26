@@ -202,7 +202,7 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 	cliCtx.GenerateOnly = HasGenerateOnlyArg(r)
 	cliCtx.Async = AsyncOnlyArg(r)
 	cliCtx.DryRun = HasDryRunArg(r)
-	cliCtx.WaitForCommit = CommitOnlyArg(r)
+	cliCtx.Commit = CommitOnlyArg(r)
 	return cliCtx
 }
 

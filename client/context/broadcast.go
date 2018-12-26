@@ -29,7 +29,7 @@ func resultBroadcastTxToCommit(res *ctypes.ResultBroadcastTx) *ctypes.ResultBroa
 // defined.
 func (cliCtx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	// commit
-	if cliCtx.WaitForCommit {
+	if cliCtx.Commit {
 		return cliCtx.broadcastTxCommit(txBytes)
 	}
 	// sync

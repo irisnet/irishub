@@ -34,7 +34,7 @@ type CLIContext struct {
 	AccountStore  string
 	TrustNode     bool
 	UseLedger     bool
-	WaitForCommit bool
+	Commit        bool
 	Async         bool
 	JSON          bool
 	PrintResponse bool
@@ -67,7 +67,7 @@ func NewCLIContext() CLIContext {
 		TrustNode:     viper.GetBool(client.FlagTrustNode),
 		UseLedger:     viper.GetBool(client.FlagUseLedger),
 		Async:         viper.GetBool(client.FlagAsync),
-		WaitForCommit: viper.GetBool(client.FlagWaitCommit),
+		Commit:        viper.GetBool(client.FlagCommit),
 		JSON:          viper.GetBool(client.FlagJson),
 		PrintResponse: viper.GetBool(client.FlagPrintResponse),
 		Verifier:      createVerifier(),
