@@ -103,11 +103,11 @@ func interceptLoadConfig() (conf *cfg.Config, err error) {
 		conf, err = tcmd.ParseConfig() // NOTE: ParseConfig() creates dir/files as necessary.
 	}
 
-	// create a default gaia config file if it does not exist
-	gaiaConfigFilePath := filepath.Join(rootDir, "config/iris.toml")
-	if _, err := os.Stat(gaiaConfigFilePath); os.IsNotExist(err) {
-		gaiaConf, _ := config.ParseConfig()
-		config.WriteConfigFile(gaiaConfigFilePath, gaiaConf)
+	// create a default iris config file if it does not exist
+	irisConfigFilePath := filepath.Join(rootDir, "config/iris.toml")
+	if _, err := os.Stat(irisConfigFilePath); os.IsNotExist(err) {
+		irisConf, _ := config.ParseConfig()
+		config.WriteConfigFile(irisConfigFilePath, irisConf)
 	}
 
 	viper.SetConfigName("iris")
