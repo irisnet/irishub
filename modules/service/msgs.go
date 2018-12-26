@@ -1,8 +1,8 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/tools/protoidl"
+	sdk "github.com/irisnet/irishub/types"
 	"regexp"
 )
 

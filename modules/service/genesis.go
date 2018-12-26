@@ -1,9 +1,9 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/service/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // GenesisState - all service state that must be provided at genesis
@@ -13,11 +13,11 @@ type GenesisState struct {
 
 func NewGenesisState(maxRequestTimeout int64, minDepositMultiple int64, serviceFeeTax, slashFraction sdk.Dec) GenesisState {
 	return GenesisState{
-		ServiceParams:serviceparams.Params{
-			MaxRequestTimeout:maxRequestTimeout,
-			MinDepositMultiple:minDepositMultiple,
-			ServiceFeeTax:serviceFeeTax,
-			SlashFraction:slashFraction,
+		ServiceParams: serviceparams.Params{
+			MaxRequestTimeout:  maxRequestTimeout,
+			MinDepositMultiple: minDepositMultiple,
+			ServiceFeeTax:      serviceFeeTax,
+			SlashFraction:      slashFraction,
 		},
 	}
 }
@@ -30,14 +30,14 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	return GenesisState{
-		ServiceParams:serviceparams.GetSericeParams(ctx),
+		ServiceParams: serviceparams.GetSericeParams(ctx),
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		ServiceParams:serviceparams.NewSericeParams(),
+		ServiceParams: serviceparams.NewSericeParams(),
 	}
 }
 
@@ -47,6 +47,6 @@ func DefaultGenesisStateForTest() GenesisState {
 	serviceParams.MaxRequestTimeout = 10
 	serviceParams.MinDepositMultiple = 10
 	return GenesisState{
-		ServiceParams:serviceParams,
+		ServiceParams: serviceParams,
 	}
 }

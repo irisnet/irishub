@@ -1,16 +1,16 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tools/protoidl"
-	"github.com/irisnet/irishub/modules/bank"
 	"fmt"
-	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration/params"
-	"time"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/tools/protoidl"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
+	"time"
 )
 
 var DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))

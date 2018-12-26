@@ -241,7 +241,7 @@ func TestTallyingProcedureParam(t *testing.T) {
 	find := TallyingProcedureParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
-	TallyingProcedureParameter.InitGenesis(nil)
+	TallyingProcedureParameter.InitGenesis(p1)
 	require.Equal(t, p1, TallyingProcedureParameter.Value)
 	require.Equal(t, "{\"threshold\":\"0.5000000000\",\"veto\":\"0.3340000000\",\"participation\":\"0.6670000000\"}", TallyingProcedureParameter.ToJson(""))
 

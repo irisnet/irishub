@@ -39,7 +39,7 @@ func (param *ServiceParams) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(Params); ok {
 		param.Value = value
 	} else {
-		param.Value = NewSericeParams()
+		panic("The " + ServiceParamsKey + " in GenesisState is empty. ")
 	}
 }
 

@@ -1,8 +1,8 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"encoding/binary"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
