@@ -233,7 +233,7 @@ func (p *ProtocolVersion0) configParams() {
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			upgradeparams.UpgradeParameter.GetStoreKey(), sdk.Dec{},
+			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
 			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
 			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),

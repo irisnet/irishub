@@ -13,6 +13,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -363,12 +364,9 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		var pd govtypes.ParameterConfigFile
 		for _, kv := range res {
 			switch string(kv.Key) {
-			case "Gov/govDepositProcedure":
-				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.DepositProcedure)
-			case "Gov/govVotingProcedure":
-				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.VotingProcedure)
-			case "Gov/govTallyingProcedure":
-				cdc.UnmarshalJSON(kv.Value, &pd.Govparams.TallyingProcedure)
+			case "Gov/"+upgradeparams.UpgradeParamsKey:
+				cdc.UnmarshalJSON(kv.Value, &pd.Upgradeparams)
+
 			}
 		}
 		utils.PostProcessResponse(w, cdc, pd, cliCtx.Indent)

@@ -12,7 +12,7 @@ import (
 )
 
 type ParameterConfigFile struct {
-	Upgradeparams upgradeparams.Params `json:"gov"`
+	Upgradeparams upgradeparams.Params `json:"upgrade"`
 }
 
 func (pd *ParameterConfigFile) ReadFile(cdc *codec.Codec, pathStr string) error {
