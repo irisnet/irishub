@@ -234,8 +234,7 @@ func (p *ProtocolVersion0) configParams() {
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
-			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
 			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
 		)),
@@ -243,15 +242,13 @@ func (p *ProtocolVersion0) configParams() {
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
 		&upgradeparams.UpgradeParameter,
-		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinDepositMultipleParameter,
+		&serviceparams.ServiceParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	params.RegisterGovParamMapping(
 		&upgradeparams.UpgradeParameter,
-		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinDepositMultipleParameter)
+		&serviceparams.ServiceParameter,)
 }
 
 // application updates every end block

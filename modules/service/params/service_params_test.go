@@ -35,58 +35,17 @@ func TestMaxRequestTimeoutParameter(t *testing.T) {
 		skey, tkeyParams,
 	)
 
-	subspace := paramKeeper.Subspace("Service").WithTypeTable(params.NewTypeTable(
-		MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-		MinDepositMultipleParameter.GetStoreKey(), int64(0),
+	subspace := paramKeeper.Subspace("Gov").WithTypeTable(params.NewTypeTable(
+		ServiceParameter.GetStoreKey(), Params{},
 	))
 
-	MaxRequestTimeoutParameter.SetReadWriter(subspace)
-	find := MaxRequestTimeoutParameter.LoadValue(ctx)
+	ServiceParameter.SetReadWriter(subspace)
+	find := ServiceParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
-	MaxRequestTimeoutParameter.InitGenesis(int64(12345))
-	require.Equal(t, int64(12345), MaxRequestTimeoutParameter.Value)
+	ServiceParameter.InitGenesis(NewSericeParams())
+	require.Equal(t, int64(100), GetMaxRequestTimeout(ctx))
 
-	MaxRequestTimeoutParameter.LoadValue(ctx)
-	require.Equal(t, int64(12345), MaxRequestTimeoutParameter.Value)
-
-	MaxRequestTimeoutParameter.Value = 30
-	MaxRequestTimeoutParameter.SaveValue(ctx)
-
-	MaxRequestTimeoutParameter.LoadValue(ctx)
-	require.Equal(t, int64(30), MaxRequestTimeoutParameter.Value)
-}
-
-func TestMinProviderDepositParameter(t *testing.T) {
-	skey := sdk.NewKVStoreKey("params")
-	tkeyParams := sdk.NewTransientStoreKey("transient_params")
-
-	ctx := defaultContext(skey, tkeyParams)
-	cdc := codec.New()
-
-	paramKeeper := params.NewKeeper(
-		cdc,
-		skey, tkeyParams,
-	)
-
-	subspace := paramKeeper.Subspace("Sig").WithTypeTable(params.NewTypeTable(
-		MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-		MinDepositMultipleParameter.GetStoreKey(), int64(0),
-	))
-
-	MinDepositMultipleParameter.SetReadWriter(subspace)
-	find := MinDepositMultipleParameter.LoadValue(ctx)
-	require.Equal(t, find, false)
-
-	MinDepositMultipleParameter.InitGenesis(int64(12345))
-	require.Equal(t, int64(12345), MinDepositMultipleParameter.Value)
-
-	MinDepositMultipleParameter.LoadValue(ctx)
-	require.Equal(t, int64(12345), MinDepositMultipleParameter.Value)
-
-	MinDepositMultipleParameter.Value = 30
-	MinDepositMultipleParameter.SaveValue(ctx)
-
-	MinDepositMultipleParameter.LoadValue(ctx)
-	require.Equal(t, int64(30), MinDepositMultipleParameter.Value)
+	SetMaxRequestTimeout(ctx,1000)
+	require.Equal(t, int64(1000), GetMaxRequestTimeout(ctx))
 }

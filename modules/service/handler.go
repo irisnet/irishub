@@ -4,6 +4,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/service/tags"
 	"fmt"
+	"github.com/irisnet/irishub/modules/service/params"
 )
 
 // handle all "service" type messages.
@@ -235,7 +236,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
-		slashFraction := keeper.GetServiceSlashFraction(ctx)
+		slashFraction := serviceparams.GetSlashFraction(ctx)
 		slashCoins := sdk.Coins{}
 		binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
 		if found {

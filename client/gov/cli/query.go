@@ -351,8 +351,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 						// 2.Error: The key in the module does not exist;
 						params.RegisterGovParamMapping(
 							&upgradeparams.UpgradeParameter,
-							&serviceparams.MaxRequestTimeoutParameter,
-							&serviceparams.MinDepositMultipleParameter)
+							&serviceparams.ServiceParameter)
 
 						res, err := ctx.QueryStore([]byte(keyStr), storeName)
 						return printKeyJsonIfExists(err, keyStr, res, cdc)
