@@ -16,6 +16,7 @@ import (
 
 const (
 	Async                = "async"
+	Commit               = "commit"
 	queryArgDryRun       = "simulate"
 	queryArgGenerateOnly = "generate-only"
 )
@@ -104,6 +105,11 @@ func HasGenerateOnlyArg(r *http.Request) bool {
 // AsyncOnlyArg returns whether a URL's query "async" parameter
 func AsyncOnlyArg(r *http.Request) bool {
 	return urlQueryHasArg(r.URL, Async)
+}
+
+// CommitOnlyArg returns whether a URL's query "commit" parameter
+func CommitOnlyArg(r *http.Request) bool {
+	return urlQueryHasArg(r.URL, Commit)
 }
 
 // ParseInt64OrReturnBadRequest converts s to a int64 value.
@@ -196,6 +202,7 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 	cliCtx.GenerateOnly = HasGenerateOnlyArg(r)
 	cliCtx.Async = AsyncOnlyArg(r)
 	cliCtx.DryRun = HasDryRunArg(r)
+	cliCtx.WaitForCommit = CommitOnlyArg(r)
 	return cliCtx
 }
 

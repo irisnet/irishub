@@ -29,6 +29,7 @@ const (
 	FlagMemo           = "memo"
 	FlagFee            = "fee"
 	FlagAsync          = "async"
+	FlagWaitCommit     = "wait-commit"
 	FlagJson           = "json"
 	FlagPrintResponse  = "print-response"
 	FlagGenerateOnly   = "generate-only"
@@ -66,6 +67,7 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().Var(&GasFlagVar, FlagGas, fmt.Sprintf(
 			"gas limit to set per-transaction; set to %q to calculate required gas automatically", GasFlagSimulate))
 		c.Flags().Bool(FlagAsync, false, "broadcast transactions asynchronously")
+		c.Flags().Bool(FlagWaitCommit, false, "wait for transaction commit accomplishment, if true, --async will be ignored")
 		c.Flags().Bool(FlagJson, false, "return output in json format")
 		c.Flags().Bool(FlagTrustNode, true, "Don't verify proofs for responses")
 		c.Flags().Bool(FlagPrintResponse, false, "return tx response (only works with async = false)")

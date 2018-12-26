@@ -23,11 +23,27 @@ func resultBroadcastTxToCommit(res *ctypes.ResultBroadcastTx) *ctypes.ResultBroa
 	}
 }
 
+func resultSyncBroadcastTxToCommit(res *ctypes.ResultBroadcastTx) *ctypes.ResultBroadcastTxCommit {
+	return &ctypes.ResultBroadcastTxCommit{
+		Hash: res.Hash,
+		CheckTx:  abci.ResponseCheckTx{
+			Code: res.Code,
+			Data: res.Data,
+			Log:  res.Log,
+		},
+	}
+}
+
 // BroadcastTx broadcasts a transactions either synchronously or asynchronously
 // based on the context parameters. The result of the broadcast is parsed into
 // an intermediate structure which is logged if the context has a logger
 // defined.
 func (cliCtx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+	// commit
+	if cliCtx.WaitForCommit {
+		return cliCtx.broadcastTxCommit(txBytes)
+	}
+	// async
 	if cliCtx.Async {
 		res, err := cliCtx.broadcastTxAsync(txBytes)
 		if err != nil {
@@ -37,8 +53,13 @@ func (cliCtx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxC
 		resCommit := resultBroadcastTxToCommit(res)
 		return resCommit, err
 	}
-
-	return cliCtx.broadcastTxCommit(txBytes)
+	// sync
+	res, err := cliCtx.BroadcastTxSync(txBytes)
+	if err != nil {
+		return nil, err
+	}
+	resCommit := resultSyncBroadcastTxToCommit(res)
+	return resCommit, err
 }
 
 // BroadcastTxAndAwaitCommit broadcasts transaction bytes to a Tendermint node
