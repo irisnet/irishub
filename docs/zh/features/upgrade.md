@@ -2,7 +2,7 @@
 
 ## 基本功能描述
 
-该模块支持区块链软件平滑升级的基础设施，通过UpgradeProposal在约定高度切换到新版的代码，并对历史版本的链上数据完全兼容。
+该模块支持区块链软件平滑升级的基础设施，通过UpgradeProposal(upgradeProposal 只能由profiler发起)在约定高度切换到新版的代码，并对历史版本的链上数据完全兼容。
 
 ## 交互流程
 
@@ -93,6 +93,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * `--software`  新软件的下载地址
 * `--switch-height` 新软件升级的高度
 * 其他参数可参考GOV的[用户手册](governance.md)
+* 只有profiler可以提交软件升级提议
 
 ```
 iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
