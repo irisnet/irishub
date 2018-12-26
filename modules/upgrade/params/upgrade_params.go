@@ -8,8 +8,8 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-
 const UpgradeParamsKey = "upgradeParams"
+
 var UpgradeParameter UpgradeParams
 
 var _ params.GovParameter = (*UpgradeParams)(nil)
@@ -39,7 +39,7 @@ func (param *UpgradeParams) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(Params); ok {
 		param.Value = value
 	} else {
-		param.Value = NewUpgradeParams()
+		panic("The " + UpgradeParamsKey + " in GenesisState is empty. ")
 	}
 }
 

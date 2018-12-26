@@ -11,13 +11,13 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
-	sdk "github.com/irisnet/irishub/types"
+	"fmt"
 	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
-	"fmt"
-	"github.com/irisnet/irishub/modules/guardian"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // initialize the mock application for this module
@@ -57,8 +57,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 // gov and stake endblocker
 func getEndBlocker() sdk.EndBlocker {
 	return func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-		return abci.ResponseEndBlock{
-		}
+		return abci.ResponseEndBlock{}
 	}
 }
 

@@ -27,6 +27,7 @@ const (
 	CodeInvalidMinDepositMultiple       sdk.CodeType      = 201
 	CodeInvalidServiceFeeTax            sdk.CodeType      = 202
 	CodeInvalidSlashFraction            sdk.CodeType      = 203
+	CodeInvalidServiceParams            sdk.CodeType      = 204
 	//upgrade
 	CodeInvalidUpgradeParams        sdk.CodeType      = 300
 )

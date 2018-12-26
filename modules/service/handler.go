@@ -1,10 +1,10 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/service/tags"
 	"fmt"
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/service/tags"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // handle all "service" type messages.
@@ -48,8 +48,7 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
@@ -59,8 +58,7 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
@@ -70,8 +68,7 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Result {
@@ -79,8 +76,7 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result {
@@ -88,8 +84,7 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposit) sdk.Result {
@@ -97,8 +92,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
@@ -195,8 +189,7 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees) sdk.Result {
@@ -204,8 +197,7 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
@@ -217,8 +209,7 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 // Called every block, update request status
