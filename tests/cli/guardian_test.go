@@ -27,6 +27,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	scStr += fmt.Sprintf(" --profiler-name=%s", "bar")
 	scStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	scStr += fmt.Sprintf(" --from=%s", "foo")
+	scStr += " --commit"
 	executeWrite(t, scStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 	profilers = executeGetProfilers(t, fmt.Sprintf("iriscli guardian profilers %v", flags))
