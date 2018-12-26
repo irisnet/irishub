@@ -18,7 +18,7 @@ var (
 
 // NewFeePreprocessHandler creates a fee token preprocesser
 func NewFeePreprocessHandler(fm FeeManager) types.FeePreprocessHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) error {
+	return func(ctx sdk.Context, tx sdk.Tx) sdk.Error {
 		stdTx, ok := tx.(StdTx)
 		if !ok {
 			return sdk.ErrInternal("tx must be StdTx")

@@ -757,7 +757,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
 		if err != nil {
-			return sdk.ErrInvalidCoins(err.Error()).Result()
+			return err.Result()
 		}
 	}
 
