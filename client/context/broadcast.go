@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
-
 	"github.com/pkg/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -171,22 +169,28 @@ func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadc
 	return res, nil
 }
 
+type ReadableTag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 func deliverTxMarshalIndentJSON(dtx abci.ResponseDeliverTx) ([]byte, error) {
-
-	tags := make(map[string]string)
-	for _, kv := range dtx.Tags {
-		tags[string(kv.Key)] = strings.Replace(string(kv.Value), "\\", "", -1)
+	tags := make([]ReadableTag, len(dtx.Tags))
+	for i, kv := range dtx.Tags {
+		tags[i] = ReadableTag{
+			Key:   string(kv.Key),
+			Value: string(kv.Value),
+		}
 	}
-
 	return json.MarshalIndent(&struct {
-		Code      uint32            `json:"code"`
-		Data      []byte            `json:"data"`
-		Log       string            `json:"log"`
-		Info      string            `json:"info"`
-		GasWanted int64             `json:"gas_wanted"`
-		GasUsed   int64             `json:"gas_used"`
-		Codespace string            `json:"codespace"`
-		Tags      map[string]string `json:"tags,omitempty"`
+		Code      uint32        `json:"code"`
+		Data      []byte        `json:"data"`
+		Log       string        `json:"log"`
+		Info      string        `json:"info"`
+		GasWanted int64         `json:"gas_wanted"`
+		GasUsed   int64         `json:"gas_used"`
+		Codespace string        `json:"codespace"`
+		Tags      []ReadableTag `json:"tags,omitempty"`
 	}{
 		Code:      dtx.Code,
 		Data:      dtx.Data,

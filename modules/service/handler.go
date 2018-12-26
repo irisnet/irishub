@@ -47,11 +47,7 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDef,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -62,11 +58,7 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBind,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -77,11 +69,7 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBindUpdate,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -90,11 +78,7 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDisable,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -103,11 +87,7 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcEnable,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -116,11 +96,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRefundDeposit,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -163,7 +139,6 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return err.Result()
 	}
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcCall,
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Provider, []byte(request.Provider.String()),
 		tags.Consumer, []byte(request.Consumer.String()),
@@ -204,7 +179,6 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	}
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRespond,
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Consumer, []byte(response.Consumer.String()),
 		tags.Provider, []byte(response.Provider.String()),
@@ -219,11 +193,7 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRefundFees,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -232,11 +202,7 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcWithdrawFees,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -260,11 +226,7 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	}
 
 	k.SetServiceFeeTaxPool(ctx, newTaxPool)
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcWithdrawTax,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
