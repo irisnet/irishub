@@ -97,7 +97,6 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 ```
 iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
 ```
-
 * `--proposalID` 当前通过的软件升级提议的ID
 
 ```
