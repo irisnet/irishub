@@ -93,6 +93,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * `--software`  新软件的下载地址
 * `--switch-height` 新软件升级的高度
 * 其他参数可参考Governance的[用户手册](governance.md)
+* 只有profiler可以提交软件升级提议
 
 ```
 iriscli upgrade info --trust-node
