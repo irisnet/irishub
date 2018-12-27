@@ -67,16 +67,17 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 		NoWithVeto: results[OptionNoWithVeto],
 	}
 
+
 	// If no one votes, proposal fails
 	if totalVotingPower.Sub(results[OptionAbstain]).Equal(sdk.ZeroDec()) {
 		return REJECT, tallyResults, votingVals
 	}
-	////////////////////  iris begin  ///////////////////////////
+
 	//if more than 1/3 of voters abstain, proposal fails
 	if tallyingProcedure.Participation.GT(totalVotingPower.Quo(systemVotingPower)) {
 		return REJECT, tallyResults, votingVals
 	}
-	////////////////////  iris end  ///////////////////////////
+
 
 	// If more than 1/3 of voters veto, proposal fails
 	if results[OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {

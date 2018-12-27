@@ -1,7 +1,7 @@
 package gov
 
-var _ Proposal = (*HaltProposal)(nil)
+var _ Proposal = (*SystemHaltProposal)(nil)
 
-type HaltProposal struct {
+type SystemHaltProposal struct {
 	TextProposal
 }

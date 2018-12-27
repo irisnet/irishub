@@ -46,7 +46,7 @@ func GetProposalLevelByProposalKind(p ProposalKind) ProposalLevel {
 		return ProposalLevelNormal
 	case ProposalTypeParameterChange:
 		return ProposalLevelImportant
-	case ProposalTypeSoftwareHalt:
+	case ProposalTypeSystemHalt:
 		return ProposalLevelCritical
 	case ProposalTypeSoftwareUpgrade:
 		return ProposalLevelCritical
@@ -107,6 +107,7 @@ func GetTallyingProcedure(ctx sdk.Context) govparams.TallyingProcedure {
 }
 
 func GetTallyingCondition(ctx sdk.Context, p Proposal) govparams.TallyCondition {
+	govparams.TallyingProcedureParameter.LoadValue(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
 		return govparams.TallyingProcedureParameter.Value.CriticalCondition

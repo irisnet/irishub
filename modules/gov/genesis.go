@@ -12,7 +12,7 @@ const StartingProposalID = 1
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
-	TerminatorPeriod  int64                       `json:"terminator_period"`
+	SystemHaltPeriod  int64                       `json:"terminator_period"`
 	DepositProcedure  govparams.DepositProcedure  `json:"deposit_period"`
 	VotingProcedure   govparams.VotingProcedure   `json:"voting_period"`
 	TallyingProcedure govparams.TallyingProcedure `json:"tallying_procedure"`
@@ -35,8 +35,8 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		panic(err)
 	}
 
-	k.SetTerminatorPeriod(ctx, data.TerminatorPeriod)
-	k.SetTerminatorHeight(ctx, -1)
+	k.SetSystemHaltPeriod(ctx, data.SystemHaltPeriod)
+	k.SetSystemHaltHeight(ctx, -1)
 
 	params.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
 	params.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
@@ -59,7 +59,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		TerminatorPeriod:  20000,
+		SystemHaltPeriod:  20000,
 		DepositProcedure:  govparams.NewDepositProcedure(),
 		VotingProcedure:   govparams.NewVotingProcedure(),
 		TallyingProcedure: govparams.NewTallyingProcedure(),
@@ -72,7 +72,7 @@ func DefaultGenesisStateForCliTest() GenesisState {
 	depositProcedure := govparams.NewDepositProcedure()
 	depositProcedure.MaxDepositPeriod = time.Duration(60) * time.Second
 	return GenesisState{
-		TerminatorPeriod:  20,
+		SystemHaltPeriod:  20,
 		DepositProcedure:  depositProcedure,
 		VotingProcedure:   govparams.NewVotingProcedure(),
 		TallyingProcedure: govparams.NewTallyingProcedure(),

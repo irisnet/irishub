@@ -11,8 +11,8 @@ func Execute(ctx sdk.Context, k Keeper, p Proposal) (err error) {
 	switch p.GetProposalType() {
 	case ProposalTypeParameterChange:
 		return ParameterProposalExecute(ctx, k, p.(*ParameterProposal))
-	case ProposalTypeSoftwareHalt:
-		return HaltProposalExecute(ctx, k)
+	case ProposalTypeSystemHalt:
+		return SystemHaltProposalExecute(ctx, k)
 	case ProposalTypeTxTaxUsage:
 		return TaxUsageProposalExecute(ctx, k, p.(*TaxUsageProposal))
 	case ProposalTypeSoftwareUpgrade:
@@ -72,14 +72,14 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp *SoftwareUpgra
 	return nil
 }
 
-func HaltProposalExecute(ctx sdk.Context, k Keeper) error {
+func SystemHaltProposalExecute(ctx sdk.Context, k Keeper) error {
 	logger := ctx.Logger().With("module", "x/gov")
 
-	if k.GetTerminatorHeight(ctx) == -1 {
-		k.SetTerminatorHeight(ctx, ctx.BlockHeight()+k.GetTerminatorPeriod(ctx))
-		logger.Info("Execute TerminatorProposal begin", "info", fmt.Sprintf("Terminator height:%d", k.GetTerminatorHeight(ctx)))
+	if k.GetSystemHaltHeight(ctx) == -1 {
+		k.SetSystemHaltHeight(ctx, ctx.BlockHeight()+k.GetSystemHaltPeriod(ctx))
+		logger.Info("Execute SystemHaltProposal begin", "info", fmt.Sprintf("SystemHalt height:%d", k.GetSystemHaltHeight(ctx)))
 	} else {
-		logger.Info("Terminator Period is in process.", "info", fmt.Sprintf("Terminator height:%d", k.GetTerminatorHeight(ctx)))
+		logger.Info("SystemHalt Period is in process.", "info", fmt.Sprintf("SystemHalt height:%d", k.GetSystemHaltHeight(ctx)))
 
 	}
 	return nil

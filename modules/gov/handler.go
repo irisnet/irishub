@@ -40,7 +40,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 	////////////////////  iris begin  ///////////////////////////
-	if msg.ProposalType == ProposalTypeSoftwareHalt {
+	if msg.ProposalType == ProposalTypeSystemHalt {
 		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
 		if !found {
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
@@ -223,9 +223,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 	resTags = sdk.NewTags()
 
-	if ctx.BlockHeight() == keeper.GetTerminatorHeight(ctx) {
+	if ctx.BlockHeight() == keeper.GetSystemHaltHeight(ctx) {
 		resTags = resTags.AppendTag(tmstate.HaltTagKey, []byte(tmstate.HaltTagValue))
-		logger.Info(fmt.Sprintf("Terminator Start!!!"))
+		logger.Info(fmt.Sprintf("SystemHalt Start!!!"))
 	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)

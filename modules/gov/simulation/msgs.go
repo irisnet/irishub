@@ -122,7 +122,7 @@ func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) 
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
 		simulation.RandStringOfLength(r, 5),
-		 gov.ProposalTypeSoftwareHalt,
+		 gov.ProposalTypeSystemHalt,
 		sender.Address,
 		deposit,
 		param,

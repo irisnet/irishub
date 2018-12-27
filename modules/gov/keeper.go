@@ -73,8 +73,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	switch proposalType {
 	case ProposalTypeParameterChange:
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
-	case ProposalTypeSoftwareHalt:
-		return keeper.NewHaltProposal(ctx, title, description, proposalType)
+	case ProposalTypeSystemHalt:
+		return keeper.NewSystemHaltProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -116,7 +116,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	return proposal
 }
 
-func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -131,7 +131,7 @@ func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description 
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	var proposal Proposal = &HaltProposal{
+	var proposal Proposal = &SystemHaltProposal{
 		textProposal,
 	}
 
@@ -589,9 +589,9 @@ func (keeper Keeper) RemoveFromInactiveProposalQueue(ctx sdk.Context, endTime ti
 	store.Delete(KeyInactiveProposalQueueProposal(endTime, proposalID))
 }
 
-func (keeper Keeper) GetTerminatorHeight(ctx sdk.Context) int64 {
+func (keeper Keeper) GetSystemHaltHeight(ctx sdk.Context) int64 {
 	store := ctx.KVStore(keeper.storeKey)
-	bz := store.Get(KeyTerminatorHeight)
+	bz := store.Get(KeySystemHaltHeight)
 	if bz == nil {
 		return -1
 	}
@@ -601,28 +601,27 @@ func (keeper Keeper) GetTerminatorHeight(ctx sdk.Context) int64 {
 	return height
 }
 
-func (keeper Keeper) SetTerminatorHeight(ctx sdk.Context, height int64) {
+func (keeper Keeper) SetSystemHaltHeight(ctx sdk.Context, height int64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(height)
-	store.Set(KeyTerminatorHeight, bz)
+	store.Set(KeySystemHaltHeight, bz)
 }
 
-func (keeper Keeper) GetTerminatorPeriod(ctx sdk.Context) int64 {
+func (keeper Keeper) GetSystemHaltPeriod(ctx sdk.Context) int64 {
 	store := ctx.KVStore(keeper.storeKey)
-	bz := store.Get(KeyTerminatorPeriod)
+	bz := store.Get(KeySystemHaltPeriod)
 	if bz == nil {
 		return -1
 	}
 	var height int64
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &height)
-
 	return height
 }
 
-func (keeper Keeper) SetTerminatorPeriod(ctx sdk.Context, height int64) {
+func (keeper Keeper) SetSystemHaltPeriod(ctx sdk.Context, height int64) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(height)
-	store.Set(KeyTerminatorPeriod, bz)
+	store.Set(KeySystemHaltPeriod, bz)
 }
 
 func (keeper Keeper) GetCriticalProposalID(ctx sdk.Context) (uint64, bool) {

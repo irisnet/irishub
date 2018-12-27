@@ -80,8 +80,8 @@ func KeyInactiveProposalQueueProposal(endTime time.Time, proposalID uint64) []by
 
 // Key for getting a the next available proposalID from the store
 var (
-	KeyTerminatorHeight     = []byte("TerminatorHeight")
-	KeyTerminatorPeriod     = []byte("TerminatorPeriod")
+	KeySystemHaltHeight     = []byte("SystemHaltHeight")
+	KeySystemHaltPeriod     = []byte("SystemHaltPeriod")
 	KeyCriticalProposal     = []byte("CriticalProposal")
 	KeyImportantProposalNum = []byte("ImportantProposalNum")
 	KeyNormalProposalNum    = []byte("NormalProposalNum")

@@ -136,8 +136,8 @@ const (
 	ProposalTypeParameterChange ProposalKind = 0x01
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
 	////////////////////  iris begin  /////////////////////////////
-	ProposalTypeSoftwareHalt ProposalKind = 0x03
-	ProposalTypeTxTaxUsage   ProposalKind = 0x04
+	ProposalTypeSystemHalt      ProposalKind = 0x03
+	ProposalTypeTxTaxUsage      ProposalKind = 0x04
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -149,8 +149,8 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
 		////////////////////  iris begin  /////////////////////////////
-	case "SoftwareHalt":
-		return ProposalTypeSoftwareHalt, nil
+	case "SystemHalt":
+		return ProposalTypeSystemHalt, nil
 	case "TxTaxUsage":
 		return ProposalTypeTxTaxUsage, nil
 		////////////////////  iris end  /////////////////////////////
@@ -164,7 +164,7 @@ func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
 		////////////////////  iris begin  /////////////////////////////
-		pt == ProposalTypeSoftwareHalt ||
+		pt == ProposalTypeSystemHalt ||
 		pt == ProposalTypeTxTaxUsage {
 		////////////////////  iris end  /////////////////////////////
 		return true
@@ -212,8 +212,8 @@ func (pt ProposalKind) String() string {
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
 		////////////////////  iris begin  /////////////////////////////
-	case ProposalTypeSoftwareHalt:
-		return "SoftwareHalt"
+	case ProposalTypeSystemHalt:
+		return "SystemHalt"
 	case ProposalTypeTxTaxUsage:
 		return "TxTaxUsage"
 		////////////////////  iris end  /////////////////////////////
