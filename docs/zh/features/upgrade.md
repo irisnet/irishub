@@ -96,17 +96,6 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * 只有profiler可以提交软件升级提议
 
 ```
-iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
-```
-* `--proposalID` 当前通过的软件升级提议的ID
-
-```
-iris start --replay
-```
-
-* 重新同步区块，清理因升级而写脏的AppHash
-
-```
 iriscli upgrade info --trust-node
 ```
 
