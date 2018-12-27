@@ -120,7 +120,7 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-trustee",
-		Short: "delete a trustee",
+		Short: "Delete a trustee",
 		Example: "iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
 			"--trustee-address=<added address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
