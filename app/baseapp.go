@@ -616,7 +616,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		if mode != RunTxModeCheck {
 			msgResult = handler(ctx, msg)
 		}
-		msgResult.Tags = append(msgResult.Tags, sdk.MakeTag("action", []byte(msg.Type())))
+		msgResult.Tags = append(msgResult.Tags, sdk.MakeTag(sdk.TagAction, []byte(msg.Type())))
 
 		// NOTE: GasWanted is determined by ante handler and
 		// GasUsed by the GasMeter

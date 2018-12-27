@@ -94,6 +94,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * `--software`  The software of the new protocol
 * `--switch-height` The switchheight of the new protocol
 * Other parameters can be referrenced in [Gov User Guide](governance.md)
+* Only profiler can submit the software upgrade proposal.
 
 Query the version details of current software 
 
