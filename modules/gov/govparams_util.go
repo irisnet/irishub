@@ -2,8 +2,8 @@ package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/gov/params"
-	govtypes "github.com/irisnet/irishub/types/gov"
+	 "github.com/irisnet/irishub/modules/gov/params"
+
 	"time"
 )
 
@@ -36,19 +36,19 @@ func (p ProposalLevel) string() string {
 	}
 }
 
-func GetProposalLevel(p govtypes.Proposal) ProposalLevel {
+func GetProposalLevel(p  Proposal) ProposalLevel {
 	return GetProposalLevelByProposalKind(p.GetProposalType())
 }
 
-func GetProposalLevelByProposalKind(p govtypes.ProposalKind) ProposalLevel {
+func GetProposalLevelByProposalKind(p  ProposalKind) ProposalLevel {
 	switch p {
-	case govtypes.ProposalTypeTxTaxUsage:
+	case  ProposalTypeTxTaxUsage:
 		return ProposalLevelNormal
-	case govtypes.ProposalTypeParameterChange:
+	case  ProposalTypeParameterChange:
 		return ProposalLevelImportant
-	case govtypes.ProposalTypeSoftwareHalt:
+	case  ProposalTypeSoftwareHalt:
 		return ProposalLevelCritical
-	case govtypes.ProposalTypeSoftwareUpgrade:
+	case  ProposalTypeSoftwareUpgrade:
 		return ProposalLevelCritical
 	default:
 		return  ProposalLevelNil
@@ -61,7 +61,7 @@ func GetDepositProcedure(ctx sdk.Context) govparams.DepositProcedure {
 	return govparams.DepositProcedureParameter.Value
 }
 
-func GetMinDeposit(ctx sdk.Context, p govtypes.Proposal) sdk.Coins {
+func GetMinDeposit(ctx sdk.Context, p  Proposal) sdk.Coins {
 	govparams.DepositProcedureParameter.LoadValue(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
@@ -87,7 +87,7 @@ func GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
 	return govparams.VotingProcedureParameter.Value
 }
 
-func GetVotingPeriod(ctx sdk.Context, p govtypes.Proposal) time.Duration {
+func GetVotingPeriod(ctx sdk.Context, p  Proposal) time.Duration {
 	govparams.VotingProcedureParameter.LoadValue(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
@@ -107,7 +107,7 @@ func GetTallyingProcedure(ctx sdk.Context) govparams.TallyingProcedure {
 	return govparams.TallyingProcedureParameter.Value
 }
 
-func GetTallyingCondition(ctx sdk.Context,p govtypes.Proposal) govparams.TallyCondition {
+func GetTallyingCondition(ctx sdk.Context,p  Proposal) govparams.TallyCondition {
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
 		return govparams.TallyingProcedureParameter.Value.CriticalCondition

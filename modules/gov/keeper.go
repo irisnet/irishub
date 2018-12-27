@@ -11,7 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -69,11 +69,11 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck ba
 // Proposals
 
 ////////////////////  iris begin  ///////////////////////////
-func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType govtypes.ProposalKind, param govtypes.Param) govtypes.Proposal {
+func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType  ProposalKind, param  Param)  Proposal {
 	switch proposalType {
-	case govtypes.ProposalTypeParameterChange:
+	case  ProposalTypeParameterChange:
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
-	case govtypes.ProposalTypeSoftwareHalt:
+	case  ProposalTypeSoftwareHalt:
 		return keeper.NewHaltProposal(ctx, title, description, proposalType)
 	}
 	return nil
@@ -86,25 +86,25 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 
 // Creates a NewProposal
 ////////////////////  iris begin  ///////////////////////////
-func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType govtypes.ProposalKind, param govtypes.Param) govtypes.Proposal {
+func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType  ProposalKind, param  Param)  Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var textProposal = govtypes.TextProposal{
+	var textProposal =  TextProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
 		ProposalType: proposalType,
-		Status:       govtypes.StatusDepositPeriod,
-		TallyResult:  govtypes.EmptyTallyResult(),
+		Status:        StatusDepositPeriod,
+		TallyResult:   EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
 
 	param.Value = params.ParamMapping[param.Key].ToJson(param.Value)
 
-	var proposal govtypes.Proposal = &govtypes.ParameterProposal{
+	var proposal  Proposal = & ParameterProposal{
 		textProposal,
 		param,
 	}
@@ -116,22 +116,22 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	return proposal
 }
 
-func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description string, proposalType govtypes.ProposalKind) govtypes.Proposal {
+func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description string, proposalType  ProposalKind)  Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var textProposal = govtypes.TextProposal{
+	var textProposal =  TextProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
 		ProposalType: proposalType,
-		Status:       govtypes.StatusDepositPeriod,
-		TallyResult:  govtypes.EmptyTallyResult(),
+		Status:        StatusDepositPeriod,
+		TallyResult:   EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	var proposal govtypes.Proposal = &govtypes.HaltProposal{
+	var proposal  Proposal = & HaltProposal{
 		textProposal,
 	}
 
@@ -142,22 +142,22 @@ func (keeper Keeper) NewHaltProposal(ctx sdk.Context, title string, description 
 	return proposal
 }
 
-func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsageProposal) govtypes.Proposal {
+func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsageProposal)  Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var textProposal = govtypes.TextProposal{
+	var textProposal =  TextProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
 		ProposalType: msg.ProposalType,
-		Status:       govtypes.StatusDepositPeriod,
-		TallyResult:  govtypes.EmptyTallyResult(),
+		Status:        StatusDepositPeriod,
+		TallyResult:   EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	var proposal govtypes.Proposal = &govtypes.TaxUsageProposal{
+	var proposal  Proposal = & TaxUsageProposal{
 		textProposal,
 		msg.Usage,
 		msg.DestAddress,
@@ -167,22 +167,22 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	return proposal
 }
 
-func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSoftwareUpgradeProposal) govtypes.Proposal {
+func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSoftwareUpgradeProposal)  Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var textProposal = govtypes.TextProposal{
+	var textProposal =  TextProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
 		ProposalType: msg.ProposalType,
-		Status:       govtypes.StatusDepositPeriod,
-		TallyResult:  govtypes.EmptyTallyResult(),
+		Status:        StatusDepositPeriod,
+		TallyResult:   EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	var proposal govtypes.Proposal = &govtypes.SoftwareUpgradeProposal{
+	var proposal  Proposal = & SoftwareUpgradeProposal{
 		textProposal,
 		msg.Version,
 		msg.Software,
@@ -192,7 +192,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	return proposal
 }
 
-func (keeper Keeper) saveProposal(ctx sdk.Context, proposal govtypes.Proposal) {
+func (keeper Keeper) saveProposal(ctx sdk.Context, proposal  Proposal) {
 	depositPeriod := GetDepositPeriod(ctx)
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
@@ -202,21 +202,21 @@ func (keeper Keeper) saveProposal(ctx sdk.Context, proposal govtypes.Proposal) {
 ////////////////////  iris end  /////////////////////////////
 
 // Get Proposal from store by ProposalID
-func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64) govtypes.Proposal {
+func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64)  Proposal {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyProposal(proposalID))
 	if bz == nil {
 		return nil
 	}
 
-	var proposal govtypes.Proposal
+	var proposal  Proposal
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &proposal)
 
 	return proposal
 }
 
 // Implements sdk.AccountKeeper.
-func (keeper Keeper) SetProposal(ctx sdk.Context, proposal govtypes.Proposal) {
+func (keeper Keeper) SetProposal(ctx sdk.Context, proposal  Proposal) {
 
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposal)
@@ -233,14 +233,14 @@ func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposalID uint64) {
 }
 
 // Get Proposal from store by ProposalID
-func (keeper Keeper) GetProposalsFiltered(ctx sdk.Context, voterAddr sdk.AccAddress, depositorAddr sdk.AccAddress, status govtypes.ProposalStatus, numLatest uint64) []govtypes.Proposal {
+func (keeper Keeper) GetProposalsFiltered(ctx sdk.Context, voterAddr sdk.AccAddress, depositorAddr sdk.AccAddress, status  ProposalStatus, numLatest uint64) [] Proposal {
 
 	maxProposalID, err := keeper.peekCurrentProposalID(ctx)
 	if err != nil {
 		return nil
 	}
 
-	matchingProposals := []govtypes.Proposal{}
+	matchingProposals := [] Proposal{}
 
 	if numLatest == 0 || maxProposalID < numLatest {
 		numLatest = maxProposalID
@@ -266,7 +266,7 @@ func (keeper Keeper) GetProposalsFiltered(ctx sdk.Context, voterAddr sdk.AccAddr
 			continue
 		}
 
-		if govtypes.ValidProposalStatus(status) {
+		if  ValidProposalStatus(status) {
 			if proposal.GetStatus() != status {
 				continue
 			}
@@ -281,7 +281,7 @@ func (keeper Keeper) setInitialProposalID(ctx sdk.Context, proposalID uint64) sd
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyNextProposalID)
 	if bz != nil {
-		return govtypes.ErrInvalidGenesis(keeper.codespace, "Initial ProposalID already set")
+		return  ErrInvalidGenesis(keeper.codespace, "Initial ProposalID already set")
 	}
 	bz = keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyNextProposalID, bz)
@@ -303,7 +303,7 @@ func (keeper Keeper) getNewProposalID(ctx sdk.Context) (proposalID uint64, err s
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyNextProposalID)
 	if bz == nil {
-		return 0, govtypes.ErrInvalidGenesis(keeper.codespace, "InitialProposalID never set")
+		return 0,  ErrInvalidGenesis(keeper.codespace, "InitialProposalID never set")
 	}
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &proposalID)
 	bz = keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID + 1)
@@ -316,17 +316,17 @@ func (keeper Keeper) peekCurrentProposalID(ctx sdk.Context) (proposalID uint64, 
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyNextProposalID)
 	if bz == nil {
-		return 0, govtypes.ErrInvalidGenesis(keeper.codespace, "InitialProposalID never set")
+		return 0,  ErrInvalidGenesis(keeper.codespace, "InitialProposalID never set")
 	}
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &proposalID)
 	return proposalID, nil
 }
 
-func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal govtypes.Proposal) {
+func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal  Proposal) {
 	proposal.SetVotingStartTime(ctx.BlockHeader().Time)
 	votingPeriod := GetVotingPeriod(ctx, proposal)
 	proposal.SetVotingEndTime(proposal.GetVotingStartTime().Add(votingPeriod))
-	proposal.SetStatus(govtypes.StatusVotingPeriod)
+	proposal.SetStatus( StatusVotingPeriod)
 	keeper.SetProposal(ctx, proposal)
 
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
@@ -338,28 +338,28 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal govtypes.Pro
 // Votes
 
 // Adds a vote on a specific proposal
-func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress, option govtypes.VoteOption) sdk.Error {
+func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress, option  VoteOption) sdk.Error {
 	proposal := keeper.GetProposal(ctx, proposalID)
 	if proposal == nil {
-		return govtypes.ErrUnknownProposal(keeper.codespace, proposalID)
+		return  ErrUnknownProposal(keeper.codespace, proposalID)
 	}
-	if proposal.GetStatus() != govtypes.StatusVotingPeriod {
-		return govtypes.ErrInactiveProposal(keeper.codespace, proposalID)
+	if proposal.GetStatus() !=  StatusVotingPeriod {
+		return  ErrInactiveProposal(keeper.codespace, proposalID)
 	}
 
 	if keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr)) == nil {
-		return govtypes.ErrOnlyValidatorVote(keeper.codespace, voterAddr)
+		return  ErrOnlyValidatorVote(keeper.codespace, voterAddr)
 	}
 
 	if _, ok := keeper.GetVote(ctx, proposalID, voterAddr); ok {
-		return govtypes.ErrAlreadyVote(keeper.codespace, voterAddr, proposalID)
+		return  ErrAlreadyVote(keeper.codespace, voterAddr, proposalID)
 	}
 
-	if !govtypes.ValidVoteOption(option) {
-		return govtypes.ErrInvalidVote(keeper.codespace, option)
+	if ! ValidVoteOption(option) {
+		return  ErrInvalidVote(keeper.codespace, option)
 	}
 
-	vote := govtypes.Vote{
+	vote :=  Vote{
 		ProposalID: proposalID,
 		Voter:      voterAddr,
 		Option:     option,
@@ -370,18 +370,18 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 }
 
 // Gets the vote of a specific voter on a specific proposal
-func (keeper Keeper) GetVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) (govtypes.Vote, bool) {
+func (keeper Keeper) GetVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) ( Vote, bool) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyVote(proposalID, voterAddr))
 	if bz == nil {
-		return govtypes.Vote{}, false
+		return  Vote{}, false
 	}
-	var vote govtypes.Vote
+	var vote  Vote
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &vote)
 	return vote, true
 }
 
-func (keeper Keeper) setVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress, vote govtypes.Vote) {
+func (keeper Keeper) setVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress, vote  Vote) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(vote)
 	store.Set(KeyVote(proposalID, voterAddr), bz)
@@ -402,18 +402,18 @@ func (keeper Keeper) deleteVote(ctx sdk.Context, proposalID uint64, voterAddr sd
 // Deposits
 
 // Gets the deposit of a specific depositor on a specific proposal
-func (keeper Keeper) GetDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress) (govtypes.Deposit, bool) {
+func (keeper Keeper) GetDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress) ( Deposit, bool) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := store.Get(KeyDeposit(proposalID, depositorAddr))
 	if bz == nil {
-		return govtypes.Deposit{}, false
+		return  Deposit{}, false
 	}
-	var deposit govtypes.Deposit
+	var deposit  Deposit
 	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &deposit)
 	return deposit, true
 }
 
-func (keeper Keeper) setDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress, deposit govtypes.Deposit) {
+func (keeper Keeper) setDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress, deposit  Deposit) {
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(deposit)
 	store.Set(KeyDeposit(proposalID, depositorAddr), bz)
@@ -425,12 +425,12 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Checks to see if proposal exists
 	proposal := keeper.GetProposal(ctx, proposalID)
 	if proposal == nil {
-		return govtypes.ErrUnknownProposal(keeper.codespace, proposalID), false
+		return  ErrUnknownProposal(keeper.codespace, proposalID), false
 	}
 
 	// Check if proposal is still depositable
-	if proposal.GetStatus() != govtypes.StatusDepositPeriod {
-		return govtypes.ErrNotInDepositPeriod(keeper.codespace, proposalID), false
+	if proposal.GetStatus() !=  StatusDepositPeriod {
+		return  ErrNotInDepositPeriod(keeper.codespace, proposalID), false
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account
@@ -446,7 +446,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetStatus() == govtypes.StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(GetMinDeposit(ctx, proposal)) {
+	if proposal.GetStatus() ==  StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(GetMinDeposit(ctx, proposal)) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}
@@ -454,7 +454,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Add or update deposit object
 	currDeposit, found := keeper.GetDeposit(ctx, proposalID, depositorAddr)
 	if !found {
-		newDeposit := govtypes.Deposit{depositorAddr, proposalID, depositAmount}
+		newDeposit :=  Deposit{depositorAddr, proposalID, depositAmount}
 		keeper.setDeposit(ctx, proposalID, depositorAddr, newDeposit)
 	} else {
 		currDeposit.Amount = currDeposit.Amount.Plus(depositAmount)
@@ -475,7 +475,7 @@ func (keeper Keeper) RefundDepositsWithoutFee(ctx sdk.Context, proposalID uint64
 	depositsIterator := keeper.GetDeposits(ctx, proposalID)
 
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
-		deposit := &govtypes.Deposit{}
+		deposit := & Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 
 		_, err := keeper.ck.SendCoins(ctx, DepositedCoinsAccAddr, deposit.Depositor, deposit.Amount)
@@ -495,9 +495,9 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	depositsIterator := keeper.GetDeposits(ctx, proposalID)
 	defer depositsIterator.Close()
 	depositSum := sdk.Coins{}
-	deposits := []*govtypes.Deposit{}
+	deposits := []* Deposit{}
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
-		deposit := &govtypes.Deposit{}
+		deposit := & Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 		deposits = append(deposits, deposit)
 		depositSum = depositSum.Plus(deposit.Amount)
@@ -534,7 +534,7 @@ func (keeper Keeper) DeleteDeposits(ctx sdk.Context, proposalID uint64) {
 	depositsIterator := keeper.GetDeposits(ctx, proposalID)
 
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
-		deposit := &govtypes.Deposit{}
+		deposit := & Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 
 		_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, deposit.Amount)
@@ -724,7 +724,7 @@ func (keeper Keeper) IsMoreThanMaxProposal(ctx sdk.Context, pl ProposalLevel) (u
 	}
 }
 
-func (keeper Keeper) AddProposalNum(ctx sdk.Context, p govtypes.Proposal) {
+func (keeper Keeper) AddProposalNum(ctx sdk.Context, p  Proposal) {
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
 		keeper.AddCriticalProposalNum(ctx, p.GetProposalID())
@@ -737,7 +737,7 @@ func (keeper Keeper) AddProposalNum(ctx sdk.Context, p govtypes.Proposal) {
 	}
 }
 
-func (keeper Keeper) SubProposalNum(ctx sdk.Context, p govtypes.Proposal) {
+func (keeper Keeper) SubProposalNum(ctx sdk.Context, p  Proposal) {
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
 		keeper.SubCriticalProposalNum(ctx)

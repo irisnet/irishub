@@ -11,7 +11,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 )
 
 type postProposalReq struct {
@@ -21,8 +21,8 @@ type postProposalReq struct {
 	ProposalType   string             `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress     `json:"proposer"`        //  Address of the proposer
 	InitialDeposit string             `json:"initial_deposit"` // Coins to add to the proposal's deposit
-	Param          govtypes.Param     `json:"param"`
-	Usage          govtypes.UsageType `json:"usage"`
+	Param          gov.Param     `json:"param"`
+	Usage          gov.UsageType `json:"usage"`
 	DestAddress    sdk.AccAddress     `json:"dest_address"`
 	Percent        sdk.Dec            `json:"percent"`
 }
@@ -55,7 +55,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		proposalType, err := govtypes.ProposalTypeFromString(client.NormalizeProposalType(req.ProposalType))
+		proposalType, err :=  gov.ProposalTypeFromString(client.NormalizeProposalType(req.ProposalType))
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -69,7 +69,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 
 		// create the message
 		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Param)
-		if msg.ProposalType == govtypes.ProposalTypeTxTaxUsage {
+		if msg.ProposalType ==  gov.ProposalTypeTxTaxUsage {
 			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -163,7 +163,7 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 			return
 		}
 
-		voteOption, err := govtypes.VoteOptionFromString(client.NormalizeVoteOption(req.Option))
+		voteOption, err :=  gov.VoteOptionFromString(client.NormalizeVoteOption(req.Option))
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

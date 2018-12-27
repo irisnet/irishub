@@ -4,47 +4,46 @@ import (
 	"fmt"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 
-func Execute(ctx sdk.Context, k Keeper, p govtypes.Proposal) (err error){
+func Execute(ctx sdk.Context, k Keeper, p  Proposal) (err error){
 	switch p.GetProposalType(){
-	case govtypes.ProposalTypeParameterChange:
-		return ParameterProposalExecute(ctx, k, p.(*govtypes.ParameterProposal))
-	case govtypes.ProposalTypeSoftwareHalt:
+	case  ProposalTypeParameterChange:
+		return ParameterProposalExecute(ctx, k, p.(* ParameterProposal))
+	case  ProposalTypeSoftwareHalt:
 		return HaltProposalExecute(ctx, k)
-	case govtypes.ProposalTypeTxTaxUsage:
-		return TaxUsageProposalExecute(ctx,k, p.(*govtypes.TaxUsageProposal))
-	case govtypes.ProposalTypeSoftwareUpgrade:
-		return SoftwareUpgradeProposalExecute(ctx, k, p.(*govtypes.SoftwareUpgradeProposal))
+	case  ProposalTypeTxTaxUsage:
+		return TaxUsageProposalExecute(ctx,k, p.(* TaxUsageProposal))
+	case  ProposalTypeSoftwareUpgrade:
+		return SoftwareUpgradeProposalExecute(ctx, k, p.(* SoftwareUpgradeProposal))
 	}
 	return nil
 }
 
-func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p *govtypes.TaxUsageProposal) (err error) {
+func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p * TaxUsageProposal) (err error) {
 	burn := false
-	if p.Usage == govtypes.UsageTypeBurn {
+	if p.Usage ==  UsageTypeBurn {
 		burn = true
 	}
 	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
 	return
 }
 
-func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp *govtypes.ParameterProposal) (err error) {
+func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp * ParameterProposal) (err error) {
 
 	logger := ctx.Logger().With("module", "x/gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-	if pp.Param.Op == govtypes.Update {
+	if pp.Param.Op ==  Update {
 		params.ParamMapping[pp.Param.Key].Update(ctx, pp.Param.Value)
-	} else if pp.Param.Op == govtypes.Insert {
+	} else if pp.Param.Op ==  Insert {
 		//Todo: insert
 	}
 	return
 }
 
-func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp *govtypes.SoftwareUpgradeProposal) error {
+func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp * SoftwareUpgradeProposal) error {
 
 	logger := ctx.Logger().With("module", "x/gov")
 

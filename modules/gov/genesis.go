@@ -3,8 +3,8 @@ package gov
 import (
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"github.com/irisnet/irishub/types/gov/params"
+
+	 "github.com/irisnet/irishub/modules/gov/params"
 	"time"
 )
 
@@ -80,13 +80,13 @@ func DefaultGenesisStateForCliTest() GenesisState {
 }
 
 func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
-	proposals := k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusDepositPeriod, 0)
+	proposals := k.GetProposalsFiltered(ctx, nil, nil,  StatusDepositPeriod, 0)
 	for _, proposal := range proposals {
 		proposalID := proposal.GetProposalID()
 		k.RefundDeposits(ctx, proposalID)
 	}
 
-	proposals = k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusVotingPeriod, 0)
+	proposals = k.GetProposalsFiltered(ctx, nil, nil,  StatusVotingPeriod, 0)
 	for _, proposal := range proposals {
 		proposalID := proposal.GetProposalID()
 		k.RefundDeposits(ctx, proposalID)

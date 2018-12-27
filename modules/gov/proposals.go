@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/gov/params"
+	 "github.com/irisnet/irishub/modules/gov/params"
 )
 
 //-----------------------------------------------------------

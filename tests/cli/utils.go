@@ -38,7 +38,7 @@ import (
 	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/app/v0"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 )
 
 func init() {
@@ -328,27 +328,27 @@ func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	return proposal
 }
 
-func executeGetVote(t *testing.T, cmdStr string) govtypes.Vote {
+func executeGetVote(t *testing.T, cmdStr string)  Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var vote govtypes.Vote
+	var vote  Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return vote
 }
 
-func executeGetVotes(t *testing.T, cmdStr string) []govtypes.Vote {
+func executeGetVotes(t *testing.T, cmdStr string) [] Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var votes []govtypes.Vote
+	var votes [] Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
 }
 
-func executeGetParam(t *testing.T, cmdStr string) govtypes.Param {
+func executeGetParam(t *testing.T, cmdStr string)  Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var param govtypes.Param
+	var param  Param
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

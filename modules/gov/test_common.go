@@ -15,7 +15,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/types/gov/params"
+	 "github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/types"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/modules/distribution"
@@ -23,7 +23,7 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/guardian"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 )
 
 // initialize the mock application for this module
@@ -31,7 +31,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	mapp := mock.NewApp()
 
 	stake.RegisterCodec(mapp.Cdc)
-	govtypes.RegisterCodec(mapp.Cdc)
+	 RegisterCodec(mapp.Cdc)
 
 	keyGov := sdk.NewKVStoreKey("gov")
 	keyDistr := sdk.NewKVStoreKey("distr")
@@ -54,9 +54,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
-	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, govtypes.DefaultCodespace)
+	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper,  DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, pk, govtypes.DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, pk,  DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
