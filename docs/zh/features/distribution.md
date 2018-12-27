@@ -40,7 +40,7 @@
 
 执行以下查询语句：
 ```bash
-iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris
+iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris --commit
 ```
 
 返回如下，`withdraw-reward-total`就是预计的抵押获益：
@@ -55,8 +55,8 @@ simulation fee amount = 0
 simulation fee denom =
 simulation tag action = withdraw-delegator-rewards-all
 simulation tag delegator = faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd
-simulation tag withdraw-reward-total = 1308135156755646.7440000000iris-atto
-simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646.7440000000iris-atto
+simulation tag withdraw-reward-total = 1308135156755646iris-atto
+simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646iris-atto
 simulation tag action = withdraw_delegation_rewards_all    
 
 ```
