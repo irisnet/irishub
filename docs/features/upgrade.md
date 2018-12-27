@@ -2,7 +2,7 @@
 
 ## Basic Function Description
 
-The module supports the infrastructure of the blockchain software upgrade. It will be upgraded to the new version through voting at UpgradeProposal  and is fully compatible with the historical data on the blockchain.
+The module supports the infrastructure of the blockchain software upgrade. It will be upgraded to the new version through voting at UpgradeProposal which can only be submitted by the profilers and is fully compatible with the historical data on the blockchain.
 
 ## Interaction Process
 
