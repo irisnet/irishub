@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // InitGenesis sets the pool and parameters for the provided keeper.  For each
@@ -26,17 +25,24 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	keeper.SetParams(ctx, data.Params)
 	keeper.SetLastTotalPower(ctx, data.LastTotalPower)
 
+	pool := keeper.GetPool(ctx)
 	for _, validator := range data.Validators {
 		keeper.SetValidator(ctx, validator)
 
 		// Manually set indices for the first time
 		keeper.SetValidatorByConsAddr(ctx, validator)
-		keeper.SetValidatorByPowerIndex(ctx, validator, types.Pool{BondedPool:	data.BondedPool})
+		keeper.SetValidatorByPowerIndex(ctx, validator, types.Pool{BondedPool: data.BondedPool})
 		keeper.OnValidatorCreated(ctx, validator.OperatorAddr)
 
 		// Set timeslice if necessary
 		if validator.Status == sdk.Unbonding {
 			keeper.InsertValidatorQueue(ctx, validator)
+		}
+
+		// Increase loosen token
+		if validator.Status != sdk.Bonded {
+			balance := sdk.NewCoin(types.StakeDenom, validator.Tokens.TruncateInt())
+			pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{balance})
 		}
 	}
 
