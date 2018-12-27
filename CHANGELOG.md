@@ -1,5 +1,15 @@
 # Changelog
 
+
+## 0.9.0
+
+*December 27th, 2018*
+
+- Refactor the gov types
+- Make the deposit flag not be required in the gov submit-proposal cmd
+- Add withdraw address into the withdraw tags list
+- Fix the monitor bug
+
 ## 0.9.0-rc0
 
 *December 19th, 2018*
