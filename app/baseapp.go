@@ -22,6 +22,7 @@ import (
 	"github.com/irisnet/irishub/version"
 	tmstate "github.com/tendermint/tendermint/state"
 	"strconv"
+	"github.com/irisnet/irishub/modules/auth"
 )
 
 // Key to store the consensus params in the main store.
@@ -839,6 +840,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 
 	success := app.Engine.Activate(appVersion)
 	if success {
+		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().LoadCodec())
 		return
 	}
 

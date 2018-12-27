@@ -30,6 +30,7 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/app/v1"
 )
 
 const (
@@ -80,9 +81,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 	protocol0 := v0.NewProtocolVersion0(cdc, logger, app.invariantLevel)
 	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
+	protocol1 := v1.NewProtocolVersion1(cdc)
+	engine.Add(protocol1)
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().LoadCodec())
 
 	return app
 }

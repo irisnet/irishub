@@ -1,10 +1,7 @@
-package v0
+package v1
 
 import (
 	"fmt"
-	"sort"
-	"time"
-
 	"github.com/irisnet/irishub/app/protocol"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
@@ -14,30 +11,28 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/record"
+	"github.com/irisnet/irishub/app/v1/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"github.com/irisnet/irishub/types/gov/params"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
+	"sort"
+	"time"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
-var _ protocol.Protocol = (*ProtocolVersion0)(nil)
+var _ protocol.Protocol = (*ProtocolVersion1)(nil)
 
-type ProtocolVersion0 struct {
-	pb             *protocol.ProtocolBase
-	cdc            *codec.Codec
-	logger         log.Logger
-	invariantLevel string
+type ProtocolVersion1 struct {
+	pb  *protocol.ProtocolBase
+	cdc *codec.Codec
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountKeeper
@@ -69,29 +64,26 @@ type ProtocolVersion0 struct {
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 }
 
-func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string) *ProtocolVersion0 {
+func NewProtocolVersion1(cdc *codec.Codec) *ProtocolVersion1 {
 	base := protocol.ProtocolBase{
 		Definition: sdk.ProtocolDefinition{
-			uint64(0),
+			uint64(1),
 			"",
 			uint64(1),
 		},
 		//		engine: engine,
 	}
-	p0 := ProtocolVersion0{
-		pb:             &base,
-		cdc:            cdc,
-		logger:         log,
-		invariantLevel: invariantLevel,
-		router:         protocol.NewRouter(),
-		queryRouter:    protocol.NewQueryRouter(),
+	p1 := ProtocolVersion1{
+		pb:          &base,
+		router:      protocol.NewRouter(),
+		queryRouter: protocol.NewQueryRouter(),
 	}
-	p0.cdc = p0.LoadCodec()
-	return &p0
+	p1.cdc = p1.LoadCodec()
+	return &p1
 }
 
 // load the configuration of this Protocol
-func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
+func (p *ProtocolVersion1) Load(protocolkeeper protocolKeeper.Keeper) {
 	p.configKeepers(protocolkeeper)
 	p.configRouters()
 	p.configFeeHandlers()
@@ -99,12 +91,12 @@ func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
 }
 
 // verison0 don't need the init
-func (p *ProtocolVersion0) Init() {
+func (p *ProtocolVersion1) Init() {
 
 }
 
-// verison0 tx codec
-func (p *ProtocolVersion0) LoadCodec() *codec.Codec {
+// verison1 tx codec
+func (p *ProtocolVersion1) LoadCodec() *codec.Codec {
 	return MakeCodec()
 }
 
@@ -127,12 +119,12 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
-func (p *ProtocolVersion0) GetDefinition() sdk.ProtocolDefinition {
+func (p *ProtocolVersion1) GetDefinition() sdk.ProtocolDefinition {
 	return p.pb.GetDefinition()
 }
 
 // create all Keepers
-func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
+func (p *ProtocolVersion1) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
@@ -214,7 +206,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 }
 
 // configure all Routers
-func (p *ProtocolVersion0) configRouters() {
+func (p *ProtocolVersion1) configRouters() {
 	p.router.
 		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
 		AddRoute("stake", stake.NewHandler(p.StakeKeeper)).
@@ -230,14 +222,14 @@ func (p *ProtocolVersion0) configRouters() {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) configFeeHandlers() {
+func (p *ProtocolVersion1) configFeeHandlers() {
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeCollectionKeeper)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeCollectionKeeper, p.feeManager)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeManager)
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
+func (p *ProtocolVersion1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		protocol.KeyMain,
 		protocol.KeyProtocol,
@@ -256,14 +248,13 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) configParams() {
+func (p *ProtocolVersion1) configParams() {
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
 			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
 			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
@@ -271,18 +262,16 @@ func (p *ProtocolVersion0) configParams() {
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
-		&upgradeparams.UpgradeParameter,
 		&serviceparams.ServiceParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	params.RegisterGovParamMapping(
-		&upgradeparams.UpgradeParameter,
 		&serviceparams.ServiceParameter)
 }
 
 // application updates every end block
-func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (p *ProtocolVersion1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	// mint new tokens for this new block
 	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
@@ -298,7 +287,7 @@ func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBl
 }
 
 // application updates every end block
-func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (p *ProtocolVersion1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, p.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
@@ -314,7 +303,7 @@ func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock)
 
 // custom logic for iris initialization
 // just 0 version need Initchainer
-func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
+func (p *ProtocolVersion1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	var genesisFileState GenesisFileState
@@ -401,28 +390,28 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	}
 }
 
-func (p *ProtocolVersion0) GetRouter() protocol.Router {
+func (p *ProtocolVersion1) GetRouter() protocol.Router {
 	return p.router
 }
-func (p *ProtocolVersion0) GetQueryRouter() protocol.QueryRouter {
+func (p *ProtocolVersion1) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
-func (p *ProtocolVersion0) GetAnteHandler() sdk.AnteHandler {
+func (p *ProtocolVersion1) GetAnteHandler() sdk.AnteHandler {
 	return p.anteHandler
 }
-func (p *ProtocolVersion0) GetFeeRefundHandler() sdk.FeeRefundHandler {
+func (p *ProtocolVersion1) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler
 }
-func (p *ProtocolVersion0) GetFeePreprocessHandler() sdk.FeePreprocessHandler {
+func (p *ProtocolVersion1) GetFeePreprocessHandler() sdk.FeePreprocessHandler {
 	return p.feePreprocessHandler
 }
-func (p *ProtocolVersion0) GetInitChainer() sdk.InitChainer1 {
+func (p *ProtocolVersion1) GetInitChainer() sdk.InitChainer1 {
 	return p.InitChainer
 }
-func (p *ProtocolVersion0) GetBeginBlocker() sdk.BeginBlocker {
+func (p *ProtocolVersion1) GetBeginBlocker() sdk.BeginBlocker {
 	return p.BeginBlocker
 }
-func (p *ProtocolVersion0) GetEndBlocker() sdk.EndBlocker {
+func (p *ProtocolVersion1) GetEndBlocker() sdk.EndBlocker {
 	return p.EndBlocker
 }
 
