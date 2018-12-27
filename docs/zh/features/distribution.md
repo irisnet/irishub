@@ -40,7 +40,7 @@
 
 执行以下查询语句：
 ```bash
-iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris
+iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris  --commit
 ```
 
 返回如下，`withdraw-reward-total`就是预计的抵押获益：
