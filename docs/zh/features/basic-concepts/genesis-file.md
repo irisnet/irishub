@@ -51,5 +51,5 @@ Genesis文件是整个网络初始化的基础。它包含了创建创世区块�
   
 ## Gentxs
 
-Gentxs中包含了创世区块中创建validators的交易集合。Cosmos SDK通过一个 gen-tx可以有效的对genesis文件的产生进行管控。 gen-tx即Genesis Transaction 是经过签名的交易数据，在区块链启动的过程中，这些交易将被执行，然后确定初始验证人集合。
+Gentxs中包含了创世区块中创建validators的交易集合。IRIS通过一个 gen-tx可以有效的对genesis文件的产生进行管控。 gen-tx即Genesis Transaction 是经过签名的交易数据，在区块链启动的过程中，这些交易将被执行，然后确定初始验证人集合。
 通过提交gen-txs交易，代币的持有者证明了自己愿意参与到这个区块链网络的启动流程中，并且愿意承担潜在的损失。
