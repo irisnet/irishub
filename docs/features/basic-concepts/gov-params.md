@@ -18,7 +18,7 @@ parameters, it is available to put up a `parameter-change` proposal in governanc
 
 Details in [gov](../governance.md)
 
-## Parameters inService Module
+## Parameters in Service Module
 
 * `MaxRequestTimeout`   The maximum of waiting blocks for service invocation
 * `MinProviderDeposit`  The minimum deposit for service binding
