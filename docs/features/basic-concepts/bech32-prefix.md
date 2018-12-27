@@ -37,10 +37,11 @@ This means you have created a new address `faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpq
 
 A Tendermint Consensus Public key is generated when the node is created with  `iris init`.
 You can get this value with   
-```iris tendermint show-validator
+```
+iris tendermint show-validator
 ```
 
 Example output:
 ```
-cosmosvalconspub1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
+fcp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
 ```
