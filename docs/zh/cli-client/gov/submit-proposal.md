@@ -25,7 +25,7 @@ iriscli gov submit-proposal --help
 | --param          |                            | [string] 提议参数,例如: [{key:key,value:value,op:update}]                                                                                 |          |
 | --path           |                            | [string] param.json文件路径                                                                                                                      |          |
 | --title          |                            | [string] 提议标题                                                                                                                           | Yes      |
-| --type           |                            | [string] 提议类型,例如:ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | [string] 提议类型,例如:Text/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | [uint64] 新协议的版本信息                                                                           |       |
 | --software           |           " "                 | [string] 新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     | [string] 新版本协议升级的高度                                                     |       |
