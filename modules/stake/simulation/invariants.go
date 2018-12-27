@@ -106,6 +106,7 @@ func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
 	return func(ctx sdk.Context) error {
 
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
+		defer iterator.Close()
 		pool := k.GetPool(ctx)
 
 		for ; iterator.Valid(); iterator.Next() {
@@ -121,7 +122,6 @@ func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
 					"\n\tkey should be: %v\n\tkey in store: %v", validator.GetPower(), powerKey, iterator.Key())
 			}
 		}
-		iterator.Close()
 		return nil
 	}
 }
