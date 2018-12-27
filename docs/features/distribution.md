@@ -41,7 +41,7 @@ This module is in charge of distributing collected transaction fee and inflated 
     Execute the command to get the estimated inflation rewards :
     
     ```bash
-    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris
+    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris  --commit
     ```
     
     Output is the following，`withdraw-reward-total`is your estimated inflation rewards：
