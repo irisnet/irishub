@@ -137,16 +137,14 @@ func NewApp() *App {
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), []byte{},
 			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), []byte{},
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
-		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinDepositMultipleParameter,
+		&serviceparams.ServiceParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 

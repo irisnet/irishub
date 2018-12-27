@@ -20,7 +20,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-// export the state of gaia for a genesis file
+// export the state of iris for a genesis file
 func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 

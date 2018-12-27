@@ -173,7 +173,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 
 	go func() {
 		for e := range roundC {
-			round := e.(types.TMEventData).(types.EventDataRoundState)
+			round := e.(types.TMEventData).(types.EventDataNewRound)
 			cs.TmMetrics.Rounds.Set(float64(round.Round))
 		}
 	}()

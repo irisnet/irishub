@@ -47,7 +47,7 @@ func TestInitGenesisParameter(t *testing.T) {
 			TallyingProcedureParameter.GetStoreKey(), TallyingProcedure{},
 		))
 	params.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
-	params.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
+	params.InitGenesisParameter(&DepositProcedureParameter, ctx, p1)
 
 	fmt.Println(DepositProcedureParameter.ToJson(""))
 	require.Equal(t, p1, DepositProcedureParameter.Value)
@@ -80,7 +80,7 @@ func TestRegisterParamMapping(t *testing.T) {
 		))
 	params.SetParamReadWriter(subspace, &DepositProcedureParameter, &DepositProcedureParameter)
 	params.RegisterGovParamMapping(&DepositProcedureParameter)
-	params.InitGenesisParameter(&DepositProcedureParameter, ctx, nil)
+	params.InitGenesisParameter(&DepositProcedureParameter, ctx, p1)
 
 	require.Equal(t, params.ParamMapping["Gov/"+string(DepositProcedureParameter.GetStoreKey())].ToJson(""),`{"critical_min_deposit":[{"denom":"iris-atto","amount":"4000000000000000000000"}],"important_min_deposit":[{"denom":"iris-atto","amount":"2000000000000000000000"}],"normal_min_deposit":[{"denom":"iris-atto","amount":"1000000000000000000000"}],"max_deposit_period":86400000000000}`)
 	require.Equal(t, p1, DepositProcedureParameter.Value)
@@ -241,7 +241,7 @@ func TestTallyingProcedureParam(t *testing.T) {
 	find := TallyingProcedureParameter.LoadValue(ctx)
 	require.Equal(t, find, false)
 
-	TallyingProcedureParameter.InitGenesis(nil)
+	TallyingProcedureParameter.InitGenesis(p1)
 	require.Equal(t, p1, TallyingProcedureParameter.Value)
 	require.Equal(t, "{\"threshold\":\"0.5000000000\",\"veto\":\"0.3340000000\",\"participation\":\"0.6670000000\"}", TallyingProcedureParameter.ToJson(""))
 

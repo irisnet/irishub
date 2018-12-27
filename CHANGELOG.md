@@ -94,7 +94,7 @@ FEATURES:
 * [iris]Add distribution module to distribute inflation token and collected transaction fee
 * [iriscli] --from can now be either an address or a key name
 * [iriscli] Passing --gas=simulate triggers a simulation of the tx before the actual execution. The gas estimate obtained via the simulation will be used as gas limit in the actual execution.
-* [iriscli]Add --bech to gaiacli keys show and respective REST endpoint to
+* [iriscli]Add --bech to iriscli keys show and respective REST endpoint to
 * [iriscli]Introduced new commission flags for validator commands create-validator and edit-validator
 * [iriscli]Add commands to query validator unbondings and redelegations
 * [iriscli]Add rest apis and commands for distribution

@@ -28,17 +28,23 @@ func resultBroadcastTxToCommit(res *ctypes.ResultBroadcastTx) *ctypes.ResultBroa
 // an intermediate structure which is logged if the context has a logger
 // defined.
 func (cliCtx CLIContext) BroadcastTx(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
-	if cliCtx.Async {
-		res, err := cliCtx.broadcastTxAsync(txBytes)
-		if err != nil {
-			return nil, err
-		}
-
-		resCommit := resultBroadcastTxToCommit(res)
-		return resCommit, err
+	// commit
+	if cliCtx.Commit {
+		return cliCtx.broadcastTxCommit(txBytes)
+	}
+	// sync
+	if !cliCtx.Async {
+		return cliCtx.broadcastTxSync(txBytes)
+	}
+	// async
+	res, err := cliCtx.broadcastTxAsync(txBytes)
+	if err != nil {
+		return nil, err
 	}
 
-	return cliCtx.broadcastTxCommit(txBytes)
+	resCommit := resultBroadcastTxToCommit(res)
+	return resCommit, err
+
 }
 
 // BroadcastTxAndAwaitCommit broadcasts transaction bytes to a Tendermint node
@@ -67,18 +73,24 @@ func (cliCtx CLIContext) BroadcastTxAndAwaitCommit(tx []byte) (*ctypes.ResultBro
 
 // BroadcastTxSync broadcasts transaction bytes to a Tendermint node
 // synchronously.
-func (cliCtx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTx, error) {
+func (cliCtx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
 
 	res, err := node.BroadcastTxSync(tx)
-	if err != nil {
-		return res, err
+
+	result := &ctypes.ResultBroadcastTxCommit{
+		Hash: res.Hash,
+		CheckTx: abci.ResponseCheckTx{
+			Code: res.Code,
+			Data: res.Data,
+			Log:  res.Log,
+		},
 	}
 
-	return res, err
+	return result, err
 }
 
 // BroadcastTxAsync broadcasts transaction bytes to a Tendermint node
@@ -95,6 +107,47 @@ func (cliCtx CLIContext) BroadcastTxAsync(tx []byte) (*ctypes.ResultBroadcastTx,
 	}
 
 	return res, err
+}
+
+func (cliCtx CLIContext) broadcastTxSync(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+	res, err := cliCtx.BroadcastTxSync(txBytes)
+	if err != nil {
+		return res, err
+	}
+
+	if cliCtx.Logger != nil {
+		if cliCtx.JSON {
+			// Since JSON is intended for automated scripts, always include response in
+			// JSON mode.
+			type toJSON struct {
+				TxHash   string
+				Response abci.ResponseCheckTx
+			}
+
+			if cliCtx.Logger != nil {
+				resJSON := toJSON{res.Hash.String(), res.CheckTx}
+				bz, err := cliCtx.Codec.MarshalJSON(resJSON)
+				if err != nil {
+					return res, err
+				}
+
+				cliCtx.Logger.Write(bz)
+				io.WriteString(cliCtx.Logger, "\n")
+			}
+
+			return res, nil
+		} else {
+			resStr := fmt.Sprintf("sync tx sent (tx hash: %s)\n", res.Hash)
+			if cliCtx.PrintResponse {
+				jsonStr, _ := checkTxMarshalIndentJSON(res.CheckTx)
+				resStr = fmt.Sprintf("Sync committed (tx hash: %s, response:\n %+v)\n", res.Hash, string(jsonStr))
+			}
+
+			io.WriteString(cliCtx.Logger, resStr)
+		}
+	}
+
+	return res, nil
 }
 
 func (cliCtx CLIContext) broadcastTxAsync(txBytes []byte) (*ctypes.ResultBroadcastTx, error) {
@@ -200,6 +253,36 @@ func deliverTxMarshalIndentJSON(dtx abci.ResponseDeliverTx) ([]byte, error) {
 		GasWanted: dtx.GasWanted,
 		GasUsed:   dtx.GasUsed,
 		Codespace: dtx.Codespace,
+		Tags:      tags,
+	}, " ", "  ")
+}
+
+func checkTxMarshalIndentJSON(ctx abci.ResponseCheckTx) ([]byte, error) {
+	tags := make([]ReadableTag, len(ctx.Tags))
+	for i, kv := range ctx.Tags {
+		tags[i] = ReadableTag{
+			Key:   string(kv.Key),
+			Value: string(kv.Value),
+		}
+	}
+
+	return json.MarshalIndent(&struct {
+		Code      uint32        `json:"code"`
+		Data      []byte        `json:"data"`
+		Log       string        `json:"log"`
+		Info      string        `json:"info"`
+		GasWanted int64         `json:"gas_wanted"`
+		GasUsed   int64         `json:"gas_used"`
+		Tags      []ReadableTag `json:"tags,omitempty"`
+		Codespace string        `json:"codespace"`
+	}{
+		Code:      ctx.Code,
+		Data:      ctx.Data,
+		Log:       ctx.Log,
+		Info:      ctx.Info,
+		GasWanted: ctx.GasWanted,
+		GasUsed:   ctx.GasUsed,
+		Codespace: ctx.Codespace,
 		Tags:      tags,
 	}, " ", "  ")
 }

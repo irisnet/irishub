@@ -2,6 +2,9 @@ package v0
 
 import (
 	"fmt"
+	"sort"
+	"time"
+
 	"github.com/irisnet/irishub/app/protocol"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
@@ -11,7 +14,6 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
@@ -21,18 +23,21 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"sort"
-	"time"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/irisnet/irishub/types/gov/params"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)
 
 type ProtocolVersion0 struct {
-	pb  *protocol.ProtocolBase
-	cdc *codec.Codec
+	pb             *protocol.ProtocolBase
+	cdc            *codec.Codec
+	logger         log.Logger
+	invariantLevel string
 
 	// Manage getting and setting accounts
 	accountMapper       auth.AccountKeeper
@@ -65,7 +70,7 @@ type ProtocolVersion0 struct {
 
 }
 
-func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
+func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string) *ProtocolVersion0 {
 	base := protocol.ProtocolBase{
 		Definition: sdk.ProtocolDefinition{
 			uint64(0),
@@ -75,10 +80,12 @@ func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
 		//		engine: engine,
 	}
 	p0 := ProtocolVersion0{
-		pb:          &base,
-		cdc:         cdc,
-		router:      protocol.NewRouter(),
-		queryRouter: protocol.NewQueryRouter(),
+		pb:             &base,
+		cdc:            cdc,
+		logger:         log,
+		invariantLevel: invariantLevel,
+		router:         protocol.NewRouter(),
+		queryRouter:    protocol.NewQueryRouter(),
 	}
 	return &p0
 }
@@ -232,22 +239,22 @@ func (p *ProtocolVersion0) configParams() {
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
 			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
 			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			serviceparams.MaxRequestTimeoutParameter.GetStoreKey(), int64(0),
-			serviceparams.MinDepositMultipleParameter.GetStoreKey(), int64(0),
+			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
+			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
 			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
 		)),
 		&govparams.DepositProcedureParameter,
 		&govparams.VotingProcedureParameter,
 		&govparams.TallyingProcedureParameter,
-		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinDepositMultipleParameter,
+		&upgradeparams.UpgradeParameter,
+		&serviceparams.ServiceParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
 
 	params.RegisterGovParamMapping(
-		&serviceparams.MaxRequestTimeoutParameter,
-		&serviceparams.MinDepositMultipleParameter)
+		&upgradeparams.UpgradeParameter,
+		&serviceparams.ServiceParameter)
 }
 
 // application updates every end block

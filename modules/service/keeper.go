@@ -1,16 +1,16 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tools/protoidl"
-	"github.com/irisnet/irishub/modules/bank"
 	"fmt"
-	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/arbitration/params"
-	"time"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/tools/protoidl"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
+	"time"
 )
 
 var DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
@@ -446,7 +446,7 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 
 // Add incoming fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
-	feeTax := k.GetServiceFeeTax(ctx)
+	feeTax := serviceparams.GetServiceFeeTax(ctx)
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
@@ -490,44 +490,6 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetIncomingFeeKey(address))
 	return nil
-}
-
-//__________________________________________________________________________
-
-func (k Keeper) GetServiceFeeTax(ctx sdk.Context) sdk.Dec {
-	var percent sdk.Dec
-	store := ctx.KVStore(k.storeKey)
-	value := store.Get(serviceFeeTaxKey)
-	if value == nil {
-		return sdk.Dec{}
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &percent)
-	return percent
-}
-
-func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
-	store.Set(serviceFeeTaxKey, bz)
-}
-
-//__________________________________________________________________________
-
-func (k Keeper) GetServiceSlashFraction(ctx sdk.Context) sdk.Dec {
-	var fraction sdk.Dec
-	store := ctx.KVStore(k.storeKey)
-	value := store.Get(serviceSlashFractionKey)
-	if value == nil {
-		return sdk.Dec{}
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fraction)
-	return fraction
-}
-
-func (k Keeper) SetServiceSlashFraction(ctx sdk.Context, fraction sdk.Dec) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fraction)
-	store.Set(serviceSlashFractionKey, bz)
 }
 
 func (k Keeper) Slash(ctx sdk.Context, binding SvcBinding, slashCoins sdk.Coins) sdk.Error {

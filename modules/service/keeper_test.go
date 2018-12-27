@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestKeeper_service_Definition(t *testing.T) {

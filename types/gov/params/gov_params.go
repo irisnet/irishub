@@ -35,7 +35,7 @@ const (
 
 var _ params.GovParameter = (*DepositProcedureParam)(nil)
 
-type ParamSet struct {
+type Params struct {
 	DepositProcedure  DepositProcedure  `json:"Gov/govDepositProcedure"`
 	VotingProcedure   VotingProcedure   `json:"Gov/govVotingProcedure"`
 	TallyingProcedure TallyingProcedure `json:"Gov/govTallyingProcedure"`
@@ -75,7 +75,7 @@ func (param *DepositProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(DepositProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = NewDepositProcedure()
+		panic("The govDepositProcedure in GenesisState is empty. ")
 	}
 }
 
@@ -196,7 +196,7 @@ func (param *VotingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(VotingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = NewVotingProcedure()
+		panic("The govVotingProcedure in GenesisState is empty. ")
 	}
 }
 
@@ -330,7 +330,7 @@ func (param *TallyingProcedureParam) InitGenesis(genesisState interface{}) {
 	if value, ok := genesisState.(TallyingProcedure); ok {
 		param.Value = value
 	} else {
-		param.Value = NewTallyingProcedure()
+		panic("The govTallyingProcedure in GenesisState is empty. ")
 	}
 }
 
