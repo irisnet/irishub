@@ -29,8 +29,9 @@ func DefaultGenesisState() GenesisState {
 }
 
 // Init store state from genesis data
-func InitGenesis(ctx sdk.Context, keeper FeeCollectionKeeper, data GenesisState, ps FeeManager, params FeeGenesisStateConfig) {
+func InitGenesis(ctx sdk.Context, keeper FeeCollectionKeeper, accountKeeper AccountKeeper, data GenesisState, ps FeeManager, params FeeGenesisStateConfig) {
 	keeper.setCollectedFees(ctx, data.CollectedFees)
+	accountKeeper.IncreaseTotalLoosenToken(ctx, data.CollectedFees)
 
 	ps.paramSpace.Set(ctx, nativeFeeTokenKey, params.FeeTokenNative)
 	ps.paramSpace.Set(ctx, nativeGasPriceThresholdKey, sdk.NewInt(params.GasPriceThreshold).String())
