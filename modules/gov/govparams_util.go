@@ -1,8 +1,8 @@
 package gov
 
 import (
+	"github.com/irisnet/irishub/modules/gov/params"
 	sdk "github.com/irisnet/irishub/types"
-	 "github.com/irisnet/irishub/modules/gov/params"
 
 	"time"
 )
@@ -15,11 +15,11 @@ type ProposalLevel byte
 
 //nolint
 const (
-	ProposalLevelNil        ProposalLevel = 0x00
-	ProposalLevelCritical   ProposalLevel = 0x01
-	ProposalLevelImportant  ProposalLevel = 0x02
+	ProposalLevelNil       ProposalLevel = 0x00
+	ProposalLevelCritical  ProposalLevel = 0x01
+	ProposalLevelImportant ProposalLevel = 0x02
 	////////////////////  iris begin  /////////////////////////////
-	ProposalLevelNormal     ProposalLevel = 0x03
+	ProposalLevelNormal ProposalLevel = 0x03
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -28,30 +28,30 @@ func (p ProposalLevel) string() string {
 	case ProposalLevelCritical:
 		return "ciritical"
 	case ProposalLevelImportant:
-		return  "important"
+		return "important"
 	case ProposalLevelNormal:
 		return "normal"
 	default:
-		return  " "
+		return " "
 	}
 }
 
-func GetProposalLevel(p  Proposal) ProposalLevel {
+func GetProposalLevel(p Proposal) ProposalLevel {
 	return GetProposalLevelByProposalKind(p.GetProposalType())
 }
 
-func GetProposalLevelByProposalKind(p  ProposalKind) ProposalLevel {
+func GetProposalLevelByProposalKind(p ProposalKind) ProposalLevel {
 	switch p {
-	case  ProposalTypeTxTaxUsage:
+	case ProposalTypeTxTaxUsage:
 		return ProposalLevelNormal
-	case  ProposalTypeParameterChange:
+	case ProposalTypeParameterChange:
 		return ProposalLevelImportant
-	case  ProposalTypeSoftwareHalt:
+	case ProposalTypeSoftwareHalt:
 		return ProposalLevelCritical
-	case  ProposalTypeSoftwareUpgrade:
+	case ProposalTypeSoftwareUpgrade:
 		return ProposalLevelCritical
 	default:
-		return  ProposalLevelNil
+		return ProposalLevelNil
 	}
 }
 
@@ -61,7 +61,7 @@ func GetDepositProcedure(ctx sdk.Context) govparams.DepositProcedure {
 	return govparams.DepositProcedureParameter.Value
 }
 
-func GetMinDeposit(ctx sdk.Context, p  Proposal) sdk.Coins {
+func GetMinDeposit(ctx sdk.Context, p Proposal) sdk.Coins {
 	govparams.DepositProcedureParameter.LoadValue(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
@@ -71,7 +71,7 @@ func GetMinDeposit(ctx sdk.Context, p  Proposal) sdk.Coins {
 	case ProposalLevelNormal:
 		return govparams.DepositProcedureParameter.Value.NormalMinDeposit
 	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
 }
 
@@ -80,14 +80,13 @@ func GetDepositPeriod(ctx sdk.Context) time.Duration {
 	return govparams.DepositProcedureParameter.Value.MaxDepositPeriod
 }
 
-
 // Returns the current Voting Procedure from the global param store
 func GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
 	govparams.VotingProcedureParameter.LoadValue(ctx)
 	return govparams.VotingProcedureParameter.Value
 }
 
-func GetVotingPeriod(ctx sdk.Context, p  Proposal) time.Duration {
+func GetVotingPeriod(ctx sdk.Context, p Proposal) time.Duration {
 	govparams.VotingProcedureParameter.LoadValue(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
@@ -97,7 +96,7 @@ func GetVotingPeriod(ctx sdk.Context, p  Proposal) time.Duration {
 	case ProposalLevelNormal:
 		return govparams.VotingProcedureParameter.Value.NormalVotingPeriod
 	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
 }
 
@@ -107,7 +106,7 @@ func GetTallyingProcedure(ctx sdk.Context) govparams.TallyingProcedure {
 	return govparams.TallyingProcedureParameter.Value
 }
 
-func GetTallyingCondition(ctx sdk.Context,p  Proposal) govparams.TallyCondition {
+func GetTallyingCondition(ctx sdk.Context, p Proposal) govparams.TallyCondition {
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
 		return govparams.TallyingProcedureParameter.Value.CriticalCondition
@@ -116,6 +115,6 @@ func GetTallyingCondition(ctx sdk.Context,p  Proposal) govparams.TallyCondition 
 	case ProposalLevelNormal:
 		return govparams.TallyingProcedureParameter.Value.NormalCondition
 	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
 }

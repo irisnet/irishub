@@ -1,10 +1,10 @@
 package gov
 
 import (
+	"encoding/json"
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
-	"encoding/json"
 )
 
 type UsageType byte
@@ -105,5 +105,3 @@ type TaxUsageProposal struct {
 	DestAddress sdk.AccAddress
 	Percent     sdk.Dec
 }
-
-

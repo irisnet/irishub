@@ -63,7 +63,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		guardianKeeper,
 		stakeKeeper,
 		protocolKeeper,
-		 DefaultCodespace,
+		 gov.DefaultCodespace,
 	)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))

@@ -2,7 +2,7 @@ package gov
 
 import (
 	"github.com/irisnet/irishub/codec"
-	 "github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/gov/params"
 )
 
 // Register concrete types on codec codec

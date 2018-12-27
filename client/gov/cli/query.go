@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -86,7 +86,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(strProposalStatus) != 0 {
-				proposalStatus, err :=  gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
+				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 				if err != nil {
 					return err
 				}
@@ -199,7 +199,7 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			if res == nil {
 				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
-				return  nil
+				return nil
 			}
 
 			fmt.Println(string(res))
@@ -428,7 +428,7 @@ func printModuleList(res []sdk.KVPair) (err error) {
 }
 
 func printParamStr(p params.GovParameter, keyStr string) {
-	var param  gov.Param
+	var param gov.Param
 	param.Key = keyStr
 	param.Value = p.ToJson("")
 	param.Op = ""

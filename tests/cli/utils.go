@@ -328,27 +328,27 @@ func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	return proposal
 }
 
-func executeGetVote(t *testing.T, cmdStr string)  Vote {
+func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var vote  Vote
+	var vote  gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return vote
 }
 
-func executeGetVotes(t *testing.T, cmdStr string) [] Vote {
+func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var votes [] Vote
+	var votes [] gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
 }
 
-func executeGetParam(t *testing.T, cmdStr string)  Param {
+func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var param  Param
+	var param  gov.Param
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

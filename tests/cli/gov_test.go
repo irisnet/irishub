@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"testing"
 	"github.com/irisnet/irishub/app/v0"
-
+    "github.com/irisnet/irishub/modules/gov"
 )
 
 func TestIrisCLISubmitProposal(t *testing.T) {
@@ -55,7 +55,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, uint64(1), proposal1.ProposalID)
-	require.Equal(t,  StatusDepositPeriod, proposal1.Status)
+	require.Equal(t,  gov.StatusDepositPeriod, proposal1.Status)
 
 	proposalsQuery, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
 	require.Equal(t, "  1 - Test", proposalsQuery)
@@ -79,7 +79,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, uint64(1), proposal1.ProposalID)
-	require.Equal(t,  StatusVotingPeriod, proposal1.Status)
+	require.Equal(t,  gov.StatusVotingPeriod, proposal1.Status)
 
 	voteStr := fmt.Sprintf("iriscli gov vote %v", flags)
 	voteStr += fmt.Sprintf(" --from=%s", "foo")
@@ -92,12 +92,12 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 
 	vote := executeGetVote(t, fmt.Sprintf("iriscli gov query-vote --proposal-id=1 --voter=%s --output=json %v", fooAddr, flags))
 	require.Equal(t, uint64(1), vote.ProposalID)
-	require.Equal(t,  OptionYes, vote.Option)
+	require.Equal(t,  gov.OptionYes, vote.Option)
 
 	votes := executeGetVotes(t, fmt.Sprintf("iriscli gov query-votes --proposal-id=1 --output=json %v", flags))
 	require.Len(t, votes, 1)
 	require.Equal(t, uint64(1), votes[0].ProposalID)
-	require.Equal(t,  OptionYes, votes[0].Option)
+	require.Equal(t,  gov.OptionYes, votes[0].Option)
 
 	proposalsQuery, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals --status=DepositPeriod %v", flags), "")
 	require.Equal(t, "No matching proposals found", proposalsQuery)
@@ -108,7 +108,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	tests.WaitForNextNBlocksTM(20, port)
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
 	require.Equal(t, uint64(1), proposal1.ProposalID)
-	require.Equal(t,  StatusPassed, proposal1.Status)
+	require.Equal(t,  gov.StatusPassed, proposal1.Status)
 
 	// submit a second test proposal
 	spStr = fmt.Sprintf("iriscli gov submit-proposal %v", flags)

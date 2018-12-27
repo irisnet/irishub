@@ -114,7 +114,7 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 
 func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) (msg gov.MsgSubmitProposal, err error) {
 	deposit := randomDeposit(r)
-	param :=  Param{
+	param :=  gov.Param{
 		Key:   "test",
 		Value: "value",
 		Op: "insert",
@@ -122,7 +122,7 @@ func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) 
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
 		simulation.RandStringOfLength(r, 5),
-		 ProposalTypeSoftwareHalt,
+		 gov.ProposalTypeSoftwareHalt,
 		sender.Address,
 		deposit,
 		param,
@@ -219,16 +219,16 @@ func randomProposalID(r *rand.Rand, k gov.Keeper, ctx sdk.Context) (proposalID i
 }
 
 // Pick a random voting option
-func randomVotingOption(r *rand.Rand)  VoteOption {
+func randomVotingOption(r *rand.Rand)  gov.VoteOption {
 	switch r.Intn(4) {
 	case 0:
-		return  OptionYes
+		return  gov.OptionYes
 	case 1:
-		return  OptionAbstain
+		return  gov.OptionAbstain
 	case 2:
-		return  OptionNo
+		return  gov.OptionNo
 	case 3:
-		return  OptionNoWithVeto
+		return  gov.OptionNoWithVeto
 	}
 	panic("should not happen")
 }
