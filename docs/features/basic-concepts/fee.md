@@ -18,6 +18,6 @@ The total gas needed for executing the transaction is the sum of gas needed for 
 
 Example
 ```
-    iriscli stake unbond complete --from=test --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy --address-delegator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=2000000000000000iris --gas=20000 --chain-id=test
+    iriscli stake unbond  --from=test --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy --address-delegator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.02iris --gas=20000 --chain-id=test-irishub
 ```
 This example is a transaction to complete the unbond operation. The maximum fee(--fee) is set to be 2000000000000000iris(2*10^15) and the maximum(--gas) gas is set to be 20000. Therefore, the gas price here is 10^11iris/gas. Suppose that 1500 gas is used to execute the transaction, then 1500000000000000 iris will be paid to validators and lefted 500000000000000 iris will be returned to user.

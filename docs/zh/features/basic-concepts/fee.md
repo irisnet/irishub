@@ -23,7 +23,7 @@ Gas价格 = 手续费上限 / Gas上限，代表用户为每个单位的资源�
 
 例子
 ```
-    iriscli stake unbond begin --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.05iris --gas=200000 --chain-id=test
+    iriscli stake unbond  --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.05iris --gas=200000 --chain-id=test-irishub
 ```
 
 在这个例子中执行的是完成解绑操作，这里设定的手续费上限(--fee)为2000000000000000iris(2*10^15)，Gas上限(--gas)为20000，Gas价格就是10^11iris/Gas。假设执行交易总共需要1500个Gas，那么会有1500000000000000iris的手续费被支付给验证人节点；剩余的500000000000000iris会被退还给用户。

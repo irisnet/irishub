@@ -15,6 +15,7 @@ iriscli upgrade [command]
 | 命令                    | 描述                                               |
 | ------------- | ------------------------------------- |
 | [info](info.md)                   | 查询软件升级模块的信息|
+|[query-signals](query-signals.md)|查询软件升级过程中signal的信息|
 
 ## 标志
 

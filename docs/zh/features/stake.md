@@ -108,14 +108,14 @@
 
 	解绑一半的token
 	```
-	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.004iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator={address-validator} --chain-id={chain-id} --from=<key name> --fee=0.004iris  --amount=100iris --share-percent=0.5
 	```
 
 8. 转委托
 
       转委托一半的token到另外一个验证人节点
 	```
-	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
+	iriscli stake redelegate --chain-id={chain-id} --from={key-name} --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
 	```
 
 

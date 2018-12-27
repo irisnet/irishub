@@ -2,9 +2,12 @@
 
 ## Basic Function Description
 
+
 1. On-chain governance proposals on text
 2. On-chain governance proposals on parameter change
 3. On-chain governance proposals on software upgrade 
+4. On-chain governance proposals on software halt
+5. On-chain governance proposals on tax usage
 
 ## Interactive process
 
