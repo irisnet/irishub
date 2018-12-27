@@ -197,7 +197,7 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		GasPriceThreshold: 0, // for mock test
 	}
 
-	auth.InitGenesis(ctx, app.FeeCollectionKeeper, auth.DefaultGenesisState(), app.FeeManager, feeTokenGensisConfig)
+	auth.InitGenesis(ctx, app.FeeCollectionKeeper, app.AccountKeeper, auth.DefaultGenesisState(), app.FeeManager, feeTokenGensisConfig)
 
 	return abci.ResponseInitChain{}
 }

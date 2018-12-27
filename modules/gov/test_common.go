@@ -96,7 +96,6 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		InitGenesis(ctx, keeper, GenesisState{
-			StartingProposalID: 1,
 			DepositProcedure: govparams.NewDepositProcedure(),
 			VotingProcedure: govparams.NewVotingProcedure(),
 			TallyingProcedure: govparams.NewTallyingProcedure(),
