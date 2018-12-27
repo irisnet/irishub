@@ -17,7 +17,10 @@ const defaultConfigTemplate = `# This is a TOML config file.
 minimum_fees = "{{ .BaseConfig.MinFees }}"
 
 
-# Enable invariant checking, valid values: error and panic. Just leave it empty if you want to disable invariant checking
+# Invariant failure handle level, valid values: 
+# 	1. error: just print error message for invariant failure
+# 	2. panic: panic and abort program for invariant failure 
+# For any other values, invariant checking will be disabled
 invariant_level = "{{ .BaseConfig.InvariantLevel }}"
 `
 
