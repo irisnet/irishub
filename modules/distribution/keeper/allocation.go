@@ -47,8 +47,13 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding)
 	feePool.ValPool = feePool.ValPool.Plus(poolReceived)
 
-	k.SetValidatorDistInfo(ctx, proposerDist)
-	k.SetFeePool(ctx, feePool)
+	validator := k.stakeKeeper.Validator(ctx, proposerValidator.GetOperator())
+	// If a validator is jailed, distribute no reward to it
+	// The jailed validator happen to be a proposor which is a corner case
+	if !validator.GetJailed() {
+		k.SetValidatorDistInfo(ctx, proposerDist)
+		k.SetFeePool(ctx, feePool)
+	}
 
 	// clear the now distributed fees
 	k.feeCollectionKeeper.ClearCollectedFees(ctx)
