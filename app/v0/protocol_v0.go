@@ -327,7 +327,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	}
 
 	// load the address to pubkey map
-	auth.InitGenesis(ctx, p.feeCollectionKeeper, genesisState.AuthData, p.feeManager, feeTokenGensisConfig)
+	auth.InitGenesis(ctx, p.feeCollectionKeeper, p.accountMapper, genesisState.AuthData, p.feeManager, feeTokenGensisConfig)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
 	mint.InitGenesis(ctx, p.mintKeeper, genesisState.MintData)
 	distr.InitGenesis(ctx, p.distrKeeper, genesisState.DistrData)

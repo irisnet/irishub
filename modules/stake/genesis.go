@@ -57,6 +57,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	for _, ubd := range data.UnbondingDelegations {
 		keeper.SetUnbondingDelegation(ctx, ubd)
 		keeper.InsertUnbondingQueue(ctx, ubd)
+		pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{ubd.Balance})
 	}
 
 	sort.SliceStable(data.Redelegations[:], func(i, j int) bool {
