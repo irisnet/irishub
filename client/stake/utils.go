@@ -93,7 +93,6 @@ type ValidatorOutput struct {
 	DelegatorShares    string            `json:"delegator_shares"`
 	Description        stake.Description `json:"description"`
 	BondHeight         int64             `json:"bond_height"`
-	BondIntraTxCounter int16             `json:"bond_intra_tx_counter"`
 	UnbondingHeight    int64             `json:"unbonding_height"`
 	UnbondingMinTime   time.Time         `json:"unbonding_time"`
 	Commission         Commission        `json:"commission"`
