@@ -3277,27 +3277,29 @@ definitions:
               $ref: "#/definitions/Coin"
       memo:
         type: string
-      signature:
-        type: object
-        properties:
-          signature:
-            type: string
-            example: MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
-          pub_key:
-            type: object
-            properties:
-              type:
-                type: string
-                example: "tendermint/PubKeySecp256k1"
-              value:
-                type: string
-                example: "Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH"
-          account_number:
-            type: string
-            example: "0"
-          sequence:
-            type: string
-            example: "0"
+      signatures:
+        type: array
+        items:
+          type: object
+          properties:
+            signature:
+              type: string
+              example: MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
+            pub_key:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: "tendermint/PubKeySecp256k1"
+                value:
+                  type: string
+                  example: "Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH"
+            account_number:
+              type: string
+              example: "0"
+            sequence:
+              type: string
+              example: "0"
   KeyOutput:
     type: object
     properties:
