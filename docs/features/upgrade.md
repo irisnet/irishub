@@ -7,7 +7,7 @@ The module supports the infrastructure of the blockchain software upgrade. It wi
 ## Interaction Process
 
 ###  Governance process of software upgrade proposal
-1. Submit a software upgrade proposal
+1. Submit a software upgrade proposal and vote to make the proposal pass
 2. More details about governance process is in GOV [User Guide](governance.md)
 
 ### The process of software upgrade   
@@ -96,20 +96,9 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * Other parameters can be referrenced in [Gov User Guide](governance.md)
 * Only profiler can submit the software upgrade proposal.
 
-```
-iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
-```
-
-* `--proposalID` The ID of passed software upgrade proposals 
-
-```
-iris start --replay
-```
-
-* Resynchronize the block, clean the dirty AppHash
+Query the version details of current software 
 
 ```
 iriscli upgrade info --trust-node
 ```
 
-* Query the version details of current software 

@@ -33,33 +33,6 @@ iriscli gov submit-proposal --help
 
 ## Examples
 
-### Submit a 'Text' type proposal
-
-```shell
-iriscli gov submit-proposal --chain-id=test --title="notice proposal" --type=Text --description="a new text proposal" --from=node0 --fee=0.01iris
-```
-
-After you enter the correct password, you're done with submitting a new proposal, and then remember to back up your proposal-id, it's the only way to retrieve your proposal.
-
-```txt
-Committed at block 13 (tx hash: 234463E89B5641F9271113D72B28CA088F641DD8A63DB57257B7CAF90ED5A1C3, response:
- {
-   "code": 0,
-   "data": "MQ==",
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 200000,
-   "gas_used": 6608,
-   "codespace": "",
-   "tags": {
-     "action": "submit_proposal",
-     "param": "",
-     "proposal-id": "1",
-     "proposer": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz"
-   }
- })
-```
-
 ### Submit a 'ParameterChange' type proposal
 
 ```shell
