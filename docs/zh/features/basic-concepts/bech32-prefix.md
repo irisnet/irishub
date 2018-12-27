@@ -29,3 +29,15 @@ test1	local	faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl	fap1addwnpepqgxa40ww28uy9
 
 这意味着你创建了一个新账户地址 `faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`， 他的用户可读部分是 `faa`。他的公钥被密码成  `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`， 他的用户可读部分是 `fap`。 
 
+ ## 验证人密钥例子
+ 
+在执行 `iris init`命令时回自动产生一个Tendermint的共识密钥给该节点。你可以通过以下命令查询：
+   
+  ```
+  iris tendermint show-validator
+  ```
+
+ 示例输出:
+  ```
+  fcp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
+```
