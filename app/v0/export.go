@@ -176,4 +176,7 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	/* Handle gov state. */
 
 	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
+
+	/* Handle service state. */
+	service.PrepForZeroHeightGenesis(ctx, p.serviceKeeper)
 }
