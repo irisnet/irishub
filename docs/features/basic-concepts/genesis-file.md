@@ -1,6 +1,9 @@
 # Genesis File
 
 The Genesis file is the basis for the entire network initialization，which contains most info for creating a Genesis block (such as ChainID, consensus params,app state), initialize account balances, parameters for each module, and validators info.
+The genesis file sets the initial parameters of any new IRIS network. Establishing a robust social consensus over the genesis file is critical to starting a network.
+
+Each genesis state starts with a list of account balances. Social consensus on these account balances must be bootstrapped from some external process be it events on another blockchain to a token generation event.
 
 ## Basic State
 
@@ -51,3 +54,5 @@ The Genesis file is the basis for the entire network initialization，which cont
 ## Gentxs
 
 Gentxs contains the transaction set of creating validators in genesis block. 
+The IRIS SDK provides robust tools for bootstrapping the identities that will start chain via the gen-tx process. gen-tx or a Genesis Transaction are cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
+The gen-txs are artifacts that prove that the holders of accounts consent in launching the network and that they putting capital at risk in the process.

@@ -22,17 +22,17 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release v0.7.0 on your computer.
+then get the release v0.9.0 on your computer.
 `unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/ ` 
 
 You can verify you have the right version installed by running the following commands:
 
 ```
 $ iris version
-v0.7.0
+v0.9.0
 
 $ iriscli version
-v0.7.0
+v0.9.0
 ```
 
 #### Compile Source Code
@@ -95,7 +95,7 @@ Make sure that you can access to google.com for that our project used some libra
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.7.0
+cd irishub && git checkout v0.9.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make all
 ```
@@ -105,9 +105,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.7.0
+v0.9.0
 $ iriscli version
-v0.7.0
+v0.9.0
 ```
 
 ### How to Update
@@ -115,10 +115,10 @@ v0.7.0
 Get latest code (you can also `git fetch` only the version desired), ensure the dependencies are up to date, then recompile.
 
 ```
-iris unsafe_reset_all --home
+iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.7.0
+git checkout v0.9.0
 make get_vendor_deps
 make install
 ```
