@@ -35,6 +35,7 @@ import (
 const (
 	appName          = "IrisApp"
 	FlagReplayHeight = "replay_height"
+	FlagReplay       = "replay"
 	//Keep snapshot every at syncable height
 	DefaultSyncableHeight = 10000
 )
@@ -73,6 +74,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		loadHeight := app.replayToHeight(replayHeight, app.Logger)
 		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
 		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	} else if viper.GetBool(FlagReplay) {
+		lastHeight := Replay(app.Logger)
+		err = app.LoadVersion(lastHeight, engine.GetKeyMain(), true)
 	} else {
 		err = app.LoadLatestVersion(engine.GetKeyMain())
 	}
