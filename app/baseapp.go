@@ -206,6 +206,13 @@ func (app *BaseApp) initFromMainStore(mainKey *sdk.KVStoreKey) error {
 	return nil
 }
 
+func (app *BaseApp) SetProtocolEngine(pe *protocol.ProtocolEngine) {
+	if app.sealed {
+		panic("SetProtocolEngine() on sealed BaseApp")
+	}
+	app.Engine = pe
+}
+
 // SetMinimumFees sets the minimum fees.
 func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
 
