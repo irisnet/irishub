@@ -4,22 +4,22 @@ import (
 	"os"
 	"path"
 
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
+	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
-	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
-	irisInit "github.com/irisnet/irishub/init"
+	"github.com/irisnet/irishub/client/utils"
+	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -67,12 +67,12 @@ func main() {
 	bankCmd.AddCommand(
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
-			bankcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			bankcmd.GetAccountCmd("acc", cdc, utils.GetAccountDecoder(cdc)),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
-			bankcmd.GetSignCommand(cdc, authcmd.GetAccountDecoder(cdc)),
+			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			bankcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
@@ -140,6 +140,7 @@ func main() {
 			stakecmd.GetCmdQueryDelegations("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorDelegations("stake", cdc),
 			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
 			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
 			stakecmd.GetCmdQueryRedelegation("stake", cdc),
@@ -169,11 +170,6 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetInfoCmd("upgrade", cdc),
-			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-		)...)
-	upgradeCmd.AddCommand(
-		client.PostCommands(
-			upgradecmd.GetCmdSubmitSwitch(cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,
@@ -204,6 +200,7 @@ func main() {
 		servicecmd.GetCmdSvcRespond(cdc),
 		servicecmd.GetCmdSvcRefundFees(cdc),
 		servicecmd.GetCmdSvcWithdrawFees(cdc),
+		servicecmd.GetCmdSvcWithdrawTax(cdc),
 	)...)
 
 	rootCmd.AddCommand(

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = 25
+	DefaultCodespace sdk.CodespaceType = "guardian"
 
 	CodeProfilerExists      sdk.CodeType = 100
 	CodeProfilerNotExists   sdk.CodeType = 101

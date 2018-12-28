@@ -16,7 +16,7 @@ iriscli tendermint tx [hash] [flags]
 | Name, shorthand | Default                    |Description                                                             | Required     |
 | --------------- | -------------------------- | --------------------------------------------------------- | -------- |
 | --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to (default "tcp://localhost:26657")  |                                     
+| --node string     |   tcp://localhost:26657                         | Node to connect to (default "tcp://localhost:26657")  |                 
 | --help, -h      |       | 	help for tx|    |
 | --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
 

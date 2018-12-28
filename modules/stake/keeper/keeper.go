@@ -112,10 +112,36 @@ func (k Keeper) SetLastValidatorPower(ctx sdk.Context, operator sdk.ValAddress, 
 	store.Set(GetLastValidatorPowerKey(operator), bz)
 }
 
+// Iterate over last validator powers.
+func (k Keeper) IterateLastValidatorPowers(ctx sdk.Context, handler func(operator sdk.ValAddress, power sdk.Int) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, LastValidatorPowerKey)
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+		addr := sdk.ValAddress(iter.Key()[len(LastValidatorPowerKey):])
+		var power sdk.Int
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &power)
+		if handler(addr, power) {
+			break
+		}
+	}
+}
+
 // Delete the last validator power.
 func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetLastValidatorPowerKey(operator))
+}
+
+// looseToken handle when burn tokens
+func (k Keeper) BurnAmount(ctx sdk.Context, amount sdk.Dec) {
+	pool := k.GetPool(ctx)
+	pool.LooseTokens = pool.LooseTokens.Sub(amount)
+	k.SetPool(ctx, pool)
+}
+
+func (k Keeper) GetStakeDenom(ctx sdk.Context) string {
+	return types.StakeDenom
 }
 
 //__________________________________________________________________________

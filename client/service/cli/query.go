@@ -1,17 +1,17 @@
 package cli
 
 import (
-	"os"
 	"fmt"
+	"os"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/client/context"
+	cmn "github.com/irisnet/irishub/client/service"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/service"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/client/context"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
-	cmn "github.com/irisnet/irishub/client/service"
 )
 
 const NULL = "null"
@@ -23,7 +23,7 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli service definition --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
@@ -60,9 +60,9 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
 	return cmd
 }
 
@@ -73,7 +73,7 @@ func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli service binding --def-chain-id=<chain-id> --service-name=<service name> --bind-chain-id=<chain-id> --provider=<provider>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
@@ -102,11 +102,12 @@ func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
-	cmd.Flags().AddFlagSet(FsBindChainID)
-	cmd.Flags().AddFlagSet(FsProvider)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.Flags().AddFlagSet(FsServiceBinding)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
+	cmd.MarkFlagRequired(FlagBindChainID)
+	cmd.MarkFlagRequired(FlagProvider)
 	return cmd
 }
 
@@ -117,7 +118,7 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli service bindings --def-chain-id=<chain-id> --service-name=<service name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
@@ -142,9 +143,9 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsServiceName)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
 	return cmd
 }
 
@@ -156,7 +157,7 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 			"--bind-chain-id=<bind-chain-id> --provider=<provider>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
@@ -188,11 +189,12 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceName)
-	cmd.Flags().AddFlagSet(FsDefChainID)
-	cmd.Flags().AddFlagSet(FsBindChainID)
-	cmd.Flags().AddFlagSet(FsProvider)
-
+	cmd.Flags().AddFlagSet(FsServiceDefinition)
+	cmd.Flags().AddFlagSet(FsServiceBinding)
+	cmd.MarkFlagRequired(FlagDefChainID)
+	cmd.MarkFlagRequired(FlagServiceName)
+	cmd.MarkFlagRequired(FlagBindChainID)
+	cmd.MarkFlagRequired(FlagProvider)
 	return cmd
 }
 
@@ -203,7 +205,7 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli service response --request-chain-id=<req-chain-id> --request-id=<request-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			reqChainId := viper.GetString(FlagReqChainId)
 			reqId := viper.GetString(FlagReqId)
@@ -232,9 +234,10 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsReqChainId)
-	cmd.Flags().AddFlagSet(FsReqId)
-
+	cmd.Flags().String(FlagReqChainId, "", "the ID of the blockchain that the service invocation initiated")
+	cmd.Flags().String(FlagReqId, "", "the ID of the service invocation")
+	cmd.MarkFlagRequired(FlagReqChainId)
+	cmd.MarkFlagRequired(FlagReqId)
 	return cmd
 }
 
@@ -246,7 +249,7 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			addrString := args[0]
 

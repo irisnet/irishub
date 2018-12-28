@@ -168,7 +168,7 @@ func (ci *cacheKVStore) iterator(start, end []byte, ascending bool) Iterator {
 
 // Constructs a slice of dirty items, to use w/ memIterator.
 func (ci *cacheKVStore) dirtyItems(start, end []byte, ascending bool) []cmn.KVPair {
-	items := make([]cmn.KVPair, 0, len(ci.cache))
+	items := make([]cmn.KVPair, 0)
 
 	for key, cacheValue := range ci.cache {
 		if !cacheValue.dirty {

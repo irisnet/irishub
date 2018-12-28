@@ -14,7 +14,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 
 ## 标志
 
-| 命令，速记       | 类型   | 是否必须 | 默认值                | 描述                                                         |
+| 命令，缩写       | 类型   | 是否必须 | 默认值                | 描述                                                         |
 | ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
 | -h, --help       |        | 否       |                       | 打印帮助                                                     |
 | --chain-id       | String | 否       |                       | tendermint 节点网络ID                                        |
@@ -42,7 +42,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 
 ## 全局标志
 
-| 命令，速记            | 默认值         | 描述                                | 是否必须 |
+| 命令，缩写            | 默认值         | 描述                                | 是否必须 |
 | --------------------- | -------------- | ----------------------------------- | -------- |
 | -e, --encoding string | hex            | 字符串二进制编码 (hex \|b64 \|btc ) | 否       |
 | --home string         | /root/.iriscli | 配置和数据存储目录                  | 否       |
@@ -64,15 +64,19 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 命令执行完成后，返回执行的细节信息
 
 ```
-[root@ce7da33d46c3 iriscli]# iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.004iris --chain-id=irishub-test --amount=10iris
-Password to sign with 'test':
-Committed at block 2265 (tx hash: A60224C8433487D48C8B03B51CB7A2BCB014932A97A55D946E5F30E561E1195E, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:4690 Tags:[{Key:[115 101 110 100 101 114] Value:[102 97 97 49 57 97 97 109 106 120 51 120 115 122 122 120 103 113 104 114 104 48 121 113 100 52 104 107 117 114 107 101 97 55 102 54 100 52 50 57 121 120] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[114 101 99 105 112 105 101 110 116] Value:[102 97 97 49 57 97 97 109 106 120 51 120 115 122 122 120 103 113 104 114 104 48 121 113 100 52 104 107 117 114 107 101 97 55 102 54 100 52 50 57 121 120] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 57 51 56 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
+Committed at block 87 (tx hash: AEA8E49C1BC9A81CAFEE8ACA3D0D96DA7B5DC43B44C06BACEC7DCA2F9C4D89FC, response:
+ {
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 3839,
+   "codespace": "",
    "tags": {
-     "completeConsumedTxFee-iris-atto": "\"93800000000000\"",
-     "recipient": "faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx",
-     "sender": "faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx"
+     "action": "send",
+     "recipient": "faa1893x4l2rdshytfzvfpduecpswz7qtpstpr9x4h",
+     "sender": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2"
    }
- }
-
+ })
 ```

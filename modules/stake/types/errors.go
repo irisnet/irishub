@@ -6,12 +6,13 @@ import (
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 type CodeType = sdk.CodeType
 
 const (
-	DefaultCodespace sdk.CodespaceType = 4
+	DefaultCodespace sdk.CodespaceType = "stake"
 
 	CodeInvalidValidator  CodeType = 101
 	CodeInvalidDelegation CodeType = 102
@@ -42,6 +43,11 @@ func ErrValidatorOwnerExists(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrValidatorPubKeyExists(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidValidator, "validator already exist for this pubkey, must use new validator pubkey")
+}
+
+func ErrValidatorPubKeyTypeNotSupported(codespace sdk.CodespaceType, keyType string, supportedTypes []string) sdk.Error {
+	msg := fmt.Sprintf("validator pubkey type %s is not supported, must use %s", keyType, strings.Join(supportedTypes, ","))
+	return sdk.NewError(codespace, CodeInvalidValidator, msg)
 }
 
 func ErrValidatorJailed(codespace sdk.CodespaceType) sdk.Error {
@@ -98,7 +104,7 @@ func ErrBadDelegationAddr(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrBadDelegationAmount(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDelegation, "amount must be > 0")
+	return sdk.NewError(codespace, CodeInvalidDelegation, "amount must be greater than 0")
 }
 
 func ErrNoDelegation(codespace sdk.CodespaceType) sdk.Error {
@@ -130,7 +136,7 @@ func ErrBadSharesAmount(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrBadSharesPercent(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDelegation, "shares percent must be >0 and <=1")
+	return sdk.NewError(codespace, CodeInvalidDelegation, "shares percent must be greater than 0 and less than or equal to 1")
 }
 
 func ErrNotMature(codespace sdk.CodespaceType, operation, descriptor string, got, min time.Time) sdk.Error {

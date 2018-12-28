@@ -8,7 +8,7 @@ iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点
 
 ### 初始化节点
 
-首先需要为自己创建对应的验证人账户，如果之前已经创建了账户，可以重复使用。
+首先需要为自己创建对应的验证人账户
 ```bash
 iriscli keys add {account_name}
 ```
@@ -23,11 +23,10 @@ witness exotic fantasy gaze brass zebra adapt guess drip quote space payment far
 ```
 
 初始化genesis.json和config.toml等配置文件
-
 ```bash
-iris init --home={path_to_your_home} --chain-id={your_chain_id}
+iris init --home={path_to_your_home} --chain-id={your_chain_id} --moniker={your node name}
 ```
-该命令会在home目录下创建相应文件。
+该命令会在home目录下创建相应文件
 
 创建申请成为验证人的交易，并使用刚才创建的验证人账户对交易进行签名
 ```bash
@@ -37,25 +36,21 @@ iris gentx --name={account_name} --home={path_to_your_home}
 
 ### 配置genesis
 
-使用如下命令修改`home`目录下的`genesis.json`
-
+使用下面命令修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
 ```bash
-
 iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
-
 ```
 
-然后你可以发现genesis.json文件中为上述验证人账户分配初始账户余额，如：150个iris
 ```json
     {
-     "accounts": [
-      {
-        "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
-        "coins": ["150iris"],
-        "sequence_number": "0",
-        "account_number": "0"
-      }
-    ]
+      "accounts": [
+        {
+          "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
+          "coins": ["150iris"],
+          "sequence_number": "0",
+          "account_number": "0"
+        }
+      ]
     }
 ```
 
@@ -94,6 +89,8 @@ iris testnet --v 4 --output-dir ./output --chain-id irishub-test --starting-ip-a
 home目录为iris节点的工作目录，home目录下包含了所有的配置信息和节点运行的所有数据。
 
 在iris命令中可以通过flag `--home` 来指定该节点的home目录，如果在同一台机器上运行多个节点，则需要为他们指定不同的home目录。如果在iris命令中没有指定`--home` flag，则使用默认值 `$HOME/.iris` 作为本次iris命令所使用的home目录。
+
+`iris init` 命令负责对所指定的`--home`目录进行初始化，创建默认的配置文件。除了`iris init` 命令外，其他任何`iris`相关命令所使用的home目录必须是被初始化过的，否则将会报错。
 
 home的`data`目录下存放iris节点运行的数据，包括区块链数据、应用层数据、索引数据等。home的`config`目录下存放所有配置文件：
 

@@ -11,7 +11,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	tcmd "github.com/tendermint/tendermint/cmd/tendermint/commands"
 	"github.com/tendermint/tendermint/p2p"
-	pvm "github.com/tendermint/tendermint/privval"
 )
 
 // ShowNodeIDCmd - ported from Tendermint, dump node ID to stdout
@@ -21,7 +20,7 @@ func ShowNodeIDCmd(ctx *Context) *cobra.Command {
 		Short: "Show this node's ID",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := ctx.Config
-			nodeKey, err := p2p.LoadOrGenNodeKey(cfg.NodeKeyFile())
+			nodeKey, err := p2p.LoadNodeKey(cfg.NodeKeyFile())
 			if err != nil {
 				return err
 			}
@@ -39,7 +38,10 @@ func ShowValidatorCmd(ctx *Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cfg := ctx.Config
-			privValidator := pvm.LoadOrGenFilePV(cfg.PrivValidatorFile())
+			privValidator, err := ReadPrivValidator(cfg.PrivValidatorFile())
+			if err != nil {
+				return err
+			}
 			valPubKey := privValidator.PubKey
 
 			if viper.GetBool(client.FlagJson) {
@@ -66,14 +68,17 @@ func ShowAddressCmd(ctx *Context) *cobra.Command {
 		Short: "Shows this node's tendermint validator address",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := ctx.Config
-			privValidator := pvm.LoadOrGenFilePV(cfg.PrivValidatorFile())
-			valAddr := (sdk.ValAddress)(privValidator.Address)
+			privValidator, err := ReadPrivValidator(cfg.PrivValidatorFile())
+			if err != nil {
+				return err
+			}
+			valConsAddr  := (sdk.ConsAddress)(privValidator.Address)
 
 			if viper.GetBool(client.FlagJson) {
-				return printlnJSON(valAddr)
+				return printlnJSON(valConsAddr)
 			}
 
-			fmt.Println(valAddr.String())
+			fmt.Println(valConsAddr.String())
 			return nil
 		},
 	}

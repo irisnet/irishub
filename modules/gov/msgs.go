@@ -5,27 +5,28 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // name to idetify transaction types
 const MsgRoute = "gov"
 
-var _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgDeposit{}, MsgVote{}
+var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitTxTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
 
 //-----------------------------------------------------------
 // MsgSubmitProposal
 type MsgSubmitProposal struct {
 	Title          string         `json:"title"`           //  Title of the proposal
 	Description    string         `json:"description"`     //  Description of the proposal
-	ProposalType   ProposalKind   `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
+	ProposalType   govtypes.ProposalKind   `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
 	////////////////////  iris begin  ///////////////////////////
-	Param          Param
+	Param govtypes.Param
 	////////////////////  iris end  /////////////////////////////
 }
 
-func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, param Param) MsgSubmitProposal {
+func NewMsgSubmitProposal(title string, description string, proposalType govtypes.ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, param govtypes.Param) MsgSubmitProposal {
 	return MsgSubmitProposal{
 		Title:          title,
 		Description:    description,
@@ -33,7 +34,7 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
 		////////////////////  iris begin  ///////////////////////////
-		Param:          param,
+		Param: param,
 		////////////////////  iris end  /////////////////////////////
 	}
 }
@@ -45,13 +46,13 @@ func (msg MsgSubmitProposal) Type() string  { return "submit_proposal" }
 // Implements Msg.
 func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if len(msg.Title) == 0 {
-		return ErrInvalidTitle(DefaultCodespace, msg.Title) // TODO: Proper Error
+		return govtypes.ErrInvalidTitle(govtypes.DefaultCodespace, msg.Title) // TODO: Proper Error
 	}
 	if len(msg.Description) == 0 {
-		return ErrInvalidDescription(DefaultCodespace, msg.Description) // TODO: Proper Error
+		return govtypes.ErrInvalidDescription(govtypes.DefaultCodespace, msg.Description) // TODO: Proper Error
 	}
-	if !validProposalType(msg.ProposalType) {
-		return ErrInvalidProposalType(DefaultCodespace, msg.ProposalType)
+	if !govtypes.ValidProposalType(msg.ProposalType) {
+		return govtypes.ErrInvalidProposalType(govtypes.DefaultCodespace, msg.ProposalType)
 	}
 	if len(msg.Proposer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Proposer.String())
@@ -63,16 +64,16 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
 	}
 	////////////////////  iris begin  ///////////////////////////
-	if msg.ProposalType == ProposalTypeParameterChange {
+	if msg.ProposalType == govtypes.ProposalTypeParameterChange {
 
-		if msg.Param.Op != Update && msg.Param.Op != Insert {
-			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
+		if msg.Param.Op != govtypes.Update && msg.Param.Op != govtypes.Insert {
+			return govtypes.ErrInvalidParamOp(govtypes.DefaultCodespace, msg.Param.Op)
 		}
 
 		if p, ok := params.ParamMapping[msg.Param.Key]; ok {
 			return p.Valid(msg.Param.Value)
 		} else {
-			return ErrInvalidParam(DefaultCodespace)
+			return govtypes.ErrInvalidParam(govtypes.DefaultCodespace)
 		}
 	}
 	////////////////////  iris end  /////////////////////////////
@@ -102,10 +103,83 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Proposer}
 }
 
+type MsgSubmitSoftwareUpgradeProposal struct {
+	MsgSubmitProposal
+	Version      uint64        `json:"version"`
+	Software     string        `json:"software"`
+	SwitchHeight uint64        `json:"switch_height"`
+}
+
+func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64) MsgSubmitSoftwareUpgradeProposal {
+	return MsgSubmitSoftwareUpgradeProposal {
+		MsgSubmitProposal: msgSubmitProposal,
+		Version:             version,
+		Software:       software,
+		SwitchHeight:           switchHeight,
+	}
+}
+
+func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
+	err := msg.MsgSubmitProposal.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (msg MsgSubmitSoftwareUpgradeProposal) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+type MsgSubmitTxTaxUsageProposal struct {
+	MsgSubmitProposal
+	Usage       govtypes.UsageType      `json:"usage"`
+	DestAddress sdk.AccAddress `json:"dest_address"`
+	Percent     sdk.Dec        `json:"percent"`
+}
+
+func NewMsgSubmitTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage govtypes.UsageType, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitTxTaxUsageProposal {
+	return MsgSubmitTxTaxUsageProposal{
+		MsgSubmitProposal: msgSubmitProposal,
+		Usage:             usage,
+		DestAddress:       destAddress,
+		Percent:           percent,
+	}
+}
+
+func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
+	err := msg.MsgSubmitProposal.ValidateBasic()
+	if err != nil {
+		return err
+	}
+	if !govtypes.ValidUsageType(msg.Usage) {
+		return govtypes.ErrInvalidUsageType(govtypes.DefaultCodespace, msg.Usage)
+	}
+	if msg.Usage != govtypes.UsageTypeBurn && len(msg.DestAddress) == 0 {
+		return sdk.ErrInvalidAddress(msg.DestAddress.String())
+	}
+	if msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
+		return govtypes.ErrInvalidPercent(govtypes.DefaultCodespace, msg.Percent)
+	}
+	return nil
+}
+
+func (msg MsgSubmitTxTaxUsageProposal) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
 //-----------------------------------------------------------
 // MsgDeposit
 type MsgDeposit struct {
-	ProposalID uint64          `json:"proposal_id"` // ID of the proposal
+	ProposalID uint64         `json:"proposal_id"` // ID of the proposal
 	Depositor  sdk.AccAddress `json:"depositor"`   // Address of the depositor
 	Amount     sdk.Coins      `json:"amount"`      // Coins to add to the proposal's deposit
 }
@@ -135,7 +209,7 @@ func (msg MsgDeposit) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins(msg.Amount.String())
 	}
 	if msg.ProposalID < 0 {
-		return ErrUnknownProposal(DefaultCodespace, msg.ProposalID)
+		return govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, msg.ProposalID)
 	}
 	return nil
 }
@@ -166,12 +240,12 @@ func (msg MsgDeposit) GetSigners() []sdk.AccAddress {
 //-----------------------------------------------------------
 // MsgVote
 type MsgVote struct {
-	ProposalID uint64          `json:"proposal_id"` // ID of the proposal
+	ProposalID uint64         `json:"proposal_id"` // ID of the proposal
 	Voter      sdk.AccAddress `json:"voter"`       //  address of the voter
-	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
+	Option     govtypes.VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
 }
 
-func NewMsgVote(voter sdk.AccAddress, proposalID uint64, option VoteOption) MsgVote {
+func NewMsgVote(voter sdk.AccAddress, proposalID uint64, option govtypes.VoteOption) MsgVote {
 	return MsgVote{
 		ProposalID: proposalID,
 		Voter:      voter,
@@ -190,10 +264,10 @@ func (msg MsgVote) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress(msg.Voter.String())
 	}
 	if msg.ProposalID < 0 {
-		return ErrUnknownProposal(DefaultCodespace, msg.ProposalID)
+		return govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, msg.ProposalID)
 	}
-	if !validVoteOption(msg.Option) {
-		return ErrInvalidVote(DefaultCodespace, msg.Option)
+	if !govtypes.ValidVoteOption(msg.Option) {
+		return govtypes.ErrInvalidVote(govtypes.DefaultCodespace, msg.Option)
 	}
 	return nil
 }

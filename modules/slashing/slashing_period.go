@@ -66,6 +66,16 @@ func (k Keeper) iterateValidatorSlashingPeriods(ctx sdk.Context, handler func(sl
 	}
 }
 
+// Delete all slashing periods in the store.
+func (k Keeper) DeleteValidatorSlashingPeriods(ctx sdk.Context) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, ValidatorSlashingPeriodKey)
+	for ; iter.Valid(); iter.Next() {
+		store.Delete(iter.Key())
+	}
+	iter.Close()
+}
+
 // Stored by validator Tendermint address (not operator address)
 // This function sets a validator slashing period for a particular validator,
 // start height, end height, and current slashed-so-far total, or updates

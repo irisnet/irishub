@@ -30,6 +30,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSvcRefundFees(ctx, k, msg)
 		case MsgSvcWithdrawFees:
 			return handleMsgSvcWithdrawFees(ctx, k, msg)
+		case MsgSvcWithdrawTax:
+			return handleMsgSvcWithdrawTax(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in service module").Result()
 		}
@@ -45,11 +47,7 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDef,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -60,11 +58,7 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBind,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -75,11 +69,7 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcBindUpdate,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -88,11 +78,7 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcDisable,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -101,11 +87,7 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcEnable,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -114,11 +96,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRefundDeposit,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -136,6 +114,12 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return ErrMethodNotExists(k.Codespace(), msg.MethodID).Result()
 	}
 
+	if msg.Profiling {
+		if _, found := k.gk.GetProfiler(ctx, msg.Consumer); !found {
+			return ErrNotProfiler(k.Codespace(), msg.Consumer).Result()
+		}
+	}
+
 	//Method id start at 1
 	if len(bind.Prices) >= int(msg.MethodID) && !msg.ServiceFee.IsAllGTE(sdk.Coins{bind.Prices[msg.MethodID-1]}) {
 		return ErrLtServiceFee(k.Codespace(), sdk.Coins{bind.Prices[msg.MethodID-1]}).Result()
@@ -143,8 +127,8 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 
 	request := NewSvcRequest(msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID, msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
 
-	// request service fee is equal to service binding service fee
-	if len(bind.Prices) >= int(msg.MethodID) {
+	// request service fee is equal to service binding service fee if not profiling
+	if len(bind.Prices) >= int(msg.MethodID) && !msg.Profiling {
 		request.ServiceFee = sdk.Coins{bind.Prices[msg.MethodID-1]}
 	} else {
 		request.ServiceFee = nil
@@ -155,7 +139,6 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return err.Result()
 	}
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcCall,
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Provider, []byte(request.Provider.String()),
 		tags.Consumer, []byte(request.Consumer.String()),
@@ -190,10 +173,15 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	k.DeleteActiveRequest(ctx, request)
 	k.DeleteRequestExpiration(ctx, request)
 
-	k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	err := k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	if err != nil {
+		return err.Result()
+	}
 
 	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRespond,
+		tags.RequestID, []byte(request.RequestID()),
+		tags.Consumer, []byte(response.Consumer.String()),
+		tags.Provider, []byte(response.Provider.String()),
 	)
 	return sdk.Result{
 		Tags: resTags,
@@ -205,11 +193,7 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcRefundFees,
-	)
 	return sdk.Result{
-		Tags: resTags,
 	}
 }
 
@@ -218,11 +202,31 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	if err != nil {
 		return err.Result()
 	}
-	resTags := sdk.NewTags(
-		tags.Action, tags.ActionSvcWithdrawFees,
-	)
 	return sdk.Result{
-		Tags: resTags,
+	}
+}
+
+func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
+	_, found := k.gk.GetTrustee(ctx, msg.Trustee)
+	if !found {
+		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
+	}
+	oldTaxPool := k.GetServiceFeeTaxPool(ctx)
+	newTaxPool, hasNeg := oldTaxPool.SafeMinus(msg.Amount)
+	if hasNeg {
+		errMsg := fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)
+		return sdk.ErrInsufficientFunds(errMsg).Result()
+	}
+	if !newTaxPool.IsNotNegative() {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldTaxPool, msg.Amount)).Result()
+	}
+	_, _, err := k.ck.AddCoins(ctx, msg.DestAddress, msg.Amount)
+	if err != nil {
+		return err.Result()
+	}
+
+	k.SetServiceFeeTaxPool(ctx, newTaxPool)
+	return sdk.Result{
 	}
 }
 
@@ -236,6 +240,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	resTags = sdk.NewTags()
 
 	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
+	defer activeIterator.Close()
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
@@ -249,7 +254,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		logger.Info(fmt.Sprintf("request %s from %s timeout",
 			req.RequestID(), req.Consumer))
 	}
-	activeIterator.Close()
 
 	return resTags
 }

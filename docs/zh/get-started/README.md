@@ -19,14 +19,14 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 请根据以下[步骤](Validator-Node.md) 将一个全节点升级成为验证人节点。
 
-### 部署IRISHub Monitor监控
+### 部署IRIShub Monitor监控
 
 请根据以下[链接](../software/monitor.md) 在服务器上部署一个Monitor监控。
 
 
 ### 如何成为一个验证人节点
 
-如何你的节点已经完全同步了，那么要如何才能升级成为一个验证人节点你？
+如果你的节点已经完全同步了，那么要如何才能升级成为一个验证人节点？
 
 如果你参与到了genesis文件的生成过程中，那么只要你的节点与网络同时启动，它就会保持验证人的状态。
 
@@ -40,13 +40,13 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 IRIS基金会通过推出测试网激励计划来鼓励更多的人加入到Fuxi测试网中。在Fuxi-3001中，很多社区成员完成了激励任务。
 
-* Fuxi-4000 任务列表：https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-4000/README.md
-* Fuxi-4000任务完成情况: https://github.com/irisnet/testnets/issues/176
+* Fuxi-6000 任务列表：https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-4000/README.md
+* Fuxi-6000任务完成情况: https://github.com/irisnet/testnets/issues/176
 
 
-在Fuxi-5000测试网中， IRIS基金会决定推出更多的测试网激励计划。
+在Fuxi-7000测试网中， IRIS基金会决定推出更多的测试网激励计划。
 
-* Fuxi-5000任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-5000/README_CN.md
+* Fuxi-7000任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-5000/README_CN.md
 
 
 ##  更多链接

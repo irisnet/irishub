@@ -1,22 +1,21 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
-	"encoding/json"
-
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	authcmd "github.com/irisnet/irishub/client/auth/cli"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -35,8 +34,8 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			////////////////////  iris end  /////////////////////////////
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			fromAddr, err := cliCtx.GetFromAddress()
@@ -49,13 +48,13 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			proposalType, err := gov.ProposalTypeFromString(strProposalType)
+			proposalType, err := govtypes.ProposalTypeFromString(strProposalType)
 			if err != nil {
 				return err
 			}
 			////////////////////  iris begin  ///////////////////////////
-			var param gov.Param
-			if proposalType == gov.ProposalTypeParameterChange {
+			var param govtypes.Param
+			if proposalType == govtypes.ProposalTypeParameterChange {
 				pathStr := viper.GetString(flagPath)
 				keyStr := viper.GetString(flagKey)
 				opStr := viper.GetString(flagOp)
@@ -67,34 +66,74 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			////////////////////  iris end  /////////////////////////////
 
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
+			if proposalType == govtypes.ProposalTypeTxTaxUsage {
+				usageStr := viper.GetString(flagUsage)
+				usage, err := govtypes.UsageTypeFromString(usageStr)
+				if err != nil {
+					return err
+				}
+				var destAddr sdk.AccAddress
+				if usage.String() != "Burn" {
+					destAddrStr := viper.GetString(flagDestAddress)
+					destAddr, err = sdk.AccAddressFromBech32(destAddrStr)
+					if err != nil {
+						return err
+					}
+				}
+				percentStr := viper.GetString(flagPercent)
+				percent, err := sdk.NewDecFromStr(percentStr)
+				if err != nil {
+					return err
+				}
+				taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, usage, destAddr, percent)
+				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
+			}
 
+			if proposalType == govtypes.ProposalTypeSoftwareUpgrade {
+				version := uint64(viper.GetInt64(flagVersion))
+				software := viper.GetString(flagSoftware)
+				switchHeight := uint64(viper.GetInt64(flagSwitchHeight))
+				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight)
+				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
 	////////////////////  iris begin  ///////////////////////////
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 	cmd.Flags().String(flagKey, "", "the key of parameter")
 	cmd.Flags().String(flagOp, "", "the operation of parameter")
 	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
+	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
+	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
+	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
+
+	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
+	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
+	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	////////////////////  iris end  /////////////////////////////
+
+	cmd.MarkFlagRequired(flagTitle)
+	cmd.MarkFlagRequired(flagDescription)
+	cmd.MarkFlagRequired(flagProposalType)
 	return cmd
 }
 
 ////////////////////  iris begin  ///////////////////////////
-func getParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *codec.Codec) (gov.Param, error) {
-	var param gov.Param
+func getParamFromString(paramStr string, pathStr string, keyStr string, opStr string, cdc *codec.Codec) (govtypes.Param, error) {
+	var param govtypes.Param
 
 	if paramStr != "" {
 		err := json.Unmarshal([]byte(paramStr), &param)
 		return param, err
 
 	} else if pathStr != "" {
-		paramDoc := gov.ParameterConfigFile{}
+		paramDoc := govtypes.ParameterConfigFile{}
 		err := paramDoc.ReadFile(cdc, pathStr)
 		if err != nil {
 			return param, err
@@ -119,8 +158,8 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			depositorAddr, err := cliCtx.GetFromAddress()
@@ -165,8 +204,8 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			voterAddr, err := cliCtx.GetFromAddress()
@@ -177,7 +216,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 			proposalID := uint64(viper.GetInt64(flagProposalID))
 			option := viper.GetString(flagOption)
 
-			byteVoteOption, err := gov.VoteOptionFromString(client.NormalizeVoteOption(option))
+			byteVoteOption, err := govtypes.VoteOptionFromString(client.NormalizeVoteOption(option))
 			if err != nil {
 				return err
 			}

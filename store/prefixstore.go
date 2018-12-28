@@ -99,12 +99,7 @@ func (s prefixStore) Iterator(start, end []byte) Iterator {
 // Implements KVStore
 // Check https://github.com/tendermint/tendermint/blob/master/libs/db/prefix_db.go#L129
 func (s prefixStore) ReverseIterator(start, end []byte) Iterator {
-	var newstart []byte
-	if start == nil {
-		newstart = cpIncr(s.prefix)
-	} else {
-		newstart = cloneAppend(s.prefix, start)
-	}
+	newstart := cloneAppend(s.prefix, start)
 
 	var newend []byte
 	if end == nil {
@@ -114,9 +109,6 @@ func (s prefixStore) ReverseIterator(start, end []byte) Iterator {
 	}
 
 	iter := s.parent.ReverseIterator(newstart, newend)
-	if start == nil {
-		skipOne(iter, cpIncr(s.prefix))
-	}
 
 	return newPrefixIterator(s.prefix, start, end, iter)
 }

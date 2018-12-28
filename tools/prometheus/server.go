@@ -15,7 +15,7 @@ import (
 
 func MonitorCommand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:          "irismon",
+		Use:          "monitor",
 		Short:        "iris monitor tool",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -42,23 +42,17 @@ func MonitorCommand(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().Int("port", 36660, "port to connect to")
-	cmd.Flags().StringP("node", "n", "tcp://localhost:26657", "Node to connect to")
-	cmd.Flags().StringP("chain-id", "c", "fuxi", "Chain ID of tendermint node")
-	cmd.Flags().StringP("address", "a", "", `hex address of the validator that you want to 
+	cmd.Flags().StringP("node", "", "tcp://localhost:26657", "Node to connect to")
+	cmd.Flags().StringP("chain-id", "", "fuxi", "Chain ID of tendermint node")
+	cmd.Flags().StringP("validator-address", "", "", `hex address of the validator that you want to 
 monitor`)
 
 	cmd.Flags().StringP("account-address", "", "", `bech32 encoding account address that you want to 
 monitor. (faa ....)`)
 
-	cmd.Flags().BoolP("recursively", "r", true, `specify whether the files in sub-directory is included, 
+	cmd.Flags().BoolP("recursively", "", true, `specify whether the files in sub-directory is included, 
 included by default. If there are many files & sub-directories in home directory, this program may be very slow!`)
 	cmd.Flags().String("home", app.DefaultNodeHome, "iris home")
 	cmd.Flags().String("trust-node", "true", "node is trust")
 	return cmd
 }
-
-/*
-TODO:
-1. 将数据轮询间隔做成可配置的
-2. 监控上一个块的出块人
-*/

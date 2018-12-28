@@ -21,6 +21,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // TODO remove dependencies on staking (should only refer to validator set type from sdk)
@@ -36,7 +37,7 @@ var (
 		sdk.ValAddress(pks[1].Address()),
 		sdk.ValAddress(pks[2].Address()),
 	}
-	initCoins = sdk.NewInt(200)
+	initCoins = sdk.NewIntWithDecimal(200, 18)
 )
 
 func createTestCodec() *codec.Codec {
@@ -75,7 +76,7 @@ func createTestInput(t *testing.T, defaults Params) (sdk.Context, bank.Keeper, s
 	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
 	genesis := stake.DefaultGenesisState()
 
-	genesis.Pool.LooseTokens = sdk.NewDec(initCoins.MulRaw(int64(len(addrs))).Int64())
+	genesis.Pool.LooseTokens = sdk.NewDecFromInt(initCoins.MulRaw(int64(len(addrs))))
 
 	_, err = stake.InitGenesis(ctx, sk, genesis)
 	require.Nil(t, err)
@@ -120,7 +121,7 @@ func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey crypto.PubKey, amt
 		DelegatorAddr: sdk.AccAddress(address),
 		ValidatorAddr: address,
 		PubKey:        pubKey,
-		Delegation:    sdk.NewCoin("steak", amt),
+		Delegation:    sdk.NewCoin(stakeTypes.StakeDenom, amt),
 	}
 }
 
@@ -128,6 +129,6 @@ func newTestMsgDelegate(delAddr sdk.AccAddress, valAddr sdk.ValAddress, delAmoun
 	return stake.MsgDelegate{
 		DelegatorAddr: delAddr,
 		ValidatorAddr: valAddr,
-		Delegation:    sdk.NewCoin("steak", delAmount),
+		Delegation:    sdk.NewCoin(stakeTypes.StakeDenom, delAmount),
 	}
 }

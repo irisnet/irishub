@@ -2,28 +2,26 @@ package context
 
 import (
 	"fmt"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-
-	"github.com/pkg/errors"
-
+	"io/ioutil"
+	"net/http"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/modules/auth"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/store"
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/merkle"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	tmliteErr "github.com/tendermint/tendermint/lite/errors"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
-	"github.com/tendermint/tendermint/crypto/merkle"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io/ioutil"
-	"net/http"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an
@@ -75,7 +73,7 @@ func (cliCtx CLIContext) GetAccount(address []byte) (auth.Account, error) {
 	if err != nil {
 		return nil, err
 	} else if len(res) == 0 {
-		return nil, err
+		return nil, ErrInvalidAccount(address)
 	}
 
 	account, err := cliCtx.AccDecoder(res)
@@ -98,7 +96,7 @@ func (cliCtx CLIContext) GetFromName() (string, error) {
 
 // GetAccountNumber returns the next account number for the given account
 // address.
-func (cliCtx CLIContext) GetAccountNumber(address []byte) (int64, error) {
+func (cliCtx CLIContext) GetAccountNumber(address []byte) (uint64, error) {
 	account, err := cliCtx.GetAccount(address)
 	if err != nil {
 		return 0, err
@@ -109,7 +107,7 @@ func (cliCtx CLIContext) GetAccountNumber(address []byte) (int64, error) {
 
 // GetAccountSequence returns the sequence number for the given account
 // address.
-func (cliCtx CLIContext) GetAccountSequence(address []byte) (int64, error) {
+func (cliCtx CLIContext) GetAccountSequence(address []byte) (uint64, error) {
 	account, err := cliCtx.GetAccount(address)
 	if err != nil {
 		return 0, err
@@ -284,8 +282,8 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	if coinName == "" {
 		return types.CoinType{}, fmt.Errorf("coin name is empty")
 	}
-	if coinName == app.Denom {
-		coinType = app.IrisCt
+	if coinName == stakeTypes.StakeDenomName {
+		coinType = v0.IrisCt
 	} else {
 		key := types.CoinTypeKey(coinName)
 		bz, err := cliCtx.QueryStore([]byte(key), "params")
@@ -365,6 +363,7 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 	for _, coin := range coinMap {
 		coins = append(coins, coin)
 	}
+	coins = coins.Sort()
 	return coins, nil
 }
 

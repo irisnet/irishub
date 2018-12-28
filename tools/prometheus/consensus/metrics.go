@@ -139,7 +139,7 @@ func (cs *Metrics) SetAddress(addrStr string) {
 
 func (cs *Metrics) Start(ctx context.CLIContext) {
 
-	validatorAddr := viper.GetString("address")
+	validatorAddr := viper.GetString("validator-address")
 	cs.SetAddress(validatorAddr)
 
 	ct, _ := cctx.WithTimeout(cctx.Background(), 10*time.Second)
@@ -173,7 +173,7 @@ func (cs *Metrics) Start(ctx context.CLIContext) {
 
 	go func() {
 		for e := range roundC {
-			round := e.(types.TMEventData).(types.EventDataRoundState)
+			round := e.(types.TMEventData).(types.EventDataNewRound)
 			cs.TmMetrics.Rounds.Set(float64(round.Round))
 		}
 	}()

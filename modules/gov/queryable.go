@@ -5,6 +5,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"time"
+	govtypes "github.com/irisnet/irishub/types/gov"
 )
 
 // query endpoints supported by the governance Querier
@@ -42,13 +43,13 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 type ProposalOutput struct {
-	ProposalID   uint64            `json:"proposal_id"`   //  ID of the proposal
-	Title        string           `json:"title"`         //  Title of the proposal
-	Description  string           `json:"description"`   //  Description of the proposal
-	ProposalType ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
+	ProposalID   uint64       `json:"proposal_id"`   //  ID of the proposal
+	Title        string       `json:"title"`         //  Title of the proposal
+	Description  string       `json:"description"`   //  Description of the proposal
+	ProposalType govtypes.ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 
-	Status       ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
-	TallyResult  TallyResult    `json:"tally_result"`    //  Result of Tallys
+	Status      govtypes.ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
+	TallyResult govtypes.TallyResult    `json:"tally_result"`    //  Result of Tallys
 
 	SubmitTime     time.Time `json:"submit_time"`      //  Time of the block where TxGovSubmitProposal was included
 	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
@@ -56,12 +57,12 @@ type ProposalOutput struct {
 
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-	Param        Param `json:"param"`
+	Param           govtypes.Param     `json:"param"`
 }
 
 type ProposalOutputs []ProposalOutput
 
-func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
+func ConvertProposalToProposalOutput(proposal govtypes.Proposal) ProposalOutput {
 
 	proposalOutput := ProposalOutput{
 		ProposalID:   proposal.GetProposalID(),
@@ -72,28 +73,28 @@ func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
 		Status:      proposal.GetStatus(),
 		TallyResult: proposal.GetTallyResult(),
 
-		SubmitTime:  proposal.GetSubmitTime(),
+		SubmitTime:     proposal.GetSubmitTime(),
 		DepositEndTime: proposal.GetDepositEndTime(),
-		TotalDeposit: proposal.GetTotalDeposit(),
+		TotalDeposit:   proposal.GetTotalDeposit(),
 
 		VotingStartTime: proposal.GetVotingStartTime(),
 		VotingEndTime:   proposal.GetVotingEndTime(),
-		Param:           Param{},
+		Param:           govtypes.Param{},
 	}
 
-	if proposal.GetProposalType() == ProposalTypeParameterChange {
-		proposalOutput.Param = proposal.(*ParameterProposal).Param
+	if proposal.GetProposalType() == govtypes.ProposalTypeParameterChange {
+		proposalOutput.Param = proposal.(*govtypes.ParameterProposal).Param
 	}
 	return proposalOutput
 }
 
-func ConvertProposalsToProposalOutputs(proposals []Proposal) ProposalOutputs {
+func ConvertProposalsToProposalOutputs(proposals []govtypes.Proposal) ProposalOutputs {
 
-     var proposalOutputs ProposalOutputs
-     for _,proposal :=range proposals{
-		 proposalOutputs= append(proposalOutputs,ConvertProposalToProposalOutput(proposal))
+	var proposalOutputs ProposalOutputs
+	for _, proposal := range proposals {
+		proposalOutputs = append(proposalOutputs, ConvertProposalToProposalOutput(proposal))
 	}
-	return  proposalOutputs
+	return proposalOutputs
 }
 
 // Params for query 'custom/gov/proposal'
@@ -111,7 +112,7 @@ func queryProposal(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 
 	proposal := keeper.GetProposal(ctx, params.ProposalID)
 	if proposal == nil {
-		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
+		return nil, govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, params.ProposalID)
 	}
 
 	proposalOutput := ConvertProposalToProposalOutput(proposal)
@@ -137,7 +138,20 @@ func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	deposit, _ := keeper.GetDeposit(ctx, params.ProposalID, params.Depositor)
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == govtypes.StatusPassed || proposal.GetStatus() == govtypes.StatusRejected {
+		return nil, govtypes.ErrCodeDepositDeleted(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	deposit, bool := keeper.GetDeposit(ctx, params.ProposalID, params.Depositor)
+	if !bool {
+		return nil, govtypes.ErrCodeDepositNotExisted(govtypes.DefaultCodespace, params.Depositor, params.ProposalID)
+	}
+
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, deposit)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
@@ -159,7 +173,20 @@ func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	vote, _ := keeper.GetVote(ctx, params.ProposalID, params.Voter)
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == govtypes.StatusPassed || proposal.GetStatus() == govtypes.StatusRejected {
+		return nil, govtypes.ErrCodeVoteDeleted(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	vote, bool := keeper.GetVote(ctx, params.ProposalID, params.Voter)
+	if !bool {
+		return nil, govtypes.ErrCodeVoteNotExisted(govtypes.DefaultCodespace, params.Voter, params.ProposalID)
+	}
+
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, vote)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
@@ -180,10 +207,20 @@ func queryDeposits(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	var deposits []Deposit
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == govtypes.StatusPassed || proposal.GetStatus() == govtypes.StatusRejected {
+		return nil, govtypes.ErrCodeDepositDeleted(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	var deposits []govtypes.Deposit
 	depositsIterator := keeper.GetDeposits(ctx, params.ProposalID)
+	defer depositsIterator.Close()
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
-		deposit := Deposit{}
+		deposit := govtypes.Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), &deposit)
 		deposits = append(deposits, deposit)
 	}
@@ -209,14 +246,27 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err2.Error()))
 	}
 
-	var votes []Vote
+	proposal := keeper.GetProposal(ctx, params.ProposalID)
+	if proposal == nil {
+		return nil, govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == govtypes.StatusPassed || proposal.GetStatus() == govtypes.StatusRejected {
+		return nil, govtypes.ErrCodeVoteDeleted(govtypes.DefaultCodespace, params.ProposalID)
+	}
+
+	var votes []govtypes.Vote
 	votesIterator := keeper.GetVotes(ctx, params.ProposalID)
+	defer votesIterator.Close()
 	for ; votesIterator.Valid(); votesIterator.Next() {
-		vote := Vote{}
+		vote := govtypes.Vote{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(votesIterator.Value(), &vote)
 		votes = append(votes, vote)
 	}
 
+	if len(votes) == 0 {
+		return nil, nil
+	}
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, votes)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
@@ -226,10 +276,10 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 
 // Params for query 'custom/gov/proposals'
 type QueryProposalsParams struct {
-	Voter              sdk.AccAddress
-	Depositor          sdk.AccAddress
-	ProposalStatus     ProposalStatus
-	Limit              uint64
+	Voter          sdk.AccAddress
+	Depositor      sdk.AccAddress
+	ProposalStatus govtypes.ProposalStatus
+	Limit          uint64
 }
 
 // nolint: unparam
@@ -268,14 +318,14 @@ func queryTally(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 
 	proposal := keeper.GetProposal(ctx, param.ProposalID)
 	if proposal == nil {
-		return nil, ErrUnknownProposal(DefaultCodespace, param.ProposalID)
+		return nil, govtypes.ErrUnknownProposal(govtypes.DefaultCodespace, param.ProposalID)
 	}
 
-	var tallyResult TallyResult
+	var tallyResult govtypes.TallyResult
 
-	if proposal.GetStatus() == StatusDepositPeriod {
-		tallyResult = EmptyTallyResult()
-	} else if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+	if proposal.GetStatus() == govtypes.StatusDepositPeriod {
+		tallyResult = govtypes.EmptyTallyResult()
+	} else if proposal.GetStatus() == govtypes.StatusPassed || proposal.GetStatus() == govtypes.StatusRejected {
 		tallyResult = proposal.GetTallyResult()
 	} else {
 		_, tallyResult = tally(ctx, keeper, proposal)

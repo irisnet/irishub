@@ -1,58 +1,57 @@
 package upgrade
 
 import (
-	bam "github.com/irisnet/irishub/baseapp"
+	"github.com/irisnet/irishub/app/protocol/keeper"
 	sdk "github.com/irisnet/irishub/types"
-	"fmt"
-	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/types/common"
+	"github.com/irisnet/irishub/version"
 )
 
 // GenesisState - all upgrade state that must be provided at genesis
 type GenesisState struct {
-	SwitchPeriod int64    `json:"switch_period"`
+	GenesisVersion AppVersion `json:genesis_version`
 }
 
 // InitGenesis - build the genesis version For first Version
-func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState) {
-
-	RegisterModuleList(router)
-
-	moduleList, found := GetModuleListFromBucket(0)
-	fmt.Println(moduleList)
-	if !found {
-		panic("No module list info found for genesis version")
-	}
-
-	genesisVersion := NewVersion(0, 0, 0, moduleList)
+func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	genesisVersion := data.GenesisVersion
 	k.AddNewVersion(ctx, genesisVersion)
-
-	params.InitGenesisParameter(&upgradeparams.ProposalAcceptHeightParameter, ctx, -1)
-	params.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, 0)
-	params.InitGenesisParameter(&upgradeparams.SwitchPeriodParameter, ctx, data.SwitchPeriod)
-
-	InitGenesis_commitID(ctx, k)
+	k.pk.ClearUpgradeConfig(ctx)
+	k.pk.SetCurrentProtocolVersion(ctx, genesisVersion.Protocol.Version)
 }
 
-
 // WriteGenesis - output genesis parameters
-func WriteGenesis(ctx sdk.Context, k Keeper) GenesisState {
-
+func ExportGenesis(ctx sdk.Context) GenesisState {
 	return GenesisState{
-		SwitchPeriod: upgradeparams.GetSwitchPeriod(ctx),
-	}
+		GenesisVersion: NewVersion(
+			keeper.UpgradeConfig{0,
+				common.ProtocolDefinition{
+					uint64(0),
+					" ",
+					uint64(1),
+				}}, true)}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		SwitchPeriod: 57600,
-	}
+		GenesisVersion: NewVersion(
+			keeper.UpgradeConfig{0,
+				common.ProtocolDefinition{
+					uint64(0),
+					"https://github.com/irisnet/irishub/releases/tag/v" + version.Version,
+					uint64(1),
+				}}, true)}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
-		SwitchPeriod: 15,
-	}
+		GenesisVersion: NewVersion(
+			keeper.UpgradeConfig{0,
+				common.ProtocolDefinition{
+					uint64(0),
+					"https://github.com/irisnet/irishub/releases/tag/v" + version.Version,
+					uint64(1),
+				}}, true)}
 }

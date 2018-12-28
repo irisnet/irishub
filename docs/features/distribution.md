@@ -38,7 +38,26 @@ This module is in charge of distributing collected transaction fee and inflated 
         
 3. Query reward token
 
-    Execute the command to get the earned tokens:
+    Execute the command to get the estimated inflation rewards :
+    
     ```bash
-    iriscli bank account [withdraw address]
+    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.004iris  --commit 
+    ```
+    
+    Output is the following，`withdraw-reward-total`is your estimated inflation rewards：
+    
+    ```bash
+    estimated gas = 6032
+    simulation code = 0
+    simulation log = Msg 0:
+    simulation gas wanted = 200000
+    simulation gas used = 6032
+    simulation fee amount = 0
+    simulation fee denom =
+    simulation tag action = withdraw-delegator-rewards-all
+    simulation tag delegator = faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd
+    simulation tag withdraw-reward-total = 1308135156755646iris-atto
+    simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646iris-atto
+    simulation tag action = withdraw_delegation_rewards_all    
+    
     ```

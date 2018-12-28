@@ -71,7 +71,7 @@ func MakeTestCodec() *codec.Codec {
 }
 
 // test input with default values
-func CreateTestInputDefault(t *testing.T, isCheckTx bool, initCoins int64) (
+func CreateTestInputDefault(t *testing.T, isCheckTx bool, initCoins sdk.Int) (
 	sdk.Context, auth.AccountKeeper, Keeper, stake.Keeper, DummyFeeCollectionKeeper) {
 
 	communityTax := sdk.NewDecWithPrec(2, 2)
@@ -79,7 +79,7 @@ func CreateTestInputDefault(t *testing.T, isCheckTx bool, initCoins int64) (
 }
 
 // hogpodge of all sorts of input required for testing
-func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins int64,
+func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	communityTax sdk.Dec) (
 	sdk.Context, auth.AccountKeeper, Keeper, stake.Keeper, DummyFeeCollectionKeeper) {
 
@@ -119,10 +119,10 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins int64,
 	for _, addr := range addrs {
 		pool := sk.GetPool(ctx)
 		_, _, err := ck.AddCoins(ctx, addr, sdk.Coins{
-			{sk.GetParams(ctx).BondDenom, sdk.NewInt(initCoins)},
+			{sk.GetParams(ctx).BondDenom, initCoins},
 		})
 		require.Nil(t, err)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDec(initCoins))
+		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDecFromInt(initCoins))
 		sk.SetPool(ctx, pool)
 	}
 

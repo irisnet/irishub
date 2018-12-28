@@ -36,7 +36,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, vs sdk.ValidatorSet, paramspa
 
 // handle a validator signing two blocks at the same height
 // power: power of the double-signing validator at the height of infraction
-func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractionHeight int64, timestamp time.Time, power int64) {
+func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractionHeight int64, timestamp time.Time, power int64) (tags sdk.Tags) {
 	logger := ctx.Logger().With("module", "x/slashing")
 	time := ctx.BlockHeader().Time
 	age := time.Sub(timestamp)
@@ -83,7 +83,7 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 	// ABCI, and now received as evidence.
 	// The revisedFraction (which is the new fraction to be slashed) is passed
 	// in separately to separately slash unbonding and rebonding delegations.
-	k.validatorSet.Slash(ctx, consAddr, distributionHeight, power, revisedFraction)
+	tags = k.validatorSet.Slash(ctx, consAddr, distributionHeight, power, revisedFraction)
 
 	// Jail validator if not already jailed
 	if !validator.GetJailed() {
@@ -96,12 +96,13 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 		panic(fmt.Sprintf("Expected signing info for validator %s but not found", consAddr))
 	}
 	signInfo.JailedUntil = time.Add(k.DoubleSignUnbondDuration(ctx))
-	k.setValidatorSigningInfo(ctx, consAddr, signInfo)
+	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
+	return
 }
 
 // handle a validator signature, must be called once per validator per block
 // TODO refactor to take in a consensus address, additionally should maybe just take in the pubkey too
-func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, power int64, signed bool) {
+func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, power int64, signed bool) (tags sdk.Tags) {
 	logger := ctx.Logger().With("module", "x/slashing")
 	height := ctx.BlockHeight()
 	consAddr := sdk.ConsAddress(addr)
@@ -153,7 +154,8 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 			// i.e. at the end of the pre-genesis block (none) = at the beginning of the genesis block.
 			// That's fine since this is just used to filter unbonding delegations & redelegations.
 			distributionHeight := height - stake.ValidatorUpdateDelay - 1
-			k.validatorSet.Slash(ctx, consAddr, distributionHeight, power, k.SlashFractionDowntime(ctx))
+			slashTags := k.validatorSet.Slash(ctx, consAddr, distributionHeight, power, k.SlashFractionDowntime(ctx))
+			tags = tags.AppendTags(slashTags)
 			k.validatorSet.Jail(ctx, consAddr)
 			signInfo.JailedUntil = ctx.BlockHeader().Time.Add(k.DowntimeUnbondDuration(ctx))
 			// We need to reset the counter & array so that the validator won't be immediately slashed for downtime upon rebonding.
@@ -168,7 +170,8 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 	}
 
 	// Set the updated signing info
-	k.setValidatorSigningInfo(ctx, consAddr, signInfo)
+	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
+	return
 }
 
 func (k Keeper) addPubkey(ctx sdk.Context, pubkey crypto.PubKey) {

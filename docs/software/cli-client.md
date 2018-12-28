@@ -4,8 +4,6 @@
 
 `iriscli` is a client for the IRISnet network. IRISnet users can use `iriscli` to send different transactions and query the blockchain data.
 
-To know how the following sub commands actually work, go to this directory: [cli-client](../cli-client)
-
 ## iriscli Work Directory
 
 The work directory for the `iriscli` is `$HOME/.iriscli`, which is mainly used to save configuration files and data. The IRISnet `key` data is saved in the work directory of `iriscli`. You can also specify  the `iriscli`  work directory by `--home`.

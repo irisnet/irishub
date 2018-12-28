@@ -26,20 +26,27 @@ iriscli service bind [flags]
 ## 示例
 
 ### 添加服务绑定到已存在的服务定义
+在服务绑定中, 你需要抵押`deposit`指定数量的IRIS, 最小的抵押金额为 该服务的服务费价格`price` * genesis 中定义的`MinDepositMultiple`倍数
+
 ```shell
-iriscli service bind --chain-id=test --from=node0 --fee=0.004iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=test --from=node0 --fee=0.004iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 ```
 
 运行成功以后，返回的结果如下:
 
 ```txt
-Password to sign with 'node0':
-Committed at block 6 (tx hash: 87A477AEA41B22F7294084B4794837211C43A297D73EABA2F42F6436F3D975DD, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:5568 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 98 105 110 100] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 49 49 49 51 54 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
+Committed at block 567 (tx hash: A48DBD217CBB843E72CC47B40F90CE7DEEEDD6437C86A74A2976ADC9F449A034, response:
+ {
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 200000,
+   "gas_used": 5893,
+   "codespace": "",
    "tags": {
-     "action": "service-bind",
-     "completeConsumedTxFee-iris-atto": "\"111360000000000\""
+     "action": "service_bind"
    }
- }
+ })
 ```
 

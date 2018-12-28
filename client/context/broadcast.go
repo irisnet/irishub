@@ -1,15 +1,12 @@
 package context
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
-
 	"github.com/pkg/errors"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	"strings"
-	"encoding/json"
 )
 
 // TODO: This should get deleted eventually, and perhaps
@@ -127,7 +124,7 @@ func (cliCtx CLIContext) broadcastTxAsync(txBytes []byte) (*ctypes.ResultBroadca
 	return res, nil
 }
 
-func (cliCtx CLIContext)  broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+func (cliCtx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	res, err := cliCtx.BroadcastTxAndAwaitCommit(txBytes)
 	if err != nil {
 		return res, err
@@ -161,8 +158,8 @@ func (cliCtx CLIContext)  broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroad
 
 		if cliCtx.PrintResponse {
 			jsonStr, _ := deliverTxMarshalIndentJSON(res.DeliverTx)
-			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n%s\n",
-				res.Height, res.Hash.String(), res.DeliverTx, string(jsonStr),
+			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response:\n %+v)\n",
+				res.Height, res.Hash.String(), string(jsonStr),
 			)
 		}
 
@@ -172,16 +169,36 @@ func (cliCtx CLIContext)  broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroad
 	return res, nil
 }
 
+type ReadableTag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 func deliverTxMarshalIndentJSON(dtx abci.ResponseDeliverTx) ([]byte, error) {
-
-	tags := make(map[string]string)
-	for _, kv := range dtx.Tags {
-		tags[string(kv.Key)] = strings.Replace(string(kv.Value), "\\", "", -1)
+	tags := make([]ReadableTag, len(dtx.Tags))
+	for i, kv := range dtx.Tags {
+		tags[i] = ReadableTag{
+			Key:   string(kv.Key),
+			Value: string(kv.Value),
+		}
 	}
-
 	return json.MarshalIndent(&struct {
-		Tags map[string]string `json:"tags,omitempty"`
+		Code      uint32        `json:"code"`
+		Data      []byte        `json:"data"`
+		Log       string        `json:"log"`
+		Info      string        `json:"info"`
+		GasWanted int64         `json:"gas_wanted"`
+		GasUsed   int64         `json:"gas_used"`
+		Codespace string        `json:"codespace"`
+		Tags      []ReadableTag `json:"tags,omitempty"`
 	}{
-		Tags: tags,
+		Code:      dtx.Code,
+		Data:      dtx.Data,
+		Log:       dtx.Log,
+		Info:      dtx.Info,
+		GasWanted: dtx.GasWanted,
+		GasUsed:   dtx.GasUsed,
+		Codespace: dtx.Codespace,
+		Tags:      tags,
 	}, " ", "  ")
 }
