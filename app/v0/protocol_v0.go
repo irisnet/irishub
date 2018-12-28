@@ -25,8 +25,8 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"github.com/irisnet/irishub/types/gov/params"
+
+	 "github.com/irisnet/irishub/modules/gov/params"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -163,7 +163,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		p.guardianKeeper,
 		&stakeKeeper,
 		protocolkeeper,
-		govtypes.DefaultCodespace,
+		 gov.DefaultCodespace,
 	)
 
 	p.recordKeeper = record.NewKeeper(

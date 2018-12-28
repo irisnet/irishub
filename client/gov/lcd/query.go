@@ -12,9 +12,6 @@ import (
 	"github.com/irisnet/irishub/modules/gov"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"github.com/irisnet/irishub/modules/upgrade/params"
-	"github.com/irisnet/irishub/modules/service/params"
 )
 
 func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -129,7 +126,7 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		var deposit govtypes.Deposit
+		var deposit gov.Deposit
 		cdc.UnmarshalJSON(res, &deposit)
 		if deposit.Empty() {
 			res, err := cliCtx.QueryWithData("custom/gov/proposal", cdc.MustMarshalBinaryLengthPrefixed(gov.QueryProposalParams{params.ProposalID}))
@@ -192,7 +189,7 @@ func queryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		var vote govtypes.Vote
+		var vote gov.Vote
 		cdc.UnmarshalJSON(res, &vote)
 		if vote.Empty() {
 			bz, err := cdc.MarshalJSON(gov.QueryProposalParams{params.ProposalID})
@@ -283,7 +280,7 @@ func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 		}
 
 		if len(strProposalStatus) != 0 {
-			proposalStatus, err := govtypes.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
+			proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -357,20 +354,6 @@ func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 // nolint: gocyclo
 func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, err := cliCtx.QuerySubspace([]byte("Gov/"), "params")
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		var pd govtypes.ParameterConfigFile
-		for _, kv := range res {
-			switch string(kv.Key) {
-			case "Gov/"+upgradeparams.UpgradeParamsKey:
-				cdc.UnmarshalJSON(kv.Value, &pd.UpgradeParams)
-			case "Gov/"+serviceparams.ServiceParamsKey:
-				cdc.UnmarshalJSON(kv.Value, &pd.ServiceParams)
-			}
-		}
-		utils.PostProcessResponse(w, cdc, pd, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, "", cliCtx.Indent)
 	}
 }
