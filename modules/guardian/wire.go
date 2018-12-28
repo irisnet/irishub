@@ -6,10 +6,10 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgAddProfiler{}, "iris-hub/guardian/MsgAddProfiler", nil)
-	cdc.RegisterConcrete(MsgAddTrustee{}, "iris-hub/guardian/MsgAddTrustee", nil)
-	cdc.RegisterConcrete(MsgDeleteProfiler{}, "iris-hub/guardian/MsgDeleteProfiler", nil)
-	cdc.RegisterConcrete(MsgDeleteTrustee{}, "iris-hub/guardian/MsgDeleteTrustee", nil)
+	cdc.RegisterConcrete(MsgAddProfiler{}, "irishub/guardian/MsgAddProfiler", nil)
+	cdc.RegisterConcrete(MsgAddTrustee{}, "irishub/guardian/MsgAddTrustee", nil)
+	cdc.RegisterConcrete(MsgDeleteProfiler{}, "irishub/guardian/MsgDeleteProfiler", nil)
+	cdc.RegisterConcrete(MsgDeleteTrustee{}, "irishub/guardian/MsgDeleteTrustee", nil)
 }
 
 var msgCdc = codec.New()

@@ -4,19 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/types/gov/params"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+
 	"github.com/irisnet/irishub/modules/service/params"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -87,7 +86,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(strProposalStatus) != 0 {
-				proposalStatus, err := govtypes.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
+				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 				if err != nil {
 					return err
 				}
@@ -200,7 +199,7 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			if res == nil {
 				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
-				return  nil
+				return nil
 			}
 
 			fmt.Println(string(res))
@@ -429,34 +428,10 @@ func printModuleList(res []sdk.KVPair) (err error) {
 }
 
 func printParamStr(p params.GovParameter, keyStr string) {
-	var param govtypes.Param
+	var param gov.Param
 	param.Key = keyStr
 	param.Value = p.ToJson("")
 	param.Op = ""
 	jsonBytes, _ := json.Marshal(param)
 	fmt.Println(string(jsonBytes))
-}
-
-func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "pull-params",
-		Short:   "generate param.json file",
-		Example: "iriscli gov pull-params",
-		RunE: func(cmd *cobra.Command, args []string) error {
-
-			ctx := context.NewCLIContext().WithCodec(cdc)
-			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
-			if err == nil && len(res) != 0 {
-				var pd govtypes.ParameterConfigFile
-				pathStr := viper.GetString(flagPath)
-				err := pd.WriteFile(cdc, res, pathStr)
-				return err
-			} else {
-				fmt.Println("No GovParams can be found")
-				return err
-			}
-		},
-	}
-	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
-	return cmd
 }

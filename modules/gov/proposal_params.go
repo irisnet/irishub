@@ -18,5 +18,3 @@ type ParameterProposal struct {
 	TextProposal
 	Param Param `json:"params"`
 }
-
-
