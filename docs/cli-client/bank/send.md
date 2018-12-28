@@ -83,10 +83,3 @@ After that, you will get the detail info for the send
 ```$xslt
 ERROR: Ciphertext decryption failed
 ```
-### Common Issues
-
-* Wrong password
-
-```$xslt
-ERROR: Ciphertext decryption failed
-```

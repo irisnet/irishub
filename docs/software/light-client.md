@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A IRISLCD node is a light node of IRISHUB. Unlike a full node, it won't store all blocks and execute all transactions, which means it only requires minimal bandwidth, computing and storage resource. In distrust mode, it will track the evolution of validator set change and require full nodes to return consensus proof and merkle proof. Unless validators with more than 2/3 voting power do byzantine behavior, then IRISLCD proof verification algorithm can detect all potential malicious data, which means an IRISLCD node can provide the same security as full nodes.
+A IRISLCD node is a light node of IRISHUB. Unlike IRISHUB full node, it won't store all blocks and execute all transactions, which means it only requires minimal bandwidth, computing and storage resource. In distrust mode, it will track the evolution of validator set change and require full nodes to return consensus proof and merkle proof. Unless validators with more than 2/3 voting power do byzantine behavior, then IRISLCD proof verification algorithm can detect all potential malicious data, which means an IRISLCD node can provide the same security as full nodes.
 
 The default home folder of irislcd is `$HOME/.irislcd`. Once an IRISLCD is started, it will create two directories: `keys` and `trust-base.db`.The keys store db locates in `keys`. `trust-base.db` stores all trusted validator set and other verification related files.
 
