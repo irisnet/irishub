@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Allocate fees handles distribution of the collected fees
@@ -26,17 +26,26 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 		return
 	}
 
-	// allocated rewards to proposer
-	baseProposerReward := k.GetBaseProposerReward(ctx)
-	bonusProposerReward := k.GetBonusProposerReward(ctx)
-	proposerMultiplier := baseProposerReward.Add(bonusProposerReward.Mul(percentVotes))
-	proposerReward := feesCollectedDec.MulDec(proposerMultiplier)
+	var proposerReward types.DecCoins
+	// If a validator is jailed, distribute no reward to it
+	// The jailed validator happen to be a proposer which is a very corner case
+	validator := k.stakeKeeper.Validator(ctx, proposerValidator.GetOperator())
+	if !validator.GetJailed() {
+		// allocated rewards to proposer
+		baseProposerReward := k.GetBaseProposerReward(ctx)
+		bonusProposerReward := k.GetBonusProposerReward(ctx)
+		proposerMultiplier := baseProposerReward.Add(bonusProposerReward.Mul(percentVotes))
+		proposerReward = feesCollectedDec.MulDec(proposerMultiplier)
 
-	// apply commission
-	commission := proposerReward.MulDec(proposerValidator.GetCommission())
-	remaining := proposerReward.Minus(commission)
-	proposerDist.ValCommission = proposerDist.ValCommission.Plus(commission)
-	proposerDist.DelPool = proposerDist.DelPool.Plus(remaining)
+		// apply commission
+		commission := proposerReward.MulDec(proposerValidator.GetCommission())
+		remaining := proposerReward.Minus(commission)
+		proposerDist.ValCommission = proposerDist.ValCommission.Plus(commission)
+		proposerDist.DelPool = proposerDist.DelPool.Plus(remaining)
+
+		// save validator distribution info
+		k.SetValidatorDistInfo(ctx, proposerDist)
+	}
 
 	// allocate community funding
 	communityTax := k.GetCommunityTax(ctx)
@@ -46,14 +55,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	// set the global pool within the distribution module
 	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding)
 	feePool.ValPool = feePool.ValPool.Plus(poolReceived)
-
-	validator := k.stakeKeeper.Validator(ctx, proposerValidator.GetOperator())
-	// If a validator is jailed, distribute no reward to it
-	// The jailed validator happen to be a proposor which is a corner case
-	if !validator.GetJailed() {
-		k.SetValidatorDistInfo(ctx, proposerDist)
-		k.SetFeePool(ctx, feePool)
-	}
+	k.SetFeePool(ctx, feePool)
 
 	// clear the now distributed fees
 	k.feeCollectionKeeper.ClearCollectedFees(ctx)
