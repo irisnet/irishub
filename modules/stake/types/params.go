@@ -7,6 +7,7 @@ import (
 
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -51,6 +52,20 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeyMaxValidators, &p.MaxValidators},
 		{KeyBondDenom, &p.BondDenom},
 	}
+}
+
+func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
+	//TODO:
+	return nil, nil
+}
+
+func (p *Params) GetParamsKey() string {
+	return "stake"
+}
+
+func (p *Params) StringFromBytes(*codec.Codec, string, []byte) (string, error) {
+	//TODO:
+	return "", nil
 }
 
 // Equal returns a boolean determining if two Param types are identical.

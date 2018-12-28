@@ -158,6 +158,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	p.govKeeper = gov.NewKeeper(
 		p.cdc,
 		protocol.KeyGov,
+		p.paramsKeeper,
 		p.distrKeeper,
 		p.bankKeeper,
 		p.guardianKeeper,
@@ -234,6 +235,8 @@ func (p *ProtocolVersion0) GetKVStoreKeyList()  []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
+	params.RegisterParamSet(&mint.Params{})
+
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
@@ -251,10 +254,6 @@ func (p *ProtocolVersion0) configParams() {
 		&serviceparams.ServiceParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
 		&arbitrationparams.ArbitrationTimelimitParameter)
-
-	params.RegisterGovParamMapping(
-		&upgradeparams.UpgradeParameter,
-		&serviceparams.ServiceParameter)
 }
 
 // application updates every end block

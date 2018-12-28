@@ -3,8 +3,8 @@ package gov
 import (
 	"fmt"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
-	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func Execute(ctx sdk.Context, k Keeper, p Proposal) (err error) {
@@ -34,11 +34,17 @@ func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp *ParameterProposal) 
 
 	logger := ctx.Logger().With("module", "x/gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-	if pp.Param.Op == Update {
-		params.ParamMapping[pp.Param.Key].Update(ctx, pp.Param.Value)
-	} else if pp.Param.Op == Insert {
-		//Todo: insert
+    for _, param := range pp.Params{
+    	paramSet := params.ParamSetMapping[param.Subspace]
+    	value, _ := paramSet.Validate(param.Key,param.Value)
+		subspace, bool := k.paramsKeeper.GetSubspace(param.Subspace)
+		if bool {
+			subspace.Set(ctx,[]byte(param.Key),value)
+		}
+
+		logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("%s = %s",param.Key,param.Value ))
 	}
+
 	return
 }
 
