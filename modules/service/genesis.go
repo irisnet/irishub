@@ -53,14 +53,14 @@ func DefaultGenesisStateForTest() GenesisState {
 
 // refund deposit from all bindings
 // refund service fee from all request
+// refund all incoming/return fee
 // no process for service fee tax account
 func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 	store := ctx.KVStore(k.storeKey)
 
+	// refund deposit from all bindings
 	bindingIterator := sdk.KVStorePrefixIterator(store, bindingPropertyKey)
 	defer bindingIterator.Close()
-
-	// refund deposit from all bindings
 	for ; bindingIterator.Valid(); bindingIterator.Next() {
 		var binding SvcBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bindingIterator.Value(), &binding)
@@ -69,6 +69,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 
 	// refund service fee from all active request
 	requestIterator := sdk.KVStorePrefixIterator(store, activeRequestKey)
+	defer requestIterator.Close()
 	for ; requestIterator.Valid(); requestIterator.Next() {
 		var request SvcRequest
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(requestIterator.Value(), &request)
@@ -77,6 +78,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 
 	// refund all incoming fee
 	incomingFeeIterator := sdk.KVStorePrefixIterator(store, incomingFeeKey)
+	defer incomingFeeIterator.Close()
 	for ; incomingFeeIterator.Valid(); incomingFeeIterator.Next() {
 		var incomingFee IncomingFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(incomingFeeIterator.Value(), &incomingFee)
@@ -85,6 +87,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 
 	// refund all return fee
 	returnedFeeIterator := sdk.KVStorePrefixIterator(store, returnedFeeKey)
+	defer returnedFeeIterator.Close()
 	for ; returnedFeeIterator.Valid(); returnedFeeIterator.Next() {
 		var returnedFee ReturnedFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(returnedFeeIterator.Value(), &returnedFee)
