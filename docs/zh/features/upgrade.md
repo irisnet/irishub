@@ -92,19 +92,7 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * `--version`  "Version" 新软件协议版本号
 * `--software`  新软件的下载地址
 * `--switch-height` 新软件升级的高度
-* 其他参数可参考GOV的[用户手册](governance.md)
-
-```
-iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
-```
-
-* `--proposalID` 当前通过的软件升级提议的ID
-
-```
-iris start --replay
-```
-
-* 重新同步区块，清理因升级而写脏的AppHash
+* 其他参数可参考Governance的[用户手册](governance.md)
 
 ```
 iriscli upgrade info --trust-node

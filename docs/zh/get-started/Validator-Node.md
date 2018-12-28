@@ -6,10 +6,8 @@
 
 ## 如何升级成一个验证人节点
 
-### 获取IRIS Token
-
-#### 创建一个账户
-你首先需要安装`iris` 和 `iriscli`。然后执行以下操作创建一个新的账户：
+### 创建一个账户
+你首先需要安装正确版本的`iris` 和 `iriscli`。如果你没有可用的账户，需要执行以下操作创建一个新的账户。你也可以使用已有的账户。
 
 ```
 iriscli keys add <NAME_OF_KEY>
@@ -34,7 +32,7 @@ blast change tumble toddler rival ordinary chicken dirt physical club few langua
 ```
 iriscli keys add <NAME_OF_KEY> --recover
 ```
-### Claim tokens
+### 获得IRIS代币
 
 
 一旦你完成了账户的创建，你可以通过[水龙头](https://testnet.irisplorer.io/#/faucet)获得用于测试网的IRIS token,然后你就可以将这部分IRIS用于绑定成为验证人。
@@ -61,7 +59,7 @@ iriscli status --node=tcp://localhost:26657
 通过执行以下命令获得节点的公钥信息，公钥信息将以`fvp1`开头：
 
 ```
-iris tendermint show_validator --home= < IRIS-HOME >
+iris tendermint show-validator --home= {IRIS-HOME}
 ```
 示例输出:
 ```
@@ -70,14 +68,14 @@ fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
 ```
-> 注意：**amount** 应为整数， **Fee** 字段可以使用小数，例如`0.01iris` 。
+> 注意：**Fee** 字段可以使用小数，例如`0.01iris` 。
 
-也就是说，如果你想要抵押100IRIS,你可以执行以下操作：
+也就是说，如果你想要抵押10IRIS在test-irishub链上,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
 ```
 
 ### 查询验证人信息
@@ -107,7 +105,7 @@ iriscli status --node=tcp://localhost:26657
 你应该在`details`字段注明自定义的信息。
 
 ```
-iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id={chain-id} 
+iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=test-irishub 
   --details="details"--node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
 ```
 ### 查询验证人信息
@@ -115,7 +113,7 @@ iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  -
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator {address-validator-operator} --chain-id=<chain-id>
+iriscli stake validator {address-validator-operator} --chain-id=test-irishub 
 ```
 
 ### 使用浏览器：IRISPlorer
