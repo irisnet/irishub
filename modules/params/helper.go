@@ -11,10 +11,10 @@ var ParamSetMapping = make(map[string]ParamSet)
 func RegisterParamSet(ps ...ParamSet) {
 	for _, ps := range ps {
 		if ps != nil {
-			if _, ok := ParamSetMapping[ps.GetParamsKey()]; ok {
-				panic(fmt.Sprintf("<%s> already registered ", ps.GetParamsKey()))
+			if _, ok := ParamSetMapping[ps.GetParamSpace()]; ok {
+				panic(fmt.Sprintf("<%s> already registered ", ps.GetParamSpace()))
 			}
-			ParamSetMapping[ps.GetParamsKey()] = ps
+			ParamSetMapping[ps.GetParamSpace()] = ps
 		}
 	}
 }

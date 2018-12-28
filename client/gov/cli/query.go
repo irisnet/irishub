@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/irisnet/irishub/client/context"
@@ -329,30 +328,33 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
+			params.RegisterParamSet(&mint.Params{})
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:
 				// 1.List of the module;
 				// 2.List of keys in the module;
 				// 3.Error: GovParameter of the module does not exist;
 				// 4.Error: The key in the module does not exist;
-				res, err := ctx.QuerySubspace([]byte(moduleStr), storeName)
+				kvs, err := ctx.QuerySubspace([]byte(moduleStr), storeName)
 				if err == nil {
-					if len(res) == 0 {
+					if len(kvs) == 0 {
 						// Return an error directly if the --module parameter is incorrect.
 						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The  module %s is not existed", moduleStr))
 					}
 
 					if keyStr != "" {
 						// There are two possible outputs if the --key parameter is not empty:
-						// 1.List of keys in the module;
+						// 1.The value of the key;
 						// 2.Error: The key in the module does not exist;
 						res, err := ctx.QueryStore([]byte(keyStr), storeName)
-						params.RegisterParamSet(&mint.Params{})
-						return printKeyJsonIfExists(err, keyStr, res, cdc)
+						if err != nil {
+							return err
+						}
+						return printParam(cdc, keyStr, res)
 					}
 
 					// Print module list
-					err := printModuleList(res)
+					err := printParams(cdc, kvs)
 					if err != nil {
 						return err
 					}
@@ -366,12 +368,14 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			// Check --key parameter if the --module parameter is empty.
 			if keyStr != "" {
 				// There are two possible outputs if the --key parameter is not empty:
-				// 1.List of keys in the module;
+				// 1.The value of the key;
 				// 2.Error: The key in the module does not exist;
 
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
-				params.RegisterParamSet(&mint.Params{})
-				return printKeyJsonIfExists(err, keyStr, res, cdc)
+				if err != nil {
+					return err
+				}
+				return printParam(cdc, keyStr, res)
 			}
 
 			// Return error if the --module & --key parameters are all empty.
@@ -384,49 +388,29 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func printKeyJsonIfExists(e error, keyStr string, res []byte, cdc *codec.Codec) (err error) {
-	if e == nil {
-		if p, ok := params.ParamSetMapping[params.GetParamSpaceFromKey(keyStr)]; ok {
-			if len(res) == 0 {
-				// Return an error directly if the --key parameter is incorrect.
-				return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
-			}
-			// Print key json in the module
-			valueStr ,err := p.StringFromBytes(cdc,params.GetParamKey(keyStr),res)
-			if err!=nil{
-				return err
-			}
-			printParamStr(valueStr, keyStr)
-			return nil
-		} else {
-			//
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
+func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
+	if p, ok := params.ParamSetMapping[params.GetParamSpaceFromKey(keyStr)]; ok {
+		if len(res) == 0 {
+			// Return an error directly if the --key parameter is incorrect.
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
 		}
+		// Print key json in the module
+		valueStr, err := p.StringFromBytes(cdc, params.GetParamKey(keyStr), res)
+		if err != nil {
+			return err
+		}
+		fmt.Printf(" %s=%s\n",keyStr,valueStr)
+		return nil
 	} else {
-		// Throw RPC client query exception
-		return e
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 	}
 }
 
-func printModuleList(res []sdk.KVPair) (err error) {
-	var keys []string
-	for _, kv := range res {
-		keys = append(keys, string(kv.Key))
+func printParams(cdc *codec.Codec, kvs []sdk.KVPair) (err error) {
+	for _, kv := range kvs {
+		if err := printParam(cdc, string(kv.Key), kv.Value); err != nil {
+			return err
+		}
 	}
-
-	output, err := json.MarshalIndent(keys, "", " ")
-
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(output))
 	return nil
-}
-
-func printParamStr(valueStr string, keyStr string) {
-	var param gov.Param
-	param.Key = keyStr
-	param.Value = valueStr
-	jsonBytes, _ := json.Marshal(param)
-	fmt.Println(string(jsonBytes))
 }

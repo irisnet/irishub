@@ -32,7 +32,7 @@ func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p *TaxUsageProposal) (er
 
 func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp *ParameterProposal) (err error) {
 
-	logger := ctx.Logger().With("module", "x/gov")
+	logger := ctx.Logger().With("module", "gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
     for _, param := range pp.Params{
     	paramSet := params.ParamSetMapping[param.Subspace]

@@ -138,7 +138,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		stake.DefaultCodespace,
 	)
 	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
-		p.paramsKeeper.Subspace(mint.DefaultParamspace),
+		p.paramsKeeper.Subspace(mint.DefaultParamSpace),
 		p.bankKeeper, p.feeCollectionKeeper,
 	)
 	p.distrKeeper = distr.NewKeeper(

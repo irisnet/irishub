@@ -12,7 +12,7 @@ var _ params.ParamSet = (*Params)(nil)
 
 // default paramspace for params keeper
 const (
-	DefaultParamspace = "mint"
+	DefaultParamSpace = "mint"
 )
 
 //Parameter store key
@@ -32,8 +32,8 @@ type Params struct {
 }
 
 // Implements params.ParamStruct
-func (p *Params) GetParamsKey() string {
-	return DefaultParamspace
+func (p *Params) GetParamSpace() string {
+	return DefaultParamSpace
 }
 
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
@@ -42,27 +42,27 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	}
 }
 
-func (p *Params) Validate(key string, value string) (interface{},sdk.Error) {
+func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
 	case string(KeyInflation):
 		inflation, err := sdk.NewDecFromStr(value)
 		if err != nil {
-			return nil , params.ErrInvalidString(value)
+			return nil, params.ErrInvalidString(value)
 		}
-		if inflation.GT(sdk.NewDecWithPrec(2,1)) || inflation.LT(sdk.NewDecWithPrec(0,0)){
-			return nil, sdk.NewError(params.DefaultCodespace,params.CodeInvalidMintInflation,fmt.Sprintf("Mint Inflation [%s] should be between 0 and 0.2 ", value))
+		if inflation.GT(sdk.NewDecWithPrec(2, 1)) || inflation.LT(sdk.NewDecWithPrec(0, 0)) {
+			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidMintInflation, fmt.Sprintf("Mint Inflation [%s] should be between [0, 0.2] ", value))
 		}
-		return inflation,nil
+		return inflation, nil
 	default:
-		return nil,nil
+		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
 }
 
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	switch key {
 	case string(KeyInflation):
-		cdc.MustUnmarshalJSON(bytes, &p.Inflation)
-		return p.Inflation.String(), nil
+		err := cdc.UnmarshalJSON(bytes, &p.Inflation)
+		return p.Inflation.String(), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -75,9 +75,9 @@ func DefaultParams() Params {
 	}
 }
 
-func validateParams(params Params) error {
-	if params.Inflation.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("mint parameter Max inflation must be greater than or equal to min inflation")
+func validateParams(p Params) error {
+	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.NewDecWithPrec(0, 0)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMintInflation, fmt.Sprintf("Mint Inflation [%s] should be between [0, 0.2] ", p.Inflation.String()))
 	}
 	return nil
 }

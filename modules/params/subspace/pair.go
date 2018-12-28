@@ -18,6 +18,6 @@ type KeyValuePairs []KeyValuePair
 type ParamSet interface {
 	KeyValuePairs() KeyValuePairs
 	Validate(key string, value string) (interface{}, sdk.Error)
-	GetParamsKey() string
+	GetParamSpace() string
 	StringFromBytes(*codec.Codec, string, []byte) (string, error)
 }

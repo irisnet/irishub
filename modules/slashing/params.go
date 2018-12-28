@@ -8,6 +8,8 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+var _ params.ParamSet = (*Params)(nil)
+
 // Default parameter namespace
 const (
 	DefaultParamspace = "slashing"
@@ -58,7 +60,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	return nil, nil
 }
 
-func (p *Params) GetParamsKey() string {
+func (p *Params) GetParamSpace() string {
 	return DefaultParamspace
 }
 
