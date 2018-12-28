@@ -7,8 +7,8 @@ import (
 // Register concrete types on codec codec for default AppAccount
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*Account)(nil), nil)
-	cdc.RegisterConcrete(&BaseAccount{}, "auth/Account", nil)
-	cdc.RegisterConcrete(StdTx{}, "auth/StdTx", nil)
+	cdc.RegisterConcrete(&BaseAccount{}, "irishub/bank/Account", nil)
+	cdc.RegisterConcrete(StdTx{}, "irishub/bank/StdTx", nil)
 }
 
 var msgCdc = codec.New()
