@@ -95,20 +95,9 @@ iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --ty
 * `--switch-height` The switchheight of the new protocol
 * Other parameters can be referrenced in [Gov User Guide](governance.md)
 
-```
-iriscli upgrade submit-switch --name=x --from=$VADDR --proposalID=1 --chain-id=upgrade-test --fee=0.05iris --gas=20000
-```
-
-* `--proposalID` The ID of passed software upgrade proposals 
-
-```
-iris start --replay
-```
-
-* Resynchronize the block, clean the dirty AppHash
+Query the version details of current software 
 
 ```
 iriscli upgrade info --trust-node
 ```
 
-* Query the version details of current software 

@@ -23,7 +23,7 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -101,7 +101,6 @@ func MakeCodec() *codec.Codec {
 	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
-	govtypes.RegisterCodec(cdc)
 	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)

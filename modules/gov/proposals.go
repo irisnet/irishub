@@ -7,8 +7,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/irisnet/irishub/modules/gov/params"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/gov/params"
 )
 
 //-----------------------------------------------------------
@@ -84,7 +84,7 @@ type TextProposal struct {
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
 
-	TallyProcedure  govparams.TallyingProcedure `json:"tallying_procedure"`
+	TallyProcedure govparams.TallyingProcedure `json:"tallying_procedure"`
 }
 
 // Implements Proposal Interface
@@ -136,8 +136,8 @@ const (
 	ProposalTypeParameterChange ProposalKind = 0x01
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
 	////////////////////  iris begin  /////////////////////////////
-	ProposalTypeSoftwareHalt ProposalKind = 0x03
-	ProposalTypeTxTaxUsage   ProposalKind = 0x04
+	ProposalTypeSystemHalt      ProposalKind = 0x03
+	ProposalTypeTxTaxUsage      ProposalKind = 0x04
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -149,8 +149,8 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
 		////////////////////  iris begin  /////////////////////////////
-	case "SoftwareHalt":
-		return ProposalTypeSoftwareHalt, nil
+	case "SystemHalt":
+		return ProposalTypeSystemHalt, nil
 	case "TxTaxUsage":
 		return ProposalTypeTxTaxUsage, nil
 		////////////////////  iris end  /////////////////////////////
@@ -164,7 +164,7 @@ func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
 		////////////////////  iris begin  /////////////////////////////
-		pt == ProposalTypeSoftwareHalt ||
+		pt == ProposalTypeSystemHalt ||
 		pt == ProposalTypeTxTaxUsage {
 		////////////////////  iris end  /////////////////////////////
 		return true
@@ -212,8 +212,8 @@ func (pt ProposalKind) String() string {
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
 		////////////////////  iris begin  /////////////////////////////
-	case ProposalTypeSoftwareHalt:
-		return "SoftwareHalt"
+	case ProposalTypeSystemHalt:
+		return "SystemHalt"
 	case ProposalTypeTxTaxUsage:
 		return "TxTaxUsage"
 		////////////////////  iris end  /////////////////////////////

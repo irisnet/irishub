@@ -154,7 +154,7 @@ func (g AddGuardian) ValidateBasic() sdk.Error {
 		return ErrInvalidDescription(DefaultCodespace)
 	}
 	if len(g.Address) == 0 {
-		return sdk.ErrInvalidAddress(g.AddedBy.String())
+		return sdk.ErrInvalidAddress(g.Address.String())
 	}
 	if len(g.AddedBy) == 0 {
 		return sdk.ErrInvalidAddress(g.AddedBy.String())

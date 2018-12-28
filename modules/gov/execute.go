@@ -2,49 +2,47 @@ package gov
 
 import (
 	"fmt"
+	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
-
-func Execute(ctx sdk.Context, k Keeper, p govtypes.Proposal) (err error){
-	switch p.GetProposalType(){
-	case govtypes.ProposalTypeParameterChange:
-		return ParameterProposalExecute(ctx, k, p.(*govtypes.ParameterProposal))
-	case govtypes.ProposalTypeSoftwareHalt:
-		return HaltProposalExecute(ctx, k)
-	case govtypes.ProposalTypeTxTaxUsage:
-		return TaxUsageProposalExecute(ctx,k, p.(*govtypes.TaxUsageProposal))
-	case govtypes.ProposalTypeSoftwareUpgrade:
-		return SoftwareUpgradeProposalExecute(ctx, k, p.(*govtypes.SoftwareUpgradeProposal))
+func Execute(ctx sdk.Context, k Keeper, p Proposal) (err error) {
+	switch p.GetProposalType() {
+	case ProposalTypeParameterChange:
+		return ParameterProposalExecute(ctx, k, p.(*ParameterProposal))
+	case ProposalTypeSystemHalt:
+		return SystemHaltProposalExecute(ctx, k)
+	case ProposalTypeTxTaxUsage:
+		return TaxUsageProposalExecute(ctx, k, p.(*TaxUsageProposal))
+	case ProposalTypeSoftwareUpgrade:
+		return SoftwareUpgradeProposalExecute(ctx, k, p.(*SoftwareUpgradeProposal))
 	}
 	return nil
 }
 
-func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p *govtypes.TaxUsageProposal) (err error) {
+func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p *TaxUsageProposal) (err error) {
 	burn := false
-	if p.Usage == govtypes.UsageTypeBurn {
+	if p.Usage == UsageTypeBurn {
 		burn = true
 	}
 	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
 	return
 }
 
-func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp *govtypes.ParameterProposal) (err error) {
+func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp *ParameterProposal) (err error) {
 
 	logger := ctx.Logger().With("module", "x/gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-	if pp.Param.Op == govtypes.Update {
+	if pp.Param.Op == Update {
 		params.ParamMapping[pp.Param.Key].Update(ctx, pp.Param.Value)
-	} else if pp.Param.Op == govtypes.Insert {
+	} else if pp.Param.Op == Insert {
 		//Todo: insert
 	}
 	return
 }
 
-func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp *govtypes.SoftwareUpgradeProposal) error {
+func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp *SoftwareUpgradeProposal) error {
 
 	logger := ctx.Logger().With("module", "x/gov")
 
@@ -74,14 +72,14 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, k Keeper, sp *govtypes.Soft
 	return nil
 }
 
-func HaltProposalExecute(ctx sdk.Context, k Keeper) error {
+func SystemHaltProposalExecute(ctx sdk.Context, k Keeper) error {
 	logger := ctx.Logger().With("module", "x/gov")
 
-	if k.GetTerminatorHeight(ctx) == -1 {
-		k.SetTerminatorHeight(ctx, ctx.BlockHeight()+k.GetTerminatorPeriod(ctx))
-		logger.Info("Execute TerminatorProposal begin", "info", fmt.Sprintf("Terminator height:%d", k.GetTerminatorHeight(ctx)))
+	if k.GetSystemHaltHeight(ctx) == -1 {
+		k.SetSystemHaltHeight(ctx, ctx.BlockHeight()+k.GetSystemHaltPeriod(ctx))
+		logger.Info("Execute SystemHaltProposal begin", "info", fmt.Sprintf("SystemHalt height:%d", k.GetSystemHaltHeight(ctx)))
 	} else {
-		logger.Info("Terminator Period is in process.", "info", fmt.Sprintf("Terminator height:%d", k.GetTerminatorHeight(ctx)))
+		logger.Info("SystemHalt Period is in process.", "info", fmt.Sprintf("SystemHalt height:%d", k.GetSystemHaltHeight(ctx)))
 
 	}
 	return nil
