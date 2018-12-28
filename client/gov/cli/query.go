@@ -339,7 +339,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 				if err == nil {
 					if len(res) == 0 {
 						// Return an error directly if the --module parameter is incorrect.
-						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
+						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The  module %s is not existed", moduleStr))
 					}
 
 					if keyStr != "" {

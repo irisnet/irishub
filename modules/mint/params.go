@@ -50,7 +50,7 @@ func (p *Params) Validate(key string, value string) (interface{},sdk.Error) {
 			return nil , params.ErrInvalidString(value)
 		}
 		if inflation.GT(sdk.NewDecWithPrec(2,1)) || inflation.LT(sdk.NewDecWithPrec(0,0)){
-            return nil, sdk.NewError(params.DefaultCodespace,params.CodeInvalidMintInflation,fmt.Sprintf("Mint Inflation should be between 0 and 20% "))
+			return nil, sdk.NewError(params.DefaultCodespace,params.CodeInvalidMintInflation,fmt.Sprintf("Mint Inflation [%s] should be between 0 and 0.2 ", value))
 		}
 		return inflation,nil
 	default:
