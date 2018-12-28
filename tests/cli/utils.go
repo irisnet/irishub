@@ -196,6 +196,11 @@ func readGenesisFile(t *testing.T, genFile string) types.GenesisDoc {
 // executors
 
 func executeWrite(t *testing.T, cmdStr string, writes ...string) (exitSuccess bool) {
+	// broadcast transaction and return after the transaction is included by a block
+	if strings.Contains(cmdStr,"--from") && strings.Contains(cmdStr,"--fee") {
+		cmdStr = cmdStr + " --commit"
+	}
+
 	exitSuccess, _, _ = executeWriteRetStdStreams(t, cmdStr, writes...)
 	return
 }

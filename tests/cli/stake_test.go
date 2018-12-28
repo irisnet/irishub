@@ -30,7 +30,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHomeB))
 	barCeshPubKey := executeGetValidatorPK(t, fmt.Sprintf("iris tendermint show-validator --home=%s", irisHomeB))
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris --commit", flags, barAddr), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -55,7 +55,6 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	cvStr += fmt.Sprintf(" --commission-max-change-rate=%s", "0.01")
 	cvStr += fmt.Sprintf(" --commission-max-rate=%s", "0.5")
 	cvStr += fmt.Sprintf(" --commission-rate=%s", "0.1")
-	cvStr += " --commit"
 
 	executeWrite(t, cvStr, v0.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -79,7 +78,6 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	unbondStr += fmt.Sprintf(" --address-validator=%s", valAddr)
 	unbondStr += fmt.Sprintf(" --shares-amount=%v", "1")
 	unbondStr += fmt.Sprintf(" --fee=%s", "0.004iris")
-	unbondStr += " --commit"
 
 	success := executeWrite(t, unbondStr, v0.DefaultKeyPass)
 	require.True(t, success)
