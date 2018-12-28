@@ -6,7 +6,7 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgSubmitRecord{}, "iris-hub/record/MsgSubmitRecord", nil)
+	cdc.RegisterConcrete(MsgSubmitRecord{}, "irishub/record/MsgSubmitRecord", nil)
 }
 
 var msgCdc = codec.New()

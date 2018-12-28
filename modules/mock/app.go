@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/types/gov/params"
+	 "github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/service/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
