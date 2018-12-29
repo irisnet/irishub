@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -328,7 +329,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			params.RegisterParamSet(&mint.Params{})
+			params.RegisterParamSet(&mint.Params{}, &slashing.Params{})
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:
 				// 1.List of the module;
