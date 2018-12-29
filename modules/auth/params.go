@@ -13,6 +13,10 @@ var _ params.ParamSet = (*Params)(nil)
 const (
 	DefaultParamSpace = "auth"
 )
+var (
+	MinimumGasPrice = sdk.ZeroInt()
+	MaximumGasPrice = sdk.NewIntWithDecimal(1, 18) //1iris, 10^18iris-atto
+)
 
 //Parameter store key
 var (
@@ -48,8 +52,8 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if !ok {
 			return nil, params.ErrInvalidString(value)
 		}
-		if !threshold.GT(sdk.ZeroInt()) {
-			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be positive", value))
+		if !threshold.GT(MinimumGasPrice) || threshold.GT(MaximumGasPrice) {
+			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", value))
 		}
 		return threshold, nil
 	default:
@@ -70,13 +74,13 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 // default auth module parameters
 func DefaultParams() Params {
 	return Params{
-		GasPriceThreshold: sdk.NewIntWithDecimal(2, 10),
+		GasPriceThreshold: sdk.NewIntWithDecimal(2, 10), //20iris-nano, 2*10^10iris-atto
 	}
 }
 
 func validateParams(p Params) error {
-	if !p.GasPriceThreshold.GT(sdk.ZeroInt()) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be positive", p.GasPriceThreshold.String()))
+	if !p.GasPriceThreshold.GT(MinimumGasPrice) || p.GasPriceThreshold.GT(MaximumGasPrice) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", p.GasPriceThreshold.String()))
 	}
 	return nil
 }
