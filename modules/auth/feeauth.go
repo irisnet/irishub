@@ -3,11 +3,11 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"math"
+
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
-	"math"
 )
-
 
 type FeeAuth struct {
 	NativeFeeDenom string `json:"native_fee_denom"`

@@ -10,6 +10,7 @@ import (
 
 	codec "github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 var (
@@ -19,12 +20,13 @@ var (
 )
 
 func TestFeeCollectionKeeperGetSet(t *testing.T) {
-	ms, _, capKey2 := setupMultiStore()
+	ms, _, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 
 	// make context and keeper
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	fck := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	fck := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// no coins initially
 	currFees := fck.GetCollectedFees(ctx)
@@ -38,12 +40,13 @@ func TestFeeCollectionKeeperGetSet(t *testing.T) {
 }
 
 func TestFeeCollectionKeeperAdd(t *testing.T) {
-	ms, _, capKey2 := setupMultiStore()
+	ms, _, capKey2, paramsKey, tParamsKey  := setupMultiStore()
 	cdc := codec.New()
 
 	// make context and keeper
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	fck := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	fck := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// no coins initially
 	require.True(t, fck.GetCollectedFees(ctx).IsEqual(emptyCoins))
@@ -58,12 +61,13 @@ func TestFeeCollectionKeeperAdd(t *testing.T) {
 }
 
 func TestFeeCollectionKeeperClear(t *testing.T) {
-	ms, _, capKey2 := setupMultiStore()
+	ms, _, capKey2, paramsKey, tParamsKey  := setupMultiStore()
 	cdc := codec.New()
 
 	// make context and keeper
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	fck := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	fck := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// set coins initially
 	fck.setCollectedFees(ctx, twoCoins)

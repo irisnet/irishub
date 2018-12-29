@@ -34,8 +34,8 @@ func TestStakeWithRandomMessages(t *testing.T) {
 	paramsTKey := mapp.TkeyParams
 	distrKey := sdk.NewKVStoreKey("distr")
 
-	feeCollectionKeeper := auth.NewFeeCollectionKeeper(mapp.Cdc, feeKey)
 	paramstore := params.NewKeeper(mapp.Cdc, paramsKey, paramsTKey)
+	feeCollectionKeeper := auth.NewFeeKeeper(mapp.Cdc, feeKey, paramstore.Subspace(auth.DefaultParamSpace))
 	stakeKeeper := stake.NewKeeper(mapp.Cdc, stakeKey, stakeTKey, bankKeeper, paramstore.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
 	distrKeeper := distribution.NewKeeper(mapp.Cdc, distrKey, paramstore.Subspace(distribution.DefaultParamspace), bankKeeper, stakeKeeper, feeCollectionKeeper, distribution.DefaultCodespace)
 	mapp.Router().AddRoute("stake", []*sdk.KVStoreKey{stakeKey, mapp.KeyAccount, distrKey}, stake.NewHandler(stakeKeeper))

@@ -28,7 +28,7 @@ func NewFeeKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace
 	return FeeKeeper{
 		storeKey:   key,
 		cdc:        cdc,
-		paramSpace: paramSpace,
+		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 }
 
