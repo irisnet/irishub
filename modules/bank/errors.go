@@ -9,8 +9,9 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "bank"
 
-	CodeInvalidInput  sdk.CodeType = 101
-	CodeInvalidOutput sdk.CodeType = 102
+	CodeInvalidInput   sdk.CodeType = 101
+	CodeInvalidOutput  sdk.CodeType = 102
+	CodeBurnEmptyCoins sdk.CodeType = 103
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -20,6 +21,8 @@ func codeToDefaultMsg(code sdk.CodeType) string {
 		return "invalid input coins"
 	case CodeInvalidOutput:
 		return "invalid output coins"
+	case CodeBurnEmptyCoins:
+		return "burn empty coins"
 	default:
 		return sdk.CodeToDefaultMsg(code)
 	}
@@ -42,6 +45,10 @@ func ErrInvalidOutput(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrNoOutputs(codespace sdk.CodespaceType) sdk.Error {
 	return newError(codespace, CodeInvalidOutput, "")
+}
+
+func ErrBurnEmptyCoins(codespace sdk.CodespaceType) sdk.Error {
+	return newError(codespace, CodeBurnEmptyCoins, "")
 }
 
 //----------------------------------------
