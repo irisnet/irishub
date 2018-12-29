@@ -9,7 +9,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/types"
@@ -128,22 +127,6 @@ func NewApp() *App {
 	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
 	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
-
-	// init iparam
-	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
-		params.NewTypeTable(
-			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
-			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
-			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-		)),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
-
-	params.RegisterGovParamMapping(
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
 
 	return app
 }

@@ -25,6 +25,7 @@ const (
 	CodeInvalidModule            sdk.CodeType = 112
 	CodeInvalidQueryParams       sdk.CodeType = 113
 	CodeInvalidMaxProposalNum    sdk.CodeType = 114
+	CodeInvalidSystemHaltPeriod  sdk.CodeType = 115
 	//service
 	CodeInvalidMaxRequestTimeout    sdk.CodeType = 200
 	CodeInvalidMinDepositMultiple   sdk.CodeType = 201
@@ -37,6 +38,8 @@ const (
 	CodeInvalidUpgradeParams sdk.CodeType = 300
 	//mint
 	CodeInvalidMintInflation sdk.CodeType = 400
+	//slash
+	CodeInvalidSlashParams   sdk.CodeType = 500
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {

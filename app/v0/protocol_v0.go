@@ -20,7 +20,6 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
 
-	"github.com/irisnet/irishub/modules/gov/params"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -151,6 +150,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		p.cdc,
 		protocol.KeyGov,
 		p.paramsKeeper,
+		p.paramsKeeper.Subspace(gov.DefaultParamSpace),
 		p.distrKeeper,
 		p.bankKeeper,
 		p.guardianKeeper,
@@ -222,19 +222,13 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &service.Params{})
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{})
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
-			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
-			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
-			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
 		)),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
-		&upgradeparams.UpgradeParameter)
+		&upgradeparams.UpgradeParameter, )
 }
 
 // application updates every end block
