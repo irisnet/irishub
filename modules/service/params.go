@@ -11,14 +11,14 @@ import (
 
 var _ params.ParamSet = (*Params)(nil)
 
-// default paramspace for params keeper
+// default paramSpace for params keeper
 const (
 	DefaultParamSpace = "service"
 )
 
 //Parameter store key
 var (
-	// params store for inflation params
+	// params store for service params
 	KeyMaxRequestTimeout    = []byte("MaxRequestTimeout")
 	KeyMinDepositMultiple   = []byte("MinDepositMultiple")
 	KeyServiceFeeTax        = []byte("ServiceFeeTax")
@@ -27,12 +27,12 @@ var (
 	KeyArbitrationTimeLimit = []byte("ArbitrationTimeLimit")
 )
 
-// ParamTable for mint module
+// ParamTable for service module
 func ParamTypeTable() params.TypeTable {
 	return params.NewTypeTable().RegisterParamSet(&Params{})
 }
 
-// mint parameters
+// service params
 type Params struct {
 	MaxRequestTimeout    int64         `json:"max_request_timeout"`
 	MinDepositMultiple   int64         `json:"min_deposit_multiple"`
@@ -123,10 +123,10 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	switch key {
 	case string(KeyMaxRequestTimeout):
 		err := cdc.UnmarshalJSON(bytes, &p.MaxRequestTimeout)
-		return string(p.MaxRequestTimeout), err
+		return strconv.FormatInt(p.MaxRequestTimeout, 10), err
 	case string(KeyMinDepositMultiple):
 		err := cdc.UnmarshalJSON(bytes, &p.MinDepositMultiple)
-		return string(p.MinDepositMultiple), err
+		return strconv.FormatInt(p.MinDepositMultiple, 10), err
 	case string(KeyServiceFeeTax):
 		err := cdc.UnmarshalJSON(bytes, &p.ServiceFeeTax)
 		return p.ServiceFeeTax.String(), err
@@ -149,10 +149,10 @@ func DefaultParams() Params {
 	return Params{
 		MaxRequestTimeout:    100,
 		MinDepositMultiple:   1000,
-		ServiceFeeTax:        sdk.NewDecWithPrec(2, 2),           //2%
-		SlashFraction:        sdk.NewDecWithPrec(1, 2),           //1%
-		ComplaintRetrospect:  time.Duration(15 * 24 * time.Hour), //15 days
-		ArbitrationTimeLimit: time.Duration(5 * 24 * time.Hour),  //5 days
+		ServiceFeeTax:        sdk.NewDecWithPrec(2, 2),    //2%
+		SlashFraction:        sdk.NewDecWithPrec(1, 2),    //1%
+		ComplaintRetrospect:  time.Duration(15 * sdk.Day), //15 days
+		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),  //5 days
 	}
 }
 
@@ -163,7 +163,7 @@ func DefaultParamsForTest() Params {
 		MinDepositMultiple:   10,
 		ServiceFeeTax:        sdk.NewDecWithPrec(2, 2), //2%
 		SlashFraction:        sdk.NewDecWithPrec(1, 2), //1%
-		ComplaintRetrospect:  20 * time.Second,         // 20s
+		ComplaintRetrospect:  20 * time.Second,         //20s
 		ArbitrationTimeLimit: 20 * time.Second,         //20s
 	}
 }
