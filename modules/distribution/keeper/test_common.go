@@ -145,7 +145,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 type DummyFeeCollectionKeeper struct{}
 
 var heldFees sdk.Coins
-var _ types.FeeCollectionKeeper = DummyFeeCollectionKeeper{}
+var _ types.FeeKeeper = DummyFeeCollectionKeeper{}
 
 // nolint
 func (fck DummyFeeCollectionKeeper) GetCollectedFees(_ sdk.Context) sdk.Coins {

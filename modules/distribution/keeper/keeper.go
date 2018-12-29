@@ -9,28 +9,28 @@ import (
 
 // keeper of the stake store
 type Keeper struct {
-	storeKey            sdk.StoreKey
-	cdc                 *codec.Codec
-	paramSpace          params.Subspace
-	bankKeeper          types.BankKeeper
-	stakeKeeper         types.StakeKeeper
-	feeCollectionKeeper types.FeeCollectionKeeper
+	storeKey    sdk.StoreKey
+	cdc         *codec.Codec
+	paramSpace  params.Subspace
+	bankKeeper  types.BankKeeper
+	stakeKeeper types.StakeKeeper
+	feeKeeper   types.FeeKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, ck types.BankKeeper,
-	sk types.StakeKeeper, fck types.FeeCollectionKeeper, codespace sdk.CodespaceType) Keeper {
+	sk types.StakeKeeper, fk types.FeeKeeper, codespace sdk.CodespaceType) Keeper {
 
 	keeper := Keeper{
-		storeKey:            key,
-		cdc:                 cdc,
-		paramSpace:          paramSpace.WithTypeTable(ParamTypeTable()),
-		bankKeeper:          ck,
-		stakeKeeper:         sk,
-		feeCollectionKeeper: fck,
-		codespace:           codespace,
+		storeKey:    key,
+		cdc:         cdc,
+		paramSpace:  paramSpace.WithTypeTable(ParamTypeTable()),
+		bankKeeper:  ck,
+		stakeKeeper: sk,
+		feeKeeper:   fk,
+		codespace:   codespace,
 	}
 	return keeper
 }

@@ -35,6 +35,8 @@ const (
 	CodeInvalidUpgradeParams sdk.CodeType = 300
 	//mint
 	CodeInvalidMintInflation sdk.CodeType = 400
+	//auth
+	CodeInvalidGasPriceThreshold sdk.CodeType = 500
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {

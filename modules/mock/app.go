@@ -52,27 +52,24 @@ var (
 // capabilities aren't needed for testing.
 type App struct {
 	*bam.BaseApp
-	Cdc              *codec.Codec // Cdc is public since the codec is passed into the module anyways
-	KeyMain          *sdk.KVStoreKey
-	KeyAccount       *sdk.KVStoreKey
-	KeyFeeCollection *sdk.KVStoreKey
-	KeyStake         *sdk.KVStoreKey
-	TkeyStake        *sdk.TransientStoreKey
-	KeyParams        *sdk.KVStoreKey
-	TkeyParams       *sdk.TransientStoreKey
-	KeyUpgrade       *sdk.KVStoreKey
+	Cdc        *codec.Codec // Cdc is public since the codec is passed into the module anyways
+	KeyMain    *sdk.KVStoreKey
+	KeyAccount *sdk.KVStoreKey
+	KeyFee     *sdk.KVStoreKey
+	KeyStake   *sdk.KVStoreKey
+	TkeyStake  *sdk.TransientStoreKey
+	KeyParams  *sdk.KVStoreKey
+	TkeyParams *sdk.TransientStoreKey
+	KeyUpgrade *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
-	AccountKeeper       auth.AccountKeeper
-	BankKeeper          bank.Keeper
-	FeeCollectionKeeper auth.FeeCollectionKeeper
-	ParamsKeeper        params.Keeper
+	AccountKeeper auth.AccountKeeper
+	BankKeeper    bank.Keeper
+	FeeKeeper     auth.FeeKeeper
+	ParamsKeeper  params.Keeper
 
 	GenesisAccounts  []auth.Account
 	TotalCoinsSupply sdk.Coins
-
-	// fee manager
-	FeeManager auth.FeeManager
 }
 
 // NewApp partially constructs a new app on the memstore for module and genesis
@@ -100,7 +97,7 @@ func NewApp() *App {
 		Cdc:              cdc,
 		KeyMain:          sdk.NewKVStoreKey("main"),
 		KeyAccount:       sdk.NewKVStoreKey("acc"),
-		KeyFeeCollection: sdk.NewKVStoreKey("fee"),
+		KeyFee:           sdk.NewKVStoreKey("fee"),
 		KeyStake:         sdk.NewKVStoreKey("stake"),
 		TkeyStake:        sdk.NewTransientStoreKey("transient_stake"),
 		KeyParams:        sdk.NewKVStoreKey("params"),
@@ -116,19 +113,20 @@ func NewApp() *App {
 		auth.ProtoBaseAccount,
 	)
 
-	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
-	app.FeeCollectionKeeper = auth.NewFeeCollectionKeeper(app.Cdc, app.KeyFeeCollection)
-
 	app.ParamsKeeper = params.NewKeeper(
 		app.Cdc,
 		app.KeyParams, app.TkeyParams,
 	)
-	app.FeeManager = auth.NewFeeManager(app.ParamsKeeper.Subspace("Fee"))
+
+	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
+	app.FeeKeeper = auth.NewFeeKeeper(app.Cdc, app.KeyFee, app.ParamsKeeper.Subspace(auth.DefaultParamSpace))
+
+
 
 	app.SetInitChainer(app.InitChainer)
-	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeCollectionKeeper))
-	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
-	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.FeeManager))
+	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeKeeper))
+	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeKeeper))
+	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.FeeKeeper))
 	// Not sealing for custom extension
 
 	// init iparam
@@ -163,7 +161,7 @@ func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
 	newKeys = append(newKeys, app.KeyAccount)
 	newKeys = append(newKeys, app.KeyParams)
 	newKeys = append(newKeys, app.KeyStake)
-	newKeys = append(newKeys, app.KeyFeeCollection)
+	newKeys = append(newKeys, app.KeyFee)
 	newKeys = append(newKeys, app.TkeyParams)
 	newKeys = append(newKeys, app.TkeyStake)
 
@@ -192,12 +190,7 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 		app.AccountKeeper.SetGenesisAccount(ctx, acc)
 	}
 
-	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
-		FeeTokenNative:    IrisCt.MinUnit.Denom,
-		GasPriceThreshold: 0, // for mock test
-	}
-
-	auth.InitGenesis(ctx, app.FeeCollectionKeeper, app.AccountKeeper, auth.DefaultGenesisState(), app.FeeManager, feeTokenGensisConfig)
+	auth.InitGenesis(ctx, app.FeeKeeper, app.AccountKeeper, auth.DefaultGenesisState())
 
 	return abci.ResponseInitChain{}
 }

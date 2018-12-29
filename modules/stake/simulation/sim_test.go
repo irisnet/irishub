@@ -27,7 +27,7 @@ func TestStakeWithRandomMessages(t *testing.T) {
 	mapper := mapp.AccountKeeper
 	bankKeeper := mapp.BankKeeper
 
-	feeKey := mapp.KeyFeeCollection
+	feeKey := mapp.KeyFee
 	stakeKey := mapp.KeyStake
 	stakeTKey := mapp.TkeyStake
 	paramsKey := mapp.KeyParams

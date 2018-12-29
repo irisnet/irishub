@@ -6,39 +6,54 @@ import (
 
 // GenesisState - all auth state that must be provided at genesis
 type GenesisState struct {
-	CollectedFees sdk.Coins `json:"collected_fees"` // collected fees
+	CollectedFees sdk.Coins `json:"collected_fee"`
+	FeeAuth       FeeAuth   `json:"data"`
+	Params        Params    `json:"params"`
 }
-
-
-type FeeGenesisStateConfig struct {
-	FeeTokenNative    string `json:"fee_token_native"`
-	GasPriceThreshold int64  `json:"gas_price_threshold"`
-}
-
 
 // Create a new genesis state
-func NewGenesisState(collectedFees sdk.Coins) GenesisState {
+func NewGenesisState(collectedFees sdk.Coins, feeAuth FeeAuth, params Params) GenesisState {
 	return GenesisState{
 		CollectedFees: collectedFees,
+		FeeAuth:       feeAuth,
+		Params:        params,
 	}
 }
 
 // Return a default genesis state
 func DefaultGenesisState() GenesisState {
-	return NewGenesisState(sdk.Coins{})
+	return GenesisState{
+		CollectedFees: nil,
+		FeeAuth:       InitialFeeAuth(),
+		Params:        DefaultParams(),
+	}
 }
 
 // Init store state from genesis data
-func InitGenesis(ctx sdk.Context, keeper FeeCollectionKeeper, accountKeeper AccountKeeper, data GenesisState, ps FeeManager, params FeeGenesisStateConfig) {
+func InitGenesis(ctx sdk.Context, keeper FeeKeeper, accountKeeper AccountKeeper, data GenesisState) {
 	keeper.setCollectedFees(ctx, data.CollectedFees)
 	accountKeeper.IncreaseTotalLoosenToken(ctx, data.CollectedFees)
 
-	ps.paramSpace.Set(ctx, nativeFeeTokenKey, params.FeeTokenNative)
-	ps.paramSpace.Set(ctx, nativeGasPriceThresholdKey, sdk.NewInt(params.GasPriceThreshold).String())
+	keeper.SetFeeAuth(ctx, data.FeeAuth)
+	keeper.SetParamSet(ctx, data.Params)
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper
-func ExportGenesis(ctx sdk.Context, keeper FeeCollectionKeeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, keeper FeeKeeper) GenesisState {
 	collectedFees := keeper.GetCollectedFees(ctx)
-	return NewGenesisState(collectedFees)
+	feeAuth := keeper.GetFeeAuth(ctx)
+	params := keeper.GetParamSet(ctx)
+	return NewGenesisState(collectedFees, feeAuth, params)
+}
+
+func ValidateGenesis(data GenesisState) error {
+	err := validateParams(data.Params)
+	if err != nil {
+		return err
+	}
+	err = ValidateFee(data.FeeAuth, data.CollectedFees)
+	if err != nil {
+		return err
+	}
+	return nil
 }
