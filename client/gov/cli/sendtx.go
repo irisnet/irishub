@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -10,10 +9,11 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"strings"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -48,17 +48,17 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			////////////////////  iris begin  ///////////////////////////
-			var param gov.Param
+			var params gov.Params
 			if proposalType == gov.ProposalTypeParameterChange {
-				paramStr := viper.GetString(flagParam)
-				param, err = getParamFromString(paramStr)
+				paramStr := viper.GetStringSlice(flagParam)
+				params, err = getParamFromString(paramStr)
 				if err != nil {
 					return err
 				}
 			}
 			////////////////////  iris end  /////////////////////////////
 
-			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, param)
+			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
 			if proposalType == gov.ProposalTypeTxTaxUsage {
 				usageStr := viper.GetString(flagUsage)
 				usage, err := gov.UsageTypeFromString(usageStr)
@@ -98,7 +98,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal")
 	////////////////////  iris begin  ///////////////////////////
-	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. [{key:key,value:value,op:update}]")
+	cmd.Flags().StringSlice(flagParam, []string{}, "parameter of proposal,eg. [{key:key,value:value,op:update}]")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
 	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
@@ -115,15 +115,22 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 }
 
 ////////////////////  iris begin  ///////////////////////////
-func getParamFromString(paramStr string) (gov.Param, error) {
-	var param gov.Param
-	if paramStr != "" {
-		err := json.Unmarshal([]byte(paramStr), &param)
-		return param, err
-
-	} else {
-		return param, errors.New("Path and param are both empty")
+func getParamFromString(paramsStr []string) (gov.Params, error) {
+	var govParams gov.Params
+	for _, paramstr := range paramsStr {
+		str := strings.Split(paramstr, "=")
+		if len(str) != 2 {
+			return gov.Params{}, fmt.Errorf("%s is not valid", paramstr)
+		}
+		//str = []string{"mint/Inflation","0.0000000000"}
+		//params.GetParamSpaceFromKey(str[0]) == "mint"
+		//params.GetParamKey(str[0])          == "Inflation"
+		govParams = append(govParams,
+			gov.Param{Subspace: params.GetParamSpaceFromKey(str[0]),
+				Key:   params.GetParamKey(str[0]),
+				Value: str[1]})
 	}
+	return govParams, nil
 }
 
 ////////////////////  iris end  /////////////////////////////

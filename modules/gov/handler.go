@@ -46,7 +46,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
 	}
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
 
 	////////////////////  iris end  /////////////////////////////
 
@@ -59,7 +59,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 	var paramBytes []byte
 	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Param)
+		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
 	}
 	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(

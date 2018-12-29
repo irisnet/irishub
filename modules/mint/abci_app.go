@@ -19,7 +19,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
 	}
 
 	// Calculate block mint amount
-	params := k.GetParams(ctx)
+	params := k.GetParamSet(ctx)
 	annualProvisions := minter.NextAnnualProvisions(params)
 	mintedCoin := minter.BlockProvision(params, annualProvisions, blockTime)
 

@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 )
 
 type testparams struct {
@@ -17,6 +19,22 @@ func (tp *testparams) KeyValuePairs() KeyValuePairs {
 		{[]byte("b"), &tp.b},
 	}
 }
+
+// Implements params.ParamStruct
+func (p *testparams) GetParamsKey() string {
+	return "test"
+}
+
+func (p *testparams) Validate(key string, value string) (interface{},sdk.Error) {
+
+		return nil,nil
+
+}
+
+func (p *testparams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
+	return "", nil
+}
+
 
 func TestTypeTable(t *testing.T) {
 	table := NewTypeTable()

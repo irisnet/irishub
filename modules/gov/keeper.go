@@ -8,10 +8,10 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 
+	"github.com/irisnet/irishub/modules/params"
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -23,6 +23,9 @@ var (
 
 // Governance Keeper
 type Keeper struct {
+	// The reference to the Param Keeper to get and set Global Params
+	paramsKeeper params.Keeper
+
 	// The reference to the CoinKeeper to modify balances
 	ck bank.Keeper
 
@@ -51,17 +54,18 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramsKeeper params.Keeper, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
-		storeKey:  key,
-		ck:        ck,
-		dk:        dk,
-		gk:        gk,
-		ds:        ds,
-		vs:        ds.GetValidatorSet(),
-		pk:        pk,
-		cdc:       cdc,
-		codespace: codespace,
+		storeKey:     key,
+		paramsKeeper: paramsKeeper,
+		ck:           ck,
+		dk:           dk,
+		gk:           gk,
+		ds:           ds,
+		vs:           ds.GetValidatorSet(),
+		pk:           pk,
+		cdc:          cdc,
+		codespace:    codespace,
 	}
 }
 
@@ -69,7 +73,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, dk distribution.Keeper, ck ba
 // Proposals
 
 ////////////////////  iris begin  ///////////////////////////
-func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
+func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Params) Proposal {
 	switch proposalType {
 	case ProposalTypeParameterChange:
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
@@ -86,7 +90,7 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 
 // Creates a NewProposal
 ////////////////////  iris begin  ///////////////////////////
-func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Param) Proposal {
+func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -102,11 +106,9 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
 
-	param.Value = params.ParamMapping[param.Key].ToJson(param.Value)
-
 	var proposal Proposal = &ParameterProposal{
 		textProposal,
-		param,
+		params,
 	}
 
 	depositPeriod := GetDepositPeriod(ctx)

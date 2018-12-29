@@ -6,9 +6,12 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+var (
+	InvariantLevel = ""
+)
+
 const (
 	defaultMinimumFees = ""
-	InvariantNo        = ""
 	InvariantError     = "error"
 	InvariantPanic     = "panic"
 )
@@ -45,5 +48,5 @@ func (c *Config) MinimumFees() sdk.Coins {
 
 // DefaultConfig returns server's default configuration.
 func DefaultConfig() *Config {
-	return &Config{BaseConfig{MinFees: defaultMinimumFees, InvariantLevel: InvariantNo}}
+	return &Config{BaseConfig{MinFees: defaultMinimumFees, InvariantLevel: InvariantLevel}}
 }

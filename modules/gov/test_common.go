@@ -55,7 +55,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.DefaultCodespace)
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov,paramsKeeper, dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
