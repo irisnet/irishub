@@ -87,7 +87,6 @@ func main() {
 	}
 	distributionCmd.AddCommand(
 		client.GetCommands(
-			distributioncmd.GetWithdrawAddress("distr", cdc),
 			distributioncmd.GetDelegationDistInfo("distr", cdc),
 			distributioncmd.GetValidatorDistInfo("distr", cdc),
 			distributioncmd.GetAllDelegationDistInfo("distr", cdc),

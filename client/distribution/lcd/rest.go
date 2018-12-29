@@ -12,8 +12,6 @@ const storeName = "distr"
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc("/distribution/{delegatorAddr}/withdrawReward", WithdrawRewardsHandlerFn(cdc, cliCtx)).Methods("POST")
 
-	r.HandleFunc("/distribution/{delegatorAddr}/withdrawAddress",
-		QueryWithdrawAddressHandlerFn(storeName, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{delegatorAddr}/distrInfo/{validatorAddr}",
 		QueryDelegationDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{delegatorAddr}/distrInfos",
