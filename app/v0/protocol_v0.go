@@ -17,7 +17,6 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
@@ -49,7 +48,6 @@ type ProtocolVersion0 struct {
 	paramsKeeper        params.Keeper
 	serviceKeeper       service.Keeper
 	guardianKeeper      guardian.Keeper
-	recordKeeper        record.Keeper
 	upgradeKeeper       upgrade.Keeper
 	// fee manager
 	feeManager auth.FeeManager
@@ -166,11 +164,6 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		gov.DefaultCodespace,
 	)
 
-	p.recordKeeper = record.NewKeeper(
-		p.cdc,
-		protocol.KeyRecord,
-		record.DefaultCodespace,
-	)
 	p.serviceKeeper = service.NewKeeper(
 		p.cdc,
 		protocol.KeyService,
@@ -197,7 +190,6 @@ func (p *ProtocolVersion0) configRouters() {
 		AddRoute("slashing", slashing.NewHandler(p.slashingKeeper)).
 		AddRoute("distr", distr.NewHandler(p.distrKeeper)).
 		AddRoute("gov", gov.NewHandler(p.govKeeper)).
-		AddRoute("record", record.NewHandler(p.recordKeeper)).
 		AddRoute("service", service.NewHandler(p.serviceKeeper)).
 		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
 	p.queryRouter.
@@ -234,7 +226,7 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{})
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{})
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(

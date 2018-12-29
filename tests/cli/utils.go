@@ -19,13 +19,10 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/keys"
-	recordCli "github.com/irisnet/irishub/client/record"
 	servicecli "github.com/irisnet/irishub/client/service"
 	stakecli "github.com/irisnet/irishub/client/stake"
-	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
@@ -463,29 +460,6 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 	require.NoError(t, err, "out %v\n, err %v", stdout, err)
 
 	return res.TxHash
-}
-
-func executeGetRecordID(t *testing.T, cmdStr string) string {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var info tx.Info
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &info)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	recordMsg, ok := info.Tx.GetMsgs()[0].(record.MsgSubmitRecord)
-	if !ok {
-		fmt.Println("Err MsgSubmitRecord type assertion failed")
-		return ""
-	}
-	return recordMsg.RecordID
-}
-
-func executeGetRecord(t *testing.T, cmdStr string) recordCli.RecordOutput {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var record recordCli.RecordOutput
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &record)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return record
 }
 
 func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force bool) bool {

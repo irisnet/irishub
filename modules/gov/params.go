@@ -167,6 +167,56 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 	case string(KeyCriticalPenalty):
 		err := cdc.UnmarshalJSON(bytes, &p.CriticalPenalty)
 		return p.CriticalPenalty.String(), err
+
+	case string(KeyImportantDepositPeriod):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantDepositPeriod)
+		return p.ImportantDepositPeriod.String(), err
+	case string(KeyImportantMinDeposit):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantMinDeposit)
+		return p.ImportantMinDeposit.String(), err
+	case string(KeyImportantVotingPeriod):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantVotingPeriod)
+		return p.ImportantDepositPeriod.String(), err
+	case string(KeyImportantMaxNum):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantMaxNum)
+		return strconv.FormatUint(p.ImportantMaxNum, 10), err
+	case string(KeyImportantThreshold):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantThreshold)
+		return p.ImportantThreshold.String(), err
+	case string(KeyImportantVeto):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantVeto)
+		return p.ImportantThreshold.String(), err
+	case string(KeyImportantParticipation):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantParticipation)
+		return p.ImportantParticipation.String(), err
+	case string(KeyImportantPenalty):
+		err := cdc.UnmarshalJSON(bytes, &p.ImportantPenalty)
+		return p.ImportantPenalty.String(), err
+
+	case string(KeyNormalDepositPeriod):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalDepositPeriod)
+		return p.NormalDepositPeriod.String(), err
+	case string(KeyNormalMinDeposit):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalMinDeposit)
+		return p.NormalMinDeposit.String(), err
+	case string(KeyNormalVotingPeriod):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalVotingPeriod)
+		return p.NormalDepositPeriod.String(), err
+	case string(KeyNormalMaxNum):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalMaxNum)
+		return strconv.FormatUint(p.NormalMaxNum, 10), err
+	case string(KeyNormalThreshold):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalThreshold)
+		return p.NormalThreshold.String(), err
+	case string(KeyNormalVeto):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalVeto)
+		return p.NormalThreshold.String(), err
+	case string(KeyNormalParticipation):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalParticipation)
+		return p.NormalParticipation.String(), err
+	case string(KeyNormalPenalty):
+		err := cdc.UnmarshalJSON(bytes, &p.NormalPenalty)
+		return p.NormalPenalty.String(), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
