@@ -29,7 +29,7 @@ func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p *TaxUsageProposal) (er
 	} else {
 		_, found := k.gk.GetTrustee(ctx, p.DestAddress)
 		if !found {
-			logger.Info("Execute TaxUsageProposal Failure", "info",
+			logger.Error("Execute TaxUsageProposal Failure", "info",
 				fmt.Sprintf("the destination address [%s] is not a trustee now", p.DestAddress))
 			return
 		}
