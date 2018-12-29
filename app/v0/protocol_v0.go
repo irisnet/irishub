@@ -222,7 +222,7 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{})
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &gov.GovParams{}, &service.Params{})
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(

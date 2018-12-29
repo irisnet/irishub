@@ -17,6 +17,9 @@ func NewGenesisState(params Params) GenesisState {
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
 	k.SetParamSet(ctx, data.Params)
 }
 
