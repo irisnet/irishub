@@ -11,7 +11,6 @@ import (
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
-	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
@@ -228,26 +227,6 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		guardianCmd,
-	)
-
-	//add record command
-	recordCmd := &cobra.Command{
-		Use:   "record",
-		Short: "Record subcommands",
-	}
-
-	recordCmd.AddCommand(
-		client.GetCommands(
-			recordcmd.GetCmdQureyRecord("record", cdc),
-			recordcmd.GetCmdDownload("record", cdc),
-		)...)
-
-	recordCmd.AddCommand(
-		client.PostCommands(
-			recordcmd.GetCmdSubmitRecord("record", cdc),
-		)...)
-	rootCmd.AddCommand(
-		recordCmd,
 	)
 
 	//Add keys and version commands
