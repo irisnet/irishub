@@ -362,7 +362,7 @@ paths:
             tx:
               $ref: "#/definitions/StdTx"
       responses:
-        202:
+        200:
           description: Tx was send and will probably be added to the next block
           schema:
             $ref: "#/definitions/BroadcastTxCommitResult"
@@ -581,8 +581,8 @@ paths:
         required: true
         type: string
       - in: body
-        name: account
-        description: The password of the account to remove from the KMS
+        name: sendBody
+        description: Parameters to send coins
         required: true
         schema:
           type: object
@@ -595,7 +595,63 @@ paths:
               type: string
               example: "1iris"
       responses:
-        202:
+        200:
+          description: Tx was send and will probably be added to the next block
+          schema:
+            $ref: "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid request
+        401:
+          description: Key password is wrong
+        500:
+          description: Server internal error
+  /bank/burn:
+    post:
+      summary: Burn coins
+      description: Burn coins
+      tags:
+      - ICS20
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: body
+        name: burnBory
+        description: Parameters to burn coins
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              $ref: "#/definitions/BaseTx"
+            owner:
+              $ref: "#/definitions/Address"
+            amount:
+              type: string
+              example: "1iris"
+      responses:
+        200:
           description: Tx was send and will probably be added to the next block
           schema:
             $ref: "#/definitions/BroadcastTxCommitResult"
