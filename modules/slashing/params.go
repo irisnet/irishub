@@ -159,21 +159,27 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	}
 }
 
-// Default parameters used by Cosmos Hub
+// Default parameters used by Iris Hub
 func DefaultParams() Params {
 	return Params{
 		MaxEvidenceAge: sdk.Day,
-
 		DoubleSignJailDuration: sdk.Week,
-
 		SignedBlocksWindow: 20000,
-
 		DowntimeJailDuration: sdk.Week,
-
 		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
-
 		SlashFractionDoubleSign: sdk.NewDec(1).Quo(sdk.NewDec(20)),
+		SlashFractionDowntime: sdk.NewDec(1).Quo(sdk.NewDec(100)),
+	}
+}
 
+func DefaultParamsForTestnet() Params {
+	return Params{
+		MaxEvidenceAge: 60 * 2 * time.Second,
+		DoubleSignJailDuration: 60 * 5 * time.Second,
+		SignedBlocksWindow: 100,
+		DowntimeJailDuration: 60 * 10 * time.Second,
+		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
+		SlashFractionDoubleSign: sdk.NewDec(1).Quo(sdk.NewDec(20)),
 		SlashFractionDowntime: sdk.NewDec(1).Quo(sdk.NewDec(100)),
 	}
 }
@@ -205,7 +211,7 @@ func validateParams(p Params) sdk.Error {
 }
 
 func validateMaxEvidenceAge(p time.Duration) sdk.Error {
-	if p < 10 * time.Minute || p > sdk.Week {
+	if p < 2 * time.Minute || p > sdk.Week {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min, 1week] ", p.String()))
 	}
 	return nil
