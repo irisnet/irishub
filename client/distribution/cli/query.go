@@ -14,7 +14,7 @@ import (
 )
 
 const NULL = "null"
-
+/*
 // GetWithdrawAddress returns withdraw address of a given delegator address
 func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
@@ -50,7 +50,7 @@ func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
 		},
 	}
 }
-
+*/
 // GetDelegationDistInfo returns the delegation distribution information of a given delegation
 func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{

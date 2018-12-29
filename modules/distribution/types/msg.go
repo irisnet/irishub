@@ -46,6 +46,8 @@ func (msg MsgSetWithdrawAddress) GetSignBytes() []byte {
 
 // quick validity check
 func (msg MsgSetWithdrawAddress) ValidateBasic() sdk.Error {
+	return ErrDeprecatedOperation(DefaultCodespace)
+	/*
 	if msg.DelegatorAddr == nil {
 		return ErrNilDelegatorAddr(DefaultCodespace)
 	}
@@ -53,6 +55,7 @@ func (msg MsgSetWithdrawAddress) ValidateBasic() sdk.Error {
 		return ErrNilWithdrawAddr(DefaultCodespace)
 	}
 	return nil
+	*/
 }
 
 //______________________________________________________________________

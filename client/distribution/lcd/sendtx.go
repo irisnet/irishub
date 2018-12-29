@@ -11,6 +11,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+/*
 type setWithdrawAddressBody struct {
 	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
 	BaseTx          utils.BaseTx   `json:"base_tx"`
@@ -45,7 +46,7 @@ func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
 	}
 }
-
+*/
 type withdrawRewardsBody struct {
 	ValidatorAddress sdk.ValAddress `json:"validator_address"`
 	IsValidator      bool           `json:"is_validator"`

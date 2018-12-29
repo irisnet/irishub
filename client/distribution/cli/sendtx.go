@@ -79,7 +79,7 @@ func GetCmdWithdrawRewards(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().Bool(flagIsValidator, false, "also withdraw validator's commission")
 	return cmd
 }
-
+/*
 // GetCmdDelegate implements the delegate command.
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -113,3 +113,4 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	}
 	return cmd
 }
+*/

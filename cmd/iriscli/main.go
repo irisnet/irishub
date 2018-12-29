@@ -94,7 +94,6 @@ func main() {
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
-			distributioncmd.GetCmdSetWithdrawAddr(cdc),
 			distributioncmd.GetCmdWithdrawRewards(cdc),
 		)...)
 	rootCmd.AddCommand(

@@ -32,6 +32,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 func handleMsgModifyWithdrawAddress(ctx sdk.Context, msg types.MsgSetWithdrawAddress, k keeper.Keeper) sdk.Result {
 
+	return types.ErrDeprecatedOperation(types.DefaultCodespace).Result()
+	/*
 	k.SetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr, msg.WithdrawAddr)
 
 	tags := sdk.NewTags(
@@ -40,6 +42,7 @@ func handleMsgModifyWithdrawAddress(ctx sdk.Context, msg types.MsgSetWithdrawAdd
 	return sdk.Result{
 		Tags: tags,
 	}
+	*/
 }
 
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
