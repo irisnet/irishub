@@ -20,7 +20,7 @@ type postProposalReq struct {
 	ProposalType   string         `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
-	Param          gov.Param      `json:"param"`
+	Params         gov.Params      `json:"param"`
 	Usage          gov.UsageType  `json:"usage"`
 	DestAddress    sdk.AccAddress `json:"dest_address"`
 	Percent        sdk.Dec        `json:"percent"`
@@ -67,7 +67,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		// create the message
-		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Param)
+		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Params)
 		if msg.ProposalType == gov.ProposalTypeTxTaxUsage {
 			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
 			err = msg.ValidateBasic()
