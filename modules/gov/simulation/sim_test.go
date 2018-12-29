@@ -58,6 +58,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 	govKeeper := gov.NewKeeper(
 		mapp.Cdc,
 		govKey,
+		paramKeeper,
 		distrKeeper,
 		bankKeeper,
 		guardianKeeper,

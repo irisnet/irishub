@@ -36,11 +36,17 @@ func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.Account) (BaseAccoun
 	}, nil
 }
 
-// build the sendTx msg
-func BuildMsg(from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) sdk.Msg {
+// BuildBankSendMsg builds the sending coins msg
+func BuildBankSendMsg(from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 	input := bank.NewInput(from, coins)
 	output := bank.NewOutput(to, coins)
 	msg := bank.NewMsgSend([]bank.Input{input}, []bank.Output{output})
+	return msg
+}
+
+// BuildBankBurnMsg builds the burning coin msg
+func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
+	msg := bank.NewMsgBurn(from, coins)
 	return msg
 }
 

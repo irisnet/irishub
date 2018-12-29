@@ -226,3 +226,52 @@ func NewOutput(addr sdk.AccAddress, coins sdk.Coins) Output {
 	}
 	return output
 }
+
+//----------------------------------------
+// MsgBurn
+
+// MsgBurn - high level transaction of the coin module
+type MsgBurn struct {
+	Owner sdk.AccAddress `json:"owner"`
+	Coins sdk.Coins      `json:"coins"`
+}
+
+var _ sdk.Msg = MsgBurn{}
+
+// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+func NewMsgBurn(owner sdk.AccAddress, coins sdk.Coins) MsgBurn {
+	return MsgBurn{Owner: owner, Coins: coins}
+}
+
+// Implements Msg.
+// nolint
+func (msg MsgBurn) Route() string { return "bank" }
+func (msg MsgBurn) Type() string  { return "burn" }
+
+// Implements Msg.
+func (msg MsgBurn) ValidateBasic() sdk.Error {
+	if len(msg.Owner) == 0 {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+	if len(msg.Coins) == 0 {
+		return ErrBurnEmptyCoins(DefaultCodespace).TraceSDK("")
+	}
+	if !msg.Coins.IsValid() {
+		return sdk.ErrInvalidCoins(msg.Coins.String())
+	}
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgBurn) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgBurn) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}

@@ -21,7 +21,8 @@ All commands which can be used to send transactions have these global flags. The
 | Name, shorthand  | type   | Required | Default               | Description                                                         |
 | -----------------| -----  | -------- | --------------------- | ------------------------------------------------------------------- |
 | --account-number | int    | false    | 0                     | AccountNumber number to sign the tx |
-| --async          | bool   | false    | false                 | broadcast transactions asynchronously |
+| --async          | bool   | false    | false                 | broadcast transactions asynchronously(only works with commit = false) |
+| --commit         | bool   | false    | false                 | broadcast transaction and wait until the transaction is included by a block |
 | --chain-id       | string | true     | ""                    | Chain ID of tendermint node  |
 | --dry-run        | bool   | false    | false                 | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it |
 | --fee            | string | true     | ""                    | Fee to pay along with transaction |

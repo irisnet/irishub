@@ -6,15 +6,17 @@ const (
 )
 
 type Param struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-	Op    string `json:"op"`
+	Subspace string `json:"subspace"`
+	Key      string `json:"key"`
+	Value    string `json:"value"`
 }
+
+type Params []Param
 
 // Implements Proposal Interface
 var _ Proposal = (*ParameterProposal)(nil)
 
 type ParameterProposal struct {
 	TextProposal
-	Param Param `json:"params"`
+	Params Params `json:"params"`
 }
