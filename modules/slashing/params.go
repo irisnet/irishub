@@ -3,9 +3,12 @@ package slashing
 import (
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 )
+
+var _ params.ParamSet = (*Params)(nil)
 
 // Default parameter namespace
 const (
@@ -50,6 +53,20 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeySlashFractionDoubleSign, &p.SlashFractionDoubleSign},
 		{KeySlashFractionDowntime, &p.SlashFractionDowntime},
 	}
+}
+
+func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
+	//TODO:
+	return nil, nil
+}
+
+func (p *Params) GetParamSpace() string {
+	return DefaultParamspace
+}
+
+func (p *Params) StringFromBytes(*codec.Codec, string, []byte) (string, error) {
+	//TODO:
+	return "", nil
 }
 
 // Default parameters used by Cosmos Hub

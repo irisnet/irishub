@@ -77,7 +77,7 @@ func TestIrisCLIParameterChangeProposal(t *testing.T) {
 	require.Equal(t, gov.StatusPassed, proposal1.Status)
 
 	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ", "Gov/govDepositProcedure", flags))
-	require.Equal(t, param, gov.Param{Key: "Gov/govDepositProcedure", Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":30000000000}", Op: ""})
+	require.Equal(t, param, gov.Param{Key: "Gov/govDepositProcedure", Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":30000000000}", Subspace: ""})
 }
 
 func TestIrisCLIQueryParams(t *testing.T) {
@@ -102,7 +102,7 @@ func TestIrisCLIQueryParams(t *testing.T) {
 	require.Equal(t, "50iris", fooCoin)
 
 	param := executeGetParam(t, fmt.Sprintf("iriscli gov query-params --key=%v --output=json %v ", "Gov/govDepositProcedure", flags))
-	require.Equal(t, param, gov.Param{Key: "Gov/govDepositProcedure", Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":60000000000}", Op: ""})
+	require.Equal(t, param, gov.Param{Key: "Gov/govDepositProcedure", Value: "{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":60000000000}", Subspace: ""})
 }
 
 func TestIrisCLIPullParams(t *testing.T) {

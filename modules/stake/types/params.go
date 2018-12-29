@@ -7,7 +7,11 @@ import (
 
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
+	"strconv"
 )
+
+var _ params.ParamSet = (*Params)(nil)
 
 const (
 	// defaultUnbondingTime reflects three weeks in seconds as the default
@@ -50,6 +54,36 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeyUnbondingTime, &p.UnbondingTime},
 		{KeyMaxValidators, &p.MaxValidators},
 		{KeyBondDenom, &p.BondDenom},
+	}
+}
+
+func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
+	//TODO:
+	return nil, nil
+}
+
+func (p *Params) GetParamSpace() string {
+	return "stake"
+}
+
+func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
+	switch key {
+	case string(KeyUnbondingTime):
+		var unBondingTime time.Duration
+		err := cdc.UnmarshalJSON(bytes, &unBondingTime)
+		return unBondingTime.String(), err
+
+	case string(KeyMaxValidators):
+		var maxValidators uint16
+		err := cdc.UnmarshalJSON(bytes, &maxValidators)
+		return strconv.Itoa(int(maxValidators)), err
+
+	case string(KeyBondDenom):
+		var bondDenom string
+		err := cdc.UnmarshalJSON(bytes, &bondDenom)
+		return bondDenom, err
+	default:
+		return "", nil
 	}
 }
 
