@@ -38,7 +38,7 @@ INSTALL_FLAGS = -ldflags "\
 ### Tools & dependencies
 
 echo_bech32_prefix:
-	@echo "\"source scripts/setProductEnv.sh\" to set compile environment variables for your product, or default values will be applied"
+	@echo "\"source scripts/setProdEnv.sh\" to set compile environment variables for your product, or default values will be applied"
 	@echo InvariantLevel=${InvariantLevel}
 	@echo Bech32PrefixAccAddr=${Bech32PrefixAccAddr}
 	@echo Bech32PrefixAccPub=${Bech32PrefixAccPub}
