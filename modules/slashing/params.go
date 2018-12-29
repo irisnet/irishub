@@ -138,7 +138,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 		return p.MaxEvidenceAge.String(), err
 	case string(KeySignedBlocksWindow):
 		err := cdc.UnmarshalJSON(bytes, &p.SignedBlocksWindow)
-		return strconv.FormatInt(p.SignedBlocksWindow, 64), err
+		return strconv.FormatInt(p.SignedBlocksWindow, 10), err
 	case string(KeyMinSignedPerWindow):
 		err := cdc.UnmarshalJSON(bytes, &p.MinSignedPerWindow)
 		return p.MinSignedPerWindow.String(), err
@@ -219,7 +219,7 @@ func validateMaxEvidenceAge(p time.Duration) sdk.Error {
 
 func validateJailDuration(p time.Duration) sdk.Error {
 	if p <= 0 || p >= 4 * sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DoubleSignJailDuration and DowntimeJailDuration [%s] should be between (, 4week) ", p.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DoubleSignJailDuration and DowntimeJailDuration [%s] should be between (0, 4week) ", p.String()))
 	}
 	return nil
 }
