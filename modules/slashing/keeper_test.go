@@ -15,8 +15,8 @@ import (
 func keeperTestParams() Params {
 	params := DefaultParams()
 	params.SignedBlocksWindow = 1000
-	params.DowntimeUnbondDuration = 60 * 60
-	params.DoubleSignUnbondDuration = 60 * 60
+	params.DowntimeJailDuration = 60 * 60
+	params.DoubleSignJailDuration = 60 * 60
 	return params
 }
 
