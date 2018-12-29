@@ -25,6 +25,7 @@ var (
 type Keeper struct {
 	// The reference to the Param Keeper to get and set Global Params
 	paramsKeeper params.Keeper
+	paramSpace   params.Subspace
 
 	// The reference to the CoinKeeper to modify balances
 	ck bank.Keeper
@@ -54,10 +55,11 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramsKeeper params.Keeper, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramsKeeper params.Keeper, paramSpace params.Subspace, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:     key,
 		paramsKeeper: paramsKeeper,
+		paramSpace:   paramSpace.WithTypeTable(ParamTypeTable()),
 		ck:           ck,
 		dk:           dk,
 		gk:           gk,
@@ -111,7 +113,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 		params,
 	}
 
-	depositPeriod := GetDepositPeriod(ctx)
+	depositPeriod := keeper.GetDepositProcedure(ctx, proposal).MaxDepositPeriod
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -137,7 +139,7 @@ func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, descri
 		textProposal,
 	}
 
-	depositPeriod := GetDepositPeriod(ctx)
+	depositPeriod := keeper.GetDepositProcedure(ctx, proposal).MaxDepositPeriod
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -195,7 +197,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 }
 
 func (keeper Keeper) saveProposal(ctx sdk.Context, proposal Proposal) {
-	depositPeriod := GetDepositPeriod(ctx)
+	depositPeriod := keeper.GetDepositProcedure(ctx, proposal).MaxDepositPeriod
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
@@ -326,7 +328,7 @@ func (keeper Keeper) peekCurrentProposalID(ctx sdk.Context) (proposalID uint64, 
 
 func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 	proposal.SetVotingStartTime(ctx.BlockHeader().Time)
-	votingPeriod := GetVotingPeriod(ctx, proposal)
+	votingPeriod := keeper.GetVotingProcedure(ctx, proposal).VotingPeriod
 	proposal.SetVotingEndTime(proposal.GetVotingStartTime().Add(votingPeriod))
 	proposal.SetStatus(StatusVotingPeriod)
 	keeper.SetProposal(ctx, proposal)
@@ -448,7 +450,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(GetMinDeposit(ctx, proposal)) {
+	if proposal.GetStatus() == StatusDepositPeriod && proposal.GetTotalDeposit().IsAllGTE(keeper.GetDepositProcedure(ctx, proposal).MinDeposit) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}
@@ -507,7 +509,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	}
 
 	proposal := keeper.GetProposal(ctx, proposalID)
-	BurnAmountDec := sdk.NewDecFromInt(GetMinDeposit(ctx, proposal).AmountOf(stakeTypes.StakeDenom)).Mul(BurnRate)
+	BurnAmountDec := sdk.NewDecFromInt(keeper.GetDepositProcedure(ctx, proposal).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(BurnRate)
 	DepositSumInt := depositSum.AmountOf(stakeTypes.StakeDenom)
 	rate := BurnAmountDec.Quo(sdk.NewDecFromInt(DepositSumInt))
 	RefundSumInt := sdk.NewInt(0)
@@ -712,14 +714,14 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 }
 
 func (keeper Keeper) IsMoreThanMaxProposal(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
-	votingProcedure := GetVotingProcedure(ctx)
+	votingProcedure := keeper.GetVotingProcedureByProposalLevel(ctx, pl)
 	switch pl {
 	case ProposalLevelCritical:
-		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) >= votingProcedure.CriticalMaxNum
+		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) >= votingProcedure.MaxNum
 	case ProposalLevelImportant:
-		return keeper.GetImportantProposalNum(ctx), keeper.GetImportantProposalNum(ctx) >= votingProcedure.ImportantMaxNum
+		return keeper.GetImportantProposalNum(ctx), keeper.GetImportantProposalNum(ctx) >= votingProcedure.MaxNum
 	case ProposalLevelNormal:
-		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) >= votingProcedure.NormalMaxNum
+		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) >= votingProcedure.MaxNum
 	default:
 		panic("There is no level for this proposal")
 	}

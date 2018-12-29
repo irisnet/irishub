@@ -328,7 +328,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			params.RegisterParamSet(&mint.Params{})
+			params.RegisterParamSet(&mint.Params{},&gov.GovParams{})
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:
 				// 1.List of the module;

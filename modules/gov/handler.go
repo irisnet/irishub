@@ -246,7 +246,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %s (had only %s); deleted",
 				inactiveProposal.GetProposalID(),
 				inactiveProposal.GetTitle(),
-				GetMinDeposit(ctx, inactiveProposal),
+				keeper.GetDepositProcedure(ctx, inactiveProposal).MinDeposit,
 				inactiveProposal.GetTotalDeposit(),
 			),
 		)
@@ -292,7 +292,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
 						val.GetPower().RoundInt64(),
-						GetTallyingCondition(ctx, activeProposal).Penalty)
+						keeper.GetTallyingProcedure(ctx, activeProposal).Penalty)
 				}
 			}
 		}

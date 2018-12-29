@@ -59,6 +59,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		mapp.Cdc,
 		govKey,
 		paramKeeper,
+		mapp.ParamsKeeper.Subspace(gov.DefaultParamSpace),
 		distrKeeper,
 		bankKeeper,
 		guardianKeeper,
