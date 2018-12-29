@@ -73,6 +73,7 @@ func main() {
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
+			bankcmd.BurnTxCmd(cdc),
 			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			bankcmd.GetBroadcastCommand(cdc),
 		)...)

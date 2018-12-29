@@ -72,6 +72,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     5. `GET /bank/token-stats`: 查询token统计信息
     6. `GET /bank/balances/{address}`: 查询账户的token数量
     7. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    8. `POST /bank/burn`: 销毁通证
 
 4. Stake模块的APIs
 
