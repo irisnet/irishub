@@ -611,22 +611,7 @@ func (keeper Keeper) SetSystemHaltHeight(ctx sdk.Context, height int64) {
 	store.Set(KeySystemHaltHeight, bz)
 }
 
-func (keeper Keeper) GetSystemHaltPeriod(ctx sdk.Context) int64 {
-	store := ctx.KVStore(keeper.storeKey)
-	bz := store.Get(KeySystemHaltPeriod)
-	if bz == nil {
-		return -1
-	}
-	var height int64
-	keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &height)
-	return height
-}
 
-func (keeper Keeper) SetSystemHaltPeriod(ctx sdk.Context, height int64) {
-	store := ctx.KVStore(keeper.storeKey)
-	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(height)
-	store.Set(KeySystemHaltPeriod, bz)
-}
 
 func (keeper Keeper) GetCriticalProposalID(ctx sdk.Context) (uint64, bool) {
 	store := ctx.KVStore(keeper.storeKey)

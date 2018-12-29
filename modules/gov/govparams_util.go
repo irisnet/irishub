@@ -157,3 +157,7 @@ func (Keeper Keeper) GetTallyingProcedure(ctx sdk.Context, p Proposal) TallyingP
 	}
 }
 
+func (keeper Keeper) GetSystemHaltPeriod(ctx sdk.Context) ( SystemHaltPeriod int64) {
+	keeper.paramSpace.Get(ctx,KeySystemHaltPeriod,SystemHaltPeriod)
+	return
+}

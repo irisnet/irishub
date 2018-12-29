@@ -9,13 +9,11 @@ const StartingProposalID = 1
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
-	SystemHaltPeriod  int64                       `json:"terminator_period"`
 	Params GovParams `json:"params"` // inflation params
 }
 
 func NewGenesisState(systemHaltPeriod int64, params GovParams) GenesisState {
 	return GenesisState{
-		SystemHaltPeriod:systemHaltPeriod,
 		Params:params,
 	}
 }
@@ -23,7 +21,6 @@ func NewGenesisState(systemHaltPeriod int64, params GovParams) GenesisState {
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		SystemHaltPeriod:  20000,
 		Params: DefaultParams(),
 	}
 }
@@ -42,7 +39,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		panic(err)
 	}
 
-	k.SetSystemHaltPeriod(ctx, data.SystemHaltPeriod)
 	k.SetSystemHaltHeight(ctx, -1)
     k.SetParamSet(ctx,data.Params)
 }
@@ -51,7 +47,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 	return GenesisState{
-		SystemHaltPeriod:k.GetSystemHaltHeight(ctx),
 		Params:k.GetParamSet(ctx),
 	}
 }
@@ -68,7 +63,7 @@ func ValidateGenesis(data GenesisState) error {
 func DefaultGenesisStateForCliTest() GenesisState {
 
 	return GenesisState{
-		SystemHaltPeriod:  20,
+		Params:DefaultParams(),
 	}
 }
 

@@ -94,7 +94,6 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		InitGenesis(ctx, keeper, GenesisState{
-			SystemHaltPeriod:20000,
 			Params:DefaultParams(),
 		})
 		return abci.ResponseInitChain{

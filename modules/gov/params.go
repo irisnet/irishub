@@ -20,10 +20,6 @@ const (
 	NORMAL               = "Normal"
 	LOWER_BOUND_AMOUNT   = 10
 	UPPER_BOUND_AMOUNT   = 10000
-	THREE_DAYS           = 3 * 3600 * 24
-	SIXTY_HOURS          = 60 * 3600
-	TWO_DAYS             = 2 * 3600 * 24 //
-	ONE_DAY              = 1 * 3600 * 24
 	STABLE_CRITIACAL_NUM = 1
 	MIN_IMPORTANT_NUM    = 2
 	MIN_NORMAL_NUM       = 1
@@ -64,6 +60,8 @@ var (
 	KeyNormalVeto          = []byte(NORMAL + "Veto")
 	KeyNormalParticipation = []byte(NORMAL + "Participation")
 	KeyNormalPenalty       = []byte(NORMAL + "Penalty")
+
+	KeySystemHaltPeriod     = []byte("SystemHaltPeriod")
 )
 
 // ParamTable for mint module
@@ -99,6 +97,8 @@ type GovParams struct {
 	NormalVeto          sdk.Dec       `json:"normal_veto"`          //  Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Initial value: 1/3
 	NormalParticipation sdk.Dec       `json:"normal_participation"` //
 	NormalPenalty       sdk.Dec       `json:"normal_penalty"`       //  Penalty if validator does not vote
+
+	SystemHaltPeriod    int64         `json:"system_halt_period"`
 }
 
 // Implements params.ParamStruct
@@ -134,6 +134,8 @@ func (p *GovParams) KeyValuePairs() params.KeyValuePairs {
 		{KeyNormalVeto, &p.NormalVeto},
 		{KeyNormalParticipation, &p.NormalParticipation},
 		{KeyNormalPenalty, &p.NormalPenalty},
+
+		{KeySystemHaltPeriod, &p.SystemHaltPeriod},
 	}
 }
 
@@ -217,6 +219,10 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 	case string(KeyNormalPenalty):
 		err := cdc.UnmarshalJSON(bytes, &p.NormalPenalty)
 		return p.NormalPenalty.String(), err
+
+	case string(KeySystemHaltPeriod):
+		err := cdc.UnmarshalJSON(bytes, &p.SystemHaltPeriod)
+		return  strconv.FormatInt(p.SystemHaltPeriod, 10), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -229,32 +235,33 @@ func DefaultParams() GovParams {
 	var normalMinDeposit, _ = sdk.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeDenomName))
 
 	return GovParams{
-		CriticalDepositPeriod: time.Duration(ONE_DAY) * time.Second,
+		CriticalDepositPeriod: time.Duration(sdk.Day),
 		CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
-		CriticalVotingPeriod:  time.Duration(THREE_DAYS) * time.Second,
+		CriticalVotingPeriod:  time.Duration(sdk.ThreeDays),
 		CriticalMaxNum:        STABLE_CRITIACAL_NUM,
 		CriticalThreshold:     sdk.NewDecWithPrec(834, 3),
 		CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 		CriticalParticipation: sdk.NewDecWithPrec(8572, 4),
 		CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
 
-		ImportantDepositPeriod: time.Duration(ONE_DAY) * time.Second,
+		ImportantDepositPeriod: time.Duration(sdk.Day),
 		ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
-		ImportantVotingPeriod:  time.Duration(SIXTY_HOURS) * time.Second,
+		ImportantVotingPeriod:  time.Duration(sdk.SixtyHours),
 		ImportantMaxNum:        MIN_IMPORTANT_NUM,
 		ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 		ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 		ImportantParticipation: sdk.NewDecWithPrec(834, 3),
 		ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
 
-		NormalDepositPeriod: time.Duration(ONE_DAY) * time.Second,
+		NormalDepositPeriod: time.Duration(sdk.Day),
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-		NormalVotingPeriod:  time.Duration(TWO_DAYS) * time.Second,
+		NormalVotingPeriod:  time.Duration(sdk.TwoDays),
 		NormalMaxNum:        MIN_NORMAL_NUM,
 		NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 		NormalVeto:          sdk.NewDecWithPrec(334, 3),
 		NormalParticipation: sdk.NewDecWithPrec(75, 2),
 		NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+		SystemHaltPeriod:    20000,
 	}
 }
 
@@ -328,6 +335,10 @@ func validateParams(p GovParams) sdk.Error {
 		return err
 	}
 
+	if p.SystemHaltPeriod <0 || p.SystemHaltPeriod > 50000 {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSystemHaltPeriod, fmt.Sprintf("SystemHaltPeriod should be between [0, 50000]"))
+	}
+
 	return nil
 }
 
@@ -374,15 +385,15 @@ func validateDepositProcedure(dp DepositProcedure, str string) sdk.Error {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(str+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
 	}
 
-	if dp.MaxDepositPeriod.Seconds() < 20 || dp.MaxDepositPeriod.Seconds() > THREE_DAYS {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(str+"MaxDepositPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(dp.MaxDepositPeriod.Seconds())), THREE_DAYS))
+	if dp.MaxDepositPeriod < sdk.TwentySeconds || dp.MaxDepositPeriod  > sdk.ThreeDays {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(str+"MaxDepositPeriod (%s) should be between 20s and %ds", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
 	}
 	return nil
 }
 
 func validatorVotingProcedure(vp VotingProcedure, str string , min_num uint64) sdk.Error {
-	if vp.VotingPeriod.Seconds() < 20 || vp.VotingPeriod.Seconds() > THREE_DAYS {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(str+"VotingPeriod (%s) should be between 20s and %ds", strconv.Itoa(int(vp.VotingPeriod.Seconds())), THREE_DAYS))
+	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod  > sdk.ThreeDays {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(str+"VotingPeriod (%s) should be between 20s and %ds", vp.VotingPeriod.String(),sdk.ThreeDays.String()))
 	}
 
 	if vp.MaxNum < min_num {

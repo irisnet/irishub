@@ -25,6 +25,7 @@ const (
 	CodeInvalidModule            sdk.CodeType = 112
 	CodeInvalidQueryParams       sdk.CodeType = 113
 	CodeInvalidMaxProposalNum    sdk.CodeType = 114
+	CodeInvalidSystemHaltPeriod  sdk.CodeType = 115
 	//service
 	CodeInvalidMaxRequestTimeout  sdk.CodeType = 200
 	CodeInvalidMinDepositMultiple sdk.CodeType = 201
