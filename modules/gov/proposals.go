@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-
-	"github.com/irisnet/irishub/modules/gov/params"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -83,8 +81,6 @@ type TextProposal struct {
 
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-
-	TallyProcedure govparams.TallyingProcedure `json:"tallying_procedure"`
 }
 
 // Implements Proposal Interface

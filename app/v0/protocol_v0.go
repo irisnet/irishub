@@ -24,8 +24,6 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
-
-	 "github.com/irisnet/irishub/modules/gov/params"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -157,12 +155,13 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		p.cdc,
 		protocol.KeyGov,
 		p.paramsKeeper,
+		p.paramsKeeper.Subspace(gov.DefaultParamSpace),
 		p.distrKeeper,
 		p.bankKeeper,
 		p.guardianKeeper,
 		&stakeKeeper,
 		protocolkeeper,
-		 gov.DefaultCodespace,
+		gov.DefaultCodespace,
 	)
 
 	p.serviceKeeper = service.NewKeeper(
@@ -206,22 +205,22 @@ func (p *ProtocolVersion0) configFeeHandlers() {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) GetKVStoreKeyList()  []*sdk.KVStoreKey {
-   return []*sdk.KVStoreKey{
-	   protocol.KeyMain,
-	   protocol.KeyProtocol,
-	   protocol.KeyAccount,
-	   protocol.KeyStake,
-	   protocol.KeyMint,
-	   protocol.KeyDistr,
-	   protocol.KeySlashing,
-	   protocol.KeyGov,
-	   protocol.KeyRecord,
-	   protocol.KeyFeeCollection,
-	   protocol.KeyParams,
-	   protocol.KeyUpgrade,
-	   protocol.KeyService,
-	   protocol.KeyGuardian}
+func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
+	return []*sdk.KVStoreKey{
+		protocol.KeyMain,
+		protocol.KeyProtocol,
+		protocol.KeyAccount,
+		protocol.KeyStake,
+		protocol.KeyMint,
+		protocol.KeyDistr,
+		protocol.KeySlashing,
+		protocol.KeyGov,
+		protocol.KeyRecord,
+		protocol.KeyFeeCollection,
+		protocol.KeyParams,
+		protocol.KeyUpgrade,
+		protocol.KeyService,
+		protocol.KeyGuardian}
 }
 
 // configure all Stores
@@ -231,17 +230,11 @@ func (p *ProtocolVersion0) configParams() {
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
-			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
-			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
-			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
 			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
 			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
 			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
 			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
 		)),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
 		&upgradeparams.UpgradeParameter,
 		&serviceparams.ServiceParameter,
 		&arbitrationparams.ComplaintRetrospectParameter,
