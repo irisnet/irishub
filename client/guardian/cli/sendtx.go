@@ -55,7 +55,7 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 		Use:   "delete-profiler",
 		Short: "Delete a profiler",
 		Example: "iriscli guardian delete-profiler --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
-			"--address=<added address>",
+			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
@@ -122,7 +122,7 @@ func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 		Use:   "delete-trustee",
 		Short: "Delete a trustee",
 		Example: "iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key name> --fee=0.004iris " +
-			"--trustee-address=<added address>",
+			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))

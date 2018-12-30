@@ -7,12 +7,9 @@ import (
 	"fmt"
 	bam "github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/service/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -129,28 +126,6 @@ func NewApp() *App {
 	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeCollectionKeeper, app.FeeManager))
 	app.SetFeePreprocessHandler(auth.NewFeePreprocessHandler(app.FeeManager))
 	// Not sealing for custom extension
-
-	// init iparam
-	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
-		params.NewTypeTable(
-			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
-			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
-			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
-			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), []byte{},
-			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), []byte{},
-		)),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
-		&serviceparams.ServiceParameter,
-		&arbitrationparams.ComplaintRetrospectParameter,
-		&arbitrationparams.ArbitrationTimelimitParameter)
-
-	params.RegisterGovParamMapping(
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
 
 	return app
 }

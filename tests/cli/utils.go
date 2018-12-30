@@ -32,7 +32,6 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"path/filepath"
 	"io/ioutil"
-	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/app/v0"
 )
@@ -77,7 +76,6 @@ func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
-	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
