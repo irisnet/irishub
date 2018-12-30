@@ -3,13 +3,9 @@ package v0
 import (
 	"fmt"
 	"sort"
-	"time"
-
 	"github.com/irisnet/irishub/app/protocol"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/arbitration"
-	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
@@ -18,12 +14,12 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/service/params"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -63,7 +59,6 @@ type ProtocolVersion0 struct {
 	initChainer  sdk.InitChainer1 // initialize state with validators and state blob
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
-
 }
 
 func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string) *ProtocolVersion0 {
@@ -170,6 +165,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		p.bankKeeper,
 		p.guardianKeeper,
 		service.DefaultCodespace,
+		p.paramsKeeper.Subspace(service.DefaultParamSpace),
 	)
 
 	// register the staking hooks
@@ -226,19 +222,13 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{})
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &gov.GovParams{}, &service.Params{})
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
-			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
-			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), time.Duration(0),
-			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), time.Duration(0),
 		)),
-		&upgradeparams.UpgradeParameter,
-		&serviceparams.ServiceParameter,
-		&arbitrationparams.ComplaintRetrospectParameter,
-		&arbitrationparams.ArbitrationTimelimitParameter)
+		&upgradeparams.UpgradeParameter, )
 }
 
 // application updates every end block
@@ -353,7 +343,6 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	}
 
 	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
-	arbitration.InitGenesis(ctx, genesisState.ArbitrationData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	return abci.ResponseInitChain{

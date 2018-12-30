@@ -8,7 +8,7 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "params"
 	//
-	CodeInvalidString            sdk.CodeType = 0
+	CodeInvalidString sdk.CodeType = 0
 	//gov
 	CodeInvalidMinDeposit        sdk.CodeType = 100
 	CodeInvalidMinDepositDenom   sdk.CodeType = 101
@@ -27,11 +27,13 @@ const (
 	CodeInvalidMaxProposalNum    sdk.CodeType = 114
 	CodeInvalidSystemHaltPeriod  sdk.CodeType = 115
 	//service
-	CodeInvalidMaxRequestTimeout  sdk.CodeType = 200
-	CodeInvalidMinDepositMultiple sdk.CodeType = 201
-	CodeInvalidServiceFeeTax      sdk.CodeType = 202
-	CodeInvalidSlashFraction      sdk.CodeType = 203
-	CodeInvalidServiceParams      sdk.CodeType = 204
+	CodeInvalidMaxRequestTimeout    sdk.CodeType = 200
+	CodeInvalidMinDepositMultiple   sdk.CodeType = 201
+	CodeInvalidServiceFeeTax        sdk.CodeType = 202
+	CodeInvalidSlashFraction        sdk.CodeType = 203
+	CodeInvalidServiceParams        sdk.CodeType = 204
+	CodeInvalidArbitrationTimeLimit sdk.CodeType = 205
+	CodeComplaintRetrospect         sdk.CodeType = 206
 	//upgrade
 	CodeInvalidUpgradeParams sdk.CodeType = 300
 	//mint
@@ -41,5 +43,5 @@ const (
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {
-	return sdk.NewError(DefaultCodespace,CodeInvalidString, fmt.Sprintf("%s can't convert to a specific type", valuestr))
+	return sdk.NewError(DefaultCodespace, CodeInvalidString, fmt.Sprintf("%s can't convert to a specific type", valuestr))
 }
