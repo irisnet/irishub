@@ -34,9 +34,7 @@ import (
 const (
 	appName          = "IrisApp"
 	FlagReplayHeight = "replay_height"
-
-	// Tendermint keeps one snapshot every 10000 blocks
-	DefaultSyncableHeight = 10000
+	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries
