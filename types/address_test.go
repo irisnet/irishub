@@ -9,8 +9,6 @@ import (
 
 	"github.com/tendermint/tendermint/crypto/ed25519"
 
-	"strings"
-
 	"github.com/irisnet/irishub/types"
 )
 
@@ -191,6 +189,7 @@ func RandString(n int) string {
 	return string(b)
 }
 
+/*
 func TestConfiguredPrefix(t *testing.T) {
 	var pub ed25519.PubKeyEd25519
 	for length := 1; length < 10; length++ {
@@ -218,6 +217,6 @@ func TestConfiguredPrefix(t *testing.T) {
 			bech32ConsPub := types.MustBech32ifyConsPub(pub)
 			require.True(t, strings.HasPrefix(bech32ConsPub, prefix+"conspub"))
 		}
-
 	}
 }
+*/

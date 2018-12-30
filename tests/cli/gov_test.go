@@ -5,7 +5,7 @@ import (
 	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
 	"testing"
-	"github.com/irisnet/irishub/app/v0"
+	sdk "github.com/irisnet/irishub/types"
     "github.com/irisnet/irishub/modules/gov"
 )
 
@@ -42,7 +42,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --description=%s", "test")
 	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, spStr, v0.DefaultKeyPass)
+	executeWrite(t, spStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -66,7 +66,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	depositStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	depositStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, depositStr, v0.DefaultKeyPass)
+	executeWrite(t, depositStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -87,7 +87,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	voteStr += fmt.Sprintf(" --option=%s", "Yes")
 	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, voteStr, v0.DefaultKeyPass)
+	executeWrite(t, voteStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	vote := executeGetVote(t, fmt.Sprintf("iriscli gov query-vote --proposal-id=1 --voter=%s --output=json %v", fooAddr, flags))
@@ -119,7 +119,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --description=%s", "test")
 	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	executeWrite(t, spStr, v0.DefaultKeyPass)
+	executeWrite(t, spStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	proposalsQuery, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals --limit=1 %v", flags), "")

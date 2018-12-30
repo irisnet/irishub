@@ -34,8 +34,7 @@ import (
 const (
 	appName          = "IrisApp"
 	FlagReplayHeight = "replay_height"
-	//Keep snapshot every at syncable height
-	DefaultSyncableHeight = 10000
+	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries

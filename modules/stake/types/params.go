@@ -24,11 +24,11 @@ const (
 	// Constant as this should not change without a hard fork.
 	ValidatorUpdateDelay int64 = 1
 
-	// Stake coin denomination
-	StakeDenom = "iris-atto"
+	// Stake token denomination "iris-atto"
+	StakeDenom = sdk.NativeTokenMinDenom
 
-	// Stake coin denomination name
-	StakeDenomName = "iris"
+	// Stake token name "iris"
+	StakeTokenName = sdk.NativeTokenName
 )
 
 // nolint - Keys for parameter access

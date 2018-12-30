@@ -230,9 +230,9 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 
 // default minting module parameters
 func DefaultParams() GovParams {
-	var criticalMinDeposit, _ = sdk.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeDenomName))
-	var importantMinDeposit, _ = sdk.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeDenomName))
-	var normalMinDeposit, _ = sdk.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeDenomName))
+	var criticalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeTokenName))
+	var importantMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeTokenName))
+	var normalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeTokenName))
 
 	return GovParams{
 		CriticalDepositPeriod: time.Duration(sdk.Day),
@@ -378,8 +378,8 @@ func validateDepositProcedure(dp DepositProcedure, str string) sdk.Error {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(str+"MinDeposit should be %s!", stakeTypes.StakeDenom))
 	}
 
-	LowerBound, _ := sdk.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
-	UpperBound, _ := sdk.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
+	LowerBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
+	UpperBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
 
 	if dp.MinDeposit[0].Amount.LT(LowerBound.Amount) || dp.MinDeposit[0].Amount.GT(UpperBound.Amount) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(str+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
@@ -401,6 +401,7 @@ func validatorVotingProcedure(vp VotingProcedure, str string , min_num uint64) s
 	}
 	return nil
 }
+
 func validateTallyingProcedure(tp TallyingProcedure, str string) sdk.Error {
 	if tp.Threshold.LTE(sdk.ZeroDec()) || tp.Threshold.GTE(sdk.NewDec(1)) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+str+" Threshold ( "+tp.Threshold.String()+" ) should be between 0 and 1"))
