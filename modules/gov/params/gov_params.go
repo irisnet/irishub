@@ -55,9 +55,9 @@ type DepositProcedureParam struct {
 }
 
 func NewDepositProcedure() DepositProcedure {
-	var ciriticalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeDenomName))
-	var importantMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeDenomName))
-	var normalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeDenomName))
+	var ciriticalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeTokenName).ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeTokenName))
+	var importantMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeTokenName).ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeTokenName))
+	var normalMinDeposit, _ = types.NewDefaultCoinType(stakeTypes.StakeTokenName).ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeTokenName))
 
 	return DepositProcedure{
 		CriticalMinDeposit:  sdk.Coins{ciriticalMinDeposit},
@@ -133,8 +133,8 @@ func (param *DepositProcedureParam) Valid(jsonStr string) sdk.Error {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf("It should be %s!", stakeTypes.StakeDenom))
 		}
 
-		LowerBound, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
-		UpperBound, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeDenomName))
+		LowerBound, _ := types.NewDefaultCoinType(stakeTypes.StakeTokenName).ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
+		UpperBound, _ := types.NewDefaultCoinType(stakeTypes.StakeTokenName).ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
 
 		if param.Value.CriticalMinDeposit[0].Amount.LT(LowerBound.Amount) || param.Value.CriticalMinDeposit[0].Amount.GT(UpperBound.Amount) {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(CRITICAL+"MinDepositAmount"+param.Value.CriticalMinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))

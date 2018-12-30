@@ -10,11 +10,10 @@ import (
 	"github.com/irisnet/irishub/modules/arbitration/params"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	 "github.com/irisnet/irishub/modules/gov/params"
+	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/service/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -27,7 +26,7 @@ import (
 const (
 	chainID = ""
 )
-
+/*
 const (
 	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
 	bech32PrefixAccAddr = "faa"
@@ -44,9 +43,9 @@ const (
 )
 
 var (
-	IrisCt = types.NewDefaultCoinType(stakeTypes.StakeDenomName)
+	IrisCt = types.NewDefaultCoinType(stakeTypes.StakeTokenName)
 )
-
+*/
 // App extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
@@ -86,12 +85,12 @@ func NewApp() *App {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-
+/*
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
-
+*/
 	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
 	// Create your application object
@@ -193,7 +192,7 @@ func (app *App) InitChainer(ctx sdk.Context, _ abci.RequestInitChain) abci.Respo
 	}
 
 	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
-		FeeTokenNative:    IrisCt.MinUnit.Denom,
+		FeeTokenNative:    sdk.IRIS.MinUnit.Denom,
 		GasPriceThreshold: 0, // for mock test
 	}
 

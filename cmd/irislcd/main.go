@@ -4,7 +4,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/lite"
 	_ "github.com/irisnet/irishub/lite/statik"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -20,7 +19,7 @@ var (
 
 func main() {
 
-	sdk.InitBech32Prefix()
+//	sdk.InitBech32Prefix()
 
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()

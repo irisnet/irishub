@@ -21,7 +21,6 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -64,7 +63,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
+	coin, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, sdk.NativeTokenName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)

@@ -28,17 +28,9 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-var (
-	FeeAmt            = int64(100)
-	IrisCt            = types.NewDefaultCoinType(stakeTypes.StakeDenomName)
-	FreeFermionVal, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", FeeAmt, stakeTypes.StakeDenomName))
-	FreeFermionAcc, _ = IrisCt.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), stakeTypes.StakeDenomName))
-)
-
 const (
 	defaultUnbondingTime time.Duration = 60 * 10 * time.Second
 	// DefaultKeyPass contains the default key password for genesis transactions
-	DefaultKeyPass = "1234567890"
 )
 
 // State to Unmarshal
@@ -322,8 +314,8 @@ func normalizeNativeToken(coins []string) sdk.Coins {
 		if err != nil {
 			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
 		}
-		if coinName == stakeTypes.StakeDenomName {
-			normalizeNativeToken, err := IrisCt.ConvertToMinCoin(coin)
+		if coinName == sdk.NativeTokenName {
+			normalizeNativeToken, err := sdk.IRIS.ConvertToMinCoin(coin)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, stakeTypes.StakeDenom))
 			}
@@ -451,7 +443,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 func NewDefaultGenesisFileAccount(addr sdk.AccAddress) GenesisFileAccount {
 	accAuth := auth.NewBaseAccountWithAddress(addr)
 	accAuth.Coins = []sdk.Coin{
-		FreeFermionAcc,
+		sdk.FreeToken4Acc,
 	}
 	return NewGenesisFileAccount(&accAuth)
 }

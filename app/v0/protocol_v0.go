@@ -313,7 +313,7 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
 
 	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
-		FeeTokenNative:    IrisCt.MinUnit.Denom,
+		FeeTokenNative:    sdk.IRIS.MinUnit.Denom,
 		GasPriceThreshold: 20000000000, // 20*10^9 iris-atto per gas, 20 iris-nano per gas, 2*10^(-8) iris per gas
 	}
 

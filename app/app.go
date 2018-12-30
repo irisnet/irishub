@@ -34,7 +34,8 @@ import (
 const (
 	appName          = "IrisApp"
 	FlagReplayHeight = "replay_height"
-	//Keep snapshot every at syncable height
+
+	// Tendermint keeps one snapshot every 10000 blocks
 	DefaultSyncableHeight = 10000
 )
 
