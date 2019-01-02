@@ -7,7 +7,6 @@ import (
 	distrsim "github.com/irisnet/irishub/modules/distribution/simulation"
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	stakesim "github.com/irisnet/irishub/modules/stake/simulation"
-	serverconfig "github.com/irisnet/irishub/server/config"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -22,13 +21,13 @@ func (p *ProtocolVersion0) runtimeInvariants() []simulation.Invariant {
 }
 
 func (p *ProtocolVersion0) assertRuntimeInvariants(ctx sdk.Context) {
-	if p.invariantLevel != serverconfig.InvariantError && p.invariantLevel != serverconfig.InvariantPanic {
+	if p.invariantLevel != sdk.InvariantError && p.invariantLevel != sdk.InvariantPanic {
 		return
 	}
 	invariants := p.runtimeInvariants()
 	for _, inv := range invariants {
 		if err := inv(ctx); err != nil {
-			if p.invariantLevel == serverconfig.InvariantPanic {
+			if p.invariantLevel == sdk.InvariantPanic {
 				panic(fmt.Errorf("invariant broken: %s", err))
 			} else {
 				p.logger.Error(fmt.Sprintf("Invariant broken: height %d, reason %s", ctx.BlockHeight(), err.Error()))

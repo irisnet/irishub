@@ -9,6 +9,8 @@ const (
 	NativeTokenName     = "iris"
 	NativeTokenMinDenom = "iris-atto"
 	DefaultKeyPass      = "1234567890"
+	InvariantPanic      = "panic"
+	InvariantError      = "error"
 )
 
 var (
@@ -21,6 +23,7 @@ var (
 // Can be configured through environment variables
 var (
 	NetworkType = "testnet"
+	InvariantLevel = InvariantPanic
 	Bech32PrefixAccAddr = "faa"		// account address
 	Bech32PrefixAccPub = "fap"		// account public key
 	Bech32PrefixValAddr = "fva"		// validator operator address

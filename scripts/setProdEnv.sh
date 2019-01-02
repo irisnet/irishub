@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Edit the script to set compile environment variables for your own application
+# The default values in this script are for mainnet
+# Edit the script to set environment variables for your own network
 
+# Network type: testnet, mainnet
+export NetworkType="mainnet"
+
+# Bech32 prefixes
 export Bech32PrefixAccAddr="iaa"
 export Bech32PrefixAccPub="iap"
 export Bech32PrefixValAddr="iva"
