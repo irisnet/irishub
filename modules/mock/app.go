@@ -18,8 +18,6 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
@@ -129,7 +127,7 @@ func NewApp() *App {
 	// Not sealing for custom extension
 
 	// init iparam
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{})
+	//params.RegisterParamSet(&mint.Params{})
 
 	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
