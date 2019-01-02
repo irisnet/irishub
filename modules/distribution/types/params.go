@@ -1,12 +1,11 @@
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/codec"
-	"time"
-	"strconv"
 	"fmt"
+
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const DefaultParamSpace = "distr"
@@ -76,17 +75,14 @@ func (p *Params) GetParamSpace() string {
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	switch key {
 	case string(KeyCommunityTax):
-		var communityTax time.Duration
-		err := cdc.UnmarshalJSON(bytes, &communityTax)
-		return communityTax.String(), err
+		err := cdc.UnmarshalJSON(bytes, &p.CommunityTax)
+		return p.CommunityTax.String(), err
 	case string(KeyBaseProposerReward):
-		var unBondingTime time.Duration
-		err := cdc.UnmarshalJSON(bytes, &unBondingTime)
-		return unBondingTime.String(), err
+		err := cdc.UnmarshalJSON(bytes, &p.BaseProposerReward)
+		return p.BaseProposerReward.String(), err
 	case string(KeyBonusProposerReward):
-		var maxValidators uint16
-		err := cdc.UnmarshalJSON(bytes, &maxValidators)
-		return strconv.Itoa(int(maxValidators)), err
+		err := cdc.UnmarshalJSON(bytes, &p.BonusProposerReward)
+		return p.BonusProposerReward.String(), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}

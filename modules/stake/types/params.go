@@ -98,19 +98,14 @@ func (p *Params) GetParamSpace() string {
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	switch key {
 	case string(KeyUnbondingTime):
-		var unBondingTime time.Duration
-		err := cdc.UnmarshalJSON(bytes, &unBondingTime)
-		return unBondingTime.String(), err
-
+		err := cdc.UnmarshalJSON(bytes, &p.UnbondingTime)
+		return p.UnbondingTime.String(), err
 	case string(KeyMaxValidators):
-		var maxValidators uint16
-		err := cdc.UnmarshalJSON(bytes, &maxValidators)
-		return strconv.Itoa(int(maxValidators)), err
-
+		err := cdc.UnmarshalJSON(bytes, &p.MaxValidators)
+		return strconv.Itoa(int(p.MaxValidators)), err
 	case string(KeyBondDenom):
-		var bondDenom string
-		err := cdc.UnmarshalJSON(bytes, &bondDenom)
-		return bondDenom, err
+		err := cdc.UnmarshalJSON(bytes, &p.BondDenom)
+		return p.BondDenom, err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -159,7 +154,7 @@ func (p Params) HumanReadableString() string {
 //______________________________________________________________________
 
 func validateUnbondingTime(v time.Duration) sdk.Error {
-	if v <= time.Minute || v >= sdk.EightWeeks {
+	if v < time.Minute || v > sdk.EightWeeks {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%d] should be between [10min, 8week]", v))
 	}
 	return nil
