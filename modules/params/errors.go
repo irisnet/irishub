@@ -40,6 +40,8 @@ const (
 	CodeInvalidMintInflation sdk.CodeType = 400
 	//slash
 	CodeInvalidSlashParams   sdk.CodeType = 500
+	//auth
+	CodeInvalidGasPriceThreshold sdk.CodeType = 600
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {
