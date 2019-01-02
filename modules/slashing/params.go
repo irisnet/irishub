@@ -174,7 +174,7 @@ func DefaultParams() Params {
 
 func DefaultParamsForTestnet() Params {
 	return Params{
-		MaxEvidenceAge: 60 * 2 * time.Second,
+		MaxEvidenceAge: sdk.Day,
 		DoubleSignJailDuration: 60 * 5 * time.Second,
 		SignedBlocksWindow: 100,
 		DowntimeJailDuration: 60 * 10 * time.Second,
@@ -211,8 +211,11 @@ func validateParams(p Params) sdk.Error {
 }
 
 func validateMaxEvidenceAge(p time.Duration) sdk.Error {
-	if p < 2 * time.Minute || p > sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min, 1week] ", p.String()))
+	if sdk.NetworkType == "testnet" && p < sdk.Day {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [1day,) ", p.String()))
+	}
+	if sdk.NetworkType == "betanet" && p < 10 * time.Minute {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min,) ", p.String()))
 	}
 	return nil
 }

@@ -13,3 +13,5 @@ export Bech32PrefixConsPub="icp"
 # Panic on invariant failure: "panic"
 # Print error message on invariant failure: "error"
 export InvariantLevel="error"
+
+export NetworkType="betanet"
