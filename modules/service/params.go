@@ -11,7 +11,7 @@ import (
 
 var _ params.ParamSet = (*Params)(nil)
 
-// default paramSpace for params keeper
+// default paramSpace for service keeper
 const (
 	DefaultParamSpace = "service"
 )
@@ -205,6 +205,7 @@ func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
 }
 
 //______________________________________________________________________
+
 func validateMaxRequestTimeout(v int64) sdk.Error {
 	if v <= 0 {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Invalid MaxRequestTimeout [%d] should be greater than 0", v))

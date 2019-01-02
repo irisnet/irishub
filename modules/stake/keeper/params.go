@@ -8,11 +8,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake/types"
 )
 
-// Default parameter namespace
-const (
-	DefaultParamspace = "stake"
-)
-
 // ParamTable for stake module
 func ParamTypeTable() params.TypeTable {
 	return params.NewTypeTable().RegisterParamSet(&types.Params{})

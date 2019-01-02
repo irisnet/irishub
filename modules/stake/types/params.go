@@ -14,6 +14,9 @@ import (
 var _ params.ParamSet = (*Params)(nil)
 
 const (
+	// Default parameter namespace
+	DefaultParamSpace = "stake"
+
 	// defaultUnbondingTime reflects three weeks in seconds as the default
 	// unbonding time.
 	defaultUnbondingTime time.Duration = 60 * 60 * 24 * 3 * time.Second
@@ -58,12 +61,38 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 }
 
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
-	//TODO:
-	return nil, nil
+	switch key {
+	case string(KeyUnbondingTime):
+		unbondingTime, err := time.ParseDuration(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateUnbondingTime(unbondingTime); err != nil {
+			return nil, err
+		}
+		return unbondingTime, nil
+	case string(KeyMaxValidators):
+		maxValidators, err := strconv.ParseUint(value, 10, 16)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateMaxValidators(uint16(maxValidators)); err != nil {
+			return nil, err
+		}
+		return maxValidators, nil
+	case string(KeyBondDenom):
+		bondDenom := string(value)
+		if err := validateBondDenom(bondDenom); err != nil {
+			return nil, err
+		}
+		return bondDenom, nil
+	default:
+		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
+	}
 }
 
 func (p *Params) GetParamSpace() string {
-	return "stake"
+	return DefaultParamSpace
 }
 
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
@@ -83,7 +112,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 		err := cdc.UnmarshalJSON(bytes, &bondDenom)
 		return bondDenom, err
 	default:
-		return "", nil
+		return "", fmt.Errorf("%s is not existed", key)
 	}
 }
 
@@ -94,13 +123,26 @@ func (p Params) Equal(p2 Params) bool {
 	return bytes.Equal(bz1, bz2)
 }
 
-// DefaultParams returns a default set of parameters.
+// default stake module params
 func DefaultParams() Params {
 	return Params{
 		UnbondingTime: defaultUnbondingTime,
 		MaxValidators: 100,
 		BondDenom:     StakeDenom,
 	}
+}
+
+func ValidateParams(p Params) error {
+	if err := validateUnbondingTime(p.UnbondingTime); err != nil {
+		return err
+	}
+	if err := validateMaxValidators(p.MaxValidators); err != nil {
+		return err
+	}
+	if err := validateBondDenom(p.BondDenom); err != nil {
+		return err
+	}
+	return nil
 }
 
 // HumanReadableString returns a human readable string representation of the
@@ -114,20 +156,25 @@ func (p Params) HumanReadableString() string {
 	return resp
 }
 
-// unmarshal the current staking params value from store key or panic
-func MustUnmarshalParams(cdc *codec.Codec, value []byte) Params {
-	params, err := UnmarshalParams(cdc, value)
-	if err != nil {
-		panic(err)
+//______________________________________________________________________
+
+func validateUnbondingTime(v time.Duration) sdk.Error {
+	if v <= time.Minute || v >= sdk.EightWeeks {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%d] should be between [10min, 8week]", v))
 	}
-	return params
+	return nil
 }
 
-// unmarshal the current staking params value from store key
-func UnmarshalParams(cdc *codec.Codec, value []byte) (params Params, err error) {
-	err = cdc.UnmarshalBinaryLengthPrefixed(value, &params)
-	if err != nil {
-		return
+func validateMaxValidators(v uint16) sdk.Error {
+	if v < 100 || v > 200 {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxValidators, fmt.Sprintf("Invalid MaxValidators [%d] should be between [100, 200]", v))
 	}
-	return
+	return nil
+}
+
+func validateBondDenom(v string) sdk.Error {
+	if len(v) == 0 {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidBondDenom, "staking parameter BondDenom can't be an empty string")
+	}
+	return nil
 }

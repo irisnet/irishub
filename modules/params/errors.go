@@ -9,6 +9,7 @@ const (
 	DefaultCodespace sdk.CodespaceType = "params"
 	//
 	CodeInvalidString sdk.CodeType = 0
+
 	//gov
 	CodeInvalidMinDeposit        sdk.CodeType = 100
 	CodeInvalidMinDepositDenom   sdk.CodeType = 101
@@ -26,6 +27,7 @@ const (
 	CodeInvalidQueryParams       sdk.CodeType = 113
 	CodeInvalidMaxProposalNum    sdk.CodeType = 114
 	CodeInvalidSystemHaltPeriod  sdk.CodeType = 115
+
 	//service
 	CodeInvalidMaxRequestTimeout    sdk.CodeType = 200
 	CodeInvalidMinDepositMultiple   sdk.CodeType = 201
@@ -34,12 +36,25 @@ const (
 	CodeInvalidServiceParams        sdk.CodeType = 204
 	CodeInvalidArbitrationTimeLimit sdk.CodeType = 205
 	CodeComplaintRetrospect         sdk.CodeType = 206
+
 	//upgrade
 	CodeInvalidUpgradeParams sdk.CodeType = 300
+
 	//mint
 	CodeInvalidMintInflation sdk.CodeType = 400
+
+	//stake
+	CodeInvalidUnbondingTime sdk.CodeType = 500
+	CodeInvalidMaxValidators sdk.CodeType = 501
+	CodeInvalidBondDenom     sdk.CodeType = 502
+
 	//slash
-	CodeInvalidSlashParams   sdk.CodeType = 500
+	CodeInvalidSlashParams sdk.CodeType = 600
+
+	//distribution
+	CodeInvalidCommunityTax        sdk.CodeType = 700
+	CodeInvalidBaseProposerReward  sdk.CodeType = 701
+	CodeInvalidBonusProposerReward sdk.CodeType = 702
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {

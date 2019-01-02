@@ -9,26 +9,26 @@ import (
 )
 
 type (
-	Keeper               = keeper.Keeper
-	Validator            = types.Validator
-	Description          = types.Description
-	Commission           = types.Commission
-	Delegation           = types.Delegation
-	UnbondingDelegation  = types.UnbondingDelegation
-	Redelegation         = types.Redelegation
-	Params               = types.Params
-	Pool                 = types.Pool
-	BondedPool           = types.BondedPool
-	PoolStatus           = types.PoolStatus
-	MsgCreateValidator   = types.MsgCreateValidator
-	MsgEditValidator     = types.MsgEditValidator
-	MsgDelegate          = types.MsgDelegate
-	MsgBeginUnbonding    = types.MsgBeginUnbonding
-	MsgBeginRedelegate   = types.MsgBeginRedelegate
-	GenesisState         = types.GenesisState
+	Keeper = keeper.Keeper
+	Validator = types.Validator
+	Description = types.Description
+	Commission = types.Commission
+	Delegation = types.Delegation
+	UnbondingDelegation = types.UnbondingDelegation
+	Redelegation = types.Redelegation
+	Params = types.Params
+	Pool = types.Pool
+	BondedPool = types.BondedPool
+	PoolStatus = types.PoolStatus
+	MsgCreateValidator = types.MsgCreateValidator
+	MsgEditValidator = types.MsgEditValidator
+	MsgDelegate = types.MsgDelegate
+	MsgBeginUnbonding = types.MsgBeginUnbonding
+	MsgBeginRedelegate = types.MsgBeginRedelegate
+	GenesisState = types.GenesisState
 	QueryDelegatorParams = querier.QueryDelegatorParams
 	QueryValidatorParams = querier.QueryValidatorParams
-	QueryBondsParams     = querier.QueryBondsParams
+	QueryBondsParams = querier.QueryBondsParams
 )
 
 var (
@@ -62,7 +62,7 @@ var (
 	RedelegationQueueKey         = keeper.RedelegationQueueKey
 	ValidatorQueueKey            = keeper.ValidatorQueueKey
 
-	DefaultParamspace = keeper.DefaultParamspace
+	DefaultParamspace = types.DefaultParamSpace
 	KeyUnbondingTime  = types.KeyUnbondingTime
 	KeyMaxValidators  = types.KeyMaxValidators
 	KeyBondDenom      = types.KeyBondDenom

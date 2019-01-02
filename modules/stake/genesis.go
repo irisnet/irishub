@@ -15,7 +15,9 @@ import (
 // setting the indexes. In addition, it also sets any delegations found in
 // data. Finally, it updates the bonded validators.
 func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res []abci.ValidatorUpdate, err error) {
-
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
 	// We need to pretend to be "n blocks before genesis", where "n" is the validator update delay,
 	// so that e.g. slashing periods are correctly initialized for the validator set
 	// e.g. with a one-block offset - the first TM block is at height 0, so state updates applied from genesis.json are in block -1.
@@ -148,18 +150,11 @@ func ValidateGenesis(data types.GenesisState) error {
 	if err != nil {
 		return err
 	}
-	err = validateParams(data.Params)
+	err = types.ValidateParams(data.Params)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func validateParams(params types.Params) error {
-	if params.BondDenom == "" {
-		return fmt.Errorf("staking parameter BondDenom can't be an empty string")
-	}
 	return nil
 }
 

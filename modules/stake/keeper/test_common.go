@@ -104,9 +104,9 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins sdk.Int) (sdk.Conte
 	ck := bank.NewBaseKeeper(accountKeeper)
 
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
-	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(DefaultParamspace), types.DefaultCodespace)
+	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(types.DefaultParamSpace), types.DefaultCodespace)
 	keeper.SetPool(ctx, types.Pool{
-		BondedPool:types.InitialBondedPool(),
+		BondedPool: types.InitialBondedPool(),
 	})
 	keeper.SetParams(ctx, types.DefaultParams())
 
