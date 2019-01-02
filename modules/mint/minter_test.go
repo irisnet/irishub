@@ -32,6 +32,6 @@ func TestNextInflation(t *testing.T) {
 		blockDurationMili := tc.blockInterval.Nanoseconds() / int64(miliSecondPerYear)
 		blockTimePercent := sdk.NewDec(blockDurationMili).Quo(sdk.NewDec(int64(60 * 60 * 8766 * 1000)))
 
-		require.True(t, mintCoin.Amount.GT(blockTimePercent.MulInt(minter.InflationBasement).TruncateInt()))
+		require.True(t, mintCoin.Amount.GT(blockTimePercent.MulInt(minter.InflationBase).TruncateInt()))
 	}
 }

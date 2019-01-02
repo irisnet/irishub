@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/modules/service/params"
+
 	"github.com/irisnet/irishub/modules/service/tags"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -220,6 +220,8 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 	logger := ctx.Logger().With("module", "service")
 	resTags = sdk.NewTags()
+	params := keeper.GetParamSet(ctx)
+	slashFraction := params.SlashFraction
 
 	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
 	defer activeIterator.Close()
@@ -227,7 +229,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
-		slashFraction := serviceparams.GetSlashFraction(ctx)
 		slashCoins := sdk.Coins{}
 		binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
 		if found {

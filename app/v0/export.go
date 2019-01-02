@@ -6,7 +6,6 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
@@ -63,7 +62,6 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 		gov.ExportGenesis(ctx, p.govKeeper),
 		upgrade.ExportGenesis(ctx),
 		service.ExportGenesis(ctx, p.serviceKeeper),
-		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, p.guardianKeeper),
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
 	)

@@ -15,13 +15,11 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/gov/params"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -56,7 +54,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.DefaultCodespace)
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov,paramsKeeper, dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov,paramsKeeper,paramsKeeper.Subspace(DefaultParamSpace), dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -65,7 +63,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
+	coin, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, sdk.NativeTokenName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)
@@ -96,9 +94,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		InitGenesis(ctx, keeper, GenesisState{
-			DepositProcedure:  govparams.NewDepositProcedure(),
-			VotingProcedure:   govparams.NewVotingProcedure(),
-			TallyingProcedure: govparams.NewTallyingProcedure(),
+			Params:DefaultParams(),
 		})
 		return abci.ResponseInitChain{
 			Validators: validators,
