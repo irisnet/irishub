@@ -31,6 +31,10 @@ func DefaultGenesisState() GenesisState {
 
 // Init store state from genesis data
 func InitGenesis(ctx sdk.Context, keeper FeeKeeper, accountKeeper AccountKeeper, data GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(err)
+	}
+
 	keeper.setCollectedFees(ctx, data.CollectedFees)
 	accountKeeper.IncreaseTotalLoosenToken(ctx, data.CollectedFees)
 
