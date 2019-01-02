@@ -82,7 +82,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateDecimalRange(minSignedPerWindow); err != nil {
+		if err := validateMinSignedPerWindow(minSignedPerWindow); err != nil {
 			return nil, err
 		}
 		return minSignedPerWindow, nil
@@ -109,7 +109,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateDecimalRange(slashFractionDoubleSign); err != nil {
+		if err := validateSlashFractionDoubleSign(slashFractionDoubleSign); err != nil {
 			return nil, err
 		}
 		return slashFractionDoubleSign, nil
@@ -118,7 +118,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateDecimalRange(slashFractionDowntime); err != nil {
+		if err := validateSlashFractionDowntime(slashFractionDowntime); err != nil {
 			return nil, err
 		}
 		return slashFractionDowntime, nil
@@ -163,18 +163,18 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 func DefaultParams() Params {
 	return Params{
 		MaxEvidenceAge: sdk.Day,
-		DoubleSignJailDuration: sdk.Week,
+		DoubleSignJailDuration: 5 * sdk.Day,
 		SignedBlocksWindow: 20000,
-		DowntimeJailDuration: sdk.Week,
+		DowntimeJailDuration: 2 * sdk.Day,
 		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
-		SlashFractionDoubleSign: sdk.NewDec(1).Quo(sdk.NewDec(20)),
-		SlashFractionDowntime: sdk.NewDec(1).Quo(sdk.NewDec(100)),
+		SlashFractionDoubleSign: sdk.NewDecWithPrec(1, 2),
+		SlashFractionDowntime: sdk.NewDecWithPrec(5, 3),
 	}
 }
 
 func DefaultParamsForTestnet() Params {
 	return Params{
-		MaxEvidenceAge: 60 * 2 * time.Second,
+		MaxEvidenceAge: 10 * time.Minute,
 		DoubleSignJailDuration: 60 * 5 * time.Second,
 		SignedBlocksWindow: 100,
 		DowntimeJailDuration: 60 * 10 * time.Second,
@@ -197,13 +197,13 @@ func validateParams(p Params) sdk.Error {
 	if err := validateSignedBlocksWindow(p.SignedBlocksWindow); err != nil {
 		return err
 	}
-	if err := validateDecimalRange(p.MinSignedPerWindow); err != nil {
+	if err := validateMinSignedPerWindow(p.MinSignedPerWindow); err != nil {
 		return err
 	}
-	if err := validateDecimalRange(p.SlashFractionDoubleSign); err != nil {
+	if err := validateSlashFractionDoubleSign(p.SlashFractionDoubleSign); err != nil {
 		return err
 	}
-	if err := validateDecimalRange(p.SlashFractionDowntime); err != nil {
+	if err := validateSlashFractionDowntime(p.SlashFractionDowntime); err != nil {
 		return err
 	}
 
@@ -211,8 +211,12 @@ func validateParams(p Params) sdk.Error {
 }
 
 func validateMaxEvidenceAge(p time.Duration) sdk.Error {
-	if p < 2 * time.Minute || p > sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min, 1week] ", p.String()))
+	if sdk.NetworkType == sdk.Mainnet {
+		if p < sdk.Day {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [1day,) ", p.String()))
+		}
+	} else if p < 10 * time.Minute {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min,) ", p.String()))
 	}
 	return nil
 }
@@ -231,9 +235,23 @@ func validateSignedBlocksWindow(p int64) sdk.Error {
 	return nil
 }
 
-func validateDecimalRange(p sdk.Dec) sdk.Error {
-	if p.LTE(sdk.NewDec(0)) || p.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between (0, 1) ", p))
+func validateMinSignedPerWindow(p sdk.Dec) sdk.Error {
+	if p.LT(sdk.NewDecWithPrec(5, 1)) || p.GT(sdk.NewDecWithPrec(9, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between [0.5, 0.9] ", p))
+	}
+	return nil
+}
+
+func validateSlashFractionDoubleSign(p sdk.Dec) sdk.Error {
+	if p.LT(sdk.NewDecWithPrec(1, 2)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between [0.01, 0.1] ", p))
+	}
+	return nil
+}
+
+func validateSlashFractionDowntime(p sdk.Dec) sdk.Error {
+	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between [0.005, 0.1] ", p))
 	}
 	return nil
 }
@@ -252,8 +270,7 @@ func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
 	k.paramspace.SetParamSet(ctx, &params)
 }
 
-// MaxEvidenceAge - Max age for evidence - 21 days (3 weeks)
-// MaxEvidenceAge = 60 * 60 * 24 * 7 * 3
+// MaxEvidenceAge - Max age for evidence
 func (k Keeper) MaxEvidenceAge(ctx sdk.Context) (res time.Duration) {
 	k.paramspace.Get(ctx, KeyMaxEvidenceAge, &res)
 	return
