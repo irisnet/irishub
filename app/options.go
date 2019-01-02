@@ -39,11 +39,6 @@ func SetMinimumFees(minFees string) func(*BaseApp) {
 	return func(bap *BaseApp) { bap.SetMinimumFees(fees) }
 }
 
-// SetMinimumFees returns an option that sets the minimum fees on the app.
-func SetInvariantLevel(invariantLevel string) func(*BaseApp) {
-	return func(bap *BaseApp) { bap.SetInvariantLevel(invariantLevel) }
-}
-
 // nolint - Setter functions
 func (app *BaseApp) SetName(name string) {
 	if app.sealed {

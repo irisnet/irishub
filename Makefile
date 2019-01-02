@@ -18,7 +18,7 @@ Bech32PrefixConsAddr := $(shell if [ -z ${Bech32PrefixConsAddr} ]; then echo "fc
 Bech32PrefixConsPub := $(shell if [ -z ${Bech32PrefixConsPub} ]; then echo "fcp"; else echo ${Bech32PrefixConsPub}; fi)
 
 BUILD_FLAGS = -ldflags "\
--X github.com/irisnet/irishub/server/config.InvariantLevel=${InvariantLevel} \
+-X github.com/irisnet/irishub/types.InvariantLevel=${InvariantLevel} \
 -X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
 -X github.com/irisnet/irishub/types.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
 -X github.com/irisnet/irishub/types.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
@@ -29,7 +29,7 @@ BUILD_FLAGS = -ldflags "\
 
 INSTALL_FLAGS = -ldflags "\
 -X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
--X github.com/irisnet/irishub/server/config.InvariantLevel=${InvariantLevel} \
+-X github.com/irisnet/irishub/types.InvariantLevel=${InvariantLevel} \
 -X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
 -X github.com/irisnet/irishub/types.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
 -X github.com/irisnet/irishub/types.Bech32PrefixAccPub=${Bech32PrefixAccPub} \

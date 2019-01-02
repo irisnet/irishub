@@ -211,7 +211,7 @@ func validateParams(p Params) sdk.Error {
 }
 
 func validateMaxEvidenceAge(p time.Duration) sdk.Error {
-	if sdk.NetworkType == "mainnet" {
+	if sdk.NetworkType == sdk.Mainnet {
 		if p < sdk.Day {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [1day,) ", p.String()))
 		}
