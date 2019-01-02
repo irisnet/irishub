@@ -18,7 +18,6 @@ type (
 	TotalAccum            = types.TotalAccum
 	FeePool               = types.FeePool
 
-	MsgSetWithdrawAddress          = types.MsgSetWithdrawAddress
 	MsgWithdrawDelegatorRewardsAll = types.MsgWithdrawDelegatorRewardsAll
 	MsgWithdrawDelegatorReward     = types.MsgWithdrawDelegatorReward
 	MsgWithdrawValidatorRewardsAll = types.MsgWithdrawValidatorRewardsAll
@@ -53,7 +52,6 @@ var (
 
 	RegisterCodec = types.RegisterCodec
 
-	NewMsgSetWithdrawAddress          = types.NewMsgSetWithdrawAddress
 	NewMsgWithdrawDelegatorRewardsAll = types.NewMsgWithdrawDelegatorRewardsAll
 	NewMsgWithdrawDelegatorReward     = types.NewMsgWithdrawDelegatorReward
 	NewMsgWithdrawValidatorRewardsAll = types.NewMsgWithdrawValidatorRewardsAll
