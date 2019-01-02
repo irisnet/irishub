@@ -38,7 +38,6 @@ const (
 var (
 	KeyUnbondingTime = []byte("UnbondingTime")
 	KeyMaxValidators = []byte("MaxValidators")
-	KeyBondDenom     = []byte("BondDenom")
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -48,7 +47,6 @@ type Params struct {
 	UnbondingTime time.Duration `json:"unbonding_time"`
 
 	MaxValidators uint16 `json:"max_validators"` // maximum number of validators
-	BondDenom     string `json:"bond_denom"`     // bondable coin denomination
 }
 
 // Implements params.Params
@@ -56,7 +54,6 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
 		{KeyUnbondingTime, &p.UnbondingTime},
 		{KeyMaxValidators, &p.MaxValidators},
-		{KeyBondDenom, &p.BondDenom},
 	}
 }
 
@@ -80,12 +77,6 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, err
 		}
 		return maxValidators, nil
-	case string(KeyBondDenom):
-		bondDenom := string(value)
-		if err := validateBondDenom(bondDenom); err != nil {
-			return nil, err
-		}
-		return bondDenom, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -103,9 +94,6 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	case string(KeyMaxValidators):
 		err := cdc.UnmarshalJSON(bytes, &p.MaxValidators)
 		return strconv.Itoa(int(p.MaxValidators)), err
-	case string(KeyBondDenom):
-		err := cdc.UnmarshalJSON(bytes, &p.BondDenom)
-		return p.BondDenom, err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -123,7 +111,6 @@ func DefaultParams() Params {
 	return Params{
 		UnbondingTime: defaultUnbondingTime,
 		MaxValidators: 100,
-		BondDenom:     StakeDenom,
 	}
 }
 
@@ -132,9 +119,6 @@ func ValidateParams(p Params) error {
 		return err
 	}
 	if err := validateMaxValidators(p.MaxValidators); err != nil {
-		return err
-	}
-	if err := validateBondDenom(p.BondDenom); err != nil {
 		return err
 	}
 	return nil
@@ -147,7 +131,6 @@ func (p Params) HumanReadableString() string {
 	resp := "Params \n"
 	resp += fmt.Sprintf("Unbonding Time: %s\n", p.UnbondingTime)
 	resp += fmt.Sprintf("Max Validators: %d: \n", p.MaxValidators)
-	resp += fmt.Sprintf("Bonded Coin Denomination: %s\n", p.BondDenom)
 	return resp
 }
 
@@ -163,13 +146,6 @@ func validateUnbondingTime(v time.Duration) sdk.Error {
 func validateMaxValidators(v uint16) sdk.Error {
 	if v < 100 || v > 200 {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxValidators, fmt.Sprintf("Invalid MaxValidators [%d] should be between [100, 200]", v))
-	}
-	return nil
-}
-
-func validateBondDenom(v string) sdk.Error {
-	if len(v) == 0 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidBondDenom, "staking parameter BondDenom can't be an empty string")
 	}
 	return nil
 }

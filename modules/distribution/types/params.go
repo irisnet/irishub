@@ -113,22 +113,22 @@ func ValidateParams(p Params) error {
 //______________________________________________________________________
 
 func validateCommunityTax(v sdk.Dec) sdk.Error {
-	if v.LTE(sdk.ZeroDec()) || v.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidCommunityTax, fmt.Sprintf("Invalid CommunityTax [%s] should be between 0 and 1", v.String()))
+	if v.LTE(sdk.ZeroDec()) || v.GT(sdk.NewDecWithPrec(2, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidCommunityTax, fmt.Sprintf("Invalid CommunityTax [%s] should be between (0, 0.2]", v.String()))
 	}
 	return nil
 }
 
 func validateBaseProposerReward(v sdk.Dec) sdk.Error {
-	if v.LTE(sdk.ZeroDec()) || v.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidBaseProposerReward, fmt.Sprintf("Invalid BaseProposerReward [%s] should be between 0 and 1", v.String()))
+	if v.LTE(sdk.ZeroDec()) || v.GT(sdk.NewDecWithPrec(2, 2)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidBaseProposerReward, fmt.Sprintf("Invalid BaseProposerReward [%s] should be between (0, 0.02]", v.String()))
 	}
 	return nil
 }
 
 func validateBonusProposerReward(v sdk.Dec) sdk.Error {
-	if v.LTE(sdk.ZeroDec()) || v.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidBonusProposerReward, fmt.Sprintf("Invalid BonusProposerReward [%s] should be between 0 and 1", v.String()))
+	if v.LTE(sdk.ZeroDec()) || v.GT(sdk.NewDecWithPrec(8, 2)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidBonusProposerReward, fmt.Sprintf("Invalid BonusProposerReward [%s] should be between (0, 0.08]", v.String()))
 	}
 	return nil
 }

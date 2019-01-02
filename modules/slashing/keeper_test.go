@@ -37,7 +37,7 @@ func TestHandleDoubleSign(t *testing.T) {
 	stake.EndBlocker(ctx, sk)
 	require.Equal(
 		t, ck.GetCoins(ctx, sdk.AccAddress(operatorAddr)),
-		sdk.Coins{sdk.NewCoin(sk.GetParams(ctx).BondDenom, initCoins.Sub(amt))},
+		sdk.Coins{sdk.NewCoin(sk.BondDenom(), initCoins.Sub(amt))},
 	)
 	require.Equal(t, sdk.NewDecFromInt(amtInt.Div(sdk.NewIntWithDecimal(1, 18))), sk.Validator(ctx, operatorAddr).GetPower())
 
@@ -81,7 +81,7 @@ func TestSlashingPeriodCap(t *testing.T) {
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 	require.Equal(
 		t, ck.GetCoins(ctx, sdk.AccAddress(operatorAddr)),
-		sdk.Coins{sdk.NewCoin(sk.GetParams(ctx).BondDenom, initCoins.Sub(amt))},
+		sdk.Coins{sdk.NewCoin(sk.BondDenom(), initCoins.Sub(amt))},
 	)
 	require.Equal(t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))), sk.Validator(ctx, operatorAddr).GetPower())
 
@@ -148,7 +148,7 @@ func TestHandleAbsentValidator(t *testing.T) {
 	stake.EndBlocker(ctx, sk)
 	require.Equal(
 		t, ck.GetCoins(ctx, sdk.AccAddress(addr)),
-		sdk.Coins{sdk.NewCoin(sk.GetParams(ctx).BondDenom, initCoins.Sub(amt))},
+		sdk.Coins{sdk.NewCoin(sk.BondDenom(), initCoins.Sub(amt))},
 	)
 	require.True(t, sdk.NewDec(amtInt).Equal(sk.Validator(ctx, addr).GetPower()))
 	// will exist since the validator has been bonded
@@ -307,7 +307,7 @@ func TestHandleNewValidator(t *testing.T) {
 	stake.EndBlocker(ctx, sk)
 	require.Equal(
 		t, ck.GetCoins(ctx, sdk.AccAddress(addr)),
-		sdk.Coins{sdk.NewCoin(sk.GetParams(ctx).BondDenom, initCoins.Sub(amt))},
+		sdk.Coins{sdk.NewCoin(sk.BondDenom(), initCoins.Sub(amt))},
 	)
 	require.Equal(t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))), sk.Validator(ctx, addr).GetPower())
 

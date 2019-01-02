@@ -65,7 +65,7 @@ var (
 	DefaultParamspace = types.DefaultParamSpace
 	KeyUnbondingTime  = types.KeyUnbondingTime
 	KeyMaxValidators  = types.KeyMaxValidators
-	KeyBondDenom      = types.KeyBondDenom
+	BondDenom         = types.StakeDenom
 
 	DefaultParams         = types.DefaultParams
 	InitialBondedPool     = types.InitialBondedPool

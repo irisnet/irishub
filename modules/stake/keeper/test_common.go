@@ -113,11 +113,11 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins sdk.Int) (sdk.Conte
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range Addrs {
 		_, _, err := ck.AddCoins(ctx, addr, sdk.Coins{
-			{keeper.BondDenom(ctx), initCoins},
+			{keeper.BondDenom(), initCoins},
 		})
 		require.Nil(t, err)
 		keeper.bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{
-			{keeper.BondDenom(ctx), initCoins},
+			{keeper.BondDenom(), initCoins},
 		})
 	}
 

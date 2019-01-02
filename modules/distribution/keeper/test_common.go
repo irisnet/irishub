@@ -118,10 +118,10 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range addrs {
 		ck.AddCoins(ctx, addr, sdk.Coins{
-			{sk.GetParams(ctx).BondDenom, initCoins},
+			{sk.BondDenom(), initCoins},
 		})
 		ck.IncreaseLoosenToken(ctx, sdk.Coins{
-			{sk.GetParams(ctx).BondDenom, initCoins},
+			{sk.BondDenom(), initCoins},
 		})
 	}
 

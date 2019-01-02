@@ -25,17 +25,10 @@ func (k Keeper) MaxValidators(ctx sdk.Context) (res uint16) {
 	return
 }
 
-// BondDenom - Bondable coin denomination
-func (k Keeper) BondDenom(ctx sdk.Context) (res string) {
-	k.paramstore.Get(ctx, types.KeyBondDenom, &res)
-	return
-}
-
 // Get all parameteras as types.Params
 func (k Keeper) GetParams(ctx sdk.Context) (res types.Params) {
 	res.UnbondingTime = k.UnbondingTime(ctx)
 	res.MaxValidators = k.MaxValidators(ctx)
-	res.BondDenom = k.BondDenom(ctx)
 	return
 }
 

@@ -147,3 +147,7 @@ func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddres
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetLastValidatorPowerKey(operator))
 }
+
+func (k Keeper) BondDenom() string {
+	return types.StakeDenom
+}
