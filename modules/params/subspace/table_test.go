@@ -21,7 +21,7 @@ func (tp *testparams) KeyValuePairs() KeyValuePairs {
 }
 
 // Implements params.ParamStruct
-func (p *testparams) GetParamsKey() string {
+func (p *testparams) GetParamSpace() string {
 	return "test"
 }
 

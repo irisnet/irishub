@@ -12,19 +12,23 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey ,*sdk.TransientStoreKey) {
 	db := dbm.NewMemDB()
 	capKey := sdk.NewKVStoreKey("capkey")
 	capKey2 := sdk.NewKVStoreKey("capkey2")
+	paramsKey := sdk.NewKVStoreKey("params")
+	tParamsKey := sdk.NewTransientStoreKey("transient_params")
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(capKey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(capKey2, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tParamsKey, sdk.StoreTypeIAVL, db)
 	ms.LoadLatestVersion()
-	return ms, capKey, capKey2
+	return ms, capKey, capKey2, paramsKey, tParamsKey
 }
 
 func TestAccountMapperGetSet(t *testing.T) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _:= setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 
@@ -60,7 +64,7 @@ func TestAccountMapperGetSet(t *testing.T) {
 }
 
 func TestAccountMapperRemoveAccount(t *testing.T) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 
@@ -98,7 +102,7 @@ func TestAccountMapperRemoveAccount(t *testing.T) {
 }
 
 func BenchmarkAccountMapperGetAccountFound(b *testing.B) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 
@@ -122,7 +126,7 @@ func BenchmarkAccountMapperGetAccountFound(b *testing.B) {
 }
 
 func BenchmarkAccountMapperGetAccountFoundWithCoins(b *testing.B) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 
@@ -156,7 +160,7 @@ func BenchmarkAccountMapperGetAccountFoundWithCoins(b *testing.B) {
 }
 
 func BenchmarkAccountMapperSetAccount(b *testing.B) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 
@@ -175,7 +179,7 @@ func BenchmarkAccountMapperSetAccount(b *testing.B) {
 }
 
 func BenchmarkAccountMapperSetAccountWithCoins(b *testing.B) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 

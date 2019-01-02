@@ -27,6 +27,10 @@ func DefaultGenesisState() GenesisState {
 
 // new mint genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
+
 	keeper.SetMinter(ctx, data.Minter)
 	keeper.SetParamSet(ctx, data.Params)
 }

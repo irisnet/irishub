@@ -13,10 +13,10 @@ import (
 // Have to change these parameters for tests
 // lest the tests take forever
 func keeperTestParams() Params {
-	params := DefaultParams()
+	params := DefaultParamsForTestnet()
 	params.SignedBlocksWindow = 1000
-	params.DowntimeUnbondDuration = 60 * 60
-	params.DoubleSignUnbondDuration = 60 * 60
+	params.DowntimeJailDuration = 60 * 60
+	params.DoubleSignJailDuration = 60 * 60
 	return params
 }
 
@@ -71,7 +71,7 @@ func TestHandleDoubleSign(t *testing.T) {
 func TestSlashingPeriodCap(t *testing.T) {
 
 	// initial setup
-	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParams())
+	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
 	amtInt := sdk.NewIntWithDecimal(100, 18)
 	operatorAddr, amt := addrs[0], amtInt
 	valConsPubKey, valConsAddr := pks[0], pks[0].Address()
@@ -335,7 +335,7 @@ func TestHandleNewValidator(t *testing.T) {
 func TestHandleAlreadyJailed(t *testing.T) {
 
 	// initial setup
-	ctx, _, sk, _, keeper := createTestInput(t, DefaultParams())
+	ctx, _, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
 	amtInt := int64(100)
 	addr, val, amt := addrs[0], pks[0], sdk.NewIntWithDecimal(amtInt, 18)
 	sh := stake.NewHandler(sk)

@@ -17,7 +17,6 @@ import (
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
@@ -35,8 +34,7 @@ import (
 const (
 	appName          = "IrisApp"
 	FlagReplayHeight = "replay_height"
-	//Keep snapshot every at syncable height
-	DefaultSyncableHeight = 10000
+	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries
@@ -97,7 +95,6 @@ func MakeCodec() *codec.Codec {
 	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)
 	guardian.RegisterCodec(cdc)

@@ -25,7 +25,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
 
 	// Increase loosen token and add minted coin to feeCollector
 	k.bk.IncreaseLoosenToken(ctx, sdk.Coins{mintedCoin})
-	k.fck.AddCollectedFees(ctx, sdk.Coins{mintedCoin})
+	k.fk.AddCollectedFees(ctx, sdk.Coins{mintedCoin})
 
 	// Update last block BFT time
 	lastInflationTime := minter.LastUpdate

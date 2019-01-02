@@ -22,9 +22,17 @@ func Execute(ctx sdk.Context, k Keeper, p Proposal) (err error) {
 }
 
 func TaxUsageProposalExecute(ctx sdk.Context, k Keeper, p *TaxUsageProposal) (err error) {
+	logger := ctx.Logger().With("module", "gov")
 	burn := false
 	if p.Usage == UsageTypeBurn {
 		burn = true
+	} else {
+		_, found := k.gk.GetTrustee(ctx, p.DestAddress)
+		if !found {
+			logger.Error("Execute TaxUsageProposal Failure", "info",
+				fmt.Sprintf("the destination address [%s] is not a trustee now", p.DestAddress))
+			return
+		}
 	}
 	k.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
 	return
@@ -34,15 +42,15 @@ func ParameterProposalExecute(ctx sdk.Context, k Keeper, pp *ParameterProposal) 
 
 	logger := ctx.Logger().With("module", "gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-    for _, param := range pp.Params{
-    	paramSet := params.ParamSetMapping[param.Subspace]
-    	value, _ := paramSet.Validate(param.Key,param.Value)
+	for _, param := range pp.Params {
+		paramSet := params.ParamSetMapping[param.Subspace]
+		value, _ := paramSet.Validate(param.Key, param.Value)
 		subspace, bool := k.paramsKeeper.GetSubspace(param.Subspace)
 		if bool {
-			subspace.Set(ctx,[]byte(param.Key),value)
+			subspace.Set(ctx, []byte(param.Key), value)
 		}
 
-		logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("%s = %s",param.Key,param.Value ))
+		logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("%s = %s", param.Key, param.Value))
 	}
 
 	return

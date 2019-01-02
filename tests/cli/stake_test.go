@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
-	"github.com/irisnet/irishub/app/v0"
 )
 
 func TestIrisCLIStakeCreateValidator(t *testing.T) {
@@ -30,7 +29,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHomeB))
 	barCeshPubKey := executeGetValidatorPK(t, fmt.Sprintf("iris tendermint show-validator --home=%s", irisHomeB))
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -56,7 +55,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	cvStr += fmt.Sprintf(" --commission-max-rate=%s", "0.5")
 	cvStr += fmt.Sprintf(" --commission-rate=%s", "0.1")
 
-	executeWrite(t, cvStr, v0.DefaultKeyPass)
+	executeWrite(t, cvStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -79,7 +78,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	unbondStr += fmt.Sprintf(" --shares-amount=%v", "1")
 	unbondStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 
-	success := executeWrite(t, unbondStr, v0.DefaultKeyPass)
+	success := executeWrite(t, unbondStr, sdk.DefaultKeyPass)
 	require.True(t, success)
 	tests.WaitForNextNBlocksTM(2, port)
 

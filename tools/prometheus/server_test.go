@@ -5,7 +5,6 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/app"
-	sdk "github.com/irisnet/irishub/types"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/shirou/gopsutil/cpu"
@@ -19,7 +18,7 @@ import (
 )
 
 func TestMetricsCmd(t *testing.T) {
-	sdk.InitBech32Prefix()
+//	sdk.InitBech32Prefix()
 
 	cdc := app.MakeCodec()
 	comm := MonitorCommand(cdc)

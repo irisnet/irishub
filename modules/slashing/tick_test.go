@@ -13,7 +13,7 @@ import (
 )
 
 func TestBeginBlocker(t *testing.T) {
-	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParams())
+	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
 	addr, pk, amt := addrs[2], pks[2], sdk.NewIntWithDecimal(100, 18)
 
 	// bond the validator
