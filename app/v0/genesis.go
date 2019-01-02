@@ -421,6 +421,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
 		Accounts:        nil,
+		AuthData:		 auth.DefaultGenesisState(),
 		StakeData:       createStakeGenesisState(),
 		MintData:        createMintGenesisState(),
 		DistrData:       distr.DefaultGenesisState(),
