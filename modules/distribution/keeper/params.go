@@ -8,7 +8,7 @@ import (
 
 // Type declaration for parameters
 func ParamTypeTable() params.TypeTable {
-	return params.NewTypeTable(&types.Params{})
+	return params.NewTypeTable().RegisterParamSet(&types.Params{})
 }
 
 func (k Keeper) GetCommunityTax(ctx sdk.Context) sdk.Dec {

@@ -85,7 +85,7 @@ func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 		KeySlashing,
 		KeyGov,
 		KeyRecord,
-		KeyFeeCollection,
+		KeyFee,
 		KeyParams,
 		KeyUpgrade,
 		KeyService,

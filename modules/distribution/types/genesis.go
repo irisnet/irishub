@@ -15,7 +15,6 @@ type DelegatorWithdrawInfo struct {
 type GenesisState struct {
 	Params                 Params                  `json:"params"`
 	FeePool                FeePool                 `json:"fee_pool"`
-	CommunityTax           sdk.Dec                 `json:"community_tax"`
 	ValidatorDistInfos     []ValidatorDistInfo     `json:"validator_dist_infos"`
 	DelegationDistInfos    []DelegationDistInfo    `json:"delegator_dist_infos"`
 	DelegatorWithdrawInfos []DelegatorWithdrawInfo `json:"delegator_withdraw_infos"`

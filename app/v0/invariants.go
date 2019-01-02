@@ -16,7 +16,7 @@ func (p *ProtocolVersion0) runtimeInvariants() []simulation.Invariant {
 		banksim.NonnegativeBalanceInvariant(p.accountMapper),
 		distrsim.ValAccumInvariants(p.distrKeeper, p.StakeKeeper),
 		stakesim.SupplyInvariants(p.bankKeeper, p.StakeKeeper,
-			p.feeCollectionKeeper, p.distrKeeper, p.accountMapper),
+			p.feeKeeper, p.distrKeeper, p.accountMapper),
 		stakesim.PositivePowerInvariant(p.StakeKeeper),
 	}
 }

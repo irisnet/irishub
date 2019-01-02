@@ -33,20 +33,18 @@ type ProtocolVersion0 struct {
 	invariantLevel string
 
 	// Manage getting and setting accounts
-	accountMapper       auth.AccountKeeper
-	feeCollectionKeeper auth.FeeCollectionKeeper
-	bankKeeper          bank.Keeper
-	StakeKeeper         stake.Keeper
-	slashingKeeper      slashing.Keeper
-	mintKeeper          mint.Keeper
-	distrKeeper         distr.Keeper
-	govKeeper           gov.Keeper
-	paramsKeeper        params.Keeper
-	serviceKeeper       service.Keeper
-	guardianKeeper      guardian.Keeper
-	upgradeKeeper       upgrade.Keeper
-	// fee manager
-	feeManager auth.FeeManager
+	accountMapper  auth.AccountKeeper
+	feeKeeper      auth.FeeKeeper
+	bankKeeper     bank.Keeper
+	StakeKeeper    stake.Keeper
+	slashingKeeper slashing.Keeper
+	mintKeeper     mint.Keeper
+	distrKeeper    distr.Keeper
+	govKeeper      gov.Keeper
+	paramsKeeper   params.Keeper
+	serviceKeeper  service.Keeper
+	guardianKeeper guardian.Keeper
+	upgradeKeeper  upgrade.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -114,13 +112,13 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 		guardian.DefaultCodespace,
 	)
 	p.bankKeeper = bank.NewBaseKeeper(p.accountMapper)
-	p.feeCollectionKeeper = auth.NewFeeCollectionKeeper(
-		p.cdc,
-		protocol.KeyFeeCollection,
-	)
 	p.paramsKeeper = params.NewKeeper(
 		p.cdc,
 		protocol.KeyParams, protocol.TkeyParams,
+	)
+	p.feeKeeper = auth.NewFeeKeeper(
+		p.cdc,
+		protocol.KeyFee, p.paramsKeeper.Subspace(auth.DefaultParamSpace),
 	)
 	stakeKeeper := stake.NewKeeper(
 		p.cdc,
@@ -130,13 +128,13 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	)
 	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamSpace),
-		p.bankKeeper, p.feeCollectionKeeper,
+		p.bankKeeper, p.feeKeeper,
 	)
 	p.distrKeeper = distr.NewKeeper(
 		p.cdc,
 		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
-		p.bankKeeper, &stakeKeeper, p.feeCollectionKeeper,
+		p.bankKeeper, &stakeKeeper, p.feeKeeper,
 		distr.DefaultCodespace,
 	)
 	p.slashingKeeper = slashing.NewKeeper(
@@ -173,7 +171,6 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	// so that it can be modified like below:
 	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
-	p.feeManager = auth.NewFeeManager(p.paramsKeeper.Subspace("Fee"))
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.StakeKeeper, protocolkeeper)
 }
@@ -195,9 +192,9 @@ func (p *ProtocolVersion0) configRouters() {
 
 // configure all Stores
 func (p *ProtocolVersion0) configFeeHandlers() {
-	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeCollectionKeeper)
-	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeCollectionKeeper, p.feeManager)
-	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeManager)
+	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
+	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
+	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
 
 // configure all Stores
@@ -212,7 +209,7 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeySlashing,
 		protocol.KeyGov,
 		protocol.KeyRecord,
-		protocol.KeyFeeCollection,
+		protocol.KeyFee,
 		protocol.KeyParams,
 		protocol.KeyUpgrade,
 		protocol.KeyService,
@@ -222,7 +219,7 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &gov.GovParams{}, &service.Params{})
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
@@ -295,13 +292,8 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	}
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
 
-	feeTokenGensisConfig := auth.FeeGenesisStateConfig{
-		FeeTokenNative:    sdk.IRIS.MinUnit.Denom,
-		GasPriceThreshold: 20000000000, // 20*10^9 iris-atto per gas, 20 iris-nano per gas, 2*10^(-8) iris per gas
-	}
-
 	// load the address to pubkey map
-	auth.InitGenesis(ctx, p.feeCollectionKeeper, p.accountMapper, genesisState.AuthData, p.feeManager, feeTokenGensisConfig)
+	auth.InitGenesis(ctx, p.feeKeeper, p.accountMapper, genesisState.AuthData)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
 	mint.InitGenesis(ctx, p.mintKeeper, genesisState.MintData)
 	distr.InitGenesis(ctx, p.distrKeeper, genesisState.DistrData)

@@ -7,10 +7,10 @@ import (
 
 // GenesisState - all slashing state that must be provided at genesis
 type GenesisState struct {
-	Params          Params
-	SigningInfos    map[string]ValidatorSigningInfo
-	MissedBlocks    map[string][]MissedBlock
-	SlashingPeriods []ValidatorSlashingPeriod
+	Params          Params                          `json:"params"`
+	SigningInfos    map[string]ValidatorSigningInfo `json:"signing_infos"`
+	MissedBlocks    map[string][]MissedBlock        `json:"missed_blocks"`
+	SlashingPeriods []ValidatorSlashingPeriod       `json:"slashing_periods"`
 }
 
 // MissedBlock

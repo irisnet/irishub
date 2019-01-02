@@ -40,9 +40,10 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		sdk.NewKVStoreKey("params"),
 		sdk.NewTransientStoreKey("transient_params"),
 	)
-	feeCollectionKeeper := auth.NewFeeCollectionKeeper(
+	feeKeeper := auth.NewFeeKeeper(
 		mapp.Cdc,
 		sdk.NewKVStoreKey("fee"),
+		paramsKeeper.Subspace(auth.DefaultParamSpace),
 	)
 
 	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
@@ -51,7 +52,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
-	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, DefaultCodespace)
+	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
 	gk := NewKeeper(mapp.Cdc, keyGov,paramsKeeper,paramsKeeper.Subspace(DefaultParamSpace), dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
 

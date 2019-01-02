@@ -33,9 +33,8 @@ const (
 	CodeInvalidMinDepositMultiple   sdk.CodeType = 201
 	CodeInvalidServiceFeeTax        sdk.CodeType = 202
 	CodeInvalidSlashFraction        sdk.CodeType = 203
-	CodeInvalidServiceParams        sdk.CodeType = 204
-	CodeInvalidArbitrationTimeLimit sdk.CodeType = 205
-	CodeComplaintRetrospect         sdk.CodeType = 206
+	CodeInvalidArbitrationTimeLimit sdk.CodeType = 204
+	CodeComplaintRetrospect         sdk.CodeType = 205
 
 	//upgrade
 	CodeInvalidUpgradeParams sdk.CodeType = 300
@@ -48,13 +47,16 @@ const (
 	CodeInvalidMaxValidators sdk.CodeType = 501
 	CodeInvalidBondDenom     sdk.CodeType = 502
 
-	//slash
-	CodeInvalidSlashParams sdk.CodeType = 600
+	//auth
+	CodeInvalidGasPriceThreshold sdk.CodeType = 600
 
 	//distribution
 	CodeInvalidCommunityTax        sdk.CodeType = 700
 	CodeInvalidBaseProposerReward  sdk.CodeType = 701
 	CodeInvalidBonusProposerReward sdk.CodeType = 702
+
+	//slash
+	CodeInvalidSlashParams sdk.CodeType = 800
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {

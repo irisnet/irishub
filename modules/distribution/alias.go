@@ -10,6 +10,7 @@ import (
 type (
 	Keeper = keeper.Keeper
 	Hooks  = keeper.Hooks
+	Params = types.Params
 
 	DelegatorWithdrawInfo = types.DelegatorWithdrawInfo
 	DelegationDistInfo    = types.DelegationDistInfo
@@ -27,7 +28,7 @@ type (
 	// expected keepers
 	StakeKeeper         = types.StakeKeeper
 	BankKeeper          = types.BankKeeper
-	FeeCollectionKeeper = types.FeeCollectionKeeper
+	FeeCollectionKeeper = types.FeeKeeper
 )
 
 var (

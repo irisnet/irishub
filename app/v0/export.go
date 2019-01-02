@@ -55,7 +55,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 
 	genState := NewGenesisFileState(
 		fileAccounts,
-		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
+		auth.ExportGenesis(ctx, p.feeKeeper),
 		stake.ExportGenesis(ctx, p.StakeKeeper),
 		mint.ExportGenesis(ctx, p.mintKeeper),
 		distr.ExportGenesis(ctx, p.distrKeeper),
