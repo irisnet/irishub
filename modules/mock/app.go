@@ -10,8 +10,6 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/gov/params"
-	"github.com/irisnet/irishub/modules/service/params"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -20,6 +18,9 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 const (
@@ -128,26 +129,13 @@ func NewApp() *App {
 	// Not sealing for custom extension
 
 	// init iparam
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{})
+
 	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
-			govparams.DepositProcedureParameter.GetStoreKey(), govparams.DepositProcedure{},
-			govparams.VotingProcedureParameter.GetStoreKey(), govparams.VotingProcedure{},
-			govparams.TallyingProcedureParameter.GetStoreKey(), govparams.TallyingProcedure{},
-			serviceparams.ServiceParameter.GetStoreKey(), serviceparams.Params{},
-			arbitrationparams.ComplaintRetrospectParameter.GetStoreKey(), []byte{},
-			arbitrationparams.ArbitrationTimelimitParameter.GetStoreKey(), []byte{},
+			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
 		)),
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter,
-		&serviceparams.ServiceParameter,
-		&arbitrationparams.ComplaintRetrospectParameter,
-		&arbitrationparams.ArbitrationTimelimitParameter)
-
-	params.RegisterGovParamMapping(
-		&govparams.DepositProcedureParameter,
-		&govparams.VotingProcedureParameter,
-		&govparams.TallyingProcedureParameter)
+		&upgradeparams.UpgradeParameter, )
 
 	return app
 }
