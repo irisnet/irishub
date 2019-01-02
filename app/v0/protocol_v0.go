@@ -22,6 +22,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
+	"strings"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion0)(nil)
@@ -72,7 +73,7 @@ func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string
 		pb:             &base,
 		cdc:            cdc,
 		logger:         log,
-		invariantLevel: invariantLevel,
+		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
 	}

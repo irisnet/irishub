@@ -16,12 +16,6 @@ const defaultConfigTemplate = `# This is a TOML config file.
 # Validators reject any tx from the mempool with less than the minimum fee per gas.
 minimum_fees = "{{ .BaseConfig.MinFees }}"
 
-
-# Invariant failure handle level, valid values: 
-# 	1. error: just print error message for invariant failure
-# 	2. panic: panic and abort program for invariant failure 
-# For any other values, invariant checking will be disabled
-invariant_level = "{{ .BaseConfig.InvariantLevel }}"
 `
 
 var configTemplate *template.Template
