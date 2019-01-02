@@ -11,8 +11,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		// NOTE msg already has validate basic run
 		switch msg := msg.(type) {
-		case types.MsgSetWithdrawAddress:
-			return handleMsgModifyWithdrawAddress(ctx, msg, k)
 		case types.MsgWithdrawDelegatorRewardsAll:
 			return handleMsgWithdrawDelegatorRewardsAll(ctx, msg, k)
 		case types.MsgWithdrawDelegatorReward:
@@ -29,21 +27,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // These functions assume everything has been authenticated,
 // now we just perform action and save
-
-func handleMsgModifyWithdrawAddress(ctx sdk.Context, msg types.MsgSetWithdrawAddress, k keeper.Keeper) sdk.Result {
-
-	return types.ErrDeprecatedOperation(types.DefaultCodespace).Result()
-	/*
-	k.SetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr, msg.WithdrawAddr)
-
-	tags := sdk.NewTags(
-		tags.Delegator, []byte(msg.DelegatorAddr.String()),
-	)
-	return sdk.Result{
-		Tags: tags,
-	}
-	*/
-}
 
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
 

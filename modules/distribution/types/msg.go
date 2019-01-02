@@ -9,54 +9,7 @@ import (
 const MsgRoute = "distr"
 
 // Verify interface at compile time
-var _, _ sdk.Msg = &MsgSetWithdrawAddress{}, &MsgWithdrawDelegatorRewardsAll{}
-var _, _ sdk.Msg = &MsgWithdrawDelegatorReward{}, &MsgWithdrawValidatorRewardsAll{}
-
-//______________________________________________________________________
-
-// msg struct for changing the withdraw address for a delegator (or validator self-delegation)
-type MsgSetWithdrawAddress struct {
-	DelegatorAddr sdk.AccAddress `json:"delegator_addr"`
-	WithdrawAddr  sdk.AccAddress `json:"withdraw_addr"`
-}
-
-func NewMsgSetWithdrawAddress(delAddr, withdrawAddr sdk.AccAddress) MsgSetWithdrawAddress {
-	return MsgSetWithdrawAddress{
-		DelegatorAddr: delAddr,
-		WithdrawAddr:  withdrawAddr,
-	}
-}
-
-func (msg MsgSetWithdrawAddress) Route() string { return MsgRoute }
-func (msg MsgSetWithdrawAddress) Type() string  { return "set_withdraw_address" }
-
-// Return address that must sign over msg.GetSignBytes()
-func (msg MsgSetWithdrawAddress) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.DelegatorAddr)}
-}
-
-// get the bytes for the message signer to sign on
-func (msg MsgSetWithdrawAddress) GetSignBytes() []byte {
-	b, err := MsgCdc.MarshalJSON(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
-}
-
-// quick validity check
-func (msg MsgSetWithdrawAddress) ValidateBasic() sdk.Error {
-	return ErrDeprecatedOperation(DefaultCodespace)
-	/*
-	if msg.DelegatorAddr == nil {
-		return ErrNilDelegatorAddr(DefaultCodespace)
-	}
-	if msg.WithdrawAddr == nil {
-		return ErrNilWithdrawAddr(DefaultCodespace)
-	}
-	return nil
-	*/
-}
+var _,_, _ sdk.Msg = &MsgWithdrawDelegatorRewardsAll{}, &MsgWithdrawDelegatorReward{}, &MsgWithdrawValidatorRewardsAll{}
 
 //______________________________________________________________________
 

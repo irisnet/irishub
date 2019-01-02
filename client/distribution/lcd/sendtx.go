@@ -11,42 +11,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-/*
-type setWithdrawAddressBody struct {
-	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
-	BaseTx          utils.BaseTx   `json:"base_tx"`
-}
-
-// SetWithdrawAddressHandlerFn - http request handler to set withdraw address
-// nolint: gocyclo
-func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Init context and read request parameters
-		vars := mux.Vars(r)
-		bech32addr := vars["delegatorAddr"]
-		delegatorAddress, err := sdk.AccAddressFromBech32(bech32addr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-		var m setWithdrawAddressBody
-		err = utils.ReadPostBody(w, r, cdc, &m)
-		if err != nil {
-			return
-		}
-		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
-			return
-		}
-		// Build message
-		msg := types.NewMsgSetWithdrawAddress(delegatorAddress, m.WithdrawAddress)
-		// Broadcast or return unsigned transaction
-		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
-	}
-}
-*/
 type withdrawRewardsBody struct {
 	ValidatorAddress sdk.ValAddress `json:"validator_address"`
 	IsValidator      bool           `json:"is_validator"`

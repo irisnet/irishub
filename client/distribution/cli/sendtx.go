@@ -79,38 +79,3 @@ func GetCmdWithdrawRewards(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().Bool(flagIsValidator, false, "also withdraw validator's commission")
 	return cmd
 }
-/*
-// GetCmdDelegate implements the delegate command.
-func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "set-withdraw-addr [withdraw-addr]",
-		Short:   "change the default withdraw address for rewards associated with an address",
-		Example: "iriscli distribution set-withdraw-addr <address> --from <key name> --fee=0.004iris --chain-id=<chain-id>",
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
-
-			delAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-
-			withdrawAddr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgSetWithdrawAddress(delAddr, withdrawAddr)
-
-			// build and sign the transaction, then broadcast to Tendermint
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-	return cmd
-}
-*/
