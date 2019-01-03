@@ -2,9 +2,7 @@ package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/types/gov/params"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"time"
+
 )
 
 //-----------------------------------------------------------
@@ -15,107 +13,151 @@ type ProposalLevel byte
 
 //nolint
 const (
-	ProposalLevelNil        ProposalLevel = 0x00
-	ProposalLevelCritical   ProposalLevel = 0x01
-	ProposalLevelImportant  ProposalLevel = 0x02
+	ProposalLevelNil       ProposalLevel = 0x00
+	ProposalLevelCritical  ProposalLevel = 0x01
+	ProposalLevelImportant ProposalLevel = 0x02
 	////////////////////  iris begin  /////////////////////////////
-	ProposalLevelNormal     ProposalLevel = 0x03
+	ProposalLevelNormal ProposalLevel = 0x03
 	////////////////////  iris end  /////////////////////////////
 )
 
 func (p ProposalLevel) string() string {
 	switch p {
 	case ProposalLevelCritical:
-		return "ciritical"
+		return "critical"
 	case ProposalLevelImportant:
-		return  "important"
+		return "important"
 	case ProposalLevelNormal:
 		return "normal"
 	default:
-		return  " "
+		return " "
 	}
 }
 
-func GetProposalLevel(p govtypes.Proposal) ProposalLevel {
+func GetProposalLevel(p Proposal) ProposalLevel {
 	return GetProposalLevelByProposalKind(p.GetProposalType())
 }
 
-func GetProposalLevelByProposalKind(p govtypes.ProposalKind) ProposalLevel {
+func GetProposalLevelByProposalKind(p ProposalKind) ProposalLevel {
 	switch p {
-	case govtypes.ProposalTypeTxTaxUsage:
+	case ProposalTypeTxTaxUsage:
 		return ProposalLevelNormal
-	case govtypes.ProposalTypeParameterChange:
+	case ProposalTypeParameterChange:
 		return ProposalLevelImportant
-	case govtypes.ProposalTypeSoftwareHalt:
+	case ProposalTypeSystemHalt:
 		return ProposalLevelCritical
-	case govtypes.ProposalTypeSoftwareUpgrade:
+	case ProposalTypeSoftwareUpgrade:
 		return ProposalLevelCritical
 	default:
-		return  ProposalLevelNil
+		return ProposalLevelNil
 	}
 }
 
 // Returns the current Deposit Procedure from the global param store
-func GetDepositProcedure(ctx sdk.Context) govparams.DepositProcedure {
-	govparams.DepositProcedureParameter.LoadValue(ctx)
-	return govparams.DepositProcedureParameter.Value
-}
-
-func GetMinDeposit(ctx sdk.Context, p govtypes.Proposal) sdk.Coins {
-	govparams.DepositProcedureParameter.LoadValue(ctx)
+func (Keeper Keeper) GetDepositProcedure(ctx sdk.Context, p Proposal) DepositProcedure {
+	params := Keeper.GetParamSet(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
-		return govparams.DepositProcedureParameter.Value.CriticalMinDeposit
+		return DepositProcedure{
+			MinDeposit:params.CriticalMinDeposit,
+			MaxDepositPeriod:params.CriticalDepositPeriod,
+		}
 	case ProposalLevelImportant:
-		return govparams.DepositProcedureParameter.Value.ImportantMinDeposit
+		return DepositProcedure{
+			MinDeposit:params.ImportantMinDeposit,
+			MaxDepositPeriod:params.ImportantDepositPeriod,
+		}
 	case ProposalLevelNormal:
-		return govparams.DepositProcedureParameter.Value.NormalMinDeposit
+		return DepositProcedure{
+		MinDeposit:params.NormalMinDeposit,
+		MaxDepositPeriod:params.NormalDepositPeriod,
+	}
 	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
 }
 
-func GetDepositPeriod(ctx sdk.Context) time.Duration {
-	govparams.DepositProcedureParameter.LoadValue(ctx)
-	return govparams.DepositProcedureParameter.Value.MaxDepositPeriod
-}
 
 
 // Returns the current Voting Procedure from the global param store
-func GetVotingProcedure(ctx sdk.Context) govparams.VotingProcedure {
-	govparams.VotingProcedureParameter.LoadValue(ctx)
-	return govparams.VotingProcedureParameter.Value
-}
-
-func GetVotingPeriod(ctx sdk.Context, p govtypes.Proposal) time.Duration {
-	govparams.VotingProcedureParameter.LoadValue(ctx)
+func (Keeper Keeper) GetVotingProcedure(ctx sdk.Context, p Proposal) VotingProcedure {
+	params := Keeper.GetParamSet(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
-		return govparams.VotingProcedureParameter.Value.CriticalVotingPeriod
+		return VotingProcedure{
+			VotingPeriod:params.CriticalVotingPeriod,
+			MaxNum:params.CriticalMaxNum,
+		}
 	case ProposalLevelImportant:
-		return govparams.VotingProcedureParameter.Value.ImportantVotingPeriod
+		return VotingProcedure{
+			VotingPeriod:params.ImportantVotingPeriod,
+			MaxNum:params.ImportantMaxNum,
+		}
 	case ProposalLevelNormal:
-		return govparams.VotingProcedureParameter.Value.NormalVotingPeriod
+		return VotingProcedure{
+			VotingPeriod:params.NormalVotingPeriod,
+			MaxNum:params.NormalMaxNum,
+		}
 	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
+	}
+}
+
+// Returns the current Voting Procedure from the global param store
+func (Keeper Keeper) GetVotingProcedureByProposalLevel(ctx sdk.Context, pl ProposalLevel) VotingProcedure {
+	params := Keeper.GetParamSet(ctx)
+	switch pl {
+	case ProposalLevelCritical:
+		return VotingProcedure{
+			VotingPeriod:params.CriticalVotingPeriod,
+			MaxNum:params.CriticalMaxNum,
+		}
+	case ProposalLevelImportant:
+		return VotingProcedure{
+			VotingPeriod:params.ImportantVotingPeriod,
+			MaxNum:params.ImportantMaxNum,
+		}
+	case ProposalLevelNormal:
+		return VotingProcedure{
+			VotingPeriod:params.NormalVotingPeriod,
+			MaxNum:params.NormalMaxNum,
+		}
+	default:
+		panic("There is no level for this proposal which type is " + pl.string())
 	}
 }
 
 // Returns the current Tallying Procedure from the global param store
-func GetTallyingProcedure(ctx sdk.Context) govparams.TallyingProcedure {
-	govparams.TallyingProcedureParameter.LoadValue(ctx)
-	return govparams.TallyingProcedureParameter.Value
-}
-
-func GetTallyingCondition(ctx sdk.Context,p govtypes.Proposal) govparams.TallyCondition {
+func (Keeper Keeper) GetTallyingProcedure(ctx sdk.Context, p Proposal) TallyingProcedure {
+	params := Keeper.GetParamSet(ctx)
 	switch GetProposalLevel(p) {
 	case ProposalLevelCritical:
-		return govparams.TallyingProcedureParameter.Value.CriticalCondition
+		return TallyingProcedure{
+			Threshold:params.CriticalThreshold,
+			Veto:params.CriticalVeto,
+			Participation:params.CriticalParticipation,
+			Penalty:params.CriticalPenalty,
+		}
 	case ProposalLevelImportant:
-		return govparams.TallyingProcedureParameter.Value.ImportantCondition
+		return TallyingProcedure{
+			Threshold:params.ImportantThreshold,
+			Veto:params.ImportantVeto,
+			Participation:params.ImportantParticipation,
+			Penalty:params.ImportantPenalty,
+		}
 	case ProposalLevelNormal:
-		return govparams.TallyingProcedureParameter.Value.NormalCondition
+		return TallyingProcedure{
+			Threshold:params.NormalThreshold,
+			Veto:params.NormalVeto,
+			Participation:params.NormalParticipation,
+			Penalty:params.NormalPenalty,
+		}
 	default:
-		panic("There is no level for this proposal which type is "+ p.GetProposalType().String())
+		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
+}
+
+func (keeper Keeper) GetSystemHaltPeriod(ctx sdk.Context) ( SystemHaltPeriod int64) {
+	keeper.paramSpace.Get(ctx,KeySystemHaltPeriod,SystemHaltPeriod)
+	return
 }

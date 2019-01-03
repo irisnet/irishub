@@ -16,7 +16,7 @@ import (
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 )
 
 // TestGovWithRandomMessages
@@ -47,7 +47,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		mapp.Cdc,
 		distrKey,
 		mapp.ParamsKeeper.Subspace(distr.DefaultParamspace),
-		mapp.BankKeeper, &stakeKeeper, mapp.FeeCollectionKeeper,
+		mapp.BankKeeper, &stakeKeeper, mapp.FeeKeeper,
 		distr.DefaultCodespace,
 	)
 	guardianKeeper := guardian.NewKeeper(
@@ -58,12 +58,14 @@ func TestGovWithRandomMessages(t *testing.T) {
 	govKeeper := gov.NewKeeper(
 		mapp.Cdc,
 		govKey,
+		paramKeeper,
+		mapp.ParamsKeeper.Subspace(gov.DefaultParamSpace),
 		distrKeeper,
 		bankKeeper,
 		guardianKeeper,
 		stakeKeeper,
 		protocolKeeper,
-		govtypes.DefaultCodespace,
+		 gov.DefaultCodespace,
 	)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))

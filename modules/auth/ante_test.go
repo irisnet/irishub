@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	codec "github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -13,6 +12,8 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/crypto/multisig"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func newTestMsg(addrs ...sdk.AccAddress) *sdk.TestMsg {
@@ -110,11 +111,12 @@ func newTestTxWithSignBytes(msgs []sdk.Msg, privs []crypto.PrivKey, accNums []ui
 // Test various error cases in the AnteHandler control flow.
 func TestAnteHandlerSigErrors(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 
@@ -163,11 +165,12 @@ func TestAnteHandlerSigErrors(t *testing.T) {
 // Test logic around account number checking with one signer and many signers.
 func TestAnteHandlerAccountNumbers(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)
@@ -223,11 +226,12 @@ func TestAnteHandlerAccountNumbers(t *testing.T) {
 // Test logic around account number checking with many signers when BlockHeight is 0.
 func TestAnteHandlerAccountNumbersAtBlockHeightZero(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(0)
@@ -283,11 +287,12 @@ func TestAnteHandlerAccountNumbersAtBlockHeightZero(t *testing.T) {
 // Test logic around sequence checking with one signer and many signers.
 func TestAnteHandlerSequences(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)
@@ -362,11 +367,12 @@ func TestAnteHandlerSequences(t *testing.T) {
 // Test logic around fee deduction.
 func TestAnteHandlerFees(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 
@@ -404,11 +410,12 @@ func TestAnteHandlerFees(t *testing.T) {
 // Test logic around memo gas consumption.
 func TestAnteHandlerMemoGas(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)
@@ -448,11 +455,12 @@ func TestAnteHandlerMemoGas(t *testing.T) {
 
 func TestAnteHandlerMultiSigner(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)
@@ -500,11 +508,12 @@ func TestAnteHandlerMultiSigner(t *testing.T) {
 
 func TestAnteHandlerBadSignBytes(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)
@@ -582,11 +591,12 @@ func TestAnteHandlerBadSignBytes(t *testing.T) {
 
 func TestAnteHandlerSetPubKey(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)
@@ -636,7 +646,7 @@ func TestAnteHandlerSetPubKey(t *testing.T) {
 }
 
 func TestProcessPubKey(t *testing.T) {
-	ms, capKey, _ := setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
@@ -749,11 +759,12 @@ func TestCountSubkeys(t *testing.T) {
 }
 func TestAnteHandlerSigLimitExceeded(t *testing.T) {
 	// setup
-	ms, capKey, capKey2 := setupMultiStore()
+	ms, capKey, capKey2, paramsKey, tParamsKey := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
-	feeCollector := NewFeeCollectionKeeper(cdc, capKey2)
+	paramsKeeper := params.NewKeeper(cdc, paramsKey, tParamsKey)
+	feeCollector := NewFeeKeeper(cdc, capKey2, paramsKeeper.Subspace(DefaultParamSpace))
 	anteHandler := NewAnteHandler(mapper, feeCollector)
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "mychainid"}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(1)

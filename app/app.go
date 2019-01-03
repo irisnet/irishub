@@ -17,13 +17,12 @@ import (
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -36,8 +35,7 @@ import (
 const (
 	appName          = "IrisApp"
 	FlagReplayHeight = "replay_height"
-	//Keep snapshot every at syncable height
-	DefaultSyncableHeight = 10000
+	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries
@@ -62,6 +60,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
+
 	engine := protocol.NewProtocolEngine(cdc)
 	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
@@ -79,10 +78,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-	protocol0 := v0.NewProtocolVersion0(cdc, logger, app.invariantLevel)
+
+	protocol0 := v0.NewProtocolVersion0(cdc, logger, sdk.InvariantLevel)
 	engine.Add(protocol0)
-	protocol1 := v1.NewProtocolVersion1(cdc)
-	engine.Add(protocol1)
+	//protocol1 := v1.NewProtocolVersion1(cdc)
+	//engine.Add(protocol1)
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
 	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().LoadCodec())
 
@@ -97,8 +97,6 @@ func MakeCodec() *codec.Codec {
 	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
-	govtypes.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)
 	guardian.RegisterCodec(cdc)
@@ -121,22 +119,22 @@ func (app *IrisApp) LoadHeight(height int64) error {
 
 func (app *IrisApp) replayToHeight(replayHeight int64, logger log.Logger) int64 {
 	loadHeight := int64(0)
-	logger.Info("Please make sure the replay height is less than block height")
+	logger.Info("Please make sure the replay height is smaller than the latest block height.")
 	if replayHeight >= DefaultSyncableHeight {
 		loadHeight = replayHeight - replayHeight%DefaultSyncableHeight
 	} else {
 		// version 1 will always be kept
 		loadHeight = 1
 	}
-	logger.Info("This replay operation will change the application store, please spare your node home directory first")
-	logger.Info("Confirm that:(y/n)")
+	logger.Info("This replay operation will change the application store, backup your node home directory before proceeding!!")
+	logger.Info("Are you sure to proceed? (y/n)")
 	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-	confirm := strings.TrimSpace(input)
+	confirm := strings.ToLower(strings.TrimSpace(input))
 	if confirm != "y" && confirm != "yes" {
-		cmn.Exit("Abort replay operation")
+		cmn.Exit("Replay operation aborted.")
 	}
 	return loadHeight
 }

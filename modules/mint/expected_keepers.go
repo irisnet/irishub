@@ -5,6 +5,6 @@ import (
 )
 
 // expected fee collection keeper interface
-type FeeCollectionKeeper interface {
+type FeeKeeper interface {
 	AddCollectedFees(sdk.Context, sdk.Coins) sdk.Coins
 }

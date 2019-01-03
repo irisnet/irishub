@@ -19,13 +19,10 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/keys"
-	recordCli "github.com/irisnet/irishub/client/record"
 	servicecli "github.com/irisnet/irishub/client/service"
 	stakecli "github.com/irisnet/irishub/client/stake"
-	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
@@ -35,19 +32,9 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"path/filepath"
 	"io/ioutil"
-	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/app/v0"
-	govtypes "github.com/irisnet/irishub/types/gov"
 )
-
-func init() {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
-	config.Seal()
-}
 
 //___________________________________________________________________________________
 // irisnet helper methods
@@ -89,7 +76,6 @@ func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
-	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
@@ -144,10 +130,10 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	irisHome, iriscliHome = getTestingHomeDirs(t.Name())
 	tests.ExecuteT(t, fmt.Sprintf("rm -rf %s ", irisHome), "")
 	//tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), v0.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), v0.DefaultKeyPass)
-	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), v0.DefaultKeyPass)
-	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), sdk.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), sdk.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), sdk.DefaultKeyPass)
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
@@ -164,8 +150,8 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	genDoc.SaveAs(genFile)
 	executeWriteCheckErr(t, fmt.Sprintf(
 		"iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
-		v0.DefaultKeyPass)
-	executeWriteCheckErr(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), v0.DefaultKeyPass)
+		sdk.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), sdk.DefaultKeyPass)
 	// get a free port, also setup some common flags
 	servAddr, port, err = server.FreeTCPAddr()
 	require.NoError(t, err)
@@ -196,6 +182,11 @@ func readGenesisFile(t *testing.T, genFile string) types.GenesisDoc {
 // executors
 
 func executeWrite(t *testing.T, cmdStr string, writes ...string) (exitSuccess bool) {
+	// broadcast transaction and return after the transaction is included by a block
+	if strings.Contains(cmdStr,"--from") && strings.Contains(cmdStr,"--fee") {
+		cmdStr = cmdStr + " --commit"
+	}
+
 	exitSuccess, _, _ = executeWriteRetStdStreams(t, cmdStr, writes...)
 	return
 }
@@ -224,7 +215,7 @@ func executeWriteRetStdStreams(t *testing.T, cmdStr string, writes ...string) (b
 }
 
 func executeInit(t *testing.T, cmdStr string) (chainID string) {
-	_, stderr := tests.ExecuteT(t, cmdStr, v0.DefaultKeyPass)
+	_, stderr := tests.ExecuteT(t, cmdStr, sdk.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(stderr), &initRes)
@@ -328,27 +319,27 @@ func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	return proposal
 }
 
-func executeGetVote(t *testing.T, cmdStr string) govtypes.Vote {
+func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var vote govtypes.Vote
+	var vote  gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return vote
 }
 
-func executeGetVotes(t *testing.T, cmdStr string) []govtypes.Vote {
+func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var votes []govtypes.Vote
+	var votes [] gov.Vote
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
 }
 
-func executeGetParam(t *testing.T, cmdStr string) govtypes.Param {
+func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var param govtypes.Param
+	var param  gov.Param
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -458,29 +449,6 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 	require.NoError(t, err, "out %v\n, err %v", stdout, err)
 
 	return res.TxHash
-}
-
-func executeGetRecordID(t *testing.T, cmdStr string) string {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var info tx.Info
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &info)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	recordMsg, ok := info.Tx.GetMsgs()[0].(record.MsgSubmitRecord)
-	if !ok {
-		fmt.Println("Err MsgSubmitRecord type assertion failed")
-		return ""
-	}
-	return recordMsg.RecordID
-}
-
-func executeGetRecord(t *testing.T, cmdStr string) recordCli.RecordOutput {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var record recordCli.RecordOutput
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &record)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return record
 }
 
 func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force bool) bool {

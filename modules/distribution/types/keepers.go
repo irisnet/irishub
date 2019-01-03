@@ -22,7 +22,7 @@ type BankKeeper interface {
 }
 
 // from ante handler
-type FeeCollectionKeeper interface {
+type FeeKeeper interface {
 	GetCollectedFees(ctx sdk.Context) sdk.Coins
 	ClearCollectedFees(ctx sdk.Context)
 }

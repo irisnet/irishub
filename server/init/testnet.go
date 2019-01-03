@@ -146,7 +146,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 
 		buf := client.BufferStdin()
 		prompt := fmt.Sprintf(
-			"Password for account '%s' (default %s):", nodeDirName, v0.DefaultKeyPass,
+			"Password for account '%s' (default %s):", nodeDirName, sdk.DefaultKeyPass,
 		)
 
 		keyPass, err := client.GetPassword(prompt, buf)
@@ -158,7 +158,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 		}
 
 		if keyPass == "" {
-			keyPass = v0.DefaultKeyPass
+			keyPass = sdk.DefaultKeyPass
 		}
 
 		addr, secret, err := generateSaveCoinKey(clientDir, nodeDirName, keyPass, true)
@@ -182,20 +182,20 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 
 		accs = append(accs, v0.GenesisFileAccount{
 			Address: addr,
-			Coins:   []string{v0.FreeFermionAcc.String()},
+			Coins:   []string{sdk.FreeToken4Acc.String()},
 		})
 
 		msg := stake.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
-			v0.FreeFermionVal,
+			sdk.FreeToken4Val,
 			stake.NewDescription(nodeDirName, "", "", ""),
 			stake.NewCommissionMsg(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(20, 2), sdk.NewDecWithPrec(1, 2)),
 		)
 		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo)
 		txCtx := utils.NewTxContextFromCLI().WithChainID(chainID).WithMemo(memo)
 
-		signedTx, err := txCtx.SignStdTx(nodeDirName, v0.DefaultKeyPass, tx, false)
+		signedTx, err := txCtx.SignStdTx(nodeDirName, sdk.DefaultKeyPass, tx, false)
 		if err != nil {
 			_ = os.RemoveAll(outDir)
 			return err

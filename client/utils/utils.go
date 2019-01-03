@@ -10,7 +10,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake/types"
-	irishubType "github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/common"
@@ -260,18 +259,18 @@ func isTxSigner(user sdk.AccAddress, signers []sdk.AccAddress) bool {
 	return false
 }
 
-func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) irishubType.Rat {
-	stakeTokenDenom, err := cliCtx.GetCoinType(types.StakeDenomName)
+func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) sdk.Rat {
+	stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
 	if err != nil {
 		panic(err)
 	}
-	decimalDiff := stakeTokenDenom.MinUnit.Decimal - stakeTokenDenom.GetMainUnit().Decimal
-	exRate := irishubType.NewRat(1).Quo(irishubType.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
+	decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
+	exRate := sdk.NewRat(1).Quo(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
 	return exRate
 }
 
-func ConvertDecToRat(input sdk.Dec) irishubType.Rat {
-	output, err := irishubType.NewRatFromDecimal(input.String(), 10)
+func ConvertDecToRat(input sdk.Dec) sdk.Rat {
+	output, err := sdk.NewRatFromDecimal(input.String(), 10)
 	if err != nil {
 		panic(err.Error())
 	}

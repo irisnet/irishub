@@ -7,7 +7,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	dbm "github.com/tendermint/tendermint/libs/db"
 
-	"github.com/irisnet/irishub/app/protocol"
 )
 
 // File for storing in-package BaseApp optional functions,
@@ -38,11 +37,6 @@ func SetMinimumFees(minFees string) func(*BaseApp) {
 		panic(fmt.Sprintf("invalid minimum fees: %v", err))
 	}
 	return func(bap *BaseApp) { bap.SetMinimumFees(fees) }
-}
-
-// SetMinimumFees returns an option that sets the minimum fees on the app.
-func SetInvariantLevel(invariantLevel string) func(*BaseApp) {
-	return func(bap *BaseApp) { bap.SetInvariantLevel(invariantLevel) }
 }
 
 // nolint - Setter functions
@@ -81,13 +75,6 @@ func (app *BaseApp) SetPubKeyPeerFilter(pf sdk.PeerFilter) {
 		panic("SetPubKeyPeerFilter() on sealed BaseApp")
 	}
 	app.pubkeyPeerFilter = pf
-}
-
-func (app *BaseApp) SetProtocolEngine(pe *protocol.ProtocolEngine) {
-	if app.sealed {
-		panic("SetPubKeyPeerFilter() on sealed BaseApp")
-	}
-	app.Engine = pe
 }
 
 func (app *BaseApp) Seal()          { app.sealed = true }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
@@ -56,14 +55,13 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 
 	genState := NewGenesisFileState(
 		fileAccounts,
-		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
+		auth.ExportGenesis(ctx, p.feeKeeper),
 		stake.ExportGenesis(ctx, p.StakeKeeper),
 		mint.ExportGenesis(ctx, p.mintKeeper),
 		distr.ExportGenesis(ctx, p.distrKeeper),
 		gov.ExportGenesis(ctx, p.govKeeper),
 		upgrade.ExportGenesis(ctx),
 		service.ExportGenesis(ctx, p.serviceKeeper),
-		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, p.guardianKeeper),
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
 	)
@@ -119,7 +117,7 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	if !feePool.TotalValAccum.Accum.IsZero() {
 		panic("unexpected leftover validator accum")
 	}
-	bondDenom := p.StakeKeeper.GetParams(ctx).BondDenom
+	bondDenom := p.StakeKeeper.BondDenom()
 	if !feePool.ValPool.AmountOf(bondDenom).IsZero() {
 		panic(fmt.Sprintf("unexpected leftover validator pool coins: %v",
 			feePool.ValPool.AmountOf(bondDenom).String()))
@@ -176,4 +174,7 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	/* Handle gov state. */
 
 	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
+
+	/* Handle service state. */
+	service.PrepForZeroHeightGenesis(ctx, p.serviceKeeper)
 }

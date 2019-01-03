@@ -11,19 +11,15 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/types/gov/params"
-	"github.com/irisnet/irishub/types"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
-	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/guardian"
 	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
-	govtypes "github.com/irisnet/irishub/types/gov"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/mock"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // initialize the mock application for this module
@@ -31,21 +27,22 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	mapp := mock.NewApp()
 
 	stake.RegisterCodec(mapp.Cdc)
-	govtypes.RegisterCodec(mapp.Cdc)
+	RegisterCodec(mapp.Cdc)
 
 	keyGov := sdk.NewKVStoreKey("gov")
 	keyDistr := sdk.NewKVStoreKey("distr")
-    keyProtocol := sdk.NewKVStoreKey("protocol")
+	keyProtocol := sdk.NewKVStoreKey("protocol")
 
-    pk := protocolKeeper.NewKeeper(mapp.Cdc,keyProtocol)
+	pk := protocolKeeper.NewKeeper(mapp.Cdc, keyProtocol)
 	paramsKeeper := params.NewKeeper(
 		mapp.Cdc,
 		sdk.NewKVStoreKey("params"),
 		sdk.NewTransientStoreKey("transient_params"),
 	)
-	feeCollectionKeeper := auth.NewFeeCollectionKeeper(
+	feeKeeper := auth.NewFeeKeeper(
 		mapp.Cdc,
 		sdk.NewKVStoreKey("fee"),
+		paramsKeeper.Subspace(auth.DefaultParamSpace),
 	)
 
 	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
@@ -54,9 +51,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
-	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeCollectionKeeper, govtypes.DefaultCodespace)
+	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov, dk, ck, guardianKeeper, sk, pk, govtypes.DefaultCodespace)
+	gk := NewKeeper(mapp.Cdc, keyGov,paramsKeeper,paramsKeeper.Subspace(DefaultParamSpace), dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -65,7 +62,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := types.NewDefaultCoinType(stakeTypes.StakeDenomName).ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, stakeTypes.StakeDenomName))
+	coin, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, sdk.NativeTokenName))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)
@@ -89,17 +86,13 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 		mapp.InitChainer(ctx, req)
 
 		stakeGenesis := stake.DefaultGenesisState()
-		stakeGenesis.Params.BondDenom = stakeTypes.StakeDenom
 
 		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 		if err != nil {
 			panic(err)
 		}
 		InitGenesis(ctx, keeper, GenesisState{
-			StartingProposalID: 1,
-			DepositProcedure: govparams.NewDepositProcedure(),
-			VotingProcedure: govparams.NewVotingProcedure(),
-			TallyingProcedure: govparams.NewTallyingProcedure(),
+			Params:DefaultParams(),
 		})
 		return abci.ResponseInitChain{
 			Validators: validators,

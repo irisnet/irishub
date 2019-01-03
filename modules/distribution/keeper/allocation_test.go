@@ -14,7 +14,7 @@ func TestAllocateTokensBasic(t *testing.T) {
 	// no community tax on inputs
 	ctx, _, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), sdk.ZeroDec())
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator
 	totalPower := int64(10)
@@ -56,7 +56,7 @@ func TestAllocateTokensWithCommunityTax(t *testing.T) {
 	communityTax := sdk.NewDecWithPrec(1, 2) //1%
 	ctx, _, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), communityTax)
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator
 	totalPower := int64(10)
@@ -84,7 +84,7 @@ func TestAllocateTokensWithPartialPrecommitPower(t *testing.T) {
 	communityTax := sdk.NewDecWithPrec(1, 2)
 	ctx, _, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), communityTax)
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator
 	totalPower := int64(100)

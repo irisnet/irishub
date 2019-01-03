@@ -1,96 +1,80 @@
 package gov
 
 import (
-	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
-	"github.com/irisnet/irishub/types/gov/params"
-	"time"
+
 )
+
+const StartingProposalID = 1
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
-	TerminatorPeriod   int64                       `json:"terminator_period"`
-	StartingProposalID uint64                      `json:"starting_proposalID"`
-	DepositProcedure   govparams.DepositProcedure  `json:"deposit_period"`
-	VotingProcedure    govparams.VotingProcedure   `json:"voting_period"`
-	TallyingProcedure  govparams.TallyingProcedure `json:"tallying_procedure"`
+	Params GovParams `json:"params"` // inflation params
 }
 
-func NewGenesisState(startingProposalID uint64, dp govparams.DepositProcedure, vp govparams.VotingProcedure, tp govparams.TallyingProcedure) GenesisState {
+func NewGenesisState(systemHaltPeriod int64, params GovParams) GenesisState {
 	return GenesisState{
-		StartingProposalID: startingProposalID,
-		DepositProcedure:   dp,
-		VotingProcedure:    vp,
-		TallyingProcedure:  tp,
-	}
-}
-
-// InitGenesis - store genesis parameters
-func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-
-	err := k.setInitialProposalID(ctx, data.StartingProposalID)
-	if err != nil {
-		// TODO: Handle this with #870
-		panic(err)
-	}
-
-	k.SetTerminatorPeriod(ctx, data.TerminatorPeriod)
-	k.SetTerminatorHeight(ctx, -1)
-
-	params.InitGenesisParameter(&govparams.DepositProcedureParameter, ctx, data.DepositProcedure)
-	params.InitGenesisParameter(&govparams.VotingProcedureParameter, ctx, data.VotingProcedure)
-	params.InitGenesisParameter(&govparams.TallyingProcedureParameter, ctx, data.TallyingProcedure)
-}
-
-// ExportGenesis - output genesis parameters
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	startingProposalID, _ := k.peekCurrentProposalID(ctx)
-	depositProcedure := GetDepositProcedure(ctx)
-	votingProcedure := GetVotingProcedure(ctx)
-	tallyingProcedure := GetTallyingProcedure(ctx)
-
-	return GenesisState{
-		StartingProposalID: startingProposalID,
-		DepositProcedure:   depositProcedure,
-		VotingProcedure:    votingProcedure,
-		TallyingProcedure:  tallyingProcedure,
+		Params:params,
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		TerminatorPeriod:   20000,
-		StartingProposalID: 1,
-		DepositProcedure:   govparams.NewDepositProcedure(),
-		VotingProcedure:    govparams.NewVotingProcedure(),
-		TallyingProcedure:  govparams.NewTallyingProcedure(),
+		Params: DefaultParams(),
 	}
+}
+
+// InitGenesis - store genesis parameters
+func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	err := ValidateGenesis(data)
+	if err != nil {
+		// TODO: Handle this with #870
+		panic(err)
+	}
+
+	err = k.setInitialProposalID(ctx, StartingProposalID)
+	if err != nil {
+		// TODO: Handle this with #870
+		panic(err)
+	}
+
+	k.SetSystemHaltHeight(ctx, -1)
+    k.SetParamSet(ctx,data.Params)
+}
+
+// ExportGenesis - output genesis parameters
+func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+
+	return GenesisState{
+		Params:k.GetParamSet(ctx),
+	}
+}
+
+func ValidateGenesis(data GenesisState) error {
+	err := validateParams(data.Params)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForCliTest() GenesisState {
 
-	depositProcedure := govparams.NewDepositProcedure()
-	depositProcedure.MaxDepositPeriod = time.Duration(60) * time.Second
 	return GenesisState{
-		TerminatorPeriod:   20,
-		StartingProposalID: 1,
-		DepositProcedure:   depositProcedure,
-		VotingProcedure:    govparams.NewVotingProcedure(),
-		TallyingProcedure:  govparams.NewTallyingProcedure(),
+		Params:DefaultParams(),
 	}
 }
 
 func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
-	proposals := k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusDepositPeriod, 0)
+	proposals := k.GetProposalsFiltered(ctx, nil, nil, StatusDepositPeriod, 0)
 	for _, proposal := range proposals {
 		proposalID := proposal.GetProposalID()
 		k.RefundDeposits(ctx, proposalID)
 	}
 
-	proposals = k.GetProposalsFiltered(ctx, nil, nil, govtypes.StatusVotingPeriod, 0)
+	proposals = k.GetProposalsFiltered(ctx, nil, nil, StatusVotingPeriod, 0)
 	for _, proposal := range proposals {
 		proposalID := proposal.GetProposalID()
 		k.RefundDeposits(ctx, proposalID)

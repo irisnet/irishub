@@ -11,7 +11,7 @@ import (
 
 	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 )
 
 const (
@@ -114,18 +114,18 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 
 func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) (msg gov.MsgSubmitProposal, err error) {
 	deposit := randomDeposit(r)
-	param := govtypes.Param{
+	param :=  gov.Param{
 		Key:   "test",
 		Value: "value",
-		Op: "insert",
+		Subspace: "insert",
 	}
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
 		simulation.RandStringOfLength(r, 5),
-		govtypes.ProposalTypeSoftwareHalt,
+		 gov.ProposalTypeSystemHalt,
 		sender.Address,
 		deposit,
-		param,
+		gov.Params{param},
 	)
 	if msg.ValidateBasic() != nil {
 		err = fmt.Errorf("expected msg to pass ValidateBasic: %s", msg.GetSignBytes())
@@ -219,16 +219,16 @@ func randomProposalID(r *rand.Rand, k gov.Keeper, ctx sdk.Context) (proposalID i
 }
 
 // Pick a random voting option
-func randomVotingOption(r *rand.Rand) govtypes.VoteOption {
+func randomVotingOption(r *rand.Rand)  gov.VoteOption {
 	switch r.Intn(4) {
 	case 0:
-		return govtypes.OptionYes
+		return  gov.OptionYes
 	case 1:
-		return govtypes.OptionAbstain
+		return  gov.OptionAbstain
 	case 2:
-		return govtypes.OptionNo
+		return  gov.OptionNo
 	case 3:
-		return govtypes.OptionNoWithVeto
+		return  gov.OptionNoWithVeto
 	}
 	panic("should not happen")
 }

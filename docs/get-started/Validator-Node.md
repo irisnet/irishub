@@ -76,7 +76,7 @@ iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.0
 ```
 Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
 
-To read more about fee mechanism in IRISHub, go to this [doc](../)
+To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-concepts/fee.md)
 
 
 In this way, to stake 1IRIS, you need to do:

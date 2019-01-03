@@ -1,72 +1,100 @@
 package auth
 
 import (
-	codec "github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
 	collectedFeesKey = []byte("collectedFees")
+	feeAuthKey       = []byte("feeAuth")
 )
 
-// This FeeCollectionKeeper handles collection of fees in the anteHandler
+// This FeeKeeper handles collection of fees in the anteHandler
 // and setting of MinFees for different fee tokens
-type FeeCollectionKeeper struct {
+type FeeKeeper struct {
 
 	// The (unexposed) key used to access the fee store from the Context.
-	key sdk.StoreKey
+	storeKey sdk.StoreKey
 
 	// The codec codec for binary encoding/decoding of accounts.
 	cdc *codec.Codec
+
+	paramSpace params.Subspace
 }
 
-func NewFeeCollectionKeeper(cdc *codec.Codec, key sdk.StoreKey) FeeCollectionKeeper {
-	return FeeCollectionKeeper{
-		key: key,
-		cdc: cdc,
+func NewFeeKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace) FeeKeeper {
+	return FeeKeeper{
+		storeKey:   key,
+		cdc:        cdc,
+		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 }
 
 // retrieves the collected fee pool
-func (fck FeeCollectionKeeper) GetCollectedFees(ctx sdk.Context) sdk.Coins {
-	store := ctx.KVStore(fck.key)
+func (fk FeeKeeper) GetCollectedFees(ctx sdk.Context) sdk.Coins {
+	store := ctx.KVStore(fk.storeKey)
 	bz := store.Get(collectedFeesKey)
 	if bz == nil {
 		return sdk.Coins{}
 	}
 
 	feePool := &(sdk.Coins{})
-	fck.cdc.MustUnmarshalBinaryLengthPrefixed(bz, feePool)
+	fk.cdc.MustUnmarshalBinaryLengthPrefixed(bz, feePool)
 	return *feePool
 }
 
-func (fck FeeCollectionKeeper) setCollectedFees(ctx sdk.Context, coins sdk.Coins) {
-	bz := fck.cdc.MustMarshalBinaryLengthPrefixed(coins)
-	store := ctx.KVStore(fck.key)
+func (fk FeeKeeper) setCollectedFees(ctx sdk.Context, coins sdk.Coins) {
+	bz := fk.cdc.MustMarshalBinaryLengthPrefixed(coins)
+	store := ctx.KVStore(fk.storeKey)
 	store.Set(collectedFeesKey, bz)
 }
 
 // add to the fee pool
-func (fck FeeCollectionKeeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins {
-	newCoins := fck.GetCollectedFees(ctx).Plus(coins)
-	fck.setCollectedFees(ctx, newCoins)
+func (fk FeeKeeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins {
+	newCoins := fk.GetCollectedFees(ctx).Plus(coins)
+	fk.setCollectedFees(ctx, newCoins)
 
 	return newCoins
 }
 
-////////////////////  iris/cosmos-sdk begin///////////////////////////
 // RefundCollectedFees deducts fees from fee collector
-func (fck FeeCollectionKeeper) RefundCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins {
-	newCoins := fck.GetCollectedFees(ctx).Minus(coins)
+func (fk FeeKeeper) RefundCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins {
+	newCoins := fk.GetCollectedFees(ctx).Minus(coins)
 	if !newCoins.IsNotNegative() {
 		panic("fee collector contains negative coins")
 	}
-	fck.setCollectedFees(ctx, newCoins)
+	fk.setCollectedFees(ctx, newCoins)
 	return newCoins
 }
-////////////////////  iris/cosmos-sdk end///////////////////////////
 
-// clear the fee pool
-func (fck FeeCollectionKeeper) ClearCollectedFees(ctx sdk.Context) {
-	fck.setCollectedFees(ctx, sdk.Coins{})
+func (fk FeeKeeper) ClearCollectedFees(ctx sdk.Context) {
+	fk.setCollectedFees(ctx, sdk.Coins{})
+}
+
+func (fk FeeKeeper) GetFeeAuth(ctx sdk.Context) (feeAuth FeeAuth) {
+	store := ctx.KVStore(fk.storeKey)
+	b := store.Get(feeAuthKey)
+	if b == nil {
+		panic("Stored fee pool should not have been nil")
+	}
+	fk.cdc.MustUnmarshalBinaryLengthPrefixed(b, &feeAuth)
+	return
+}
+
+func (fk FeeKeeper) SetFeeAuth(ctx sdk.Context, feeAuth FeeAuth) {
+	store := ctx.KVStore(fk.storeKey)
+	b := fk.cdc.MustMarshalBinaryLengthPrefixed(feeAuth)
+	store.Set(feeAuthKey, b)
+}
+
+func (fk FeeKeeper) GetParamSet(ctx sdk.Context) Params {
+	var feeParams Params
+	fk.paramSpace.GetParamSet(ctx, &feeParams)
+	return feeParams
+}
+
+func (fk FeeKeeper) SetParamSet(ctx sdk.Context, feeParams Params) {
+	fk.paramSpace.SetParamSet(ctx, &feeParams)
 }

@@ -13,18 +13,18 @@ type Keeper struct {
 	cdc        *codec.Codec
 	paramSpace params.Subspace
 	bk         bank.Keeper
-	fck        FeeCollectionKeeper
+	fk         FeeKeeper
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
-	paramSpace params.Subspace, bk bank.Keeper, fck FeeCollectionKeeper) Keeper {
+	paramSpace params.Subspace, bk bank.Keeper, fk FeeKeeper) Keeper {
 
 	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 		bk:         bk,
-		fck:        fck,
+		fk:         fk,
 	}
 	return keeper
 }
@@ -34,21 +34,6 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 
 var (
 	minterKey = []byte{0x00} // the one key to use for the keeper store
-
-	// params store for inflation params
-	ParamStoreKeyParams = []byte("params")
-)
-
-// ParamTable for stake module
-func ParamTypeTable() params.TypeTable {
-	return params.NewTypeTable(
-		ParamStoreKeyParams, Params{},
-	)
-}
-
-const (
-	// default paramspace for params keeper
-	DefaultParamspace = "mint"
 )
 
 //______________________________________________________________________
@@ -69,18 +54,4 @@ func (k Keeper) SetMinter(ctx sdk.Context, minter Minter) {
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshalBinaryLengthPrefixed(minter)
 	store.Set(minterKey, b)
-}
-
-//______________________________________________________________________
-
-// get inflation params from the global param store
-func (k Keeper) GetParams(ctx sdk.Context) Params {
-	var params Params
-	k.paramSpace.Get(ctx, ParamStoreKeyParams, &params)
-	return params
-}
-
-// set inflation params from the global param store
-func (k Keeper) SetParams(ctx sdk.Context, params Params) {
-	k.paramSpace.Set(ctx, ParamStoreKeyParams, &params)
 }
