@@ -34,18 +34,18 @@ type ProtocolVersion0 struct {
 	invariantLevel string
 
 	// Manage getting and setting accounts
-	accountMapper       auth.AccountKeeper
-	feeKeeper           auth.FeeKeeper
-	bankKeeper          bank.Keeper
-	StakeKeeper         stake.Keeper
-	slashingKeeper      slashing.Keeper
-	mintKeeper          mint.Keeper
-	distrKeeper         distr.Keeper
-	govKeeper           gov.Keeper
-	paramsKeeper        params.Keeper
-	serviceKeeper       service.Keeper
-	guardianKeeper      guardian.Keeper
-	upgradeKeeper       upgrade.Keeper
+	accountMapper  auth.AccountKeeper
+	feeKeeper      auth.FeeKeeper
+	bankKeeper     bank.Keeper
+	StakeKeeper    stake.Keeper
+	slashingKeeper slashing.Keeper
+	mintKeeper     mint.Keeper
+	distrKeeper    distr.Keeper
+	govKeeper      gov.Keeper
+	paramsKeeper   params.Keeper
+	serviceKeeper  service.Keeper
+	guardianKeeper guardian.Keeper
+	upgradeKeeper  upgrade.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -199,28 +199,28 @@ func (p *ProtocolVersion0) configFeeHandlers() {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) GetKVStoreKeyList()  []*sdk.KVStoreKey {
-   return []*sdk.KVStoreKey{
-	   protocol.KeyMain,
-	   protocol.KeyProtocol,
-	   protocol.KeyAccount,
-	   protocol.KeyStake,
-	   protocol.KeyMint,
-	   protocol.KeyDistr,
-	   protocol.KeySlashing,
-	   protocol.KeyGov,
-	   protocol.KeyRecord,
-	   protocol.KeyFee,
-	   protocol.KeyParams,
-	   protocol.KeyUpgrade,
-	   protocol.KeyService,
-	   protocol.KeyGuardian}
+func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
+	return []*sdk.KVStoreKey{
+		protocol.KeyMain,
+		protocol.KeyProtocol,
+		protocol.KeyAccount,
+		protocol.KeyStake,
+		protocol.KeyMint,
+		protocol.KeyDistr,
+		protocol.KeySlashing,
+		protocol.KeyGov,
+		protocol.KeyRecord,
+		protocol.KeyFee,
+		protocol.KeyParams,
+		protocol.KeyUpgrade,
+		protocol.KeyService,
+		protocol.KeyGuardian}
 }
 
 // configure all Stores
 func (p *ProtocolVersion0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{})
+	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
 	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(

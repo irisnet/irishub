@@ -81,7 +81,7 @@ func createTestInput(t *testing.T, defaults Params) (sdk.Context, bank.Keeper, s
 
 	for _, addr := range addrs {
 		initTokens := sdk.Coins{
-			{sk.GetParams(ctx).BondDenom, initCoins},
+			{sk.BondDenom(), initCoins},
 		}
 		_, _, err = ck.AddCoins(ctx, sdk.AccAddress(addr), initTokens)
 		ck.IncreaseLoosenToken(ctx, initTokens)

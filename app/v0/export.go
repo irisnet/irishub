@@ -117,7 +117,7 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	if !feePool.TotalValAccum.Accum.IsZero() {
 		panic("unexpected leftover validator accum")
 	}
-	bondDenom := p.StakeKeeper.GetParams(ctx).BondDenom
+	bondDenom := p.StakeKeeper.BondDenom()
 	if !feePool.ValPool.AmountOf(bondDenom).IsZero() {
 		panic(fmt.Sprintf("unexpected leftover validator pool coins: %v",
 			feePool.ValPool.AmountOf(bondDenom).String()))

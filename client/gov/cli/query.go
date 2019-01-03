@@ -16,6 +16,8 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
+	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -331,7 +333,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{})
+			params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:

@@ -10,6 +10,7 @@ import (
 type (
 	Keeper = keeper.Keeper
 	Hooks  = keeper.Hooks
+	Params = types.Params
 
 	DelegatorWithdrawInfo = types.DelegatorWithdrawInfo
 	DelegationDistInfo    = types.DelegationDistInfo
