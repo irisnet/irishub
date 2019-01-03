@@ -60,7 +60,7 @@ type ProtocolVersion0 struct {
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 }
 
-func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string) *ProtocolVersion0 {
+func NewProtocolVersion0(log log.Logger, invariantLevel string) *ProtocolVersion0 {
 	base := protocol.ProtocolBase{
 		Definition: sdk.ProtocolDefinition{
 			uint64(0),
@@ -71,13 +71,12 @@ func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string
 	}
 	p0 := ProtocolVersion0{
 		pb:             &base,
-		cdc:            cdc,
+		cdc:            MakeCodec(),
 		logger:         log,
 		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
 	}
-	p0.cdc = p0.LoadCodec()
 	return &p0
 }
 
