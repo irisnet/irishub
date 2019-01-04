@@ -13,6 +13,11 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/service"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
+	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -328,7 +333,8 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			params.RegisterParamSet(&mint.Params{})
+			params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:
 				// 1.List of the module;
@@ -399,7 +405,7 @@ func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
 		if err != nil {
 			return err
 		}
-		fmt.Printf(" %s=%s\n",keyStr,valueStr)
+		fmt.Printf(" %s=%s\n", keyStr, valueStr)
 		return nil
 	} else {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))

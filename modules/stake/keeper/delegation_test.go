@@ -338,7 +338,7 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 	// retrieve the unbonding delegation
 	ubd, found := keeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
 	require.True(t, found)
-	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18))))
+	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18))))
 	assert.Equal(t, blockHeight, ubd.CreationHeight)
 	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }
@@ -744,7 +744,7 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	// retrieve the unbonding delegation
 	ubd, found := keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
 	require.True(t, found)
-	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18))))
+	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18))))
 	assert.Equal(t, blockHeight, ubd.CreationHeight)
 	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }

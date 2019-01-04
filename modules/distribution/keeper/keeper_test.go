@@ -16,15 +16,6 @@ func TestSetGetPreviousProposerConsAddr(t *testing.T) {
 	require.True(t, res.Equals(valConsAddr1), "expected: %v got: %v", valConsAddr1.String(), res.String())
 }
 
-func TestSetGetCommunityTax(t *testing.T) {
-	ctx, _, keeper, _, _ := CreateTestInputDefault(t, false, sdk.ZeroInt())
-
-	someDec := sdk.NewDec(333)
-	keeper.SetCommunityTax(ctx, someDec)
-	res := keeper.GetCommunityTax(ctx)
-	require.True(sdk.DecEq(t, someDec, res))
-}
-
 func TestSetGetFeePool(t *testing.T) {
 	ctx, _, keeper, _, _ := CreateTestInputDefault(t, false, sdk.ZeroInt())
 

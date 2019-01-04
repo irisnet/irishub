@@ -36,7 +36,7 @@ const (
 	FlagReplayHeight = "replay_height"
 	FlagReplay       = "replay"
 	//Keep snapshot every at syncable height
-	DefaultSyncableHeight = 10000
+	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries
@@ -83,7 +83,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		cmn.Exit(err.Error())
 	}
 
-	protocol0 := v0.NewProtocolVersion0(cdc, logger, app.invariantLevel)
+	protocol0 := v0.NewProtocolVersion0(cdc, logger, sdk.InvariantLevel)
 	engine.Add(protocol0)
 	//	protocol1 := protocol.NewProtocolVersion1(cdc, logger, app.invariantLevel)
 	//	Engine.Add(&protocol1)

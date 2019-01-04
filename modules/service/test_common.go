@@ -18,11 +18,15 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 // initialize the mock application for this module
 func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, []sdk.AccAddress, []crypto.PubKey, []crypto.PrivKey) {
 	mapp := mock.NewApp()
+
+	a := params.ParamSetMapping
+	println(a)
 
 	stake.RegisterCodec(mapp.Cdc)
 	RegisterCodec(mapp.Cdc)
@@ -37,7 +41,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
-	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace)
+	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace), )
 
 	mapp.Router().AddRoute("service", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
 
@@ -72,6 +76,8 @@ func getInitChainer(mapp *mock.App, serviceKeeper Keeper, stakeKeeper stake.Keep
 		if err != nil {
 			panic(err)
 		}
+		a := params.ParamSetMapping
+		println(a)
 		InitGenesis(ctx, serviceKeeper, DefaultGenesisState())
 		return abci.ResponseInitChain{
 			Validators: validators,

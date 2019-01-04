@@ -15,14 +15,14 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 
 	// get the fees which have been getting collected through all the
 	// transactions in the block
-	feesCollected := k.feeCollectionKeeper.GetCollectedFees(ctx)
+	feesCollected := k.feeKeeper.GetCollectedFees(ctx)
 	feesCollectedDec := types.NewDecCoins(feesCollected)
 
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
 		feePool.CommunityPool = feePool.CommunityPool.Plus(feesCollectedDec)
 		k.SetFeePool(ctx, feePool)
-		k.feeCollectionKeeper.ClearCollectedFees(ctx)
+		k.feeKeeper.ClearCollectedFees(ctx)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	k.SetFeePool(ctx, feePool)
 
 	// clear the now distributed fees
-	k.feeCollectionKeeper.ClearCollectedFees(ctx)
+	k.feeKeeper.ClearCollectedFees(ctx)
 }
 
 // Allocate fee tax from the community fee pool, burn or send to trustee account

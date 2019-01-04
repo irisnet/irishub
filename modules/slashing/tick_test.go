@@ -13,7 +13,7 @@ import (
 )
 
 func TestBeginBlocker(t *testing.T) {
-	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParams())
+	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
 	addr, pk, amt := addrs[2], pks[2], sdk.NewIntWithDecimal(100, 18)
 
 	// bond the validator
@@ -22,7 +22,7 @@ func TestBeginBlocker(t *testing.T) {
 	stake.EndBlocker(ctx, sk)
 	require.Equal(
 		t, ck.GetCoins(ctx, sdk.AccAddress(addr)),
-		sdk.Coins{sdk.NewCoin(sk.GetParams(ctx).BondDenom, initCoins.Sub(amt))},
+		sdk.Coins{sdk.NewCoin(sk.BondDenom(), initCoins.Sub(amt))},
 	)
 	require.Equal(t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))), sk.Validator(ctx, addr).GetPower())
 

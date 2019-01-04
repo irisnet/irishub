@@ -6,7 +6,7 @@ import (
 
 	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
-	"github.com/irisnet/irishub/app/v0"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/guardian"
 )
 
@@ -36,7 +36,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	paStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	paStr += fmt.Sprintf(" --from=%s", "foo")
 
-	require.True(t, executeWrite(t, paStr, v0.DefaultKeyPass))
+	require.True(t, executeWrite(t, paStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 	profilers = executeGetProfilers(t, fmt.Sprintf("iriscli guardian profilers %v", flags))
 	require.Equal(t, 2, len(profilers))
@@ -60,7 +60,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	taStr += fmt.Sprintf(" --address=%s", barAddr)
 	taStr += fmt.Sprintf(" --from=%s", "foo")
 
-	require.True(t, executeWrite(t, taStr, v0.DefaultKeyPass))
+	require.True(t, executeWrite(t, taStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 	trustees = executeGetProfilers(t, fmt.Sprintf("iriscli guardian trustees %v", flags))
 	require.Equal(t, 2, len(trustees))
@@ -80,9 +80,9 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	pdbStr := pdStr + fmt.Sprintf(" --address=%s", barAddr)
 	pdfStr := pdStr + fmt.Sprintf(" --address=%s", fooAddr)
-	require.Equal(t, false, executeWrite(t, pdfStr, v0.DefaultKeyPass))
+	require.Equal(t, false, executeWrite(t, pdfStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
-	require.True(t, executeWrite(t, pdbStr, v0.DefaultKeyPass))
+	require.True(t, executeWrite(t, pdbStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 	profilers = executeGetProfilers(t, fmt.Sprintf("iriscli guardian profilers %v", flags))
 	require.Equal(t, 1, len(profilers))
@@ -95,9 +95,9 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	tdbStr := tdStr + fmt.Sprintf(" --address=%s", barAddr)
 	tdfStr := tdStr + fmt.Sprintf(" --address=%s", fooAddr)
-	require.Equal(t, false, executeWrite(t, tdfStr, v0.DefaultKeyPass))
+	require.Equal(t, false, executeWrite(t, tdfStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
-	require.True(t, executeWrite(t, tdbStr, v0.DefaultKeyPass))
+	require.True(t, executeWrite(t, tdbStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 	trustees = executeGetTrustees(t, fmt.Sprintf("iriscli guardian trustees %v", flags))
 	require.Equal(t, 1, len(trustees))

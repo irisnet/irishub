@@ -47,7 +47,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		mapp.Cdc,
 		distrKey,
 		mapp.ParamsKeeper.Subspace(distr.DefaultParamspace),
-		mapp.BankKeeper, &stakeKeeper, mapp.FeeCollectionKeeper,
+		mapp.BankKeeper, &stakeKeeper, mapp.FeeKeeper,
 		distr.DefaultCodespace,
 	)
 	guardianKeeper := guardian.NewKeeper(
@@ -59,6 +59,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		mapp.Cdc,
 		govKey,
 		paramKeeper,
+		mapp.ParamsKeeper.Subspace(gov.DefaultParamSpace),
 		distrKeeper,
 		bankKeeper,
 		guardianKeeper,

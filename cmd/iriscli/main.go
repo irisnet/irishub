@@ -18,7 +18,6 @@ import (
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +34,7 @@ var (
 
 func main() {
 
-	sdk.InitBech32Prefix()
+//	sdk.InitBech32Prefix()
 
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeCodec()
@@ -87,14 +86,12 @@ func main() {
 	}
 	distributionCmd.AddCommand(
 		client.GetCommands(
-			distributioncmd.GetWithdrawAddress("distr", cdc),
 			distributioncmd.GetDelegationDistInfo("distr", cdc),
 			distributioncmd.GetValidatorDistInfo("distr", cdc),
 			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
-			distributioncmd.GetCmdSetWithdrawAddr(cdc),
 			distributioncmd.GetCmdWithdrawRewards(cdc),
 		)...)
 	rootCmd.AddCommand(

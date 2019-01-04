@@ -71,7 +71,7 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 					return err
 				}
 			} else {
-				return ErrInvalidParam(DefaultCodespace)
+				return ErrInvalidParam(DefaultCodespace, param.Subspace)
 			}
 		}
 

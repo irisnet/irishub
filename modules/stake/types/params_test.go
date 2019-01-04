@@ -14,7 +14,6 @@ func TestParamsEqual(t *testing.T) {
 	require.True(t, ok)
 
 	p2.UnbondingTime = 60 * 60 * 24 * 2
-	p2.BondDenom = "soup"
 
 	ok = p1.Equal(p2)
 	require.False(t, ok)

@@ -13,18 +13,18 @@ type Keeper struct {
 	cdc        *codec.Codec
 	paramSpace params.Subspace
 	bk         bank.Keeper
-	fck        FeeCollectionKeeper
+	fk         FeeKeeper
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
-	paramSpace params.Subspace, bk bank.Keeper, fck FeeCollectionKeeper) Keeper {
+	paramSpace params.Subspace, bk bank.Keeper, fk FeeKeeper) Keeper {
 
 	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 		bk:         bk,
-		fck:        fck,
+		fk:         fk,
 	}
 	return keeper
 }

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"github.com/irisnet/irishub/tests"
 	"github.com/stretchr/testify/require"
-	"github.com/irisnet/irishub/app/v0"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func TestIrisCLIBankSend(t *testing.T) {
@@ -28,7 +28,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -44,7 +44,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	}
 
 	// test autosequencing
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -60,7 +60,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	}
 
 	// test memo
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --memo 'testmemo' --gas=10000 --fee=0.04iris", flags, barAddr), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --memo 'testmemo' --gas=10000 --fee=0.04iris", flags, barAddr), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))

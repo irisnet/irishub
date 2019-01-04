@@ -11,7 +11,7 @@ import (
 func TestWithdrawDelegationRewardBasic(t *testing.T) {
 	ctx, accMapper, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), sdk.ZeroDec())
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator
 	msgCreateValidator := stake.NewTestMsgCreateValidator(valOpAddr1, valConsPk1, sdk.NewIntWithDecimal(10, 18))
@@ -46,7 +46,7 @@ func TestWithdrawDelegationRewardBasic(t *testing.T) {
 func TestWithdrawDelegationRewardWithCommission(t *testing.T) {
 	ctx, accMapper, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), sdk.ZeroDec())
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator with 10% commission
 	msgCreateValidator := stake.NewTestMsgCreateValidatorWithCommission(
@@ -80,7 +80,7 @@ func TestWithdrawDelegationRewardWithCommission(t *testing.T) {
 func TestWithdrawDelegationRewardTwoDelegators(t *testing.T) {
 	ctx, accMapper, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), sdk.ZeroDec())
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator with 10% commission
 	msgCreateValidator := stake.NewTestMsgCreateValidatorWithCommission(
@@ -122,7 +122,7 @@ func TestWithdrawDelegationRewardTwoDelegators(t *testing.T) {
 func TestWithdrawDelegationRewardTwoDelegatorsUneven(t *testing.T) {
 	ctx, accMapper, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), sdk.ZeroDec())
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//first make a validator with no commission
 	msgCreateValidator := stake.NewTestMsgCreateValidatorWithCommission(
@@ -188,7 +188,7 @@ func TestWithdrawDelegationRewardTwoDelegatorsUneven(t *testing.T) {
 func TestWithdrawDelegationRewardsAll(t *testing.T) {
 	ctx, accMapper, keeper, sk, fck := CreateTestInputAdvanced(t, false, sdk.NewIntWithDecimal(100, 18), sdk.ZeroDec())
 	stakeHandler := stake.NewHandler(sk)
-	denom := sk.GetParams(ctx).BondDenom
+	denom := sk.BondDenom()
 
 	//make some  validators with different commissions
 	msgCreateValidator := stake.NewTestMsgCreateValidatorWithCommission(
