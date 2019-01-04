@@ -64,3 +64,56 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	}
 	return cmd
 }
+
+func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "query-signals",
+		Short:   "query the information of signals",
+		Example: "iriscli upgrade status",
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+
+			res_upgradeConfig, err := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
+			if err != nil {
+				return err
+			}
+			if len(res_upgradeConfig) == 0 {
+				fmt.Println("No Software Upgrade Switch Period is in process.")
+				return err
+			}
+
+			var upgradeConfig protocol.UpgradeConfig
+			if err = cdc.UnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig); err != nil {
+				return err
+			}
+
+			var validatorAddrs []string
+			res, err := cliCtx.QuerySubspace(upgrade.GetSignalPrefixKey(upgradeConfig.Definition.Version), storeName)
+			if err != nil {
+				return err
+			}
+
+			for _, kv := range res {
+				validatorAddrs = append(validatorAddrs, upgrade.GetAddressFromSignalKey(kv.Key))
+			}
+
+			if len(validatorAddrs) == 0 {
+				fmt.Println("No validators have started the new version.")
+				return nil
+			}
+
+			output, err := codec.MarshalJSONIndent(cdc, validatorAddrs)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+	return cmd
+}
