@@ -41,7 +41,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	}
 	////////////////////  iris begin  ///////////////////////////
 	if msg.ProposalType == ProposalTypeSystemHalt {
-		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
+		_, found := keeper.guardianKeeper.GetProfiler(ctx, msg.Proposer)
 		if !found {
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
@@ -88,7 +88,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 	}
 
 	if msg.Usage != UsageTypeBurn {
-		_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
+		_, found := keeper.guardianKeeper.GetTrustee(ctx, msg.DestAddress)
 		if !found {
 			return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
 		}
@@ -130,19 +130,19 @@ func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg 
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
-	if !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
+	if !keeper.protocolKeeper.IsValidVersion(ctx, msg.Version) {
 		return ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
 	}
 
 	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
 		return ErrCodeInvalidSwitchHeight(keeper.codespace, uint64(ctx.BlockHeight()), msg.SwitchHeight).Result()
 	}
-	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
+	_, found := keeper.guardianKeeper.GetProfiler(ctx, msg.Proposer)
 	if !found {
 		return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 	}
 
-	if _, ok := keeper.pk.GetUpgradeConfig(ctx); ok {
+	if _, ok := keeper.protocolKeeper.GetUpgradeConfig(ctx); ok {
 		return ErrSwitchPeriodInProcess(keeper.codespace).Result()
 	}
 

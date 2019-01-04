@@ -1,21 +1,20 @@
 package upgrade
 
 import (
-	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/modules/upgrade"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type UpgradeInfoOutput struct {
-	AppVerion          upgrade.AppVersion     `json:"version"`
-	LastFailureVersion uint64                 `json:"last_failure_version"`
-	UpgradeConfig      protocol.UpgradeConfig `json:"upgrade_config"`
+	CurrentVersion    upgrade.VersionInfo `json:"current_version"`
+	LastFailedVersion int64               `json:"last_failed_version"`
+	UpgradeInProgress sdk.UpgradeConfig   `json:"upgrade_in_progress"`
 }
 
-func ConvertUpgradeInfoToUpgradeOutput(appVersion upgrade.AppVersion, upgradeConfig protocol.UpgradeConfig, lastFailureVersion uint64) UpgradeInfoOutput {
-
+func NewUpgradeInfoOutput(currentVersion upgrade.VersionInfo, lastFailedVersion int64, upgradeInProgress sdk.UpgradeConfig) UpgradeInfoOutput {
 	return UpgradeInfoOutput{
-		AppVerion:          appVersion,
-		LastFailureVersion: lastFailureVersion,
-		UpgradeConfig:      upgradeConfig,
+		currentVersion,
+		lastFailedVersion,
+		upgradeInProgress,
 	}
 }

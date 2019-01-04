@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -70,9 +69,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		replayHeight := viper.GetInt64(FlagReplayHeight)
 		loadHeight := app.replayToHeight(replayHeight, app.Logger)
 		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
-		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
+		err = app.LoadVersion(loadHeight, sdk.KeyMain, true)
 	} else {
-		err = app.LoadLatestVersion(engine.GetKeyMain())
+		err = app.LoadLatestVersion(sdk.KeyMain)
 	}
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -82,7 +81,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	engine.Add(protocol0)
 	//	protocol1 := protocol.NewProtocolVersion1(cdc, logger, app.invariantLevel)
 	//	Engine.Add(&protocol1)
-	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+	loaded, current := engine.LoadCurrentProtocol(app.GetKVStore(sdk.KeyMain))
+
+	if !loaded {
+		cmn.Exit(fmt.Sprintf("Failed to load protocol version: %d", current))
+	}
 
 	return app
 }
@@ -101,7 +104,6 @@ func MakeCodec() *codec.Codec {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	protocolKeeper.RegisterCodec(cdc)
 	return cdc
 }
 
@@ -112,7 +114,7 @@ func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState js
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
-	return app.LoadVersion(height, protocol.KeyMain, false)
+	return app.LoadVersion(height, sdk.KeyMain, false)
 }
 
 func (app *IrisApp) replayToHeight(replayHeight int64, logger log.Logger) int64 {

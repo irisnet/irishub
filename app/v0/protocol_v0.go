@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sort"
 	"github.com/irisnet/irishub/app/protocol"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
@@ -81,8 +80,8 @@ func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string
 }
 
 // load the configuration of this Protocol
-func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
-	p.configKeepers(protocolkeeper)
+func (p *ProtocolVersion0) Load() {
+	p.configKeepers()
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
@@ -98,7 +97,7 @@ func (p *ProtocolVersion0) GetDefinition() sdk.ProtocolDefinition {
 }
 
 // create all Keepers
-func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
+func (p *ProtocolVersion0) configKeepers() {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
@@ -146,15 +145,15 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	)
 
 	p.govKeeper = gov.NewKeeper(
-		p.cdc,
 		protocol.KeyGov,
-		p.paramsKeeper,
+		p.cdc,
 		p.paramsKeeper.Subspace(gov.DefaultParamSpace),
-		p.distrKeeper,
+		p.paramsKeeper,
+		sdk.NewProtocolKeeper(p.cdc),
 		p.bankKeeper,
+		p.distrKeeper,
 		p.guardianKeeper,
 		&stakeKeeper,
-		protocolkeeper,
 		gov.DefaultCodespace,
 	)
 
@@ -173,7 +172,7 @@ func (p *ProtocolVersion0) configKeepers(protocolkeeper protocolKeeper.Keeper) {
 	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 
-	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.StakeKeeper, protocolkeeper)
+	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, sdk.NewProtocolKeeper(p.cdc), p.StakeKeeper)
 }
 
 // configure all Routers
@@ -202,14 +201,12 @@ func (p *ProtocolVersion0) configFeeHandlers() {
 func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		protocol.KeyMain,
-		protocol.KeyProtocol,
 		protocol.KeyAccount,
 		protocol.KeyStake,
 		protocol.KeyMint,
 		protocol.KeyDistr,
 		protocol.KeySlashing,
 		protocol.KeyGov,
-		protocol.KeyRecord,
 		protocol.KeyFee,
 		protocol.KeyParams,
 		protocol.KeyUpgrade,

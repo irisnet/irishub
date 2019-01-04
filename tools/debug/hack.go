@@ -79,7 +79,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 	checkHeight := topHeight
 	for {
 		// load the given version of the state
-		err = app.LoadVersion(checkHeight, protocol.KeyMain, false)
+		err = app.LoadVersion(checkHeight, sdk.KeyMain, false)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -146,7 +146,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	engine := protocol.NewProtocolEngine(cdc)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
-	err := app.LoadLatestVersion(engine.GetKeyMain())
+	err := app.LoadLatestVersion(sdk.KeyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
@@ -156,7 +156,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	//	protocol1 := protocol.NewProtocolVersion1(cdc)
 	//	Engine.Add(&protocol1)
 
-	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+	engine.LoadCurrentProtocol(app.GetKVStore(sdk.KeyMain))
 	app.SetProtocolEngine(&engine)
 
 	return app
@@ -186,5 +186,5 @@ func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState js
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
-	return app.LoadVersion(height, protocol.KeyMain, false)
+	return app.LoadVersion(height, sdk.KeyMain, false)
 }

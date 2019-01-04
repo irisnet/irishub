@@ -2,7 +2,6 @@ package protocol
 
 import (
 	"encoding/json"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -22,7 +21,7 @@ type Protocol interface {
 	GetEndBlocker() sdk.EndBlocker     // logic to run after all txs, and to determine valset changes
 
 	GetKVStoreKeyList() []*sdk.KVStoreKey
-	Load(protocolKeeper.Keeper)
+	Load()
 	Init()
 }
 

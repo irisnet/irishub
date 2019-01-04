@@ -2,7 +2,6 @@ package upgrade
 
 import (
 	"encoding/hex"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
@@ -56,25 +55,23 @@ func createTestCodec() *codec.Codec {
 }
 
 func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
+	keyMain := sdk.NewKVStoreKey("main")
 	keyAcc := sdk.NewKVStoreKey("acc")
 	keyStake := sdk.NewKVStoreKey("stake")
-	keyUpdate := sdk.NewKVStoreKey("update")
+	keyUpgrade := sdk.NewKVStoreKey("upgrade")
 	keyParams := sdk.NewKVStoreKey("params")
-	keyIparams := sdk.NewKVStoreKey("iparams")
 	tkeyStake := sdk.NewTransientStoreKey("transient_stake")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
-	keyProtocol := sdk.NewKVStoreKey("protocol")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(keyMain, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyUpgrade, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyIparams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyStake, sdk.StoreTypeTransient, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
-	ms.MountStoreWithDB(keyProtocol, sdk.StoreTypeIAVL, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
@@ -93,8 +90,7 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 		ck, paramsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 	)
-	pk := protocolKeeper.NewKeeper(cdc, keyProtocol)
-	keeper := NewKeeper(cdc, keyUpdate, sk, pk)
+	keeper := NewKeeper(cdc, keyUpgrade, sdk.NewProtocolKeeper(cdc), sk)
 
 	return ctx, keeper, paramsKeeper
 }
