@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 0.9.1
+
+*January 4th, 2019*
+
+- Add cli cmd to query the software upgrade signal status
+- Remove the text proposal
+
 ## 0.9.0
 
 *December 27th, 2018*
