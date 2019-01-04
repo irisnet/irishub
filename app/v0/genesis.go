@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -25,11 +24,6 @@ import (
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-)
-
-const (
-	defaultUnbondingTime time.Duration = 60 * 10 * time.Second
-	// DefaultKeyPass contains the default key password for genesis transactions
 )
 
 // State to Unmarshal
@@ -280,27 +274,6 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	return appGenTxs, persistentPeers, nil
 }
 
-func createStakeGenesisState() stake.GenesisState {
-	return stake.GenesisState{
-		BondedPool: stake.BondedPool{
-			BondedTokens: sdk.ZeroDec(),
-		},
-		Params: stake.Params{
-			UnbondingTime: defaultUnbondingTime,
-			MaxValidators: 100,
-		},
-	}
-}
-
-func createMintGenesisState() mint.GenesisState {
-	return mint.GenesisState{
-		Minter: mint.InitialMinter(),
-		Params: mint.Params{
-			Inflation: sdk.NewDecWithPrec(4, 2),
-		},
-	}
-}
-
 // normalize stake token to mini-unit
 func normalizeNativeToken(coins []string) sdk.Coins {
 	var accountCoins sdk.Coins
@@ -421,8 +394,8 @@ func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
 		Accounts:     nil,
 		AuthData:     auth.DefaultGenesisState(),
-		StakeData:    createStakeGenesisState(),
-		MintData:     createMintGenesisState(),
+		StakeData:    stake.DefaultGenesisState(),
+		MintData:     mint.DefaultGenesisState(),
 		DistrData:    distr.DefaultGenesisState(),
 		GovData:      gov.DefaultGenesisState(),
 		UpgradeData:  upgrade.DefaultGenesisState(),

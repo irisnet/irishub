@@ -195,29 +195,29 @@ func TestIrisCLIService(t *testing.T) {
 	reStr += fmt.Sprintf(" --from=%s", "foo")
 
 	executeWrite(t, reStr, sdk.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(2, port)
+	tests.WaitForNextNBlocksTM(7, port)
 
 	// fees test
 	fooFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
 	barFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
-	require.Equal(t, "980000000000000000iris-atto", fooFess.IncomingFee.String())
+	require.Equal(t, "990000000000000000iris-atto", fooFess.IncomingFee.String())
 	require.Nil(t, fooFess.ReturnedFee)
 	require.Nil(t, barFess.ReturnedFee)
 	require.Nil(t, barFess.IncomingFee)
 
 	executeWrite(t, caStr, sdk.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(12, port)
+	tests.WaitForNextNBlocksTM(7, port)
 
 	fooFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
 	barFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
-	require.Equal(t, "980000000000000000iris-atto", fooFess.IncomingFee.String())
+	require.Equal(t, "990000000000000000iris-atto", fooFess.IncomingFee.String())
 	require.Nil(t, fooFess.ReturnedFee)
 	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.String())
 	require.Nil(t, barFess.IncomingFee)
 	serviceBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
 	require.NotNil(t, serviceBinding)
-	require.Equal(t, "9900000000000000000iris-atto", serviceBinding.Deposit.String())
+	require.Equal(t, "9990000000000000000iris-atto", serviceBinding.Deposit.String())
 	require.Equal(t, false, serviceBinding.Available)
 
 	// refund fees
@@ -244,7 +244,7 @@ func TestIrisCLIService(t *testing.T) {
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 
 	wtStr := fmt.Sprintf("iriscli service withdraw-tax %v", flags)
-	wtStr += fmt.Sprintf(" --withdraw-amount=%s", "0.02iris")
+	wtStr += fmt.Sprintf(" --withdraw-amount=%s", "0.001iris")
 	wtStr += fmt.Sprintf(" --dest-address=%s", barAcc.Address)
 	wtStr += fmt.Sprintf(" --fee=%s", "0.004iris")
 	wtStr += fmt.Sprintf(" --from=%s", "foo")
@@ -256,7 +256,7 @@ func TestIrisCLIService(t *testing.T) {
 	cliCtx := context.NewCLIContext()
 	oldAmount, _ := cliCtx.ParseCoin(barAcc.Coins[0])
 	newAmount, _ := cliCtx.ParseCoin(barAcc1.Coins[0])
-	tax, _ := sdk.NewIntFromString("20000000000000000")
+	tax, _ := sdk.NewIntFromString("1000000000000000")
 	require.Equal(t, oldAmount.Amount.Add(tax).String(), newAmount.Amount.String())
 }
 

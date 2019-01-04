@@ -19,7 +19,7 @@ const (
 
 	// defaultUnbondingTime reflects three weeks in seconds as the default
 	// unbonding time.
-	defaultUnbondingTime time.Duration = 60 * 60 * 24 * 3 * time.Second
+	defaultUnbondingTime time.Duration = 3 * sdk.Week
 
 	// Delay, in blocks, between when validator updates are returned to Tendermint and when they are applied
 	// For example, if this is 0, the validator set at the end of a block will sign the next block, or
@@ -137,8 +137,12 @@ func (p Params) HumanReadableString() string {
 //______________________________________________________________________
 
 func validateUnbondingTime(v time.Duration) sdk.Error {
-	if v < time.Minute || v > sdk.EightWeeks {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%d] should be between [10min, 8week]", v))
+	if sdk.NetworkType == sdk.Mainnet {
+		if v < 2*sdk.Week {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%s] should be greater than or equal to 2 weeks", v.String()))
+		}
+	} else if v < 10*time.Second {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%s] should be greater than or equal to 10 seconds", v.String()))
 	}
 	return nil
 }
