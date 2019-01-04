@@ -69,11 +69,10 @@ type ProtocolVersion1 struct {
 func NewProtocolVersion1(cdc *codec.Codec) *ProtocolVersion1 {
 	base := protocol.ProtocolBase{
 		Definition: common.ProtocolDefinition{
-			uint64(0),
-			"",
 			uint64(1),
+			"",
+			uint64(50),
 		},
-		//		engine: engine,
 	}
 	p0 := ProtocolVersion1{
 		pb:          &base,
