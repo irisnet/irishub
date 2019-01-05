@@ -93,6 +93,10 @@ func (p *ProtocolV0) GetCodec() *codec.Codec {
 }
 
 func (p *ProtocolV0) configCodec() {
+	p.cdc = MakeCodec()
+}
+
+func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
 	bank.RegisterCodec(cdc)
 	stake.RegisterCodec(cdc)
@@ -105,7 +109,7 @@ func (p *ProtocolV0) configCodec() {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	p.cdc = cdc
+	return cdc
 }
 
 func (p *ProtocolV0) GetVersion() uint64 {
