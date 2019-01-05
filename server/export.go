@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	flagHeight = "height"
+	flagHeight        = "height"
 	flagForZeroHeight = "for-zero-height"
 )
 
@@ -55,7 +55,7 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			if height == 0 && forZeroHeight {
 				return errors.Errorf("Can't export state at height 0 for restarting blockchain. In this case, just copy the current genesis file")
 			}
-			appState, validators, err := appExporter(ctx.Logger, db, traceWriter, height, forZeroHeight)
+			appState, validators, err := appExporter(ctx, ctx.Logger, db, traceWriter, height, forZeroHeight)
 			if err != nil {
 				return errors.Errorf("error exporting state: %v\n", err)
 			}

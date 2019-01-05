@@ -29,14 +29,14 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/store"
 )
 
 const (
-	appName          = "IrisApp"
-	FlagReplayHeight = "replay_height"
-	FlagReplay       = "replay"
+	appName    = "IrisApp"
+	FlagReplay = "replay-last-block"
 	//Keep snapshot every at syncable height
-	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
+	DefaultSyncableHeight = store.DefaultIAVLCacheSize // Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries
@@ -68,12 +68,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 
 	var err error
-	if viper.GetInt64(FlagReplayHeight) > 0 {
-		replayHeight := viper.GetInt64(FlagReplayHeight)
-		loadHeight := app.replayToHeight(replayHeight, app.Logger)
-		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
-		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
-	} else if viper.GetBool(FlagReplay) {
+	if viper.GetBool(FlagReplay) {
 		lastHeight := Replay(app.Logger)
 		err = app.LoadVersion(lastHeight, engine.GetKeyMain(), true)
 	} else {
@@ -108,6 +103,29 @@ func MakeCodec() *codec.Codec {
 	codec.RegisterCrypto(cdc)
 	protocolKeeper.RegisterCodec(cdc)
 	return cdc
+}
+
+func (app *IrisApp) ExportOrReplay(replayHeight int64) (replay bool, height int64) {
+	lastBlockHeight := app.BaseApp.LastBlockHeight()
+	if replayHeight > lastBlockHeight {
+		replayHeight = lastBlockHeight
+	}
+
+	loadHeight := app.replayToHeight(replayHeight, app.Logger)
+	if replayHeight >= loadHeight && lastBlockHeight-loadHeight < DefaultSyncableHeight {
+		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
+		if err != nil {
+			cmn.Exit(err.Error())
+		}
+	} else {
+		err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
+		if err != nil {
+			cmn.Exit(err.Error())
+		}
+		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+		return true, replayHeight
+	}
+	return false, replayHeight
 }
 
 // export the state of iris for a genesis file

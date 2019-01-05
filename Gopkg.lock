@@ -496,8 +496,8 @@
   source = "https://github.com/irisnet/iavl.git"
 
 [[projects]]
-  branch = "irisnet/v0.27.3-iris"
-  digest = "1:8d5381a63ff497adc3d5885f40672ce2f11fb5c68147c22b92cf753e7aec7800"
+  branch = "v0.27.3-iris"
+  digest = "1:d711d107a4980bf15d3b44be8f11754e746636564cd6f4428b67dd4fb9655386"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -562,8 +562,8 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "7e7484d5def4366949395946b5703ea5f51fbdcc"
-  source = "https://github.com/irisnet/tendermint.git"
+  revision = "b96f7dd30616d515d6e8294df7a080ee5ea1975a"
+  source = "https://github.com/chengwenxi/tendermint.git"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
