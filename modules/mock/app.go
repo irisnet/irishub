@@ -118,8 +118,6 @@ func NewApp() *App {
 	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
 	app.FeeKeeper = auth.NewFeeKeeper(app.Cdc, app.KeyFee, app.ParamsKeeper.Subspace(auth.DefaultParamSpace))
 
-
-
 	app.SetInitChainer(app.InitChainer)
 	app.SetAnteHandler(auth.NewAnteHandler(app.AccountKeeper, app.FeeKeeper))
 	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.AccountKeeper, app.FeeKeeper))
@@ -128,7 +126,6 @@ func NewApp() *App {
 
 	// init iparam
 	//params.RegisterParamSet(&mint.Params{})
-
 	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},

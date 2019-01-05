@@ -6,4 +6,5 @@ import "github.com/irisnet/irishub/codec"
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*Msg)(nil), nil)
 	cdc.RegisterInterface((*Tx)(nil), nil)
+	cdc.RegisterConcrete(&UpgradeConfig{}, "irishub/protocol/UpgradeConfig", nil)
 }
