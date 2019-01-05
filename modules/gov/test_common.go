@@ -11,7 +11,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	"fmt"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
@@ -31,9 +30,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	keyGov := sdk.NewKVStoreKey("gov")
 	keyDistr := sdk.NewKVStoreKey("distr")
-	keyProtocol := sdk.NewKVStoreKey("protocol")
 
-	pk := protocolKeeper.NewKeeper(mapp.Cdc, keyProtocol)
 	paramsKeeper := params.NewKeeper(
 		mapp.Cdc,
 		sdk.NewKVStoreKey("params"),
@@ -53,7 +50,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.DefaultCodespace)
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(mapp.Cdc, keyGov,paramsKeeper,paramsKeeper.Subspace(DefaultParamSpace), dk, ck, guardianKeeper, sk, pk, DefaultCodespace)
+	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main"), mapp.Cdc), ck, dk, guardianKeeper, sk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -92,7 +89,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		InitGenesis(ctx, keeper, GenesisState{
-			Params:DefaultParams(),
+			Params: DefaultParams(),
 		})
 		return abci.ResponseInitChain{
 			Validators: validators,

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -60,7 +59,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		BaseApp: bApp,
 	}
 
-	engine := protocol.NewProtocolEngine(cdc)
+	engine := protocol.NewProtocolEngine(protocol.KeyMain, cdc)
+
 	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
@@ -72,18 +72,21 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
 		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
 	} else {
-		err = app.LoadLatestVersion(engine.GetKeyMain())
+		err = app.LoadLatestVersion(protocol.KeyMain)
 	}
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
 
-	protocol0 := v0.NewProtocolVersion0(logger, sdk.InvariantLevel)
-	engine.Add(protocol0)
-	//protocol1 := v1.NewProtocolVersion1(logger, sdk.InvariantLevel)
-	//engine.Add(protocol1)
-	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
-	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().LoadCodec())
+	engine.Add(v0.NewProtocolV0(0, cdc, logger, engine.ProtocolKeeper, sdk.InvariantLevel))
+	// engine.Add(v1.NewProtocolV1(1, ...))
+	// engine.Add(v2.NewProtocolV1(2, ...))
+
+	loaded, current := engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
+	if !loaded {
+		cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
+	}
+	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().GetCodec())
 
 	return app
 }
@@ -102,7 +105,6 @@ func MakeCodec() *codec.Codec {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	protocolKeeper.RegisterCodec(cdc)
 	return cdc
 }
 

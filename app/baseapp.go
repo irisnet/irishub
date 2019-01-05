@@ -15,7 +15,6 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
@@ -830,7 +829,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = endBlocker(app.deliverState.ctx, req)
 	}
 
-	appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag)
+	appVersionStr, ok := abci.GetTagByKey(res.Tags, sdk.AppVersionTag)
 	if !ok {
 		return
 	}
@@ -842,17 +841,17 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 
 	success := app.Engine.Activate(appVersion)
 	if success {
-		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().LoadCodec())
+		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 		return
 	}
 
-	if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
+	if upgradeConfig, ok := app.Engine.ProtocolKeeper.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyMain)); ok {
 		res.Tags = append(res.Tags,
 			sdk.MakeTag(tmstate.UpgradeFailureTagKey,
-				[]byte("Please install the right protocol version from "+upgradeConfig.Definition.Software)))
+				[]byte("Please install the right application version from "+upgradeConfig.Protocol.Software)))
 	} else {
 		res.Tags = append(res.Tags,
-			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right protocol version")))
+			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right application version")))
 	}
 
 	return

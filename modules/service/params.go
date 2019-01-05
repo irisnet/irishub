@@ -149,8 +149,8 @@ func DefaultParams() Params {
 	return Params{
 		MaxRequestTimeout:    100,
 		MinDepositMultiple:   1000,
-		ServiceFeeTax:        sdk.NewDecWithPrec(2, 2),    //2%
-		SlashFraction:        sdk.NewDecWithPrec(1, 2),    //1%
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),    //1%
+		SlashFraction:        sdk.NewDecWithPrec(1, 3),    //0.1%
 		ComplaintRetrospect:  time.Duration(15 * sdk.Day), //15 days
 		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),  //5 days
 	}
@@ -159,12 +159,12 @@ func DefaultParams() Params {
 // default service module params for test
 func DefaultParamsForTest() Params {
 	return Params{
-		MaxRequestTimeout:    10,
+		MaxRequestTimeout:    5,
 		MinDepositMultiple:   10,
-		ServiceFeeTax:        sdk.NewDecWithPrec(2, 2), //2%
-		SlashFraction:        sdk.NewDecWithPrec(1, 2), //1%
-		ComplaintRetrospect:  20 * time.Second,         //20s
-		ArbitrationTimeLimit: 20 * time.Second,         //20s
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2), //1%
+		SlashFraction:        sdk.NewDecWithPrec(1, 3), //0.1%
+		ComplaintRetrospect:  20 * time.Second,         //20 seconds
+		ArbitrationTimeLimit: 20 * time.Second,         //20 seconds
 	}
 }
 
@@ -172,7 +172,7 @@ func validateParams(p Params) error {
 	if err := validateMaxRequestTimeout(p.MaxRequestTimeout); err != nil {
 		return err
 	}
-	if err := validateMinDepositMultiple(p.MaxRequestTimeout); err != nil {
+	if err := validateMinDepositMultiple(p.MinDepositMultiple); err != nil {
 		return err
 	}
 	if err := validateSlashFraction(p.SlashFraction); err != nil {
@@ -207,43 +207,59 @@ func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
 //______________________________________________________________________
 
 func validateMaxRequestTimeout(v int64) sdk.Error {
-	if v <= 0 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Invalid MaxRequestTimeout [%d] should be greater than 0", v))
+	if sdk.NetworkType == sdk.Mainnet {
+		if v < 20 {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Invalid MaxRequestTimeout [%d] should be greater than or equal to 20", v))
+		}
+	} else if v < 5 {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxRequestTimeout, fmt.Sprintf("Invalid MaxRequestTimeout [%d] should be greater than or equal to 5", v))
 	}
 	return nil
 }
 
 func validateMinDepositMultiple(v int64) sdk.Error {
-	if v <= 0 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be greater than 0", v))
+	if sdk.NetworkType == sdk.Mainnet {
+		if v < 500 || v > 5000 {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be between [500, 5000]", v))
+		}
+	} else if v < 10 || v > 5000 {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be between [10, 5000]", v))
 	}
 	return nil
 }
 
 func validateSlashFraction(v sdk.Dec) sdk.Error {
-	if v.LTE(sdk.ZeroDec()) || v.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashFraction, fmt.Sprintf("Invalid SlashFraction [%s] should be between 0 and 1", v.String()))
+	if v.LTE(sdk.ZeroDec()) || v.GT(sdk.NewDecWithPrec(1, 2)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashFraction, fmt.Sprintf("Invalid SlashFraction [%s] should be between (0, 0.01]", v.String()))
 	}
 	return nil
 }
 
 func validateServiceFeeTax(v sdk.Dec) sdk.Error {
-	if v.LTE(sdk.ZeroDec()) || v.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidServiceFeeTax, fmt.Sprintf("Invalid ServiceFeeTax [%s] should be between 0 and 1", v.String()))
+	if v.LTE(sdk.ZeroDec()) || v.GT(sdk.NewDecWithPrec(2, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidServiceFeeTax, fmt.Sprintf("Invalid ServiceFeeTax [%s] should be between (0, 0.2]", v.String()))
 	}
 	return nil
 }
 
 func validateComplaintRetrospect(v time.Duration) sdk.Error {
-	if v <= 0 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeComplaintRetrospect, fmt.Sprintf("Invalid ComplaintRetrospect [%d] should be greater than 0", v))
+	if sdk.NetworkType == sdk.Mainnet {
+		if v < 15*sdk.Day || v > 30*sdk.Day {
+			return sdk.NewError(params.DefaultCodespace, params.CodeComplaintRetrospect, fmt.Sprintf("Invalid ComplaintRetrospect [%s] should be between [15days, 30days]", v.String()))
+		}
+	} else if v < 20*time.Second {
+		return sdk.NewError(params.DefaultCodespace, params.CodeComplaintRetrospect, fmt.Sprintf("Invalid ComplaintRetrospect [%s] should be between [20seconds, )", v.String()))
 	}
 	return nil
 }
 
 func validateArbitrationTimeLimit(v time.Duration) sdk.Error {
-	if v <= 0 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidArbitrationTimeLimit, fmt.Sprintf("Invalid ArbitrationTimeLimit [%d] should be greater than 0", v))
+	if sdk.NetworkType == sdk.Mainnet {
+		if v < 5*sdk.Day || v > 10*sdk.Day {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidArbitrationTimeLimit, fmt.Sprintf("Invalid ArbitrationTimeLimit [%s] should be between [5days, 10days]", v.String()))
+		}
+	} else if v < 20*time.Second {
+		return sdk.NewError(params.DefaultCodespace, params.CodeComplaintRetrospect, fmt.Sprintf("Invalid ComplaintRetrospect [%s] should be between [20seconds, )", v.String()))
 	}
 	return nil
 }

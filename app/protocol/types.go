@@ -2,14 +2,13 @@ package protocol
 
 import (
 	"encoding/json"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/codec"
 )
 
 type Protocol interface {
-	GetDefinition() sdk.ProtocolDefinition
+	GetVersion() uint64
 	GetRouter() Router
 	GetQueryRouter() QueryRouter
 	GetAnteHandler() sdk.AnteHandler                   // ante handler for fee and auth
@@ -23,16 +22,7 @@ type Protocol interface {
 	GetEndBlocker() sdk.EndBlocker     // logic to run after all txs, and to determine valset changes
 
 	GetKVStoreKeyList() []*sdk.KVStoreKey
-	Load(protocolKeeper.Keeper)
+	Load()
 	Init()
-	LoadCodec() *codec.Codec
-}
-
-type ProtocolBase struct {
-	Definition sdk.ProtocolDefinition
-	//	engine 		*ProtocolEngine
-}
-
-func (pb ProtocolBase) GetDefinition() sdk.ProtocolDefinition {
-	return pb.Definition
+	GetCodec() *codec.Codec
 }
