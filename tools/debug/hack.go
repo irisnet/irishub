@@ -17,21 +17,20 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	bam "github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/app/protocol"
-	sdk "github.com/irisnet/irishub/types"
 
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/guardian"
 	"encoding/json"
-	"github.com/irisnet/irishub/app/v0"
 	tmtypes "github.com/tendermint/tendermint/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
 )
@@ -79,7 +78,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 	checkHeight := topHeight
 	for {
 		// load the given version of the state
-		err = app.LoadVersion(checkHeight, sdk.KeyMain, false)
+		err = app.LoadVersion(checkHeight, protocol.KeyMain, false)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -89,7 +88,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 		// check for the powerkey and the validator from the store
 		store := ctx.KVStore(protocol.KeyStake)
 		res := store.Get(powerKey)
-		val, _ := app.Engine.GetCurrentProtocol().(*v0.ProtocolVersion0).StakeKeeper.GetValidator(ctx, trouble)
+		val, _ := app.Engine.GetCurrentProtocol().(*v0.ProtocolV0).StakeKeeper.GetValidator(ctx, trouble)
 		fmt.Println("checking height", checkHeight, res, val)
 		if res == nil {
 			bottomHeight = checkHeight
@@ -143,21 +142,19 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine(cdc)
+	engine := protocol.NewProtocolEngine(protocol.KeyMain, cdc)
+	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
-	err := app.LoadLatestVersion(sdk.KeyMain)
+	err := app.LoadLatestVersion(protocol.KeyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
 
-	protocol0 := v0.NewProtocolVersion0(cdc, logger, "")
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
+	engine.Add(v0.NewProtocolV0(0, cdc, logger, engine.ProtocolKeeper, sdk.InvariantLevel))
+	// engine.Add(v1.NewProtocolV1(1, ...))
 
-	engine.LoadCurrentProtocol(app.GetKVStore(sdk.KeyMain))
-	app.SetProtocolEngine(&engine)
+	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
 
 	return app
 }
@@ -186,5 +183,5 @@ func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState js
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
-	return app.LoadVersion(height, sdk.KeyMain, false)
+	return app.LoadVersion(height, protocol.KeyMain, false)
 }

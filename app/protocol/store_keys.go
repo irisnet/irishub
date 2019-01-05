@@ -3,7 +3,7 @@ package protocol
 import sdk "github.com/irisnet/irishub/types"
 
 var (
-	KeyMain          = sdk.KeyMain
+	KeyMain          = sdk.NewKVStoreKey(sdk.MainStore)
 	KeyAccount       = sdk.NewKVStoreKey("acc")
 	KeyStake         = sdk.NewKVStoreKey("stake")
 	TkeyStake        = sdk.NewTransientStoreKey("transient_stake")

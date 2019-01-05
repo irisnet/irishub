@@ -7,11 +7,11 @@ import (
 
 type UpgradeInfoOutput struct {
 	CurrentVersion    upgrade.VersionInfo `json:"current_version"`
-	LastFailedVersion int64               `json:"last_failed_version"`
+	LastFailedVersion uint64              `json:"last_failed_version"`
 	UpgradeInProgress sdk.UpgradeConfig   `json:"upgrade_in_progress"`
 }
 
-func NewUpgradeInfoOutput(currentVersion upgrade.VersionInfo, lastFailedVersion int64, upgradeInProgress sdk.UpgradeConfig) UpgradeInfoOutput {
+func NewUpgradeInfoOutput(currentVersion upgrade.VersionInfo, lastFailedVersion uint64, upgradeInProgress sdk.UpgradeConfig) UpgradeInfoOutput {
 	return UpgradeInfoOutput{
 		currentVersion,
 		lastFailedVersion,

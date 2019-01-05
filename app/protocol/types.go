@@ -7,7 +7,7 @@ import (
 )
 
 type Protocol interface {
-	GetDefinition() sdk.ProtocolDefinition
+	GetVersion() uint64
 	GetRouter() Router
 	GetQueryRouter() QueryRouter
 	GetAnteHandler() sdk.AnteHandler                   // ante handler for fee and auth
@@ -23,13 +23,4 @@ type Protocol interface {
 	GetKVStoreKeyList() []*sdk.KVStoreKey
 	Load()
 	Init()
-}
-
-type ProtocolBase struct {
-	Definition sdk.ProtocolDefinition
-	//	engine 		*ProtocolEngine
-}
-
-func (pb ProtocolBase) GetDefinition() sdk.ProtocolDefinition {
-	return pb.Definition
 }

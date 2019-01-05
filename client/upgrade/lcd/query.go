@@ -39,13 +39,11 @@ func InfoHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec, storeName string
 		}
 
 		res_LastFailedVersion, err := cliCtx.QueryStore(sdk.LastFailedVersionKey, sdk.MainStore)
-		var ulastFailedVersion uint64
-		var lastFailedVersion int64
+		var lastFailedVersion uint64
 		if err == nil && len(res_LastFailedVersion) != 0 {
-			cdc.MustUnmarshalBinaryLengthPrefixed(res_LastFailedVersion, &ulastFailedVersion)
-			lastFailedVersion = int64(ulastFailedVersion)
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_LastFailedVersion, &lastFailedVersion)
 		} else {
-			lastFailedVersion = -1
+			lastFailedVersion = 0
 		}
 
 		upgradeInfoOutput := upgcli.NewUpgradeInfoOutput(currentVersionInfo, lastFailedVersion, upgradeInProgress)

@@ -261,7 +261,7 @@ func (app *BaseApp) storeConsensusParams(consensusParams *abci.ConsensusParams) 
 	if err != nil {
 		panic(err)
 	}
-	mainStore := app.cms.GetKVStore(sdk.KeyMain)
+	mainStore := app.cms.GetKVStore(protocol.KeyMain)
 	mainStore.Set(mainConsensusParamsKey, consensusParamsBz)
 }
 
@@ -843,7 +843,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		return
 	}
 
-	if upgradeConfig, ok := app.Engine.ProtocolKeeper.GetUpgradeConfigByStore(app.GetKVStore(sdk.KeyMain)); ok {
+	if upgradeConfig, ok := app.Engine.ProtocolKeeper.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyMain)); ok {
 		res.Tags = append(res.Tags,
 			sdk.MakeTag(tmstate.UpgradeFailureTagKey,
 				[]byte("Please install the right application version from "+upgradeConfig.Protocol.Software)))

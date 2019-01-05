@@ -10,7 +10,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func (p *ProtocolVersion0) runtimeInvariants() []simulation.Invariant {
+func (p *ProtocolV0) runtimeInvariants() []simulation.Invariant {
 	return []simulation.Invariant{
 		banksim.NonnegativeBalanceInvariant(p.accountMapper),
 		distrsim.ValAccumInvariants(p.distrKeeper, p.StakeKeeper),
@@ -20,7 +20,7 @@ func (p *ProtocolVersion0) runtimeInvariants() []simulation.Invariant {
 	}
 }
 
-func (p *ProtocolVersion0) assertRuntimeInvariants(ctx sdk.Context) {
+func (p *ProtocolV0) assertRuntimeInvariants(ctx sdk.Context) {
 	if p.invariantLevel != sdk.InvariantError && p.invariantLevel != sdk.InvariantPanic {
 		return
 	}

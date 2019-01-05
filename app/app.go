@@ -59,7 +59,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		BaseApp: bApp,
 	}
 
-	engine := protocol.NewProtocolEngine(cdc)
+	engine := protocol.NewProtocolEngine(protocol.KeyMain, cdc)
+
 	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
@@ -69,22 +70,21 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		replayHeight := viper.GetInt64(FlagReplayHeight)
 		loadHeight := app.replayToHeight(replayHeight, app.Logger)
 		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
-		err = app.LoadVersion(loadHeight, sdk.KeyMain, true)
+		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
 	} else {
-		err = app.LoadLatestVersion(sdk.KeyMain)
+		err = app.LoadLatestVersion(protocol.KeyMain)
 	}
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
 
-	protocol0 := v0.NewProtocolVersion0(cdc, logger, sdk.InvariantLevel)
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc, logger, app.invariantLevel)
-	//	Engine.Add(&protocol1)
-	loaded, current := engine.LoadCurrentProtocol(app.GetKVStore(sdk.KeyMain))
+	engine.Add(v0.NewProtocolV0(0, cdc, logger, engine.ProtocolKeeper, sdk.InvariantLevel))
+	// engine.Add(v1.NewProtocolV1(1, ...))
+	// engine.Add(v2.NewProtocolV1(2, ...))
 
+	loaded, current := engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
 	if !loaded {
-		cmn.Exit(fmt.Sprintf("Failed to load protocol version: %d", current))
+		cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
 	}
 
 	return app
@@ -114,7 +114,7 @@ func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState js
 }
 
 func (app *IrisApp) LoadHeight(height int64) error {
-	return app.LoadVersion(height, sdk.KeyMain, false)
+	return app.LoadVersion(height, protocol.KeyMain, false)
 }
 
 func (app *IrisApp) replayToHeight(replayHeight int64, logger log.Logger) int64 {

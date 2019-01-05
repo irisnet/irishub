@@ -3,19 +3,22 @@ package protocol
 import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"fmt"
 )
 
 type ProtocolEngine struct {
 	protocols      map[uint64]Protocol
 	current        uint64
+	next           uint64
 	ProtocolKeeper sdk.ProtocolKeeper
 }
 
-func NewProtocolEngine(cdc *codec.Codec) ProtocolEngine {
+func NewProtocolEngine(key sdk.StoreKey, cdc *codec.Codec) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
 		0,
-		sdk.NewProtocolKeeper(cdc),
+		1,
+		sdk.NewProtocolKeeper(key, cdc),
 	}
 	return engine
 }
@@ -51,7 +54,11 @@ func (pe *ProtocolEngine) GetCurrentVersion() uint64 {
 }
 
 func (pe *ProtocolEngine) Add(p Protocol) Protocol {
-	pe.protocols[p.GetDefinition().Version] = p
+	if p.GetVersion() != pe.next {
+		panic(fmt.Errorf("Wrong version being added to the protocol engine: %d; Expecting %d", p.GetVersion(), pe.next))
+	}
+	pe.protocols[pe.next] = p
+	pe.next++
 	return p
 }
 

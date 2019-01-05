@@ -24,10 +24,10 @@ import (
 	"strings"
 )
 
-var _ protocol.Protocol = (*ProtocolVersion0)(nil)
+var _ protocol.Protocol = (*ProtocolV0)(nil)
 
-type ProtocolVersion0 struct {
-	pb             *protocol.ProtocolBase
+type ProtocolV0 struct {
+	version        uint64
 	cdc            *codec.Codec
 	logger         log.Logger
 	invariantLevel string
@@ -40,6 +40,7 @@ type ProtocolVersion0 struct {
 	slashingKeeper slashing.Keeper
 	mintKeeper     mint.Keeper
 	distrKeeper    distr.Keeper
+	protocolKeeper sdk.ProtocolKeeper
 	govKeeper      gov.Keeper
 	paramsKeeper   params.Keeper
 	serviceKeeper  service.Keeper
@@ -59,19 +60,12 @@ type ProtocolVersion0 struct {
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 }
 
-func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string) *ProtocolVersion0 {
-	base := protocol.ProtocolBase{
-		Definition: sdk.ProtocolDefinition{
-			uint64(0),
-			"",
-			uint64(1),
-		},
-		//		engine: engine,
-	}
-	p0 := ProtocolVersion0{
-		pb:             &base,
+func NewProtocolV0(version uint64, cdc *codec.Codec, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string) *ProtocolV0 {
+	p0 := ProtocolV0{
+		version:        version,
 		cdc:            cdc,
 		logger:         log,
+		protocolKeeper: pk,
 		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
@@ -80,7 +74,7 @@ func NewProtocolVersion0(cdc *codec.Codec, log log.Logger, invariantLevel string
 }
 
 // load the configuration of this Protocol
-func (p *ProtocolVersion0) Load() {
+func (p *ProtocolV0) Load() {
 	p.configKeepers()
 	p.configRouters()
 	p.configFeeHandlers()
@@ -88,16 +82,16 @@ func (p *ProtocolVersion0) Load() {
 }
 
 // verison0 don't need the init
-func (p *ProtocolVersion0) Init() {
+func (p *ProtocolV0) Init() {
 
 }
 
-func (p *ProtocolVersion0) GetDefinition() sdk.ProtocolDefinition {
-	return p.pb.GetDefinition()
+func (p *ProtocolV0) GetVersion() uint64 {
+	return p.version
 }
 
 // create all Keepers
-func (p *ProtocolVersion0) configKeepers() {
+func (p *ProtocolV0) configKeepers() {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
@@ -149,7 +143,7 @@ func (p *ProtocolVersion0) configKeepers() {
 		p.cdc,
 		p.paramsKeeper.Subspace(gov.DefaultParamSpace),
 		p.paramsKeeper,
-		sdk.NewProtocolKeeper(p.cdc),
+		p.protocolKeeper,
 		p.bankKeeper,
 		p.distrKeeper,
 		p.guardianKeeper,
@@ -172,11 +166,11 @@ func (p *ProtocolVersion0) configKeepers() {
 	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 
-	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, sdk.NewProtocolKeeper(p.cdc), p.StakeKeeper)
+	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper)
 }
 
 // configure all Routers
-func (p *ProtocolVersion0) configRouters() {
+func (p *ProtocolV0) configRouters() {
 	p.router.
 		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
 		AddRoute("stake", stake.NewHandler(p.StakeKeeper)).
@@ -191,14 +185,14 @@ func (p *ProtocolVersion0) configRouters() {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) configFeeHandlers() {
+func (p *ProtocolV0) configFeeHandlers() {
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
+func (p *ProtocolV0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		protocol.KeyMain,
 		protocol.KeyAccount,
@@ -215,7 +209,7 @@ func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) configParams() {
+func (p *ProtocolV0) configParams() {
 
 	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
@@ -227,7 +221,7 @@ func (p *ProtocolVersion0) configParams() {
 }
 
 // application updates every end block
-func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	// mint new tokens for this new block
 	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
@@ -243,7 +237,7 @@ func (p *ProtocolVersion0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBl
 }
 
 // application updates every end block
-func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, p.govKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
@@ -259,7 +253,7 @@ func (p *ProtocolVersion0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock)
 
 // custom logic for iris initialization
 // just 0 version need Initchainer
-func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
+func (p *ProtocolV0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	var genesisFileState GenesisFileState
@@ -340,28 +334,28 @@ func (p *ProtocolVersion0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx,
 	}
 }
 
-func (p *ProtocolVersion0) GetRouter() protocol.Router {
+func (p *ProtocolV0) GetRouter() protocol.Router {
 	return p.router
 }
-func (p *ProtocolVersion0) GetQueryRouter() protocol.QueryRouter {
+func (p *ProtocolV0) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
-func (p *ProtocolVersion0) GetAnteHandler() sdk.AnteHandler {
+func (p *ProtocolV0) GetAnteHandler() sdk.AnteHandler {
 	return p.anteHandler
 }
-func (p *ProtocolVersion0) GetFeeRefundHandler() sdk.FeeRefundHandler {
+func (p *ProtocolV0) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler
 }
-func (p *ProtocolVersion0) GetFeePreprocessHandler() sdk.FeePreprocessHandler {
+func (p *ProtocolV0) GetFeePreprocessHandler() sdk.FeePreprocessHandler {
 	return p.feePreprocessHandler
 }
-func (p *ProtocolVersion0) GetInitChainer() sdk.InitChainer1 {
+func (p *ProtocolV0) GetInitChainer() sdk.InitChainer1 {
 	return p.InitChainer
 }
-func (p *ProtocolVersion0) GetBeginBlocker() sdk.BeginBlocker {
+func (p *ProtocolV0) GetBeginBlocker() sdk.BeginBlocker {
 	return p.BeginBlocker
 }
-func (p *ProtocolVersion0) GetEndBlocker() sdk.EndBlocker {
+func (p *ProtocolV0) GetEndBlocker() sdk.EndBlocker {
 	return p.EndBlocker
 }
 
