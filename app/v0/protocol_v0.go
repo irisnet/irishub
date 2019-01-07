@@ -74,11 +74,11 @@ func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invari
 
 // load the configuration of this Protocol
 func (p *ProtocolV0) Load() {
+	p.configCodec()
 	p.configKeepers()
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
-	p.configCodec()
 }
 
 // verison0 don't need the init
