@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 0.9.1-patch01
+
+*January 7th, 2019*
+
+- Hotfix bug of software upgrade
+
 ## 0.9.1
 
 *January 4th, 2019*
