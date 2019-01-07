@@ -63,7 +63,6 @@ type ProtocolVersion0 struct {
 	initChainer  sdk.InitChainer1 // initialize state with validators and state blob
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
-
 }
 
 func NewProtocolVersion0(cdc *codec.Codec) *ProtocolVersion0 {
@@ -90,6 +89,7 @@ func (p *ProtocolVersion0) Load(protocolkeeper protocolKeeper.Keeper) {
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
+	p.cdc = MakeCodec()
 }
 
 // verison0 don't need the init
@@ -99,6 +99,31 @@ func (p *ProtocolVersion0) Init() {
 
 func (p *ProtocolVersion0) GetDefinition() common.ProtocolDefinition {
 	return p.pb.GetDefinition()
+}
+
+func (p *ProtocolVersion0) GetCodec() *codec.Codec {
+	return p.cdc
+}
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	//v1gov.RegisterCodec(cdc)
+	govtypes.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	guardian.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	protocolKeeper.RegisterCodec(cdc)
+	return cdc
 }
 
 // create all Keepers
@@ -207,22 +232,22 @@ func (p *ProtocolVersion0) configFeeHandlers() {
 }
 
 // configure all Stores
-func (p *ProtocolVersion0) GetKVStoreKeyList()  []*sdk.KVStoreKey {
-   return []*sdk.KVStoreKey{
-	   protocol.KeyMain,
-	   protocol.KeyProtocol,
-	   protocol.KeyAccount,
-	   protocol.KeyStake,
-	   protocol.KeyMint,
-	   protocol.KeyDistr,
-	   protocol.KeySlashing,
-	   protocol.KeyGov,
-	   protocol.KeyRecord,
-	   protocol.KeyFeeCollection,
-	   protocol.KeyParams,
-	   protocol.KeyUpgrade,
-	   protocol.KeyService,
-	   protocol.KeyGuardian}
+func (p *ProtocolVersion0) GetKVStoreKeyList() []*sdk.KVStoreKey {
+	return []*sdk.KVStoreKey{
+		protocol.KeyMain,
+		protocol.KeyProtocol,
+		protocol.KeyAccount,
+		protocol.KeyStake,
+		protocol.KeyMint,
+		protocol.KeyDistr,
+		protocol.KeySlashing,
+		protocol.KeyGov,
+		protocol.KeyRecord,
+		protocol.KeyFeeCollection,
+		protocol.KeyParams,
+		protocol.KeyUpgrade,
+		protocol.KeyService,
+		protocol.KeyGuardian}
 }
 
 // configure all Stores
