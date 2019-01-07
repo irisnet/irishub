@@ -13,7 +13,7 @@
 
 1. 任何用户可以发起提议，并抵押一部分token，如果超过`min_deposit`,提议进入投票，否则留在抵押期。其他人可以对在抵押期的提议进行抵押token，如果提议的抵押token总和超过`min_deposit`,则进入投票期。但若提议在抵押期停留的出块数目超过`max_deposit_period`，则提议被关闭。
 2. 进入投票期的提议，只有验证人和委托人可以进行投票。如果委托人没投票，则他继承他委托的验证人的投票选项。如果委托人投票了，则覆盖他委托的验证人的投票选项。当提议到达`voting_perid`,统计投票结果。
-3. 我们统计结果有参与度的限制，其他逻辑细节见[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/v0.26.0/docs/spec/governance/overview.md)
+3. 我们统计结果有参与度的限制。
 
 ## 使用场景
 
@@ -39,7 +39,7 @@ iriscli gov query-params --key=Gov/govDepositProcedure --trust-node
 {"key":"Gov/govDepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}","op":""}
 
 # 发送提议，返回参数修改的内容
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/govDepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"20000000000000000000\"}],\"max_deposit_period\":172800000000000}","op":"update"}}' --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='mint/Inflation=0.050' --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
 
 # 对提议进行抵押
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
@@ -50,69 +50,6 @@ iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fe
 # 查询提议情况
 iriscli gov query-proposal --proposal-id=1 --trust-node
 
-```
-
-场景二，通过文件修改参数
-
-```
-# 导出配置文件
-iriscli gov pull-params --path=iris --trust-node
-
-# 查询配置文件信息
-cat iris/config/params.json                                              {
-"gov": {
-"Gov/govDepositProcedure": {
-"min_deposit": [
-{
-"denom": "iris-atto",
-"amount": "10000000000000000000"
-}
-],
-"max_deposit_period": "172800000000000"
-},
-"Gov/govVotingProcedure": {
-"voting_period": "10000000000"
-},
-"Gov/govTallyingProcedure": {
-"threshold": "0.5000000000",
-"veto": "0.3340000000",
-"participation": "0.6670000000"
-}
-}
-
-# 修改配置文件 (TallyingProcedure的governance_penalty)
-vi iris/config/params.json                                               {
-"gov": {
-"Gov/govDepositProcedure": {
-"min_deposit": [
-{
-"denom": "iris-atto",
-"amount": "10000000000000000000"
-}
-],
-"max_deposit_period": "172800000000000"
-},
-"Gov/govVotingProcedure": {
-"voting_period": "10000000000"
-},
-"Gov/govTallyingProcedure": {
-"threshold": "0.5000000000",
-"veto": "0.3340000000",
-"participation": "0.4990000000"
-}
-}
-
-# 通过文件修改参数的命令，返回参数修改的内容
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --path=iris --key=Gov/govTallyingProcedure --op=update --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
-
-# 对提议进行抵押
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
-
-# 对提议投票
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
-
-# 查询提议情况
-iriscli gov query-proposal --proposal-id=1 --trust-node
 ```
 
 ### 软件升级提议部分
