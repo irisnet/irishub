@@ -60,7 +60,7 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 	return Keeper{
 		key,
 		cdc,
-		paramSpace,
+		paramSpace.WithTypeTable(ParamTypeTable()),
 		paramsKeeper,
 		protocolKeeper,
 		ck,

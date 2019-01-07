@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/codec"
 )
 
 type Protocol interface {
@@ -23,4 +24,5 @@ type Protocol interface {
 	GetKVStoreKeyList() []*sdk.KVStoreKey
 	Load()
 	Init()
+	GetCodec() *codec.Codec
 }

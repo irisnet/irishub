@@ -126,6 +126,7 @@ func NewApp() *App {
 
 	// init iparam
 	//params.RegisterParamSet(&mint.Params{})
+
 	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
 		params.NewTypeTable(
 			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},

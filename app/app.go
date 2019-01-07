@@ -12,14 +12,6 @@ import (
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
-	distr "github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
 
 	"github.com/spf13/viper"
@@ -31,9 +23,9 @@ import (
 )
 
 const (
-	appName          = "IrisApp"
-	FlagReplayHeight = "replay_height"
-	DefaultSyncableHeight = 10000	// Multistore saves a snapshot every 10000 blocks
+	appName               = "IrisApp"
+	FlagReplayHeight      = "replay_height"
+	DefaultSyncableHeight = 10000 // Multistore saves a snapshot every 10000 blocks
 )
 
 // default home directories for expected binaries
@@ -86,24 +78,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	if !loaded {
 		cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
 	}
+	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().GetCodec())
 
 	return app
 }
 
 // custom tx codec
 func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	guardian.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
+	var cdc = v0.MakeCodec()
 	return cdc
 }
 

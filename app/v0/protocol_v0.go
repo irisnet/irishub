@@ -79,11 +79,37 @@ func (p *ProtocolV0) Load() {
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
+	p.configCodec()
 }
 
 // verison0 don't need the init
 func (p *ProtocolV0) Init() {
 
+}
+
+// verison0 tx codec
+func (p *ProtocolV0) GetCodec() *codec.Codec {
+	return p.cdc
+}
+
+func (p *ProtocolV0) configCodec() {
+	p.cdc = MakeCodec()
+}
+
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	gov.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	guardian.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
 }
 
 func (p *ProtocolV0) GetVersion() uint64 {

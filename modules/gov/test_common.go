@@ -50,7 +50,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.DefaultCodespace)
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace)
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(mapp.Cdc), ck, dk, guardianKeeper, sk, DefaultCodespace)
+	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main"), mapp.Cdc), ck, dk, guardianKeeper, sk, DefaultCodespace)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -89,7 +89,7 @@ func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk
 			panic(err)
 		}
 		InitGenesis(ctx, keeper, GenesisState{
-			Params:DefaultParams(),
+			Params: DefaultParams(),
 		})
 		return abci.ResponseInitChain{
 			Validators: validators,

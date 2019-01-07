@@ -17,7 +17,7 @@ func NewProtocolEngine(key sdk.StoreKey, cdc *codec.Codec) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
 		0,
-		1,
+		0,
 		sdk.NewProtocolKeeper(key, cdc),
 	}
 	return engine
