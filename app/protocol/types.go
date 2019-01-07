@@ -6,6 +6,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/types/common"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/codec"
 )
 
 type Protocol interface {
@@ -25,6 +26,7 @@ type Protocol interface {
 	GetKVStoreKeyList() []*sdk.KVStoreKey
 	Load(protocolKeeper.Keeper)
 	Init()
+	GetCodec() *codec.Codec
 }
 
 type ProtocolBase struct {

@@ -9,27 +9,15 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
-	distr "github.com/irisnet/irishub/modules/distribution"
-	v1gov "github.com/irisnet/irishub/app/v1/gov"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/record"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
 	"github.com/irisnet/irishub/app/v1"
 )
 
@@ -87,29 +75,14 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	engine.Add(protocol1)
 
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
+	bApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().GetCodec())
 
 	return app
 }
 
 // custom tx codec
 func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	//gov.RegisterCodec(cdc)
-	v1gov.RegisterCodec(cdc)
-	govtypes.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	guardian.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	protocolKeeper.RegisterCodec(cdc)
-	return cdc
+	return v0.MakeCodec()
 }
 
 // export the state of iris for a genesis file

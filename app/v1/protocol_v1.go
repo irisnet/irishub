@@ -27,6 +27,7 @@ import (
 	"sort"
 	"time"
 	govtypes "github.com/irisnet/irishub/types/gov"
+	v1gov "github.com/irisnet/irishub/app/v1/gov"
 )
 
 var _ protocol.Protocol = (*ProtocolVersion1)(nil)
@@ -63,7 +64,6 @@ type ProtocolVersion1 struct {
 	initChainer  sdk.InitChainer1 // initialize state with validators and state blob
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
-
 }
 
 func NewProtocolVersion1(cdc *codec.Codec) *ProtocolVersion1 {
@@ -89,6 +89,7 @@ func (p *ProtocolVersion1) Load(protocolkeeper protocolKeeper.Keeper) {
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
+	p.cdc = MakeCodec()
 }
 
 // verison0 don't need the init
@@ -98,6 +99,30 @@ func (p *ProtocolVersion1) Init() {
 
 func (p *ProtocolVersion1) GetDefinition() common.ProtocolDefinition {
 	return p.pb.GetDefinition()
+}
+
+func (p *ProtocolVersion1) GetCodec() *codec.Codec {
+	return p.cdc
+}
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	distr.RegisterCodec(cdc)
+	slashing.RegisterCodec(cdc)
+	v1gov.RegisterCodec(cdc)
+	govtypes.RegisterCodec(cdc)
+	record.RegisterCodec(cdc)
+	upgrade.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
+	guardian.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	protocolKeeper.RegisterCodec(cdc)
+	return cdc
 }
 
 // create all Keepers
@@ -206,22 +231,22 @@ func (p *ProtocolVersion1) configFeeHandlers() {
 }
 
 // configure all Stores
-func (p *ProtocolVersion1) GetKVStoreKeyList()  []*sdk.KVStoreKey {
-   return []*sdk.KVStoreKey{
-	   protocol.KeyMain,
-	   protocol.KeyProtocol,
-	   protocol.KeyAccount,
-	   protocol.KeyStake,
-	   protocol.KeyMint,
-	   protocol.KeyDistr,
-	   protocol.KeySlashing,
-	   protocol.KeyGov,
-	   protocol.KeyRecord,
-	   protocol.KeyFeeCollection,
-	   protocol.KeyParams,
-	   protocol.KeyUpgrade,
-	   protocol.KeyService,
-	   protocol.KeyGuardian}
+func (p *ProtocolVersion1) GetKVStoreKeyList() []*sdk.KVStoreKey {
+	return []*sdk.KVStoreKey{
+		protocol.KeyMain,
+		protocol.KeyProtocol,
+		protocol.KeyAccount,
+		protocol.KeyStake,
+		protocol.KeyMint,
+		protocol.KeyDistr,
+		protocol.KeySlashing,
+		protocol.KeyGov,
+		protocol.KeyRecord,
+		protocol.KeyFeeCollection,
+		protocol.KeyParams,
+		protocol.KeyUpgrade,
+		protocol.KeyService,
+		protocol.KeyGuardian}
 }
 
 // configure all Stores
