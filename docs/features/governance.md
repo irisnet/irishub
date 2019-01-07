@@ -13,8 +13,7 @@
 
 1. Any users can deposit some tokens to initiate a proposal. Once deposit reaches a certain value `min_deposit`, enter voting period, otherwise it will remain in the deposit period. Others can deposit the proposals on the deposit period. Once the sum of the deposit reaches `min_deposit`, enter voting period. However, if the block-time exceeds `max_deposit_period` in the deposit period, the proposal will be closed.
 2. The proposals which enter voting period only can be voted by validators and delegators. The vote of a delegator who hasn't vote will be the same as his validator's vote, and the vote of a delegator who has voted will be remained. The votes wil be tallyed when reach `voting_period'.
-3. Our tally have a limit on participation, Other details about voting for proposals:
-[CosmosSDK-Gov-spec](https://github.com/cosmos/cosmos-sdk/blob/v0.26.0/docs/spec/governance/overview.md)
+3. Our tally have a limit on participation.
 
 ## Usage Scenario
 
@@ -40,7 +39,7 @@ iriscli gov query-params --key=Gov/govDepositProcedure --trust-node
 {"key":"Gov/govDepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":172800000000000}","op":""}
 
 # Send proposals, return changed parameters
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='{"key":"Gov/govDepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"20000000000000000000\"}],\"max_deposit_period\":172800000000000}","op":"update"}}' --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
+iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --param='mint/Inflation=0.050' --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
 
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
@@ -51,69 +50,6 @@ echo 1234567890 | iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chai
 # Query the state of a proposal
 iriscli gov query-proposal --proposal-id=1 --trust-node
 
-```
-
-Scenario 2: Change the parameters by the files
-
-```
-# Export profiles
-iriscli gov pull-params --path=iris --trust-node
-
-# Query profiles' info
-cat iris/config/params.json                                              {
-"gov": {
-"Gov/govDepositProcedure": {
-"min_deposit": [
-{
-"denom": "iris-atto",
-"amount": "10000000000000000000"
-}
-],
-"max_deposit_period": "172800000000000"
-},
-"Gov/govVotingProcedure": {
-"voting_period": "10000000000"
-},
-"Gov/govTallyingProcedure": {
-"threshold": "0.5000000000",
-"veto": "0.3340000000",
-"participation": "0.6670000000"
-}
-}
-
-# Modify profiles (TallyingProcedure的governance_penalty)
-vi iris/config/params.json                                               {
-"gov": {
-"Gov/govDepositProcedure": {
-"min_deposit": [
-{
-"denom": "iris-atto",
-"amount": "10000000000000000000"
-}
-],
-"max_deposit_period": "172800000000000"
-},
-"Gov/govVotingProcedure": {
-"voting_period": "10000000000"
-},
-"Gov/govTallyingProcedure": {
-"threshold": "0.5000000000",
-"veto": "0.3340000000",
-"participation": "0.4990000000"
-}
-}
-
-# Change the parameters through files, return changed parameters
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit="10iris"  --path=iris --key=Gov/govTallyingProcedure --op=update --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
-
-# Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
-
-# Vote for a proposal
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=20000
-
-# Query the state of a proposal
-iriscli gov query-proposal --proposal-id=1 --trust-node
 ```
 
 ### Proposals on software upgrade
