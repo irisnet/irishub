@@ -21,11 +21,11 @@ type MsgSubmitProposal struct {
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
 	////////////////////  iris begin  ///////////////////////////
-	Param Param
+	Params Params
 	////////////////////  iris end  /////////////////////////////
 }
 
-func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, param Param) MsgSubmitProposal {
+func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, params Params) MsgSubmitProposal {
 	return MsgSubmitProposal{
 		Title:          title,
 		Description:    description,
@@ -33,7 +33,7 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
 		////////////////////  iris begin  ///////////////////////////
-		Param: param,
+		Params: params,
 		////////////////////  iris end  /////////////////////////////
 	}
 }
@@ -65,15 +65,16 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	////////////////////  iris begin  ///////////////////////////
 	if msg.ProposalType == ProposalTypeParameterChange {
 
-		if msg.Param.Op != Update && msg.Param.Op != Insert {
-			return ErrInvalidParamOp(DefaultCodespace, msg.Param.Op)
+		for _, param := range msg.Params {
+			if p, ok := params.ParamSetMapping[param.Subspace]; ok {
+				if _, err := p.Validate(param.Key, param.Value); err != nil {
+					return err
+				}
+			} else {
+				return ErrInvalidParam(DefaultCodespace, param.Subspace)
+			}
 		}
 
-		if p, ok := params.ParamMapping[msg.Param.Key]; ok {
-			return p.Valid(msg.Param.Value)
-		} else {
-			return ErrInvalidParam(DefaultCodespace)
-		}
 	}
 	////////////////////  iris end  /////////////////////////////
 	return nil

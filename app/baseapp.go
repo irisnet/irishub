@@ -15,13 +15,13 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	tmstate "github.com/tendermint/tendermint/state"
 	"strconv"
+	"github.com/irisnet/irishub/modules/auth"
 )
 
 // Key to store the consensus params in the main store.
@@ -71,8 +71,6 @@ type BaseApp struct {
 
 	// minimum fees for spam prevention
 	minimumFees sdk.Coins
-	// invariant checking level
-	invariantLevel string
 
 	// flag for sealing
 	sealed bool
@@ -85,13 +83,12 @@ var _ abci.Application = (*BaseApp)(nil)
 // NOTE: The db is used to store the version number for now.
 // Accepts a user-defined txDecoder
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
-func NewBaseApp(name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp)) *BaseApp {
+func NewBaseApp(name string, logger log.Logger, db dbm.DB, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
 		Logger:    logger,
 		name:      name,
 		db:        db,
 		cms:       store.NewCommitMultiStore(db),
-		txDecoder: txDecoder,
 	}
 
 	for _, option := range options {
@@ -215,9 +212,6 @@ func (app *BaseApp) SetProtocolEngine(pe *protocol.ProtocolEngine) {
 
 // SetMinimumFees sets the minimum fees.
 func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
-
-// SetInvariantLevel sets the invariant checking config.
-func (app *BaseApp) SetInvariantLevel(invariantLevel string) { app.invariantLevel = invariantLevel }
 
 // NewContext returns a new Context with the correct store, the given header, and nil txBytes.
 func (app *BaseApp) NewContext(isCheckTx bool, header abci.Header) sdk.Context {
@@ -834,7 +828,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = endBlocker(app.deliverState.ctx, req)
 	}
 
-	appVersionStr, ok := abci.GetTagByKey(res.Tags, protocolKeeper.AppVersionTag)
+	appVersionStr, ok := abci.GetTagByKey(res.Tags, sdk.AppVersionTag)
 	if !ok {
 		return
 	}
@@ -846,16 +840,17 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 
 	success := app.Engine.Activate(appVersion)
 	if success {
+		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 		return
 	}
 
-	if upgradeConfig, ok := app.Engine.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyProtocol)); ok {
+	if upgradeConfig, ok := app.Engine.ProtocolKeeper.GetUpgradeConfigByStore(app.GetKVStore(protocol.KeyMain)); ok {
 		res.Tags = append(res.Tags,
 			sdk.MakeTag(tmstate.UpgradeFailureTagKey,
-				[]byte("Please install the right protocol version from "+upgradeConfig.Definition.Software)))
+				[]byte("Please install the right application version from "+upgradeConfig.Protocol.Software)))
 	} else {
 		res.Tags = append(res.Tags,
-			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right protocol version")))
+			sdk.MakeTag(tmstate.UpgradeFailureTagKey, []byte("Please install the right application version")))
 	}
 
 	return

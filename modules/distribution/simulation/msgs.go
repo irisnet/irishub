@@ -11,34 +11,6 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
-// SimulateMsgSetWithdrawAddress
-func SimulateMsgSetWithdrawAddress(m auth.AccountKeeper, k distribution.Keeper) simulation.Operation {
-	handler := distribution.NewHandler(k)
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
-		accs []simulation.Account, event func(string)) (
-		action string, fOp []simulation.FutureOperation, err error) {
-
-		accountOrigin := simulation.RandomAcc(r, accs)
-		accountDestination := simulation.RandomAcc(r, accs)
-		msg := distribution.NewMsgSetWithdrawAddress(accountOrigin.Address, accountDestination.Address)
-
-		if msg.ValidateBasic() != nil {
-			return "", nil, fmt.Errorf("expected msg to pass ValidateBasic: %s", msg.GetSignBytes())
-		}
-
-		ctx, write := ctx.CacheContext()
-		result := handler(ctx, msg)
-		if result.IsOK() {
-			write()
-		}
-
-		event(fmt.Sprintf("distribution/MsgSetWithdrawAddress/%v", result.IsOK()))
-
-		action = fmt.Sprintf("TestMsgSetWithdrawAddress: ok %v, msg %s", result.IsOK(), msg.GetSignBytes())
-		return action, nil, nil
-	}
-}
-
 // SimulateMsgWithdrawDelegatorRewardsAll
 func SimulateMsgWithdrawDelegatorRewardsAll(m auth.AccountKeeper, k distribution.Keeper) simulation.Operation {
 	handler := distribution.NewHandler(k)

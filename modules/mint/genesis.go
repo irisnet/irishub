@@ -27,8 +27,12 @@ func DefaultGenesisState() GenesisState {
 
 // new mint genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
+
 	keeper.SetMinter(ctx, data.Minter)
-	keeper.SetParams(ctx, data.Params)
+	keeper.SetParamSet(ctx, data.Params)
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper. The
@@ -36,7 +40,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 
 	minter := keeper.GetMinter(ctx)
-	params := keeper.GetParams(ctx)
+	params := keeper.GetParamSet(ctx)
 	return NewGenesisState(minter, params)
 }
 

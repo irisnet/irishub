@@ -9,7 +9,6 @@ import (
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/server"
 	irisInit "github.com/irisnet/irishub/server/init"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,10 +20,8 @@ import (
 )
 
 func main() {
-
-	sdk.InitBech32Prefix()
-
-	cdc := app.MakeCodec()
+//	sdk.InitBech32Prefix()
+	cdc := app.MakeLatestCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
@@ -75,7 +72,6 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 	return app.NewIrisApp(logger, db, traceStore,
 		bam.SetPruning(viper.GetString("pruning")),
 		bam.SetMinimumFees(viper.GetString("minimum_fees")),
-		bam.SetInvariantLevel(viper.GetString("invariant_level")),
 	)
 }
 

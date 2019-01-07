@@ -12,6 +12,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSend(ctx, k, msg)
 		case MsgIssue:
 			return handleMsgIssue(ctx, k, msg)
+		case MsgBurn:
+			return handleMsgBurn(ctx, k, msg)
 		default:
 			errMsg := "Unrecognized bank Msg type: %s" + msg.Type()
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -36,4 +38,18 @@ func handleMsgSend(ctx sdk.Context, k Keeper, msg MsgSend) sdk.Result {
 // Handle MsgIssue.
 func handleMsgIssue(ctx sdk.Context, k Keeper, msg MsgIssue) sdk.Result {
 	panic("not implemented yet")
+}
+
+// Handle MsgBurn.
+func handleMsgBurn(ctx sdk.Context, k Keeper, msg MsgBurn) sdk.Result {
+
+	tags, err := k.BurnCoinsFromAddr(ctx, msg.Owner, msg.Coins)
+
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }

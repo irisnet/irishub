@@ -1,4 +1,4 @@
-package record
+package mint
 
 import (
 	"github.com/irisnet/irishub/codec"
@@ -6,7 +6,11 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgSubmitRecord{}, "irishub/record/MsgSubmitRecord", nil)
+	cdc.RegisterConcrete(Minter{}, "irishub/mint/Minter", nil)
 }
 
 var msgCdc = codec.New()
+
+func init() {
+	RegisterCodec(msgCdc)
+}

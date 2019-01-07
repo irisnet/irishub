@@ -11,7 +11,6 @@ import (
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
-	recordhandle "github.com/irisnet/irishub/client/record/lcd"
 	servicehandle "github.com/irisnet/irishub/client/service/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
@@ -102,7 +101,6 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
-	recordhandle.RegisterRoutes(cliCtx, r, cdc)
 	servicehandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)

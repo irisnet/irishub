@@ -117,7 +117,7 @@ func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) 
 	param :=  gov.Param{
 		Key:   "test",
 		Value: "value",
-		Op: "insert",
+		Subspace: "insert",
 	}
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
@@ -125,7 +125,7 @@ func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) 
 		 gov.ProposalTypeSystemHalt,
 		sender.Address,
 		deposit,
-		param,
+		gov.Params{param},
 	)
 	if msg.ValidateBasic() != nil {
 		err = fmt.Errorf("expected msg to pass ValidateBasic: %s", msg.GetSignBytes())

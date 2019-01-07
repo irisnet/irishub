@@ -7,10 +7,10 @@ import (
 
 // GenesisState - all slashing state that must be provided at genesis
 type GenesisState struct {
-	Params          Params
-	SigningInfos    map[string]ValidatorSigningInfo
-	MissedBlocks    map[string][]MissedBlock
-	SlashingPeriods []ValidatorSlashingPeriod
+	Params          Params                          `json:"params"`
+	SigningInfos    map[string]ValidatorSigningInfo `json:"signing_infos"`
+	MissedBlocks    map[string][]MissedBlock        `json:"missed_blocks"`
+	SlashingPeriods []ValidatorSlashingPeriod       `json:"slashing_periods"`
 }
 
 // MissedBlock
@@ -32,6 +32,10 @@ func DefaultGenesisState() GenesisState {
 // InitGenesis initialize default parameters
 // and the keeper's address to pubkey map
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState, sdata types.GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
+
 	for _, validator := range sdata.Validators {
 		keeper.addPubkey(ctx, validator.GetConsPubKey())
 	}
@@ -96,4 +100,12 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) (data GenesisState) {
 		MissedBlocks:    missedBlocks,
 		SlashingPeriods: slashingPeriods,
 	}
+}
+
+func ValidateGenesis(data GenesisState) error {
+	err := validateParams(data.Params)
+	if err != nil {
+		return err
+	}
+	return nil
 }

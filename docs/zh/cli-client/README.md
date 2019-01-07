@@ -20,7 +20,8 @@
 | 名称, 速记        | 类型         |必需          |默认值                | 描述                         |
 | -----------------| -----  | -------- | --------------------- | ------------------------------------------------------------------- |
 | --account-number | int    | false    | 0                     | 发起交易的账户的编号 |
-| --async          | bool   | false    | false                 | 是否异步广播交易 |
+| --async          | bool   | false    | false                 | 是否异步广播交易（仅当commit为false时有效） |
+| --commit         | bool   | false    | false                 | 广播交易并等到交易被打包再返回 |
 | --chain-id       | string | true     | ""                    | Tendermint节点的`Chain ID` |
 | --dry-run        | bool   | false    | false                 | 模拟执行交易，并返回消耗的`gas`。`--gas`指定的值会被忽略 |
 | --fee            | string | true     | ""                    | 交易费 |

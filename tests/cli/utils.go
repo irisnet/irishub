@@ -19,13 +19,10 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/keys"
-	recordCli "github.com/irisnet/irishub/client/record"
 	servicecli "github.com/irisnet/irishub/client/service"
 	stakecli "github.com/irisnet/irishub/client/stake"
-	"github.com/irisnet/irishub/client/tendermint/tx"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
@@ -35,19 +32,9 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"path/filepath"
 	"io/ioutil"
-	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/app/v0"
-
 )
-
-func init() {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
-	config.Seal()
-}
 
 //___________________________________________________________________________________
 // irisnet helper methods
@@ -89,7 +76,6 @@ func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
-	genesisState.ArbitrationData = arbitration.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
@@ -144,10 +130,10 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	irisHome, iriscliHome = getTestingHomeDirs(t.Name())
 	tests.ExecuteT(t, fmt.Sprintf("rm -rf %s ", irisHome), "")
 	//tests.ExecuteT(t, fmt.Sprintf("iris --home=%s unsafe-reset-all", irisHome), "")
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), v0.DefaultKeyPass)
-	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), v0.DefaultKeyPass)
-	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), v0.DefaultKeyPass)
-	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), v0.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s foo", iriscliHome), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), sdk.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), sdk.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), sdk.DefaultKeyPass)
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
 		"iriscli keys show foo --output=json --home=%s", iriscliHome))
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
@@ -164,8 +150,8 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	genDoc.SaveAs(genFile)
 	executeWriteCheckErr(t, fmt.Sprintf(
 		"iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
-		v0.DefaultKeyPass)
-	executeWriteCheckErr(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), v0.DefaultKeyPass)
+		sdk.DefaultKeyPass)
+	executeWriteCheckErr(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), sdk.DefaultKeyPass)
 	// get a free port, also setup some common flags
 	servAddr, port, err = server.FreeTCPAddr()
 	require.NoError(t, err)
@@ -175,7 +161,7 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 }
 
 func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
 	return
 }
@@ -229,7 +215,7 @@ func executeWriteRetStdStreams(t *testing.T, cmdStr string, writes ...string) (b
 }
 
 func executeInit(t *testing.T, cmdStr string) (chainID string) {
-	_, stderr := tests.ExecuteT(t, cmdStr, v0.DefaultKeyPass)
+	_, stderr := tests.ExecuteT(t, cmdStr, sdk.DefaultKeyPass)
 
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(stderr), &initRes)
@@ -283,7 +269,7 @@ func executeGetDelegatorDistrInfo(t *testing.T, cmdStr string) []distributiontyp
 	out, errMsg := tests.ExecuteT(t, cmdStr, "")
 	require.Empty(t, errMsg)
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	var ddiList []distributiontypes.DelegationDistInfo
 	err := cdc.UnmarshalJSON([]byte(out), &ddiList)
 
@@ -295,7 +281,7 @@ func executeGetDelegationDistrInfo(t *testing.T, cmdStr string) distributiontype
 	out, errMsg := tests.ExecuteT(t, cmdStr, "")
 	require.Empty(t, errMsg)
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	var ddi distributiontypes.DelegationDistInfo
 	err := cdc.UnmarshalJSON([]byte(out), &ddi)
 
@@ -307,7 +293,7 @@ func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclien
 	out, errMsg := tests.ExecuteT(t, cmdStr, "")
 	require.Empty(t, errMsg)
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	var vdi distributionclient.ValidatorDistInfoOutput
 	err := cdc.UnmarshalJSON([]byte(out), &vdi)
 
@@ -318,7 +304,7 @@ func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclien
 func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var validator stakecli.ValidatorOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &validator)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return validator
@@ -327,7 +313,7 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var proposal gov.ProposalOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return proposal
@@ -336,7 +322,7 @@ func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var vote  gov.Vote
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return vote
@@ -345,7 +331,7 @@ func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
 func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var votes [] gov.Vote
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
@@ -354,7 +340,7 @@ func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var param  gov.Param
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return param
@@ -363,7 +349,7 @@ func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
 func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var info upgcli.UpgradeInfoOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &info)
 
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -373,7 +359,7 @@ func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput
 func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceDef servicecli.DefOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceDef
@@ -382,7 +368,7 @@ func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutp
 func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceBinding service.SvcBinding
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBinding)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBinding
@@ -391,7 +377,7 @@ func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {
 func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceBindings []service.SvcBinding
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBindings
@@ -400,7 +386,7 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var profilers []guardian.Guardian
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &profilers)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return profilers
@@ -409,7 +395,7 @@ func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {
 func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var trustees []guardian.Guardian
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &trustees)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return trustees
@@ -418,7 +404,7 @@ func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var svcRequests []service.SvcRequest
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return svcRequests
@@ -427,7 +413,7 @@ func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest
 func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var feesOutput servicecli.FeesOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return feesOutput
@@ -458,34 +444,11 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 		//Response string `json:"Response"`
 	}
 	var res toJSON
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err = cdc.UnmarshalJSON([]byte(stdout), &res)
 	require.NoError(t, err, "out %v\n, err %v", stdout, err)
 
 	return res.TxHash
-}
-
-func executeGetRecordID(t *testing.T, cmdStr string) string {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var info tx.Info
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &info)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	recordMsg, ok := info.Tx.GetMsgs()[0].(record.MsgSubmitRecord)
-	if !ok {
-		fmt.Println("Err MsgSubmitRecord type assertion failed")
-		return ""
-	}
-	return recordMsg.RecordID
-}
-
-func executeGetRecord(t *testing.T, cmdStr string) recordCli.RecordOutput {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var record recordCli.RecordOutput
-	cdc := app.MakeCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &record)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return record
 }
 
 func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force bool) bool {

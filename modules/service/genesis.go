@@ -1,53 +1,44 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/service/params"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // GenesisState - all service state that must be provided at genesis
 type GenesisState struct {
-	ServiceParams serviceparams.Params `json:service_govparams`
+	Params Params `json:"params"` // service params
 }
 
-func NewGenesisState(maxRequestTimeout int64, minDepositMultiple int64, serviceFeeTax, slashFraction sdk.Dec) GenesisState {
+func NewGenesisState(params Params) GenesisState {
 	return GenesisState{
-		ServiceParams: serviceparams.Params{
-			MaxRequestTimeout:  maxRequestTimeout,
-			MinDepositMultiple: minDepositMultiple,
-			ServiceFeeTax:      serviceFeeTax,
-			SlashFraction:      slashFraction,
-		},
+		Params: params,
 	}
 }
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	params.InitGenesisParameter(&serviceparams.ServiceParameter, ctx, data.ServiceParams)
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
+	k.SetParamSet(ctx, data.Params)
 }
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	return GenesisState{
-		ServiceParams: serviceparams.GetSericeParams(ctx),
-	}
+	return NewGenesisState(k.GetParamSet(ctx))
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		ServiceParams: serviceparams.NewSericeParams(),
+		Params: DefaultParams(),
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForTest() GenesisState {
-	serviceParams := serviceparams.NewSericeParams()
-	serviceParams.MaxRequestTimeout = 10
-	serviceParams.MinDepositMultiple = 10
 	return GenesisState{
-		ServiceParams: serviceParams,
+		Params: DefaultParamsForTest(),
 	}
 }
 
@@ -93,4 +84,14 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(returnedFeeIterator.Value(), &returnedFee)
 		k.ck.SendCoins(ctx, RequestCoinsAccAddr, returnedFee.Address, returnedFee.Coins)
 	}
+}
+
+// ValidateGenesis validates the provided service genesis state to ensure the
+// expected invariants holds.
+func ValidateGenesis(data GenesisState) error {
+	err := validateParams(data.Params)
+	if err != nil {
+		return err
+	}
+	return nil
 }

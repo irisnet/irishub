@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	debugcmd "github.com/irisnet/irishub/tools/debug"
 	"github.com/irisnet/irishub/tools/prometheus"
@@ -12,10 +11,8 @@ import (
 )
 
 func init() {
-
-	sdk.InitBech32Prefix()
-	cdc := app.MakeCodec()
-
+//	sdk.InitBech32Prefix()
+	cdc := app.MakeLatestCodec()
 	rootCmd.AddCommand(debugcmd.RootCmd)
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 }

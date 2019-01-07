@@ -17,22 +17,20 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	bam "github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/app/protocol"
-	sdk "github.com/irisnet/irishub/types"
 
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/record"
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/guardian"
 	"encoding/json"
-	"github.com/irisnet/irishub/app/v0"
 	tmtypes "github.com/tendermint/tendermint/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
 )
@@ -90,7 +88,7 @@ func runHackCmd(cmd *cobra.Command, args []string) error {
 		// check for the powerkey and the validator from the store
 		store := ctx.KVStore(protocol.KeyStake)
 		res := store.Get(powerKey)
-		val, _ := app.Engine.GetCurrentProtocol().(*v0.ProtocolVersion0).StakeKeeper.GetValidator(ctx, trouble)
+		val, _ := app.Engine.GetCurrentProtocol().(*v0.ProtocolV0).StakeKeeper.GetValidator(ctx, trouble)
 		fmt.Println("checking height", checkHeight, res, val)
 		if res == nil {
 			bottomHeight = checkHeight
@@ -136,29 +134,26 @@ type IrisApp struct {
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
-	cdc := MakeCodec()
-
-	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := bam.NewBaseApp(appName, logger, db, baseAppOptions...)
 
 	// create your application object
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine(cdc)
+	protocolKeeper := sdk.NewProtocolKeeper(protocol.KeyMain)
+	engine := protocol.NewProtocolEngine(protocolKeeper)
+	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
-	err := app.LoadLatestVersion(engine.GetKeyMain())
+	err := app.LoadLatestVersion(protocol.KeyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
 
-	protocol0 := v0.NewProtocolVersion0(cdc, logger, "")
-	engine.Add(protocol0)
-	//	protocol1 := protocol.NewProtocolVersion1(cdc)
-	//	Engine.Add(&protocol1)
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
+	// engine.Add(v1.NewProtocolV1(1, ...))
 
-	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyProtocol))
-	app.SetProtocolEngine(&engine)
+	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
 
 	return app
 }
@@ -171,7 +166,6 @@ func MakeCodec() *codec.Codec {
 	distr.RegisterCodec(cdc)
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
-	record.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)
 	guardian.RegisterCodec(cdc)

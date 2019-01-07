@@ -10,6 +10,7 @@ import (
 type (
 	Keeper = keeper.Keeper
 	Hooks  = keeper.Hooks
+	Params = types.Params
 
 	DelegatorWithdrawInfo = types.DelegatorWithdrawInfo
 	DelegationDistInfo    = types.DelegationDistInfo
@@ -17,7 +18,6 @@ type (
 	TotalAccum            = types.TotalAccum
 	FeePool               = types.FeePool
 
-	MsgSetWithdrawAddress          = types.MsgSetWithdrawAddress
 	MsgWithdrawDelegatorRewardsAll = types.MsgWithdrawDelegatorRewardsAll
 	MsgWithdrawDelegatorReward     = types.MsgWithdrawDelegatorReward
 	MsgWithdrawValidatorRewardsAll = types.MsgWithdrawValidatorRewardsAll
@@ -27,7 +27,7 @@ type (
 	// expected keepers
 	StakeKeeper         = types.StakeKeeper
 	BankKeeper          = types.BankKeeper
-	FeeCollectionKeeper = types.FeeCollectionKeeper
+	FeeCollectionKeeper = types.FeeKeeper
 )
 
 var (
@@ -52,7 +52,6 @@ var (
 
 	RegisterCodec = types.RegisterCodec
 
-	NewMsgSetWithdrawAddress          = types.NewMsgSetWithdrawAddress
 	NewMsgWithdrawDelegatorRewardsAll = types.NewMsgWithdrawDelegatorRewardsAll
 	NewMsgWithdrawDelegatorReward     = types.NewMsgWithdrawDelegatorReward
 	NewMsgWithdrawValidatorRewardsAll = types.NewMsgWithdrawValidatorRewardsAll
