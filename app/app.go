@@ -27,6 +27,7 @@ const (
 	FlagReplay = "replay-last-block"
 	//Keep snapshot every at syncable height
 	DefaultSyncableHeight = 10000 // Multistore saves a snapshot every 10000 blocks
+	DefaultCacheSize      = 100   // Multistore saves last 100 blocks
 )
 
 // default home directories for expected binaries
@@ -46,7 +47,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
-	var app = &IrisApp { BaseApp: bApp }
+	var app = &IrisApp{BaseApp: bApp}
 
 	protocolKeeper := sdk.NewProtocolKeeper(protocol.KeyMain)
 	engine := protocol.NewProtocolEngine(protocolKeeper)
@@ -80,7 +81,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 // latest version of codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v0.MakeCodec()	// replace with latest protocol version
+	var cdc = v0.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 
@@ -91,7 +92,7 @@ func (app *IrisApp) ExportOrReplay(replayHeight int64) (replay bool, height int6
 	}
 
 	loadHeight := app.replayToHeight(replayHeight, app.Logger)
-	if replayHeight >= loadHeight && lastBlockHeight-loadHeight < DefaultSyncableHeight {
+	if replayHeight >= loadHeight && lastBlockHeight-loadHeight < DefaultCacheSize {
 		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
 		if err != nil {
 			cmn.Exit(err.Error())

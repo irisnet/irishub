@@ -15,12 +15,12 @@ import (
 )
 
 const (
-	DefaultIAVLCacheSize = 10
+	defaultIAVLCacheSize = 10000
 )
 
 // load the iavl store
 func LoadIAVLStore(db dbm.DB, id CommitID, pruning sdk.PruningStrategy, overwrite bool) (CommitStore, error) {
-	tree := iavl.NewMutableTree(db, DefaultIAVLCacheSize)
+	tree := iavl.NewMutableTree(db, defaultIAVLCacheSize)
 	var err error
 	if overwrite {
 		_, err = tree.LoadVersionForOverwriting(id.Version)
