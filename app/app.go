@@ -82,7 +82,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 // custom tx codec
 func MakeCodec() *codec.Codec {
-	return v0.MakeCodec()
+	return v1.MakeCodec()
 }
 
 // export the state of iris for a genesis file
