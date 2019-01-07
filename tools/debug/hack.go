@@ -134,15 +134,14 @@ type IrisApp struct {
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IrisApp {
-	cdc := MakeCodec()
-
-	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := bam.NewBaseApp(appName, logger, db, baseAppOptions...)
 
 	// create your application object
 	var app = &IrisApp{
 		BaseApp: bApp,
 	}
-	engine := protocol.NewProtocolEngine(protocol.KeyMain, cdc)
+	protocolKeeper := sdk.NewProtocolKeeper(protocol.KeyMain)
+	engine := protocol.NewProtocolEngine(protocolKeeper)
 	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
@@ -151,7 +150,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		cmn.Exit(err.Error())
 	}
 
-	engine.Add(v0.NewProtocolV0(0, cdc, logger, engine.ProtocolKeeper, sdk.InvariantLevel))
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
