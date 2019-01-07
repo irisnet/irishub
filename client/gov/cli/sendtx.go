@@ -21,7 +21,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "submit-proposal",
 		Short:   "Submit a proposal along with an initial deposit",
-		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.004iris --type=Text --description=test --title=test-proposal",
+		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.004iris --type=ParameterChange --description=test --title=test-proposal --param='mint/Inflation=0.050'",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
 			description := viper.GetString(flagDescription)
@@ -47,7 +47,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			////////////////////  iris begin  ///////////////////////////
 			var params gov.Params
 			if proposalType == gov.ProposalTypeParameterChange {
 				paramStr := viper.GetStringSlice(flagParam)
@@ -56,8 +55,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 			}
-			////////////////////  iris end  /////////////////////////////
-
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
 			if proposalType == gov.ProposalTypeTxTaxUsage {
 				usageStr := viper.GetString(flagUsage)
