@@ -24,7 +24,7 @@ import (
 )
 
 func main() {
-//	sdk.InitBech32Prefix()
+	//	sdk.InitBech32Prefix()
 	cdc := app.MakeLatestCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
@@ -84,7 +84,7 @@ func exportAppStateAndTMValidators(ctx *server.Context,
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, traceStore)
-	if height != -1 {
+	if height > 0 {
 		if replay, replayHeight := gApp.ExportOrReplay(height); replay {
 			_, err := startNodeAndReplay(ctx, gApp, replayHeight)
 			if err != nil {

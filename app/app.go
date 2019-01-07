@@ -20,13 +20,14 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/store"
 )
 
 const (
 	appName               = "IrisApp"
 	FlagReplay            = "replay-last-block"
-	DefaultSyncableHeight = 10000 // Multistore saves a snapshot every 10000 blocks
-	DefaultCacheSize      = 100   // Multistore saves last 100 blocks
+	DefaultSyncableHeight = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
+	DefaultCacheSize      = store.NumRecent     // Multistore saves last 100 blocks
 )
 
 // default home directories for expected binaries
@@ -91,7 +92,7 @@ func (app *IrisApp) ExportOrReplay(replayHeight int64) (replay bool, height int6
 	}
 
 	if lastBlockHeight-replayHeight <= DefaultCacheSize {
-		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
+		err := app.LoadVersion(replayHeight, protocol.KeyMain, false)
 		if err != nil {
 			cmn.Exit(err.Error())
 		}
