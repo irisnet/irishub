@@ -18,11 +18,9 @@ var (
 )
 
 func main() {
-
 //	sdk.InitBech32Prefix()
-
 	cobra.EnableCommandSorting = false
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 
 	rootCmd.AddCommand(
 		lite.ServeLCDStartCommand(cdc),

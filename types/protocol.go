@@ -13,6 +13,7 @@ var (
 	UpgradeConfigKey     = []byte("upgrade_config")
 	CurrentVersionKey    = []byte("current_version")
 	LastFailedVersionKey = []byte("last_failed_version")
+	cdc                  = makeCodec()
 )
 
 type ProtocolDefinition struct {
@@ -46,9 +47,15 @@ type ProtocolKeeper struct {
 	cdc      *codec.Codec
 }
 
-func NewProtocolKeeper(key StoreKey, cdc *codec.Codec) ProtocolKeeper {
-	keeper := ProtocolKeeper{key, cdc}
-	return keeper
+func makeCodec() *codec.Codec {
+	var cdc = codec.New()
+	cdc.RegisterConcrete(&UpgradeConfig{}, "irishub/protocol/UpgradeConfig", nil)
+	cdc.RegisterConcrete(&ProtocolDefinition{}, "irishub/protocol/ProtocolDefinition", nil)
+	return cdc
+}
+
+func NewProtocolKeeper(key StoreKey) ProtocolKeeper {
+	return ProtocolKeeper{key, cdc}
 }
 
 func (pk ProtocolKeeper) GetCurrentVersionByStore(store KVStore) uint64 {

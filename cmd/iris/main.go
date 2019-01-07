@@ -20,10 +20,8 @@ import (
 )
 
 func main() {
-
 //	sdk.InitBech32Prefix()
-
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
