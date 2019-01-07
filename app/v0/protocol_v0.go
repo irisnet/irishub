@@ -60,10 +60,9 @@ type ProtocolV0 struct {
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 }
 
-func NewProtocolV0(version uint64, cdc *codec.Codec, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string) *ProtocolV0 {
+func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string) *ProtocolV0 {
 	p0 := ProtocolV0{
 		version:        version,
-		cdc:            cdc,
 		logger:         log,
 		protocolKeeper: pk,
 		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
@@ -75,11 +74,11 @@ func NewProtocolV0(version uint64, cdc *codec.Codec, log log.Logger, pk sdk.Prot
 
 // load the configuration of this Protocol
 func (p *ProtocolV0) Load() {
+	p.configCodec()
 	p.configKeepers()
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
-	p.configCodec()
 }
 
 // verison0 don't need the init

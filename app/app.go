@@ -41,18 +41,14 @@ type IrisApp struct {
 }
 
 func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
-	cdc := MakeCodec()
-
-	bApp := NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := NewBaseApp(appName, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
-	var app = &IrisApp{
-		BaseApp: bApp,
-	}
+	var app = &IrisApp { BaseApp: bApp }
 
-	engine := protocol.NewProtocolEngine(protocol.KeyMain, cdc)
-
+	protocolKeeper := sdk.NewProtocolKeeper(protocol.KeyMain)
+	engine := protocol.NewProtocolEngine(protocolKeeper)
 	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
@@ -65,12 +61,12 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
 	} else {
 		err = app.LoadLatestVersion(protocol.KeyMain)
-	}
+	} // app is now sealed
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
 
-	engine.Add(v0.NewProtocolV0(0, cdc, logger, engine.ProtocolKeeper, sdk.InvariantLevel))
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -83,9 +79,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	return app
 }
 
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = v0.MakeCodec()
+// latest version of codec
+func MakeLatestCodec() *codec.Codec {
+	var cdc = v0.MakeCodec()	// replace with latest protocol version
 	return cdc
 }
 

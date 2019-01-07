@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"fmt"
 )
@@ -13,12 +12,12 @@ type ProtocolEngine struct {
 	ProtocolKeeper sdk.ProtocolKeeper
 }
 
-func NewProtocolEngine(key sdk.StoreKey, cdc *codec.Codec) ProtocolEngine {
+func NewProtocolEngine(protocolKeeper sdk.ProtocolKeeper) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
 		0,
 		0,
-		sdk.NewProtocolKeeper(key, cdc),
+		protocolKeeper,
 	}
 	return engine
 }

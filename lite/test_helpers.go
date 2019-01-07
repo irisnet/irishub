@@ -148,7 +148,7 @@ func InitializeTestLCD(
 
 	db := dbm.NewMemDB()
 	app := irisapp.NewIrisApp(logger, db, nil)
-	cdc = irisapp.MakeCodec()
+	cdc = irisapp.MakeLatestCodec()
 
 	genesisFile := config.GenesisFile()
 	genDoc, err := tmtypes.GenesisDocFromFile(genesisFile)
