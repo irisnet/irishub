@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/irisnet/irishub/codec"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/codec"
 )
 
 // CodeType - ABCI code identifier within codespace
@@ -169,6 +169,7 @@ func ErrInvalidTxFee(msg string) Error {
 func ErrInvalidFeeDenom(msg string) Error {
 	return newErrorWithRootCodespace(CodeInvalidFeeDenom, msg)
 }
+
 //----------------------------------------
 // Error & sdkError
 

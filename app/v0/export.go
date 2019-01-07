@@ -20,7 +20,7 @@ import (
 )
 
 // export the state of iris for a genesis file
-func (p *ProtocolV0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
+func (p *ProtocolV0)  ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	if forZeroHeight {

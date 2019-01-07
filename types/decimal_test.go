@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/irisnet/irishub/codec"
 	"github.com/stretchr/testify/require"
 )
 
@@ -229,8 +228,6 @@ func TestTruncate(t *testing.T) {
 		require.Equal(t, tc.exp, resPos, "positive tc %d", tcIndex)
 	}
 }
-
-var cdc = codec.New()
 
 func TestDecMarshalJSON(t *testing.T) {
 	decimal := func(i int64) Dec {

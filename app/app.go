@@ -20,12 +20,14 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/irisnet/irishub/store"
 )
 
 const (
 	appName               = "IrisApp"
-	FlagReplayHeight      = "replay_height"
-	DefaultSyncableHeight = 10000 // Multistore saves a snapshot every 10000 blocks
+	FlagReplay            = "replay-last-block"
+	DefaultSyncableHeight = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
+	DefaultCacheSize      = store.NumRecent     // Multistore saves last 100 blocks
 )
 
 // default home directories for expected binaries
@@ -45,7 +47,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
 	// create your application object
-	var app = &IrisApp { BaseApp: bApp }
+	var app = &IrisApp{BaseApp: bApp}
 
 	protocolKeeper := sdk.NewProtocolKeeper(protocol.KeyMain)
 	engine := protocol.NewProtocolEngine(protocolKeeper)
@@ -54,11 +56,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
 
 	var err error
-	if viper.GetInt64(FlagReplayHeight) > 0 {
-		replayHeight := viper.GetInt64(FlagReplayHeight)
-		loadHeight := app.replayToHeight(replayHeight, app.Logger)
-		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
-		err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	if viper.GetBool(FlagReplay) {
+		lastHeight := Replay(app.Logger)
+		err = app.LoadVersion(lastHeight, protocol.KeyMain, true)
 	} else {
 		err = app.LoadLatestVersion(protocol.KeyMain)
 	} // app is now sealed
@@ -81,8 +81,32 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 // latest version of codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v0.MakeCodec()	// replace with latest protocol version
+	var cdc = v0.MakeCodec() // replace with latest protocol version
 	return cdc
+}
+
+func (app *IrisApp) ExportOrReplay(replayHeight int64) (replay bool, height int64) {
+	lastBlockHeight := app.BaseApp.LastBlockHeight()
+	if replayHeight > lastBlockHeight {
+		replayHeight = lastBlockHeight
+	}
+
+	if lastBlockHeight-replayHeight <= DefaultCacheSize {
+		err := app.LoadVersion(replayHeight, protocol.KeyMain, false)
+		if err != nil {
+			cmn.Exit(err.Error())
+		}
+		return false, replayHeight
+	}
+
+	loadHeight := app.replayToHeight(replayHeight, app.Logger)
+	err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	if err != nil {
+		cmn.Exit(err.Error())
+	}
+	app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+	return true, replayHeight
+
 }
 
 // export the state of iris for a genesis file

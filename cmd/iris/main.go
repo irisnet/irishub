@@ -17,10 +17,14 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	pvm "github.com/tendermint/tendermint/privval"
+	"github.com/tendermint/tendermint/node"
+	"github.com/tendermint/tendermint/p2p"
+	"github.com/tendermint/tendermint/proxy"
 )
 
 func main() {
-//	sdk.InitBech32Prefix()
+	//	sdk.InitBech32Prefix()
 	cdc := app.MakeLatestCodec()
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
@@ -44,6 +48,7 @@ func main() {
 	)
 
 	startCmd := server.StartCmd(ctx, newApp)
+	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
 	rootCmd.AddCommand(
 		irisInit.InitCmd(ctx, cdc),
 		irisInit.GenTxCmd(ctx, cdc),
@@ -75,15 +80,52 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 	)
 }
 
-func exportAppStateAndTMValidators(
+func exportAppStateAndTMValidators(ctx *server.Context,
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, traceStore)
-	if height != -1 {
-		err := gApp.LoadHeight(height)
-		if err != nil {
-			return nil, nil, err
+	if height > 0 {
+		if replay, replayHeight := gApp.ExportOrReplay(height); replay {
+			_, err := startNodeAndReplay(ctx, gApp, replayHeight)
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 	}
 	return gApp.ExportAppStateAndValidators(forZeroHeight)
+}
+
+func startNodeAndReplay(ctx *server.Context, app *app.IrisApp, height int64) (n *node.Node, err error) {
+	cfg := ctx.Config
+	cfg.BaseConfig.ReplayHeight = height
+
+	nodeKey, err := p2p.LoadOrGenNodeKey(cfg.NodeKeyFile())
+	if err != nil {
+		return nil, err
+	}
+	newNode := func(c chan int) {
+		defer func() {
+			c <- 0
+		}()
+		n, err = node.NewNode(
+			cfg,
+			pvm.LoadOrGenFilePV(cfg.PrivValidatorFile()),
+			nodeKey,
+			proxy.NewLocalClientCreator(app),
+			node.DefaultGenesisDocProviderFunc(cfg),
+			node.DefaultDBProvider,
+			node.DefaultMetricsProvider(cfg.Instrumentation),
+			ctx.Logger.With("module", "node"),
+		)
+		if err != nil {
+			c <- 1
+		}
+	}
+	ch := make(chan int)
+	go newNode(ch)
+	v := <-ch
+	if v == 0 {
+		err = nil
+	}
+	return nil, err
 }

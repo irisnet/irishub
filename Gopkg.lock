@@ -57,18 +57,6 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:7abbe8e2248f10d85b12e207cf432a0e193beeb8a6117a5c6de8f694567c6bd0"
-  name = "github.com/cosmos/cosmos-sdk"
-  packages = [
-    "codec",
-    "types",
-    "x/auth",
-  ]
-  pruneopts = "UT"
-  revision = "dfd00a661a19df6efe7e0dde96b2fbeb883d1d80"
-  version = "v0.27.1"
-
-[[projects]]
   digest = "1:e8a3550c8786316675ff54ad6f09d265d129c9d986919af7f541afba50d87ce2"
   name = "github.com/cosmos/go-bip39"
   packages = ["."]
@@ -509,7 +497,7 @@
 
 [[projects]]
   branch = "irisnet/v0.27.3-iris"
-  digest = "1:8d5381a63ff497adc3d5885f40672ce2f11fb5c68147c22b92cf753e7aec7800"
+  digest = "1:4416561b9d6e7de60334a880810e9d02c348b2549f5a327ccd34e90edac16271"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -574,7 +562,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "bf8a3cf548d19aa742d17e511aee364145153f5d"
+  revision = "ae55f6ecaab71915ff86bf7303c43f1e91b9dac2"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
@@ -754,6 +742,7 @@
     "github.com/tendermint/iavl",
     "github.com/tendermint/tendermint/abci/server",
     "github.com/tendermint/tendermint/abci/types",
+    "github.com/tendermint/tendermint/blockchain",
     "github.com/tendermint/tendermint/cmd/tendermint/commands",
     "github.com/tendermint/tendermint/config",
     "github.com/tendermint/tendermint/consensus",

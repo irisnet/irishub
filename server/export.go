@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	flagHeight = "height"
+	flagHeight        = "height"
 	flagForZeroHeight = "for-zero-height"
 )
 
@@ -51,11 +51,11 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 				return err
 			}
 			height := viper.GetInt64(flagHeight)
-			forZeroHeight := viper.GetBool(flagForZeroHeight)
-			if height == 0 && forZeroHeight {
-				return errors.Errorf("Can't export state at height 0 for restarting blockchain. In this case, just copy the current genesis file")
+			if height < 0 {
+				return errors.Errorf("Height must greater than or equal to zero")
 			}
-			appState, validators, err := appExporter(ctx.Logger, db, traceWriter, height, forZeroHeight)
+			forZeroHeight := viper.GetBool(flagForZeroHeight)
+			appState, validators, err := appExporter(ctx, ctx.Logger, db, traceWriter, height, forZeroHeight)
 			if err != nil {
 				return errors.Errorf("error exporting state: %v\n", err)
 			}
@@ -77,7 +77,7 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			return nil
 		},
 	}
-	cmd.Flags().Int64(flagHeight, -1, "Export state from a particular height (-1 means latest height)")
+	cmd.Flags().Int64(flagHeight, 0, "Export state from a particular height (-1 means latest height)")
 	cmd.Flags().Bool(flagForZeroHeight, false, "Export state to start at height zero (perform preproccessing)")
 	return cmd
 }
