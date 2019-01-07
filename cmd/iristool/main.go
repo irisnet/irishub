@@ -11,10 +11,8 @@ import (
 )
 
 func init() {
-
 //	sdk.InitBech32Prefix()
-	cdc := app.MakeCodec()
-
+	cdc := app.MakeLatestCodec()
 	rootCmd.AddCommand(debugcmd.RootCmd)
 	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 }

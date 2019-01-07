@@ -20,7 +20,7 @@ import (
 )
 
 // export the state of iris for a genesis file
-func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
+func (p *ProtocolV0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	if forZeroHeight {
@@ -75,7 +75,7 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 }
 
 // prepare for fresh start at zero height
-func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
+func (p *ProtocolV0) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle fee distribution state. */
 

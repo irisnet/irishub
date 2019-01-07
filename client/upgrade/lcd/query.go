@@ -1,8 +1,8 @@
 package lcd
 
 import (
-	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/client/context"
+	sdk "github.com/irisnet/irishub/types"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -20,19 +20,33 @@ type VersionInfo struct {
 func InfoHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		res_protocolVersion, _ := cliCtx.QueryStore(protocol.CurrentProtocolVersionKey, "protocol")
-		var protocolVersion uint64
-		cdc.UnmarshalJSON(res_protocolVersion, &protocolVersion)
+		res_currentVersion, _ := cliCtx.QueryStore(sdk.CurrentVersionKey, sdk.MainStore)
+		var currentVersion uint64
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_currentVersion, &currentVersion)
 
-		res_upgradeConfig, _ := cliCtx.QueryStore(protocol.UpgradeConfigkey, "protocol")
-		var upgradeConfig protocol.UpgradeConfig
-		cdc.UnmarshalJSON(res_upgradeConfig, &upgradeConfig)
+		res_proposalID, _ := cliCtx.QueryStore(upgrade.GetSuccessVersionKey(currentVersion), storeName)
+		var proposalID uint64
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_proposalID, &proposalID)
 
-		res_appVersion, _ := cliCtx.QueryStore(upgrade.GetAppVersionKey(protocolVersion), storeName)
-		var appVersion upgrade.AppVersion
-		cdc.MustUnmarshalBinaryLengthPrefixed(res_appVersion, &appVersion)
+		res_currentVersionInfo, err := cliCtx.QueryStore(upgrade.GetProposalIDKey(proposalID), storeName)
+		var currentVersionInfo upgrade.VersionInfo
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_currentVersionInfo, &currentVersionInfo)
 
-		upgradeInfoOutput := upgcli.ConvertUpgradeInfoToUpgradeOutput(appVersion, upgradeConfig)
+		res_upgradeInProgress, _ := cliCtx.QueryStore(sdk.UpgradeConfigKey, sdk.MainStore)
+		var upgradeInProgress sdk.UpgradeConfig
+		if err == nil && len(res_upgradeInProgress) != 0 {
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeInProgress, &upgradeInProgress)
+		}
+
+		res_LastFailedVersion, err := cliCtx.QueryStore(sdk.LastFailedVersionKey, sdk.MainStore)
+		var lastFailedVersion uint64
+		if err == nil && len(res_LastFailedVersion) != 0 {
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_LastFailedVersion, &lastFailedVersion)
+		} else {
+			lastFailedVersion = 0
+		}
+
+		upgradeInfoOutput := upgcli.NewUpgradeInfoOutput(currentVersionInfo, lastFailedVersion, upgradeInProgress)
 
 		output, err := cdc.MarshalJSONIndent(upgradeInfoOutput, "", "  ")
 		if err != nil {

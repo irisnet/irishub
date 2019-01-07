@@ -161,7 +161,7 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 }
 
 func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
 	return
 }
@@ -269,7 +269,7 @@ func executeGetDelegatorDistrInfo(t *testing.T, cmdStr string) []distributiontyp
 	out, errMsg := tests.ExecuteT(t, cmdStr, "")
 	require.Empty(t, errMsg)
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	var ddiList []distributiontypes.DelegationDistInfo
 	err := cdc.UnmarshalJSON([]byte(out), &ddiList)
 
@@ -281,7 +281,7 @@ func executeGetDelegationDistrInfo(t *testing.T, cmdStr string) distributiontype
 	out, errMsg := tests.ExecuteT(t, cmdStr, "")
 	require.Empty(t, errMsg)
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	var ddi distributiontypes.DelegationDistInfo
 	err := cdc.UnmarshalJSON([]byte(out), &ddi)
 
@@ -293,7 +293,7 @@ func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclien
 	out, errMsg := tests.ExecuteT(t, cmdStr, "")
 	require.Empty(t, errMsg)
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	var vdi distributionclient.ValidatorDistInfoOutput
 	err := cdc.UnmarshalJSON([]byte(out), &vdi)
 
@@ -304,7 +304,7 @@ func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclien
 func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var validator stakecli.ValidatorOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &validator)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return validator
@@ -313,7 +313,7 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var proposal gov.ProposalOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return proposal
@@ -322,7 +322,7 @@ func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
 func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var vote  gov.Vote
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return vote
@@ -331,7 +331,7 @@ func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
 func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var votes [] gov.Vote
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
@@ -340,7 +340,7 @@ func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var param  gov.Param
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return param
@@ -349,7 +349,7 @@ func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
 func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var info upgcli.UpgradeInfoOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &info)
 
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -359,7 +359,7 @@ func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput
 func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceDef servicecli.DefOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceDef
@@ -368,7 +368,7 @@ func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutp
 func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceBinding service.SvcBinding
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBinding)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBinding
@@ -377,7 +377,7 @@ func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {
 func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var serviceBindings []service.SvcBinding
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return serviceBindings
@@ -386,7 +386,7 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding
 func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var profilers []guardian.Guardian
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &profilers)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return profilers
@@ -395,7 +395,7 @@ func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {
 func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var trustees []guardian.Guardian
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &trustees)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return trustees
@@ -404,7 +404,7 @@ func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var svcRequests []service.SvcRequest
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return svcRequests
@@ -413,7 +413,7 @@ func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest
 func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var feesOutput servicecli.FeesOutput
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return feesOutput
@@ -444,7 +444,7 @@ func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...stri
 		//Response string `json:"Response"`
 	}
 	var res toJSON
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 	err = cdc.UnmarshalJSON([]byte(stdout), &res)
 	require.NoError(t, err, "out %v\n, err %v", stdout, err)
 

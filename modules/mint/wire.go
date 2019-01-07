@@ -1,4 +1,4 @@
-package keeper
+package mint
 
 import (
 	"github.com/irisnet/irishub/codec"
@@ -6,7 +6,7 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(&UpgradeConfig{}, "iris-hub/protocol/upgradeConfig", nil)
+	cdc.RegisterConcrete(Minter{}, "irishub/mint/Minter", nil)
 }
 
 var msgCdc = codec.New()

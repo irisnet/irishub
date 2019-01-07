@@ -3,7 +3,6 @@ package gov
 import (
 	"time"
 
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
@@ -21,53 +20,55 @@ var (
 	BurnRate              = sdk.NewDecWithPrec(2, 1)
 )
 
-// Governance Keeper
+// Governance ProtocolKeeper
 type Keeper struct {
-	// The reference to the Param Keeper to get and set Global Params
-	paramsKeeper params.Keeper
-	paramSpace   params.Subspace
-
-	// The reference to the CoinKeeper to modify balances
-	ck bank.Keeper
-
-	dk distribution.Keeper
-
-	gk guardian.Keeper
-	// The ValidatorSet to get information about validators
-	vs sdk.ValidatorSet
-
-	// The reference to the DelegationSet to get information about delegators
-	ds sdk.DelegationSet
-
-	pk protocolKeeper.Keeper
 	// The (unexposed) keys used to access the stores from the Context.
 	storeKey sdk.StoreKey
 
 	// The codec codec for binary encoding/decoding.
 	cdc *codec.Codec
 
+	// The reference to the Param ProtocolKeeper to get and set Global Params
+	paramSpace   params.Subspace
+	paramsKeeper params.Keeper
+
+	protocolKeeper sdk.ProtocolKeeper
+
+	// The reference to the CoinKeeper to modify balances
+	ck bank.Keeper
+
+	dk distribution.Keeper
+
+	guardianKeeper guardian.Keeper
+
+	// The ValidatorSet to get information about validators
+	vs sdk.ValidatorSet
+
+	// The reference to the DelegationSet to get information about delegators
+	ds sdk.DelegationSet
+
 	// Reserved codespace
 	codespace sdk.CodespaceType
 }
 
-// NewKeeper returns a governance keeper. It handles:
+// NewProtocolKeeper returns a governance keeper. It handles:
 // - submitting governance proposals
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramsKeeper params.Keeper, paramSpace params.Subspace, dk distribution.Keeper, ck bank.Keeper, gk guardian.Keeper, ds sdk.DelegationSet, pk protocolKeeper.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
-		storeKey:     key,
-		paramsKeeper: paramsKeeper,
-		paramSpace:   paramSpace.WithTypeTable(ParamTypeTable()),
-		ck:           ck,
-		dk:           dk,
-		gk:           gk,
-		ds:           ds,
-		vs:           ds.GetValidatorSet(),
-		pk:           pk,
-		cdc:          cdc,
-		codespace:    codespace,
+		key,
+		cdc,
+		paramSpace.WithTypeTable(ParamTypeTable()),
+		paramsKeeper,
+		protocolKeeper,
+		ck,
+		dk,
+		guardianKeeper,
+		ds.GetValidatorSet(),
+		ds,
+		codespace,
 	}
 }
 

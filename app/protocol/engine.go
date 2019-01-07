@@ -1,55 +1,43 @@
 package protocol
 
 import (
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
-	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"fmt"
 )
 
-/*
-func (pb *ProtocolBase) GetEngine() *ProtocolEngine {
-	return pb.engine
-}
-*/
 type ProtocolEngine struct {
-	protocols map[uint64]Protocol
-	current   uint64
-	pk        protocolKeeper.Keeper
+	protocols      map[uint64]Protocol
+	current        uint64
+	next           uint64
+	ProtocolKeeper sdk.ProtocolKeeper
 }
 
-func NewProtocolEngine(cdc *codec.Codec) ProtocolEngine {
+func NewProtocolEngine(protocolKeeper sdk.ProtocolKeeper) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
 		0,
-		protocolKeeper.NewKeeper(cdc, KeyProtocol),
-		//		irisApp,
+		0,
+		protocolKeeper,
 	}
 	return engine
 }
 
-func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) {
-	//find the current version From DB( EngineKeeper?)
-	current := pe.pk.GetCurrentProtocolVersionByStore(kvStore)
+func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) (bool, uint64) {
+	// find the current version from store
+	current := pe.ProtocolKeeper.GetCurrentVersionByStore(kvStore)
 	p, flag := pe.protocols[current]
 	if flag == true {
-		p.Load(pe.pk)
+		p.Load()
 		pe.current = current
 	}
-}
-
-func (pe *ProtocolEngine) GetCurrentProtocolVersionByStore(kvStore sdk.KVStore) uint64 {
-	return pe.pk.GetCurrentProtocolVersionByStore(kvStore)
-}
-
-func (pe *ProtocolEngine) GetUpgradeConfigByStore(kvStore sdk.KVStore) (protocolKeeper.UpgradeConfig, bool) {
-	return pe.pk.GetUpgradeConfigByStore(kvStore)
+	return flag, current
 }
 
 // To be used for Protocol with version > 0
 func (pe *ProtocolEngine) Activate(version uint64) bool {
 	p, flag := pe.protocols[version]
 	if flag == true {
-		p.Load(pe.pk)
+		p.Load()
 		p.Init()
 		pe.current = version
 	}
@@ -65,7 +53,11 @@ func (pe *ProtocolEngine) GetCurrentVersion() uint64 {
 }
 
 func (pe *ProtocolEngine) Add(p Protocol) Protocol {
-	pe.protocols[p.GetDefinition().GetVersion()] = p
+	if p.GetVersion() != pe.next {
+		panic(fmt.Errorf("Wrong version being added to the protocol engine: %d; Expecting %d", p.GetVersion(), pe.next))
+	}
+	pe.protocols[pe.next] = p
+	pe.next++
 	return p
 }
 
@@ -77,14 +69,12 @@ func (pe *ProtocolEngine) GetByVersion(v uint64) (Protocol, bool) {
 func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		KeyMain,
-		KeyProtocol,
 		KeyAccount,
 		KeyStake,
 		KeyMint,
 		KeyDistr,
 		KeySlashing,
 		KeyGov,
-		KeyRecord,
 		KeyFee,
 		KeyParams,
 		KeyUpgrade,
@@ -97,8 +87,4 @@ func (pe *ProtocolEngine) GetTransientStoreKeys() []*sdk.TransientStoreKey {
 		TkeyStake,
 		TkeyDistr,
 		TkeyParams}
-}
-
-func (pe *ProtocolEngine) GetKeyMain() *sdk.KVStoreKey {
-	return KeyMain
 }
