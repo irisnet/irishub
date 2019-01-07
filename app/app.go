@@ -23,9 +23,8 @@ import (
 )
 
 const (
-	appName    = "IrisApp"
-	FlagReplay = "replay-last-block"
-	//Keep snapshot every at syncable height
+	appName               = "IrisApp"
+	FlagReplay            = "replay-last-block"
 	DefaultSyncableHeight = 10000 // Multistore saves a snapshot every 10000 blocks
 	DefaultCacheSize      = 100   // Multistore saves last 100 blocks
 )
@@ -91,21 +90,22 @@ func (app *IrisApp) ExportOrReplay(replayHeight int64) (replay bool, height int6
 		replayHeight = lastBlockHeight
 	}
 
-	loadHeight := app.replayToHeight(replayHeight, app.Logger)
-	if replayHeight >= loadHeight && lastBlockHeight-loadHeight < DefaultCacheSize {
+	if lastBlockHeight-replayHeight <= DefaultCacheSize {
 		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
 		if err != nil {
 			cmn.Exit(err.Error())
 		}
-	} else {
-		err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
-		if err != nil {
-			cmn.Exit(err.Error())
-		}
-		app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
-		return true, replayHeight
+		return false, replayHeight
 	}
-	return false, replayHeight
+
+	loadHeight := app.replayToHeight(replayHeight, app.Logger)
+	err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	if err != nil {
+		cmn.Exit(err.Error())
+	}
+	app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+	return true, replayHeight
+
 }
 
 // export the state of iris for a genesis file
