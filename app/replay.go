@@ -30,11 +30,16 @@ func Replay(logger log.Logger) int64 {
 
 	curState := sm.LoadState(stateDB)
 	preState := sm.LoadPreState(stateDB)
-	if curState.LastBlockHeight == preState.LastBlockHeight {
+	if curState.LastBlockHeight <= preState.LastBlockHeight {
 		panic(fmt.Errorf("there is no block now, can't replay"))
 	}
 	var loadHeight int64
-	if blockStore.Height() == curState.LastBlockHeight || blockStore.Height() == curState.LastBlockHeight+1 {
+	if blockStore.Height() == curState.LastBlockHeight {
+		logger.Info(fmt.Sprintf("blockstore height equals to current state height %d", curState.LastBlockHeight))
+		logger.Info("Just reset state DB to last height")
+		sm.SaveState(stateDB, preState)
+		loadHeight = preState.LastBlockHeight
+	} else if blockStore.Height() == curState.LastBlockHeight+1 {
 		logger.Info(fmt.Sprintf("blockstore height %d, current state height %d", blockStore.Height(), curState.LastBlockHeight))
 		logger.Info(fmt.Sprintf("Retreat block %d in block store and reset state DB to last height", blockStore.Height()))
 		blockStore.RetreatLastBlock()
