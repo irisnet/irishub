@@ -85,11 +85,11 @@ func NewProtocolVersion1(cdc *codec.Codec) *ProtocolVersion1 {
 
 // load the configuration of this Protocol
 func (p *ProtocolVersion1) Load(protocolkeeper protocolKeeper.Keeper) {
+	p.cdc = MakeCodec()
 	p.configKeepers(protocolkeeper)
 	p.configRouters()
 	p.configFeeHandlers()
 	p.configParams()
-	p.cdc = MakeCodec()
 }
 
 // verison0 don't need the init
