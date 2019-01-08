@@ -16,7 +16,7 @@
 - Important：`ParameterChange`
 - Normal：`TxTaxUsage`
 
-`SoftwareUpgradeProposal` 和 `SystemHaltProposal` 只能由profiler发起。`TxTaxUsage`只能由`trustee`发起。
+`SoftwareUpgradeProposal` 和 `SystemHaltProposal` 只能由profiler发起。
 
 不同级别对应的参数不同：
 

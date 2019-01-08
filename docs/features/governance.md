@@ -16,7 +16,7 @@ Specific Proposal for different levels：
 - Important：`ParameterChange`
 - Normal：`TxTaxUsage`
 
-`SoftwareUpgradeProposal` and `SystemHaltProposal` can only be submitted by the profiler. `TxTaxUsage` can only be submitted by `trustee`.
+`SoftwareUpgradeProposal` and `SystemHaltProposal` can only be submitted by the profiler.
 
 Different levels correspond to different parameters：
 
