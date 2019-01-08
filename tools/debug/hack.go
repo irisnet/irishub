@@ -21,18 +21,8 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/guardian"
 	"encoding/json"
 	tmtypes "github.com/tendermint/tendermint/types"
-	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -121,13 +111,6 @@ const (
 	appName    = "IrisApp"
 )
 
-// default home directories for expected binaries
-var (
-	DefaultLCDHome  = os.ExpandEnv("$HOME/.irislcd")
-	DefaultCLIHome  = os.ExpandEnv("$HOME/.iriscli")
-	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
-)
-
 // Extended ABCI application
 type IrisApp struct {
 	*bam.BaseApp
@@ -156,23 +139,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
 
 	return app
-}
-
-// custom tx codec
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
-	distr.RegisterCodec(cdc)
-	slashing.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	upgrade.RegisterCodec(cdc)
-	service.RegisterCodec(cdc)
-	guardian.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
 }
 
 // export the state of iris for a genesis file
