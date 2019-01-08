@@ -54,7 +54,9 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 		})
 		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
 			if validator.GetTokens().IsNegative() {
-				panic(fmt.Sprintf("validator (%s) token amount is negative", validator.GetOperator().String()))
+				validatorInfo := fmt.Sprintf("Operator address: %s\nValidator name: %s\nValidator Token: %s\nValidator Shares: %s\n",
+					validator.GetOperator().String(), validator.GetMoniker(), validator.GetTokens().String(), validator.GetDelegatorShares().String())
+				panic(fmt.Sprintf("Validator token is negative!\n%s", validatorInfo))
 			}
 			switch validator.GetStatus() {
 			case sdk.Bonded:
