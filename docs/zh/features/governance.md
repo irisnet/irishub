@@ -37,12 +37,12 @@
 * `VotingPeriod` 投票阶段的窗口期
 * `MaxProposal` 该类型提议在网络中同时能存在的最大个数
 * `Penalty`  slash验证人绑定通证的比例
-* `Veto` 
-* `Threshold` 
-* `Participation` 
+* `Veto`  由govTallyingProcedure/Veto定义
+* `Threshold` 由govTallyingProcedure/Threshold定义
+* `Participation` 由govTallyingProcedure/Participation定义
 
 ### 抵押阶段
-提交的提议有抵押金，当抵押金超过 `MinDeposit` ,才能进入投票阶段。该提议超过 `MaxDepositPeriod` ，还未进入投票阶段，则提议会被删除，并返还全部抵押金。 
+提交的提议有抵押金，当抵押金超过 `MinDeposit` ,才能进入投票阶段。该提议超过 `MaxDepositPeriod` ，还未进超过 `MinDeposit`，则提议会被删除，并返还全部抵押金。 
 不能对进入投票阶段的提议再进行抵押。
 
 ### 投票阶段

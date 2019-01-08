@@ -37,22 +37,22 @@ Different levels correspond to different parameters：
 * `VotingPeriod` Window period for voting
 * `MaxProposal` The maximum number of proposal that can exist at the same time
 * `Penalty`   The proportion of the slash
-* `Veto` 
-* `Threshold` 
-* `Participation` 
+* `Veto`  The ratio that is defined by the govTallyingProcedure/Veto
+* `Threshold` The ratio that is defined by the govTallyingProcedure/Threshold
+* `Participation` The ratio that is defined by the govTallyingProcedure/Participation
 
 ### Deposit Procedure
 
-The submitted proposal has the deposit and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet entered the voting procedure, the proposal will be deleted and the full deposit will be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
+The submitted proposal has the deposit and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet exceeds `MinDeposit`, the proposal will be deleted and the full deposit will be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
 
 ### Voting Procedure
-Only the validator can vote once, and the vote cannot be repeated. The voting options are: `Yes` , `Abstain` , `No` , `NoWithVeto` .
+Only the validator can vote , and they can't vote again. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
 
 ### Tallying Procedure
 
 There are three tallying results: `PASS`，`REJECT`，`REJECTVETO`。
 
- Under the premise that the ratio of all voters' voting power to the total voting power in system is more than `participation`, if the ratio of `NoWithVeto` voting power  to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power  to all voter's voting power  over `threshold`, the result is `REJECT`. Otherwise, the result is `REJECT`.
+ Voter is the validator that has voted. Under the premise that the ratio of all voters' voting power to the total voting power in system is more than `participation`, if the ratio of `NoWithVeto` voting power  to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power  to all voter's voting power  over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`. 
 
 ### Burning Mechanism
 
