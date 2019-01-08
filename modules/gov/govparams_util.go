@@ -83,42 +83,31 @@ func (Keeper Keeper) GetVotingProcedure(ctx sdk.Context, p Proposal) VotingProce
 	case ProposalLevelCritical:
 		return VotingProcedure{
 			VotingPeriod: params.CriticalVotingPeriod,
-			MaxNum:       params.CriticalMaxNum,
 		}
 	case ProposalLevelImportant:
 		return VotingProcedure{
 			VotingPeriod: params.ImportantVotingPeriod,
-			MaxNum:       params.ImportantMaxNum,
 		}
 	case ProposalLevelNormal:
 		return VotingProcedure{
 			VotingPeriod: params.NormalVotingPeriod,
-			MaxNum:       params.NormalMaxNum,
 		}
 	default:
 		panic("There is no level for this proposal which type is " + p.GetProposalType().String())
 	}
 }
 
-// Returns the current Voting Procedure from the global param store
-func (Keeper Keeper) GetVotingProcedureByProposalLevel(ctx sdk.Context, pl ProposalLevel) VotingProcedure {
+func (Keeper Keeper) GetMaxNumByProposalLevel(ctx sdk.Context, pl ProposalLevel) uint64 {
 	params := Keeper.GetParamSet(ctx)
 	switch pl {
 	case ProposalLevelCritical:
-		return VotingProcedure{
-			VotingPeriod: params.CriticalVotingPeriod,
-			MaxNum:       params.CriticalMaxNum,
-		}
+		return params.CriticalMaxNum
+
 	case ProposalLevelImportant:
-		return VotingProcedure{
-			VotingPeriod: params.ImportantVotingPeriod,
-			MaxNum:       params.ImportantMaxNum,
-		}
+		return params.ImportantMaxNum
+
 	case ProposalLevelNormal:
-		return VotingProcedure{
-			VotingPeriod: params.NormalVotingPeriod,
-			MaxNum:       params.NormalMaxNum,
-		}
+		return params.NormalMaxNum
 	default:
 		panic("There is no level for this proposal which type is " + pl.string())
 	}

@@ -21,7 +21,7 @@ const (
 	LOWER_BOUND_AMOUNT   = 10
 	UPPER_BOUND_AMOUNT   = 10000
 	STABLE_CRITIACAL_NUM = 1
-	MIN_IMPORTANT_NUM    = 2
+	MIN_IMPORTANT_NUM    = 1
 	MIN_NORMAL_NUM       = 1
 )
 
@@ -61,7 +61,7 @@ var (
 	KeyNormalParticipation = []byte(NORMAL + "Participation")
 	KeyNormalPenalty       = []byte(NORMAL + "Penalty")
 
-	KeySystemHaltPeriod     = []byte("SystemHaltPeriod")
+	KeySystemHaltPeriod = []byte("SystemHaltPeriod")
 )
 
 // ParamTable for mint module
@@ -98,7 +98,7 @@ type GovParams struct {
 	NormalParticipation sdk.Dec       `json:"normal_participation"` //
 	NormalPenalty       sdk.Dec       `json:"normal_penalty"`       //  Penalty if validator does not vote
 
-	SystemHaltPeriod    int64         `json:"system_halt_period"`
+	SystemHaltPeriod int64 `json:"system_halt_period"`
 }
 
 // Implements params.ParamStruct
@@ -222,7 +222,7 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 
 	case string(KeySystemHaltPeriod):
 		err := cdc.UnmarshalJSON(bytes, &p.SystemHaltPeriod)
-		return  strconv.FormatInt(p.SystemHaltPeriod, 10), err
+		return strconv.FormatInt(p.SystemHaltPeriod, 10), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -274,10 +274,9 @@ func validateParams(p GovParams) sdk.Error {
 	}
 
 	if err := validatorVotingProcedure(VotingProcedure{
-		VotingPeriod:p.CriticalVotingPeriod,
-		MaxNum:p.CriticalMaxNum,
-	},CRITICAL,STABLE_CRITIACAL_NUM); err!=nil{
-			return  err
+		VotingPeriod: p.CriticalVotingPeriod,
+	}, CRITICAL); err != nil {
+		return err
 	}
 
 	if err := validateTallyingProcedure(TallyingProcedure{
@@ -285,7 +284,7 @@ func validateParams(p GovParams) sdk.Error {
 		Veto:          p.CriticalVeto,
 		Participation: p.CriticalParticipation,
 		Penalty:       p.CriticalPenalty,
-	}, CRITICAL); err !=nil{
+	}, CRITICAL); err != nil {
 		return err
 	}
 
@@ -297,10 +296,9 @@ func validateParams(p GovParams) sdk.Error {
 	}
 
 	if err := validatorVotingProcedure(VotingProcedure{
-		VotingPeriod:p.ImportantVotingPeriod,
-		MaxNum:p.ImportantMaxNum,
-	},IMPORTANT,MIN_IMPORTANT_NUM); err!=nil{
-		return  err
+		VotingPeriod: p.ImportantVotingPeriod,
+	}, IMPORTANT); err != nil {
+		return err
 	}
 
 	if err := validateTallyingProcedure(TallyingProcedure{
@@ -308,7 +306,7 @@ func validateParams(p GovParams) sdk.Error {
 		Veto:          p.ImportantVeto,
 		Participation: p.ImportantParticipation,
 		Penalty:       p.ImportantPenalty,
-	}, IMPORTANT); err !=nil{
+	}, IMPORTANT); err != nil {
 		return err
 	}
 
@@ -320,10 +318,9 @@ func validateParams(p GovParams) sdk.Error {
 	}
 
 	if err := validatorVotingProcedure(VotingProcedure{
-		VotingPeriod:p.NormalVotingPeriod,
-		MaxNum:p.NormalMaxNum,
-	},NORMAL,MIN_NORMAL_NUM); err!=nil{
-		return  err
+		VotingPeriod: p.NormalVotingPeriod,
+	}, NORMAL); err != nil {
+		return err
 	}
 
 	if err := validateTallyingProcedure(TallyingProcedure{
@@ -331,11 +328,15 @@ func validateParams(p GovParams) sdk.Error {
 		Veto:          p.NormalVeto,
 		Participation: p.NormalParticipation,
 		Penalty:       p.NormalPenalty,
-	}, NORMAL); err !=nil{
+	}, NORMAL); err != nil {
 		return err
 	}
 
-	if p.SystemHaltPeriod <0 || p.SystemHaltPeriod > 50000 {
+	if err := validateMaxNum(p); err != nil {
+		return err
+	}
+
+	if p.SystemHaltPeriod < 0 || p.SystemHaltPeriod > 50000 {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSystemHaltPeriod, fmt.Sprintf("SystemHaltPeriod should be between [0, 50000]"))
 	}
 
@@ -363,7 +364,6 @@ type DepositProcedure struct {
 
 type VotingProcedure struct {
 	VotingPeriod time.Duration `json:"critical_voting_period"` //  Length of the critical voting period.
-	MaxNum       uint64        `json:"normal_max_num"`
 }
 
 type TallyingProcedure struct {
@@ -373,47 +373,56 @@ type TallyingProcedure struct {
 	Penalty       sdk.Dec `json:"penalty"`       //  Penalty if validator does not vote
 }
 
-func validateDepositProcedure(dp DepositProcedure, str string) sdk.Error {
+func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 	if dp.MinDeposit[0].Denom != stakeTypes.StakeDenom {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(str+"MinDeposit should be %s!", stakeTypes.StakeDenom))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit should be %s!", stakeTypes.StakeDenom))
 	}
 
 	LowerBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
 	UpperBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
 
 	if dp.MinDeposit[0].Amount.LT(LowerBound.Amount) || dp.MinDeposit[0].Amount.GT(UpperBound.Amount) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(str+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(level+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
 	}
 
-	if dp.MaxDepositPeriod < sdk.TwentySeconds || dp.MaxDepositPeriod  > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(str+"MaxDepositPeriod (%s) should be between 20s and %ds", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
-	}
-	return nil
-}
-
-func validatorVotingProcedure(vp VotingProcedure, str string , min_num uint64) sdk.Error {
-	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod  > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(str+"VotingPeriod (%s) should be between 20s and %ds", vp.VotingPeriod.String(),sdk.ThreeDays.String()))
-	}
-
-	if vp.MaxNum < min_num {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+str+"Proposal should be no less than %v.", min_num))
+	if dp.MaxDepositPeriod < sdk.TwentySeconds || dp.MaxDepositPeriod > sdk.ThreeDays {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %ds", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
 	}
 	return nil
 }
 
-func validateTallyingProcedure(tp TallyingProcedure, str string) sdk.Error {
+func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
+	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.ThreeDays {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %ds", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
+	}
+	return nil
+}
+
+func validateTallyingProcedure(tp TallyingProcedure, level string) sdk.Error {
 	if tp.Threshold.LTE(sdk.ZeroDec()) || tp.Threshold.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+str+" Threshold ( "+tp.Threshold.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be between 0 and 1"))
 	}
 	if tp.Participation.LTE(sdk.ZeroDec()) || tp.Participation.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+str+" participation ( "+tp.Participation.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be between 0 and 1"))
 	}
 	if tp.Veto.LTE(sdk.ZeroDec()) || tp.Veto.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+str+" Veto ( "+tp.Veto.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be between 0 and 1"))
 	}
 	if tp.Penalty.LTE(sdk.ZeroDec()) || tp.Penalty.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+str+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be between 0 and 1"))
+	}
+	return nil
+}
+
+func validateMaxNum(gp GovParams) sdk.Error {
+	if gp.CriticalMaxNum != STABLE_CRITIACAL_NUM {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+CRITICAL+"Proposal [%v] can only be %v.", gp.CriticalMaxNum, STABLE_CRITIACAL_NUM))
+	}
+	if gp.ImportantMaxNum < MIN_IMPORTANT_NUM {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+IMPORTANT+"Proposal [%v] should be no less than %v.", gp.CriticalMaxNum, MIN_IMPORTANT_NUM))
+	}
+	if gp.NormalMaxNum < MIN_NORMAL_NUM {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+NORMAL+"Proposal [%v] should be no less than %v.", gp.NormalMaxNum, MIN_NORMAL_NUM))
 	}
 	return nil
 }
