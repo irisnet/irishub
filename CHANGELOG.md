@@ -1,5 +1,52 @@
 # Changelog
 
+v0.10.0：
+- Make more validation about the `MsgCreateValidator` in CollectStdTxs
+- Withdraw commission on self bond removal
+- Use address instead of bond height / intratxcounter for deduplication
+- Removal of Mandatory Self-Delegation Reward
+- Add cli cmd to query the software upgrade signal status
+- Remove the text proposal
+- Make gov data types codec wires usable across different protocol versions
+- Don't export the unfinished proposals and refund the deposits of these proposals before export snapshot 
+- Fix bug of the tx result tags
+
+- Setup different level min-deposit for different proposals
+- Setup different level voting-period for different proposals
+- Remove loosen token in stake pool, use bank to calculate the total loosen token
+- Update tendermint to v0.27.3
+- Make flag deposit not be required in the gov submit-proposal cmd
+- Fix absence proof verification
+- Add token stats query cmd and lcd interface
+- Remove iris replay flag
+- Implement the block mint token-economics
+- Add the service slash feature
+
+- NewGov features
+- Avoid to export account with no coin
+- Correctly reset jailed-validator bond height / unbonding height on export-for-zero-height
+- Replace decimal with int coins in distribution withdraw tags
+
+- Run cli test suite in parallel
+- Only the genesis type profiler/trustee can initiate the addition or deletion (rather than prohibiting) transactions of the minor type profiler/trustee record. Everyone can view the profiler/trustee list
+- Add the sync tx broadcast type as the default mode in iriscli
+- If a validator is jailed, distribute no reward to it
+- Refund service fee and deposit before export service state
+
+- Redefined the gov/slashing/service/stake/distribution and gasPrice params 
+- Add invariant checking level into makefile
+- Add burn token cmd and lcd api
+- Make sure the destination address is a trustee when the TaxUsage proposal execute
+- Remove set-withdraw-addr sub-command
+- Remove the record module
+
+pending:
+- Fix issue that miss checking the first one in Coins
+- iris start --replay-last-block 
+- iris export --height
+
+
+
 ## 0.9.0-rc0
 
 *December 19th, 2018*
