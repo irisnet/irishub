@@ -3528,9 +3528,6 @@ definitions:
       bond_height:
         type: string
         example: '0'
-      bond_intra_tx_counter:
-        type: integer
-        example: 0
       unbonding_height:
         type: string
         example: '0'
