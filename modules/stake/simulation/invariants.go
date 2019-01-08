@@ -3,14 +3,16 @@ package simulation
 import (
 	"bytes"
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
+	"runtime/debug"
+
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/mock/simulation"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/modules/mock/simulation"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // AllInvariants runs all invariants of the stake module.
@@ -39,7 +41,19 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 // nolint: unparam
 func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 	f auth.FeeKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		pool := k.GetPool(ctx)
 
 		loose := sdk.ZeroDec()
@@ -49,10 +63,23 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 			return false
 		})
 		k.IterateUnbondingDelegations(ctx, func(_ int64, ubd stake.UnbondingDelegation) bool {
+			if ubd.Balance.Amount.LT(sdk.ZeroInt()) {
+				panic(fmt.Errorf("found negative balance in unbonding delegation"))
+			}
 			loose = loose.Add(sdk.NewDecFromInt(ubd.Balance.Amount))
 			return false
 		})
 		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
+			validatorInfo := fmt.Sprintf("Operator address: %s\nValidator name: %s\nValidator Token: %s\nValidator Shares: %s\n",
+				validator.GetOperator().String(), validator.GetMoniker(), validator.GetTokens().String(), validator.GetDelegatorShares().String())
+
+			if validator.GetTokens().IsNegative() {
+				panic(fmt.Errorf("Validator token is negative!\n%s", validatorInfo))
+			}
+			// if validator delegator shares is zero, validator will be deleted once its status becomes unbonded, thus validator tokens will be lost
+			if !validator.GetTokens().IsZero() && validator.GetDelegatorShares().IsZero() {
+				panic(fmt.Errorf("Validator token is not zero but delegation shares is zero!\n%s", validatorInfo))
+			}
 			switch validator.GetStatus() {
 			case sdk.Bonded:
 				bonded = bonded.Add(validator.GetTokens())
