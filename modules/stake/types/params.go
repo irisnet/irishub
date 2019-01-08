@@ -76,7 +76,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err := validateMaxValidators(uint16(maxValidators)); err != nil {
 			return nil, err
 		}
-		return maxValidators, nil
+		return uint16(maxValidators), nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
