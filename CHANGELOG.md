@@ -1,5 +1,77 @@
 # Changelog
 
+## 0.10.0-rc0
+
+*January 8th, 2019*
+
+FEATURES:
+
+- [iris] Make more validation about the `MsgCreateValidator` in CollectStdTxs
+- [iris] Remove loosen token in stake pool, use bank to calculate the total loosen token
+- [iris] Implement the block mint token-economics
+- [iris] Add the service slash feature
+- [iris] Redesign and implement the governance module to setup the new voting, tally, and penalty rules for each level of proposals
+- [iris] Refactor and redefined all the gov/slashing/service/stake/distribution and gasPrice params 
+- [iris] Make gov data types codec wires usable across different protocol versions
+- [iris] Don't export the unfinished proposals and refund the deposits of these proposals before export snapshot 
+- [iris] Refund service fee and deposit before export service state
+- [iris] Add invariant checking level into makefile
+- [iris] Only the genesis type profiler/trustee can initiate the addition or deletion (rather than prohibiting) transactions of the minor type profiler/trustee record. Everyone can view the profiler/trustee list
+- [iris] Make sure the destination address is a trustee when the TaxUsage proposal execute
+- [iris] Remove the record module
+- [iris] Add `iris start --replay-last-block` to reset the app state by replay the last block
+- [iris] Add `iris export --height` to export the snapshot of any block height even beyond the maximum cached historical version
+
+- [iriscli] Add cli cmd to query the software upgrade signal status
+- [iriscli] Make flag deposit not be required in the gov submit-proposal cmd
+- [iriscli] Add token stats query cmd and lcd interface
+- [iriscli] Replace decimal with int coins in distribution withdraw tags
+- [iriscli] Add the sync tx broadcast type as the default mode in iriscli
+- [iriscli] Add burn token cmd and lcd api
+- [iriscli] Remove set-withdraw-addr sub-command
+
+- [tendermint] Update tendermint to v0.27.3
+- [test] Run cli test suite in parallel
+
+
+BUG FIXES:
+
+- Withdraw commission on self bond removal
+- Use address instead of bond height / intratxcounter for deduplication
+- Removal of mandatory self-delegation reward
+- Fix bug of the tx result tags
+- Fix absence proof verification
+- Avoid to export account with no coin
+- Correctly reset jailed-validator bond height / unbonding height on export-for-zero-height
+- If a validator is jailed, distribute no reward to it
+- Fix issue that miss checking the first one in Coins
+
+
+## 0.9.1-patch01
+
+*January 7th, 2019*
+
+- Hotfix bug of software upgrade
+
+
+## 0.9.1
+
+*January 4th, 2019*
+
+- Add cli cmd to query the software upgrade signal status
+- Remove the text proposal
+
+
+## 0.9.0
+
+*December 27th, 2018*
+
+- Refactor the gov types
+- Make the deposit flag not be required in the gov submit-proposal cmd
+- Add withdraw address into the withdraw tags list
+- Fix the monitor bug
+
+
 ## 0.9.0-rc0
 
 *December 19th, 2018*
