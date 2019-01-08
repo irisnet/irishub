@@ -149,7 +149,7 @@ func ErrOnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) s
 }
 
 func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLevel string) sdk.Error {
-	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal is more than the maximum %v.", proposalLevel, num))
+	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal can't be more than the maximum %v.", proposalLevel, num))
 }
 
 ////////////////////  iris end  /////////////////////////////
