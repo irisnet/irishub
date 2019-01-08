@@ -287,7 +287,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		for _, valAddr := range keeper.GetValidatorSet(ctx, proposalID) {
 			if _, ok := votingVals[valAddr.String()]; !ok {
 				val := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
-				if val != nil && val.GetStatus() != sdk.Unbonded {
+				if val != nil && val.GetStatus() == sdk.Bonded {
 					keeper.ds.GetValidatorSet().Slash(ctx,
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
