@@ -487,16 +487,15 @@
   version = "v0.14.0"
 
 [[projects]]
-  branch = "irisnet/v0.12.0-iris"
   digest = "1:bfbae02a6a9430f804a8a7fee56edbb93c38e08a777ab4a6a33b03b4780b97f6"
   name = "github.com/tendermint/iavl"
   packages = ["."]
   pruneopts = "UT"
   revision = "4114c0fad8f5909e46327dc967259e33e0e80508"
   source = "https://github.com/irisnet/iavl.git"
+  version = "v0.12.0-iris"
 
 [[projects]]
-  branch = "irisnet/v0.27.3-iris"
   digest = "1:4416561b9d6e7de60334a880810e9d02c348b2549f5a327ccd34e90edac16271"
   name = "github.com/tendermint/tendermint"
   packages = [
@@ -564,6 +563,7 @@
   pruneopts = "UT"
   revision = "ae55f6ecaab71915ff86bf7303c43f1e91b9dac2"
   source = "https://github.com/irisnet/tendermint.git"
+  version = "v0.27.3-iris"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
