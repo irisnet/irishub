@@ -699,15 +699,15 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 	keeper.SetNormalProposalNum(ctx, keeper.GetNormalProposalNum(ctx)-1)
 }
 
-func (keeper Keeper) IsMoreThanMaxProposal(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
-	votingProcedure := keeper.GetVotingProcedureByProposalLevel(ctx, pl)
+func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
+	maxNum := keeper.GetMaxNumByProposalLevel(ctx, pl)
 	switch pl {
 	case ProposalLevelCritical:
-		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) >= votingProcedure.MaxNum
+		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) == maxNum
 	case ProposalLevelImportant:
-		return keeper.GetImportantProposalNum(ctx), keeper.GetImportantProposalNum(ctx) >= votingProcedure.MaxNum
+		return keeper.GetImportantProposalNum(ctx), keeper.GetImportantProposalNum(ctx) == maxNum
 	case ProposalLevelNormal:
-		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) >= votingProcedure.MaxNum
+		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) == maxNum
 	default:
 		panic("There is no level for this proposal")
 	}

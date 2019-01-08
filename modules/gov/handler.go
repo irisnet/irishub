@@ -36,7 +36,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
-	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 	////////////////////  iris begin  ///////////////////////////
@@ -83,7 +83,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
-	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
@@ -126,7 +126,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
-	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
