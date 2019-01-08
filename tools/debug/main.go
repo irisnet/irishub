@@ -18,6 +18,7 @@ import (
 )
 
 func init() {
+	hackCmd.Flags().String("pruning", "syncable", "Pruning strategy: syncable, nothing, everything")
 	RootCmd.AddCommand(txCmd)
 	RootCmd.AddCommand(pubkeyCmd)
 	RootCmd.AddCommand(addrCmd)
