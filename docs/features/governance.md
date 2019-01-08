@@ -44,7 +44,7 @@ iriscli gov submit-proposal --title="update MinDeposit" --description="test" --t
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
 
-# Vote for a proposal
+# Vote for a proposal 
 echo 1234567890 | iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=gov-test --fee=0.05iris --gas=200000
 
 # Query the state of a proposal
