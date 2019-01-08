@@ -77,7 +77,7 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			return nil
 		},
 	}
-	cmd.Flags().Int64(flagHeight, 0, "Export state from a particular height (-1 means latest height)")
+	cmd.Flags().Int64(flagHeight, 0, "Export state from a particular height (0 means latest height)")
 	cmd.Flags().Bool(flagForZeroHeight, false, "Export state to start at height zero (perform preproccessing)")
 	return cmd
 }
