@@ -30,7 +30,7 @@ iriscli gov submit-proposal --help
 | --version           |            0                | [uint64] the version of the new protocol                                                                            |       |
 | --software           |           " "                 | [string] the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | [string] the switchheight of the new protocol                                                         |       |
-| --threshold | "0.667"   |  [string] the threshold of the software upgrade                                                     |               |
+| --threshold | "0.85"   |  [string] the upgrade signal threshold of the software upgrade                                                   |               |
 
 ## Examples
 
