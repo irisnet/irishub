@@ -82,6 +82,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSystemHalt:
 		return keeper.NewSystemHaltProposal(ctx, title, description, proposalType)
+	case ProposalText:
+		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -93,6 +95,29 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 
 // Creates a NewProposal
 ////////////////////  iris begin  ///////////////////////////
+func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var proposal Proposal = &TextProposal{
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+
+	depositPeriod := keeper.GetDepositProcedure(ctx, proposal).MaxDepositPeriod
+	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
+	keeper.SetProposal(ctx, proposal)
+	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
+	return proposal
+}
+
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
