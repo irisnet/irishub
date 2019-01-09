@@ -13,13 +13,13 @@ var (
 	UpgradeConfigKey     = []byte("upgrade_config")
 	CurrentVersionKey    = []byte("current_version")
 	LastFailedVersionKey = []byte("last_failed_version")
-	cdc                  = makeCodec()
+	cdc                  = codec.New()
 )
 
 type ProtocolDefinition struct {
-	Version 	uint64	`json:"version"`
-	Software	string	`json:"software"`
-	Height		uint64	`json:"height"`
+	Version  uint64 `json:"version"`
+	Software string `json:"software"`
+	Height   uint64 `json:"height"`
 }
 
 type UpgradeConfig struct {
@@ -55,13 +55,6 @@ func DefaultUpgradeConfig(software string) UpgradeConfig {
 type ProtocolKeeper struct {
 	storeKey StoreKey
 	cdc      *codec.Codec
-}
-
-func makeCodec() *codec.Codec {
-	var cdc = codec.New()
-	cdc.RegisterConcrete(&UpgradeConfig{}, "irishub/protocol/UpgradeConfig", nil)
-	cdc.RegisterConcrete(&ProtocolDefinition{}, "irishub/protocol/ProtocolDefinition", nil)
-	return cdc
 }
 
 func NewProtocolKeeper(key StoreKey) ProtocolKeeper {
@@ -108,7 +101,7 @@ func (pk ProtocolKeeper) GetLastFailedVersion(ctx Context) uint64 {
 	store := ctx.KVStore(pk.storeKey)
 	bz := store.Get(LastFailedVersionKey)
 	if bz == nil {
-		return 0	// default value
+		return 0 // default value
 	}
 	var lastFailedVersion uint64
 	pk.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &lastFailedVersion)
