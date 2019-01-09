@@ -155,7 +155,7 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 
 func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
 
-	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be between 0.667 and 1"))
+	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
 
 }
 
