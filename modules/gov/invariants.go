@@ -1,4 +1,4 @@
-package simulation
+package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"

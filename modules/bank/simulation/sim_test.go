@@ -38,8 +38,8 @@ func TestBankWithRandomMessages(t *testing.T) {
 		},
 		[]simulation.RandSetup{},
 		[]simulation.Invariant{
-			NonnegativeBalanceInvariant(mapper),
-			TotalCoinsInvariant(mapper, func() sdk.Coins { return mapp.TotalCoinsSupply }),
+			bank.NonnegativeBalanceInvariant(mapper),
+			bank.TotalCoinsInvariant(mapper, func() sdk.Coins { return mapp.TotalCoinsSupply }),
 		},
 		30, 60,
 		false,

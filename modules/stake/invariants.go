@@ -1,4 +1,4 @@
-package simulation
+package stake
 
 import (
 	"bytes"

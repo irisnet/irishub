@@ -1,4 +1,4 @@
-package simulation
+package bank
 
 import (
 	"errors"
@@ -7,11 +7,10 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
 // NonnegativeBalanceInvariant checks that all accounts in the application have non-negative balances
-func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) simulation.Invariant {
+func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) sdk.Invariant {
 	return func(ctx sdk.Context) error {
 		accts := mock.GetAllAccounts(mapper, ctx)
 		for _, acc := range accts {
@@ -28,7 +27,7 @@ func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) simulation.Invariant
 
 // TotalCoinsInvariant checks that the sum of the coins across all accounts
 // is what is expected
-func TotalCoinsInvariant(mapper auth.AccountKeeper, totalSupplyFn func() sdk.Coins) simulation.Invariant {
+func TotalCoinsInvariant(mapper auth.AccountKeeper, totalSupplyFn func() sdk.Coins) sdk.Invariant {
 	return func(ctx sdk.Context) error {
 		totalCoins := sdk.Coins{}
 
