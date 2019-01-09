@@ -16,7 +16,6 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -238,11 +237,6 @@ func (p *ProtocolV0) configParams() {
 
 	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
-	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
-		params.NewTypeTable(
-			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
-		)),
-		&upgradeparams.UpgradeParameter, )
 }
 
 // application updates every end block

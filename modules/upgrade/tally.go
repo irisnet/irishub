@@ -4,7 +4,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func tally(ctx sdk.Context,versionProtocol uint64, k Keeper) (passes bool) {
+func tally(ctx sdk.Context,versionProtocol uint64, k Keeper, threshold sdk.Dec) (passes bool) {
 
 	totalVotingPower := sdk.ZeroDec()
 	switchVotingPower := sdk.ZeroDec()
@@ -20,7 +20,7 @@ func tally(ctx sdk.Context,versionProtocol uint64, k Keeper) (passes bool) {
 	})
 
 	// If more than 95% of validator update , do switch
-	if switchVotingPower.Quo(totalVotingPower).GT(GetUpgradeThreshlod(ctx)) {
+	if switchVotingPower.Quo(totalVotingPower).GT(threshold) {
 		return true
 	}
 	return false
