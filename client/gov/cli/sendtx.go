@@ -108,7 +108,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
-	cmd.Flags().String(flagThreshold, "0.667", "the threshold of the software upgrade")
+	cmd.Flags().String(flagThreshold, "0.85", "the upgrade signal threshold of the software upgrade")
 	////////////////////  iris end  /////////////////////////////
 
 	cmd.MarkFlagRequired(flagTitle)
