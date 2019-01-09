@@ -31,14 +31,15 @@ const (
 	CodeInvalidVersion        sdk.CodeType = 18
 	CodeInvalidSwitchHeight   sdk.CodeType = 19
 
-	CodeVoteDeleted         sdk.CodeType = 20
-	CodeDepositDeleted      sdk.CodeType = 21
-	CodeVoteNotExisted      sdk.CodeType = 22
-	CodeDepositNotExisted   sdk.CodeType = 23
-	CodeNotInDepositPeriod  sdk.CodeType = 24
-	CodeAlreadyVote         sdk.CodeType = 25
-	CodeOnlyValidatorVote   sdk.CodeType = 26
-	CodeMoreThanMaxProposal sdk.CodeType = 27
+	CodeVoteDeleted          sdk.CodeType = 20
+	CodeDepositDeleted       sdk.CodeType = 21
+	CodeVoteNotExisted       sdk.CodeType = 22
+	CodeDepositNotExisted    sdk.CodeType = 23
+	CodeNotInDepositPeriod   sdk.CodeType = 24
+	CodeAlreadyVote          sdk.CodeType = 25
+	CodeOnlyValidatorVote    sdk.CodeType = 26
+	CodeMoreThanMaxProposal  sdk.CodeType = 27
+	CodeInvalidUpgradeParams sdk.CodeType = 28
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -150,6 +151,12 @@ func ErrOnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) s
 
 func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLevel string) sdk.Error {
 	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal can't be more than the maximum %v.", proposalLevel, num))
+}
+
+func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
+
+	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be between 0.667 and 1"))
+
 }
 
 ////////////////////  iris end  /////////////////////////////

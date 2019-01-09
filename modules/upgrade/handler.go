@@ -16,8 +16,11 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 			uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
 		}
 
+		x := upgradeConfig.Threshold.String()
+		_ = x
+
 		if uint64(ctx.BlockHeight())+1 == upgradeConfig.Protocol.Height {
-			success := tally(ctx, upgradeConfig.Protocol.Version, uk)
+			success := tally(ctx, upgradeConfig.Protocol.Version, uk, upgradeConfig.Threshold)
 
 			if success {
 				uk.protocolKeeper.SetCurrentVersion(ctx, upgradeConfig.Protocol.Version)

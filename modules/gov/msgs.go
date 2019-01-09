@@ -105,17 +105,19 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 
 type MsgSubmitSoftwareUpgradeProposal struct {
 	MsgSubmitProposal
-	Version      uint64 `json:"version"`
-	Software     string `json:"software"`
-	SwitchHeight uint64 `json:"switch_height"`
+	Version      uint64  `json:"version"`
+	Software     string  `json:"software"`
+	SwitchHeight uint64  `json:"switch_height"`
+	Threshold    sdk.Dec `json:"threshold"`
 }
 
-func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64) MsgSubmitSoftwareUpgradeProposal {
+func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64, threshold sdk.Dec) MsgSubmitSoftwareUpgradeProposal {
 	return MsgSubmitSoftwareUpgradeProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Version:           version,
 		Software:          software,
 		SwitchHeight:      switchHeight,
+		Threshold:         threshold,
 	}
 }
 
@@ -124,6 +126,11 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	if err != nil {
 		return err
 	}
+	// if threshold < 2/3, then print error
+	if msg.Threshold.LT(sdk.NewDecWithPrec(667,3)) || msg.Threshold.GT(sdk.NewDec(1)){
+		return ErrInvalidUpgradeThreshold(DefaultCodespace,msg.Threshold)
+	}
+
 	return nil
 }
 

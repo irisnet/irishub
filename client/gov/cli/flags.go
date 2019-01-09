@@ -22,4 +22,5 @@ const (
 	flagVersion      = "version"
 	flagSoftware     = "software"
 	flagSwitchHeight = "switch-height"
+	flagThreshold    = "threshold"
 )
