@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	memoCostPerByte     sdk.Gas = 1
-	ed25519VerifyCost           = 59
-	secp256k1VerifyCost         = 100
-	maxMemoCharacters           = 100
+	memoCostPerByte       sdk.Gas = 1
+	BlockStoreCostPerByte         = 10
+	ed25519VerifyCost             = 59
+	secp256k1VerifyCost           = 100
+	maxMemoCharacters             = 100
 	// how much gas = 1 atom
 	gasPerUnitCost = 1000
 	// max total number of sigs per tx
@@ -69,7 +70,7 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 			return newCtx, err.Result(), true
 		}
 		// charge gas for the memo
-		newCtx.GasMeter().ConsumeGas(memoCostPerByte*sdk.Gas(len(stdTx.GetMemo())), "memo")
+		newCtx.GasMeter().ConsumeGas(memoCostPerByte * sdk.Gas(len(stdTx.GetMemo())), "memo")
 
 		// stdSigs contains the sequence number, account number, and signatures.
 		// When simulating, this would just be a 0-length slice.
