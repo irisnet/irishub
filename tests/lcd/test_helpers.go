@@ -1,4 +1,4 @@
-package lite
+package lcd
 
 import (
 	"bytes"
@@ -148,7 +148,7 @@ func InitializeTestLCD(
 
 	db := dbm.NewMemDB()
 	app := irisapp.NewIrisApp(logger, db, nil)
-	cdc = irisapp.MakeLatestCodec()
+	cdc := irisapp.MakeLatestCodec()
 
 	genesisFile := config.GenesisFile()
 	genDoc, err := tmtypes.GenesisDocFromFile(genesisFile)

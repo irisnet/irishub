@@ -8,8 +8,6 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/mock/simulation"
-	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -17,9 +15,9 @@ import (
 
 // AllInvariants runs all invariants of the stake module.
 // Currently: total supply, positive power
-func AllInvariants(ck bank.Keeper, k stake.Keeper,
+func AllInvariants(ck bank.Keeper, k Keeper,
 	f auth.FeeKeeper, d distribution.Keeper,
-	am auth.AccountKeeper) simulation.Invariant {
+	am auth.AccountKeeper) sdk.Invariant {
 
 	return func(ctx sdk.Context) error {
 		//err := SupplyInvariants(ck, k, f, d, am)(app, header)
@@ -39,8 +37,8 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 
 // SupplyInvariants checks that the total supply reflects all held loose tokens, bonded tokens, and unbonding delegations
 // nolint: unparam
-func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
-	f auth.FeeKeeper, d distribution.Keeper, am auth.AccountKeeper) simulation.Invariant {
+func SupplyInvariants(ck bank.Keeper, k Keeper,
+	f auth.FeeKeeper, d distribution.Keeper, am auth.AccountKeeper) sdk.Invariant {
 	return func(ctx sdk.Context) (err error) {
 
 		defer func() {
@@ -62,7 +60,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 			loose = loose.Add(sdk.NewDecFromInt(acc.GetCoins().AmountOf(types.StakeDenom)))
 			return false
 		})
-		k.IterateUnbondingDelegations(ctx, func(_ int64, ubd stake.UnbondingDelegation) bool {
+		k.IterateUnbondingDelegations(ctx, func(_ int64, ubd UnbondingDelegation) bool {
 			if ubd.Balance.Amount.LT(sdk.ZeroInt()) {
 				panic(fmt.Errorf("found negative balance in unbonding delegation"))
 			}
@@ -129,7 +127,7 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 }
 
 // PositivePowerInvariant checks that all stored validators have > 0 power
-func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
+func PositivePowerInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) error {
 
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
@@ -154,7 +152,7 @@ func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
 }
 
 // ValidatorSetInvariant checks equivalence of Tendermint validator set and SDK validator set
-func ValidatorSetInvariant(k stake.Keeper) simulation.Invariant {
+func ValidatorSetInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) error {
 		// TODO
 		return nil

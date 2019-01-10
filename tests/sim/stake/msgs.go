@@ -1,4 +1,4 @@
-package simulation
+package stake
 
 import (
 	"fmt"
@@ -6,9 +6,9 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/modules/mock/baseapp"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock/baseapp"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"math/rand"
 	"github.com/irisnet/irishub/modules/stake/types"

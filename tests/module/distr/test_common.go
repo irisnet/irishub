@@ -1,4 +1,4 @@
-package keeper
+package distr
 
 import (
 	"testing"
@@ -19,6 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 
+	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/distribution/types"
 )
 
@@ -72,7 +73,7 @@ func MakeTestCodec() *codec.Codec {
 
 // test input with default values
 func CreateTestInputDefault(t *testing.T, isCheckTx bool, initCoins sdk.Int) (
-	sdk.Context, auth.AccountKeeper, Keeper, stake.Keeper, DummyFeeCollectionKeeper) {
+	sdk.Context, auth.AccountKeeper, distr.Keeper, stake.Keeper, DummyFeeCollectionKeeper) {
 
 	communityTax := sdk.NewDecWithPrec(2, 2)
 	return CreateTestInputAdvanced(t, isCheckTx, initCoins, communityTax)
@@ -81,7 +82,7 @@ func CreateTestInputDefault(t *testing.T, isCheckTx bool, initCoins sdk.Int) (
 // hogpodge of all sorts of input required for testing
 func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	communityTax sdk.Dec) (
-	sdk.Context, auth.AccountKeeper, Keeper, stake.Keeper, DummyFeeCollectionKeeper) {
+	sdk.Context, auth.AccountKeeper, distr.Keeper, stake.Keeper, DummyFeeCollectionKeeper) {
 
 	keyDistr := sdk.NewKVStoreKey("distr")
 	keyStake := sdk.NewKVStoreKey("stake")
@@ -126,7 +127,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	}
 
 	fck := DummyFeeCollectionKeeper{}
-	keeper := NewKeeper(cdc, keyDistr, pk.Subspace(DefaultParamspace), ck, sk, fck, types.DefaultCodespace)
+	keeper := distr.NewKeeper(cdc, keyDistr, pk.Subspace(distr.DefaultParamspace), ck, sk, fck, types.DefaultCodespace)
 
 	// set the distribution hooks on staking
 	sk.SetHooks(keeper.Hooks())
@@ -160,23 +161,3 @@ func (fck DummyFeeCollectionKeeper) ClearCollectedFees(_ sdk.Context) {
 	heldFees = sdk.Coins{}
 }
 
-//__________________________________________________________________________________
-// used in simulation
-
-// iterate over all the validator distribution infos (inefficient, just used to check invariants)
-func (k Keeper) IterateValidatorDistInfos(ctx sdk.Context,
-	fn func(index int64, distInfo types.ValidatorDistInfo) (stop bool)) {
-
-	store := ctx.KVStore(k.storeKey)
-	iter := sdk.KVStorePrefixIterator(store, ValidatorDistInfoKey)
-	defer iter.Close()
-	index := int64(0)
-	for ; iter.Valid(); iter.Next() {
-		var vdi types.ValidatorDistInfo
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &vdi)
-		if fn(index, vdi) {
-			return
-		}
-		index++
-	}
-}

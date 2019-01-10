@@ -1,4 +1,4 @@
-package simulation
+package gov
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/irisnet/irishub/modules/mock/baseapp"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock/baseapp"
+	"github.com/irisnet/irishub/mock/simulation"
 
 )
 

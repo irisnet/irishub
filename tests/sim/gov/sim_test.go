@@ -1,4 +1,4 @@
-package simulation
+package gov
 
 import (
 	"encoding/json"
@@ -11,8 +11,8 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/simulation"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
 )

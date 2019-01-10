@@ -1,4 +1,4 @@
-package lite
+package lcd
 
 import (
 	"encoding/hex"
@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/client/tx"
+	"github.com/irisnet/irishub/client/tendermint/tx"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -21,22 +21,25 @@ import (
 	"bytes"
 	"strconv"
 
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
-	"github.com/irisnet/irishub/client/rpc"
+	"github.com/irisnet/irishub/client/tendermint/rpc"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/client/rest"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
-	recordcli "github.com/irisnet/irishub/client/record"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	stakeLcd "github.com/irisnet/irishub/client/stake/lcd"
 	"github.com/irisnet/irishub/modules/gov"
+)
+
+var (
+	cdc = codec.New()
 )
 
 func init() {
@@ -61,7 +64,7 @@ func TestKeys(t *testing.T) {
 	err := cdc.UnmarshalJSON([]byte(body), &resp)
 	require.Nil(t, err, body)
 
-	addr2Bech32 := resp.Address.String()
+	addr2Bech32 := resp.Address
 	_, err = sdk.AccAddressFromBech32(addr2Bech32)
 	require.NoError(t, err, "Failed to return a correct bech32 address")
 
@@ -80,9 +83,9 @@ func TestKeys(t *testing.T) {
 	addrBech32 := addr.String()
 
 	require.Equal(t, name, m[0].Name, "Did not serve keys name correctly")
-	require.Equal(t, addrBech32, m[0].Address.String(), "Did not serve keys Address correctly")
+	require.Equal(t, addrBech32, m[0].Address, "Did not serve keys Address correctly")
 	require.Equal(t, newName, m[1].Name, "Did not serve keys name correctly")
-	require.Equal(t, addr2Bech32, m[1].Address.String(), "Did not serve keys Address correctly")
+	require.Equal(t, addr2Bech32, m[1].Address, "Did not serve keys Address correctly")
 
 	// select key
 	keyEndpoint := fmt.Sprintf("/keys/%s", newName)
@@ -93,7 +96,7 @@ func TestKeys(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, newName, m2.Name, "Did not serve keys name correctly")
-	require.Equal(t, addr2Bech32, m2.Address.String(), "Did not serve keys Address correctly")
+	require.Equal(t, addr2Bech32, m2.Address, "Did not serve keys Address correctly")
 
 	// update key
 	jsonStr = []byte(fmt.Sprintf(`{
@@ -1154,57 +1157,4 @@ func doVote(t *testing.T, port, seed, name, password string, proposerAddr sdk.Ac
 	require.Nil(t, err)
 
 	return results
-}
-
-// ============= Record Module ================
-func doSubmitRecord(t *testing.T, port, seed, name, password string, proposerAddr sdk.AccAddress, data string) (resultTx ctypes.ResultBroadcastTxCommit) {
-	// get the account to get the sequence
-	acc := getAccount(t, port, proposerAddr)
-	accnum := acc.GetAccountNumber()
-	sequence := acc.GetSequence()
-
-	chainID := viper.GetString(client.FlagChainID)
-
-	// submitproposal
-	jsonStr := []byte(fmt.Sprintf(`{
-		"submitter":"%s",
-		"base_tx":{
-			"name":"%s",
-			"password":"%s",
-			"chain_id":"%s",
-			"gas":"200000",
-			"fee":"0.004iris",
-			"account_number":"%d",
-			"sequence":"%d"
-		 },
-		 "description":"this is record lcd test",
-		 "data":"%s"
-	}`, proposerAddr, name, password, chainID, accnum, sequence, data))
-	res, body := Request(t, port, "POST", "/record/records", jsonStr)
-	require.Equal(t, http.StatusOK, res.StatusCode, body)
-
-	var results ctypes.ResultBroadcastTxCommit
-	err := cdc.UnmarshalJSON([]byte(body), &results)
-	require.Nil(t, err)
-
-	return results
-}
-
-func getRecord(t *testing.T, port, proposalID string) recordcli.RecordOutput {
-	res, body := Request(t, port, "GET", fmt.Sprintf("/record/records/%s", proposalID), nil)
-	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	var record recordcli.RecordOutput
-	err := cdc.UnmarshalJSON([]byte(body), &record)
-	require.Nil(t, err)
-	return record
-}
-
-func getRecordsFilterRecordID(t *testing.T, port, recordID string) recordcli.RecordOutput {
-	res, body := Request(t, port, "GET", fmt.Sprintf("/record/records?recordID=%s", recordID), nil)
-	require.Equal(t, http.StatusOK, res.StatusCode, body)
-
-	var record recordcli.RecordOutput
-	err := cdc.UnmarshalJSON([]byte(body), &record)
-	require.Nil(t, err)
-	return record
 }

@@ -6,13 +6,12 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/mock"
 )
 
 // NonnegativeBalanceInvariant checks that all accounts in the application have non-negative balances
 func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) sdk.Invariant {
 	return func(ctx sdk.Context) error {
-		accts := mock.GetAllAccounts(mapper, ctx)
+		accts := mapper.GetAllAccounts(ctx)
 		for _, acc := range accts {
 			coins := acc.GetCoins()
 			if !coins.IsNotNegative() {

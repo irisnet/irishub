@@ -1,4 +1,4 @@
-package simulation
+package bank
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/simulation"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 

@@ -1,4 +1,4 @@
-package simulation
+package bank
 
 import (
 	"errors"
@@ -9,11 +9,11 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/irisnet/irishub/modules/mock/baseapp"
+	"github.com/irisnet/irishub/mock/baseapp"
 )
 
 // SingleInputSendTx tests and runs a single msg send w/ auth, with one input and one output, where both

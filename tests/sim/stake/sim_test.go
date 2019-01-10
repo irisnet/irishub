@@ -1,4 +1,4 @@
-package simulation
+package stake
 
 import (
 	"encoding/json"
@@ -11,8 +11,8 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/mock"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/irisnet/irishub/modules/stake/types"
 )

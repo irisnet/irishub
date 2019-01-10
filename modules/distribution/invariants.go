@@ -4,12 +4,11 @@ import (
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/mock/simulation"
 )
 
 // AllInvariants runs all invariants of the distribution module
 // Currently: total supply, positive power
-func AllInvariants(d Keeper, sk StakeKeeper) simulation.Invariant {
+func AllInvariants(d Keeper, sk StakeKeeper) sdk.Invariant {
 	return func(ctx sdk.Context) error {
 		err := ValAccumInvariants(d, sk)(ctx)
 		if err != nil {
@@ -20,7 +19,7 @@ func AllInvariants(d Keeper, sk StakeKeeper) simulation.Invariant {
 }
 
 // ValAccumInvariants checks that the fee pool accum == sum all validators' accum
-func ValAccumInvariants(k Keeper, sk StakeKeeper) simulation.Invariant {
+func ValAccumInvariants(k Keeper, sk StakeKeeper) sdk.Invariant {
 
 	return func(ctx sdk.Context) error {
 		height := ctx.BlockHeight()

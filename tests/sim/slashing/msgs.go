@@ -1,11 +1,11 @@
-package simulation
+package slashing
 
 import (
 	"fmt"
 	"math/rand"
-	"github.com/irisnet/irishub/modules/mock/baseapp"
+	"github.com/irisnet/irishub/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/mock/simulation"
+	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/slashing"
 )
 
