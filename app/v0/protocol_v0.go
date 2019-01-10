@@ -115,6 +115,18 @@ func (p *ProtocolV0) GetVersion() uint64 {
 	return p.version
 }
 
+func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) bool {
+	subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
+	var txSizeLimit uint32
+	if bool {
+		subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
+	} else {
+		panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
+	}
+
+	return uint32(len(txBytes)) <= txSizeLimit
+}
+
 // create all Keepers
 func (p *ProtocolV0) configKeepers() {
 	// define the AccountKeeper

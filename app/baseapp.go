@@ -704,6 +704,11 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return
 	}
 
+	if app.Engine.GetCurrentProtocol().ValidateTx(ctx, txBytes) == false {
+		result = sdk.ErrExceedsTxSize("the tx size exceeds the limitation").Result()
+		return
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
 			switch rType := r.(type) {
