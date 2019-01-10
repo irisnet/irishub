@@ -704,6 +704,11 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return
 	}
 
+	if err := app.Engine.GetCurrentProtocol().ValidateTx(ctx, txBytes); err != nil {
+		result = err.Result()
+		return
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
 			switch rType := r.(type) {
