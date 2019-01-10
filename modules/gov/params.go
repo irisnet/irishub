@@ -268,6 +268,10 @@ func DefaultParams() GovParams {
 }
 
 func validateParams(p GovParams) sdk.Error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateDepositProcedure(DepositProcedure{
 		MaxDepositPeriod: p.CriticalDepositPeriod,
 		MinDeposit:       p.CriticalMinDeposit,
@@ -388,14 +392,14 @@ func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 	}
 
 	if dp.MaxDepositPeriod < sdk.TwentySeconds || dp.MaxDepositPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %ds", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %s", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
 	}
 	return nil
 }
 
 func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
 	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %ds", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %s", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
 	}
 	return nil
 }
