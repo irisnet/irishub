@@ -12,12 +12,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/stake"
-	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -393,9 +387,7 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 }
 
 func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
-	paramSets := make(map[string]params.ParamSet)
-	params.RegisterParamSet(paramSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
-	if p, ok := paramSets[params.GetParamSpaceFromKey(keyStr)]; ok {
+	if p, ok := client.ParamSets[params.GetParamSpaceFromKey(keyStr)]; ok {
 		if len(res) == 0 {
 			// Return an error directly if the --key parameter is incorrect.
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
