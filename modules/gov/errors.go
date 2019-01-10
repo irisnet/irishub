@@ -39,6 +39,7 @@ const (
 	CodeAlreadyVote         sdk.CodeType = 25
 	CodeOnlyValidatorVote   sdk.CodeType = 26
 	CodeMoreThanMaxProposal sdk.CodeType = 27
+	CodeEmptyParam          sdk.CodeType = 29
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -88,6 +89,10 @@ func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
 ////////////////////  iris begin  ///////////////////////////
 func ErrInvalidParam(codespace sdk.CodespaceType, str string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("%s Params don't support the ParameterChange.", str))
+}
+
+func ErrEmptyParam(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeEmptyParam, fmt.Sprintf("Params can't be empty"))
 }
 
 func ErrInvalidParamOp(codespace sdk.CodespaceType, opStr string) sdk.Error {
