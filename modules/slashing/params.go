@@ -64,7 +64,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateMaxEvidenceAge(p.MaxEvidenceAge); err != nil {
+		if err := validateMaxEvidenceAge(maxEvidenceAge); err != nil {
 			return nil, err
 		}
 		return maxEvidenceAge, nil
