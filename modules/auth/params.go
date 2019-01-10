@@ -52,7 +52,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if !ok {
 			return nil, params.ErrInvalidString(value)
 		}
-		if !threshold.GT(MinimumGasPrice) || threshold.GT(MaximumGasPrice) {
+		if threshold.LT(MinimumGasPrice) || threshold.GT(MaximumGasPrice) {
 			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", value))
 		}
 		return threshold, nil
