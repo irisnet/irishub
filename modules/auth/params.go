@@ -99,6 +99,10 @@ func DefaultParams() Params {
 }
 
 func validateParams(p Params) error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if !p.GasPriceThreshold.GT(MinimumGasPrice) || p.GasPriceThreshold.GT(MaximumGasPrice) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be (0, 10^18iris-atto]", p.GasPriceThreshold.String()))
 	}

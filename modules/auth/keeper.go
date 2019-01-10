@@ -115,6 +115,16 @@ func (am AccountKeeper) IterateAccounts(ctx sdk.Context, process func(Account) (
 	}
 }
 
+func (am AccountKeeper) GetAllAccounts(ctx sdk.Context) []Account {
+	accounts := []Account{}
+	appendAccount := func(acc Account) (stop bool) {
+		accounts = append(accounts, acc)
+		return false
+	}
+	am.IterateAccounts(ctx, appendAccount)
+	return accounts
+}
+
 // Returns the PubKey of the account at address
 func (am AccountKeeper) GetPubKey(ctx sdk.Context, addr sdk.AccAddress) (crypto.PubKey, sdk.Error) {
 	acc := am.GetAccount(ctx, addr)
