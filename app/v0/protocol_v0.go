@@ -251,7 +251,7 @@ func (p *ProtocolV0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolV0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
 }
 
