@@ -2,7 +2,7 @@
 
 ## 描述
 
-在所有提交的块上匹配此txhash
+在所有提交的区块上寻找匹配此txhash的交易
 
 ## 用法
 
@@ -24,7 +24,7 @@ iriscli tendermint tx [hash] [flags]
 ### 
 
 ```shell
-iriscli tendermint tx 6D361F4BE14B6B9596104A9411DB7962501CA264 --chain-id=fuxi-4000 --trust-node=true
+iriscli tendermint tx 6D361F4BE14B6B9596104A9411DB7962501CA264 --chain-id=irishub-test --trust-node=true
 ```
 得到得结果如下：
 ```

@@ -2,7 +2,7 @@
 
 ## 介绍
 
-查询validator的公钥对于的地址
+查询validator的私钥对应的地址
 
 ## 用法
 
@@ -34,7 +34,7 @@ iris tendermint show-address --home={iris-home}
 ```
 
 示例返回：
-``·
+```
 fca1jhax359kz6hm70swxpxumpgkaglr7yq80qhwvv
 ```
 
