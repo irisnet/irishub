@@ -99,6 +99,9 @@ func (msg MsgCreateValidator) ValidateBasic() sdk.Error {
 	if msg.Description == (Description{}) {
 		return sdk.NewError(DefaultCodespace, CodeInvalidInput, "description must be included")
 	}
+	if _, err := msg.Description.EnsureLength(); err != nil {
+		return err
+	}
 	if msg.Commission == (CommissionMsg{}) {
 		return sdk.NewError(DefaultCodespace, CodeInvalidInput, "commission must be included")
 	}
@@ -161,6 +164,9 @@ func (msg MsgEditValidator) ValidateBasic() sdk.Error {
 		return sdk.NewError(DefaultCodespace, CodeInvalidInput, "transaction must include some information to modify")
 	}
 
+	if _, err := msg.Description.EnsureLength(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -222,7 +228,7 @@ type MsgBeginRedelegate struct {
 }
 
 func NewMsgBeginRedelegate(delAddr sdk.AccAddress, valSrcAddr,
-	valDstAddr sdk.ValAddress, sharesAmount sdk.Dec) MsgBeginRedelegate {
+valDstAddr sdk.ValAddress, sharesAmount sdk.Dec) MsgBeginRedelegate {
 
 	return MsgBeginRedelegate{
 		DelegatorAddr:    delAddr,

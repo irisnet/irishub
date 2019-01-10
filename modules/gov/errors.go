@@ -41,7 +41,6 @@ const (
 	CodeMoreThanMaxProposal  sdk.CodeType = 27
 	CodeInvalidUpgradeParams sdk.CodeType = 28
 	CodeEmptyParam           sdk.CodeType = 29
-	////////////////////  iris end  /////////////////////////////
 )
 
 //----------------------------------------
@@ -159,9 +158,10 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 }
 
 func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
-
 	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
-
 }
 
-////////////////////  iris end  /////////////////////////////
+func ErrDescriptionLength(codespace sdk.CodespaceType, descriptor string, got, max int) sdk.Error {
+	msg := fmt.Sprintf("bad description length for %v, got length %v, max is %v", descriptor, got, max)
+	return sdk.NewError(codespace, CodeInactiveProposal, msg)
+}

@@ -6,6 +6,8 @@ import (
 
 const MsgType = "guardian"
 
+var _, _, _, _ sdk.Msg = MsgAddProfiler{}, MsgAddTrustee{}, MsgDeleteProfiler{}, MsgDeleteTrustee{}
+
 //______________________________________________________________________
 // MsgAddProfiler - struct for add a profiler
 type MsgAddProfiler struct {
@@ -159,6 +161,9 @@ func (g AddGuardian) ValidateBasic() sdk.Error {
 	if len(g.AddedBy) == 0 {
 		return sdk.ErrInvalidAddress(g.AddedBy.String())
 	}
+	if err := g.EnsureLength(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -168,6 +173,13 @@ func (g DeleteGuardian) ValidateBasic() sdk.Error {
 	}
 	if len(g.DeletedBy) == 0 {
 		return sdk.ErrInvalidAddress(g.DeletedBy.String())
+	}
+	return nil
+}
+
+func (g AddGuardian) EnsureLength() sdk.Error {
+	if len(g.Description) > 70 {
+		return ErrDescriptionLength(DefaultCodespace, "description", len(g.Description), 70)
 	}
 	return nil
 }

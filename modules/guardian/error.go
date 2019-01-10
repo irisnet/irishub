@@ -16,6 +16,7 @@ const (
 	CodeInvalidDescription    sdk.CodeType = 105
 	CodeDeleteGenesisProfiler sdk.CodeType = 106
 	CodeDeleteGenesisTrustee  sdk.CodeType = 107
+	CodeInactiveGuardian      sdk.CodeType = 108
 )
 
 func ErrInvalidOperator(codespace sdk.CodespaceType, operator sdk.AccAddress) sdk.Error {
@@ -48,4 +49,9 @@ func ErrDeleteGenesisTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress
 
 func ErrInvalidDescription(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidDescription, "description is empty")
+}
+
+func ErrDescriptionLength(codespace sdk.CodespaceType, descriptor string, got, max int) sdk.Error {
+	msg := fmt.Sprintf("bad description length for %v, got length %v, max is %v", descriptor, got, max)
+	return sdk.NewError(codespace, CodeInactiveGuardian, msg)
 }

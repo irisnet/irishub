@@ -4,6 +4,7 @@ import (
 	"github.com/irisnet/irishub/tools/protoidl"
 	sdk "github.com/irisnet/irishub/types"
 	"regexp"
+	"fmt"
 )
 
 const (
@@ -14,7 +15,7 @@ const (
 	description   = "description"
 )
 
-var _ sdk.Msg = MsgSvcDef{}
+var _, _, _, _, _, _, _, _, _, _, _ sdk.Msg = MsgSvcDef{}, MsgSvcBind{}, MsgSvcBindingUpdate{}, MsgSvcDisable{}, MsgSvcEnable{}, MsgSvcRefundDeposit{}, MsgSvcRequest{}, MsgSvcResponse{}, MsgSvcRefundFees{}, MsgSvcWithdrawFees{}, MsgSvcWithdrawTax{}
 
 //______________________________________________________________________
 
@@ -69,6 +70,9 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 		return ErrInvalidIDL(DefaultCodespace, err.Error())
 	}
 	if valid, err := validateMethods(methods); !valid {
+		return err
+	}
+	if err := msg.EnsureLength(); err != nil {
 		return err
 	}
 
@@ -176,6 +180,9 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+	if err := ensureNameLength(msg.DefName); err != nil {
+		return err
+	}
 	if !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
@@ -247,6 +254,9 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+	if err := ensureNameLength(msg.DefName); err != nil {
+		return err
+	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
@@ -311,6 +321,9 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+	if err := ensureNameLength(msg.DefName); err != nil {
+		return err
+	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
@@ -362,6 +375,9 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+	}
+	if err := ensureNameLength(msg.DefName); err != nil {
+		return err
 	}
 	if !msg.Deposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
@@ -415,6 +431,9 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+	}
+	if err := ensureNameLength(msg.DefName); err != nil {
+		return err
 	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
@@ -483,6 +502,9 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+	}
+	if err := ensureNameLength(msg.DefName); err != nil {
+		return err
 	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
@@ -673,4 +695,36 @@ func validServiceName(name string) bool {
 	// Must contain alphanumeric characters, _ and - only
 	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
 	return !reg.Match([]byte(name))
+}
+
+func (msg MsgSvcDef) EnsureLength() sdk.Error {
+	if err := ensureNameLength(msg.Name); err != nil {
+		return err
+	}
+	if len(msg.Description) > 280 {
+		return ErrDescriptionLength(DefaultCodespace, "description", len(msg.Description), 280)
+	}
+	if len(msg.Tags) > 10 {
+		return ErrDescriptionLength(DefaultCodespace, "tags", len(msg.Description), 10)
+	} else {
+		for i, tag := range msg.Tags {
+			if len(tag) > 70 {
+				ErrDescriptionLength(DefaultCodespace, fmt.Sprintf("tags[%d]", i), len(tag), 70)
+			}
+		}
+	}
+	if len(msg.AuthorDescription) > 280 {
+		return ErrDescriptionLength(DefaultCodespace, "author_description", len(msg.Author), 280)
+	}
+	if len(msg.IDLContent) > 10000 {
+		return ErrDescriptionLength(DefaultCodespace, "idl_content", len(msg.Author), 10000)
+	}
+	return nil
+}
+
+func ensureNameLength(name string) sdk.Error {
+	if len(name) > 70 {
+		return ErrDescriptionLength(DefaultCodespace, "name", len(name), 70)
+	}
+	return nil
 }

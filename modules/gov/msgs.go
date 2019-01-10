@@ -20,9 +20,7 @@ type MsgSubmitProposal struct {
 	ProposalType   ProposalKind   `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
-	////////////////////  iris begin  ///////////////////////////
-	Params Params
-	////////////////////  iris end  /////////////////////////////
+	Params         Params         `json:"params"`
 }
 
 func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, params Params) MsgSubmitProposal {
@@ -32,9 +30,7 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		ProposalType:   proposalType,
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
-		////////////////////  iris begin  ///////////////////////////
-		Params: params,
-		////////////////////  iris end  /////////////////////////////
+		Params:         params,
 	}
 }
 
@@ -62,7 +58,9 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if !msg.InitialDeposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
 	}
-	////////////////////  iris begin  ///////////////////////////
+	if err := msg.EnsureLength(); err != nil {
+		return err
+	}
 	if msg.ProposalType == ProposalTypeParameterChange {
 
 		if len(msg.Params) == 0 {
@@ -80,7 +78,6 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 		}
 
 	}
-	////////////////////  iris end  /////////////////////////////
 	return nil
 }
 
@@ -131,8 +128,8 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 		return err
 	}
 	// if threshold not in [0.85,1), then print error
-	if msg.Threshold.LT(sdk.NewDecWithPrec(85,2)) || msg.Threshold.GTE(sdk.NewDec(1)){
-		return ErrInvalidUpgradeThreshold(DefaultCodespace,msg.Threshold)
+	if msg.Threshold.LT(sdk.NewDecWithPrec(85, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
+		return ErrInvalidUpgradeThreshold(DefaultCodespace, msg.Threshold)
 	}
 
 	return nil
@@ -304,4 +301,14 @@ func (msg MsgVote) GetSignBytes() []byte {
 // Implements Msg.
 func (msg MsgVote) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Voter}
+}
+
+func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
+	if len(msg.Title) > 70 {
+		return ErrDescriptionLength(DefaultCodespace, "title", len(msg.Title), 70)
+	}
+	if len(msg.Description) > 3000 {
+		return ErrDescriptionLength(DefaultCodespace, "description", len(msg.Description), 3000)
+	}
+	return nil
 }
