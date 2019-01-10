@@ -114,7 +114,7 @@ func (p *ProtocolV0) GetVersion() uint64 {
 	return p.version
 }
 
-func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) bool {
+func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) sdk.Error {
 	subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
 	var txSizeLimit uint32
 	if bool {
@@ -123,7 +123,11 @@ func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) bool {
 		panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
 	}
 
-	return uint32(len(txBytes)) <= txSizeLimit
+	if uint32(len(txBytes)) > txSizeLimit {
+		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+	}
+
+	return nil
 }
 
 // create all Keepers
