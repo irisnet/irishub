@@ -185,6 +185,10 @@ func DefaultParamsForTestnet() Params {
 }
 
 func validateParams(p Params) sdk.Error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateMaxEvidenceAge(p.MaxEvidenceAge); err != nil {
 		return err
 	}
