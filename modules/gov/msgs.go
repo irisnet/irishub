@@ -65,6 +65,10 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	////////////////////  iris begin  ///////////////////////////
 	if msg.ProposalType == ProposalTypeParameterChange {
 
+		if len(msg.Params) == 0 {
+			return ErrEmptyParam(DefaultCodespace)
+		}
+
 		for _, param := range msg.Params {
 			if p, ok := params.ParamSetMapping[param.Subspace]; ok {
 				if _, err := p.Validate(param.Key, param.Value); err != nil {
