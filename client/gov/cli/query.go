@@ -333,8 +333,6 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
-
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:
 				// 1.List of the module;
@@ -395,7 +393,9 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 }
 
 func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
-	if p, ok := params.ParamSetMapping[params.GetParamSpaceFromKey(keyStr)]; ok {
+	paramSets := make(map[string]params.ParamSet)
+	params.RegisterParamSet(paramSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+	if p, ok := paramSets[params.GetParamSpaceFromKey(keyStr)]; ok {
 		if len(res) == 0 {
 			// Return an error directly if the --key parameter is incorrect.
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))

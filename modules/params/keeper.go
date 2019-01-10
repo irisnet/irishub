@@ -13,7 +13,8 @@ type Keeper struct {
 	key  sdk.StoreKey
 	tkey sdk.StoreKey
 
-	spaces map[string]*Subspace
+	spaces    map[string]*Subspace
+	paramSets map[string]ParamSet
 }
 
 // NewKeeper constructs a params keeper
@@ -23,7 +24,8 @@ func NewKeeper(cdc *codec.Codec, key *sdk.KVStoreKey, tkey *sdk.TransientStoreKe
 		key:  key,
 		tkey: tkey,
 
-		spaces: make(map[string]*Subspace),
+		spaces:    make(map[string]*Subspace),
+		paramSets: make(map[string]ParamSet),
 	}
 
 	return k
@@ -54,4 +56,17 @@ func (k Keeper) GetSubspace(storename string) (Subspace, bool) {
 		return Subspace{}, false
 	}
 	return *space, ok
+}
+
+func (k Keeper) RegisterParamSet(ps ...ParamSet) {
+	RegisterParamSet(k.paramSets, ps...)
+}
+
+// Get existing substore from keeper
+func (k Keeper) GetParamSet(paramSpace string) (ParamSet, bool) {
+	paramSet, ok := k.paramSets[paramSpace]
+	if !ok {
+		return nil, false
+	}
+	return paramSet, ok
 }
