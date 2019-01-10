@@ -18,7 +18,6 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 )
 
 const (
@@ -126,13 +125,6 @@ func NewApp() *App {
 
 	// init iparam
 	//params.RegisterParamSet(&mint.Params{})
-
-	params.SetParamReadWriter(app.ParamsKeeper.Subspace(params.GovParamspace).WithTypeTable(
-		params.NewTypeTable(
-			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
-		)),
-		&upgradeparams.UpgradeParameter, )
-
 	return app
 }
 

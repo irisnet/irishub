@@ -60,7 +60,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, params.ErrInvalidString(value)
 		}
 		if !threshold.GT(MinimumGasPrice) || threshold.GT(MaximumGasPrice) {
-			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", value))
+			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be (0, 10^18iris-atto]", value))
 		}
 		return threshold, nil
 	case string(TxSizeLimitKey):
@@ -100,7 +100,7 @@ func DefaultParams() Params {
 
 func validateParams(p Params) error {
 	if !p.GasPriceThreshold.GT(MinimumGasPrice) || p.GasPriceThreshold.GT(MaximumGasPrice) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", p.GasPriceThreshold.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be (0, 10^18iris-atto]", p.GasPriceThreshold.String()))
 	}
 	if p.TxSizeLimit < MinimumTxSizeLimit || p.TxSizeLimit > MaximumTxSizeLimit {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidTxSizeLimit, fmt.Sprintf("Tx size limit (%s) should be [500, 1500]", strconv.FormatUint(uint64(p.TxSizeLimit), 10)))

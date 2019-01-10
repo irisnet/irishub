@@ -65,6 +65,10 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	////////////////////  iris begin  ///////////////////////////
 	if msg.ProposalType == ProposalTypeParameterChange {
 
+		if len(msg.Params) == 0 {
+			return ErrEmptyParam(DefaultCodespace)
+		}
+
 		for _, param := range msg.Params {
 			if p, ok := params.ParamSetMapping[param.Subspace]; ok {
 				if _, err := p.Validate(param.Key, param.Value); err != nil {
@@ -105,17 +109,19 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 
 type MsgSubmitSoftwareUpgradeProposal struct {
 	MsgSubmitProposal
-	Version      uint64 `json:"version"`
-	Software     string `json:"software"`
-	SwitchHeight uint64 `json:"switch_height"`
+	Version      uint64  `json:"version"`
+	Software     string  `json:"software"`
+	SwitchHeight uint64  `json:"switch_height"`
+	Threshold    sdk.Dec `json:"threshold"`
 }
 
-func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64) MsgSubmitSoftwareUpgradeProposal {
+func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64, threshold sdk.Dec) MsgSubmitSoftwareUpgradeProposal {
 	return MsgSubmitSoftwareUpgradeProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Version:           version,
 		Software:          software,
 		SwitchHeight:      switchHeight,
+		Threshold:         threshold,
 	}
 }
 
@@ -124,6 +130,11 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	if err != nil {
 		return err
 	}
+	// if threshold not in [0.85,1), then print error
+	if msg.Threshold.LT(sdk.NewDecWithPrec(85,2)) || msg.Threshold.GTE(sdk.NewDec(1)){
+		return ErrInvalidUpgradeThreshold(DefaultCodespace,msg.Threshold)
+	}
+
 	return nil
 }
 

@@ -31,14 +31,15 @@ const (
 	CodeInvalidVersion        sdk.CodeType = 18
 	CodeInvalidSwitchHeight   sdk.CodeType = 19
 
-	CodeVoteDeleted         sdk.CodeType = 20
-	CodeDepositDeleted      sdk.CodeType = 21
-	CodeVoteNotExisted      sdk.CodeType = 22
-	CodeDepositNotExisted   sdk.CodeType = 23
-	CodeNotInDepositPeriod  sdk.CodeType = 24
-	CodeAlreadyVote         sdk.CodeType = 25
-	CodeOnlyValidatorVote   sdk.CodeType = 26
-	CodeMoreThanMaxProposal sdk.CodeType = 27
+	CodeDepositDeleted       sdk.CodeType = 21
+	CodeVoteNotExisted       sdk.CodeType = 22
+	CodeDepositNotExisted    sdk.CodeType = 23
+	CodeNotInDepositPeriod   sdk.CodeType = 24
+	CodeAlreadyVote          sdk.CodeType = 25
+	CodeOnlyValidatorVote    sdk.CodeType = 26
+	CodeMoreThanMaxProposal  sdk.CodeType = 27
+	CodeInvalidUpgradeParams sdk.CodeType = 28
+	CodeEmptyParam           sdk.CodeType = 29
 	////////////////////  iris end  /////////////////////////////
 )
 
@@ -90,6 +91,10 @@ func ErrInvalidParam(codespace sdk.CodespaceType, str string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("%s Params don't support the ParameterChange.", str))
 }
 
+func ErrEmptyParam(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeEmptyParam, fmt.Sprintf("Params can't be empty"))
+}
+
 func ErrInvalidParamOp(codespace sdk.CodespaceType, opStr string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParamOp, fmt.Sprintf("Op '%s' is not valid", opStr))
 }
@@ -120,10 +125,6 @@ func ErrCodeInvalidSwitchHeight(codespace sdk.CodespaceType, blockHeight uint64,
 	return sdk.NewError(codespace, CodeInvalidVersion, fmt.Sprintf("Protocol switchHeight [%v] in SoftwareUpgradeProposal isn't large than current block height [%v]", switchHeight, blockHeight))
 }
 
-func ErrCodeVoteDeleted(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
-	return sdk.NewError(codespace, CodeVoteDeleted, fmt.Sprintf("The vote records of proposal [%d] have been deleted.", proposalID))
-}
-
 func ErrCodeDepositDeleted(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
 	return sdk.NewError(codespace, CodeDepositDeleted, fmt.Sprintf("The deposit records of proposal [%d] have been deleted.", proposalID))
 }
@@ -150,6 +151,12 @@ func ErrOnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) s
 
 func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLevel string) sdk.Error {
 	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal can't be more than the maximum %v.", proposalLevel, num))
+}
+
+func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
+
+	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
+
 }
 
 ////////////////////  iris end  /////////////////////////////
