@@ -21,15 +21,14 @@ const (
 	CodeInvalidVote             sdk.CodeType = 9
 	CodeInvalidGenesis          sdk.CodeType = 10
 	CodeInvalidProposalStatus   sdk.CodeType = 11
-	////////////////////  iris begin  ///////////////////////////
-	CodeInvalidParam          sdk.CodeType = 12
-	CodeInvalidParamOp        sdk.CodeType = 13
-	CodeSwitchPeriodInProcess sdk.CodeType = 14
-	CodeInvalidPercent        sdk.CodeType = 15
-	CodeInvalidUsageType      sdk.CodeType = 16
-	CodeInvalidInput          sdk.CodeType = 17
-	CodeInvalidVersion        sdk.CodeType = 18
-	CodeInvalidSwitchHeight   sdk.CodeType = 19
+	CodeInvalidParam            sdk.CodeType = 12
+	CodeInvalidParamOp          sdk.CodeType = 13
+	CodeSwitchPeriodInProcess   sdk.CodeType = 14
+	CodeInvalidPercent          sdk.CodeType = 15
+	CodeInvalidUsageType        sdk.CodeType = 16
+	CodeInvalidInput            sdk.CodeType = 17
+	CodeInvalidVersion          sdk.CodeType = 18
+	CodeInvalidProposal         sdk.CodeType = 19
 
 	CodeVoteDeleted          sdk.CodeType = 20
 	CodeDepositDeleted       sdk.CodeType = 21
@@ -159,9 +158,4 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 
 func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
-}
-
-func ErrDescriptionLength(codespace sdk.CodespaceType, descriptor string, got, max int) sdk.Error {
-	msg := fmt.Sprintf("bad description length for %v, got length %v, max is %v", descriptor, got, max)
-	return sdk.NewError(codespace, CodeInactiveProposal, msg)
 }

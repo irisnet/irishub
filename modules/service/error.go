@@ -193,8 +193,3 @@ func ErrNotTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Erro
 func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("[%s] is not a profiler address", profiler))
 }
-
-func ErrDescriptionLength(codespace sdk.CodespaceType, descriptor string, got, max int) sdk.Error {
-	msg := fmt.Sprintf("bad description length for %v, got length %v, max is %v", descriptor, got, max)
-	return sdk.NewError(codespace, CodeInvalidInput, msg)
-}
