@@ -23,9 +23,9 @@ func GetCmdQueryProfilers(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var profilers []guardian.Profiler
+			var profilers []guardian.Guardian
 			for i := 0; i < len(res); i++ {
-				var profiler guardian.Profiler
+				var profiler guardian.Guardian
 				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &profiler)
 				profilers = append(profilers, profiler)
 			}
@@ -49,9 +49,9 @@ func GetCmdQueryTrustees(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var trustees []guardian.Trustee
+			var trustees []guardian.Guardian
 			for i := 0; i < len(res); i++ {
-				var trustee guardian.Trustee
+				var trustee guardian.Guardian
 				cdc.MustUnmarshalBinaryLengthPrefixed(res[i].Value, &trustee)
 				trustees = append(trustees, trustee)
 			}

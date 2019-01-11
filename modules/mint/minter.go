@@ -4,71 +4,58 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+)
+
+const (
+	nanoToMiliSecond  = 1000000
+	miliSecondPerYear = 60 * 60 * 8766 * 1000
 )
 
 // current inflation state
 type Minter struct {
-	InflationLastTime time.Time `json:"inflation_last_time"` // block time which the last inflation was processed
-	Inflation         sdk.Dec   `json:"inflation"`           // current annual inflation rate
+	LastUpdate    time.Time `json:"last_update"`       // time which the last update was made to the minter
+	MintDenom     string    `json:"mint_denom"`        // type of coin to mint
+	InflationBase sdk.Int   `json:"inflation_basement"`
 }
 
-// minter object for a new minter
-func InitialMinter() Minter {
+// Create a new minter object
+func NewMinter(lastUpdate time.Time, mintDenom string, inflationBase sdk.Int) Minter {
 	return Minter{
-		InflationLastTime: time.Unix(0, 0),
-		Inflation:         sdk.NewDecWithPrec(13, 2),
+		LastUpdate:    lastUpdate,
+		MintDenom:     mintDenom,
+		InflationBase: inflationBase,
 	}
+}
+
+// minter object for a new chain
+func InitialMinter() Minter {
+	return NewMinter(
+		time.Unix(0, 0),
+		stakeTypes.StakeDenom,
+		sdk.InitialIssue.Mul(sdk.NewIntWithDecimal(1, 18)), // 2*(10^9)iris, 2*(10^9)*(10^18)iris-atto
+	)
 }
 
 func validateMinter(minter Minter) error {
-	if minter.Inflation.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("mint parameter Inflation should be positive, is %s ", minter.Inflation.String())
-	}
-	if minter.Inflation.GT(sdk.OneDec()) {
-		return fmt.Errorf("mint parameter Inflation must be <= 1, is %s", minter.Inflation.String())
+	if minter.LastUpdate.Nanosecond() < 0 {
+		return fmt.Errorf("mint parameter Inflation should be positive, is %s ", minter.LastUpdate.String())
 	}
 	return nil
 }
 
-var hrsPerYr = sdk.NewDec(8766) // as defined by a julian year of 365.25 days
-
-// process provisions for an hour period
-func (m Minter) ProcessProvisions(params Params) (
-	minter Minter, provisions sdk.Coin) {
-
-	totalSupplyAmount := sdk.NewIntWithDecimal(2, 9).Mul(sdk.NewIntWithDecimal(1, 18))
-	inflationRatePerYear := sdk.NewDecWithPrec(4,2)
-	inflationRatePerHour := inflationRatePerYear.Quo(hrsPerYr)
-	provisionsAmount := inflationRatePerHour.MulInt(totalSupplyAmount).TruncateInt()
-	provisions = sdk.NewCoin(stakeTypes.StakeDenom, provisionsAmount)
-	return m, provisions
+// get the provisions for a block based on the annual provisions rate
+func (m Minter) NextAnnualProvisions(params Params) (provisions sdk.Dec) {
+	return params.Inflation.MulInt(m.InflationBase)
 }
 
-// get the next inflation rate for the hour
-func (m Minter) NextInflation(params Params, bondedRatio sdk.Dec) (inflation sdk.Dec) {
+// get the provisions for a block based on the annual provisions rate
+func (m Minter) BlockProvision(params Params, annualProvisions sdk.Dec, inflationTime time.Time) sdk.Coin {
+	inflationPeriod := inflationTime.Sub(m.LastUpdate)
+	millisecond := inflationPeriod.Nanoseconds() / int64(nanoToMiliSecond)
+	blockTimeAnnualPercent := sdk.NewDec(millisecond).Quo(sdk.NewDec(int64(miliSecondPerYear)))
 
-	// The target annual inflation rate is recalculated for each previsions cycle. The
-	// inflation is also subject to a rate change (positive or negative) depending on
-	// the distance from the desired ratio (67%). The maximum rate change possible is
-	// defined to be 13% per year, however the annual inflation is capped as between
-	// 7% and 20%.
-
-	// (1 - bondedRatio/GoalBonded) * InflationRateChange
-	inflationRateChangePerYear := sdk.OneDec().
-		Sub(bondedRatio.Quo(params.GoalBonded)).
-		Mul(params.InflationRateChange)
-	inflationRateChange := inflationRateChangePerYear.Quo(hrsPerYr)
-
-	// increase the new annual inflation for this next cycle
-	inflation = m.Inflation.Add(inflationRateChange)
-	if inflation.GT(params.InflationMax) {
-		inflation = params.InflationMax
-	}
-	if inflation.LT(params.InflationMin) {
-		inflation = params.InflationMin
-	}
-
-	return inflation
+	blockInflationAmount := annualProvisions.Mul(blockTimeAnnualPercent)
+	return sdk.NewCoin(m.MintDenom, blockInflationAmount.TruncateInt())
 }

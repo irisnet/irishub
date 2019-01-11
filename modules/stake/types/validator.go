@@ -161,7 +161,6 @@ type bechValidator struct {
 
 	Description        Description `json:"description"`           // description terms for the validator
 	BondHeight         int64       `json:"bond_height"`           // earliest height as a bonded validator
-	BondIntraTxCounter int16       `json:"bond_intra_tx_counter"` // block-local tx index of validator change
 
 	UnbondingHeight  int64     `json:"unbonding_height"` // if unbonding, height at which this validator has begun unbonding
 	UnbondingMinTime time.Time `json:"unbonding_time"`   // if unbonding, min time for the validator to complete unbonding
@@ -403,6 +402,14 @@ func (v Validator) AddTokensFromDel(ctx sdk.Context, pool Pool, amount sdk.Int) 
 // RemoveDelShares removes delegator shares from a validator.
 func (v Validator) RemoveDelShares(ctx sdk.Context, pool Pool, delShares sdk.Dec) (Validator, Pool, sdk.Dec) {
 	issuedAmount := v.DelegatorShareExRate().Mul(delShares).TruncateDec()
+
+	// Now the DelegatorShareExRate calculation use gaussian rounding to truncate decimals and only keep 10 decimals
+	// This will cause two bad results:
+	//     1. the issuedAmount might be greater than validator token amount, then the validator token amount will be negative
+	//     2. If the unbond delShares equals to validator total delegator shares, the issuedAmount might be less than validator tokens. As a result, validator will have zero delegator shares but non-zero validator tokens. Once the unbonding is completed, the validator will be deleted, as well as the validator tokens. Then the invariant checking on loosen token will fail.
+	if issuedAmount.GT(v.Tokens) || delShares.Equal(v.DelegatorShares) {
+		issuedAmount = v.Tokens
+	}
 
 	v.Tokens = v.Tokens.Sub(issuedAmount)
 	v.DelegatorShares = v.DelegatorShares.Sub(delShares)

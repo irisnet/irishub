@@ -6,7 +6,6 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/arbitration"
 	"github.com/irisnet/irishub/modules/auth"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/gov"
@@ -20,8 +19,8 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-// export the state of gaia for a genesis file
-func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
+// export the state of iris for a genesis file
+func (p *ProtocolV0)  ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	if forZeroHeight {
@@ -38,6 +37,9 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 	p.accountMapper.IterateAccounts(ctx, appendAccount)
 	fileAccounts := []GenesisFileAccount{}
 	for _, acc := range accounts {
+		if acc.Coins == nil {
+			continue
+		}
 		var coinsString []string
 		for _, coin := range acc.Coins {
 			coinsString = append(coinsString, coin.String())
@@ -53,14 +55,13 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 
 	genState := NewGenesisFileState(
 		fileAccounts,
-		auth.ExportGenesis(ctx, p.feeCollectionKeeper),
+		auth.ExportGenesis(ctx, p.feeKeeper),
 		stake.ExportGenesis(ctx, p.StakeKeeper),
 		mint.ExportGenesis(ctx, p.mintKeeper),
 		distr.ExportGenesis(ctx, p.distrKeeper),
 		gov.ExportGenesis(ctx, p.govKeeper),
 		upgrade.ExportGenesis(ctx),
 		service.ExportGenesis(ctx, p.serviceKeeper),
-		arbitration.ExportGenesis(ctx),
 		guardian.ExportGenesis(ctx, p.guardianKeeper),
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
 	)
@@ -68,12 +69,13 @@ func (p *ProtocolVersion0) ExportAppStateAndValidators(ctx sdk.Context, forZeroH
 	if err != nil {
 		return nil, nil, err
 	}
+	sdk.MustSortJSON(appState)
 	validators = stake.WriteValidators(ctx, p.StakeKeeper)
 	return appState, validators, nil
 }
 
 // prepare for fresh start at zero height
-func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
+func (p *ProtocolV0) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle fee distribution state. */
 
@@ -115,7 +117,7 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	if !feePool.TotalValAccum.Accum.IsZero() {
 		panic("unexpected leftover validator accum")
 	}
-	bondDenom := p.StakeKeeper.GetParams(ctx).BondDenom
+	bondDenom := p.StakeKeeper.BondDenom()
 	if !feePool.ValPool.AmountOf(bondDenom).IsZero() {
 		panic(fmt.Sprintf("unexpected leftover validator pool coins: %v",
 			feePool.ValPool.AmountOf(bondDenom).String()))
@@ -127,27 +129,51 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle stake state. */
 
-	// iterate through validators by power descending, reset bond height, update bond intra-tx counter
+	// iterate through redelegations, reset creation height
+	p.StakeKeeper.IterateRedelegations(ctx, func(_ int64, red stake.Redelegation) (stop bool) {
+		red.CreationHeight = 0
+		p.StakeKeeper.SetRedelegation(ctx, red)
+		return false
+	})
+
+	// iterate through unbonding delegations, reset creation height
+	p.StakeKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stake.UnbondingDelegation) (stop bool) {
+		ubd.CreationHeight = 0
+		p.StakeKeeper.SetUnbondingDelegation(ctx, ubd)
+		return false
+	})
+	// Iterate through validators by power descending, reset bond and unbonding heights
 	store := ctx.KVStore(protocol.KeyStake)
-	iter := sdk.KVStoreReversePrefixIterator(store, stake.ValidatorsByPowerIndexKey)
+	iter := sdk.KVStoreReversePrefixIterator(store, stake.ValidatorsKey)
+	defer iter.Close()
 	counter := int16(0)
+	var valConsAddrs []sdk.ConsAddress
 	for ; iter.Valid(); iter.Next() {
-		addr := sdk.ValAddress(iter.Value())
+		addr := sdk.ValAddress(iter.Key()[1:])
 		validator, found := p.StakeKeeper.GetValidator(ctx, addr)
 		if !found {
 			panic("expected validator, not found")
 		}
 		validator.BondHeight = 0
 		validator.UnbondingHeight = 0
+		valConsAddrs = append(valConsAddrs, validator.ConsAddress())
 		p.StakeKeeper.SetValidator(ctx, validator)
 		counter++
 	}
-	iter.Close()
 
 	/* Handle slashing state. */
 
-	// we have to clear the slashing periods, since they reference heights
+	// remove all existing slashing periods and recreate one for each validator
 	p.slashingKeeper.DeleteValidatorSlashingPeriods(ctx)
+	for _, valConsAddr := range valConsAddrs {
+		sp := slashing.ValidatorSlashingPeriod{
+			ValidatorAddr: valConsAddr,
+			StartHeight:   0,
+			EndHeight:     0,
+			SlashedSoFar:  sdk.ZeroDec(),
+		}
+		p.slashingKeeper.SetValidatorSlashingPeriod(ctx, sp)
+	}
 
 	// reset start height on signing infos
 	p.slashingKeeper.IterateValidatorSigningInfos(ctx, func(addr sdk.ConsAddress, info slashing.ValidatorSigningInfo) (stop bool) {
@@ -159,4 +185,7 @@ func (p *ProtocolVersion0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	/* Handle gov state. */
 
 	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
+
+	/* Handle service state. */
+	service.PrepForZeroHeightGenesis(ctx, p.serviceKeeper)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/gov"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 	"github.com/spf13/viper"
 	"log"
 	"time"
@@ -103,18 +103,18 @@ func (gov *Metrics) RecordMetrics(ctx context.CLIContext, cdc *codec.Codec) {
 
 //-------------------------help functions--------------------------------------
 
-func getAllInactiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposals govtypes.ProposalQueue, err error) {
+func getAllInactiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposals  gov.ProposalQueue, err error) {
 	if res, err := ctx.QueryStore(gov.PrefixInactiveProposalQueue, storeName); err != nil {
-		return govtypes.ProposalQueue{}, err
+		return  gov.ProposalQueue{}, err
 	} else {
 		err = cdc.UnmarshalBinaryLengthPrefixed(res, &proposals)
 		return proposals, err
 	}
 }
 
-func getAllActiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposals govtypes.ProposalQueue, err error) {
+func getAllActiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposals gov.ProposalQueue, err error) {
 	if res, err := ctx.QueryStore(gov.PrefixActiveProposalQueue, storeName); len(res) == 0 || err != nil {
-		return govtypes.ProposalQueue{}, err
+		return  gov.ProposalQueue{}, err
 	} else {
 		err = cdc.UnmarshalBinaryLengthPrefixed(res, &proposals)
 		return proposals, err
@@ -122,22 +122,22 @@ func getAllActiveProposalsID(cdc *codec.Codec, ctx context.CLIContext) (proposal
 
 }
 
-func getProposal(ID int64, cdc *codec.Codec, ctx context.CLIContext) (*govtypes.Proposal, error) {
+func getProposal(ID int64, cdc *codec.Codec, ctx context.CLIContext) (* gov.Proposal, error) {
 	if res, err := ctx.QueryStore(gov.KeyProposal(uint64(ID)), storeName); err != nil {
 		return nil, err
 	} else {
-		var proposal *govtypes.Proposal
+		var proposal *gov.Proposal
 		err = cdc.UnmarshalBinaryLengthPrefixed(res, proposal)
 		return proposal, err
 	}
 }
 
-func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *codec.Codec, ctx context.CLIContext) (vote govtypes.Vote, err error) {
+func getVote(proposalID int64, voterAddr sdk.AccAddress, cdc *codec.Codec, ctx context.CLIContext) (vote gov.Vote, err error) {
 	if res, err := ctx.QueryStore(gov.KeyVote(uint64(proposalID), voterAddr), storeName); err != nil {
-		return govtypes.Vote{}, err
+		return  gov.Vote{}, err
 	} else {
 		if len(res) == 0 {
-			return govtypes.Vote{}, fmt.Errorf("cannot find the vote that %s vote for proposal %d", voterAddr.String(), proposalID)
+			return  gov.Vote{}, fmt.Errorf("cannot find the vote that %s vote for proposal %d", voterAddr.String(), proposalID)
 		}
 		err = cdc.UnmarshalBinaryLengthPrefixed(res, &vote)
 		return vote, err

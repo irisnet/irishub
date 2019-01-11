@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/irisnet/irishub/codec"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 )
@@ -46,6 +46,8 @@ const (
 	CodeGasPriceTooLow    CodeType = 17
 	CodeInvalidGas        CodeType = 18
 	CodeInvalidTxFee      CodeType = 19
+	CodeInvalidFeeDenom   CodeType = 20
+	CodeExceedsTxSize       CodeType = 21
 
 	// CodespaceRoot is a codespace for error codes in this file only.
 	// Notice that 0 is an "unset" codespace, which can be overridden with
@@ -99,6 +101,8 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "invalid gas"
 	case CodeInvalidTxFee:
 		return "invalid tx fee"
+	case CodeInvalidFeeDenom:
+		return "invalid fee denom"
 	default:
 		return unknownCodeMsg(code)
 	}
@@ -163,6 +167,13 @@ func ErrInvalidGas(msg string) Error {
 func ErrInvalidTxFee(msg string) Error {
 	return newErrorWithRootCodespace(CodeInvalidTxFee, msg)
 }
+func ErrInvalidFeeDenom(msg string) Error {
+	return newErrorWithRootCodespace(CodeInvalidFeeDenom, msg)
+}
+func ErrExceedsTxSize(msg string) Error {
+	return newErrorWithRootCodespace(CodeExceedsTxSize, msg)
+}
+
 //----------------------------------------
 // Error & sdkError
 

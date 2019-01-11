@@ -525,7 +525,7 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	}
 
 	rounded := returnAmount.TruncateInt()
-	balance := sdk.NewCoin(k.BondDenom(ctx), rounded)
+	balance := sdk.NewCoin(k.BondDenom(), rounded)
 
 	// no need to create the ubd object just complete now
 	if completeNow {
@@ -593,7 +593,7 @@ func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	}
 
 	rounded := returnAmount.TruncateInt()
-	returnCoin := sdk.NewCoin(k.BondDenom(ctx), rounded)
+	returnCoin := sdk.NewCoin(k.BondDenom(), rounded)
 
 	dstValidator, found := k.GetValidator(ctx, valDstAddr)
 	if !found {

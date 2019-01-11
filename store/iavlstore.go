@@ -16,6 +16,8 @@ import (
 
 const (
 	defaultIAVLCacheSize = 10000
+	NumStoreEvery        = 10000
+	NumRecent            = 100
 )
 
 // load the iavl store
@@ -43,7 +45,6 @@ var _ Queryable = (*iavlStore)(nil)
 
 // iavlStore Implements KVStore and CommitStore.
 type iavlStore struct {
-
 	// The underlying tree.
 	tree *iavl.MutableTree
 
@@ -122,8 +123,8 @@ func (st *iavlStore) SetPruning(pruning sdk.PruningStrategy) {
 	case sdk.PruneNothing:
 		st.storeEvery = 1
 	case sdk.PruneSyncable:
-		st.numRecent = 100
-		st.storeEvery = 10000
+		st.numRecent = NumRecent
+		st.storeEvery = NumStoreEvery
 	}
 }
 
@@ -222,7 +223,7 @@ func (st *iavlStore) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 	res.Height = getHeight(tree, req)
 
 	switch req.Path {
-	case "/key": // get by key
+	case "/key":        // get by key
 		key := req.Data // data holds the key bytes
 
 		res.Key = key

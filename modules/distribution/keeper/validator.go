@@ -81,6 +81,10 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 		k.SetValidatorDistInfo(ctx, vi)
 		k.SetDelegationDistInfo(ctx, di)
 		k.WithdrawToDelegator(ctx, fp, accAddr, withdraw)
+	} else {
+		vi := k.GetValidatorDistInfo(ctx, operatorAddr)
+		vi.DelAccum.UpdateHeight = ctx.BlockHeight()
+		k.SetValidatorDistInfo(ctx, vi)
 	}
 
 	// withdraw validator commission rewards
@@ -108,7 +112,8 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	// withdraw validator commission rewards
 	feePool, commission := k.withdrawValidatorCommission(ctx, operatorAddr)
 	withdraw = withdraw.Plus(commission)
-	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commission.ToString()))
+	commissionTruncated, _ := commission.TruncateDecimal()
+	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commissionTruncated.String()))
 
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
 	return withdraw, resultTags, nil

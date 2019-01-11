@@ -1,16 +1,15 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tools/protoidl"
-	"github.com/irisnet/irishub/modules/bank"
 	"fmt"
-	"github.com/irisnet/irishub/modules/service/params"
-	"github.com/irisnet/irishub/modules/arbitration/params"
-	"time"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/tools/protoidl"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
+	"time"
 )
 
 var DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
@@ -25,15 +24,18 @@ type Keeper struct {
 
 	// codespace
 	codespace sdk.CodespaceType
+	// params subspace
+	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	keeper := Keeper{
-		storeKey:  key,
-		cdc:       cdc,
-		ck:        ck,
-		gk:        gk,
-		codespace: codespace,
+		storeKey:   key,
+		cdc:        cdc,
+		ck:         ck,
+		gk:         gk,
+		codespace:  codespace,
+		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 	return keeper
 }
@@ -111,7 +113,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk.Er
 		return ErrSvcBindingExists(k.Codespace())
 	}
 
-	minDeposit, err := getMinDeposit(ctx, svcBinding.Prices)
+	minDeposit, err := k.getMinDeposit(ctx, svcBinding.Prices)
 	if err != nil {
 		return err
 	}
@@ -188,7 +190,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk
 
 	// only check deposit if binding is available
 	if oldBinding.Available {
-		minDeposit, err := getMinDeposit(ctx, oldBinding.Prices)
+		minDeposit, err := k.getMinDeposit(ctx, oldBinding.Prices)
 		if err != nil {
 			return err
 		}
@@ -236,7 +238,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 		binding.Deposit = binding.Deposit.Plus(deposit)
 	}
 
-	minDeposit, err := getMinDeposit(ctx, binding.Prices)
+	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
 	if err != nil {
 		return err
 	}
@@ -274,7 +276,8 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	}
 
 	blockTime := ctx.BlockHeader().Time
-	refundTime := binding.DisableTime.Add(arbitrationparams.GetArbitrationTimelimit(ctx)).Add(arbitrationparams.GetComplaintRetrospect(ctx))
+	params := k.GetParamSet(ctx)
+	refundTime := binding.DisableTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
 	if blockTime.Before(refundTime) {
 		return ErrRefundDeposit(k.Codespace(), fmt.Sprintf("can not refund deposit before %s", refundTime.Format("2006-01-02 15:04:05")))
 	}
@@ -318,8 +321,8 @@ func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) (SvcRequest, sdk.Err
 	req.RequestIntraTxCounter = counter
 	k.SetIntraTxCounter(ctx, counter+1)
 
-	maxTimeout := serviceparams.GetMaxRequestTimeout(ctx)
-	req.ExpirationHeight = req.RequestHeight + maxTimeout
+	params := k.GetParamSet(ctx)
+	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
 
@@ -446,7 +449,8 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee Inc
 
 // Add incoming fee for a particular provider, if it is not existed will create a new
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
-	feeTax := k.GetServiceFeeTax(ctx)
+	params := k.GetParamSet(ctx)
+	feeTax := params.ServiceFeeTax
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
@@ -492,44 +496,6 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	return nil
 }
 
-//__________________________________________________________________________
-
-func (k Keeper) GetServiceFeeTax(ctx sdk.Context) sdk.Dec {
-	var percent sdk.Dec
-	store := ctx.KVStore(k.storeKey)
-	value := store.Get(serviceFeeTaxKey)
-	if value == nil {
-		return sdk.Dec{}
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &percent)
-	return percent
-}
-
-func (k Keeper) SetServiceFeeTax(ctx sdk.Context, percent sdk.Dec) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(percent)
-	store.Set(serviceFeeTaxKey, bz)
-}
-
-//__________________________________________________________________________
-
-func (k Keeper) GetServiceSlashFraction(ctx sdk.Context) sdk.Dec {
-	var fraction sdk.Dec
-	store := ctx.KVStore(k.storeKey)
-	value := store.Get(serviceSlashFractionKey)
-	if value == nil {
-		return sdk.Dec{}
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fraction)
-	return fraction
-}
-
-func (k Keeper) SetServiceSlashFraction(ctx sdk.Context, fraction sdk.Dec) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fraction)
-	store.Set(serviceSlashFractionKey, bz)
-}
-
 func (k Keeper) Slash(ctx sdk.Context, binding SvcBinding, slashCoins sdk.Coins) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	deposit, hasNeg := binding.Deposit.SafeMinus(slashCoins)
@@ -538,7 +504,7 @@ func (k Keeper) Slash(ctx sdk.Context, binding SvcBinding, slashCoins sdk.Coins)
 		panic(errMsg)
 	}
 	binding.Deposit = deposit
-	minDeposit, err := getMinDeposit(ctx, binding.Prices)
+	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
 	if err != nil {
 		return err
 	}
@@ -572,9 +538,10 @@ func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	store.Set(intraTxCounterKey, bz)
 }
 
-func getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sdk.Error) {
+func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sdk.Error) {
+	params := k.GetParamSet(ctx)
 	// min deposit must >= sum(method price) * minDepositMultiple
-	minDepositMultiple := sdk.NewInt(serviceparams.GetMinDepositMultiple(ctx))
+	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
 	var minDeposit sdk.Coins
 	for _, price := range prices {
 		if price.Amount.BigInt().BitLen()+minDepositMultiple.BigInt().BitLen()-1 > 255 {

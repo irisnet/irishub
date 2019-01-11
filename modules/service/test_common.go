@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"sort"
 	"testing"
@@ -11,13 +12,12 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/mock"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
-	"fmt"
-	"github.com/irisnet/irishub/modules/guardian"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // initialize the mock application for this module
@@ -37,7 +37,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace)
-	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace)
+	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace))
 
 	mapp.Router().AddRoute("service", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
 
@@ -57,8 +57,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 // gov and stake endblocker
 func getEndBlocker() sdk.EndBlocker {
 	return func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-		return abci.ResponseEndBlock{
-		}
+		return abci.ResponseEndBlock{}
 	}
 }
 
@@ -73,6 +72,7 @@ func getInitChainer(mapp *mock.App, serviceKeeper Keeper, stakeKeeper stake.Keep
 		if err != nil {
 			panic(err)
 		}
+
 		InitGenesis(ctx, serviceKeeper, DefaultGenesisState())
 		return abci.ResponseInitChain{
 			Validators: validators,

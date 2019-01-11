@@ -13,7 +13,7 @@ const (
 // BaseConfig defines the server's basic configuration
 type BaseConfig struct {
 	// Tx minimum fee
-	MinFees string `mapstructure:"minimum_fees"`
+	MinFees        string `mapstructure:"minimum_fees"`
 }
 
 // Config defines the server's top level configuration
@@ -34,4 +34,6 @@ func (c *Config) MinimumFees() sdk.Coins {
 }
 
 // DefaultConfig returns server's default configuration.
-func DefaultConfig() *Config { return &Config{BaseConfig{MinFees: defaultMinimumFees}} }
+func DefaultConfig() *Config {
+	return &Config{BaseConfig{MinFees: defaultMinimumFees}}
+}

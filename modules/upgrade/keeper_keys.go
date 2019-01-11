@@ -8,23 +8,23 @@ import (
 )
 
 var (
-	appVersionKey  = "v/%s/%s"    // v/<protocol.version>/<proposalID>
-	proposalIDKey  = "p/%s"    // p/<proposalId>
-	successAppVersionKey = "success/%s"    // h/<protocol.version>
-	signalKey      = "s/%s/%s" // s/<protocol.version>/<switchVoterAddress>
-	signalPrefixKey = "s/%s"
+	proposalIDKey      = "p/%s"       	// p/<proposalId>
+	successVersionKey  = "success/%s" 	// success/<protocolVersion>
+	failedVersionKey   = "failed/%s/%s"	// failed/<protocolVersion>/<proposalId>
+	signalKey          = "s/%s/%s"		// s/<protocolVersion>/<switchVoterAddress>
+	signalPrefixKey    = "s/%s"
 )
-
-func GetAppVersionKey(versionID uint64, proposalID uint64) []byte {
-	return []byte(fmt.Sprintf(appVersionKey, UintToHexString(versionID), UintToHexString(proposalID)))
-}
-
-func GetSuccessAppVersionKey(versionID uint64) []byte {
-	return []byte(fmt.Sprintf(successAppVersionKey, UintToHexString(versionID)))
-}
 
 func GetProposalIDKey(proposalID uint64) []byte {
 	return []byte(fmt.Sprintf(proposalIDKey, UintToHexString(proposalID)))
+}
+
+func GetSuccessVersionKey(versionID uint64) []byte {
+	return []byte(fmt.Sprintf(successVersionKey, UintToHexString(versionID)))
+}
+
+func GetFailedVersionKey(versionID uint64, proposalID uint64) []byte {
+	return []byte(fmt.Sprintf(failedVersionKey, UintToHexString(versionID), UintToHexString(proposalID)))
 }
 
 func GetSignalKey(versionID uint64, switchVoterAddr string) []byte {

@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"encoding/json"
+	"strconv"
+
 	"github.com/irisnet/irishub/modules/gov/tags"
 	sdk "github.com/irisnet/irishub/types"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 	tmstate "github.com/tendermint/tendermint/state"
-	"strconv"
 )
 
 // Handle all "gov" type messages.
@@ -35,17 +36,28 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitProposal) sdk.Result {
 
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
-	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
-		return govtypes.ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
+		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 	////////////////////  iris begin  ///////////////////////////
-	if msg.ProposalType == govtypes.ProposalTypeSoftwareHalt {
-		_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
+	if msg.ProposalType == ProposalTypeSystemHalt {
+		_, found := keeper.guardianKeeper.GetProfiler(ctx, msg.Proposer)
 		if !found {
-			return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
 	}
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Param)
+	if msg.ProposalType == ProposalTypeParameterChange {
+		for _, param := range msg.Params {
+			if p, ok := keeper.paramsKeeper.GetParamSet(param.Subspace); ok {
+				if _, err := p.Validate(param.Key, param.Value); err != nil {
+					return err.Result()
+				}
+			} else {
+				return ErrInvalidParam(DefaultCodespace, param.Subspace).Result()
+			}
+		}
+	}
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
 
 	////////////////////  iris end  /////////////////////////////
 
@@ -57,8 +69,8 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
-	if msg.ProposalType == govtypes.ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*govtypes.ParameterProposal).Param)
+	if msg.ProposalType == ProposalTypeParameterChange {
+		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
 	}
 	////////////////////  iris end  /////////////////////////////
 	resTags := sdk.NewTags(
@@ -82,14 +94,14 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitTxTaxUsageProposal) sdk.Result {
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
-	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
-		return govtypes.ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
+		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
-	if msg.Usage != govtypes.UsageTypeBurn {
-		_, found := keeper.gk.GetTrustee(ctx, msg.DestAddress)
+	if msg.Usage != UsageTypeBurn {
+		_, found := keeper.guardianKeeper.GetTrustee(ctx, msg.DestAddress)
 		if !found {
-			return govtypes.ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
+			return ErrNotTrustee(keeper.codespace, msg.DestAddress).Result()
 		}
 	}
 
@@ -108,7 +120,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 		tags.Percent, []byte(msg.Percent.String()),
 	)
 
-	if msg.Usage != govtypes.UsageTypeBurn {
+	if msg.Usage != UsageTypeBurn {
 		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
 	}
 
@@ -125,24 +137,24 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 
 func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitSoftwareUpgradeProposal) sdk.Result {
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
-	if num, ok := keeper.IsMoreThanMaxProposal(ctx, proposalLevel); ok {
-		return govtypes.ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
+		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
-	if !keeper.pk.IsValidProtocolVersion(ctx, msg.Version) {
-		return govtypes.ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
+	if !keeper.protocolKeeper.IsValidVersion(ctx, msg.Version) {
+		return ErrCodeInvalidVersion(keeper.codespace, msg.Version).Result()
 	}
 
 	if uint64(ctx.BlockHeight()) > msg.SwitchHeight {
-		return govtypes.ErrCodeInvalidSwitchHeight(keeper.codespace, uint64(ctx.BlockHeight()), msg.SwitchHeight).Result()
+		return ErrCodeInvalidSwitchHeight(keeper.codespace, uint64(ctx.BlockHeight()), msg.SwitchHeight).Result()
 	}
-	_, found := keeper.gk.GetProfiler(ctx, msg.Proposer)
+	_, found := keeper.guardianKeeper.GetProfiler(ctx, msg.Proposer)
 	if !found {
-		return govtypes.ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
+		return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 	}
 
-	if _, ok := keeper.pk.GetUpgradeConfig(ctx); ok {
-		return govtypes.ErrSwitchPeriodInProcess(keeper.codespace).Result()
+	if _, ok := keeper.protocolKeeper.GetUpgradeConfig(ctx); ok {
+		return ErrSwitchPeriodInProcess(keeper.codespace).Result()
 	}
 
 	proposal := keeper.NewSoftwareUpgradeProposal(ctx, msg)
@@ -222,35 +234,37 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 	resTags = sdk.NewTags()
 
-	if ctx.BlockHeight() == keeper.GetTerminatorHeight(ctx) {
+	if ctx.BlockHeight() == keeper.GetSystemHaltHeight(ctx) {
 		resTags = resTags.AppendTag(tmstate.HaltTagKey, []byte(tmstate.HaltTagValue))
-		logger.Info(fmt.Sprintf("Terminator Start!!!"))
+		logger.Info(fmt.Sprintf("SystemHalt Start!!!"))
 	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
+	defer inactiveIterator.Close()
 	for ; inactiveIterator.Valid(); inactiveIterator.Next() {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
 		keeper.SubProposalNum(ctx, inactiveProposal)
+		keeper.RefundDepositsWithoutFee(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
-		keeper.RefundDeposits(ctx, proposalID)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
+		keeper.RemoveFromInactiveProposalQueue(ctx, inactiveProposal.GetDepositEndTime(), inactiveProposal.GetProposalID())
 		logger.Info(
 			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %s (had only %s); deleted",
 				inactiveProposal.GetProposalID(),
 				inactiveProposal.GetTitle(),
-				GetMinDeposit(ctx, inactiveProposal),
+				keeper.GetDepositProcedure(ctx, inactiveProposal).MinDeposit,
 				inactiveProposal.GetTotalDeposit(),
 			),
 		)
 	}
-	inactiveIterator.Close()
 
 	activeIterator := keeper.ActiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
+	defer activeIterator.Close()
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &proposalID)
@@ -260,16 +274,16 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var action []byte
 		if result == PASS {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusPassed)
+			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
 			Execute(ctx, keeper, activeProposal)
 		} else if result == REJECT {
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusRejected)
+			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
 		} else if result == REJECTVETO {
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusRejected)
+			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
 		}
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
@@ -284,49 +298,15 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		for _, valAddr := range keeper.GetValidatorSet(ctx, proposalID) {
 			if _, ok := votingVals[valAddr.String()]; !ok {
 				val := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
-				if val != nil {
+				if val != nil && val.GetStatus() == sdk.Bonded {
 					keeper.ds.GetValidatorSet().Slash(ctx,
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
 						val.GetPower().RoundInt64(),
-						GetTallyingProcedure(ctx).GovernancePenalty)
+						keeper.GetTallyingProcedure(ctx, activeProposal).Penalty)
 				}
 			}
 		}
-
-		keeper.SubProposalNum(ctx, activeProposal)
-		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
-	}
-	activeIterator.Close()
-
-	if proposalID, ok := keeper.GetCriticalProposalID(ctx); ok {
-		activeProposal := keeper.GetProposal(ctx, proposalID)
-		result, tallyResults, _ := tally(ctx, keeper, activeProposal)
-
-		var action []byte
-		if result == PASS {
-			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusPassed)
-			action = tags.ActionProposalPassed
-			Execute(ctx, keeper, activeProposal)
-		} else if result == REJECTVETO {
-			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
-			activeProposal.SetStatus(govtypes.StatusRejected)
-			action = tags.ActionProposalRejected
-		} else {
-			return resTags
-		}
-		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
-
-		activeProposal.SetTallyResult(tallyResults)
-		activeProposal.SetVotingEndTime(ctx.BlockHeader().Time)
-		keeper.SetProposal(ctx, activeProposal)
-
-		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
-			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
-
-		resTags = resTags.AppendTag(tags.Action, action)
-		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
 		keeper.SubProposalNum(ctx, activeProposal)
 		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())

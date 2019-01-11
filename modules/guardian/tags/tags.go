@@ -5,7 +5,5 @@ import (
 )
 
 var (
-	ActionAddProfiler = []byte("add-profiler")
-
 	Action = sdk.TagAction
 )

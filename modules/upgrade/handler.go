@@ -3,37 +3,34 @@ package upgrade
 import (
 	sdk "github.com/irisnet/irishub/types"
 	"strconv"
-	protocolKeeper "github.com/irisnet/irishub/app/protocol/keeper"
 )
 
 // do switch
-func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
+func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
-	upgradeConfig,ok := keeper.pk.GetUpgradeConfig(ctx)
+	upgradeConfig,ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
 	if ok {
-		if ctx.BlockHeader().Version.App == upgradeConfig.Definition.Version {
-			keeper.SetSignal(ctx, upgradeConfig.Definition.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
+		if ctx.BlockHeader().Version.App == upgradeConfig.Protocol.Version {
+			uk.SetSignal(ctx, upgradeConfig.Protocol.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
 		} else {
-			keeper.DeleteSignal(ctx, upgradeConfig.Definition.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
+			uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String())
 		}
-
-		if uint64(ctx.BlockHeight())+1 == upgradeConfig.Definition.Height {
-			success := tally(ctx, upgradeConfig.Definition.Version, keeper)
+		if uint64(ctx.BlockHeight())+1 == upgradeConfig.Protocol.Height {
+			success := tally(ctx, upgradeConfig.Protocol.Version, uk, upgradeConfig.Threshold)
 
 			if success {
-				keeper.pk.SetCurrentProtocolVersion(ctx, upgradeConfig.Definition.Version)
+				uk.protocolKeeper.SetCurrentVersion(ctx, upgradeConfig.Protocol.Version)
 			} else {
-				keeper.pk.SetLastFailureVersion(ctx, upgradeConfig.Definition.Version)
+				uk.protocolKeeper.SetLastFailedVersion(ctx, upgradeConfig.Protocol.Version)
 			}
 
-			appVersion := NewVersion(upgradeConfig, success)
-			keeper.AddNewVersion(ctx, appVersion)
-			keeper.pk.ClearUpgradeConfig(ctx)
+			uk.AddNewVersionInfo(ctx, NewVersionInfo(upgradeConfig, success))
+			uk.protocolKeeper.ClearUpgradeConfig(ctx)
 		}
 	}
 
 	// TODO: const CurrentVersionTagKey CurrentSoftwareTagKey
-	tags = tags.AppendTag(protocolKeeper.AppVersionTag, []byte(strconv.FormatUint(keeper.pk.GetCurrentProtocolVersion(ctx),10)))
+	tags = tags.AppendTag(sdk.AppVersionTag, []byte(strconv.FormatUint(uk.protocolKeeper.GetCurrentVersion(ctx),10)))
 
 	return tags
 }

@@ -2,20 +2,42 @@ package types
 
 import (
 	"sync"
+	"fmt"
 )
 
-// Config is the structure that holds the SDK configuration parameters.
-// This could be used to initialize certain configuration parameters for the SDK.
-type Config struct {
-	mtx                 sync.RWMutex
-	sealed              bool
-	bech32AddressPrefix map[string]string
-}
+const (
+	NativeTokenName     = "iris"
+	NativeTokenMinDenom = "iris-atto"
+	DefaultKeyPass      = "1234567890"
+	Testnet             = "testnet"
+	Mainnet             = "mainnet"
+	InvariantPanic      = "panic"
+	InvariantError      = "error"
+)
+
+var (
+	IRIS = NewDefaultCoinType(NativeTokenName)
+	InitialIssue = NewIntWithDecimal(2, 9)	// 2 billion
+	FreeToken4Val, _ = IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(100), NativeTokenName))
+	FreeToken4Acc, _ = IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), NativeTokenName))
+)
+
+// Can be configured through environment variables
+var (
+	NetworkType = Testnet
+	InvariantLevel = InvariantPanic
+	Bech32PrefixAccAddr = "faa"		// account address
+	Bech32PrefixAccPub = "fap"		// account public key
+	Bech32PrefixValAddr = "fva"		// validator operator address
+	Bech32PrefixValPub = "fvp"		// validator operator public key
+	Bech32PrefixConsAddr = "fca"	// consensus node address
+	Bech32PrefixConsPub = "fcp"		// consensus node public key
+)
 
 var (
 	// Initializing an instance of Config
-	sdkConfig = &Config{
-		sealed: false,
+	config = &Config{
+		sealed: true,
 		bech32AddressPrefix: map[string]string{
 			"account_addr":   Bech32PrefixAccAddr,
 			"validator_addr": Bech32PrefixValAddr,
@@ -27,11 +49,30 @@ var (
 	}
 )
 
-// GetConfig returns the config instance for the SDK.
-func GetConfig() *Config {
-	return sdkConfig
+type Config struct {
+	mtx                 sync.RWMutex
+	sealed              bool
+	bech32AddressPrefix map[string]string
 }
 
+// An Invariant is a function which tests a particular invariant.
+// If the invariant has been broken, it should return an error
+// containing a descriptive message about what happened.
+type Invariant func(ctx Context) error
+
+/*
+func InitBech32Prefix() {
+	config.SetBech32PrefixForAccount(Bech32PrefixAccAddr, Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(Bech32PrefixValAddr, Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(Bech32PrefixConsAddr, Bech32PrefixConsPub)
+	config.Seal()
+}
+*/
+// GetConfig returns the config instance for the SDK.
+func GetConfig() *Config {
+	return config
+}
+/*
 func (config *Config) assertNotSealed() {
 	config.mtx.Lock()
 	defer config.mtx.Unlock()
@@ -73,7 +114,7 @@ func (config *Config) Seal() *Config {
 	config.sealed = true
 	return config
 }
-
+*/
 // GetBech32AccountAddrPrefix returns the Bech32 prefix for account address
 func (config *Config) GetBech32AccountAddrPrefix() string {
 	return config.bech32AddressPrefix["account_addr"]

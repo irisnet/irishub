@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // InitGenesis sets the pool and parameters for the provided keeper.  For each
@@ -16,7 +15,9 @@ import (
 // setting the indexes. In addition, it also sets any delegations found in
 // data. Finally, it updates the bonded validators.
 func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res []abci.ValidatorUpdate, err error) {
-
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
 	// We need to pretend to be "n blocks before genesis", where "n" is the validator update delay,
 	// so that e.g. slashing periods are correctly initialized for the validator set
 	// e.g. with a one-block offset - the first TM block is at height 0, so state updates applied from genesis.json are in block -1.
@@ -26,17 +27,24 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	keeper.SetParams(ctx, data.Params)
 	keeper.SetLastTotalPower(ctx, data.LastTotalPower)
 
+	pool := keeper.GetPool(ctx)
 	for _, validator := range data.Validators {
 		keeper.SetValidator(ctx, validator)
 
 		// Manually set indices for the first time
 		keeper.SetValidatorByConsAddr(ctx, validator)
-		keeper.SetValidatorByPowerIndex(ctx, validator, types.Pool{BondedPool:	data.BondedPool})
+		keeper.SetValidatorByPowerIndex(ctx, validator, pool)
 		keeper.OnValidatorCreated(ctx, validator.OperatorAddr)
 
 		// Set timeslice if necessary
 		if validator.Status == sdk.Unbonding {
 			keeper.InsertValidatorQueue(ctx, validator)
+		}
+
+		// Increase loosen token
+		if validator.Status != sdk.Bonded {
+			balance := sdk.NewCoin(types.StakeDenom, validator.Tokens.TruncateInt())
+			pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{balance})
 		}
 	}
 
@@ -51,6 +59,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	for _, ubd := range data.UnbondingDelegations {
 		keeper.SetUnbondingDelegation(ctx, ubd)
 		keeper.InsertUnbondingQueue(ctx, ubd)
+		pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{ubd.Balance})
 	}
 
 	sort.SliceStable(data.Redelegations[:], func(i, j int) bool {
@@ -141,18 +150,11 @@ func ValidateGenesis(data types.GenesisState) error {
 	if err != nil {
 		return err
 	}
-	err = validateParams(data.Params)
+	err = types.ValidateParams(data.Params)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func validateParams(params types.Params) error {
-	if params.BondDenom == "" {
-		return fmt.Errorf("staking parameter BondDenom can't be an empty string")
-	}
 	return nil
 }
 

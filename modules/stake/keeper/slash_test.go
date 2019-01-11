@@ -66,7 +66,7 @@ func TestRevocation(t *testing.T) {
 
 // tests slashUnbondingDelegation
 func TestSlashUnbondingDelegation(t *testing.T) {
-	ctx, keeper, params := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
+	ctx, keeper, _ := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
 	fraction := sdk.NewDecWithPrec(5, 1)
 
 	// set an unbonding delegation
@@ -76,8 +76,8 @@ func TestSlashUnbondingDelegation(t *testing.T) {
 		CreationHeight: 0,
 		// expiration timestamp (beyond which the unbonding delegation shouldn't be slashed)
 		MinTime:        time.Unix(0, 0),
-		InitialBalance: sdk.NewInt64Coin(params.BondDenom, 10),
-		Balance:        sdk.NewInt64Coin(params.BondDenom, 10),
+		InitialBalance: sdk.NewInt64Coin(keeper.BondDenom(), 10),
+		Balance:        sdk.NewInt64Coin(keeper.BondDenom(), 10),
 	}
 	keeper.SetUnbondingDelegation(ctx, ubd)
 
@@ -102,17 +102,17 @@ func TestSlashUnbondingDelegation(t *testing.T) {
 	require.True(t, found)
 
 	// initialbalance unchanged
-	require.Equal(t, sdk.NewInt64Coin(params.BondDenom, 10), ubd.InitialBalance)
+	require.Equal(t, sdk.NewInt64Coin(keeper.BondDenom(), 10), ubd.InitialBalance)
 
 	// balance decreased
-	require.Equal(t, sdk.NewInt64Coin(params.BondDenom, 5), ubd.Balance)
+	require.Equal(t, sdk.NewInt64Coin(keeper.BondDenom(), 5), ubd.Balance)
 	newPool := keeper.GetPool(ctx)
 	require.Equal(t, int64(5), oldPoolLoosenToken.Sub(newPool.GetLoosenTokenAmount(ctx)).RoundInt64())
 }
 
 // tests slashRedelegation
 func TestSlashRedelegation(t *testing.T) {
-	ctx, keeper, params := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
+	ctx, keeper, _ := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
 	fraction := sdk.NewDecWithPrec(5, 1)
 
 	// set a redelegation
@@ -125,8 +125,8 @@ func TestSlashRedelegation(t *testing.T) {
 		MinTime:        time.Unix(0, 0),
 		SharesSrc:      sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)),
 		SharesDst:      sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)),
-		InitialBalance: sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(10, 18)),
-		Balance:        sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(10, 18)),
+		InitialBalance: sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(10, 18)),
+		Balance:        sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(10, 18)),
 	}
 	keeper.SetRedelegation(ctx, rd)
 
@@ -168,10 +168,10 @@ func TestSlashRedelegation(t *testing.T) {
 	require.Equal(t, 1, len(updates))
 
 	// initialbalance unchanged
-	require.Equal(t, sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(10, 18)), rd.InitialBalance)
+	require.Equal(t, sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(10, 18)), rd.InitialBalance)
 
 	// balance decreased
-	require.Equal(t, sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(5, 18)), rd.Balance)
+	require.Equal(t, sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(5, 18)), rd.Balance)
 
 	// shares decreased
 	del, found = keeper.GetDelegation(ctx, addrDels[0], addrVals[1])
@@ -248,7 +248,7 @@ func TestSlashValidatorAtCurrentHeight(t *testing.T) {
 
 // tests Slash at a previous height with an unbonding delegation
 func TestSlashWithUnbondingDelegation(t *testing.T) {
-	ctx, keeper, params := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
+	ctx, keeper, _ := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
 	consAddr := sdk.ConsAddress(PKs[0].Address())
 	fraction := sdk.NewDecWithPrec(5, 1)
 
@@ -259,8 +259,8 @@ func TestSlashWithUnbondingDelegation(t *testing.T) {
 		CreationHeight: 11,
 		// expiration timestamp (beyond which the unbonding delegation shouldn't be slashed)
 		MinTime:        time.Unix(0, 0),
-		InitialBalance: sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(4, 18)),
-		Balance:        sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(4, 18)),
+		InitialBalance: sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(4, 18)),
+		Balance:        sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(4, 18)),
 	}
 	keeper.SetUnbondingDelegation(ctx, ubd)
 
@@ -355,7 +355,7 @@ func TestSlashWithUnbondingDelegation(t *testing.T) {
 
 // tests Slash at a previous height with a redelegation
 func TestSlashWithRedelegation(t *testing.T) {
-	ctx, keeper, params := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
+	ctx, keeper, _ := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
 	consAddr := sdk.ConsAddress(PKs[0].Address())
 	fraction := sdk.NewDecWithPrec(5, 1)
 
@@ -368,8 +368,8 @@ func TestSlashWithRedelegation(t *testing.T) {
 		MinTime:          time.Unix(0, 0),
 		SharesSrc:        sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)),
 		SharesDst:        sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)),
-		InitialBalance:   sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18)),
-		Balance:          sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18)),
+		InitialBalance:   sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18)),
+		Balance:          sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18)),
 	}
 	keeper.SetRedelegation(ctx, rd)
 
@@ -479,7 +479,7 @@ func TestSlashWithRedelegation(t *testing.T) {
 
 // tests Slash at a previous height with both an unbonding delegation and a redelegation
 func TestSlashBoth(t *testing.T) {
-	ctx, keeper, params := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
+	ctx, keeper, _ := setupHelper(t, sdk.NewIntWithDecimal(10, 18))
 	fraction := sdk.NewDecWithPrec(5, 1)
 
 	// set a redelegation
@@ -492,8 +492,8 @@ func TestSlashBoth(t *testing.T) {
 		MinTime:        time.Unix(0, 0),
 		SharesSrc:      sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)),
 		SharesDst:      sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)),
-		InitialBalance: sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18)),
-		Balance:        sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(6, 18)),
+		InitialBalance: sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18)),
+		Balance:        sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18)),
 	}
 	keeper.SetRedelegation(ctx, rdA)
 
@@ -512,8 +512,8 @@ func TestSlashBoth(t *testing.T) {
 		CreationHeight: 11,
 		// expiration timestamp (beyond which the unbonding delegation shouldn't be slashed)
 		MinTime:        time.Unix(0, 0),
-		InitialBalance: sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(4, 18)),
-		Balance:        sdk.NewCoin(params.BondDenom, sdk.NewIntWithDecimal(4, 18)),
+		InitialBalance: sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(4, 18)),
+		Balance:        sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(4, 18)),
 	}
 	keeper.SetUnbondingDelegation(ctx, ubdA)
 
