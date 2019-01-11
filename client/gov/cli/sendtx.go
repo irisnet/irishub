@@ -54,6 +54,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
+				if err := client.ValidateParam(params); err != nil {
+					return err
+				}
 			}
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
 			if proposalType == gov.ProposalTypeTxTaxUsage {
@@ -85,10 +88,10 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				switchHeight := uint64(viper.GetInt64(flagSwitchHeight))
 				thresholdStr := viper.GetString(flagThreshold)
 				threshold, err := sdk.NewDecFromStr(thresholdStr)
-				if err!=nil{
-					return  err
+				if err != nil {
+					return err
 				}
-				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight,threshold)
+				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight, threshold)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -130,7 +133,7 @@ func getParamFromString(paramsStr []string) (gov.Params, error) {
 		//params.GetParamKey(str[0])          == "Inflation"
 		govParams = append(govParams,
 			gov.Param{Subspace: params.GetParamSpaceFromKey(str[0]),
-				Key:   params.GetParamKey(str[0]),
+				Key: params.GetParamKey(str[0]),
 				Value: str[1]})
 	}
 	return govParams, nil
