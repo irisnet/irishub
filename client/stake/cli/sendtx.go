@@ -322,6 +322,8 @@ func getShares(
 		resQuery, err := cliCtx.QueryStore(key, storeName)
 		if err != nil {
 			return sharesAmount, errors.Errorf("cannot find delegation to determine percent Error: %v", err)
+		} else if len(resQuery) == 0 {
+			return sharesAmount, errors.Errorf("delegation (from delegator %s to validator %s) doesn't exist", delegatorAddr.String(), validatorAddr.String())
 		}
 
 		delegation, err := types.UnmarshalDelegation(cdc, key, resQuery)
