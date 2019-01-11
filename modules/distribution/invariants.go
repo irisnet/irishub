@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	staketypes "github.com/irisnet/irishub/modules/stake/types"
+	"runtime/debug"
 )
 
 // AllInvariants runs all invariants of the distribution module
@@ -30,7 +31,19 @@ func AllInvariants(d Keeper, sk StakeKeeper) sdk.Invariant {
 // ValAccumInvariants checks that the fee pool accum == sum all validators' accum
 func ValAccumInvariants(k Keeper, sk StakeKeeper) sdk.Invariant {
 
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		height := ctx.BlockHeight()
 
 		valAccum := sdk.ZeroDec()
@@ -55,7 +68,19 @@ func ValAccumInvariants(k Keeper, sk StakeKeeper) sdk.Invariant {
 // DelAccumInvariants checks that each validator del accum == sum all delegators' accum
 func DelAccumInvariants(k Keeper, sk StakeKeeper) sdk.Invariant {
 
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		height := ctx.BlockHeight()
 
 		totalDelAccumFromVal := make(map[string]sdk.Dec) // key is the valOpAddr string
@@ -131,7 +156,19 @@ func DelAccumInvariants(k Keeper, sk StakeKeeper) sdk.Invariant {
 
 // CanWithdrawInvariant checks that current rewards can be completely withdrawn
 func CanWithdrawInvariant(k Keeper, sk StakeKeeper) sdk.Invariant {
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		// we don't want to write the changes
 		ctx, _ = ctx.CacheContext()
 
@@ -164,6 +201,20 @@ func CanWithdrawInvariant(k Keeper, sk StakeKeeper) sdk.Invariant {
 			return fmt.Errorf("unexpected leftover validator pool coins: %v",
 				feePool.ValPool.AmountOf(staketypes.StakeDenom).String())
 		}
+
+		vdiIterCheck := func(_ int64, valInfo ValidatorDistInfo) (stop bool) {
+			if !valInfo.DelAccum.Accum.IsZero() {
+				panic(fmt.Errorf("unexpected leftover in validator delegation accumulation\n%s", valInfo.String()))
+			}
+			if !valInfo.DelPool.IsZero() {
+				panic(fmt.Errorf("unexpected leftover in validator delegation pool\n%s", valInfo.String()))
+			}
+			if !valInfo.ValCommission.IsZero() {
+				panic(fmt.Errorf("unexpected leftover in validator commission pool\n%s", valInfo.String()))
+			}
+			return false
+		}
+		k.IterateValidatorDistInfos(ctx, vdiIterCheck)
 
 		// all ok
 		return nil

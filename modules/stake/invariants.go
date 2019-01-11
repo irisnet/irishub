@@ -127,7 +127,19 @@ func SupplyInvariants(ck bank.Keeper, k Keeper,
 
 // NonNegativePowerInvariant checks that all stored validators have >= 0 power.
 func NonNegativePowerInvariant(k Keeper) sdk.Invariant {
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
 
 		for ; iterator.Valid(); iterator.Next() {
@@ -162,7 +174,19 @@ func NonNegativePowerInvariant(k Keeper) sdk.Invariant {
 
 // PositiveDelegationInvariant checks that all stored delegations have > 0 shares.
 func PositiveDelegationInvariant(k Keeper) sdk.Invariant {
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		delegations := k.GetAllDelegations(ctx)
 		for _, delegation := range delegations {
 			if delegation.Shares.IsNegative() {
@@ -181,7 +205,19 @@ func PositiveDelegationInvariant(k Keeper) sdk.Invariant {
 // in the delegator object add up to the correct total delegator shares
 // amount stored in each validator
 func DelegatorSharesInvariant(k Keeper) sdk.Invariant {
-	return func(ctx sdk.Context) error {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
 		validators := k.GetAllValidators(ctx)
 		for _, validator := range validators {
 
