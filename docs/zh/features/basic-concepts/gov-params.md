@@ -22,11 +22,11 @@
 
 ## Service模块可治理参数
 
-* `MaxRequestTimeout`   服务调用最大等待区块个数
-* `MinDepositMultiple`  服务绑定最小抵押金额的倍数
-
-## Service模块不可治理参数
-
-* `ServiceFeeTax`服务费的税收比例
+* `MinDepositMultiple`    服务绑定最小抵押金额的倍数
+* `MaxRequestTimeout`     服务调用最大等待区块个数
+* `ServiceFeeTax`         服务费的税收比例
+* `SlashFraction`         惩罚百分比
+* `ComplaintRetrospect`   可提起争议最大时长
+* `ArbitrationTimeLimit`  争议解决最大时长
 
 详细见[service](../service.md)

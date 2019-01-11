@@ -10,185 +10,83 @@ The currently supported IDL language is [protobuf](https://developers.google.com
 4. Dispute Resolution (TODO)
 5. Service Analysis (TODO)
 
+### System parameters
+The following parameters can be modified by governance(./governance.md)
+
+* `MinDepositMultiple`    a multiple of the minimum deposit amount of service binding
+* `MaxRequestTimeout`     maximum number of waiting blocks for service invocation
+* `ServiceFeeTax`         tax rate of service fee
+* `SlashFraction`         slash fraction
+* `ComplaintRetrospect`   maximum time for submit a dispute
+* `ArbitrationTimeLimit`  maximum time of dispute resolution
+
 ## Interactive process
 
-### Service definition process
+### Service definition
 
-1. Any users can define a service. In service definition，use `protobuf` to standardize the definition of the service's method, its input and output parameters.
-
-## Usage Scenario
-### Create an environment
+Any users can define a service. In service definition，use `protobuf` to standardize the definition of the service's method, its input and output parameters.has made some extensions to `protobuf`, please refer to [IDL extension](#idl-extension) for details.
 
 ```
-rm -rf iris
-rm -rf .iriscli
-iris init gen-tx --name=x --home=iris
-iris init --gen-txs --chain-id=service-test -o --home=iris
-iris start --home=iris
-```
-
-### Service Definition
-
-```
-# Service definition
+# create a new service definition
 iriscli service define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 
-# Result
-Committed at block 92 (tx hash: A63241AA6666B8CFE6B1C092B707AB0FA350F108, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:8007 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 100 101 102 105 110 101]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 54 48 49 52 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
-   "tags": {
-     "action": "service-define",
-     "completeConsumedTxFee-iris-atto": "160140000000000"
-   }
-}
-
-# Query service definition
+# query service definition
 iriscli service definition --def-chain-id=service-test --service-name=test-service
-
 ```
 
 ### Service Binding
 
-In service binding, you need to define `deposit`, minimum deposit = `price` of this service * `MinDepositMultiple` in genesis file
+In the service binding, need a deposit amount of the binding, the smallest deposit amount is `MinDepositMultiple` times the service fee。The service provider can update his service binding and adjust the price any time, disable and enable the service binding. If the provider want to refund the deposit need to disable service binding and await a period that is `ComplaintRetrospectParameter` + `ArbitrationTimelimitParameter`.
+
 ```
-# Service Binding
-iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+# create a new service binding
+iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 
-# Result
-Committed at block 168 (tx hash: 02CAC60E75CD93465CAE10CE35F30B53C8A95574, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:5437 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 98 105 110 100]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 48 56 55 52 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
-   "tags": {
-     "action": "service-bind",
-     "completeConsumedTxFee-iris-atto": "108740000000000"
-   }
-}
-
-# Query service binding
+# query service binding
 iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
 
-# Query service binding list
+# query service bindings
 iriscli service bindings --def-chain-id=service-test --service-name=test-service
 
-# Service binding update
+# update a service binding
 iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
 
-# Result
-Committed at block 233 (tx hash: 2F5F44BAF09981D137EA667F9E872EB098A9B619, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:4989 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 98 105 110 100 105 110 103 45 117 112 100 97 116 101]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[57 57 55 56 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
-   "tags": {
-     "action": "service-binding-update",
-     "completeConsumedTxFee-iris-atto": "99780000000000"
-   }
-}
-
-# Disable service binding
+# disable a available service binding
 iriscli service disable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
 
-# Result
-Committed at block 241 (tx hash: 0EF936E1228F9838D0343D0FB3613F5E938602B7, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:4861 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 100 105 115 97 98 108 101] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 57 55 50 50 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
-   "tags": {
-     "action": "service-disable",
-     "completeConsumedTxFee-iris-atto": "\"97220000000000\""
-   }
-}
-
-# Enable service binding
+# enable an unavailable service binding
 iriscli service enable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service --deposit=1iris
 
-# Result
-Committed at block 176 (tx hash: 74AE647B8A311501CA82DACE90AA28CDB4695803, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:6330 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 101 110 97 98 108 101] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 49 50 54 54 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
-   "tags": {
-     "action": "service-enable",
-     "completeConsumedTxFee-iris-atto": "\"126600000000000\""
-   }
-}
-
-# Refund Deposit
-iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
-
-# Result
-Committed at block 1563 (tx hash: 748CEA6EA9DEFB384FFCFBE68A3CB6D8B643361B, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:5116 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 114 101 102 117 110 100 45 100 101 112 111 115 105 116]} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[49 48 50 51 50 48 48 48 48 48 48 48 48 48 48]}] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
-{
-   "tags": {
-     "action": "service-refund-deposit",
-     "completeConsumedTxFee-iris-atto": "102320000000000"
-   }
-}
-```
-
-## CLI Command Details
-
-```
-iriscli service define --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
-```
-* `--service-name`  The name of service
-* `--service-description`  The description of this service
-* `--author-description`  The self-description of the service creator which is optional
-* `--tags`  The keywords of this service
-* `--idl-content`  The standardized definition of the methods for this service
-* `--file`  Idl-content can be replaced by files,if the item is not empty.
-
-```
-iriscli service definition --def-chain-id=service-test --service-name=test-service
-```
-* `--def-chain-id`  The ID of the blockchain defined of the service
-* `--service-name`  The name of service
-
-```
-iriscli service bind --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
-```
-* `--def-chain-id` The ID of the blockchain defined of the service
-* `--service-name` The name of service
-* `--bind-type` Set whether the service is local or global
-* `--deposit` The deposit of service provider
-* `--prices` Service prices, a list sorted by service method
-* `--avg-rsp-time` The average service response time in milliseconds
-* `--usable-time` An integer represents the number of usable service invocations per 10,000
-
-```
-iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
-```
-* `--def-chain-id` The ID of the blockchain defined of the service
-* `--service-name` The name of service
-* `--bind-chain-id`  The ID of the blockchain bound of the service
-* `--provider` The blockchain address of bech32 encoded account 
-
-```
-iriscli service bindings --def-chain-id=service-test --service-name=test-service
-```
-* Refer to iriscli service binding
-
-```
-iriscli service update-binding --chain-id=service-test  --from=x --fee=0.004iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
-```
-* `--def-chain-id` The ID of the blockchain defined of the service
-* `--service-name` The name of service
-* `--bind-type` Set whether the service is local or global
-* `--deposit` Add to the current deposit balance of service provider
-* `--prices` Service prices, a list sorted by service method
-* `--avg-rsp-time` The average service response time in milliseconds
-* `--usable-time` An integer represents the number of usable service invocations per 10,000
-
-```
-iriscli service disable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
-```
-* `--def-chain-id` The ID of the blockchain defined of the service
-* `--service-name` The name of service
-
-```
-iriscli service enable --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service --deposit=1iris
-```
-* `--def-chain-id` The ID of the blockchain defined of the service
-* `--service-name` The name of service
-* `--deposit` Add to the current deposit balance of service provider
-
-```
+# refund all deposit from a service binding
 iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.004iris --def-chain-id=service-test --service-name=test-service
 ```
-* `--def-chain-id` The ID of the blockchain defined of the service
-* `--service-name` The name of service
+
+### Service Invocation
+
+If the service consumer needs to initiate a service invocation request, the service fee specified by the service provider needs to be paid. The service provider needs to respond to the service request within the block height defined by `MaxRequestTimeout`. If the service provider does not respond in time, the deposit of the 'SlashFraction' ratio will be deducted from the service provider's service binding deposit. If the service call is responded normally, the system will deduct the system tax of the `ServiceFeeTax` ratio from the service fee called by the service, and add the remaining service fee to the service provider's incoming pool. If the service call does not respond in time, the service fee for the service call will be refunded to the service consumer's return pool. The service provider/consumer can initiate the `withdraw-fees`/`refund-fees` transaction to retrieve all of the tokens in the incoming/return pool.
+
+```
+# initiate service invocation
+iriscli service call --chain-id=test --from=node0 --fee=0.004iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
+
+# query service requests
+iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
+
+# respond a service invocation
+iriscli service respond --chain-id=test --from=node0 --fee=0.004iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
+
+# query a service response
+iriscli service response --request-chain-id=test --request-id=635-535-0
+
+# query return and incoming fee of a particular address
+iriscli service fees [account address]
+
+# refund all fees from service return fees
+iriscli service refund-fees --chain-id=test --from=node0 --fee=0.004iris
+
+# withdraw all fees from service incoming fees
+iriscli service withdraw-fees --chain-id=test --from=node0 --fee=0.004iris
+```
 
 ## IDL extension
 When using proto file to standardize the definition of the service's method, its input and output parameters, the method attributes can be added through annotations.
