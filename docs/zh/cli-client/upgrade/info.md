@@ -32,9 +32,9 @@ iriscli upgrade info
     "ProposalID": "1",
     "Success": true,
     "Protocol": {
-      "version": "1",
+      "version": "0",
       "software": "https://github.com/irisnet/irishub/tree/v0.10.0",
-      "height": "30"
+      "height": "1"
     }
   },
   "upgrade_config": {
