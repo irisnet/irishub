@@ -34,7 +34,7 @@ Then it will show the current protocol information and the protocol information 
 "Protocol": {
 "version": "0",
 "software": "https://github.com/irisnet/irishub/tree/v0.10.0",
-"height": "0"
+"height": "1"
 }
 
 },
