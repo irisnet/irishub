@@ -25,7 +25,7 @@ Different levels correspond to different parameters：
 | govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 2 | 1 |Critial==1, other(1,)|
+| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critial==1, other(1,)|
 | govTallyingProcedure/Participation | 6/7 | 5/6 | 3/4 |(0,1)|
 | govTallyingProcedure/Threshold | 5/6 | 4/5 | 2/3 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
@@ -43,7 +43,7 @@ Different levels correspond to different parameters：
 
 ### Deposit Procedure
 
-The submitted proposal has the deposit and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet exceeds `MinDeposit`, the proposal will be deleted and the full deposit will be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
+The proposor which submits proposal mortgages at least 30% of `MinDeposit`  and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet exceeds `MinDeposit`, the proposal will be deleted and the full deposit won't be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
 
 ### Voting Procedure
 Only the validator can vote , and they can't vote again. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
