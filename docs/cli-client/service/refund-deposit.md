@@ -16,8 +16,6 @@ iriscli service refund-deposit [flags]
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
 | --service-name        |                         |  [string] service name                                                                                                                                |  Yes     |
-| -h, --help            |                         |  help for refund-deposit                                                                                                                              |          |
-| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

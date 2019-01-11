@@ -14,17 +14,6 @@ Print help messages:
 ```
 iriscli stake delegate --help
 ```
-## Flags
-
-| Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
-| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --fee            | String | True     |                       | Fee to pay along with transaction                            |
-| --from           | String | True     |                       | Name of private key with which to sign                       |
-| --gas            | String | False    | 20000                 | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
-| --gas-adjustment | Float  |          | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |
-| --generate-only  |        |          |                       | Build an unsigned transaction and write it to STDOUT         |
-| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
-
 
 ## Unique Flags
 
