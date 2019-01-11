@@ -40,6 +40,7 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
@@ -94,6 +95,44 @@ func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
 	return nil
 }
 
+type ReadableTag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type ResponseDeliverTx struct {
+	Code                 uint32
+	Data                 []byte
+	Log                  string
+	Info                 string
+	GasWanted            int64
+	GasUsed              int64
+	Tags                 []ReadableTag
+	Codespace            string
+	XXX_NoUnkeyedLiteral struct{}
+	XXX_unrecognized     []byte
+	XXX_sizecache        int32
+}
+
+func MakeResponseDeliverTxHumanReadable(dtx abci.ResponseDeliverTx) ResponseDeliverTx {
+	tags := make([]ReadableTag, len(dtx.Tags))
+	for i, kv := range dtx.Tags {
+		tags[i] = ReadableTag{
+			Key:   string(kv.Key),
+			Value: string(kv.Value),
+		}
+	}
+	return ResponseDeliverTx{
+		Code:      dtx.Code,
+		Data:      dtx.Data,
+		Log:       dtx.Log,
+		Info:      dtx.Info,
+		GasWanted: dtx.GasWanted,
+		GasUsed:   dtx.GasUsed,
+		Codespace: dtx.Codespace,
+		Tags:      tags,
+	}
+}
 func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
 	tx, err := parseTx(cdc, res.Tx)
 	if err != nil {
@@ -104,7 +143,7 @@ func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
 		Hash:   res.Hash,
 		Height: res.Height,
 		Tx:     tx,
-		Result: res.TxResult,
+		Result: MakeResponseDeliverTxHumanReadable(res.TxResult),
 	}, nil
 }
 
@@ -113,7 +152,7 @@ type Info struct {
 	Hash   common.HexBytes        `json:"hash"`
 	Height int64                  `json:"height"`
 	Tx     sdk.Tx                 `json:"tx"`
-	Result abci.ResponseDeliverTx `json:"result"`
+	Result ResponseDeliverTx      `json:"result"`
 }
 
 func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
