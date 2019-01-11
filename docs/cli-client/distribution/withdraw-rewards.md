@@ -22,7 +22,6 @@ iriscli distribution withdraw-rewards --help
 | --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
 | --only-from-validator | string | false    | ""       | only withdraw from this validator address (in bech) |
 | --is-validator        | bool   | false    | false    | Also withdraw validator's commission |
-| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 Keep in mind, don't specify the above options both.
 

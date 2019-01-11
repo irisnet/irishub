@@ -17,8 +17,6 @@ iriscli service respond [flags]
 | --request-chain-id    |                         | [string] the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
 | --request-id          |                         | [string] the ID of the service invocation                                                                                                                                |  Yes     |
 | --response-data       |                         | [string] hex encoded response data of a service invocation                                                                       |         |
-| -h, --help            |                         | help for respond                                                                                                                                         |          |
-| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

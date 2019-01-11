@@ -10,13 +10,6 @@ Withdraw all fees from service incoming fees
 iriscli service withdraw-fees [flags]
 ```
 
-## Flags
-
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| -h, --help            |                         | help for withdraw-fees                                                                                                                                         |          |
-| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
-
 ## Examples
 
 ### Withdraw fees from service incoming fees 
