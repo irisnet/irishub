@@ -34,7 +34,7 @@ iriscli upgrade info
     "Protocol": {
       "version": "1",
       "software": "https://github.com/irisnet/irishub/tree/v0.10.0",
-      "height": "30"
+      "height": "0"
     }
   },
   "upgrade_config": {

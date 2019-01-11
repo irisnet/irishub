@@ -67,7 +67,7 @@ iriscli upgrade info --trust-node
 
 * 场景二
 
-用户在指定的高度（例如80），没有安装新软件，软件无法继续运行：
+用户在指定的高度（例如80），没有安装新软件，软件无法继续运行出现apphash冲突的错误：
 
 ```
 # 1. 下载新版本iris1
@@ -76,7 +76,7 @@ iriscli upgrade info --trust-node
 kill -f iris
 
 # 3. 安装新版本 iris1 并启动
-iris1 start --home=iris
+iris1 start --home=iris --replay-last-block
 
 # 4. 查询当前版本是否升级成功
 iriscli upgrade info --trust-node
