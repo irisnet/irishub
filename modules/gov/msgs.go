@@ -19,9 +19,7 @@ type MsgSubmitProposal struct {
 	ProposalType   ProposalKind   `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
-	////////////////////  iris begin  ///////////////////////////
 	Params Params
-	////////////////////  iris end  /////////////////////////////
 }
 
 func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, params Params) MsgSubmitProposal {
@@ -31,9 +29,7 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		ProposalType:   proposalType,
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
-		////////////////////  iris begin  ///////////////////////////
 		Params: params,
-		////////////////////  iris end  /////////////////////////////
 	}
 }
 
@@ -61,13 +57,13 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if !msg.InitialDeposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
 	}
-	////////////////////  iris begin  ///////////////////////////
+
 	if msg.ProposalType == ProposalTypeParameterChange {
 		if len(msg.Params) == 0 {
 			return ErrEmptyParam(DefaultCodespace)
 		}
 	}
-	////////////////////  iris end  /////////////////////////////
+
 	return nil
 }
 
