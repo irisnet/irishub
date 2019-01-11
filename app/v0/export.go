@@ -69,7 +69,7 @@ func (p *ProtocolV0)  ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight
 	if err != nil {
 		return nil, nil, err
 	}
-	sdk.MustSortJSON(appState)
+
 	validators = stake.WriteValidators(ctx, p.StakeKeeper)
 	return appState, validators, nil
 }
