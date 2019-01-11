@@ -141,14 +141,15 @@ func NonNegativePowerInvariant(k Keeper) sdk.Invariant {
 		}()
 
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
+		defer iterator.Close()
 
+		pool := k.GetPool(ctx)
 		for ; iterator.Valid(); iterator.Next() {
 			validator, found := k.GetValidator(ctx, iterator.Value())
 			if !found {
 				panic(fmt.Sprintf("validator record not found for address: %X\n", iterator.Value()))
 			}
 
-			pool := k.GetPool(ctx)
 			powerKey := keeper.GetValidatorsByPowerIndexKey(validator, pool)
 
 			validatorInfo := fmt.Sprintf("\n\tOperator address: %s\n\tValidator name: %s\n\tValidator Token: %s\n\tValidator Shares: %s\n",
@@ -167,7 +168,6 @@ func NonNegativePowerInvariant(k Keeper) sdk.Invariant {
 			}
 		}
 
-		iterator.Close()
 		return nil
 	}
 }
