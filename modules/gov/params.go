@@ -12,19 +12,17 @@ import (
 )
 
 const (
-	CRITICAL_DEPOSIT      = 4000
-	IMPORTANT_DEPOSIT     = 2000
-	NORMAL_DEPOSIT        = 1000
-	CRITICAL              = "Critical"
-	IMPORTANT             = "Important"
-	NORMAL                = "Normal"
-	LOWER_BOUND_AMOUNT    = 10
-	UPPER_BOUND_AMOUNT    = 10000
-	STABLE_CRITIACAL_NUM  = 1
-	DEFAULT_IMPORTANT_NUM = 2
-	DEFAULT_NORMAL_NUM    = 1
-	MIN_IMPORTANT_NUM     = 1
-	MIN_NORMAL_NUM        = 1
+	CRITICAL_DEPOSIT     = 4000
+	IMPORTANT_DEPOSIT    = 2000
+	NORMAL_DEPOSIT       = 1000
+	CRITICAL             = "Critical"
+	IMPORTANT            = "Important"
+	NORMAL               = "Normal"
+	LOWER_BOUND_AMOUNT   = 10
+	UPPER_BOUND_AMOUNT   = 10000
+	STABLE_CRITIACAL_NUM = 1
+	MIN_IMPORTANT_NUM    = 1
+	MIN_NORMAL_NUM       = 1
 )
 
 var _ params.ParamSet = (*GovParams)(nil)
@@ -249,7 +247,7 @@ func DefaultParams() GovParams {
 		ImportantDepositPeriod: time.Duration(sdk.Day),
 		ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
 		ImportantVotingPeriod:  time.Duration(sdk.SixtyHours),
-		ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
+		ImportantMaxNum:        MIN_IMPORTANT_NUM,
 		ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 		ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 		ImportantParticipation: sdk.NewDecWithPrec(834, 3),
@@ -258,7 +256,7 @@ func DefaultParams() GovParams {
 		NormalDepositPeriod: time.Duration(sdk.Day),
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
 		NormalVotingPeriod:  time.Duration(sdk.TwoDays),
-		NormalMaxNum:        DEFAULT_NORMAL_NUM,
+		NormalMaxNum:        MIN_NORMAL_NUM,
 		NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 		NormalVeto:          sdk.NewDecWithPrec(334, 3),
 		NormalParticipation: sdk.NewDecWithPrec(75, 2),
@@ -268,10 +266,6 @@ func DefaultParams() GovParams {
 }
 
 func validateParams(p GovParams) sdk.Error {
-	if sdk.NetworkType != sdk.Mainnet {
-		return nil
-	}
-
 	if err := validateDepositProcedure(DepositProcedure{
 		MaxDepositPeriod: p.CriticalDepositPeriod,
 		MinDeposit:       p.CriticalMinDeposit,
@@ -392,14 +386,14 @@ func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 	}
 
 	if dp.MaxDepositPeriod < sdk.TwentySeconds || dp.MaxDepositPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %s", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %ds", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
 	}
 	return nil
 }
 
 func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
 	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %s", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %ds", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
 	}
 	return nil
 }

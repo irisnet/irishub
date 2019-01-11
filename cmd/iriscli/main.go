@@ -33,17 +33,7 @@ var (
 )
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			switch rType := r.(type) {
-			case string:
-				println(rType)
-			default:
-				panic(r)
-			}
-		}
-	}()
-	//	sdk.InitBech32Prefix()
+//	sdk.InitBech32Prefix()
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeLatestCodec()
 

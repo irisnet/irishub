@@ -15,7 +15,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/modules/mock"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 	sdk "github.com/irisnet/irishub/types"

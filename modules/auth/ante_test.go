@@ -437,6 +437,11 @@ func TestAnteHandlerMemoGas(t *testing.T) {
 	tx = newTestTx(ctx, []sdk.Msg{msg}, privs, accnums, seqs, fee)
 	checkInvalidTx(t, anteHandler, ctx, tx, false, sdk.CodeOutOfGas)
 
+	// tx with memo doesn't have enough gas
+	fee = NewStdFee(801, sdk.NewInt64Coin("atom", 0))
+	tx = newTestTxWithMemo(ctx, []sdk.Msg{msg}, privs, accnums, seqs, fee, "abcininasidniandsinasindiansdiansdinaisndiasndiadninsd")
+	checkInvalidTx(t, anteHandler, ctx, tx, false, sdk.CodeOutOfGas)
+
 	// memo too large
 	fee = NewStdFee(2001, sdk.NewInt64Coin("atom", 0))
 	tx = newTestTxWithMemo(ctx, []sdk.Msg{msg}, privs, accnums, seqs, fee, "abcininasidniandsinasindiansdiansdinaisndiasndiadninsdabcininasidniandsinasindiansdiansdinaisndiasndiadninsdabcininasidniandsinasindiansdiansdinaisndiasndiadninsd")

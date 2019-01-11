@@ -34,6 +34,12 @@ var (
 	Bech32PrefixConsPub = "fcp"		// consensus node public key
 )
 
+type Config struct {
+	mtx                 sync.RWMutex
+	sealed              bool
+	bech32AddressPrefix map[string]string
+}
+
 var (
 	// Initializing an instance of Config
 	config = &Config{
@@ -48,18 +54,6 @@ var (
 		},
 	}
 )
-
-type Config struct {
-	mtx                 sync.RWMutex
-	sealed              bool
-	bech32AddressPrefix map[string]string
-}
-
-// An Invariant is a function which tests a particular invariant.
-// If the invariant has been broken, it should return an error
-// containing a descriptive message about what happened.
-type Invariant func(ctx Context) error
-
 /*
 func InitBech32Prefix() {
 	config.SetBech32PrefixForAccount(Bech32PrefixAccAddr, Bech32PrefixAccPub)

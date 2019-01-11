@@ -177,6 +177,10 @@ func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
 	}
 
+	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+		return nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
+	}
+
 	vote, bool := keeper.GetVote(ctx, params.ProposalID, params.Voter)
 	if !bool {
 		return nil, ErrCodeVoteNotExisted(DefaultCodespace, params.Voter, params.ProposalID)
@@ -244,6 +248,10 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	proposal := keeper.GetProposal(ctx, params.ProposalID)
 	if proposal == nil {
 		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
+	}
+
+	if proposal.GetStatus() == StatusPassed || proposal.GetStatus() == StatusRejected {
+		return nil, ErrCodeVoteDeleted(DefaultCodespace, params.ProposalID)
 	}
 
 	var votes []Vote

@@ -192,7 +192,6 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 		msg.Version,
 		msg.Software,
 		msg.SwitchHeight,
-		msg.Threshold,
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal

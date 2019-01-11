@@ -1,17 +1,20 @@
 package params
 
 import (
-	"strings"
 	"fmt"
+	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
-func RegisterParamSet(paramSets map[string]ParamSet, ps ...ParamSet) {
+var ParamSetMapping = make(map[string]ParamSet)
+
+func RegisterParamSet(ps ...ParamSet) {
 	for _, ps := range ps {
 		if ps != nil {
-			if _, ok := paramSets[ps.GetParamSpace()]; ok {
+			if _, ok := ParamSetMapping[ps.GetParamSpace()]; ok {
 				panic(fmt.Sprintf("<%s> already registered ", ps.GetParamSpace()))
 			}
-			paramSets[ps.GetParamSpace()] = ps
+			ParamSetMapping[ps.GetParamSpace()] = ps
 		}
 	}
 }
@@ -30,4 +33,32 @@ func GetParamSpaceFromKey(keystr string) string {
 		return ""
 	}
 	return strs[0]
+}
+
+var ParamMapping = make(map[string]GovParameter)
+
+func RegisterGovParamMapping(gps ...GovParameter) {
+	for _, gp := range gps {
+		if gp != nil {
+			ParamMapping[GovParamspace+"/"+string(gp.GetStoreKey())] = gp
+		}
+	}
+}
+
+func InitGenesisParameter(p Parameter, ctx sdk.Context, genesisData interface{}) {
+	if p != nil {
+		find := p.LoadValue(ctx)
+		if !find {
+			p.InitGenesis(genesisData)
+			p.SaveValue(ctx)
+		}
+	}
+}
+
+func SetParamReadWriter(paramSpace Subspace, ps ...Parameter) {
+	for _, p := range ps {
+		if p != nil {
+			p.SetReadWriter(paramSpace)
+		}
+	}
 }

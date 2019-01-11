@@ -20,7 +20,7 @@ type postProposalReq struct {
 	ProposalType   string         `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
-	Params         gov.Params     `json:"param"`
+	Params         gov.Params      `json:"param"`
 	Usage          gov.UsageType  `json:"usage"`
 	DestAddress    sdk.AccAddress `json:"dest_address"`
 	Percent        sdk.Dec        `json:"percent"`
@@ -77,12 +77,6 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			}
 			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{taxMsg})
 			return
-		}
-		if proposalType == gov.ProposalTypeParameterChange {
-			if err := client.ValidateParam(req.Params); err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
 		}
 		err = msg.ValidateBasic()
 		if err != nil {
