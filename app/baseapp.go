@@ -789,6 +789,9 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		if abort {
 			return result
 		}
+
+		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte * sdk.Gas(len(txBytes)), "blockstore")
+
 		if !newCtx.IsZero() {
 			// At this point, newCtx.MultiStore() is cache wrapped,
 			// or something else replaced by anteHandler.
