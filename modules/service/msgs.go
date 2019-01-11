@@ -715,9 +715,6 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 	if len(msg.AuthorDescription) > 280 {
 		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "author_description", len(msg.Author), 280)
 	}
-	if len(msg.IDLContent) > 10000 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "idl_content", len(msg.Author), 10000)
-	}
 	return nil
 }
 
