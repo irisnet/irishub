@@ -29,16 +29,16 @@ const (
 	CodeInvalidInput            sdk.CodeType = 17
 	CodeInvalidVersion          sdk.CodeType = 18
 	CodeInvalidProposal         sdk.CodeType = 19
-
-	CodeDepositDeleted       sdk.CodeType = 21
-	CodeVoteNotExisted       sdk.CodeType = 22
-	CodeDepositNotExisted    sdk.CodeType = 23
-	CodeNotInDepositPeriod   sdk.CodeType = 24
-	CodeAlreadyVote          sdk.CodeType = 25
-	CodeOnlyValidatorVote    sdk.CodeType = 26
-	CodeMoreThanMaxProposal  sdk.CodeType = 27
-	CodeInvalidUpgradeParams sdk.CodeType = 28
-	CodeEmptyParam           sdk.CodeType = 29
+	CodeNotEnoughInitialDeposit sdk.CodeType = 20
+	CodeDepositDeleted          sdk.CodeType = 21
+	CodeVoteNotExisted          sdk.CodeType = 22
+	CodeDepositNotExisted       sdk.CodeType = 23
+	CodeNotInDepositPeriod      sdk.CodeType = 24
+	CodeAlreadyVote             sdk.CodeType = 25
+	CodeOnlyValidatorVote       sdk.CodeType = 26
+	CodeMoreThanMaxProposal     sdk.CodeType = 27
+	CodeInvalidUpgradeParams    sdk.CodeType = 28
+	CodeEmptyParam              sdk.CodeType = 29
 )
 
 //----------------------------------------
@@ -59,7 +59,6 @@ func ErrAlreadyActiveProposal(codespace sdk.CodespaceType, proposalID uint64) sd
 func ErrAlreadyFinishedProposal(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
 	return sdk.NewError(codespace, CodeAlreadyFinishedProposal, fmt.Sprintf("Proposal %d has already passed its voting period", proposalID))
 }
-
 func ErrAddressNotStaked(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeAddressNotStaked, fmt.Sprintf("Address %s is not staked and is thus ineligible to vote", address))
 }
@@ -153,4 +152,8 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 
 func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
+}
+
+func ErrNotEnoughInitialDeposit(codespace sdk.CodespaceType, initialDeposit sdk.Coins, minDeposit sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeNotEnoughInitialDeposit, fmt.Sprintf("Initial Deposit [%s] is less than minInitialDeposit [%s]", initialDeposit.String(), minDeposit.String()))
 }
