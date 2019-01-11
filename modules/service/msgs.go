@@ -65,6 +65,9 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if len(msg.IDLContent) == 0 {
 		return ErrInvalidIDL(DefaultCodespace, "content is empty")
 	}
+	if err := msg.EnsureLength(); err != nil {
+		return err
+	}
 	methods, err := protoidl.GetMethods(msg.IDLContent)
 	if err != nil {
 		return ErrInvalidIDL(DefaultCodespace, err.Error())
@@ -72,10 +75,6 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if valid, err := validateMethods(methods); !valid {
 		return err
 	}
-	if err := msg.EnsureLength(); err != nil {
-		return err
-	}
-
 	return nil
 }
 

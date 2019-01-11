@@ -99,13 +99,12 @@ func (msg MsgCreateValidator) ValidateBasic() sdk.Error {
 	if msg.Description == (Description{}) {
 		return sdk.NewError(DefaultCodespace, CodeInvalidInput, "description must be included")
 	}
-	if _, err := msg.Description.EnsureLength(); err != nil {
-		return err
-	}
 	if msg.Commission == (CommissionMsg{}) {
 		return sdk.NewError(DefaultCodespace, CodeInvalidInput, "commission must be included")
 	}
-
+	if _, err := msg.Description.EnsureLength(); err != nil {
+		return err
+	}
 	return nil
 }
 
