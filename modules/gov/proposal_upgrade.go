@@ -1,5 +1,6 @@
 package gov
 
+import sdk "github.com/irisnet/irishub/types"
 var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
@@ -7,4 +8,5 @@ type SoftwareUpgradeProposal struct {
 	Version      uint64
 	Software     string
 	SwitchHeight uint64
+	Threshold    sdk.Dec
 }

@@ -64,7 +64,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateMaxEvidenceAge(p.MaxEvidenceAge); err != nil {
+		if err := validateMaxEvidenceAge(maxEvidenceAge); err != nil {
 			return nil, err
 		}
 		return maxEvidenceAge, nil
@@ -185,6 +185,10 @@ func DefaultParamsForTestnet() Params {
 }
 
 func validateParams(p Params) sdk.Error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateMaxEvidenceAge(p.MaxEvidenceAge); err != nil {
 		return err
 	}
@@ -237,21 +241,21 @@ func validateSignedBlocksWindow(p int64) sdk.Error {
 
 func validateMinSignedPerWindow(p sdk.Dec) sdk.Error {
 	if p.LT(sdk.NewDecWithPrec(5, 1)) || p.GT(sdk.NewDecWithPrec(9, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between [0.5, 0.9] ", p))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow [%s] should be between [0.5, 0.9] ", p.String()))
 	}
 	return nil
 }
 
 func validateSlashFractionDoubleSign(p sdk.Dec) sdk.Error {
 	if p.LT(sdk.NewDecWithPrec(1, 2)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between [0.01, 0.1] ", p))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionDoubleSign [%s] should be between [0.01, 0.1] ", p.String()))
 	}
 	return nil
 }
 
 func validateSlashFractionDowntime(p sdk.Dec) sdk.Error {
 	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MinSignedPerWindow/SlashFractionDoubleSign/SlashFractionDowntime [%s] should be between [0.005, 0.1] ", p))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionDowntime [%s] should be between [0.005, 0.1] ", p.String()))
 	}
 	return nil
 }

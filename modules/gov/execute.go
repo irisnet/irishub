@@ -3,7 +3,6 @@ package gov
 import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
@@ -41,10 +40,10 @@ func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal)
 	logger := ctx.Logger().With("module", "gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
 	for _, param := range pp.Params {
-		paramSet := params.ParamSetMapping[param.Subspace]
+		paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
 		value, _ := paramSet.Validate(param.Key, param.Value)
-		subspace, bool := gk.paramsKeeper.GetSubspace(param.Subspace)
-		if bool {
+		subspace, found := gk.paramsKeeper.GetSubspace(param.Subspace)
+		if found {
 			subspace.Set(ctx, []byte(param.Key), value)
 		}
 
@@ -73,7 +72,7 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgr
 		return nil
 	}
 
-	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.Version, sp.Software, sp.SwitchHeight)))
+	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.Version, sp.Software, sp.SwitchHeight), sp.Threshold))
 
 	logger.Info("Execute SoftwareProposal Success", "info",
 		fmt.Sprintf("current height:%d", ctx.BlockHeight()))

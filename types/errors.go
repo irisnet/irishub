@@ -47,6 +47,7 @@ const (
 	CodeInvalidGas        CodeType = 18
 	CodeInvalidTxFee      CodeType = 19
 	CodeInvalidFeeDenom   CodeType = 20
+	CodeExceedsTxSize       CodeType = 21
 
 	// CodespaceRoot is a codespace for error codes in this file only.
 	// Notice that 0 is an "unset" codespace, which can be overridden with
@@ -168,6 +169,9 @@ func ErrInvalidTxFee(msg string) Error {
 }
 func ErrInvalidFeeDenom(msg string) Error {
 	return newErrorWithRootCodespace(CodeInvalidFeeDenom, msg)
+}
+func ErrExceedsTxSize(msg string) Error {
+	return newErrorWithRootCodespace(CodeExceedsTxSize, msg)
 }
 
 //----------------------------------------

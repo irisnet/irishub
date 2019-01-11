@@ -115,6 +115,10 @@ func DefaultParams() Params {
 }
 
 func ValidateParams(p Params) error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateUnbondingTime(p.UnbondingTime); err != nil {
 		return err
 	}

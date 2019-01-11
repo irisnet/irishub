@@ -25,6 +25,7 @@ type ProtocolDefinition struct {
 type UpgradeConfig struct {
 	ProposalID uint64
 	Protocol   ProtocolDefinition
+	Threshold  Dec
 }
 
 func NewProtocolDefinition(version uint64, software string, height uint64) ProtocolDefinition {
@@ -35,10 +36,20 @@ func NewProtocolDefinition(version uint64, software string, height uint64) Proto
 	}
 }
 
-func NewUpgradeConfig(proposalID uint64, protocol ProtocolDefinition) UpgradeConfig {
-	return UpgradeConfig{
+
+func NewUpgradeConfig(proposalID uint64, protocol ProtocolDefinition, threshold Dec) UpgradeConfig {
+	return UpgradeConfig {
 		proposalID,
 		protocol,
+		threshold,
+	}
+}
+
+func DefaultUpgradeConfig(software string) UpgradeConfig {
+	return UpgradeConfig{
+		ProposalID:uint64(0),
+		Protocol:NewProtocolDefinition(uint64(0), software, uint64(1)),
+		Threshold:NewDecWithPrec(9,1),
 	}
 }
 

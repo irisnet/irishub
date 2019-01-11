@@ -81,6 +81,10 @@ func (cliCtx CLIContext) BroadcastTxSync(tx []byte) (*ctypes.ResultBroadcastTxCo
 
 	res, err := node.BroadcastTxSync(tx)
 
+	if err != nil {
+		return nil, err
+	}
+
 	result := &ctypes.ResultBroadcastTxCommit{
 		Hash: res.Hash,
 		CheckTx: abci.ResponseCheckTx{

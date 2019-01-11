@@ -16,7 +16,6 @@ import (
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	sdk "github.com/irisnet/irishub/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -113,6 +112,22 @@ func MakeCodec() *codec.Codec {
 
 func (p *ProtocolV0) GetVersion() uint64 {
 	return p.version
+}
+
+func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) sdk.Error {
+	subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
+	var txSizeLimit uint32
+	if bool {
+		subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
+	} else {
+		panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
+	}
+
+	if uint32(len(txBytes)) > txSizeLimit {
+		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+	}
+
+	return nil
 }
 
 // create all Keepers
@@ -236,13 +251,8 @@ func (p *ProtocolV0) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolV0) configParams() {
 
-	params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 
-	params.SetParamReadWriter(p.paramsKeeper.Subspace(params.GovParamspace).WithTypeTable(
-		params.NewTypeTable(
-			upgradeparams.UpgradeParameter.GetStoreKey(), upgradeparams.Params{},
-		)),
-		&upgradeparams.UpgradeParameter, )
 }
 
 // application updates every end block

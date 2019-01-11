@@ -54,6 +54,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
+				if err := client.ValidateParam(params); err != nil {
+					return err
+				}
 			}
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
 			if proposalType == gov.ProposalTypeTxTaxUsage {
@@ -83,7 +86,12 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				version := uint64(viper.GetInt64(flagVersion))
 				software := viper.GetString(flagSoftware)
 				switchHeight := uint64(viper.GetInt64(flagSwitchHeight))
-				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight)
+				thresholdStr := viper.GetString(flagThreshold)
+				threshold, err := sdk.NewDecFromStr(thresholdStr)
+				if err != nil {
+					return err
+				}
+				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight, threshold)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -103,6 +111,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
+	cmd.Flags().String(flagThreshold, "0.85", "the upgrade signal threshold of the software upgrade")
 	////////////////////  iris end  /////////////////////////////
 
 	cmd.MarkFlagRequired(flagTitle)
@@ -124,7 +133,7 @@ func getParamFromString(paramsStr []string) (gov.Params, error) {
 		//params.GetParamKey(str[0])          == "Inflation"
 		govParams = append(govParams,
 			gov.Param{Subspace: params.GetParamSpaceFromKey(str[0]),
-				Key:   params.GetParamKey(str[0]),
+				Key: params.GetParamKey(str[0]),
 				Value: str[1]})
 	}
 	return govParams, nil
