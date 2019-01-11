@@ -76,7 +76,7 @@ iriscli upgrade info --trust-node
 kill -f iris
 
 # 3. 安装新版本 iris1 并启动
-iris1 start --home=iris
+iris1 start --home=iris --replay-last-block
 
 # 4. 查询当前版本是否升级成功
 iriscli upgrade info --trust-node

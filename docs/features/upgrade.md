@@ -77,7 +77,7 @@ kill -f iris
 
 # 3. Install the new version iris1 and start it 
 
-iris1 start --home=iris
+iris1 start --home=iris --replay-last-block
 
 # 4. Query whether the current version has been successfully upgraded
 iriscli upgrade info --trust-node
