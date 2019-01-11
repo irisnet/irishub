@@ -179,7 +179,7 @@ func (g DeleteGuardian) ValidateBasic() sdk.Error {
 
 func (g AddGuardian) EnsureLength() sdk.Error {
 	if len(g.Description) > 70 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidGuardian, "description", len(g.Description), 70)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidGuardian, "description", len(g.Description), 70)
 	}
 	return nil
 }

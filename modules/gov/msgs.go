@@ -305,10 +305,10 @@ func (msg MsgVote) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	if len(msg.Title) > 70 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidProposal, "title", len(msg.Title), 70)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "title", len(msg.Title), 70)
 	}
 	if len(msg.Description) > 3000 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidProposal, "description", len(msg.Description), 3000)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "description", len(msg.Description), 3000)
 	}
 	return nil
 }

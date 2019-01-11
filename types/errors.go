@@ -169,8 +169,8 @@ func ErrInvalidTxFee(msg string) Error {
 func ErrInvalidFeeDenom(msg string) Error {
 	return newErrorWithRootCodespace(CodeInvalidFeeDenom, msg)
 }
-func ErrDescriptionLength(codespace CodespaceType, codeType CodeType, descriptor string, got, max int) Error {
-	msg := fmt.Sprintf("bad description length for %v, got length %v, max is %v", descriptor, got, max)
+func ErrInvalidLength(codespace CodespaceType, codeType CodeType, descriptor string, got, max int) Error {
+	msg := fmt.Sprintf("bad length for %v, got length %v, max is %v", descriptor, got, max)
 	return NewError(codespace, codeType, msg)
 }
 

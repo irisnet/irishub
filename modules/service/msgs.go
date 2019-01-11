@@ -701,29 +701,29 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 		return err
 	}
 	if len(msg.Description) > 280 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidInput, "description", len(msg.Description), 280)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "description", len(msg.Description), 280)
 	}
 	if len(msg.Tags) > 10 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidInput, "tags", len(msg.Description), 10)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "tags", len(msg.Description), 10)
 	} else {
 		for i, tag := range msg.Tags {
 			if len(tag) > 70 {
-				sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidInput, fmt.Sprintf("tags[%d]", i), len(tag), 70)
+				sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, fmt.Sprintf("tags[%d]", i), len(tag), 70)
 			}
 		}
 	}
 	if len(msg.AuthorDescription) > 280 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidInput, "author_description", len(msg.Author), 280)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "author_description", len(msg.Author), 280)
 	}
 	if len(msg.IDLContent) > 10000 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidInput, "idl_content", len(msg.Author), 10000)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "idl_content", len(msg.Author), 10000)
 	}
 	return nil
 }
 
 func ensureNameLength(name string) sdk.Error {
 	if len(name) > 70 {
-		return sdk.ErrDescriptionLength(DefaultCodespace, CodeInvalidInput, "name", len(name), 70)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "name", len(name), 70)
 	}
 	return nil
 }
