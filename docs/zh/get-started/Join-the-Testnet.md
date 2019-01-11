@@ -46,7 +46,7 @@ IRIS基金会通过推出测试网激励计划来鼓励更多的人加入到Fuxi
 
 在Fuxi-8000测试网中， IRIS基金会决定推出更多的测试网激励计划。
 
-Fuxi-7、8000任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-7000/README_CN.md
+Fuxi-8000任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-8000/README_CN.md
 
 ##  更多链接
 

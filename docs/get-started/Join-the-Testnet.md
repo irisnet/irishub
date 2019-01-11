@@ -42,7 +42,7 @@ IRIS foundation plans to reward all the testnet participants who took part in th
 * Results for Fuxi-7000 tasks: https://github.com/irisnet/testnets/issues/211
 
 To get more people involved, IRIS foundation decides to send out more tasks in the latest iteration of testnet:Fuxi-5000.
-* Task List for Fuxi-8000: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-7000/README.md
+* Task List for Fuxi-8000: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-8000/README.md
 
 ##  Useful Links
 
