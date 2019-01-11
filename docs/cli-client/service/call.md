@@ -22,6 +22,7 @@ iriscli service call [flags]
 | --service-fee         |                         | [string] fee to pay for a service invocation                 |          |
 | --request-data        |                         | [string] hex encoded request data of a service invocation    |          |
 | -h, --help            |                         | help for call                                                |          |
+| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

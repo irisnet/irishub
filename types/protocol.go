@@ -36,6 +36,7 @@ func NewProtocolDefinition(version uint64, software string, height uint64) Proto
 	}
 }
 
+
 func NewUpgradeConfig(proposalID uint64, protocol ProtocolDefinition, threshold Dec) UpgradeConfig {
 	return UpgradeConfig {
 		proposalID,

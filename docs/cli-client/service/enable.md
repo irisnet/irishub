@@ -18,6 +18,7 @@ iriscli service enable [flags]
 | --deposit string      |                         | [string] deposit of binding, will add to the current deposit balance                                                                                  |          |
 | --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
 | -h, --help            |                         | help for enable                                                                                                                                       |          |
+| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

@@ -2,8 +2,7 @@
 
 ## Description
 
-Show the id of your node, this id will be used for making connection between peers.
-
+This command shows the hex-encoding of address which derives from private key of node_key.json in {irishome}/config
 ## Usage
 
 ```
@@ -34,7 +33,7 @@ iris tendermint show-node-id --home={iris-home}
 ```
 
 The sample output could be:
-```$xslt
+```
 b18d3d1990c886555241f91331f9c00fe69421aa
 ```
 

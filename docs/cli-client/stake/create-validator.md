@@ -30,6 +30,7 @@ iriscli stake create-validator --help
 | --moniker                    | string | true     | ""       | Validator name |
 | --pubkey                     | string | true     | ""       | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
 | --website                    | string | false    | ""       | Optional website |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

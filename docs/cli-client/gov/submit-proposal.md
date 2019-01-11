@@ -30,6 +30,7 @@ iriscli gov submit-proposal --help
 | --version           |            0                | [uint64] the version of the new protocol                                                                            |       |
 | --software           |           " "                 | [string] the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | [string] the switchheight of the new protocol                                                         |       |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 | --threshold | "0.85"   |  [string] the upgrade signal threshold of the software upgrade                                                   |               |
 
 ## Examples

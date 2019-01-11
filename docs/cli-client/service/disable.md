@@ -17,6 +17,7 @@ iriscli service disable [flags]
 | --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
 | --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
 | -h, --help            |                         | help for disable                                                                                                                                      |          |
+| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

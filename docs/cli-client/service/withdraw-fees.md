@@ -15,6 +15,7 @@ iriscli service withdraw-fees [flags]
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | -h, --help            |                         | help for withdraw-fees                                                                                                                                         |          |
+| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 
