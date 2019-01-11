@@ -169,6 +169,10 @@ func DefaultParamsForTest() Params {
 }
 
 func validateParams(p Params) error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateMaxRequestTimeout(p.MaxRequestTimeout); err != nil {
 		return err
 	}

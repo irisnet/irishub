@@ -30,7 +30,6 @@ const (
 	CodeInvalidVersion          sdk.CodeType = 18
 	CodeInvalidProposal         sdk.CodeType = 19
 
-	CodeVoteDeleted          sdk.CodeType = 20
 	CodeDepositDeleted       sdk.CodeType = 21
 	CodeVoteNotExisted       sdk.CodeType = 22
 	CodeDepositNotExisted    sdk.CodeType = 23
@@ -122,10 +121,6 @@ func ErrCodeInvalidVersion(codespace sdk.CodespaceType, version uint64) sdk.Erro
 }
 func ErrCodeInvalidSwitchHeight(codespace sdk.CodespaceType, blockHeight uint64, switchHeight uint64) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidVersion, fmt.Sprintf("Protocol switchHeight [%v] in SoftwareUpgradeProposal isn't large than current block height [%v]", switchHeight, blockHeight))
-}
-
-func ErrCodeVoteDeleted(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
-	return sdk.NewError(codespace, CodeVoteDeleted, fmt.Sprintf("The vote records of proposal [%d] have been deleted.", proposalID))
 }
 
 func ErrCodeDepositDeleted(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
