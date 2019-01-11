@@ -42,7 +42,7 @@
 * `Participation` 由govTallyingProcedure/Participation定义
 
 ### 抵押阶段
-提交的提议有抵押金，当抵押金超过 `MinDeposit` ,才能进入投票阶段。该提议超过 `MaxDepositPeriod` ，还未进超过 `MinDeposit`，则提议会被删除，并返还全部抵押金。 
+提交提议者至少抵押30%的 `MinDeposit` ，当抵押金超过 `MinDeposit` ,才能进入投票阶段。该提议超过 `MaxDepositPeriod` ，还未进超过 `MinDeposit`，则提议会被删除，并不会返还抵押金。 
 不能对进入投票阶段的提议再进行抵押。
 
 ### 投票阶段

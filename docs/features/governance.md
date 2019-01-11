@@ -43,7 +43,7 @@ Different levels correspond to different parameters：
 
 ### Deposit Procedure
 
-The submitted proposal has the deposit and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet exceeds `MinDeposit`, the proposal will be deleted and the full deposit will be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
+The proposor which submits proposal mortgages at least 30% of `MinDeposit`  and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet exceeds `MinDeposit`, the proposal will be deleted and the full deposit won't be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
 
 ### Voting Procedure
 Only the validator can vote , and they can't vote again. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
