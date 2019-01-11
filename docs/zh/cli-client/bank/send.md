@@ -37,6 +37,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 | --ledger         | String | 否       |                       | 使用一个联网的分账设备                                       |
 | --node           | String | 否       | tcp://localhost:26657 | <主机>:<端口> 链上的tendermint rpc 接口。                    |
 | --trust-node     | String | 否       | True                  | 不验证响应的证明                                             |
+| --commit         | String | 否     | True                  |是否等到交易有明确的返回值，如果是True，则忽略--async的内容|
 
 
 

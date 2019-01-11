@@ -21,6 +21,7 @@ iriscli service update-binding [flags]
 | --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
 | --usable-time         |                         | [int] an integer represents the number of usable service invocations per 10,000                                                                       |          |
 | -h, --help            |                         | help for update-binding                                                                                                                               |          |
+| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

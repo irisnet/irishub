@@ -15,6 +15,7 @@ iriscli service refund-fees [flags]
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | -h, --help            |                         | help for refund-fees                                                                                                                                         |          |
+| --commit           | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 
