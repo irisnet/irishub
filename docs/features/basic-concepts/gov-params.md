@@ -20,8 +20,9 @@ Details in [gov](../governance.md)
 
 ## Parameters inService Module
 
-* `MaxRequestTimeout`   The maximum of waiting blocks for service invocation
-* `MinProviderDeposit`  The minimum deposit for service binding
-
-Details in [service](../service.md)
-
+* `MinDepositMultiple`    a multiple of the minimum deposit amount of service binding
+* `MaxRequestTimeout`     maximum number of waiting blocks for service invocation
+* `ServiceFeeTax`         tax rate of service fee
+* `SlashFraction`         slash fraction
+* `ComplaintRetrospect`   maximum time for submit a dispute
+* `ArbitrationTimeLimit`  maximum time of dispute resolution
