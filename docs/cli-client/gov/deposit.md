@@ -21,6 +21,8 @@ iriscli gov deposit --help
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --deposit        |                            | [string] Deposit of proposal                                                                                                                         | Yes      |
 | --proposal-id    |                            | [string] ProposalID of proposal depositing on                                                                                                        | Yes      |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
+
 ## Examples
 
 ### Deposit

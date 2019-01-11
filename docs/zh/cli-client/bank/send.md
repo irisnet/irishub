@@ -51,7 +51,6 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.004iris --cha
 
 
 
-## 
 
 ## 例子
 

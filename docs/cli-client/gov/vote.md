@@ -21,6 +21,7 @@ iriscli gov vote --help
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --option         |                            | [string] Vote option {Yes, No, NoWithVeto, Abstain}                                                                                                  | Yes      |
 | --proposal-id    |                            | [string] ProposalID of proposal voting on                                                                                                            | Yes      |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 

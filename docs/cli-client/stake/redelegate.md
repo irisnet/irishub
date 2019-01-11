@@ -24,6 +24,7 @@ iriscli stake redelegate --help
 | --address-validator-source | string | true     | ""       | Bech address of the source validator |
 | --shares-amount            | float  | false    | 0.0      | Amount of source-shares to either unbond or redelegate as a positive integer or decimal |
 | --shares-percent           | float  | false    | 0.0      | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 Users must specify the redeleagtion token amount. There two options can do this: `--shares-amount` or `--shares-percent`. Keep in mind, don't specify both of them.
 

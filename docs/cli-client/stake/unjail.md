@@ -14,6 +14,11 @@ Print help messages:
 ```
 iriscli stake unjail --help
 ```
+## Flags
+
+| Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
+| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 ## Examples
 
