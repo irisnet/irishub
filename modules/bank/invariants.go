@@ -3,10 +3,10 @@ package bank
 import (
 	"errors"
 	"fmt"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
 	"runtime/debug"
+
+	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // NonnegativeBalanceInvariant checks that all accounts in the application have non-negative balances

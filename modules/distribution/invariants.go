@@ -2,10 +2,10 @@ package distribution
 
 import (
 	"fmt"
-
-	sdk "github.com/irisnet/irishub/types"
-	staketypes "github.com/irisnet/irishub/modules/stake/types"
 	"runtime/debug"
+
+	staketypes "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // AllInvariants runs all invariants of the distribution module
