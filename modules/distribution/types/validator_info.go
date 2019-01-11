@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -150,4 +152,20 @@ func (vi ValidatorDistInfo) CurrentCommissionRewards(
 	commission := withdrawalTokens.MulDec(wc.CommissionRate)
 	commissionPool := vi.ValCommission.Plus(commission)
 	return commissionPool
+}
+
+// convert validator distribution info to string
+func (vi ValidatorDistInfo) String() string {
+
+	resp := "ValidatorDistInfo {\n"
+	resp += fmt.Sprintf("\tOperator Address: %s\n", vi.OperatorAddr)
+	resp += fmt.Sprintf("\tFeePoolWithdrawalHeight: %d\n", vi.FeePoolWithdrawalHeight)
+	resp += fmt.Sprintf("\tDelAccum: {\n")
+	resp += fmt.Sprintf("\t\tUpdateHeight: %d\n", vi.DelAccum.UpdateHeight)
+	resp += fmt.Sprintf("\t\tAccum: %s\n", vi.DelAccum.Accum.String())
+	resp += fmt.Sprintf("\t}\n")
+	resp += fmt.Sprintf("\tdel_pool: %s\n", vi.DelPool.ToString())
+	resp += fmt.Sprintf("\tval_commission: %s\n", vi.ValCommission.ToString())
+	resp += fmt.Sprintf("}")
+	return resp
 }
