@@ -2,12 +2,12 @@ package simulation
 
 import (
 	"fmt"
+	"runtime/debug"
 
-	sdk "github.com/irisnet/irishub/types"
 	distr "github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	"runtime/debug"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // AllInvariants runs all invariants of the distribution module
