@@ -166,7 +166,7 @@ func (vi ValidatorDistInfo) String() string {
 	resp += fmt.Sprintf("\t}\n")
 	resp += fmt.Sprintf("\tdel_pool: %s\n", vi.DelPool.ToString())
 	resp += fmt.Sprintf("\tval_commission: %s\n", vi.ValCommission.ToString())
-	resp += fmt.Sprintf("}\n")
+	resp += fmt.Sprintf("}")
 
 	return resp
 }
