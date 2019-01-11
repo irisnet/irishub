@@ -2,15 +2,15 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path"
 
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/irisnet/irishub/codec"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io/ioutil"
-	"path"
 )
 
 const (
@@ -72,7 +72,7 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			if err != nil {
 				return err
 			}
-
+			encoded = sdk.MustSortJSON(encoded)
 			fmt.Println(string(encoded))
 			return nil
 		},
