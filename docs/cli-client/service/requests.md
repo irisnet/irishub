@@ -18,7 +18,6 @@ iriscli service requests [flags]
 | --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
 | --bind-chain-id       |                         | [string] the ID of the blockchain bond of the service                                                                                                                                 |  Yes     |
 | --provider            |                         | [string] bech32 encoded account created the service binding                                                                       |  Yes     |
-| -h, --help            |                         | help for requests                                                                                                                                         |          |
 
 ## Examples
 

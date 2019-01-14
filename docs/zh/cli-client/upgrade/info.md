@@ -15,10 +15,6 @@ iriscli upgrade info
 ```
 iriscli upgrade info --help
 ```
-## 标志
-
-| 名称, 速记       | 默认值                     | 描述                                                        | 必需     |
-| --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
 
 ## 例子
 
@@ -36,17 +32,17 @@ iriscli upgrade info
     "ProposalID": "1",
     "Success": true,
     "Protocol": {
-      "version": "1",
-      "software": "https://github.com/irisnet/irishub/tree/v0.7.0",
-      "height": "30"
+      "version": "0",
+      "software": "https://github.com/irisnet/irishub/tree/v0.10.0",
+      "height": "1"
     }
   },
   "upgrade_config": {
     "ProposalID": "3",
     "Definition": {
-      "version": "2",
-      "software": "https://github.com/irisnet/irishub/tree/v0.9.0",
-      "height": "80"
+      "version": "1",
+      "software": "https://github.com/irisnet/irishub/tree/v0.10.1",
+      "height": "8000"
     }
   }
 }
