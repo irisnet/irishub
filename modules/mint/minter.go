@@ -56,7 +56,7 @@ func (m Minter) NextAnnualProvisions(params Params) (provisions sdk.Dec) {
 }
 
 // get the provisions for a block based on the annual provisions rate
-func (m Minter) BlockProvision(params Params, annualProvisions sdk.Dec) sdk.Coin {
+func (m Minter) BlockProvision(annualProvisions sdk.Dec) sdk.Coin {
 	blockInflationAmount := annualProvisions.QuoInt(sdk.NewInt(blocksPerYear))
 	return sdk.NewCoin(m.MintDenom, blockInflationAmount.TruncateInt())
 }

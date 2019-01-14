@@ -21,7 +21,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
 	// Calculate block mint amount
 	params := k.GetParamSet(ctx)
 	annualProvisions := minter.NextAnnualProvisions(params)
-	mintedCoin := minter.BlockProvision(params, annualProvisions)
+	mintedCoin := minter.BlockProvision(annualProvisions)
 
 	// Increase loosen token and add minted coin to feeCollector
 	k.bk.IncreaseLoosenToken(ctx, sdk.Coins{mintedCoin})
