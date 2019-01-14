@@ -173,9 +173,16 @@ func ErrInvalidFeeDenom(msg string) Error {
 func ErrExceedsTxSize(msg string) Error {
 	return newErrorWithRootCodespace(CodeExceedsTxSize, msg)
 }
+
 func ErrServiceTxLimit(msg string) Error {
 	return newErrorWithRootCodespace(CodeServiceTxLimit, msg)
 }
+
+func ErrInvalidLength(codespace CodespaceType, codeType CodeType, descriptor string, got, max int) Error {
+	msg := fmt.Sprintf("bad length for %v, got length %v, max is %v", descriptor, got, max)
+	return NewError(codespace, codeType, msg)
+}
+
 //----------------------------------------
 // Error & sdkError
 

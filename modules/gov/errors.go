@@ -21,7 +21,6 @@ const (
 	CodeInvalidVote             sdk.CodeType = 9
 	CodeInvalidGenesis          sdk.CodeType = 10
 	CodeInvalidProposalStatus   sdk.CodeType = 11
-	////////////////////  iris begin  ///////////////////////////
 	CodeInvalidParam            sdk.CodeType = 12
 	CodeInvalidParamOp          sdk.CodeType = 13
 	CodeSwitchPeriodInProcess   sdk.CodeType = 14
@@ -29,7 +28,7 @@ const (
 	CodeInvalidUsageType        sdk.CodeType = 16
 	CodeInvalidInput            sdk.CodeType = 17
 	CodeInvalidVersion          sdk.CodeType = 18
-	CodeInvalidSwitchHeight     sdk.CodeType = 19
+	CodeInvalidProposal         sdk.CodeType = 19
 	CodeNotEnoughInitialDeposit sdk.CodeType = 20
 	CodeDepositDeleted          sdk.CodeType = 21
 	CodeVoteNotExisted          sdk.CodeType = 22
@@ -40,7 +39,6 @@ const (
 	CodeMoreThanMaxProposal     sdk.CodeType = 27
 	CodeInvalidUpgradeParams    sdk.CodeType = 28
 	CodeEmptyParam              sdk.CodeType = 29
-	////////////////////  iris end  /////////////////////////////
 )
 
 //----------------------------------------
@@ -61,7 +59,6 @@ func ErrAlreadyActiveProposal(codespace sdk.CodespaceType, proposalID uint64) sd
 func ErrAlreadyFinishedProposal(codespace sdk.CodespaceType, proposalID uint64) sdk.Error {
 	return sdk.NewError(codespace, CodeAlreadyFinishedProposal, fmt.Sprintf("Proposal %d has already passed its voting period", proposalID))
 }
-
 func ErrAddressNotStaked(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeAddressNotStaked, fmt.Sprintf("Address %s is not staked and is thus ineligible to vote", address))
 }
@@ -160,5 +157,3 @@ func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) 
 func ErrNotEnoughInitialDeposit(codespace sdk.CodespaceType, initialDeposit sdk.Coins, minDeposit sdk.Coins) sdk.Error {
 	return sdk.NewError(codespace, CodeNotEnoughInitialDeposit, fmt.Sprintf("Initial Deposit [%s] is less than minInitialDeposit [%s]", initialDeposit.String(), minDeposit.String()))
 }
-
-////////////////////  iris end  /////////////////////////////

@@ -16,6 +16,7 @@ const (
 	CodeInvalidDescription    sdk.CodeType = 105
 	CodeDeleteGenesisProfiler sdk.CodeType = 106
 	CodeDeleteGenesisTrustee  sdk.CodeType = 107
+	CodeInvalidGuardian       sdk.CodeType = 108
 )
 
 func ErrInvalidOperator(codespace sdk.CodespaceType, operator sdk.AccAddress) sdk.Error {

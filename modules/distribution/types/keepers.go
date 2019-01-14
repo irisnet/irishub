@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+)
 
 // expected stake keeper
 type StakeKeeper interface {
@@ -12,6 +15,7 @@ type StakeKeeper interface {
 	TotalPower(ctx sdk.Context) sdk.Dec
 	GetLastTotalPower(ctx sdk.Context) sdk.Int
 	GetLastValidatorPower(ctx sdk.Context, valAddr sdk.ValAddress) sdk.Int
+	GetValidatorDelegations(ctx sdk.Context, valAddr sdk.ValAddress) []types.Delegation
 }
 
 // expected coin keeper
