@@ -164,9 +164,10 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	}
 	var proposal Proposal = &TaxUsageProposal{
 		textProposal,
-		msg.Usage,
-		msg.DestAddress,
-		msg.Percent,
+		TaxUsage{
+			msg.Usage,
+			msg.DestAddress,
+			msg.Percent},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -189,9 +190,10 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
 		textProposal,
-		msg.Version,
-		msg.Software,
-		msg.SwitchHeight,
+		Upgrade{
+			msg.Version,
+			msg.Software,
+			msg.SwitchHeight,},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -611,8 +613,6 @@ func (keeper Keeper) SetSystemHaltHeight(ctx sdk.Context, height int64) {
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(height)
 	store.Set(KeySystemHaltHeight, bz)
 }
-
-
 
 func (keeper Keeper) GetCriticalProposalID(ctx sdk.Context) (uint64, bool) {
 	store := ctx.KVStore(keeper.storeKey)
