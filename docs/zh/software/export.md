@@ -17,6 +17,7 @@ iris export [flags]
 | --for-zero-height   | bool   | false    | false    | 导出数据之前做一些清理性的工作，如果不想以导出的数据启动一条新链，可以不加这个标志 |
 | --height            | int    | false    | 0        | 指定的高度，默认值为0表示导出当前高度状态 |
 | --home              | string | false    | $HOME/.iris | 指定存储配置和区块链数据的目录 |
+| --output-file       | string | false    | genesis.json |  存储导出状态的文件 |
 
 ## 示例
 
