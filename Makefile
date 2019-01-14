@@ -28,17 +28,6 @@ BUILD_FLAGS = -ldflags "\
 -X github.com/irisnet/irishub/types.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
 -X github.com/irisnet/irishub/types.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
 
-INSTALL_FLAGS = -ldflags "\
--X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
--X github.com/irisnet/irishub/types.InvariantLevel=${InvariantLevel} \
--X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
--X github.com/irisnet/irishub/types.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
--X github.com/irisnet/irishub/types.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
--X github.com/irisnet/irishub/types.Bech32PrefixValAddr=${Bech32PrefixValAddr} \
--X github.com/irisnet/irishub/types.Bech32PrefixValPub=${Bech32PrefixValPub} \
--X github.com/irisnet/irishub/types.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
--X github.com/irisnet/irishub/types.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
-
 ########################################
 ### Tools & dependencies
 
@@ -89,10 +78,10 @@ update_irislcd_swagger_docs:
 ########################################
 ### Compile and Install
 install: update_irislcd_swagger_docs echo_bech32_prefix
-	go install $(INSTALL_FLAGS) ./cmd/iris
-	go install $(INSTALL_FLAGS) ./cmd/iriscli
-	go install $(INSTALL_FLAGS) ./cmd/irislcd
-	go install $(INSTALL_FLAGS) ./cmd/iristool
+	go install $(BUILD_FLAGS) ./cmd/iris
+	go install $(BUILD_FLAGS) ./cmd/iriscli
+	go install $(BUILD_FLAGS) ./cmd/irislcd
+	go install $(BUILD_FLAGS) ./cmd/iristool
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
