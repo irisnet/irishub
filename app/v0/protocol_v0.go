@@ -3,6 +3,7 @@ package v0
 import (
 	"fmt"
 	"sort"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -18,9 +19,10 @@ import (
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
 
+	"strings"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	"strings"
 )
 
 var _ protocol.Protocol = (*ProtocolV0)(nil)
@@ -114,17 +116,45 @@ func (p *ProtocolV0) GetVersion() uint64 {
 	return p.version
 }
 
-func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) sdk.Error {
-	subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
-	var txSizeLimit uint32
-	if bool {
-		subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
-	} else {
-		panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
+func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error {
+
+	serviceMsgNum := 0
+	for _, msg := range msgs {
+		if msg.Route() == service.MsgRoute {
+			serviceMsgNum++
+		}
 	}
 
-	if uint32(len(txBytes)) > txSizeLimit {
-		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+	if serviceMsgNum != 0 && serviceMsgNum != len(msgs) {
+		return sdk.ErrServiceTxLimit("Can't mix service msgs with other types of msg in one transaction!")
+	}
+
+	if serviceMsgNum == 0 {
+		subspace, found := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
+		var txSizeLimit uint64
+		if found {
+			subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
+		} else {
+			panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
+		}
+		if uint64(len(txBytes)) > txSizeLimit {
+			return sdk.ErrExceedsTxSize(fmt.Sprintf("the tx size [%d] exceeds the limitation [%d]", len(txBytes), txSizeLimit))
+		}
+	}
+
+	if serviceMsgNum == len(msgs) {
+		subspace, found := p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
+		var serviceTxSizeLimit uint64
+		if found {
+			subspace.Get(ctx, service.KeyTxSizeLimit, &serviceTxSizeLimit)
+		} else {
+			panic("The subspace " + service.DefaultParamSpace + " cannot be found!")
+		}
+
+		if uint64(len(txBytes)) > serviceTxSizeLimit {
+			return sdk.ErrExceedsTxSize(fmt.Sprintf("the tx size [%d] exceeds the limitation [%d]", len(txBytes), serviceTxSizeLimit))
+		}
+
 	}
 
 	return nil
@@ -318,12 +348,15 @@ func (p *ProtocolV0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 		panic(err)
 	}
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
-
-	// load the address to pubkey map
 	auth.InitGenesis(ctx, p.feeKeeper, p.accountMapper, genesisState.AuthData)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
 	mint.InitGenesis(ctx, p.mintKeeper, genesisState.MintData)
 	distr.InitGenesis(ctx, p.distrKeeper, genesisState.DistrData)
+	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
+	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
+	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
+
+	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)
 	if err != nil {
 		panic(err) // TODO find a way to do this w/o panics
@@ -360,10 +393,6 @@ func (p *ProtocolV0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 			}
 		}
 	}
-
-	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
-	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
-	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}
