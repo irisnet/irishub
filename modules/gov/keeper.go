@@ -18,7 +18,7 @@ import (
 var (
 	DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
 	BurnRate              = sdk.NewDecWithPrec(2, 1)
-	MinDepositRate        = sdk.NewDecWithPrec(3,1)
+	MinDepositRate        = sdk.NewDecWithPrec(3, 1)
 )
 
 // Governance ProtocolKeeper
@@ -165,9 +165,10 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	}
 	var proposal Proposal = &TaxUsageProposal{
 		textProposal,
-		msg.Usage,
-		msg.DestAddress,
-		msg.Percent,
+		TaxUsage{
+			msg.Usage,
+			msg.DestAddress,
+			msg.Percent},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -190,10 +191,11 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
 		textProposal,
-		msg.Version,
-		msg.Software,
-		msg.SwitchHeight,
-		msg.Threshold,
+		Upgrade{
+			msg.Version,
+			msg.Software,
+			msg.SwitchHeight,
+			msg.Threshold},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -205,8 +207,6 @@ func (keeper Keeper) saveProposal(ctx sdk.Context, proposal Proposal) {
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
 }
-
-////////////////////  iris end  /////////////////////////////
 
 // Get Proposal from store by ProposalID
 func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64) Proposal {
@@ -429,12 +429,12 @@ func (keeper Keeper) setDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 func (keeper Keeper) AddInitialDeposit(ctx sdk.Context, proposal Proposal, depositorAddr sdk.AccAddress, initialDeposit sdk.Coins) (sdk.Error, bool) {
 
 	minDepositInt := sdk.NewDecFromInt(keeper.GetDepositProcedure(ctx, proposal).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(MinDepositRate).RoundInt()
-	minInitialDeposit := sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,minDepositInt)}
+	minInitialDeposit := sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, minDepositInt)}
 	if !initialDeposit.IsAllGTE(minInitialDeposit) {
-		return ErrNotEnoughInitialDeposit(DefaultCodespace,initialDeposit,minInitialDeposit), false
+		return ErrNotEnoughInitialDeposit(DefaultCodespace, initialDeposit, minInitialDeposit), false
 	}
 
-	return keeper.AddDeposit(ctx,proposal.GetProposalID(),depositorAddr, initialDeposit)
+	return keeper.AddDeposit(ctx, proposal.GetProposalID(), depositorAddr, initialDeposit)
 }
 
 // Adds or updates a deposit of a specific depositor on a specific proposal
@@ -624,8 +624,6 @@ func (keeper Keeper) SetSystemHaltHeight(ctx sdk.Context, height int64) {
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(height)
 	store.Set(KeySystemHaltHeight, bz)
 }
-
-
 
 func (keeper Keeper) GetCriticalProposalID(ctx sdk.Context) (uint64, bool) {
 	store := ctx.KVStore(keeper.storeKey)

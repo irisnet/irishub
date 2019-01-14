@@ -44,6 +44,12 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
+
+	GetUpgrade() Upgrade
+	SetUpgrade(Upgrade)
+
+	GetTaxUsage() TaxUsage
+	SetTaxUsage(TaxUsage)
 }
 
 // checks if two proposals are equal
@@ -115,6 +121,10 @@ func (tp TextProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
 func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
+func (tp TextProposal) GetUpgrade() Upgrade { return Upgrade{} }
+func (tp *TextProposal) SetUpgrade(upgrade Upgrade) {}
+func (tp TextProposal) GetTaxUsage() TaxUsage { return TaxUsage{} }
+func (tp *TextProposal) SetTaxUsage(taxUsage TaxUsage) {}
 
 //-----------------------------------------------------------
 // ProposalQueue
@@ -131,10 +141,8 @@ const (
 	ProposalTypeNil             ProposalKind = 0x00
 	ProposalTypeParameterChange ProposalKind = 0x01
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
-	////////////////////  iris begin  /////////////////////////////
 	ProposalTypeSystemHalt      ProposalKind = 0x03
 	ProposalTypeTxTaxUsage      ProposalKind = 0x04
-	////////////////////  iris end  /////////////////////////////
 )
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -144,12 +152,10 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 		return ProposalTypeParameterChange, nil
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
-		////////////////////  iris begin  /////////////////////////////
 	case "SystemHalt":
 		return ProposalTypeSystemHalt, nil
 	case "TxTaxUsage":
 		return ProposalTypeTxTaxUsage, nil
-		////////////////////  iris end  /////////////////////////////
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
@@ -159,10 +165,8 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
-		////////////////////  iris begin  /////////////////////////////
 		pt == ProposalTypeSystemHalt ||
 		pt == ProposalTypeTxTaxUsage {
-		////////////////////  iris end  /////////////////////////////
 		return true
 	}
 	return false
@@ -207,12 +211,10 @@ func (pt ProposalKind) String() string {
 		return "ParameterChange"
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
-		////////////////////  iris begin  /////////////////////////////
 	case ProposalTypeSystemHalt:
 		return "SystemHalt"
 	case ProposalTypeTxTaxUsage:
 		return "TxTaxUsage"
-		////////////////////  iris end  /////////////////////////////
 	default:
 		return ""
 	}
