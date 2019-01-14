@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -16,6 +17,7 @@ import (
 const (
 	flagHeight        = "height"
 	flagForZeroHeight = "for-zero-height"
+	flagOutputFile    = "output-file"
 )
 
 // ExportCmd dumps app state to JSON.
@@ -72,13 +74,25 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			if err != nil {
 				return err
 			}
-			encoded = sdk.MustSortJSON(encoded)
-			fmt.Println(string(encoded))
+
+			var outputRaw json.RawMessage
+			codec.Cdc.UnmarshalJSON(encoded, &outputRaw)
+			outputRaw = sdk.MustSortJSON(outputRaw)
+
+			output, err := codec.MarshalJSONIndent(cdc, outputRaw)
+
+			outputFile := viper.GetString(flagOutputFile)
+			err = ioutil.WriteFile(outputFile, output, 0644)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("export state to file %s successfully\n", outputFile)
 			return nil
 		},
 	}
 	cmd.Flags().Int64(flagHeight, 0, "Export state from a particular height (0 means latest height)")
 	cmd.Flags().Bool(flagForZeroHeight, false, "Export state to start at height zero (perform preproccessing)")
+	cmd.Flags().String(flagOutputFile, "genesis.json", "Target file to save exported state")
 	return cmd
 }
 
