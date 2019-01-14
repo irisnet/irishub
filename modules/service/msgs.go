@@ -8,7 +8,7 @@ import (
 
 const (
 	// name to idetify transaction types
-	MsgType       = "service"
+	MsgRoute      = "service"
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
@@ -37,7 +37,7 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 	}
 }
 
-func (msg MsgSvcDef) Route() string { return MsgType }
+func (msg MsgSvcDef) Route() string { return MsgRoute }
 func (msg MsgSvcDef) Type() string  { return "service_define" }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
@@ -155,7 +155,7 @@ func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddr
 	}
 }
 
-func (msg MsgSvcBind) Route() string { return MsgType }
+func (msg MsgSvcBind) Route() string { return MsgRoute }
 func (msg MsgSvcBind) Type() string  { return "service_bind" }
 
 func (msg MsgSvcBind) GetSignBytes() []byte {
@@ -226,7 +226,7 @@ func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sd
 		Level:       level,
 	}
 }
-func (msg MsgSvcBindingUpdate) Route() string { return MsgType }
+func (msg MsgSvcBindingUpdate) Route() string { return MsgRoute }
 func (msg MsgSvcBindingUpdate) Type() string  { return "service_binding_update" }
 
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
@@ -290,7 +290,7 @@ func NewMsgSvcDisable(defChainID, defName, bindChainID string, provider sdk.AccA
 	}
 }
 
-func (msg MsgSvcDisable) Route() string { return MsgType }
+func (msg MsgSvcDisable) Route() string { return MsgRoute }
 func (msg MsgSvcDisable) Type() string  { return "service_disable" }
 
 func (msg MsgSvcDisable) GetSignBytes() []byte {
@@ -342,7 +342,7 @@ func NewMsgSvcEnable(defChainID, defName, bindChainID string, provider sdk.AccAd
 	}
 }
 
-func (msg MsgSvcEnable) Route() string { return MsgType }
+func (msg MsgSvcEnable) Route() string { return MsgRoute }
 func (msg MsgSvcEnable) Type() string  { return "service_enable" }
 
 func (msg MsgSvcEnable) GetSignBytes() []byte {
@@ -395,7 +395,7 @@ func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sd
 	}
 }
 
-func (msg MsgSvcRefundDeposit) Route() string { return MsgType }
+func (msg MsgSvcRefundDeposit) Route() string { return MsgRoute }
 func (msg MsgSvcRefundDeposit) Type() string  { return "service_refund_deposit" }
 
 func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
@@ -457,7 +457,7 @@ func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consu
 	}
 }
 
-func (msg MsgSvcRequest) Route() string { return MsgType }
+func (msg MsgSvcRequest) Route() string { return MsgRoute }
 func (msg MsgSvcRequest) Type() string  { return "service_call" }
 
 func (msg MsgSvcRequest) GetSignBytes() []byte {
@@ -518,7 +518,7 @@ func NewMsgSvcResponse(reqChainID string, requestId string, provider sdk.AccAddr
 	}
 }
 
-func (msg MsgSvcResponse) Route() string { return MsgType }
+func (msg MsgSvcResponse) Route() string { return MsgRoute }
 func (msg MsgSvcResponse) Type() string  { return "service_respond" }
 
 func (msg MsgSvcResponse) GetSignBytes() []byte {
@@ -567,7 +567,7 @@ func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
 	}
 }
 
-func (msg MsgSvcRefundFees) Route() string { return MsgType }
+func (msg MsgSvcRefundFees) Route() string { return MsgRoute }
 func (msg MsgSvcRefundFees) Type() string  { return "service_refund_fees" }
 
 func (msg MsgSvcRefundFees) GetSignBytes() []byte {
@@ -599,7 +599,7 @@ func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
 	}
 }
 
-func (msg MsgSvcWithdrawFees) Route() string { return MsgType }
+func (msg MsgSvcWithdrawFees) Route() string { return MsgRoute }
 func (msg MsgSvcWithdrawFees) Type() string  { return "service_withdraw_fees" }
 
 func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
@@ -635,7 +635,7 @@ func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins)
 	}
 }
 
-func (msg MsgSvcWithdrawTax) Route() string { return MsgType }
+func (msg MsgSvcWithdrawTax) Route() string { return MsgRoute }
 func (msg MsgSvcWithdrawTax) Type() string  { return "service_withdraw_fee_tax" }
 
 func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {

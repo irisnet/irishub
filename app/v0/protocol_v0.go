@@ -2,7 +2,6 @@ package v0
 
 import (
 	"fmt"
-	"sort"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -17,6 +16,7 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
+	"sort"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -114,7 +114,19 @@ func (p *ProtocolV0) GetVersion() uint64 {
 	return p.version
 }
 
-func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) sdk.Error {
+func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error {
+
+	serviceMsgMum := 0
+	for _, msg := range msgs {
+		if msg.Route() == service.MsgRoute {
+			serviceMsgMum++
+		}
+	}
+
+	if serviceMsgMum != 0 && serviceMsgMum != len(msgs) {
+		return sdk.ErrServiceTxLimit("Can't mix the service msg with other types of msg in a transaction! ")
+	}
+
 	subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
 	var txSizeLimit uint32
 	if bool {
@@ -122,8 +134,18 @@ func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte) sdk.Error {
 	} else {
 		panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
 	}
+	if serviceMsgMum == 0 && uint32(len(txBytes)) > txSizeLimit {
+		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+	}
 
-	if uint32(len(txBytes)) > txSizeLimit {
+	subspace, bool = p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
+	var serviceTxSizeLimit uint32
+	if bool {
+		subspace.Get(ctx, service.KeyTxSizeLimit, &serviceTxSizeLimit)
+	} else {
+		panic("The subspace " + service.DefaultParamSpace + " cannot be found!")
+	}
+	if serviceMsgMum == len(msgs) && uint32(len(txBytes)) > serviceTxSizeLimit {
 		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
 	}
 

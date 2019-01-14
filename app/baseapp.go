@@ -709,7 +709,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
-	if err := app.Engine.GetCurrentProtocol().ValidateTx(ctx, txBytes); err != nil {
+	if err := app.Engine.GetCurrentProtocol().ValidateTx(ctx, txBytes, msgs); err != nil {
 		result = err.Result()
 		return
 	}
