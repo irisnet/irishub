@@ -127,26 +127,32 @@ func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg)
 		return sdk.ErrServiceTxLimit("Can't mix the service msg with other types of msg in a transaction! ")
 	}
 
-	subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
-	var txSizeLimit uint32
-	if bool {
-		subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
-	} else {
-		panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
-	}
-	if serviceMsgMum == 0 && uint32(len(txBytes)) > txSizeLimit {
-		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+	if serviceMsgMum == 0 {
+		subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
+		var txSizeLimit uint32
+		if bool {
+			subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
+		} else {
+			panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
+		}
+		if uint32(len(txBytes)) > txSizeLimit {
+			return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+		}
 	}
 
-	subspace, bool = p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
-	var serviceTxSizeLimit uint64
-	if bool {
-		subspace.Get(ctx, service.KeyTxSizeLimit, &serviceTxSizeLimit)
-	} else {
-		panic("The subspace " + service.DefaultParamSpace + " cannot be found!")
-	}
-	if serviceMsgMum == len(msgs) && uint64(len(txBytes)) > serviceTxSizeLimit {
-		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+	if serviceMsgMum == len(msgs) {
+		subspace, bool := p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
+		var serviceTxSizeLimit uint64
+		if bool {
+			subspace.Get(ctx, service.KeyTxSizeLimit, &serviceTxSizeLimit)
+		} else {
+			panic("The subspace " + service.DefaultParamSpace + " cannot be found!")
+		}
+
+		if uint64(len(txBytes)) > serviceTxSizeLimit {
+			return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+		}
+
 	}
 
 	return nil

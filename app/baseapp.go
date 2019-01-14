@@ -705,13 +705,12 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	var msgs = tx.GetMsgs()
-	if err := validateBasicTxMsgs(msgs); err != nil {
-		return err.Result()
-	}
-
 	if err := app.Engine.GetCurrentProtocol().ValidateTx(ctx, txBytes, msgs); err != nil {
 		result = err.Result()
 		return
+	}
+	if err := validateBasicTxMsgs(msgs); err != nil {
+		return err.Result()
 	}
 
 	defer func() {

@@ -1,12 +1,12 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
-	"time"
 	"fmt"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 	"strconv"
+	"time"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -57,7 +57,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeySlashFraction, &p.SlashFraction},
 		{KeyComplaintRetrospect, &p.ComplaintRetrospect},
 		{KeyArbitrationTimeLimit, &p.ArbitrationTimeLimit},
-		{KeyTxSizeLimit,&p.TxSizeLimit},
+		{KeyTxSizeLimit, &p.TxSizeLimit},
 	}
 }
 
@@ -153,7 +153,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 		return p.ArbitrationTimeLimit.String(), err
 	case string(KeyTxSizeLimit):
 		err := cdc.UnmarshalJSON(bytes, &p.TxSizeLimit)
-		return strconv.FormatUint(p.TxSizeLimit,10), err
+		return strconv.FormatUint(p.TxSizeLimit, 10), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -168,7 +168,7 @@ func DefaultParams() Params {
 		SlashFraction:        sdk.NewDecWithPrec(1, 3),    //0.1%
 		ComplaintRetrospect:  time.Duration(15 * sdk.Day), //15 days
 		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),  //5 days
-		TxSizeLimit:4000,
+		TxSizeLimit:          4000,
 	}
 }
 
@@ -181,7 +181,7 @@ func DefaultParamsForTest() Params {
 		SlashFraction:        sdk.NewDecWithPrec(1, 3), //0.1%
 		ComplaintRetrospect:  20 * time.Second,         //20 seconds
 		ArbitrationTimeLimit: 20 * time.Second,         //20 seconds
-		TxSizeLimit:4000,
+		TxSizeLimit:          4000,
 	}
 }
 
@@ -288,8 +288,8 @@ func validateArbitrationTimeLimit(v time.Duration) sdk.Error {
 	return nil
 }
 
-func validateTxSizeLimit(v uint64) sdk.Error{
-	if v < 5 {
+func validateTxSizeLimit(v uint64) sdk.Error {
+	if v < 2000 || v > 6000 {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidServiceTxSizeLimit, fmt.Sprintf("Invalid ServiceTxSizeLimit [%d] should be between [2000, 6000]", v))
 	}
 	return nil
