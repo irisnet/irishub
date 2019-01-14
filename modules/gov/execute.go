@@ -23,17 +23,17 @@ func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (err error) {
 	logger := ctx.Logger().With("module", "gov")
 	burn := false
-	if p.Usage == UsageTypeBurn {
+	if p.TaxUsage.Usage == UsageTypeBurn {
 		burn = true
 	} else {
-		_, found := gk.guardianKeeper.GetTrustee(ctx, p.DestAddress)
+		_, found := gk.guardianKeeper.GetTrustee(ctx, p.TaxUsage.DestAddress)
 		if !found {
 			logger.Error("Execute TaxUsageProposal Failure", "info",
-				fmt.Sprintf("the destination address [%s] is not a trustee now", p.DestAddress))
+				fmt.Sprintf("the destination address [%s] is not a trustee now", p.TaxUsage.DestAddress))
 			return
 		}
 	}
-	gk.dk.AllocateFeeTax(ctx, p.DestAddress, p.Percent, burn)
+	gk.dk.AllocateFeeTax(ctx, p.TaxUsage.DestAddress, p.TaxUsage.Percent, burn)
 	return
 }
 
@@ -62,18 +62,18 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgr
 			fmt.Sprintf("Software Upgrade Switch Period is in process. current height:%d", ctx.BlockHeight()))
 		return nil
 	}
-	if !gk.protocolKeeper.IsValidVersion(ctx, sp.Version) {
+	if !gk.protocolKeeper.IsValidVersion(ctx, sp.ProtocolDefinition.Version) {
 		logger.Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("version [%v] in SoftwareUpgradeProposal isn't valid ", sp.ProposalID))
 		return nil
 	}
-	if uint64(ctx.BlockHeight())+1 >= sp.SwitchHeight {
+	if uint64(ctx.BlockHeight())+1 >= sp.ProtocolDefinition.Height {
 		logger.Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("switch height must be more than blockHeight + 1"))
 		return nil
 	}
 
-	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.Version, sp.Software, sp.SwitchHeight)))
+	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.ProtocolDefinition.Version, sp.ProtocolDefinition.Software, sp.ProtocolDefinition.Height)))
 
 	logger.Info("Execute SoftwareProposal Success", "info",
 		fmt.Sprintf("current height:%d", ctx.BlockHeight()))

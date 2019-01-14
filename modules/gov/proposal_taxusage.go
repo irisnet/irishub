@@ -3,8 +3,8 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type UsageType byte
@@ -99,9 +99,18 @@ func (ut UsageType) Format(s fmt.State, verb rune) {
 // Implements Proposal Interface
 var _ Proposal = (*ParameterProposal)(nil)
 
+type TaxUsage struct {
+	Usage       UsageType		`json:"usage"`
+	DestAddress sdk.AccAddress	`json:"dest_address"`
+	Percent     sdk.Dec			`json:"percent"`
+}
+
 type TaxUsageProposal struct {
 	TextProposal
-	Usage       UsageType
-	DestAddress sdk.AccAddress
-	Percent     sdk.Dec
+	TaxUsage 	TaxUsage `json:"tax_usage"`
+}
+
+func (tp TaxUsageProposal) GetTaxUsage() TaxUsage { return tp.TaxUsage }
+func (tp *TaxUsageProposal) SetTaxUsage(taxUsage TaxUsage) {
+	tp.TaxUsage = taxUsage
 }
