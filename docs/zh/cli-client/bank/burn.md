@@ -2,7 +2,7 @@
 
 ## 描述
 
-销毁token
+通过减去账户余额的方式来销毁一些token
 
 ## 使用方式
 
@@ -10,7 +10,6 @@
 iriscli bank burn --from <key name> --fee=0.004iris --chain-id=<chain-id> --amount=10iris
 ```
 
- 
 
 ## 标志
 
@@ -19,7 +18,6 @@ iriscli bank burn --from <key name> --fee=0.004iris --chain-id=<chain-id> --amou
 | --amount         | String | 是       |                       | 销毁token数量，比如10iris                               |
 
 
-## 
 
 ## 例子
 

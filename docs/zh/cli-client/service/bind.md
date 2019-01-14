@@ -10,7 +10,7 @@
 iriscli service bind [flags]
 ```
 
-## 标志
+## 特殊标志
 
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------- | -------- |
@@ -21,7 +21,6 @@ iriscli service bind [flags]
 | --prices              |                         | [strings] 服务定价,按照服务方法排序的定价列表                                             |          |
 | --service-name        |                         | [string] 服务名称                                                                    | 是       |
 | --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  | 是       |
-| -h, --help            |                         | 绑定命令帮助                                                                          |          |
 
 ## 示例
 

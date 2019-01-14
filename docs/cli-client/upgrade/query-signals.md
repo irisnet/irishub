@@ -15,10 +15,6 @@ Print help messages:
 ```
 iriscli upgrade query-signals --help
 ```
-## Flags
-
-| Name, shorthand | Default                    | Description                                                       | Required |
-| --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
 
 ## Example
 

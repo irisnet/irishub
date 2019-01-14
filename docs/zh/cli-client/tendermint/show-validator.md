@@ -2,7 +2,7 @@
 
 ## 介绍
 
-获取验证人的公钥
+在{irishome}/config获取验证人的私钥文件private_key.json，再推导出公钥，然后以`fcp`为hrp进行bech32编码后的结果。
 
 ## 用法
 

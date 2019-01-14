@@ -2,7 +2,7 @@
 
 ## Description
 
-Burn tokens 
+Decrease the balance of input address, so that the fund couldn't be recovered
 
 ## Usage:
 

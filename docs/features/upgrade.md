@@ -67,7 +67,7 @@ iriscli upgrade info --trust-node
 
 * Scenario 2
 
-The operations in Scenario 1 haven't been implemented at the certain time (80 block height), report errors after the new version become valid:
+The operations in Scenario 1 haven't been implemented at the certain time (80 block height), report apphash conflicts errors after the new version become valid:
 
 ```
 # 1. Download the new version, iris1
@@ -77,7 +77,7 @@ kill -f iris
 
 # 3. Install the new version iris1 and start it 
 
-iris1 start --home=iris
+iris1 start --home=iris --replay-last-block
 
 # 4. Query whether the current version has been successfully upgraded
 iriscli upgrade info --trust-node

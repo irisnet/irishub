@@ -53,7 +53,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, params.ErrInvalidString(value)
 		}
 		if !threshold.GT(MinimumGasPrice) || threshold.GT(MaximumGasPrice) {
-			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", value))
+			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be (0, 10^18iris-atto]", value))
 		}
 		return threshold, nil
 	default:
@@ -80,7 +80,7 @@ func DefaultParams() Params {
 
 func validateParams(p Params) error {
 	if !p.GasPriceThreshold.GT(MinimumGasPrice) || p.GasPriceThreshold.GT(MaximumGasPrice) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be [0, 10^18iris-atto]", p.GasPriceThreshold.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be (0, 10^18iris-atto]", p.GasPriceThreshold.String()))
 	}
 	return nil
 }

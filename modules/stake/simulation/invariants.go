@@ -22,17 +22,26 @@ func AllInvariants(ck bank.Keeper, k stake.Keeper,
 	am auth.AccountKeeper) simulation.Invariant {
 
 	return func(ctx sdk.Context) error {
-		//err := SupplyInvariants(ck, k, f, d, am)(app, header)
-		//if err != nil {
-		//	return err
-		//}
-		//err = PositivePowerInvariant(k)(app, header)
-		//if err != nil {
-		//	return err
-		//}
-		//err = ValidatorSetInvariant(k)(app, header)
-		//return err
-		//return nil
+		err := SupplyInvariants(ck, k, f, d, am)(ctx)
+		if err != nil {
+			return err
+		}
+
+		err = NonNegativePowerInvariant(k)(ctx)
+		if err != nil {
+			return err
+		}
+
+		err = PositiveDelegationInvariant(k)(ctx)
+		if err != nil {
+			return err
+		}
+
+		err = DelegatorSharesInvariant(k)(ctx)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 }
@@ -70,16 +79,6 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 			return false
 		})
 		k.IterateValidators(ctx, func(_ int64, validator sdk.Validator) bool {
-			validatorInfo := fmt.Sprintf("Operator address: %s\nValidator name: %s\nValidator Token: %s\nValidator Shares: %s\n",
-				validator.GetOperator().String(), validator.GetMoniker(), validator.GetTokens().String(), validator.GetDelegatorShares().String())
-
-			if validator.GetTokens().IsNegative() {
-				panic(fmt.Errorf("Validator token is negative!\n%s", validatorInfo))
-			}
-			// if validator delegator shares is zero, validator will be deleted once its status becomes unbonded, thus validator tokens will be lost
-			if !validator.GetTokens().IsZero() && validator.GetDelegatorShares().IsZero() {
-				panic(fmt.Errorf("Validator token is not zero but delegation shares is zero!\n%s", validatorInfo))
-			}
 			switch validator.GetStatus() {
 			case sdk.Bonded:
 				bonded = bonded.Add(validator.GetTokens())
@@ -128,14 +127,25 @@ func SupplyInvariants(ck bank.Keeper, k stake.Keeper,
 	}
 }
 
-// PositivePowerInvariant checks that all stored validators have > 0 power
-func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
-	return func(ctx sdk.Context) error {
+// NonNegativePowerInvariant checks that all stored validators have >= 0 power.
+func NonNegativePowerInvariant(k stake.Keeper) simulation.Invariant {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
 
 		iterator := k.ValidatorsPowerStoreIterator(ctx)
 		defer iterator.Close()
-		pool := k.GetPool(ctx)
 
+		pool := k.GetPool(ctx)
 		for ; iterator.Valid(); iterator.Next() {
 			validator, found := k.GetValidator(ctx, iterator.Value())
 			if !found {
@@ -144,19 +154,89 @@ func PositivePowerInvariant(k stake.Keeper) simulation.Invariant {
 
 			powerKey := keeper.GetValidatorsByPowerIndexKey(validator, pool)
 
+			validatorInfo := fmt.Sprintf("\n\tOperator address: %s\n\tValidator name: %s\n\tValidator Token: %s\n\tValidator Shares: %s\n",
+				validator.GetOperator().String(), validator.GetMoniker(), validator.GetTokens().String(), validator.GetDelegatorShares().String())
+
 			if !bytes.Equal(iterator.Key(), powerKey) {
-				return fmt.Errorf("power store invariance:\n\tvalidator.Power: %v"+
-					"\n\tkey should be: %v\n\tkey in store: %v", validator.GetPower(), powerKey, iterator.Key())
+				return fmt.Errorf("Power store invariance:\n%s", validatorInfo)
+			}
+
+			if validator.GetTokens().IsNegative() {
+				return fmt.Errorf("Validator token is negative!\n%s", validatorInfo)
+			}
+			// if validator delegator shares is zero, validator will be deleted once its status becomes unbonded, thus validator tokens will be lost
+			if !validator.GetTokens().IsZero() && validator.GetDelegatorShares().IsZero() {
+				return fmt.Errorf("Validator token is not zero but delegation shares is zero!\n%s", validatorInfo)
 			}
 		}
+
 		return nil
 	}
 }
 
-// ValidatorSetInvariant checks equivalence of Tendermint validator set and SDK validator set
-func ValidatorSetInvariant(k stake.Keeper) simulation.Invariant {
-	return func(ctx sdk.Context) error {
-		// TODO
+// PositiveDelegationInvariant checks that all stored delegations have > 0 shares.
+func PositiveDelegationInvariant(k stake.Keeper) simulation.Invariant {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
+		delegations := k.GetAllDelegations(ctx)
+		for _, delegation := range delegations {
+			if delegation.Shares.IsNegative() {
+				return fmt.Errorf("delegation with negative shares: %+v", delegation)
+			}
+			if delegation.Shares.IsZero() {
+				return fmt.Errorf("delegation with zero shares: %+v", delegation)
+			}
+		}
+
+		return nil
+	}
+}
+
+// DelegatorSharesInvariant checks whether all the delegator shares which persist
+// in the delegator object add up to the correct total delegator shares
+// amount stored in each validator
+func DelegatorSharesInvariant(k stake.Keeper) simulation.Invariant {
+	return func(ctx sdk.Context) (err error) {
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case error:
+					err = rType
+				default:
+					err = fmt.Errorf(string(debug.Stack()))
+				}
+			}
+		}()
+
+		validators := k.GetAllValidators(ctx)
+		for _, validator := range validators {
+
+			valTotalDelShares := validator.GetDelegatorShares()
+
+			totalDelShares := sdk.ZeroDec()
+			delegations := k.GetValidatorDelegations(ctx, validator.GetOperator())
+			for _, delegation := range delegations {
+				totalDelShares = totalDelShares.Add(delegation.Shares)
+			}
+
+			if !valTotalDelShares.Equal(totalDelShares) {
+				return fmt.Errorf("broken delegator shares invariance:\n"+
+					"\tvalidator.DelegatorShares: %v\n"+
+					"\tsum of Delegator.Shares: %v", valTotalDelShares, totalDelShares)
+			}
+		}
 		return nil
 	}
 }
