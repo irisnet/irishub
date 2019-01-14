@@ -2,19 +2,20 @@ package mint
 
 import (
 	"fmt"
+	"time"
+
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	"time"
 )
 
 const (
-	blocksPerYear     = 60 * 60 * 8766 / 5 // 5 second a block, 8766 = 365.25 * 24
+	blocksPerYear = 60 * 60 * 8766 / 5 // 5 second a block, 8766 = 365.25 * 24
 )
 
 // current inflation state
 type Minter struct {
-	LastUpdate    time.Time `json:"last_update"`       // time which the last update was made to the minter
-	MintDenom     string    `json:"mint_denom"`        // type of coin to mint
+	LastUpdate    time.Time `json:"last_update"` // time which the last update was made to the minter
+	MintDenom     string    `json:"mint_denom"`  // type of coin to mint
 	InflationBase sdk.Int   `json:"inflation_basement"`
 }
 
