@@ -2,6 +2,8 @@ package v0
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
@@ -16,11 +18,11 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-	"sort"
+
+	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	"strings"
 )
 
 var _ protocol.Protocol = (*ProtocolV0)(nil)
@@ -116,41 +118,41 @@ func (p *ProtocolV0) GetVersion() uint64 {
 
 func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error {
 
-	serviceMsgMum := 0
+	serviceMsgNum := 0
 	for _, msg := range msgs {
 		if msg.Route() == service.MsgRoute {
-			serviceMsgMum++
+			serviceMsgNum++
 		}
 	}
 
-	if serviceMsgMum != 0 && serviceMsgMum != len(msgs) {
-		return sdk.ErrServiceTxLimit("Can't mix the service msg with other types of msg in a transaction! ")
+	if serviceMsgNum != 0 && serviceMsgNum != len(msgs) {
+		return sdk.ErrServiceTxLimit("Can't mix service msgs with other types of msg in one transaction!")
 	}
 
-	if serviceMsgMum == 0 {
-		subspace, bool := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
-		var txSizeLimit uint32
-		if bool {
+	if serviceMsgNum == 0 {
+		subspace, found := p.paramsKeeper.GetSubspace(auth.DefaultParamSpace)
+		var txSizeLimit uint64
+		if found {
 			subspace.Get(ctx, auth.TxSizeLimitKey, &txSizeLimit)
 		} else {
 			panic("The subspace " + auth.DefaultParamSpace + " cannot be found!")
 		}
-		if uint32(len(txBytes)) > txSizeLimit {
-			return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+		if uint64(len(txBytes)) > txSizeLimit {
+			return sdk.ErrExceedsTxSize(fmt.Sprintf("the tx size [%d] exceeds the limitation [%d]", len(txBytes), txSizeLimit))
 		}
 	}
 
-	if serviceMsgMum == len(msgs) {
-		subspace, bool := p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
+	if serviceMsgNum == len(msgs) {
+		subspace, found := p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
 		var serviceTxSizeLimit uint64
-		if bool {
+		if found {
 			subspace.Get(ctx, service.KeyTxSizeLimit, &serviceTxSizeLimit)
 		} else {
 			panic("The subspace " + service.DefaultParamSpace + " cannot be found!")
 		}
 
 		if uint64(len(txBytes)) > serviceTxSizeLimit {
-			return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
+			return sdk.ErrExceedsTxSize(fmt.Sprintf("the tx size [%d] exceeds the limitation [%d]", len(txBytes), serviceTxSizeLimit))
 		}
 
 	}

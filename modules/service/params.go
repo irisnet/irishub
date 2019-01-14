@@ -2,11 +2,12 @@ package service
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
-	"time"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -289,7 +290,7 @@ func validateArbitrationTimeLimit(v time.Duration) sdk.Error {
 }
 
 func validateTxSizeLimit(v uint64) sdk.Error {
-	if v < 2000 || v > 6000 {
+	if v < uint64(2000) || v > uint64(6000) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidServiceTxSizeLimit, fmt.Sprintf("Invalid ServiceTxSizeLimit [%d] should be between [2000, 6000]", v))
 	}
 	return nil
