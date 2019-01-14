@@ -39,13 +39,13 @@ func InitialMinter() Minter {
 
 func validateMinter(minter Minter) error {
 	if minter.LastUpdate.Before(time.Unix(0, 0)) {
-		return fmt.Errorf("mint last update time(%s) should not be a time before January 1, 1970 UTC", minter.LastUpdate.String())
+		return fmt.Errorf("minter last update time(%s) should not be a time before January 1, 1970 UTC", minter.LastUpdate.String())
 	}
 	if len(minter.MintDenom) == 0 {
-		return fmt.Errorf("mint token denom (%s) should not be empty", minter.MintDenom)
+		return fmt.Errorf("minter token denom should not be empty")
 	}
 	if !minter.InflationBase.GT(sdk.ZeroInt()) {
-		return fmt.Errorf("mint inflation basement (%s) should be positive", minter.InflationBase.String())
+		return fmt.Errorf("minter inflation basement (%s) should be positive", minter.InflationBase.String())
 	}
 	return nil
 }
