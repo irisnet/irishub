@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -70,19 +69,15 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			doc.AppState = appState
 			doc.Validators = validators
 
+			doc.AppState = sdk.MustSortJSON(doc.AppState)
+
 			encoded, err := codec.MarshalJSONIndent(cdc, doc)
 			if err != nil {
 				return err
 			}
 
-			var outputRaw json.RawMessage
-			codec.Cdc.UnmarshalJSON(encoded, &outputRaw)
-			outputRaw = sdk.MustSortJSON(outputRaw)
-
-			output, err := codec.MarshalJSONIndent(cdc, outputRaw)
-
 			outputFile := viper.GetString(flagOutputFile)
-			err = ioutil.WriteFile(outputFile, output, 0644)
+			err = ioutil.WriteFile(outputFile, encoded, 0644)
 			if err != nil {
 				return err
 			}
