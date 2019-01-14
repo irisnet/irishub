@@ -3,7 +3,6 @@ package gov
 import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
 )
 
 func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
@@ -73,7 +72,7 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgr
 		return nil
 	}
 
-	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.ProtocolDefinition.Version, sp.ProtocolDefinition.Software, sp.ProtocolDefinition.Height)))
+	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.ProtocolDefinition.Version, sp.ProtocolDefinition.Software, sp.ProtocolDefinition.Height, sp.ProtocolDefinition.Threshold)))
 
 	logger.Info("Execute SoftwareProposal Success", "info",
 		fmt.Sprintf("current height:%d", ctx.BlockHeight()))
