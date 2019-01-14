@@ -42,8 +42,8 @@ func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal)
 	for _, param := range pp.Params {
 		paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
 		value, _ := paramSet.Validate(param.Key, param.Value)
-		subspace, bool := gk.paramsKeeper.GetSubspace(param.Subspace)
-		if bool {
+		subspace, found := gk.paramsKeeper.GetSubspace(param.Subspace)
+		if found {
 			subspace.Set(ctx, []byte(param.Key), value)
 		}
 
