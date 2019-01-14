@@ -46,7 +46,7 @@ Note: in this case, --path and --param cannot be both empty.
 ### Submit a 'SoftwareUpgrade' type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80
+iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9
 ```
 
 In this case, 'title'、 'type' and 'desciption' of the proposal is required parameters, also you should back up your proposal-id which is the only way to retrieve your proposal.
