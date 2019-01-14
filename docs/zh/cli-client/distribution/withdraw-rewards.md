@@ -22,7 +22,6 @@ iriscli distribution withdraw-rewards --help
 | --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
 | --only-from-validator | string | false    | ""       | 验证人地址，仅取回在这个验证人上的委托收益 |
 | --is-validator        | bool   | false    | false    | 取回验证人佣金收益 |
-| --commit         | String | 否     | True                  |是否等到交易有明确的返回值，如果是True，则忽略--async的内容|
 
 不能同时使用两个flags。
 
