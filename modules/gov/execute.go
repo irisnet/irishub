@@ -72,7 +72,7 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgr
 		return nil
 	}
 
-	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.ProtocolDefinition.Version, sp.ProtocolDefinition.Software, sp.ProtocolDefinition.Height, sp.ProtocolDefinition.Threshold)))
+	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sp.ProtocolDefinition))
 
 	logger.Info("Execute SoftwareProposal Success", "info",
 		fmt.Sprintf("current height:%d", ctx.BlockHeight()))
