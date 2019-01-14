@@ -139,13 +139,13 @@ func (p *ProtocolV0) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg)
 	}
 
 	subspace, bool = p.paramsKeeper.GetSubspace(service.DefaultParamSpace)
-	var serviceTxSizeLimit uint32
+	var serviceTxSizeLimit uint64
 	if bool {
 		subspace.Get(ctx, service.KeyTxSizeLimit, &serviceTxSizeLimit)
 	} else {
 		panic("The subspace " + service.DefaultParamSpace + " cannot be found!")
 	}
-	if serviceMsgMum == len(msgs) && uint32(len(txBytes)) > serviceTxSizeLimit {
+	if serviceMsgMum == len(msgs) && uint64(len(txBytes)) > serviceTxSizeLimit {
 		return sdk.ErrExceedsTxSize("the tx size exceeds the limitation")
 	}
 
@@ -340,12 +340,15 @@ func (p *ProtocolV0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 		panic(err)
 	}
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
-
-	// load the address to pubkey map
 	auth.InitGenesis(ctx, p.feeKeeper, p.accountMapper, genesisState.AuthData)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
 	mint.InitGenesis(ctx, p.mintKeeper, genesisState.MintData)
 	distr.InitGenesis(ctx, p.distrKeeper, genesisState.DistrData)
+	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
+	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
+	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
+
+	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)
 	if err != nil {
 		panic(err) // TODO find a way to do this w/o panics
@@ -382,10 +385,6 @@ func (p *ProtocolV0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 			}
 		}
 	}
-
-	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
-	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
-	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	return abci.ResponseInitChain{
 		Validators: validators,
 	}
