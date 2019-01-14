@@ -21,7 +21,6 @@ iriscli service bind [flags]
 | --prices              |                         | [strings] prices of binding, will contains all method                                                                                                 |          |
 | --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
 | --usable-time         |                         | [int] an integer represents the number of usable service invocations per 10,000                                                                       |  Yes     |
-| -h, --help            |                         | help for bind                                                                                                                                         |          |
 
 ## Examples
 

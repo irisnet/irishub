@@ -15,10 +15,6 @@ Print help messages:
 ```
 iriscli upgrade info --help
 ```
-## Flags
-
-| Name, shorthand | Default                    | Description                                                       | Required |
-| --------------- | -------------------------- | ----------------------------------------------------------------- | -------- |
 
 ## Example
 
@@ -36,18 +32,18 @@ Then it will show the current protocol information and the protocol information 
 "ProposalID": "1",
 "Success": true,
 "Protocol": {
-"version": "1",
-"software": "https://github.com/irisnet/irishub/tree/v0.7.0",
-"height": "30"
+"version": "0",
+"software": "https://github.com/irisnet/irishub/tree/v0.10.0",
+"height": "1"
 }
 
 },
 "upgrade_config": {
 "ProposalID": "3",
 "Definition": {
-"version": "2",
-"software": "https://github.com/irisnet/irishub/tree/v0.9.0",
-"height": "80"
+"version": "1",
+"software": "https://github.com/irisnet/irishub/tree/v0.10.1",
+"height": "8000"
 }
 }
 }

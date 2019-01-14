@@ -16,7 +16,7 @@ iriscli distribution withdraw-rewards [flags]
 iriscli distribution withdraw-rewards --help
 ```
 
-## 特有的flags
+## 特有标志位
 
 | 名称                | 类型   | 是否必填 | 默认值  | 功能描述        |
 | --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |

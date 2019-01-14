@@ -14,6 +14,7 @@ Print help messages:
 iriscli stake edit-validator --help
 ```
 
+
 ## Unique Flags
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |
@@ -23,6 +24,7 @@ iriscli stake edit-validator --help
 | --identity          | string | false    | ""       | Optional identity signature (ex. UPort or Keybase) |
 | --website           | string | false    | ""       | Optional website  |
 | --details           | string | false    | ""       | Optional details |
+| --commit         | String | False     | True                  |wait for transaction commit accomplishment, if true, --async will be ignored|
 
 
 ## Examples
