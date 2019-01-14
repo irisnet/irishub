@@ -9,14 +9,13 @@ import (
 )
 
 const (
-	nanoToMiliSecond  = 1000000
-	miliSecondPerYear = 60 * 60 * 8766 * 1000
+	blocksPerYear = 60 * 60 * 8766 / 5 // 5 second a block, 8766 = 365.25 * 24
 )
 
 // current inflation state
 type Minter struct {
-	LastUpdate    time.Time `json:"last_update"`       // time which the last update was made to the minter
-	MintDenom     string    `json:"mint_denom"`        // type of coin to mint
+	LastUpdate    time.Time `json:"last_update"` // time which the last update was made to the minter
+	MintDenom     string    `json:"mint_denom"`  // type of coin to mint
 	InflationBase sdk.Int   `json:"inflation_basement"`
 }
 
@@ -39,8 +38,14 @@ func InitialMinter() Minter {
 }
 
 func validateMinter(minter Minter) error {
-	if minter.LastUpdate.Nanosecond() < 0 {
-		return fmt.Errorf("mint parameter Inflation should be positive, is %s ", minter.LastUpdate.String())
+	if minter.LastUpdate.Before(time.Unix(0, 0)) {
+		return fmt.Errorf("minter last update time(%s) should not be a time before January 1, 1970 UTC", minter.LastUpdate.String())
+	}
+	if len(minter.MintDenom) == 0 {
+		return fmt.Errorf("minter token denom should not be empty")
+	}
+	if !minter.InflationBase.GT(sdk.ZeroInt()) {
+		return fmt.Errorf("minter inflation basement (%s) should be positive", minter.InflationBase.String())
 	}
 	return nil
 }
@@ -51,11 +56,7 @@ func (m Minter) NextAnnualProvisions(params Params) (provisions sdk.Dec) {
 }
 
 // get the provisions for a block based on the annual provisions rate
-func (m Minter) BlockProvision(params Params, annualProvisions sdk.Dec, inflationTime time.Time) sdk.Coin {
-	inflationPeriod := inflationTime.Sub(m.LastUpdate)
-	millisecond := inflationPeriod.Nanoseconds() / int64(nanoToMiliSecond)
-	blockTimeAnnualPercent := sdk.NewDec(millisecond).Quo(sdk.NewDec(int64(miliSecondPerYear)))
-
-	blockInflationAmount := annualProvisions.Mul(blockTimeAnnualPercent)
+func (m Minter) BlockProvision(annualProvisions sdk.Dec) sdk.Coin {
+	blockInflationAmount := annualProvisions.QuoInt(sdk.NewInt(blocksPerYear))
 	return sdk.NewCoin(m.MintDenom, blockInflationAmount.TruncateInt())
 }
