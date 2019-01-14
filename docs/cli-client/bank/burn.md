@@ -2,8 +2,7 @@
 
 ## Description
 
-Decrease the balance of input address, so that the fund couldn't be recovered
-
+This command is used for burning tokens from specified address. Anyone can send this transaction type. There is no any connection to fund.
 ## Usage:
 
 ```
