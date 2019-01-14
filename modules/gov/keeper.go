@@ -190,7 +190,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
 		textProposal,
-		Upgrade{
+		sdk.ProtocolDefinition{
 			msg.Version,
 			msg.Software,
 			msg.SwitchHeight,},
@@ -205,8 +205,6 @@ func (keeper Keeper) saveProposal(ctx sdk.Context, proposal Proposal) {
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
 }
-
-////////////////////  iris end  /////////////////////////////
 
 // Get Proposal from store by ProposalID
 func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64) Proposal {
