@@ -36,7 +36,7 @@ iriscli gov submit-proposal --help
 ### Submit a 'ParameterChange' type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='mint/Inflation=0.050' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
+iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='mint/Inflation=0.050' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris --threshold=0.9
 ```
 
 After that, you're done with submitting a new 'ParameterChange' proposal. 
