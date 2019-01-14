@@ -1,21 +1,15 @@
 package gov
 
 import sdk "github.com/irisnet/irishub/types"
-var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
-type Upgrade struct {
-	Version      uint64		`json:"version"`
-	Software     string		`json:"software"`
-	SwitchHeight uint64		`json:"switch_height"`
-	Threshold    sdk.Dec	`json:"threshold"`
-}
+var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
 	TextProposal
-	Upgrade	Upgrade  `json:"upgrade"`
+	ProtocolDefinition sdk.ProtocolDefinition `json:"protocol_definition"`
 }
 
-func (sp SoftwareUpgradeProposal) GetUpgrade() Upgrade { return sp.Upgrade }
-func (sp *SoftwareUpgradeProposal) SetUpgrade(upgrade Upgrade) {
-	sp.Upgrade = upgrade
+func (sp SoftwareUpgradeProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sp.ProtocolDefinition }
+func (sp *SoftwareUpgradeProposal) SetProtocolDefinition(upgrade sdk.ProtocolDefinition) {
+	sp.ProtocolDefinition = upgrade
 }

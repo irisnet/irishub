@@ -3,6 +3,7 @@ package gov
 import (
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
@@ -61,18 +62,18 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgr
 			fmt.Sprintf("Software Upgrade Switch Period is in process. current height:%d", ctx.BlockHeight()))
 		return nil
 	}
-	if !gk.protocolKeeper.IsValidVersion(ctx, sp.Upgrade.Version) {
+	if !gk.protocolKeeper.IsValidVersion(ctx, sp.ProtocolDefinition.Version) {
 		logger.Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("version [%v] in SoftwareUpgradeProposal isn't valid ", sp.ProposalID))
 		return nil
 	}
-	if uint64(ctx.BlockHeight())+1 >= sp.Upgrade.SwitchHeight {
+	if uint64(ctx.BlockHeight())+1 >= sp.ProtocolDefinition.Height {
 		logger.Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("switch height must be more than blockHeight + 1"))
 		return nil
 	}
 
-	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.Upgrade.Version, sp.Upgrade.Software, sp.Upgrade.SwitchHeight), sp.Upgrade.Threshold))
+	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sdk.NewProtocolDefinition(sp.ProtocolDefinition.Version, sp.ProtocolDefinition.Software, sp.ProtocolDefinition.Height)))
 
 	logger.Info("Execute SoftwareProposal Success", "info",
 		fmt.Sprintf("current height:%d", ctx.BlockHeight()))

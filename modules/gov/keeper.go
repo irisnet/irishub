@@ -191,7 +191,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
 		textProposal,
-		Upgrade{
+		sdk.ProtocolDefinition{
 			msg.Version,
 			msg.Software,
 			msg.SwitchHeight,

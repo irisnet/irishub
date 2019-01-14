@@ -45,8 +45,8 @@ type Proposal interface {
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
 
-	GetUpgrade() Upgrade
-	SetUpgrade(Upgrade)
+	GetProtocolDefinition() sdk.ProtocolDefinition
+	SetProtocolDefinition(sdk.ProtocolDefinition)
 
 	GetTaxUsage() TaxUsage
 	SetTaxUsage(TaxUsage)
@@ -121,8 +121,8 @@ func (tp TextProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
 func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
-func (tp TextProposal) GetUpgrade() Upgrade { return Upgrade{} }
-func (tp *TextProposal) SetUpgrade(upgrade Upgrade) {}
+func (tp TextProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
+func (tp *TextProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
 func (tp TextProposal) GetTaxUsage() TaxUsage { return TaxUsage{} }
 func (tp *TextProposal) SetTaxUsage(taxUsage TaxUsage) {}
 
