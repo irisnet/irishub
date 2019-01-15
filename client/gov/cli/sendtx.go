@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
-
+	"github.com/pkg/errors"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
@@ -83,9 +83,22 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			}
 
 			if proposalType == gov.ProposalTypeSoftwareUpgrade {
-				version := uint64(viper.GetInt64(flagVersion))
+
+				version_ := viper.GetInt64(flagVersion)
+				if version_ < 0 {
+					return errors.Errorf("Version must greater than or equal to zero")
+				}
+
+				version := uint64(version_)
 				software := viper.GetString(flagSoftware)
-				switchHeight := uint64(viper.GetInt64(flagSwitchHeight))
+
+
+				switchHeight_ := viper.GetInt64(flagSwitchHeight)
+				if switchHeight_ < 0 {
+					return errors.Errorf("SwitchHeight must greater than or equal to zero")
+				}
+				switchHeight := uint64(switchHeight_)
+
 				thresholdStr := viper.GetString(flagThreshold)
 				threshold, err := sdk.NewDecFromStr(thresholdStr)
 				if err != nil {

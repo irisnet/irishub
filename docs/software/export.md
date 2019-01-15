@@ -17,6 +17,7 @@ iris export [flags]
 | --for-zero-height   | bool   | false    | false    | Do some clean up work before exporting state. If you want use the exported state to start a new blockchain, please add this flag. Otherwise, just leave out it |
 | --height            | int    | false    | 0        | Specify the height, defalut value is 0 which means to export the latest state |
 | --home              | string | false    | $HOME/.iris       | Specify the directory which stores node config and blockchain data |
+| --output-file       | string | false    | genesis.json |  Target file to save exported state |
 
 ## Examples
 

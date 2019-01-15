@@ -54,9 +54,11 @@ type ProposalOutput struct {
 	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
 	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
-	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-	Params           Params     `json:"param"`
+	VotingStartTime time.Time              `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingEndTime   time.Time              `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+	Params          Params                 `json:"param"`
+	TaxUsage        TaxUsage               `json:"tax_usage"`
+	Upgrade         sdk.ProtocolDefinition `json:"protocol_definition"`
 }
 
 type ProposalOutputs []ProposalOutput
@@ -78,7 +80,9 @@ func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
 
 		VotingStartTime: proposal.GetVotingStartTime(),
 		VotingEndTime:   proposal.GetVotingEndTime(),
-		Params:           Params{},
+		Params:          Params{},
+		TaxUsage:        proposal.GetTaxUsage(),
+		Upgrade:         proposal.GetProtocolDefinition(),
 	}
 
 	if proposal.GetProposalType() == ProposalTypeParameterChange {

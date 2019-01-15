@@ -18,8 +18,8 @@ const (
 var (
 	MinimumGasPrice    = sdk.ZeroInt()
 	MaximumGasPrice    = sdk.NewIntWithDecimal(1, 18) //1iris, 10^18iris-atto
-	MinimumTxSizeLimit = uint32(500)
-	MaximumTxSizeLimit = uint32(1500)
+	MinimumTxSizeLimit = uint64(500)
+	MaximumTxSizeLimit = uint64(1500)
 )
 
 //Parameter store key
@@ -37,7 +37,7 @@ func ParamTypeTable() params.TypeTable {
 // auth parameters
 type Params struct {
 	GasPriceThreshold sdk.Int `json:"gas_price_threshold"` // gas price threshold
-	TxSizeLimit       uint32  `json:"tx_size"`             // tx size limit
+	TxSizeLimit       uint64  `json:"tx_size"`             // tx size limit
 }
 
 // Implements params.ParamStruct
@@ -64,14 +64,14 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		}
 		return threshold, nil
 	case string(TxSizeLimitKey):
-		txsize, err := strconv.ParseUint(value, 10, 32)
+		txsize, err := strconv.ParseUint(value, 10, 64)
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if uint32(txsize) < MinimumTxSizeLimit || uint32(txsize) > MaximumTxSizeLimit {
+		if txsize < MinimumTxSizeLimit || txsize > MaximumTxSizeLimit {
 			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidTxSizeLimit, fmt.Sprintf("Tx size limit (%s) should be [500, 1500]", value))
 		}
-		return uint32(txsize), nil
+		return txsize, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -94,7 +94,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 func DefaultParams() Params {
 	return Params{
 		GasPriceThreshold: sdk.NewIntWithDecimal(2, 10), //20iris-nano, 2*10^10iris-atto
-		TxSizeLimit:       1000,
+		TxSizeLimit:       uint64(1000),
 	}
 }
 

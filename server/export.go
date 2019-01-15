@@ -2,20 +2,21 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path"
 
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/irisnet/irishub/codec"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io/ioutil"
-	"path"
 )
 
 const (
 	flagHeight        = "height"
 	flagForZeroHeight = "for-zero-height"
+	flagOutputFile    = "output-file"
 )
 
 // ExportCmd dumps app state to JSON.
@@ -68,17 +69,25 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			doc.AppState = appState
 			doc.Validators = validators
 
+			doc.AppState = sdk.MustSortJSON(doc.AppState)
+
 			encoded, err := codec.MarshalJSONIndent(cdc, doc)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(encoded))
+			outputFile := viper.GetString(flagOutputFile)
+			err = ioutil.WriteFile(outputFile, encoded, 0644)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("export state to file %s successfully\n", outputFile)
 			return nil
 		},
 	}
 	cmd.Flags().Int64(flagHeight, 0, "Export state from a particular height (0 means latest height)")
 	cmd.Flags().Bool(flagForZeroHeight, false, "Export state to start at height zero (perform preproccessing)")
+	cmd.Flags().String(flagOutputFile, "genesis.json", "Target file to save exported state")
 	return cmd
 }
 
