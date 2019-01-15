@@ -18,6 +18,7 @@ import (
 var (
 	DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
 	BurnRate              = sdk.NewDecWithPrec(2, 1)
+	MinDepositRate        = sdk.NewDecWithPrec(3,1)
 )
 
 // Governance ProtocolKeeper
@@ -422,6 +423,17 @@ func (keeper Keeper) setDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(deposit)
 	store.Set(KeyDeposit(proposalID, depositorAddr), bz)
+}
+
+func (keeper Keeper) AddInitialDeposit(ctx sdk.Context, proposal Proposal, depositorAddr sdk.AccAddress, initialDeposit sdk.Coins) (sdk.Error, bool) {
+
+	minDepositInt := sdk.NewDecFromInt(keeper.GetDepositProcedure(ctx, proposal).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(MinDepositRate).RoundInt()
+	minInitialDeposit := sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom,minDepositInt)}
+	if !initialDeposit.IsAllGTE(minInitialDeposit) {
+		return ErrNotEnoughInitialDeposit(DefaultCodespace,initialDeposit,minInitialDeposit), false
+	}
+
+	return keeper.AddDeposit(ctx,proposal.GetProposalID(),depositorAddr, initialDeposit)
 }
 
 // Adds or updates a deposit of a specific depositor on a specific proposal
