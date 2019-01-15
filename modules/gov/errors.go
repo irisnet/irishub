@@ -21,7 +21,6 @@ const (
 	CodeInvalidVote             sdk.CodeType = 9
 	CodeInvalidGenesis          sdk.CodeType = 10
 	CodeInvalidProposalStatus   sdk.CodeType = 11
-	////////////////////  iris begin  ///////////////////////////
 	CodeInvalidParam          sdk.CodeType = 12
 	CodeInvalidParamOp        sdk.CodeType = 13
 	CodeSwitchPeriodInProcess sdk.CodeType = 14
@@ -39,7 +38,6 @@ const (
 	CodeOnlyValidatorVote   sdk.CodeType = 26
 	CodeMoreThanMaxProposal sdk.CodeType = 27
 	CodeEmptyParam          sdk.CodeType = 29
-	////////////////////  iris end  /////////////////////////////
 )
 
 //----------------------------------------
