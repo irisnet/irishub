@@ -40,3 +40,20 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 
 	return
 }
+
+// slashing begin block functionality
+func EndBlocker(ctx sdk.Context,req abci.RequestEndBlock, sk Keeper) (tags sdk.Tags) {
+
+	// Tag the height
+	heightBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(heightBytes, uint64(req.Height))
+	tags = sdk.NewTags("height", heightBytes)
+
+	doubleSignSlashTag := sk.handleDoubleSign(ctx,
+		ctx.BlockHeader().ProposerAddress,
+		ctx.BlockHeight(),
+		ctx.BlockHeader().Time,
+		sk.validatorSet.ValidatorByConsAddr(ctx,(sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress)).GetPower().RoundInt64())
+	tags = tags.AppendTags(doubleSignSlashTag)
+	return
+}

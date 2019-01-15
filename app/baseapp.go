@@ -16,12 +16,12 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	tmstate "github.com/tendermint/tendermint/state"
 	"strconv"
-	"github.com/irisnet/irishub/modules/auth"
 )
 
 // Key to store the consensus params in the main store.
@@ -74,6 +74,7 @@ type BaseApp struct {
 
 	// flag for sealing
 	sealed bool
+
 }
 
 var _ abci.Application = (*BaseApp)(nil)
@@ -85,10 +86,10 @@ var _ abci.Application = (*BaseApp)(nil)
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
 func NewBaseApp(name string, logger log.Logger, db dbm.DB, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:    logger,
-		name:      name,
-		db:        db,
-		cms:       store.NewCommitMultiStore(db),
+		Logger:       logger,
+		name:         name,
+		db:           db,
+		cms:          store.NewCommitMultiStore(db),
 	}
 
 	for _, option := range options {
@@ -491,7 +492,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.
 			WithBlockHeader(req.Header).
-			WithBlockHeight(req.Header.Height)
+			WithBlockHeight(req.Header.Height).WithCheckValidNum(0)
 	}
 
 	// add block gas meter
@@ -511,6 +512,10 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	// set the signed validators for addition to context in deliverTx
 	// TODO: communicate this result to the address to pubkey map in slashing
 	app.voteInfos = req.LastCommitInfo.GetVotes()
+
+	x := app.deliverState.ctx.CheckValidNum()
+	_ = x
+
 	return
 }
 
@@ -523,12 +528,12 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	// Decode the Tx.
 	var result sdk.Result
 
-	var tx, err = app.txDecoder(txBytes)
-	if err != nil {
-		result = err.Result()
-	} else {
-		result = app.runTx(RunTxModeCheck, txBytes, tx)
-	}
+	//var tx, err = app.txDecoder(txBytes)
+	//if err != nil {
+	//	result = err.Result()
+	//} else {
+	//	result = app.runTx(RunTxModeCheck, txBytes, tx)
+	//}
 
 	return abci.ResponseCheckTx{
 		Code:      uint32(result.Code),
@@ -548,7 +553,10 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	if err != nil {
 		result = err.Result()
 	} else {
+		// success pass txDecoder
+		app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum()+1)
 		result = app.runTx(RunTxModeDeliver, txBytes, tx)
+
 	}
 
 	// Even though the Result.Code is not OK, there are still effects,
@@ -762,7 +770,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}()
 
-
 	feePreprocessHandler := app.Engine.GetCurrentProtocol().GetFeePreprocessHandler()
 	// run the fee handler
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
@@ -790,7 +797,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 			return result
 		}
 
-		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte * sdk.Gas(len(txBytes)), "blockstore")
+		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte*sdk.Gas(len(txBytes)), "blockstore")
 
 		if !newCtx.IsZero() {
 			// At this point, newCtx.MultiStore() is cache wrapped,
@@ -827,6 +834,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 // EndBlock implements the ABCI application interface.
 func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBlock) {
+
 	if app.deliverState.ms.TracingEnabled() {
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
