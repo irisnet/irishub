@@ -20,7 +20,7 @@ func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 }
 
 func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (err error) {
-	logger := ctx.Logger().With("module", "gov")
+	logger := ctx.Logger().With("module", "x/gov")
 	burn := false
 	if p.TaxUsage.Usage == UsageTypeBurn {
 		burn = true
@@ -37,7 +37,7 @@ func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (e
 }
 
 func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal) (err error) {
-	logger := ctx.Logger().With("module", "gov")
+	logger := ctx.Logger().With("module", "x/gov")
 	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
 	for _, param := range pp.Params {
 		paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)

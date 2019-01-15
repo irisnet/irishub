@@ -229,7 +229,7 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 // Called every block, process inflation, update validator set
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
-	logger := ctx.Logger().With("module", "gov")
+	logger := ctx.Logger().With("module", "x/gov")
 
 	resTags = sdk.NewTags()
 
