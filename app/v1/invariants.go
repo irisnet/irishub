@@ -13,10 +13,16 @@ import (
 func (p *ProtocolV1) runtimeInvariants() []simulation.Invariant {
 	return []simulation.Invariant{
 		banksim.NonnegativeBalanceInvariant(p.accountMapper),
+
 		distrsim.ValAccumInvariants(p.distrKeeper, p.StakeKeeper),
+		distrsim.DelAccumInvariants(p.distrKeeper, p.StakeKeeper),
+		distrsim.CanWithdrawInvariant(p.distrKeeper, p.StakeKeeper),
+
 		stakesim.SupplyInvariants(p.bankKeeper, p.StakeKeeper,
 			p.feeKeeper, p.distrKeeper, p.accountMapper),
-		stakesim.PositivePowerInvariant(p.StakeKeeper),
+		stakesim.NonNegativePowerInvariant(p.StakeKeeper),
+		stakesim.PositiveDelegationInvariant(p.StakeKeeper),
+		stakesim.DelegatorSharesInvariant(p.StakeKeeper),
 	}
 }
 

@@ -6,12 +6,10 @@ import (
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
-	"time"
 )
 
 // Vote
 type Vote struct {
-	VoteTime   time.Time      `json:"vote_time"`   //  vote time
 	Voter      sdk.AccAddress `json:"voter"`       //  address of the voter
 	ProposalID uint64         `json:"proposal_id"` //  proposalID of the proposal
 	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter

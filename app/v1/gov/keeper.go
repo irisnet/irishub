@@ -82,8 +82,6 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSystemHalt:
 		return keeper.NewSystemHaltProposal(ctx, title, description, proposalType)
-	case ProposalText:
-		return keeper.NewTextProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -95,29 +93,6 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 
 // Creates a NewProposal
 ////////////////////  iris begin  ///////////////////////////
-func (keeper Keeper) NewTextProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
-	proposalID, err := keeper.getNewProposalID(ctx)
-	if err != nil {
-		return nil
-	}
-	var proposal Proposal = &TextProposal{
-		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
-	}
-
-	depositPeriod := keeper.GetDepositProcedure(ctx, proposal).MaxDepositPeriod
-	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
-	keeper.SetProposal(ctx, proposal)
-	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
-	return proposal
-}
-
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
@@ -159,7 +134,7 @@ func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, descri
 		Status:       StatusDepositPeriod,
 		TallyResult:  EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
-		SubmitTime:   ctx.BlockHeader().Time,
+		SubmitTime:   time.Now(),
 	}
 	var proposal Proposal = &SystemHaltProposal{
 		textProposal,
@@ -189,9 +164,10 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	}
 	var proposal Proposal = &TaxUsageProposal{
 		textProposal,
-		msg.Usage,
-		msg.DestAddress,
-		msg.Percent,
+		TaxUsage{
+			msg.Usage,
+			msg.DestAddress,
+			msg.Percent},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -214,9 +190,10 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	}
 	var proposal Proposal = &SoftwareUpgradeProposal{
 		textProposal,
-		msg.Version,
-		msg.Software,
-		msg.SwitchHeight,
+		sdk.ProtocolDefinition{
+			msg.Version,
+			msg.Software,
+			msg.SwitchHeight,},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -228,8 +205,6 @@ func (keeper Keeper) saveProposal(ctx sdk.Context, proposal Proposal) {
 	keeper.SetProposal(ctx, proposal)
 	keeper.InsertInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposal.GetProposalID())
 }
-
-////////////////////  iris end  /////////////////////////////
 
 // Get Proposal from store by ProposalID
 func (keeper Keeper) GetProposal(ctx sdk.Context, proposalID uint64) Proposal {
@@ -390,7 +365,6 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	}
 
 	vote := Vote{
-		VoteTime:   time.Now(),
 		ProposalID: proposalID,
 		Voter:      voterAddr,
 		Option:     option,
