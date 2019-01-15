@@ -496,7 +496,7 @@
   version = "v0.12.0-iris"
 
 [[projects]]
-  digest = "1:4416561b9d6e7de60334a880810e9d02c348b2549f5a327ccd34e90edac16271"
+  digest = "1:ffa35a4a4ce4ee278c208a1e5f75b2d92eaba36d2f614e3ffa2863651429e4ed"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -561,9 +561,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "ae55f6ecaab71915ff86bf7303c43f1e91b9dac2"
+  revision = "f261e73ea0164abe584fbdf7370dbd777f348d56"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.27.3-iris"
+  version = "v0.27.3-iris1"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
