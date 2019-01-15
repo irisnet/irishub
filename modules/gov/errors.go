@@ -29,7 +29,7 @@ const (
 	CodeInvalidInput          sdk.CodeType = 17
 	CodeInvalidVersion        sdk.CodeType = 18
 	CodeInvalidSwitchHeight   sdk.CodeType = 19
-
+	CodeNotEnoughInitialDeposit sdk.CodeType = 20
 	CodeDepositDeleted      sdk.CodeType = 21
 	CodeVoteNotExisted      sdk.CodeType = 22
 	CodeDepositNotExisted   sdk.CodeType = 23
@@ -150,4 +150,6 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal can't be more than the maximum %v.", proposalLevel, num))
 }
 
-////////////////////  iris end  /////////////////////////////
+func ErrNotEnoughInitialDeposit(codespace sdk.CodespaceType, initialDeposit sdk.Coins, minDeposit sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeNotEnoughInitialDeposit, fmt.Sprintf("Initial Deposit [%s] is less than minInitialDeposit [%s]", initialDeposit.String(), minDeposit.String()))
+}
