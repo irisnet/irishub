@@ -21,6 +21,8 @@ const (
 	LOWER_BOUND_AMOUNT   = 10
 	UPPER_BOUND_AMOUNT   = 10000
 	STABLE_CRITIACAL_NUM = 1
+	DEFAULT_IMPORTANT_NUM = 2
+	DEFAULT_NORMAL_NUM    = 1
 	MIN_IMPORTANT_NUM    = 1
 	MIN_NORMAL_NUM       = 1
 )
@@ -247,7 +249,7 @@ func DefaultParams() GovParams {
 		ImportantDepositPeriod: time.Duration(sdk.Day),
 		ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
 		ImportantVotingPeriod:  time.Duration(sdk.SixtyHours),
-		ImportantMaxNum:        MIN_IMPORTANT_NUM,
+		ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
 		ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 		ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 		ImportantParticipation: sdk.NewDecWithPrec(834, 3),
@@ -256,7 +258,7 @@ func DefaultParams() GovParams {
 		NormalDepositPeriod: time.Duration(sdk.Day),
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
 		NormalVotingPeriod:  time.Duration(sdk.TwoDays),
-		NormalMaxNum:        MIN_NORMAL_NUM,
+		NormalMaxNum:        DEFAULT_NORMAL_NUM,
 		NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 		NormalVeto:          sdk.NewDecWithPrec(334, 3),
 		NormalParticipation: sdk.NewDecWithPrec(75, 2),

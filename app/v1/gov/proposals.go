@@ -44,6 +44,12 @@ type Proposal interface {
 
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
+
+	GetProtocolDefinition() sdk.ProtocolDefinition
+	SetProtocolDefinition(sdk.ProtocolDefinition)
+
+	GetTaxUsage() TaxUsage
+	SetTaxUsage(TaxUsage)
 }
 
 // checks if two proposals are equal
@@ -115,6 +121,10 @@ func (tp TextProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
 func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
+func (tp TextProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
+func (tp *TextProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
+func (tp TextProposal) GetTaxUsage() TaxUsage { return TaxUsage{} }
+func (tp *TextProposal) SetTaxUsage(taxUsage TaxUsage) {}
 
 //-----------------------------------------------------------
 // ProposalQueue
@@ -131,11 +141,8 @@ const (
 	ProposalTypeNil             ProposalKind = 0x00
 	ProposalTypeParameterChange ProposalKind = 0x01
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
-	////////////////////  iris begin  /////////////////////////////
-	ProposalTypeSystemHalt ProposalKind = 0x03
-	ProposalTypeTxTaxUsage ProposalKind = 0x04
-	ProposalText           ProposalKind = 0x05
-	////////////////////  iris end  /////////////////////////////
+	ProposalTypeSystemHalt      ProposalKind = 0x03
+	ProposalTypeTxTaxUsage      ProposalKind = 0x04
 )
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -145,14 +152,10 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 		return ProposalTypeParameterChange, nil
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
-		////////////////////  iris begin  /////////////////////////////
 	case "SystemHalt":
 		return ProposalTypeSystemHalt, nil
 	case "TxTaxUsage":
 		return ProposalTypeTxTaxUsage, nil
-	case "Text":
-		return ProposalText, nil
-		////////////////////  iris end  /////////////////////////////
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
@@ -162,11 +165,8 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
-	////////////////////  iris begin  /////////////////////////////
 		pt == ProposalTypeSystemHalt ||
-		pt == ProposalTypeTxTaxUsage ||
-		pt == ProposalText {
-		////////////////////  iris end  /////////////////////////////
+		pt == ProposalTypeTxTaxUsage {
 		return true
 	}
 	return false
@@ -211,14 +211,10 @@ func (pt ProposalKind) String() string {
 		return "ParameterChange"
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
-		////////////////////  iris begin  /////////////////////////////
 	case ProposalTypeSystemHalt:
 		return "SystemHalt"
 	case ProposalTypeTxTaxUsage:
 		return "TxTaxUsage"
-	case ProposalText:
-		return "Text"
-		////////////////////  iris end  /////////////////////////////
 	default:
 		return ""
 	}
