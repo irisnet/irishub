@@ -400,7 +400,7 @@ func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
 		fmt.Printf(" %s=%s\n", keyStr, valueStr)
 		return nil
 	} else {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
+		return gov.ErrInvalidParam(gov.DefaultCodespace,params.GetParamSpaceFromKey(keyStr))
 	}
 }
 
