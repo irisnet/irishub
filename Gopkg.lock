@@ -561,7 +561,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "c88e2ac2a6bc973a05e9fdbc54634c02d54979c7"
+  revision = "9505c83f9d41f020b8fc77d411025e8394264554"
   source = "https://github.com/irisnet/tendermint.git"
   version = "v0.27.3-iris2"
 
