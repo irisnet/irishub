@@ -18,7 +18,7 @@ iriscli gov submit-proposal --help
 
 | 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --deposit        |                            | [string] 提议的保证金                                                                                                                         |          |
+| --deposit        |                            | [string] 提议的保证金（至少30%minDeposit）                                                                                                                         |          |
 | --description    |                            | [string] 提议的描述                                                                                                           | Yes      |
 | --key            |                            | 参数的键名称                                                                                                                        |          |
 | --op             |                            | [string] 对参数的操作                                                                                                             |          |
@@ -32,6 +32,8 @@ iriscli gov submit-proposal --help
 | --threshold        | "0.85"   |  [string] 软件升级的阈值                                              |               |
 
 ## 例子
+
+提议者必须抵押至少30%的`MinDeposit`，详情见 [Gov](../../feature/governance.md)
 
 ### 提交一个'ParameterChange'类型的提议
 
