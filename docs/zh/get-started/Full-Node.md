@@ -17,8 +17,8 @@ genesis文件中定义了区块链网络的初始状态，而config.toml指定�
 
 ```
 cd $IRISHOME/config/
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-7000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-7000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/config/genesis.json
 ```
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：

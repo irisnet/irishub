@@ -10,39 +10,6 @@ Sign transactions in generated offline file. The file created with the --generat
 iriscli bank sign <file> [flags]
 ```
 
- 
-
-## Flags
-
-| Name,shorthand   | Type   | Required | Default               | Description                                                  |
-| ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| -h, --help       |        | False    |                       | Help for send                                                |
-| --append         | Boole  | True     | True                  | Append the signature to the existing ones. If disabled, old signatures would be overwritten |
-| --name           | String | True     |                       | Name of private key with which to sign                       |
-| --offline        | Boole  | True     | False                 | Offline mode. Do not query local cache.                      |
-| --print-sigs     | Boole  | True     | False                 | Print the addresses that must sign the transaction and those who have already signed it, then exit |
-| --chain-id       | String | False    |                       | Chain ID of tendermint node                                  |
-| --account-number | Int    | False    |                       | AccountNumber number to sign the tx                          |
-| --amount         | String | True     |                       | Amount of coins to send, for instance: 10iris                |
-| --async          |        | False    | True                  | Broadcast transactions asynchronously                        |
-| --dry-run        |        | False    |                       | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it |
-| --fee            | String | True     |                       | Fee to pay along with transaction                            |
-| --from           | String | True     |                       | Name of private key with which to sign                       |
-| --from-addr      | String | False    |                       | Specify from address in generate-only mode                   |
-| --gas            | String | False    | 20000                 | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
-| --gas-adjustment | Float  | False    | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored |
-| --generate-only  |        | False    |                       | Build an unsigned transaction and write it to STDOUT         |
-| --indent         |        | False    |                       | Add indent to JSON response                                  |
-| --json           |        | False    |                       | Return output in json format                                 |
-| --memo           | String | False    |                       | Memo to send along with transaction                          |
-| --print-response |        | False    |                       | Return tx response (only works with async = false)           |
-| --sequence       | Int    | False    |                       | Sequence number to sign the tx                               |
-| --to             | String | False    |                       | Bech32 encoding address to receive coins                     |
-| --ledger         | String | False    |                       | Use a connected Ledger device                                |
-| --node           | String | False    | tcp://localhost:26657 | <host>:<port> to tendermint rpc interface for this chain     |
-| --trust-node     | String | False    | True                  | Don't verify proofs for responses                            |
-
-
 
 ## Global Flags
 

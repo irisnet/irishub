@@ -10,12 +10,6 @@ Withdraw all fees from service incoming fees
 iriscli service withdraw-fees [flags]
 ```
 
-## Flags
-
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| -h, --help            |                         | help for withdraw-fees                                                                                                                                         |          |
-
 ## Examples
 
 ### Withdraw fees from service incoming fees 
