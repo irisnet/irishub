@@ -10,13 +10,12 @@
 iriscli service disable [flags]
 ```
 
-## 标志
+## 特有标志
 
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------  | -------- |
 | --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                         | 是       |
 | --service-name        |                         | [string] 服务名称                                                                   | 是       |
-| -h, --help            |                         | 禁用命令帮助                                                                         |          |
 
 ## 示例
 

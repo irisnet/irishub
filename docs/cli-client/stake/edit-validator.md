@@ -14,6 +14,7 @@ Print help messages:
 iriscli stake edit-validator --help
 ```
 
+
 ## Unique Flags
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |

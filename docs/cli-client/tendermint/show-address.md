@@ -2,7 +2,7 @@
 
 ## Description
 
-Shows this node's tendermint validator address
+Shows this node's tendermint validator consensus address
 
 ## Usage
 
