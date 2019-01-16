@@ -2,8 +2,7 @@
 
 ## Description
 
-Burn tokens 
-
+This command is used for burning tokens from specified address. Anyone can send this transaction type. 
 ## Usage:
 
 ```

@@ -12,7 +12,7 @@ The module supports the infrastructure of the blockchain software upgrade. It wi
 
 ### The process of software upgrade   
 1. Install a new software.
-2. Once reach the limited time determined by `SoftwareUpgradeProposal`, it will be counted whether the proportion of voting power of upgraded software exceeds threshold determined by `SoftwareUpgradeProposal`.
+2. Once reach the limited time determined by `SoftwareUpgradeProposal`, it will be counted whether the proportion of voting power of upgraded software exceeds threshold determined by `SoftwareUpgradeProposal`.		 2. Once reach the limited time, it will be counted whether the proportion of voting power of upgraded software exceeds 95%.
 3. If it exceeds threshold, the software will be upgraded, otherwise the upgrade fails.
 4. The validators who didn't upgrade in time need to re-download the new software and blocks synchronized.
 
@@ -32,7 +32,7 @@ iris start --home=iris
 
 ```
 # Send an upgrade proposal
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9 --commit
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80  --threshold=0.9 --commit
 
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --commit
@@ -67,7 +67,7 @@ iriscli upgrade info --trust-node
 
 * Scenario 2
 
-The operations in Scenario 1 haven't been implemented at the certain time (80 block height), report errors after the new version become valid:
+The operations in Scenario 1 haven't been implemented at the certain time (80 block height), report apphash conflicts errors after the new version become valid:
 
 ```
 # 1. Download the new version, iris1
@@ -86,14 +86,14 @@ iriscli upgrade info --trust-node
 ## Command details
 
 ```
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80  --threshold=0.9 --commit
 ```
 
 * `--type`  "SoftwareUpgrade" The type of Software upgrade proposals
 * `--version`  The version of the new protocol
 * `--software`  The software of the new protocol
 * `--switch-height` The switchheight of the new protocol
-* `--threshold`  The threshold of "SoftwareUpgrade"
+* `--threshold`  The threshold of "SoftwareUpgrade"		
 * Other parameters can be referrenced in [Gov User Guide](governance.md)
 
 Query the version details of current software 

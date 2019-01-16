@@ -20,7 +20,6 @@ iriscli service define [flags]
 | --tags                |                         | [strings] service tags                                                                                                                                |          |
 | --idl-content         |                         | [string] content of service interface description language                                                                                            |          |
 | --file                |                         | [string] path of file which contains service interface description language                                                                           |          |
-| -h, --help            |                         | help for define                                                                                                                                       |          |
 
 ## Examples
 

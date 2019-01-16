@@ -2,7 +2,7 @@
 
 ## 介绍
 
-获取节点p2p的id
+从{irishome}/config获取节点的私钥文件node_key.json，再推导公钥对应的地址，然后进行hex编码结果。
 
 ## 用法
 
@@ -32,7 +32,7 @@ iris tendermint show-node-id --home={iris-home}
 ```
 
 示例返回
-```$xslt
+```
 b18d3d1990c886555241f91331f9c00fe69421aa
 ```
 

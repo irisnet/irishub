@@ -22,6 +22,14 @@
 
 ## 例子 
 
+### 获得114263高度的区块信息
+
 ```shell
-iriscli tendermint block 114263  --chain-id=fuxi-4000 
+iriscli tendermint block 114263  --chain-id=irishub-test
+```
+### 获得最新区块
+
+```shell
+iriscli tendermint block  --chain-id=irishub-test --trust-node=true
+
 ```

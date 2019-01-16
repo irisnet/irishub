@@ -16,7 +16,6 @@ iriscli service response [flags]
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --request-chain-id    |                         | [string] the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
 | --request-id          |                         | [string] the ID of the service invocation                                                                                                                                 |  Yes     |
-| -h, --help            |                         | help for response                                                                                                                                         |          |
 
 ## Examples
 

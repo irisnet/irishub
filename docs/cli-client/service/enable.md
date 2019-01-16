@@ -17,7 +17,6 @@ iriscli service enable [flags]
 | --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
 | --deposit string      |                         | [string] deposit of binding, will add to the current deposit balance                                                                                  |          |
 | --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
-| -h, --help            |                         | help for enable                                                                                                                                       |          |
 
 ## Examples
 

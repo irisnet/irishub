@@ -10,7 +10,7 @@
 iriscli service define [flags]
 ```
 
-## 标志
+## 特有标志
 
 | Name, shorthand       | Default                 | Description                                                                       | Required |
 | --------------------- | ----------------------- | --------------------------------------------------------------------------------- | -------- |
@@ -20,7 +20,6 @@ iriscli service define [flags]
 | --tags                |                         | [strings] 该服务的关键字                                                             |          |
 | --idl-content         |                         | [string] 对该服务描述的接口定义语言内容                                                 |          |
 | --file                |                         | [string] 对该服务描述的接口定义语言内容的文件路径                                         |          |
-| -h, --help            |                         | 服务定义命令帮助                                                                    |          |
 
 ## 示例
 

@@ -9,12 +9,12 @@ These instructions are for setting up a brand new full node from scratch.
 First, initialize the node and create the necessary config files:
 
 ```
-iris init --name=<your_custom_name> --home=$IRISHOME
+iris init --moniker=<your_custom_name> --home=$IRISHOME
 ```
 
-> Note: Only ASCII characters are supported for the `--name`. Using Unicode characters will render your node unreachable.
+> Note: Only ASCII characters are supported for the `--moniker`. Using Unicode characters will render your node unreachable.
 
-The default \$IRISHOME is `~/.iris` , You can edit this `name` later, in the `~/.iris/config/config.toml` file:
+The default \$IRISHOME is `~/.iris` , You can edit this `moniker` later, in the `~/.iris/config/config.toml` file:
 
 Your full node has been initialized!
 
@@ -27,8 +27,8 @@ After intializing your node, please download the genesis file and the config fil
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-5000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-5000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/config/genesis.json
 ```
 ## Edit Your Config File
 
