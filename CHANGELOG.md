@@ -1,5 +1,19 @@
 # Changelog
 
+
+## 0.10.0
+
+*January 16th, 2019*
+
+
+- [iris] Add flag --output-file to save export result and ensure result is consistent
+- [iris] Improve invariant checking coverage and fix distribution bugs
+- [iriscli] Make the result of `iriscli tendermint tx` readable
+- [iriscli] Query cmd return details about software upgrade and tax usage proposal
+- [tendermint] Fix the inconformity of too many evidences check
+- [tendermint] Fix replay bug of `iris export`
+
+
 ## 0.10.0-rc0
 
 *January 8th, 2019*
