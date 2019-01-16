@@ -114,6 +114,11 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	if err != nil {
 		return err
 	}
+
+	if len(msg.Software) > 70 {
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "software", len(msg.Software), 70)
+	}
+
 	// if threshold not in [0.85,1), then print error
 	if msg.Threshold.LT(sdk.NewDecWithPrec(85, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
 		return ErrInvalidUpgradeThreshold(DefaultCodespace, msg.Threshold)
