@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"sort"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // Apply and return accumulated updates to the bonded validator set. Also,
@@ -24,6 +23,7 @@ import (
 // at the previous block height or were removed from the validator set entirely
 // are returned to Tendermint.
 func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []abci.ValidatorUpdate) {
+	logger := ctx.Logger().With("module", "x/stake")
 
 	store := ctx.KVStore(k.storeKey)
 	maxValidators := k.GetParams(ctx).MaxValidators
@@ -58,8 +58,10 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		switch validator.Status {
 		case sdk.Unbonded:
 			validator = k.unbondedToBonded(ctx, validator)
+			logger.Info(fmt.Sprintf("Switch validator %s status from unbonded to bonded", validator.ConsPubKey.Address()))
 		case sdk.Unbonding:
 			validator = k.unbondingToBonded(ctx, validator)
+			logger.Info(fmt.Sprintf("Switch validator %s status from unbonding to bonded", validator.ConsPubKey.Address()))
 		case sdk.Bonded:
 			// no state change
 		default:
@@ -113,6 +115,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 		// update the validator set
 		updates = append(updates, validator.ABCIValidatorUpdateZero())
+		logger.Info(fmt.Sprintf("Remove no longer bonded validator %s", validator.ConsPubKey.Address()))
 	}
 
 	// set total power on lookup index if there are any updates
