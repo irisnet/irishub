@@ -10,7 +10,7 @@
 iriscli service update-binding [flags]
 ```
 
-## 标志
+## 特有标志
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------- | -------- |
 | --avg-rsp-time        |                         | [int]  服务平均返回时间的毫秒数表示                                                     | 是       |
@@ -20,7 +20,6 @@ iriscli service update-binding [flags]
 | --prices              |                         | [strings] 服务定价,按照服务方法排序的定价列表                                             |          |
 | --service-name        |                         | [string] 服务名称                                                                    | 是       |
 | --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  | 是       |
-| -h, --help            |                         | 绑定更新命令帮助                                                                       |          |
 
 ## 示例
 

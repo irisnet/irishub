@@ -12,7 +12,7 @@ import (
 
 func TestCannotUnjailUnlessJailed(t *testing.T) {
 	// initial setup
-	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParams())
+	ctx, ck, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
 	slh := NewHandler(keeper)
 	amtInt := sdk.NewIntWithDecimal(100, 18)
 	addr, val, amt := addrs[0], pks[0], amtInt
@@ -23,7 +23,7 @@ func TestCannotUnjailUnlessJailed(t *testing.T) {
 
 	require.Equal(
 		t, ck.GetCoins(ctx, sdk.AccAddress(addr)),
-		sdk.Coins{sdk.NewCoin(sk.GetParams(ctx).BondDenom, initCoins.Sub(amt))},
+		sdk.Coins{sdk.NewCoin(sk.BondDenom(), initCoins.Sub(amt))},
 	)
 	require.Equal(t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))), sk.Validator(ctx, addr).GetPower())
 
@@ -35,7 +35,7 @@ func TestCannotUnjailUnlessJailed(t *testing.T) {
 }
 
 func TestJailedValidatorDelegations(t *testing.T) {
-	ctx, _, stakeKeeper, _, slashingKeeper := createTestInput(t, DefaultParams())
+	ctx, _, stakeKeeper, _, slashingKeeper := createTestInput(t, DefaultParamsForTestnet())
 
 	stakeParams := stakeKeeper.GetParams(ctx)
 	stakeParams.UnbondingTime = 0

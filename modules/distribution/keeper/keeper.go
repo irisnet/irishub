@@ -9,28 +9,28 @@ import (
 
 // keeper of the stake store
 type Keeper struct {
-	storeKey            sdk.StoreKey
-	cdc                 *codec.Codec
-	paramSpace          params.Subspace
-	bankKeeper          types.BankKeeper
-	stakeKeeper         types.StakeKeeper
-	feeCollectionKeeper types.FeeCollectionKeeper
+	storeKey    sdk.StoreKey
+	cdc         *codec.Codec
+	paramSpace  params.Subspace
+	bankKeeper  types.BankKeeper
+	stakeKeeper types.StakeKeeper
+	feeKeeper   types.FeeKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, ck types.BankKeeper,
-	sk types.StakeKeeper, fck types.FeeCollectionKeeper, codespace sdk.CodespaceType) Keeper {
+	sk types.StakeKeeper, fk types.FeeKeeper, codespace sdk.CodespaceType) Keeper {
 
 	keeper := Keeper{
-		storeKey:            key,
-		cdc:                 cdc,
-		paramSpace:          paramSpace.WithTypeTable(ParamTypeTable()),
-		bankKeeper:          ck,
-		stakeKeeper:         sk,
-		feeCollectionKeeper: fck,
-		codespace:           codespace,
+		storeKey:    key,
+		cdc:         cdc,
+		paramSpace:  paramSpace.WithTypeTable(ParamTypeTable()),
+		bankKeeper:  ck,
+		stakeKeeper: sk,
+		feeKeeper:   fk,
+		codespace:   codespace,
 	}
 	return keeper
 }
@@ -46,6 +46,16 @@ func (k Keeper) GetFeePool(ctx sdk.Context) (feePool types.FeePool) {
 	}
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &feePool)
 	return
+}
+
+// set the global fee pool distribution info
+func (k Keeper) SetGenesisFeePool(ctx sdk.Context, feePool types.FeePool) {
+	coins, _ := feePool.CommunityPool.TruncateDecimal()
+	k.bankKeeper.IncreaseLoosenToken(ctx, coins)
+	feePool.CommunityPool = types.NewDecCoins(coins)
+	store := ctx.KVStore(k.storeKey)
+	b := k.cdc.MustMarshalBinaryLengthPrefixed(feePool)
+	store.Set(FeePoolKey, b)
 }
 
 // set the global fee pool distribution info
@@ -103,55 +113,4 @@ func (k Keeper) GetWithdrawContext(ctx sdk.Context,
 	return types.NewWithdrawContext(
 		feePool, height, lastTotalPower, sdk.NewDecFromInt(lastValPower),
 		validator.GetCommission())
-}
-
-//______________________________________________________________________
-// PARAM STORE
-
-// Type declaration for parameters
-func ParamTypeTable() params.TypeTable {
-	return params.NewTypeTable(
-		ParamStoreKeyCommunityTax, sdk.Dec{},
-		ParamStoreKeyBaseProposerReward, sdk.Dec{},
-		ParamStoreKeyBonusProposerReward, sdk.Dec{},
-	)
-}
-
-// Returns the current CommunityTax rate from the global param store
-// nolint: errcheck
-func (k Keeper) GetCommunityTax(ctx sdk.Context) sdk.Dec {
-	var percent sdk.Dec
-	k.paramSpace.Get(ctx, ParamStoreKeyCommunityTax, &percent)
-	return percent
-}
-
-// nolint: errcheck
-func (k Keeper) SetCommunityTax(ctx sdk.Context, percent sdk.Dec) {
-	k.paramSpace.Set(ctx, ParamStoreKeyCommunityTax, &percent)
-}
-
-// Returns the current BaseProposerReward rate from the global param store
-// nolint: errcheck
-func (k Keeper) GetBaseProposerReward(ctx sdk.Context) sdk.Dec {
-	var percent sdk.Dec
-	k.paramSpace.Get(ctx, ParamStoreKeyBaseProposerReward, &percent)
-	return percent
-}
-
-// nolint: errcheck
-func (k Keeper) SetBaseProposerReward(ctx sdk.Context, percent sdk.Dec) {
-	k.paramSpace.Set(ctx, ParamStoreKeyBaseProposerReward, &percent)
-}
-
-// Returns the current BaseProposerReward rate from the global param store
-// nolint: errcheck
-func (k Keeper) GetBonusProposerReward(ctx sdk.Context) sdk.Dec {
-	var percent sdk.Dec
-	k.paramSpace.Get(ctx, ParamStoreKeyBonusProposerReward, &percent)
-	return percent
-}
-
-// nolint: errcheck
-func (k Keeper) SetBonusProposerReward(ctx sdk.Context, percent sdk.Dec) {
-	k.paramSpace.Set(ctx, ParamStoreKeyBonusProposerReward, &percent)
 }

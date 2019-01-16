@@ -21,6 +21,7 @@ iriscli gov deposit --help
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --deposit        |                            | [string] Deposit of proposal                                                                                                                         | Yes      |
 | --proposal-id    |                            | [string] ProposalID of proposal depositing on                                                                                                        | Yes      |
+
 ## Examples
 
 ### Deposit

@@ -22,6 +22,12 @@ type sendBody struct {
 	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
+type burnBody struct {
+	Amount string       `json:"amount"`
+	Owner  string       `json:"owner"`
+	BaseTx utils.BaseTx `json:"base_tx"`
+}
+
 // SendRequestHandlerFn - http request handler to send coins to a address
 // nolint: gocyclo
 func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -56,7 +62,44 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			w.Write([]byte(fmt.Sprintf("Couldn't decode delegator. Error: %s", err.Error())))
 			return
 		}
-		msg := bank.BuildMsg(sender, to, amount)
+		msg := bank.BuildBankSendMsg(sender, to, amount)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		// Broadcast or return unsigned transaction
+		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
+	}
+}
+
+// BurnRequestHandlerFn - http request handler to burn coins
+// nolint: gocyclo
+func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Init context and read request parameters
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+		var m burnBody
+		err := utils.ReadPostBody(w, r, cdc, &m)
+		if err != nil {
+			return
+		}
+		baseReq := m.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
+			return
+		}
+		// Build message
+		amount, err := cliCtx.ParseCoins(m.Amount)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		owner, err := sdk.AccAddressFromBech32(m.Owner)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Couldn't decode delegator. Error: %s", err.Error())))
+			return
+		}
+		msg := bank.BuildBankBurnMsg(owner, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

@@ -16,10 +16,12 @@ Bank模块允许你管理你本地账户的资产。
 
 | 命令      | 描述                   |
 | --------- | ---------------------- |
-| coin-type | 查询货币类型           |
-| account   | 查询账户余额           |
-| send      | 创建和签名一个转账请求 |
-| sign      | 签名离线传输文件       |
+| [coin-type](coin-type.md) | 查询货币类型           |
+| [token-stats](token-stats.md) | 查询token统计数据           |
+| [account](account.md)   | 查询账户余额           |
+| [send](send.md)      | 创建和签名一个转账请求 |
+| [burn](burn.md)      | 销毁token |
+| [sign](sign.md)      | 签名离线传输文件       |
 
 ## 标志
 

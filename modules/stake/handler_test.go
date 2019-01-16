@@ -306,7 +306,6 @@ func TestLegacyValidatorDelegations(t *testing.T) {
 func TestIncrementsMsgDelegate(t *testing.T) {
 	initBond := sdk.NewIntWithDecimal(1000, 18)
 	ctx, accMapper, keeper := keep.CreateTestInput(t, false, initBond)
-	params := keeper.GetParams(ctx)
 
 	bondAmount := sdk.NewIntWithDecimal(10, 18)
 	validatorAddr, delegatorAddr := sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
@@ -335,7 +334,7 @@ func TestIncrementsMsgDelegate(t *testing.T) {
 	pool := keeper.GetPool(ctx)
 	exRate := validator.DelegatorShareExRate()
 	require.True(t, exRate.Equal(sdk.OneDec()), "expected exRate 1 got %v", exRate)
-	require.Equal(t, sdk.NewDecFromInt(bondAmount), pool.BondedTokens)
+	require.Equal(t, sdk.NewDecFromInt(bondAmount), pool.BondedPool.BondedTokens)
 
 	// just send the same msgbond multiple times
 	msgDelegate := NewTestMsgDelegate(delegatorAddr, validatorAddr, bondAmount)
@@ -363,7 +362,7 @@ func TestIncrementsMsgDelegate(t *testing.T) {
 
 		gotBond := bond.Shares
 		gotDelegatorShares := validator.DelegatorShares
-		gotDelegatorAcc := accMapper.GetAccount(ctx, delegatorAddr).GetCoins().AmountOf(params.BondDenom)
+		gotDelegatorAcc := accMapper.GetAccount(ctx, delegatorAddr).GetCoins().AmountOf(keeper.BondDenom())
 
 		require.Equal(t, sdk.NewDecFromInt(expBond), gotBond,
 			"i: %v\nexpBond: %v\ngotBond: %v\nvalidator: %v\nbond: %v\n",
@@ -380,8 +379,7 @@ func TestIncrementsMsgDelegate(t *testing.T) {
 func TestIncrementsMsgUnbond(t *testing.T) {
 	initBond := sdk.NewIntWithDecimal(1000, 18)
 	ctx, accMapper, keeper := keep.CreateTestInput(t, false, initBond)
-	params := setInstantUnbondPeriod(keeper, ctx)
-	denom := params.BondDenom
+	denom := keeper.BondDenom()
 
 	// create validator, delegate
 	validatorAddr, delegatorAddr := sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
@@ -434,7 +432,7 @@ func TestIncrementsMsgUnbond(t *testing.T) {
 
 		gotBond := bond.Shares
 		gotDelegatorShares := validator.DelegatorShares
-		gotDelegatorAcc := accMapper.GetAccount(ctx, delegatorAddr).GetCoins().AmountOf(params.BondDenom)
+		gotDelegatorAcc := accMapper.GetAccount(ctx, delegatorAddr).GetCoins().AmountOf(keeper.BondDenom())
 
 		require.Equal(t, sdk.NewDecFromInt(expBond), gotBond,
 			"i: %v\nexpBond: %v\ngotBond: %v\nvalidator: %v\nbond: %v\n",
@@ -482,7 +480,7 @@ func TestIncrementsMsgUnbond(t *testing.T) {
 func TestMultipleMsgCreateValidator(t *testing.T) {
 	initBond := sdk.NewIntWithDecimal(1000, 18)
 	ctx, accMapper, keeper := keep.CreateTestInput(t, false, initBond)
-	params := setInstantUnbondPeriod(keeper, ctx)
+	setInstantUnbondPeriod(keeper, ctx)
 
 	validatorAddrs := []sdk.ValAddress{sdk.ValAddress(keep.Addrs[0]), sdk.ValAddress(keep.Addrs[1]), sdk.ValAddress(keep.Addrs[2])}
 	delegatorAddrs := []sdk.AccAddress{keep.Addrs[3], keep.Addrs[4], keep.Addrs[5]}
@@ -498,7 +496,7 @@ func TestMultipleMsgCreateValidator(t *testing.T) {
 		require.Equal(t, (i + 1), len(validators))
 		val := validators[i]
 		balanceExpd := initBond.Sub(sdk.NewIntWithDecimal(10, 18))
-		balanceGot := accMapper.GetAccount(ctx, delegatorAddrs[i]).GetCoins().AmountOf(params.BondDenom)
+		balanceGot := accMapper.GetAccount(ctx, delegatorAddrs[i]).GetCoins().AmountOf(keeper.BondDenom())
 		require.Equal(t, i+1, len(validators), "expected %d validators got %d, validators: %v", i+1, len(validators), validators)
 		require.Equal(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), val.DelegatorShares, "expected %d shares, got %d", 10, val.DelegatorShares)
 		require.Equal(t, balanceExpd, balanceGot, "expected account to have %d, got %d", balanceExpd, balanceGot)
@@ -526,7 +524,7 @@ func TestMultipleMsgCreateValidator(t *testing.T) {
 		require.False(t, found)
 
 		expBalance := initBond
-		gotBalance := accMapper.GetAccount(ctx, delegatorAddrs[i]).GetCoins().AmountOf(params.BondDenom)
+		gotBalance := accMapper.GetAccount(ctx, delegatorAddrs[i]).GetCoins().AmountOf(keeper.BondDenom())
 		require.Equal(t, expBalance, gotBalance, "expected account to have %d, got %d", expBalance, gotBalance)
 	}
 }
@@ -751,7 +749,7 @@ func TestUnbondingFromUnbondingValidator(t *testing.T) {
 func TestRedelegationPeriod(t *testing.T) {
 	ctx, AccMapper, keeper := keep.CreateTestInput(t, false, sdk.NewIntWithDecimal(1000, 18))
 	validatorAddr, validatorAddr2 := sdk.ValAddress(keep.Addrs[0]), sdk.ValAddress(keep.Addrs[1])
-	denom := keeper.GetParams(ctx).BondDenom
+	denom := keeper.BondDenom()
 
 	// set the unbonding time
 	params := keeper.GetParams(ctx)

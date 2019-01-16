@@ -14,6 +14,7 @@ var _ sdk.ValidatorSet = Keeper{}
 func (k Keeper) IterateValidators(ctx sdk.Context, fn func(index int64, validator sdk.Validator) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, ValidatorsKey)
+	defer iterator.Close()
 	i := int64(0)
 	for ; iterator.Valid(); iterator.Next() {
 		addr := iterator.Key()[1:]
@@ -24,7 +25,6 @@ func (k Keeper) IterateValidators(ctx sdk.Context, fn func(index int64, validato
 		}
 		i++
 	}
-	iterator.Close()
 }
 
 // iterate through the active validator set and perform the provided function
@@ -90,21 +90,21 @@ func (k Keeper) ValidatorByConsAddr(ctx sdk.Context, addr sdk.ConsAddress) sdk.V
 
 // total power from the bond (not last, but current)
 func (k Keeper) TotalPower(ctx sdk.Context) sdk.Dec {
-	pool := k.GetPool(ctx)
+	pool := k.GetPool(ctx).BondedPool
 	return pool.BondedTokens
 }
 
 // total power from the bond
 func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
-	pool := k.GetPool(ctx)
-	return pool.BondedRatio()
-}
+	pool := k.GetPool(ctx).BondedPool
+	loosenCoins := k.bankKeeper.GetLoosenCoins(ctx)
+	loosenAmount := sdk.NewDecFromInt(loosenCoins.AmountOf(types.StakeDenom))
 
-// when minting new tokens
-func (k Keeper) InflateSupply(ctx sdk.Context, newTokens sdk.Dec) {
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Add(newTokens)
-	k.SetPool(ctx, pool)
+	supplyAmount := loosenAmount.Add(pool.BondedTokens)
+	if supplyAmount.GT(sdk.ZeroDec()) {
+		return pool.BondedTokens.Quo(supplyAmount)
+	}
+	return sdk.ZeroDec()
 }
 
 //__________________________________________________________________________

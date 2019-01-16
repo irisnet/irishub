@@ -4,46 +4,47 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
-// InitGenesis sets the pool and parameters for the provided keeper and
-// initializes the IntraTxCounter. For each validator in data, it sets that
-// validator in the keeper along with manually setting the indexes. In
-// addition, it also sets any delegations found in data. Finally, it updates
-// the bonded validators.
-// Returns final validator set after applying all declaration and delegations
+// InitGenesis sets the pool and parameters for the provided keeper.  For each
+// validator in data, it sets that validator in the keeper along with manually
+// setting the indexes. In addition, it also sets any delegations found in
+// data. Finally, it updates the bonded validators.
 func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res []abci.ValidatorUpdate, err error) {
-
+	if err := ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
 	// We need to pretend to be "n blocks before genesis", where "n" is the validator update delay,
 	// so that e.g. slashing periods are correctly initialized for the validator set
 	// e.g. with a one-block offset - the first TM block is at height 0, so state updates applied from genesis.json are in block -1.
 	ctx = ctx.WithBlockHeight(1 - types.ValidatorUpdateDelay)
 
-	keeper.SetPool(ctx, data.Pool)
+	keeper.SetPool(ctx, types.Pool{BondedPool: data.BondedPool})
 	keeper.SetParams(ctx, data.Params)
-	keeper.SetIntraTxCounter(ctx, data.IntraTxCounter)
 	keeper.SetLastTotalPower(ctx, data.LastTotalPower)
 
-	for i, validator := range data.Validators {
-		// set the intra-tx counter to the order the validators are presented, if necessary
-		if !data.Exported {
-			validator.BondIntraTxCounter = int16(i)
-		}
+	pool := keeper.GetPool(ctx)
+	for _, validator := range data.Validators {
 		keeper.SetValidator(ctx, validator)
 
 		// Manually set indices for the first time
 		keeper.SetValidatorByConsAddr(ctx, validator)
-		keeper.SetValidatorByPowerIndex(ctx, validator, data.Pool)
+		keeper.SetValidatorByPowerIndex(ctx, validator, pool)
 		keeper.OnValidatorCreated(ctx, validator.OperatorAddr)
 
 		// Set timeslice if necessary
 		if validator.Status == sdk.Unbonding {
 			keeper.InsertValidatorQueue(ctx, validator)
+		}
+
+		// Increase loosen token
+		if validator.Status != sdk.Bonded {
+			balance := sdk.NewCoin(types.StakeDenom, validator.Tokens.TruncateInt())
+			pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{balance})
 		}
 	}
 
@@ -58,6 +59,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	for _, ubd := range data.UnbondingDelegations {
 		keeper.SetUnbondingDelegation(ctx, ubd)
 		keeper.InsertUnbondingQueue(ctx, ubd)
+		pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{ubd.Balance})
 	}
 
 	sort.SliceStable(data.Redelegations[:], func(i, j int) bool {
@@ -91,9 +93,8 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 // GenesisState will contain the pool, params, validators, and bonds found in
 // the keeper.
 func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
-	pool := keeper.GetPool(ctx)
+	pool := keeper.GetPool(ctx).BondedPool
 	params := keeper.GetParams(ctx)
-	intraTxCounter := keeper.GetIntraTxCounter(ctx)
 	lastTotalPower := keeper.GetLastTotalPower(ctx)
 	validators := keeper.GetAllValidators(ctx)
 	bonds := keeper.GetAllDelegations(ctx)
@@ -115,9 +116,8 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
 	})
 
 	return types.GenesisState{
-		Pool:                 pool,
+		BondedPool:           pool,
 		Params:               params,
-		IntraTxCounter:       intraTxCounter,
 		LastTotalPower:       lastTotalPower,
 		LastValidatorPowers:  lastValidatorPowers,
 		Validators:           validators,
@@ -150,18 +150,11 @@ func ValidateGenesis(data types.GenesisState) error {
 	if err != nil {
 		return err
 	}
-	err = validateParams(data.Params)
+	err = types.ValidateParams(data.Params)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func validateParams(params types.Params) error {
-	if params.BondDenom == "" {
-		return fmt.Errorf("staking parameter BondDenom can't be an empty string")
-	}
 	return nil
 }
 

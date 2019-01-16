@@ -1,26 +1,41 @@
 package mint
 
 import (
-	"time"
-
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/mint/tags"
 )
 
 // Called every block, process inflation on the first block of every hour
-func BeginBlocker(ctx sdk.Context, k Keeper) {
+func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
 
+	// Get block BFT time and block height
 	blockTime := ctx.BlockHeader().Time
+	blockHeight := ctx.BlockHeader().Height
 	minter := k.GetMinter(ctx)
-	if blockTime.Sub(minter.InflationLastTime) < time.Hour { // only mint on the hour!
-		return
+	if blockHeight <= 1 { // don't inflate token in the first block
+		minter.LastUpdate = blockTime
+		k.SetMinter(ctx, minter)
+		return nil
 	}
 
-	params := k.GetParams(ctx)
-	totalSupply := k.sk.TotalPower(ctx)
-	bondedRatio := k.sk.BondedRatio(ctx)
-	minter.InflationLastTime = blockTime
-	minter, mintedCoin := minter.ProcessProvisions(params, totalSupply, bondedRatio)
-	k.fck.AddCollectedFees(ctx, sdk.Coins{mintedCoin})
-	k.sk.InflateSupply(ctx, sdk.NewDecFromInt(mintedCoin.Amount))
+	// Calculate block mint amount
+	params := k.GetParamSet(ctx)
+	annualProvisions := minter.NextAnnualProvisions(params)
+	mintedCoin := minter.BlockProvision(params, annualProvisions, blockTime)
+
+	// Increase loosen token and add minted coin to feeCollector
+	k.bk.IncreaseLoosenToken(ctx, sdk.Coins{mintedCoin})
+	k.fk.AddCollectedFees(ctx, sdk.Coins{mintedCoin})
+
+	// Update last block BFT time
+	lastInflationTime := minter.LastUpdate
+	minter.LastUpdate = blockTime
 	k.SetMinter(ctx, minter)
+
+	// Add tags
+	return sdk.NewTags(
+		tags.LastInflationTime, []byte(lastInflationTime.String()),
+		tags.InflationTime, []byte(blockTime.String()),
+		tags.MintCoin, []byte(mintedCoin.String()),
+	)
 }

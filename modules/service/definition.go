@@ -1,11 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 type SvcDef struct {

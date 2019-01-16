@@ -69,8 +69,10 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
     3. `POST /txs/send`: Send non-amino encoding transaction
     4. `GET /bank/coin/{coin-type}`: Get coin type
-    5. `GET /bank/balances/{address}`: Get the account information on blockchain
-    6. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
+    5. `GET /bank/token-stats`: Get token statistic
+    6. `GET /bank/balances/{address}`: Get the account information on blockchain
+    7. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
+    8. `POST /bank/burn`: Burn coins
 
 4. Stake module APIs
 
@@ -135,11 +137,12 @@ These apis are picked out from above section. And they can be used to build and 
 7. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
 8. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
 
-They all support the these special query parameters below. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `generate-only` is true, then all other parameters, such as `simulate` and `async` will be ignored.  
+They all support the these special query parameters below. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `generate-only` is true, then all other parameters, such as `simulate` and `commit` will be ignored.  
 
 | parameter name   | Type | Default | Priority | Description                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
 | generate-only   | bool | false | 0 | Build an unsigned transaction and write it back |
 | simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
-| async           | bool | false | 2 | Broadcast transaction asynchronously   |
+| commit          | bool | false | 2 | Wait for transaction being included in a block   |
+| async           | bool | false | 3 | Broadcast transaction asynchronously   |
 

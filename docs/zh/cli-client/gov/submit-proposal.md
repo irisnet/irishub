@@ -14,7 +14,8 @@ iriscli gov submit-proposal [flags]
 ```
 iriscli gov submit-proposal --help
 ```
-## 标志
+
+## 特殊标志
 
 | 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
@@ -25,7 +26,7 @@ iriscli gov submit-proposal --help
 | --param          |                            | [string] 提议参数,例如: [{key:key,value:value,op:update}]                                                                                 |          |
 | --path           |                            | [string] param.json文件路径                                                                                                                      |          |
 | --title          |                            | [string] 提议标题                                                                                                                           | Yes      |
-| --type           |                            | [string] 提议类型,例如:Text/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | [string] 提议类型,例如:ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | [uint64] 新协议的版本信息                                                                           |       |
 | --software           |           " "                 | [string] 新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     | [string] 新版本协议升级的高度                                                     |       |
@@ -35,7 +36,7 @@ iriscli gov submit-proposal --help
 ### 提交一个'ParameterChange'类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
+iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='mint/Inflation=0.050' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
 ```
 
 提交之后，您完成了提交新的“ParameterChange”提议。

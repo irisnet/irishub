@@ -1,8 +1,8 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"encoding/binary"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -21,8 +21,8 @@ var (
 	returnedFeeKey               = []byte{0x10}
 	incomingFeeKey               = []byte{0x11}
 
-	serviceFeeTaxKey     = []byte{0x12}
-	serviceFeeTaxPoolKey = []byte{0x13}
+	serviceFeeTaxKey        = []byte{0x12}
+	serviceSlashFractionKey = []byte{0x13}
 )
 
 func GetServiceDefinitionKey(chainId, name string) []byte {

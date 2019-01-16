@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/modules/auth"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -226,6 +224,13 @@ func (cliCtx CLIContext) verifyProof(queryPath string, resp abci.ResponseQuery) 
 	kp = kp.AppendKey([]byte(storeName), merkle.KeyEncodingURL)
 	kp = kp.AppendKey(resp.Key, merkle.KeyEncodingURL)
 
+	if resp.Value == nil {
+		err = prt.VerifyAbsence(resp.Proof, commit.Header.AppHash, kp.String())
+		if err != nil {
+			return errors.Wrap(err, "failed to prove merkle proof")
+		}
+		return nil
+	}
 	err = prt.VerifyValue(resp.Proof, commit.Header.AppHash, kp.String(), resp.Value)
 	if err != nil {
 		return errors.Wrap(err, "failed to prove merkle proof")
@@ -282,8 +287,8 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	if coinName == "" {
 		return types.CoinType{}, fmt.Errorf("coin name is empty")
 	}
-	if coinName == stakeTypes.StakeDenomName {
-		coinType = v0.IrisCt
+	if coinName == sdk.NativeTokenName {
+		coinType = sdk.IRIS
 	} else {
 		key := types.CoinTypeKey(coinName)
 		bz, err := cliCtx.QueryStore([]byte(key), "params")
@@ -375,6 +380,24 @@ func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
 	httpClient := client.(*tmclient.HTTP)
 	return httpClient.NetInfo()
 }
+
+func (cliCtx CLIContext) GetLatestHeight() (int64, error) {
+	client, err := cliCtx.GetNode()
+	if err != nil {
+		return 0, err
+	}
+	httpClient := client.(*tmclient.HTTP)
+
+	status, err := httpClient.Status()
+	if err != nil {
+		return 0, err
+	}
+	if status.SyncInfo.CatchingUp {
+		return 0, fmt.Errorf("the connected full node is still syncing blocks")
+	}
+	return status.SyncInfo.LatestBlockHeight, nil
+}
+
 
 func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 	client := &http.Client{}

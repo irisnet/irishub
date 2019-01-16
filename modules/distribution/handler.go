@@ -11,8 +11,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		// NOTE msg already has validate basic run
 		switch msg := msg.(type) {
-		case types.MsgSetWithdrawAddress:
-			return handleMsgModifyWithdrawAddress(ctx, msg, k)
 		case types.MsgWithdrawDelegatorRewardsAll:
 			return handleMsgWithdrawDelegatorRewardsAll(ctx, msg, k)
 		case types.MsgWithdrawDelegatorReward:
@@ -30,25 +28,13 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 // These functions assume everything has been authenticated,
 // now we just perform action and save
 
-func handleMsgModifyWithdrawAddress(ctx sdk.Context, msg types.MsgSetWithdrawAddress, k keeper.Keeper) sdk.Result {
-
-	k.SetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr, msg.WithdrawAddr)
-
-	tags := sdk.NewTags(
-		tags.Delegator, []byte(msg.DelegatorAddr.String()),
-	)
-	return sdk.Result{
-		Tags: tags,
-	}
-}
-
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
 
 	reward, withdrawTags := k.WithdrawDelegationRewardsAll(ctx, msg.DelegatorAddr)
-
+	rewardTruncate, _  :=	reward.TruncateDecimal()
 	resultTags := sdk.NewTags(
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
-		tags.Reward, []byte(reward.ToString()),
+		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr).String()),
 	)
 	resultTags = resultTags.AppendTags(withdrawTags)
@@ -63,11 +49,11 @@ func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDele
 	if err != nil {
 		return err.Result()
 	}
-
+	rewardTruncate, _  :=	reward.TruncateDecimal()
 	tags := sdk.NewTags(
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
 		tags.Validator, []byte(msg.ValidatorAddr.String()),
-		tags.Reward, []byte(reward.ToString()),
+		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr).String()),
 	)
 	return sdk.Result{
@@ -81,10 +67,10 @@ func handleMsgWithdrawValidatorRewardsAll(ctx sdk.Context, msg types.MsgWithdraw
 	if err != nil {
 		return err.Result()
 	}
-
+	rewardTruncate, _  :=	reward.TruncateDecimal()
 	resultTags := sdk.NewTags(
 		tags.Validator, []byte(msg.ValidatorAddr.String()),
-		tags.Reward, []byte(reward.ToString()),
+		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, sdk.AccAddress(msg.ValidatorAddr)).String()),
 	)
 	resultTags = resultTags.AppendTags(withdrawTags)

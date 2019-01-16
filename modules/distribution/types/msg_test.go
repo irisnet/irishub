@@ -8,30 +8,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// test ValidateBasic for MsgCreateValidator
-func TestMsgSetWithdrawAddress(t *testing.T) {
-	tests := []struct {
-		delegatorAddr sdk.AccAddress
-		withdrawAddr  sdk.AccAddress
-		expectPass    bool
-	}{
-		{delAddr1, delAddr2, true},
-		{delAddr1, delAddr1, true},
-		{emptyDelAddr, delAddr1, false},
-		{delAddr1, emptyDelAddr, false},
-		{emptyDelAddr, emptyDelAddr, false},
-	}
-
-	for i, tc := range tests {
-		msg := NewMsgSetWithdrawAddress(tc.delegatorAddr, tc.withdrawAddr)
-		if tc.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test index: %v", i)
-		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test index: %v", i)
-		}
-	}
-}
-
 // test ValidateBasic for MsgEditValidator
 func TestMsgWithdrawDelegatorReward(t *testing.T) {
 	tests := []struct {

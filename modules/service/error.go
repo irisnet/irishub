@@ -1,18 +1,12 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"fmt"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
 	DefaultCodespace sdk.CodespaceType = "service"
-
-	CodeInvalidDefiniton sdk.CodeType = 100
-	CodeInvalidBinding   sdk.CodeType = 101
-	CodeInvalidRequest   sdk.CodeType = 102
-	CodeInvalidResponse  sdk.CodeType = 103
-	CodeInvalidInput     sdk.CodeType = 104
 
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101
@@ -47,7 +41,8 @@ const (
 	CodeInvalidBindChainId     sdk.CodeType = 128
 	CodeNotMatchingReqChainID  sdk.CodeType = 129
 
-	CodeIntOverflow sdk.CodeType = 130
+	CodeIntOverflow  sdk.CodeType = 130
+	CodeInvalidInput sdk.CodeType = 131
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {

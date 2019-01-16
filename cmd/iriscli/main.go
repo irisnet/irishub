@@ -11,7 +11,6 @@ import (
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
-	recordcmd "github.com/irisnet/irishub/client/record/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
@@ -19,7 +18,6 @@ import (
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
-	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,11 +33,9 @@ var (
 )
 
 func main() {
-
-	irisInit.InitBech32Prefix()
-
+//	sdk.InitBech32Prefix()
 	cobra.EnableCommandSorting = false
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 
 	rootCmd.AddCommand(client.ConfigCmd())
 	rootCmd.AddCommand(client.LineBreak)
@@ -68,10 +64,12 @@ func main() {
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
 			bankcmd.GetAccountCmd("acc", cdc, utils.GetAccountDecoder(cdc)),
+			bankcmd.GetCmdQueryTokenStats(cdc, "acc", "stake"),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
+			bankcmd.BurnTxCmd(cdc),
 			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			bankcmd.GetBroadcastCommand(cdc),
 		)...)
@@ -86,14 +84,12 @@ func main() {
 	}
 	distributionCmd.AddCommand(
 		client.GetCommands(
-			distributioncmd.GetWithdrawAddress("distr", cdc),
 			distributioncmd.GetDelegationDistInfo("distr", cdc),
 			distributioncmd.GetValidatorDistInfo("distr", cdc),
 			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
-			distributioncmd.GetCmdSetWithdrawAddr(cdc),
 			distributioncmd.GetCmdWithdrawRewards(cdc),
 		)...)
 	rootCmd.AddCommand(
@@ -115,7 +111,6 @@ func main() {
 			govcmd.GetCmdQueryDeposits("gov", cdc),
 			govcmd.GetCmdQueryTally("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
-			govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -170,6 +165,7 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetInfoCmd("upgrade", cdc),
+			upgradecmd.GetCmdQuerySignals("upgrade", cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,
@@ -221,29 +217,12 @@ func main() {
 	guardianCmd.AddCommand(
 		client.PostCommands(
 			guardiancmd.GetCmdCreateProfiler(cdc),
+			guardiancmd.GetCmdDeleteProfiler(cdc),
+			guardiancmd.GetCmdCreateTrustee(cdc),
+			guardiancmd.GetCmdDeleteTrustee(cdc),
 		)...)
 	rootCmd.AddCommand(
 		guardianCmd,
-	)
-
-	//add record command
-	recordCmd := &cobra.Command{
-		Use:   "record",
-		Short: "Record subcommands",
-	}
-
-	recordCmd.AddCommand(
-		client.GetCommands(
-			recordcmd.GetCmdQureyRecord("record", cdc),
-			recordcmd.GetCmdDownload("record", cdc),
-		)...)
-
-	recordCmd.AddCommand(
-		client.PostCommands(
-			recordcmd.GetCmdSubmitRecord("record", cdc),
-		)...)
-	rootCmd.AddCommand(
-		recordCmd,
 	)
 
 	//Add keys and version commands

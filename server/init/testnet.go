@@ -16,6 +16,7 @@ import (
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client"
 	clkeys "github.com/irisnet/irishub/client/keys"
+	srvconfig "github.com/irisnet/irishub/server/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
@@ -100,6 +101,8 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 		genFiles []string
 	)
 
+	irisConfig := srvconfig.DefaultConfig()
+
 	// generate private keys, node IDs, and initial transactions
 	for i := 0; i < numValidators; i++ {
 		nodeDirName := fmt.Sprintf("%s%d", viper.GetString(flagNodeDirPrefix), i)
@@ -143,7 +146,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 
 		buf := client.BufferStdin()
 		prompt := fmt.Sprintf(
-			"Password for account '%s' (default %s):", nodeDirName, v0.DefaultKeyPass,
+			"Password for account '%s' (default %s):", nodeDirName, sdk.DefaultKeyPass,
 		)
 
 		keyPass, err := client.GetPassword(prompt, buf)
@@ -155,7 +158,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 		}
 
 		if keyPass == "" {
-			keyPass = v0.DefaultKeyPass
+			keyPass = sdk.DefaultKeyPass
 		}
 
 		addr, secret, err := generateSaveCoinKey(clientDir, nodeDirName, keyPass, true)
@@ -179,20 +182,20 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 
 		accs = append(accs, v0.GenesisFileAccount{
 			Address: addr,
-			Coins:   []string{v0.FreeFermionAcc.String()},
+			Coins:   []string{sdk.FreeToken4Acc.String()},
 		})
 
 		msg := stake.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
-			v0.FreeFermionVal,
+			sdk.FreeToken4Val,
 			stake.NewDescription(nodeDirName, "", "", ""),
 			stake.NewCommissionMsg(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(20, 2), sdk.NewDecWithPrec(1, 2)),
 		)
 		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo)
 		txCtx := utils.NewTxContextFromCLI().WithChainID(chainID).WithMemo(memo)
 
-		signedTx, err := txCtx.SignStdTx(nodeDirName, v0.DefaultKeyPass, tx, false)
+		signedTx, err := txCtx.SignStdTx(nodeDirName, sdk.DefaultKeyPass, tx, false)
 		if err != nil {
 			_ = os.RemoveAll(outDir)
 			return err
@@ -210,6 +213,9 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			_ = os.RemoveAll(outDir)
 			return err
 		}
+
+		irisConfigFilePath := filepath.Join(nodeDir, "config/iris.toml")
+		srvconfig.WriteConfigFile(irisConfigFilePath, irisConfig)
 	}
 
 	if err := initGenFiles(cdc, chainID, accs, genFiles, numValidators); err != nil {
@@ -238,18 +244,22 @@ func initGenFiles(
 
 	// genesis add a profiler
 	if len(appGenState.Accounts) > 0 {
-		profiler := guardian.Profiler{
-			Name:      "genesis",
-			Addr:      appGenState.Accounts[0].Address,
-			AddedAddr: appGenState.Accounts[0].Address,
+		profiler := guardian.Guardian{
+			Description: "genesis",
+			AccountType: guardian.Genesis,
+			Address:     appGenState.Accounts[0].Address,
+			AddedBy:     appGenState.Accounts[0].Address,
 		}
 		appGenState.GuardianData.Profilers[0] = profiler
 	}
 
 	// genesis add a trustee
 	if len(appGenState.Accounts) > 0 {
-		trustee := guardian.Trustee{
-			Addr: appGenState.Accounts[0].Address,
+		trustee := guardian.Guardian{
+			Description: "genesis",
+			AccountType: guardian.Genesis,
+			Address:     appGenState.Accounts[0].Address,
+			AddedBy:     appGenState.Accounts[0].Address,
 		}
 		appGenState.GuardianData.Trustees[0] = trustee
 	}

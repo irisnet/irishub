@@ -1,7 +1,6 @@
 package upgrade
 
 import (
-	protocol "github.com/irisnet/irishub/app/protocol/keeper"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/stake"
 	sdk "github.com/irisnet/irishub/types"
@@ -10,62 +9,40 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	pk       protocol.Keeper
 	// The ValidatorSet to get information about validators
-	sk stake.Keeper
+	protocolKeeper sdk.ProtocolKeeper
+	sk             stake.Keeper
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk stake.Keeper, pk protocol.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, protocolKeeper sdk.ProtocolKeeper, sk stake.Keeper) Keeper {
 	keeper := Keeper{
-		storeKey: key,
-		cdc:      cdc,
-		sk:       sk,
-		pk:       pk,
+		key,
+		cdc,
+		protocolKeeper,
+		sk,
 	}
 	return keeper
 }
 
-func (k Keeper) AddNewVersion(ctx sdk.Context, appVersion AppVersion) {
+func (k Keeper) AddNewVersionInfo(ctx sdk.Context, versionInfo VersionInfo) {
 	kvStore := ctx.KVStore(k.storeKey)
 
-	appVersionBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion)
+	versionInfoBytes, err := k.cdc.MarshalBinaryLengthPrefixed(versionInfo)
 	if err != nil {
 		panic(err)
 	}
-	kvStore.Set(GetProposalIDKey(appVersion.ProposalID), appVersionBytes)
+	kvStore.Set(GetProposalIDKey(versionInfo.UpgradeInfo.ProposalID), versionInfoBytes)
 
-	proposalIDBytes, err := k.cdc.MarshalBinaryLengthPrefixed(appVersion.ProposalID)
+	proposalIDBytes, err := k.cdc.MarshalBinaryLengthPrefixed(versionInfo.UpgradeInfo.ProposalID)
 	if err != nil {
 		panic(err)
 	}
-	kvStore.Set(GetAppVersionKey(appVersion.Protocol.Version, appVersion.ProposalID), proposalIDBytes)
 
-	if appVersion.Success {
-		kvStore.Set(GetSuccessAppVersionKey(appVersion.Protocol.Version), proposalIDBytes)
+	if versionInfo.Success {
+		kvStore.Set(GetSuccessVersionKey(versionInfo.UpgradeInfo.Protocol.Version), proposalIDBytes)
+	} else {
+		kvStore.Set(GetFailedVersionKey(versionInfo.UpgradeInfo.Protocol.Version,versionInfo.UpgradeInfo.ProposalID), proposalIDBytes)
 	}
-}
-
-func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId uint64) *AppVersion {
-	kvStore := ctx.KVStore(k.storeKey)
-	versionIDBytes := kvStore.Get(GetProposalIDKey(proposalId))
-	if versionIDBytes == nil {
-		return nil
-	}
-	var versionID uint64
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(versionIDBytes, &versionID)
-	if err != nil {
-		panic(err)
-	}
-	versionBytes := kvStore.Get(GetAppVersionKey(versionID,proposalId))
-	if versionBytes != nil {
-		var version AppVersion
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(versionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		return &version
-	}
-	return nil
 }
 
 func (k Keeper) SetSignal(ctx sdk.Context, protocol uint64, address string) {

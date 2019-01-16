@@ -112,18 +112,17 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	accountKeeper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewBaseKeeper(accountKeeper)
 	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
-	sk.SetPool(ctx, stake.InitialPool())
+	sk.SetPool(ctx, stake.Pool{BondedPool: stake.InitialBondedPool()})
 	sk.SetParams(ctx, stake.DefaultParams())
 
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range addrs {
-		pool := sk.GetPool(ctx)
-		_, _, err := ck.AddCoins(ctx, addr, sdk.Coins{
-			{sk.GetParams(ctx).BondDenom, initCoins},
+		ck.AddCoins(ctx, addr, sdk.Coins{
+			{sk.BondDenom(), initCoins},
 		})
-		require.Nil(t, err)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDecFromInt(initCoins))
-		sk.SetPool(ctx, pool)
+		ck.IncreaseLoosenToken(ctx, sdk.Coins{
+			{sk.BondDenom(), initCoins},
+		})
 	}
 
 	fck := DummyFeeCollectionKeeper{}
@@ -134,10 +133,12 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 
 	// set genesis items required for distribution
 	keeper.SetFeePool(ctx, types.InitialFeePool())
-	keeper.SetCommunityTax(ctx, communityTax)
-	keeper.SetBaseProposerReward(ctx, sdk.NewDecWithPrec(1, 2))
-	keeper.SetBonusProposerReward(ctx, sdk.NewDecWithPrec(4, 2))
-
+	params := types.Params{
+		CommunityTax:        communityTax,
+		BaseProposerReward:  sdk.NewDecWithPrec(1, 2),
+		BonusProposerReward: sdk.NewDecWithPrec(4, 2),
+	}
+	keeper.SetParams(ctx, params)
 	return ctx, accountKeeper, keeper, sk, fck
 }
 
@@ -146,7 +147,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 type DummyFeeCollectionKeeper struct{}
 
 var heldFees sdk.Coins
-var _ types.FeeCollectionKeeper = DummyFeeCollectionKeeper{}
+var _ types.FeeKeeper = DummyFeeCollectionKeeper{}
 
 // nolint
 func (fck DummyFeeCollectionKeeper) GetCollectedFees(_ sdk.Context) sdk.Coins {

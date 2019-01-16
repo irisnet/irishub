@@ -104,19 +104,21 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins sdk.Int) (sdk.Conte
 	ck := bank.NewBaseKeeper(accountKeeper)
 
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
-	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(DefaultParamspace), types.DefaultCodespace)
-	keeper.SetPool(ctx, types.InitialPool())
+	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(types.DefaultParamSpace), types.DefaultCodespace)
+	keeper.SetPool(ctx, types.Pool{
+		BondedPool: types.InitialBondedPool(),
+	})
 	keeper.SetParams(ctx, types.DefaultParams())
 
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range Addrs {
-		pool := keeper.GetPool(ctx)
 		_, _, err := ck.AddCoins(ctx, addr, sdk.Coins{
-			{keeper.BondDenom(ctx), initCoins},
+			{keeper.BondDenom(), initCoins},
 		})
 		require.Nil(t, err)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDecFromInt(initCoins))
-		keeper.SetPool(ctx, pool)
+		keeper.bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{
+			{keeper.BondDenom(), initCoins},
+		})
 	}
 
 	return ctx, accountKeeper, keeper
@@ -200,12 +202,37 @@ func ValidatorByPowerIndexExists(ctx sdk.Context, keeper Keeper, power []byte) b
 }
 
 // update validator for testing
-func TestingUpdateValidator(keeper Keeper, ctx sdk.Context, validator types.Validator) types.Validator {
-	pool := keeper.GetPool(ctx)
+func TestingUpdateValidator(keeper Keeper, ctx sdk.Context, validator types.Validator, apply bool) types.Validator {
 	keeper.SetValidator(ctx, validator)
+	{ // Remove any existing power key for validator.
+		store := ctx.KVStore(keeper.storeKey)
+		iterator := sdk.KVStorePrefixIterator(store, ValidatorsByPowerIndexKey)
+		deleted := false
+		for ; iterator.Valid(); iterator.Next() {
+			valAddr := parseValidatorPowerRankKey(iterator.Key())
+			if bytes.Equal(valAddr, validator.OperatorAddr) {
+				if deleted {
+					panic("found duplicate power index key")
+				} else {
+					deleted = true
+				}
+				store.Delete(iterator.Key())
+			}
+		}
+	}
+	pool := keeper.GetPool(ctx)
 	keeper.SetValidatorByPowerIndex(ctx, validator, pool)
-	keeper.ApplyAndReturnValidatorSetUpdates(ctx)
-	validator, found := keeper.GetValidator(ctx, validator.OperatorAddr)
+	if apply {
+		keeper.ApplyAndReturnValidatorSetUpdates(ctx)
+		validator, found := keeper.GetValidator(ctx, validator.OperatorAddr)
+		if !found {
+			panic("validator expected but not found")
+		}
+		return validator
+	}
+	cachectx, _ := ctx.CacheContext()
+	keeper.ApplyAndReturnValidatorSetUpdates(cachectx)
+	validator, found := keeper.GetValidator(cachectx, validator.OperatorAddr)
 	if !found {
 		panic("validator expected but not found")
 	}

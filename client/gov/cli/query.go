@@ -1,20 +1,23 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/types/gov/params"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/service"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
+	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -85,7 +88,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(strProposalStatus) != 0 {
-				proposalStatus, err := govtypes.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
+				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
 				if err != nil {
 					return err
 				}
@@ -198,7 +201,7 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			if res == nil {
 				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
-				return  nil
+				return nil
 			}
 
 			fmt.Println(string(res))
@@ -330,33 +333,34 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
+			params.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+
 			if moduleStr != "" {
 				// There are four possible outputs if the --module parameter is not empty:
 				// 1.List of the module;
 				// 2.List of keys in the module;
 				// 3.Error: GovParameter of the module does not exist;
 				// 4.Error: The key in the module does not exist;
-				res, err := ctx.QuerySubspace([]byte("Gov/"+moduleStr), storeName)
+				kvs, err := ctx.QuerySubspace([]byte(moduleStr), storeName)
 				if err == nil {
-					if len(res) == 0 {
+					if len(kvs) == 0 {
 						// Return an error directly if the --module parameter is incorrect.
-						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The GovParameter of the module %s is not existed", moduleStr))
+						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The  module %s is not existed", moduleStr))
 					}
 
 					if keyStr != "" {
 						// There are two possible outputs if the --key parameter is not empty:
-						// 1.List of keys in the module;
+						// 1.The value of the key;
 						// 2.Error: The key in the module does not exist;
-						params.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-							&govparams.VotingProcedureParameter,
-							&govparams.TallyingProcedureParameter)
-
 						res, err := ctx.QueryStore([]byte(keyStr), storeName)
-						return printKeyJsonIfExists(err, keyStr, res, cdc)
+						if err != nil {
+							return err
+						}
+						return printParam(cdc, keyStr, res)
 					}
 
 					// Print module list
-					err := printModuleList(res)
+					err := printParams(cdc, kvs)
 					if err != nil {
 						return err
 					}
@@ -370,14 +374,14 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 			// Check --key parameter if the --module parameter is empty.
 			if keyStr != "" {
 				// There are two possible outputs if the --key parameter is not empty:
-				// 1.List of keys in the module;
+				// 1.The value of the key;
 				// 2.Error: The key in the module does not exist;
-				params.RegisterGovParamMapping(&govparams.DepositProcedureParameter,
-					&govparams.VotingProcedureParameter,
-					&govparams.TallyingProcedureParameter)
 
 				res, err := ctx.QueryStore([]byte(keyStr), storeName)
-				return printKeyJsonIfExists(err, keyStr, res, cdc)
+				if err != nil {
+					return err
+				}
+				return printParam(cdc, keyStr, res)
 			}
 
 			// Return error if the --module & --key parameters are all empty.
@@ -390,71 +394,29 @@ func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func printKeyJsonIfExists(e error, keyStr string, res []byte, cdc *codec.Codec) (err error) {
-	if e == nil {
-		if p, ok := params.ParamMapping[keyStr]; ok {
-			if len(res) == 0 {
-				// Return an error directly if the --key parameter is incorrect.
-				return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
-			}
-			// Print key json in the module
-			p.GetValueFromRawData(cdc, res)
-			printParamStr(p, keyStr)
-			return nil
-		} else {
-			//
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
+func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
+	if p, ok := params.ParamSetMapping[params.GetParamSpaceFromKey(keyStr)]; ok {
+		if len(res) == 0 {
+			// Return an error directly if the --key parameter is incorrect.
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
 		}
+		// Print key json in the module
+		valueStr, err := p.StringFromBytes(cdc, params.GetParamKey(keyStr), res)
+		if err != nil {
+			return err
+		}
+		fmt.Printf(" %s=%s\n", keyStr, valueStr)
+		return nil
 	} else {
-		// Throw RPC client query exception
-		return e
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not found"))
 	}
 }
 
-func printModuleList(res []sdk.KVPair) (err error) {
-	var keys []string
-	for _, kv := range res {
-		keys = append(keys, string(kv.Key))
+func printParams(cdc *codec.Codec, kvs []sdk.KVPair) (err error) {
+	for _, kv := range kvs {
+		if err := printParam(cdc, string(kv.Key), kv.Value); err != nil {
+			return err
+		}
 	}
-
-	output, err := json.MarshalIndent(keys, "", " ")
-
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(output))
 	return nil
-}
-
-func printParamStr(p params.GovParameter, keyStr string) {
-	var param govtypes.Param
-	param.Key = keyStr
-	param.Value = p.ToJson("")
-	param.Op = ""
-	jsonBytes, _ := json.Marshal(param)
-	fmt.Println(string(jsonBytes))
-}
-
-func GetCmdPullGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "pull-params",
-		Short:   "generate param.json file",
-		Example: "iriscli gov pull-params",
-		RunE: func(cmd *cobra.Command, args []string) error {
-
-			ctx := context.NewCLIContext().WithCodec(cdc)
-			res, err := ctx.QuerySubspace([]byte("Gov/"), storeName)
-			if err == nil && len(res) != 0 {
-				var pd govtypes.ParameterConfigFile
-				pathStr := viper.GetString(flagPath)
-				err := pd.WriteFile(cdc, res, pathStr)
-				return err
-			} else {
-				fmt.Println("No GovParams can be found")
-				return err
-			}
-		},
-	}
-	cmd.Flags().String(flagPath, app.DefaultCLIHome, "the directory of the param.json")
-	return cmd
 }

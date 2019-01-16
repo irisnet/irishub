@@ -525,13 +525,7 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	}
 
 	rounded := returnAmount.TruncateInt()
-	balance := sdk.NewCoin(k.BondDenom(ctx), rounded)
-	change := returnAmount.Sub(sdk.NewDecFromInt(rounded))
-
-	// for now, change is just burned
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Sub(change)
-	k.SetPool(ctx, pool)
+	balance := sdk.NewCoin(k.BondDenom(), rounded)
 
 	// no need to create the ubd object just complete now
 	if completeNow {
@@ -573,7 +567,7 @@ func (k Keeper) CompleteUnbonding(ctx sdk.Context, delAddr sdk.AccAddress, valAd
 	return nil
 }
 
-// complete unbonding an unbonding record
+// begin unbonding / redelegation; create a redelegation record
 func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	valSrcAddr, valDstAddr sdk.ValAddress, sharesAmount sdk.Dec) (types.Redelegation, sdk.Error) {
 
@@ -599,13 +593,7 @@ func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	}
 
 	rounded := returnAmount.TruncateInt()
-	returnCoin := sdk.NewCoin(k.BondDenom(ctx), rounded)
-	change := returnAmount.Sub(sdk.NewDecFromInt(rounded))
-
-	// for now, change is just burned
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Sub(change)
-	k.SetPool(ctx, pool)
+	returnCoin := sdk.NewCoin(k.BondDenom(), rounded)
 
 	dstValidator, found := k.GetValidator(ctx, valDstAddr)
 	if !found {

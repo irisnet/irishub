@@ -5,20 +5,40 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestKeeper_AddProfiler(t *testing.T) {
+func TestKeeper(t *testing.T) {
 	ctx, keeper := createTestInput(t)
-	profiler := NewProfiler(addrs[0], addrs[1])
+	profiler := NewGuardian("test", Genesis, addrs[0], addrs[1])
+
 	keeper.AddProfiler(ctx, profiler)
 	AddedProfiler, found := keeper.GetProfiler(ctx, addrs[0])
 	require.True(t, found)
-	require.True(t, ProfilerEqual(profiler, AddedProfiler))
-}
+	require.True(t, profiler.Equal(AddedProfiler))
 
-func TestKeeper_AddTrustee(t *testing.T) {
-	ctx, keeper := createTestInput(t)
-	trustee := NewTrustee(addrs[0])
+	trustee := NewGuardian("test", Genesis, addrs[0], addrs[1])
 	keeper.AddTrustee(ctx, trustee)
 	AddedTrustee, found := keeper.GetTrustee(ctx, addrs[0])
 	require.True(t, found)
-	require.True(t, TrusteeEqual(trustee, AddedTrustee))
+	require.True(t, trustee.Equal(AddedTrustee))
+
+	profilersIterator := keeper.ProfilersIterator(ctx)
+	defer profilersIterator.Close()
+	var profilers []Guardian
+	for ; profilersIterator.Valid(); profilersIterator.Next() {
+		var profiler Guardian
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
+		profilers = append(profilers, profiler)
+	}
+	require.Equal(t, 1, len(profilers))
+	require.True(t, profiler.Equal(profilers[0]))
+
+	trusteesIterator := keeper.TrusteesIterator(ctx)
+	defer trusteesIterator.Close()
+	var trustees []Guardian
+	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
+		var trustee Guardian
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
+		trustees = append(trustees, trustee)
+	}
+	require.Equal(t, 1, len(trustees))
+	require.True(t, trustee.Equal(trustees[0]))
 }

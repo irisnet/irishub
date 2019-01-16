@@ -69,8 +69,10 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     2. `POST /tx/broadcast`: 广播一个amino编码的交易
     3. `POST /txs/send`: 广播一个非amino编码的交易
     4. `GET /bank/coin/{coin-type}`: 查询coin的类型信息
-    5. `GET /bank/balances/{address}`: 查询账户的token数量
-    6. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    5. `GET /bank/token-stats`: 查询token统计信息
+    6. `GET /bank/balances/{address}`: 查询账户的token数量
+    7. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    8. `POST /bank/burn`: 销毁token
 
 4. Stake模块的APIs
 
@@ -136,10 +138,11 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 7. `POST /gov/proposals/{proposalId}/votes`
 8. `POST /slashing/validators/{validatorAddr}/unjail`
 
-上述的API都有三个特殊的查询参数，如上下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`async`将被忽略。
+上述的API都有三个特殊的查询参数，如上下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`commit`将被忽略。
 
 | 参数名字        | 类型 | 默认值 | 优先级 | 功能描述                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
 | generate-only   | bool | false | 0 | 构建一个未签名的交易并返回 |
 | simulate        | bool | false | 1 | 用仿真的方式去执行交易 |
-| async           | bool | false | 2 | 用异步地方式广播交易  |
+| commit          | bool | false | 2 | 等待交易被打包入块  |
+| async           | bool | false | 3 | 用异步地方式广播交易  |

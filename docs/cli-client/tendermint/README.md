@@ -1,4 +1,4 @@
-# tendermint subcommand of iris and iriscli
+# Tendermint subcommand of iris and iriscli
 
 ## iriscli tendermint
 

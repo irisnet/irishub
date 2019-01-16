@@ -55,20 +55,35 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // load the pool
 func (k Keeper) GetPool(ctx sdk.Context) (pool types.Pool) {
+	var bondedPool types.BondedPool
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(PoolKey)
 	if b == nil {
 		panic("stored pool should not have been nil")
 	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &pool)
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &bondedPool)
+	pool = types.Pool{
+		BondedPool: bondedPool,
+		BankKeeper: k.bankKeeper,
+	}
 	return
 }
 
 // set the pool
 func (k Keeper) SetPool(ctx sdk.Context, pool types.Pool) {
 	store := ctx.KVStore(k.storeKey)
-	b := k.cdc.MustMarshalBinaryLengthPrefixed(pool)
+	b := k.cdc.MustMarshalBinaryLengthPrefixed(pool.BondedPool)
 	store.Set(PoolKey, b)
+}
+
+// load the pool status
+func (k Keeper) GetPoolStatus(ctx sdk.Context) (poolStatus types.PoolStatus) {
+	pool := k.GetPool(ctx)
+	poolStatus = types.PoolStatus{
+		LooseTokens:  pool.GetLoosenTokenAmount(ctx),
+		BondedTokens: pool.BondedPool.BondedTokens,
+	}
+	return
 }
 
 //_______________________________________________________________________
@@ -133,34 +148,6 @@ func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddres
 	store.Delete(GetLastValidatorPowerKey(operator))
 }
 
-// looseToken handle when burn tokens
-func (k Keeper) BurnAmount(ctx sdk.Context, amount sdk.Dec) {
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Sub(amount)
-	k.SetPool(ctx, pool)
-}
-
-func (k Keeper) GetStakeDenom(ctx sdk.Context) string {
+func (k Keeper) BondDenom() string {
 	return types.StakeDenom
-}
-
-//__________________________________________________________________________
-
-// get the current in-block validator operation counter
-func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
-	store := ctx.KVStore(k.storeKey)
-	b := store.Get(IntraTxCounterKey)
-	if b == nil {
-		return 0
-	}
-	var counter int16
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
-	return counter
-}
-
-// set the current in-block validator operation counter
-func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
-	store.Set(IntraTxCounterKey, bz)
 }

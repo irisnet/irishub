@@ -103,18 +103,15 @@ func interceptLoadConfig() (conf *cfg.Config, err error) {
 		conf, err = tcmd.ParseConfig() // NOTE: ParseConfig() creates dir/files as necessary.
 	}
 
-	cosmosConfigFilePath := filepath.Join(rootDir, "config/iris.toml")
-	viper.SetConfigName("cosmos")
-	_ = viper.MergeInConfig()
-	var cosmosConf *config.Config
-	if _, err := os.Stat(cosmosConfigFilePath); os.IsNotExist(err) {
-		cosmosConf, _ := config.ParseConfig()
-		config.WriteConfigFile(cosmosConfigFilePath, cosmosConf)
+	// create a default iris config file if it does not exist
+	irisConfigFilePath := filepath.Join(rootDir, "config/iris.toml")
+	if _, err := os.Stat(irisConfigFilePath); os.IsNotExist(err) {
+		irisConf, _ := config.ParseConfig()
+		config.WriteConfigFile(irisConfigFilePath, irisConf)
 	}
 
-	if cosmosConf == nil {
-		_, err = config.ParseConfig()
-	}
+	viper.SetConfigName("iris")
+	err = viper.MergeInConfig()
 
 	return
 }

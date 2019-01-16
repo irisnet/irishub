@@ -11,11 +11,11 @@ import (
 
 	"github.com/irisnet/irishub/modules/mock/baseapp"
 	"github.com/irisnet/irishub/modules/mock/simulation"
-	govtypes "github.com/irisnet/irishub/types/gov"
+
 )
 
 const (
-	denom = "steak"
+	denom = "iris-atto"
 )
 
 // SimulateSubmittingVotingAndSlashingForProposal simulates creating a msg Submit Proposal
@@ -103,7 +103,7 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 	if ok {
 		// Update pool to keep invariants
 		pool := sk.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Sub(sdk.NewDecFromInt(msg.InitialDeposit.AmountOf(denom)))
+		pool.BankKeeper.DecreaseLoosenToken(ctx, msg.InitialDeposit)
 		sk.SetPool(ctx, pool)
 		write()
 	}
@@ -114,18 +114,18 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 
 func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) (msg gov.MsgSubmitProposal, err error) {
 	deposit := randomDeposit(r)
-	param := govtypes.Param{
+	param :=  gov.Param{
 		Key:   "test",
 		Value: "value",
-		Op: "insert",
+		Subspace: "insert",
 	}
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
 		simulation.RandStringOfLength(r, 5),
-		govtypes.ProposalTypeSoftwareHalt,
+		 gov.ProposalTypeSystemHalt,
 		sender.Address,
 		deposit,
-		param,
+		gov.Params{param},
 	)
 	if msg.ValidateBasic() != nil {
 		err = fmt.Errorf("expected msg to pass ValidateBasic: %s", msg.GetSignBytes())
@@ -151,7 +151,7 @@ func SimulateMsgDeposit(k gov.Keeper, sk stake.Keeper) simulation.Operation {
 		if result.IsOK() {
 			// Update pool to keep invariants
 			pool := sk.GetPool(ctx)
-			pool.LooseTokens = pool.LooseTokens.Sub(sdk.NewDecFromInt(deposit.AmountOf(denom)))
+			pool.BankKeeper.DecreaseLoosenToken(ctx, deposit)
 			sk.SetPool(ctx, pool)
 			write()
 		}
@@ -219,16 +219,16 @@ func randomProposalID(r *rand.Rand, k gov.Keeper, ctx sdk.Context) (proposalID i
 }
 
 // Pick a random voting option
-func randomVotingOption(r *rand.Rand) govtypes.VoteOption {
+func randomVotingOption(r *rand.Rand)  gov.VoteOption {
 	switch r.Intn(4) {
 	case 0:
-		return govtypes.OptionYes
+		return  gov.OptionYes
 	case 1:
-		return govtypes.OptionAbstain
+		return  gov.OptionAbstain
 	case 2:
-		return govtypes.OptionNo
+		return  gov.OptionNo
 	case 3:
-		return govtypes.OptionNoWithVeto
+		return  gov.OptionNoWithVeto
 	}
 	panic("should not happen")
 }

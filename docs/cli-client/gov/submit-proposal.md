@@ -26,7 +26,7 @@ iriscli gov submit-proposal --help
 | --param          |                            | [string] Parameter of proposal,eg. [{key:key,value:value,op:update}]                                                                                 |          |
 | --path           |                            | [string] The path of param.json                                                                                                                      |          |
 | --title          |                            | [string] Title of proposal                                                                                                                           | Yes      |
-| --type           |                            | [string] ProposalType of proposal,eg:Text/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | [string] ProposalType of proposal,eg:ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | [uint64] the version of the new protocol                                                                            |       |
 | --software           |           " "                 | [string] the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | [string] the switchheight of the new protocol                                                         |       |
@@ -36,7 +36,7 @@ iriscli gov submit-proposal --help
 ### Submit a 'ParameterChange' type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='{"key":"Gov/gov/DepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"10000000000000000000\"}],\"max_deposit_period\":20}","op":"update"}' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
+iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='mint/Inflation=0.050' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
 ```
 
 After that, you're done with submitting a new 'ParameterChange' proposal. 

@@ -93,7 +93,6 @@ type ValidatorOutput struct {
 	DelegatorShares    string            `json:"delegator_shares"`
 	Description        stake.Description `json:"description"`
 	BondHeight         int64             `json:"bond_height"`
-	BondIntraTxCounter int16             `json:"bond_intra_tx_counter"`
 	UnbondingHeight    int64             `json:"unbonding_height"`
 	UnbondingMinTime   time.Time         `json:"unbonding_time"`
 	Commission         Commission        `json:"commission"`
@@ -148,18 +147,17 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		UpdateTime:    v.Commission.UpdateTime,
 	}
 	return ValidatorOutput{
-		OperatorAddr:       v.OperatorAddr,
-		ConsPubKey:         bechValPubkey,
-		Jailed:             v.Jailed,
-		Status:             v.Status,
-		Tokens:             utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
-		DelegatorShares:    utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
-		Description:        v.Description,
-		BondHeight:         v.UnbondingHeight,
-		BondIntraTxCounter: v.BondIntraTxCounter,
-		UnbondingHeight:    v.UnbondingHeight,
-		UnbondingMinTime:   v.UnbondingMinTime,
-		Commission:         commission,
+		OperatorAddr:     v.OperatorAddr,
+		ConsPubKey:       bechValPubkey,
+		Jailed:           v.Jailed,
+		Status:           v.Status,
+		Tokens:           utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
+		DelegatorShares:  utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
+		Description:      v.Description,
+		BondHeight:       v.UnbondingHeight,
+		UnbondingHeight:  v.UnbondingHeight,
+		UnbondingMinTime: v.UnbondingMinTime,
+		Commission:       commission,
 	}
 }
 
@@ -215,7 +213,7 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 	}
 }
 
-func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.Pool) PoolOutput {
+func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.PoolStatus) PoolOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return PoolOutput{
 		LooseTokens:  utils.ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),

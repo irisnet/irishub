@@ -35,10 +35,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 // Called every block, update validator set
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) (validatorUpdates []abci.ValidatorUpdate) {
 	endBlockerTags := sdk.EmptyTags()
-
-	// Reset the intra-transaction counter.
-	k.SetIntraTxCounter(ctx, 0)
-
 	// Calculate validator set changes.
 	//
 	// NOTE: ApplyAndReturnValidatorSetUpdates has to come before
@@ -101,7 +97,7 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator, k k
 		return ErrValidatorPubKeyExists(k.Codespace()).Result()
 	}
 
-	if msg.Delegation.Denom != k.GetParams(ctx).BondDenom {
+	if msg.Delegation.Denom != k.BondDenom() {
 		return ErrBadDenom(k.Codespace()).Result()
 	}
 
@@ -189,7 +185,7 @@ func handleMsgDelegate(ctx sdk.Context, msg types.MsgDelegate, k keeper.Keeper) 
 		return ErrNoValidatorFound(k.Codespace()).Result()
 	}
 
-	if msg.Delegation.Denom != k.GetParams(ctx).BondDenom {
+	if msg.Delegation.Denom != k.BondDenom() {
 		return ErrBadDenom(k.Codespace()).Result()
 	}
 

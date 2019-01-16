@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestKeeper_service_Definition(t *testing.T) {
@@ -50,7 +50,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(1000))}, []sdk.Coin{{"iris", sdk.NewInt(1)}},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
-	err, _ := keeper.AddServiceBinding(ctx, svcBinding)
+	err := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
 	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}))
@@ -63,7 +63,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	svcBindingUpdate := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}, []sdk.Coin{{"iris", sdk.NewInt(1)}},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
-	err, _ = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
+	err = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
 	require.NoError(t, err)
 
 	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(0))}))

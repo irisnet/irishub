@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+)
 
 // expected stake keeper
 type StakeKeeper interface {
@@ -12,17 +15,18 @@ type StakeKeeper interface {
 	TotalPower(ctx sdk.Context) sdk.Dec
 	GetLastTotalPower(ctx sdk.Context) sdk.Int
 	GetLastValidatorPower(ctx sdk.Context, valAddr sdk.ValAddress) sdk.Int
-	BurnAmount(ctx sdk.Context, amount sdk.Dec)
-	GetStakeDenom(ctx sdk.Context) string
+	GetValidatorDelegations(ctx sdk.Context, valAddr sdk.ValAddress) []types.Delegation
 }
 
 // expected coin keeper
 type BankKeeper interface {
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
+	BurnCoinsFromPool(ctx sdk.Context, pool string, amt sdk.Coins) (sdk.Tags, sdk.Error)
+	IncreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 }
 
 // from ante handler
-type FeeCollectionKeeper interface {
+type FeeKeeper interface {
 	GetCollectedFees(ctx sdk.Context) sdk.Coins
 	ClearCollectedFees(ctx sdk.Context)
 }

@@ -190,3 +190,13 @@ func (coins DecCoins) ToString() string {
 	}
 	return rewardBytes.String()
 }
+
+// return whether all coins are zero
+func (coins DecCoins) IsZero() bool {
+	for _, coin := range coins {
+		if !coin.Amount.IsZero() {
+			return false
+		}
+	}
+	return true
+}

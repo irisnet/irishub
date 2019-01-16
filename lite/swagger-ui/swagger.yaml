@@ -2,7 +2,7 @@
 swagger: '2.0'
 info:
   description: A REST interface for state queries, transaction generation, signing, and broadcast.
-  version: "0.9.0"
+  version: "0.10.0"
   title: IRISLCD Swagger-UI
   termsOfService: https://www.irisnet.org
   contact:
@@ -343,6 +343,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -357,7 +362,7 @@ paths:
             tx:
               $ref: "#/definitions/StdTx"
       responses:
-        202:
+        200:
           description: Tx was send and will probably be added to the next block
           schema:
             $ref: "#/definitions/BroadcastTxCommitResult"
@@ -379,6 +384,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -484,6 +494,32 @@ paths:
           description: Not Found
         500:
           description: Internal Server Error
+  /bank/token-stats:
+    get:
+      tags:
+      - ICS20
+      summary: Get token statistics
+      description: Get token statistics, such as total loosen token, total bonded token and total burned token
+      produces:
+      - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              loosen_token:
+                type: array
+                items:
+                  type: string
+              bonded_token:
+                type: string
+              burned_token:
+                type: array
+                items:
+                  type: string
+        500:
+          description: Internal Server Error
   /bank/balances/{address}:
     get:
       summary: Get the account information on blockchain
@@ -525,6 +561,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -540,8 +581,8 @@ paths:
         required: true
         type: string
       - in: body
-        name: account
-        description: The password of the account to remove from the KMS
+        name: sendBody
+        description: Parameters to send coins
         required: true
         schema:
           type: object
@@ -554,7 +595,63 @@ paths:
               type: string
               example: "1iris"
       responses:
-        202:
+        200:
+          description: Tx was send and will probably be added to the next block
+          schema:
+            $ref: "#/definitions/BroadcastTxCommitResult"
+        400:
+          description: Invalid request
+        401:
+          description: Key password is wrong
+        500:
+          description: Server internal error
+  /bank/burn:
+    post:
+      summary: Burn coins
+      description: Burn coins
+      tags:
+      - ICS20
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: async
+        description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
+        name: simulate
+        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
+        required: false
+        type: boolean
+      - in: query
+        name: generate-only
+        description: if true, build an unsigned transaction and write it back
+        required: false
+        type: boolean
+      - in: body
+        name: burnBory
+        description: Parameters to burn coins
+        required: true
+        schema:
+          type: object
+          properties:
+            base_tx:
+              $ref: "#/definitions/BaseTx"
+            owner:
+              $ref: "#/definitions/Address"
+            amount:
+              type: string
+              example: "1iris"
+      responses:
+        200:
           description: Tx was send and will probably be added to the next block
           schema:
             $ref: "#/definitions/BroadcastTxCommitResult"
@@ -806,6 +903,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -862,6 +964,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -923,6 +1030,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -1385,6 +1497,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1434,6 +1551,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -1534,6 +1656,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -1610,6 +1737,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -1773,74 +1905,6 @@ paths:
         500:
           description: Internal Server Error
 
-  /distribution/{delegatorAddr}/withdrawAddress:
-    parameters:
-    - in: path
-      name: delegatorAddr
-      description: Bech32 AccAddress of Delegator
-      required: true
-      type: string
-    post:
-      summary: Set withdraw address
-      tags:
-      - ICS24
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      parameters:
-      - in: query
-        name: async
-        description: if true, broadcast transaction asynchronously
-        required: false
-        type: boolean
-      - in: query
-        name: simulate
-        description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
-        required: false
-        type: boolean
-      - in: query
-        name: generate-only
-        description: if true, build an unsigned transaction and write it back
-        required: false
-        type: boolean
-      - name: withdraw_address_body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            base_tx:
-              "$ref": "#/definitions/BaseTx"
-            withdraw_address:
-              "$ref": "#/definitions/Address"
-      responses:
-        200:
-          description: OK
-          schema:
-            "$ref": "#/definitions/BroadcastTxCommitResult"
-        400:
-          description: Invalid proposal body
-        401:
-          description: Key password is wrong
-        500:
-          description: Internal Server Error
-    get:
-      summary: Query withdraw address
-      tags:
-      - ICS24
-      responses:
-        200:
-          description: OK
-          schema:
-            type: string
-            example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
-        400:
-          description: Invalid delegator address
-        204:
-          description: No other address have been specified as withdraw address, delegator address will be used.
-        500:
-          description: Internal Server Error
   /distribution/{delegatorAddr}/withdrawReward:
     parameters:
     - in: path
@@ -1860,6 +1924,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2006,6 +2075,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2127,6 +2201,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2338,6 +2417,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2420,6 +2504,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2478,6 +2567,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2545,6 +2639,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2603,6 +2702,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2740,6 +2844,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -2883,6 +2992,11 @@ paths:
         required: false
         type: boolean
       - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
+        required: false
+        type: boolean
+      - in: query
         name: simulate
         description: if true, ignore the gas field and perform a simulation of a transaction, but don't broadcast it
         required: false
@@ -2931,6 +3045,11 @@ paths:
       - in: query
         name: async
         description: if true, broadcast transaction asynchronously
+        required: false
+        type: boolean
+      - in: query
+        name: commit
+        description: if true, response will be returned after the transaction is included in a block.
         required: false
         type: boolean
       - in: query
@@ -3141,27 +3260,29 @@ definitions:
               $ref: "#/definitions/Coin"
       memo:
         type: string
-      signature:
-        type: object
-        properties:
-          signature:
-            type: string
-            example: MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
-          pub_key:
-            type: object
-            properties:
-              type:
-                type: string
-                example: "tendermint/PubKeySecp256k1"
-              value:
-                type: string
-                example: "Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH"
-          account_number:
-            type: string
-            example: "0"
-          sequence:
-            type: string
-            example: "0"
+      signatures:
+        type: array
+        items:
+          type: object
+          properties:
+            signature:
+              type: string
+              example: MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
+            pub_key:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: "tendermint/PubKeySecp256k1"
+                value:
+                  type: string
+                  example: "Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH"
+            account_number:
+              type: string
+              example: "0"
+            sequence:
+              type: string
+              example: "0"
   KeyOutput:
     type: object
     properties:
@@ -3407,9 +3528,6 @@ definitions:
       bond_height:
         type: string
         example: '0'
-      bond_intra_tx_counter:
-        type: integer
-        example: 0
       unbonding_height:
         type: string
         example: '0'

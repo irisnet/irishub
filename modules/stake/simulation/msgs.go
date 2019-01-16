@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/mock/simulation"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"math/rand"
+	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // SimulateMsgCreateValidator
@@ -20,7 +21,7 @@ func SimulateMsgCreateValidator(m auth.AccountKeeper, k stake.Keeper) simulation
 		accs []simulation.Account, event func(string)) (
 		action string, fOp []simulation.FutureOperation, err error) {
 
-		denom := k.GetParams(ctx).BondDenom
+		denom := k.BondDenom()
 		description := stake.Description{
 			Moniker: simulation.RandStringOfLength(r, 10),
 		}
@@ -119,7 +120,7 @@ func SimulateMsgDelegate(m auth.AccountKeeper, k stake.Keeper) simulation.Operat
 		accs []simulation.Account, event func(string)) (
 		action string, fOp []simulation.FutureOperation, err error) {
 
-		denom := k.GetParams(ctx).BondDenom
+		denom := k.BondDenom()
 		val := keeper.RandomValidator(r, k, ctx)
 		validatorAddress := val.GetOperator()
 		delegatorAcc := simulation.RandomAcc(r, accs)
@@ -194,7 +195,7 @@ func SimulateMsgBeginRedelegate(m auth.AccountKeeper, k stake.Keeper) simulation
 		accs []simulation.Account, event func(string)) (
 		action string, fOp []simulation.FutureOperation, err error) {
 
-		denom := k.GetParams(ctx).BondDenom
+		denom := k.BondDenom()
 		srcVal := keeper.RandomValidator(r, k, ctx)
 		srcValidatorAddress := srcVal.GetOperator()
 		destVal := keeper.RandomValidator(r, k, ctx)
@@ -236,8 +237,7 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 		ctx := mapp.NewContext(false, abci.Header{})
 		gen := stake.DefaultGenesisState()
 		stake.InitGenesis(ctx, k, gen)
-		params := k.GetParams(ctx)
-		denom := params.BondDenom
+		denom := k.BondDenom()
 		loose := sdk.ZeroInt()
 		mapp.AccountKeeper.IterateAccounts(ctx, func(acc auth.Account) bool {
 			balance := simulation.RandomAmount(r, sdk.NewInt(1000000))
@@ -247,7 +247,6 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 			return false
 		})
 		pool := k.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDec(loose.Int64()))
-		k.SetPool(ctx, pool)
+		pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, loose)})
 	}
 }
