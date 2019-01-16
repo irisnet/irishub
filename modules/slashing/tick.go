@@ -49,11 +49,11 @@ func EndBlocker(ctx sdk.Context,req abci.RequestEndBlock, sk Keeper) (tags sdk.T
 	binary.LittleEndian.PutUint64(heightBytes, uint64(req.Height))
 	tags = sdk.NewTags("height", heightBytes)
 
-	doubleSignSlashTag := sk.handleDoubleSign(ctx,
-		ctx.BlockHeader().ProposerAddress,
-		ctx.BlockHeight(),
-		ctx.BlockHeader().Time,
-		sk.validatorSet.ValidatorByConsAddr(ctx,(sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress)).GetPower().RoundInt64())
-	tags = tags.AppendTags(doubleSignSlashTag)
+	if int64(ctx.CheckValidNum()) < ctx.BlockHeader().NumTxs {
+		proposalCensorshipTag := sk.handleProposalCensorship(ctx,
+			ctx.BlockHeader().ProposerAddress,
+			ctx.BlockHeight())
+		tags = tags.AppendTags(proposalCensorshipTag)
+	}
 	return
 }

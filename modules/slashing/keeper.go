@@ -174,6 +174,50 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 	return
 }
 
+// Punish proposer censorship by slashing malefactor's stake
+func (k Keeper) handleProposalCensorship(ctx sdk.Context, addr crypto.Address, infractionHeight int64) (tags sdk.Tags) {
+	logger := ctx.Logger().With("module", "x/slashing")
+	time := ctx.BlockHeader().Time
+	consAddr := sdk.ConsAddress(addr)
+	pubkey, err := k.getPubkey(ctx, addr)
+	if err != nil {
+		panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))
+	}
+
+	// Get validator.
+	validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
+	if validator == nil || validator.GetStatus() == sdk.Unbonded {
+		// Defensive.
+		// Simulation doesn't take unbonding periods into account, and
+		// Tendermint might break this assumption at some point.
+		return
+	}
+	logger.Info(fmt.Sprintf("proposer censorship from %s at height %d", pubkey.Address(), infractionHeight))
+
+
+	// Slash validator
+	// `power` is the int64 power of the validator as provided to/by
+	// Tendermint. This value is validator.Tokens as sent to Tendermint via
+	// ABCI, and now received as evidence.
+	// The revisedFraction (which is the new fraction to be slashed) is passed
+	// in separately to separately slash unbonding and rebonding delegations.
+	tags = k.validatorSet.Slash(ctx, consAddr,infractionHeight, validator.GetPower().RoundInt64(), sdk.NewDecWithPrec(5,2))
+
+	// Jail validator if not already jailed
+	if !validator.GetJailed() {
+		k.validatorSet.Jail(ctx, consAddr)
+	}
+
+	// Set or updated validator jail duration
+	signInfo, found := k.getValidatorSigningInfo(ctx, consAddr)
+	if !found {
+		panic(fmt.Sprintf("Expected signing info for validator %s but not found", consAddr))
+	}
+	signInfo.JailedUntil = time.Add(k.DoubleSignUnbondDuration(ctx))
+	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
+	return
+}
+
 func (k Keeper) addPubkey(ctx sdk.Context, pubkey crypto.PubKey) {
 	addr := pubkey.Address()
 	k.setAddrPubkeyRelation(ctx, addr, pubkey)

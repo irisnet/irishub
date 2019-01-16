@@ -74,7 +74,6 @@ type BaseApp struct {
 
 	// flag for sealing
 	sealed bool
-
 }
 
 var _ abci.Application = (*BaseApp)(nil)
@@ -86,10 +85,10 @@ var _ abci.Application = (*BaseApp)(nil)
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
 func NewBaseApp(name string, logger log.Logger, db dbm.DB, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:       logger,
-		name:         name,
-		db:           db,
-		cms:          store.NewCommitMultiStore(db),
+		Logger: logger,
+		name:   name,
+		db:     db,
+		cms:    store.NewCommitMultiStore(db),
 	}
 
 	for _, option := range options {
@@ -513,9 +512,6 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	// TODO: communicate this result to the address to pubkey map in slashing
 	app.voteInfos = req.LastCommitInfo.GetVotes()
 
-	x := app.deliverState.ctx.CheckValidNum()
-	_ = x
-
 	return
 }
 
@@ -528,12 +524,12 @@ func (app *BaseApp) CheckTx(txBytes []byte) (res abci.ResponseCheckTx) {
 	// Decode the Tx.
 	var result sdk.Result
 
-	//var tx, err = app.txDecoder(txBytes)
-	//if err != nil {
-	//	result = err.Result()
-	//} else {
-	//	result = app.runTx(RunTxModeCheck, txBytes, tx)
-	//}
+	var tx, err = app.txDecoder(txBytes)
+	if err != nil {
+		result = err.Result()
+	} else {
+		result = app.runTx(RunTxModeCheck, txBytes, tx)
+	}
 
 	return abci.ResponseCheckTx{
 		Code:      uint32(result.Code),
@@ -554,7 +550,6 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 		result = err.Result()
 	} else {
 		// success pass txDecoder
-		app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum()+1)
 		result = app.runTx(RunTxModeDeliver, txBytes, tx)
 
 	}
@@ -813,7 +808,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	if mode == RunTxModeCheck {
 		return
 	}
-
+	app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum() + 1)
 	// Create a new context based off of the existing context with a cache wrapped
 	// multi-store in case message processing fails.
 	runMsgCtx, msCache := app.cacheTxContext(ctx, txBytes)
