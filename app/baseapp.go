@@ -54,8 +54,6 @@ type BaseApp struct {
 
 	addrPeerFilter   sdk.PeerFilter // filter peers by address and port
 	pubkeyPeerFilter sdk.PeerFilter // filter peers by public key
-	runMsg           RunMsg
-
 	//--------------------
 	// Volatile
 	// checkState is set on initialization and reset on Commit.
@@ -132,15 +130,8 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 	app.cms.MountStoreWithDB(key, typ, nil)
 }
 
-////////////////////  iris/cosmos-sdk begin  ///////////////////////////
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
-}
-
-////////////////////  iris/cosmos-sdk end  ///////////////////////////
-
-func (app *BaseApp) SetRunMsg(runMsg RunMsg) {
-	app.runMsg = runMsg
 }
 
 // panics if called more than once on a running baseapp

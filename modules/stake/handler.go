@@ -10,7 +10,6 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/common"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"fmt"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
@@ -35,8 +34,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // Called every block, update validator set
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) (validatorUpdates []abci.ValidatorUpdate) {
-	logger := ctx.Logger().With("handler", "endBlock").With("module", fmt.Sprintf("iris/%s", "stake"))
-	logger.Info("stake end block")
+	logger := ctx.Logger().With("handler", "endBlock").With("module", "iris/stake")
+	logger.Debug("stake end block")
 	endBlockerTags := sdk.EmptyTags()
 	// Calculate validator set changes.
 	//
