@@ -102,15 +102,21 @@ func (k Keeper) RemoveDelegatorWithdrawAddr(ctx sdk.Context, delAddr, withdrawAd
 func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	delAddr sdk.AccAddress, valAddr sdk.ValAddress) (types.FeePool,
 	types.ValidatorDistInfo, types.DelegationDistInfo, types.DecCoins) {
-
+	logger := ctx.Logger()
 	wc := k.GetWithdrawContext(ctx, valAddr)
 	valInfo := k.GetValidatorDistInfo(ctx, valAddr)
 	delInfo := k.GetDelegationDistInfo(ctx, delAddr, valAddr)
 	validator := k.stakeKeeper.Validator(ctx, valAddr)
 	delegation := k.stakeKeeper.Delegation(ctx, delAddr, valAddr)
 
-	delInfo, valInfo, feePool, withdraw := delInfo.WithdrawRewards(wc, valInfo,
+	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "height", wc.Height, "total_power", wc.TotalPower, "validator_power", wc.ValPower, "community_pool", wc.FeePool.CommunityPool, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool)
+	logger.Debug(fmt.Sprintf("validator total delegation shares %s, delegation share %s", validator.GetDelegatorShares().String(), delegation.GetShares().String()))
+	logger.Debug(fmt.Sprintf("Before withdraw: %s", valInfo.String()))
+
+	delInfo, valInfo, feePool, withdraw := delInfo.WithdrawRewards(logger, wc, valInfo,
 		validator.GetDelegatorShares(), delegation.GetShares())
+
+	logger.Debug(fmt.Sprintf("After withdraw: %s", valInfo.String()))
 
 	return feePool, valInfo, delInfo, withdraw
 }
@@ -209,6 +215,7 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 		k.SetValidatorDistInfo(ctx, valInfo)
 		k.SetDelegationDistInfo(ctx, delInfo)
 		diWithdrawTruncated, _ := diWithdraw.TruncateDecimal()
+		ctx.Logger().Debug(fmt.Sprint("Withdraw reward %s for delegation(delegator: %s, validator: %s)", diWithdrawTruncated.String(), del.GetDelegatorAddr().String(), del.GetValidatorAddr().String()))
 		tags = tags.AppendTag(fmt.Sprintf(sdk.TagRewardFromValidator, valAddr.String()), []byte(diWithdrawTruncated.String()))
 		return false
 	}

@@ -1,6 +1,7 @@
 package distribution
 
 import (
+	"fmt"
 	"github.com/irisnet/irishub/modules/distribution/keeper"
 	"github.com/irisnet/irishub/modules/distribution/tags"
 	"github.com/irisnet/irishub/modules/distribution/types"
@@ -30,6 +31,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
 
+	ctx.Logger().Debug(fmt.Sprintf("Handle transaction to withdraw all reward for delegation %s", msg.DelegatorAddr.String()))
 	reward, withdrawTags := k.WithdrawDelegationRewardsAll(ctx, msg.DelegatorAddr)
 	rewardTruncate, _  :=	reward.TruncateDecimal()
 	resultTags := sdk.NewTags(
@@ -45,6 +47,7 @@ func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdraw
 
 func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDelegatorReward, k keeper.Keeper) sdk.Result {
 
+	ctx.Logger().Debug(fmt.Sprintf("Handle transaction to withdraw reward for delegation %s from validator %s", msg.DelegatorAddr.String(), msg.ValidatorAddr.String()))
 	reward, err := k.WithdrawDelegationReward(ctx, msg.DelegatorAddr, msg.ValidatorAddr)
 	if err != nil {
 		return err.Result()
@@ -62,7 +65,7 @@ func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDele
 }
 
 func handleMsgWithdrawValidatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawValidatorRewardsAll, k keeper.Keeper) sdk.Result {
-
+	ctx.Logger().Debug(fmt.Sprintf("Handle transaction to withdraw both all delegation reward and commission reward for validator %s", msg.ValidatorAddr.String()))
 	reward, withdrawTags, err := k.WithdrawValidatorRewardsAll(ctx, msg.ValidatorAddr)
 	if err != nil {
 		return err.Result()

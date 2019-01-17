@@ -10,7 +10,6 @@ import (
 // Allocate fees handles distribution of the collected fees
 func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer sdk.ConsAddress) {
 	logger := ctx.Logger()
-	height := ctx.BlockHeight()
 	// get the proposer of this block
 	proposerValidator := k.stakeKeeper.ValidatorByConsAddr(ctx, proposer)
 
@@ -21,7 +20,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	feesCollected := k.feeKeeper.GetCollectedFees(ctx)
 	feesCollectedDec := types.NewDecCoins(feesCollected)
 
-	logger.Info("Get collected transaction fee token and minted token", "collected_token", feesCollected, "height", height)
+	logger.Info("Get collected transaction fee token and minted token", "collected_token", feesCollected)
 
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
@@ -62,14 +61,14 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
-	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString(), "height", height)
+	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString())
 
 	// set the global pool within the distribution module
 	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding)
 	feePool.ValPool = feePool.ValPool.Plus(poolReceived)
 	k.SetFeePool(ctx, feePool)
 
-	logger.Info("Allocate reward to global validator pool", "allocate_amount", poolReceived.ToString(), "total_global_validator_pool", feePool.ValPool.ToString(), "height", height)
+	logger.Info("Allocate reward to global validator pool", "allocate_amount", poolReceived.ToString(), "total_global_validator_pool", feePool.ValPool.ToString())
 
 	// clear the now distributed fees
 	k.feeKeeper.ClearCollectedFees(ctx)

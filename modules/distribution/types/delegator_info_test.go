@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/tendermint/tendermint/libs/log"
 	"testing"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -31,7 +32,7 @@ func TestWithdrawRewards(t *testing.T) {
 	// withdraw rewards
 	wc := NewWithdrawContext(fp, height,
 		totalBondedTokens, validatorTokens, commissionRate)
-	di1, vi, fp, rewardRecv1 := di1.WithdrawRewards(wc, vi,
+	di1, vi, fp, rewardRecv1 := di1.WithdrawRewards(log.NewNopLogger(), wc, vi,
 		validatorDelShares, di1Shares)
 
 	assert.Equal(t, height, di1.DelPoolWithdrawalHeight)
@@ -48,7 +49,7 @@ func TestWithdrawRewards(t *testing.T) {
 	// withdraw rewards
 	wc = NewWithdrawContext(fp, height,
 		totalBondedTokens, validatorTokens, commissionRate)
-	di2, vi, fp, rewardRecv2 := di2.WithdrawRewards(wc, vi,
+	di2, vi, fp, rewardRecv2 := di2.WithdrawRewards(log.NewNopLogger(), wc, vi,
 		validatorDelShares, di2Shares)
 
 	assert.Equal(t, height, di2.DelPoolWithdrawalHeight)
