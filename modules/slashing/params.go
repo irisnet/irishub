@@ -273,7 +273,7 @@ func validateJailDuration(p time.Duration) sdk.Error {
 
 func validateCensorshipJailDuration(p time.Duration) sdk.Error {
 	if p <= 0 || p >= 4*sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash CensorshipJailDuration should be between (0, 4week) ", p.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash CensorshipJailDuration [%s] should be between (0, 4week) ", p.String()))
 	}
 	return nil
 }
