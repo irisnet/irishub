@@ -9,7 +9,8 @@ import (
 
 // Called every block, process inflation on the first block of every hour
 func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
-	logger := ctx.Logger().With("handler", "beginBlock").With("module", "iris/mint")
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/mint"))
+	logger := ctx.Logger()
 	// Get block BFT time and block height
 	blockTime := ctx.BlockHeader().Time
 	blockHeight := ctx.BlockHeader().Height

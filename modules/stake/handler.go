@@ -34,8 +34,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // Called every block, update validator set
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) (validatorUpdates []abci.ValidatorUpdate) {
-	logger := ctx.Logger().With("handler", "endBlock").With("module", "iris/stake")
-	logger.Debug("stake end block")
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/stake"))
 	endBlockerTags := sdk.EmptyTags()
 	// Calculate validator set changes.
 	//
