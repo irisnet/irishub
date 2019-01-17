@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
 	stake "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -201,7 +201,7 @@ func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, i
 	// ABCI, and now received as evidence.
 	// The revisedFraction (which is the new fraction to be slashed) is passed
 	// in separately to separately slash unbonding and rebonding delegations.
-	tags = k.validatorSet.Slash(ctx, consAddr, distributionHeight, validator.GetPower().RoundInt64(),k.SlashFractionCensorship(ctx))
+	tags = k.validatorSet.Slash(ctx, consAddr, distributionHeight, validator.GetPower().RoundInt64(), k.SlashFractionCensorship(ctx))
 
 	// Jail validator if not already jailed
 	if !validator.GetJailed() {

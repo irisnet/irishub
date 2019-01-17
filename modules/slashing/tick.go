@@ -42,7 +42,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 }
 
 // slashing end block functionality
-func EndBlocker(ctx sdk.Context,req abci.RequestEndBlock, sk Keeper) (tags sdk.Tags) {
+func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, sk Keeper) (tags sdk.Tags) {
 
 	// Tag the height
 	heightBytes := make([]byte, 8)

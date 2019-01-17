@@ -3,10 +3,10 @@ package slashing
 import (
 	"time"
 
+	"fmt"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	"fmt"
 	"strconv"
 )
 
@@ -192,29 +192,29 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 // Default parameters used by Iris Hub
 func DefaultParams() Params {
 	return Params{
-		MaxEvidenceAge: sdk.Day,
-		DoubleSignJailDuration: 5 * sdk.Day,
-		SignedBlocksWindow: 20000,
-		DowntimeJailDuration: 2 * sdk.Day,
-		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
+		MaxEvidenceAge:          sdk.Day,
+		DoubleSignJailDuration:  5 * sdk.Day,
+		SignedBlocksWindow:      20000,
+		DowntimeJailDuration:    2 * sdk.Day,
+		MinSignedPerWindow:      sdk.NewDecWithPrec(5, 1),
 		SlashFractionDoubleSign: sdk.NewDecWithPrec(1, 2),
-		SlashFractionDowntime: sdk.NewDecWithPrec(5, 3),
+		SlashFractionDowntime:   sdk.NewDecWithPrec(5, 3),
 		SlashFractionCensorship: sdk.NewDecWithPrec(2, 2),
-		CensorshipJailDuration: 7 * sdk.Day,
+		CensorshipJailDuration:  7 * sdk.Day,
 	}
 }
 
 func DefaultParamsForTestnet() Params {
 	return Params{
-		MaxEvidenceAge: 10 * time.Minute,
-		DoubleSignJailDuration: 60 * 5 * time.Second,
-		SignedBlocksWindow: 100,
-		DowntimeJailDuration: 60 * 10 * time.Second,
-		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
+		MaxEvidenceAge:          10 * time.Minute,
+		DoubleSignJailDuration:  60 * 5 * time.Second,
+		SignedBlocksWindow:      100,
+		DowntimeJailDuration:    60 * 10 * time.Second,
+		MinSignedPerWindow:      sdk.NewDecWithPrec(5, 1),
 		SlashFractionDoubleSign: sdk.NewDec(1).Quo(sdk.NewDec(20)),
-		SlashFractionDowntime: sdk.NewDec(1).Quo(sdk.NewDec(100)),
+		SlashFractionDowntime:   sdk.NewDec(1).Quo(sdk.NewDec(100)),
 		SlashFractionCensorship: sdk.NewDecWithPrec(2, 2),
-		CensorshipJailDuration: 60 * 7 * time.Second,
+		CensorshipJailDuration:  60 * 7 * time.Second,
 	}
 }
 
@@ -258,21 +258,21 @@ func validateMaxEvidenceAge(p time.Duration) sdk.Error {
 		if p < sdk.Day {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [1day,) ", p.String()))
 		}
-	} else if p < 10 * time.Minute {
+	} else if p < 10*time.Minute {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min,) ", p.String()))
 	}
 	return nil
 }
 
 func validateJailDuration(p time.Duration) sdk.Error {
-	if p <= 0 || p >= 4 * sdk.Week {
+	if p <= 0 || p >= 4*sdk.Week {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DoubleSignJailDuration and DowntimeJailDuration [%s] should be between (0, 4week) ", p.String()))
 	}
 	return nil
 }
 
 func validateCensorshipJailDuration(p time.Duration) sdk.Error {
-	if p <= 0 || p >= 4 * sdk.Week {
+	if p <= 0 || p >= 4*sdk.Week {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash CensorshipJailDuration should be between (0, 4week) ", p.String()))
 	}
 	return nil
@@ -312,6 +312,7 @@ func validateSlashFractionCensorship(p sdk.Dec) sdk.Error {
 	}
 	return nil
 }
+
 //______________________________________________________________________
 
 // get inflation params from the global param store
