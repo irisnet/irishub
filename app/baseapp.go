@@ -16,12 +16,12 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 	tmstate "github.com/tendermint/tendermint/state"
 	"strconv"
-	"github.com/irisnet/irishub/modules/auth"
 )
 
 // Key to store the consensus params in the main store.
@@ -482,7 +482,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.
 			WithBlockHeader(req.Header).
-			WithBlockHeight(req.Header.Height)
+			WithBlockHeight(req.Header.Height).WithCheckValidNum(0)
 	}
 
 	// add block gas meter
@@ -502,6 +502,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	// set the signed validators for addition to context in deliverTx
 	// TODO: communicate this result to the address to pubkey map in slashing
 	app.voteInfos = req.LastCommitInfo.GetVotes()
+
 	return
 }
 
@@ -539,7 +540,9 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 	if err != nil {
 		result = err.Result()
 	} else {
+		// success pass txDecoder
 		result = app.runTx(RunTxModeDeliver, txBytes, tx)
+
 	}
 
 	// Even though the Result.Code is not OK, there are still effects,
@@ -702,6 +705,10 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
+	if mode == RunTxModeDeliver {
+		app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum() + 1)
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
 			switch rType := r.(type) {
@@ -819,6 +826,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 // EndBlock implements the ABCI application interface.
 func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBlock) {
+
 	if app.deliverState.ms.TracingEnabled() {
 		app.deliverState.ms = app.deliverState.ms.ResetTraceContext().(sdk.CacheMultiStore)
 	}
