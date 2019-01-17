@@ -9,7 +9,7 @@ import (
 
 // Allocate fees handles distribution of the collected fees
 func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer sdk.ConsAddress) {
-	logger := ctx.Logger().With("module", "x/distr")
+	logger := ctx.Logger()
 	height := ctx.BlockHeight()
 	// get the proposer of this block
 	proposerValidator := k.stakeKeeper.ValidatorByConsAddr(ctx, proposer)
@@ -21,7 +21,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	feesCollected := k.feeKeeper.GetCollectedFees(ctx)
 	feesCollectedDec := types.NewDecCoins(feesCollected)
 
-	logger.Info(fmt.Sprintf("Collected fees %s at height %d", feesCollected, height))
+	logger.Info("Get collected transaction fee token and minted token", "collected_token", feesCollected, "height", height)
 
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
@@ -37,6 +37,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	validator := k.stakeKeeper.Validator(ctx, proposerValidator.GetOperator())
 	if !validator.GetJailed() {
 		// allocated rewards to proposer
+		logger.Info("Allocate reward to proposer", "proposer_address", proposerValidator.GetOperator().String())
 		baseProposerReward := k.GetBaseProposerReward(ctx)
 		bonusProposerReward := k.GetBonusProposerReward(ctx)
 		proposerMultiplier := baseProposerReward.Add(bonusProposerReward.Mul(percentVotes))
@@ -47,9 +48,13 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 		remaining := proposerReward.Minus(commission)
 		proposerDist.ValCommission = proposerDist.ValCommission.Plus(commission)
 		proposerDist.DelPool = proposerDist.DelPool.Plus(remaining)
+		logger.Info("Allocate commission to proposer commission pool", "commission", commission.ToString())
+		logger.Info("Allocate reward to proposer delegation reward pool", "delegation_reward", remaining.ToString())
 
 		// save validator distribution info
 		k.SetValidatorDistInfo(ctx, proposerDist)
+	} else {
+		logger.Info("The block proposer is jailed, distribute no reward to it", "proposer_address", proposerValidator.GetOperator().String())
 	}
 
 	// allocate community funding
@@ -57,15 +62,14 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
-	logger.Info(fmt.Sprintf("Collected community tax funding %s at height %d", communityFunding.ToString(), height))
-	logger.Info(fmt.Sprintf("Community pool increase to %s at height %d", feePool.CommunityPool.ToString(), height))
+	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString(), "height", height)
 
 	// set the global pool within the distribution module
 	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding)
 	feePool.ValPool = feePool.ValPool.Plus(poolReceived)
 	k.SetFeePool(ctx, feePool)
 
-	logger.Info(fmt.Sprintf("Validators pool increase to %s at height %d", feePool.ValPool.ToString(), height))
+	logger.Info("Allocate reward to global validator pool", "allocate_amount", poolReceived.ToString(), "total_global_validator_pool", feePool.ValPool.ToString(), "height", height)
 
 	// clear the now distributed fees
 	k.feeKeeper.ClearCollectedFees(ctx)
@@ -73,16 +77,25 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 
 // Allocate fee tax from the community fee pool, burn or send to trustee account
 func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent sdk.Dec, burn bool) {
+	logger := ctx.Logger()
 	feePool := k.GetFeePool(ctx)
 	communityPool := feePool.CommunityPool
 	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
 	k.SetFeePool(ctx, feePool)
-
+	logger.Info("Spend community tax fund", "total_community_tax_fund", communityPool.ToString(), "left_community_tax_fund", feePool.CommunityPool.ToString())
 	if burn {
-		k.bankKeeper.BurnCoinsFromPool(ctx, "communityTax", allocateCoins)
+		logger.Info(fmt.Sprintf("Burn %s", allocateCoins.String()))
+		_, err := k.bankKeeper.BurnCoinsFromPool(ctx, "communityTax", allocateCoins)
+		if err != nil {
+			panic(err)
+		}
 	} else {
-		k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
+		logger.Info(fmt.Sprintf("Send %s to account %s", allocateCoins.String(), destAddr.String()))
+		_, _, err := k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 }
