@@ -34,6 +34,7 @@ import (
 	"io/ioutil"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/app/v0"
+	"time"
 )
 
 //___________________________________________________________________________________
@@ -183,7 +184,7 @@ func readGenesisFile(t *testing.T, genFile string) types.GenesisDoc {
 
 func executeWrite(t *testing.T, cmdStr string, writes ...string) (exitSuccess bool) {
 	// broadcast transaction and return after the transaction is included by a block
-	if strings.Contains(cmdStr,"--from") && strings.Contains(cmdStr,"--fee") {
+	if strings.Contains(cmdStr, "--from") && strings.Contains(cmdStr, "--fee") {
 		cmdStr = cmdStr + " --commit"
 	}
 
@@ -310,18 +311,27 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	return validator
 }
 
-func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
+func executeGetProposal(t *testing.T, cmdStr string) ProposalOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var proposal gov.ProposalOutput
+	var proposal ProposalOutput
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return proposal
 }
 
-func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
+func executeGetProposals(t *testing.T, cmdStr string) []ProposalOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var vote  gov.Vote
+	var proposals []ProposalOutput
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &proposals)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return proposals
+}
+
+func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var vote gov.Vote
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -337,9 +347,9 @@ func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 	return votes
 }
 
-func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
+func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var param  gov.Param
+	var param gov.Param
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -486,4 +496,23 @@ func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force b
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
 	require.True(t, executeWrite(t, cmdStr, writes...))
+}
+
+type ProposalOutput struct {
+	ProposalID   uint64           `json:"proposal_id"`   //  ID of the proposal
+	Title        string           `json:"title"`         //  Title of the proposal
+	Description  string           `json:"description"`   //  Description of the proposal
+	ProposalType gov.ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
+
+	Status      gov.ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
+	TallyResult gov.TallyResult    `json:"tally_result"`    //  Result of Tallys
+
+	SubmitTime     time.Time `json:"submit_time"`      //  Time of the block where TxGovSubmitProposal was included
+	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
+	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
+
+	VotingStartTime time.Time              `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingEndTime   time.Time              `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+	Params          gov.Params             `json:"param"`
+	Upgrade         sdk.ProtocolDefinition `json:"protocol_definition"`
 }

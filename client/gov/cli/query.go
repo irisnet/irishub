@@ -11,7 +11,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
 )
 
 // GetCmdQueryProposal implements the query proposal command.
@@ -100,22 +99,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			////////////////////  iris begin  ///////////////////////////
-			var matchingProposals gov.ProposalOutputs
-			err = cdc.UnmarshalJSON(res, &matchingProposals)
-			if err != nil {
-				return err
-			}
-
-			if len(matchingProposals) == 0 {
-				fmt.Println("No matching proposals found")
-				return nil
-			}
-
-			for _, proposal := range matchingProposals {
-				fmt.Printf("  %d - %s\n", proposal.ProposalID, proposal.Title)
-			}
-			////////////////////  iris end  /////////////////////////////
+			fmt.Println(string(res))
 			return nil
 		},
 	}

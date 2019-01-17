@@ -299,6 +299,42 @@ func DefaultParams() GovParams {
 	}
 }
 
+func DefaultParamsForTest() GovParams {
+	var criticalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeTokenName))
+	var importantMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeTokenName))
+	var normalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeTokenName))
+
+	return GovParams{
+		CriticalDepositPeriod: time.Duration(30 * time.Second),
+		CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
+		CriticalVotingPeriod:  time.Duration(30 * time.Second),
+		CriticalMaxNum:        STABLE_CRITIACAL_NUM,
+		CriticalThreshold:     sdk.NewDecWithPrec(834, 3),
+		CriticalVeto:          sdk.NewDecWithPrec(334, 3),
+		CriticalParticipation: sdk.NewDecWithPrec(8572, 4),
+		CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+
+		ImportantDepositPeriod: time.Duration(30 * time.Second),
+		ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
+		ImportantVotingPeriod:  time.Duration(30 * time.Second),
+		ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
+		ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
+		ImportantVeto:          sdk.NewDecWithPrec(334, 3),
+		ImportantParticipation: sdk.NewDecWithPrec(834, 3),
+		ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+
+		NormalDepositPeriod: time.Duration(30 * time.Second),
+		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
+		NormalVotingPeriod:  time.Duration(30 * time.Second),
+		NormalMaxNum:        DEFAULT_NORMAL_NUM,
+		NormalThreshold:     sdk.NewDecWithPrec(667, 3),
+		NormalVeto:          sdk.NewDecWithPrec(334, 3),
+		NormalParticipation: sdk.NewDecWithPrec(75, 2),
+		NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+		SystemHaltPeriod:    60,
+	}
+}
+
 func validateParams(p GovParams) sdk.Error {
 	if sdk.NetworkType != sdk.Mainnet {
 		return nil
