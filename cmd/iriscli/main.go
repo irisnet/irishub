@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 
@@ -250,10 +251,9 @@ func main() {
 		panic(err)
 	}
 
-	err = executor.Execute()
-	if err != nil {
-		// handle with #870
-		panic(err)
+	if err := executor.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 

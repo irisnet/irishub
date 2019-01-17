@@ -218,7 +218,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 	// Reset the intra-transaction counter.
 	keeper.SetIntraTxCounter(ctx, 0)
 
-	logger := ctx.Logger().With("module", "service")
+	logger := ctx.Logger().With("module", "x/service")
 	resTags = sdk.NewTags()
 	params := keeper.GetParamSet(ctx)
 	slashFraction := params.SlashFraction

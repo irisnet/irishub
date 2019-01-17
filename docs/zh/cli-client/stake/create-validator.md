@@ -15,7 +15,7 @@ iriscli stake create-validator [flags]
 iriscli stake create-validator --help
 ```
 
-## 特有的flags
+## 特有的标志
 
 | 名称                         | 类型   | 是否必填 | 默认值   | 功能描述         |
 | ---------------------------- | -----  | -------- | -------- | ------------------------------------ |

@@ -704,16 +704,16 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "description", len(msg.Description), 280)
 	}
 	if len(msg.Tags) > 10 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "tags", len(msg.Description), 10)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "tags", len(msg.Tags), 10)
 	} else {
 		for i, tag := range msg.Tags {
 			if len(tag) > 70 {
-				sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, fmt.Sprintf("tags[%d]", i), len(tag), 70)
+				return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, fmt.Sprintf("tags[%d]", i), len(tag), 70)
 			}
 		}
 	}
 	if len(msg.AuthorDescription) > 280 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "author_description", len(msg.Author), 280)
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "author_description", len(msg.AuthorDescription), 280)
 	}
 	return nil
 }

@@ -1,13 +1,16 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // Allocate fees handles distribution of the collected fees
 func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer sdk.ConsAddress) {
-
+	logger := ctx.Logger().With("module", "x/distr")
+	height := ctx.BlockHeight()
 	// get the proposer of this block
 	proposerValidator := k.stakeKeeper.ValidatorByConsAddr(ctx, proposer)
 
@@ -17,6 +20,8 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	// transactions in the block
 	feesCollected := k.feeKeeper.GetCollectedFees(ctx)
 	feesCollectedDec := types.NewDecCoins(feesCollected)
+
+	logger.Info(fmt.Sprintf("Collected fees %s at height %d", feesCollected, height))
 
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
@@ -52,10 +57,15 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
+	logger.Info(fmt.Sprintf("Collected community tax funding %s at height %d", communityFunding.ToString(), height))
+	logger.Info(fmt.Sprintf("Community pool increase to %s at height %d", feePool.CommunityPool.ToString(), height))
+
 	// set the global pool within the distribution module
 	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding)
 	feePool.ValPool = feePool.ValPool.Plus(poolReceived)
 	k.SetFeePool(ctx, feePool)
+
+	logger.Info(fmt.Sprintf("Validators pool increase to %s at height %d", feePool.ValPool.ToString(), height))
 
 	// clear the now distributed fees
 	k.feeKeeper.ClearCollectedFees(ctx)

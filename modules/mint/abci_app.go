@@ -1,13 +1,15 @@
 package mint
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"fmt"
+
 	"github.com/irisnet/irishub/modules/mint/tags"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Called every block, process inflation on the first block of every hour
 func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
-
+	logger := ctx.Logger().With("module", "x/mint")
 	// Get block BFT time and block height
 	blockTime := ctx.BlockHeader().Time
 	blockHeight := ctx.BlockHeader().Height
@@ -32,6 +34,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
 	minter.LastUpdate = blockTime
 	k.SetMinter(ctx, minter)
 
+	logger.Info(fmt.Sprintf("Minted coin %s at height %d", mintedCoin, blockHeight), "time", blockTime)
 	// Add tags
 	return sdk.NewTags(
 		tags.LastInflationTime, []byte(lastInflationTime.String()),

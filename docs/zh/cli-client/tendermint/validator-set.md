@@ -20,8 +20,16 @@
 | --trust-node    | true                       | 信任连接的完整节点，关闭响应结果校验                                            |          |
 
 ## 例子 
+### 查询某高度上区块中的validator-set
+
 
 ```shell
-iriscli tendermint validator-set 114360 --chain-id=fuxi-4000 
+iriscli tendermint validator-set 114360 --chain-id=irishub-test
 ```
 之后你会在验证器上查询到该高度的信息
+### 查询最新区块中的validator-set
+
+```shell
+ iriscli tendermint validator-set --chain-id=irishub-test --trust-node=true
+
+```

@@ -17,10 +17,11 @@ iriscli gov deposit --help
 ```
 ## Flags
  
-| Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
-| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --deposit        |                            | [string] Deposit of proposal                                                                                                                         | Yes      |
-| --proposal-id    |                            | [string] ProposalID of proposal depositing on                                                                                                        | Yes      |
+| Name, shorthand  | Default                    | Description                                                                                                                                         | Required |
+| ---------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------- |
+| --deposit        |                                       | [string] Deposit of proposal                                                                                                                 | Yes          |
+| --proposal-id  |                                       | [string] ProposalID of proposal depositing on                                                                                    | Yes      |
+
 ## Examples
 
 ### Deposit

@@ -14,7 +14,7 @@ iriscli stake edit-validator [flags]
 iriscli stake edit-validator --help
 ```
 
-## 特有flags
+## 特有标志
 
 | 名称                | 类型   | 是否必填 | 默认值   | 功能描述         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
@@ -23,6 +23,7 @@ iriscli stake edit-validator --help
 | --identity          | string | false    | ""       | 身份签名 |
 | --website           | string | false    | ""       | 网址  |
 | --details           | string | false    | ""       | 验证人节点详细信息 |
+| --commit         | String | 否     | True                  |是否等到交易有明确的返回值，如果是True，则忽略--async的内容|
 
 
 ## 示例

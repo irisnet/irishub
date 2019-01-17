@@ -10,12 +10,6 @@ Refund all fees from service return fees
 iriscli service refund-fees [flags]
 ```
 
-## Flags
-
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| -h, --help            |                         | help for refund-fees                                                                                                                                         |          |
-
 ## Examples
 
 ### Refund fees from service return fees 

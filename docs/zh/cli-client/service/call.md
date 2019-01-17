@@ -10,7 +10,7 @@
 iriscli service call [flags]
 ```
 
-## 标志
+## 特殊标志
 
 | Name, shorthand       | Default                 | Description                          | Required |
 | --------------------- | ----------------------- | ------------------------------------ | -------- |
@@ -21,7 +21,6 @@ iriscli service call [flags]
 | --provider            |                         | [string] bech32编码的服务提供商账户地址  | 是       |
 | --service-fee         |                         | [string] 服务调用支付的服务费            |          |
 | --request-data        |                         | [string] hex编码的服务调用请求数据        |          |
-| -h, --help            |                         | 调用命令帮助                             |          |
 
 ## 示例
 

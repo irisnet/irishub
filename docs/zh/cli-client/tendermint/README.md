@@ -1,4 +1,4 @@
-# iriscli tendermint
+# iriscli tendermint & iris tendermint
 
 ## 介绍
 tendermint的状态查询的子命令
