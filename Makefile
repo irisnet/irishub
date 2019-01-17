@@ -10,23 +10,11 @@ COMMIT_HASH := $(shell git rev-parse --short HEAD)
 
 InvariantLevel := $(shell if [ -z ${InvariantLevel} ]; then echo "panic"; else echo ${InvariantLevel}; fi)
 NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "testnet"; else echo ${NetworkType}; fi)
-Bech32PrefixAccAddr := $(shell if [ -z ${Bech32PrefixAccAddr} ]; then echo "faa"; else echo ${Bech32PrefixAccAddr}; fi)
-Bech32PrefixAccPub := $(shell if [ -z ${Bech32PrefixAccPub} ]; then echo "fap"; else echo ${Bech32PrefixAccPub}; fi)
-Bech32PrefixValAddr := $(shell if [ -z ${Bech32PrefixValAddr} ]; then echo "fva"; else echo ${Bech32PrefixValAddr}; fi)
-Bech32PrefixValPub := $(shell if [ -z ${Bech32PrefixValPub} ]; then echo "fvp"; else echo ${Bech32PrefixValPub}; fi)
-Bech32PrefixConsAddr := $(shell if [ -z ${Bech32PrefixConsAddr} ]; then echo "fca"; else echo ${Bech32PrefixConsAddr}; fi)
-Bech32PrefixConsPub := $(shell if [ -z ${Bech32PrefixConsPub} ]; then echo "fcp"; else echo ${Bech32PrefixConsPub}; fi)
 
 BUILD_FLAGS = -ldflags "\
 -X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
 -X github.com/irisnet/irishub/types.InvariantLevel=${InvariantLevel} \
 -X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
--X github.com/irisnet/irishub/types.Bech32PrefixAccAddr=${Bech32PrefixAccAddr} \
--X github.com/irisnet/irishub/types.Bech32PrefixAccPub=${Bech32PrefixAccPub} \
--X github.com/irisnet/irishub/types.Bech32PrefixValAddr=${Bech32PrefixValAddr} \
--X github.com/irisnet/irishub/types.Bech32PrefixValPub=${Bech32PrefixValPub} \
--X github.com/irisnet/irishub/types.Bech32PrefixConsAddr=${Bech32PrefixConsAddr} \
--X github.com/irisnet/irishub/types.Bech32PrefixConsPub=${Bech32PrefixConsPub}"
 
 ########################################
 ### Tools & dependencies
@@ -35,12 +23,6 @@ echo_bech32_prefix:
 	@echo "\"source scripts/setProdEnv.sh\" to set compile environment variables for your product, or default values will be applied"
 	@echo InvariantLevel=${InvariantLevel}
 	@echo NetworkType=${NetworkType}
-	@echo Bech32PrefixAccAddr=${Bech32PrefixAccAddr}
-	@echo Bech32PrefixAccPub=${Bech32PrefixAccPub}
-	@echo Bech32PrefixValAddr=${Bech32PrefixValAddr}
-	@echo Bech32PrefixValPub=${Bech32PrefixValPub}
-	@echo Bech32PrefixConsAddr=${Bech32PrefixConsAddr}
-	@echo Bech32PrefixConsPub=${Bech32PrefixConsPub}
 
 check_tools:
 	cd scripts && $(MAKE) check_tools
