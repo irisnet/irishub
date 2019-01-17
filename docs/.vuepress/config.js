@@ -43,7 +43,6 @@ module.exports = {
                         children: [
                             ["basic-concepts/coin-type.md", 'Coin Type'],
                             ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/inflation.md", 'Infation'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
                             ["basic-concepts/gov-params.md", 'Gov Params']
@@ -55,7 +54,6 @@ module.exports = {
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
                             ['service.md', 'Service'],
-                            ['record.md', 'Record'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
@@ -69,62 +67,55 @@ module.exports = {
                             ['status/', 'iriscli status']
                         ]
                     },
-                    {
-                        title: 'Tendermint',
-                        collapsable: false,
-                        children: [
-                            ['tendermint/', 'iriscli tendermint']
-                        ]
-                    },
-                    {
-                        title: 'Keys',
-                        collapsable: false,
-                        children: [
-                            ['keys/', 'iriscli keys']
-                        ]
-                    },
-                    {
-                        title: 'Bank',
-                        collapsable: false,
-                        children: [
-                            ['bank/', 'iriscli bank']
-                        ]
-                    },
-                    {
-                        title: 'Stake',
-                        collapsable: false,
-                        children: [
-                            ['stake/', 'iriscli stake']
-                        ]
-                    },
-                    {
-                        title: 'Gov',
-                        collapsable: false,
-                        children: [
-                            ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
-                        ]
-                    },
-                    {
-                        title: 'Upgrade',
-                        collapsable: false,
-                        children: [
-                            ['upgrade/', 'iriscli upgrade']
-                        ]
-                    },
-                    {
-                        title: 'Service',
-                        collapsable: false,
-                        children: [
-                            ['service/', 'iriscli service']
-                        ]
-                    }],
+                        {
+                            title: 'Tendermint',
+                            collapsable: false,
+                            children: [
+                                ['tendermint/', 'iriscli tendermint']
+                            ]
+                        },
+                        {
+                            title: 'Keys',
+                            collapsable: false,
+                            children: [
+                                ['keys/', 'iriscli keys']
+                            ]
+                        },
+                        {
+                            title: 'Bank',
+                            collapsable: false,
+                            children: [
+                                ['bank/', 'iriscli bank']
+                            ]
+                        },
+                        {
+                            title: 'Stake',
+                            collapsable: false,
+                            children: [
+                                ['stake/', 'iriscli stake']
+                            ]
+                        },
+                        {
+                            title: 'Gov',
+                            collapsable: false,
+                            children: [
+                                ['gov/', 'iriscli gov']
+                            ]
+                        },
+                        {
+                            title: 'Upgrade',
+                            collapsable: false,
+                            children: [
+                                ['upgrade/', 'iriscli upgrade']
+                            ]
+                        },
+                        {
+                            title: 'Service',
+                            collapsable: false,
+                            children: [
+                                ['service/', 'iriscli service']
+                            ]
+                        }],
                     '/resources/': [
                         ['validator-faq.md', 'Validator FAQ'],
                         ['delegator-faq.md', 'Delegator FAQ'],
@@ -164,7 +155,6 @@ module.exports = {
                         children: [
                             ["basic-concepts/coin-type.md", 'Coin Type'],
                             ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/inflation.md", 'Infation'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
                             ["basic-concepts/gov-params.md", 'Gov Params']
@@ -176,7 +166,6 @@ module.exports = {
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
                             ['service.md', 'Service'],
-                            ['record.md', 'Record'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
@@ -190,62 +179,55 @@ module.exports = {
                             ['status/', 'iriscli status']
                         ]
                     },
-                    {
-                        title: 'Tendermint',
-                        collapsable: false,
-                        children: [
-                            ['tendermint/', 'iriscli tendermint']
-                        ]
-                    },
-                    {
-                        title: 'Keys',
-                        collapsable: false,
-                        children: [
-                            ['keys/', 'iriscli keys']
-                        ]
-                    },
-                    {
-                        title: 'Bank',
-                        collapsable: false,
-                        children: [
-                            ['bank/', 'iriscli bank']
-                        ]
-                    },
-                    {
-                        title: 'Stake',
-                        collapsable: false,
-                        children: [
-                            ['stake/', 'iriscli stake']
-                        ]
-                    },
-                    {
-                        title: 'Gov',
-                        collapsable: false,
-                        children: [
-                            ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
-                        ]
-                    },
-                    {
-                        title: 'Upgrade',
-                        collapsable: false,
-                        children: [
-                            ['upgrade/', 'iriscli upgrade']
-                        ]
-                    },
-                    {
-                        title: 'Service',
-                        collapsable: false,
-                        children: [
-                            ['service/', 'iriscli service']
-                        ]
-                    }],
+                        {
+                            title: 'Tendermint',
+                            collapsable: false,
+                            children: [
+                                ['tendermint/', 'iriscli tendermint']
+                            ]
+                        },
+                        {
+                            title: 'Keys',
+                            collapsable: false,
+                            children: [
+                                ['keys/', 'iriscli keys']
+                            ]
+                        },
+                        {
+                            title: 'Bank',
+                            collapsable: false,
+                            children: [
+                                ['bank/', 'iriscli bank']
+                            ]
+                        },
+                        {
+                            title: 'Stake',
+                            collapsable: false,
+                            children: [
+                                ['stake/', 'iriscli stake']
+                            ]
+                        },
+                        {
+                            title: 'Gov',
+                            collapsable: false,
+                            children: [
+                                ['gov/', 'iriscli gov']
+                            ]
+                        },
+                        {
+                            title: 'Upgrade',
+                            collapsable: false,
+                            children: [
+                                ['upgrade/', 'iriscli upgrade']
+                            ]
+                        },
+                        {
+                            title: 'Service',
+                            collapsable: false,
+                            children: [
+                                ['service/', 'iriscli service']
+                            ]
+                        }],
                     '/zh/resources/': [
                         ['validator-faq.md', 'Validator FAQ'],
                         ['delegator-faq.md', 'Delegator FAQ'],
