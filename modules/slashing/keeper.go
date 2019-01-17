@@ -175,7 +175,7 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 }
 
 // Punish proposer censorship by slashing malefactor's stake
-func (k Keeper) handleProposalCensorship(ctx sdk.Context, addr crypto.Address, infractionHeight int64) (tags sdk.Tags) {
+func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, infractionHeight int64) (tags sdk.Tags) {
 	logger := ctx.Logger().With("module", "x/slashing")
 	time := ctx.BlockHeader().Time
 	consAddr := sdk.ConsAddress(addr)
@@ -194,14 +194,14 @@ func (k Keeper) handleProposalCensorship(ctx sdk.Context, addr crypto.Address, i
 	}
 	logger.Info(fmt.Sprintf("proposer censorship from %s at height %d", pubkey.Address(), infractionHeight))
 
-
+	distributionHeight := infractionHeight - stake.ValidatorUpdateDelay
 	// Slash validator
 	// `power` is the int64 power of the validator as provided to/by
 	// Tendermint. This value is validator.Tokens as sent to Tendermint via
 	// ABCI, and now received as evidence.
 	// The revisedFraction (which is the new fraction to be slashed) is passed
 	// in separately to separately slash unbonding and rebonding delegations.
-	tags = k.validatorSet.Slash(ctx, consAddr,infractionHeight, validator.GetPower().RoundInt64(), sdk.NewDecWithPrec(5,2))
+	tags = k.validatorSet.Slash(ctx, consAddr, distributionHeight, validator.GetPower().RoundInt64(),k.SlashFractionCensorship(ctx))
 
 	// Jail validator if not already jailed
 	if !validator.GetJailed() {
@@ -213,7 +213,7 @@ func (k Keeper) handleProposalCensorship(ctx sdk.Context, addr crypto.Address, i
 	if !found {
 		panic(fmt.Sprintf("Expected signing info for validator %s but not found", consAddr))
 	}
-	signInfo.JailedUntil = time.Add(k.DoubleSignUnbondDuration(ctx))
+	signInfo.JailedUntil = time.Add(k.CensorshipUnbondDuration(ctx))
 	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
 	return
 }

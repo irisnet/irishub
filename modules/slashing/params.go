@@ -26,6 +26,8 @@ var (
 	KeyDowntimeJailDuration    = []byte("DowntimeJailDuration")
 	KeySlashFractionDoubleSign = []byte("SlashFractionDoubleSign")
 	KeySlashFractionDowntime   = []byte("SlashFractionDowntime")
+	keySlashFractionCensorship = []byte("SlashFractionCensorship")
+	keyCensorshipJailDuration  = []byte("CensorshipJailDuration")
 )
 
 // ParamTypeTable for slashing module
@@ -42,6 +44,8 @@ type Params struct {
 	DowntimeJailDuration    time.Duration `json:"downtime-unbond-duration"`
 	SlashFractionDoubleSign sdk.Dec       `json:"slash-fraction-double-sign"`
 	SlashFractionDowntime   sdk.Dec       `json:"slash-fraction-downtime"`
+	SlashFractionCensorship sdk.Dec       `json:"slash-fraction-censorship"`
+	CensorshipJailDuration  time.Duration `json:"censorship-jail-duration"`
 }
 
 // Implements params.ParamStruct
@@ -54,6 +58,8 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeyDowntimeJailDuration, &p.DowntimeJailDuration},
 		{KeySlashFractionDoubleSign, &p.SlashFractionDoubleSign},
 		{KeySlashFractionDowntime, &p.SlashFractionDowntime},
+		{keySlashFractionCensorship, &p.SlashFractionCensorship},
+		{keyCensorshipJailDuration, &p.CensorshipJailDuration},
 	}
 }
 
@@ -122,6 +128,24 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, err
 		}
 		return slashFractionDowntime, nil
+	case string(keySlashFractionCensorship):
+		slashFractionCensorship, err := sdk.NewDecFromStr(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateSlashFractionCensorship(slashFractionCensorship); err != nil {
+			return nil, err
+		}
+		return slashFractionCensorship, nil
+	case string(keyCensorshipJailDuration):
+		censorshipJailDuration, err := time.ParseDuration(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateCensorshipJailDuration(censorshipJailDuration); err != nil {
+			return nil, err
+		}
+		return censorshipJailDuration, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -154,6 +178,12 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	case string(KeySlashFractionDowntime):
 		err := cdc.UnmarshalJSON(bytes, &p.SlashFractionDowntime)
 		return p.SlashFractionDowntime.String(), err
+	case string(keySlashFractionCensorship):
+		err := cdc.UnmarshalJSON(bytes, &p.SlashFractionCensorship)
+		return p.SlashFractionCensorship.String(), err
+	case string(keyCensorshipJailDuration):
+		err := cdc.UnmarshalJSON(bytes, &p.CensorshipJailDuration)
+		return p.CensorshipJailDuration.String(), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -169,6 +199,8 @@ func DefaultParams() Params {
 		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
 		SlashFractionDoubleSign: sdk.NewDecWithPrec(1, 2),
 		SlashFractionDowntime: sdk.NewDecWithPrec(5, 3),
+		SlashFractionCensorship: sdk.NewDecWithPrec(2, 2),
+		CensorshipJailDuration: 7 * sdk.Day,
 	}
 }
 
@@ -181,6 +213,8 @@ func DefaultParamsForTestnet() Params {
 		MinSignedPerWindow: sdk.NewDecWithPrec(5, 1),
 		SlashFractionDoubleSign: sdk.NewDec(1).Quo(sdk.NewDec(20)),
 		SlashFractionDowntime: sdk.NewDec(1).Quo(sdk.NewDec(100)),
+		SlashFractionCensorship: sdk.NewDecWithPrec(2, 2),
+		CensorshipJailDuration: 60 * 7 * time.Second,
 	}
 }
 
@@ -210,7 +244,12 @@ func validateParams(p Params) sdk.Error {
 	if err := validateSlashFractionDowntime(p.SlashFractionDowntime); err != nil {
 		return err
 	}
-
+	if err := validateSlashFractionCensorship(p.SlashFractionCensorship); err != nil {
+		return err
+	}
+	if err := validateCensorshipJailDuration(p.CensorshipJailDuration); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -228,6 +267,13 @@ func validateMaxEvidenceAge(p time.Duration) sdk.Error {
 func validateJailDuration(p time.Duration) sdk.Error {
 	if p <= 0 || p >= 4 * sdk.Week {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DoubleSignJailDuration and DowntimeJailDuration [%s] should be between (0, 4week) ", p.String()))
+	}
+	return nil
+}
+
+func validateCensorshipJailDuration(p time.Duration) sdk.Error {
+	if p <= 0 || p >= 4 * sdk.Week {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash CensorshipJailDuration should be between (0, 4week) ", p.String()))
 	}
 	return nil
 }
@@ -260,6 +306,12 @@ func validateSlashFractionDowntime(p sdk.Dec) sdk.Error {
 	return nil
 }
 
+func validateSlashFractionCensorship(p sdk.Dec) sdk.Error {
+	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionCensorship [%s] should be between [0.005, 0.1] ", p.String()))
+	}
+	return nil
+}
 //______________________________________________________________________
 
 // get inflation params from the global param store
@@ -315,5 +367,17 @@ func (k Keeper) SlashFractionDoubleSign(ctx sdk.Context) (res sdk.Dec) {
 // SlashFractionDowntime - currently default 1%
 func (k Keeper) SlashFractionDowntime(ctx sdk.Context) (res sdk.Dec) {
 	k.paramspace.Get(ctx, KeySlashFractionDowntime, &res)
+	return
+}
+
+// SlashFractionDowntime - currently default 1%
+func (k Keeper) SlashFractionCensorship(ctx sdk.Context) (res sdk.Dec) {
+	k.paramspace.Get(ctx, keySlashFractionCensorship, &res)
+	return
+}
+
+// Downtime unbond duration
+func (k Keeper) CensorshipUnbondDuration(ctx sdk.Context) (res time.Duration) {
+	k.paramspace.Get(ctx, keyCensorshipJailDuration, &res)
 	return
 }

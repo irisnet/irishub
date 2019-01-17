@@ -41,7 +41,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 	return
 }
 
-// slashing begin block functionality
+// slashing end block functionality
 func EndBlocker(ctx sdk.Context,req abci.RequestEndBlock, sk Keeper) (tags sdk.Tags) {
 
 	// Tag the height
@@ -50,7 +50,7 @@ func EndBlocker(ctx sdk.Context,req abci.RequestEndBlock, sk Keeper) (tags sdk.T
 	tags = sdk.NewTags("height", heightBytes)
 
 	if int64(ctx.CheckValidNum()) < ctx.BlockHeader().NumTxs {
-		proposalCensorshipTag := sk.handleProposalCensorship(ctx,
+		proposalCensorshipTag := sk.handleProposerCensorship(ctx,
 			ctx.BlockHeader().ProposerAddress,
 			ctx.BlockHeight())
 		tags = tags.AppendTags(proposalCensorshipTag)
