@@ -54,8 +54,6 @@ type BaseApp struct {
 
 	addrPeerFilter   sdk.PeerFilter // filter peers by address and port
 	pubkeyPeerFilter sdk.PeerFilter // filter peers by public key
-	runMsg           RunMsg
-
 	//--------------------
 	// Volatile
 	// checkState is set on initialization and reset on Commit.
@@ -85,10 +83,10 @@ var _ abci.Application = (*BaseApp)(nil)
 // Accepts variable number of option functions, which act on the BaseApp to set configuration choices
 func NewBaseApp(name string, logger log.Logger, db dbm.DB, options ...func(*BaseApp)) *BaseApp {
 	app := &BaseApp{
-		Logger:    logger,
-		name:      name,
-		db:        db,
-		cms:       store.NewCommitMultiStore(db),
+		Logger: logger,
+		name:   name,
+		db:     db,
+		cms:    store.NewCommitMultiStore(db),
 	}
 
 	for _, option := range options {
@@ -132,15 +130,8 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 	app.cms.MountStoreWithDB(key, typ, nil)
 }
 
-////////////////////  iris/cosmos-sdk begin  ///////////////////////////
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
-}
-
-////////////////////  iris/cosmos-sdk end  ///////////////////////////
-
-func (app *BaseApp) SetRunMsg(runMsg RunMsg) {
-	app.runMsg = runMsg
 }
 
 // panics if called more than once on a running baseapp
@@ -599,10 +590,6 @@ func (app *BaseApp) getContextForTx(mode RunTxMode, txBytes []byte) (ctx sdk.Con
 
 // Iterates through msgs and executes them
 func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (result sdk.Result) {
-	if app.runMsg != nil {
-		return app.runMsg(ctx, msgs, mode)
-	}
-
 	// accumulate results
 	logs := make([]string, 0, len(msgs))
 	var data []byte   // NOTE: we just append them all (?!)
@@ -620,6 +607,8 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		var msgResult sdk.Result
 		// Skip actual execution for CheckTx
 		if mode != RunTxModeCheck {
+			ctx = ctx.WithLogger(ctx.Logger().With("module", fmt.Sprintf("iris/%s", msg.Route())).
+				With("handler", msg.Type()))
 			msgResult = handler(ctx, msg)
 		}
 		msgResult.Tags = append(sdk.Tags{sdk.MakeTag(sdk.TagAction, []byte(msg.Type()))}, msgResult.Tags...)
@@ -762,7 +751,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}()
 
-
 	feePreprocessHandler := app.Engine.GetCurrentProtocol().GetFeePreprocessHandler()
 	// run the fee handler
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
@@ -801,7 +789,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 			return result
 		}
 
-		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte * sdk.Gas(len(txBytes)), "blockstore")
+		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte*sdk.Gas(len(txBytes)), "blockstore")
 
 		msCache.Write()
 		gasWanted = result.GasWanted
