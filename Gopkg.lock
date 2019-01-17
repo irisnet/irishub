@@ -562,7 +562,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "43c4be6fcf4f1a7b9e0f989f47fb9c8ce614020f"
+  revision = "312c9119ee8f21b48117b505d8a4e3cbefe7030b"
   source = "https://github.com/irisnet/tendermint.git"
 
 [[projects]]
