@@ -1,10 +1,16 @@
 # Changelog
 
+## 0.10.1
+
+*January 17th, 2019*
+
+- [iriscli] Fix issue about query validator information
+- [iriscli] Fix cli query proposals error
+
 
 ## 0.10.0
 
 *January 16th, 2019*
-
 
 - [iris] Add flag --output-file to save export result and ensure result is consistent
 - [iris] Improve invariant checking coverage and fix distribution bugs
