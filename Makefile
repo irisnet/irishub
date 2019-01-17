@@ -14,7 +14,7 @@ NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "testnet"; else echo 
 BUILD_FLAGS = -ldflags "\
 -X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
 -X github.com/irisnet/irishub/types.InvariantLevel=${InvariantLevel} \
--X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
+-X github.com/irisnet/irishub/types.NetworkType=${NetworkType}"
 
 ########################################
 ### Tools & dependencies
