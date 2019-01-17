@@ -3,6 +3,7 @@ package protocol
 import (
 	sdk "github.com/irisnet/irishub/types"
 	"fmt"
+	"github.com/irisnet/irishub/modules/params"
 )
 
 type ProtocolEngine struct {
@@ -37,6 +38,7 @@ func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) (bool, uint64
 func (pe *ProtocolEngine) Activate(version uint64) bool {
 	p, flag := pe.protocols[version]
 	if flag == true {
+		params.ParamSetMapping = make(map[string]params.ParamSet)
 		p.Load()
 		p.Init()
 		pe.current = version

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.2
+
+*January 17th, 2019*
+
+- [iris] The proposer must deposit 30% of the mindeposit when submitting the proposal
+
+
 ## 0.10.1
 
 *January 17th, 2019*
