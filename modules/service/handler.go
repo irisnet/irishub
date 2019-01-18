@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/irisnet/irishub/modules/service/tags"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -48,6 +46,7 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Info("Create service definition", "name", msg.Name, "author", msg.Author.String())
 	return sdk.Result{}
 }
 
@@ -58,6 +57,8 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Info("Add service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
 	return sdk.Result{}
 }
 
@@ -68,6 +69,8 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Info("Update service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
 	return sdk.Result{}
 }
 
@@ -76,6 +79,8 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Info("Disable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+		"provider", msg.Provider.String())
 	return sdk.Result{}
 }
 
@@ -84,6 +89,8 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Info("Enable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+		"provider", msg.Provider.String())
 	return sdk.Result{}
 }
 
@@ -92,6 +99,8 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Info("Refund deposit", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+		"provider", msg.Provider.String())
 	return sdk.Result{}
 }
 
@@ -133,6 +142,11 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
+
+	ctx.Logger().Debug("Service request", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+		"provider", msg.Provider.String(), "consumer", request.Consumer.String(), "method_id", msg.MethodID,
+		"service_fee", msg.ServiceFee, "request_id", request.RequestID())
+
 	resTags := sdk.NewTags(
 		tags.RequestID, []byte(request.RequestID()),
 		tags.Provider, []byte(request.Provider.String()),
@@ -173,6 +187,8 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	if err != nil {
 		return err.Result()
 	}
+	ctx.Logger().Debug("Service response", "def_name", "request_id", request.RequestID(),
+		"consumer", response.Consumer.String())
 
 	resTags := sdk.NewTags(
 		tags.RequestID, []byte(request.RequestID()),
@@ -214,11 +230,11 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 
 // Called every block, update request status
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
-
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
+	logger := ctx.Logger()
 	// Reset the intra-transaction counter.
 	keeper.SetIntraTxCounter(ctx, 0)
 
-	logger := ctx.Logger().With("module", "x/service")
 	resTags = sdk.NewTags()
 	params := keeper.GetParamSet(ctx)
 	slashFraction := params.SlashFraction
@@ -255,8 +271,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		resTags = resTags.AppendTag(tags.RequestID, []byte(req.RequestID()))
 		resTags = resTags.AppendTag(tags.Provider, []byte(req.Provider))
 		resTags = resTags.AppendTag(tags.SlashCoins, []byte(slashCoins.String()))
-		logger.Info(fmt.Sprintf("request %s from %s timeout",
-			req.RequestID(), req.Consumer))
+		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
 	}
 
 	return resTags

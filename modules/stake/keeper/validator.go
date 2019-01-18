@@ -196,6 +196,7 @@ func (k Keeper) RemoveValidator(ctx sdk.Context, address sdk.ValAddress) {
 	store.Delete(GetValidatorKey(address))
 	store.Delete(GetValidatorByConsAddrKey(sdk.ConsAddress(validator.ConsPubKey.Address())))
 	store.Delete(GetValidatorsByPowerIndexKey(validator, pool))
+	ctx.Logger().Info("Remove validator", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 
 	// call hook if present
 	if k.hooks != nil {

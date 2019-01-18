@@ -132,6 +132,9 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator, k k
 		return err.Result()
 	}
 
+	ctx.Logger().Info("Create validator", "consensus_address", validator.ConsAddress().String(),
+		"operator_address", validator.OperatorAddr.String(), "commission", validator.Commission.String())
+
 	tags := sdk.NewTags(
 		tags.DstValidator, []byte(msg.ValidatorAddr.String()),
 		tags.Moniker, []byte(msg.Description.Moniker),
@@ -168,6 +171,8 @@ func handleMsgEditValidator(ctx sdk.Context, msg types.MsgEditValidator, k keepe
 	}
 
 	k.SetValidator(ctx, validator)
+	ctx.Logger().Debug("Edit validator", "validator_addr", msg.ValidatorAddr.String(),
+		"commission_rate", msg.CommissionRate.String())
 
 	tags := sdk.NewTags(
 		tags.DstValidator, []byte(msg.ValidatorAddr.String()),

@@ -425,6 +425,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if err != nil {
 		return err
 	}
+	ctx.Logger().Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetReturnedFeeKey(address))
 	return nil
@@ -491,6 +492,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if err != nil {
 		return err
 	}
+	ctx.Logger().Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetIncomingFeeKey(address))
 	return nil
@@ -512,6 +514,7 @@ func (k Keeper) Slash(ctx sdk.Context, binding SvcBinding, slashCoins sdk.Coins)
 		binding.Available = false
 		binding.DisableTime = ctx.BlockHeader().Time
 	}
+	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	store.Set(GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
 	return nil

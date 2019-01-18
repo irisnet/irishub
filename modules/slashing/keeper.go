@@ -179,11 +179,10 @@ func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, i
 	logger := ctx.Logger().With("module", "x/slashing")
 	time := ctx.BlockHeader().Time
 	consAddr := sdk.ConsAddress(addr)
-	pubkey, err := k.getPubkey(ctx, addr)
+	_, err := k.getPubkey(ctx, addr)
 	if err != nil {
 		panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))
 	}
-
 
 	// Get validator.
 	validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
@@ -193,10 +192,9 @@ func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, i
 		// Tendermint might break this assumption at some point.
 		return
 	}
-	ctx.Logger().Info("the malefactor proposer proposed a invalid block",
-		"proposer address", validator.GetOperator().String(),
-		"block height", ctx.BlockHeight())
-	logger.Info(fmt.Sprintf("proposer censorship from %s at height %d", pubkey.Address(), infractionHeight))
+	logger.Info("the malefactor proposer proposed a invalid block",
+		"proposer_address", validator.GetOperator().String(),
+		"block_height", ctx.BlockHeight(), "consensus_address", consAddr.String())
 
 	distributionHeight := infractionHeight - stake.ValidatorUpdateDelay
 	// Slash validator
