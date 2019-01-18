@@ -17,12 +17,12 @@ var invalidStrs = []string{
 	"hello, world!",
 	"0xAA",
 	"AAA",
-	types.Bech32PrefixAccAddr + "AB0C",
-	types.Bech32PrefixAccPub + "1234",
-	types.Bech32PrefixValAddr + "5678",
-	types.Bech32PrefixValPub + "BBAB",
-	types.Bech32PrefixConsAddr + "FF04",
-	types.Bech32PrefixConsPub + "6789",
+	"faa" + "AB0C",
+	"fap" + "1234",
+	"fva" + "5678",
+	"fvp" + "BBAB",
+	"fca" + "FF04",
+	"fcp" + "6789",
 }
 
 func testMarshal(t *testing.T, original interface{}, res interface{}, marshal func() ([]byte, error), unmarshal func([]byte) error) {

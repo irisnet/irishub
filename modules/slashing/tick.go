@@ -7,6 +7,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 // slashing begin block functionality
@@ -34,7 +35,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 			doubleSignSlashTag := sk.handleDoubleSign(ctx, evidence.Validator.Address, evidence.Height, evidence.Time, evidence.Validator.Power)
 			tags = tags.AppendTags(doubleSignSlashTag)
 		default:
-			ctx.Logger().With("module", "x/slashing").Error(fmt.Sprintf("ignored unknown evidence type: %s", evidence.Type))
+			ctx.Logger().With("module", "iris/slashing").Error(fmt.Sprintf("ignored unknown evidence type: %s", evidence.Type))
 		}
 	}
 
@@ -50,6 +51,11 @@ func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, sk Keeper) (tags sdk.
 	tags = sdk.NewTags("height", heightBytes)
 
 	if int64(ctx.CheckValidNum()) < ctx.BlockHeader().NumTxs {
+		ctx.Logger().With("module", "iris/slashing").
+			Info("the malefactor proposer proposed a invalid block",
+				"proposer address", crypto.Address(ctx.BlockHeader().ProposerAddress).String(),
+				"block height", ctx.BlockHeight())
+
 		proposalCensorshipTag := sk.handleProposerCensorship(ctx,
 			ctx.BlockHeader().ProposerAddress,
 			ctx.BlockHeight())
