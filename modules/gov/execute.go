@@ -27,7 +27,7 @@ func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (e
 		_, found := gk.guardianKeeper.GetTrustee(ctx, p.TaxUsage.DestAddress)
 		if !found {
 			ctx.Logger().Error("Execute TaxUsageProposal Failure", "info",
-				fmt.Sprintf("the destination address [%s] is not a trustee now", p.TaxUsage.DestAddress))
+				"the destination address is not a trustee now", "destinationAddress",p.TaxUsage.DestAddress)
 			return
 		}
 	}
@@ -36,7 +36,7 @@ func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (e
 }
 
 func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal) (err error) {
-	ctx.Logger().Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
+	ctx.Logger().Info("Execute ParameterProposal begin")
 	for _, param := range pp.Params {
 		paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
 		value, _ := paramSet.Validate(param.Key, param.Value)
@@ -83,9 +83,9 @@ func SystemHaltProposalExecute(ctx sdk.Context, gk Keeper) error {
 
 	if gk.GetSystemHaltHeight(ctx) == -1 {
 		gk.SetSystemHaltHeight(ctx, ctx.BlockHeight()+gk.GetSystemHaltPeriod(ctx))
-		logger.Info("Execute SystemHaltProposal begin", "info", fmt.Sprintf("SystemHalt height:%d", gk.GetSystemHaltHeight(ctx)))
+		logger.Info("Execute SystemHaltProposal begin", "SystemHaltHeight", gk.GetSystemHaltHeight(ctx))
 	} else {
-		logger.Info("SystemHalt Period is in process.", "info", fmt.Sprintf("SystemHalt height:%d", gk.GetSystemHaltHeight(ctx)))
+		logger.Info("SystemHalt Period is in process.", "SystemHaltHeight:%d", gk.GetSystemHaltHeight(ctx))
 
 	}
 	return nil
