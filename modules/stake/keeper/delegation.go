@@ -80,6 +80,8 @@ func (k Keeper) SetDelegation(ctx sdk.Context, delegation types.Delegation) {
 
 // remove a delegation from store
 func (k Keeper) RemoveDelegation(ctx sdk.Context, delegation types.Delegation) {
+	ctx.Logger().Debug("remove delegation", "validator_address", delegation.ValidatorAddr.String(),
+		"delegator_address", delegation.DelegatorAddr.String(), "shares", delegation.Shares.String(), "create_height", delegation.Height)
 	k.OnDelegationRemoved(ctx, delegation.DelegatorAddr, delegation.ValidatorAddr)
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetDelegationKey(delegation.DelegatorAddr, delegation.ValidatorAddr))
@@ -416,6 +418,8 @@ func (k Keeper) Delegate(ctx sdk.Context, delAddr sdk.AccAddress, bondAmt sdk.Co
 	delegation.Shares = delegation.Shares.Add(newShares)
 	delegation.Height = ctx.BlockHeight()
 	k.SetDelegation(ctx, delegation)
+	ctx.Logger().Info("Delegate to validator", "destination_validator", validator.GetOperator().String(),
+		"delegator_address", delAddr.String(), "amount", bondAmt.String())
 
 	return newShares, nil
 }
@@ -473,6 +477,8 @@ func (k Keeper) unbond(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValA
 		// if not unbonded, we must instead remove validator in EndBlocker once it finishes its unbonding period
 		k.RemoveValidator(ctx, validator.OperatorAddr)
 	}
+	ctx.Logger().Info("Unbond from validator", "validator_address", valAddr.String(),
+		"delegator_address", delAddr.String(), "shares", shares.String())
 
 	return amount, nil
 }
@@ -563,6 +569,8 @@ func (k Keeper) CompleteUnbonding(ctx sdk.Context, delAddr sdk.AccAddress, valAd
 	if err != nil {
 		return err
 	}
+	ctx.Logger().Info("Complete unbonding", "banlance", ubd.Balance.String(),
+		"validator_address", valAddr.String(), "delegator_address", delAddr.String())
 	k.RemoveUnbondingDelegation(ctx, ubd)
 	return nil
 }
@@ -607,6 +615,10 @@ func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	// create the unbonding delegation
 	minTime, height, completeNow := k.getBeginInfo(ctx, valSrcAddr)
 
+	ctx.Logger().Info("Begin redelegation", "shares", sharesAmount.String(),
+		"src_address", valSrcAddr.String(), "dst_address", valDstAddr.String(),
+		"shares_src", sharesAmount.String(), "shares_dst", sharesCreated, "balance", returnCoin)
+
 	if completeNow { // no need to create the redelegation object
 		return types.Redelegation{MinTime: minTime}, nil
 	}
@@ -641,7 +653,8 @@ func (k Keeper) CompleteRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	if red.MinTime.After(ctxTime) {
 		return types.ErrNotMature(k.Codespace(), "redelegation", "unit-time", red.MinTime, ctxTime)
 	}
-
+	ctx.Logger().Info("Complete redelegate", "banlance", red.Balance.String(),
+		"validator_address", valSrcAddr.String(), "delegator_address", delAddr.String())
 	k.RemoveRedelegation(ctx, red)
 	return nil
 }

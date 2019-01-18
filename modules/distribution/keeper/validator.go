@@ -38,6 +38,7 @@ func (k Keeper) SetValidatorDistInfo(ctx sdk.Context, vdi types.ValidatorDistInf
 func (k Keeper) RemoveValidatorDistInfo(ctx sdk.Context, valAddr sdk.ValAddress) {
 	// defensive check
 	vdi := k.GetValidatorDistInfo(ctx, valAddr)
+	ctx.Logger().Debug("Remove validator distribution info", "validator", valAddr.String(), "validator_distri_info", vdi.String())
 	if vdi.DelAccum.Accum.IsPositive() {
 		panic("Should not delete validator with unwithdrawn delegator accum")
 	}
@@ -102,7 +103,7 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 	// withdraw validator commission rewards
 	valInfo := k.GetValidatorDistInfo(ctx, operatorAddr)
 	wc := k.GetWithdrawContext(ctx, operatorAddr)
-	valInfo, feePool := valInfo.TakeFeePoolRewards(wc)
+	valInfo, feePool := valInfo.TakeFeePoolRewards(ctx.Logger(), wc)
 
 	k.SetFeePool(ctx, feePool)
 	k.SetValidatorDistInfo(ctx, valInfo)
@@ -113,14 +114,16 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 // withdrawal all the validator rewards including the commission
 func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.ValAddress) (types.DecCoins, sdk.Tags, sdk.Error) {
 
+	logger := ctx.Logger()
 	if !k.HasValidatorDistInfo(ctx, operatorAddr) {
+		logger.Debug("Validator has no distribution information")
 		return nil, nil, types.ErrNoValidatorDistInfo(k.codespace)
 	}
 
 	// withdraw self-delegation
 	accAddr := sdk.AccAddress(operatorAddr.Bytes())
 	withdraw, resultTags := k.withdrawDelegationRewardsAll(ctx, accAddr)
-
+	logger.Debug("Withdraw all delegation reward for validator operator", "reward", withdraw.ToString())
 	// withdraw validator commission rewards
 	feePool, commission := k.withdrawValidatorCommission(ctx, operatorAddr)
 	withdraw = withdraw.Plus(commission)
@@ -134,7 +137,7 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 func (k Keeper) withdrawValidatorCommission(ctx sdk.Context, operatorAddr sdk.ValAddress) (types.FeePool, types.DecCoins) {
 	valInfo := k.GetValidatorDistInfo(ctx, operatorAddr)
 	wc := k.GetWithdrawContext(ctx, operatorAddr)
-	valInfo, feePool, commission := valInfo.WithdrawCommission(wc)
+	valInfo, feePool, commission := valInfo.WithdrawCommission(ctx.Logger(), wc)
 	k.SetValidatorDistInfo(ctx, valInfo)
 
 	return feePool, commission

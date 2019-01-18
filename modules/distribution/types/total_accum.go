@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // total accumulation tracker
@@ -19,12 +20,14 @@ func NewTotalAccum(height int64) TotalAccum {
 
 // update total accumulation factor for the new height
 // CONTRACT: height should be greater than the old height
-func (ta TotalAccum) UpdateForNewHeight(height int64, accumCreatedPerBlock sdk.Dec) TotalAccum {
+func (ta TotalAccum) UpdateForNewHeight(logger log.Logger, height int64, accumCreatedPerBlock sdk.Dec) TotalAccum {
 	blocks := height - ta.UpdateHeight
 	if blocks < 0 {
 		panic("reverse updated for new height")
 	}
-	ta.Accum = ta.Accum.Add(accumCreatedPerBlock.MulInt(sdk.NewInt(blocks)))
+	accumDelta := accumCreatedPerBlock.MulInt(sdk.NewInt(blocks))
+	ta.Accum = ta.Accum.Add(accumDelta)
+	logger.Debug("Update accumulation", "last_update_height", ta.UpdateHeight, "accum_delta", accumDelta.String())
 	ta.UpdateHeight = height
 	return ta
 }
