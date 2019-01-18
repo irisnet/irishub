@@ -14,8 +14,8 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 	upgradeConfig, ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
 	if ok {
-		validator,found := uk.sk.GetValidatorByConsAddr(ctx,(sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress));
-		if!found {
+		validator, found := uk.sk.GetValidatorByConsAddr(ctx, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress));
+		if !found {
 			panic(fmt.Sprintf("Proposer is not a bonded validator whose consaddress is %s", (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String()))
 		}
 
@@ -23,12 +23,12 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 			uk.SetSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
 
 			ctx.Logger().Info("Validator has downloaded the latest software ",
-					"validator",validator.GetOperator().String(), "version",upgradeConfig.Protocol.Version)
+				"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
 		} else {
 			ok := uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
 			if ok {
 				ctx.Logger().Info("Validator has restarted the old software ",
-					"validator",validator.GetOperator().String(), "version",upgradeConfig.Protocol.Version)
+					"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
 			}
 		}
 
