@@ -58,10 +58,8 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		switch validator.Status {
 		case sdk.Unbonded:
 			validator = k.unbondedToBonded(ctx, validator)
-			logger.Info("Switch validator status from unbonded to bonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 		case sdk.Unbonding:
 			validator = k.unbondingToBonded(ctx, validator)
-			logger.Info("Switch validator status from unbonding to bonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 		case sdk.Bonded:
 			// no state change
 		default:
@@ -116,6 +114,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 		// update the validator set
 		updates = append(updates, validator.ABCIValidatorUpdateZero())
+		logger.Info("Remove no-longer-bonded validator", "consensus_address", validator.GetConsAddr().String(), "operator_address", validator.GetOperator().String(), "tokens", validator.Tokens)
 	}
 
 	// set total power on lookup index if there are any updates
