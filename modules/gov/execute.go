@@ -20,14 +20,13 @@ func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 }
 
 func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (err error) {
-	logger := ctx.Logger().With("module", "x/gov")
 	burn := false
 	if p.TaxUsage.Usage == UsageTypeBurn {
 		burn = true
 	} else {
 		_, found := gk.guardianKeeper.GetTrustee(ctx, p.TaxUsage.DestAddress)
 		if !found {
-			logger.Error("Execute TaxUsageProposal Failure", "info",
+			ctx.Logger().Error("Execute TaxUsageProposal Failure", "info",
 				fmt.Sprintf("the destination address [%s] is not a trustee now", p.TaxUsage.DestAddress))
 			return
 		}
@@ -37,45 +36,44 @@ func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (e
 }
 
 func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal) (err error) {
-	logger := ctx.Logger().With("module", "x/gov")
-	logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
+	ctx.Logger().Info("Execute ParameterProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
 	for _, param := range pp.Params {
 		paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
 		value, _ := paramSet.Validate(param.Key, param.Value)
 		subspace, found := gk.paramsKeeper.GetSubspace(param.Subspace)
 		if found {
 			subspace.Set(ctx, []byte(param.Key), value)
+			ctx.Logger().Info("Execute ParameterProposal Successed", "key", param.Key, "value", param.Value)
+		} else {
+			ctx.Logger().Info("Execute ParameterProposal Failed", "key", param.Key, "value", param.Value)
 		}
 
-		logger.Info("Execute ParameterProposal begin", "info", fmt.Sprintf("%s = %s", param.Key, param.Value))
 	}
 
 	return
 }
 
 func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgradeProposal) error {
-	logger := ctx.Logger().With("module", "x/gov")
 
 	if _, ok := gk.protocolKeeper.GetUpgradeConfig(ctx); ok {
-		logger.Info("Execute SoftwareProposal Failure", "info",
-			fmt.Sprintf("Software Upgrade Switch Period is in process. current height:%d", ctx.BlockHeight()))
+		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
+			fmt.Sprintf("Software Upgrade Switch Period is in process."))
 		return nil
 	}
 	if !gk.protocolKeeper.IsValidVersion(ctx, sp.ProtocolDefinition.Version) {
-		logger.Info("Execute SoftwareProposal Failure", "info",
+		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("version [%v] in SoftwareUpgradeProposal isn't valid ", sp.ProposalID))
 		return nil
 	}
 	if uint64(ctx.BlockHeight())+1 >= sp.ProtocolDefinition.Height {
-		logger.Info("Execute SoftwareProposal Failure", "info",
+		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("switch height must be more than blockHeight + 1"))
 		return nil
 	}
 
 	gk.protocolKeeper.SetUpgradeConfig(ctx, sdk.NewUpgradeConfig(sp.ProposalID, sp.ProtocolDefinition))
 
-	logger.Info("Execute SoftwareProposal Success", "info",
-		fmt.Sprintf("current height:%d", ctx.BlockHeight()))
+	ctx.Logger().Info("Execute SoftwareProposal Success")
 
 	return nil
 }
