@@ -1,13 +1,45 @@
 package keeper
 
 import (
+	"github.com/go-kit/kit/metrics"
+	"github.com/go-kit/kit/metrics/discard"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 
+	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake/types"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	cfg "github.com/tendermint/tendermint/config"
 )
+
+const MetricsSubsystem = "stake"
+
+type Metrics struct {
+	ValidatorUpdate metrics.Gauge
+}
+
+// PrometheusMetrics returns Metrics build using Prometheus client library.
+func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
+	if !config.Prometheus {
+		return NopMetrics()
+	}
+	return &Metrics{
+		ValidatorUpdate: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Namespace: config.Namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "validator_update",
+			Help:      "validator change",
+		}, []string{}),
+	}
+}
+
+func NopMetrics() *Metrics {
+	return &Metrics{
+		ValidatorUpdate: discard.NewGauge(),
+	}
+}
 
 // keeper of the stake store
 type Keeper struct {
@@ -20,9 +52,11 @@ type Keeper struct {
 
 	// codespace
 	codespace sdk.CodespaceType
+	// metrics
+	metrics   *Metrics
 }
 
-func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramstore params.Subspace, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramstore params.Subspace, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
 	keeper := Keeper{
 		storeKey:   key,
 		storeTKey:  tkey,
@@ -31,6 +65,7 @@ func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramst
 		paramstore: paramstore.WithTypeTable(ParamTypeTable()),
 		hooks:      nil,
 		codespace:  codespace,
+		metrics:    metrics,
 	}
 	return keeper
 }
