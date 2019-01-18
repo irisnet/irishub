@@ -99,7 +99,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -127,7 +127,7 @@ func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -153,7 +153,7 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
@@ -179,7 +179,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
@@ -711,6 +711,11 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 }
 
 func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
+	ctx.Logger().Debug("Proposals Distribution",
+		"CriticalProposalNum" , keeper.GetCriticalProposalNum(ctx),
+		        "ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
+		        "NormalProposalNum"   , keeper.GetNormalProposalNum(ctx))
+
 	maxNum := keeper.GetMaxNumByProposalLevel(ctx, pl)
 	switch pl {
 	case ProposalLevelCritical:

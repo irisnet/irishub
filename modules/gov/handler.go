@@ -39,7 +39,7 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
-	
+
 	if msg.ProposalType == ProposalTypeSystemHalt {
 		_, found := keeper.guardianKeeper.GetProfiler(ctx, msg.Proposer)
 		if !found {
@@ -64,20 +64,19 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	if err != nil {
 		return err.Result()
 	}
-	
+
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
 	if msg.ProposalType == ProposalTypeParameterChange {
 		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
 	}
-	
+
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-		
+
 		tags.Param, paramBytes,
-		
 	)
 
 	if votingStarted {
@@ -187,9 +186,7 @@ func handleMsgDeposit(ctx sdk.Context, keeper Keeper, msg MsgDeposit) sdk.Result
 		return err.Result()
 	}
 
-	
 	proposalIDBytes := []byte(strconv.FormatUint(msg.ProposalID, 10))
-	
 
 	// TODO: Add tag for if voting period started
 	resTags := sdk.NewTags(
@@ -213,9 +210,7 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 		return err.Result()
 	}
 
-	
 	proposalIDBytes := []byte(strconv.FormatUint(msg.ProposalID, 10))
-	
 
 	resTags := sdk.NewTags(
 		tags.Voter, []byte(msg.Voter.String()),
@@ -229,13 +224,12 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 // Called every block, process inflation, update validator set
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
-	logger := ctx.Logger().With("module", "x/gov")
-
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/gov"))
 	resTags = sdk.NewTags()
 
 	if ctx.BlockHeight() == keeper.GetSystemHaltHeight(ctx) {
 		resTags = resTags.AppendTag(tmstate.HaltTagKey, []byte(tmstate.HaltTagValue))
-		logger.Info(fmt.Sprintf("SystemHalt Start!!!"))
+		ctx.Logger().Info(fmt.Sprintf("SystemHalt Start!!!"))
 	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
@@ -252,13 +246,9 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
 		keeper.RemoveFromInactiveProposalQueue(ctx, inactiveProposal.GetDepositEndTime(), inactiveProposal.GetProposalID())
-		logger.Info(
-			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %s (had only %s); deleted",
-				inactiveProposal.GetProposalID(),
-				inactiveProposal.GetTitle(),
-				keeper.GetDepositProcedure(ctx, inactiveProposal).MinDeposit,
-				inactiveProposal.GetTotalDeposit(),
-			),
+		ctx.Logger().Info("Proposal didn't meet minimum deposit; deleted", "ProposalID",
+			inactiveProposal.GetProposalID(), "MinDeposit", keeper.GetDepositProcedure(ctx, inactiveProposal).MinDeposit,
+			"ActualDeposit", inactiveProposal.GetTotalDeposit(),
 		)
 	}
 
@@ -288,9 +278,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
-		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
-			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
-
+		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result)
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
