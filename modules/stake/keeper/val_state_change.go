@@ -23,7 +23,7 @@ import (
 // at the previous block height or were removed from the validator set entirely
 // are returned to Tendermint.
 func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []abci.ValidatorUpdate) {
-	logger := ctx.Logger().With("module", "x/stake")
+	logger := ctx.Logger()
 
 	store := ctx.KVStore(k.storeKey)
 	maxValidators := k.GetParams(ctx).MaxValidators
@@ -58,10 +58,10 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		switch validator.Status {
 		case sdk.Unbonded:
 			validator = k.unbondedToBonded(ctx, validator)
-			logger.Info(fmt.Sprintf("Switch validator %s status from unbonded to bonded", validator.ConsPubKey.Address()))
+			logger.Info("Switch validator status from unbonded to bonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 		case sdk.Unbonding:
 			validator = k.unbondingToBonded(ctx, validator)
-			logger.Info(fmt.Sprintf("Switch validator %s status from unbonding to bonded", validator.ConsPubKey.Address()))
+			logger.Info("Switch validator status from unbonding to bonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 		case sdk.Bonded:
 			// no state change
 		default:
@@ -88,6 +88,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 			// set validator power on lookup index.
 			k.SetLastValidatorPower(ctx, valAddr, sdk.NewInt(newPower))
+			logger.Info("Validator power update", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String(), "new_power", newPower)
 		}
 
 		// validator still in the validator set, so delete from the copy
@@ -115,7 +116,6 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 		// update the validator set
 		updates = append(updates, validator.ABCIValidatorUpdateZero())
-		logger.Info(fmt.Sprintf("Remove no longer bonded validator %s", validator.ConsPubKey.Address()))
 	}
 
 	// set total power on lookup index if there are any updates
@@ -132,6 +132,7 @@ func (k Keeper) bondedToUnbonding(ctx sdk.Context, validator types.Validator) ty
 	if validator.Status != sdk.Bonded {
 		panic(fmt.Sprintf("bad state transition bondedToUnbonding, validator: %v\n", validator))
 	}
+	ctx.Logger().Info("Validator state transition bondedToUnbonding", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	return k.beginUnbondingValidator(ctx, validator)
 }
 
@@ -139,6 +140,7 @@ func (k Keeper) unbondingToBonded(ctx sdk.Context, validator types.Validator) ty
 	if validator.Status != sdk.Unbonding {
 		panic(fmt.Sprintf("bad state transition unbondingToBonded, validator: %v\n", validator))
 	}
+	ctx.Logger().Info("Validator state transition unbondingToBonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	return k.bondValidator(ctx, validator)
 }
 
@@ -146,6 +148,7 @@ func (k Keeper) unbondedToBonded(ctx sdk.Context, validator types.Validator) typ
 	if validator.Status != sdk.Unbonded {
 		panic(fmt.Sprintf("bad state transition unbondedToBonded, validator: %v\n", validator))
 	}
+	ctx.Logger().Info("Validator state transition unbondedToBonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	return k.bondValidator(ctx, validator)
 }
 
@@ -154,6 +157,7 @@ func (k Keeper) unbondingToUnbonded(ctx sdk.Context, validator types.Validator) 
 	if validator.Status != sdk.Unbonding {
 		panic(fmt.Sprintf("bad state transition unbondingToBonded, validator: %v\n", validator))
 	}
+	ctx.Logger().Info("Validator state transition unbondingToBonded", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	return k.completeUnbondingValidator(ctx, validator)
 }
 
@@ -162,7 +166,7 @@ func (k Keeper) jailValidator(ctx sdk.Context, validator types.Validator) {
 	if validator.Jailed {
 		panic(fmt.Sprintf("cannot jail already jailed validator, validator: %v\n", validator))
 	}
-
+	ctx.Logger().Info("Validator jailed", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	pool := k.GetPool(ctx)
 	validator.Jailed = true
 	k.SetValidator(ctx, validator)
@@ -174,6 +178,7 @@ func (k Keeper) unjailValidator(ctx sdk.Context, validator types.Validator) {
 	if !validator.Jailed {
 		panic(fmt.Sprintf("cannot unjail already unjailed validator, validator: %v\n", validator))
 	}
+	ctx.Logger().Info("Validator unjailed", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 
 	pool := k.GetPool(ctx)
 	validator.Jailed = false
