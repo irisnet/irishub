@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -84,13 +82,13 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	k.SetFeePool(ctx, feePool)
 	logger.Info("Spend community tax fund", "total_community_tax_fund", communityPool.ToString(), "left_community_tax_fund", feePool.CommunityPool.ToString())
 	if burn {
-		logger.Info(fmt.Sprintf("Burn %s", allocateCoins.String()))
+		logger.Info("Burn community tax", "burn_amount", allocateCoins.String())
 		_, err := k.bankKeeper.BurnCoinsFromPool(ctx, "communityTax", allocateCoins)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		logger.Info(fmt.Sprintf("Send %s to account %s", allocateCoins.String(), destAddr.String()))
+		logger.Info("Grant community tax to account", "grant_amount", allocateCoins.String(), "grant_address", destAddr.String())
 		_, _, err := k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
 		if err != nil {
 			panic(err)
