@@ -144,7 +144,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 	}
 
 	ctx.Logger().Debug("Service request", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String(), "Consumer", request.Consumer.String(), "method_id", msg.MethodID,
+		"provider", msg.Provider.String(), "consumer", request.Consumer.String(), "method_id", msg.MethodID,
 		"service_fee", msg.ServiceFee, "request_id", request.RequestID())
 
 	resTags := sdk.NewTags(
