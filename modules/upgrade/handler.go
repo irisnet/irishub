@@ -9,7 +9,7 @@ import (
 // do switch
 func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/distribution"))
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/upgrade"))
 
 	tags = sdk.NewTags()
 	upgradeConfig, ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
@@ -22,15 +22,14 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 		if ctx.BlockHeader().Version.App == upgradeConfig.Protocol.Version {
 			uk.SetSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
 
-			ctx.Logger().Info(
-				fmt.Sprintf("Validator ConsAddress %s has downloaded the latest software which protocolVersion is %d ",
-					validator.GetOperator().String(), ctx, upgradeConfig.Protocol.Version))
+			ctx.Logger().Info("Validator has downloaded the latest software ",
+					"validator",validator.GetOperator().String(), "version",upgradeConfig.Protocol.Version)
 		} else {
-			uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
-
-			ctx.Logger().Info(
-				fmt.Sprintf("Validator ConsAddress %s has restarted the old software which protocolVersion is %d ",
-					validator.GetOperator().String(), ctx, upgradeConfig.Protocol.Version))
+			ok := uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
+			if ok {
+				ctx.Logger().Info("Validator has restarted the old software ",
+					"validator",validator.GetOperator().String(), "version",upgradeConfig.Protocol.Version)
+			}
 		}
 
 		if uint64(ctx.BlockHeight())+1 == upgradeConfig.Protocol.Height {

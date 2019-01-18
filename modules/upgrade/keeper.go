@@ -68,9 +68,11 @@ func (k Keeper) GetSignal(ctx sdk.Context, protocol uint64, address string) bool
 	return false
 }
 
-func (k Keeper) DeleteSignal(ctx sdk.Context, protocol uint64, address string) {
+func (k Keeper) DeleteSignal(ctx sdk.Context, protocol uint64, address string) bool {
 	if ok := k.GetSignal(ctx, protocol, address); ok {
 		kvStore := ctx.KVStore(k.storeKey)
 		kvStore.Delete(GetSignalKey(protocol, address))
+		return true
 	}
+	return false
 }
