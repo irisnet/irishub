@@ -233,6 +233,9 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
 	store.Set(TotalLoosenTokenKey, bzNew)
+
+	ctx.Logger().Info("Execute IncreaseTotalLoosenToken Successed",
+		"increaseCoins", coins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
@@ -251,6 +254,9 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
 	store.Set(TotalLoosenTokenKey, bzNew)
+
+	ctx.Logger().Info("Execute DecreaseTotalLoosenToken Successed",
+		"decreaseCoins", coins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
 //----------------------------------------
