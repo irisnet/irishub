@@ -418,7 +418,7 @@ func (k Keeper) Delegate(ctx sdk.Context, delAddr sdk.AccAddress, bondAmt sdk.Co
 	delegation.Shares = delegation.Shares.Add(newShares)
 	delegation.Height = ctx.BlockHeight()
 	k.SetDelegation(ctx, delegation)
-	ctx.Logger().Info("Delegate to validator", "destination_validator", validator.ConsAddress().String(),
+	ctx.Logger().Info("Delegate to validator", "destination_validator", validator.GetOperator().String(),
 		"delegator_address", delAddr.String(), "amount", bondAmt.String())
 
 	return newShares, nil
