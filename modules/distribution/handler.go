@@ -29,7 +29,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 // now we just perform action and save
 
 func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawDelegatorRewardsAll, k keeper.Keeper) sdk.Result {
-
+	ctx.Logger().Debug("Withdraw delegator reward", "delegator", msg.DelegatorAddr.String())
 	reward, withdrawTags := k.WithdrawDelegationRewardsAll(ctx, msg.DelegatorAddr)
 	rewardTruncate, _  :=	reward.TruncateDecimal()
 	resultTags := sdk.NewTags(
@@ -38,13 +38,14 @@ func handleMsgWithdrawDelegatorRewardsAll(ctx sdk.Context, msg types.MsgWithdraw
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr).String()),
 	)
 	resultTags = resultTags.AppendTags(withdrawTags)
+	ctx.Logger().Debug("Withdraw result", "reward", rewardTruncate.String())
 	return sdk.Result{
 		Tags: resultTags,
 	}
 }
 
 func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDelegatorReward, k keeper.Keeper) sdk.Result {
-
+	ctx.Logger().Debug("Withdraw delegation reward", "delegator", msg.DelegatorAddr.String(), "validator", msg.ValidatorAddr.String())
 	reward, err := k.WithdrawDelegationReward(ctx, msg.DelegatorAddr, msg.ValidatorAddr)
 	if err != nil {
 		return err.Result()
@@ -56,13 +57,14 @@ func handleMsgWithdrawDelegatorReward(ctx sdk.Context, msg types.MsgWithdrawDele
 		tags.Reward, []byte(rewardTruncate.String()),
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, msg.DelegatorAddr).String()),
 	)
+	ctx.Logger().Debug("Withdraw result", "reward", rewardTruncate.String())
 	return sdk.Result{
 		Tags: tags,
 	}
 }
 
 func handleMsgWithdrawValidatorRewardsAll(ctx sdk.Context, msg types.MsgWithdrawValidatorRewardsAll, k keeper.Keeper) sdk.Result {
-
+	ctx.Logger().Debug("Withdraw validator reward", "validator", msg.ValidatorAddr.String())
 	reward, withdrawTags, err := k.WithdrawValidatorRewardsAll(ctx, msg.ValidatorAddr)
 	if err != nil {
 		return err.Result()
@@ -74,6 +76,7 @@ func handleMsgWithdrawValidatorRewardsAll(ctx sdk.Context, msg types.MsgWithdraw
 		tags.WithdrawAddr, []byte(k.GetDelegatorWithdrawAddr(ctx, sdk.AccAddress(msg.ValidatorAddr)).String()),
 	)
 	resultTags = resultTags.AppendTags(withdrawTags)
+	ctx.Logger().Debug("Withdraw result", "reward", rewardTruncate.String())
 	return sdk.Result{
 		Tags: resultTags,
 	}
