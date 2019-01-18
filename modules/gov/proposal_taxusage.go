@@ -106,7 +106,7 @@ type TaxUsage struct {
 }
 
 type TaxUsageProposal struct {
-	TextProposal
+	BasicProposal
 	TaxUsage 	TaxUsage `json:"tax_usage"`
 }
 

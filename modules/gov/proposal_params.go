@@ -17,6 +17,6 @@ type Params []Param
 var _ Proposal = (*ParameterProposal)(nil)
 
 type ParameterProposal struct {
-	TextProposal
+	BasicProposal
 	Params Params `json:"params"`
 }
