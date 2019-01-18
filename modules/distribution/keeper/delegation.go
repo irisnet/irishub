@@ -110,7 +110,7 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	validator := k.stakeKeeper.Validator(ctx, valAddr)
 	delegation := k.stakeKeeper.Delegation(ctx, delAddr, valAddr)
 
-	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "height", wc.Height, "total_power", wc.TotalPower, "validator_power", wc.ValPower, "community_pool", wc.FeePool.CommunityPool, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool, "validator_total_delegation_shares", validator.GetDelegatorShares().String(), "delegation_shares", delegation.GetShares().String())
+	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "total_power", wc.TotalPower, "validator_power", wc.ValPower, "community_pool", wc.FeePool.CommunityPool, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool, "validator_total_delegation_shares", validator.GetDelegatorShares().String(), "delegation_shares", delegation.GetShares().String())
 	logger.Debug("Before withdraw: ", "validator_distInfo", valInfo.String())
 	delInfo, valInfo, feePool, withdraw := delInfo.WithdrawRewards(logger, wc, valInfo,
 		validator.GetDelegatorShares(), delegation.GetShares())

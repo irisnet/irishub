@@ -27,7 +27,7 @@ func (ta TotalAccum) UpdateForNewHeight(logger log.Logger, height int64, accumCr
 	}
 	accumDelta := accumCreatedPerBlock.MulInt(sdk.NewInt(blocks))
 	ta.Accum = ta.Accum.Add(accumDelta)
-	logger.Debug("Update accumulation", "height", height, "last_update_height", ta.UpdateHeight, "accum_delta", accumDelta.String())
+	logger.Debug("Update accumulation", "last_update_height", ta.UpdateHeight, "accum_delta", accumDelta.String())
 	ta.UpdateHeight = height
 	return ta
 }
