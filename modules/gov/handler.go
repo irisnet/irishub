@@ -1,8 +1,6 @@
 package gov
 
 import (
-	"fmt"
-
 	"encoding/json"
 	"strconv"
 
@@ -229,7 +227,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 	if ctx.BlockHeight() == keeper.GetSystemHaltHeight(ctx) {
 		resTags = resTags.AppendTag(tmstate.HaltTagKey, []byte(tmstate.HaltTagValue))
-		ctx.Logger().Info(fmt.Sprintf("SystemHalt Start!!!"))
+		ctx.Logger().Info("SystemHalt Start!!!")
 	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
