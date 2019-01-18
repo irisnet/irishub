@@ -4,7 +4,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"time"
 )
 
 // query endpoints supported by the governance Querier
@@ -41,65 +40,6 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-type ProposalOutput struct {
-	ProposalID   uint64       `json:"proposal_id"`   //  ID of the proposal
-	Title        string       `json:"title"`         //  Title of the proposal
-	Description  string       `json:"description"`   //  Description of the proposal
-	ProposalType ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
-
-	Status      ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
-	TallyResult TallyResult    `json:"tally_result"`    //  Result of Tallys
-
-	SubmitTime     time.Time `json:"submit_time"`      //  Time of the block where TxGovSubmitProposal was included
-	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
-	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
-
-	VotingStartTime time.Time              `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
-	VotingEndTime   time.Time              `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-	Params          Params                 `json:"param"`
-	TaxUsage        TaxUsage               `json:"tax_usage"`
-	Upgrade         sdk.ProtocolDefinition `json:"protocol_definition"`
-}
-
-type ProposalOutputs []ProposalOutput
-
-func ConvertProposalToProposalOutput(proposal Proposal) ProposalOutput {
-
-	proposalOutput := ProposalOutput{
-		ProposalID:   proposal.GetProposalID(),
-		Title:        proposal.GetTitle(),
-		Description:  proposal.GetDescription(),
-		ProposalType: proposal.GetProposalType(),
-
-		Status:      proposal.GetStatus(),
-		TallyResult: proposal.GetTallyResult(),
-
-		SubmitTime:     proposal.GetSubmitTime(),
-		DepositEndTime: proposal.GetDepositEndTime(),
-		TotalDeposit:   proposal.GetTotalDeposit(),
-
-		VotingStartTime: proposal.GetVotingStartTime(),
-		VotingEndTime:   proposal.GetVotingEndTime(),
-		Params:          Params{},
-		TaxUsage:        proposal.GetTaxUsage(),
-		Upgrade:         proposal.GetProtocolDefinition(),
-	}
-
-	if proposal.GetProposalType() == ProposalTypeParameterChange {
-		proposalOutput.Params = proposal.(*ParameterProposal).Params
-	}
-	return proposalOutput
-}
-
-func ConvertProposalsToProposalOutputs(proposals []Proposal) ProposalOutputs {
-
-	var proposalOutputs ProposalOutputs
-	for _, proposal := range proposals {
-		proposalOutputs = append(proposalOutputs, ConvertProposalToProposalOutput(proposal))
-	}
-	return proposalOutputs
-}
-
 // Params for query 'custom/gov/proposal'
 type QueryProposalParams struct {
 	ProposalID uint64
@@ -118,9 +58,7 @@ func queryProposal(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 		return nil, ErrUnknownProposal(DefaultCodespace, params.ProposalID)
 	}
 
-	proposalOutput := ConvertProposalToProposalOutput(proposal)
-
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, proposalOutput)
+	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, proposal)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
 	}
@@ -286,10 +224,7 @@ func queryProposals(ctx sdk.Context, path []string, req abci.RequestQuery, keepe
 	}
 
 	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositor, params.ProposalStatus, params.Limit)
-
-	proposalOutputs := ConvertProposalsToProposalOutputs(proposals)
-
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, proposalOutputs)
+	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, proposals)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err2.Error()))
 	}

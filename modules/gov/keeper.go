@@ -99,7 +99,7 @@ func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -127,7 +127,7 @@ func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -153,7 +153,7 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
@@ -179,7 +179,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
