@@ -67,6 +67,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 		cmn.Exit(err.Error())
 	}
 
+	config.Namespace = appName
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel, config))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
