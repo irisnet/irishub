@@ -92,6 +92,7 @@ func (k Keeper) SetDelegatorWithdrawAddr(ctx sdk.Context, delAddr, withdrawAddr 
 
 // remove a delegator withdraw info
 func (k Keeper) RemoveDelegatorWithdrawAddr(ctx sdk.Context, delAddr, withdrawAddr sdk.AccAddress) {
+	ctx.Logger().Debug("Remove delegator distribution info", "delegator", delAddr.String())
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetDelegatorWithdrawAddrKey(delAddr))
 }
@@ -109,14 +110,11 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	validator := k.stakeKeeper.Validator(ctx, valAddr)
 	delegation := k.stakeKeeper.Delegation(ctx, delAddr, valAddr)
 
-	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "height", wc.Height, "total_power", wc.TotalPower, "validator_power", wc.ValPower, "community_pool", wc.FeePool.CommunityPool, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool)
-	logger.Debug(fmt.Sprintf("validator total delegation shares %s, delegation share %s", validator.GetDelegatorShares().String(), delegation.GetShares().String()))
-	logger.Debug(fmt.Sprintf("Before withdraw: %s", valInfo.String()))
-
+	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "height", wc.Height, "total_power", wc.TotalPower, "validator_power", wc.ValPower, "community_pool", wc.FeePool.CommunityPool, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool, "validator_total_delegation_shares", validator.GetDelegatorShares().String(), "delegation_shares", delegation.GetShares().String())
+	logger.Debug("Before withdraw: ", "validator_distInfo", valInfo.String())
 	delInfo, valInfo, feePool, withdraw := delInfo.WithdrawRewards(logger, wc, valInfo,
 		validator.GetDelegatorShares(), delegation.GetShares())
-
-	logger.Debug(fmt.Sprintf("After withdraw: %s", valInfo.String()))
+	logger.Debug("After withdraw: ", "validator_distInfo", valInfo.String())
 
 	return feePool, valInfo, delInfo, withdraw
 }
@@ -150,6 +148,9 @@ func (k Keeper) WithdrawToDelegator(ctx sdk.Context, feePool types.FeePool,
 	coinsToAdd, change := amount.TruncateDecimal()
 	feePool.CommunityPool = feePool.CommunityPool.Plus(change)
 	k.SetFeePool(ctx, feePool)
+
+	ctx.Logger().Debug("Withdraw reward to delegator", "reward", coinsToAdd.String(), "change", change.ToString(), "delegator", delAddr.String())
+
 	_, _, err := k.bankKeeper.AddCoins(ctx, withdrawAddr, coinsToAdd)
 	if err != nil {
 		panic(err)
@@ -165,6 +166,7 @@ func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress
 	valAddr sdk.ValAddress) (types.DecCoins, sdk.Error) {
 
 	if !k.HasDelegationDistInfo(ctx, delAddr, valAddr) {
+		ctx.Logger().Debug("There is no delegation distribution information")
 		return nil, types.ErrNoDelegationDistInfo(k.codespace)
 	}
 
@@ -215,7 +217,7 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 		k.SetValidatorDistInfo(ctx, valInfo)
 		k.SetDelegationDistInfo(ctx, delInfo)
 		diWithdrawTruncated, _ := diWithdraw.TruncateDecimal()
-		ctx.Logger().Debug(fmt.Sprint("Withdraw reward %s for delegation(delegator: %s, validator: %s)", diWithdrawTruncated.String(), del.GetDelegatorAddr().String(), del.GetValidatorAddr().String()))
+		ctx.Logger().Debug("Withdraw delegation reward", "reward", diWithdrawTruncated.String(), "delegator", del.GetDelegatorAddr().String(), "validator", del.GetValidatorAddr().String())
 		tags = tags.AppendTag(fmt.Sprintf(sdk.TagRewardFromValidator, valAddr.String()), []byte(diWithdrawTruncated.String()))
 		return false
 	}

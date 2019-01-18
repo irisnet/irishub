@@ -1,11 +1,11 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/libs/log"
 	"testing"
 
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/assert"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 func TestWithdrawRewards(t *testing.T) {

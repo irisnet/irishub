@@ -30,6 +30,7 @@ func (p *ProtocolV0) assertRuntimeInvariants(ctx sdk.Context) {
 		return
 	}
 	invariants := p.runtimeInvariants()
+	ctx = ctx.WithLogger(ctx.Logger().With("module", "invariant"))
 	for _, inv := range invariants {
 		if err := inv(ctx); err != nil {
 			if p.invariantLevel == sdk.InvariantPanic {

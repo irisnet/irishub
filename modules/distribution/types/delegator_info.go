@@ -40,13 +40,15 @@ func (di DelegationDistInfo) WithdrawRewards(logger log.Logger, wc WithdrawConte
 	DelegationDistInfo, ValidatorDistInfo, FeePool, DecCoins) {
 
 	fp := wc.FeePool
-	vi = vi.UpdateTotalDelAccum(wc.Height, totalDelShares)
+	vi = vi.UpdateTotalDelAccum(logger, wc.Height, totalDelShares)
+	logger.Debug("After updating delegation accumulation: ", "validator_distInfo", vi.String())
 
 	if vi.DelAccum.Accum.IsZero() {
+		logger.Debug("validator delegation accumulation is zero")
 		return di, vi, fp, DecCoins{}
 	}
 
-	vi, fp = vi.TakeFeePoolRewards(wc)
+	vi, fp = vi.TakeFeePoolRewards(logger, wc)
 
 	accum := di.GetDelAccum(wc.Height, delegatorShares)
 	di.DelPoolWithdrawalHeight = wc.Height

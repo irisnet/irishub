@@ -2,10 +2,10 @@ package distribution
 
 import (
 	"fmt"
-	abci "github.com/tendermint/tendermint/abci/types"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/keeper"
+	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // set the proposer for determining distribution during endblock
