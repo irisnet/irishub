@@ -49,6 +49,7 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	c = c.WithGasMeter(NewInfiniteGasMeter())
 	c = c.WithMinimumFees(Coins{})
 	c = c.WithConsensusParams(nil)
+	c = c.WithCheckValidNum(0)
 	return c
 }
 
@@ -143,6 +144,7 @@ const (
 	contextKeyGasMeter
 	contextKeyBlockGasMeter
 	contextKeyMinimumFees
+	contextKeyCheckValidNum
 )
 
 // NOTE: Do not expose MultiStore.
@@ -159,7 +161,6 @@ func (c Context) BlockHeight() int64 { return c.Value(contextKeyBlockHeight).(in
 func (c Context) ConsensusParams() *abci.ConsensusParams {
 	return c.Value(contextKeyConsensusParams).(*abci.ConsensusParams)
 }
-
 func (c Context) ChainID() string { return c.Value(contextKeyChainID).(string) }
 
 func (c Context) TxBytes() []byte { return c.Value(contextKeyTxBytes).([]byte) }
@@ -177,6 +178,9 @@ func (c Context) BlockGasMeter() GasMeter { return c.Value(contextKeyBlockGasMet
 func (c Context) IsCheckTx() bool { return c.Value(contextKeyIsCheckTx).(bool) }
 
 func (c Context) MinimumFees() Coins { return c.Value(contextKeyMinimumFees).(Coins) }
+
+
+func (c Context) CheckValidNum() uint64 { return c.Value(contextKeyCheckValidNum).(uint64) }
 
 func (c Context) WithMultiStore(ms MultiStore) Context { return c.withValue(contextKeyMultiStore, ms) }
 
@@ -205,6 +209,10 @@ func (c Context) WithBlockHeight(height int64) Context {
 
 func (c Context) WithConsensusParams(params *abci.ConsensusParams) Context {
 	return c.withValue(contextKeyConsensusParams, params)
+}
+
+func (c Context) WithCheckValidNum(checkValidNum uint64) Context {
+	return c.withValue(contextKeyCheckValidNum, checkValidNum)
 }
 
 func (c Context) WithChainID(chainID string) Context { return c.withValue(contextKeyChainID, chainID) }
