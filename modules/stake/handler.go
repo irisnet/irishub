@@ -166,13 +166,14 @@ func handleMsgEditValidator(ctx sdk.Context, msg types.MsgEditValidator, k keepe
 		if err != nil {
 			return err.Result()
 		}
+		ctx.Logger().Debug("Update validator commission rate", "validator_addr", msg.ValidatorAddr.String(),
+			"commission_rate", msg.CommissionRate.String())
 		validator.Commission = commission
 		k.OnValidatorModified(ctx, msg.ValidatorAddr)
 	}
 
 	k.SetValidator(ctx, validator)
-	ctx.Logger().Debug("Edit validator", "validator_addr", msg.ValidatorAddr.String(),
-		"commission_rate", msg.CommissionRate.String())
+	ctx.Logger().Debug("Edit validator", "validator_addr", msg.ValidatorAddr.String())
 
 	tags := sdk.NewTags(
 		tags.DstValidator, []byte(msg.ValidatorAddr.String()),
