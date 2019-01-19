@@ -46,15 +46,13 @@ All commands which can be used to send transactions have these global flags. The
 Each modules provides a set of command line interfaces. Here we sort these commands by modules.
 
 1. [bank command](./bank/README.md)
+10. [tendermint command](./tendermint/README.md)
 2. [distribution command](./distribution/README.md)
 3. [gov command](./gov/README.md)
 4. [keys command](./keys/README.md)
-5. [lcd command](./lcd/README.md)
-6. [record command](./record/README.md)
 7. [service command](./service/README.md)
 8. [stake command](./stake/README.md)
 9. [status command](./status/README.md)
-10. [tendermint command](./tendermint/README.md)
 11. [upgrade command](./upgrade/README.md)
 
 ## iriscli config command
