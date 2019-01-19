@@ -42,20 +42,18 @@
 
 每个发送交易的命令都包含上表中的flags，同时不同交易的命令还可能会有自己独有的flags。
 
-## 模块列表
+## 模块命令列表
 
-1. [bank command](./bank/README.md)
-2. [distribution command](./distribution/README.md)
-3. [gov command](./gov/README.md)
-4. [keys command](./keys/README.md)
-5. [lcd command](./lcd/README.md)
-6. [record command](./record/README.md)
-7. [service command](./service/README.md)
-8. [stake command](./stake/README.md)
-9. [status command](./status/README.md)
-10. [tendermint command](./tendermint/README.md)
-11. [upgrade command](./upgrade/README.md)
+1. [status command](./status/README.md)
+2. [tendermint command](./tendermint/README.md)
+3. [keys command](./keys/README.md)
+4. [bank command](./bank/README.md)
+5. [stake command](./stake/README.md)
+6. [distribution command](./distribution/README.md)
+7. [gov command](./gov/README.md)
+8. [upgrade command](./upgrade/README.md)
+9. [service command](./service/README.md)
 
-## iriscli config命令
+## 配置命令
 
 iriscli config命令可以交互式地配置一些默认参数，例如chain-id，home，fee 和 node。
