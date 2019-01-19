@@ -98,17 +98,17 @@ module.exports = {
                         ]
                     },
                     {
+                        title: 'Distribution',
+                        collapsable: false,
+                        children: [
+                            ['distribution/', 'iriscli distribution']
+                        ]
+                    },
+                    {
                         title: 'Gov',
                         collapsable: false,
                         children: [
                             ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
                         ]
                     },
                     {
@@ -219,17 +219,17 @@ module.exports = {
                         ]
                     },
                     {
+                        title: 'Distribution',
+                        collapsable: false,
+                        children: [
+                            ['distribution/', 'iriscli distribution']
+                        ]
+                    },
+                    {
                         title: 'Gov',
                         collapsable: false,
                         children: [
                             ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
                         ]
                     },
                     {
