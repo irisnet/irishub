@@ -41,22 +41,20 @@ All commands which can be used to send transactions have these global flags. The
 | --sequence int   | int    | false    | 0                     | Sequence number to sign the tx |
 | --trust-node     | bool   | false    | true                  | Don't verify proofs for responses | 
 
-## Modules list
+## Module command list
 
 Each modules provides a set of command line interfaces. Here we sort these commands by modules.
 
-1. [bank command](./bank/README.md)
-2. [distribution command](./distribution/README.md)
-3. [gov command](./gov/README.md)
-4. [keys command](./keys/README.md)
-5. [lcd command](./lcd/README.md)
-6. [record command](./record/README.md)
-7. [service command](./service/README.md)
-8. [stake command](./stake/README.md)
-9. [status command](./status/README.md)
-10. [tendermint command](./tendermint/README.md)
-11. [upgrade command](./upgrade/README.md)
+1. [status command](./status/README.md)
+2. [tendermint command](./tendermint/README.md)
+3. [keys command](./keys/README.md)
+4. [bank command](./bank/README.md)
+5. [stake command](./stake/README.md)
+6. [distribution command](./distribution/README.md)
+7. [gov command](./gov/README.md)
+8. [upgrade command](./upgrade/README.md)
+9. [service command](./service/README.md)
 
-## iriscli config command
+## Config command
 
 The `iriscli config` command interactively configures some default parameters, such as chain-id, home, fee, and node.

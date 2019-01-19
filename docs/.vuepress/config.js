@@ -96,6 +96,13 @@ module.exports = {
                             ]
                         },
                         {
+                            title: 'Distribution',
+                            collapsable: false,
+                            children: [
+                                ['distribution/', 'iriscli distribution']
+                            ]
+                        },
+                        {
                             title: 'Gov',
                             collapsable: false,
                             children: [
@@ -205,6 +212,13 @@ module.exports = {
                             collapsable: false,
                             children: [
                                 ['stake/', 'iriscli stake']
+                            ]
+                        },
+                        {
+                            title: 'Distribution',
+                            collapsable: false,
+                            children: [
+                                ['distribution/', 'iriscli distribution']
                             ]
                         },
                         {
