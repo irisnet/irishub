@@ -215,6 +215,13 @@ module.exports = {
                             ]
                         },
                         {
+                            title: 'Distribution',
+                            collapsable: false,
+                            children: [
+                                ['distribution/', 'iriscli distribution']
+                            ]
+                        },
+                        {
                             title: 'Gov',
                             collapsable: false,
                             children: [
