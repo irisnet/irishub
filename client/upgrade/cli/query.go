@@ -108,7 +108,7 @@ func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(validatorConsAddrs) == 0 {
-				fmt.Println("No validators have started the new version.")
+				fmt.Println("No validator has started the new version.")
 				return nil
 			}
 
@@ -133,7 +133,7 @@ func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 					}
 				}
 			}
-			fmt.Println("siganalsVotingPower/totalVotingPower = " + signalsVotingPower.Quo(totalVotingPower).String())
+			fmt.Println("signalsVotingPower/totalVotingPower = " + signalsVotingPower.Quo(totalVotingPower).String())
 			return nil
 		},
 	}
