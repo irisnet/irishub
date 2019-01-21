@@ -31,11 +31,13 @@ func QueryWithdrawAddressHandlerFn(storeName string, cliCtx context.CLIContext) 
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		var withdrawAddress sdk.AccAddress
 		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNoContent, "")
-			return
+			withdrawAddress = delAddr
+		} else {
+			withdrawAddress = sdk.AccAddress(res)
 		}
-		withdrawAddress := sdk.AccAddress(res)
 
 		w.Write([]byte(withdrawAddress.String()))
 	}
