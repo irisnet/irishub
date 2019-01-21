@@ -44,7 +44,7 @@ func (di DelegationDistInfo) WithdrawRewards(logger log.Logger, wc WithdrawConte
 	logger.Debug("After updating delegation accumulation", "validator_distInfo", vi.String())
 
 	if vi.DelAccum.Accum.IsZero() {
-		logger.Debug("validator delegation accumulation is zero")
+		logger.Debug("Validator delegation accumulation is zero")
 		return di, vi, fp, DecCoins{}
 	}
 

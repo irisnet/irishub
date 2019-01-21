@@ -83,9 +83,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	case infractionHeight == ctx.BlockHeight():
 
 		// Special-case slash at current height for efficiency - we don't need to look through unbonding delegations or redelegations
-		logger.Info(fmt.Sprintf(
-			"slashing at current height %d, not scanning unbonding delegations & redelegations",
-			infractionHeight))
+		logger.Info("Slashing at current height, not scanning unbonding delegations & redelegations", "infraction_height", infractionHeight)
 
 	case infractionHeight < ctx.BlockHeight():
 

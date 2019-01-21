@@ -21,11 +21,11 @@ func BeginBlocker(ctx sdk.Context, k Keeper) sdk.Tags {
 
 	// Calculate block mint amount
 	params := k.GetParamSet(ctx)
-	logger.Info("mint parameters", "inflation_rate", params.Inflation.String())
+	logger.Info("Mint parameters", "inflation_rate", params.Inflation.String())
 	annualProvisions := minter.NextAnnualProvisions(params)
-	logger.Info("calculate annual provisions", "annual_provisions", annualProvisions.String())
+	logger.Info("Calculate annual provisions", "annual_provisions", annualProvisions.String())
 	mintedCoin := minter.BlockProvision(annualProvisions)
-	logger.Info("mint result", "block_provisions", mintedCoin.String(), "time", blockTime.String())
+	logger.Info("Mint result", "block_provisions", mintedCoin.String(), "time", blockTime.String())
 
 	// Increase loosen token and add minted coin to feeCollector
 	k.bk.IncreaseLoosenToken(ctx, sdk.Coins{mintedCoin})
