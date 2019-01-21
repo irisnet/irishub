@@ -79,13 +79,13 @@ func SoftwareUpgradeProposalExecute(ctx sdk.Context, gk Keeper, sp *SoftwareUpgr
 }
 
 func SystemHaltProposalExecute(ctx sdk.Context, gk Keeper) error {
-	logger := ctx.Logger().With("module", "x/gov")
+	logger := ctx.Logger()
 
 	if gk.GetSystemHaltHeight(ctx) == -1 {
 		gk.SetSystemHaltHeight(ctx, ctx.BlockHeight()+gk.GetSystemHaltPeriod(ctx))
 		logger.Info("Execute SystemHaltProposal begin", "SystemHaltHeight", gk.GetSystemHaltHeight(ctx))
 	} else {
-		logger.Info("SystemHalt Period is in process.", "SystemHaltHeight:%d", gk.GetSystemHaltHeight(ctx))
+		logger.Info("SystemHalt Period is in process", "SystemHaltHeight", gk.GetSystemHaltHeight(ctx))
 
 	}
 	return nil

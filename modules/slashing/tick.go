@@ -2,8 +2,6 @@ package slashing
 
 import (
 	"encoding/binary"
-	"fmt"
-
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -11,6 +9,7 @@ import (
 
 // slashing begin block functionality
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags sdk.Tags) {
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/slashing"))
 
 	// Tag the height
 	heightBytes := make([]byte, 8)
@@ -34,7 +33,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 			doubleSignSlashTag := sk.handleDoubleSign(ctx, evidence.Validator.Address, evidence.Height, evidence.Time, evidence.Validator.Power)
 			tags = tags.AppendTags(doubleSignSlashTag)
 		default:
-			ctx.Logger().With("module", "iris/slashing").Error(fmt.Sprintf("ignored unknown evidence type: %s", evidence.Type))
+			ctx.Logger().Error("ignored unknown evidence type", "type", evidence.Type)
 		}
 	}
 
@@ -43,7 +42,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 
 // slashing end block functionality
 func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, sk Keeper) (tags sdk.Tags) {
-
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/slashing"))
 	// Tag the height
 	heightBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(heightBytes, uint64(req.Height))
