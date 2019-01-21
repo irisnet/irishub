@@ -105,13 +105,6 @@ module.exports = {
                         ]
                     },
                     {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
-                        ]
-                    },
-                    {
                         title: 'Upgrade',
                         collapsable: false,
                         children: [
@@ -223,13 +216,6 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
                         ]
                     },
                     {
