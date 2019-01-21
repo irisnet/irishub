@@ -5,12 +5,19 @@ import (
 	"os"
 
 	"github.com/irisnet/irishub/client/context"
-	sdk "github.com/irisnet/irishub/types"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/modules/upgrade"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+const (
+	flagDetail = "detail"
 )
 
 func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
@@ -90,29 +97,46 @@ func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var validatorAddrs []string
+			validatorConsAddrs := make(map[string]bool)
 			res, err := cliCtx.QuerySubspace(upgrade.GetSignalPrefixKey(upgradeConfig.Protocol.Version), storeName)
 			if err != nil {
 				return err
 			}
 
 			for _, kv := range res {
-				validatorAddrs = append(validatorAddrs, upgrade.GetAddressFromSignalKey(kv.Key))
+				validatorConsAddrs[upgrade.GetAddressFromSignalKey(kv.Key)] = true
 			}
 
-			if len(validatorAddrs) == 0 {
+			if len(validatorConsAddrs) == 0 {
 				fmt.Println("No validators have started the new version.")
 				return nil
 			}
 
-			output, err := codec.MarshalJSONIndent(cdc, validatorAddrs)
+			key := stake.ValidatorsKey
+			resKVs, err := cliCtx.QuerySubspace(key, "stake")
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			isDetail := viper.GetBool(flagDetail)
+			totalVotingPower := sdk.ZeroDec()
+			signalsVotingPower := sdk.ZeroDec()
+
+			for _, kv := range resKVs {
+				addr := kv.Key[1:]
+				validator := types.MustUnmarshalValidator(cdc, addr, kv.Value)
+				totalVotingPower = totalVotingPower.Add(validator.GetPower())
+				if _, ok := validatorConsAddrs[validator.GetConsAddr().String()]; ok {
+					signalsVotingPower = signalsVotingPower.Add(validator.GetPower())
+					if isDetail {
+						fmt.Println(validator.GetOperator().String(), " ", validator.GetPower().String())
+					}
+				}
+			}
+			fmt.Println("siganalsVotingPower/totalVotingPower = " + signalsVotingPower.Quo(totalVotingPower).String())
 			return nil
 		},
 	}
+	cmd.Flags().Bool(flagDetail, false, "details of siganls")
 	return cmd
 }
