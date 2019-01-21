@@ -43,7 +43,6 @@ module.exports = {
                         children: [
                             ["basic-concepts/coin-type.md", 'Coin Type'],
                             ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/inflation.md", 'Infation'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
                             ["basic-concepts/gov-params.md", 'Gov Params']
@@ -55,7 +54,6 @@ module.exports = {
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
                             ['service.md', 'Service'],
-                            ['record.md', 'Record'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
@@ -164,7 +162,6 @@ module.exports = {
                         children: [
                             ["basic-concepts/coin-type.md", 'Coin Type'],
                             ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/inflation.md", 'Infation'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
                             ["basic-concepts/gov-params.md", 'Gov Params']
@@ -176,7 +173,6 @@ module.exports = {
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
                             ['service.md', 'Service'],
-                            ['record.md', 'Record'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
