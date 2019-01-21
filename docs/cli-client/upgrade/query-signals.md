@@ -4,6 +4,12 @@
 
 Query the current information of signals.
 
+## Flags
+
+| Name, shorthand | Default               | Description                                                                                                                                 | Required |
+| --------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------| -------- |
+| --detail        | false                 | [bool] details of signals                                                                                                                 |          |
+
 ## Usage
 
 ```
@@ -21,12 +27,14 @@ iriscli upgrade query-signals --help
 Query the current information of signals.
 
 ```
-iriscli upgrade query-signals
+signalsVotingPower/totalVotingPower = 0.5000000000
 ```
 
 ```
-[
-  "fca1pz46rw68wjxklxp7ptw6wrdvn5hae04jhuhdc5",
-  "fca1uvjn440xjgech86avm855v5u5c65dar6gu3ng4"
-]
+iriscli upgrade query-signals --detail
+```
+
+```
+fva15cv33a67cfey5eze7238hck6yngw3694ak2elm   100.0000000000
+siganalsVotingPower/totalVotingPower = 0.5000000000
 ```
