@@ -57,6 +57,7 @@ type App struct {
 	KeyParams  *sdk.KVStoreKey
 	TkeyParams *sdk.TransientStoreKey
 	KeyUpgrade *sdk.KVStoreKey
+	KeyGuardian *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically
 	AccountKeeper auth.AccountKeeper
@@ -79,12 +80,7 @@ func NewApp() *App {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-/*
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(bech32PrefixAccAddr, bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(bech32PrefixValAddr, bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(bech32PrefixConsAddr, bech32PrefixConsPub)
-*/
+
 	bApp := bam.NewBaseApp("mock", logger, db, auth.DefaultTxDecoder(cdc), bam.SetPruning("nothing"))
 
 	// Create your application object
@@ -99,6 +95,7 @@ func NewApp() *App {
 		KeyParams:        sdk.NewKVStoreKey("params"),
 		TkeyParams:       sdk.NewTransientStoreKey("transient_params"),
 		KeyUpgrade:       sdk.NewKVStoreKey("upgrade"),
+		KeyGuardian:      sdk.NewKVStoreKey("guardian"),
 		TotalCoinsSupply: sdk.Coins{},
 	}
 
@@ -138,6 +135,7 @@ func (app *App) CompleteSetup(newKeys ...sdk.StoreKey) error {
 	newKeys = append(newKeys, app.KeyFee)
 	newKeys = append(newKeys, app.TkeyParams)
 	newKeys = append(newKeys, app.TkeyStake)
+	newKeys = append(newKeys, app.KeyGuardian)
 
 	for _, key := range newKeys {
 		switch key.(type) {
