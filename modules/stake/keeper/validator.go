@@ -377,6 +377,7 @@ func (k Keeper) GetAllMatureValidatorQueue(ctx sdk.Context, currTime time.Time) 
 func (k Keeper) UnbondAllMatureValidatorQueue(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 	validatorTimesliceIterator := k.ValidatorQueueIterator(ctx, ctx.BlockHeader().Time)
+	defer validatorTimesliceIterator.Close()
 	for ; validatorTimesliceIterator.Valid(); validatorTimesliceIterator.Next() {
 		timeslice := []sdk.ValAddress{}
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(validatorTimesliceIterator.Value(), &timeslice)
