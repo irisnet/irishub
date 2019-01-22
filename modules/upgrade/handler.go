@@ -14,9 +14,9 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 	upgradeConfig, ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
 	if ok {
-		validator, found := uk.sk.GetValidatorByConsAddr(ctx, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress));
+		validator, found := uk.sk.GetValidatorByConsAddr(ctx, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress))
 		if !found {
-			panic(fmt.Sprintf("Proposer is not a bonded validator whose consaddress is %s", (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String()))
+			panic(fmt.Sprintf("validator with consensus-Address %s not found", (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String()))
 		}
 
 		if ctx.BlockHeader().Version.App == upgradeConfig.Protocol.Version {
