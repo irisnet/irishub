@@ -84,7 +84,7 @@ func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidVote, msg)
 }
 
-////////////////////  iris begin  ///////////////////////////
+
 func ErrInvalidParam(codespace sdk.CodespaceType, str string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("%s Params don't support the ParameterChange.", str))
 }
