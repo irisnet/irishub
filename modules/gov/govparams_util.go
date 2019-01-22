@@ -15,9 +15,9 @@ const (
 	ProposalLevelNil       ProposalLevel = 0x00
 	ProposalLevelCritical  ProposalLevel = 0x01
 	ProposalLevelImportant ProposalLevel = 0x02
-	////////////////////  iris begin  /////////////////////////////
+
 	ProposalLevelNormal ProposalLevel = 0x03
-	////////////////////  iris end  /////////////////////////////
+
 )
 
 func (p ProposalLevel) string() string {
