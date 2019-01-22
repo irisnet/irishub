@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.2-patch
+
+*January 21th, 2019*
+
+- [iris] Fix the app hash conflict issue caused by the system halt proposal
+
+
 ## 0.10.2
 
 *January 17th, 2019*

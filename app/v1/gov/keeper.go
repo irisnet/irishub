@@ -135,7 +135,7 @@ func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, descri
 		Status:       StatusDepositPeriod,
 		TallyResult:  EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
-		SubmitTime:   time.Now(),
+		SubmitTime:   ctx.BlockHeader().Time,
 	}
 	var proposal Proposal = &SystemHaltProposal{
 		textProposal,

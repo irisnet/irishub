@@ -496,7 +496,7 @@
   version = "v0.12.0-iris"
 
 [[projects]]
-  digest = "1:abc3ddbc37c7e5f9db16180052f30741518409fd1e204577264878d488bff291"
+  digest = "1:6cdabe9ae8dbe1346d33970fb753a266d4ec9382aeb3435254c7f16dab2cdc5e"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
