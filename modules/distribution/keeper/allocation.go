@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -10,6 +12,10 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	logger := ctx.Logger()
 	// get the proposer of this block
 	proposerValidator := k.stakeKeeper.ValidatorByConsAddr(ctx, proposer)
+
+	if proposerValidator == nil {
+		panic(fmt.Sprintf("Can't find proposer %s in validator set", proposerValidator.GetConsAddr()))
+	}
 
 	proposerDist := k.GetValidatorDistInfo(ctx, proposerValidator.GetOperator())
 
