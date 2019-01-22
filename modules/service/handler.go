@@ -259,8 +259,14 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		slashCoins = slashCoins.Sort()
 
-		keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, slashCoins)
-		keeper.Slash(ctx, binding, slashCoins)
+		_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, slashCoins)
+		if err != nil {
+			panic(err)
+		}
+		err = keeper.Slash(ctx, binding, slashCoins)
+		if err != nil {
+			panic(err)
+		}
 
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
