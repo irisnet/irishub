@@ -11,7 +11,7 @@ import (
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/utils"
 )
-/*
+
 // QueryWithdrawAddressHandlerFn performs withdraw address query
 func QueryWithdrawAddressHandlerFn(storeName string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -31,16 +31,18 @@ func QueryWithdrawAddressHandlerFn(storeName string, cliCtx context.CLIContext) 
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		var withdrawAddress sdk.AccAddress
 		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNoContent, "")
-			return
+			withdrawAddress = delAddr
+		} else {
+			withdrawAddress = sdk.AccAddress(res)
 		}
-		withdrawAddress := sdk.AccAddress(res)
 
 		w.Write([]byte(withdrawAddress.String()))
 	}
 }
-*/
+
 // QueryDelegatorDistInfoHandlerFn query all delegation distribution info of the specified delegator
 func QueryDelegatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
