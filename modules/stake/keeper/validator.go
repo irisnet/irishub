@@ -77,7 +77,7 @@ func (k Keeper) GetValidatorByConsAddr(ctx sdk.Context, consAddr sdk.ConsAddress
 func (k Keeper) mustGetValidatorByConsAddr(ctx sdk.Context, consAddr sdk.ConsAddress) types.Validator {
 	validator, found := k.GetValidatorByConsAddr(ctx, consAddr)
 	if !found {
-		panic(fmt.Errorf("validator with consensus-Address %s not found", consAddr))
+		panic(fmt.Errorf("validator with consensus-address %s not found", consAddr))
 	}
 	return validator
 }
