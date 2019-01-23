@@ -21,6 +21,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/irisnet/irishub/store"
+	"github.com/irisnet/irishub/app/v1"
 )
 
 const (
@@ -67,6 +68,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	}
 
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
+	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, sdk.InvariantLevel))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -81,7 +83,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 
 // latest version of codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v0.MakeCodec() // replace with latest protocol version
+	var cdc = v1.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 
