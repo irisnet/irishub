@@ -26,29 +26,26 @@ iriscli gov query-params --help
 ### 通过module查参数
 
 ```shell
-iriscli gov query-params --module=gov
+iriscli gov query-params --module=stake
 ```
 
-可以检索得到gov模块的所有键值。
+可以检索得到stake模块的所有键值。
 
 ```txt
-[
- "Gov/govDepositProcedure",
- "Gov/govTallyingProcedure",
- "Gov/govVotingProcedure"
-]
+ stake/MaxValidators=100
+ stake/UnbondingTime=504h0m0s
 ```
 
 ### 通过key查参数
 
 ```shell
-iriscli gov query-params --key=Gov/govDepositProcedure
+iriscli gov query-params --key=stake/MaxValidators
 ```
 
 可以得到gov模块中指定键值的参数详情。
 
 ```txt
-{"key":"Gov/govDepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"1000000000000000000000\"}],\"max_deposit_period\":172800000000000}","op":""}
+ stake/MaxValidators=100
 ```
 
 注意：--module和--key参数不能同时为空.
