@@ -27,6 +27,10 @@ iriscli upgrade query-signals --help
 Query the current information of signals.
 
 ```
+iriscli upgrade query-signals
+```
+
+```
 signalsVotingPower/totalVotingPower = 0.5000000000
 ```
 

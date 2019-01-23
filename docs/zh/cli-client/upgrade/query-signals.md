@@ -27,6 +27,10 @@ iriscli upgrade query-signals --help
 查询软件升级过程中signal的信息
 
 ```
+iriscli upgrade query-signals
+```
+
+```
 signalsVotingPower/totalVotingPower = 0.5000000000
 ```
 
