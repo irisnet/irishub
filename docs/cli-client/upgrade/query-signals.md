@@ -41,4 +41,5 @@ iriscli upgrade query-signals --detail
 ```
 fva15cv33a67cfey5eze7238hck6yngw3694ak2elm   100.0000000000
 siganalsVotingPower/totalVotingPower = 0.5000000000
+
 ```
