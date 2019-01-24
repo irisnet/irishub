@@ -88,7 +88,7 @@ IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通�
   在IRISnet网络中，所有验证节点将轮流出块。出块的概率和抵押IRIS的数量成正比。作为出块人，验证人将获得额外的出块奖励。
   
 * **抵押获利**
-  接受IRIS通证持有人的委托，抵押委托人的代币用做共识投票的权益证明，并与委托人分享所获得的收益；IRISnet是基于Tendermint的PoS网络，验证人在网络共识中的投票权取决于验证人（包括受委托）[抵押通证（IRIS）的数量](https://www.irisnet.org/docs/zh/features/stake.html#%E4%BB%8B%E7%BB%8D)。网络中抵押的通证数量越多，攻击网络所需的成本也越大，网络也越安全。为了维护验证人及其委托人抵押通证的价值，IRISnet设定通胀增发通证，用于激励验证人及所有IRIS通证持有人将通证抵押。抵押获利[定时发放](https://www.irisnet.org/docs/zh/features/mint.html#%E5%8C%BA%E5%9D%97%E6%97%B6%E9%97%B4)。 通胀率也是社区对[IRIS通证抵押率的调节器](https://www.irisnet.org/docs/zh/features/mint.html#%E9%80%9A%E8%83%80%E7%8E%87)，IRISnet在第一年将通胀设定在4%， 后期可以通过社区提案的形式通过在线治理投票调整。网络中IRIS数量将逐年增加。没有被抵押的IRIS的价值将会逐渐被稀释。通胀参数可以通过发起链上治理投票来修改。
+  接受IRIS通证持有人的委托，抵押委托人的代币用做共识投票的权益证明，并与委托人分享所获得的收益；IRISnet是基于Tendermint的PoS网络，验证人在网络共识中的投票权取决于验证人（包括受委托）[抵押通证（IRIS）的数量](https://www.irisnet.org/docs/zh/features/stake.html#%E4%BB%8B%E7%BB%8D)。网络中抵押的通证数量越多，攻击网络所需的成本也越大，网络也越安全。为了维护验证人及其委托人抵押通证的价值，IRISnet设定通胀增发通证，用于激励验证人及所有IRIS通证持有人将通证抵押。抵押获利[定时发放](https://www.irisnet.org/docs/zh/features/mint.html#%E5%8C%BA%E5%9D%97%E6%97%B6%E9%97%B4)。 通胀率也是社区对[IRIS通证抵押率的调节器](https://www.irisnet.org/docs/zh/features/mint.html#%E9%80%9A%E8%83%80%E7%8E%87)，IRISnet在第一年将通胀设定在4%， **该通胀系数可以通过社区提案的形式通过在线治理投票调整**。网络中IRIS数量将逐年增加。没有被抵押的IRIS的价值将会逐渐被稀释。通胀参数可以通过发起链上治理投票来修改。
 
 * **手续费** 
 在IRIS网络中的各种交易都需要支付一定的手续费。手续费的多少取决于每种交易的[手续费上限 (fee)](https://www.irisnet.org/docs/zh/features/basic-concepts/fee.html#fee)和[交易消耗资源 (Gas) ](https://www.irisnet.org/docs/zh/features/basic-concepts/fee.html#gas)。IRISnet网络的中设定全局的手续费/Gas最小比例。
