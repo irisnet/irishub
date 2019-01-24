@@ -1,14 +1,13 @@
 
 # IRISnet 验证人常见问题
 
-## IRIS网络介绍
+## IRISnet介绍
 
-IRIS网络是跨链服务基础设施和协议，用于构建可信的分布式商业应用。IRIS网络将面向服务的基础设施融入到Cosmos网络中。它整合由异构系统提供的商业服务，包括公共链、联盟链以及现有系统。通过区块链互联网实现服务的互联互通。
-
+IRISnet是跨链服务基础设施和协议，用于构建可信的分布式商业应用。IRISent是采用Cosmos SDK开发的BPoS区块链网络。它支持对包括公链、联盟链以及现有传统商业系统的集成与互联互通，允许数据及复杂计算跨异构网络被调用，是链接数字经济和实体经济，构建复杂分布式商业应用的下一代公链。
 
 ## IRIS枢纽
 
-在IRIS网络的第一个区块链称为 *IRIS枢纽* 的区块链，它是一个基于Tendermint共识引擎构建的Bond-Proof-of-Stake（BPoS）区块链。它将成为第一个连接Cosmos枢纽的区域性枢纽。IRIS网络通过标准的ABCI交易实现IRIS服务（也称为iServices）的注册，绑定，调用，查询，分析和管理。iService提供商充当公共链、联盟区块链以及现有企业系统中业务逻辑的适配器。IRIShub将于从2019年春节后启动，这也标志着[主网启动](https://github.com/irisnet/iris-foundation/blob/master/iris-betanet-plan_cn.md)的第一步。
+在IRISnet的第一个区块链称为 *IRIS枢纽* 的区块链，它是一个基于Tendermint共识引擎构建的Bond-Proof-of-Stake（BPoS）区块链。它将成为第一个连接Cosmos枢纽的区域性枢纽。IRIS网络通过标准的ABCI交易实现IRIS服务（也称为iServices）的注册，绑定，调用，查询，分析和管理。iService提供商充当公共链、联盟区块链以及现有企业系统中业务逻辑的适配器。IRIShub将于从2019年春节后启动，这也标志着[主网启动](https://github.com/irisnet/iris-foundation/blob/master/iris-betanet-plan_cn.md)的第一步。
 
 ## IRIS服务
 
