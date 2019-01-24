@@ -1,4 +1,4 @@
-# Mint User Guide
+# Mint Module User Guide
 
 ## Introduction
 
