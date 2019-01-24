@@ -120,7 +120,7 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	}
 
 	// if threshold not in [0.85,1), then print error
-	if msg.Threshold.LT(sdk.NewDecWithPrec(85, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
+	if msg.Threshold.LT(sdk.NewDecWithPrec(80, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
 		return ErrInvalidUpgradeThreshold(DefaultCodespace, msg.Threshold)
 	}
 

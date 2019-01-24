@@ -1,17 +1,19 @@
 package distribution
 
 import (
-	abci "github.com/tendermint/tendermint/abci/types"
+	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/keeper"
+	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // set the proposer for determining distribution during endblock
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
-
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/distribution"))
 	if ctx.BlockHeight() > 1 {
 		previousPercentPrecommitVotes := getPreviousPercentPrecommitVotes(req)
+		ctx.Logger().Info(fmt.Sprintf("Percent of previous precommit voting power against total voting power: %s", previousPercentPrecommitVotes.String()))
 		previousProposer := k.GetPreviousProposerConsAddr(ctx)
 		k.AllocateTokens(ctx, previousPercentPrecommitVotes, previousProposer)
 	}

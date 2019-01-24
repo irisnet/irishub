@@ -9,6 +9,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgWithdrawDelegatorRewardsAll{}, "irishub/distr/MsgWithdrawDelegationRewardsAll", nil)
 	cdc.RegisterConcrete(MsgWithdrawDelegatorReward{}, "irishub/distr/MsgWithdrawDelegationReward", nil)
 	cdc.RegisterConcrete(MsgWithdrawValidatorRewardsAll{}, "irishub/distr/MsgWithdrawValidatorRewardsAll", nil)
+	cdc.RegisterConcrete(MsgSetWithdrawAddress{}, "irishub/distr/MsgModifyWithdrawAddress", nil)
 
 	cdc.RegisterConcrete(DelegationDistInfo{},"irishub/distr/DelegationDistInfo", nil)
 	cdc.RegisterConcrete(FeePool{},"irishub/distr/FeePool", nil)

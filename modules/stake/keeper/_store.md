@@ -1,7 +1,7 @@
 # Stores
 
 This document provided a bit more insight as to the purpose of several related
-prefixed areas of the staking store which are accessed in `x/stake/keeper.go`.
+prefixed areas of the staking store which are accessed in `modules/stake/keeper.go`.
 
 # IAVL Store 
 

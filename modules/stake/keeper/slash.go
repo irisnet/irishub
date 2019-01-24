@@ -33,7 +33,7 @@ const (
 //    Infraction committed at the current height or at a past height,
 //    not at a height in the future
 func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeight int64, power int64, slashFactor sdk.Dec) (tags sdk.Tags) {
-	logger := ctx.Logger().With("module", "x/stake")
+	logger := ctx.Logger()
 
 	if slashFactor.LT(sdk.ZeroDec()) {
 		panic(fmt.Errorf("attempted to slash with a negative slash factor: %v", slashFactor))
@@ -83,9 +83,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	case infractionHeight == ctx.BlockHeight():
 
 		// Special-case slash at current height for efficiency - we don't need to look through unbonding delegations or redelegations
-		logger.Info(fmt.Sprintf(
-			"slashing at current height %d, not scanning unbonding delegations & redelegations",
-			infractionHeight))
+		logger.Info("Slashing at current height, not scanning unbonding delegations & redelegations", "infraction_height", infractionHeight)
 
 	case infractionHeight < ctx.BlockHeight():
 
@@ -127,10 +125,8 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		Amount: tokensToBurn.TruncateInt(),
 	}})
 	// Log that a slash occurred!
-	logger.Info(fmt.Sprintf(
-		"validator %s slashed by slash factor of %s; burned %v tokens",
-		validator.GetOperator(), slashFactor.String(), tokensToBurn))
-
+	logger.Info("Validator slashed", "consensus_address", validator.GetConsAddr().String(),
+		"operator_address", validator.GetOperator().String(), "slash_factor", slashFactor.String(), "slash_tokens", tokensToBurn)
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }
@@ -139,8 +135,6 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.jailValidator(ctx, validator)
-	logger := ctx.Logger().With("module", "x/stake")
-	logger.Info(fmt.Sprintf("validator %s jailed", consAddr))
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }
@@ -149,8 +143,6 @@ func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 func (k Keeper) Unjail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.unjailValidator(ctx, validator)
-	logger := ctx.Logger().With("module", "x/stake")
-	logger.Info(fmt.Sprintf("validator %s unjailed", consAddr))
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }

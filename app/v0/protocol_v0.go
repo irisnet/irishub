@@ -322,10 +322,7 @@ func (p *ProtocolV0) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	stateJSON := req.AppStateBytes
 
 	var genesisFileState GenesisFileState
-	err := p.cdc.UnmarshalJSON(stateJSON, &genesisFileState)
-	if err != nil {
-		panic(err)
-	}
+	p.cdc.MustUnmarshalJSON(stateJSON, &genesisFileState)
 
 	genesisState := convertToGenesisState(genesisFileState)
 	// sort by account number to maintain consistency

@@ -492,7 +492,8 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	} else {
 		gasMeter = sdk.NewInfiniteGasMeter()
 	}
-	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter)
+	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
+		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight()))
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 

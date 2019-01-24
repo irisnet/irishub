@@ -15,6 +15,44 @@ import (
 
 const NULL = "null"
 
+// GetWithdrawAddress returns withdraw address of a given delegator address
+func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:     "withdraw-address",
+		Short:   "Query withdraw address",
+		Example: "iriscli distribution withdraw-address <account address>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// find the key to look up the account
+			addrString := args[0]
+
+			delAddr, err := sdk.AccAddressFromBech32(addrString)
+			if err != nil {
+				return err
+			}
+
+			key := distribution.GetDelegatorWithdrawAddrKey(delAddr)
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			res, err := cliCtx.QueryStore(key, storeName)
+			if err != nil {
+				return err
+			}
+
+			var withdrawAddress sdk.AccAddress
+			if len(res) == 0 {
+				withdrawAddress = delAddr
+			} else {
+				withdrawAddress = sdk.AccAddress(res)
+			}
+
+			fmt.Println(withdrawAddress.String())
+			return nil
+		},
+	}
+}
+
 // GetDelegationDistInfo returns the delegation distribution information of a given delegation
 func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{

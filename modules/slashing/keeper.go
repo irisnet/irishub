@@ -37,7 +37,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, vs sdk.ValidatorSet, paramspa
 // handle a validator signing two blocks at the same height
 // power: power of the double-signing validator at the height of infraction
 func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractionHeight int64, timestamp time.Time, power int64) (tags sdk.Tags) {
-	logger := ctx.Logger().With("module", "x/slashing")
+	logger := ctx.Logger()
 	time := ctx.BlockHeader().Time
 	age := time.Sub(timestamp)
 	consAddr := sdk.ConsAddress(addr)
@@ -58,12 +58,14 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 	// Double sign too old
 	maxEvidenceAge := k.MaxEvidenceAge(ctx)
 	if age > maxEvidenceAge {
-		logger.Info(fmt.Sprintf("Ignored double sign from %s at height %d, age of %d past max age of %d", pubkey.Address(), infractionHeight, age, maxEvidenceAge))
+		logger.Info("Ignored double sign because of the age is greater than max age", "validator", pubkey.Address(),
+			"infraction_height", infractionHeight, "age", age, "max_evidence_age", maxEvidenceAge)
 		return
 	}
 
 	// Double sign confirmed
-	logger.Info(fmt.Sprintf("Confirmed double sign from %s at height %d, age of %d less than max age of %d", pubkey.Address(), infractionHeight, age, maxEvidenceAge))
+	logger.Info("Validator double sign Confirmed", "validator", pubkey.Address(), "infraction_height", infractionHeight,
+		"age", age, "max_evidence_age", maxEvidenceAge)
 
 	// We need to retrieve the stake distribution which signed the block, so we subtract ValidatorUpdateDelay from the evidence height.
 	// Note that this *can* result in a negative "distributionHeight", up to -ValidatorUpdateDelay,
@@ -75,7 +77,7 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 	// within the slashing period when this infraction was committed
 	fraction := k.SlashFractionDoubleSign(ctx)
 	revisedFraction := k.capBySlashingPeriod(ctx, consAddr, fraction, distributionHeight)
-	logger.Info(fmt.Sprintf("Fraction slashed capped by slashing period from %v to %v", fraction, revisedFraction))
+	logger.Info("Fraction slashed capped by slashing period", "fraction", fraction, "revised_fraction", revisedFraction)
 
 	// Slash validator
 	// `power` is the int64 power of the validator as provided to/by
@@ -103,7 +105,7 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 // handle a validator signature, must be called once per validator per block
 // TODO refactor to take in a consensus address, additionally should maybe just take in the pubkey too
 func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, power int64, signed bool) (tags sdk.Tags) {
-	logger := ctx.Logger().With("module", "x/slashing")
+	logger := ctx.Logger()
 	height := ctx.BlockHeight()
 	consAddr := sdk.ConsAddress(addr)
 	pubkey, err := k.getPubkey(ctx, addr)
@@ -138,7 +140,7 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 	}
 
 	if missed {
-		logger.Info(fmt.Sprintf("Absent validator %s at height %d, %d missed, threshold %d", addr, height, signInfo.MissedBlocksCounter, k.MinSignedPerWindow(ctx)))
+		logger.Info("Absent validator", "validator", addr.String(), "missed", signInfo.MissedBlocksCounter, "threshold", k.MinSignedPerWindow(ctx))
 	}
 	minHeight := signInfo.StartHeight + k.SignedBlocksWindow(ctx)
 	maxMissed := k.SignedBlocksWindow(ctx) - k.MinSignedPerWindow(ctx)
@@ -146,8 +148,8 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 		validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
 		if validator != nil && !validator.GetJailed() {
 			// Downtime confirmed: slash and jail the validator
-			logger.Info(fmt.Sprintf("Validator %s past min height of %d and below signed blocks threshold of %d",
-				pubkey.Address(), minHeight, k.MinSignedPerWindow(ctx)))
+			logger.Info("Validator Downtime confirmed", "validator", pubkey.Address(),
+				"operator_address", validator.GetOperator().String(), "min_height", minHeight, "missed", signInfo.MissedBlocksCounter, "threshold", k.MinSignedPerWindow(ctx))
 			// We need to retrieve the stake distribution which signed the block, so we subtract ValidatorUpdateDelay from the evidence height,
 			// and subtract an additional 1 since this is the LastCommit.
 			// Note that this *can* result in a negative "distributionHeight" up to -ValidatorUpdateDelay-1,
@@ -164,8 +166,8 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 			k.clearValidatorMissedBlockBitArray(ctx, consAddr)
 		} else {
 			// Validator was (a) not found or (b) already jailed, don't slash
-			logger.Info(fmt.Sprintf("Validator %s would have been slashed for downtime, but was either not found in store or already jailed",
-				pubkey.Address()))
+			logger.Info("Validator would have been slashed for downtime, but was either not found in store or already jailed",
+				"validator", pubkey.Address())
 		}
 	}
 
@@ -176,10 +178,10 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 
 // Punish proposer censorship by slashing malefactor's stake
 func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, infractionHeight int64) (tags sdk.Tags) {
-	logger := ctx.Logger().With("module", "x/slashing")
+	logger := ctx.Logger()
 	time := ctx.BlockHeader().Time
 	consAddr := sdk.ConsAddress(addr)
-	pubkey, err := k.getPubkey(ctx, addr)
+	_, err := k.getPubkey(ctx, addr)
 	if err != nil {
 		panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))
 	}
@@ -192,7 +194,9 @@ func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, i
 		// Tendermint might break this assumption at some point.
 		return
 	}
-	logger.Info(fmt.Sprintf("proposer censorship from %s at height %d", pubkey.Address(), infractionHeight))
+	logger.Info("The malefactor proposer proposed a invalid block",
+		"proposer_address", validator.GetOperator().String(),
+		"block_height", ctx.BlockHeight(), "consensus_address", consAddr.String())
 
 	distributionHeight := infractionHeight - stake.ValidatorUpdateDelay
 	// Slash validator
