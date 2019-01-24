@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/app/v1/gov"
 	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
