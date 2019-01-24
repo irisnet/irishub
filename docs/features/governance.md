@@ -26,8 +26,8 @@ Different levels correspond to different parameters：
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
 | govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critial==1, other(1,)|
-| govTallyingProcedure/Participation | 6/7 | 5/6 | 3/4 |(0,1)|
-| govTallyingProcedure/Threshold | 5/6 | 4/5 | 2/3 |(0,1)|
+| govTallyingProcedure/Participation | 7/8 | 5/6 | 3/4 |(0,1)|
+| govTallyingProcedure/Threshold | 6/7 | 4/5 | 2/3 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
 | govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
 
