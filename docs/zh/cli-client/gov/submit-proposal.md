@@ -29,7 +29,7 @@ iriscli gov submit-proposal --help
 | --version           |            0                | [uint64] 新协议的版本信息                                                                           |       |
 | --software           |           " "                 | [string] 新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     | [string] 新版本协议升级的高度                                                     |       |
-| --threshold        | "0.85"   |  [string] 软件升级的阈值                                              |               |
+| --threshold        | "0.8"   |  [string] 软件升级的阈值                                              |               |
 
 ## 例子
 
