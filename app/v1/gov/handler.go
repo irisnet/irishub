@@ -43,7 +43,6 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 		if !found {
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
-		keeper.ck.IncreaseLoosenToken(ctx,sdk.Coins{sdk.NewCoin("iris-atto",sdk.NewInt(10))})
 	}
 
 	if msg.ProposalType == ProposalTypeParameterChange {
