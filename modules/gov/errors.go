@@ -21,23 +21,24 @@ const (
 	CodeInvalidVote             sdk.CodeType = 9
 	CodeInvalidGenesis          sdk.CodeType = 10
 	CodeInvalidProposalStatus   sdk.CodeType = 11
-	CodeInvalidParam          sdk.CodeType = 12
-	CodeInvalidParamOp        sdk.CodeType = 13
-	CodeSwitchPeriodInProcess sdk.CodeType = 14
-	CodeInvalidPercent        sdk.CodeType = 15
-	CodeInvalidUsageType      sdk.CodeType = 16
-	CodeInvalidInput          sdk.CodeType = 17
-	CodeInvalidVersion        sdk.CodeType = 18
-	CodeInvalidSwitchHeight   sdk.CodeType = 19
-
-	CodeDepositDeleted      sdk.CodeType = 21
-	CodeVoteNotExisted      sdk.CodeType = 22
-	CodeDepositNotExisted   sdk.CodeType = 23
-	CodeNotInDepositPeriod  sdk.CodeType = 24
-	CodeAlreadyVote         sdk.CodeType = 25
-	CodeOnlyValidatorVote   sdk.CodeType = 26
-	CodeMoreThanMaxProposal sdk.CodeType = 27
-	CodeEmptyParam          sdk.CodeType = 29
+	CodeInvalidParam            sdk.CodeType = 12
+	CodeInvalidParamOp          sdk.CodeType = 13
+	CodeSwitchPeriodInProcess   sdk.CodeType = 14
+	CodeInvalidPercent          sdk.CodeType = 15
+	CodeInvalidUsageType        sdk.CodeType = 16
+	CodeInvalidInput            sdk.CodeType = 17
+	CodeInvalidVersion          sdk.CodeType = 18
+	CodeInvalidProposal         sdk.CodeType = 19
+	CodeNotEnoughInitialDeposit sdk.CodeType = 20
+	CodeDepositDeleted          sdk.CodeType = 21
+	CodeVoteNotExisted          sdk.CodeType = 22
+	CodeDepositNotExisted       sdk.CodeType = 23
+	CodeNotInDepositPeriod      sdk.CodeType = 24
+	CodeAlreadyVote             sdk.CodeType = 25
+	CodeOnlyValidatorVote       sdk.CodeType = 26
+	CodeMoreThanMaxProposal     sdk.CodeType = 27
+	CodeInvalidUpgradeParams    sdk.CodeType = 28
+	CodeEmptyParam              sdk.CodeType = 29
 )
 
 //----------------------------------------
@@ -83,7 +84,6 @@ func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidVote, msg)
 }
 
-////////////////////  iris begin  ///////////////////////////
 func ErrInvalidParam(codespace sdk.CodespaceType, str string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("%s Params don't support the ParameterChange.", str))
 }
@@ -150,4 +150,10 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 	return sdk.NewError(codespace, CodeMoreThanMaxProposal, fmt.Sprintf("The num of %s proposal can't be more than the maximum %v.", proposalLevel, num))
 }
 
-////////////////////  iris end  /////////////////////////////
+func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
+}
+
+func ErrNotEnoughInitialDeposit(codespace sdk.CodespaceType, initialDeposit sdk.Coins, minDeposit sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeNotEnoughInitialDeposit, fmt.Sprintf("Initial Deposit [%s] is less than minInitialDeposit [%s]", initialDeposit.String(), minDeposit.String()))
+}

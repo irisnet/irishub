@@ -5,7 +5,7 @@ import sdk "github.com/irisnet/irishub/types"
 var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
-	TextProposal
+	BasicProposal
 	ProtocolDefinition sdk.ProtocolDefinition `json:"protocol_definition"`
 }
 

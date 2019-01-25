@@ -43,7 +43,7 @@ All commands which can be used to send transactions have these global flags. The
 
 ## Module command list
 
-Each modules provides a set of command line interfaces. Here we sort these commands by modules.
+Each module provides a set of command line interfaces. Here we sort these commands by modules.
 
 1. [status command](./status/README.md)
 2. [tendermint command](./tendermint/README.md)

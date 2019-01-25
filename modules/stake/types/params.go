@@ -115,6 +115,10 @@ func DefaultParams() Params {
 }
 
 func ValidateParams(p Params) error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateUnbondingTime(p.UnbondingTime); err != nil {
 		return err
 	}
@@ -148,10 +152,8 @@ func validateUnbondingTime(v time.Duration) sdk.Error {
 }
 
 func validateMaxValidators(v uint16) sdk.Error {
-	if sdk.NetworkType == sdk.Mainnet {
-		if v < 100 || v > 200 {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxValidators, fmt.Sprintf("Invalid MaxValidators [%d] should be between [100, 200]", v))
-		}
+	if v < 100 || v > 200 {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxValidators, fmt.Sprintf("Invalid MaxValidators [%d] should be between [100, 200]", v))
 	}
 	return nil
 }

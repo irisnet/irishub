@@ -2,7 +2,6 @@ package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-
 )
 
 const StartingProposalID = 1
@@ -14,7 +13,7 @@ type GenesisState struct {
 
 func NewGenesisState(systemHaltPeriod int64, params GovParams) GenesisState {
 	return GenesisState{
-		Params:params,
+		Params: params,
 	}
 }
 
@@ -40,14 +39,14 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 
 	k.SetSystemHaltHeight(ctx, -1)
-    k.SetParamSet(ctx,data.Params)
+	k.SetParamSet(ctx, data.Params)
 }
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 	return GenesisState{
-		Params:k.GetParamSet(ctx),
+		Params: k.GetParamSet(ctx),
 	}
 }
 
@@ -63,7 +62,7 @@ func ValidateGenesis(data GenesisState) error {
 func DefaultGenesisStateForCliTest() GenesisState {
 
 	return GenesisState{
-		Params:DefaultParams(),
+		Params: DefaultParamsForTest(),
 	}
 }
 

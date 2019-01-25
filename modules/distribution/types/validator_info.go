@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/tendermint/tendermint/libs/log"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -51,8 +52,8 @@ func NewValidatorDistInfo(operatorAddr sdk.ValAddress, currentHeight int64) Vali
 }
 
 // update total delegator accumululation
-func (vi ValidatorDistInfo) UpdateTotalDelAccum(height int64, totalDelShares sdk.Dec) ValidatorDistInfo {
-	vi.DelAccum = vi.DelAccum.UpdateForNewHeight(height, totalDelShares)
+func (vi ValidatorDistInfo) UpdateTotalDelAccum(logger log.Logger, height int64, totalDelShares sdk.Dec) ValidatorDistInfo {
+	vi.DelAccum = vi.DelAccum.UpdateForNewHeight(logger, height, totalDelShares)
 	return vi
 }
 
@@ -76,12 +77,13 @@ func (vi ValidatorDistInfo) GetValAccum(height int64, valTokens sdk.Dec) sdk.Dec
 // - called in DelegationDistInfo.WithdrawRewards
 // NOTE: When a delegator unbonds, say, onDelegationSharesModified ->
 //       WithdrawDelegationReward -> WithdrawRewards
-func (vi ValidatorDistInfo) TakeFeePoolRewards(wc WithdrawContext) (
+func (vi ValidatorDistInfo) TakeFeePoolRewards(logger log.Logger, wc WithdrawContext) (
 	ValidatorDistInfo, FeePool) {
 
-	fp := wc.FeePool.UpdateTotalValAccum(wc.Height, wc.TotalPower)
+	fp := wc.FeePool.UpdateTotalValAccum(logger, wc.Height, wc.TotalPower)
 
 	if fp.TotalValAccum.Accum.IsZero() {
+		logger.Debug("The total validator accumulation of feelPool is zero")
 		vi.FeePoolWithdrawalHeight = wc.Height
 		return vi, fp
 	}
@@ -101,18 +103,20 @@ func (vi ValidatorDistInfo) TakeFeePoolRewards(wc WithdrawContext) (
 
 	fp.TotalValAccum.Accum = fp.TotalValAccum.Accum.Sub(accum)
 	fp.ValPool = remValPool
+	logger.Debug("Global fee pool", "total_accum", fp.TotalValAccum.Accum.String(), "update_height", fp.TotalValAccum.UpdateHeight, "val_pool", fp.ValPool.ToString(), "community_pool", fp.CommunityPool.ToString())
 	vi.ValCommission = vi.ValCommission.Plus(commission)
 	vi.DelPool = vi.DelPool.Plus(afterCommission)
+	logger.Debug("Take fee pool reward", "withdraw_token", withdrawalTokens.ToString(), "commission_rate", wc.CommissionRate.String(), "commission", commission.ToString(), "after_commission", afterCommission.ToString())
 
 	return vi, fp
 }
 
 // withdraw commission rewards
-func (vi ValidatorDistInfo) WithdrawCommission(wc WithdrawContext) (
+func (vi ValidatorDistInfo) WithdrawCommission(logger log.Logger, wc WithdrawContext) (
 	vio ValidatorDistInfo, fpo FeePool, withdrawn DecCoins) {
 
-	vi, fp := vi.TakeFeePoolRewards(wc)
-
+	vi, fp := vi.TakeFeePoolRewards(logger, wc)
+	logger.Debug("Withdraw commission", "commission", vi.ValCommission.ToString())
 	withdrawalTokens := vi.ValCommission
 	vi.ValCommission = DecCoins{} // zero
 
@@ -154,10 +158,10 @@ func (vi ValidatorDistInfo) CurrentCommissionRewards(
 	return commissionPool
 }
 
-// convert validator distribution info to string
+// get the validator's commission pool rewards at this current state,
 func (vi ValidatorDistInfo) String() string {
 
-	resp := "ValidatorDistInfo {\n"
+	resp := "{\n"
 	resp += fmt.Sprintf("\tOperator Address: %s\n", vi.OperatorAddr)
 	resp += fmt.Sprintf("\tFeePoolWithdrawalHeight: %d\n", vi.FeePoolWithdrawalHeight)
 	resp += fmt.Sprintf("\tDelAccum: {\n")
@@ -167,5 +171,6 @@ func (vi ValidatorDistInfo) String() string {
 	resp += fmt.Sprintf("\tdel_pool: %s\n", vi.DelPool.ToString())
 	resp += fmt.Sprintf("\tval_commission: %s\n", vi.ValCommission.ToString())
 	resp += fmt.Sprintf("}")
+
 	return resp
 }

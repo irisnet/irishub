@@ -34,6 +34,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // Called every block, update validator set
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) (validatorUpdates []abci.ValidatorUpdate) {
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/stake"))
 	endBlockerTags := sdk.EmptyTags()
 	// Calculate validator set changes.
 	//
@@ -131,6 +132,9 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator, k k
 		return err.Result()
 	}
 
+	ctx.Logger().Info("Create validator", "consensus_address", validator.ConsAddress().String(),
+		"operator_address", validator.OperatorAddr.String(), "commission", validator.Commission.String())
+
 	tags := sdk.NewTags(
 		tags.DstValidator, []byte(msg.ValidatorAddr.String()),
 		tags.Moniker, []byte(msg.Description.Moniker),
@@ -162,11 +166,14 @@ func handleMsgEditValidator(ctx sdk.Context, msg types.MsgEditValidator, k keepe
 		if err != nil {
 			return err.Result()
 		}
+		ctx.Logger().Debug("Update validator commission rate", "validator_addr", msg.ValidatorAddr.String(),
+			"commission_rate", msg.CommissionRate.String())
 		validator.Commission = commission
 		k.OnValidatorModified(ctx, msg.ValidatorAddr)
 	}
 
 	k.SetValidator(ctx, validator)
+	ctx.Logger().Debug("Edit validator", "validator_addr", msg.ValidatorAddr.String())
 
 	tags := sdk.NewTags(
 		tags.DstValidator, []byte(msg.ValidatorAddr.String()),

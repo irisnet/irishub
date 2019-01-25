@@ -3,26 +3,25 @@ package v0
 import (
 	"fmt"
 
-	banksim "github.com/irisnet/irishub/modules/bank/simulation"
-	distrsim "github.com/irisnet/irishub/modules/distribution/simulation"
-	"github.com/irisnet/irishub/modules/mock/simulation"
-	stakesim "github.com/irisnet/irishub/modules/stake/simulation"
+	"github.com/irisnet/irishub/modules/bank"
+	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/stake"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func (p *ProtocolV0) runtimeInvariants() []simulation.Invariant {
-	return []simulation.Invariant{
-		banksim.NonnegativeBalanceInvariant(p.accountMapper),
+func (p *ProtocolV0) runtimeInvariants() []sdk.Invariant {
+	return []sdk.Invariant{
+		bank.NonnegativeBalanceInvariant(p.accountMapper),
 
-		distrsim.ValAccumInvariants(p.distrKeeper, p.StakeKeeper),
-		distrsim.DelAccumInvariants(p.distrKeeper, p.StakeKeeper),
-		distrsim.CanWithdrawInvariant(p.distrKeeper, p.StakeKeeper),
+		distr.ValAccumInvariants(p.distrKeeper, p.StakeKeeper),
+		distr.DelAccumInvariants(p.distrKeeper, p.StakeKeeper),
+		distr.CanWithdrawInvariant(p.distrKeeper, p.StakeKeeper),
 
-		stakesim.SupplyInvariants(p.bankKeeper, p.StakeKeeper,
+		stake.SupplyInvariants(p.bankKeeper, p.StakeKeeper,
 			p.feeKeeper, p.distrKeeper, p.accountMapper),
-		stakesim.NonNegativePowerInvariant(p.StakeKeeper),
-		stakesim.PositiveDelegationInvariant(p.StakeKeeper),
-		stakesim.DelegatorSharesInvariant(p.StakeKeeper),
+		stake.NonNegativePowerInvariant(p.StakeKeeper),
+		stake.PositiveDelegationInvariant(p.StakeKeeper),
+		stake.DelegatorSharesInvariant(p.StakeKeeper),
 	}
 }
 
@@ -31,6 +30,7 @@ func (p *ProtocolV0) assertRuntimeInvariants(ctx sdk.Context) {
 		return
 	}
 	invariants := p.runtimeInvariants()
+	ctx = ctx.WithLogger(ctx.Logger().With("module", "iris/invariant"))
 	for _, inv := range invariants {
 		if err := inv(ctx); err != nil {
 			if p.invariantLevel == sdk.InvariantPanic {

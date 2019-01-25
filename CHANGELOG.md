@@ -1,10 +1,61 @@
 # Changelog
 
+## 0.11.0
+
+*January 25th, 2019*
+
+- [iris] Handle the expected abort during replay last block
+- [iris] Go through and make sure all panic are reasonable
+- [iris] Add the set-withdraw-address feature
+- [iris] Update default param value of Upgrade Threshold and Critical Proposal
+- [iris] Fix bug that evidence age doesn't take effect
+
+- [iriscli] Improve the upgrade query-signals cmd
+
+- [tendermint] Avoid one evidence be committed multiple times
+
+## 0.11.0-rc0
+
+*January 21th, 2019*
+
+- [iris] Move the upgrade tally threshold into the software upgrade proposal
+- [iris] Limit the size of transaction
+- [iris] Tendermint's blockstore also needs to consume gas when storing transactions
+- [iris] Proposer censorship slashing to prevent the proposer from submitting block containing garbage tx data
+- [iris] The proposer must deposit 30% of the mindeposit when submitting the proposal
+- [iris] Make more check about every msg's ValidateBasic()
+- [iris] Add flag --output-file to save export result and ensure result is consistent
+- [iris] Add new param service/TxSizeLimit to limit the service tx size
+- [iris] Block mint doesn't depend on BFT time
+- [iris] Fix infinite gas meter utilization during aborted ante handler executions
+- [iris] Auto-config bech32 prefixes based on network type
+- [iris] Improve the system logs
+
+- [iriscli] Make the result of `iriscli tendermint tx` readable
+- [iriscli] Improve the output format of the query proposals
+- [iriscli] Enhance the query-signals cmd to print the accumulated signal voting power percent
+
+- [iristool] Add support for consensus address and pubkey
+
+
+## 0.10.2
+
+*January 17th, 2019*
+
+- [iris] The proposer must deposit 30% of the mindeposit when submitting the proposal
+
+
+## 0.10.1
+
+*January 17th, 2019*
+
+- [iriscli] Fix issue about query validator information
+- [iriscli] Fix cli query proposals error
+
 
 ## 0.10.0
 
 *January 16th, 2019*
-
 
 - [iris] Add flag --output-file to save export result and ensure result is consistent
 - [iris] Improve invariant checking coverage and fix distribution bugs

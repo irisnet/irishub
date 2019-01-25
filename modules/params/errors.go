@@ -35,6 +35,7 @@ const (
 	CodeInvalidSlashFraction        sdk.CodeType = 203
 	CodeInvalidArbitrationTimeLimit sdk.CodeType = 204
 	CodeComplaintRetrospect         sdk.CodeType = 205
+	CodeInvalidServiceTxSizeLimit          sdk.CodeType = 206
 
 	//upgrade
 	CodeInvalidUpgradeParams sdk.CodeType = 300
@@ -49,6 +50,7 @@ const (
 
 	//auth
 	CodeInvalidGasPriceThreshold sdk.CodeType = 600
+	CodeInvalidTxSizeLimit       sdk.CodeType = 601
 
 	//distribution
 	CodeInvalidCommunityTax        sdk.CodeType = 700

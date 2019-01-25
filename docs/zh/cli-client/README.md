@@ -44,16 +44,16 @@
 
 ## 模块命令列表
 
-1. [status command](./status/README.md)
-2. [tendermint command](./tendermint/README.md)
-3. [keys command](./keys/README.md)
-4. [bank command](./bank/README.md)
-5. [stake command](./stake/README.md)
-6. [distribution command](./distribution/README.md)
-7. [gov command](./gov/README.md)
-8. [upgrade command](./upgrade/README.md)
-9. [service command](./service/README.md)
+1. [status 命令](./status/README.md)
+2. [tendermint 命令](./tendermint/README.md)
+3. [keys 命令](./keys/README.md)
+4. [bank 命令](./bank/README.md)
+5. [stake 命令](./stake/README.md)
+6. [distribution 命令](./distribution/README.md)
+7. [gov 命令](./gov/README.md)
+8. [upgrade 命令](./upgrade/README.md)
+9. [service 命令](./service/README.md)
 
 ## 配置命令
 
-iriscli config命令可以交互式地配置一些默认参数，例如chain-id，home，fee 和 node。
+`iriscli config` 命令可以交互式地配置一些默认参数，例如chain-id，home，fee 和 node。

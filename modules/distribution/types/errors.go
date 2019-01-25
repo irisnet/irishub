@@ -8,10 +8,9 @@ import (
 type CodeType = sdk.CodeType
 
 const (
-	DefaultCodespace        sdk.CodespaceType = "distr"
-	CodeInvalidInput        CodeType          = 103
-	CodeNoDistributionInfo  CodeType          = 104
-	CodeDeprecatedOperation CodeType          = 105
+	DefaultCodespace       sdk.CodespaceType = "distr"
+	CodeInvalidInput       CodeType          = 103
+	CodeNoDistributionInfo CodeType          = 104
 )
 
 func ErrNilDelegatorAddr(codespace sdk.CodespaceType) sdk.Error {
@@ -28,7 +27,4 @@ func ErrNoDelegationDistInfo(codespace sdk.CodespaceType) sdk.Error {
 }
 func ErrNoValidatorDistInfo(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNoDistributionInfo, "no validator distribution info")
-}
-func ErrDeprecatedOperation(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeDeprecatedOperation, "this operation is deprecated")
 }

@@ -1,8 +1,6 @@
 package gov
 
 import (
-	"fmt"
-
 	"encoding/json"
 	"strconv"
 
@@ -39,35 +37,44 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
-	////////////////////  iris begin  ///////////////////////////
+
 	if msg.ProposalType == ProposalTypeSystemHalt {
 		_, found := keeper.guardianKeeper.GetProfiler(ctx, msg.Proposer)
 		if !found {
 			return ErrNotProfiler(keeper.codespace, msg.Proposer).Result()
 		}
 	}
+
+	if msg.ProposalType == ProposalTypeParameterChange {
+		for _, param := range msg.Params {
+			if p, ok := keeper.paramsKeeper.GetParamSet(param.Subspace); ok {
+				if _, err := p.Validate(param.Key, param.Value); err != nil {
+					return err.Result()
+				}
+			} else {
+				return ErrInvalidParam(DefaultCodespace, param.Subspace).Result()
+			}
+		}
+	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
 
-	////////////////////  iris end  /////////////////////////////
-
-	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
+	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
-	////////////////////  iris begin  ///////////////////////////
+
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
 	var paramBytes []byte
 	if msg.ProposalType == ProposalTypeParameterChange {
 		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
 	}
-	////////////////////  iris end  /////////////////////////////
+
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-		////////////////////  iris begin  ///////////////////////////
+
 		tags.Param, paramBytes,
-		////////////////////  iris end  /////////////////////////////
 	)
 
 	if votingStarted {
@@ -96,7 +103,7 @@ func handleMsgSubmitTxTaxUsageProposal(ctx sdk.Context, keeper Keeper, msg MsgSu
 
 	proposal := keeper.NewUsageProposal(ctx, msg)
 
-	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
+	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
@@ -148,7 +155,7 @@ func handleMsgSubmitSoftwareUpgradeProposal(ctx sdk.Context, keeper Keeper, msg 
 
 	proposal := keeper.NewSoftwareUpgradeProposal(ctx, msg)
 
-	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), msg.Proposer, msg.InitialDeposit)
+	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
@@ -177,9 +184,7 @@ func handleMsgDeposit(ctx sdk.Context, keeper Keeper, msg MsgDeposit) sdk.Result
 		return err.Result()
 	}
 
-	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatUint(msg.ProposalID, 10))
-	////////////////////  iris end  /////////////////////////////
 
 	// TODO: Add tag for if voting period started
 	resTags := sdk.NewTags(
@@ -203,9 +208,7 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 		return err.Result()
 	}
 
-	////////////////////  iris begin  ///////////////////////////
 	proposalIDBytes := []byte(strconv.FormatUint(msg.ProposalID, 10))
-	////////////////////  iris end  /////////////////////////////
 
 	resTags := sdk.NewTags(
 		tags.Voter, []byte(msg.Voter.String()),
@@ -219,13 +222,12 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 // Called every block, process inflation, update validator set
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
-	logger := ctx.Logger().With("module", "gov")
-
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/gov"))
 	resTags = sdk.NewTags()
 
 	if ctx.BlockHeight() == keeper.GetSystemHaltHeight(ctx) {
 		resTags = resTags.AppendTag(tmstate.HaltTagKey, []byte(tmstate.HaltTagValue))
-		logger.Info(fmt.Sprintf("SystemHalt Start!!!"))
+		ctx.Logger().Info("SystemHalt Start!!!")
 	}
 
 	inactiveIterator := keeper.InactiveProposalQueueIterator(ctx, ctx.BlockHeader().Time)
@@ -235,20 +237,16 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
 		keeper.SubProposalNum(ctx, inactiveProposal)
-		keeper.RefundDepositsWithoutFee(ctx, proposalID)
+		keeper.DeleteDeposits(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
 		keeper.RemoveFromInactiveProposalQueue(ctx, inactiveProposal.GetDepositEndTime(), inactiveProposal.GetProposalID())
-		logger.Info(
-			fmt.Sprintf("proposal %d (%s) didn't meet minimum deposit of %s (had only %s); deleted",
-				inactiveProposal.GetProposalID(),
-				inactiveProposal.GetTitle(),
-				keeper.GetDepositProcedure(ctx, inactiveProposal).MinDeposit,
-				inactiveProposal.GetTotalDeposit(),
-			),
+		ctx.Logger().Info("Proposal didn't meet minimum deposit; deleted", "ProposalID",
+			inactiveProposal.GetProposalID(), "MinDeposit", keeper.GetDepositProcedure(ctx, inactiveProposal).MinDeposit,
+			"ActualDeposit", inactiveProposal.GetTotalDeposit(),
 		)
 	}
 
@@ -278,9 +276,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
-		logger.Info(fmt.Sprintf("proposal %d (%s) tallied; result: %v",
-			activeProposal.GetProposalID(), activeProposal.GetTitle(), result))
-
+		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result)
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 

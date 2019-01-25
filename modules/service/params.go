@@ -1,12 +1,13 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
-	"time"
 	"fmt"
-	"github.com/irisnet/irishub/codec"
 	"strconv"
+	"time"
+
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -25,6 +26,7 @@ var (
 	KeySlashFraction        = []byte("SlashFraction")
 	KeyComplaintRetrospect  = []byte("ComplaintRetrospect")
 	KeyArbitrationTimeLimit = []byte("ArbitrationTimeLimit")
+	KeyTxSizeLimit          = []byte("TxSizeLimit")
 )
 
 // ParamTable for service module
@@ -40,6 +42,7 @@ type Params struct {
 	SlashFraction        sdk.Dec       `json:"slash_fraction"`
 	ComplaintRetrospect  time.Duration `json:"complaint_retrospect"`
 	ArbitrationTimeLimit time.Duration `json:"arbitration_time_limit"`
+	TxSizeLimit          uint64        `json:"tx_size_limit"`
 }
 
 // Implements params.ParamStruct
@@ -55,6 +58,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeySlashFraction, &p.SlashFraction},
 		{KeyComplaintRetrospect, &p.ComplaintRetrospect},
 		{KeyArbitrationTimeLimit, &p.ArbitrationTimeLimit},
+		{KeyTxSizeLimit, &p.TxSizeLimit},
 	}
 }
 
@@ -114,6 +118,15 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, err
 		}
 		return arbitrationTimeLimit, nil
+	case string(KeyTxSizeLimit):
+		txSizeLimit, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateTxSizeLimit(txSizeLimit); err != nil {
+			return nil, err
+		}
+		return txSizeLimit, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -139,6 +152,9 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	case string(KeyArbitrationTimeLimit):
 		err := cdc.UnmarshalJSON(bytes, &p.ArbitrationTimeLimit)
 		return p.ArbitrationTimeLimit.String(), err
+	case string(KeyTxSizeLimit):
+		err := cdc.UnmarshalJSON(bytes, &p.TxSizeLimit)
+		return strconv.FormatUint(p.TxSizeLimit, 10), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
@@ -153,6 +169,7 @@ func DefaultParams() Params {
 		SlashFraction:        sdk.NewDecWithPrec(1, 3),    //0.1%
 		ComplaintRetrospect:  time.Duration(15 * sdk.Day), //15 days
 		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),  //5 days
+		TxSizeLimit:          4000,
 	}
 }
 
@@ -165,10 +182,15 @@ func DefaultParamsForTest() Params {
 		SlashFraction:        sdk.NewDecWithPrec(1, 3), //0.1%
 		ComplaintRetrospect:  20 * time.Second,         //20 seconds
 		ArbitrationTimeLimit: 20 * time.Second,         //20 seconds
+		TxSizeLimit:          4000,
 	}
 }
 
 func validateParams(p Params) error {
+	if sdk.NetworkType != sdk.Mainnet {
+		return nil
+	}
+
 	if err := validateMaxRequestTimeout(p.MaxRequestTimeout); err != nil {
 		return err
 	}
@@ -185,6 +207,9 @@ func validateParams(p Params) error {
 		return err
 	}
 	if err := validateArbitrationTimeLimit(p.ArbitrationTimeLimit); err != nil {
+		return err
+	}
+	if err := validateTxSizeLimit(p.TxSizeLimit); err != nil {
 		return err
 	}
 	return nil
@@ -260,6 +285,13 @@ func validateArbitrationTimeLimit(v time.Duration) sdk.Error {
 		}
 	} else if v < 20*time.Second {
 		return sdk.NewError(params.DefaultCodespace, params.CodeComplaintRetrospect, fmt.Sprintf("Invalid ComplaintRetrospect [%s] should be between [20seconds, )", v.String()))
+	}
+	return nil
+}
+
+func validateTxSizeLimit(v uint64) sdk.Error {
+	if v < uint64(2000) || v > uint64(6000) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidServiceTxSizeLimit, fmt.Sprintf("Invalid ServiceTxSizeLimit [%d] should be between [2000, 6000]", v))
 	}
 	return nil
 }

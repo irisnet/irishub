@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // distribution info for a delegation - used to determine entitled rewards
@@ -34,18 +35,20 @@ func (di DelegationDistInfo) GetDelAccum(height int64, delegatorShares sdk.Dec) 
 //   * updates validator info's FeePoolWithdrawalHeight, thus setting accum to 0
 //   * updates fee pool to latest height and total val accum w/ given totalBonded
 //   (see comment on TakeFeePoolRewards for more info)
-func (di DelegationDistInfo) WithdrawRewards(wc WithdrawContext, vi ValidatorDistInfo,
+func (di DelegationDistInfo) WithdrawRewards(logger log.Logger, wc WithdrawContext, vi ValidatorDistInfo,
 	totalDelShares, delegatorShares sdk.Dec) (
 	DelegationDistInfo, ValidatorDistInfo, FeePool, DecCoins) {
 
 	fp := wc.FeePool
-	vi = vi.UpdateTotalDelAccum(wc.Height, totalDelShares)
+	vi = vi.UpdateTotalDelAccum(logger, wc.Height, totalDelShares)
+	logger.Debug("After updating delegation accumulation", "validator_distInfo", vi.String())
 
 	if vi.DelAccum.Accum.IsZero() {
+		logger.Debug("Validator delegation accumulation is zero")
 		return di, vi, fp, DecCoins{}
 	}
 
-	vi, fp = vi.TakeFeePoolRewards(wc)
+	vi, fp = vi.TakeFeePoolRewards(logger, wc)
 
 	accum := di.GetDelAccum(wc.Height, delegatorShares)
 	di.DelPoolWithdrawalHeight = wc.Height

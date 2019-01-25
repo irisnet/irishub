@@ -18,6 +18,7 @@ import (
 var (
 	DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
 	BurnRate              = sdk.NewDecWithPrec(2, 1)
+	MinDepositRate        = sdk.NewDecWithPrec(3, 1)
 )
 
 // Governance ProtocolKeeper
@@ -75,7 +76,6 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 // =====================================================
 // Proposals
 
-////////////////////  iris begin  ///////////////////////////
 func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Params) Proposal {
 	switch proposalType {
 	case ProposalTypeParameterChange:
@@ -86,19 +86,17 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	return nil
 }
 
-////////////////////  iris end  /////////////////////////////
-
 // =====================================================
 // Proposals
 
 // Creates a NewProposal
-////////////////////  iris begin  ///////////////////////////
+
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -126,7 +124,7 @@ func (keeper Keeper) NewSystemHaltProposal(ctx sdk.Context, title string, descri
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        title,
 		Description:  description,
@@ -152,7 +150,7 @@ func (keeper Keeper) NewUsageProposal(ctx sdk.Context, msg MsgSubmitTxTaxUsagePr
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
@@ -178,7 +176,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	if err != nil {
 		return nil
 	}
-	var textProposal = TextProposal{
+	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
 		Title:        msg.Title,
 		Description:  msg.Description,
@@ -193,7 +191,8 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 		sdk.ProtocolDefinition{
 			msg.Version,
 			msg.Software,
-			msg.SwitchHeight,},
+			msg.SwitchHeight,
+			msg.Threshold},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
@@ -422,6 +421,17 @@ func (keeper Keeper) setDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(deposit)
 	store.Set(KeyDeposit(proposalID, depositorAddr), bz)
+}
+
+func (keeper Keeper) AddInitialDeposit(ctx sdk.Context, proposal Proposal, depositorAddr sdk.AccAddress, initialDeposit sdk.Coins) (sdk.Error, bool) {
+
+	minDepositInt := sdk.NewDecFromInt(keeper.GetDepositProcedure(ctx, proposal).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(MinDepositRate).RoundInt()
+	minInitialDeposit := sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, minDepositInt)}
+	if !initialDeposit.IsAllGTE(minInitialDeposit) {
+		return ErrNotEnoughInitialDeposit(DefaultCodespace, initialDeposit, minInitialDeposit), false
+	}
+
+	return keeper.AddDeposit(ctx, proposal.GetProposalID(), depositorAddr, initialDeposit)
 }
 
 // Adds or updates a deposit of a specific depositor on a specific proposal
@@ -698,6 +708,11 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 }
 
 func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
+	ctx.Logger().Debug("Proposals Distribution",
+		"CriticalProposalNum" , keeper.GetCriticalProposalNum(ctx),
+		        "ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
+		        "NormalProposalNum"   , keeper.GetNormalProposalNum(ctx))
+
 	maxNum := keeper.GetMaxNumByProposalLevel(ctx, pl)
 	switch pl {
 	case ProposalLevelCritical:

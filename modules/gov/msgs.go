@@ -3,7 +3,6 @@ package gov
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -20,9 +19,7 @@ type MsgSubmitProposal struct {
 	ProposalType   ProposalKind   `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit sdk.Coins      `json:"initial_deposit"` //  Initial deposit paid by sender. Must be strictly positive.
-	////////////////////  iris begin  ///////////////////////////
-	Params Params
-	////////////////////  iris end  /////////////////////////////
+	Params         Params         `json:"params"`
 }
 
 func NewMsgSubmitProposal(title string, description string, proposalType ProposalKind, proposer sdk.AccAddress, initialDeposit sdk.Coins, params Params) MsgSubmitProposal {
@@ -32,9 +29,7 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		ProposalType:   proposalType,
 		Proposer:       proposer,
 		InitialDeposit: initialDeposit,
-		////////////////////  iris begin  ///////////////////////////
-		Params: params,
-		////////////////////  iris end  /////////////////////////////
+		Params:         params,
 	}
 }
 
@@ -62,25 +57,14 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if !msg.InitialDeposit.IsNotNegative() {
 		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
 	}
-	////////////////////  iris begin  ///////////////////////////
+	if err := msg.EnsureLength(); err != nil {
+		return err
+	}
 	if msg.ProposalType == ProposalTypeParameterChange {
-
 		if len(msg.Params) == 0 {
 			return ErrEmptyParam(DefaultCodespace)
 		}
-
-		for _, param := range msg.Params {
-			if p, ok := params.ParamSetMapping[param.Subspace]; ok {
-				if _, err := p.Validate(param.Key, param.Value); err != nil {
-					return err
-				}
-			} else {
-				return ErrInvalidParam(DefaultCodespace, param.Subspace)
-			}
-		}
-
 	}
-	////////////////////  iris end  /////////////////////////////
 	return nil
 }
 
@@ -109,17 +93,19 @@ func (msg MsgSubmitProposal) GetSigners() []sdk.AccAddress {
 
 type MsgSubmitSoftwareUpgradeProposal struct {
 	MsgSubmitProposal
-	Version      uint64 `json:"version"`
-	Software     string `json:"software"`
-	SwitchHeight uint64 `json:"switch_height"`
+	Version      uint64  `json:"version"`
+	Software     string  `json:"software"`
+	SwitchHeight uint64  `json:"switch_height"`
+	Threshold    sdk.Dec `json:"threshold"`
 }
 
-func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64) MsgSubmitSoftwareUpgradeProposal {
+func NewMsgSubmitSoftwareUpgradeProposal(msgSubmitProposal MsgSubmitProposal, version uint64, software string, switchHeight uint64, threshold sdk.Dec) MsgSubmitSoftwareUpgradeProposal {
 	return MsgSubmitSoftwareUpgradeProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Version:           version,
 		Software:          software,
 		SwitchHeight:      switchHeight,
+		Threshold:         threshold,
 	}
 }
 
@@ -128,6 +114,16 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	if err != nil {
 		return err
 	}
+
+	if len(msg.Software) > 70 {
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "software", len(msg.Software), 70)
+	}
+
+	// if threshold not in [0.85,1), then print error
+	if msg.Threshold.LT(sdk.NewDecWithPrec(80, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
+		return ErrInvalidUpgradeThreshold(DefaultCodespace, msg.Threshold)
+	}
+
 	return nil
 }
 
@@ -297,4 +293,14 @@ func (msg MsgVote) GetSignBytes() []byte {
 // Implements Msg.
 func (msg MsgVote) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Voter}
+}
+
+func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
+	if len(msg.Title) > 70 {
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "title", len(msg.Title), 70)
+	}
+	if len(msg.Description) > 280 {
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "description", len(msg.Description), 280)
+	}
+	return nil
 }

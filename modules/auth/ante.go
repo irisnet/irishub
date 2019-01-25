@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	memoCostPerByte     sdk.Gas = 1
-	ed25519VerifyCost           = 59
-	secp256k1VerifyCost         = 100
-	maxMemoCharacters           = 100
+	BlockStoreCostPerByte         = 10
+	ed25519VerifyCost             = 59
+	secp256k1VerifyCost           = 100
+	maxMemoCharacters             = 100
 	// how much gas = 1 atom
 	gasPerUnitCost = 1000
 	// max total number of sigs per tx
@@ -32,7 +32,10 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 		// This AnteHandler requires Txs to be StdTxs
 		stdTx, ok := tx.(StdTx)
 		if !ok {
-			return ctx, sdk.ErrInternal("tx must be StdTx").Result(), true
+			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
+			// during runTx.
+			newCtx = setGasMeter(simulate, ctx, 0)
+			return newCtx, sdk.ErrInternal("tx must be StdTx").Result(), true
 		}
 
 		// Ensure that the provided fees meet a minimum threshold for the validator, if this is a CheckTx.
@@ -44,7 +47,7 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 			}
 		}
 
-		newCtx = setGasMeter(simulate, ctx, stdTx)
+		newCtx = setGasMeter(simulate, ctx, stdTx.Fee.Gas)
 
 		// AnteHandlers must have their own defer/recover in order
 		// for the BaseApp to know how much gas was used!
@@ -68,8 +71,6 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 		if err := tx.ValidateBasic(); err != nil {
 			return newCtx, err.Result(), true
 		}
-		// charge gas for the memo
-		newCtx.GasMeter().ConsumeGas(memoCostPerByte*sdk.Gas(len(stdTx.GetMemo())), "memo")
 
 		// stdSigs contains the sequence number, account number, and signatures.
 		// When simulating, this would just be a 0-length slice.
@@ -279,13 +280,13 @@ func ensureSufficientMempoolFees(ctx sdk.Context, stdTx StdTx) sdk.Result {
 	return sdk.Result{}
 }
 
-func setGasMeter(simulate bool, ctx sdk.Context, stdTx StdTx) sdk.Context {
+func setGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
-	return ctx.WithGasMeter(sdk.NewGasMeter(stdTx.Fee.Gas))
+	return ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
 }
 
 func getSignBytesList(chainID string, stdTx StdTx, stdSigs []StdSignature) (signatureBytesList [][]byte) {

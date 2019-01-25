@@ -14,12 +14,11 @@ iriscli gov submit-proposal [flags]
 ```
 iriscli gov submit-proposal --help
 ```
-
-## 特殊标志
+## 标志
 
 | 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --deposit        |                            | [string] 提议的保证金                                                                                                                         |          |
+| --deposit        |                            | [string] 提议的保证金（至少30%minDeposit）                                                                                                                         |          |
 | --description    |                            | [string] 提议的描述                                                                                                           | Yes      |
 | --key            |                            | 参数的键名称                                                                                                                        |          |
 | --op             |                            | [string] 对参数的操作                                                                                                             |          |
@@ -30,8 +29,11 @@ iriscli gov submit-proposal --help
 | --version           |            0                | [uint64] 新协议的版本信息                                                                           |       |
 | --software           |           " "                 | [string] 新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     | [string] 新版本协议升级的高度                                                     |       |
+| --threshold        | "0.8"   |  [string] 软件升级的阈值                                              |               |
 
 ## 例子
+
+提议者必须抵押至少30%的`MinDeposit`，详情见 [Gov](../../feature/governance.md)
 
 ### 提交一个'ParameterChange'类型的提议
 
@@ -46,7 +48,7 @@ iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal"
 ### 提交一个'SoftwareUpgrade'类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80
+iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9
 ```
 
 在这种场景下，提议的 --title、--type 和--description参数必不可少，另外你也应该保留好提议ID，这是检索所提交提议的唯一方法。

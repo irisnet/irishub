@@ -318,6 +318,8 @@ func burnCoins(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coin
 		"burnAmount", []byte(amt.String()),
 	)
 
+	ctx.Logger().Info("Execute Burntoken Successed", "burnFrom", from, "burnAmount", amt.String())
+
 	return burnTags, nil
 }
 

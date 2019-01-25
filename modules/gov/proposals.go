@@ -71,8 +71,8 @@ func ProposalEqual(proposalA Proposal, proposalB Proposal) bool {
 }
 
 //-----------------------------------------------------------
-// Text Proposals
-type TextProposal struct {
+// Basic Proposals
+type BasicProposal struct {
 	ProposalID   uint64       `json:"proposal_id"`   //  ID of the proposal
 	Title        string       `json:"title"`         //  Title of the proposal
 	Description  string       `json:"description"`   //  Description of the proposal
@@ -90,41 +90,41 @@ type TextProposal struct {
 }
 
 // Implements Proposal Interface
-var _ Proposal = (*TextProposal)(nil)
+var _ Proposal = (*BasicProposal)(nil)
 
 // nolint
-func (tp TextProposal) GetProposalID() uint64                      { return tp.ProposalID }
-func (tp *TextProposal) SetProposalID(proposalID uint64)           { tp.ProposalID = proposalID }
-func (tp TextProposal) GetTitle() string                           { return tp.Title }
-func (tp *TextProposal) SetTitle(title string)                     { tp.Title = title }
-func (tp TextProposal) GetDescription() string                     { return tp.Description }
-func (tp *TextProposal) SetDescription(description string)         { tp.Description = description }
-func (tp TextProposal) GetProposalType() ProposalKind              { return tp.ProposalType }
-func (tp *TextProposal) SetProposalType(proposalType ProposalKind) { tp.ProposalType = proposalType }
-func (tp TextProposal) GetStatus() ProposalStatus                  { return tp.Status }
-func (tp *TextProposal) SetStatus(status ProposalStatus)           { tp.Status = status }
-func (tp TextProposal) GetTallyResult() TallyResult                { return tp.TallyResult }
-func (tp *TextProposal) SetTallyResult(tallyResult TallyResult)    { tp.TallyResult = tallyResult }
-func (tp TextProposal) GetSubmitTime() time.Time                   { return tp.SubmitTime }
-func (tp *TextProposal) SetSubmitTime(submitTime time.Time)        { tp.SubmitTime = submitTime }
-func (tp TextProposal) GetDepositEndTime() time.Time               { return tp.DepositEndTime }
-func (tp *TextProposal) SetDepositEndTime(depositEndTime time.Time) {
+func (tp BasicProposal) GetProposalID() uint64                      { return tp.ProposalID }
+func (tp *BasicProposal) SetProposalID(proposalID uint64)           { tp.ProposalID = proposalID }
+func (tp BasicProposal) GetTitle() string                           { return tp.Title }
+func (tp *BasicProposal) SetTitle(title string)                     { tp.Title = title }
+func (tp BasicProposal) GetDescription() string                     { return tp.Description }
+func (tp *BasicProposal) SetDescription(description string)         { tp.Description = description }
+func (tp BasicProposal) GetProposalType() ProposalKind              { return tp.ProposalType }
+func (tp *BasicProposal) SetProposalType(proposalType ProposalKind) { tp.ProposalType = proposalType }
+func (tp BasicProposal) GetStatus() ProposalStatus                  { return tp.Status }
+func (tp *BasicProposal) SetStatus(status ProposalStatus)           { tp.Status = status }
+func (tp BasicProposal) GetTallyResult() TallyResult                { return tp.TallyResult }
+func (tp *BasicProposal) SetTallyResult(tallyResult TallyResult)    { tp.TallyResult = tallyResult }
+func (tp BasicProposal) GetSubmitTime() time.Time                   { return tp.SubmitTime }
+func (tp *BasicProposal) SetSubmitTime(submitTime time.Time)        { tp.SubmitTime = submitTime }
+func (tp BasicProposal) GetDepositEndTime() time.Time               { return tp.DepositEndTime }
+func (tp *BasicProposal) SetDepositEndTime(depositEndTime time.Time) {
 	tp.DepositEndTime = depositEndTime
 }
-func (tp TextProposal) GetTotalDeposit() sdk.Coins              { return tp.TotalDeposit }
-func (tp *TextProposal) SetTotalDeposit(totalDeposit sdk.Coins) { tp.TotalDeposit = totalDeposit }
-func (tp TextProposal) GetVotingStartTime() time.Time           { return tp.VotingStartTime }
-func (tp *TextProposal) SetVotingStartTime(votingStartTime time.Time) {
+func (tp BasicProposal) GetTotalDeposit() sdk.Coins              { return tp.TotalDeposit }
+func (tp *BasicProposal) SetTotalDeposit(totalDeposit sdk.Coins) { tp.TotalDeposit = totalDeposit }
+func (tp BasicProposal) GetVotingStartTime() time.Time           { return tp.VotingStartTime }
+func (tp *BasicProposal) SetVotingStartTime(votingStartTime time.Time) {
 	tp.VotingStartTime = votingStartTime
 }
-func (tp TextProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
-func (tp *TextProposal) SetVotingEndTime(votingEndTime time.Time) {
+func (tp BasicProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
+func (tp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
-func (tp TextProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
-func (tp *TextProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
-func (tp TextProposal) GetTaxUsage() TaxUsage { return TaxUsage{} }
-func (tp *TextProposal) SetTaxUsage(taxUsage TaxUsage) {}
+func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
+func (tp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
+func (tp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
+func (tp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
 
 //-----------------------------------------------------------
 // ProposalQueue

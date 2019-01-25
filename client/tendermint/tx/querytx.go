@@ -39,7 +39,6 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-
 	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
@@ -133,6 +132,7 @@ func MakeResponseDeliverTxHumanReadable(dtx abci.ResponseDeliverTx) ResponseDeli
 		Tags:      tags,
 	}
 }
+
 func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
 	tx, err := parseTx(cdc, res.Tx)
 	if err != nil {
@@ -146,6 +146,7 @@ func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
 		Result: MakeResponseDeliverTxHumanReadable(res.TxResult),
 	}, nil
 }
+
 
 // Info is used to prepare info to display
 type Info struct {

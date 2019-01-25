@@ -104,12 +104,17 @@ func runPubKeyCmd(cmd *cobra.Command, args []string) error {
 				pubKeyI, err4 = sdk.GetValPubKeyBech32(pubkeyString)
 
 				if err4 != nil {
-					return fmt.Errorf(`Expected hex, base64, or bech32. Got errors:
-			hex: %v,
-			base64: %v
-			bech32 acc: %v
-			bech32 val: %v
-			`, err, err2, err3, err4)
+					var err5 error
+					pubKeyI, err5 = sdk.GetConsPubKeyBech32(pubkeyString)
+					if err5 != nil {
+						return fmt.Errorf(`Expected hex, base64, or bech32. Got errors:
+								hex: %v,
+								base64: %v
+								bech32 Acc: %v
+								bech32 Val: %v
+								bech32 Cons: %v`,
+							err, err2, err3, err4, err5)
+					}
 
 				}
 			}
@@ -138,11 +143,16 @@ func runPubKeyCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	consPub, err := sdk.Bech32ifyConsPub(pubKey)
+	if err != nil {
+		return err
+	}
 	fmt.Println("Address:", pubKey.Address())
 	fmt.Printf("Hex: %X\n", pubkeyBytes)
 	fmt.Println("JSON (base64):", string(pubKeyJSONBytes))
 	fmt.Println("Bech32 Acc:", accPub)
 	fmt.Println("Bech32 Val:", valPub)
+	fmt.Println("Bech32 Cons:", consPub)
 	return nil
 }
 
@@ -165,11 +175,16 @@ func runAddrCmd(cmd *cobra.Command, args []string) error {
 			addr, err3 = sdk.ValAddressFromBech32(addrString)
 
 			if err3 != nil {
-				return fmt.Errorf(`Expected hex or bech32. Got errors:
-			hex: %v,
-			bech32 acc: %v
-			bech32 val: %v
-			`, err, err2, err3)
+				var err4 error
+				addr, err4 = sdk.ConsAddressFromBech32(addrString)
+				if err4 != nil {
+					return fmt.Errorf(`Expected hex or bech32. Got errors:
+							hex: %v,
+							bech32 Acc: %v
+							bech32 Val: %v
+							bech32 Cons: %v:`,
+						err, err2, err3, err4)
+				}
 
 			}
 		}
@@ -177,10 +192,12 @@ func runAddrCmd(cmd *cobra.Command, args []string) error {
 
 	accAddr := sdk.AccAddress(addr)
 	valAddr := sdk.ValAddress(addr)
+	consAddr := sdk.ConsAddress(addr)
 
 	fmt.Printf("Address (Hex): %X\n", addr)
 	fmt.Printf("Bech32 Acc: %s\n", accAddr)
 	fmt.Printf("Bech32 Val: %s\n", valAddr)
+	fmt.Printf("Bech32 Cons: %s\n", consAddr)
 	return nil
 }
 

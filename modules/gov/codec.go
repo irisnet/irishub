@@ -13,7 +13,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgVote{}, "irishub/gov/MsgVote", nil)
 
 	cdc.RegisterInterface((*Proposal)(nil), nil)
-	cdc.RegisterConcrete(&TextProposal{}, "irishub/gov/TextProposal", nil)
+	cdc.RegisterConcrete(&BasicProposal{}, "irishub/gov/BasicProposal", nil)
 	cdc.RegisterConcrete(&ParameterProposal{}, "irishub/gov/ParameterProposal", nil)
 	cdc.RegisterConcrete(&SoftwareUpgradeProposal{}, "irishub/gov/SoftwareUpgradeProposal", nil)
 	cdc.RegisterConcrete(&SystemHaltProposal{}, "irishub/gov/SystemHaltProposal", nil)

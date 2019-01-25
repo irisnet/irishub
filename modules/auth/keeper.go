@@ -115,6 +115,16 @@ func (am AccountKeeper) IterateAccounts(ctx sdk.Context, process func(Account) (
 	}
 }
 
+func (am AccountKeeper) GetAllAccounts(ctx sdk.Context) []Account {
+	accounts := []Account{}
+	appendAccount := func(acc Account) (stop bool) {
+		accounts = append(accounts, acc)
+		return false
+	}
+	am.IterateAccounts(ctx, appendAccount)
+	return accounts
+}
+
 // Returns the PubKey of the account at address
 func (am AccountKeeper) GetPubKey(ctx sdk.Context, addr sdk.AccAddress) (crypto.PubKey, sdk.Error) {
 	acc := am.GetAccount(ctx, addr)
@@ -223,6 +233,9 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
 	store.Set(TotalLoosenTokenKey, bzNew)
+
+	ctx.Logger().Info("Execute IncreaseTotalLoosenToken Successed",
+		"increaseCoins", coins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
@@ -241,6 +254,9 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
 	store.Set(TotalLoosenTokenKey, bzNew)
+
+	ctx.Logger().Info("Execute DecreaseTotalLoosenToken Successed",
+		"decreaseCoins", coins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
 //----------------------------------------

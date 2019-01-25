@@ -25,9 +25,9 @@
 | govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 2 | 1 |Critial==1, other(1,)|
-| govTallyingProcedure/Participation | 6/7 | 5/6 | 3/4 |(0,1)|
-| govTallyingProcedure/Threshold | 5/6 | 4/5 | 2/3 |(0,1)|
+| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critial==1, other(1,)|
+| govTallyingProcedure/Participation | 7/8 | 5/6 | 3/4 |(0,1)|
+| govTallyingProcedure/Threshold | 6/7 | 4/5 | 2/3 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
 | govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
 
@@ -42,7 +42,7 @@
 * `Participation` 由govTallyingProcedure/Participation定义
 
 ### 抵押阶段
-提交的提议有抵押金，当抵押金超过 `MinDeposit` ,才能进入投票阶段。该提议超过 `MaxDepositPeriod` ，还未进超过 `MinDeposit`，则提议会被删除，并返还全部抵押金。 
+提交提议者至少抵押30%的 `MinDeposit` ，当抵押金超过 `MinDeposit` ,才能进入投票阶段。该提议超过 `MaxDepositPeriod` ，还未进超过 `MinDeposit`，则提议会被删除，并不会返还抵押金。 
 不能对进入投票阶段的提议再进行抵押。
 
 ### 投票阶段

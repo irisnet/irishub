@@ -77,7 +77,7 @@ func (k Keeper) GetValidatorByConsAddr(ctx sdk.Context, consAddr sdk.ConsAddress
 func (k Keeper) mustGetValidatorByConsAddr(ctx sdk.Context, consAddr sdk.ConsAddress) types.Validator {
 	validator, found := k.GetValidatorByConsAddr(ctx, consAddr)
 	if !found {
-		panic(fmt.Errorf("validator with consensus-Address %s not found", consAddr))
+		panic(fmt.Errorf("validator with consensus-address %s not found", consAddr))
 	}
 	return validator
 }
@@ -196,6 +196,7 @@ func (k Keeper) RemoveValidator(ctx sdk.Context, address sdk.ValAddress) {
 	store.Delete(GetValidatorKey(address))
 	store.Delete(GetValidatorByConsAddrKey(sdk.ConsAddress(validator.ConsPubKey.Address())))
 	store.Delete(GetValidatorsByPowerIndexKey(validator, pool))
+	ctx.Logger().Info("Remove validator", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 
 	// call hook if present
 	if k.hooks != nil {
@@ -376,6 +377,7 @@ func (k Keeper) GetAllMatureValidatorQueue(ctx sdk.Context, currTime time.Time) 
 func (k Keeper) UnbondAllMatureValidatorQueue(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 	validatorTimesliceIterator := k.ValidatorQueueIterator(ctx, ctx.BlockHeader().Time)
+	defer validatorTimesliceIterator.Close()
 	for ; validatorTimesliceIterator.Valid(); validatorTimesliceIterator.Next() {
 		timeslice := []sdk.ValAddress{}
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(validatorTimesliceIterator.Value(), &timeslice)

@@ -183,7 +183,7 @@ func readGenesisFile(t *testing.T, genFile string) types.GenesisDoc {
 
 func executeWrite(t *testing.T, cmdStr string, writes ...string) (exitSuccess bool) {
 	// broadcast transaction and return after the transaction is included by a block
-	if strings.Contains(cmdStr,"--from") && strings.Contains(cmdStr,"--fee") {
+	if strings.Contains(cmdStr, "--from") && strings.Contains(cmdStr, "--fee") {
 		cmdStr = cmdStr + " --commit"
 	}
 
@@ -310,18 +310,27 @@ func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
 	return validator
 }
 
-func executeGetProposal(t *testing.T, cmdStr string) gov.ProposalOutput {
+func executeGetProposal(t *testing.T, cmdStr string) gov.Proposal {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var proposal gov.ProposalOutput
+	var proposal gov.Proposal
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &proposal)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return proposal
 }
 
-func executeGetVote(t *testing.T, cmdStr string)  gov.Vote {
+func executeGetProposals(t *testing.T, cmdStr string) []gov.Proposal {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var vote  gov.Vote
+	var proposals []gov.Proposal
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &proposals)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return proposals
+}
+
+func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var vote gov.Vote
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &vote)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -337,9 +346,9 @@ func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
 	return votes
 }
 
-func executeGetParam(t *testing.T, cmdStr string)  gov.Param {
+func executeGetParam(t *testing.T, cmdStr string) gov.Param {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var param  gov.Param
+	var param gov.Param
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &param)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

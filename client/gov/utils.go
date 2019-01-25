@@ -2,7 +2,21 @@ package gov
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/service"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/gov"
+	distr "github.com/irisnet/irishub/modules/distribution"
 )
+
+var ParamSets = make(map[string]params.ParamSet)
+
+func init() {
+	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+}
 
 // Deposit
 type DepositOutput struct {
@@ -28,7 +42,7 @@ func NormalizeVoteOption(option string) string {
 	case "NoWithVeto", "no_with_veto":
 		return "NoWithVeto"
 	}
-	return ""
+	return option
 }
 
 //NormalizeProposalType - normalize user specified proposal type
@@ -41,7 +55,7 @@ func NormalizeProposalType(proposalType string) string {
 	case "TxTaxUsage", "tx_tax_usage":
 		return "TxTaxUsage"
 	}
-	return ""
+	return proposalType
 }
 
 //NormalizeProposalStatus - normalize user specified proposal status
@@ -56,5 +70,18 @@ func NormalizeProposalStatus(status string) string {
 	case "Rejected", "rejected":
 		return "Rejected"
 	}
-	return ""
+	return status
+}
+
+func ValidateParam(params gov.Params) error {
+	for _, param := range params {
+		if p, ok := ParamSets[param.Subspace]; ok {
+			if _, err := p.Validate(param.Key, param.Value); err != nil {
+				return err
+			}
+		} else {
+			return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
+		}
+	}
+	return nil
 }

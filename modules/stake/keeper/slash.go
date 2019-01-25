@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -17,6 +17,7 @@ const (
 	// slash-validator-redelegation-[validatorAddrDst]-[validatorAddrSrc]-[delegatorAddr]
 	SlashValidatorRedelegation = "slash-validator-redelegation-%s-%s-%s"
 )
+
 // Slash a validator for an infraction committed at a known height
 // Find the contributing stake at that height and burn the specified slashFactor
 // of it, updating unbonding delegation & redelegations appropriately
@@ -32,7 +33,7 @@ const (
 //    Infraction committed at the current height or at a past height,
 //    not at a height in the future
 func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeight int64, power int64, slashFactor sdk.Dec) (tags sdk.Tags) {
-	logger := ctx.Logger().With("module", "x/stake")
+	logger := ctx.Logger()
 
 	if slashFactor.LT(sdk.ZeroDec()) {
 		panic(fmt.Errorf("attempted to slash with a negative slash factor: %v", slashFactor))
@@ -82,9 +83,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	case infractionHeight == ctx.BlockHeight():
 
 		// Special-case slash at current height for efficiency - we don't need to look through unbonding delegations or redelegations
-		logger.Info(fmt.Sprintf(
-			"slashing at current height %d, not scanning unbonding delegations & redelegations",
-			infractionHeight))
+		logger.Info("Slashing at current height, not scanning unbonding delegations & redelegations", "infraction_height", infractionHeight)
 
 	case infractionHeight < ctx.BlockHeight():
 
@@ -114,7 +113,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	// cannot decrease balance below zero
 	tokensToBurn := sdk.MinDec(remainingSlashAmount, validator.Tokens)
 	tokensToBurn = sdk.MaxDec(tokensToBurn, sdk.ZeroDec()) // defensive.
-	tags = tags.AppendTag(fmt.Sprintf(SlashValidator, validator.OperatorAddr),[]byte(tokensToBurn.String()))
+	tags = tags.AppendTag(fmt.Sprintf(SlashValidator, validator.OperatorAddr), []byte(tokensToBurn.String()))
 	// Deduct from validator's bonded tokens and update the validator.
 	// The deducted tokens are returned to pool.LooseTokens.
 	validator = k.RemoveValidatorTokens(ctx, validator, tokensToBurn)
@@ -122,14 +121,12 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		panic("slash decimal token in redelegation")
 	}
 	k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.Coin{
-		Denom: types.StakeDenom,
+		Denom:  types.StakeDenom,
 		Amount: tokensToBurn.TruncateInt(),
 	}})
 	// Log that a slash occurred!
-	logger.Info(fmt.Sprintf(
-		"validator %s slashed by slash factor of %s; burned %v tokens",
-		validator.GetOperator(), slashFactor.String(), tokensToBurn))
-
+	logger.Info("Validator slashed", "consensus_address", validator.GetConsAddr().String(),
+		"operator_address", validator.GetOperator().String(), "slash_factor", slashFactor.String(), "slash_tokens", tokensToBurn)
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }
@@ -138,8 +135,6 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.jailValidator(ctx, validator)
-	logger := ctx.Logger().With("module", "x/stake")
-	logger.Info(fmt.Sprintf("validator %s jailed", consAddr))
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }
@@ -148,8 +143,6 @@ func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 func (k Keeper) Unjail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.unjailValidator(ctx, validator)
-	logger := ctx.Logger().With("module", "x/stake")
-	logger.Info(fmt.Sprintf("validator %s unjailed", consAddr))
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }
@@ -187,10 +180,10 @@ func (k Keeper) slashUnbondingDelegation(ctx sdk.Context, unbondingDelegation ty
 	// Update unbonding delegation if necessary
 	if !unbondingSlashAmount.IsZero() {
 		unbondingDelegation.Balance.Amount = unbondingDelegation.Balance.Amount.Sub(unbondingSlashAmount)
-		tags = tags.AppendTag(fmt.Sprintf(SlashUnbondindDelegation, unbondingDelegation.DelegatorAddr, unbondingDelegation.ValidatorAddr),[]byte(unbondingSlashAmount.String()))
+		tags = tags.AppendTag(fmt.Sprintf(SlashUnbondindDelegation, unbondingDelegation.DelegatorAddr, unbondingDelegation.ValidatorAddr), []byte(unbondingSlashAmount.String()))
 		k.SetUnbondingDelegation(ctx, unbondingDelegation)
 		k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.Coin{
-			Denom: types.StakeDenom,
+			Denom:  types.StakeDenom,
 			Amount: unbondingSlashAmount,
 		}})
 	}
@@ -254,7 +247,7 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 		}
 		tags = tags.AppendTag(fmt.Sprintf(SlashValidatorRedelegation, redelegation.ValidatorDstAddr, redelegation.ValidatorSrcAddr, redelegation.DelegatorAddr), []byte(tokensToBurn.String()))
 		k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.Coin{
-			Denom: types.StakeDenom,
+			Denom:  types.StakeDenom,
 			Amount: tokensToBurn.TruncateInt(),
 		}})
 	}
