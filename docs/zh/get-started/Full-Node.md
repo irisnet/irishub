@@ -25,8 +25,8 @@ wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/co
 * 将`moniker`字段配置称为自定义的名称，这样便于区分不同的节点
 * `seed`字段用语设置种子节点，在fuxi-5000中的官方种子节点为：
 ```
-c16700520a810b270206d59f0f02ea9abd85a4fe@ts-1.bianjie.ai:26656
-a12cfb2f535210ea12731f94a76b691832056156@ts-2.bianjie.ai:26656
+d1f2bbc6634c7f7041ede42d8f4b990a99681baa@ts-1.irisnet.org:26656
+afb247319e00ddd48ef95983812a50eaf9b381df@ts-2.irisnet.org:26656
 ```
 
 你也可以配置 `moniker` 和 `external_address` 字段. 
@@ -56,7 +56,7 @@ iriscli status
 ```
 示例输出：
 ```json
-{"node_info":{"id":"3fb472c641078eaaee4a4acbe32841f18967672c","listen_addr":"172.31.0.190:26656","network":"fuxi-5000","version":"0.22.6","channels":"4020212223303800","moniker":"name","other":["amino_version=0.10.1","p2p_version=0.5.0","consensus_version=v1/0.2.2","rpc_version=0.7.0/3","tx_index=on","rpc_addr=tcp://0.0.0.0:26657"]},"sync_info":{"latest_block_hash":"7B1168B2055B19F811773EEE56BB3C9ECB6F3B37","latest_app_hash":"B8F7F8BF18E3F1829CCDE26897DB905A51AF4372","latest_block_height":12567,"latest_block_time":"2018-08-25T11:33:13.164432273Z","catching_up":false},"validator_info":{"address":"CAF80DAEC0F4A7036DD2116B56F89B07F43A133E","pub_key":{"type":"AC26791624DE60","value":"Cl6Yq+gqZZY14QxrguOaZqAswPhluv7bDfcyQx2uSRc="},"voting_power":0}}
+{"node_info":{"protocol_version":{"p2p":"5","block":"8","app":"0"},"id":"8fa36b85e98f986b70889da52b733fa925908947","listen_addr":"tcp://0.0.0.0:26656","network":"fuxi-8000","version":"0.27.3","channels":"4020212223303800","moniker":"test","other":{"tx_index":"on","rpc_address":"tcp://0.0.0.0:26657"}},"sync_info":{"latest_block_hash":"DF2F64D56863C5516586112B9A954DFB2257C65FF178267E75D85D160E5E0E2B","latest_app_hash":"","latest_block_height":"1","latest_block_time":"2019-01-23T03:42:17.268038878Z","catching_up":false},"validator_info":{"address":"7B9052D259643E5B9AF0BD481B843C89B27AACAA","pub_key":{"type":"tendermint/PubKeyEd25519","value":"Mt9WvNPDd8F4Dcq7lP+GFIhW0/K4jAt8nTq/ljut94E="},"voting_power":"100"}}
 ```
 通过以上命令可以查看状态：
 
