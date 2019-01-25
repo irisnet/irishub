@@ -8,10 +8,10 @@ To reduce computation stress, a lazy distribution strategy is brought in.
 The contributors are required to explicitly send transactions to withdraw their benefit, otherwise, 
 their benefit will be kept in the global pool. 
 
-If one validator is the proposer of current round, that validator (and their delegators) receives between 1% and 5% of fee rewards as proposer reward.
+If one validator is the proposer of current round, that validator (and their delegators) receives between 1% and 5% of the sum of fee rewards and inflated token as proposer reward.
 It is calculated as:
 ```
- proposerReward = feesCollectedDec * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
+ proposerReward = (TxFee + InflatedToken) * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
 ```
 ## Usage Scenario
 

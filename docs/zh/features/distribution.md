@@ -5,9 +5,9 @@
 该模块负责将收集的交易费和通胀的代币分发给所有验证人和委托人。为了减少计算压力，引入了一种被动分配策略。
 `被动`意味着不会直接向贡献者自动支付利益。贡委托人或者验证人必须手动发送交易以取回其收益，否则，他们的收益将保留在全局收益池中。
 
-每个出块人会获得该区块收到的手续费的一部分作为出块奖励。计算方法：
+每个出块人会获得该区块收到的手续费和通胀Token的一部分作为出块奖励。计算方法：
 ```
- proposerReward = feesCollectedDec * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
+ proposerReward = (TxFee + InflatedToken) * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
 ```
 
 ## 使用场景
