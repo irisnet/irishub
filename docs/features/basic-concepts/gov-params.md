@@ -4,25 +4,51 @@ In IRISnet, there are some special parameters can be modified through on-chain g
 All the IRIS holders are able to modify. If the community is not satisfied with certain modifiable 
 parameters, it is available to put up a `parameter-change` proposal in governance module.
 
-## Parameters in Governance Module
+## Parameters in Auth
 
-* In `DepositProcedure` step of governance procedure, the following parameters are up to on-chain governance:
-  * Minimum of deposit as `min_deposit` in genesis file
-  * Deposit period as `voting_period` in genesis file
-* In `VotingProcedure`  step of governance procedure, the following parameters are up to on-chain governance:
-   * Voting period as `voting_period` in genesis file
-* In `TallyingProcedure`  step of governance procedure, the following parameters are up to on-chain governance:
-   * Threshold as `threshold` in genesis file to pass a proposal 
-   * Veto percentage as `veto`in genesis file to stop a proposal 
-   * Participation percentage as `participation` in genesis file to make the results legitimate
+* `auth/gasPriceThreshold`  minimum of gas price
+* `auth/txSizeLimit`  the limit of the normal txsize
 
-Details in [gov](../governance.md)
+## Parameters in Stake
 
-## Parameters inService Module
+* `stake/MaxValidators`  maximum number of validators
+* `stake/UnbondingTime`  unbonding time
 
-* `MinDepositMultiple`    a multiple of the minimum deposit amount of service binding
-* `MaxRequestTimeout`     maximum number of waiting blocks for service invocation
-* `ServiceFeeTax`         tax rate of service fee
-* `SlashFraction`         slash fraction
-* `ComplaintRetrospect`   maximum time for submit a dispute
-* `ArbitrationTimeLimit`  maximum time of dispute resolution
+## Parameters in Distribution
+
+* `distr/BaseProposerReward`  benchmark ratio of the block reward
+* `distr/BonusProposerReward`  maximum additional bonus ratio
+* `distr/CommunityTax`  proportion of contributions to community funds
+
+Details in [distribution](../distribution.md)
+
+## Parameters in Mint
+
+* `mint/Inflation`  Inflation coefficient
+
+## Parameters in Slashing
+
+* `slashing/CensorshipJailDuration` 
+* `slashing/DoubleSignJailDuration`
+* `slashing/DowntimeJailDuration`  
+* `slashing/MaxEvidenceAge`         
+* `slashing/MinSignedPerWindow`     
+* `slashing/SignedBlocksWindow`      
+* `slashing/SlashFractionCensorship` 
+* `slashing/SlashFractionDoubleSign` 
+* `slashing/SlashFractionDowntime`   
+
+Details in [slashing](../slashing.md)
+
+## Parameters in Service
+
+* `service/ArbitrationTimeLimit` maximum time of dispute resolution
+* `service/ComplaintRetrospect`   maximum time for submit a dispute
+* `service/MaxRequestTimeout`       maximum number of waiting blocks for service invocation
+* `service/MinDepositMultiple`     a multiple of the minimum deposit amount of service binding
+* `service/ServiceFeeTax`               tax rate of service fee
+* `service/SlashFraction`               slash fraction
+* `service/TxSizeLimit`                  the limit of the service txsize
+
+Details in [service](../service.md)
+
