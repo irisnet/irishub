@@ -264,11 +264,11 @@ func (st *iavlStore) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 		res.Key = subspace
 
 		iterator := sdk.KVStorePrefixIterator(st, subspace)
+		defer iterator.Close()
 		for ; iterator.Valid(); iterator.Next() {
 			KVs = append(KVs, KVPair{Key: iterator.Key(), Value: iterator.Value()})
 		}
 
-		iterator.Close()
 		res.Value = cdc.MustMarshalBinaryLengthPrefixed(KVs)
 
 	default:

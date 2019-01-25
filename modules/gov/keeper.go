@@ -76,7 +76,6 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 // =====================================================
 // Proposals
 
-
 func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Params) Proposal {
 	switch proposalType {
 	case ProposalTypeParameterChange:
@@ -86,8 +85,6 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	}
 	return nil
 }
-
-
 
 // =====================================================
 // Proposals
@@ -491,6 +488,7 @@ func (keeper Keeper) GetDeposits(ctx sdk.Context, proposalID uint64) sdk.Iterato
 func (keeper Keeper) RefundDepositsWithoutFee(ctx sdk.Context, proposalID uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	depositsIterator := keeper.GetDeposits(ctx, proposalID)
+	defer depositsIterator.Close()
 
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
 		deposit := &Deposit{}
@@ -503,8 +501,6 @@ func (keeper Keeper) RefundDepositsWithoutFee(ctx sdk.Context, proposalID uint64
 
 		store.Delete(depositsIterator.Key())
 	}
-
-	depositsIterator.Close()
 }
 
 // Returns and deletes all the deposits on a specific proposal
@@ -550,6 +546,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 func (keeper Keeper) DeleteDeposits(ctx sdk.Context, proposalID uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	depositsIterator := keeper.GetDeposits(ctx, proposalID)
+	defer depositsIterator.Close()
 
 	for ; depositsIterator.Valid(); depositsIterator.Next() {
 		deposit := &Deposit{}
@@ -562,8 +559,6 @@ func (keeper Keeper) DeleteDeposits(ctx sdk.Context, proposalID uint64) {
 
 		store.Delete(depositsIterator.Key())
 	}
-
-	depositsIterator.Close()
 }
 
 // =====================================================
@@ -712,9 +707,9 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 
 func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
 	ctx.Logger().Debug("Proposals Distribution",
-		"CriticalProposalNum" , keeper.GetCriticalProposalNum(ctx),
-		        "ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
-		        "NormalProposalNum"   , keeper.GetNormalProposalNum(ctx))
+		"CriticalProposalNum", keeper.GetCriticalProposalNum(ctx),
+		"ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
+		"NormalProposalNum", keeper.GetNormalProposalNum(ctx))
 
 	maxNum := keeper.GetMaxNumByProposalLevel(ctx, pl)
 	switch pl {
