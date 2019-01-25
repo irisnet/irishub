@@ -10,6 +10,7 @@ To secure their own validator node and maintain the avalibility of blockchain ne
 
 The resource needed for every transactions are varied for different type of transactions. For example, only a few computations, queries & modifies is needed for sending some token to other peolpe. But a lot of computations, queries & modifies is needed for creating a validator.  Gas is the unit used to measure how much resource needed to execute the transaction. We list the gas needed for some typical operactions in the below:
 
+- gas needed  for writing the tx to the database is: 10 * the size of the transaction data (in bytes)
 - gas needed for reading some data from database: 10 + data length(in bytes)
 - gas needed for writing some data to database: 10 + 10 * data length(in bytes)
 - sign or verify a signature
