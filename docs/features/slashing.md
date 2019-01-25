@@ -2,13 +2,23 @@
 
 ## Basic Function
 
-By punishing some byzantine validators, we can better maintain the healthy growth of the network and maintain the network's activeness.
+Collect the validator's abnormal behavior and implement the corresponding slashing mechanism according to the type of abnormal behavior.
 
-There are three types of punishment:
+There are three main types:
 
-1. Punish the validator for a long time not online
-2. Punish the validator's double sign behavior
-3. Punish the validator hack code to packing the garbage data into blockchain with minimal cost.
+1. The validator node does not participate in the network consensus for a long time.
+2. Voted multiple times on the same consensus process, and these votes contradict each other
+3. The validator node disturbs the network consensus by packing illegal transactions into the block.
+
+## Punishment mechanism
+
+1. Calculate the number of tokens bound to the validator node based on the voting power owned by the current validator.
+2. Punish the token certifier a certain percentage of the token and kick it out of the certifier's collection; at the same time prohibit the certifier from re-entering the certifier's collection for a period of time, a process known as the jail certifier.
+3. For different types of abnormal behavior, use different penalty ratios and jail time.
+4. Penalty rules:
+1. If the current validator token total is A and the penalty ratio is B, then the number of tokens that the validator can punish at most is A*B.
+2. If there is unbonding delegation and redelegation in the unbonding period at the current height, and the creation height of unbonding delegation and redegetation is less than the execution height of the abnormal behavior, then the tokens of the two parts are penalized by  the ratio B.
+3. The total number of tokens penalized for unbonding delegation and redelegation is S. If S is less than A*B, the validator token punished will be `A*B-S`. Otherwise, the validator bonded token is not penalized.
 
 ## Long Downtime
 
