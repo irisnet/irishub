@@ -19,10 +19,8 @@ var (
 	VotingPeriodStart = "voting-period-start"
 	Depositor         = "depositor"
 	Voter             = "voter"
-	////////////////////  iris begin  ///////////////////////////
 	Param       = "param"
 	Usage       = "usage"
 	Percent     = "percent"
 	DestAddress = "dest-address"
-	////////////////////  iris end  /////////////////////////////
 )
