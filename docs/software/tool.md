@@ -26,12 +26,3 @@ Pass in a hex/base64 tx and get back the full JSON
 ```bash
 iristool debug tx [hex or base64 transaction]
 ```
-
-* Hack
-This is a command with boilerplate for using Go as a scripting language to hack on an existing Iris state.
-
-If you run 
-```
-iristool debug hack $HOME/.iris
-```
-on that state, it will do a binary search on the state history to find when the state invariant was violated.

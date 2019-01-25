@@ -27,11 +27,3 @@ iristool debug pubkey 4D94D09DFA8EB22F3D49EA17567230FAD9C5267AF85FCA950B453C02C1
 iristool debug tx [hex or base64 transaction]
 ```
 
-* Hack
-这是一个带有样板的命令，用于将Go作为脚本语言来攻击现有的Iris状态。
-
-如果你运行 
-```
-iristool debug hack $HOME/.iris
-```
-在那个状态, 它将对状态历史进行二分查找来发现何时违背了状态不变量。
