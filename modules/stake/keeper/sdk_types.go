@@ -53,6 +53,7 @@ func (k Keeper) IterateBondedValidatorsByPower(ctx sdk.Context, fn func(index in
 // iterate through the active validator set and perform the provided function
 func (k Keeper) IterateLastValidators(ctx sdk.Context, fn func(index int64, validator sdk.Validator) (stop bool)) {
 	iterator := k.LastValidatorsIterator(ctx)
+	defer iterator.Close()
 	i := int64(0)
 	for ; iterator.Valid(); iterator.Next() {
 		address := AddressFromLastValidatorPowerKey(iterator.Key())
@@ -67,7 +68,6 @@ func (k Keeper) IterateLastValidators(ctx sdk.Context, fn func(index int64, vali
 		}
 		i++
 	}
-	iterator.Close()
 }
 
 // get the sdk.validator for a particular address

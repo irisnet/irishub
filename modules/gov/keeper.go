@@ -76,7 +76,6 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 // =====================================================
 // Proposals
 
-////////////////////  iris begin  ///////////////////////////
 func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, param Params) Proposal {
 	switch proposalType {
 	case ProposalTypeParameterChange:
@@ -87,13 +86,11 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 	return nil
 }
 
-////////////////////  iris end  /////////////////////////////
-
 // =====================================================
 // Proposals
 
 // Creates a NewProposal
-////////////////////  iris begin  ///////////////////////////
+
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
