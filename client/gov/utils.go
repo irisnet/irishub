@@ -42,7 +42,7 @@ func NormalizeVoteOption(option string) string {
 	case "NoWithVeto", "no_with_veto":
 		return "NoWithVeto"
 	}
-	return ""
+	return option
 }
 
 //NormalizeProposalType - normalize user specified proposal type
@@ -55,7 +55,7 @@ func NormalizeProposalType(proposalType string) string {
 	case "TxTaxUsage", "tx_tax_usage":
 		return "TxTaxUsage"
 	}
-	return ""
+	return proposalType
 }
 
 //NormalizeProposalStatus - normalize user specified proposal status
@@ -70,7 +70,7 @@ func NormalizeProposalStatus(status string) string {
 	case "Rejected", "rejected":
 		return "Rejected"
 	}
-	return ""
+	return status
 }
 
 func ValidateParam(params gov.Params) error {

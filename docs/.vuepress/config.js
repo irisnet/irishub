@@ -43,7 +43,6 @@ module.exports = {
                         children: [
                             ["basic-concepts/coin-type.md", 'Coin Type'],
                             ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/inflation.md", 'Infation'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
                             ["basic-concepts/gov-params.md", 'Gov Params']
@@ -54,8 +53,8 @@ module.exports = {
                         children: [
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
+                            ['slashing.md', 'Slashing'],
                             ['service.md', 'Service'],
-                            ['record.md', 'Record'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
@@ -98,17 +97,17 @@ module.exports = {
                         ]
                     },
                     {
+                        title: 'Distribution',
+                        collapsable: false,
+                        children: [
+                            ['distribution/', 'iriscli distribution']
+                        ]
+                    },
+                    {
                         title: 'Gov',
                         collapsable: false,
                         children: [
                             ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
                         ]
                     },
                     {
@@ -164,7 +163,6 @@ module.exports = {
                         children: [
                             ["basic-concepts/coin-type.md", 'Coin Type'],
                             ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/inflation.md", 'Infation'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
                             ["basic-concepts/gov-params.md", 'Gov Params']
@@ -175,8 +173,8 @@ module.exports = {
                         children: [
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
+                            ['slashing.md', 'Slashing'],
                             ['service.md', 'Service'],
-                            ['record.md', 'Record'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
@@ -219,17 +217,17 @@ module.exports = {
                         ]
                     },
                     {
+                        title: 'Distribution',
+                        collapsable: false,
+                        children: [
+                            ['distribution/', 'iriscli distribution']
+                        ]
+                    },
+                    {
                         title: 'Gov',
                         collapsable: false,
                         children: [
                             ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Record',
-                        collapsable: false,
-                        children: [
-                            ['record/', 'iriscli record']
                         ]
                     },
                     {

@@ -69,7 +69,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	valAddr := sdk.ValAddress(barAddr).String()
 	validator := executeGetValidator(t, fmt.Sprintf("iriscli stake validator %s --output=json %v", valAddr, flags))
 	require.Equal(t, valAddr, validator.OperatorAddr.String())
-	require.Equal(t, "2.000000000000000000", validator.Tokens)
+	require.Equal(t, "2.0000000000000000000000000000", validator.Tokens)
 
 	// unbond a single share
 	unbondStr := fmt.Sprintf("iriscli stake unbond %v", flags)
@@ -83,5 +83,5 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	validator = executeGetValidator(t, fmt.Sprintf("iriscli stake validator %s --output=json %v", valAddr, flags))
-	require.Equal(t, "1.000000000000000000", validator.Tokens)
+	require.Equal(t, "1.0000000000000000000000000000", validator.Tokens)
 }

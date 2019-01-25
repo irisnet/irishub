@@ -1,4 +1,4 @@
-package distr
+package tests
 
 import (
 	"testing"
