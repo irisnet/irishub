@@ -53,6 +53,7 @@ module.exports = {
                         children: [
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
+                            ['slashing.md', 'Slashing'],
                             ['service.md', 'Service'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
@@ -172,6 +173,7 @@ module.exports = {
                         children: [
                             ['bank.md', 'Bank'],
                             ['stake.md', 'Stake'],
+                            ['slashing.md', 'Slashing'],
                             ['service.md', 'Service'],
                             ['governance.md', 'Governance'],
                             ['upgrade.md', 'Upgrade'],
