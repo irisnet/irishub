@@ -13,7 +13,7 @@ There are three main types:
 ## Punishment mechanism
 
 1. Calculate the number of tokens bound to the validator node based on the voting power owned by the current validator.
-2. Punish the token certifier a certain percentage of the token and kick it out of the certifier's collection; at the same time prohibit the certifier from re-entering the certifier's collection for a period of time, a process known as the jail certifier.
+2. Punish validator  with a certain percentage of the token and kick it out of the validator set; at the same time prohibit the validator from re-entering the validator set for a period of time, a process known as the jail validator.
 3. For different types of abnormal behavior, use different penalty ratios and jail time.
 4. Penalty rules:
 1. If the current validator token total is A and the penalty ratio is B, then the number of tokens that the validator can punish at most is A*B.
