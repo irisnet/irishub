@@ -3,9 +3,10 @@
 ## Description
 
 This module provides the basic functions as described below:
-1. On-chain governance proposals on text
-2. On-chain governance proposals on parameter change
-3. On-chain governance proposals on software upgrade
+1. On-chain governance proposals on parameter change
+2. On-chain governance proposals on software upgrade 
+3. On-chain governance proposals on software halt
+4. On-chain governance proposals on tax usage
 
 ## Usage
 
