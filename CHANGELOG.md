@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.0
+
+*January 25th, 2019*
+
+- [iris] Handle the expected abort during replay last block
+- [iris] Go through and make sure all panic are reasonable
+- [iris] Add the set-withdraw-address feature
+- [iris] Update default param value of Upgrade Threshold and Critical Proposal
+- [iris] Fix bug that evidence age doesn't take effect
+
+- [iriscli] Improve the upgrade query-signals cmd
+
+- [tendermint] Avoid one evidence be committed multiple times
 
 ## 0.11.0-rc0
 

@@ -2,8 +2,6 @@ package slashing
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	stake "github.com/irisnet/irishub/modules/stake/types"
@@ -36,10 +34,10 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, vs sdk.ValidatorSet, paramspa
 
 // handle a validator signing two blocks at the same height
 // power: power of the double-signing validator at the height of infraction
-func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractionHeight int64, timestamp time.Time, power int64) (tags sdk.Tags) {
+func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractionHeight int64, power int64) (tags sdk.Tags) {
 	logger := ctx.Logger()
 	time := ctx.BlockHeader().Time
-	age := time.Sub(timestamp)
+	age := ctx.BlockHeight() - infractionHeight
 	consAddr := sdk.ConsAddress(addr)
 	pubkey, err := k.getPubkey(ctx, addr)
 	if err != nil {

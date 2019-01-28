@@ -1,20 +1,22 @@
 package slashing
 
 import (
+	"fmt"
+	"strconv"
 	"time"
 
-	"fmt"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
 )
 
 var _ params.ParamSet = (*Params)(nil)
 
 // Default parameter namespace
 const (
-	DefaultParamspace = "slashing"
+	DefaultParamspace       = "slashing"
+	BlockQuantityPerDay     = 12 * 60 * 24 //17280, 5 second a block
+	BlockQuantityTenMinutes = 12 * 10      //120, 5 second a block
 )
 
 // Parameter store key
@@ -37,7 +39,7 @@ func ParamTypeTable() params.TypeTable {
 
 // Params - used for initializing default parameter for slashing at genesis
 type Params struct {
-	MaxEvidenceAge          time.Duration `json:"max-evidence-age"`
+	MaxEvidenceAge          int64         `json:"max-evidence-age"`
 	SignedBlocksWindow      int64         `json:"signed-blocks-window"`
 	MinSignedPerWindow      sdk.Dec       `json:"min-signed-per-window"`
 	DoubleSignJailDuration  time.Duration `json:"double-sign-unbond-duration"`
@@ -66,7 +68,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
 	case string(KeyMaxEvidenceAge):
-		maxEvidenceAge, err := time.ParseDuration(value)
+		maxEvidenceAge, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
@@ -159,7 +161,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	switch key {
 	case string(KeyMaxEvidenceAge):
 		err := cdc.UnmarshalJSON(bytes, &p.MaxEvidenceAge)
-		return p.MaxEvidenceAge.String(), err
+		return strconv.FormatInt(p.MaxEvidenceAge, 10), err
 	case string(KeySignedBlocksWindow):
 		err := cdc.UnmarshalJSON(bytes, &p.SignedBlocksWindow)
 		return strconv.FormatInt(p.SignedBlocksWindow, 10), err
@@ -192,7 +194,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 // Default parameters used by Iris Hub
 func DefaultParams() Params {
 	return Params{
-		MaxEvidenceAge:          sdk.Day,
+		MaxEvidenceAge:          BlockQuantityPerDay,
 		DoubleSignJailDuration:  5 * sdk.Day,
 		SignedBlocksWindow:      20000,
 		DowntimeJailDuration:    2 * sdk.Day,
@@ -206,7 +208,7 @@ func DefaultParams() Params {
 
 func DefaultParamsForTestnet() Params {
 	return Params{
-		MaxEvidenceAge:          10 * time.Minute,
+		MaxEvidenceAge:          BlockQuantityTenMinutes,
 		DoubleSignJailDuration:  60 * 5 * time.Second,
 		SignedBlocksWindow:      100,
 		DowntimeJailDuration:    60 * 10 * time.Second,
@@ -253,13 +255,13 @@ func validateParams(p Params) sdk.Error {
 	return nil
 }
 
-func validateMaxEvidenceAge(p time.Duration) sdk.Error {
+func validateMaxEvidenceAge(p int64) sdk.Error {
 	if sdk.NetworkType == sdk.Mainnet {
-		if p < sdk.Day {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [1day,) ", p.String()))
+		if p < BlockQuantityPerDay {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%d] should be between [1day,) ", p))
 		}
-	} else if p < 10*time.Minute {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%s] should be between [10min,) ", p.String()))
+	} else if p < BlockQuantityTenMinutes {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%d] should be between [10min,) ", p))
 	}
 	return nil
 }
@@ -328,7 +330,7 @@ func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
 }
 
 // MaxEvidenceAge - Max age for evidence
-func (k Keeper) MaxEvidenceAge(ctx sdk.Context) (res time.Duration) {
+func (k Keeper) MaxEvidenceAge(ctx sdk.Context) (res int64) {
 	k.paramspace.Get(ctx, KeyMaxEvidenceAge, &res)
 	return
 }
