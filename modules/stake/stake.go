@@ -34,6 +34,9 @@ type (
 var (
 	NewKeeper = keeper.NewKeeper
 
+	PrometheusMetrics = keeper.PrometheusMetrics
+	NopMetrics        = keeper.NopMetrics
+
 	GetValidatorKey              = keeper.GetValidatorKey
 	GetValidatorByConsAddrKey    = keeper.GetValidatorByConsAddrKey
 	GetValidatorsByPowerIndexKey = keeper.GetValidatorsByPowerIndexKey

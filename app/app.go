@@ -14,13 +14,14 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	sdk "github.com/irisnet/irishub/types"
 
+	"github.com/irisnet/irishub/store"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/store"
 )
 
 const (
@@ -42,7 +43,7 @@ type IrisApp struct {
 	*BaseApp
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
 	bApp := NewBaseApp(appName, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
@@ -66,7 +67,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 		cmn.Exit(err.Error())
 	}
 
-	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
+	config.Namespace = appName
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel, config))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
