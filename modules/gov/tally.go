@@ -56,9 +56,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 		}
 	}
 
-
 	tallyingProcedure := keeper.GetTallyingProcedure(ctx, proposal)
-
 
 	tallyResults = TallyResult{
 		Yes:        results[OptionYes],

@@ -27,29 +27,26 @@ iriscli gov query-params --help
 ### Query params by module
 
 ```shell
-iriscli gov query-params --module=gov
+iriscli gov query-params --module=stake
 ```
 
-You'll get all the keys of gov module.
+You'll get all the params of stake module.
 
 ```txt
-[
- "Gov/govDepositProcedure",
- "Gov/govTallyingProcedure",
- "Gov/govVotingProcedure"
-]
+ stake/MaxValidators=100
+ stake/UnbondingTime=504h0m0s
 ```
 
 ### Query params by key
 
 ```shell
-iriscli gov query-params --key=Gov/govDepositProcedure
+iriscli gov query-params --key=stake/MaxValidators
 ```
 
-You'll get all the details of the key specified in the gov module.
+You'll get the details of the parameter specified in the stake module.
 
 ```txt
-{"key":"Gov/govDepositProcedure","value":"{\"min_deposit\":[{\"denom\":\"iris-atto\",\"amount\":\"1000000000000000000000\"}],\"max_deposit_period\":172800000000000}","op":""}
+ stake/MaxValidators=100
 ```
 
 Note: --module and --key cannot be both empty.
