@@ -63,4 +63,3 @@ If the validator was jailed and the jail time passed, release the validator by u
 ```
 iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=<chain-id>
 ```
-
