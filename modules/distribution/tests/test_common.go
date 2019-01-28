@@ -112,7 +112,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "foochainid"}, isCheckTx, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	ck := bank.NewBaseKeeper(accountKeeper)
-	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
+	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(stake.DefaultParamspace), stake.DefaultCodespace, stake.NopMetrics())
 	sk.SetPool(ctx, stake.Pool{BondedPool: stake.InitialBondedPool()})
 	sk.SetParams(ctx, stake.DefaultParams())
 
@@ -160,4 +160,3 @@ func (fck DummyFeeCollectionKeeper) SetCollectedFees(in sdk.Coins) {
 func (fck DummyFeeCollectionKeeper) ClearCollectedFees(_ sdk.Context) {
 	heldFees = sdk.Coins{}
 }
-
