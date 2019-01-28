@@ -717,6 +717,7 @@
     "github.com/cosmos/go-bip39",
     "github.com/emicklei/proto",
     "github.com/go-kit/kit/metrics",
+    "github.com/go-kit/kit/metrics/discard",
     "github.com/go-kit/kit/metrics/prometheus",
     "github.com/gogo/protobuf/proto",
     "github.com/golang/protobuf/proto",

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/stake"
@@ -37,12 +38,14 @@ type (
 	msgRedelegateInput struct {
 		ValidatorSrcAddr string `json:"validator_src_addr"` // in bech32
 		ValidatorDstAddr string `json:"validator_dst_addr"` // in bech32
-		SharesAmount     string `json:"shares"`
+		SharesAmount     string `json:"shares_amount"`
+		SharesPercent    string `json:"shares_percent"`
 	}
 
 	msgUnbondInput struct {
 		ValidatorAddr string `json:"validator_addr"` // in bech32
-		SharesAmount  string `json:"shares"`
+		SharesAmount  string `json:"shares_amount"`
+		SharesPercent string `json:"shares_percent"`
 	}
 
 	// the request body for edit delegations
@@ -151,7 +154,10 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 			return
 		}
 
-		shares, err := sdk.NewDecFromStr(req.BeginRedelegate.SharesAmount)
+		sharesAmount, err := stakeClient.GetShares(
+			storeName, cliCtx, cdc, req.BeginRedelegate.SharesAmount, req.BeginRedelegate.SharesPercent,
+			delAddr, valSrcAddr,
+		)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -161,7 +167,7 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 			DelegatorAddr:    delAddr,
 			ValidatorSrcAddr: valSrcAddr,
 			ValidatorDstAddr: valDstAddr,
-			SharesAmount:     sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
+			SharesAmount:     sharesAmount,
 		}
 
 		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
@@ -202,7 +208,10 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 			return
 		}
 
-		shares, err := sdk.NewDecFromStr(req.BeginUnbond.SharesAmount)
+		sharesAmount, err := stakeClient.GetShares(
+			storeName, cliCtx, cdc, req.BeginUnbond.SharesAmount, req.BeginUnbond.SharesPercent,
+			delAddr, valAddr,
+		)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -211,7 +220,7 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 		msg := stake.MsgBeginUnbonding{
 			DelegatorAddr: delAddr,
 			ValidatorAddr: valAddr,
-			SharesAmount:  sdk.NewDecFromInt(utils.ConvertDecToRat(shares).Quo(utils.ExRateFromStakeTokenToMainUnit(cliCtx)).Num()),
+			SharesAmount:  sharesAmount,
 		}
 
 		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
