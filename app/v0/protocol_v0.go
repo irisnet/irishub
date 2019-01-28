@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -59,9 +60,10 @@ type ProtocolV0 struct {
 	initChainer  sdk.InitChainer1 // initialize state with validators and state blob
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
+	config       *cfg.InstrumentationConfig
 }
 
-func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string) *ProtocolV0 {
+func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string, config *cfg.InstrumentationConfig) *ProtocolV0 {
 	p0 := ProtocolV0{
 		version:        version,
 		logger:         log,
@@ -69,6 +71,7 @@ func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invari
 		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
+		config:         config,
 	}
 	return &p0
 }
@@ -189,6 +192,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeyStake, protocol.TkeyStake,
 		p.bankKeeper, p.paramsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
+		stake.PrometheusMetrics(p.config),
 	)
 	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamSpace),
