@@ -5,6 +5,7 @@ import (
 
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
+	"strconv"
 )
 
 const (
@@ -124,6 +125,10 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		Denom:  types.StakeDenom,
 		Amount: tokensToBurn.TruncateInt(),
 	}})
+	slashToken, err := strconv.ParseFloat(tokensToBurn.String(), 64)
+	if err == nil {
+		k.metrics.SlashedToken.With("validator_address", validator.GetConsAddr().String()).Add(slashToken)
+	}
 	// Log that a slash occurred!
 	logger.Info("Validator slashed", "consensus_address", validator.GetConsAddr().String(),
 		"operator_address", validator.GetOperator().String(), "slash_factor", slashFactor.String(), "slash_tokens", tokensToBurn)
@@ -135,6 +140,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.jailValidator(ctx, validator)
+	k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(1)
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }
@@ -143,6 +149,7 @@ func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 func (k Keeper) Unjail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.unjailValidator(ctx, validator)
+	k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(0)
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }

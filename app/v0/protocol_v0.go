@@ -210,6 +210,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeySlashing,
 		&stakeKeeper, p.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		slashing.DefaultCodespace,
+		slashing.PrometheusMetrics(p.config),
 	)
 
 	p.govKeeper = gov.NewKeeper(

@@ -7,6 +7,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake/types"
+	"strconv"
 )
 
 // keeper of the stake store
@@ -21,7 +22,7 @@ type Keeper struct {
 	// codespace
 	codespace sdk.CodespaceType
 	// metrics
-	metrics   *Metrics
+	metrics *Metrics
 }
 
 func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramstore params.Subspace, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
@@ -153,4 +154,15 @@ func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddres
 
 func (k Keeper) BondDenom() string {
 	return types.StakeDenom
+}
+
+func (k Keeper) Tally(ctx sdk.Context) {
+	burnedToken, err := strconv.ParseFloat(k.bankKeeper.GetBurnedCoins(ctx).AmountOf(types.StakeDenom).String(), 64)
+	if err == nil {
+		k.metrics.BurnedToken.Set(burnedToken)
+	}
+	loosenToken, err := strconv.ParseFloat(k.bankKeeper.GetLoosenCoins(ctx).AmountOf(types.StakeDenom).String(), 64)
+	if err == nil {
+		k.metrics.LoosenToken.Set(loosenToken)
+	}
 }

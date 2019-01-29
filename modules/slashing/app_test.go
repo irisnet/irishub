@@ -31,7 +31,7 @@ func getMockApp(t *testing.T) (*mock.App, stake.Keeper, Keeper) {
 
 	paramsKeeper := params.NewKeeper(mApp.Cdc, mApp.KeyParams, mApp.TkeyParams)
 	stakeKeeper := stake.NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace, stake.NopMetrics())
-	keeper := NewKeeper(mApp.Cdc, keySlashing, stakeKeeper, paramsKeeper.Subspace(DefaultParamspace), DefaultCodespace)
+	keeper := NewKeeper(mApp.Cdc, keySlashing, stakeKeeper, paramsKeeper.Subspace(DefaultParamspace), DefaultCodespace, NopMetrics())
 	mApp.Router().AddRoute("stake", []*sdk.KVStoreKey{mApp.KeyStake, mApp.KeyAccount, mApp.KeyParams}, stake.NewHandler(stakeKeeper))
 	mApp.Router().AddRoute("slashing", []*sdk.KVStoreKey{mApp.KeyStake, keySlashing, mApp.KeyParams}, NewHandler(keeper))
 
@@ -88,8 +88,8 @@ func checkValidatorSigningInfo(t *testing.T, mapp *mock.App, keeper Keeper,
 func TestSlashingMsgs(t *testing.T) {
 	mapp, stakeKeeper, keeper := getMockApp(t)
 
-	genCoin := sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(42,18))
-	bondCoin := sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(10,18))
+	genCoin := sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(42, 18))
+	bondCoin := sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(10, 18))
 
 	acc1 := &auth.BaseAccount{
 		Address: addr1,
