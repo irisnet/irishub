@@ -26,6 +26,7 @@ import (
 
 const (
 	appName               = "IrisApp"
+	appPrometheusNamespace= "iris"
 	FlagReplay            = "replay-last-block"
 	DefaultSyncableHeight = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
 	DefaultCacheSize      = store.NumRecent     // Multistore saves last 100 blocks
@@ -66,9 +67,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-
-	config.Namespace = appName
-	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel, config))
+	//Duplicate prometheus config
+	appPrometheusConfig := *config
+	//Change namespace to appName
+	appPrometheusConfig.Namespace = appPrometheusNamespace
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
