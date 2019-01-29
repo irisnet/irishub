@@ -125,7 +125,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		Denom:  types.StakeDenom,
 		Amount: tokensToBurn.TruncateInt(),
 	}})
-	slashToken, err := strconv.ParseFloat(tokensToBurn.String(), 64)
+	slashToken, err := strconv.ParseFloat(tokensToBurn.TruncateInt().Div(tokenPrecision).String(), 64)
 	if err == nil {
 		k.metrics.SlashedToken.With("validator_address", validator.GetConsAddr().String()).Add(slashToken)
 	}
