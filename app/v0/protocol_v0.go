@@ -61,6 +61,8 @@ type ProtocolV0 struct {
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 	config       *cfg.InstrumentationConfig
+
+	metrics		*Metrics
 }
 
 func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string, config *cfg.InstrumentationConfig) *ProtocolV0 {
@@ -72,6 +74,7 @@ func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invari
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
 		config:         config,
+		metrics:        PrometheusMetrics(config),
 	}
 	return &p0
 }
