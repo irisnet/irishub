@@ -2,8 +2,17 @@
 
 ## Introduction 
 
-This module is in charge of distributing collected transaction fee and inflated token to all validators and delegators. To reduce computation stress, a lazy distribution strategy is brought in. `lazy` means that the benefit won't be paid directly to contributors automatically. The contributors are required to explicitly send transactions to withdraw their benefit, otherwise, their benefit will be kept in the global pool. 
+This module is in charge of distributing collected transaction fee and inflated token to all validators and delegators. 
+To reduce computation stress, a lazy distribution strategy is brought in. 
+`lazy` means that the benefit won't be paid directly to contributors automatically. 
+The contributors are required to explicitly send transactions to withdraw their benefit, otherwise, 
+their benefit will be kept in the global pool. 
 
+If one validator is the proposer of current round, that validator (and their delegators) receives between 1% and 5% of the sum of fee rewards and inflated token as proposer reward.
+It is calculated as:
+```
+ proposerReward = (TxFee + InflatedToken) * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
+```
 ## Usage Scenario
 
 1. Set withdraw address

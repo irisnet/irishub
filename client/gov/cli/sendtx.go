@@ -92,7 +92,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				version := uint64(version_)
 				software := viper.GetString(flagSoftware)
 
-
 				switchHeight_ := viper.GetInt64(flagSwitchHeight)
 				if switchHeight_ < 0 {
 					return errors.Errorf("SwitchHeight must greater than or equal to zero")
@@ -119,16 +118,17 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
 	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
+
 	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	cmd.Flags().String(flagThreshold, "0.8", "the upgrade signal threshold of the software upgrade")
+
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)
 	cmd.MarkFlagRequired(flagProposalType)
 	return cmd
 }
-
 
 func getParamFromString(paramsStr []string) (gov.Params, error) {
 	var govParams gov.Params
@@ -147,8 +147,6 @@ func getParamFromString(paramsStr []string) (gov.Params, error) {
 	}
 	return govParams, nil
 }
-
-
 
 // GetCmdDeposit implements depositing tokens for an active proposal.
 func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
@@ -171,9 +169,7 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 
 			proposalID := uint64(viper.GetInt64(flagProposalID))
 
-
 			amount, err := cliCtx.ParseCoins(viper.GetString(flagDeposit))
-
 
 			if err != nil {
 				return err

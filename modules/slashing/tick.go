@@ -30,7 +30,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 	for _, evidence := range req.ByzantineValidators {
 		switch evidence.Type {
 		case tmtypes.ABCIEvidenceTypeDuplicateVote:
-			doubleSignSlashTag := sk.handleDoubleSign(ctx, evidence.Validator.Address, evidence.Height, evidence.Time, evidence.Validator.Power)
+			doubleSignSlashTag := sk.handleDoubleSign(ctx, evidence.Validator.Address, evidence.Height, evidence.Validator.Power)
 			tags = tags.AppendTags(doubleSignSlashTag)
 		default:
 			ctx.Logger().Error("ignored unknown evidence type", "type", evidence.Type)

@@ -45,7 +45,7 @@ func TestHandleDoubleSign(t *testing.T) {
 	keeper.handleValidatorSignature(ctx, val.Address(), amtInt.Div(sdk.NewIntWithDecimal(1, 18)).Int64(), true)
 
 	// double sign less than max age
-	keeper.handleDoubleSign(ctx, val.Address(), 0, time.Unix(0, 0), amtInt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
+	keeper.handleDoubleSign(ctx, val.Address(), 0, amtInt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
 
 	// should be jailed
 	require.True(t, sk.Validator(ctx, operatorAddr).GetJailed())
@@ -56,10 +56,10 @@ func TestHandleDoubleSign(t *testing.T) {
 		t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))).Mul(sdk.NewDec(19).Quo(sdk.NewDec(20))),
 		sk.Validator(ctx, operatorAddr).GetPower(),
 	)
-	ctx = ctx.WithBlockHeader(abci.Header{Time: time.Unix(1, 0).Add(keeper.MaxEvidenceAge(ctx))})
+	ctx = ctx.WithBlockHeight(ctx.BlockHeight()+(keeper.MaxEvidenceAge(ctx)))
 
 	// double sign past max age
-	keeper.handleDoubleSign(ctx, val.Address(), 0, time.Unix(0, 0), amtInt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
+	keeper.handleDoubleSign(ctx, val.Address(), 0, amtInt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
 	require.Equal(
 		t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))).Mul(sdk.NewDec(19).Quo(sdk.NewDec(20))),
 		sk.Validator(ctx, operatorAddr).GetPower(),
@@ -89,7 +89,7 @@ func TestSlashingPeriodCap(t *testing.T) {
 	keeper.handleValidatorSignature(ctx, valConsAddr, amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64(), true)
 
 	// double sign less than max age
-	keeper.handleDoubleSign(ctx, valConsAddr, 1, time.Unix(0, 0), amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
+	keeper.handleDoubleSign(ctx, valConsAddr, 1, amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
 	// should be jailed
 	require.True(t, sk.Validator(ctx, operatorAddr).GetJailed())
 	// end block
@@ -105,7 +105,7 @@ func TestSlashingPeriodCap(t *testing.T) {
 	require.Equal(t, expectedPower, sk.Validator(ctx, operatorAddr).GetPower())
 
 	// double sign again, same slashing period
-	keeper.handleDoubleSign(ctx, valConsAddr, 1, time.Unix(0, 0), amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
+	keeper.handleDoubleSign(ctx, valConsAddr, 1, amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
 	// should be jailed
 	require.True(t, sk.Validator(ctx, operatorAddr).GetJailed())
 	// end block
@@ -121,7 +121,7 @@ func TestSlashingPeriodCap(t *testing.T) {
 	require.Equal(t, expectedPower, sk.Validator(ctx, operatorAddr).GetPower())
 
 	// double sign again, new slashing period
-	keeper.handleDoubleSign(ctx, valConsAddr, 3, time.Unix(0, 0), amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
+	keeper.handleDoubleSign(ctx, valConsAddr, 3, amt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())
 	// should be jailed
 	require.True(t, sk.Validator(ctx, operatorAddr).GetJailed())
 	// unjail to measure power
@@ -224,7 +224,7 @@ func TestHandleAbsentValidator(t *testing.T) {
 	require.Equal(t, sdk.NewDecFromInt(amt).Sub(slashAmt), validator.GetTokens())
 
 	// 502nd block *double signed* (oh no!)
-	keeper.handleDoubleSign(ctx, val.Address(), height, ctx.BlockHeader().Time, amtInt)
+	keeper.handleDoubleSign(ctx, val.Address(), height, amtInt)
 
 	// validator should have been slashed
 	validator, _ = sk.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(val))

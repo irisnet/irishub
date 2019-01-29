@@ -166,7 +166,7 @@ func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress
 	valAddr sdk.ValAddress) (types.DecCoins, sdk.Error) {
 
 	if !k.HasDelegationDistInfo(ctx, delAddr, valAddr) {
-		ctx.Logger().Debug("There is no delegation distribution information")
+		ctx.Logger().Error("There is no delegation distribution information")
 		return nil, types.ErrNoDelegationDistInfo(k.codespace)
 	}
 
