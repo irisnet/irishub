@@ -9,9 +9,7 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -253,7 +251,7 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 			// get the shares amount
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
-			sharesAmount, err := getShares(
+			sharesAmount, err := stakeClient.GetShares(
 				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorSrcAddr,
 			)
@@ -272,68 +270,6 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagAddressValidatorSrc)
 	cmd.MarkFlagRequired(FlagAddressValidatorDst)
 	return cmd
-}
-
-// nolint: gocyclo
-// TODO: Make this pass gocyclo linting
-func getShares(
-	storeName string, cliCtx context.CLIContext, cdc *codec.Codec, sharesAmountStr,
-	sharesPercentStr string, delegatorAddr sdk.AccAddress, validatorAddr sdk.ValAddress,
-) (sharesAmount sdk.Dec, err error) {
-	switch {
-	case sharesAmountStr != "" && sharesPercentStr != "":
-		return sharesAmount, errors.Errorf("can either specify the amount OR the percent of the shares, not both")
-
-	case sharesAmountStr == "" && sharesPercentStr == "":
-		return sharesAmount, errors.Errorf("can either specify the amount OR the percent of the shares, not both")
-
-	case sharesAmountStr != "":
-		sharesAmount, err = sdk.NewDecFromStr(sharesAmountStr)
-		if err != nil {
-			return sharesAmount, err
-		}
-		if !sharesAmount.GT(sdk.ZeroDec()) {
-			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
-		}
-
-		stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
-		if err != nil {
-			panic(err)
-		}
-		decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
-		exRate := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, decimalDiff))
-		sharesAmount = sharesAmount.Mul(exRate)
-	case sharesPercentStr != "":
-		var sharesPercent sdk.Dec
-		sharesPercent, err = sdk.NewDecFromStr(sharesPercentStr)
-		if err != nil {
-			return sharesAmount, err
-		}
-		if !sharesPercent.GT(sdk.ZeroDec()) || !sharesPercent.LTE(sdk.OneDec()) {
-			return sharesAmount, errors.Errorf("shares percent must be >0 and <=1 (ex. 0.01, 0.75, 1)")
-		}
-
-		// make a query to get the existing delegation shares
-		key := stake.GetDelegationKey(delegatorAddr, validatorAddr)
-		cliCtx := context.NewCLIContext().
-			WithCodec(cdc).
-			WithAccountDecoder(utils.GetAccountDecoder(cdc))
-
-		resQuery, err := cliCtx.QueryStore(key, storeName)
-		if err != nil {
-			return sharesAmount, errors.Errorf("cannot find delegation to determine percent Error: %v", err)
-		} else if len(resQuery) == 0 {
-			return sharesAmount, errors.Errorf("delegation (from delegator %s to validator %s) doesn't exist", delegatorAddr.String(), validatorAddr.String())
-		}
-
-		delegation, err := types.UnmarshalDelegation(cdc, key, resQuery)
-		if err != nil {
-			return sdk.ZeroDec(), err
-		}
-
-		sharesAmount = sharesPercent.Mul(delegation.Shares)
-	}
-	return
 }
 
 // GetCmdBeginUnbonding implements the begin unbonding validator command.
@@ -363,7 +299,7 @@ func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 			// get the shares amount
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
-			sharesAmount, err := getShares(
+			sharesAmount, err := stakeClient.GetShares(
 				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorAddr,
 			)

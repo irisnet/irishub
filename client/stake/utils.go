@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 // defines a delegation without type Rat for shares
@@ -85,17 +87,17 @@ type Commission struct {
 }
 
 type ValidatorOutput struct {
-	OperatorAddr       sdk.ValAddress    `json:"operator_address"`
-	ConsPubKey         string            `json:"consensus_pubkey"`
-	Jailed             bool              `json:"jailed"`
-	Status             sdk.BondStatus    `json:"status"`
-	Tokens             string            `json:"tokens"`
-	DelegatorShares    string            `json:"delegator_shares"`
-	Description        stake.Description `json:"description"`
-	BondHeight         int64             `json:"bond_height"`
-	UnbondingHeight    int64             `json:"unbonding_height"`
-	UnbondingMinTime   time.Time         `json:"unbonding_time"`
-	Commission         Commission        `json:"commission"`
+	OperatorAddr     sdk.ValAddress    `json:"operator_address"`
+	ConsPubKey       string            `json:"consensus_pubkey"`
+	Jailed           bool              `json:"jailed"`
+	Status           sdk.BondStatus    `json:"status"`
+	Tokens           string            `json:"tokens"`
+	DelegatorShares  string            `json:"delegator_shares"`
+	Description      stake.Description `json:"description"`
+	BondHeight       int64             `json:"bond_height"`
+	UnbondingHeight  int64             `json:"unbonding_height"`
+	UnbondingMinTime time.Time         `json:"unbonding_time"`
+	Commission       Commission        `json:"commission"`
 }
 
 func (v ValidatorOutput) HumanReadableString() (string, error) {
@@ -245,4 +247,63 @@ func BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr string) (commissio
 
 	commission = types.NewCommissionMsg(rate, maxRate, maxChangeRate)
 	return commission, nil
+}
+
+// nolint: gocyclo
+// TODO: Make this pass gocyclo linting
+func GetShares(
+	storeName string, cliCtx context.CLIContext, cdc *codec.Codec, sharesAmountStr,
+	sharesPercentStr string, delegatorAddr sdk.AccAddress, validatorAddr sdk.ValAddress,
+) (sharesAmount sdk.Dec, err error) {
+	switch {
+	case sharesAmountStr != "" && sharesPercentStr != "":
+		return sharesAmount, errors.Errorf("can either specify the amount OR the percent of the shares, not both")
+
+	case sharesAmountStr == "" && sharesPercentStr == "":
+		return sharesAmount, errors.Errorf("can either specify the amount OR the percent of the shares, not both")
+
+	case sharesAmountStr != "":
+		sharesAmount, err = sdk.NewDecFromStr(sharesAmountStr)
+		if err != nil {
+			return sharesAmount, err
+		}
+		if !sharesAmount.GT(sdk.ZeroDec()) {
+			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
+		}
+
+		stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
+		if err != nil {
+			panic(err)
+		}
+		decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
+		exRate := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, decimalDiff))
+		sharesAmount = sharesAmount.Mul(exRate)
+	case sharesPercentStr != "":
+		var sharesPercent sdk.Dec
+		sharesPercent, err = sdk.NewDecFromStr(sharesPercentStr)
+		if err != nil {
+			return sharesAmount, err
+		}
+		if !sharesPercent.GT(sdk.ZeroDec()) || !sharesPercent.LTE(sdk.OneDec()) {
+			return sharesAmount, errors.Errorf("shares percent must be >0 and <=1 (ex. 0.01, 0.75, 1)")
+		}
+
+		// make a query to get the existing delegation shares
+		key := stake.GetDelegationKey(delegatorAddr, validatorAddr)
+
+		resQuery, err := cliCtx.QueryStore(key, storeName)
+		if err != nil {
+			return sharesAmount, errors.Errorf("cannot find delegation to determine percent Error: %v", err)
+		} else if len(resQuery) == 0 {
+			return sharesAmount, errors.Errorf("delegation (from delegator %s to validator %s) doesn't exist", delegatorAddr.String(), validatorAddr.String())
+		}
+
+		delegation, err := types.UnmarshalDelegation(cdc, key, resQuery)
+		if err != nil {
+			return sdk.ZeroDec(), err
+		}
+
+		sharesAmount = sharesPercent.Mul(delegation.Shares)
+	}
+	return
 }

@@ -1003,7 +1003,7 @@ paths:
                     delegation:
                       type: string
                       example: 10iris
-        description: The password of the account to remove from the KMS
+        description: Delegation amount must be specified
   '/stake/delegators/{delegatorAddr}/redelegate':
     parameters:
       - in: path
@@ -1073,10 +1073,13 @@ paths:
                       $ref: '#/components/schemas/ValidatorAddress'
                     validator_dst_addr:
                       $ref: '#/components/schemas/ValidatorAddress'
-                    shares:
+                    shares_amount:
                       type: string
                       example: '100'
-        description: The password of the account to remove from the KMS
+                    shares_percent:
+                      type: string
+                      example: '0.1'
+        description: Either specify the shares_amount or the shares_percent, not both
   '/stake/delegators/{delegatorAddr}/unbond':
     parameters:
       - in: path
@@ -1144,10 +1147,13 @@ paths:
                   properties:
                     validator_addr:
                       $ref: '#/components/schemas/ValidatorAddress'
-                    shares:
+                    shares_amount:
                       type: string
                       example: '100'
-        description: The password of the account to remove from the KMS
+                    shares_percent:
+                      type: string
+                      example: '0.1'
+        description: Either specify the shares_amount or the shares_percent, not both
   '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path
