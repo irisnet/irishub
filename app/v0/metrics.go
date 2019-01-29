@@ -8,7 +8,7 @@ import (
 	cfg "github.com/tendermint/tendermint/config"
 )
 
-const MetricsSubsystem = "invariant"
+const MetricsSubsystem = "v0"
 
 type Metrics struct {
 	InvariantFailure metrics.Gauge
@@ -23,7 +23,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		InvariantFailure: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
 			Namespace: config.Namespace,
 			Subsystem: MetricsSubsystem,
-			Name:      "failure",
+			Name:      "invariant_failure",
 			Help:      "invariant failure",
 		}, []string{"error"}),
 	}
