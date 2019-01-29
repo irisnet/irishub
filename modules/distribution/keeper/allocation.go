@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -64,7 +65,10 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityTax := k.GetCommunityTax(ctx)
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
-
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).String(), 64)
+	if err == nil {
+		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+	}
 	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString())
 
 	// set the global pool within the distribution module

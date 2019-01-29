@@ -203,7 +203,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
 		p.bankKeeper, &stakeKeeper, p.feeKeeper,
-		distr.DefaultCodespace,
+		distr.DefaultCodespace,  distr.PrometheusMetrics(p.config),
 	)
 	p.slashingKeeper = slashing.NewKeeper(
 		p.cdc,

@@ -33,6 +33,9 @@ type (
 var (
 	NewKeeper = keeper.NewKeeper
 
+	PrometheusMetrics = keeper.PrometheusMetrics
+	NopMetrics        = keeper.NopMetrics
+
 	GetValidatorDistInfoKey     = keeper.GetValidatorDistInfoKey
 	GetDelegationDistInfoKey    = keeper.GetDelegationDistInfoKey
 	GetDelegationDistInfosKey   = keeper.GetDelegationDistInfosKey
