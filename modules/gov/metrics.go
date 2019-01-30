@@ -15,7 +15,7 @@ import (
 const (
 	MetricsSubsystem = "module_gov"
 	ValidatorLabel   = "validator_address"
-	ProposalIDLabel  = "proposalID"
+	ProposalIDLabel  = "proposal_id"
 	ParamKeyLabel    = "parameter_key"
 )
 
