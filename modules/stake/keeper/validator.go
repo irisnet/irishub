@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"container/list"
 	"fmt"
+	"strconv"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
-	"strconv"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Cache the amino decoding of validators, as it can be the case that repeated slashing calls
@@ -91,7 +91,7 @@ func (k Keeper) SetValidator(ctx sdk.Context, validator types.Validator) {
 	bz := types.MustMarshalValidator(k.cdc, validator)
 	bondedToken, err := strconv.ParseFloat(validator.GetPower().String(), 64)
 	if err == nil {
-		k.metrics.BondedToken.With("validator_address", validator.OperatorAddr.String()).Set(bondedToken)
+		k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
 	}
 	store.Set(GetValidatorKey(validator.OperatorAddr), bz)
 }

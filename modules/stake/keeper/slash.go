@@ -2,10 +2,10 @@ package keeper
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
 )
 
 const (

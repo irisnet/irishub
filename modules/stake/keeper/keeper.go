@@ -1,13 +1,14 @@
 package keeper
 
 import (
+	"strconv"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake/types"
-	"strconv"
 )
 
 // keeper of the stake store
