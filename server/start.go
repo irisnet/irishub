@@ -22,7 +22,7 @@ const (
 	flagTraceStore     = "trace-store"
 	flagPruning        = "pruning"
 	flagMinimumFees    = "minimum_fees"
-	flagInvariantLevel = "invariant_check"
+	flagInvariantLevel = "invariant_level"
 )
 
 // StartCmd runs the service passed in, either stand-alone or in-process with
