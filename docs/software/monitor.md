@@ -24,6 +24,9 @@ The following metrics are available:
 | upgrade_upgrade  | Gauge |  | Whether new software needs to be installed, either 0 (no) or 1 (yes) |
 | upgrade_signal  | Gauge | validator_address, version | Whether validator have run the new version software, either 0 (no) or 1 (yes)|
 | service_active_requests  | Gauge |  | Number of active requests |
+| gov_parameter  | Gauge |  parameter_key | Parameter of governance |
+| gov_proposal_status  | Gauge |  proposal_id | Status of proposal, 0:DepositPeriod 1:VotingPeriod 2:Pass 3:Reject 4:Other |
+| gov_vote  | Gauge |  proposal_id, validator_address | Validator vote result of a proposal, 0:Yes 1:No 2:NoWithVeto 3:Abstain |
 
 IRISnet metrics also contains tendermint metrics, Visit [tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md) for more information.
 

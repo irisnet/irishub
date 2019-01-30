@@ -24,6 +24,10 @@ The following metrics are available:
 | upgrade_upgrade  | Gauge |  | 是否需要安装新软件，0（否）或1（是） |
 | upgrade_signal  | Gauge | validator_address, version | 验证人是否运行了新版本软件，0（否）或1（是）|
 | service_active_requests  | Gauge |  | 活跃的请求数 |
+| gov_parameter  | Gauge |  parameter_key | 治理参数 |
+| gov_proposal_status  | Gauge |  proposal_id | 提议状态，0:抵押期 1:投票期 2:通过 3:拒绝 4:其他 |
+| gov_vote  | Gauge |  proposal_id, validator_address | 验证人投票结果，0:同意 1:反对 2:强烈反对 3:弃权 |
+
 
 IRISnet metrics同时也包括了tendermint metrics，访问[tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md) 获取更多信息。
 
