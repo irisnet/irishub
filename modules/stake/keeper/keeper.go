@@ -157,7 +157,7 @@ func (k Keeper) BondDenom() string {
 	return types.StakeDenom
 }
 
-func (k Keeper) Tally(ctx sdk.Context) {
+func (k Keeper) UpdateMetrics(ctx sdk.Context) {
 	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
 	burnedToken, err := strconv.ParseFloat(k.bankKeeper.GetBurnedCoins(ctx).AmountOf(types.StakeDenom).Div(tokenPrecision).String(), 64)
 	if err == nil {

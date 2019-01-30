@@ -78,7 +78,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) (validatorUpdates []abci.Valid
 			tags.DstValidator, []byte(dvvTriplet.ValidatorDstAddr.String()),
 		))
 	}
-	k.Tally(ctx)
+	k.UpdateMetrics(ctx)
 	return
 }
 

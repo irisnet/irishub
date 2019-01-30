@@ -16,6 +16,7 @@ type Metrics struct {
 	BurnedToken  metrics.Gauge
 	SlashedToken metrics.Counter
 	Jailed       metrics.Gauge
+	Power        metrics.Gauge
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -53,6 +54,12 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 			Subsystem: MetricsSubsystem,
 			Name:      "jailed",
 			Help:      "jailed",
+		}, []string{"validator_address"}),
+		Power: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Namespace: config.Namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "power",
+			Help:      "power",
 		}, []string{"validator_address"}),
 	}
 }
