@@ -15,7 +15,7 @@ The following metrics are available:
 | Name | Type | Tags | Description |
 | ---- | ---- | ---- | ----------- |
 | stake_bonded_token | Gauge | validator_address | 验证人被绑定的token总数 |
-| stake_loosen_token | Gauge |                   | Total loosen token |
+| stake_loosen_token | Gauge |                   | 未被绑定的token总数 |
 | stake_burned_token | Gauge |                   | 销毁的token总数 |
 | stake_slashed_token | Counter | validator_address | 验证人被惩罚的token总数 |
 | stake_jailed        | Gauge | validator_address | 验证人监禁状态，0（未监禁）或1（被监禁） |
