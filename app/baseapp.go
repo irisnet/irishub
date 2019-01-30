@@ -70,6 +70,9 @@ type BaseApp struct {
 	// minimum fees for spam prevention
 	minimumFees sdk.Coins
 
+	// invariant check level
+	invariantLevel string
+
 	// flag for sealing
 	sealed bool
 }
@@ -203,6 +206,9 @@ func (app *BaseApp) SetProtocolEngine(pe *protocol.ProtocolEngine) {
 
 // SetMinimumFees sets the minimum fees.
 func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
+
+// SetInvariantCheck sets the invariant check config.
+func (app *BaseApp) SetInvariantLevel(level string) { app.invariantLevel = level }
 
 // NewContext returns a new Context with the correct store, the given header, and nil txBytes.
 func (app *BaseApp) NewContext(isCheckTx bool, header abci.Header) sdk.Context {

@@ -14,6 +14,9 @@ const (
 type BaseConfig struct {
 	// Tx minimum fee
 	MinFees        string `mapstructure:"minimum_fees"`
+
+	// Invariant check level, panic: panic when failure, error: print error log, no: disable invariant check
+	InvariantLevel string `mapstructure:"invariant_level"`
 }
 
 // Config defines the server's top level configuration
@@ -35,5 +38,5 @@ func (c *Config) MinimumFees() sdk.Coins {
 
 // DefaultConfig returns server's default configuration.
 func DefaultConfig() *Config {
-	return &Config{BaseConfig{MinFees: defaultMinimumFees}}
+	return &Config{BaseConfig{MinFees: defaultMinimumFees, InvariantLevel: sdk.InvariantLevel}}
 }
