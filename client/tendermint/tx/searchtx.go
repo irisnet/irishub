@@ -160,6 +160,9 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 		}
 
 		for key, values := range r.Form {
+			if key == "search_request_page" || key == "search_request_size" {
+				continue
+			}
 			value, err := url.QueryUnescape(values[0])
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, sdk.AppendMsgToErr("could not decode query value", err.Error()))
@@ -169,8 +172,8 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			tag := fmt.Sprintf("%s='%s'", key, value)
 			tags = append(tags, tag)
 		}
-		pageString := r.FormValue("page")
-		sizeString := r.FormValue("size")
+		pageString := r.FormValue("search_request_page")
+		sizeString := r.FormValue("search_request_size")
 		page := int64(0)
 		size := int64(100)
 		if pageString != "" {

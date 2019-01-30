@@ -243,12 +243,12 @@ paths:
             additionalProperties:
               type: string
         - in: query
-          name: page
+          name: search_request_page
           description: 'Pagination page, default value 0'
           schema:
             type: integer
         - in: query
-          name: size
+          name: search_request_size
           description: 'Pagination size, default value 100'
           schema:
             type: integer
