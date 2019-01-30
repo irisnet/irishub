@@ -271,6 +271,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
+		keeper.metrics.ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionSvcCallTimeOut)

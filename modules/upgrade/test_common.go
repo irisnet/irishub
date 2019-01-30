@@ -91,7 +91,7 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
 		stake.DefaultCodespace,
 		stake.NopMetrics(),
 	)
-	keeper := NewKeeper(cdc, keyUpgrade, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), sk)
+	keeper := NewKeeper(cdc, keyUpgrade, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), sk, NopMetrics())
 
 	return ctx, keeper, paramsKeeper
 }

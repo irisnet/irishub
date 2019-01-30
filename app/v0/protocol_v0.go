@@ -213,6 +213,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeySlashing,
 		&stakeKeeper, p.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		slashing.DefaultCodespace,
+		slashing.PrometheusMetrics(p.config),
 	)
 
 	p.govKeeper = gov.NewKeeper(
@@ -235,6 +236,7 @@ func (p *ProtocolV0) configKeepers() {
 		p.guardianKeeper,
 		service.DefaultCodespace,
 		p.paramsKeeper.Subspace(service.DefaultParamSpace),
+		service.PrometheusMetrics(p.config),
 	)
 
 	// register the staking hooks
@@ -243,7 +245,7 @@ func (p *ProtocolV0) configKeepers() {
 	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 
-	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper)
+	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 }
 
 // configure all Routers

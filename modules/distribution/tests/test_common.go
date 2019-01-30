@@ -127,7 +127,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initCoins sdk.Int,
 	}
 
 	fck := DummyFeeCollectionKeeper{}
-	keeper := distr.NewKeeper(cdc, keyDistr, pk.Subspace(distr.DefaultParamspace), ck, sk, fck, types.DefaultCodespace)
+	keeper := distr.NewKeeper(cdc, keyDistr, pk.Subspace(distr.DefaultParamspace), ck, sk, fck, types.DefaultCodespace, distr.NopMetrics())
 
 	// set the distribution hooks on staking
 	sk.SetHooks(keeper.Hooks())

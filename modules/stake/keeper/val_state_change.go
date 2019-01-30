@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
+	"strconv"
 
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -79,6 +80,11 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		if !found || !bytes.Equal(oldPowerBytes, newPowerBytes) {
 			updates = append(updates, validator.ABCIValidatorUpdate())
 
+			power, err := strconv.ParseFloat(validator.GetPower().String(), 64)
+			if err == nil {
+				k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
+			}
+
 			// Assert that the validator had updated its ValidatorDistInfo.FeePoolWithdrawalHeight.
 			// This hook is extremely useful, otherwise lazy accum bugs will be difficult to solve.
 			if k.hooks != nil {
@@ -115,15 +121,18 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 		// update the validator set
 		updates = append(updates, validator.ABCIValidatorUpdateZero())
+
+		power, err := strconv.ParseFloat(validator.GetPower().String(), 64)
+		if err == nil {
+			k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
+		}
+
 		logger.Info("Remove no-longer-bonded validator", "consensus_address", validator.GetConsAddr().String(), "operator_address", validator.GetOperator().String(), "tokens", validator.Tokens)
 	}
 
 	// set total power on lookup index if there are any updates
 	if len(updates) > 0 {
 		k.SetLastTotalPower(ctx, totalPower)
-		for _, update := range updates {
-			k.metrics.ValidatorUpdate.Set(float64(update.Power))
-		}
 	}
 
 	return updates
