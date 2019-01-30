@@ -709,9 +709,9 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 
 func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, pl ProposalLevel) (uint64, bool) {
 	ctx.Logger().Debug("Proposals Distribution",
-		"CriticalProposalNum" , keeper.GetCriticalProposalNum(ctx),
-		        "ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
-		        "NormalProposalNum"   , keeper.GetNormalProposalNum(ctx))
+		"CriticalProposalNum", keeper.GetCriticalProposalNum(ctx),
+		"ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
+		"NormalProposalNum", keeper.GetNormalProposalNum(ctx))
 
 	maxNum := keeper.GetMaxNumByProposalLevel(ctx, pl)
 	switch pl {
