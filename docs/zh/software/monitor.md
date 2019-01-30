@@ -1,9 +1,31 @@
 # 如何部署 IRIS Monitor
 
-## 安装 IRIS Monitor
+## Metrics
 
-你可以参考这个页面来安装 IRIS 及 IRIS Monitor : https://github.com/irisnet/irishub/blob/master/docs/get-started/Install-Iris.md。
-另外，系统中需要有/bin/bash、wc、ps等命令。 
+IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用这些指标。
+
+默认情况下禁用此功能。
+
+要启用Prometheus metrics，请在配置文件中设置`instrumentation.prometheus=true`。默认情况下，Metrics将在26660端口下的/metrics提供。可以在配置文件中修改服务地址(请参阅 instrumentation.prometheus\_listen\_addr).
+
+### List of available metrics
+
+The following metrics are available:
+
+| Name | Type | Tags | Description |
+| ---- | ---- | ---- | ----------- |
+| stake_bonded_token | Gauge | validator_address | 验证人被绑定的token总数 |
+| stake_loosen_token | Gauge |                   | Total loosen token |
+| stake_burned_token | Gauge |                   | 销毁的token总数 |
+| stake_slashed_token | Counter | validator_address | 验证人被惩罚的token总数 |
+| stake_jailed        | Gauge | validator_address | 验证人监禁状态，0（未监禁）或1（被监禁） |
+| stake_power         | Gauge | validator_address | 验证人投票权 |
+| distribution_community_tax  | Gauge |  | 社区资金池的token总数 |
+| upgrade_upgrade  | Gauge |  | 是否需要安装新软件，0（否）或1（是） |
+| upgrade_signal  | Gauge | validator_address, version | 验证人是否运行了新版本软件，0（否）或1（是）|
+| service_active_requests  | Gauge |  | 活跃的请求数 |
+
+IRISnet metrics同时也包括了tendermint metrics，访问[tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md) 获取更多信息。
 
 ## 启动 IRIS Monitor
 

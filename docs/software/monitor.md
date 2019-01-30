@@ -1,24 +1,31 @@
 # How to deploy IRIS Monitor
 
-## Install IRIS Monitor 
-Please refer to this [document](https://github.com/irisnet/irishub/blob/master/docs/get-started/Install-Iris.md) for deatiled instructions. Besides, please make sure your machine has these commands(bash, wc, ps) installed.
+## Metrics
 
-## Start IRIS Monitor
+IRISnet can report and serve the Prometheus metrics, which in their turn can be consumed by Prometheus collector(s).
 
-```
-iristool monitor --validator-address=EAC535EC37EB3AE8D18C623BA4B4C8128BC082D2 \
---account-address=faa1nwpzlrs35nawthal6vz2rjr4k8xjvn7k8l63st \
---chain-id=test-irishub--node=http://localhost:26657
-```
+This functionality is disabled by default.
 
-Parameters：
+To enable the Prometheus metrics, set `instrumentation.prometheus=true` in your config file. Metrics will be served under /metrics on 26660 port by default. Listen address can be changed in the config file (see instrumentation.prometheus\_listen\_addr).
 
-- `validator-address`：hex encoded validator address
-- `account-address`：bech32 encoded account address
-- `chain-id`：blockchain id that you want to monitor
-- `node`：listening address of the node that you want to monitor (The rpc url of a irishub node, default value is tcp://localhost:26657. If you want to monitor other irishub nodes, please change this value.)
+### List of available metrics
 
-Then you can visit `http://localhost:36660/` to see metrics data。
+The following metrics are available:
+
+| Name | Type | Tags | Description |
+| ---- | ---- | ---- | ----------- |
+| stake_bonded_token | Gauge | validator_address | Total bonded token by validator |
+| stake_loosen_token | Gauge |                   | Total loosen token |
+| stake_burned_token | Gauge |                   | Total burned token |
+| stake_slashed_token | Counter | validator_address | Total slashed token by validator |
+| stake_jailed        | Gauge | validator_address | Jailed status by validator, either 0 (not jailed) or 1 (jailed) |
+| stake_power         | Gauge | validator_address | Voting power by validator |
+| distribution_community_tax  | Gauge |  | Total token of community funds pool |
+| upgrade_upgrade  | Gauge |  | Whether new software needs to be installed, either 0 (no) or 1 (yes) |
+| upgrade_signal  | Gauge | validator_address, version | Whether validator have run the new version software, either 0 (no) or 1 (yes)|
+| service_active_requests  | Gauge |  | Number of active requests |
+
+IRISnet metrics also contains tendermint metrics, Visit [tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md) for more information.
 
 ## Start Prometheus
 

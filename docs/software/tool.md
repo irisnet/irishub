@@ -1,7 +1,7 @@
 # IRIS Command tool
 
 ## Introduction
-`iristool` include [monitor](./monitor.md) and debug now.
+`iristool` include debug now.
 
 ## debug
 Simple tool for simple debugging.
