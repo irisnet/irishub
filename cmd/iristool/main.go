@@ -5,16 +5,13 @@ import (
 
 	"github.com/spf13/cobra"
 	debugcmd "github.com/irisnet/irishub/tools/debug"
-	"github.com/irisnet/irishub/tools/prometheus"
 	"github.com/irisnet/irishub/app"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
 func init() {
-//	sdk.InitBech32Prefix()
-	cdc := app.MakeLatestCodec()
+	//	sdk.InitBech32Prefix()
 	rootCmd.AddCommand(debugcmd.RootCmd)
-	rootCmd.AddCommand(prometheus.MonitorCommand(cdc))
 }
 
 var rootCmd = &cobra.Command{
