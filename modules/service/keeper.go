@@ -26,9 +26,11 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 	// params subspace
 	paramSpace params.Subspace
+	// metrics
+	metrics *Metrics
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace, metrics *Metrics) Keeper {
 	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
@@ -36,6 +38,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.K
 		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
+		metrics:    metrics,
 	}
 	return keeper
 }
@@ -335,6 +338,7 @@ func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) (SvcRequest, sdk.Err
 	}
 	k.AddActiveRequest(ctx, req)
 	k.AddRequestExpiration(ctx, req)
+	k.metrics.ActiveRequests.Add(1)
 	return req, nil
 }
 

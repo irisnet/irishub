@@ -233,6 +233,7 @@ func (p *ProtocolV0) configKeepers() {
 		p.guardianKeeper,
 		service.DefaultCodespace,
 		p.paramsKeeper.Subspace(service.DefaultParamSpace),
+		service.PrometheusMetrics(p.config),
 	)
 
 	// register the staking hooks
