@@ -42,6 +42,7 @@ func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal)
 		value, _ := paramSet.Validate(param.Key, param.Value)
 		subspace, found := gk.paramsKeeper.GetSubspace(param.Subspace)
 		if found {
+			SetParameterMetrics(gk.metrics,param.Key,value)
 			subspace.Set(ctx, []byte(param.Key), value)
 			ctx.Logger().Info("Execute ParameterProposal Successed", "key", param.Key, "value", param.Value)
 		} else {
