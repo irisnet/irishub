@@ -71,5 +71,6 @@ func NopMetrics() *Metrics {
 		BurnedToken:  discard.NewGauge(),
 		SlashedToken: discard.NewCounter(),
 		Jailed:       discard.NewGauge(),
+		Power:        discard.NewGauge(),
 	}
 }
