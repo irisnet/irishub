@@ -15,7 +15,7 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 	upgradeConfig, ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
 	if ok {
 
-		versionIDstr := strconv.FormatUint(upgradeConfig.Protocol.Version,10)
+		versionIDstr := strconv.FormatUint(upgradeConfig.Protocol.Version, 10)
 		uk.metrics.Upgrade.Set(float64(upgradeConfig.Protocol.Version))
 
 		validator, found := uk.sk.GetValidatorByConsAddr(ctx, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress))
@@ -58,8 +58,6 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 	} else {
 		uk.metrics.Upgrade.Set(float64(0))
 	}
-
-
 
 	tags = tags.AppendTag(sdk.AppVersionTag, []byte(strconv.FormatUint(uk.protocolKeeper.GetCurrentVersion(ctx), 10)))
 
