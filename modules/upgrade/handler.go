@@ -14,6 +14,10 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 	upgradeConfig, ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
 	if ok {
+
+		versionIDstr := strconv.FormatUint(upgradeConfig.Protocol.Version,10)
+		uk.metrics.Upgrade.Set(float64(upgradeConfig.Protocol.Version))
+
 		validator, found := uk.sk.GetValidatorByConsAddr(ctx, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress))
 		if !found {
 			panic(fmt.Sprintf("validator with consensus-address %s not found", (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String()))
@@ -21,11 +25,16 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 
 		if ctx.BlockHeader().Version.App == upgradeConfig.Protocol.Version {
 			uk.SetSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
+			uk.metrics.Signal.With(ValidatorLabel, validator.ConsAddress().String(), VersionLabel, versionIDstr).Set(1)
 
 			ctx.Logger().Info("Validator has downloaded the latest software ",
 				"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
+
 		} else {
+
 			ok := uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
+			uk.metrics.Signal.With(ValidatorLabel, validator.ConsAddress().String(), VersionLabel, versionIDstr).Set(0)
+
 			if ok {
 				ctx.Logger().Info("Validator has restarted the old software ",
 					"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
@@ -46,7 +55,11 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 			uk.AddNewVersionInfo(ctx, NewVersionInfo(upgradeConfig, success))
 			uk.protocolKeeper.ClearUpgradeConfig(ctx)
 		}
+	} else {
+		uk.metrics.Upgrade.Set(float64(0))
 	}
+
+
 
 	tags = tags.AppendTag(sdk.AppVersionTag, []byte(strconv.FormatUint(uk.protocolKeeper.GetCurrentVersion(ctx), 10)))
 
