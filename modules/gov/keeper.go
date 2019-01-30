@@ -12,6 +12,7 @@ import (
 
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/tendermint/tendermint/crypto"
+	"strconv"
 )
 
 // nolint
@@ -50,6 +51,8 @@ type Keeper struct {
 
 	// Reserved codespace
 	codespace sdk.CodespaceType
+
+	metrics   *Metrics
 }
 
 // NewProtocolKeeper returns a governance keeper. It handles:
@@ -57,7 +60,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType,metrics   *Metrics) Keeper {
 	return Keeper{
 		key,
 		cdc,
@@ -70,6 +73,7 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 		ds.GetValidatorSet(),
 		ds,
 		codespace,
+		metrics,
 	}
 }
 
@@ -229,6 +233,7 @@ func (keeper Keeper) SetProposal(ctx sdk.Context, proposal Proposal) {
 
 // Implements sdk.AccountKeeper.
 func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposalID uint64) {
+	keeper.metrics.ProposalStatus.With(ProposalIDLabel,strconv.FormatUint(proposalID,10)).Set(4)
 	store := ctx.KVStore(keeper.storeKey)
 	proposal := keeper.GetProposal(ctx, proposalID)
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -351,7 +356,8 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 		return ErrInactiveProposal(keeper.codespace, proposalID)
 	}
 
-	if keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr)) == nil {
+    validator := keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr))
+	if validator == nil {
 		return ErrOnlyValidatorVote(keeper.codespace, voterAddr)
 	}
 
@@ -369,7 +375,7 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 		Option:     option,
 	}
 	keeper.setVote(ctx, proposalID, voterAddr, vote)
-
+	keeper.metrics.Vote.With(ValidatorLabel,validator.GetConsAddr().String(),ProposalIDLabel,strconv.FormatUint(proposalID,10)).Set(float64(option))
 	return nil
 }
 
@@ -572,6 +578,7 @@ func (keeper Keeper) ActiveProposalQueueIterator(ctx sdk.Context, endTime time.T
 
 // Inserts a ProposalID into the active proposal queue at endTime
 func (keeper Keeper) InsertActiveProposalQueue(ctx sdk.Context, endTime time.Time, proposalID uint64) {
+	keeper.metrics.ProposalStatus.With(ProposalIDLabel,strconv.FormatUint(proposalID,10)).Set(1)
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyActiveProposalQueueProposal(endTime, proposalID), bz)
@@ -591,6 +598,7 @@ func (keeper Keeper) InactiveProposalQueueIterator(ctx sdk.Context, endTime time
 
 // Inserts a ProposalID into the inactive proposal queue at endTime
 func (keeper Keeper) InsertInactiveProposalQueue(ctx sdk.Context, endTime time.Time, proposalID uint64) {
+	keeper.metrics.ProposalStatus.With(ProposalIDLabel,strconv.FormatUint(proposalID,10)).Set(0)
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyInactiveProposalQueueProposal(endTime, proposalID), bz)

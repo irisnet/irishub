@@ -224,6 +224,7 @@ func (p *ProtocolV0) configKeepers() {
 		p.guardianKeeper,
 		&stakeKeeper,
 		gov.DefaultCodespace,
+		gov.PrometheusMetrics(p.config),
 	)
 
 	p.serviceKeeper = service.NewKeeper(
