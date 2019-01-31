@@ -55,14 +55,13 @@ Consensus metrics, namespace: `tendermint`
 | p2p_peer_send_bytes_total               | counter   | peer_id | number of bytes sent to a given peer                            |
 | p2p_peer_pending_send_bytes             | gauge     | peer_id | number of pending bytes to be sent to a given peer              |
 | p2p_num_txs                             | gauge     | peer_id | number of transactions submitted by each peer_id               |
-| p2p_pending_send_bytes                  | gauge     | peer_id | amount of data pending to be sent to peer                       |
 | mempool_size                            | Gauge     |          | Number of uncommitted transactions                              |
 | mempool_tx_size_bytes                   | histogram |          | transaction sizes in bytes                                      |
 | mempool_failed_txs                      | counter   |          | number of failed transactions                                   |
 | mempool_recheck_times                   | counter   |          | number of transactions rechecked in the mempool                 |
 | state_block_processing_time             | histogram |          | time between BeginBlock and EndBlock in ms                      |
 | state_recheck_time                      | histogram |          | time cost on recheck in ms                      |
-| state_app_hash_conflict                 | count     | proposer, height | time between BeginBlock and EndBlock in ms                      |
+| state_app_hash_conflict                 | count     | proposer, height | App hash conflict error                      |
 
 IRISnet metrics also contains tendermint metrics, Visit [tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md) for more information.
 
