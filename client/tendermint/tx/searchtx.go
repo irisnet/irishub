@@ -160,7 +160,7 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 		}
 
 		for key, values := range r.Form {
-			if key == "search_request_page" || key == "search_request_size" {
+			if key == "page" || key == "size" {
 				continue
 			}
 			value, err := url.QueryUnescape(values[0])
@@ -172,8 +172,8 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			tag := fmt.Sprintf("%s='%s'", key, value)
 			tags = append(tags, tag)
 		}
-		pageString := r.FormValue("search_request_page")
-		sizeString := r.FormValue("search_request_size")
+		pageString := r.FormValue("page")
+		sizeString := r.FormValue("size")
 		page := int64(0)
 		size := int64(100)
 		if pageString != "" {
