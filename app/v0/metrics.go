@@ -11,7 +11,7 @@ import (
 const MetricsSubsystem = "v0"
 
 type Metrics struct {
-	InvariantFailure metrics.Gauge
+	InvariantFailure metrics.Counter
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -20,7 +20,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		return NopMetrics()
 	}
 	return &Metrics{
-		InvariantFailure: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+		InvariantFailure: prometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: config.Namespace,
 			Subsystem: MetricsSubsystem,
 			Name:      "invariant_failure",
@@ -31,6 +31,6 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 
 func NopMetrics() *Metrics {
 	return &Metrics{
-		InvariantFailure: discard.NewGauge(),
+		InvariantFailure: discard.NewCounter(),
 	}
 }
