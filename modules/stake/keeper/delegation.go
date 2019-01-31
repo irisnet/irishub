@@ -441,7 +441,7 @@ func (k Keeper) unbond(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValA
 
 	// retrieve the amount to remove
 	if delegation.Shares.LT(shares) {
-		err = types.ErrNotEnoughDelegationShares(k.Codespace(), delegation.Shares.String())
+		err = types.ErrNotEnoughDelegationShares(k.Codespace(), delegation.Shares.QuoInt(sdk.NewIntWithDecimal(1,18)).RoundInt().String())
 		return
 	}
 
