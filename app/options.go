@@ -39,9 +39,9 @@ func SetMinimumFees(minFees string) func(*BaseApp) {
 	return func(bap *BaseApp) { bap.SetMinimumFees(fees) }
 }
 
-// SetInvariantLevel set app invariant check level
-func SetInvariantLevel(level string) func(*BaseApp) {
-	return func(bap *BaseApp) { bap.SetInvariantLevel(level) }
+// SetCheckInvariant set app invariant check config
+func SetCheckInvariant(check bool) func(*BaseApp) {
+	return func(bap *BaseApp) { bap.SetCheckInvariant(check) }
 }
 
 // nolint - Setter functions

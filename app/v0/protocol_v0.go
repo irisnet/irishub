@@ -33,6 +33,7 @@ type ProtocolV0 struct {
 	cdc            *codec.Codec
 	logger         log.Logger
 	invariantLevel string
+	checkInvariant bool
 
 	// Manage getting and setting accounts
 	accountMapper  auth.AccountKeeper
@@ -65,12 +66,13 @@ type ProtocolV0 struct {
 	metrics		*Metrics
 }
 
-func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string, config *cfg.InstrumentationConfig) *ProtocolV0 {
+func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
 	p0 := ProtocolV0{
 		version:        version,
 		logger:         log,
 		protocolKeeper: pk,
-		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
+		invariantLevel: strings.ToLower(sdk.InvariantLevel),
+		checkInvariant: checkInvariant,
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
 		config:         config,

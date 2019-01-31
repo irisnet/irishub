@@ -78,7 +78,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, config *cfg.Inst
 	return app.NewIrisApp(logger, db, config, traceStore,
 		bam.SetPruning(viper.GetString("pruning")),
 		bam.SetMinimumFees(viper.GetString("minimum_fees")),
-		bam.SetInvariantLevel(viper.GetString("invariant_level")),
+		bam.SetCheckInvariant(viper.GetBool("check_invariant")),
 	)
 }
 

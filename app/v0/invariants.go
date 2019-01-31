@@ -29,6 +29,9 @@ func (p *ProtocolV0) assertRuntimeInvariants(ctx sdk.Context) {
 	if p.invariantLevel != sdk.InvariantError && p.invariantLevel != sdk.InvariantPanic {
 		return
 	}
+	if p.invariantLevel == sdk.InvariantError && !p.checkInvariant {
+		return
+	}
 	invariants := p.runtimeInvariants()
 	ctx = ctx.WithLogger(ctx.Logger().With("module", "iris/invariant"))
 	for _, inv := range invariants {

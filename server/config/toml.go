@@ -16,8 +16,8 @@ const defaultConfigTemplate = `# This is a TOML config file.
 # Validators reject any tx from the mempool with less than the minimum fee per gas.
 minimum_fees = "{{ .BaseConfig.MinFees }}"
 
-# Invariant check level, panic: panic when failure, error: print error log, no: disable invariant check.
-invariant_level = "{{ .BaseConfig.InvariantLevel }}"
+# Enable invariant check on mainnet, ignore this config on testnet
+check_invariant = "{{ .BaseConfig.CheckInvariant }}"
 
 `
 

@@ -13,7 +13,6 @@ import (
 	"github.com/tendermint/tendermint/p2p"
 	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -22,7 +21,7 @@ const (
 	flagTraceStore     = "trace-store"
 	flagPruning        = "pruning"
 	flagMinimumFees    = "minimum_fees"
-	flagInvariantLevel = "invariant_level"
+	flagCheckInvariant = "check_invariant"
 )
 
 // StartCmd runs the service passed in, either stand-alone or in-process with
@@ -50,7 +49,7 @@ func StartCmd(ctx *Context, appCreator AppCreator) *cobra.Command {
 	cmd.Flags().String(flagTraceStore, "", "Enable KVStore tracing to an output file")
 	cmd.Flags().String(flagPruning, "syncable", "Pruning strategy: syncable, nothing, everything")
 	cmd.Flags().String(flagMinimumFees, "", "Minimum fees validator will accept for transactions")
-	cmd.Flags().String(flagInvariantLevel, sdk.InvariantLevel, "Invariant check level, panic: panic when failure, error: print error log, no: disable invariant check")
+	cmd.Flags().Bool(flagCheckInvariant, false, "Enable invariant check on mainnet, ignore this flag on testnet")
 
 	// add support for all Tendermint-specific command line options
 	tcmd.AddNodeFlags(cmd)
