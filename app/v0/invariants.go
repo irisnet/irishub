@@ -39,7 +39,7 @@ func (p *ProtocolV0) assertRuntimeInvariants(ctx sdk.Context) {
 			if p.invariantLevel == sdk.InvariantPanic {
 				panic(fmt.Errorf("invariant broken: %s", err))
 			} else {
-				p.metrics.InvariantFailure.With("error", err.Error()).Set(float64(1))
+				p.metrics.InvariantFailure.With("error", err.Error()).Add(float64(1))
 				p.logger.Error(fmt.Sprintf("Invariant broken: height %d, reason %s", ctx.BlockHeight(), err.Error()))
 			}
 		}
