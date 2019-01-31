@@ -16,9 +16,9 @@
 2. 惩罚作恶验证人一定比例的token，并把其踢出验证人集合；同时禁止此验证人在一段时间内再次进入验证人集合，这个过程被称为jail验证人。
 3. 对于不同类型的异常行为，采用不同的惩罚比例和jail的时间。
 4. 惩罚细则：
-1. 如果当前验证人token总数为A，惩罚比例为B，那么对此验证人最多惩罚的token的数量为A*B。
-2. 如果在当前高度有处于unbonding阶段的unbonding delegation和redelegation,并且unbonding delegation和redelegation的创建高度小于作恶实施高度，则按比例B先惩罚这两部分的token
-3. 对unbonding delegation和redelegation总共惩罚的token数量为S。如果S小于A*B，则惩罚验证人的token梳理为`A*B-S`。否则不惩罚绑定在验证人上的token
+	1. 如果当前验证人token总数为A，惩罚比例为B，那么对此验证人最多惩罚的token的数量为A*B。
+	2. 如果在当前高度有处于unbonding阶段的unbonding delegation和redelegation,并且unbonding delegation和redelegation的创建高度小于作恶实施高度，则按比例B先惩罚这两部分的token
+	3. 对unbonding delegation和redelegation总共惩罚的token数量为S。如果S小于A*B，则惩罚验证人的token梳理为`A*B-S`。否则不惩罚绑定在验证人上的token
 
 ## 长时间不参与网络共识
 
@@ -63,4 +63,3 @@
 ```
 iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=<chain-id>
 ```
-

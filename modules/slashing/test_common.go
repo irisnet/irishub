@@ -73,7 +73,7 @@ func createTestInput(t *testing.T, defaults Params) (sdk.Context, bank.Keeper, s
 
 	ck := bank.NewBaseKeeper(accountKeeper)
 	paramsKeeper := params.NewKeeper(cdc, keyParams, tkeyParams)
-	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
+	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, ck, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace, stake.NopMetrics())
 	genesis := stake.DefaultGenesisState()
 
 	_, err = stake.InitGenesis(ctx, sk, genesis)
@@ -88,7 +88,7 @@ func createTestInput(t *testing.T, defaults Params) (sdk.Context, bank.Keeper, s
 	}
 	require.Nil(t, err)
 	paramstore := paramsKeeper.Subspace(DefaultParamspace)
-	keeper := NewKeeper(cdc, keySlashing, &sk, paramstore, DefaultCodespace)
+	keeper := NewKeeper(cdc, keySlashing, &sk, paramstore, DefaultCodespace, NopMetrics())
 	sk.SetHooks(keeper.Hooks())
 
 	require.NotPanics(t, func() {

@@ -14,17 +14,19 @@ import (
 	"github.com/irisnet/irishub/modules/auth"
 	sdk "github.com/irisnet/irishub/types"
 
+	"github.com/irisnet/irishub/store"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/store"
 )
 
 const (
 	appName               = "IrisApp"
+	appPrometheusNamespace= "iris"
 	FlagReplay            = "replay-last-block"
 	DefaultSyncableHeight = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
 	DefaultCacheSize      = store.NumRecent     // Multistore saves last 100 blocks
@@ -42,7 +44,7 @@ type IrisApp struct {
 	*BaseApp
 }
 
-func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
+func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
 	bApp := NewBaseApp(appName, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
@@ -65,8 +67,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptio
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-
-	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
+	//Duplicate prometheus config
+	appPrometheusConfig := *config
+	//Change namespace to appName
+	appPrometheusConfig.Namespace = appPrometheusNamespace
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 

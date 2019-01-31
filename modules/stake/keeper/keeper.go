@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strconv"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 
@@ -20,9 +22,11 @@ type Keeper struct {
 
 	// codespace
 	codespace sdk.CodespaceType
+	// metrics
+	metrics *Metrics
 }
 
-func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramstore params.Subspace, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramstore params.Subspace, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
 	keeper := Keeper{
 		storeKey:   key,
 		storeTKey:  tkey,
@@ -31,6 +35,7 @@ func NewKeeper(cdc *codec.Codec, key, tkey sdk.StoreKey, ck bank.Keeper, paramst
 		paramstore: paramstore.WithTypeTable(ParamTypeTable()),
 		hooks:      nil,
 		codespace:  codespace,
+		metrics:    metrics,
 	}
 	return keeper
 }
@@ -150,4 +155,16 @@ func (k Keeper) DeleteLastValidatorPower(ctx sdk.Context, operator sdk.ValAddres
 
 func (k Keeper) BondDenom() string {
 	return types.StakeDenom
+}
+
+func (k Keeper) UpdateMetrics(ctx sdk.Context) {
+	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
+	burnedToken, err := strconv.ParseFloat(k.bankKeeper.GetBurnedCoins(ctx).AmountOf(types.StakeDenom).Div(tokenPrecision).String(), 64)
+	if err == nil {
+		k.metrics.BurnedToken.Set(burnedToken)
+	}
+	loosenToken, err := strconv.ParseFloat(k.bankKeeper.GetLoosenCoins(ctx).AmountOf(types.StakeDenom).Div(tokenPrecision).String(), 64)
+	if err == nil {
+		k.metrics.LoosenToken.Set(loosenToken)
+	}
 }

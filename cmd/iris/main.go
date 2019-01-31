@@ -13,14 +13,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
-	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/node"
 	"github.com/tendermint/tendermint/p2p"
+	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 func main() {
@@ -73,17 +74,18 @@ func main() {
 	executor.Execute()
 }
 
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewIrisApp(logger, db, traceStore,
+func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, config *cfg.InstrumentationConfig) abci.Application {
+	return app.NewIrisApp(logger, db, config, traceStore,
 		bam.SetPruning(viper.GetString("pruning")),
 		bam.SetMinimumFees(viper.GetString("minimum_fees")),
+		bam.SetCheckInvariant(viper.GetBool("check_invariant")),
 	)
 }
 
 func exportAppStateAndTMValidators(ctx *server.Context,
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	gApp := app.NewIrisApp(logger, db, traceStore)
+	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
 	if height > 0 {
 		if replay, replayHeight := gApp.ExportOrReplay(height); replay {
 			_, err := startNodeAndReplay(ctx, gApp, replayHeight)

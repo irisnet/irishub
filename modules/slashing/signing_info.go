@@ -39,6 +39,7 @@ func (k Keeper) IterateValidatorSigningInfos(ctx sdk.Context, handler func(addre
 func (k Keeper) SetValidatorSigningInfo(ctx sdk.Context, address sdk.ConsAddress, info ValidatorSigningInfo) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(info)
+	k.metrics.MissedBlocks.With("validator_address", address.String()).Set(float64(info.MissedBlocksCounter))
 	store.Set(GetValidatorSigningInfoKey(address), bz)
 }
 
