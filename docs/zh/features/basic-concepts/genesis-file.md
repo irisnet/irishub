@@ -20,32 +20,32 @@ Genesis文件是整个网络初始化的基础。它包含了创建创世区块�
 * **accounts** 初始化账户信息
 
 * **auth** 与系统相关的参数 
-  * params 详情见[Gov-Params](gov-params.md)
+  * params 详情见[Gov-Params](gov-params.md#auth模块可治理参数)
 
 * **stake** 与抵押共识相关的参数
   * pool   当前绑定的token总数
   * validators 当前每个验证人的信息
-  * params 详情见[Gov-Params](gov-params.md)
+  * params 详情见[Gov-Params](gov-params.md#stake模块可治理参数)
   
 * **mint**  与通货膨胀相关的参数
   * minter 初始化状态
-  * params 详情见[Gov-Params](gov-params.md)
+  * params 详情见[Gov-Params](gov-params.md#mint模块可治理参数)
   
 * **distribution** 与分配收益有关的参数
-  * params 详情见[Gov-Params](gov-params.md)
+  * params 详情见[Gov-Params](gov-params.md#distribution模块可治理参数)
 
 * **gov**  与链上治理相关的参数
-  * params 详情见[Governance.md](../governance.md)
+  * params 详情见[Governance.md](../governance.md#交互流程)
   
 
 * **upgrade** 与升级相关的参数
   * GenesisVersion 初始化当前版本信息
 
 * **slashing** 与惩罚validator相关的参数
-  * params 详情见[Gov-Params](gov-params.md)
+  * params 详情见[Gov-Params](gov-params.md#slashing模块可治理参数)
 
 * **service**  与service相关的参数
-  * params 详情见[Gov-Params](gov-params.md)
+  * params 详情见[Gov-Params](gov-params.md#service模块可治理参数)
     
 * **guardian** 与guardian相关的参数
   * `profilers` profiler列表

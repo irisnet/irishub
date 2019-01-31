@@ -6,20 +6,20 @@
 ## Auth模块可治理参数
 
 | key |描述 | 有效范围|
-|----| ---|---|---|
+|----| ---|---|
 |`auth/gasPriceThreshold`  |最小的gas单价|(0, 10^18iris-atto]
 |`auth/txSizeLimit`  |常交易大小限制 |[500, 1500]
 
 ## Stake模块可治理参数
 
 | key |描述 | 有效范围|
-|----| ---|---|---|
+|----| ---|---|
 |`stake/MaxValidators`|  最多验证人数目|[100, 200]
 |`stake/UnbondingTime`|  解绑时间|[2week,)
 
 ## Distribution模块可治理参数
 | key |描述 | 有效范围|
-|----| ---|---|---|
+|----| ---|---|
 |`distr/BaseProposerReward` | 出块奖励的基准比例| (0, 0.02]
 |`distr/BonusProposerReward` | 最大额外奖励比例| (0, 0.08]
 |`distr/CommunityTax`  | 贡献给社区基金的比例|(0, 0.2]
@@ -29,7 +29,7 @@ Details in [distribution](../distribution.md)
 ## Mint模块可治理参数
 
 | key |描述 | 有效范围|
-|----| ---|---|---|
+|----| ---|---|
 |`mint/Inflation` | 通胀系数 |[0,0.2]
 
 ## Slashing模块可治理参数

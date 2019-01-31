@@ -22,30 +22,30 @@ Each genesis state starts with a list of account balances. Social consensus on t
 * **accounts** Initialization account info
 
 * **auth** Params related to the system 
-  * params Detail in [Gov-Params](gov-params.md)
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-auth)
 
 * **stake** Params related to the staking consensus
   * pool   The total of the current bonded token
   * validators   All the information of validators 
-  * params Detail in [Gov-Params](gov-params.md)
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-stake)
   
 * **mint**  Params related to inflation
-  * params Detail in [Gov-Params](gov-params.md)
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-mint)
   
 * **distribution** Params related to distribution & commission
-  * params Detail in [Gov-Params](gov-params.md)
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-distribution)
   
 * **gov**  Params related to on-chain governance
-  * params Detail in [Governance.md](../governance.md)
+  * params Detail in [Governance.md](../governance.md#interactive-process)
 
-* **upgrade** Params related to upg rade
+* **upgrade** Params related to upgrade
   * GenesisVersion Initialize the genesis version
 
 * **slashing** Params related to slashing validators
-  * params Detail in [Gov-Params](gov-params.md)
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-slashing)
   
 * **service**  Params related to service
-  * params Detail in [Gov-Params](gov-params.md)
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-service)
   
 * **guardian** Params related to guardian
   * `profilers` The profiler list
