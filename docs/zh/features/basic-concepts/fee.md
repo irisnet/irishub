@@ -1,6 +1,6 @@
 # 简介
 
-手续费上限使用 --fee指定。Gas是衡量交易需要消耗多少资源的单位。Gas上限用--gas指定。Gas上限太小时，不够交易需要的Gas；手续费太低时，每一单位Gas支付的手续费太低，验证人节点也不会执行这笔交易。手续费(最小单位)/Gas应该大于等于2*10^10。推荐将Gas上限设置为20000，手续费上限设置为400000000000000iris。需要多少Gas就会花多少手续费，剩余的手续费会被退还。
+手续费上限使用 --fee指定。Gas是衡量交易需要消耗多少资源的单位。Gas上限用--gas指定。Gas上限太小时，不够交易需要的Gas；手续费太低时，每一单位Gas支付的手续费太低，验证人节点也不会执行这笔交易。手续费(最小单位)/Gas应该大于等于2*10^13。推荐将Gas上限设置为20000，手续费上限设置为4iris。需要多少Gas就会花多少手续费，剩余的手续费会被退还。
 
 ## Fee
 
@@ -20,11 +20,11 @@ IRIS网络中的验证人为了维护自己节点的安全性和网络的正常�
 
 Gas价格 = 手续费上限 / Gas上限，代表用户为每个单位的资源消耗支付的手续费价格。
 
-为了使用户支付的手续费维持在一个合理的水平，我们给Gas价格设定了一个下限，2^(-8) iris/Gas，Gas价格低于此限制的交易不会被执行。
+为了使用户支付的手续费维持在一个合理的水平，我们给Gas价格设定了一个下限，2^(-5) iris/Gas，Gas价格低于此限制的交易不会被执行。
 
 例子
 ```
-    iriscli stake unbond  --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.05iris --gas=200000 --chain-id=test-irishub
+    iriscli stake unbond  --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=4iris --gas=20000 --chain-id=test-irishub
 ```
 
-在这个例子中执行的是完成解绑操作，这里设定的手续费上限(--fee)为2000000000000000iris(2*10^15)，Gas上限(--gas)为20000，Gas价格就是10^11iris/Gas。假设执行交易总共需要1500个Gas，那么会有1500000000000000iris的手续费被支付给验证人节点；剩余的500000000000000iris会被退还给用户。
+在这个例子中执行的是完成解绑操作，这里设定的手续费上限(--fee)为4iris，Gas上限(--gas)为20000，Gas价格就是4^18iris-atto/Gas。假设执行交易总共需要1500个Gas，那么会有0.3iris的手续费被支付给验证人节点；剩余的3.7iris会被退还给用户。
