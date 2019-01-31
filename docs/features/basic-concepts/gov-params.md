@@ -7,21 +7,21 @@ parameters, it is available to put up a `parameter-change` proposal in governanc
 ## Parameters in Auth
 
 | key |Description | Range|
-|----| ---|---|---|
+|----| ---|---|
 |`auth/gasPriceThreshold`  |minimum of gas price |(0, 10^18iris-atto]
 |`auth/txSizeLimit`  |the limit of the normal txsize |[500, 1500]
 
 ## Parameters in Stake
 
 | key |Description | Range|
-|----| ---|---|---|
+|----| ---|---|
 |`stake/MaxValidators`|  maximum number of validators|[100, 200]
 |`stake/UnbondingTime`|  unbonding time|[2week,)
 
 ## Parameters in Distribution
 
 | key |Description | Range|
-|----| ---|---|---|
+|----| ---|---|
 |`distr/BaseProposerReward` | standard ratio of the block reward| (0, 0.02]
 |`distr/BonusProposerReward` | maximum additional bonus ratio| (0, 0.08]
 |`distr/CommunityTax`  | proportion of contributions to community funds|(0, 0.2]
@@ -31,7 +31,7 @@ Details in [distribution](../distribution.md)
 ## Parameters in Mint
 
 | key |Description | Range|
-|----| ---|---|---|
+|----| ---|---|
 |`mint/Inflation` | Inflation coefficient|[0,0.2]
 
 ## Parameters in Slashing
