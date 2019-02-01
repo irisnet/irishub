@@ -18,15 +18,7 @@ The module supports the infrastructure of the blockchain software upgrade. It wi
 
 ## Usage Scenarios
 
-### Create an environment
-
-```
-rm -rf iris                                                                         
-rm -rf .iriscli
-iris init gen-tx --name=x --home=iris
-iris init --gen-txs --chain-id=upgrade-test -o --home=iris
-iris start --home=iris
-```
+You need to start a local testnet first:
 
 ### Submit a software upgrade proposal
 

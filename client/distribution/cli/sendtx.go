@@ -24,7 +24,7 @@ func GetCmdWithdrawRewards(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-rewards",
 		Short:   "withdraw rewards for either: all-delegations, a delegation, or a validator",
-		Example: "iriscli distribution withdraw-rewards --from <key name> --fee=0.004iris --chain-id=<chain-id>",
+		Example: "iriscli distribution withdraw-rewards --from <key name> --fee=0.4iris --chain-id=<chain-id>",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
@@ -85,7 +85,7 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "set-withdraw-addr [withdraw-addr]",
 		Short:   "change the default withdraw address for rewards associated with an address",
-		Example: "iriscli distribution set-withdraw-addr <address> --from <key name> --fee=0.004iris --chain-id=<chain-id>",
+		Example: "iriscli distribution set-withdraw-addr <address> --from <key name> --fee=0.4iris --chain-id=<chain-id>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
