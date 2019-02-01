@@ -20,7 +20,6 @@ Application metrics, namespace: `iris`
 | module_stake_slashed_token | Counter | validator_address | Total slashed token by validator |
 | module_stake_jailed        | Gauge | validator_address | Jailed status by validator, either 0 (not jailed) or 1 (jailed) |
 | module_stake_power         | Gauge | validator_address | Voting power by validator |
-| module_distribution_community_tax  | Gauge |  | Total token of community funds pool |
 | module_upgrade_upgrade  | Gauge |  | Whether new software needs to be installed, either 0 (no) or 1 (yes) |
 | module_upgrade_signal  | Gauge | validator_address, version | Whether validator have run the new version software, either 0 (no) or 1 (yes)|
 | module_service_active_requests  | Gauge |  | Number of active requests |

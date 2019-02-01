@@ -20,7 +20,6 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 | module_stake_slashed_token | Counter | validator_address | 验证人被惩罚的token总数 |
 | module_stake_jailed        | Gauge | validator_address | 验证人监禁状态，0（未监禁）或1（被监禁） |
 | module_stake_power         | Gauge | validator_address | 验证人投票权 |
-| module_distribution_community_tax  | Gauge |  | 社区资金池的token总数 |
 | module_upgrade_upgrade  | Gauge |  | 是否需要安装新软件，0（否）或1（是） |
 | module_upgrade_signal  | Gauge | validator_address, version | 验证人是否运行了新版本软件，0（否）或1（是）|
 | module_service_active_requests  | Gauge |  | 活跃的请求数 |
