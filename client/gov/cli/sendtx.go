@@ -21,7 +21,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "submit-proposal",
 		Short:   "Submit a proposal along with an initial deposit",
-		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.004iris --type=ParameterChange --description=test --title=test-proposal --param='mint/Inflation=0.050'",
+		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.4iris --type=ParameterChange --description=test --title=test-proposal --param='mint/Inflation=0.050'",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
 			description := viper.GetString(flagDescription)
@@ -153,7 +153,7 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "deposit",
 		Short:   "deposit tokens for activing proposal",
-		Example: "iriscli gov deposit --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposal-id=1 --deposit=10iris",
+		Example: "iriscli gov deposit --chain-id=<chain-id> --from=<key name> --fee=0.4iris --proposal-id=1 --deposit=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -197,7 +197,7 @@ func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "vote",
 		Short:   "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
-		Example: "iriscli gov vote --chain-id=<chain-id> --from=<key name> --fee=0.004iris --proposal-id=1 --option=Yes",
+		Example: "iriscli gov vote --chain-id=<chain-id> --from=<key name> --fee=0.4iris --proposal-id=1 --option=Yes",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
