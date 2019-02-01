@@ -41,9 +41,10 @@ When executing a block, it receives evidence that a validator has signed the dif
 * `DoubleSignJailDuration` default: 5Days
 * `SlashFractionDoubleSign`default: 0.01
 
-## Propoer Censorship
+## Proposer Censorship
 
-If the node is in the process of executing the block, it detects that the transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token is penalized in the `SlashFractionCensorship` ratio, and the validator is jailed. Until the jail time exceeds `CensorshipJailDuration`, the validator can be released by the unjail command.
+If the node is in the process of processing a new block, it detects if any transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token is slashed by `SlashFractionCensorship` percent, and the validator is jailed. Until the jail time exceeds `CensorshipJailDuration`, 
+the validator can be unjailed by the `unjail` command after jailing period.
 
 * `txDecode` Deserialization of Tx
 * `validateTx` Size limit for Tx
@@ -58,8 +59,8 @@ If the node is in the process of executing the block, it detects that the transa
 
 ### unjail
 
-If the validator was jailed and the jail time passed, release the validator by unjail command.
+If the validator was jailed and the jailing period passed, release the validator by unjail command.
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.004iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.4iris --chain-id=<chain-id>
 ```

@@ -21,7 +21,7 @@ iriscli service disable [flags]
 
 ### 禁用一个可用的服务绑定
 ```shell
-iriscli service disable --chain-id=test  --from=node0 --fee=0.004iris --def-chain-id=test --service-name=test-service
+iriscli service disable --chain-id=test  --from=node0 --fee=0.4iris --def-chain-id=test --service-name=test-service
 ```
 
 运行成功以后，返回的结果如下:
