@@ -741,7 +741,7 @@ func doSend(t *testing.T, port, seed, name, password string, addr sdk.AccAddress
 			"account_number":"%d",
 			"sequence":"%d",
 			"gas": "200000",
-			"fee": "0.004iris",
+			"fee": "0.4iris",
 			"chain_id":"%s"
         },
 		"amount":"%s"
@@ -832,7 +832,7 @@ func doDelegate(t *testing.T, port, seed, name, password string, delegatorAddr, 
 		"account_number": "%d",
 		"sequence": "%d",
 		"gas": "200000",
-		"fee": "0.004iris",
+		"fee": "0.4iris",
 		"chain_id": "%s"
 		},
 		"delegations": [
@@ -875,7 +875,7 @@ func doBeginUnbonding(t *testing.T, port, seed, name, password string,
 			"account_number": "%d",
 			"sequence": "%d",
 			"gas": "200000",
-			"fee": "0.004iris",
+			"fee": "0.4iris",
 			"chain_id": "%s"
 		},
 		"delegations": [],
@@ -918,7 +918,7 @@ func doBeginRedelegation(t *testing.T, port, seed, name, password string,
 		"account_number": "%d",
 		"sequence": "%d",
 		"gas": "200000",
-		"fee": "0.004iris",
+		"fee": "0.4iris",
 		"chain_id": "%s",
 		}
 		"delegations": [],
@@ -1074,7 +1074,7 @@ func doSubmitProposal(t *testing.T, port, seed, name, password string, proposerA
 			"account_number":"%d",
 			"sequence":"%d",
 			"gas":"200000",
-			"fee":"0.004iris",
+			"fee":"0.4iris",
 			"memo":"test"
 		},
 		"param": {
