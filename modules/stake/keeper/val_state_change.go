@@ -80,7 +80,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		if !found || !bytes.Equal(oldPowerBytes, newPowerBytes) {
 			updates = append(updates, validator.ABCIValidatorUpdate())
 
-			power, err := strconv.ParseFloat(validator.GetPower().String(), 64)
+			power, err := strconv.ParseFloat(validator.GetPower().RoundInt().String(), 64)
 			if err == nil {
 				k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
 			}
@@ -122,7 +122,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		// update the validator set
 		updates = append(updates, validator.ABCIValidatorUpdateZero())
 
-		power, err := strconv.ParseFloat(validator.GetPower().String(), 64)
+		power, err := strconv.ParseFloat(validator.GetPower().RoundInt().String(), 64)
 		if err == nil {
 			k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
 		}
