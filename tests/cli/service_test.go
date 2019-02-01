@@ -153,8 +153,8 @@ func TestIrisCLIService(t *testing.T) {
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
-	if !(barNum > 19 && barNum < 20) {
-		t.Error("Test Failed: (19, 20) expected, recieved: {}", barNum)
+	if !(barNum > 18 && barNum < 20) {
+		t.Error("Test Failed: (18, 20) expected, recieved: {}", barNum)
 	}
 
 	// call test
@@ -182,8 +182,8 @@ func TestIrisCLIService(t *testing.T) {
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
-	if !(barNum > 18 && barNum < 19) {
-		t.Error("Test Failed: (18, 19) expected, recieved: {}", barNum)
+	if !(barNum > 17 && barNum < 19) {
+		t.Error("Test Failed: (17, 19) expected, recieved: {}", barNum)
 	}
 
 	// respond test
@@ -226,8 +226,8 @@ func TestIrisCLIService(t *testing.T) {
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
-	if !(barNum > 18 && barNum < 19) {
-		t.Error("Test Failed: (18, 19) expected, recieved: {}", barNum)
+	if !(barNum > 17 && barNum < 19) {
+		t.Error("Test Failed: (17, 19) expected, recieved: {}", barNum)
 	}
 
 	// withdraw fees
@@ -236,8 +236,8 @@ func TestIrisCLIService(t *testing.T) {
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	fooNum := getAmountFromCoinStr(fooCoin)
-	if !(fooNum > 20 && fooNum < 21) {
-		t.Error("Test Failed: (20, 21) expected, recieved: {}", fooNum)
+	if !(fooNum > 19 && fooNum < 21) {
+		t.Error("Test Failed: (19, 21) expected, recieved: {}", fooNum)
 	}
 
 	// withdraw tax
