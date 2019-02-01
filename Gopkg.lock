@@ -2,14 +2,6 @@
 
 
 [[projects]]
-  digest = "1:e92f5581902c345eb4ceffdcd4a854fb8f73cf436d47d837d1ec98ef1fe0a214"
-  name = "github.com/StackExchange/wmi"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5d049714c4a64225c3c79a7cf7d02f7fb5b96338"
-  version = "1.0.0"
-
-[[projects]]
   branch = "master"
   digest = "1:7736fc6da04620727f8f3aa2ced8d77be8e074a302820937aa5993848c769b27"
   name = "github.com/ZondaX/hid-go"
@@ -110,17 +102,6 @@
   pruneopts = "UT"
   revision = "390ab7935ee28ec6b286364bba9b4dd6410cb3d5"
   version = "v0.3.0"
-
-[[projects]]
-  digest = "1:64a5a67c69b70c2420e607a8545d674a23778ed9c3e80607bfd17b77c6c87f6a"
-  name = "github.com/go-ole/go-ole"
-  packages = [
-    ".",
-    "oleutil",
-  ]
-  pruneopts = "UT"
-  revision = "a41e3c4b706f6ae8dfbff342b06e40fa4d2d0506"
-  version = "v1.2.1"
 
 [[projects]]
   digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
@@ -366,30 +347,6 @@
   version = "v1.6.0"
 
 [[projects]]
-  digest = "1:3fb45284d554f369d08136a0fd4d01f50897f6f79469358c41fb5a30a6379dfe"
-  name = "github.com/shirou/gopsutil"
-  packages = [
-    "cpu",
-    "disk",
-    "host",
-    "internal/common",
-    "mem",
-    "net",
-    "process",
-  ]
-  pruneopts = "UT"
-  revision = "3ec50d2876a36047b2ca39f955ba88fb7a455e92"
-  version = "v2.18.10"
-
-[[projects]]
-  branch = "master"
-  digest = "1:99c6a6dab47067c9b898e8c8b13d130c6ab4ffbcc4b7cc6236c2cd0b1e344f5b"
-  name = "github.com/shirou/w32"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
-
-[[projects]]
   digest = "1:6a4a11ba764a56d2758899ec6f3848d24698d48442ebce85ee7a3f63284526cd"
   name = "github.com/spf13/afero"
   packages = [
@@ -496,7 +453,7 @@
   version = "v0.12.0-iris"
 
 [[projects]]
-  digest = "1:06d523491f1d735b77858de2da4b3c8633edfaf6e19141c9ac5df1b9df4d7ac5"
+  digest = "1:d75069146141c30fa3de3055c8dbcf71cf68295019d4dca22a74794c7d55a64d"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -561,9 +518,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "3d4486cdf06224803083e6de07e703de6a18bd1c"
+  revision = "ff8ef6b4b603baa4fa27fce905bb29f3420f7c00"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.27.3-iris3"
+  version = "v0.27.3-iris5"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
@@ -625,12 +582,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7e2cb6c95ac3f1ff730a61ec4ce423a1857c7c6c28abafd8fabae25d80ccb667"
+  digest = "1:3f6e1af4cc2c512f2001d5870dc317ab93e68baf0f005d558d4c957c125602d9"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
-    "windows",
   ]
   pruneopts = "UT"
   revision = "9b800f95dbbc54abff0acf7ee32d88ba4e328c89"
@@ -727,12 +683,7 @@
     "github.com/pelletier/go-toml",
     "github.com/pkg/errors",
     "github.com/prometheus/client_golang/prometheus",
-    "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/rakyll/statik/fs",
-    "github.com/shirou/gopsutil/cpu",
-    "github.com/shirou/gopsutil/disk",
-    "github.com/shirou/gopsutil/mem",
-    "github.com/shirou/gopsutil/process",
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "github.com/spf13/viper",
@@ -746,7 +697,6 @@
     "github.com/tendermint/tendermint/blockchain",
     "github.com/tendermint/tendermint/cmd/tendermint/commands",
     "github.com/tendermint/tendermint/config",
-    "github.com/tendermint/tendermint/consensus",
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/armor",
     "github.com/tendermint/tendermint/crypto/ed25519",
@@ -765,7 +715,6 @@
     "github.com/tendermint/tendermint/lite",
     "github.com/tendermint/tendermint/lite/errors",
     "github.com/tendermint/tendermint/lite/proxy",
-    "github.com/tendermint/tendermint/mempool",
     "github.com/tendermint/tendermint/node",
     "github.com/tendermint/tendermint/p2p",
     "github.com/tendermint/tendermint/privval",

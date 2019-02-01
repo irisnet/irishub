@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.12.0-Alpha
+## 0.12.0
 
-*January 31th, 2019*
+*February 1st, 2019*
 
 [iris] Refactor and add more metrics for monitor
 [iris] Improve the config of Invariant Checking
@@ -11,6 +11,7 @@
 [iriscli] Fix tx search bug by page and size query parameter name
 
 [tendermint] Fix DynamicVerifier for large validator set changes
+[tendermint] Optimize txs search
 
 
 ## 0.11.0
