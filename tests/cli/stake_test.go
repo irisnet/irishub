@@ -77,6 +77,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	unbondStr += fmt.Sprintf(" --address-validator=%s", valAddr)
 	unbondStr += fmt.Sprintf(" --shares-amount=%v", "1")
 	unbondStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+	unbondStr += fmt.Sprintf(" --gas=%s", "40000")
 
 	success := executeWrite(t, unbondStr, sdk.DefaultKeyPass)
 	require.True(t, success)
