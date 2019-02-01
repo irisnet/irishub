@@ -51,7 +51,7 @@ func TestIrisCLIService(t *testing.T) {
 	sdStr += fmt.Sprintf(" --tags=%s", "tag1,tag2")
 	sdStr += fmt.Sprintf(" --author-description=%s", "foo")
 	sdStr += fmt.Sprintf(" --file=%s", fileName)
-	sdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	sdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	executeWrite(t, sdStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -82,7 +82,7 @@ func TestIrisCLIService(t *testing.T) {
 	sdStr += fmt.Sprintf(" --prices=%s", "1iris")
 	sdStr += fmt.Sprintf(" --avg-rsp-time=%d", 10000)
 	sdStr += fmt.Sprintf(" --usable-time=%d", 10000)
-	sdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	sdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	sdStrFoo := sdStr + fmt.Sprintf(" --from=%s", "foo")
 	sdStrBar := sdStr + fmt.Sprintf(" --from=%s", "bar")
@@ -125,7 +125,7 @@ func TestIrisCLIService(t *testing.T) {
 	ubStr += fmt.Sprintf(" --prices=%s", "0.1iris")
 	ubStr += fmt.Sprintf(" --avg-rsp-time=%d", 99)
 	ubStr += fmt.Sprintf(" --usable-time=%d", 99)
-	ubStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	ubStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	ubStr += fmt.Sprintf(" --from=%s", "bar")
 	executeWrite(t, ubStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -166,7 +166,7 @@ func TestIrisCLIService(t *testing.T) {
 	caStr += fmt.Sprintf(" --provider=%s", fooAddr.String())
 	caStr += fmt.Sprintf(" --request-data=%s", "1234")
 	caStr += fmt.Sprintf(" --service-fee=%s", "2iris")
-	caStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	caStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	caStr += fmt.Sprintf(" --from=%s", "bar")
 	caStr += " --commit"
 	_, outString, _ := executeWriteRetStdStreams(t, caStr, sdk.DefaultKeyPass)
@@ -191,7 +191,7 @@ func TestIrisCLIService(t *testing.T) {
 	reStr += fmt.Sprintf(" --request-chain-id=%s", chainID)
 	reStr += fmt.Sprintf(" --request-id=%s", requestId)
 	reStr += fmt.Sprintf(" --response-data=%s", "1234")
-	reStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	reStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	reStr += fmt.Sprintf(" --from=%s", "foo")
 
 	executeWrite(t, reStr, sdk.DefaultKeyPass)
@@ -221,7 +221,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, false, serviceBinding.Available)
 
 	// refund fees
-	executeWrite(t, fmt.Sprintf("iriscli service refund-fees %v --fee=%s --from=%s", flags, "0.004iris", "bar"), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli service refund-fees %v --fee=%s --from=%s", flags, "0.4iris", "bar"), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
@@ -231,7 +231,7 @@ func TestIrisCLIService(t *testing.T) {
 	}
 
 	// withdraw fees
-	executeWrite(t, fmt.Sprintf("iriscli service withdraw-fees %v --fee=%s --from=%s", flags, "0.004iris", "foo"), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli service withdraw-fees %v --fee=%s --from=%s", flags, "0.4iris", "foo"), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
@@ -246,7 +246,7 @@ func TestIrisCLIService(t *testing.T) {
 	wtStr := fmt.Sprintf("iriscli service withdraw-tax %v", flags)
 	wtStr += fmt.Sprintf(" --withdraw-amount=%s", "0.001iris")
 	wtStr += fmt.Sprintf(" --dest-address=%s", barAcc.Address)
-	wtStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	wtStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	wtStr += fmt.Sprintf(" --from=%s", "foo")
 
 	executeWrite(t, wtStr, sdk.DefaultKeyPass)
