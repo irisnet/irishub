@@ -33,7 +33,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	paStr := fmt.Sprintf("iriscli guardian add-profiler %v", flags)
 	paStr += fmt.Sprintf(" --address=%s", barAddr)
 	paStr += fmt.Sprintf(" --description=%s", "bar")
-	paStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	paStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	paStr += fmt.Sprintf(" --from=%s", "foo")
 
 	require.True(t, executeWrite(t, paStr, sdk.DefaultKeyPass))
@@ -56,7 +56,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	taStr := fmt.Sprintf("iriscli guardian add-trustee %v", flags)
 	taStr += fmt.Sprintf(" --description=%s", "bar")
-	taStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	taStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	taStr += fmt.Sprintf(" --address=%s", barAddr)
 	taStr += fmt.Sprintf(" --from=%s", "foo")
 
@@ -75,7 +75,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	// delete profiler
 	pdStr := fmt.Sprintf("iriscli guardian delete-profiler %v", flags)
-	pdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	pdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	pdStr += fmt.Sprintf(" --from=%s", "foo")
 
 	pdbStr := pdStr + fmt.Sprintf(" --address=%s", barAddr)
@@ -90,7 +90,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	// delete trustee
 	tdStr := fmt.Sprintf("iriscli guardian delete-trustee %v", flags)
-	tdStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	tdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	tdStr += fmt.Sprintf(" --from=%s", "foo")
 
 	tdbStr := tdStr + fmt.Sprintf(" --address=%s", barAddr)

@@ -3736,7 +3736,7 @@ components:
           example: '200000'
         fee:
           type: string
-          example: 0.004iris
+          example: 0.4iris
         gas_adjustment:
           type: string
           example: '1.2'
