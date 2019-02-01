@@ -3733,7 +3733,7 @@ components:
           example: '0'
         gas:
           type: string
-          example: '200000'
+          example: '20000'
         fee:
           type: string
           example: 0.4iris
