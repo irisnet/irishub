@@ -48,7 +48,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	numValCommission := getAmountFromCoinStr(vdi.ValCommission)
 	require.True(t, numDelPool > numValCommission)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.004iris %s", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.4iris %s", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -85,7 +85,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	numValCommission := getAmountFromCoinStr(vdi.ValCommission)
 	require.True(t, numDelPool > numValCommission)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.004iris %s", valAddr, flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.4iris %s", valAddr, flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -98,7 +98,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	numValCommission = getAmountFromCoinStr(vdi.ValCommission)
 	require.True(t, numValCommission > 0)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.004iris %s", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.4iris %s", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))

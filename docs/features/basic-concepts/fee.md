@@ -5,8 +5,8 @@ Specify the maximum gas limit by `--gas`.
 If maximum gas is too small, it won't be enough for executing the transaction. 
 If the fee is too low, fee paid for each unit of gas will be less than gaslimit and 
 validators won't execute the transaction neither. 
-The fee(minimum unit)/gas must be large than 2*10^4. 
-We recommend that you set your maximum gas to 20000 and set your maximum fee to 0.44iris. 
+The fee(minimum unit)/gas must be large than 2*10^13. 
+We recommend that you set your maximum gas to 20000 and set your maximum fee to 0.4iris. 
 Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
 
 ## Fee
