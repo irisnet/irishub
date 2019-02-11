@@ -2,7 +2,7 @@
 
 ## 0.12.0
 
-*February 1st, 2019*
+*February 11th, 2019*
 
 - [iris] Refactor and add more promethus metrics for monitor
 - [iris] Enrich log message for all modules
