@@ -36,17 +36,10 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 验证人有遭受攻击的风险。你可以根据以下[教程](../software/sentry.md)部署一个哨兵节点来保护验证人。
 
-## Fuxi测试网激励计划
+## Fuxi测试网
 
-IRIS基金会通过推出测试网激励计划来鼓励更多的人加入到Fuxi测试网中。在Fuxi-7000中，很多社区成员完成了激励任务。
+Fuxi测试网将用于测试irishub的最新功能。
 
-* Fuxi-7000 任务列表：https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-7000/README_CN.md
-* Fuxi-7000 任务完成情况: https://github.com/irisnet/testnets/issues/251
-
-
-在Fuxi-8000测试网中， IRIS基金会决定推出更多的测试网激励计划。
-
-Fuxi-8000任务列表: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-8000/README_CN.md
 
 ##  更多链接
 

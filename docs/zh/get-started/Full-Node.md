@@ -2,13 +2,22 @@
 
 ## 配置
 
-### 设置软件运行的目录
+## 初始化全节点
+
+
+首先执行以下命令：
+```
+iris init --moniker=<your_custom_name> --home=$IRISHOME --chain-id=fuxi
+```
 
 iris在运行过程中所依赖的配置文件和数据会存放在\$IRISHOME下，所以在运行iris前，需要指定一个目录作为\$IRISHOME。\$IRISHOME默认为：/Users/$user/.iris。
 
 在\$IRISHOME需要设置两个文件夹：/config 和 /data
 
-### 下载配置文件文件
+
+
+### 下载配置文件
+
 iris运行中需要用到两个重要的文件：genesis.json 和config.toml
 
 genesis文件中定义了区块链网络的初始状态，而config.toml指定了iris软件模块的重要组成部分。
@@ -17,8 +26,8 @@ genesis文件中定义了区块链网络的初始状态，而config.toml指定�
 
 ```
 cd $IRISHOME/config/
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-8000/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-testnet/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-testnet/config/genesis.json
 ```
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：
