@@ -38,6 +38,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		stakeTKey, bankKeeper,
 		paramKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
+		stake.NopMetrics(),
 	)
 	distrKeeper := distr.NewKeeper(
 		mapp.Cdc,
@@ -45,6 +46,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		mapp.ParamsKeeper.Subspace(distr.DefaultParamspace),
 		mapp.BankKeeper, &stakeKeeper, mapp.FeeKeeper,
 		distr.DefaultCodespace,
+		distr.NopMetrics(),
 	)
 	guardianKeeper := guardian.NewKeeper(
 		mapp.Cdc,
@@ -62,6 +64,7 @@ func TestGovWithRandomMessages(t *testing.T) {
 		guardianKeeper,
 		stakeKeeper,
 		gov.DefaultCodespace,
+		gov.NopMetrics(),
 	)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{govKey, mapp.KeyAccount, stakeKey, paramKey}, gov.NewHandler(govKeeper))

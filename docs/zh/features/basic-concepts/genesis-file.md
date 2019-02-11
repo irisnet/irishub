@@ -19,31 +19,33 @@ Genesis文件是整个网络初始化的基础。它包含了创建创世区块�
 
 * **accounts** 初始化账户信息
 
+* **auth** 与系统相关的参数 
+  * params 详情见[Gov-Params](gov-params.md#auth模块可治理参数)
+
 * **stake** 与抵押共识相关的参数
-  * `loose_tokens`   全网未绑定的通证总和
-  * `unbonding_time` 开始解绑到解绑成功需要的时间
-  * `max_validators` 最大验证人数目
+  * pool   当前绑定的token总数
+  * validators 当前每个验证人的信息
+  * params 详情见[Gov-Params](gov-params.md#stake模块可治理参数)
   
 * **mint**  与通货膨胀相关的参数
-  * `inflation_max` 最大通货膨胀率
-  * `inflation_min` 最小通货膨胀率
+  * minter 初始化状态
+  * params 详情见[Gov-Params](gov-params.md#mint模块可治理参数)
   
 * **distribution** 与分配收益有关的参数
+  * params 详情见[Gov-Params](gov-params.md#distribution模块可治理参数)
 
 * **gov**  与链上治理相关的参数
-  * `DepositProcedure`  抵押阶段的参数
-  * `VotingProcedure`   投票阶段的参数
-  * `TallyingProcedure` 统计阶段的参数
+  * params 详情见[Governance.md](../governance.md#交互流程)
+  
 
 * **upgrade** 与升级相关的参数
-  * `switch_period` 软件升级通过后需要在switch_perid内发送switch消息
+  * GenesisVersion 初始化当前版本信息
 
 * **slashing** 与惩罚validator相关的参数
+  * params 详情见[Gov-Params](gov-params.md#slashing模块可治理参数)
 
 * **service**  与service相关的参数
-  * `MaxRequestTimeout`   服务调用最大等待区块个数
-  * `MinProviderDeposit`  服务绑定最小抵押金额
-  * `ServiceFeeTax` 服务费税金
+  * params 详情见[Gov-Params](gov-params.md#service模块可治理参数)
     
 * **guardian** 与guardian相关的参数
   * `profilers` profiler列表

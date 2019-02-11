@@ -21,31 +21,31 @@ Each genesis state starts with a list of account balances. Social consensus on t
 
 * **accounts** Initialization account info
 
+* **auth** Params related to the system 
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-auth)
+
 * **stake** Params related to the staking consensus
-  * `loose_tokens`   The sum of unbonded tokens in the entire network
-  * `unbonding_time` The time between the moment a validator begin to unbond until the moment it is unbonded successfully
-  * `max_validators` The max of validators
+  * pool   The total of the current bonded token
+  * validators   All the information of validators 
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-stake)
   
 * **mint**  Params related to inflation
-  * `inflation_max` The max of inflation rate
-  * `inflation_min` The min of inflation rate
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-mint)
   
 * **distribution** Params related to distribution & commission
-
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-distribution)
+  
 * **gov**  Params related to on-chain governance
-  * `DepositProcedure`  Params in deposit period
-  * `VotingProcedure`   Params in voting period
-  * `TallyingProcedure` Params in tallying period
+  * params Detail in [Governance.md](../governance.md#interactive-process)
 
 * **upgrade** Params related to upgrade
-  * `switch_period` After upgrade, a switch message needs to be sent in switch_perid
+  * GenesisVersion Initialize the genesis version
 
 * **slashing** Params related to slashing validators
-
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-slashing)
+  
 * **service**  Params related to service
-  * `MaxRequestTimeout`   The max of waiting blocks for service invocation
-  * `MinProviderDeposit`  The min deposit for service binding
-  * `ServiceFeeTax` The service fee tax
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-service)
   
 * **guardian** Params related to guardian
   * `profilers` The profiler list

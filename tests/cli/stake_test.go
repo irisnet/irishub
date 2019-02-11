@@ -50,7 +50,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	cvStr += fmt.Sprintf(" --pubkey=%s", barCeshPubKey)
 	cvStr += fmt.Sprintf(" --amount=%v", "2iris")
 	cvStr += fmt.Sprintf(" --moniker=%v", "bar-vally")
-	cvStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	cvStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	cvStr += fmt.Sprintf(" --commission-max-change-rate=%s", "0.01")
 	cvStr += fmt.Sprintf(" --commission-max-rate=%s", "0.5")
 	cvStr += fmt.Sprintf(" --commission-rate=%s", "0.1")
@@ -76,7 +76,8 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	unbondStr += fmt.Sprintf(" --from=%s", "bar")
 	unbondStr += fmt.Sprintf(" --address-validator=%s", valAddr)
 	unbondStr += fmt.Sprintf(" --shares-amount=%v", "1")
-	unbondStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	unbondStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+	unbondStr += fmt.Sprintf(" --gas=%s", "40000")
 
 	success := executeWrite(t, unbondStr, sdk.DefaultKeyPass)
 	require.True(t, success)

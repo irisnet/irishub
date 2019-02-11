@@ -30,7 +30,8 @@ module.exports = {
                         ['node.md', 'Node'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
-                        ['tool.md', 'Tool']
+                        ['tool.md', 'Tool'],
+                        ['monitor.md', 'Monitor']
                     ],
                     '/get-started/': [
                         ['Download-Rainbow.md', 'Download Rainbow'],
@@ -150,7 +151,8 @@ module.exports = {
                         ['node.md', 'Node'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
-                        ['tool.md', 'Tool']
+                        ['tool.md', 'Tool'],
+                        ['monitor.md', 'Monitor']
                     ],
                     '/zh/get-started/': [
                         ['Download-Rainbow.md', 'Download Rainbow'],

@@ -38,7 +38,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --type=%s", "ParameterChange")
 	spStr += fmt.Sprintf(" --title=%s", "Test")
 	spStr += fmt.Sprintf(" --description=%s", "test")
-	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	spStr += fmt.Sprintf(" --param=mint/Inflation=%s", "0.04")
 
 	executeWrite(t, spStr, sdk.DefaultKeyPass)
@@ -64,7 +64,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	depositStr += fmt.Sprintf(" --from=%s", "foo")
 	depositStr += fmt.Sprintf(" --deposit=%s", "5iris")
 	depositStr += fmt.Sprintf(" --proposal-id=%s", "1")
-	depositStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	depositStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	executeWrite(t, depositStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -85,7 +85,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	voteStr += fmt.Sprintf(" --from=%s", "foo")
 	voteStr += fmt.Sprintf(" --proposal-id=%s", "1")
 	voteStr += fmt.Sprintf(" --option=%s", "Yes")
-	voteStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	voteStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	executeWrite(t, voteStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
@@ -118,7 +118,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	spStr += fmt.Sprintf(" --type=%s", "ParameterChange")
 	spStr += fmt.Sprintf(" --title=%s", "Apples")
 	spStr += fmt.Sprintf(" --description=%s", "test")
-	spStr += fmt.Sprintf(" --fee=%s", "0.004iris")
+	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	spStr += fmt.Sprintf(" --param=mint/Inflation=%s", "0.05")
 
 	executeWrite(t, spStr, sdk.DefaultKeyPass)

@@ -28,7 +28,7 @@ iriscli service bind [flags]
 在服务绑定中, 你需要抵押`deposit`指定数量的IRIS, 最小的抵押金额为 该服务的服务费价格`price` * genesis 中定义的`MinDepositMultiple`倍数
 
 ```shell
-iriscli service bind --chain-id=test --from=node0 --fee=0.004iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=test --from=node0 --fee=0.4iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 ```
 
 运行成功以后，返回的结果如下:

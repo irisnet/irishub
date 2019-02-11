@@ -1,7 +1,7 @@
 # IRIS Command tool
 
 ## Introduction
-`iristool` 现在包含 [monitor](./monitor.md) 和 debug.
+`iristool` 现在包含debug。
 
 ## debug
 用于简单调试的简单工具。

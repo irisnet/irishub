@@ -1,6 +1,6 @@
 # 运行一个验证人节点
 
-在配置验证人节点之前，请保证已经按照此[文档](Install-the-Software.md)正确安装了**Iris**
+在配置测试网验证人节点之前，请保证已经按照此[文档](Install-the-Software.md)正确安装了**Iris**
 
 在IRISHub枢纽中，验证人负责将交易打包并提交区块。成为一个验证人需要满足很多条件，不仅仅是技术和硬件上的投资。同时，因为只有在有限验证人的条件下，Tendermint才能发挥最大的作用。目前，我们将IRISHub枢纽的验证人上限定为100。也就是说只有前100个验证人能够获得奖励，而大部分IRIS持有者不会成为验证人而是通过委托的方式决定谁会成为验证人。
 
@@ -68,14 +68,14 @@ fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
 ```
 > 注意：**Fee** 字段可以使用小数，例如`0.01iris` 。
 
 也就是说，如果你想要抵押10IRIS在test-irishub链上,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
 ```
 
 ### 查询验证人信息

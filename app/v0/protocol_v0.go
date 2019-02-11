@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -32,6 +33,7 @@ type ProtocolV0 struct {
 	cdc            *codec.Codec
 	logger         log.Logger
 	invariantLevel string
+	checkInvariant bool
 
 	// Manage getting and setting accounts
 	accountMapper  auth.AccountKeeper
@@ -59,16 +61,22 @@ type ProtocolV0 struct {
 	initChainer  sdk.InitChainer1 // initialize state with validators and state blob
 	beginBlocker sdk.BeginBlocker // logic to run before any txs
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
+	config       *cfg.InstrumentationConfig
+
+	metrics		*Metrics
 }
 
-func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, invariantLevel string) *ProtocolV0 {
+func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
 	p0 := ProtocolV0{
 		version:        version,
 		logger:         log,
 		protocolKeeper: pk,
-		invariantLevel: strings.ToLower(strings.TrimSpace(invariantLevel)),
+		invariantLevel: strings.ToLower(sdk.InvariantLevel),
+		checkInvariant: checkInvariant,
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
+		config:         config,
+		metrics:        PrometheusMetrics(config),
 	}
 	return &p0
 }
@@ -189,6 +197,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeyStake, protocol.TkeyStake,
 		p.bankKeeper, p.paramsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
+		stake.PrometheusMetrics(p.config),
 	)
 	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamSpace),
@@ -199,13 +208,14 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
 		p.bankKeeper, &stakeKeeper, p.feeKeeper,
-		distr.DefaultCodespace,
+		distr.DefaultCodespace,  distr.PrometheusMetrics(p.config),
 	)
 	p.slashingKeeper = slashing.NewKeeper(
 		p.cdc,
 		protocol.KeySlashing,
 		&stakeKeeper, p.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		slashing.DefaultCodespace,
+		slashing.PrometheusMetrics(p.config),
 	)
 
 	p.govKeeper = gov.NewKeeper(
@@ -219,6 +229,7 @@ func (p *ProtocolV0) configKeepers() {
 		p.guardianKeeper,
 		&stakeKeeper,
 		gov.DefaultCodespace,
+		gov.PrometheusMetrics(p.config),
 	)
 
 	p.serviceKeeper = service.NewKeeper(
@@ -228,6 +239,7 @@ func (p *ProtocolV0) configKeepers() {
 		p.guardianKeeper,
 		service.DefaultCodespace,
 		p.paramsKeeper.Subspace(service.DefaultParamSpace),
+		service.PrometheusMetrics(p.config),
 	)
 
 	// register the staking hooks
@@ -236,7 +248,7 @@ func (p *ProtocolV0) configKeepers() {
 	p.StakeKeeper = *stakeKeeper.SetHooks(
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 
-	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper)
+	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 }
 
 // configure all Routers
