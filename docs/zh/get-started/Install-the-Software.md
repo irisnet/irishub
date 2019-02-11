@@ -28,10 +28,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.11.0
+v0.12.0
     
 $ iriscli version
-v0.11.0
+v0.12.0
 ```
 #### 方法2：源码编译安装
 
@@ -84,34 +84,51 @@ source ~/.bash_profile
 
 在完成Go的安装后，通过以下命令下载并安装IRIS hub相关程序.
 
+* 编译用于`测试网`的可执行文件:
+
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.11.0
+cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make all
+make get_tools
+make get_vendor_deps
+make build_linux
+```
+
+* 编译用于`betanet`的可执行文件:
+```
+mkdir -p $GOPATH/src/github.com/irisnet
+cd $GOPATH/src/github.com/irisnet
+git clone https://github.com/irisnet/irishub
+cd irishub && git checkout v0.12.0
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+make get_tools
+make get_vendor_deps
+source scripts/setProdEnv.sh
+make build_linux
 ```
 
 以上命令将完成iris 和 iriscli的安装. 若出现对应的版本号则说明安装成功。
 
 ```
 $ iris version
-v0.11.0
+v0.12.0
     
 $ iriscli version
-v0.11.0
+v0.12.0
 ```
 ### 如何升级IRISHub
 
-通过执行一下命令可以完成IRISHub从v0.10.0到v0.11.0的升级
+通过执行一下命令可以完成测试网上IRISHub从v0.11.0到v0.12.0的升级
 
 ```
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.11.0
+git checkout v0.12.0
 make get_tools
 make get_vendor_deps
-make install
+make build_linux
 ```

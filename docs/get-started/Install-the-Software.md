@@ -22,17 +22,20 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release v0.11.0 on your computer.
+then get the release v0.12.0 on your computer.
+
+> Note: there are two different binaries available. One for testnet and the other for betanet.
+
 `unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/ ` 
 
 You can verify you have the right version installed by running the following commands:
 
 ```
 $ iris version
-v0.11.0
+v0.12.0
 
 $ iriscli version
-v0.11.0
+v0.12.0
 ```
 
 #### Compile Source Code
@@ -90,14 +93,32 @@ $ echo $PATH
 - Get the code and compile Iris
 
 After setup Go correctly, you should be able to compile and run **Iris**.
-Make sure that you can access to google.com for that our project used some libraries provided by google.
+Make sure that your server can access to google.com for that our project depends on some libraries provided by google.
+
+* To compile for `testnet`:
+
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.11.0
+cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make all
+make get_tools
+make get_vendor_deps
+make build_linux
+```
+
+* To compile for `betanet`:
+```
+mkdir -p $GOPATH/src/github.com/irisnet
+cd $GOPATH/src/github.com/irisnet
+git clone https://github.com/irisnet/irishub
+cd irishub && git checkout v0.12.0
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+make get_tools
+make get_vendor_deps
+source scripts/setProdEnv.sh
+make build_linux
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
@@ -105,9 +126,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.11.0
+v0.12.0
 $ iriscli version
-v0.11.0
+v0.12.0
 ```
 
 ### How to Update
@@ -118,7 +139,7 @@ Get latest code (you can also `git fetch` only the version desired), ensure the 
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.11.0
+git checkout v0.12.0
 make get_vendor_deps
-make install
+make build_linux
 ```

@@ -36,13 +36,9 @@ If you miss the genesis file generation process, you can still upgrade your full
 
 A validator is under the risk of being attacked. You could follow this [guide](../software/sentry.md) to setup a sentry node to protect yourself.
 
-## Fuxi Incentivized Testnet
-IRIS foundation plans to reward all the testnet participants who took part in the testnet. In Fuxi-3001 testnet,the community members have finished the tasks and they will receive their rewards in genesis allocation.
-* Task List for Fuxi-7000： https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-7000/README.md
-* Results for Fuxi-7000 tasks: https://github.com/irisnet/testnets/issues/251
+## Fuxi  Testnet
 
-To get more people involved, IRIS foundation decides to send out more tasks in the latest iteration of testnet:Fuxi-8000.
-* Task List for Fuxi-8000: https://github.com/irisnet/testnets/blob/master/fuxi/fuxi-8000/README.md
+Fuxi testnet is used for testing irishub.
 
 ##  Useful Links
 
