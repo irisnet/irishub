@@ -2,16 +2,20 @@
 
 ## 0.12.0
 
-*February 1st, 2019*
+*February 11th, 2019*
 
-[iris] Refactor and add more metrics for monitor
-[iris] Improve the config of Invariant Checking
-
-[iriscli] Add share percent in lcd unbond and redelegate 
-[iriscli] Fix tx search bug by page and size query parameter name
-
-[tendermint] Fix DynamicVerifier for large validator set changes
-[tendermint] Optimize txs search
+- [iris] Refactor and add more promethus metrics for monitor
+- [iris] Enrich log message for all modules
+- [iris] Close all unclosed iterators
+- [iris] Add invariant check level configuration in iris.toml
+- [iriscli] Add share percent in lcd unbond and redelegate 
+- [iriscli] Fix tx search bug by page and size query parameter name
+- [iriscli] Improve error message for gov module
+- [irislcd] Upgrade swagger-ui to 3.0 which can support dynamic query parameters
+- [iristool] Remove monitor command
+- [tendermint] Fix DynamicVerifier for large validator set changes
+- [tendermint] Optimize txs search to handle huge search result
+- [doc] Improve slashing document
 
 
 ## 0.11.0
