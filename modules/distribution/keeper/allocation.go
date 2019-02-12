@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -65,6 +66,12 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
+	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(tokenPrecision).String(), 64)
+	if err == nil {
+		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+	}
+
 	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString())
 
 	// set the global pool within the distribution module
@@ -85,6 +92,13 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	communityPool := feePool.CommunityPool
 	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
+
+	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(tokenPrecision).String(), 64)
+	if err == nil {
+		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+	}
+
 	k.SetFeePool(ctx, feePool)
 	logger.Info("Spend community tax fund", "total_community_tax_fund", communityPool.ToString(), "left_community_tax_fund", feePool.CommunityPool.ToString())
 	if burn {

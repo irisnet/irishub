@@ -39,6 +39,11 @@ func SetMinimumFees(minFees string) func(*BaseApp) {
 	return func(bap *BaseApp) { bap.SetMinimumFees(fees) }
 }
 
+// SetCheckInvariant set app invariant check config
+func SetCheckInvariant(check bool) func(*BaseApp) {
+	return func(bap *BaseApp) { bap.SetCheckInvariant(check) }
+}
+
 // nolint - Setter functions
 func (app *BaseApp) SetName(name string) {
 	if app.sealed {

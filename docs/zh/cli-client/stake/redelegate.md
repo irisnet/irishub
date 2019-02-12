@@ -31,7 +31,7 @@ iriscli stake redelegate --help
 执行如下在chain-id为test的网络上重新委托10iris的命令：
 
 ```
-iriscli stake redelegate --chain-id=test-irishub --from=fuxi --fee=0.004iris --address-validator-source=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-validator-dest=fva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
+iriscli stake redelegate --chain-id=test-irishub --from=fuxi --fee=0.4iris --address-validator-source=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-validator-dest=fva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
 ```
 输出信息：
 ```$xslt

@@ -243,12 +243,12 @@ paths:
             additionalProperties:
               type: string
         - in: query
-          name: page
+          name: search_request_page
           description: 'Pagination page, default value 0'
           schema:
             type: integer
         - in: query
-          name: size
+          name: search_request_size
           description: 'Pagination size, default value 100'
           schema:
             type: integer
@@ -1003,7 +1003,7 @@ paths:
                     delegation:
                       type: string
                       example: 10iris
-        description: The password of the account to remove from the KMS
+        description: Delegation amount must be specified
   '/stake/delegators/{delegatorAddr}/redelegate':
     parameters:
       - in: path
@@ -1073,10 +1073,13 @@ paths:
                       $ref: '#/components/schemas/ValidatorAddress'
                     validator_dst_addr:
                       $ref: '#/components/schemas/ValidatorAddress'
-                    shares:
+                    shares_amount:
                       type: string
                       example: '100'
-        description: The password of the account to remove from the KMS
+                    shares_percent:
+                      type: string
+                      example: '0.1'
+        description: Either specify the shares_amount or the shares_percent, not both
   '/stake/delegators/{delegatorAddr}/unbond':
     parameters:
       - in: path
@@ -1144,10 +1147,13 @@ paths:
                   properties:
                     validator_addr:
                       $ref: '#/components/schemas/ValidatorAddress'
-                    shares:
+                    shares_amount:
                       type: string
                       example: '100'
-        description: The password of the account to remove from the KMS
+                    shares_percent:
+                      type: string
+                      example: '0.1'
+        description: Either specify the shares_amount or the shares_percent, not both
   '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path
@@ -3727,10 +3733,10 @@ components:
           example: '0'
         gas:
           type: string
-          example: '200000'
+          example: '20000'
         fee:
           type: string
-          example: 0.004iris
+          example: 0.4iris
         gas_adjustment:
           type: string
           example: '1.2'

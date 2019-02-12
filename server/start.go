@@ -21,6 +21,7 @@ const (
 	flagTraceStore     = "trace-store"
 	flagPruning        = "pruning"
 	flagMinimumFees    = "minimum_fees"
+	flagCheckInvariant = "check_invariant"
 )
 
 // StartCmd runs the service passed in, either stand-alone or in-process with
@@ -48,6 +49,7 @@ func StartCmd(ctx *Context, appCreator AppCreator) *cobra.Command {
 	cmd.Flags().String(flagTraceStore, "", "Enable KVStore tracing to an output file")
 	cmd.Flags().String(flagPruning, "syncable", "Pruning strategy: syncable, nothing, everything")
 	cmd.Flags().String(flagMinimumFees, "", "Minimum fees validator will accept for transactions")
+	cmd.Flags().Bool(flagCheckInvariant, false, "Enable invariant check on mainnet, ignore this flag on testnet")
 
 	// add support for all Tendermint-specific command line options
 	tcmd.AddNodeFlags(cmd)
@@ -68,7 +70,7 @@ func startStandAlone(ctx *Context, appCreator AppCreator) error {
 		return err
 	}
 
-	app := appCreator(ctx.Logger, db, traceWriter)
+	app := appCreator(ctx.Logger, db, traceWriter, ctx.Config.Instrumentation)
 
 	svr, err := server.NewServer(addr, "socket", app)
 	if err != nil {
@@ -107,7 +109,7 @@ func startInProcess(ctx *Context, appCreator AppCreator) (*node.Node, error) {
 		return nil, err
 	}
 
-	app := appCreator(ctx.Logger, db, traceWriter)
+	app := appCreator(ctx.Logger, db, traceWriter, ctx.Config.Instrumentation)
 
 	nodeKey, err := p2p.LoadOrGenNodeKey(cfg.NodeKeyFile())
 	if err != nil {

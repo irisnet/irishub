@@ -12,14 +12,16 @@ type Keeper struct {
 	// The ValidatorSet to get information about validators
 	protocolKeeper sdk.ProtocolKeeper
 	sk             stake.Keeper
+	metrics        *Metrics
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, protocolKeeper sdk.ProtocolKeeper, sk stake.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, protocolKeeper sdk.ProtocolKeeper, sk stake.Keeper, metrics *Metrics) Keeper {
 	keeper := Keeper{
 		key,
 		cdc,
 		protocolKeeper,
 		sk,
+		metrics,
 	}
 	return keeper
 }
@@ -41,7 +43,7 @@ func (k Keeper) AddNewVersionInfo(ctx sdk.Context, versionInfo VersionInfo) {
 	if versionInfo.Success {
 		kvStore.Set(GetSuccessVersionKey(versionInfo.UpgradeInfo.Protocol.Version), proposalIDBytes)
 	} else {
-		kvStore.Set(GetFailedVersionKey(versionInfo.UpgradeInfo.Protocol.Version,versionInfo.UpgradeInfo.ProposalID), proposalIDBytes)
+		kvStore.Set(GetFailedVersionKey(versionInfo.UpgradeInfo.Protocol.Version, versionInfo.UpgradeInfo.ProposalID), proposalIDBytes)
 	}
 }
 

@@ -23,6 +23,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"encoding/json"
 	tmtypes "github.com/tendermint/tendermint/types"
+	cfg "github.com/tendermint/tendermint/config"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -133,7 +134,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		cmn.Exit(err.Error())
 	}
 
-	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, sdk.InvariantLevel))
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, true, cfg.DefaultInstrumentationConfig()))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))

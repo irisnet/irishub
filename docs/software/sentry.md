@@ -6,7 +6,7 @@ A validator node is under the risk of distributed denial-of-service (DDoS)attack
 
 ## What is a sentry node?
 
-In IRISnet, a sentry node is just a normal full node. The validator node will only connect to its sentry node. In this way, the sentry nodes will be protect the validator node from DDoS attack. 
+In IRISnet, a sentry node is just a  full node. The validator node will only connect to its sentry node. In this way, the sentry nodes will be protect the validator node from DDoS attack. 
 
 ## How to setup a sentry node?
 

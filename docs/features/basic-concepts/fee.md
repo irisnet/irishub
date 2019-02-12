@@ -1,10 +1,20 @@
 # Introduction
 
-Specify the maximum fee you want to pay by `--fee`. Gas is the unit used to measure how much resource needed to execute the transaction. Specify the maximum gas limit by --gas. If maximum gas is too small, it won't be enough for executing the transaction. If the fee is too low, fee paid for each unit of gas will be low & validator won't execute the transaction too. The fee(minimum unit)/gas must be large than 2*10^10. We recommend that you set your maximum gas to 20000 and set your maximum fee to 400000000000000iris. Fee will be deduct according to the gas used and lefted fee will be returned to user.
+Specify the maximum fee you want to pay by `--fee`. Gas is the unit used to measure how much resource needed to execute the transaction. 
+Specify the maximum gas limit by `--gas`. 
+If maximum gas is too small, it won't be enough for executing the transaction. 
+If the fee is too low, fee paid for each unit of gas will be less than gaslimit and 
+validators won't execute the transaction neither. 
+The fee(minimum unit)/gas must be large than 2*10^13. 
+We recommend that you set your maximum gas to 20000 and set your maximum fee to 0.4iris. 
+Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
 
 ## Fee
 
-To secure their own validator node and maintain the avalibility of blockchain network, validators in IRISnet need a lot of equipments and works. Thus, every transactions in IRISnet should pay some fee to validators. The parameter in commands is used to specify the maximum fee the user want to pay for their transaction.
+To secure their own validator node and maintain the avalibility of blockchain network, 
+validators in IRISnet need a lot of equipments and resources. 
+Thus, every transactions in IRISnet should pay some fee to validators. 
+The parameter in commands is used to specify the maximum fee the user want to pay for their transaction.
 
 ## Gas
 

@@ -1,6 +1,6 @@
 # Running a Validator Node
 
-Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
+Before setting up your validator node on Fuxi testnet, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
 
 Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
@@ -72,7 +72,7 @@ Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` c
 
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
 
@@ -117,7 +117,7 @@ You can edit your validator's public description following [this](../cli-client/
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator --chain-id=<chain-id> --from=<key-name> --fee=0.004iris --moniker=<validator name> --details=<details>
+iriscli stake edit-validator --chain-id=<chain-id> --from=<key-name> --fee=0.4iris --moniker=<validator name> --details=<details>
 
 ```
 ### View Validator Description
