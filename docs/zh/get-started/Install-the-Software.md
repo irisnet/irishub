@@ -1,6 +1,6 @@
-### 安装IRIShub
+# 安装IRIShub
 
-#### 服务器配置要求
+## 服务器配置要求
 
 
 首先，你需要配置一台服务器。你的验证人节点应该能够一直运行，使用你可能需要在一台数据中心的服务器。任何像AWS、GCP、DigitalOcean中的云服务器都是适合的。
@@ -94,7 +94,7 @@ cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
-make build_linux
+make install
 ```
 
 * 编译用于`betanet`的可执行文件:
@@ -107,7 +107,7 @@ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
 source scripts/setProdEnv.sh
-make build_linux
+make install
 ```
 
 以上命令将完成iris 和 iriscli的安装. 若出现对应的版本号则说明安装成功。
@@ -130,5 +130,5 @@ git fetch -a origin
 git checkout v0.12.0
 make get_tools
 make get_vendor_deps
-make build_linux
+make install
 ```
