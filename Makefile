@@ -4,7 +4,7 @@ PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
 PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
-all: get_tools get_vendor_deps install
+all: get_tools get_vendor_deps install build_linux
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 
