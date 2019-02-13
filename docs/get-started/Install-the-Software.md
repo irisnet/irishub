@@ -105,7 +105,7 @@ cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
-make build_linux
+make install
 ```
 
 * To compile for `betanet`:
@@ -118,7 +118,7 @@ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
 source scripts/setProdEnv.sh
-make build_linux
+make install
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
@@ -141,5 +141,5 @@ cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 git checkout v0.12.0
 make get_vendor_deps
-make build_linux
+make install
 ```
