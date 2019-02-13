@@ -105,7 +105,7 @@ cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
-make install
+make all
 ```
 
 * To compile for `betanet`:
