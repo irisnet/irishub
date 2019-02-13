@@ -518,9 +518,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "ff8ef6b4b603baa4fa27fce905bb29f3420f7c00"
+  revision = "95d1adbd406e7a61e6f4161a62a517a9380224d8"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.27.3-iris5"
+  version = "v0.27.3-iris6"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
