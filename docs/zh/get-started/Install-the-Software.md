@@ -92,8 +92,6 @@ cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_tools
-make get_vendor_deps
 make all
 ```
 
@@ -104,8 +102,6 @@ cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_tools
-make get_vendor_deps
 source scripts/setProdEnv.sh
 make all
 ```
@@ -128,7 +124,5 @@ iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 git checkout v0.12.0
-make get_tools
-make get_vendor_deps
 make all
 ```
