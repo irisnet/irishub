@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.12.1
+
+*February 14th, 2019*
+
+- Fix the bug of repeatability check about evidence in the tendermint
+- Change the invariant level for mainnet
+
 ## 0.12.0
 
 *February 11th, 2019*
