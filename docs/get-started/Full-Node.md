@@ -1,6 +1,6 @@
 # Setup A Full-node
 
-Before setting up your validator node on Fuxi testnet, make sure you already had **Iris** installed by following this [guide](Install-the-Software.md)
+
 
 ## Init Your Node
 
@@ -27,8 +27,6 @@ After intializing your node, please download the genesis file and the config fil
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-testnet/config/config.toml
-wget https://raw.githubusercontent.com/irisnet/testnets/master/fuxi/fuxi-testnet/config/genesis.json
 ```
 ## Edit Your Config File
 
@@ -54,8 +52,6 @@ addr_book_strict = false
 Your node needs to know how to find more peers. You'll need to add healthy seed nodes to `$IRISHOME/config/config.toml`. Here are some seed nodes you can use:
 
 ```
-d1f2bbc6634c7f7041ede42d8f4b990a99681baa@ts-1.irisnet.org:26656
-afb247319e00ddd48ef95983812a50eaf9b381df@ts-2.irisnet.org:26656
 ```
 
 Meanwhile, you could add some known full node as `Persistent Peer`. Your node could connect to `sentry node` as `persistent peers`.

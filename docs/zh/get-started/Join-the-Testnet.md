@@ -13,9 +13,13 @@ Fuxi测试网将用于测试irishub的最新功能。
 
 ### 第二步: 接入测试网节点
 
-* RPC: https://rpc.testnet.irisnet.org
+* RPC
 
-* LCD: https://lcd.testnet.irisnet.org/swagger-ui/
+通过`iriscli`执行相关命令，将`node`字段设为：https://rpc.testnet.irisnet.org
+
+* LCD
+
+通过以下链接完成信息查询：https://lcd.testnet.irisnet.org/swagger-ui/
 
 ##  更多链接
 

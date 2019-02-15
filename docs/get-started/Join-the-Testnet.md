@@ -12,9 +12,13 @@ Please follow this [instruction](Install-the-Software.md) to get **Iricli** inst
 
 ### Step 2: Connect to nodes
 
-* RPC: https://rpc.testnet.irisnet.org
+* RPC
 
-* LCD: https://lcd.testnet.irisnet.org/swagger-ui/
+please use the following url as `node` in your iriscli query: https://rpc.testnet.irisnet.org
+
+* LCD
+
+please visit lcd site for information: https://lcd.testnet.irisnet.org/swagger-ui/
 
 
 ##  Useful Links
