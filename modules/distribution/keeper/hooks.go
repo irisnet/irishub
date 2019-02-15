@@ -82,6 +82,7 @@ func (k Keeper) onDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress,
 	valAddr sdk.ValAddress) {
 	if valAddr.Equals(sdk.ValAddress(delAddr)) {
 		feePool, commission := k.withdrawValidatorCommission(ctx, valAddr)
+		ctx = ctx.WithDistriReason("onDelegationRemoved withdraw commission")
 		k.WithdrawToDelegator(ctx, feePool, delAddr, commission)
 	}
 	k.RemoveDelegationDistInfo(ctx, delAddr, valAddr)

@@ -81,6 +81,7 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 		k.SetFeePool(ctx, fp)
 		k.SetValidatorDistInfo(ctx, vi)
 		k.SetDelegationDistInfo(ctx, di)
+		ctx = ctx.WithDistriReason("takeValidatorFeePoolRewards has self delegation")
 		k.WithdrawToDelegator(ctx, fp, accAddr, withdraw)
 	} else {
 		delegations := k.stakeKeeper.GetValidatorDelegations(ctx, operatorAddr)
@@ -90,6 +91,7 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 			k.SetFeePool(ctx, fp)
 			k.SetValidatorDistInfo(ctx, vi)
 			k.SetDelegationDistInfo(ctx, di)
+			ctx = ctx.WithDistriReason("takeValidatorFeePoolRewards no self delegation")
 			k.WithdrawToDelegator(ctx, fp, accAddr, withdraw)
 		}
 		if len(delegations) == 0 {
@@ -130,6 +132,7 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	commissionTruncated, _ := commission.TruncateDecimal()
 	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commissionTruncated.String()))
 
+	ctx = ctx.WithDistriReason("WithdrawValidatorRewardsAll including commission")
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
 	return withdraw, resultTags, nil
 }

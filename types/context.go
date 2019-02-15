@@ -145,6 +145,7 @@ const (
 	contextKeyBlockGasMeter
 	contextKeyMinimumFees
 	contextKeyCheckValidNum
+	contextKeyDistriReason
 )
 
 // NOTE: Do not expose MultiStore.
@@ -179,6 +180,7 @@ func (c Context) IsCheckTx() bool { return c.Value(contextKeyIsCheckTx).(bool) }
 
 func (c Context) MinimumFees() Coins { return c.Value(contextKeyMinimumFees).(Coins) }
 
+func (c Context) DistriReason() string { return c.Value(contextKeyDistriReason).(string) }
 
 func (c Context) CheckValidNum() uint64 { return c.Value(contextKeyCheckValidNum).(uint64) }
 
@@ -237,6 +239,10 @@ func (c Context) WithIsCheckTx(isCheckTx bool) Context {
 
 func (c Context) WithMinimumFees(minFees Coins) Context {
 	return c.withValue(contextKeyMinimumFees, minFees)
+}
+
+func (c Context) WithDistriReason(reason string) Context {
+	return c.withValue(contextKeyDistriReason, reason)
 }
 
 // Cache the multistore and return a new cached context. The cached context is

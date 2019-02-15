@@ -1,9 +1,11 @@
 package keeper
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
 // check whether a delegator distribution info exists
@@ -150,6 +152,13 @@ func (k Keeper) WithdrawToDelegator(ctx sdk.Context, feePool types.FeePool,
 	k.SetFeePool(ctx, feePool)
 
 	ctx.Logger().Debug("Withdraw reward to delegator", "reward", coinsToAdd.String(), "change", change.ToString(), "delegator", delAddr.String())
+	var txHash string
+	if len(ctx.TxBytes()) != 0 {
+		txHash = hex.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+	} else {
+		txHash = ""
+	}
+	ctx.Logger().Info("Withdraw reward to delegator", "txHash", txHash, "delegator", delAddr.String(), "reward", coinsToAdd.String(), "reason", ctx.DistriReason() )
 
 	_, _, err := k.bankKeeper.AddCoins(ctx, withdrawAddr, coinsToAdd)
 	if err != nil {
@@ -175,6 +184,7 @@ func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress
 
 	k.SetValidatorDistInfo(ctx, valInfo)
 	k.SetDelegationDistInfo(ctx, delInfo)
+	ctx = ctx.WithDistriReason("WithdrawDelegationReward")
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
 	return withdraw, nil
 }
@@ -197,6 +207,7 @@ func (k Keeper) CurrentDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress,
 func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) (types.DecCoins, sdk.Tags) {
 	withdraw, tags := k.withdrawDelegationRewardsAll(ctx, delAddr)
 	feePool := k.GetFeePool(ctx)
+	ctx = ctx.WithDistriReason("WithdrawDelegationRewardsAll")
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
 	return withdraw, tags
 }
