@@ -1,20 +1,23 @@
 package context
 
 import (
-	"io"
-
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/irisnet/irishub/client"
-
 	"bytes"
 	"fmt"
+	"io"
+	"os"
+
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	cskeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/tendermint/tendermint/libs/log"
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	"os"
 )
 
 const ctxAccStoreName = "acc"
@@ -22,23 +25,25 @@ const ctxAccStoreName = "acc"
 // CLIContext implements a typical CLI context created in SDK modules for
 // transaction handling and queries.
 type CLIContext struct {
-	Codec           *wire.Codec
-	AccDecoder      auth.AccountDecoder
-	Client          rpcclient.Client
-	Logger          io.Writer
-	Height          int64
-	NodeURI         string
-	FromAddressName string
-	//If GenerateOnly is true and FromAddressName is not specified, the signer is required for building msg
-	SignerAddr      string
-	AccountStore    string
-	TrustNode       bool
-	UseLedger       bool
-	Async           bool
-	JSON            bool
-	PrintResponse   bool
-	Certifier       tmlite.Certifier
-	GenerateOnly    bool
+	Codec         *codec.Codec
+	AccDecoder    auth.AccountDecoder
+	Client        rpcclient.Client
+	Logger        io.Writer
+	Height        int64
+	NodeURI       string
+	AccountStore  string
+	TrustNode     bool
+	UseLedger     bool
+	Commit        bool
+	Async         bool
+	JSON          bool
+	PrintResponse bool
+	Verifier      tmlite.Verifier
+	GenerateOnly  bool
+	fromAddress   types.AccAddress
+	fromName      string
+	Indent        bool
+	DryRun        bool
 }
 
 // NewCLIContext returns a new initialized CLIContext with parameters from the
@@ -46,29 +51,35 @@ type CLIContext struct {
 func NewCLIContext() CLIContext {
 	var rpc rpcclient.Client
 
+	from := viper.GetString(client.FlagFrom)
+	fromAddress, fromName := fromFields(from)
+
 	nodeURI := viper.GetString(client.FlagNode)
 	if nodeURI != "" {
 		rpc = rpcclient.NewHTTP(nodeURI, "/websocket")
 	}
 
 	return CLIContext{
-		Client:          rpc,
-		NodeURI:         nodeURI,
-		AccountStore:    ctxAccStoreName,
-		FromAddressName: viper.GetString(client.FlagFrom),
-		SignerAddr:      viper.GetString(client.FlagSignerAddr),
-		Height:          viper.GetInt64(client.FlagHeight),
-		TrustNode:       viper.GetBool(client.FlagTrustNode),
-		UseLedger:       viper.GetBool(client.FlagUseLedger),
-		Async:           viper.GetBool(client.FlagAsync),
-		JSON:            viper.GetBool(client.FlagJson),
-		PrintResponse:   viper.GetBool(client.FlagPrintResponse),
-		Certifier:       createCertifier(),
-		GenerateOnly:    viper.GetBool(client.FlagGenerateOnly),
+		Client:        rpc,
+		NodeURI:       nodeURI,
+		AccountStore:  ctxAccStoreName,
+		Height:        viper.GetInt64(client.FlagHeight),
+		TrustNode:     viper.GetBool(client.FlagTrustNode),
+		UseLedger:     viper.GetBool(client.FlagUseLedger),
+		Async:         viper.GetBool(client.FlagAsync),
+		Commit:        viper.GetBool(client.FlagCommit),
+		JSON:          viper.GetBool(client.FlagJson),
+		PrintResponse: viper.GetBool(client.FlagPrintResponse),
+		Verifier:      createVerifier(),
+		DryRun:        viper.GetBool(client.FlagDryRun),
+		GenerateOnly:  viper.GetBool(client.FlagGenerateOnly),
+		fromAddress:   fromAddress,
+		fromName:      fromName,
+		Indent:        viper.GetBool(client.FlagIndentResponse),
 	}
 }
 
-func createCertifier() tmlite.Certifier {
+func createVerifier() tmlite.Verifier {
 	trustNodeDefined := viper.IsSet(client.FlagTrustNode)
 	if !trustNodeDefined {
 		return nil
@@ -98,18 +109,74 @@ func createCertifier() tmlite.Certifier {
 		os.Exit(1)
 	}
 
-	certifier, err := tmliteProxy.GetCertifier(chainID, home, nodeURI)
+	node := rpcclient.NewHTTP(nodeURI, "/websocket")
+	cacheSize := 10 // TODO: determine appropriate cache size
+	verifier, err := tmliteProxy.NewVerifier(
+		chainID, home,
+		node, log.NewNopLogger(), cacheSize,
+	)
+
 	if err != nil {
-		fmt.Printf("Abort!! IRISLCD encountered fatal error in creating certifier: %s", err.Error())
+		fmt.Printf("Create verifier failed: %s\n", err.Error())
+		fmt.Printf("Please check network connection and verify the address of the node to connect to\n")
 		os.Exit(1)
 	}
 
-	return certifier
+	return verifier
+}
+
+func fromFields(from string) (fromAddr types.AccAddress, fromName string) {
+	// In generate-only mode, if the signer key doesn't exist in keystore, the fromAddress can be specified by --from-addr
+	if from == "" {
+		fromAddrString := viper.GetString(client.FlagFromAddr)
+		if fromAddrString == "" {
+			return nil, ""
+		}
+		address, err := types.AccAddressFromBech32(fromAddrString)
+		if err != nil {
+			fmt.Printf("invalid from address %s\n", fromAddrString)
+			os.Exit(1)
+		}
+		fromAddr = address
+		fromName = ""
+		return
+	}
+
+	keybase, err := keys.GetKeyBase()
+	if err != nil {
+		fmt.Println("no keybase found")
+		os.Exit(1)
+	}
+
+	var info cskeys.Info
+	if addr, err := types.AccAddressFromBech32(from); err == nil {
+		info, err = keybase.GetByAddress(addr)
+		if err != nil {
+			fmt.Printf("could not find key %s\n", from)
+			os.Exit(1)
+		}
+	} else {
+		info, err = keybase.Get(from)
+		if err != nil {
+			fmt.Fprint(os.Stderr, fmt.Sprintf("could not find key %s\n", from))
+			os.Exit(1)
+		}
+	}
+
+	fromAddr = info.GetAddress()
+	fromName = info.GetName()
+	return
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (ctx CLIContext) WithCodec(cdc *wire.Codec) CLIContext {
+func (ctx CLIContext) WithCodec(cdc *codec.Codec) CLIContext {
 	ctx.Codec = cdc
+	return ctx
+}
+
+// WithHeight returns a copy of the context with an updated height.
+func (ctx CLIContext) WithHeight(height int64) CLIContext {
+	ctx.Height = height
 	return ctx
 }
 
@@ -129,13 +196,6 @@ func (ctx CLIContext) WithLogger(w io.Writer) CLIContext {
 // WithAccountStore returns a copy of the context with an updated AccountStore.
 func (ctx CLIContext) WithAccountStore(accountStore string) CLIContext {
 	ctx.AccountStore = accountStore
-	return ctx
-}
-
-// WithFromAddressName returns a copy of the context with an updated from
-// address.
-func (ctx CLIContext) WithFromAddressName(addrName string) CLIContext {
-	ctx.FromAddressName = addrName
 	return ctx
 }
 
@@ -166,7 +226,7 @@ func (ctx CLIContext) WithUseLedger(useLedger bool) CLIContext {
 }
 
 // WithCertifier - return a copy of the context with an updated Certifier
-func (ctx CLIContext) WithCertifier(certifier tmlite.Certifier) CLIContext {
-	ctx.Certifier = certifier
+func (ctx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
+	ctx.Verifier = verifier
 	return ctx
 }

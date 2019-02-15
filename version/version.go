@@ -2,13 +2,14 @@ package version
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 // Version - Iris Version
-const Version = "0.6.0"
-
+const ProtocolVersion = 0
+const Version = "0.12.1"
 // GitCommit set by build flags
 var GitCommit = ""
 
@@ -16,13 +17,13 @@ var GitCommit = ""
 func GetVersion() string {
 	v := Version
 	if GitCommit != "" {
-		v = v + "-" + GitCommit
+		v = v + "-" + GitCommit + "-" + strconv.Itoa(ProtocolVersion)
 	}
 	return v
 }
 
 // ServeVersionCommand
-func ServeVersionCommand(cdc *wire.Codec) *cobra.Command {
+func ServeVersionCommand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Show executable binary version",

@@ -1,56 +1,45 @@
 package lcd
 
 import (
-	"bytes"
-	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"net/http"
+
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"net/http"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/slashing"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Unrevoke TX body
-type UnrevokeBody struct {
-	BaseTx        context.BaseTx `json:"base_tx"`
-	ValidatorAddr string         `json:"validator_addr"`
+type UnjailBody struct {
+	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
-func unrevokeRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var m UnrevokeBody
-		err := utils.ReadPostBody(w, r, cdc, &m)
-		if err != nil {
-			return
-		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, m.BaseTx.LocalAccountName, m.ValidatorAddr)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, m.BaseTx)
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+		vars := mux.Vars(r)
+
+		validatorAddr, err := sdk.ValAddressFromBech32(vars["validatorAddr"])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		validatorAddr, err := sdk.AccAddressFromBech32(m.ValidatorAddr)
+		var m UnjailBody
+		err = utils.ReadPostBody(w, r, cdc, &m)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("Couldn't decode validator. Error: %s", err.Error()))
 			return
 		}
 
-		if !cliCtx.GenerateOnly {
-			fromAddress, err := cliCtx.GetFromAddress()
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			if !bytes.Equal(fromAddress, validatorAddr) {
-				utils.WriteErrorResponse(w, http.StatusUnauthorized, "Must use own validator address")
-				return
-			}
+		baseReq := m.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
+			return
 		}
 
-		msg := slashing.NewMsgUnrevoke(validatorAddr)
+		msg := slashing.NewMsgUnjail(validatorAddr)
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, m.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
 	}
 }

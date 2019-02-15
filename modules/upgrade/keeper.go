@@ -1,210 +1,80 @@
 package upgrade
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"math"
-	"fmt"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      *wire.Codec
+	cdc      *codec.Codec
 	// The ValidatorSet to get information about validators
-	sk stake.Keeper
+	protocolKeeper sdk.ProtocolKeeper
+	sk             stake.Keeper
+	metrics        *Metrics
 }
 
-var VersionListCached VersionList
-
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, sk stake.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, protocolKeeper sdk.ProtocolKeeper, sk stake.Keeper, metrics *Metrics) Keeper {
 	keeper := Keeper{
-		storeKey: key,
-		cdc:      cdc,
-		sk:       sk,
+		key,
+		cdc,
+		protocolKeeper,
+		sk,
+		metrics,
 	}
 	return keeper
 }
 
-func (k Keeper) GetCurrentVersion(ctx sdk.Context) *Version {
+func (k Keeper) AddNewVersionInfo(ctx sdk.Context, versionInfo VersionInfo) {
 	kvStore := ctx.KVStore(k.storeKey)
-	return k.GetCurrentVersionByStore(kvStore)
-}
 
-func (k Keeper) GetCurrentVersionByStore(kvStore sdk.KVStore) *Version {
-	versionIDBytes := kvStore.Get(GetCurrentVersionKey())
-	if versionIDBytes != nil {
-		var versionID int64
-		err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
-		if err != nil {
-			panic(err)
-		}
-		curVersionBytes := kvStore.Get(GetVersionIDKey(versionID))
-		if curVersionBytes == nil {
-			return nil
-		}
-		var version Version
-		err = k.cdc.UnmarshalBinary(curVersionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		return &version
+	versionInfoBytes, err := k.cdc.MarshalBinaryLengthPrefixed(versionInfo)
+	if err != nil {
+		panic(err)
 	}
-	return nil
-}
+	kvStore.Set(GetProposalIDKey(versionInfo.UpgradeInfo.ProposalID), versionInfoBytes)
 
-func (k Keeper) AddNewVersion(ctx sdk.Context, version Version) {
-	kvStore := ctx.KVStore(k.storeKey)
-	curVersion := k.GetCurrentVersion(ctx)
+	proposalIDBytes, err := k.cdc.MarshalBinaryLengthPrefixed(versionInfo.UpgradeInfo.ProposalID)
+	if err != nil {
+		panic(err)
+	}
 
-	if curVersion == nil {
-		version.Id = 0
+	if versionInfo.Success {
+		kvStore.Set(GetSuccessVersionKey(versionInfo.UpgradeInfo.Protocol.Version), proposalIDBytes)
 	} else {
-		version.Id = curVersion.Id + 1
-		if version.ProposalID == curVersion.ProposalID {
-			return
-		}
+		kvStore.Set(GetFailedVersionKey(versionInfo.UpgradeInfo.Protocol.Version, versionInfo.UpgradeInfo.ProposalID), proposalIDBytes)
 	}
+}
 
-	for _, module := range version.ModuleList {
-		module.Start = version.Start
-	}
-
-	versionBytes, err := k.cdc.MarshalBinary(version)
+func (k Keeper) SetSignal(ctx sdk.Context, protocol uint64, address string) {
+	kvStore := ctx.KVStore(k.storeKey)
+	cmsgBytes, err := k.cdc.MarshalBinaryLengthPrefixed(true)
 	if err != nil {
 		panic(err)
 	}
-
-	kvStore.Set(GetVersionIDKey(version.Id), versionBytes)
-	VersionListCached = append(VersionListCached, version)
-
-	versionIDBytes, err := k.cdc.MarshalBinary(version.Id)
-	if err != nil {
-		panic(err)
-	}
-
-	kvStore.Set(GetCurrentVersionKey(), versionIDBytes)
-	kvStore.Set(GetProposalIDKey(version.ProposalID), versionIDBytes)
-	kvStore.Set(GetStartHeightKey(version.Start), versionIDBytes)
+	kvStore.Set(GetSignalKey(protocol, address), cmsgBytes)
 }
 
-func (k Keeper) GetVersionByHeight(ctx sdk.Context, blockHeight int64) *Version {
+func (k Keeper) GetSignal(ctx sdk.Context, protocol uint64, address string) bool {
 	kvStore := ctx.KVStore(k.storeKey)
-	iterator := kvStore.ReverseIterator(GetStartHeightKey(0), GetStartHeightKey(blockHeight+1))
-	defer iterator.Close()
-
-	if iterator.Valid() {
-		versionIDBytes := iterator.Value()
-		if versionIDBytes == nil {
-			return nil
-		}
-		var versionID int64
-		err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
+	flagBytes := kvStore.Get(GetSignalKey(protocol, address))
+	if flagBytes != nil {
+		var flag bool
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(flagBytes, &flag)
 		if err != nil {
 			panic(err)
 		}
-		versionBytes := kvStore.Get(GetVersionIDKey(versionID))
-		if versionBytes == nil {
-			return nil
-		}
-		var version Version
-		err = k.cdc.UnmarshalBinary(versionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		return &version
+		return true
 	}
-	return nil
+	return false
 }
 
-func (k Keeper) GetVersionByProposalId(ctx sdk.Context, proposalId int64) *Version {
-	kvStore := ctx.KVStore(k.storeKey)
-	versionIDBytes := kvStore.Get(GetProposalIDKey(proposalId))
-	if versionIDBytes == nil {
-		return nil
+func (k Keeper) DeleteSignal(ctx sdk.Context, protocol uint64, address string) bool {
+	if ok := k.GetSignal(ctx, protocol, address); ok {
+		kvStore := ctx.KVStore(k.storeKey)
+		kvStore.Delete(GetSignalKey(protocol, address))
+		return true
 	}
-	var versionID int64
-	err := k.cdc.UnmarshalBinary(versionIDBytes, &versionID)
-	if err != nil {
-		panic(err)
-	}
-	versionBytes := kvStore.Get(GetVersionIDKey(versionID))
-	if versionBytes != nil {
-		var version Version
-		err := k.cdc.UnmarshalBinary(versionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		return &version
-	}
-	return nil
-}
-
-func (k Keeper) GetVersionByVersionId(versionId int64) *Version {
-	len := len(VersionListCached)
-	if versionId < 0 || versionId >= int64(len) {
-		panic(fmt.Errorf("version id %d doesn't exist", versionId))
-	}
-
-	return &(VersionListCached[versionId])
-}
-
-func (k Keeper) RefreshVersionList(kvStore sdk.KVStore) {
-	VersionListCached = k.GetVersionListByStore(kvStore)
-}
-
-func (k Keeper) GetVersionList(ctx sdk.Context) VersionList {
-	kvStore := ctx.KVStore(k.storeKey)
-	return k.GetVersionListByStore(kvStore)
-}
-
-func (k Keeper) GetVersionListByStore(kvStore sdk.KVStore) VersionList {
-
-	iterator := kvStore.Iterator(GetVersionIDKey(0), GetVersionIDKey(math.MaxInt64))
-	defer iterator.Close()
-
-	var versionList VersionList
-	for iterator.Valid() {
-		versionBytes := iterator.Value()
-		iterator.Next()
-		if versionBytes == nil {
-			continue
-		}
-		var version Version
-		err := k.cdc.UnmarshalBinary(versionBytes, &version)
-		if err != nil {
-			panic(err)
-		}
-		versionList = append(versionList, version)
-	}
-
-	return versionList
-}
-
-func (k Keeper) GetMsgTypeInCurrentVersion(ctx sdk.Context, msg sdk.Msg) (string, sdk.Error) {
-	currentVersion := k.GetCurrentVersion(ctx)
-	return currentVersion.getMsgType(msg)
-}
-
-func (k Keeper) SetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddress, cmsg MsgSwitch) {
-	kvStore := ctx.KVStore(k.storeKey)
-	cmsgBytes, err := k.cdc.MarshalBinary(cmsg)
-	if err != nil {
-		panic(err)
-	}
-	kvStore.Set(GetSwitchKey(propsalID, address), cmsgBytes)
-}
-
-func (k Keeper) GetSwitch(ctx sdk.Context, propsalID int64, address sdk.AccAddress) (MsgSwitch, bool) {
-	kvStore := ctx.KVStore(k.storeKey)
-	cmsgBytes := kvStore.Get(GetSwitchKey(propsalID, address))
-	if cmsgBytes != nil {
-		var cmsg MsgSwitch
-		err := k.cdc.UnmarshalBinary(cmsgBytes, &cmsg)
-		if err != nil {
-			panic(err)
-		}
-		return cmsg, true
-	}
-	return MsgSwitch{}, false
+	return false
 }

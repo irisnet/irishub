@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/irisnet/irishub/crypto/keys"
 	dbm "github.com/tendermint/tendermint/libs/db"
 )
 

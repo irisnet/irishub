@@ -1,21 +1,27 @@
 package main
 
 import (
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"fmt"
+	"os"
+	"path"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
+	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
-	iservicecmd "github.com/irisnet/irishub/client/iservice/cli"
+	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
-	recordcmd "github.com/irisnet/irishub/client/record/cli"
+	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/version"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
@@ -28,8 +34,22 @@ var (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			switch rType := r.(type) {
+			case string:
+				println(rType)
+			default:
+				panic(r)
+			}
+		}
+	}()
+	//	sdk.InitBech32Prefix()
 	cobra.EnableCommandSorting = false
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
+
+	rootCmd.AddCommand(client.ConfigCmd())
+	rootCmd.AddCommand(client.LineBreak)
 
 	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
 	//Add state commands
@@ -44,6 +64,7 @@ func main() {
 		tendermintrpccmd.ValidatorCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
+	rootCmd.AddCommand(client.LineBreak)
 
 	//Add bank commands
 	bankCmd := &cobra.Command{
@@ -53,14 +74,39 @@ func main() {
 	bankCmd.AddCommand(
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
-			bankcmd.GetAccountCmd("acc", cdc, authcmd.GetAccountDecoder(cdc)),
+			bankcmd.GetAccountCmd("acc", cdc, utils.GetAccountDecoder(cdc)),
+			bankcmd.GetCmdQueryTokenStats(cdc, "acc", "stake"),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
+			bankcmd.BurnTxCmd(cdc),
+			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
+			bankcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,
+	)
+
+	//Add distribution commands
+	distributionCmd := &cobra.Command{
+		Use:   "distribution",
+		Short: "Distribution subcommands",
+	}
+	distributionCmd.AddCommand(
+		client.GetCommands(
+			distributioncmd.GetWithdrawAddress("distr", cdc),
+			distributioncmd.GetDelegationDistInfo("distr", cdc),
+			distributioncmd.GetValidatorDistInfo("distr", cdc),
+			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
+		)...)
+	distributionCmd.AddCommand(
+		client.PostCommands(
+			distributioncmd.GetCmdSetWithdrawAddr(cdc),
+			distributioncmd.GetCmdWithdrawRewards(cdc),
+		)...)
+	rootCmd.AddCommand(
+		distributionCmd,
 	)
 
 	//Add gov commands
@@ -74,8 +120,10 @@ func main() {
 			govcmd.GetCmdQueryProposals("gov", cdc),
 			govcmd.GetCmdQueryVote("gov", cdc),
 			govcmd.GetCmdQueryVotes("gov", cdc),
+			govcmd.GetCmdQueryDeposit("gov", cdc),
+			govcmd.GetCmdQueryDeposits("gov", cdc),
+			govcmd.GetCmdQueryTally("gov", cdc),
 			govcmd.GetCmdQueryGovConfig("params", cdc),
-			govcmd.GetCmdPullGovConfig("params", cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -100,8 +148,13 @@ func main() {
 			stakecmd.GetCmdQueryDelegations("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
 			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
 			stakecmd.GetCmdQueryRedelegation("stake", cdc),
 			stakecmd.GetCmdQueryRedelegations("stake", cdc),
+			stakecmd.GetCmdQueryPool("stake", cdc),
+			stakecmd.GetCmdQueryParams("stake", cdc),
 			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
 		)...)
 	stakeCmd.AddCommand(
@@ -125,65 +178,104 @@ func main() {
 	upgradeCmd.AddCommand(
 		client.GetCommands(
 			upgradecmd.GetInfoCmd("upgrade", cdc),
-			upgradecmd.GetCmdQuerySwitch("upgrade", cdc),
-		)...)
-	upgradeCmd.AddCommand(
-		client.PostCommands(
-			upgradecmd.GetCmdSubmitSwitch(cdc),
+			upgradecmd.GetCmdQuerySignals("upgrade", cdc),
 		)...)
 	rootCmd.AddCommand(
 		upgradeCmd,
 	)
 
-	//Add iservice commands
-	iserviceCmd := &cobra.Command{
-		Use:   "iservice",
-		Short: "iservice subcommands",
+	//Add service commands
+	serviceCmd := &cobra.Command{
+		Use:   "service",
+		Short: "Service subcommands",
 	}
-	iserviceCmd.AddCommand(
+	serviceCmd.AddCommand(
 		client.GetCommands(
-			iservicecmd.GetCmdQueryScvDef("iservice", cdc),
+			servicecmd.GetCmdQuerySvcDef("service", cdc),
+			servicecmd.GetCmdQuerySvcBind("service", cdc),
+			servicecmd.GetCmdQuerySvcBinds("service", cdc),
+			servicecmd.GetCmdQuerySvcRequests("service", cdc),
+			servicecmd.GetCmdQuerySvcResponse("service", cdc),
+			servicecmd.GetCmdQuerySvcFees("service", cdc),
 		)...)
-	iserviceCmd.AddCommand(client.PostCommands(
-		iservicecmd.GetCmdScvDef(cdc),
+	serviceCmd.AddCommand(client.PostCommands(
+		servicecmd.GetCmdSvcDef(cdc),
+		servicecmd.GetCmdSvcBind(cdc),
+		servicecmd.GetCmdSvcBindUpdate(cdc),
+		servicecmd.GetCmdSvcDisable(cdc),
+		servicecmd.GetCmdSvcEnable(cdc),
+		servicecmd.GetCmdSvcRefundDeposit(cdc),
+		servicecmd.GetCmdSvcCall(cdc),
+		servicecmd.GetCmdSvcRespond(cdc),
+		servicecmd.GetCmdSvcRefundFees(cdc),
+		servicecmd.GetCmdSvcWithdrawFees(cdc),
+		servicecmd.GetCmdSvcWithdrawTax(cdc),
 	)...)
 
 	rootCmd.AddCommand(
-		iserviceCmd,
+		serviceCmd,
 	)
 
-	//add record command
-	recordCmd := &cobra.Command{
-		Use:   "record",
-		Short: "Record subcommands",
+	//add guardian command
+	guardianCmd := &cobra.Command{
+		Use:   "guardian",
+		Short: "Guardian subcommands",
 	}
-
-	recordCmd.AddCommand(
+	guardianCmd.AddCommand(
 		client.GetCommands(
-			recordcmd.GetCmdQureyRecord("record", cdc),
-			recordcmd.GetCmdDownload("record", cdc),
+			guardiancmd.GetCmdQueryProfilers("guardian", cdc),
+			guardiancmd.GetCmdQueryTrustees("guardian", cdc),
 		)...)
 
-	recordCmd.AddCommand(
+	guardianCmd.AddCommand(
 		client.PostCommands(
-			recordcmd.GetCmdSubmitRecord("record", cdc),
+			guardiancmd.GetCmdCreateProfiler(cdc),
+			guardiancmd.GetCmdDeleteProfiler(cdc),
+			guardiancmd.GetCmdCreateTrustee(cdc),
+			guardiancmd.GetCmdDeleteTrustee(cdc),
 		)...)
 	rootCmd.AddCommand(
-		recordCmd,
+		guardianCmd,
 	)
 
 	//Add keys and version commands
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
+		client.LineBreak,
 		version.ServeVersionCommand(cdc),
 	)
 
 	// prepare and add flags
 	executor := cli.PrepareMainCmd(rootCmd, "IRISCLI", app.DefaultCLIHome)
-	err := executor.Execute()
+	err := initConfig(rootCmd)
 	if err != nil {
-		// handle with #870
 		panic(err)
 	}
+
+	if err := executor.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func initConfig(cmd *cobra.Command) error {
+	home, err := cmd.PersistentFlags().GetString(cli.HomeFlag)
+	if err != nil {
+		return err
+	}
+
+	cfgFile := path.Join(home, "config", "config.toml")
+	if _, err := os.Stat(cfgFile); err == nil {
+		viper.SetConfigFile(cfgFile)
+
+		if err := viper.ReadInConfig(); err != nil {
+			return err
+		}
+	}
+
+	if err := viper.BindPFlag(cli.EncodingFlag, cmd.PersistentFlags().Lookup(cli.EncodingFlag)); err != nil {
+		return err
+	}
+	return viper.BindPFlag(cli.OutputFlag, cmd.PersistentFlags().Lookup(cli.OutputFlag))
 }

@@ -3,9 +3,9 @@ package tx
 import (
 	"encoding/hex"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
@@ -14,10 +14,11 @@ import (
 	"github.com/tendermint/tendermint/libs/common"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"net/http"
+	"github.com/irisnet/irishub/client/utils"
 )
 
 // QueryTxCmd implements the default command for a tx query.
-func QueryTxCmd(cdc *wire.Codec) *cobra.Command {
+func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "tx [hash]",
 		Short: "Matches this txhash over all committed blocks",
@@ -38,14 +39,14 @@ func QueryTxCmd(cdc *wire.Codec) *cobra.Command {
 			return nil
 		},
 	}
-
+	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
 	return cmd
 }
 
-func queryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
+func queryTx(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
 	hash, err := hex.DecodeString(hashHexStr)
 	if err != nil {
 		return nil, err
@@ -73,12 +74,15 @@ func queryTx(cdc *wire.Codec, cliCtx context.CLIContext, hashHexStr string) ([]b
 		return nil, err
 	}
 
-	return cdc.MarshalJSONIndent(info, "", "  ")
+	if cliCtx.Indent {
+		return cdc.MarshalJSONIndent(info, "", "  ")
+	}
+	return cdc.MarshalJSON(info)
 }
 
 // ValidateTxResult performs transaction verification
 func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
-	check, err := cliCtx.Certify(res.Height)
+	check, err := cliCtx.Verify(res.Height)
 	if err != nil {
 		return err
 	}
@@ -90,7 +94,46 @@ func ValidateTxResult(cliCtx context.CLIContext, res *ctypes.ResultTx) error {
 	return nil
 }
 
-func formatTxResult(cdc *wire.Codec, res *ctypes.ResultTx) (Info, error) {
+type ReadableTag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type ResponseDeliverTx struct {
+	Code                 uint32
+	Data                 []byte
+	Log                  string
+	Info                 string
+	GasWanted            int64
+	GasUsed              int64
+	Tags                 []ReadableTag
+	Codespace            string
+	XXX_NoUnkeyedLiteral struct{}
+	XXX_unrecognized     []byte
+	XXX_sizecache        int32
+}
+
+func MakeResponseDeliverTxHumanReadable(dtx abci.ResponseDeliverTx) ResponseDeliverTx {
+	tags := make([]ReadableTag, len(dtx.Tags))
+	for i, kv := range dtx.Tags {
+		tags[i] = ReadableTag{
+			Key:   string(kv.Key),
+			Value: string(kv.Value),
+		}
+	}
+	return ResponseDeliverTx{
+		Code:      dtx.Code,
+		Data:      dtx.Data,
+		Log:       dtx.Log,
+		Info:      dtx.Info,
+		GasWanted: dtx.GasWanted,
+		GasUsed:   dtx.GasUsed,
+		Codespace: dtx.Codespace,
+		Tags:      tags,
+	}
+}
+
+func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
 	tx, err := parseTx(cdc, res.Tx)
 	if err != nil {
 		return Info{}, err
@@ -100,22 +143,23 @@ func formatTxResult(cdc *wire.Codec, res *ctypes.ResultTx) (Info, error) {
 		Hash:   res.Hash,
 		Height: res.Height,
 		Tx:     tx,
-		Result: res.TxResult,
+		Result: MakeResponseDeliverTxHumanReadable(res.TxResult),
 	}, nil
 }
+
 
 // Info is used to prepare info to display
 type Info struct {
 	Hash   common.HexBytes        `json:"hash"`
 	Height int64                  `json:"height"`
 	Tx     sdk.Tx                 `json:"tx"`
-	Result abci.ResponseDeliverTx `json:"result"`
+	Result ResponseDeliverTx      `json:"result"`
 }
 
-func parseTx(cdc *wire.Codec, txBytes []byte) (sdk.Tx, error) {
+func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
 	var tx auth.StdTx
 
-	err := cdc.UnmarshalBinary(txBytes, &tx)
+	err := cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx)
 	if err != nil {
 		return nil, err
 	}
@@ -124,18 +168,18 @@ func parseTx(cdc *wire.Codec, txBytes []byte) (sdk.Tx, error) {
 }
 
 // transaction query REST handler
-func QueryTxRequestHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		hashHexStr := vars["hash"]
 
 		output, err := queryTx(cdc, cliCtx, hashHexStr)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		w.Write(output)
+		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
 }

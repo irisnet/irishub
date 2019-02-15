@@ -4,33 +4,28 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/x/stake/types"
-
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/utils"
-	"github.com/pkg/errors"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
-func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
+func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-validator",
-		Short: "create new validator initialized with a self-delegation to it",
-		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name>",
+		Use:     "create-validator",
+		Short:   "create new validator initialized with a self-delegation to it",
+		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name> --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			amounstStr := viper.GetString(FlagAmount)
@@ -52,7 +47,7 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 				return fmt.Errorf("must use --pubkey flag")
 			}
 
-			pk, err := sdk.GetValPubKeyBech32(pkStr)
+			pk, err := sdk.GetConsPubKeyBech32(pkStr)
 			if err != nil {
 				return err
 			}
@@ -68,45 +63,79 @@ func GetCmdCreateValidator(cdc *wire.Codec) *cobra.Command {
 				Details:  viper.GetString(FlagDetails),
 			}
 
+			// get the initial validator commission parameters
+			rateStr := viper.GetString(FlagCommissionRate)
+			maxRateStr := viper.GetString(FlagCommissionMaxRate)
+			maxChangeRateStr := viper.GetString(FlagCommissionMaxChangeRate)
+			commissionMsg, err := stakeClient.BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr)
+			if err != nil {
+				return err
+			}
+
 			var msg sdk.Msg
 			if viper.GetString(FlagAddressDelegator) != "" {
-				delegatorAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressDelegator))
+				delAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressDelegator))
 				if err != nil {
 					return err
 				}
 
-				msg = stake.NewMsgCreateValidatorOnBehalfOf(delegatorAddr, validatorAddr, pk, amount, description)
+				msg = stake.NewMsgCreateValidatorOnBehalfOf(
+					delAddr, sdk.ValAddress(validatorAddr), pk, amount, description, commissionMsg,
+				)
 			} else {
-				msg = stake.NewMsgCreateValidator(validatorAddr, pk, amount, description)
+				msg = stake.NewMsgCreateValidator(
+					sdk.ValAddress(validatorAddr), pk, amount, description, commissionMsg,
+				)
+			}
+
+			if viper.GetBool(FlagGenesisFormat) {
+				ip := viper.GetString(FlagIP)
+				nodeID := viper.GetString(FlagNodeID)
+				if nodeID != "" && ip != "" {
+					txCtx = txCtx.WithMemo(fmt.Sprintf("%s@%s:26656", nodeID, ip))
+				}
+			}
+
+			if viper.GetBool(FlagGenesisFormat) || cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsPk)
-	cmd.Flags().AddFlagSet(fsAmount)
+	cmd.Flags().AddFlagSet(FsPk)
+	cmd.Flags().AddFlagSet(FsAmount)
 	cmd.Flags().AddFlagSet(fsDescriptionCreate)
+	cmd.Flags().AddFlagSet(FsCommissionCreate)
 	cmd.Flags().AddFlagSet(fsDelegator)
-
+	cmd.Flags().Bool(FlagGenesisFormat, false, "Export the transaction in gen-tx format; it implies --generate-only")
+	cmd.Flags().String(FlagIP, "", fmt.Sprintf("Node's public IP. It takes effect only when used in combination with --%s", FlagGenesisFormat))
+	cmd.Flags().String(FlagNodeID, "", "Node's ID")
+	cmd.MarkFlagRequired(FlagMoniker)
+	cmd.MarkFlagRequired(FlagPubKey)
+	cmd.MarkFlagRequired(FlagAmount)
+	cmd.MarkFlagRequired(FlagCommissionRate)
+	cmd.MarkFlagRequired(FlagCommissionMaxRate)
+	cmd.MarkFlagRequired(FlagCommissionMaxChangeRate)
 	return cmd
 }
 
 // GetCmdEditValidator implements the create edit validator command.
-func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
+func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "edit-validator",
-		Short: "edit and existing validator account",
-		Example: "iriscli stake edit-validator --chain-id=<chain-id> --from=<key name> --fee=0.004iris --moniker=<new validator name>",
+		Use:     "edit-validator",
+		Short:   "edit and existing validator account",
+		Example: "iriscli stake edit-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --moniker=<validator name> --details=<optional details> --website=<optional website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			validatorAddr, err := cliCtx.GetFromAddress()
+			valAddr, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
@@ -117,29 +146,48 @@ func GetCmdEditValidator(cdc *wire.Codec) *cobra.Command {
 				Website:  viper.GetString(FlagWebsite),
 				Details:  viper.GetString(FlagDetails),
 			}
-			msg := stake.NewMsgEditValidator(validatorAddr, description)
 
+			var newRate *sdk.Dec
+
+			commissionRate := viper.GetString(FlagCommissionRate)
+			if commissionRate != "" {
+				rate, err := sdk.NewDecFromStr(commissionRate)
+				if err != nil {
+					return fmt.Errorf("invalid new commission rate: %v", err)
+				}
+
+				newRate = &rate
+			}
+
+			msg := stake.NewMsgEditValidator(sdk.ValAddress(valAddr), description, newRate)
+
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, false)
+			}
+
+			// build and sign the transaction, then broadcast to Tendermint
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
 	cmd.Flags().AddFlagSet(fsDescriptionEdit)
+	cmd.Flags().AddFlagSet(fsCommissionUpdate)
 
 	return cmd
 }
 
 // GetCmdDelegate implements the delegate command.
-func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
+func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delegate",
-		Short: "delegate liquid tokens to an validator",
-		Example: "iriscli stake delegate --chain-id=<chain-id> --from=<key name> --fee=0.004iris --amount=10iris --address-validator=<validator owner address>",
+		Use:     "delegate",
+		Short:   "delegate liquid tokens to an validator",
+		Example: "iriscli stake delegate --chain-id=<chain-id> --from=<key name> --fee=0.4iris --amount=10iris --address-validator=<validator owner address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			amount, err := cliCtx.ParseCoin(viper.GetString(FlagAmount))
@@ -152,7 +200,7 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			validatorAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidator))
+			validatorAddr, err := sdk.ValAddressFromBech32(viper.GetString(FlagAddressValidator))
 			if err != nil {
 				return err
 			}
@@ -163,40 +211,25 @@ func GetCmdDelegate(cdc *wire.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsAmount)
+	cmd.Flags().AddFlagSet(FsAmount)
 	cmd.Flags().AddFlagSet(fsValidator)
-
+	cmd.MarkFlagRequired(FlagAmount)
+	cmd.MarkFlagRequired(FlagAddressValidator)
 	return cmd
 }
 
 // GetCmdRedelegate implements the redelegate validator command.
-func GetCmdRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "redelegate",
-		Short: "redelegate illiquid tokens from one validator to another",
-	}
-
-	cmd.AddCommand(
-		client.PostCommands(
-			GetCmdBeginRedelegate(storeName, cdc),
-			GetCmdCompleteRedelegate(cdc),
-		)...)
-
-	return cmd
-}
-
-// GetCmdBeginRedelegate the begin redelegation command.
-func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "begin",
-		Short: "begin redelegation",
-		Example: "iriscli stake redelegation begin --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> shares-percent=0.5",
+		Use:     "redelegate",
+		Short:   "redelegate illiquid tokens from one validator to another",
+		Example: "iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.4iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			var err error
@@ -205,12 +238,12 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			validatorSrcAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidatorSrc))
+			validatorSrcAddr, err := sdk.ValAddressFromBech32(viper.GetString(FlagAddressValidatorSrc))
 			if err != nil {
 				return err
 			}
 
-			validatorDstAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidatorDst))
+			validatorDstAddr, err := sdk.ValAddressFromBech32(viper.GetString(FlagAddressValidatorDst))
 			if err != nil {
 				return err
 			}
@@ -218,7 +251,7 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 			// get the shares amount
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
-			sharesAmount, err := getShares(
+			sharesAmount, err := stakeClient.GetShares(
 				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorSrcAddr,
 			)
@@ -234,126 +267,23 @@ func GetCmdBeginRedelegate(storeName string, cdc *wire.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(fsShares)
 	cmd.Flags().AddFlagSet(fsRedelegation)
-
-	return cmd
-}
-
-// nolint: gocyclo
-// TODO: Make this pass gocyclo linting
-func getShares(
-	storeName string, cliCtx context.CLIContext, cdc *wire.Codec, sharesAmountStr,
-	sharesPercentStr string, delegatorAddr, validatorAddr sdk.AccAddress,
-) (sharesAmount sdk.Rat, err error) {
-	switch {
-	case sharesAmountStr != "" && sharesPercentStr != "":
-		return sharesAmount, errors.Errorf("can either specify the amount OR the percent of the shares, not both")
-	case sharesAmountStr == "" && sharesPercentStr == "":
-		return sharesAmount, errors.Errorf("can either specify the amount OR the percent of the shares, not both")
-	case sharesAmountStr != "":
-		sharesAmount, err = sdk.NewRatFromDecimal(sharesAmountStr, types.MaxBondDenominatorPrecision)
-		if err != nil {
-			return sharesAmount, err
-		}
-		if !sharesAmount.GT(sdk.ZeroRat()) {
-			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
-		}
-		sharesAmount = sharesAmount.Quo(stakeClient.ExRateFromStakeTokenToMainUnit(cliCtx))
-	case sharesPercentStr != "":
-		var sharesPercent sdk.Rat
-		sharesPercent, err = sdk.NewRatFromDecimal(sharesPercentStr, types.MaxBondDenominatorPrecision)
-		if err != nil {
-			return sharesAmount, err
-		}
-		if !sharesPercent.GT(sdk.ZeroRat()) || !sharesPercent.LTE(sdk.OneRat()) {
-			return sharesAmount, errors.Errorf("shares percent must be >0 and <=1 (ex. 0.01, 0.75, 1)")
-		}
-
-		// make a query to get the existing delegation shares
-		key := stake.GetDelegationKey(delegatorAddr, validatorAddr)
-		cliCtx := context.NewCLIContext().
-			WithCodec(cdc).
-			WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-
-		resQuery, err := cliCtx.QueryStore(key, storeName)
-		if err != nil {
-			return sharesAmount, errors.Errorf("cannot find delegation to determine percent Error: %v", err)
-		}
-
-		delegation := types.MustUnmarshalDelegation(cdc, key, resQuery)
-		sharesAmount = sharesPercent.Mul(delegation.Shares)
-	}
-
-	return
-}
-
-// GetCmdCompleteRedelegate implements the complete redelegation command.
-func GetCmdCompleteRedelegate(cdc *wire.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "complete",
-		Short: "complete redelegation",
-		Example: "iriscli stake redelegation complete --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
-
-			delegatorAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-
-			validatorSrcAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidatorSrc))
-			if err != nil {
-				return err
-			}
-
-			validatorDstAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidatorDst))
-			if err != nil {
-				return err
-			}
-
-			msg := stake.NewMsgCompleteRedelegate(delegatorAddr, validatorSrcAddr, validatorDstAddr)
-
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-
-	cmd.Flags().AddFlagSet(fsRedelegation)
-
-	return cmd
-}
-
-// GetCmdUnbond implements the unbond validator command.
-func GetCmdUnbond(storeName string, cdc *wire.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "unbond",
-		Short: "begin or complete unbonding shares from a validator",
-	}
-
-	cmd.AddCommand(
-		client.PostCommands(
-			GetCmdBeginUnbonding(storeName, cdc),
-			GetCmdCompleteUnbonding(cdc),
-		)...)
-
+	cmd.MarkFlagRequired(FlagAddressValidatorSrc)
+	cmd.MarkFlagRequired(FlagAddressValidatorDst)
 	return cmd
 }
 
 // GetCmdBeginUnbonding implements the begin unbonding validator command.
-func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
+func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "begin",
-		Short: "begin unbonding",
-		Example: "iriscli stake unbond begin --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator=<validator address> shares-percent=0.5",
+		Use:     "unbond",
+		Short:   "unbond shares from a validator",
+		Example: "iriscli stake unbond --chain-id=<chain-id> --from=<key name> --fee=0.4iris --address-validator=<validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			delegatorAddr, err := cliCtx.GetFromAddress()
@@ -361,7 +291,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			validatorAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidator))
+			validatorAddr, err := sdk.ValAddressFromBech32(viper.GetString(FlagAddressValidator))
 			if err != nil {
 				return err
 			}
@@ -369,7 +299,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 			// get the shares amount
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
-			sharesAmount, err := getShares(
+			sharesAmount, err := stakeClient.GetShares(
 				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorAddr,
 			)
@@ -385,41 +315,7 @@ func GetCmdBeginUnbonding(storeName string, cdc *wire.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(fsShares)
 	cmd.Flags().AddFlagSet(fsValidator)
-
-	return cmd
-}
-
-// GetCmdCompleteUnbonding implements the complete unbonding validator command.
-func GetCmdCompleteUnbonding(cdc *wire.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "complete",
-		Short: "complete unbonding",
-		Example: "iriscli stake unbond complete --chain-id=<chain-id> --from=<key name> --fee=0.004iris --address-validator=<validator address>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
-
-			delegatorAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-
-			validatorAddr, err := sdk.AccAddressFromBech32(viper.GetString(FlagAddressValidator))
-			if err != nil {
-				return err
-			}
-
-			msg := stake.NewMsgCompleteUnbonding(delegatorAddr, validatorAddr)
-
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-
-	cmd.Flags().AddFlagSet(fsValidator)
+	cmd.MarkFlagRequired(FlagAddressValidator)
 
 	return cmd
 }

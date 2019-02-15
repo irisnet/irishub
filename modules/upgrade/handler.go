@@ -2,85 +2,64 @@ package upgrade
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"reflect"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	sdk "github.com/irisnet/irishub/types"
+	"strconv"
 )
 
-func NewHandler(k Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
-		switch msg := msg.(type) {
-		case MsgSwitch:
-			return handlerSwitch(ctx, msg, k)
-		default:
-			errMsg := "Unrecognized Upgrade Msg type: " + reflect.TypeOf(msg).Name()
-			return sdk.ErrUnknownRequest(errMsg).Result()
-		}
-	}
-}
-
-func handlerSwitch(ctx sdk.Context, msg sdk.Msg, k Keeper) sdk.Result {
-
-	msgSwitch, ok := msg.(MsgSwitch)
-	if !ok {
-		return NewError(DefaultCodespace, CodeInvalidMsgType, "Handler should only receive MsgSwitch").Result()
-	}
-
-	proposalID := msgSwitch.ProposalID
-
-	CurrentProposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
-
-	if proposalID != CurrentProposalID {
-
-		return NewError(DefaultCodespace, CodeNotCurrentProposal, "It isn't the current SoftwareUpgradeProposal").Result()
-
-	}
-
-	voter := msgSwitch.Voter
-
-	if _, ok := k.sk.GetValidator(ctx, voter); !ok {
-		return NewError(DefaultCodespace, CodeNotValidator, "Not a validator").Result()
-	}
-
-	if _, ok := k.GetSwitch(ctx, proposalID, voter); ok {
-		return NewError(DefaultCodespace, CodeDoubleSwitch, "You have sent the switch msg").Result()
-	}
-
-	k.SetSwitch(ctx, proposalID, voter, msgSwitch)
-
-	return sdk.Result{
-		Code: 0,
-		Log:  fmt.Sprintf("Switch %s by %s", msgSwitch.Title, msgSwitch.Voter.String()),
-	}
-}
-
 // do switch
-func EndBlocker(ctx sdk.Context, keeper Keeper) (tags sdk.Tags) {
+func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
+
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/upgrade"))
+
 	tags = sdk.NewTags()
+	upgradeConfig, ok := uk.protocolKeeper.GetUpgradeConfig(ctx)
+	if ok {
 
-	height := upgradeparams.GetProposalAcceptHeight(ctx)
-	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
-	switchPeriod := upgradeparams.GetSwitchPeriod(ctx)
+		versionIDstr := strconv.FormatUint(upgradeConfig.Protocol.Version, 10)
+		uk.metrics.Upgrade.Set(float64(upgradeConfig.Protocol.Version))
 
-	if (proposalID != -1) && (ctx.BlockHeight() == height + switchPeriod) {
-		switchPasses := tally(ctx, keeper)
-		if switchPasses {
-			tags.AppendTag("action", []byte("switchPassed"))
-
-			keeper.DoSwitchBegin(ctx)
-		} else {
-			tags.AppendTag("action", []byte("switchDropped"))
-
-			upgradeparams.SetCurrentUpgradeProposalId(ctx,-1)
+		validator, found := uk.sk.GetValidatorByConsAddr(ctx, (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress))
+		if !found {
+			panic(fmt.Sprintf("validator with consensus-address %s not found", (sdk.ConsAddress)(ctx.BlockHeader().ProposerAddress).String()))
 		}
+
+		if ctx.BlockHeader().Version.App == upgradeConfig.Protocol.Version {
+			uk.SetSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
+			uk.metrics.Signal.With(ValidatorLabel, validator.ConsAddress().String(), VersionLabel, versionIDstr).Set(1)
+
+			ctx.Logger().Info("Validator has downloaded the latest software ",
+				"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
+
+		} else {
+
+			ok := uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
+			uk.metrics.Signal.With(ValidatorLabel, validator.ConsAddress().String(), VersionLabel, versionIDstr).Set(0)
+
+			if ok {
+				ctx.Logger().Info("Validator has restarted the old software ",
+					"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
+			}
+		}
+
+		if uint64(ctx.BlockHeight())+1 == upgradeConfig.Protocol.Height {
+			success := tally(ctx, upgradeConfig.Protocol.Version, uk, upgradeConfig.Protocol.Threshold)
+
+			if success {
+				ctx.Logger().Info("Software Upgrade is successful.", "version", upgradeConfig.Protocol.Version)
+				uk.protocolKeeper.SetCurrentVersion(ctx, upgradeConfig.Protocol.Version)
+			} else {
+				ctx.Logger().Info("Software Upgrade is failure.", "version", upgradeConfig.Protocol.Version)
+				uk.protocolKeeper.SetLastFailedVersion(ctx, upgradeConfig.Protocol.Version)
+			}
+
+			uk.AddNewVersionInfo(ctx, NewVersionInfo(upgradeConfig, success))
+			uk.protocolKeeper.ClearUpgradeConfig(ctx)
+		}
+	} else {
+		uk.metrics.Upgrade.Set(float64(0))
 	}
 
-	blockHeader := ctx.BlockHeader()
-	if keeper.GetDoingSwitch(ctx) && (&blockHeader).GetNumTxs() == 0 {
-		tags.AppendTag("action", []byte("readyToDoSwitch"))
+	tags = tags.AppendTag(sdk.AppVersionTag, []byte(strconv.FormatUint(uk.protocolKeeper.GetCurrentVersion(ctx), 10)))
 
-		keeper.DoSwitchEnd(ctx)
-	}
-    fmt.Println(keeper.GetCurrentVersion(ctx))
 	return tags
 }

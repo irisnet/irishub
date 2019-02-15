@@ -3,29 +3,27 @@ package cli
 import (
 	"os"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-
-	"github.com/spf13/cobra"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/slashing"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/spf13/cobra"
 )
 
 // GetCmdUnrevoke implements the create unrevoke validator command.
-func GetCmdUnrevoke(cdc *wire.Codec) *cobra.Command {
+func GetCmdUnrevoke(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "unrevoke",
-		Args:  cobra.ExactArgs(0),
-		Short: "unrevoke validator previously revoked for downtime",
-		Example: "iriscli stake unrevoke --to=<account address> --from <key name> --fee=0.004iris --chain-id=<chain-id>",
+		Use:     "unjail",
+		Args:    cobra.ExactArgs(0),
+		Short:   "unjail validator previously jailed for downtime",
+		Example: "iriscli stake unjail --from <key name> --fee=0.4iris --chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
 				WithLogger(os.Stdout).
-				WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
-			txCtx := context.NewTxContextFromCLI().WithCodec(cdc).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
 			validatorAddr, err := cliCtx.GetFromAddress()
@@ -33,7 +31,7 @@ func GetCmdUnrevoke(cdc *wire.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := slashing.NewMsgUnrevoke(validatorAddr)
+			msg := slashing.NewMsgUnjail(sdk.ValAddress(validatorAddr))
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},

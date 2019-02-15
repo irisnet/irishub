@@ -3,17 +3,17 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 //-----------------------------------------------------------
 // Proposal interface
 type Proposal interface {
-	GetProposalID() int64
-	SetProposalID(int64)
+	GetProposalID() uint64
+	SetProposalID(uint64)
 
 	GetTitle() string
 	SetTitle(string)
@@ -30,18 +30,26 @@ type Proposal interface {
 	GetTallyResult() TallyResult
 	SetTallyResult(TallyResult)
 
-	GetSubmitBlock() int64
-	SetSubmitBlock(int64)
+	GetSubmitTime() time.Time
+	SetSubmitTime(time.Time)
+
+	GetDepositEndTime() time.Time
+	SetDepositEndTime(time.Time)
 
 	GetTotalDeposit() sdk.Coins
 	SetTotalDeposit(sdk.Coins)
 
-	GetVotingStartBlock() int64
-	SetVotingStartBlock(int64)
+	GetVotingStartTime() time.Time
+	SetVotingStartTime(time.Time)
 
-	////////////////////  iris begin  ///////////////////////////
-	Execute(ctx sdk.Context, k Keeper) error
-	////////////////////  iris end  ///////////////////////////
+	GetVotingEndTime() time.Time
+	SetVotingEndTime(time.Time)
+
+	GetProtocolDefinition() sdk.ProtocolDefinition
+	SetProtocolDefinition(sdk.ProtocolDefinition)
+
+	GetTaxUsage() TaxUsage
+	SetTaxUsage(TaxUsage)
 }
 
 // checks if two proposals are equal
@@ -52,18 +60,20 @@ func ProposalEqual(proposalA Proposal, proposalB Proposal) bool {
 		proposalA.GetProposalType() == proposalB.GetProposalType() &&
 		proposalA.GetStatus() == proposalB.GetStatus() &&
 		proposalA.GetTallyResult().Equals(proposalB.GetTallyResult()) &&
-		proposalA.GetSubmitBlock() == proposalB.GetSubmitBlock() &&
+		proposalA.GetSubmitTime().Equal(proposalB.GetSubmitTime()) &&
+		proposalA.GetDepositEndTime().Equal(proposalB.GetDepositEndTime()) &&
 		proposalA.GetTotalDeposit().IsEqual(proposalB.GetTotalDeposit()) &&
-		proposalA.GetVotingStartBlock() == proposalB.GetVotingStartBlock() {
+		proposalA.GetVotingStartTime().Equal(proposalB.GetVotingStartTime()) &&
+		proposalA.GetVotingEndTime().Equal(proposalB.GetVotingEndTime()) {
 		return true
 	}
 	return false
 }
 
 //-----------------------------------------------------------
-// Text Proposals
-type TextProposal struct {
-	ProposalID   int64        `json:"proposal_id"`   //  ID of the proposal
+// Basic Proposals
+type BasicProposal struct {
+	ProposalID   uint64       `json:"proposal_id"`   //  ID of the proposal
 	Title        string       `json:"title"`         //  Title of the proposal
 	Description  string       `json:"description"`   //  Description of the proposal
 	ProposalType ProposalKind `json:"proposal_type"` //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
@@ -71,41 +81,54 @@ type TextProposal struct {
 	Status      ProposalStatus `json:"proposal_status"` //  Status of the Proposal {Pending, Active, Passed, Rejected}
 	TallyResult TallyResult    `json:"tally_result"`    //  Result of Tallys
 
-	SubmitBlock  int64     `json:"submit_block"`  //  Height of the block where TxGovSubmitProposal was included
-	TotalDeposit sdk.Coins `json:"total_deposit"` //  Current deposit on this proposal. Initial value is set at InitialDeposit
+	SubmitTime     time.Time `json:"submit_time"`      //  Time of the block where TxGovSubmitProposal was included
+	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
+	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartBlock int64 `json:"voting_start_block"` //  Height of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
 }
 
 // Implements Proposal Interface
-var _ Proposal = (*TextProposal)(nil)
+var _ Proposal = (*BasicProposal)(nil)
 
 // nolint
-func (tp TextProposal) GetProposalID() int64                       { return tp.ProposalID }
-func (tp *TextProposal) SetProposalID(proposalID int64)            { tp.ProposalID = proposalID }
-func (tp TextProposal) GetTitle() string                           { return tp.Title }
-func (tp *TextProposal) SetTitle(title string)                     { tp.Title = title }
-func (tp TextProposal) GetDescription() string                     { return tp.Description }
-func (tp *TextProposal) SetDescription(description string)         { tp.Description = description }
-func (tp TextProposal) GetProposalType() ProposalKind              { return tp.ProposalType }
-func (tp *TextProposal) SetProposalType(proposalType ProposalKind) { tp.ProposalType = proposalType }
-func (tp TextProposal) GetStatus() ProposalStatus                  { return tp.Status }
-func (tp *TextProposal) SetStatus(status ProposalStatus)           { tp.Status = status }
-func (tp TextProposal) GetTallyResult() TallyResult                { return tp.TallyResult }
-func (tp *TextProposal) SetTallyResult(tallyResult TallyResult)    { tp.TallyResult = tallyResult }
-func (tp TextProposal) GetSubmitBlock() int64                      { return tp.SubmitBlock }
-func (tp *TextProposal) SetSubmitBlock(submitBlock int64)          { tp.SubmitBlock = submitBlock }
-func (tp TextProposal) GetTotalDeposit() sdk.Coins                 { return tp.TotalDeposit }
-func (tp *TextProposal) SetTotalDeposit(totalDeposit sdk.Coins)    { tp.TotalDeposit = totalDeposit }
-func (tp TextProposal) GetVotingStartBlock() int64                 { return tp.VotingStartBlock }
-func (tp *TextProposal) SetVotingStartBlock(votingStartBlock int64) {
-	tp.VotingStartBlock = votingStartBlock
+func (tp BasicProposal) GetProposalID() uint64                      { return tp.ProposalID }
+func (tp *BasicProposal) SetProposalID(proposalID uint64)           { tp.ProposalID = proposalID }
+func (tp BasicProposal) GetTitle() string                           { return tp.Title }
+func (tp *BasicProposal) SetTitle(title string)                     { tp.Title = title }
+func (tp BasicProposal) GetDescription() string                     { return tp.Description }
+func (tp *BasicProposal) SetDescription(description string)         { tp.Description = description }
+func (tp BasicProposal) GetProposalType() ProposalKind              { return tp.ProposalType }
+func (tp *BasicProposal) SetProposalType(proposalType ProposalKind) { tp.ProposalType = proposalType }
+func (tp BasicProposal) GetStatus() ProposalStatus                  { return tp.Status }
+func (tp *BasicProposal) SetStatus(status ProposalStatus)           { tp.Status = status }
+func (tp BasicProposal) GetTallyResult() TallyResult                { return tp.TallyResult }
+func (tp *BasicProposal) SetTallyResult(tallyResult TallyResult)    { tp.TallyResult = tallyResult }
+func (tp BasicProposal) GetSubmitTime() time.Time                   { return tp.SubmitTime }
+func (tp *BasicProposal) SetSubmitTime(submitTime time.Time)        { tp.SubmitTime = submitTime }
+func (tp BasicProposal) GetDepositEndTime() time.Time               { return tp.DepositEndTime }
+func (tp *BasicProposal) SetDepositEndTime(depositEndTime time.Time) {
+	tp.DepositEndTime = depositEndTime
 }
-func (tp *TextProposal) Execute(ctx sdk.Context, k Keeper) error { return nil }
+func (tp BasicProposal) GetTotalDeposit() sdk.Coins              { return tp.TotalDeposit }
+func (tp *BasicProposal) SetTotalDeposit(totalDeposit sdk.Coins) { tp.TotalDeposit = totalDeposit }
+func (tp BasicProposal) GetVotingStartTime() time.Time           { return tp.VotingStartTime }
+func (tp *BasicProposal) SetVotingStartTime(votingStartTime time.Time) {
+	tp.VotingStartTime = votingStartTime
+}
+func (tp BasicProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
+func (tp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
+	tp.VotingEndTime = votingEndTime
+}
+func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
+func (tp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
+func (tp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
+func (tp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
 
 //-----------------------------------------------------------
 // ProposalQueue
-type ProposalQueue []int64
+type ProposalQueue []uint64
 
 //-----------------------------------------------------------
 // ProposalKind
@@ -115,30 +138,35 @@ type ProposalKind byte
 
 //nolint
 const (
-	ProposalTypeText            ProposalKind = 0x01
-	ProposalTypeParameterChange ProposalKind = 0x02
-	ProposalTypeSoftwareUpgrade ProposalKind = 0x03
+	ProposalTypeNil             ProposalKind = 0x00
+	ProposalTypeParameterChange ProposalKind = 0x01
+	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
+	ProposalTypeSystemHalt      ProposalKind = 0x03
+	ProposalTypeTxTaxUsage      ProposalKind = 0x04
 )
 
 // String to proposalType byte.  Returns ff if invalid.
 func ProposalTypeFromString(str string) (ProposalKind, error) {
 	switch str {
-	case "Text":
-		return ProposalTypeText, nil
 	case "ParameterChange":
 		return ProposalTypeParameterChange, nil
 	case "SoftwareUpgrade":
 		return ProposalTypeSoftwareUpgrade, nil
+	case "SystemHalt":
+		return ProposalTypeSystemHalt, nil
+	case "TxTaxUsage":
+		return ProposalTypeTxTaxUsage, nil
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
 }
 
 // is defined ProposalType?
-func validProposalType(pt ProposalKind) bool {
-	if pt == ProposalTypeText ||
-		pt == ProposalTypeParameterChange ||
-		pt == ProposalTypeSoftwareUpgrade {
+func ValidProposalType(pt ProposalKind) bool {
+	if pt == ProposalTypeParameterChange ||
+		pt == ProposalTypeSoftwareUpgrade ||
+		pt == ProposalTypeSystemHalt ||
+		pt == ProposalTypeTxTaxUsage {
 		return true
 	}
 	return false
@@ -179,23 +207,27 @@ func (pt *ProposalKind) UnmarshalJSON(data []byte) error {
 // Turns VoteOption byte to String
 func (pt ProposalKind) String() string {
 	switch pt {
-	case ProposalTypeText:
-		return "Text"
 	case ProposalTypeParameterChange:
 		return "ParameterChange"
 	case ProposalTypeSoftwareUpgrade:
 		return "SoftwareUpgrade"
+	case ProposalTypeSystemHalt:
+		return "SystemHalt"
+	case ProposalTypeTxTaxUsage:
+		return "TxTaxUsage"
 	default:
 		return ""
 	}
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
+// nolint: errcheck
 func (pt ProposalKind) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", pt.String())))
+		s.Write([]byte(pt.String()))
 	default:
+		// TODO: Do this conversion more directly
 		s.Write([]byte(fmt.Sprintf("%v", byte(pt))))
 	}
 }
@@ -208,6 +240,7 @@ type ProposalStatus byte
 
 //nolint
 const (
+	StatusNil           ProposalStatus = 0x00
 	StatusDepositPeriod ProposalStatus = 0x01
 	StatusVotingPeriod  ProposalStatus = 0x02
 	StatusPassed        ProposalStatus = 0x03
@@ -225,13 +258,15 @@ func ProposalStatusFromString(str string) (ProposalStatus, error) {
 		return StatusPassed, nil
 	case "Rejected":
 		return StatusRejected, nil
+	case "":
+		return StatusNil, nil
 	default:
 		return ProposalStatus(0xff), errors.Errorf("'%s' is not a valid proposal status", str)
 	}
 }
 
 // is defined ProposalType?
-func validProposalStatus(status ProposalStatus) bool {
+func ValidProposalStatus(status ProposalStatus) bool {
 	if status == StatusDepositPeriod ||
 		status == StatusVotingPeriod ||
 		status == StatusPassed ||
@@ -290,11 +325,13 @@ func (status ProposalStatus) String() string {
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
+// nolint: errcheck
 func (status ProposalStatus) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", status.String())))
+		s.Write([]byte(status.String()))
 	default:
+		// TODO: Do this conversion more directly
 		s.Write([]byte(fmt.Sprintf("%v", byte(status))))
 	}
 }
@@ -302,29 +339,26 @@ func (status ProposalStatus) Format(s fmt.State, verb rune) {
 //-----------------------------------------------------------
 // Tally Results
 type TallyResult struct {
-	Yes        sdk.Rat `json:"yes"`
-	Abstain    sdk.Rat `json:"abstain"`
-	No         sdk.Rat `json:"no"`
-	NoWithVeto sdk.Rat `json:"no_with_veto"`
+	Yes        sdk.Dec `json:"yes"`
+	Abstain    sdk.Dec `json:"abstain"`
+	No         sdk.Dec `json:"no"`
+	NoWithVeto sdk.Dec `json:"no_with_veto"`
 }
 
 // checks if two proposals are equal
 func EmptyTallyResult() TallyResult {
 	return TallyResult{
-		Yes:        sdk.ZeroRat(),
-		Abstain:    sdk.ZeroRat(),
-		No:         sdk.ZeroRat(),
-		NoWithVeto: sdk.ZeroRat(),
+		Yes:        sdk.ZeroDec(),
+		Abstain:    sdk.ZeroDec(),
+		No:         sdk.ZeroDec(),
+		NoWithVeto: sdk.ZeroDec(),
 	}
 }
 
 // checks if two proposals are equal
 func (resultA TallyResult) Equals(resultB TallyResult) bool {
-	if resultA.Yes.Equal(resultB.Yes) &&
+	return resultA.Yes.Equal(resultB.Yes) &&
 		resultA.Abstain.Equal(resultB.Abstain) &&
 		resultA.No.Equal(resultB.No) &&
-		resultA.NoWithVeto.Equal(resultB.NoWithVeto) {
-		return true
-	}
-	return false
+		resultA.NoWithVeto.Equal(resultB.NoWithVeto)
 }

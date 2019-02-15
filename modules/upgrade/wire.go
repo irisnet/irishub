@@ -1,18 +1,16 @@
 package upgrade
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/irisnet/irishub/codec"
 )
 
-// Register concrete types on wire codec
-func RegisterWire(cdc *wire.Codec) {
-	cdc.RegisterConcrete(MsgSwitch{}, "iris-hub/upgrade/MsgSwitch", nil)
-	cdc.RegisterConcrete(&ModuleLifeTime{}, "iris-hub/upgrade/ModuleLifeTime", nil)
-	cdc.RegisterConcrete(&Version{}, "iris-hub/upgrade/Version", nil)
+// Register concrete types on codec codec
+func RegisterCodec(cdc *codec.Codec) {
+	cdc.RegisterConcrete(&VersionInfo{}, "irishub/upgrade/VersionInfo", nil)
 }
 
-var msgCdc = wire.NewCodec()
+var msgCdc = codec.New()
 
 func init() {
-	RegisterWire(msgCdc)
+	RegisterCodec(msgCdc)
 }

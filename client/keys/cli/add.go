@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	ccrypto "github.com/cosmos/cosmos-sdk/crypto"
-	cryptokeys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	ccrypto "github.com/irisnet/irishub/crypto"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
 
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
@@ -62,7 +62,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 			return errors.New("you must provide a name for the key")
 		}
 		name = args[0]
-		kb, err = keys.GetKeyBase()
+		kb, err = keys.GetKeyBaseWithWritePerm()
 		if err != nil {
 			return err
 		}
@@ -125,7 +125,7 @@ func printCreate(info cryptokeys.Info, seed string) {
 	output := viper.Get(cli.OutputFlag)
 	switch output {
 	case "text":
-		keys.PrintInfo(cdc, info)
+		keys.PrintKeyInfo(info, keys.Bech32KeyOutput)
 		// print seed unless requested not to.
 		if !viper.GetBool(client.FlagUseLedger) && !viper.GetBool(flagNoBackup) {
 			fmt.Println("**Important** write this seed phrase in a safe place.")
@@ -141,11 +141,16 @@ func printCreate(info cryptokeys.Info, seed string) {
 		if !viper.GetBool(flagNoBackup) {
 			out.Seed = seed
 		}
-		json, err := cdc.MarshalJSON(out)
+		var jsonString []byte
+		if viper.GetBool(client.FlagIndentResponse) {
+			jsonString, err = cdc.MarshalJSONIndent(out, "", "  ")
+		} else {
+			jsonString, err = cdc.MarshalJSON(out)
+		}
 		if err != nil {
 			panic(err) // really shouldn't happen...
 		}
-		fmt.Println(string(json))
+		fmt.Println(string(jsonString))
 	default:
 		panic(fmt.Sprintf("I can't speak: %s", output))
 	}

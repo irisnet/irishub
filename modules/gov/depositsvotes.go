@@ -4,22 +4,44 @@ import (
 	"encoding/json"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
 
 // Vote
 type Vote struct {
 	Voter      sdk.AccAddress `json:"voter"`       //  address of the voter
-	ProposalID int64          `json:"proposal_id"` //  proposalID of the proposal
+	ProposalID uint64         `json:"proposal_id"` //  proposalID of the proposal
 	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
+}
+
+// Returns whether 2 votes are equal
+func (voteA Vote) Equals(voteB Vote) bool {
+	return voteA.Voter.Equals(voteB.Voter) && voteA.ProposalID == voteB.ProposalID && voteA.Option == voteB.Option
+}
+
+// Returns whether a vote is empty
+func (voteA Vote) Empty() bool {
+	voteB := Vote{}
+	return voteA.Equals(voteB)
 }
 
 // Deposit
 type Deposit struct {
-	Depositer  sdk.AccAddress `json:"depositer"`   //  Address of the depositer
-	ProposalID int64          `json:"proposal_id"` //  proposalID of the proposal
+	Depositor  sdk.AccAddress `json:"depositor"`   //  Address of the depositor
+	ProposalID uint64         `json:"proposal_id"` //  proposalID of the proposal
 	Amount     sdk.Coins      `json:"amount"`      //  Deposit amount
+}
+
+// Returns whether 2 deposits are equal
+func (depositA Deposit) Equals(depositB Deposit) bool {
+	return depositA.Depositor.Equals(depositB.Depositor) && depositA.ProposalID == depositB.ProposalID && depositA.Amount.IsEqual(depositB.Amount)
+}
+
+// Returns whether a deposit is empty
+func (depositA Deposit) Empty() bool {
+	depositB := Deposit{}
+	return depositA.Equals(depositB)
 }
 
 // Type that represents VoteOption as a byte
@@ -51,7 +73,7 @@ func VoteOptionFromString(str string) (VoteOption, error) {
 }
 
 // Is defined VoteOption
-func validVoteOption(option VoteOption) bool {
+func ValidVoteOption(option VoteOption) bool {
 	if option == OptionYes ||
 		option == OptionAbstain ||
 		option == OptionNo ||
@@ -110,6 +132,7 @@ func (vo VoteOption) String() string {
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
+// nolint: errcheck
 func (vo VoteOption) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':

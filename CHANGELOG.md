@@ -1,5 +1,274 @@
 # Changelog
 
+## 0.12.1
+
+*February 14th, 2019*
+
+- Fix the bug of repeatability check about evidence in the tendermint
+- Change the invariant level for mainnet
+
+## 0.12.0
+
+*February 11th, 2019*
+
+- [iris] Refactor and add more promethus metrics for monitor
+- [iris] Enrich log message for all modules
+- [iris] Close all unclosed iterators
+- [iris] Add invariant check level configuration in iris.toml
+- [iriscli] Add share percent in lcd unbond and redelegate 
+- [iriscli] Fix tx search bug by page and size query parameter name
+- [iriscli] Improve error message for gov module
+- [irislcd] Upgrade swagger-ui to 3.0 which can support dynamic query parameters
+- [iristool] Remove monitor command
+- [tendermint] Fix DynamicVerifier for large validator set changes
+- [tendermint] Optimize txs search to handle huge search result
+- [doc] Improve slashing document
+
+
+## 0.11.0
+
+*January 25th, 2019*
+
+- [iris] Handle the expected abort during replay last block
+- [iris] Go through and make sure all panic are reasonable
+- [iris] Add the set-withdraw-address feature
+- [iris] Update default param value of Upgrade Threshold and Critical Proposal
+- [iris] Fix bug that evidence age doesn't take effect
+
+- [iriscli] Improve the upgrade query-signals cmd
+
+- [tendermint] Avoid one evidence be committed multiple times
+
+## 0.11.0-rc0
+
+*January 21th, 2019*
+
+- [iris] Move the upgrade tally threshold into the software upgrade proposal
+- [iris] Limit the size of transaction
+- [iris] Tendermint's blockstore also needs to consume gas when storing transactions
+- [iris] Proposer censorship slashing to prevent the proposer from submitting block containing garbage tx data
+- [iris] The proposer must deposit 30% of the mindeposit when submitting the proposal
+- [iris] Make more check about every msg's ValidateBasic()
+- [iris] Add flag --output-file to save export result and ensure result is consistent
+- [iris] Add new param service/TxSizeLimit to limit the service tx size
+- [iris] Block mint doesn't depend on BFT time
+- [iris] Fix infinite gas meter utilization during aborted ante handler executions
+- [iris] Auto-config bech32 prefixes based on network type
+- [iris] Improve the system logs
+
+- [iriscli] Make the result of `iriscli tendermint tx` readable
+- [iriscli] Improve the output format of the query proposals
+- [iriscli] Enhance the query-signals cmd to print the accumulated signal voting power percent
+
+- [iristool] Add support for consensus address and pubkey
+
+
+## 0.10.2
+
+*January 17th, 2019*
+
+- [iris] The proposer must deposit 30% of the mindeposit when submitting the proposal
+
+
+## 0.10.1
+
+*January 17th, 2019*
+
+- [iriscli] Fix issue about query validator information
+- [iriscli] Fix cli query proposals error
+
+
+## 0.10.0
+
+*January 16th, 2019*
+
+- [iris] Add flag --output-file to save export result and ensure result is consistent
+- [iris] Improve invariant checking coverage and fix distribution bugs
+- [iriscli] Make the result of `iriscli tendermint tx` readable
+- [iriscli] Query cmd return details about software upgrade and tax usage proposal
+- [tendermint] Fix the inconformity of too many evidences check
+- [tendermint] Fix replay bug of `iris export`
+
+
+## 0.10.0-rc0
+
+*January 8th, 2019*
+
+FEATURES:
+
+- [iris] Make more validation about the `MsgCreateValidator` in CollectStdTxs
+- [iris] Remove loosen token in stake pool, use bank to calculate the total loosen token
+- [iris] Implement the block mint token-economics
+- [iris] Add the service slash feature
+- [iris] Redesign and implement the governance module to setup the new voting, tally, and penalty rules for each level of proposals
+- [iris] Refactor and redefined all the gov/slashing/service/stake/distribution and gasPrice params 
+- [iris] Make gov data types codec wires usable across different protocol versions
+- [iris] Don't export the unfinished proposals and refund the deposits of these proposals before export snapshot 
+- [iris] Refund service fee and deposit before export service state
+- [iris] Add invariant checking level into makefile
+- [iris] Only the genesis type profiler/trustee can initiate the addition or deletion (rather than prohibiting) transactions of the minor type profiler/trustee record. Everyone can view the profiler/trustee list
+- [iris] Make sure the destination address is a trustee when the TaxUsage proposal execute
+- [iris] Remove the record module
+- [iris] Add `iris start --replay-last-block` to reset the app state by replay the last block
+- [iris] Add `iris export --height` to export the snapshot of any block height even beyond the maximum cached historical version
+
+- [iriscli] Add cli cmd to query the software upgrade signal status
+- [iriscli] Make flag deposit not be required in the gov submit-proposal cmd
+- [iriscli] Add token stats query cmd and lcd interface
+- [iriscli] Replace decimal with int coins in distribution withdraw tags
+- [iriscli] Add the sync tx broadcast type as the default mode in iriscli
+- [iriscli] Add burn token cmd and lcd api
+- [iriscli] Remove set-withdraw-addr sub-command
+
+- [tendermint] Update tendermint to v0.27.3
+- [test] Run cli test suite in parallel
+
+
+BUG FIXES:
+
+- Withdraw commission on self bond removal
+- Use address instead of bond height / intratxcounter for deduplication
+- Removal of mandatory self-delegation reward
+- Fix bug of the tx result tags
+- Fix absence proof verification
+- Avoid to export account with no coin
+- Correctly reset jailed-validator bond height / unbonding height on export-for-zero-height
+- If a validator is jailed, distribute no reward to it
+- Fix issue that miss checking the first one in Coins
+
+
+## 0.9.1-patch01
+
+*January 7th, 2019*
+
+- Hotfix bug of software upgrade
+
+
+## 0.9.1
+
+*January 4th, 2019*
+
+- Add cli cmd to query the software upgrade signal status
+- Remove the text proposal
+
+
+## 0.9.0
+
+*December 27th, 2018*
+
+- Refactor the gov types
+- Make the deposit flag not be required in the gov submit-proposal cmd
+- Add withdraw address into the withdraw tags list
+- Fix the monitor bug
+
+
+## 0.9.0-rc0
+
+*December 19th, 2018*
+
+BREAKING CHANGES:
+
+- Use `iristool` to replace the original `irisdebug` and `irismon`
+- `iris init` must specify moniker
+ 
+FEATURES:
+
+- [iriscli] Optimize the way tags are displayed
+- [iriscli] Add `iriscli stake delegations-to [validator-addr]` and `/stake/validators/{validatorAddr}/delegations` interfaces
+- [iris] Application framework code refactoring
+- [iris] Add a new mechanism to distribute service fee tax
+- [iris] Slashing module supports querying slashing history
+- [iris] Gov module adds TxTaxUsageProposal/SoftwareHaltProposal proposals
+- [iris] Export and import blockchain snapshot at any block height
+- [iris] Redesigned to implement class 2 software upgrade
+- [iris] Restrict the block gas limit
+- [iris] Improve tx search to support multiple tags
+- [iris] Improve the default behavior of iris --home
+- [iris] `iris tendermint show-address` output begins with `fca`
+- [iris] Restrict the number of signatures on the transaction
+- [iris] Add a check for the validator private key type and reject the unsupported private key type
+- [tendermint] Update tendermint to v0.27.0
+
+BUG FIXES:
+
+- Add chain-id value checking for sign command
+- Specify the required flags for cmds `query-proposal`, `query-deposit` and `query-vote`
+
+
+## 0.8.0
+
+*December 13th, 2018*
+
+- Upgrade tendermint to v0.27.0-dev1
+
+
+## 0.8.0-rc0
+
+*December 3rd, 2018*
+
+BREAKING CHANGES:
+
+- Genesis.json supports any unit format of IRIS CoinType
+- The configuration information of the bech32 prefix is dynamically specified by the environment variable
+- Improvement of File/directory path specification and the exception handler
+
+FEATURES:
+
+- Upgrade cosmos-sdk to v0.26.1-rc1 and remove the cosmos-sdk dependency
+- Upgrade tendermint denpendency to v0.26.1-rc3
+- View the current available withdraw balance by simulation mode
+- Command line and LCD interface for service invocation request and query
+- Implement guardian module for some governance proposal
+- Added command add-genesis-account to configure account for genesis.json
+- New proposal TerminatorProposal to terminate network consensus
+
+
+## 0.7.0
+
+*November 27th, 2018*
+
+- Add broadcast command in bank
+- Impose upgrade proposal with restrictions
+- Fix bech32 prefix error in irismon
+- Improve user documents
+
+## 0.7.0-rc0
+
+*November 19th, 2018*
+
+BREAKING CHANGES:
+* [iris] New genesis workflow
+* [iris] Validator.Owner renamed to Validator. Validator operator type has now changed to sdk.ValAddress
+* [iris] unsafe_reset_all, show_validator, and show_node_id have been renamed to unsafe-reset-all, show-validator, and show-node-id
+* [iris]Rename "revoked" to "jailed"
+* [iris]Removed CompleteUnbonding and CompleteRedelegation Msg types, and instead added unbonding/redelegation queues to endblocker
+* [iris]Removed slashing for governance non-voting validators
+* [iris]Validators are no longer deleted until they can no longer possibly be slashed
+* [iris]Remove ibc module
+* [iris]Validator set updates delayed by one block
+* [iris]Drop GenesisTx in favor of a signed StdTx with only one MsgCreateValidator message
+
+FEATURES:
+* Upgrade cosmos-sdk denpendency to v0.26.0
+* Upgrade tendermint denpendency to v0.26.1-rc0
+* [docs]Improve docs
+* [iris]Add token inflation
+* [iris]Add distribution module to distribute inflation token and collected transaction fee
+* [iriscli] --from can now be either an address or a key name
+* [iriscli] Passing --gas=simulate triggers a simulation of the tx before the actual execution. The gas estimate obtained via the simulation will be used as gas limit in the actual execution.
+* [iriscli]Add --bech to iriscli keys show and respective REST endpoint to
+* [iriscli]Introduced new commission flags for validator commands create-validator and edit-validator
+* [iriscli]Add commands to query validator unbondings and redelegations
+* [iriscli]Add rest apis and commands for distribution
+
+BUG FIXES:
+* [iriscli]Mark --to and --amount as required flags for iriscli bank send
+* [iris]Add general merkle absence proof (also for empty substores)
+* [iris]Fix issue about consumed gas increasing rapidly
+* [iris]Return correct Tendermint validator update set on EndBlocker by not including non previously bonded validators that have zero power
+* [iris]Add commission data to MsgCreateValidator signature bytes
+
+
 ## 0.6.0
 
 *November 1st, 2018*

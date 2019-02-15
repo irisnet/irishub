@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"regexp"
 	"strings"
 )
@@ -94,8 +93,8 @@ func NewUnit(denom string, decimal int) Unit {
 		Decimal: decimal,
 	}
 }
-func (u Unit) GetPrecision() sdk.Int {
-	return sdk.NewIntWithDecimal(1, u.Decimal)
+func (u Unit) GetPrecision() Int {
+	return NewIntWithDecimal(1, u.Decimal)
 }
 
 type Units = []Unit
@@ -119,19 +118,19 @@ func (ct CoinType) Convert(orgCoinStr string, denom string) (destCoinStr string,
 	}
 	// target Coin = original amount * (10^(target decimal) / 10^(original decimal))
 	if orgUnit, err := ct.GetUnit(orgDenom); err == nil {
-		rat := sdk.NewRatFromInt(destUint.GetPrecision(), orgUnit.GetPrecision())
-		amount, err := sdk.NewRatFromDecimal(orgAmt, ct.MinUnit.Decimal) //Convert the original amount to the target accuracy
+		rat := NewRatFromInt(destUint.GetPrecision(), orgUnit.GetPrecision())
+		amount, err := NewRatFromDecimal(orgAmt, ct.MinUnit.Decimal) //Convert the original amount to the target accuracy
 		if err != nil {
 			return destCoinStr, err
 		}
-		amt := NewRat(amount.Mul(rat)).DecimalString(ct.MinUnit.Decimal)
+		amt := amount.Mul(rat).DecimalString(ct.MinUnit.Decimal)
 		destCoinStr = fmt.Sprintf("%s%s", amt, destUint.Denom)
 		return destCoinStr, nil
 	}
 	return destCoinStr, errors.New("not exist unit " + orgDenom)
 }
 
-func (ct CoinType) ConvertToMinCoin(coinStr string) (coin sdk.Coin, err error) {
+func (ct CoinType) ConvertToMinCoin(coinStr string) (coin Coin, err error) {
 	minUint := ct.GetMinUnit()
 
 	if destCoinStr, err := ct.Convert(coinStr, minUint.Denom); err == nil {
@@ -176,6 +175,7 @@ func NewDefaultCoinType(name string) CoinType {
 	}
 }
 
+//TODO currently only iris token is supported
 func CoinTypeKey(coinName string) string {
 	return fmt.Sprintf("%s/%s/%s", "global", "coin_types", coinName)
 }
@@ -211,15 +211,18 @@ func GetCoin(coinStr string) (denom, amount string, err error) {
 	return
 }
 
-func parseCoin(coinStr string) (coin sdk.Coin, err error) {
-	if denom, amount, err := GetCoin(coinStr); err == nil {
-		if amt, ok := sdk.NewIntFromString(amount); ok {
-			denom = strings.ToLower(denom)
-			coin := sdk.NewCoin(denom, amt)
-			return coin, err
-		}
+func parseCoin(coinStr string) (coin Coin, err error) {
+	denom, amount, err := GetCoin(coinStr)
+	if err != nil {
+		return Coin{}, err
 	}
-	return
+
+	amt, ok := NewIntFromString(amount)
+	if !ok {
+		return Coin{}, fmt.Errorf("invalid coin amount: %s", amount)
+	}
+	denom = strings.ToLower(denom)
+	return NewCoin(denom, amt), nil
 }
 
 func GetCoinName(coinStr string) (coinName string, err error) {
@@ -229,5 +232,8 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	}
 	coinName = strings.Split(denom, "-")[0]
 	coinName = strings.ToLower(coinName)
+	if coinName == "" {
+		return coinName, fmt.Errorf("coin name is empty")
+	}
 	return coinName, nil
 }

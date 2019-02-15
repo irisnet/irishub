@@ -1,31 +1,30 @@
 package upgrade
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	sdk "github.com/irisnet/irishub/types"
 )
 
-var Threshold = sdk.NewRat(95, 100)
+func tally(ctx sdk.Context, versionProtocol uint64, k Keeper, threshold sdk.Dec) (passes bool) {
 
-func tally(ctx sdk.Context, k Keeper) (passes bool) {
+	totalVotingPower := sdk.ZeroDec()
+	signalsVotingPower := sdk.ZeroDec()
 
-	proposalID := upgradeparams.GetCurrentUpgradeProposalId(ctx)
-
-	if proposalID != -1 {
-
-		totalVotingPower := sdk.ZeroRat()
-		switchVotingPower := sdk.ZeroRat()
-		for _, validator := range k.sk.GetAllValidators(ctx) {
-			totalVotingPower = totalVotingPower.Add(validator.GetPower())
-			if _, ok := k.GetSwitch(ctx, proposalID, validator.Owner); ok {
-				switchVotingPower = switchVotingPower.Add(validator.GetPower())
-			}
+	k.sk.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
+		totalVotingPower = totalVotingPower.Add(validator.GetPower())
+		valAcc := validator.GetConsAddr().String()
+		if ok := k.GetSignal(ctx, versionProtocol, valAcc); ok {
+			signalsVotingPower = signalsVotingPower.Add(validator.GetPower())
 		}
-		// If more than 95% of validator update , do switch
-		if switchVotingPower.Quo(totalVotingPower).GT(Threshold) {
-			return true
-		}
+		return false
+	})
 
+	ctx.Logger().Info("Tally Start", "SiganlsVotingPower", signalsVotingPower.String(),
+		"TotalVotingPower", totalVotingPower.String(),
+		"SiganlsVotingPower/TotalVotingPower", signalsVotingPower.Quo(totalVotingPower).String(),
+		"Threshold", threshold.String())
+	// If more than 95% of validator update , do switch
+	if signalsVotingPower.Quo(totalVotingPower).GT(threshold) {
+		return true
 	}
 	return false
 }

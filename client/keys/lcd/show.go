@@ -1,47 +1,53 @@
 package keys
 
 import (
-	"encoding/json"
-	"fmt"
+	"net/http"
+
+	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/keys"
-	"net/http"
-	"strings"
+	keycli "github.com/irisnet/irishub/client/keys/cli"
 )
 
 ///////////////////////////
 // REST
 
 // get key REST handler
-func GetKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	name := vars["name"]
+func GetKeyRequestHandler(indent bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		name := vars["name"]
+		bechPrefix := r.URL.Query().Get(keycli.FlagBechPrefix)
 
-	info, err := keys.GetKey(name)
-	if err != nil {
-		if strings.Contains(err.Error(), fmt.Sprintf("Key %s not found", name)) {
-			w.WriteHeader(http.StatusNotFound)
+		if bechPrefix == "" {
+			bechPrefix = "acc"
+		}
+
+		bechKeyOut, err := keys.GetBechKeyOut(bechPrefix)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
-		} else {
+		}
+
+		info, err := keys.GetKeyInfo(name)
+		if keyerror.IsErrKeyNotFound(err) {
+			w.WriteHeader(http.StatusNoContent)
+			w.Write([]byte(err.Error()))
+			return
+		} else if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
-	}
 
-	keyOutput, err := keys.Bech32KeyOutput(info)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	output, err := json.MarshalIndent(keyOutput, "", "  ")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
+		keyOutput, err := bechKeyOut(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
 
-	w.Write(output)
+		keys.PostProcessResponse(w, cdc, keyOutput, indent)
+	}
 }

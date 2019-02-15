@@ -1,88 +1,62 @@
 package gov
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/gov/params"
+	sdk "github.com/irisnet/irishub/types"
+)
+
+type ProposalResult string
+
+const (
+	PASS       ProposalResult = "pass"
+	REJECT     ProposalResult = "reject"
+	REJECTVETO ProposalResult = "reject-veto"
 )
 
 // validatorGovInfo used for tallying
 type validatorGovInfo struct {
-	Address         sdk.AccAddress // sdk.AccAddress of the validator owner
-	Power           sdk.Rat        // Power of a Validator
-	DelegatorShares sdk.Rat        // Total outstanding delegator shares
-	Minus           sdk.Rat        // Minus of validator, used to compute validator's voting power
-	Vote            VoteOption     // Vote of the validator
+	Address sdk.ValAddress // address of the validator operator
+	Power   sdk.Dec        // Power of a Validator
+	Vote    VoteOption     // Vote of the validator
 }
 
-func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tallyResults TallyResult, nonVoting []sdk.AccAddress) {
-	results := make(map[VoteOption]sdk.Rat)
-	results[OptionYes] = sdk.ZeroRat()
-	results[OptionAbstain] = sdk.ZeroRat()
-	results[OptionNo] = sdk.ZeroRat()
-	results[OptionNoWithVeto] = sdk.ZeroRat()
+func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalResult, tallyResults TallyResult, votingVals map[string]bool) {
+	results := make(map[VoteOption]sdk.Dec)
+	results[OptionYes] = sdk.ZeroDec()
+	results[OptionAbstain] = sdk.ZeroDec()
+	results[OptionNo] = sdk.ZeroDec()
+	results[OptionNoWithVeto] = sdk.ZeroDec()
 
-	totalVotingPower := sdk.ZeroRat()
+	totalVotingPower := sdk.ZeroDec()
+	systemVotingPower := sdk.ZeroDec()
 	currValidators := make(map[string]validatorGovInfo)
-
-	keeper.vs.IterateValidatorsBonded(ctx, func(index int64, validator sdk.Validator) (stop bool) {
-		currValidators[validator.GetOwner().String()] = validatorGovInfo{
-			Address:         validator.GetOwner(),
-			Power:           validator.GetPower(),
-			DelegatorShares: validator.GetDelegatorShares(),
-			Minus:           sdk.ZeroRat(),
-			Vote:            OptionEmpty,
+	votingVals = make(map[string]bool)
+	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
+		currValidators[validator.GetOperator().String()] = validatorGovInfo{
+			Address: validator.GetOperator(),
+			Power:   validator.GetPower(),
+			Vote:    OptionEmpty,
 		}
+		systemVotingPower = systemVotingPower.Add(validator.GetPower())
 		return false
 	})
-
 	// iterate over all the votes
 	votesIterator := keeper.GetVotes(ctx, proposal.GetProposalID())
+	defer votesIterator.Close()
 	for ; votesIterator.Valid(); votesIterator.Next() {
 		vote := &Vote{}
-		keeper.cdc.MustUnmarshalBinary(votesIterator.Value(), vote)
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(votesIterator.Value(), vote)
 
 		// if validator, just record it in the map
-		// if delegator tally voting power
-		if val, ok := currValidators[vote.Voter.String()]; ok {
+		valAddrStr := sdk.ValAddress(vote.Voter).String()
+		if val, ok := currValidators[valAddrStr]; ok {
 			val.Vote = vote.Option
-			currValidators[vote.Voter.String()] = val
-		} else {
-
-			keeper.ds.IterateDelegations(ctx, vote.Voter, func(index int64, delegation sdk.Delegation) (stop bool) {
-				if val, ok := currValidators[delegation.GetValidator().String()]; ok {
-					val.Minus = val.Minus.Add(delegation.GetBondShares())
-					currValidators[delegation.GetValidator().String()] = val
-
-					delegatorShare := delegation.GetBondShares().Quo(val.DelegatorShares)
-					votingPower := val.Power.Mul(delegatorShare)
-
-					results[vote.Option] = results[vote.Option].Add(votingPower)
-					totalVotingPower = totalVotingPower.Add(votingPower)
-				}
-				return false
-			})
+			results[val.Vote] = results[val.Vote].Add(val.Power)
+			totalVotingPower = totalVotingPower.Add(val.Power)
+			votingVals[valAddrStr] = true
 		}
-
-		keeper.deleteVote(ctx, vote.ProposalID, vote.Voter)
-	}
-	votesIterator.Close()
-
-	// Iterate over the validators again to tally their voting power and see who didn't vote
-	nonVoting = []sdk.AccAddress{}
-	for _, val := range currValidators {
-		if val.Vote == OptionEmpty {
-			nonVoting = append(nonVoting, val.Address)
-			continue
-		}
-		sharesAfterMinus := val.DelegatorShares.Sub(val.Minus)
-		percentAfterMinus := sharesAfterMinus.Quo(val.DelegatorShares)
-		votingPower := val.Power.Mul(percentAfterMinus)
-
-		results[val.Vote] = results[val.Vote].Add(votingPower)
-		totalVotingPower = totalVotingPower.Add(votingPower)
 	}
 
-	tallyingProcedure := govparams.GetTallyingProcedure(ctx)
+	tallyingProcedure := keeper.GetTallyingProcedure(ctx, proposal)
 
 	tallyResults = TallyResult{
 		Yes:        results[OptionYes],
@@ -91,18 +65,28 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (passes bool, tall
 		NoWithVeto: results[OptionNoWithVeto],
 	}
 
+
 	// If no one votes, proposal fails
-	if totalVotingPower.Sub(results[OptionAbstain]).Equal(sdk.ZeroRat()) {
-		return false, tallyResults, nonVoting
+	if totalVotingPower.Sub(results[OptionAbstain]).Equal(sdk.ZeroDec()) {
+		return REJECT, tallyResults, votingVals
 	}
+
+	//if more than 1/3 of voters abstain, proposal fails
+	if tallyingProcedure.Participation.GT(totalVotingPower.Quo(systemVotingPower)) {
+		return REJECT, tallyResults, votingVals
+	}
+
+
 	// If more than 1/3 of voters veto, proposal fails
 	if results[OptionNoWithVeto].Quo(totalVotingPower).GT(tallyingProcedure.Veto) {
-		return false, tallyResults, nonVoting
+		return REJECTVETO, tallyResults, votingVals
 	}
+
 	// If more than 1/2 of non-abstaining voters vote Yes, proposal passes
-	if results[OptionYes].Quo(totalVotingPower.Sub(results[OptionAbstain])).GT(tallyingProcedure.Threshold) {
-		return true, tallyResults, nonVoting
+	if results[OptionYes].Quo(totalVotingPower).GT(tallyingProcedure.Threshold) {
+		return PASS, tallyResults, votingVals
 	}
 	// If more than 1/2 of non-abstaining voters vote No, proposal fails
-	return false, tallyResults, nonVoting
+
+	return REJECT, tallyResults, votingVals
 }

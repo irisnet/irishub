@@ -1,49 +1,41 @@
 package upgrade
 
 import (
-	bam "github.com/irisnet/irishub/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"fmt"
-	"github.com/irisnet/irishub/modules/iparam"
-	"github.com/irisnet/irishub/modules/upgrade/params"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/version"
 )
 
 // GenesisState - all upgrade state that must be provided at genesis
 type GenesisState struct {
-	SwitchPeriod int64    `json:"switch_period"`
+	GenesisVersion VersionInfo          `json:genesis_version`
 }
 
 // InitGenesis - build the genesis version For first Version
-func InitGenesis(ctx sdk.Context, k Keeper, router bam.Router, data GenesisState) {
+func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	genesisVersion := data.GenesisVersion
 
-	RegisterModuleList(router)
+	k.AddNewVersionInfo(ctx, genesisVersion)
+	k.protocolKeeper.ClearUpgradeConfig(ctx)
+	k.protocolKeeper.SetCurrentVersion(ctx, genesisVersion.UpgradeInfo.Protocol.Version)
+}
 
-	moduleList, found := GetModuleListFromBucket(0)
-	fmt.Println(moduleList)
-	if !found {
-		panic("No module list info found for genesis version")
+// WriteGenesis - output genesis parameters
+func ExportGenesis(ctx sdk.Context) GenesisState {
+	return GenesisState{
+		NewVersionInfo(sdk.DefaultUpgradeConfig("https://github.com/irisnet/irishub/releases/tag/v"+version.Version), true),
 	}
-
-	genesisVersion := NewVersion(0, 0, 0, moduleList)
-	k.AddNewVersion(ctx, genesisVersion)
-
-	iparam.InitGenesisParameter(&upgradeparams.ProposalAcceptHeightParameter, ctx, -1)
-	iparam.InitGenesisParameter(&upgradeparams.CurrentUpgradeProposalIdParameter, ctx, -1)
-	iparam.InitGenesisParameter(&upgradeparams.SwitchPeriodParameter, ctx, data.SwitchPeriod)
-
-	InitGenesis_commitID(ctx, k)
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		SwitchPeriod: 57600,
+		NewVersionInfo(sdk.DefaultUpgradeConfig("https://github.com/irisnet/irishub/releases/tag/v"+version.Version), true),
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
-		SwitchPeriod: 15,
+		NewVersionInfo(sdk.DefaultUpgradeConfig("https://github.com/irisnet/irishub/releases/tag/v"+version.Version), true),
 	}
 }

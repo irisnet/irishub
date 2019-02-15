@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+const maxElements = 200
+
 // validate proto idl text
 func ValidateProto(content string) (bool, error) {
 	reader := strings.NewReader(content)
@@ -26,12 +28,36 @@ func GetMethods(content string) (methods []Method, err error) {
 		return methods, err
 	}
 
+	if len(definition.Elements) > maxElements {
+		err = fmt.Errorf("too many elements in idl content, limit to %d", maxElements)
+		return methods, err
+	}
+
 	// iterate definition get all method
 	var rs []*proto.RPC
+	rm := make(map[string]*proto.RPC)
+	var ms []*proto.Message
+	mm := make(map[string]*proto.Message)
 	proto.Walk(definition,
 		proto.WithRPC(func(r *proto.RPC) {
+			if _, ok := rm[r.Name]; ok {
+				err = fmt.Errorf("contains duplicate methods %s", r.Name)
+			}
+			rm[r.Name] = r
 			rs = append(rs, r)
-		}))
+		}),
+		proto.WithMessage(func(m *proto.Message) {
+			if _, ok := mm[m.Name]; ok {
+				err = fmt.Errorf("contains duplicate messages %s", m.Name)
+			}
+			mm[m.Name] = m
+			ms = append(ms, m)
+		}),
+	)
+
+	if err != nil {
+		return methods, err
+	}
 
 	// get method attribute from comment, each line comment only define one attribute
 	for _, r := range rs {
@@ -67,7 +93,7 @@ func transferComment(lines []string) (map[string]string, error) {
 			return attributes, fmt.Errorf("attribute has empty key at %s", line)
 		}
 		value := strings.TrimSpace(ss[1])
-		if key == "" {
+		if value == "" {
 			return attributes, fmt.Errorf("attribute has empty value at %s", line)
 		}
 		attributes[key] = value

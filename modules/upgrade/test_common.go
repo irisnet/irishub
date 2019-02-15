@@ -1,22 +1,22 @@
 package upgrade
 
 import (
-	"testing"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/stake"
-	"github.com/cosmos/cosmos-sdk/store"
+	"encoding/hex"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
-	"os"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/wire"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
-	"encoding/hex"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
+	"os"
+	"testing"
 )
 
 var (
@@ -43,42 +43,55 @@ func newPubKey(pk string) (res crypto.PubKey) {
 	return pkEd
 }
 
-func createTestCodec() *wire.Codec {
-	cdc := wire.NewCodec()
-	sdk.RegisterWire(cdc)
-	RegisterWire(cdc)
-	auth.RegisterWire(cdc)
-	bank.RegisterWire(cdc)
-	stake.RegisterWire(cdc)
-	wire.RegisterCrypto(cdc)
+func createTestCodec() *codec.Codec {
+	cdc := codec.New()
+	sdk.RegisterCodec(cdc)
+	RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	bank.RegisterCodec(cdc)
+	stake.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 	return cdc
 }
 
 func createTestInput(t *testing.T) (sdk.Context, Keeper, params.Keeper) {
+	keyMain := sdk.NewKVStoreKey("main")
 	keyAcc := sdk.NewKVStoreKey("acc")
 	keyStake := sdk.NewKVStoreKey("stake")
-	keyUpdate := sdk.NewKVStoreKey("update")
+	keyUpgrade := sdk.NewKVStoreKey("upgrade")
 	keyParams := sdk.NewKVStoreKey("params")
-	keyIparams := sdk.NewKVStoreKey("iparams")
+	tkeyStake := sdk.NewTransientStoreKey("transient_stake")
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(keyMain, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyUpdate, sdk.StoreTypeIAVL, db)
-    ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyIparams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyUpgrade, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyStake, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
 
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewTMLogger(os.Stdout))
 	cdc := createTestCodec()
-	accountMapper := auth.NewAccountMapper(cdc, keyAcc, auth.ProtoBaseAccount)
-	ck := bank.NewKeeper(accountMapper)
-	sk := stake.NewKeeper(cdc, keyStake, ck, stake.DefaultCodespace)
+	AccountKeeper := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
+	ck := bank.NewBaseKeeper(AccountKeeper)
 
-	keeper := NewKeeper(cdc, keyUpdate, sk)
-	paramKeeper := params.NewKeeper(wire.NewCodec(), keyParams)
+	paramsKeeper := params.NewKeeper(
+		cdc,
+		keyParams, tkeyParams,
+	)
+	sk := stake.NewKeeper(
+		cdc,
+		keyStake, tkeyStake,
+		ck, paramsKeeper.Subspace(stake.DefaultParamspace),
+		stake.DefaultCodespace,
+		stake.NopMetrics(),
+	)
+	keeper := NewKeeper(cdc, keyUpgrade, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), sk, NopMetrics())
 
-	return ctx, keeper, paramKeeper
+	return ctx, keeper, paramsKeeper
 }

@@ -1,6 +1,6 @@
 # Running a Validator Node
 
-Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
+Before setting up your validator node on Fuxi testnet, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
 
 Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
@@ -57,34 +57,34 @@ You should also be able to see `catching_up` is `false`.
 
 You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fvp`, 
 it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, 
-please read this [doc](Bech32-on-IRISnet.md)
+please read this [doc](../features/basic-concepts/bech32-prefix.md)
 
 You can find your validator's pubkey by running:
 
 ```
-iris tendermint show_validator --home=<IRIS-HOME>
+iris tendermint show-validator --home=<IRIS-HOME>
 ```
 Example output:
 ```
-fvp1zcjduepqv7z2kgussh7ufe8e0prupwcm7l9jcn2fp90yeupaszmqjk73rjxq8yzw85
+fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
 ```
-Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` command:
+Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` command following [this](../cli-client/stake/create-validator.md). :
 
 
 ```
-iriscli stake create-validator --amount=XXiris --pubkey=<pubkey>  --moniker=<moniker> --fee=0.05iris  --gas=2000000  --chain-id=fuxi-4000  --node=http://localhost:26657
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
 
-To read more about fee mechanism in IRISHub, go to this [doc](../modules/fee-token/Fee.md)
+To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-concepts/fee.md)
 
 
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --pubkey=pubkey  --fee=0.05iris  --gas=2000000 --from=<name> --chain-id=fuxi-4000   --node=tcp://localhost:26657  --amount=1iris
+iriscli stake create-validator --pubkey=pubkey  --fee=0.05iris  --gas=2000000 --from=<name> --chain-id=<chain-id>   --node=tcp://localhost:26657  --amount=1iris
 ```
-Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../zh/modules/coin/README.md)
+Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../features/basic-concepts/coin-type.md)
 
 
 
@@ -93,10 +93,10 @@ Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub
 View the validator's information with this command:
 
 ```
-iriscli stake validator <val-address-operator>  --chain-id=fuxi-4000 --node=tcp://localhost:26657 
+iriscli stake validator <val-address-operator>  --chain-id=<chain-id> --node=tcp://localhost:26657 
 ```
 
-The `<val-address-operator>` is your account address that starts with 'faa1'
+The `<val-address-operator>` is your account address that starts with 'fva1'
 
 
 ### Confirm Your Validator is Running
@@ -112,22 +112,22 @@ You should also be able to see your power is above 0 if your bonded toke is in t
 
 ### Edit Validator Description
 
-You can edit your validator's public description. This info is to identify your validator, and will be relied on by delegators to decide which validators to stake to. Make sure to provide input for every flag below, otherwise the field will default to empty (`--moniker`defaults to the machine name).
+You can edit your validator's public description following [this](../cli-client/stake/edit-validator.md). This info is to identify your validator, and will be relied on by delegators to decide which validators to stake to. Make sure to provide input for every flag below, otherwise the field will default to empty (`--moniker`defaults to the machine name).
 
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator --from= < name >  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-4000 
-  --details="details"--node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
+iriscli stake edit-validator --chain-id=<chain-id> --from=<key-name> --fee=0.4iris --moniker=<validator name> --details=<details>
+
 ```
 ### View Validator Description
 
 View the validator's information with this command:
 
 ```
-iriscli stake validator <val-address> --chain-id=fuxi-4000
+iriscli stake validator <val-address-operato> --chain-id=<chain-id>
 ```
 
 ### Use IRISPlorer
 
-You should also be able to see your validator on the [Explorer](https://testnet.irisplorer.io). You are looking for the `bech32` encoded `address` in the `~/.iris/config/priv_validator.json` file.
+You should also be able to see your validator on the [Explorer](https://testnet.irisplorer.io). 

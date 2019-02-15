@@ -1,11 +1,12 @@
 package lcd
 
 import (
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/irisnet/irishub/client/context"
+	sdk "github.com/irisnet/irishub/types"
+	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/upgrade"
-	"github.com/irisnet/irishub/modules/upgrade/params"
 	"net/http"
 )
 
@@ -16,24 +17,38 @@ type VersionInfo struct {
 	ProposalId     int64  `json:"proposal_id"`
 }
 
-func InfoHandlerFn(cliCtx context.CLIContext, cdc *wire.Codec, storeName string) http.HandlerFunc {
+func InfoHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		res_height, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.ProposalAcceptHeightParameter.GetStoreKey()), "params")
-		res_proposalID, _ := cliCtx.QueryStore([]byte("gov/"+upgradeparams.CurrentUpgradeProposalIdParameter.GetStoreKey()), "params")
-		var height int64
-		var proposalID int64
-		cdc.MustUnmarshalBinary(res_height, &height)
-		cdc.MustUnmarshalBinary(res_proposalID, &proposalID)
+		res_currentVersion, _ := cliCtx.QueryStore(sdk.CurrentVersionKey, sdk.MainStore)
+		var currentVersion uint64
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_currentVersion, &currentVersion)
 
-		res_versionID, _ := cliCtx.QueryStore(upgrade.GetCurrentVersionKey(), storeName)
-		var versionID int64
-		cdc.MustUnmarshalBinary(res_versionID, &versionID)
+		res_proposalID, _ := cliCtx.QueryStore(upgrade.GetSuccessVersionKey(currentVersion), storeName)
+		var proposalID uint64
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_proposalID, &proposalID)
 
-		res_version, _ := cliCtx.QueryStore(upgrade.GetVersionIDKey(versionID), storeName)
-		var version upgrade.Version
-		cdc.MustUnmarshalBinary(res_version, &version)
-		output, err := cdc.MarshalJSONIndent(version, "", "  ")
+		res_currentVersionInfo, err := cliCtx.QueryStore(upgrade.GetProposalIDKey(proposalID), storeName)
+		var currentVersionInfo upgrade.VersionInfo
+		cdc.MustUnmarshalBinaryLengthPrefixed(res_currentVersionInfo, &currentVersionInfo)
+
+		res_upgradeInProgress, _ := cliCtx.QueryStore(sdk.UpgradeConfigKey, sdk.MainStore)
+		var upgradeInProgress sdk.UpgradeConfig
+		if err == nil && len(res_upgradeInProgress) != 0 {
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeInProgress, &upgradeInProgress)
+		}
+
+		res_LastFailedVersion, err := cliCtx.QueryStore(sdk.LastFailedVersionKey, sdk.MainStore)
+		var lastFailedVersion uint64
+		if err == nil && len(res_LastFailedVersion) != 0 {
+			cdc.MustUnmarshalBinaryLengthPrefixed(res_LastFailedVersion, &lastFailedVersion)
+		} else {
+			lastFailedVersion = 0
+		}
+
+		upgradeInfoOutput := upgcli.NewUpgradeInfoOutput(currentVersionInfo, lastFailedVersion, upgradeInProgress)
+
+		output, err := cdc.MarshalJSONIndent(upgradeInfoOutput, "", "  ")
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

@@ -1,23 +1,15 @@
 package gov
 
-import (
-	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/upgrade/params"
-)
+import sdk "github.com/irisnet/irishub/types"
 
 var _ Proposal = (*SoftwareUpgradeProposal)(nil)
 
 type SoftwareUpgradeProposal struct {
-	TextProposal
+	BasicProposal
+	ProtocolDefinition sdk.ProtocolDefinition `json:"protocol_definition"`
 }
 
-func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, k Keeper) error {
-	logger := ctx.Logger().With("module", "x/gov")
-	logger.Info("Execute SoftwareProposal begin", "info", fmt.Sprintf("current height:%d", ctx.BlockHeight()))
-
-    upgradeparams.SetCurrentUpgradeProposalId(ctx,sp.ProposalID)
-	upgradeparams.SetProposalAcceptHeight(ctx,ctx.BlockHeight())
-
-	return nil
+func (sp SoftwareUpgradeProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sp.ProtocolDefinition }
+func (sp *SoftwareUpgradeProposal) SetProtocolDefinition(upgrade sdk.ProtocolDefinition) {
+	sp.ProtocolDefinition = upgrade
 }

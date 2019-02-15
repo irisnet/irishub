@@ -2,54 +2,59 @@ package lcd
 
 import (
 	"errors"
-	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
-	"net/http"
-	"strconv"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type postProposalReq struct {
-	BaseTx         context.BaseTx   `json:"base_tx"`
-	Param          gov.Param        `json:"param"`
-	Title          string           `json:"title"`           //  Title of the proposal
-	Description    string           `json:"description"`     //  Description of the proposal
-	ProposalType   gov.ProposalKind `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
-	Proposer       string           `json:"proposer"`        //  Address of the proposer
-	InitialDeposit string           `json:"initial_deposit"` // Coins to add to the proposal's deposit
+	BaseTx         utils.BaseTx   `json:"base_tx"`
+	Title          string         `json:"title"`           //  Title of the proposal
+	Description    string         `json:"description"`     //  Description of the proposal
+	ProposalType   string         `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
+	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
+	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
+	Params         gov.Params     `json:"param"`
+	Usage          gov.UsageType  `json:"usage"`
+	DestAddress    sdk.AccAddress `json:"dest_address"`
+	Percent        sdk.Dec        `json:"percent"`
 }
 
 type depositReq struct {
-	BaseTx    context.BaseTx `json:"base_tx"`
-	Depositer string         `json:"depositer"` // Address of the depositer
+	BaseTx    utils.BaseTx   `json:"base_tx"`
+	Depositor sdk.AccAddress `json:"depositor"` // Address of the depositor
 	Amount    string         `json:"amount"`    // Coins to add to the proposal's deposit
 }
 
 type voteReq struct {
-	BaseTx context.BaseTx `json:"base_tx"`
-	Voter  string         `json:"voter"`  //  address of the voter
-	Option gov.VoteOption `json:"option"` //  option from OptionSet chosen by the voter
+	BaseTx utils.BaseTx   `json:"base_tx"`
+	Voter  sdk.AccAddress `json:"voter"`  //  address of the voter
+	Option string         `json:"option"` //  option from OptionSet chosen by the voter
 }
 
-func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var req postProposalReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Proposer)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 
-		proposer, err := sdk.AccAddressFromBech32(req.Proposer)
+		proposalType, err := gov.ProposalTypeFromString(client.NormalizeProposalType(req.ProposalType))
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -60,20 +65,39 @@ func postProposalHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		// create the message
-		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, req.ProposalType, proposer, initDepositAmount, req.Param)
+		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Params)
+		if msg.ProposalType == gov.ProposalTypeTxTaxUsage {
+			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
+			err = msg.ValidateBasic()
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{taxMsg})
+			return
+		}
+		if proposalType == gov.ProposalTypeParameterChange {
+			if err := client.ValidateParam(req.Params); err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
 
-func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
@@ -82,93 +106,82 @@ func depositHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFu
 			return
 		}
 
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		proposalID, ok := utils.ParseUint64OrReturnBadRequest(w, strProposalID)
+		if !ok {
 			return
 		}
 
 		var req depositReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
+		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Depositer)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		depositer, err := sdk.AccAddressFromBech32(req.Depositer)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
+
 		depositAmount, err := cliCtx.ParseCoins(req.Amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		// create the message
-		msg := gov.NewMsgDeposit(depositer, proposalID, depositAmount)
+		msg := gov.NewMsgDeposit(req.Depositor, proposalID, depositAmount)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
 
-func voteHandlerFn(cdc *wire.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
 		if len(strProposalID) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
 			err := errors.New("proposalId required but not specified")
-			w.Write([]byte(err.Error()))
-
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		proposalID, err := strconv.ParseInt(strProposalID, 10, 64)
-		if err != nil {
-			err := fmt.Errorf("proposalID [%d] is not positive", proposalID)
-			w.Write([]byte(err.Error()))
+		proposalID, ok := utils.ParseUint64OrReturnBadRequest(w, strProposalID)
+		if !ok {
 			return
 		}
 
 		var req voteReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
+		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		cliCtx = utils.InitRequestClictx(cliCtx, r, req.BaseTx.LocalAccountName, req.Voter)
-		txCtx, err := context.NewTxContextFromBaseTx(cliCtx, cdc, req.BaseTx)
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
+			return
+		}
+
+		voteOption, err := gov.VoteOptionFromString(client.NormalizeVoteOption(req.Option))
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		voter, err := sdk.AccAddressFromBech32(req.Voter)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
 		// create the message
-		msg := gov.NewMsgVote(voter, proposalID, req.Option)
+		msg := gov.NewMsgVote(req.Voter, proposalID, voteOption)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, txCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }

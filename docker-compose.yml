@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  irisnode0:
+    container_name: irisnode0
+    image: ubuntu:16.04
+    ports:
+    - "26656-26657:26656-26657"
+    volumes:
+    - ./build:/home
+    command: /bin/bash -c 'cd /home/nodecluster/node0 && ../../iris start --home iris --log_level info'
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.2
+
+  irisnode1:
+    container_name: irisnode1
+    image: ubuntu:16.04
+    ports:
+    - "26659-26660:26656-26657"
+    volumes:
+    - ./build:/home
+    command: /bin/bash -c 'cd /home/nodecluster/node1 && ../../iris start --home iris --log_level info'
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.3
+
+  irisnode2:
+    container_name: irisnode2
+    image: ubuntu:16.04
+    ports:
+    - "26661-26662:26656-26657"
+    volumes:
+    - ./build:/home
+    command: /bin/bash -c 'cd /home/nodecluster/node2 && ../../iris start --home iris --log_level info'
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.4
+
+  irisnode3:
+    container_name: irisnode3
+    image: ubuntu:16.04
+    ports:
+    - "26663-26664:26656-26657"
+    volumes:
+    - ./build:/home
+    command: /bin/bash -c 'cd /home/nodecluster/node3 && ../../iris start --home iris --log_level info'
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.5
+
+networks:
+  localnet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 192.168.10.0/16

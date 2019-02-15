@@ -2,7 +2,7 @@
 package tags
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -17,7 +17,10 @@ var (
 	Proposer          = "proposer"
 	ProposalID        = "proposal-id"
 	VotingPeriodStart = "voting-period-start"
-	Depositer         = "depositer"
+	Depositor         = "depositor"
 	Voter             = "voter"
-	Param             = "param"
+	Param       = "param"
+	Usage       = "usage"
+	Percent     = "percent"
+	DestAddress = "dest-address"
 )
