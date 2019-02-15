@@ -83,8 +83,8 @@
   revision = "52158e4697b87de16ed390e1bdaf813e581008fa"
 
 [[constraint]]
-  name = "github.com/zondax/ledger-goclient"
-  version = "=v0.1.0"
+  name = "github.com/zondax/ledger-cosmos-go"
+  version = "=v0.9.7"
 
 ## transitive deps, with releases:
 
