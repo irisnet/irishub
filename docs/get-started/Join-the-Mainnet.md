@@ -33,9 +33,6 @@ If you miss the genesis file generation process, you can still upgrade your full
 
 A validator is under the risk of being attacked. You could follow this [guide](../software/sentry.md) to setup a sentry node to protect yourself.
 
-## Fuxi  Testnet
-
-Fuxi testnet is used for testing irishub.
 
 ##  Useful Links
 

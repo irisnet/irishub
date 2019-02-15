@@ -36,10 +36,6 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 验证人有遭受攻击的风险。你可以根据以下[教程](../software/sentry.md)部署一个哨兵节点来保护验证人。
 
-## Fuxi测试网
-
-Fuxi测试网将用于测试irishub的最新功能。
-
 
 ##  更多链接
 
