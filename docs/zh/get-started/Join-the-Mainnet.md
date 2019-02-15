@@ -1,4 +1,4 @@
-# IRISnet测试网
+# IRISnet主网
 
 ## IRIShub 简介
 
