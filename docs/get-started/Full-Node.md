@@ -1,6 +1,6 @@
 # Setup A Full-node
 
-
+Before setting up your validator node on IRIShub, make sure you already had **Iris** installed by following this [guide](Install-the-Software.md)
 
 ## Init Your Node
 

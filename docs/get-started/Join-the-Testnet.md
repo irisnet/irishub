@@ -4,7 +4,7 @@
 
 Fuxi testnet is used for testing irishub.
 
-## How to Join Fuxi Testnet
+## How to Use Fuxi Testnet
 
 ### Step 1: Install Iriscli on Your Server
 

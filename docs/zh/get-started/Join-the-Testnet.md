@@ -5,7 +5,7 @@
 Fuxi测试网将用于测试irishub的最新功能。
 
 
-## 如何加入fuxi测试网
+## 如何测试fuxi网络
 
 ### 第一步: 安装IRIScli
 
