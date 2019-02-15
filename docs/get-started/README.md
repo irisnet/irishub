@@ -10,7 +10,7 @@ IRIS network (a.k.a. IRISnet) is named after Greek goddess **Iris**, said to be 
 Please follow this [instruction](Join-the-Mainnet.md) to join IRIShub mainnet.
 
 
-## How to Join Fuxi Testnet
+## How to Use Fuxi Testnet
 
 
-Please follow this [instruction](Join-the-Testnet.md) to join IRIShub testnet.
+Please follow this [instruction](Join-the-Testnet.md) to use IRIShub testnet.

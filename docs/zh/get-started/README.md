@@ -10,7 +10,7 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 请根据以下[教程](Join-the-Mainnet.md) 加入主网。
 
 
-## 如何加入fuxi测试网
+## 如何使用fuxi测试网
 
 
-请根据以下[教程](Join-the-Testnet.md) 加入测试网。
+请根据以下[教程](Join-the-Testnet.md) 进行测试。
