@@ -2,7 +2,10 @@
 
 ## 介绍
 
-iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris命令并启动守护进程来加入到IRISnet网络。也可以使用该命令在本地启动自己的测试网络，如需加入IRISnet测试网请参阅[get-started](../get-started/README.md)。
+iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris命令并启动守护进程来加入到IRISnet网络。
+
+## 如何安装IRIShub
+请根据以下[教程](How-to-install-irishub.md)完成安装。
 
 ## 如何在本地启动一个IRISnet网络
 
