@@ -2,7 +2,7 @@
 
 ## Fuxi  Testnet
 
-Fuxi testnet is used for testing irishub.
+The Fuxi testnet is used to provide a stable test environment for developers such as third-party wallets, browsers and other applications.
 
 ## How to Use Fuxi Testnet
 
@@ -14,7 +14,7 @@ Please follow this [instruction](Install-the-Software.md) to get **Iricli** inst
 
 * RPC
 
-please use the following url as `node` in your iriscli query: https://rpc.testnet.irisnet.org
+please use the following url as `node` in your iriscli query: http://rpc.testnet.irisnet.org:80
 
 * LCD
 

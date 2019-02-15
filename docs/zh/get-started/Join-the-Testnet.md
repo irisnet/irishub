@@ -2,8 +2,7 @@
 
 ## Fuxi测试网
 
-Fuxi测试网将用于测试irishub的最新功能。
-
+伏羲测试网（chain-id = fuxi）将运行跟主网一致的软件版本，为开发者社区（钱包、浏览器、Service Providers/Consumers）提供一个稳定的测试环境。
 
 ## 如何测试fuxi网络
 
@@ -15,7 +14,7 @@ Fuxi测试网将用于测试irishub的最新功能。
 
 * RPC
 
-通过`iriscli`执行相关命令，将`node`字段设为：https://rpc.testnet.irisnet.org
+通过`iriscli`执行相关命令，将`node`字段设为：http://rpc.testnet.irisnet.org:80
 
 * LCD
 
