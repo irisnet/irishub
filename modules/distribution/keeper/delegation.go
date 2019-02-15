@@ -184,7 +184,7 @@ func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress
 
 	k.SetValidatorDistInfo(ctx, valInfo)
 	k.SetDelegationDistInfo(ctx, delInfo)
-	ctx = ctx.WithDistriReason("WithdrawDelegationReward")
+	ctx = ctx.WithDistriReason("Withdraw delegation reward")
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
 	return withdraw, nil
 }
@@ -207,7 +207,7 @@ func (k Keeper) CurrentDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress,
 func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) (types.DecCoins, sdk.Tags) {
 	withdraw, tags := k.withdrawDelegationRewardsAll(ctx, delAddr)
 	feePool := k.GetFeePool(ctx)
-	ctx = ctx.WithDistriReason("WithdrawDelegationRewardsAll")
+	ctx = ctx.WithDistriReason("Withdraw all delegation rewards for a delegator")
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
 	return withdraw, tags
 }
