@@ -37,7 +37,7 @@ module.exports = {
                     '/get-started/': [
                         ['Download-Rainbow.md', 'Download Rainbow'],
                         ['Install-the-Software.md', 'Install the Software'],
-                        ['Join-the-Testnet.md', 'Use the Testnet']
+                        ['Join-the-Testnet.md', 'Use the Testnet'],
                         ['Join-the-Mainnet.md', 'Join the Mainnet']
                     ],
                     '/features/': [{
@@ -160,7 +160,7 @@ module.exports = {
                     '/zh/get-started/': [
                         ['Download-Rainbow.md', 'Download Rainbow'],
                         ['Install-the-Software.md', 'Install the Software'],
-                        ['Join-the-Testnet.md', 'Use the Testnet']
+                        ['Join-the-Testnet.md', 'Use the Testnet'],
                         ['Join-the-Mainnet.md', 'Join the Mainnet']
 
                     ],
