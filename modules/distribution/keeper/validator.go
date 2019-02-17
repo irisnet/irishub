@@ -92,7 +92,7 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 			k.SetValidatorDistInfo(ctx, vi)
 			k.SetDelegationDistInfo(ctx, di)
 			ctx = ctx.WithDistriReason("Validator has no self-delegation and is jailed, withdraw reward for other delegator")
-			k.WithdrawToDelegator(ctx, fp, accAddr, withdraw)
+			k.WithdrawToDelegator(ctx, fp, delegation.DelegatorAddr, withdraw)
 		}
 		if len(delegations) == 0 {
 			vi := k.GetValidatorDistInfo(ctx, operatorAddr)
