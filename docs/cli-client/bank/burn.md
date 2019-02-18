@@ -21,7 +21,7 @@ iriscli bank burn --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount
 ### Burn token 
 
 ```
- iriscli bank burn --from=test  --fee=0.4iris --chain-id=test-irishub --amount=10iris --commit
+ iriscli bank burn --from=test  --fee=0.4iris --chain-id=<chain-id> --amount=10iris --commit
 ```
 
 After that, you will get the detail info for the send

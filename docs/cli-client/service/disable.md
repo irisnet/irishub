@@ -21,7 +21,7 @@ iriscli service disable [flags]
 
 ### Disable a available service binding
 ```shell
-iriscli service disable --chain-id=test  --from=node0 --fee=0.4iris --def-chain-id=test --service-name=test-service
+iriscli service disable --chain-id=<chain-id>  --from=node0 --fee=0.4iris --def-chain-id=test --service-name=test-service
 ```
 
 After that, you're done with disabling a available service binding.

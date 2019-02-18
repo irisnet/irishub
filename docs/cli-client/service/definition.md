@@ -23,7 +23,7 @@ iriscli service definition [flags]
 ### Query a service definition
 
 ```shell
-iriscli service definition --def-chain-id=test --service-name=test-service
+iriscli service definition --def-chain-id=<chain-id> --service-name=test-service
 ```
 
 After that, you will get detail info for the service definition which has the specfied define chain id and service name.
