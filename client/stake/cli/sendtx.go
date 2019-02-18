@@ -65,8 +65,8 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 
 			// get the initial validator commission parameters
 			rateStr := viper.GetString(FlagCommissionRate)
-			maxRateStr := viper.GetString(FlagCommissionMaxRate)
-			maxChangeRateStr := viper.GetString(FlagCommissionMaxChangeRate)
+			maxRateStr := "1.0"
+			maxChangeRateStr := "1.0"
 			commissionMsg, err := stakeClient.BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr)
 			if err != nil {
 				return err
@@ -116,8 +116,6 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagPubKey)
 	cmd.MarkFlagRequired(FlagAmount)
 	cmd.MarkFlagRequired(FlagCommissionRate)
-	cmd.MarkFlagRequired(FlagCommissionMaxRate)
-	cmd.MarkFlagRequired(FlagCommissionMaxChangeRate)
 	return cmd
 }
 

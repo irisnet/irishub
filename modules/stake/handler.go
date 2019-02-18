@@ -112,8 +112,8 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator, k k
 
 	validator := NewValidator(msg.ValidatorAddr, msg.PubKey, msg.Description)
 	commission := NewCommissionWithTime(
-		msg.Commission.Rate, msg.Commission.MaxRate,
-		msg.Commission.MaxChangeRate, ctx.BlockHeader().Time,
+		msg.Commission.Rate, sdk.NewDec(1),
+		sdk.NewDec(1), ctx.BlockHeader().Time,
 	)
 	validator, err := validator.SetInitialCommission(commission)
 	if err != nil {
