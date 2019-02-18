@@ -25,7 +25,7 @@ iriscli stake delegate --help
 ## Examples
 
 ```
-iriscli stake delegate --chain-id=test-irishub --from=KeyName --fee=0.04iris  --amount=10iris --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
+iriscli stake delegate --chain-id=<chain-id> --from=KeyName --fee=0.04iris  --amount=10iris --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
 ```
 Output:
 ```txt

@@ -25,7 +25,7 @@ iriscli tendermint tx [hash] [flags]
 ### tx
 
 ```shell
-iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=irishub-test --trust-node=true
+iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=<chain-id> --trust-node=true
 ```
 
 You will get the following result.
