@@ -50,7 +50,7 @@ This specification briefly introduces the functionality of stake module and what
 
 	Then just send a create-validator transaction. This is an example command.
 	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.4iris --chain-id=<chain-id> --from=<key name> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1
+	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.4iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
 	```
 	The more tokens specified by `--amount`, the more probability your full node will be a real validator. Otherwise, it will just be validator candidate.
 

@@ -72,7 +72,7 @@ Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` c
 
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<pubkey> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
 
@@ -82,7 +82,7 @@ To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --pubkey=pubkey  --fee=0.05iris  --gas=2000000 --from=<name> --chain-id=<chain-id>   --node=tcp://localhost:26657  --amount=1iris
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.4iris --pubkey=<pubkey> --amount=1iris --moniker={validator-name} --commission-rate=0.1
 ```
 Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../features/basic-concepts/coin-type.md)
 
