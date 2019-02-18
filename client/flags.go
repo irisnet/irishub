@@ -12,7 +12,7 @@ const (
 	// DefaultGasAdjustment is applied to gas estimates to avoid tx
 	// execution failures due to state changes that might
 	// occur between the tx simulation and the actual run.
-	DefaultGasAdjustment = 1.0
+	DefaultGasAdjustment = 1.5
 	DefaultGasLimit      = 20000
 	GasFlagSimulate      = "simulate"
 
@@ -116,6 +116,7 @@ func ReadGasFlag(s string) (simulate bool, gas uint64, err error) {
 	case "":
 		gas = DefaultGasLimit
 	case GasFlagSimulate:
+		gas = 1
 		simulate = true
 	default:
 		gas, err = strconv.ParseUint(s, 10, 64)
