@@ -82,7 +82,10 @@ func (k Keeper) onDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress,
 	valAddr sdk.ValAddress) {
 	if valAddr.Equals(sdk.ValAddress(delAddr)) {
 		feePool, commission := k.withdrawValidatorCommission(ctx, valAddr)
-		ctx = ctx.WithDistriReason("Withdraw commission for removing delegation")
+
+		recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
+		coins, _ := commission.TruncateDecimal()
+		ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), recipient.String(), ctx.CoinFlowMsgType(), sdk.ValidatorCommissionReward, valAddr.String(), coins.String(), ctx.BlockHeader().Time.String())
 		k.WithdrawToDelegator(ctx, feePool, delAddr, commission)
 	}
 	k.RemoveDelegationDistInfo(ctx, delAddr, valAddr)

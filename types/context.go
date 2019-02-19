@@ -50,6 +50,9 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	c = c.WithMinimumFees(Coins{})
 	c = c.WithConsensusParams(nil)
 	c = c.WithCheckValidNum(0)
+	c = c.WithCoinFlowTrigger("")
+	c = c.WithCoinFlowTags(nil)
+	c = c.WithCoinFlowMsgType("")
 	return c
 }
 
@@ -145,7 +148,9 @@ const (
 	contextKeyBlockGasMeter
 	contextKeyMinimumFees
 	contextKeyCheckValidNum
-	contextKeyDistriReason
+	contextKeyCoinFlowTrigger
+	contextKeyCoinFlowTags
+	contextKeyCoinFlowMsgType
 )
 
 // NOTE: Do not expose MultiStore.
@@ -180,7 +185,11 @@ func (c Context) IsCheckTx() bool { return c.Value(contextKeyIsCheckTx).(bool) }
 
 func (c Context) MinimumFees() Coins { return c.Value(contextKeyMinimumFees).(Coins) }
 
-func (c Context) DistriReason() string { return c.Value(contextKeyDistriReason).(string) }
+func (c Context) CoinFlowTrigger() string { return c.Value(contextKeyCoinFlowTrigger).(string) }
+
+func (c Context) CoinFlowTags() CoinFlowRecord { return c.Value(contextKeyCoinFlowTags).(CoinFlowRecord) }
+
+func (c Context) CoinFlowMsgType() string { return c.Value(contextKeyCoinFlowMsgType).(string) }
 
 func (c Context) CheckValidNum() uint64 { return c.Value(contextKeyCheckValidNum).(uint64) }
 
@@ -241,9 +250,11 @@ func (c Context) WithMinimumFees(minFees Coins) Context {
 	return c.withValue(contextKeyMinimumFees, minFees)
 }
 
-func (c Context) WithDistriReason(reason string) Context {
-	return c.withValue(contextKeyDistriReason, reason)
-}
+func (c Context) WithCoinFlowTrigger(trigger string) Context { return c.withValue(contextKeyCoinFlowTrigger, trigger) }
+
+func (c Context) WithCoinFlowTags(cTag CoinFlowRecord) Context { return c.withValue(contextKeyCoinFlowTags, cTag) }
+
+func (c Context) WithCoinFlowMsgType(cfType string) Context { return c.withValue(contextKeyCoinFlowMsgType, cfType) }
 
 // Cache the multistore and return a new cached context. The cached context is
 // written to the context when writeCache is called.

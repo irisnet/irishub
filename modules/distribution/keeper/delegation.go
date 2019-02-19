@@ -1,11 +1,9 @@
 package keeper
 
 import (
-	"encoding/hex"
 	"fmt"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
 // check whether a delegator distribution info exists
@@ -118,6 +116,9 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 		validator.GetDelegatorShares(), delegation.GetShares())
 	logger.Debug("After withdraw", "validator_distInfo", valInfo.String())
 
+	recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
+	coins, _ := withdraw.TruncateDecimal()
+	ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), recipient.String(), ctx.CoinFlowMsgType(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String(), ctx.BlockHeader().Time.String())
 	return feePool, valInfo, delInfo, withdraw
 }
 
@@ -152,13 +153,6 @@ func (k Keeper) WithdrawToDelegator(ctx sdk.Context, feePool types.FeePool,
 	k.SetFeePool(ctx, feePool)
 
 	ctx.Logger().Debug("Withdraw reward to delegator", "reward", coinsToAdd.String(), "change", change.ToString(), "delegator", delAddr.String())
-	var txHash string
-	if len(ctx.TxBytes()) != 0 {
-		txHash = hex.EncodeToString(tmhash.Sum(ctx.TxBytes()))
-	} else {
-		txHash = ""
-	}
-	ctx.Logger().Info("Withdraw reward to delegator", "txHash", txHash, "delegator", delAddr.String(), "reward", coinsToAdd.String(), "reason", ctx.DistriReason() )
 
 	_, _, err := k.bankKeeper.AddCoins(ctx, withdrawAddr, coinsToAdd)
 	if err != nil {
@@ -184,7 +178,6 @@ func (k Keeper) WithdrawDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress
 
 	k.SetValidatorDistInfo(ctx, valInfo)
 	k.SetDelegationDistInfo(ctx, delInfo)
-	ctx = ctx.WithDistriReason("Withdraw delegation reward")
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
 	return withdraw, nil
 }
@@ -207,7 +200,6 @@ func (k Keeper) CurrentDelegationReward(ctx sdk.Context, delAddr sdk.AccAddress,
 func (k Keeper) WithdrawDelegationRewardsAll(ctx sdk.Context, delAddr sdk.AccAddress) (types.DecCoins, sdk.Tags) {
 	withdraw, tags := k.withdrawDelegationRewardsAll(ctx, delAddr)
 	feePool := k.GetFeePool(ctx)
-	ctx = ctx.WithDistriReason("Withdraw all delegation rewards for a delegator")
 	k.WithdrawToDelegator(ctx, feePool, delAddr, withdraw)
 	return withdraw, tags
 }
@@ -230,6 +222,11 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 		diWithdrawTruncated, _ := diWithdraw.TruncateDecimal()
 		ctx.Logger().Debug("Withdraw delegation reward", "reward", diWithdrawTruncated.String(), "delegator", del.GetDelegatorAddr().String(), "validator", del.GetValidatorAddr().String())
 		tags = tags.AppendTag(fmt.Sprintf(sdk.TagRewardFromValidator, valAddr.String()), []byte(diWithdrawTruncated.String()))
+
+		recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
+		coins, _ := diWithdraw.TruncateDecimal()
+		ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), recipient.String(), ctx.CoinFlowMsgType(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String(), ctx.BlockHeader().Time.String())
+
 		return false
 	}
 	k.stakeKeeper.IterateDelegations(ctx, delAddr, operationAtDelegation)

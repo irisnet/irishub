@@ -145,3 +145,13 @@ func (app *IrisApp) replayToHeight(replayHeight int64, logger log.Logger) int64 
 	}
 	return loadHeight
 }
+
+func extractHookTags(ctx sdk.Context) sdk.Tags {
+	var tags sdk.Tags
+	for _, tag := range ctx.CoinFlowTags().GetTags() {
+		//tagParts := strings.Split(tag, ":")
+		ctx.Logger().Info("extractHookTags","key", string(tag.Key), "value", string(tag.Value))
+		tags = tags.AppendTag(string(tag.Key), tag.Value)
+	}
+	return tags
+}

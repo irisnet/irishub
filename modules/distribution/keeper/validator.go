@@ -81,7 +81,6 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 		k.SetFeePool(ctx, fp)
 		k.SetValidatorDistInfo(ctx, vi)
 		k.SetDelegationDistInfo(ctx, di)
-		ctx = ctx.WithDistriReason("Withdraw validator self-delegation reward")
 		k.WithdrawToDelegator(ctx, fp, accAddr, withdraw)
 	} else {
 		delegations := k.stakeKeeper.GetValidatorDelegations(ctx, operatorAddr)
@@ -91,7 +90,6 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 			k.SetFeePool(ctx, fp)
 			k.SetValidatorDistInfo(ctx, vi)
 			k.SetDelegationDistInfo(ctx, di)
-			ctx = ctx.WithDistriReason("Validator has no self-delegation and is jailed, withdraw reward for other delegator")
 			k.WithdrawToDelegator(ctx, fp, delegation.DelegatorAddr, withdraw)
 		}
 		if len(delegations) == 0 {
@@ -132,7 +130,9 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	commissionTruncated, _ := commission.TruncateDecimal()
 	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commissionTruncated.String()))
 
-	ctx = ctx.WithDistriReason("Withdraw validator all rewards including commission")
+	recipient := k.GetDelegatorWithdrawAddr(ctx, sdk.AccAddress(operatorAddr))
+	coins, _ := commission.TruncateDecimal()
+	ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), recipient.String(), ctx.CoinFlowMsgType(), sdk.ValidatorCommissionReward, operatorAddr.String(), coins.String(), ctx.BlockHeader().Time.String())
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
 	return withdraw, resultTags, nil
 }

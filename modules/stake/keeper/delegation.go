@@ -567,6 +567,7 @@ func (k Keeper) CompleteUnbonding(ctx sdk.Context, delAddr sdk.AccAddress, valAd
 		return types.ErrNoUnbondingDelegation(k.Codespace())
 	}
 
+	ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), ubd.DelegatorAddr.String(), ctx.CoinFlowMsgType(), sdk.StakeDelegationRefund, sdk.StakeDelegation, ubd.Balance.String(), ctx.BlockHeader().Time.String())
 	_, _, err := k.bankKeeper.AddCoins(ctx, ubd.DelegatorAddr, sdk.Coins{ubd.Balance})
 	if err != nil {
 		return err

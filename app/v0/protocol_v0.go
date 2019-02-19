@@ -320,12 +320,23 @@ func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
+	tags = tags.AppendTags(extractHookTags(ctx))
 	p.assertRuntimeInvariants(ctx)
 
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
 	}
+}
+
+func extractHookTags(ctx sdk.Context) sdk.Tags {
+	var tags sdk.Tags
+	for _, tag := range ctx.CoinFlowTags().GetTags() {
+		//tagParts := strings.Split(tag, ":")
+		ctx.Logger().Error("extractHookTags","key", string(tag.Key), "value", string(tag.Value))
+		tags = tags.AppendTag(string(tag.Key), tag.Value)
+	}
+	return tags
 }
 
 // custom logic for iris initialization

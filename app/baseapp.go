@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io"
 	"runtime/debug"
@@ -499,7 +500,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		gasMeter = sdk.NewInfiniteGasMeter()
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
-		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight()))
+		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowTags())
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 
@@ -588,10 +589,12 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 
 // retrieve the context for the tx w/ txBytes and other memoized values.
 func (app *BaseApp) getContextForTx(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
+	txHash := hex.EncodeToString(tmhash.Sum(txBytes))
 	ctx = app.getState(mode).ctx.
 		WithTxBytes(txBytes).
 		WithVoteInfos(app.voteInfos).
-		WithConsensusParams(app.consensusParams)
+		WithConsensusParams(app.consensusParams).
+		WithCoinFlowTrigger(txHash)
 	if mode == RunTxModeSimulate {
 		ctx, _ = ctx.CacheContext()
 	}
@@ -619,6 +622,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		if mode != RunTxModeCheck {
 			ctx = ctx.WithLogger(ctx.Logger().With("module", fmt.Sprintf("iris/%s", msg.Route())).
 				With("handler", msg.Type()))
+			ctx = ctx.WithCoinFlowMsgType(msg.Type())
 			msgResult = handler(ctx, msg)
 		}
 		msgResult.Tags = append(sdk.Tags{sdk.MakeTag(sdk.TagAction, []byte(msg.Type()))}, msgResult.Tags...)
