@@ -50,7 +50,7 @@
 
 	发送申请成为验证人的交易，示例：
 	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.4iris --chain-id=<chain-id> --from=<key name> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1
+	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.4iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
 	```
 	`--amount`可以指定自己绑定的token数量，这个数越大你越有可能立刻成为验证人，否则只能成为候选验证人。
 
