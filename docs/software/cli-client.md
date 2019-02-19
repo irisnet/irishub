@@ -19,7 +19,7 @@ The `iriscli config` command interactively configures some default parameters, s
 
 ## Fee and Gas
 
-`iriscli` can send a transaction with the fee specified by `--fee` and gas(the default is 200000) specified by `--gas` . The gas divided by the fee is gas price, and the gas price can't be less than the minimum value set by the blockchain. The remaining fees after the completion of the entire transaction will be returned to the user. You can set `--gas="simulate"`, which can estimate the gas consumed by the transaction through the simulation run, and multiply the coefficient specified by `--gas-adjustment` to get the final gas as the transaction gas. Finally, the transaction will be broadcast.
+`iriscli` can send a transaction with the fee specified by `--fee` and gas(the default is 200000) specified by `--gas` . The fee divided by the gas is gas price, and the gas price can't be less than the minimum value set by the blockchain. The remaining fees after the completion of the entire transaction will be returned to the user. You can set `--gas="simulate"`, which can estimate the gas consumed by the transaction through the simulation run, and multiply the coefficient specified by `--gas-adjustment` to get the final gas as the transaction gas. Finally, the transaction will be broadcast.
 
 ## Dry-run Mode
 

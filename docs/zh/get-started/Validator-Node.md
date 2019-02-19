@@ -1,6 +1,6 @@
 # 运行一个验证人节点
 
-在配置测试网验证人节点之前，请保证已经按照此[文档](Install-the-Software.md)正确安装了**Iris**
+在配置验证人节点之前，请保证已经按照此[文档](Install-the-Software.md)正确安装了**Iris**
 
 在IRISHub枢纽中，验证人负责将交易打包并提交区块。成为一个验证人需要满足很多条件，不仅仅是技术和硬件上的投资。同时，因为只有在有限验证人的条件下，Tendermint才能发挥最大的作用。目前，我们将IRISHub枢纽的验证人上限定为100。也就是说只有前100个验证人能够获得奖励，而大部分IRIS持有者不会成为验证人而是通过委托的方式决定谁会成为验证人。
 
@@ -105,7 +105,7 @@ iriscli status --node=tcp://localhost:26657
 你应该在`details`字段注明自定义的信息。
 
 ```
-iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=fuxi-8000 
+iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=irishub-8000 
   --details="details"--node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
 ```
 ### 查询验证人信息
