@@ -8,8 +8,8 @@ all: get_tools get_vendor_deps install build_cur
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 
-InvariantLevel := $(shell if [ -z ${InvariantLevel} ]; then echo "panic"; else echo ${InvariantLevel}; fi)
-NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "testnet"; else echo ${NetworkType}; fi)
+InvariantLevel := $(shell if [ -z ${InvariantLevel} ]; then echo "error"; else echo ${InvariantLevel}; fi)
+NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo ${NetworkType}; fi)
 
 BUILD_FLAGS = -ldflags "\
 -X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
@@ -20,7 +20,7 @@ BUILD_FLAGS = -ldflags "\
 ### Tools & dependencies
 
 echo_bech32_prefix:
-	@echo "\"source scripts/setProdEnv.sh\" to set compile environment variables for your product, or default values will be applied"
+	@echo "If you want to build binaries for testnet, please execute \"source scripts/setTestEnv.sh\" first"
 	@echo InvariantLevel=${InvariantLevel}
 	@echo NetworkType=${NetworkType}
 
@@ -118,17 +118,16 @@ test_sim_iris_slow:
 	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
 
 testnet_init:
-	@echo "Work well only when Bech32PrefixAccAddr equal faa"
 	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
 	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
 	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
-	@jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json
+	@if [ ${NetworkType} = "testnet" ]; then jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ; else jq '.app_state.accounts+= [{"address": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ; fi
 	@sudo cp build/genesis_temp.json build/nodecluster/node0/iris/config/genesis.json
 	@sudo cp build/genesis_temp.json build/nodecluster/node1/iris/config/genesis.json
 	@sudo cp build/genesis_temp.json build/nodecluster/node2/iris/config/genesis.json
 	@sudo cp build/genesis_temp.json build/nodecluster/node3/iris/config/genesis.json
 	@rm build/genesis_temp.json
-	@echo "Faucet address: faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm"
+	@if [ ${NetworkType} = "testnet" ]; then echo "Faucet address: faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm" ; else echo "Faucet address: iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx" ; fi
 	@echo "Faucet coin amount: 1000000iris"
 	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
 

@@ -4,9 +4,9 @@
 # Edit the script to set environment variables for your own network
 
 # Network type: testnet, mainnet
-export NetworkType="mainnet"
+export NetworkType="testnet"
 
 # Disable invariant checking: "no"
 # Panic on invariant failure: "panic"
 # Print error message on invariant failure: "error"
-export InvariantLevel="error"
+export InvariantLevel="panic"
