@@ -82,7 +82,7 @@ $ iriscli query txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 			return nil
 		},
 	}
-
+	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
