@@ -62,5 +62,5 @@ the validator can be unjailed by the `unjail` command after jailing period.
 If the validator was jailed and the jailing period passed, release the validator by unjail command.
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.4iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.12iris --chain-id=<chain-id>
 ```

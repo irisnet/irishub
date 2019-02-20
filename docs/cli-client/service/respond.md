@@ -22,7 +22,7 @@ iriscli service respond [flags]
 
 ### Respond to a service invocation 
 ```shell
-iriscli service respond --chain-id=<chain-id> --from=node0 --fee=0.4iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
+iriscli service respond --chain-id=<chain-id> --from=node0 --fee=0.12iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
 ```
 
 After that, you're done with responding to a service invocation.

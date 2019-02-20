@@ -25,7 +25,7 @@ iriscli service update-binding [flags]
 
 ### Update an existing service binding
 ```shell
-iriscli service update-binding --chain-id=test --from=node0 --fee=0.4iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding --chain-id=test --from=node0 --fee=0.12iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 ```
 
 After that, you're done with updating an existing service binding.

@@ -29,7 +29,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHomeB))
 	barCeshPubKey := executeGetValidatorPK(t, fmt.Sprintf("iris tendermint show-validator --home=%s", irisHomeB))
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.04iris", flags, barAddr), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10iris --to=%s --from=foo --gas=10000 --fee=0.2iris", flags, barAddr), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
