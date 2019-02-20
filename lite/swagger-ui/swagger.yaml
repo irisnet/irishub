@@ -127,7 +127,7 @@ paths:
                 $ref: '#/components/schemas/BlockQuery'
         '500':
           description: Server internal error
-  '/blocks/{height}':
+  /blocks/{height}:
     get:
       summary: Get a block at a certain height
       tags:
@@ -146,6 +146,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlockQuery'
+        '400':
+          description: Invalid height
+        '404':
+          description: Request block height doesn't
+        '500':
+          description: Server internal error
+  /blocks-result/latest:
+    get:
+      summary: Get the latest block result
+      tags:
+        - ICS0
+      responses:
+        '200':
+          description: The latest block result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockResultQuery'
+        '500':
+          description: Server internal error
+  '/blocks-result/{height}':
+    get:
+      summary: Get a block result at a certain height
+      tags:
+        - ICS0
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: The block result at a specific height
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockResultQuery'
         '400':
           description: Invalid height
         '404':
@@ -217,6 +256,11 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: coin-flow-record
+          description: 'Include trigger coin flow record'
+          schema:
+            type: boolean
       responses:
         '200':
           description: Tx with the provided hash
@@ -3543,6 +3587,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/KVPair'
+        coin-flow-record:
+          type: array
+          items:
+            $ref: '#/components/schemas/KVPair'
     StdTx:
       type: object
       properties:
@@ -3713,6 +3761,66 @@ components:
               $ref: '#/components/schemas/BlockID'
         block:
           $ref: '#/components/schemas/Block'
+    BlockResultQuery:
+      type: object
+      properties:
+        Height:
+          type: string
+        results:
+          type: object
+          properties:
+            deliver_tx:
+              type: object
+              properties:
+                code:
+                  type: string
+                data:
+                  type: string
+                log:
+                  type: string
+                info:
+                  type: string
+                gas_wanted:
+                  type: string
+                gas_used:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KVPair'
+            end_block:
+              type: object
+              properties:
+                validator_updates:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      pub_key:
+                        type: string
+                      power:
+                        type: string
+                consensus_param_updates:
+                  type: object
+                  properties:
+                    blockSize:
+                      type: string
+                    evidence:
+                      type: string
+                    validator:
+                      type: string
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KVPair'
+            begin_block:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KVPair'
+
     BaseTx:
       type: object
       properties:
