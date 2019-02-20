@@ -16,7 +16,7 @@ IRISnet引入了两种由基金会控制的特权系统用户，profiler和trust
 
     只有profiler能添加新的profiler
     ```shell
-    iriscli guardian add-profiler --profiler-address=[profiler address] --profiler-name=[name] --chain-id=[chain-id] --from=[key name] --fee=0.4iris 
+    iriscli guardian add-profiler --profiler-address=[profiler address] --profiler-name=[name] --chain-id=[chain-id] --from=[key name] --fee=0.12iris 
     ```
     
 2. 查询profiler和trustee列表
@@ -36,7 +36,7 @@ IRISnet引入了两种由基金会控制的特权系统用户，profiler和trust
 
 4. Profiler使用profiling模式发起服务调用
     ```shell
-    iriscli service call --def-chain-id=[def-chain-id] --service-name=[service-name] --method-id=[method-id] --bind-chain-id=[bind-chain-id] --provider=[provider address] --service-fee=1iris --request-data=[request-data] --chain-id=[chain-id] --from=[key name] --fee=0.4iris
+    iriscli service call --def-chain-id=[def-chain-id] --service-name=[service-name] --method-id=[method-id] --bind-chain-id=[bind-chain-id] --provider=[provider address] --service-fee=1iris --request-data=[request-data] --chain-id=[chain-id] --from=[key name] --fee=0.12iris
     ```
     
 5. Trustee作为`TxTaxUsage`提议的目的地地址
@@ -45,5 +45,5 @@ IRISnet引入了两种由基金会控制的特权系统用户，profiler和trust
     
 6. Trustee取回服务费税金
     ```shell
-    iriscli service withdraw-tax --dest-address=[destination address] --withdraw-amount=1iris --chain-id=[chain-id] --from=[key name] --fee=0.4iris 
+    iriscli service withdraw-tax --dest-address=[destination address] --withdraw-amount=1iris --chain-id=[chain-id] --from=[key name] --fee=0.12iris 
     ```

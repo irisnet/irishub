@@ -32,7 +32,7 @@ iriscli stake create-validator --help
 ## Examples
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.4iris --pubkey=<Validator PubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.12iris --pubkey=<Validator PubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 Sample Output:
 ```txt

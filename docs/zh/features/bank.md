@@ -22,7 +22,7 @@
 
     如从账户A转账给账户B10iris:
     ```bash
-    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.4iris --from=[key name of wallet A] --chain-id=[chain-id]
+    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.12iris --from=[key name of wallet A] --chain-id=[chain-id]
     ```
     IRISnet支持多种代币流通，将来IRISnet可以在一个交易中包含多种代币交换——代币种类可以为任意在IRISnet中注册过的coin_type。
 
@@ -30,7 +30,7 @@
 
     为了提高账户安全性，IRISnet支持交易离线签名保护账户的私钥。在任意交易中，使用参数--generate-only=true可以构建一个未签名的交易。使用转账交易作为示例:
     ```bash
-    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.4iris --from=[key name of wallet A] --generate-only=true
+    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.12iris --from=[key name of wallet A] --generate-only=true
     ```
     将构建一个signatures为空的交易返回:
     ```json

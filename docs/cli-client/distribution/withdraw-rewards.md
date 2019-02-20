@@ -29,13 +29,13 @@ Keep in mind, don't specify the above options both.
 
 1. Only withdraw a delegation rewards from a given validator
     ```
-    iriscli distribution withdraw-rewards --only-from-validator <validator address> --from <key name> --fee=0.4iris --chain-id=<chain-id>
+    iriscli distribution withdraw-rewards --only-from-validator <validator address> --from <key name> --fee=0.12iris --chain-id=<chain-id>
     ```
 2. Withdraw all delegation rewards of a delegator
     ```
-    iriscli distribution withdraw-rewards --from <key name> --fee=0.4iris --chain-id=<chain-id>
+    iriscli distribution withdraw-rewards --from <key name> --fee=0.12iris --chain-id=<chain-id>
     ```
 3. If the delegator is a onwer of a validator, withdraw all delegation rewards and validator commmission rewards:
     ```
-    iriscli distribution withdraw-rewards --is-validator=true --from <key name> --fee=0.4iris --chain-id=<chain-id>
+    iriscli distribution withdraw-rewards --is-validator=true --from <key name> --fee=0.12iris --chain-id=<chain-id>
     ```

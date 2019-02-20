@@ -28,7 +28,7 @@ IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式
 
 ```
 # 创建服务定义
-iriscli service define --chain-id=service-test  --from=x --fee=0.4iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=service-test  --from=x --fee=0.12iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 
 # 查询服务定义
 iriscli service definition --def-chain-id=service-test --service-name=test-service
@@ -39,7 +39,7 @@ iriscli service definition --def-chain-id=service-test --service-name=test-servi
 
 ```
 # 服务绑定
-iriscli service bind --chain-id=service-test  --from=x --fee=0.4iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=service-test  --from=x --fee=0.12iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 
 # 查询服务绑定
 iriscli service binding --def-chain-id=service-test --service-name=test-service --bind-chain-id=service-test --provider=<your address>
@@ -48,16 +48,16 @@ iriscli service binding --def-chain-id=service-test --service-name=test-service 
 iriscli service bindings --def-chain-id=service-test --service-name=test-service
 
 # 服务绑定更新
-iriscli service update-binding --chain-id=service-test  --from=x --fee=0.4iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding --chain-id=service-test  --from=x --fee=0.12iris --service-name=test-service --def-chain-id=service-test --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
 
 # 禁用服务绑定
-iriscli service disable --chain-id=service-test  --from=x --fee=0.4iris --def-chain-id=service-test --service-name=test-service
+iriscli service disable --chain-id=service-test  --from=x --fee=0.12iris --def-chain-id=service-test --service-name=test-service
 
 # 开启服务绑定
-iriscli service enable --chain-id=service-test  --from=x --fee=0.4iris --def-chain-id=service-test --service-name=test-service --deposit=1iris
+iriscli service enable --chain-id=service-test  --from=x --fee=0.12iris --def-chain-id=service-test --service-name=test-service --deposit=1iris
 
 # 取回押金
-iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.4iris --def-chain-id=service-test --service-name=test-service
+iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.12iris --def-chain-id=service-test --service-name=test-service
 ```
 
 ### 服务调用
@@ -65,13 +65,13 @@ iriscli service refund-deposit --chain-id=service-test  --from=x --fee=0.4iris -
 
 ```
 # 发起服务调用
-iriscli service call --chain-id=test --from=node0 --fee=0.4iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
+iriscli service call --chain-id=test --from=node0 --fee=0.12iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
 
 # 查询服务请求列表
 iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
 
 # 响应服务调用
-iriscli service respond --chain-id=test --from=node0 --fee=0.4iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
+iriscli service respond --chain-id=test --from=node0 --fee=0.12iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
 
 # 查询服务响应
 iriscli service response --request-chain-id=test --request-id=635-535-0
@@ -80,10 +80,10 @@ iriscli service response --request-chain-id=test --request-id=635-535-0
 iriscli service fees [account address]
 
 # 从服务费退款中退还所有费用
-iriscli service refund-fees --chain-id=test --from=node0 --fee=0.4iris
+iriscli service refund-fees --chain-id=test --from=node0 --fee=0.12iris
 
 # 从服务费收入中取回所有费用
-iriscli service withdraw-fees --chain-id=test --from=node0 --fee=0.4iris
+iriscli service withdraw-fees --chain-id=test --from=node0 --fee=0.12iris
 ```
 
 ## IDL文件扩展
