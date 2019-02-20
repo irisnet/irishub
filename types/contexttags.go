@@ -29,8 +29,12 @@ const (
 
 type CoinFlowTags interface {
 	GetTags() Tags
-	AppendCoinFlowTag(ctx Context, from, to, amount, flowType string)
+	//Append temporary tags to persistent tags
 	TagWrite()
+	//Clean temporary tags
+	TagClean()
+	//Add new tag to temporary tags
+	AppendCoinFlowTag(ctx Context, from, to, amount, flowType string)
 }
 
 type CoinFlowRecord struct {
@@ -73,5 +77,9 @@ func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount,
 
 func (cfRecord *CoinFlowRecord) TagWrite() {
 	cfRecord.tags = cfRecord.tags.AppendTags(cfRecord.tempTags)
+	cfRecord.tempTags = nil
+}
+
+func (cfRecord *CoinFlowRecord) TagClean() {
 	cfRecord.tempTags = nil
 }
