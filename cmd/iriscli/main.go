@@ -59,6 +59,7 @@ func main() {
 	}
 	tendermintCmd.AddCommand(
 		tenderminttxcmd.QueryTxCmd(cdc),
+		tenderminttxcmd.QueryTxWithCoinFlowCmd(cdc),
 		tenderminttxcmd.SearchTxCmd(cdc),
 		tendermintrpccmd.BlockCommand(),
 		tendermintrpccmd.BlockResultCommand(),

@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/client/tendermint"
 	"net/http"
 	"strconv"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -30,10 +30,7 @@ func BlockResultCommand() *cobra.Command {
 	return cmd
 }
 
-type ReadableTag struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
+
 
 type ResponseDeliverTx struct {
 	Code      uint32        `json:"code"`
@@ -42,17 +39,17 @@ type ResponseDeliverTx struct {
 	Info      string        `json:"info"`
 	GasWanted int64         `json:"gas_wanted"`
 	GasUsed   int64         `json:"gas_used"`
-	Tags      []ReadableTag `json:"tags"`
+	Tags      []tendermint.ReadableTag `json:"tags"`
 }
 
 type ResponseEndBlock struct {
 	ValidatorUpdates      []abci.ValidatorUpdate `json:"validator_updates"`
 	ConsensusParamUpdates *abci.ConsensusParams  `json:"consensus_param_updates"`
-	Tags                  []ReadableTag          `json:"tags"`
+	Tags                  []tendermint.ReadableTag          `json:"tags"`
 }
 
 type ResponseBeginBlock struct {
-	Tags []ReadableTag `json:"tags"`
+	Tags []tendermint.ReadableTag `json:"tags"`
 }
 
 type ABCIResponses struct {
@@ -64,17 +61,6 @@ type ABCIResponses struct {
 type ResultBlockResults struct {
 	Height  int64         `json:"height"`
 	Results ABCIResponses `json:"results"`
-}
-
-func MakeTagsHumanReadable(tags sdk.Tags) []ReadableTag {
-	readableTags := make([]ReadableTag, len(tags))
-	for i, kv := range tags {
-		readableTags[i] = ReadableTag{
-			Key:   string(kv.Key),
-			Value: string(kv.Value),
-		}
-	}
-	return readableTags
 }
 
 func getBlockResult(cliCtx context.CLIContext, height *int64) ([]byte, error) {
@@ -101,18 +87,18 @@ func getBlockResult(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 			Info:      delieverTx.Info,
 			GasWanted: delieverTx.GasWanted,
 			GasUsed:   delieverTx.GasUsed,
-			Tags:      MakeTagsHumanReadable(delieverTx.Tags),
+			Tags:      tendermint.MakeTagsHumanReadable(delieverTx.Tags),
 		})
 	}
 	abciResponses := ABCIResponses{
 		DeliverTx: delieverTxResponse,
 		BeginBlock: &ResponseBeginBlock{
-			Tags: MakeTagsHumanReadable(res.Results.BeginBlock.Tags),
+			Tags: tendermint.MakeTagsHumanReadable(res.Results.BeginBlock.Tags),
 		},
 		EndBlock: &ResponseEndBlock{
 			ValidatorUpdates:      res.Results.EndBlock.ValidatorUpdates,
 			ConsensusParamUpdates: res.Results.EndBlock.ConsensusParamUpdates,
-			Tags:                  MakeTagsHumanReadable(res.Results.EndBlock.Tags),
+			Tags:                  tendermint.MakeTagsHumanReadable(res.Results.EndBlock.Tags),
 		},
 	}
 	var response ResultBlockResults
@@ -123,6 +109,33 @@ func getBlockResult(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 		return cdc.MarshalJSONIndent(response, "", "  ")
 	}
 	return cdc.MarshalJSON(response)
+}
+
+func GetTxCoinFlow(cliCtx context.CLIContext, height *int64, hashStr string) ([]tendermint.ReadableTag, error) {
+	// get the node
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := node.BlockResults(height)
+	if err != nil {
+		return nil, err
+	}
+
+	var coinFlowTags []tendermint.ReadableTag
+	endBlockTags := tendermint.MakeTagsHumanReadable(res.Results.EndBlock.Tags)
+	found := false
+	for _,tag := range endBlockTags {
+		if tag.Key == hashStr {
+			coinFlowTags = append(coinFlowTags, tag)
+			found = true
+		} else if found {
+			//txHash coin flow records are centralized distributed
+			break
+		}
+	}
+	return coinFlowTags, nil
 }
 
 // CMD
