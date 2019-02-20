@@ -97,7 +97,7 @@ that your balance is above 0.
 If you want to query your account in test-irishub, you should use the following: 
 
 ```
-iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --chain-id=test-irishub
+iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --chain-id=<chain-id>
 ```
 
 After that, you will get the detail info for the account.

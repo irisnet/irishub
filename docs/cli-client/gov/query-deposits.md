@@ -27,7 +27,7 @@ iriscli gov query-deposits --help
 ### Query deposits
 
 ```shell
-iriscli gov query-deposits --chain-id=test --proposal-id=1
+iriscli gov query-deposits --chain-id=<chain-id> --proposal-id=1
 ```
 
 You could query all the deposited tokens on a specific proposal, includes deposit details for each depositor.

@@ -5,8 +5,8 @@ Specify the maximum gas limit by `--gas`.
 If maximum gas is too small, it won't be enough for executing the transaction. 
 If the fee is too low, fee paid for each unit of gas will be less than gaslimit and 
 validators won't execute the transaction neither. 
-The fee(minimum unit)/gas must be large than 2*10^13. 
-We recommend that you set your maximum gas to 20000 and set your maximum fee to 0.4iris. 
+The fee(minimum unit)/gas must be large than 6*10^12. 
+We recommend that you set your maximum gas to 20000 and set your maximum fee to 0.12iris. 
 Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
 
 ## Fee
@@ -29,6 +29,6 @@ The total gas needed for executing the transaction is the sum of gas needed for 
 
 Example
 ```
-    iriscli stake unbond  --from=test --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy --address-delegator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.02iris --gas=20000 --chain-id=test-irishub
+    iriscli stake unbond  --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.12iris --gas=20000 --chain-id=<chain-id>
 ```
-This example is a transaction to complete the unbond operation. The maximum fee(--fee) is set to be 2000000000000000iris(2*10^15) and the maximum(--gas) gas is set to be 20000. Therefore, the gas price here is 10^11iris/gas. Suppose that 1500 gas is used to execute the transaction, then 1500000000000000 iris will be paid to validators and lefted 500000000000000 iris will be returned to user.
+This example is a transaction to complete the unbond operation. The maximum fee(--fee) is set to be 0.12iris and the maximum(--gas) gas is set to be 20000. Therefore, the gas price here is 0.12^18iris-atto/Gas. Suppose that 10000 gas is used to execute the transaction, then 1200iris-atto will be paid to validators and lefted 0.11999iris will be returned to user.

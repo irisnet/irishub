@@ -1,19 +1,4 @@
-# Install Iris
-
-### Step 1: Configure Your Server
-
-All the blockchains in IRISnet is based on Cosmos-SDK, which is a framework for building blockchain applications in Golang. It is being used to build [Cosmos Hub](https://cosmos.network/). It's recommended to run a validator node on Linux server.
-
-**Recommanded Configurations:**
-
-1. 2 CPU
-2. Memory: 6GB
-3. Disk: 256GB SSD
-4. OS: Ubuntu 16.04 LTS
-5. Bandwidth: 20Mbps
-6. Allow all incoming connections on TCP port 26656 and 26657
-
-### Step 2: Install Iris
+# How to install IRIShub 
 
 There are two ways to get Iris running on your server. You can download the binary files from our release pages, or you can download the source code and compile it locally.
 
@@ -23,7 +8,7 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release v0.12.1 on your computer.
+then get the release v0.12.0 on your computer.
 
 > Note: there are two different binaries available. One for testnet and the other for betanet.
 
@@ -33,10 +18,10 @@ You can verify you have the right version installed by running the following com
 
 ```
 $ iris version
-v0.12.1
+v0.12.0
 
 $ iriscli version
-v0.12.1
+v0.12.0
 ```
 
 #### Compile Source Code
@@ -102,8 +87,10 @@ Make sure that your server can access to google.com for that our project depends
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.1
+cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+make get_tools
+make get_vendor_deps
 make all
 ```
 
@@ -112,8 +99,10 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.1
+cd irishub && git checkout v0.12.0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+make get_tools
+make get_vendor_deps
 source scripts/setProdEnv.sh
 make all
 ```
@@ -123,19 +112,7 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.12.1
+v0.12.0
 $ iriscli version
-v0.12.1
-```
-
-### How to Update
-
-Get latest code (you can also `git fetch` only the version desired), ensure the dependencies are up to date, then recompile.
-
-```
-iris unsafe-reset-all --home
-cd $GOPATH/src/github.com/irisnet/irishub
-git fetch -a origin
-git checkout v0.12.1
-make all
+v0.12.0
 ```

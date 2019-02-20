@@ -23,7 +23,7 @@ iriscli service bindings [flags]
 ### Query service binding list
 
 ```shell
-iriscli service bindings --def-chain-id=test --service-name=test-service
+iriscli service bindings --def-chain-id=<chain-id> --service-name=test-service
 ```
 
 After that, you will get a binding list of the service definition.
