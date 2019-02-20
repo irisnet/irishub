@@ -334,6 +334,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 			return nil, err
 		}
 		allTags = allTags.AppendTags(tags)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, in.Address.String(), ctx.CoinFlowTrigger(), in.Coins.String(), sdk.TokenTransfer)
 	}
 
 	for _, out := range outputs {
@@ -342,6 +343,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 			return nil, err
 		}
 		allTags = allTags.AppendTags(tags)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, ctx.CoinFlowTrigger(), out.Address.String(), out.Coins.String(), sdk.TokenTransfer)
 	}
 
 	return allTags, nil
