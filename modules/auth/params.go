@@ -93,7 +93,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 // default auth module parameters
 func DefaultParams() Params {
 	return Params{
-		GasPriceThreshold: sdk.NewIntWithDecimal(2, 10), //20iris-nano, 2*10^10iris-atto
+		GasPriceThreshold: sdk.NewIntWithDecimal(6, 12), // 6000iris-nano, 6*10^12iris-atto
 		TxSizeLimit:       uint64(1000),
 	}
 }
