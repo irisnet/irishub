@@ -301,6 +301,7 @@ func (p *ProtocolV0) configParams() {
 
 // application updates every end block
 func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	ctx = ctx.WithCoinFlowTrigger(sdk.BeginBlockTrigger)
 	// mint new tokens for this new block
 	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
@@ -324,6 +325,7 @@ func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	if p.coinFlowRecord {
+		ctx.CoinFlowTags().TagWrite()
 		tags = tags.AppendTags(extractCoinFlowTags(ctx))
 	}
 	p.assertRuntimeInvariants(ctx)

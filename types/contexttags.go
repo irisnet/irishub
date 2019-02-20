@@ -2,49 +2,41 @@ package types
 
 import (
 	"bytes"
-	"strconv"
 )
 
 const (
-	separate        = "::"
-	addCoinTag      = "add"
-	subtractCoinTag = "subtract"
-	coinSourcetag   = "source"
+	separate = "::"
 	//source type
 	ValidatorDelegationReward = "validatorDelegationReward"
 	ValidatorCommissionReward = "validatorCommissionReward"
+	DelegatorDelegationReward = "delegatorDelegationReward"
 	StakeDelegationRefund     = "stakeDelegationRefund"
 	TokenTransfer             = "tokenTransfer"
-	GovDeposit                = "govDeposit"
 	GovDepositRefund          = "govDepositRefund"
-	ServiceDeposit            = "serviceDeposit"
 	ServiceDepositRefund      = "serviceDepositRefund"
 	CommunityTax              = "communityTax"
-	//source name
-	TokenTransferTx  = "tokenTransferTransaction"
-	CommunityTaxPool = "communityTaxPool"
 
-	//trigger: transaction, endBlock
-	EndBlockTrigger = "endBlocker"
+	//trigger: transaction, beginBlock, endBlock
+	BeginBlockTrigger = "beginBlock"
+	EndBlockTrigger   = "endBlock"
 	//Msg type: transaction msg type, module endBlock and txFee
 	GovEndBlocker     = "govEndBlocker"
+	SlashBeginBlocker = "slashBeginBlocker"
 	SlashEndBlocker   = "slashEndBlocker"
 	StakeEndBlocker   = "stakeEndBlocker"
 	ServiceEndBlocker = "serviceEndBlocker"
-	TxFee             = "txFee"
 )
 
 type CoinFlowTags interface {
-	Append(key, value string)
 	GetTags() Tags
-	AppendAddCoinTag(ctx Context, recipient, amount string)
-	AppendSubtractCoinTag(ctx Context, sender, amount string)
-	AppendAddCoinSourceTag(ctx Context, recipient, sourceType, source, amount string)
+	AppendCoinFlowTag(ctx Context, from, to, amount, flowType string)
+	TagWrite()
 }
 
 type CoinFlowRecord struct {
-	tags   Tags
-	enable bool
+	tags     Tags
+	tempTags Tags
+	enable   bool
 }
 
 func NewCoinFlowRecord(enable bool) CoinFlowTags {
@@ -53,18 +45,11 @@ func NewCoinFlowRecord(enable bool) CoinFlowTags {
 	}
 }
 
-func (cfRecord *CoinFlowRecord) Append(key, value string) {
-	if !cfRecord.enable {
-		return
-	}
-	cfRecord.tags = append(cfRecord.tags, MakeTag(key, []byte(value)))
-}
-
 func (cfRecord *CoinFlowRecord) GetTags() Tags {
 	return cfRecord.tags
 }
 
-func (cfRecord *CoinFlowRecord) AppendAddCoinTag(ctx Context, recipient, amount string) {
+func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount, flowType string) {
 	if !cfRecord.enable {
 		return
 	}
@@ -72,64 +57,20 @@ func (cfRecord *CoinFlowRecord) AppendAddCoinTag(ctx Context, recipient, amount 
 	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
 
 	var tagValueBuffer bytes.Buffer
-	tagValueBuffer.WriteString(addCoinTag)
+	tagValueBuffer.WriteString(from)
 	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(recipient)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(ctx.CoinFlowMsgType())
+	tagValueBuffer.WriteString(to)
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(amount)
 	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
+	tagValueBuffer.WriteString(ctx.CoinFlowTriggerType())
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(flowType)
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
-	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
+	cfRecord.tempTags = append(cfRecord.tempTags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
 }
 
-func (cfRecord *CoinFlowRecord) AppendSubtractCoinTag(ctx Context, sender, amount string) {
-	if !cfRecord.enable {
-		return
-	}
-	var tagKeyBuffer bytes.Buffer
-	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
-
-	var tagValueBuffer bytes.Buffer
-	tagValueBuffer.WriteString(subtractCoinTag)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(sender)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(ctx.CoinFlowMsgType())
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(amount)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
-	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
-}
-
-func (cfRecord *CoinFlowRecord) AppendAddCoinSourceTag(ctx Context, recipient, sourceType, source, amount string) {
-	if !cfRecord.enable {
-		return
-	}
-	var tagKeyBuffer bytes.Buffer
-	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
-
-	var tagValueBuffer bytes.Buffer
-	tagValueBuffer.WriteString(coinSourcetag)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(recipient)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(ctx.CoinFlowMsgType())
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(sourceType)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(source)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(amount)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
-	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
+func (cfRecord *CoinFlowRecord) TagWrite() {
+	cfRecord.tags = cfRecord.tags.AppendTags(cfRecord.tempTags)
 }

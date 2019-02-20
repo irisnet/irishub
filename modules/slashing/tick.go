@@ -9,6 +9,7 @@ import (
 
 // slashing begin block functionality
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags sdk.Tags) {
+	ctx = ctx.WithCoinFlowTriggerType(sdk.SlashBeginBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/slashing"))
 
 	// Tag the height
@@ -40,7 +41,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 
 // slashing end block functionality
 func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, sk Keeper) (tags sdk.Tags) {
-	ctx = ctx.WithCoinFlowMsgType(sdk.SlashEndBlocker)
+	ctx = ctx.WithCoinFlowTriggerType(sdk.SlashEndBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/slashing"))
 	// Tag the height
 	tags = sdk.NewTags("height", []byte(strconv.FormatInt(req.Height, 10)))

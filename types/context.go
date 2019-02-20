@@ -52,7 +52,7 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	c = c.WithCheckValidNum(0)
 	c = c.WithCoinFlowTrigger("")
 	c = c.WithCoinFlowTags(nil)
-	c = c.WithCoinFlowMsgType("")
+	c = c.WithCoinFlowTriggerType("")
 	return c
 }
 
@@ -150,7 +150,7 @@ const (
 	contextKeyCheckValidNum
 	contextKeyCoinFlowTrigger
 	contextKeyCoinFlowTags
-	contextKeyCoinFlowMsgType
+	contextKeyCoinFlowTriggerType
 )
 
 // NOTE: Do not expose MultiStore.
@@ -189,7 +189,7 @@ func (c Context) CoinFlowTrigger() string { return c.Value(contextKeyCoinFlowTri
 
 func (c Context) CoinFlowTags() CoinFlowTags { return c.Value(contextKeyCoinFlowTags).(CoinFlowTags) }
 
-func (c Context) CoinFlowMsgType() string { return c.Value(contextKeyCoinFlowMsgType).(string) }
+func (c Context) CoinFlowTriggerType() string { return c.Value(contextKeyCoinFlowTriggerType).(string) }
 
 func (c Context) CheckValidNum() uint64 { return c.Value(contextKeyCheckValidNum).(uint64) }
 
@@ -254,7 +254,7 @@ func (c Context) WithCoinFlowTrigger(trigger string) Context { return c.withValu
 
 func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context { return c.withValue(contextKeyCoinFlowTags, cTag) }
 
-func (c Context) WithCoinFlowMsgType(cfType string) Context { return c.withValue(contextKeyCoinFlowMsgType, cfType) }
+func (c Context) WithCoinFlowTriggerType(cfType string) Context { return c.withValue(contextKeyCoinFlowTriggerType, cfType) }
 
 // Cache the multistore and return a new cached context. The cached context is
 // written to the context when writeCache is called.

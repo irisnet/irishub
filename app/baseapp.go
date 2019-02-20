@@ -628,7 +628,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		if mode != RunTxModeCheck {
 			ctx = ctx.WithLogger(ctx.Logger().With("module", fmt.Sprintf("iris/%s", msg.Route())).
 				With("handler", msg.Type()))
-			ctx = ctx.WithCoinFlowMsgType(msg.Type())
+			ctx = ctx.WithCoinFlowTriggerType(msg.Type())
 			msgResult = handler(ctx, msg)
 		}
 		msgResult.Tags = append(sdk.Tags{sdk.MakeTag(sdk.TagAction, []byte(msg.Type()))}, msgResult.Tags...)
@@ -754,15 +754,10 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
-			actualCostFee, err := feeRefundHandler(refundCtx, tx, result)
+			_, err := feeRefundHandler(refundCtx, tx, result)
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				return
-			}
-			signers := auth.GetSigners(ctx)
-			if len(signers) > 0 && ctx.CoinFlowTags() != nil && !actualCostFee.IsZero() {
-				ctx = ctx.WithCoinFlowMsgType(sdk.TxFee)
-				ctx.CoinFlowTags().AppendSubtractCoinTag(ctx, signers[0].GetAddress().String(), actualCostFee.String())
 			}
 			refundCache.Write()
 		}
@@ -841,6 +836,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// only update state if all messages pass
 	if result.IsOK() {
 		msCache.Write()
+		ctx.CoinFlowTags().TagWrite()
 	}
 
 	return

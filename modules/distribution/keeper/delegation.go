@@ -119,7 +119,11 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 	coins, _ := withdraw.TruncateDecimal()
 	if !coins.IsZero() {
-		ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx, recipient.String(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String())
+		if delAddr.Equals(sdk.AccAddress(valAddr)){
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.ValidatorDelegationReward)
+		} else {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.DelegatorDelegationReward)
+		}
 	}
 	return feePool, valInfo, delInfo, withdraw
 }
@@ -228,7 +232,11 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 		recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 		coins, _ := diWithdraw.TruncateDecimal()
 		if !coins.IsZero() {
-			ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx, recipient.String(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String())
+			if delAddr.Equals(sdk.AccAddress(valAddr)){
+				ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.ValidatorDelegationReward)
+			} else {
+				ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.DelegatorDelegationReward)
+			}
 		}
 		return false
 	}
