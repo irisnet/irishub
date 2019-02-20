@@ -6,6 +6,10 @@ import (
 )
 
 const (
+	separate        = "::"
+	addCoinTag      = "add"
+	subtractCoinTag = "subtract"
+	coinSourcetag   = "source"
 	//source type
 	ValidatorDelegationReward = "validatorDelegationReward"
 	ValidatorCommissionReward = "validatorCommissionReward"
@@ -68,16 +72,16 @@ func (cfRecord *CoinFlowRecord) AppendAddCoinTag(ctx Context, recipient, amount 
 	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
 
 	var tagValueBuffer bytes.Buffer
-	tagValueBuffer.WriteString("add")
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(addCoinTag)
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(recipient)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.CoinFlowMsgType())
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(amount)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
 }
@@ -90,16 +94,16 @@ func (cfRecord *CoinFlowRecord) AppendSubtractCoinTag(ctx Context, sender, amoun
 	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
 
 	var tagValueBuffer bytes.Buffer
-	tagValueBuffer.WriteString("subtract")
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(subtractCoinTag)
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(sender)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.CoinFlowMsgType())
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(amount)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
 }
@@ -112,20 +116,20 @@ func (cfRecord *CoinFlowRecord) AppendAddCoinSourceTag(ctx Context, recipient, s
 	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
 
 	var tagValueBuffer bytes.Buffer
-	tagValueBuffer.WriteString("source")
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(coinSourcetag)
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(recipient)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.CoinFlowMsgType())
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(sourceType)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(source)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(amount)
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
-	tagValueBuffer.WriteString("&")
+	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
 }
