@@ -313,7 +313,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 
 	// add block gas meter for any genesis transactions (allow infinite gas)
 	app.deliverState.ctx = app.deliverState.ctx.
-		WithBlockGasMeter(sdk.NewInfiniteGasMeter())
+		WithBlockGasMeter(sdk.NewInfiniteGasMeter()).WithCoinFlowTags(sdk.NewCoinFlowRecord())
 
 	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
 
@@ -500,7 +500,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		gasMeter = sdk.NewInfiniteGasMeter()
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
-		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowTags())
+		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowRecord())
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 
@@ -748,10 +748,15 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 		// Refund unspent fee
 		if mode != RunTxModeCheck && feeRefundHandler != nil {
-			_, err := feeRefundHandler(refundCtx, tx, result)
+			actualCostFee, err := feeRefundHandler(refundCtx, tx, result)
 			if err != nil {
 				result = sdk.ErrInternal(err.Error()).Result()
 				return
+			}
+			signers := auth.GetSigners(ctx)
+			if len(signers) > 0 && ctx.CoinFlowTags() != nil {
+				ctx = ctx.WithCoinFlowMsgType(sdk.TxFee)
+				ctx.CoinFlowTags().AppendSubtractCoinTag(ctx, signers[0].GetAddress().String(), actualCostFee.String())
 			}
 			refundCache.Write()
 		}

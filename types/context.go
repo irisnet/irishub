@@ -187,7 +187,7 @@ func (c Context) MinimumFees() Coins { return c.Value(contextKeyMinimumFees).(Co
 
 func (c Context) CoinFlowTrigger() string { return c.Value(contextKeyCoinFlowTrigger).(string) }
 
-func (c Context) CoinFlowTags() CoinFlowRecord { return c.Value(contextKeyCoinFlowTags).(CoinFlowRecord) }
+func (c Context) CoinFlowTags() CoinFlowTags { return c.Value(contextKeyCoinFlowTags).(CoinFlowTags) }
 
 func (c Context) CoinFlowMsgType() string { return c.Value(contextKeyCoinFlowMsgType).(string) }
 
@@ -252,7 +252,7 @@ func (c Context) WithMinimumFees(minFees Coins) Context {
 
 func (c Context) WithCoinFlowTrigger(trigger string) Context { return c.withValue(contextKeyCoinFlowTrigger, trigger) }
 
-func (c Context) WithCoinFlowTags(cTag CoinFlowRecord) Context { return c.withValue(contextKeyCoinFlowTags, cTag) }
+func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context { return c.withValue(contextKeyCoinFlowTags, cTag) }
 
 func (c Context) WithCoinFlowMsgType(cfType string) Context { return c.withValue(contextKeyCoinFlowMsgType, cfType) }
 

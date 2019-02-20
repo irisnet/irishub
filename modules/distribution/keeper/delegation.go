@@ -118,7 +118,7 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 
 	recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 	coins, _ := withdraw.TruncateDecimal()
-	ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), recipient.String(), ctx.CoinFlowMsgType(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String(), ctx.BlockHeader().Time.String())
+	ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx, recipient.String(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String())
 	return feePool, valInfo, delInfo, withdraw
 }
 
@@ -225,7 +225,7 @@ func (k Keeper) withdrawDelegationRewardsAll(ctx sdk.Context,
 
 		recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 		coins, _ := diWithdraw.TruncateDecimal()
-		ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx.CoinFlowTrigger(), recipient.String(), ctx.CoinFlowMsgType(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String(), ctx.BlockHeader().Time.String())
+		ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx, recipient.String(), sdk.ValidatorDelegationReward, valAddr.String(), coins.String())
 
 		return false
 	}
