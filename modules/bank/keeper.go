@@ -275,7 +275,7 @@ func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, 
 	}
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("sender", []byte(addr.String()))
-	if err == nil {
+	if err == nil && !amt.IsZero() {
 		ctx.CoinFlowTags().AppendSubtractCoinTag(ctx, addr.String(), amt.String())
 	}
 	return newCoins, tags, err
@@ -291,7 +291,7 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 	}
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("recipient", []byte(addr.String()))
-	if err == nil {
+	if err == nil && !amt.IsZero() {
 		ctx.CoinFlowTags().AppendAddCoinTag(ctx, addr.String(), amt.String())
 	}
 	return newCoins, tags, err
@@ -343,7 +343,9 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 	}
 
 	for _, out := range outputs {
-		ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx, out.Address.String(), sdk.TokenTransfer, sdk.TokenTransferTx, out.Coins.String())
+		if !out.Coins.IsZero() {
+			ctx.CoinFlowTags().AppendAddCoinSourceTag(ctx, out.Address.String(), sdk.TokenTransfer, sdk.TokenTransferTx, out.Coins.String())
+		}
 		_, tags, err := addCoins(ctx, am, out.Address, out.Coins)
 		if err != nil {
 			return nil, err

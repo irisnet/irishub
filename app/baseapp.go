@@ -754,7 +754,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 				return
 			}
 			signers := auth.GetSigners(ctx)
-			if len(signers) > 0 && ctx.CoinFlowTags() != nil {
+			if len(signers) > 0 && ctx.CoinFlowTags() != nil && !actualCostFee.IsZero() {
 				ctx = ctx.WithCoinFlowMsgType(sdk.TxFee)
 				ctx.CoinFlowTags().AppendSubtractCoinTag(ctx, signers[0].GetAddress().String(), actualCostFee.String())
 			}

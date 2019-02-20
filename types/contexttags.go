@@ -19,7 +19,6 @@ const (
 	//source name
 	TokenTransferTx  = "tokenTransferTransaction"
 	CommunityTaxPool = "communityTaxPool"
-	StakeDelegation  = "stakeDelegation"
 
 	//trigger: transaction, endBlock
 	EndBlockTrigger = "endBlocker"
