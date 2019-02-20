@@ -74,6 +74,9 @@ type BaseApp struct {
 	// enable invariant check
 	checkInvariant bool
 
+	// enable coin flow record
+	coinFlowRecord bool
+
 	// flag for sealing
 	sealed bool
 }
@@ -211,6 +214,9 @@ func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
 // SetInvariantCheck sets the invariant check config.
 func (app *BaseApp) SetCheckInvariant(check bool) { app.checkInvariant = check }
 
+// SetInvariantCheck sets the invariant check config.
+func (app *BaseApp) SetCoinFlowRecord(enable bool) { app.coinFlowRecord = enable }
+
 // NewContext returns a new Context with the correct store, the given header, and nil txBytes.
 func (app *BaseApp) NewContext(isCheckTx bool, header abci.Header) sdk.Context {
 	if isCheckTx {
@@ -313,7 +319,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 
 	// add block gas meter for any genesis transactions (allow infinite gas)
 	app.deliverState.ctx = app.deliverState.ctx.
-		WithBlockGasMeter(sdk.NewInfiniteGasMeter()).WithCoinFlowTags(sdk.NewCoinFlowRecord())
+		WithBlockGasMeter(sdk.NewInfiniteGasMeter()).WithCoinFlowTags(sdk.NewCoinFlowRecord(app.coinFlowRecord))
 
 	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
 
@@ -500,7 +506,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		gasMeter = sdk.NewInfiniteGasMeter()
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
-		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowRecord())
+		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowRecord(app.coinFlowRecord))
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 

@@ -17,7 +17,10 @@ const defaultConfigTemplate = `# This is a TOML config file.
 minimum_fees = "{{ .BaseConfig.MinFees }}"
 
 # Enable invariant check on mainnet, ignore this config on testnet
-check_invariant = "{{ .BaseConfig.CheckInvariant }}"
+check_invariant = {{ .BaseConfig.CheckInvariant }}
+
+# Enable coin flow record
+coin_flow_record = {{ .BaseConfig.CoinFlowRecord }}
 
 `
 
