@@ -1,10 +1,10 @@
 package slashing
 
 import (
-	"encoding/binary"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"strconv"
 )
 
 // slashing begin block functionality
@@ -12,9 +12,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, sk Keeper) (tags 
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/slashing"))
 
 	// Tag the height
-	heightBytes := make([]byte, 8)
-	binary.LittleEndian.PutUint64(heightBytes, uint64(req.Header.Height))
-	tags = sdk.NewTags("height", heightBytes)
+	tags = sdk.NewTags("height", []byte(strconv.FormatInt(req.Header.Height, 10)))
 
 	// Iterate over all the validators  which *should* have signed this block
 	// store whether or not they have actually signed it and slash/unbond any
@@ -45,9 +43,7 @@ func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, sk Keeper) (tags sdk.
 	ctx = ctx.WithCoinFlowMsgType(sdk.SlashEndBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/slashing"))
 	// Tag the height
-	heightBytes := make([]byte, 8)
-	binary.LittleEndian.PutUint64(heightBytes, uint64(req.Height))
-	tags = sdk.NewTags("height", heightBytes)
+	tags = sdk.NewTags("height", []byte(strconv.FormatInt(req.Height, 10)))
 
 	if int64(ctx.CheckValidNum()) < ctx.BlockHeader().NumTxs {
 		proposalCensorshipTag := sk.handleProposerCensorship(ctx,

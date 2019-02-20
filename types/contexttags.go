@@ -23,11 +23,11 @@ const (
 	//trigger: transaction, endBlock
 	EndBlockTrigger = "endBlocker"
 	//Msg type: transaction msg type, module endBlock and txFee
-	GovEndBlocker = "govEndBlocker"
-	SlashEndBlocker = "slashEndBlocker"
-	StakeEndBlocker = "stakeEndBlocker"
+	GovEndBlocker     = "govEndBlocker"
+	SlashEndBlocker   = "slashEndBlocker"
+	StakeEndBlocker   = "stakeEndBlocker"
 	ServiceEndBlocker = "serviceEndBlocker"
-	TxFee = "txFee"
+	TxFee             = "txFee"
 )
 
 type CoinFlowTags interface {
@@ -76,7 +76,7 @@ func (cfRecord *CoinFlowRecord) AppendAddCoinTag(ctx Context, recipient, amount 
 	tagValueBuffer.WriteString("&")
 	tagValueBuffer.WriteString(amount)
 	tagValueBuffer.WriteString("&")
-	tagValueBuffer.WriteString(strconv.Itoa(int(ctx.BlockHeight())))
+	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
 	tagValueBuffer.WriteString("&")
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
@@ -98,7 +98,7 @@ func (cfRecord *CoinFlowRecord) AppendSubtractCoinTag(ctx Context, sender, amoun
 	tagValueBuffer.WriteString("&")
 	tagValueBuffer.WriteString(amount)
 	tagValueBuffer.WriteString("&")
-	tagValueBuffer.WriteString(strconv.Itoa(int(ctx.BlockHeight())))
+	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
 	tagValueBuffer.WriteString("&")
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
@@ -124,7 +124,7 @@ func (cfRecord *CoinFlowRecord) AppendAddCoinSourceTag(ctx Context, recipient, s
 	tagValueBuffer.WriteString("&")
 	tagValueBuffer.WriteString(amount)
 	tagValueBuffer.WriteString("&")
-	tagValueBuffer.WriteString(strconv.Itoa(int(ctx.BlockHeight())))
+	tagValueBuffer.WriteString(strconv.FormatInt(ctx.BlockHeight(), 10))
 	tagValueBuffer.WriteString("&")
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tags = append(cfRecord.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
