@@ -1025,8 +1025,8 @@ func TestUpdateValidatorCommission(t *testing.T) {
 	}{
 		{val1, sdk.ZeroDec(), true},
 		{val2, sdk.NewDecWithPrec(-1, 1), true},
-		{val2, sdk.NewDecWithPrec(4, 1), false},
-		{val2, sdk.NewDecWithPrec(3, 1), false},
+		{val2, sdk.NewDecWithPrec(4, 1), true},
+		{val2, sdk.NewDecWithPrec(3, 1), true},
 		{val2, sdk.NewDecWithPrec(2, 1), false},
 	}
 
