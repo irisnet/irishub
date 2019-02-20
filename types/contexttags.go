@@ -73,4 +73,5 @@ func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount,
 
 func (cfRecord *CoinFlowRecord) TagWrite() {
 	cfRecord.tags = cfRecord.tags.AppendTags(cfRecord.tempTags)
+	cfRecord.tempTags = nil
 }

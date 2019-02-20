@@ -310,6 +310,8 @@ func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 
 	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
 
+	ctx.CoinFlowTags().TagWrite()
+
 	tags = tags.AppendTags(slashTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
