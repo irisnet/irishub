@@ -328,12 +328,21 @@ func burnCoins(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coin
 func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, outputs []Output) (sdk.Tags, sdk.Error) {
 	allTags := sdk.EmptyTags()
 
+	multiInMultiOut := true
+	if len(inputs) == 1 && len(outputs) == 1 {
+		multiInMultiOut = false
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, inputs[0].Address.String(), outputs[0].Address.String(), inputs[0].Coins.String(), sdk.TransferFlow)
+	}
+
 	for _, in := range inputs {
 		_, tags, err := subtractCoins(ctx, am, in.Address, in.Coins)
 		if err != nil {
 			return nil, err
 		}
 		allTags = allTags.AppendTags(tags)
+		if multiInMultiOut {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, in.Address.String(), ctx.CoinFlowTrigger(), in.Coins.String(), sdk.TransferFlow)
+		}
 	}
 
 	for _, out := range outputs {
@@ -342,6 +351,9 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 			return nil, err
 		}
 		allTags = allTags.AppendTags(tags)
+		if multiInMultiOut {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, ctx.CoinFlowTrigger(), out.Address.String(), out.Coins.String(), sdk.TransferFlow)
+		}
 	}
 
 	return allTags, nil

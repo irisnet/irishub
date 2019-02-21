@@ -425,6 +425,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if !found {
 		return ErrReturnFeeNotExists(k.Codespace(), address)
 	}
+
 	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err
