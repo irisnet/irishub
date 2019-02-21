@@ -20,7 +20,7 @@ iriscli stake unjail --help
 ### Unjail validator previously jailed for downtime
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.4iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.12iris --chain-id=<chain-id>
 ```
 ### Common Issue
 

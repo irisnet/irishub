@@ -7,7 +7,7 @@ Sending tokens to another address.
 ## Usage:
 
 ```
-iriscli bank send --to=<account address> --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount=10iris
+iriscli bank send --to=<account address> --from <key name> --fee=0.12iris --chain-id=<chain-id> --amount=10iris
 ```
 
  
@@ -25,7 +25,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.4iris --chain
 ### Send token to a address 
 
 ```
- iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.4iris --chain-id=<chain-id> --amount=10iris
+ iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.12iris --chain-id=<chain-id> --amount=10iris
 ```
 
 After that, you will get the detail info for the send
