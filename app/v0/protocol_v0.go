@@ -34,7 +34,7 @@ type ProtocolV0 struct {
 	logger         log.Logger
 	invariantLevel string
 	checkInvariant bool
-	coinFlowRecord bool
+	trackCoinFlow  bool
 
 	// Manage getting and setting accounts
 	accountMapper  auth.AccountKeeper
@@ -67,14 +67,14 @@ type ProtocolV0 struct {
 	metrics		*Metrics
 }
 
-func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, coinFlowRecord bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
+func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
 	p0 := ProtocolV0{
 		version:        version,
 		logger:         log,
 		protocolKeeper: pk,
 		invariantLevel: strings.ToLower(sdk.InvariantLevel),
 		checkInvariant: checkInvariant,
-		coinFlowRecord: coinFlowRecord,
+		trackCoinFlow:  trackCoinFlow,
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
 		config:         config,
@@ -326,7 +326,7 @@ func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
-	if p.coinFlowRecord {
+	if p.trackCoinFlow {
 		ctx.CoinFlowTags().TagWrite()
 		tags = tags.AppendTags(extractCoinFlowTags(ctx))
 	}

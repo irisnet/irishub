@@ -18,8 +18,8 @@ type BaseConfig struct {
 	// Enable invariant check, ignore this flag on testnet
 	CheckInvariant bool `mapstructure:"check_invariant"`
 
-	// Enable coin flow record
-	CoinFlowRecord bool `mapstructure:"coin_flow_record"`
+	// Enable track coin flow
+	TrackCoinFlow bool `mapstructure:"track_coin_flow"`
 }
 
 // Config defines the server's top level configuration
@@ -41,5 +41,5 @@ func (c *Config) MinimumFees() sdk.Coins {
 
 // DefaultConfig returns server's default configuration.
 func DefaultConfig() *Config {
-	return &Config{BaseConfig{MinFees: defaultMinimumFees, CheckInvariant: false, CoinFlowRecord: false}}
+	return &Config{BaseConfig{MinFees: defaultMinimumFees, CheckInvariant: false, TrackCoinFlow: false}}
 }
