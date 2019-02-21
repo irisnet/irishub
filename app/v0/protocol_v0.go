@@ -326,7 +326,7 @@ func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	if p.trackCoinFlow {
 		ctx.CoinFlowTags().TagWrite()
-		tags = tags.AppendTags(extractCoinFlowTags(ctx))
+		tags = tags.AppendTags(ctx.CoinFlowTags().GetTags())
 	}
 	p.assertRuntimeInvariants(ctx)
 
@@ -334,15 +334,6 @@ func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
 	}
-}
-
-func extractCoinFlowTags(ctx sdk.Context) sdk.Tags {
-	var tags sdk.Tags
-	for _, tag := range ctx.CoinFlowTags().GetTags() {
-		ctx.Logger().Error("CoinFlowRecord","key", string(tag.Key), "value", string(tag.Value))
-		tags = tags.AppendTag(string(tag.Key), tag.Value)
-	}
-	return tags
 }
 
 // custom logic for iris initialization
