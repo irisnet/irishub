@@ -260,6 +260,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		slashCoins = slashCoins.Sort()
 
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, DepositedCoinsAccAddr.String(), "", slashCoins.String(), sdk.ServiceBurnDeposit)
 		_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, slashCoins)
 		if err != nil {
 			panic(err)

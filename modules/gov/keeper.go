@@ -455,7 +455,6 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account
-	ctx = ctx.WithCoinFlowFlowType(sdk.GovDeposit)
 	_, err := keeper.ck.SendCoins(ctx, depositorAddr, DepositedCoinsAccAddr, depositAmount)
 	if err != nil {
 		return err, false
