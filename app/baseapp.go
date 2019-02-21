@@ -319,7 +319,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 
 	// add block gas meter for any genesis transactions (allow infinite gas)
 	app.deliverState.ctx = app.deliverState.ctx.
-		WithBlockGasMeter(sdk.NewInfiniteGasMeter()).WithCoinFlowTags(sdk.NewCoinFlowRecord(app.trackCoinFlow))
+		WithBlockGasMeter(sdk.NewInfiniteGasMeter()).WithCoinFlowTags(sdk.NewCoinFlowRecord(false))
 
 	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
 
@@ -388,7 +388,7 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 			if err != nil {
 				result = err.Result()
 			} else {
-				result = app.Simulate(tx)
+				result = app.Simulate(tx, txBytes)
 			}
 		case "version":
 			return abci.ResponseQuery{
@@ -603,6 +603,7 @@ func (app *BaseApp) getContextForTx(mode RunTxMode, txBytes []byte) (ctx sdk.Con
 		WithCoinFlowTrigger(txHash)
 	if mode == RunTxModeSimulate {
 		ctx, _ = ctx.CacheContext()
+		ctx = ctx.WithCoinFlowTags(sdk.NewCoinFlowRecord(false))
 	}
 	return
 }
