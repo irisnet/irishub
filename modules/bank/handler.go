@@ -48,7 +48,7 @@ func handleMsgBurn(ctx sdk.Context, k Keeper, msg MsgBurn) sdk.Result {
 	if err != nil {
 		return err.Result()
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), "", msg.Coins.String(), sdk.TokenTransfer)
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), "", msg.Coins.String(), sdk.TokenBurn)
 	return sdk.Result{
 		Tags: tags,
 	}

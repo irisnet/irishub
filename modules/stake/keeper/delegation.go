@@ -408,7 +408,7 @@ func (k Keeper) Delegate(ctx sdk.Context, delAddr sdk.AccAddress, bondAmt sdk.Co
 
 	if subtractAccount {
 		// Account new shares, save
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, delAddr.String(), validator.OperatorAddr.String(),  bondAmt.String(), sdk.TokenTransfer)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, delAddr.String(), validator.OperatorAddr.String(),  bondAmt.String(), sdk.StakeDelegation)
 		_, _, err = k.bankKeeper.SubtractCoins(ctx, delegation.DelegatorAddr, sdk.Coins{bondAmt})
 		if err != nil {
 			return

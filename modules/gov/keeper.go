@@ -455,9 +455,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account
-	if !depositAmount.IsZero() {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, depositorAddr.String(), DepositedCoinsAccAddr.String(), depositAmount.String(), sdk.TokenTransfer)
-	}
+	ctx = ctx.WithCoinFlowFlowType(sdk.GovDeposit)
 	_, err := keeper.ck.SendCoins(ctx, depositorAddr, DepositedCoinsAccAddr, depositAmount)
 	if err != nil {
 		return err, false
@@ -520,9 +518,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 		RefundSumInt = RefundSumInt.Add(RefundAmountInt)
 		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, RefundAmountInt)}
 
-		if !deposit.Amount.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, DepositedCoinsAccAddr.String(), deposit.Depositor.String(), deposit.Amount.String(), sdk.GovDepositRefund)
-		}
+		ctx = ctx.WithCoinFlowFlowType(sdk.GovDepositRefund)
 		_, err := keeper.ck.SendCoins(ctx, DepositedCoinsAccAddr, deposit.Depositor, deposit.Amount)
 		if err != nil {
 			panic(err)

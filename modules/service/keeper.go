@@ -131,6 +131,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk.Er
 	}
 
 	// Subtract coins from provider's account
+	ctx = ctx.WithCoinFlowFlowType(sdk.ServiceDeposit)
 	_, err = k.ck.SendCoins(ctx, svcBinding.Provider, DepositedCoinsAccAddr, svcBinding.Deposit)
 	if err != nil {
 		return err
@@ -286,6 +287,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	}
 
 	// Add coins to provider's account
+	ctx = ctx.WithCoinFlowFlowType(sdk.ServiceDepositRefund)
 	_, err := k.ck.SendCoins(ctx, DepositedCoinsAccAddr, binding.Provider, binding.Deposit)
 	if err != nil {
 		return err
@@ -425,6 +427,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if !found {
 		return ErrReturnFeeNotExists(k.Codespace(), address)
 	}
+	ctx = ctx.WithCoinFlowFlowType(sdk.ServiceFeeRefund)
 	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err

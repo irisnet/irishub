@@ -10,10 +10,15 @@ const (
 	ValidatorDelegationReward = "validatorDelegationReward"
 	ValidatorCommissionReward = "validatorCommissionReward"
 	DelegatorDelegationReward = "delegatorDelegationReward"
+	StakeDelegation           = "stakeDelegation"
 	StakeDelegationRefund     = "stakeDelegationRefund"
 	TokenTransfer             = "tokenTransfer"
+	TokenBurn                 = "tokenBurn"
+	GovDeposit                = "govDeposit"
 	GovDepositRefund          = "govDepositRefund"
+	ServiceDeposit            = "serviceDeposit"
 	ServiceDepositRefund      = "serviceDepositRefund"
+	ServiceFeeRefund          = "serviceFeeRefund"
 	CommunityTax              = "communityTax"
 
 	//trigger: transaction, beginBlock, endBlock
