@@ -126,11 +126,12 @@ func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
 
 // Info is used to prepare info to display
 type InfoCoinFlow struct {
-	Hash     common.HexBytes          `json:"hash"`
-	Height   int64                    `json:"height"`
-	Tx       sdk.Tx                   `json:"tx"`
-	Result   ResponseDeliverTx        `json:"result"`
-	CoinFlow []string
+	Hash     common.HexBytes   `json:"hash"`
+	Height   int64             `json:"height"`
+	Tx       sdk.Tx            `json:"tx"`
+	Result   ResponseDeliverTx `json:"result"`
+	CoinFlow []string          `json:"coin_flow"`
+}
 
 func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
 	hash, err := hex.DecodeString(hashHexStr)
@@ -155,8 +156,7 @@ func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr
 		}
 	}
 
-	var coinFlow []tendermint.ReadableTag
-	coinFlow, err = rpc.GetTxCoinFlow(cliCtx, &res.Height, strings.ToLower(hashHexStr))
+	coinFlow, err := rpc.GetTxCoinFlow(cliCtx, &res.Height, strings.ToLower(hashHexStr))
 	if err != nil {
 		return nil, err
 	}
