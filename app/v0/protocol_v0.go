@@ -301,7 +301,6 @@ func (p *ProtocolV0) configParams() {
 
 // application updates every end block
 func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	ctx = ctx.WithCoinFlowTrigger(sdk.BeginBlockTrigger)
 	// mint new tokens for this new block
 	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
@@ -320,7 +319,6 @@ func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 
 // application updates every end block
 func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	ctx = ctx.WithCoinFlowTrigger(sdk.EndBlockTrigger)
 	tags := gov.EndBlocker(ctx, p.govKeeper)
 	tags = tags.AppendTags(slashing.EndBlocker(ctx, req, p.slashingKeeper))
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))

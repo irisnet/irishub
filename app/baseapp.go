@@ -628,7 +628,6 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 		if mode != RunTxModeCheck {
 			ctx = ctx.WithLogger(ctx.Logger().With("module", fmt.Sprintf("iris/%s", msg.Route())).
 				With("handler", msg.Type()))
-			ctx = ctx.WithCoinFlowTriggerType(msg.Type())
 			msgResult = handler(ctx, msg)
 		}
 		msgResult.Tags = append(sdk.Tags{sdk.MakeTag(sdk.TagAction, []byte(msg.Type()))}, msgResult.Tags...)

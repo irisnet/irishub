@@ -294,13 +294,6 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 // SendCoins moves coins from one account to another
 // NOTE: Make sure to revert state changes from tx on error
 func sendCoins(ctx sdk.Context, am auth.AccountKeeper, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error) {
-	if !amt.IsZero() {
-		flowType := sdk.TokenTransfer
-		if ctx.CoinFlowFlowType() != "" {
-			flowType = ctx.CoinFlowFlowType()
-		}
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, fromAddr.String(), toAddr.String(), amt.String(), flowType)
-	}
 	_, subTags, err := subtractCoins(ctx, am, fromAddr, amt)
 	if err != nil {
 		return nil, err
@@ -338,7 +331,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 	multiInMultiOut := true
 	if len(inputs) == 1 && len(outputs) == 1 {
 		multiInMultiOut = false
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, inputs[0].Address.String(), outputs[0].Address.String(), inputs[0].Coins.String(), sdk.TokenTransfer)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, inputs[0].Address.String(), outputs[0].Address.String(), inputs[0].Coins.String(), sdk.TransferFlow)
 	}
 
 	for _, in := range inputs {
@@ -348,7 +341,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 		}
 		allTags = allTags.AppendTags(tags)
 		if multiInMultiOut {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, in.Address.String(), ctx.CoinFlowTrigger(), in.Coins.String(), sdk.TokenTransfer)
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, in.Address.String(), ctx.CoinFlowTrigger(), in.Coins.String(), sdk.TransferFlow)
 		}
 	}
 
@@ -359,7 +352,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 		}
 		allTags = allTags.AppendTags(tags)
 		if multiInMultiOut {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, ctx.CoinFlowTrigger(), out.Address.String(), out.Coins.String(), sdk.TokenTransfer)
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, ctx.CoinFlowTrigger(), out.Address.String(), out.Coins.String(), sdk.TransferFlow)
 		}
 	}
 

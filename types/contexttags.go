@@ -7,19 +7,20 @@ import (
 const (
 	separate = "::"
 	//source type
-	ValidatorDelegationReward = "validatorDelegationReward"
-	ValidatorCommissionReward = "validatorCommissionReward"
-	DelegatorDelegationReward = "delegatorDelegationReward"
-	StakeDelegationRefund     = "stakeDelegationRefund"
-	TokenTransfer             = "tokenTransfer"
-	GovDepositRefund          = "govDepositRefund"
-	ServiceBurnDeposit        = "serviceBurnDeposit"
-	CommunityTax              = "communityTax"
+	TransferFlow             = "Transfer"
+	DelegationFlow           = "Delegation"
+	UndelegationFlow         = "Undelegation"
+	ValidatorRewardFlow      = "ValidatorReward"
+	ValidatorCommissionFlow  = "ValidatorCommission"
+	DelegatorRewardFlow      = "DelegatorReward"
+	BurnFlow                 = "Burn"
+	CommunityTaxUseFlow      = "CommunityTaxUse"
+	GovDepositFlow           = "GovDeposit"
+	GovDepositRefundFlow     = "GovDepositRefund"
+	ServiceDepositFlow       = "ServiceDeposit"
+	ServiceDepositRefundFlow = "ServiceDepositRefund"
 
-	//trigger: transaction, beginBlock, endBlock
-	BeginBlockTrigger = "beginBlock"
-	EndBlockTrigger   = "endBlock"
-	//Msg type: transaction msg type, module endBlock and txFee
+	//Trigger: transaction hash, module endBlock
 	GovEndBlocker     = "govEndBlocker"
 	SlashBeginBlocker = "slashBeginBlocker"
 	SlashEndBlocker   = "slashEndBlocker"
@@ -66,8 +67,6 @@ func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount,
 	tagValueBuffer.WriteString(to)
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(amount)
-	tagValueBuffer.WriteString(separate)
-	tagValueBuffer.WriteString(ctx.CoinFlowTriggerType())
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(flowType)
 	tagValueBuffer.WriteString(separate)

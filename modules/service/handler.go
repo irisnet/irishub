@@ -230,7 +230,6 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 
 // Called every block, update request status
 func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
-	ctx = ctx.WithCoinFlowTriggerType(sdk.ServiceEndBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
 	logger := ctx.Logger()
 	// Reset the intra-transaction counter.
@@ -260,7 +259,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		slashCoins = slashCoins.Sort()
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, DepositedCoinsAccAddr.String(), "", slashCoins.String(), sdk.ServiceBurnDeposit)
 		_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, slashCoins)
 		if err != nil {
 			panic(err)
