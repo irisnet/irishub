@@ -256,11 +256,6 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: coin-flow-record
-          description: 'Include trigger coin flow record'
-          schema:
-            type: boolean
       responses:
         '200':
           description: Tx with the provided hash
@@ -3590,7 +3585,7 @@ components:
         coin-flow-record:
           type: array
           items:
-            $ref: '#/components/schemas/KVPair'
+            type: string
     StdTx:
       type: object
       properties:

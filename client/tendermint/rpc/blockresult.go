@@ -111,7 +111,7 @@ func getBlockResult(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	return cdc.MarshalJSON(response)
 }
 
-func GetTxCoinFlow(cliCtx context.CLIContext, height *int64, hashStr string) ([]tendermint.ReadableTag, error) {
+func GetTxCoinFlow(cliCtx context.CLIContext, height *int64, hashStr string) ([]string, error) {
 	// get the node
 	node, err := cliCtx.GetNode()
 	if err != nil {
@@ -123,12 +123,12 @@ func GetTxCoinFlow(cliCtx context.CLIContext, height *int64, hashStr string) ([]
 		return nil, err
 	}
 
-	var coinFlowTags []tendermint.ReadableTag
+	var coinFlowTags []string
 	endBlockTags := tendermint.MakeTagsHumanReadable(res.Results.EndBlock.Tags)
 	found := false
 	for _,tag := range endBlockTags {
 		if tag.Key == hashStr {
-			coinFlowTags = append(coinFlowTags, tag)
+			coinFlowTags = append(coinFlowTags, tag.Value)
 			found = true
 		} else if found {
 			//txHash coin flow records are centralized distributed

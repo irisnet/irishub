@@ -3,7 +3,6 @@ package tx
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/spf13/viper"
 	"net/http"
 	"strings"
 
@@ -22,10 +21,6 @@ import (
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
-const (
-	coinFlow = "coin-flow-record"
-)
-
 // QueryTxCmd implements the default command for a tx query.
 func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -39,7 +34,7 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			output, err := queryTxWithCoinFlow(cdc, cliCtx, hashHexStr, viper.GetBool(coinFlow))
+			output, err := queryTxWithCoinFlow(cdc, cliCtx, hashHexStr)
 			if err != nil {
 				return err
 			}
@@ -52,7 +47,6 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
-	cmd.Flags().Bool(coinFlow, false, "Include triggered coin flow record")
 	return cmd
 }
 
@@ -136,10 +130,9 @@ type InfoCoinFlow struct {
 	Height   int64                    `json:"height"`
 	Tx       sdk.Tx                   `json:"tx"`
 	Result   ResponseDeliverTx        `json:"result"`
-	CoinFlow []tendermint.ReadableTag `json:"coin_flow_record"`
-}
+	CoinFlow []string
 
-func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string, coinFlowRecord bool) ([]byte, error) {
+func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
 	hash, err := hex.DecodeString(hashHexStr)
 	if err != nil {
 		return nil, err
@@ -163,11 +156,9 @@ func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr
 	}
 
 	var coinFlow []tendermint.ReadableTag
-	if coinFlowRecord {
-		coinFlow, err = rpc.GetTxCoinFlow(cliCtx, &res.Height, strings.ToLower(hashHexStr))
-		if err != nil {
-			return nil, err
-		}
+	coinFlow, err = rpc.GetTxCoinFlow(cliCtx, &res.Height, strings.ToLower(hashHexStr))
+	if err != nil {
+		return nil, err
 	}
 
 	tx, err := parseTx(cdc, res.Tx)
@@ -193,9 +184,8 @@ func QueryTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		hashHexStr := vars["hash"]
-		coinFlowRecord := r.URL.Query().Get("coin-flow-record")
 
-		output, err := queryTxWithCoinFlow(cdc, cliCtx, hashHexStr, coinFlowRecord == "true")
+		output, err := queryTxWithCoinFlow(cdc, cliCtx, hashHexStr)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
