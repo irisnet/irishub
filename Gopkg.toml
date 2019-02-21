@@ -31,8 +31,8 @@
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  source = "https://github.com/irisnet/tendermint.git"
-  version = "=v0.27.3-iris6"
+  source = "https://github.com/cryptiumlabs/tendermint-iris.git"
+  revision = "1d89d5d5cb68e188bfe36ff4fdb88d208411110c"
 
 [[constraint]]
   name = "github.com/emicklei/proto"
