@@ -101,7 +101,6 @@ Each validator receives revenue in proportion to its total stake. However, befor
 -   **Double Sign**：If someone reports on IRIShub that a validator signed two different blocks at the same height, this validator will get slashed on IRIShub by 1% and remove from current validatorset for 5 day.
 -   **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in the last 20,000 blocks, 
 the validator will get slashed by 0.5% and remove from current validatorset for 2 days.
--   **Non-voting**： If a validator did not vote on a proposal and once the fault is reported by a someone, its stake will receive a 0.7% slash.
 -   **Censorship**：If someone reports that a validator includes invalid transactions in block, this validator will get slashed on IRIShub by 2% and remove from current validatorset for 7 day.
 
 All metrics mentioned could be adjusted by `parameter-change` proposals. 
