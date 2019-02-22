@@ -138,4 +138,4 @@ cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 git checkout v0.12.1
 make all
-
+```

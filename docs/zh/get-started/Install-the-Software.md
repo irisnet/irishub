@@ -124,14 +124,6 @@ v0.12.1
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-<<<<<<< HEAD
-git checkout v0.12.0
-make get_tools
-make get_vendor_deps
-make all
-```
-=======
 git checkout v0.12.1
 make all
 ```
->>>>>>> 1029f3afa7bfe58bd7443cba7cc169398507b2a6
