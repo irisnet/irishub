@@ -29,14 +29,14 @@ or
 ### Get validator-set at height 114360
 
 ```shell
- iriscli tendermint validator-set 114360 --chain-id=irishub-test --trust-node=true
+ iriscli tendermint validator-set 114360 --chain-id=<chain-id> --trust-node=true
 
 ```
 
 ### Get the latest validator-set
 
 ```shell
- iriscli tendermint validator-set --chain-id=fuxi-4000 --trust-node=true
+ iriscli tendermint validator-set --chain-id=<chain-id> --trust-node=true
 
 ```
 You will get the following result.

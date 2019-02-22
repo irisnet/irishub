@@ -90,7 +90,7 @@ func (k Keeper) takeValidatorFeePoolRewards(ctx sdk.Context, operatorAddr sdk.Va
 			k.SetFeePool(ctx, fp)
 			k.SetValidatorDistInfo(ctx, vi)
 			k.SetDelegationDistInfo(ctx, di)
-			k.WithdrawToDelegator(ctx, fp, accAddr, withdraw)
+			k.WithdrawToDelegator(ctx, fp, delegation.DelegatorAddr, withdraw)
 		}
 		if len(delegations) == 0 {
 			vi := k.GetValidatorDistInfo(ctx, operatorAddr)
