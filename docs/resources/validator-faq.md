@@ -98,10 +98,9 @@ Each validator receives revenue in proportion to its total stake. However, befor
 
 ###  IRISnet Valdiators Risks
 
--   **Double Sign**：If someone reports on IRIShub that a validator signed two different blocks at the same height, this validator will get slashed on IRIShub by 5% and remove from current validatorset for 2 day.
 -   **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in the last 20,000 blocks, 
-the validator will get slashed by 1% and remove from current validatorset for 1 day.
--   **Non-voting**： If a validator did not vote on a proposal and once the fault is reported by a someone, its stake will receive a 0.7% slash.
+the validator will get slashed by 0.5% and remove from current validatorset for 2 days.
+-   **Double Sign**：If someone reports on IRIShub that a validator signed two different blocks at the same height, this validator will get slashed on IRIShub by 1% and remove from current validatorset for 5 day.
 -   **Censorship**：If someone reports that a validator includes invalid transactions in block, this validator will get slashed on IRIShub by 2% and remove from current validatorset for 7 day.
 
 All metrics mentioned could be adjusted by `parameter-change` proposals. 
@@ -150,12 +149,9 @@ IRISplorer：https://testnet.irisplorer.cn
 
 **IRISnet Testnet Fuxi** 
 
-IRISnet testnet is called Fuxi. Fuxi is an incentivized testnet.  Now, it's in its 8th iteration and it will be the last testnet before Betanet. 
-Community validators could accrue IRIS tokens by completing thoese testbet [tasks](https://github.com/irisnet/testnets/blob/master/fuxi/docs_CN/Fuxi_FAQ.md)
-The accrued rewards will be published at [IRISnet website](https://www.irisnet.org/testnets) 
+IRISnet testnet is called Fuxi. The Fuxi testnet is used to provide a stable test environment for developers such as third-party wallets, browsers and other applications。 
 
-After that, the testnet will be operated by IRISnet dev team and named `fuxi` afterwards. The software version in testnet will be the same as mainnet. In this way, 
-all developers are welcomed to debug/test their software in it. 
+Learn more here: https://www.irisnet.org/docs/get-started/Join-the-Testnet.html.
 
 **IRISnet Betanet**
 
@@ -165,5 +161,4 @@ Betanet is the first part of launching IRISnet mainnet. Betanet will start at mi
 
 - Riot chat: #irisvalidators:matrix.org
 - IRIShub Validator Working Group QQ Group：834063323
-
 
