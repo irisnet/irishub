@@ -55,7 +55,7 @@ iriscli status --node=tcp://localhost:26657
 
 You should also be able to see `catching_up` is `false`. 
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fvp`, 
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fcp`, 
 it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, 
 please read this [doc](../features/basic-concepts/bech32-prefix.md)
 
