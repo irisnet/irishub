@@ -30,7 +30,7 @@ iriscli stake unjail --from=<key name> --fee=0.12iris --chain-id=<chain-id>
 * 检查这个验证人保持`jail`状态的截止时间：
 
 ```$xslt
-iriscli stake signing-info fvp1zcjduepqewwc93xwvt0ym6prxx9ppfzeufs33flkcpu23n5eutjgnnqmgazsw54sfv --node=localhost:36657 --trust-node
+iriscli stake signing-info fcp1zcjduepqewwc93xwvt0ym6prxx9ppfzeufs33flkcpu23n5eutjgnnqmgazsw54sfv --node=localhost:36657 --trust-node
 ```
 
 如果此验证人状态为`jailed`，那么你可以看到它的jail状态的截止时间

@@ -73,7 +73,7 @@
 	```text
     Validator 
     Operator Address: fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
-    Validator Consensus Pubkey: fvp1zcjduepq8fw9p4zfrl5fknrdd9tc2l24jnqel6waxlugn66y66dxasmeuzhsxl6m5e
+    Validator Consensus Pubkey: fcp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus2r55he
     Jailed: false
     Status: Bonded
     Tokens: 100.0000000000
