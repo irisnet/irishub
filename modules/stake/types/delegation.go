@@ -116,6 +116,7 @@ func (d Delegation) HumanReadableString() (string, error) {
 
 // UnbondingDelegation reflects a delegation's passive unbonding queue.
 type UnbondingDelegation struct {
+	TxHash         string         `json:"tx_hash"`
 	DelegatorAddr  sdk.AccAddress `json:"delegator_addr"`  // delegator
 	ValidatorAddr  sdk.ValAddress `json:"validator_addr"`  // validator unbonding from operator addr
 	CreationHeight int64          `json:"creation_height"` // height which the unbonding took place
@@ -125,6 +126,7 @@ type UnbondingDelegation struct {
 }
 
 type ubdValue struct {
+	TxHash         string
 	CreationHeight int64
 	MinTime        time.Time
 	InitialBalance sdk.Coin
@@ -134,6 +136,7 @@ type ubdValue struct {
 // return the unbonding delegation without fields contained within the key for the store
 func MustMarshalUBD(cdc *codec.Codec, ubd UnbondingDelegation) []byte {
 	val := ubdValue{
+		ubd.TxHash,
 		ubd.CreationHeight,
 		ubd.MinTime,
 		ubd.InitialBalance,
@@ -168,6 +171,7 @@ func UnmarshalUBD(cdc *codec.Codec, key, value []byte) (ubd UnbondingDelegation,
 	valAddr := sdk.ValAddress(addrs[sdk.AddrLen:])
 
 	return UnbondingDelegation{
+		TxHash:         storeValue.TxHash,
 		DelegatorAddr:  delAddr,
 		ValidatorAddr:  valAddr,
 		CreationHeight: storeValue.CreationHeight,
@@ -189,6 +193,7 @@ func (d UnbondingDelegation) Equal(d2 UnbondingDelegation) bool {
 // delegator or validator addresses cannot be Bech32 encoded.
 func (d UnbondingDelegation) HumanReadableString() (string, error) {
 	resp := "Unbonding Delegation \n"
+	resp += fmt.Sprintf("TxHash: %s\n", d.TxHash)
 	resp += fmt.Sprintf("Delegator: %s\n", d.DelegatorAddr)
 	resp += fmt.Sprintf("Validator: %s\n", d.ValidatorAddr)
 	resp += fmt.Sprintf("Creation height: %v\n", d.CreationHeight)
