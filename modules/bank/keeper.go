@@ -331,7 +331,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 	multiInMultiOut := true
 	if len(inputs) == 1 && len(outputs) == 1 {
 		multiInMultiOut = false
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, inputs[0].Address.String(), outputs[0].Address.String(), inputs[0].Coins.String(), sdk.TransferFlow)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, inputs[0].Address.String(), outputs[0].Address.String(), inputs[0].Coins.String(), sdk.TransferFlow, "")
 	}
 
 	for _, in := range inputs {
@@ -341,7 +341,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 		}
 		allTags = allTags.AppendTags(tags)
 		if multiInMultiOut {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, in.Address.String(), ctx.CoinFlowTrigger(), in.Coins.String(), sdk.TransferFlow)
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, in.Address.String(), ctx.CoinFlowTrigger(), in.Coins.String(), sdk.TransferFlow, "")
 		}
 	}
 
@@ -352,7 +352,7 @@ func inputOutputCoins(ctx sdk.Context, am auth.AccountKeeper, inputs []Input, ou
 		}
 		allTags = allTags.AppendTags(tags)
 		if multiInMultiOut {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, ctx.CoinFlowTrigger(), out.Address.String(), out.Coins.String(), sdk.TransferFlow)
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, ctx.CoinFlowTrigger(), out.Address.String(), out.Coins.String(), sdk.TransferFlow, "")
 		}
 	}
 

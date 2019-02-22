@@ -22,7 +22,7 @@ iriscli service enable [flags]
 
 ### Enable a unavailable service binding
 ```shell
-iriscli service enable --chain-id=<chain-id>  --from=node0 --fee=0.12iris --def-chain-id=test --service-name=test-service
+iriscli service enable --chain-id=<chain-id>  --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service
 ```
 
 After that, you're done with Enabling a available service binding.

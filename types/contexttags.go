@@ -35,7 +35,7 @@ type CoinFlowTags interface {
 	//Clean temporary tags
 	TagClean()
 	//Add new tag to temporary tags
-	AppendCoinFlowTag(ctx Context, from, to, amount, flowType string)
+	AppendCoinFlowTag(ctx Context, from, to, amount, flowType, desc string)
 }
 
 type CoinFlowRecord struct {
@@ -54,7 +54,7 @@ func (cfRecord *CoinFlowRecord) GetTags() Tags {
 	return cfRecord.tags
 }
 
-func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount, flowType string) {
+func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount, flowType, desc string) {
 	if !cfRecord.enable {
 		return
 	}
@@ -69,6 +69,8 @@ func (cfRecord *CoinFlowRecord) AppendCoinFlowTag(ctx Context, from, to, amount,
 	tagValueBuffer.WriteString(amount)
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(flowType)
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(desc)
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 	cfRecord.tempTags = append(cfRecord.tempTags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))

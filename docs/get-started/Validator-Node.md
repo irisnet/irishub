@@ -55,7 +55,7 @@ iriscli status --node=tcp://localhost:26657
 
 You should also be able to see `catching_up` is `false`. 
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fvp`, 
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fcp`, 
 it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, 
 please read this [doc](../features/basic-concepts/bech32-prefix.md)
 
@@ -72,7 +72,7 @@ Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` c
 
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.12iris --pubkey=<pubkey> --amount=10iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<pubkey> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
 
@@ -82,7 +82,7 @@ To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.12iris --pubkey=<pubkey> --amount=1iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.3iris --pubkey=<pubkey> --amount=1iris --moniker={validator-name} --commission-rate=0.1
 ```
 Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../features/basic-concepts/coin-type.md)
 
@@ -117,7 +117,7 @@ You can edit your validator's public description following [this](../cli-client/
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator --chain-id=<chain-id> --from=<key-name> --fee=0.12iris --moniker=<validator name> --details=<details>
+iriscli stake edit-validator --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --moniker=<validator name> --details=<details>
 
 ```
 ### View Validator Description

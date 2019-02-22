@@ -14,7 +14,7 @@ iriscli service withdraw-fees [flags]
 
 ### Withdraw fees from service incoming fees 
 ```shell
-iriscli service withdraw-fees --chain-id=<chain-id> --from=node0 --fee=0.12iris
+iriscli service withdraw-fees --chain-id=<chain-id> --from=node0 --fee=0.3iris
 ```
 
 After that, you're done with withdraw fees from service incoming fees.
