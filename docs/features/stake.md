@@ -50,7 +50,7 @@ This specification briefly introduces the functionality of stake module and what
 
 	Then just send a create-validator transaction. This is an example command.
 	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.12iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
+	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.3iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
 	```
 	The more tokens specified by `--amount`, the more probability your full node will be a real validator. Otherwise, it will just be validator candidate.
 
@@ -88,34 +88,34 @@ This specification briefly introduces the functionality of stake module and what
 4. Edit validator
 
 	```
-	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.12iris --commission-rate=0.15 --moniker=<new name>
+	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new name>
 	```
 	
 5. Increase self-delegation
 
 	```
-	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.12iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
 	```
 
 6. Delegate tokens to other validators
 
 	If you just want to be a delegator, you can skip the above steps.
 	```
-	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.12iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
 	```
 
 7. Unbond tokens from a validator
 
 	Unbond half of total bonded token on a given validator
 	```
-	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.12iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris --share-percent=0.5
 	```
 
 8. Redelegate tokens to another validator
 
 	Redelegate half of total bonded token on a given validator to another one
 	```
-	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.12iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
+	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.3iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
 	```
 
 For other query stake state commands, please refer to [stake cli client](../cli-client/stake/README.md)

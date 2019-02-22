@@ -22,7 +22,7 @@ This module is mainly used to transfer coins between accounts、query account ba
 
     For example, transfer 10iris from account A to account B:
     ```bash
-    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.12iris --from=[key name of wallet A] --chain-id=[chain-id]
+    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.3iris --from=[key name of wallet A] --chain-id=[chain-id]
     ```
     IRISnet supports multiple tokens in circulation, and in the future IRISnet will be able to include multiple tokens in one transaction -- tokens can be any coin_type registered in IRISnet. 
 
@@ -30,7 +30,7 @@ This module is mainly used to transfer coins between accounts、query account ba
 
     To improve account security, IRISnet supports offline signing of transactions to protect the account's private key. In any transaction, you can build an unsigned transaction using the flag --generate-only=true. Use transfer transactions as an example:
     ```bash
-    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.12iris --from=[key name of wallet A] --generate-only=true
+    iriscli bank send --to [address of wallet B] --amount=10iris --fee=0.3iris --from=[key name of wallet A] --generate-only=true
     ```
     Return the built transaction with empty signatures:
     ```json

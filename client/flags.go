@@ -13,7 +13,7 @@ const (
 	// execution failures due to state changes that might
 	// occur between the tx simulation and the actual run.
 	DefaultGasAdjustment = 1.5
-	DefaultGasLimit      = 20000
+	DefaultGasLimit      = 50000
 	GasFlagSimulate      = "simulate"
 
 	FlagUseLedger      = "ledger"
