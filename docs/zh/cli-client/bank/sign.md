@@ -60,7 +60,7 @@ iriscli bank sign <file> [flags]
 首先你必须使用 **iriscli bank send**  命令和标志 **--generate-only** 来生成一个发送记录，如下
 
 ```  
-iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.12iris --chain-id=irishub-test --amount=10iris --generate-only
+iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.3iris --chain-id=irishub-test --amount=10iris --generate-only
 
 {"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"4000000000000000"}],"gas":"200000"},"signatures":null,"memo":""}}
 ```
@@ -72,7 +72,7 @@ iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  
 接着来签名这个离线文件.
 
 ```
-iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.12iris --chain-id=irishub-test --amount=10iris --generate-only > tx.json
+iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.3iris --chain-id=irishub-test --amount=10iris --generate-only > tx.json
 ```
 
 随后得到签名详细信息，如下输出中你会看到签名信息。 

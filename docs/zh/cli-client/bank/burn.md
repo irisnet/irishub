@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli bank burn --from <key name> --fee=0.12iris --chain-id=<chain-id> --amount=10iris
+iriscli bank burn --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
 
@@ -24,7 +24,7 @@ iriscli bank burn --from <key name> --fee=0.12iris --chain-id=<chain-id> --amoun
 ### 销毁token
 
 ```
- iriscli bank burn --from=test  --fee=0.12iris --chain-id=irishub-test --amount=10iris --commit
+ iriscli bank burn --from=test  --fee=0.3iris --chain-id=irishub-test --amount=10iris --commit
 ```
 
 命令执行完成后，返回执行的细节信息

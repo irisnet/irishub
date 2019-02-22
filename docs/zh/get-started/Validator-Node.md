@@ -68,14 +68,14 @@ fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.12iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 > 注意：**Fee** 字段可以使用小数，例如`0.01iris` 。
 
 也就是说，如果你想要抵押10IRIS在test-irishub链上,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.12iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.3iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 
 ### 查询验证人信息
