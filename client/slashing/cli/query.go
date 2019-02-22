@@ -21,7 +21,7 @@ func GetCmdQuerySigningInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli stake signing-info <validator public key>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pk, err := sdk.GetValPubKeyBech32(args[0])
+			pk, err := sdk.GetConsPubKeyBech32(args[0])
 			if err != nil {
 				return err
 			}
