@@ -538,6 +538,9 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 
 	// no need to create the ubd object just complete now
 	if completeNow {
+		if !balance.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), delAddr.String(),  balance.String(), sdk.UndelegationFlow, ctx.CoinFlowTrigger())
+		}
 		_, _, err := k.bankKeeper.AddCoins(ctx, delAddr, sdk.Coins{balance})
 		if err != nil {
 			return types.UnbondingDelegation{}, err
