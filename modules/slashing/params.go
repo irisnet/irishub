@@ -200,8 +200,8 @@ func DefaultParams() Params {
 		DowntimeJailDuration:    2 * sdk.Day,
 		MinSignedPerWindow:      sdk.NewDecWithPrec(5, 1),
 		SlashFractionDoubleSign: sdk.NewDecWithPrec(1, 2),
-		SlashFractionDowntime:   sdk.NewDecWithPrec(5, 3),
-		SlashFractionCensorship: sdk.NewDecWithPrec(2, 2),
+		SlashFractionDowntime:   sdk.ZeroDec(),
+		SlashFractionCensorship: sdk.ZeroDec(),
 		CensorshipJailDuration:  7 * sdk.Day,
 	}
 }
@@ -213,9 +213,9 @@ func DefaultParamsForTestnet() Params {
 		SignedBlocksWindow:      100,
 		DowntimeJailDuration:    60 * 10 * time.Second,
 		MinSignedPerWindow:      sdk.NewDecWithPrec(5, 1),
-		SlashFractionDoubleSign: sdk.NewDec(1).Quo(sdk.NewDec(20)),
-		SlashFractionDowntime:   sdk.NewDec(1).Quo(sdk.NewDec(100)),
-		SlashFractionCensorship: sdk.NewDecWithPrec(2, 2),
+		SlashFractionDoubleSign: sdk.NewDecWithPrec(5, 2),
+		SlashFractionDowntime:   sdk.ZeroDec(),
+		SlashFractionCensorship: sdk.ZeroDec(),
 		CensorshipJailDuration:  60 * 7 * time.Second,
 	}
 }
@@ -302,15 +302,15 @@ func validateSlashFractionDoubleSign(p sdk.Dec) sdk.Error {
 }
 
 func validateSlashFractionDowntime(p sdk.Dec) sdk.Error {
-	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionDowntime [%s] should be between [0.005, 0.1] ", p.String()))
+	if p.LT(sdk.ZeroDec()) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionDowntime [%s] should be between [0, 0.1] ", p.String()))
 	}
 	return nil
 }
 
 func validateSlashFractionCensorship(p sdk.Dec) sdk.Error {
-	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionCensorship [%s] should be between [0.005, 0.1] ", p.String()))
+	if p.LT(sdk.ZeroDec()) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionCensorship [%s] should be between [0, 0.1] ", p.String()))
 	}
 	return nil
 }
