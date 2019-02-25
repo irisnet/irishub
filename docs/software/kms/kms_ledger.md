@@ -48,7 +48,7 @@ tmkms keygen ~/.tmkms/secret_connection.key
 
 #### Retrieve validator key
 
-The last step is to retrieve the validator key that you will use in `gaiad`.
+The last step is to retrieve the validator key that you will use in `iris`.
 
 Start the KMS:
 
@@ -60,13 +60,13 @@ The output should look similar to:
 
 ```text
 07:28:24 [INFO] tmkms 0.3.0 starting up...
-07:28:24 [INFO] [keyring:ledgertm:ledgertm] added validator key cosmosvalconspub1zcjduepqy53m39prgp9dz3nz96kaav3el5e0th8ltwcf8cpavqdvpxgr5slsd6wz6f
+07:28:24 [INFO] [keyring:ledgertm:ledgertm] added validator key icp1zcjduepqa9y67dqgug4u4stf5sf0arvjrnty8eenlfj22vnh78cmejd8qdss8t6ljg
 07:28:24 [INFO] KMS node ID: 1BC12314E2E1C29015B66017A397F170C6ECDE4A
 ```
 
-The KMS may complain that it cannot connect to gaiad. That is fine, we will fix it in the next section.
+The KMS may complain that it cannot connect to iris. That is fine, we will fix it in the next section.
 
-This output indicates the validator key linked to this particular device is: `cosmosvalconspub1zcjduepqy53m39prgp9dz3nz96kaav3el5e0th8ltwcf8cpavqdvpxgr5slsd6wz6f`
+This output indicates the validator key linked to this particular device is: `icp1zcjduepqa9y67dqgug4u4stf5sf0arvjrnty8eenlfj22vnh78cmejd8qdss8t6ljg`
 
 TODO: KMS CLI should allow for querying keys, etc. [ISSUE#]()
 
@@ -84,13 +84,13 @@ For example:
 priv_validator_laddr = "tcp://127.0.0.1:26658"
 ```
 
-Let's assume that you have set up your validator account and called it `kmsval`. You can tell gaiad the key that we've got in the previous section.
+Let's assume that you have set up your validator account and called it `kmsval`. You can tell iris the key that we've got in the previous section.
 
 ```bash
 iris gentx --name kmsval --pubkey {.ValidatorKey} 
 ```
 
-Now start `gaiad`. You should see that the KMS connects and receives a signature request.
+Now start `iris`. You should see that the KMS connects and receives a signature request.
 
 Once the ledger receives the first message, it will ask for confirmation that the values are adequate.
 
