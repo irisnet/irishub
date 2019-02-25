@@ -240,7 +240,7 @@ func DefaultParams() GovParams {
 		return GovParams{
 			CriticalDepositPeriod: time.Duration(sdk.Day),
 			CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
-			CriticalVotingPeriod:  time.Duration(sdk.ThreeDays),
+			CriticalVotingPeriod:  time.Duration(sdk.FiveDays),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
 			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
@@ -249,7 +249,7 @@ func DefaultParams() GovParams {
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
-			ImportantVotingPeriod:  time.Duration(sdk.SixtyHours),
+			ImportantVotingPeriod:  time.Duration(sdk.FiveDays),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
 			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
@@ -258,7 +258,7 @@ func DefaultParams() GovParams {
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-			NormalVotingPeriod:  time.Duration(sdk.TwoDays),
+			NormalVotingPeriod:  time.Duration(sdk.FiveDays),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
 			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 			NormalVeto:          sdk.NewDecWithPrec(334, 3),
