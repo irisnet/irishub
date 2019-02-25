@@ -74,7 +74,7 @@ This mnemonic 此助记符与IRISNet兼容，用于在IRISNet网络上生成地�
 
 在ledger设备的核心，有一个助记词用于在多个区块链（包括IRISNet）上生成帐户。通常，在初始话ledger设备时，您将创建新的助记词。
 
-接下来，单击[此处](#using-a-ledger-device)以了解如何生成帐户。
+接下来，单击[此处](#使用ledger设备)以了解如何生成帐户。
 
 ## 创建账户
 
