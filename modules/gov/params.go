@@ -245,7 +245,7 @@ func DefaultParams() GovParams {
 			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
-			CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
@@ -254,7 +254,7 @@ func DefaultParams() GovParams {
 			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
-			ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
@@ -263,7 +263,7 @@ func DefaultParams() GovParams {
 			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 			NormalVeto:          sdk.NewDecWithPrec(334, 3),
 			NormalParticipation: sdk.NewDecWithPrec(75, 2),
-			NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    20000,
 		}
 	} else {
@@ -275,7 +275,7 @@ func DefaultParams() GovParams {
 			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
-			CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
@@ -284,7 +284,7 @@ func DefaultParams() GovParams {
 			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
-			ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
@@ -293,7 +293,7 @@ func DefaultParams() GovParams {
 			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 			NormalVeto:          sdk.NewDecWithPrec(334, 3),
 			NormalParticipation: sdk.NewDecWithPrec(75, 2),
-			NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    60,
 		}
 	}
@@ -312,7 +312,7 @@ func DefaultParamsForTest() GovParams {
 		CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 		CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 		CriticalParticipation: sdk.NewDecWithPrec(875, 3),
-		CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+		CriticalPenalty:       sdk.ZeroDec(),
 
 		ImportantDepositPeriod: time.Duration(30 * time.Second),
 		ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
@@ -321,7 +321,7 @@ func DefaultParamsForTest() GovParams {
 		ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 		ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 		ImportantParticipation: sdk.NewDecWithPrec(834, 3),
-		ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+		ImportantPenalty:       sdk.ZeroDec(),
 
 		NormalDepositPeriod: time.Duration(30 * time.Second),
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
@@ -330,7 +330,7 @@ func DefaultParamsForTest() GovParams {
 		NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 		NormalVeto:          sdk.NewDecWithPrec(334, 3),
 		NormalParticipation: sdk.NewDecWithPrec(75, 2),
-		NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+		NormalPenalty:       sdk.ZeroDec(),
 		SystemHaltPeriod:    60,
 	}
 }
