@@ -82,7 +82,7 @@ func (coin Coin) Plus(coinB Coin) Coin {
 		panic(fmt.Sprintf("invalid coin denominations; %s, %s", coin.Denom, coinB.Denom))
 	}
 
-	return NewCoin(coin.Denom, coin.Amount.Add(coinB.Amount))
+	return Coin{coin.Denom, coin.Amount.Add(coinB.Amount)}
 }
 
 // Subtracts amounts of two coins with same denom. If the coins differ in denom
@@ -388,7 +388,7 @@ func (coins Coins) negative() Coins {
 	res := make([]Coin, 0, len(coins))
 
 	for _, coin := range coins {
-		res = append(res, NewCoin(coin.Denom, coin.Amount.Neg()))
+		res = append(res, Coin{coin.Denom, coin.Amount.Neg()})
 	}
 
 	return res
