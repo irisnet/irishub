@@ -250,10 +250,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		if found {
 			for _, coin := range binding.Deposit {
 				taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-				slashCoins = append(slashCoins, sdk.Coin{
-					Denom:  coin.Denom,
-					Amount: taxAmount,
-				})
+				slashCoins = append(slashCoins, sdk.NewCoin(coin.Denom, taxAmount))
 			}
 		}
 

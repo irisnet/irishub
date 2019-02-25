@@ -335,7 +335,9 @@ func TestHandleNewValidator(t *testing.T) {
 func TestHandleAlreadyJailed(t *testing.T) {
 
 	// initial setup
-	ctx, _, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
+	defaultParams := DefaultParamsForTestnet()
+	defaultParams.SlashFractionDowntime = sdk.NewDecWithPrec(1, 2)
+	ctx, _, sk, _, keeper := createTestInput(t, defaultParams)
 	amtInt := int64(100)
 	addr, val, amt := addrs[0], pks[0], sdk.NewIntWithDecimal(amtInt, 18)
 	sh := stake.NewHandler(sk)
