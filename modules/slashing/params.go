@@ -99,7 +99,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateJailDuration(doubleSignJailDuration); err != nil {
+		if err := validateDoubleSignJailDuration(doubleSignJailDuration); err != nil {
 			return nil, err
 		}
 		return doubleSignJailDuration, nil
@@ -108,7 +108,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateJailDuration(downtimeJailDuration); err != nil {
+		if err := validateDowntimeJailDuration(downtimeJailDuration); err != nil {
 			return nil, err
 		}
 		return downtimeJailDuration, nil
@@ -194,8 +194,8 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 // Default parameters used by Iris Hub
 func DefaultParams() Params {
 	return Params{
-		MaxEvidenceAge:          21 * BlocksPerDay,
-		SignedBlocksWindow:      30000,
+		MaxEvidenceAge:          3 * BlocksPerDay,
+		SignedBlocksWindow:      2 * BlocksPerDay,
 		MinSignedPerWindow:      sdk.NewDecWithPrec(5, 1),
 		DoubleSignJailDuration:  2 * sdk.Day,
 		DowntimeJailDuration:    1 * sdk.Day,
@@ -208,8 +208,8 @@ func DefaultParams() Params {
 
 func DefaultParamsForTestnet() Params {
 	return Params{
-		MaxEvidenceAge:          2 * BlocksPerMinute,
-		SignedBlocksWindow:      100,
+		MaxEvidenceAge:          3 * BlocksPerMinute,
+		SignedBlocksWindow:      200,
 		MinSignedPerWindow:      sdk.NewDecWithPrec(5, 1),
 		DoubleSignJailDuration:  20 * time.Minute,
 		DowntimeJailDuration:    10 * time.Minute,
@@ -234,10 +234,10 @@ func validateParams(p Params) sdk.Error {
 	if err := validateMinSignedPerWindow(p.MinSignedPerWindow); err != nil {
 		return err
 	}
-	if err := validateJailDuration(p.DoubleSignJailDuration); err != nil {
+	if err := validateDoubleSignJailDuration(p.DoubleSignJailDuration); err != nil {
 		return err
 	}
-	if err := validateJailDuration(p.DowntimeJailDuration); err != nil {
+	if err := validateDowntimeJailDuration(p.DowntimeJailDuration); err != nil {
 		return err
 	}
 	if err := validateCensorshipJailDuration(p.CensorshipJailDuration); err != nil {
@@ -257,11 +257,11 @@ func validateParams(p Params) sdk.Error {
 
 func validateMaxEvidenceAge(p int64) sdk.Error {
 	if sdk.NetworkType == sdk.Mainnet {
-		if p < 14*BlocksPerDay {
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%d] should be between [2weeks,) ", p))
+		if p < 2*BlocksPerDay {
+			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%d] should be between [2days,) ", p))
 		}
 	} else if p < 2*BlocksPerMinute {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%d] should be between [2min,) ", p))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash MaxEvidenceAge [%d] should be between [2minutes,) ", p))
 	}
 	return nil
 }
@@ -280,16 +280,23 @@ func validateMinSignedPerWindow(p sdk.Dec) sdk.Error {
 	return nil
 }
 
-func validateJailDuration(p time.Duration) sdk.Error {
-	if p <= 0 || p >= 4*sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DoubleSignJailDuration and DowntimeJailDuration [%s] should be between (0, 4week) ", p.String()))
+func validateDoubleSignJailDuration(p time.Duration) sdk.Error {
+	if p <= 0 || p >= 2*sdk.Week {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DoubleSignJailDuration [%s] should be between (0, 2weeks) ", p.String()))
+	}
+	return nil
+}
+
+func validateDowntimeJailDuration(p time.Duration) sdk.Error {
+	if p <= 0 || p >= 1*sdk.Week {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash DowntimeJailDuration [%s] should be between (0, 1week) ", p.String()))
 	}
 	return nil
 }
 
 func validateCensorshipJailDuration(p time.Duration) sdk.Error {
-	if p <= 0 || p >= 4*sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash CensorshipJailDuration [%s] should be between (0, 4week) ", p.String()))
+	if p <= 0 || p >= 2*sdk.Week {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash CensorshipJailDuration [%s] should be between (0, 2weeks) ", p.String()))
 	}
 	return nil
 }
