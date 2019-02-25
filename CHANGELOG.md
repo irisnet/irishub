@@ -1,11 +1,30 @@
 # Changelog
 
+## 0.12.2
+
+*February 22th, 2019*
+
+- Set max commission rate and max commission change rate to 100%
+- Implement coin flow record feature for "internal transactions"
+- Support Ledger Nano S and KMS
+- Update the default gas_price_threshold to be 6000iris-nano
+- No slashing for Censorship or Downtime 
+- No slashing for non-voting for proposals
+- Configure the default build environment as mainnet
+- Set the default gas limit to be 50000
+- Fix wrong withdraw address
+- Fix gas simulate issue
+- Display correct validator consensus pubkey
+- Improve the documents
+
+
 ## 0.12.1
 
 *February 14th, 2019*
 
 - Fix the bug of repeatability check about evidence in the tendermint
 - Change the invariant level for mainnet
+
 
 ## 0.12.0
 

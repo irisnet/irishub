@@ -82,7 +82,7 @@ func (coin Coin) Plus(coinB Coin) Coin {
 		panic(fmt.Sprintf("invalid coin denominations; %s, %s", coin.Denom, coinB.Denom))
 	}
 
-	return Coin{coin.Denom, coin.Amount.Add(coinB.Amount)}
+	return NewCoin(coin.Denom, coin.Amount.Add(coinB.Amount))
 }
 
 // Subtracts amounts of two coins with same denom. If the coins differ in denom
@@ -92,11 +92,7 @@ func (coin Coin) Minus(coinB Coin) Coin {
 		panic(fmt.Sprintf("invalid coin denominations; %s, %s", coin.Denom, coinB.Denom))
 	}
 
-	res := Coin{coin.Denom, coin.Amount.Sub(coinB.Amount)}
-	if !res.IsNotNegative() {
-		panic("negative count amount")
-	}
-
+	res := NewCoin(coin.Denom, coin.Amount.Sub(coinB.Amount))
 	return res
 }
 
@@ -392,10 +388,7 @@ func (coins Coins) negative() Coins {
 	res := make([]Coin, 0, len(coins))
 
 	for _, coin := range coins {
-		res = append(res, Coin{
-			Denom:  coin.Denom,
-			Amount: coin.Amount.Neg(),
-		})
+		res = append(res, NewCoin(coin.Denom, coin.Amount.Neg()))
 	}
 
 	return res
@@ -461,7 +454,7 @@ func ParseCoin(coinStr string) (coin Coin, err error) {
 		return Coin{}, fmt.Errorf("failed to parse coin amount: %s", amountStr)
 	}
 
-	return Coin{denomStr, amount}, nil
+	return NewCoin(denomStr, amount), nil
 }
 
 // ParseCoins will parse out a list of coins separated by commas.
