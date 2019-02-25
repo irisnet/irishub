@@ -302,15 +302,15 @@ func validateSlashFractionDoubleSign(p sdk.Dec) sdk.Error {
 }
 
 func validateSlashFractionDowntime(p sdk.Dec) sdk.Error {
-	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionDowntime [%s] should be between [0.005, 0.1] ", p.String()))
+	if p.LT(sdk.ZeroDec()) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionDowntime [%s] should be between [0, 0.1] ", p.String()))
 	}
 	return nil
 }
 
 func validateSlashFractionCensorship(p sdk.Dec) sdk.Error {
-	if p.LT(sdk.NewDecWithPrec(5, 3)) || p.GT(sdk.NewDecWithPrec(1, 1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionCensorship [%s] should be between [0.005, 0.1] ", p.String()))
+	if p.LT(sdk.ZeroDec()) || p.GT(sdk.NewDecWithPrec(1, 1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSlashParams, fmt.Sprintf("Slash SlashFractionCensorship [%s] should be between [0, 0.1] ", p.String()))
 	}
 	return nil
 }
