@@ -62,17 +62,17 @@
 **不要丢失或与任何人分享你的24个单词。为防止盗窃或资金损失，最好确保保留多个助记词副本，并将其存放在安全可靠的地方，并且只有您知道如何访问。如果有人能够访问您的助记词，他们将能够访问您的私钥并控制与其关联的帐户。**
 :::
 
-This mnemonic 此助记符与IRISNet兼容，用于在IRISNet网络上生成地址和交易的工具称是`iriscli`，它支持从Ledger种子派生帐户密钥。请注意，Ledger设备充当种子和私钥的保护，并且签名交易发生在其中。没有任何私人信息会在Ledger设备之外被获取。
+This mnemonic 此助记符与IRISnet兼容，用于在IRISnet网络上生成地址和交易的工具称是`iriscli`，它支持从Ledger种子派生帐户密钥。请注意，Ledger设备充当种子和私钥的保护，并且签名交易发生在其中。没有任何私人信息会在Ledger设备之外被获取。
 
 要使用Ledger设备支持`iriscli`，你需要采取下面步骤（因为IRISnet基于cosmos-sdk，COSMOS应用程序可用于IRISnet）。
 
 - [A Ledger Nano with the `COSMOS` app installed and an account](#using-a-ledger-device)
-- [A running `iris` instance connected to the network you wish to use.](./node.md#how-to-start-an-irisnet-network-locally)
+- [A running `iris` instance connected to the network you wish to use.](../get-started/Join-the-Mainnet.md)
 - [A `iriscli` instance configured to connect to your chosen `iris` instance.](./cli-client.md)
 
 现在，您已准备好开始在网络上发送交易。
 
-在ledger设备的核心，有一个助记词用于在多个区块链（包括IRISNet）上生成帐户。通常，在初始话ledger设备时，您将创建新的助记词。
+在ledger设备的核心，有一个助记词用于在多个区块链（包括IRISnet）上生成帐户。通常，在初始话ledger设备时，您将创建新的助记词。
 
 接下来，单击[此处](#使用ledger设备)以了解如何生成帐户。
 
@@ -86,7 +86,7 @@ This mnemonic 此助记符与IRISNet兼容，用于在IRISNet网络上生成地�
 **仅使用您购买的新设备或完全信任的Ledger设备**
 :::
 
-初始化ledger时，会生成一个24个单词的助记词并存储在设备中。此助记词与IRISNet兼容，可以从中派生出IRISNet账号。因此，您所要做的就是让您的ledger与`iriscli`兼容。为此，您需要执行以下步骤：
+初始化ledger时，会生成一个24个单词的助记词并存储在设备中。此助记词与IRISnet兼容，可以从中派生出IRISnet账号。因此，您所要做的就是让您的ledger与`iriscli`兼容。为此，您需要执行以下步骤：
 
 1. 下载Ledger Live app [这里](https://www.ledger.com/pages/ledger-live). 
 2. 通过USB连接ledger并更新到最新的firmware。

@@ -67,12 +67,12 @@ This mnemonic is compatible with IrisNet accounts. The tool used to generate add
 To use `iriscli` with a Ledger device you will need the following(Since IRISnet is based on cosmos-sdk, the COSMOS app is available for IRISnet):
 
 - [A Ledger Nano with the `COSMOS` app installed and an account](#using-a-ledger-device)
-- [A running `iris` instance connected to the network you wish to use.](./node.md#how-to-start-an-irisnet-network-locally)
+- [A running `iris` instance connected to the network you wish to use.](../get-started/Join-the-Mainnet.md)
 - [A `iriscli` instance configured to connect to your chosen `iris` instance.](./cli-client.md)
 
 Now, you are all set to start sending transactions on the network.
 
-At the core of a ledger device, there is a mnemonic used to generate accounts on multiple blockchains (including the IRISNet). Usually, you will create a new mnemonic when you initialize your ledger device.
+At the core of a ledger device, there is a mnemonic used to generate accounts on multiple blockchains (including the IRISnet). Usually, you will create a new mnemonic when you initialize your ledger device.
 
 Next, click [here](#using-a-ledger-device) to learn how to generate an account.
 
@@ -86,7 +86,7 @@ To create an account, you just need to have `iriscli` installed. Before creating
 **Only use Ledger devices that you bought factory new or trust fully**
 :::
 
-When you initialize your ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRISNet and IRISNet accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iriscli``. To do so, you need to go through the following steps:
+When you initialize your ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRISnet and IRISnet accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iriscli``. To do so, you need to go through the following steps:
 
 1. Download the Ledger Live app [here](https://www.ledger.com/pages/ledger-live). 
 2. Connect your ledger via USB and update to the latest firmware
