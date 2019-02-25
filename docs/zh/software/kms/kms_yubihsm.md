@@ -1,6 +1,6 @@
 # Setting up Tendermint KMS + YubiHSM
 
-::: 危险警告
+::: danger Warning
 以下说明是一个简短的演练，而不是一个全面的指南。
 :::
 

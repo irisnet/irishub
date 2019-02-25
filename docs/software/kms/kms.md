@@ -24,5 +24,5 @@ When compiling the KMS, ensure you have enabled the applicable features:
 The KMS provides different alternatives
 
 - [Using a CPU-based signer](kms_cpu.md)
-- [Using a YubiHSM](kms_ledger.md)
+- [Using a YubiHSM](kms_yubihsm.md)
 - [Using a Ledger device running the Tendermint Validator app](kms_ledger.md)
