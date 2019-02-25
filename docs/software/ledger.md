@@ -59,7 +59,7 @@ The funds stored in an account are controlled by the private key. This private k
 At the core of a Ledger device, there is a mnemonic that is used to generate private keys. When you initialize you Ledger, a mnemonic is generated. 
 
 ::: danger
-**Do not lose or share your 12 words with anyone. To prevent theft or loss of funds, it is best to ensure that you keep multiple copies of your mnemonic, and store it in a safe, secure place and that only you know how to access. If someone is able to gain access to your mnemonic, they will be able to gain access to your private keys and control the accounts associated with them.**
+**Do not lose or share your 24 words with anyone. To prevent theft or loss of funds, it is best to ensure that you keep multiple copies of your mnemonic, and store it in a safe, secure place and that only you know how to access. If someone is able to gain access to your mnemonic, they will be able to gain access to your private keys and control the accounts associated with them.**
 :::
 
 This mnemonic is compatible with IrisNet accounts. The tool used to generate addresses and transactions on the IrisNet network is called `iriscli`, which supports derivation of account keys from a Ledger seed. Note that the Ledger device acts as an enclave of the seed and private keys, and the process of signing transaction takes place within it. No private information ever leaves the Ledger device. 
@@ -72,22 +72,7 @@ To use `iriscli` with a Ledger device you will need the following(Since IRISnet 
 
 Now, you are all set to start sending transactions on the network.
 
-At the core of a ledger device, there is a mnemonic used to generate accounts on multiple blockchains (including the Cosmos Hub). Usually, you will create a new mnemonic when you initialize your ledger device. However, it is possible to tell the ledger device to use a mnemonic provided by the user instead. Let us go ahead and see how you can input the mnemonic you obtained during the fundraiser as the seed of your ledger device. 
-
-::: warning
-*NOTE: To do this, **it is preferable to use a brand new ledger device.**. Indeed, there can be only one mnemonic per ledger device. If, however, you want to use a ledger that is already initialized with a seed, you can reset it by going in `Settings`>`Device`>`Reset All`. **Please note that this will wipe out the seed currently stored on the device. If you have not properly secured the associated mnemonic, you could lose your funds!!!***
-:::
-
-The following steps need to be performed on an un-initialized ledger device:
-
-1. Connect your ledger device to the computer via USB
-2. Press both buttons
-3. Do **NOT** choose the "Config as a new device" option. Instead, choose "Restore Configuration"
-4. Choose a PIN
-5. Choose the 12 words option
-6. Input each of the words you got during the fundraiser, in the correct order. 
-
-Your ledger is now correctly set up with your fundraiser mnemonic! Do not lose this mnemonic! If your ledger is compromised, you can always restore a new device again using the same mnemonic.
+At the core of a ledger device, there is a mnemonic used to generate accounts on multiple blockchains (including the IRISNet). Usually, you will create a new mnemonic when you initialize your ledger device.
 
 Next, click [here](#using-a-ledger-device) to learn how to generate an account.
 
@@ -101,7 +86,7 @@ To create an account, you just need to have `iriscli` installed. Before creating
 **Only use Ledger devices that you bought factory new or trust fully**
 :::
 
-When you initialize your ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with Cosmos and Cosmos accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iriscli``. To do so, you need to go through the following steps:
+When you initialize your ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRISNet and IRISNet accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iriscli``. To do so, you need to go through the following steps:
 
 1. Download the Ledger Live app [here](https://www.ledger.com/pages/ledger-live). 
 2. Connect your ledger via USB and update to the latest firmware

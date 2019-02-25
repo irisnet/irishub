@@ -1,25 +1,25 @@
 # Setting up Tendermint KMS + YubiHSM
 
-::: danger Warning
-The following instructions are a brief walkthrough and not a comprehensive guideline.
+::: 危险警告
+以下说明是一个简短的演练，而不是一个全面的指南。
 :::
 
 ::: danger Warning
-KMS is currently work in progress. Details may vary. Use with care under your own risk.
+KMS目前正在进行中。细节可能有所不同请谨慎使用，风险自负。
 :::
 
 ## YubiHSM
 [YubiHSM](https://www.yubico.com/products/yubihsm/): hardware security module providing root of trust for servers and computing devices.
 
-## KMS configuration
+## KMS配置
 
-In this section, we will configure a KMS to use YubiHSM. 
+在本节中，我们将配置KMS以使用YubiHSM。
 
-#### Config file
+#### 配置文件
 
-You can find other configuration examples [here](https://github.com/irisnet/kms/blob/master/tmkms.toml.example)
+可以在[这里](https://github.com/irisnet/kms/blob/master/tmkms.toml.example)找到其他配置示例。
 
-- Create a `~/.tmkms/tmkms.toml` file with the following content:
+- 使用以下内容创建一个`~/.tmkms/tmkms.toml`文件：
 
 ```toml
 # Example KMS configuration file
@@ -35,10 +35,10 @@ keys = [{ id = "test", key = 1 }]
 #serial_number = "0123456789" # identify serial number of a specific YubiHSM to connect to
 ```
 
-- Edit `addr` to point to your `iris` instance.
-- Adjust `chain-id` to match your `.iris/config/config.toml` settings.
-- Edit `auth` to authorize access to your yubihsm.
-- Edit `keys` to determine which pubkey you will be using. [How to import key?](#import-private-key))
+- 编辑 `addr` 指向你的 `iris` 实例。
+- 调整 `chain-id` 以匹配你的 `.iris/config/config.toml` 设置。
+- 编辑 `auth` 以授权访问你的yubihsm。
+- 编辑 `keys` 确定您将使用哪个pubkey。[如何导入密钥？](#import-private-key-to-yubihsm))
 
 #### Import private key to yubihsm
 
@@ -46,19 +46,19 @@ keys = [{ id = "test", key = 1 }]
 tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [id]
 ```
 
-#### Generate connection secret key
+#### 生成连接密钥
 
-Now you need to generate secret_key:
+现在你需要生成secret_key
 
 ```bash
 tmkms keygen ~/.tmkms/secret_connection.key
 ```
 
-#### Start the KMS
+#### 启动KMS
 
-The last step is to retrieve the validator key that you will use in `iris`.
+最后一步是检索将在`iris`中使用的验证人密钥。
 
-Start the KMS:
+启动KMS:
 
 ```bash
 tmkms start -c ~/.tmkms/tmkms.toml
