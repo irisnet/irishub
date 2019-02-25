@@ -474,16 +474,16 @@ func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
 
 func validateTallyingProcedure(tp TallyingProcedure, level string) sdk.Error {
 	if tp.Threshold.LTE(sdk.ZeroDec()) || tp.Threshold.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be (0,1)"))
 	}
 	if tp.Participation.LTE(sdk.ZeroDec()) || tp.Participation.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be between (0,1)"))
 	}
 	if tp.Veto.LTE(sdk.ZeroDec()) || tp.Veto.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be between (0,1)"))
 	}
-	if tp.Penalty.LTE(sdk.ZeroDec()) || tp.Penalty.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be between 0 and 1"))
+	if tp.Penalty.LT(sdk.ZeroDec()) || tp.Penalty.GTE(sdk.NewDec(1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be between [0,1)"))
 	}
 	return nil
 }
