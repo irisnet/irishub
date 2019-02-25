@@ -466,8 +466,8 @@ func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 }
 
 func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
-	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %s", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
+	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.Week {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and 1 week", vp.VotingPeriod.String()))
 	}
 	return nil
 }
