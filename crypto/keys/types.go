@@ -14,7 +14,7 @@ type Keybase interface {
 	List() ([]Info, error)
 	Get(name string) (Info, error)
 	GetByAddress(address types.AccAddress) (Info, error)
-	Delete(name, passphrase string) error
+	Delete(name, passphrase string, skipPass bool) error
 
 	// Sign some bytes, looking up the private key to use
 	Sign(name, passphrase string, msg []byte) ([]byte, crypto.PubKey, error)
@@ -31,7 +31,7 @@ type Keybase interface {
 	// Encrypt the key to disk using encryptPasswd.
 	// See https://github.com/irisnet/irishub/issues/2095
 	Derive(name, mnemonic, bip39Passwd,
-		encryptPasswd string, params hd.BIP44Params) (Info, error)
+	encryptPasswd string, params hd.BIP44Params) (Info, error)
 	// Create, store, and return a new Ledger key reference
 	CreateLedger(name string, path ccrypto.DerivationPath, algo SigningAlgo) (info Info, err error)
 
