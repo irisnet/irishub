@@ -16,6 +16,7 @@ const (
 	BurnFlow                 = "Burn"
 	CommunityTaxUseFlow      = "CommunityTaxUse"
 	GovDepositFlow           = "GovDeposit"
+	GovDepositBurnFlow       = "GovDepositBurn"
 	GovDepositRefundFlow     = "GovDepositRefund"
 	ServiceDepositFlow       = "ServiceDeposit"
 	ServiceDepositRefundFlow = "ServiceDepositRefund"
