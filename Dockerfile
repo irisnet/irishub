@@ -3,7 +3,7 @@
 # > docker run -v $HOME/.iris:/root/.iris iris init
 # > docker run -v $HOME/.iris:/root/.iris iris start
 
-FROM golang:1.10-alpine3.7 as builder
+FROM golang:1.11.5-alpine3.9 as builder
 
 # Set up dependencies
 ENV PACKAGES make gcc git libc-dev bash
@@ -29,7 +29,7 @@ RUN cd $REPO_PATH && \
     make install && \
     make test_cli
 
-FROM alpine:3.7
+FROM alpine:3.9
 
 # p2p port
 EXPOSE 26656
