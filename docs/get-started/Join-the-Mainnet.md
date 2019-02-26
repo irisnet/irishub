@@ -33,6 +33,8 @@ If you miss the genesis file generation process, you can still upgrade your full
 
 A validator is under the risk of being attacked. You could follow this [guide](../software/sentry.md) to setup a sentry node to protect yourself.
 
+### Using a KMS
+If you plan to use a KMS (key management system), you should go through these steps first: [Using a KMS](../software/kms/kms.md).
 
 ##  Useful Links
 

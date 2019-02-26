@@ -1,10 +1,11 @@
 package keys
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/client/keys"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/client/utils"
 )
 
@@ -31,7 +32,7 @@ func DeleteKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = kb.Delete(name, m.Password)
+	err = kb.Delete(name, m.Password, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "Ciphertext decryption failed") {
 			w.WriteHeader(http.StatusUnauthorized)
