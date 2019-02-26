@@ -21,6 +21,13 @@
 
 ## Configuration
 
+如果要启用KMS，首先需要在`~/.iris/config/config.toml`文件中编辑`priv_validator_laddr`。例如：
+```text
+# TCP or UNIX socket address for Tendermint to listen on for
+# connections from an external PrivValidator process
+Priv_validator_laddr = "localhost:26658"
+```
+
 KMS提供了不同的选择
 
 - [Using a CPU-based signer](kms_cpu.md)

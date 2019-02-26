@@ -66,7 +66,7 @@ This mnemonic is compatible with IrisNet accounts. The tool used to generate add
 
 To use `iriscli` with a Ledger device you will need the following(Since IRISnet is based on cosmos-sdk, the COSMOS app is available for IRISnet):
 
-- [A Ledger Nano with the `COSMOS` app installed and an account](#using-a-ledger-device)
+- [A Ledger Nano with the `COSMOS` app installed and an account.](#using-a-ledger-device)
 - [A running `iris` instance connected to the network you wish to use.](../get-started/Join-the-Mainnet.md)
 - [A `iriscli` instance configured to connect to your chosen `iris` instance.](./cli-client.md)
 
