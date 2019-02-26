@@ -1,5 +1,13 @@
 # Changelog
 
+
+## 0.12.2
+
+*February 26th, 2019*
+
+- Fix the document issue
+
+
 ## 0.12.2-rc0
 
 *February 26th, 2019*
