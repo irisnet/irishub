@@ -14,6 +14,8 @@ ENV GOPATH       /root/go
 ENV BASE_PATH    $GOPATH/src/github.com/irisnet
 ENV REPO_PATH    $BASE_PATH/irishub
 ENV PATH         $GOPATH/bin:$PATH
+ENV InvariantLevel panic
+ENV NetworkType testnet
 
 # Add source files
 COPY . $REPO_PATH/
@@ -25,7 +27,9 @@ RUN cd $REPO_PATH && \
     make get_tools && \
     make get_vendor_deps && \
     make test_unit && \
-    make build_linux
+    make build_linux && \
+    make install && \
+    make test_cli
 
 FROM alpine:3.9
 
