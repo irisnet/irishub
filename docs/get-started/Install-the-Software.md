@@ -41,15 +41,15 @@ v0.12.2
 
 #### Compile Source Code
 
-- Install Go 1.10+
+- Install Go 1.11+
 
 ```
 $ sudo add-apt-repository ppa:gophers/archive
 $ sudo apt-get update
-$ sudo apt-get install golang-1.10-go
+$ sudo apt-get install golang-1.11-go
 ```
 
-> Note that golang-1.10-go puts binaries in /usr/lib/go-1.10/bin. If you want them on your PATH, you need to make that change yourself.
+> Note that golang-1.10-go puts binaries in /usr/lib/go-1.11/bin. If you want them on your PATH, you need to make that change yourself.
 
 Using snaps also works quite well:
 
@@ -64,7 +64,7 @@ Then you need to verify the versions of Go:
 
 ```
 $ go version
-go version go1.10.3 darwin/amd64
+go version go1.11.5 darwin/amd64
 ```
 
 Then, you need to add `GOPATH` to system `PATH` , then your system could correctly compile the code.

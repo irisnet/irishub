@@ -36,7 +36,7 @@ v0.12.2
 ```
 #### 方法2：源码编译安装
 
-#### 安装Go版本 1.10+ 
+#### 安装Go版本 1.11+ 
 
 
 系统要求：
@@ -44,20 +44,20 @@ v0.12.2
 Ubuntu LTS 16.04
 
 
-安装IRISHub需要保证Go的版本在1.10以上，
+安装IRISHub需要保证Go的版本在1.11以上，
 
-通过执行以下命令安装1.10版本的Go。
+通过执行以下命令安装1.11版本的Go。
 
 ```
 $ sudo add-apt-repository ppa:gophers/archive
 $ sudo apt-get update
-$ sudo apt-get install golang-1.10-go
+$ sudo apt-get install golang-1.11-go
 ```
 
-以上命令将安装 golang-1.10-go在 /usr/lib/go-1.10/bin. 需要将它加入到PATH中
+以上命令将安装 golang-1.11-go在 /usr/lib/go-1.11/bin. 需要将它加入到PATH中
 
 ```
-echo "export PATH=$PATH:/usr/lib/go-1.10/bin" >> ~/.bash_profile
+echo "export PATH=$PATH:/usr/lib/go-1.11/bin" >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
