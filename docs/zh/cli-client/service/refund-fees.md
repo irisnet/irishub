@@ -15,7 +15,7 @@ iriscli service refund-fees [flags]
 
 ### 从服务费退款中退还费用 
 ```shell
-iriscli service refund-fees --chain-id=test --from=node0 --fee=0.4iris
+iriscli service refund-fees --chain-id=test --from=node0 --fee=0.3iris
 ```
 
 运行成功以后，返回的结果如下:

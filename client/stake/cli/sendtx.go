@@ -19,7 +19,7 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create-validator",
 		Short:   "create new validator initialized with a self-delegation to it",
-		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name> --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1",
+		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name> --commission-rate=0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -65,8 +65,8 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 
 			// get the initial validator commission parameters
 			rateStr := viper.GetString(FlagCommissionRate)
-			maxRateStr := viper.GetString(FlagCommissionMaxRate)
-			maxChangeRateStr := viper.GetString(FlagCommissionMaxChangeRate)
+			maxRateStr := "1.0"
+			maxChangeRateStr := "1.0"
 			commissionMsg, err := stakeClient.BuildCommissionMsg(rateStr, maxRateStr, maxChangeRateStr)
 			if err != nil {
 				return err
@@ -116,8 +116,6 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagPubKey)
 	cmd.MarkFlagRequired(FlagAmount)
 	cmd.MarkFlagRequired(FlagCommissionRate)
-	cmd.MarkFlagRequired(FlagCommissionMaxRate)
-	cmd.MarkFlagRequired(FlagCommissionMaxChangeRate)
 	return cmd
 }
 

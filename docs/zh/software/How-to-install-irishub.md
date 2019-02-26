@@ -13,10 +13,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.12.0
+v0.12.2-rc0
     
 $ iriscli version
-v0.12.0
+v0.12.2-rc0
 ```
 ### 方法2：源码编译安装
 
@@ -75,7 +75,7 @@ source ~/.bash_profile
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.0
+cd irishub && git checkout v0.12.2-rc0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
@@ -87,7 +87,7 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.0
+cd irishub && git checkout v0.12.2-rc0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
@@ -99,8 +99,8 @@ make all
 
 ```
 $ iris version
-v0.12.0
+v0.12.2-rc0
     
 $ iriscli version
-v0.12.0
+v0.12.2-rc0
 ```

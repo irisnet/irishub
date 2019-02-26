@@ -54,9 +54,9 @@ iriscli status --node=tcp://localhost:26657
 ```
 若 `catching_up` 字段为 `false`那么你的节点就是同步的。
 
-你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fvp`为首字节，想要了解更多的编码信息，请参考以下 [文档](../features/basic-concepts/bech32-prefix.md)
+你需要获取当前节点的公钥信息来执行以下操作，公钥信息以 `fcp`为首字节，想要了解更多的编码信息，请参考以下 [文档](../features/basic-concepts/bech32-prefix.md)
 
-通过执行以下命令获得节点的公钥信息，公钥信息将以`fvp1`开头：
+通过执行以下命令获得节点的公钥信息，公钥信息将以`fcp`开头：
 
 ```
 iris tendermint show-validator --home= {IRIS-HOME}
@@ -68,14 +68,14 @@ fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 > 注意：**Fee** 字段可以使用小数，例如`0.01iris` 。
 
 也就是说，如果你想要抵押10IRIS在test-irishub链上,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-max-change-rate=0.1 --commission-max-rate=0.5 --commission-rate=0.1
+iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.3iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 
 ### 查询验证人信息
@@ -106,14 +106,14 @@ iriscli status --node=tcp://localhost:26657
 
 ```
 iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=irishub-8000 
-  --details="details"--node=tcp://localhost:26657 --fee=0.04iris  --gas=2000000
+  --details="details"--node=tcp://localhost:26657 --fee=0.4iris  --gas=2000000
 ```
 ### 查询验证人信息
 
 你可以通过以下命令查询验证人的信息：
 
 ```
-iriscli stake validator {address-validator-operator} --chain-id=test-irishub 
+iriscli stake validator {address-validator-operator} --chain-id=<chain-id> 
 ```
 
 ### 使用浏览器：IRISPlorer

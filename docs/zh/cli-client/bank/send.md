@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli bank send --to=<account address> --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount=10iris
+iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
  
@@ -26,7 +26,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.4iris --chain
 ### 发送通证到指定地址 
 
 ```
- iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.4iris --chain-id=irishub-test --amount=10iris
+ iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.3iris --chain-id=irishub-test --amount=10iris
 ```
 
 命令执行完成后，返回执行的细节信息

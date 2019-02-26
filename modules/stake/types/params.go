@@ -17,10 +17,6 @@ const (
 	// Default parameter namespace
 	DefaultParamSpace = "stake"
 
-	// defaultUnbondingTime reflects three weeks in seconds as the default
-	// unbonding time.
-	defaultUnbondingTime time.Duration = 3 * sdk.Week
-
 	// Delay, in blocks, between when validator updates are returned to Tendermint and when they are applied
 	// For example, if this is 0, the validator set at the end of a block will sign the next block, or
 	// if this is 1, the validator set at the end of a block will sign the block after the next.
@@ -45,7 +41,6 @@ var _ params.ParamSet = (*Params)(nil)
 // Params defines the high level settings for staking
 type Params struct {
 	UnbondingTime time.Duration `json:"unbonding_time"`
-
 	MaxValidators uint16 `json:"max_validators"` // maximum number of validators
 }
 
@@ -109,7 +104,7 @@ func (p Params) Equal(p2 Params) bool {
 // default stake module params
 func DefaultParams() Params {
 	return Params{
-		UnbondingTime: defaultUnbondingTime,
+		UnbondingTime: 3 * sdk.Week,
 		MaxValidators: 100,
 	}
 }
@@ -131,7 +126,6 @@ func ValidateParams(p Params) error {
 // HumanReadableString returns a human readable string representation of the
 // parameters.
 func (p Params) HumanReadableString() string {
-
 	resp := "Params \n"
 	resp += fmt.Sprintf("Unbonding Time: %s\n", p.UnbondingTime)
 	resp += fmt.Sprintf("Max Validators: %d: \n", p.MaxValidators)
@@ -145,8 +139,8 @@ func validateUnbondingTime(v time.Duration) sdk.Error {
 		if v < 2*sdk.Week {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%s] should be greater than or equal to 2 weeks", v.String()))
 		}
-	} else if v < 10*time.Second {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%s] should be greater than or equal to 10 seconds", v.String()))
+	} else if v < 2*time.Minute {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidUnbondingTime, fmt.Sprintf("Invalid UnbondingTime [%s] should be greater than or equal to 2 minutes", v.String()))
 	}
 	return nil
 }

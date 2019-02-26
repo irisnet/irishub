@@ -291,10 +291,7 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 		amount := sdk.NewIntWithDecimal(1, 2)
 		// generate a random coin for each denomination
 		for j := 0; j < len(denoms); j++ {
-			coins[j] = sdk.Coin{Denom: denoms[j],
-				//Amount: RandFromBigInterval(r, randCoinIntervals).Add(amount),
-				Amount: amount,
-			}
+			coins[j] = sdk.NewCoin(denoms[j], amount)
 		}
 
 		app.TotalCoinsSupply = app.TotalCoinsSupply.Plus(coins)

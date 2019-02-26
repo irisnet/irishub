@@ -116,6 +116,15 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 		validator.GetDelegatorShares(), delegation.GetShares())
 	logger.Debug("After withdraw", "validator_distInfo", valInfo.String())
 
+	recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
+	coins, _ := withdraw.TruncateDecimal()
+	if !coins.IsZero() {
+		if delAddr.Equals(sdk.AccAddress(valAddr)){
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.ValidatorRewardFlow, "")
+		} else {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.DelegatorRewardFlow, "")
+		}
+	}
 	return feePool, valInfo, delInfo, withdraw
 }
 

@@ -29,7 +29,7 @@ iriscli stake unbond --help
 ## 示例
 
 ```
-iriscli stake unbond --address-validator=<ValidatorAddress> --shares-percent=0.1 --from=<key name> --chain-id=test-irishub --fee=0.4iris
+iriscli stake unbond --address-validator=<ValidatorAddress> --shares-percent=0.1 --from=<key name> --chain-id=test-irishub --fee=0.3iris
 ```
 输出信息：
 ```txt

@@ -20,8 +20,6 @@ iriscli stake create-validator --help
 | 名称                         | 类型   | 是否必填 | 默认值   | 功能描述         |
 | ---------------------------- | -----  | -------- | -------- | ------------------------------------ |
 | --amount                     | string | true     | ""       | 委托token的数量 |
-| --commission-max-change-rate | float  | true     | 0.0      | 佣金比率每天变化的最大数量 |
-| --commission-max-rate        | float  | true     | 0.0      | 最大佣金比例 |
 | --commission-rate            | float  | true     | 0.0      | 初始佣金比例 |
 | --details                    | string | false    | ""       | 验证人节点的详细信息 |
 | --genesis-format             | bool   | false    | false    | 是否已genesis transaction的方式倒出 |
@@ -34,7 +32,7 @@ iriscli stake create-validator --help
 ## 示例
 
 ```
-iriscli stake create-validator --chain-id=test-irishub--from=<key name> --fee=0.4iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=test-irishub--from=<key name> --fee=0.3iris --pubkey=<Validator PubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 
 返回信息：

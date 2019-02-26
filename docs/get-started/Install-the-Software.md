@@ -23,7 +23,7 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release v0.12.1 on your computer.
+then get the release v0.12.2-rc0 on your computer.
 
 > Note: there are two different binaries available. One for testnet and the other for betanet.
 
@@ -33,10 +33,10 @@ You can verify you have the right version installed by running the following com
 
 ```
 $ iris version
-v0.12.1
+v0.12.2-rc0
 
 $ iriscli version
-v0.12.1
+v0.12.2-rc0
 ```
 
 #### Compile Source Code
@@ -102,7 +102,7 @@ Make sure that your server can access to google.com for that our project depends
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.1
+cd irishub && git checkout v0.12.2-rc0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make all
 ```
@@ -112,7 +112,7 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.1
+cd irishub && git checkout v0.12.2-rc0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 source scripts/setProdEnv.sh
 make all
@@ -123,9 +123,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.12.1
+v0.12.2-rc0
 $ iriscli version
-v0.12.1
+v0.12.2-rc0
 ```
 
 ### How to Update
@@ -136,6 +136,6 @@ Get latest code (you can also `git fetch` only the version desired), ensure the 
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.12.1
+git checkout v0.12.2-rc0
 make all
 ```

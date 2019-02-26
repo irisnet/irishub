@@ -19,7 +19,7 @@ iriscli distribution set-withdraw-addr --help
 ## Examples
 
 ```
-iriscli distribution set-withdraw-addr [withdraw address] --from <key name> --fee=0.4iris --chain-id=<chain-id>
+iriscli distribution set-withdraw-addr [withdraw address] --from <key name> --fee=0.3iris --chain-id=<chain-id>
 ```
 Example response:
 ```json

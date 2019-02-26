@@ -369,32 +369,19 @@ func (kb dbKeybase) ImportPubKey(name string, armor string) (err error) {
 // proper passphrase before deleting it (for security).
 // A passphrase of 'yes' is used to delete stored
 // references to offline and Ledger / HW wallet keys
-func (kb dbKeybase) Delete(name, passphrase string) error {
+func (kb dbKeybase) Delete(name, passphrase string, skipPass bool) error {
 	// verify we have the proper password before deleting
 	info, err := kb.Get(name)
 	if err != nil {
 		return err
 	}
-	switch info.(type) {
-	case localInfo:
-		linfo := info.(localInfo)
-		_, err = mintkey.UnarmorDecryptPrivKey(linfo.PrivKeyArmor, passphrase)
-		if err != nil {
+	if linfo, ok := info.(localInfo); ok && !skipPass {
+		if _, err = mintkey.UnarmorDecryptPrivKey(linfo.PrivKeyArmor, passphrase); err != nil {
 			return err
 		}
-		kb.db.DeleteSync(addrKey(linfo.GetAddress()))
-		kb.db.DeleteSync(infoKey(name))
-		return nil
-	case ledgerInfo:
-	case offlineInfo:
-		if passphrase != "yes" {
-			return fmt.Errorf("enter 'yes' exactly to delete the key - this cannot be undone")
-		}
-		kb.db.DeleteSync(addrKey(info.GetAddress()))
-		kb.db.DeleteSync(infoKey(name))
-		return nil
 	}
-
+	kb.db.DeleteSync(addrKey(info.GetAddress()))
+	kb.db.DeleteSync(infoKey(name))
 	return nil
 }
 

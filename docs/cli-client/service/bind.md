@@ -29,7 +29,7 @@ In service binding, you need to define `deposit`, minimum deposit = `price` of t
 
 
 ```shell
-iriscli service bind --chain-id=test --from=node0 --fee=0.4iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=test --from=node0 --fee=0.3iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
 ```
 
 After that, you're done with adding a binding to an existing service definition.

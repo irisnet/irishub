@@ -29,7 +29,7 @@ iriscli stake edit-validator --help
 ## 示例
 
 ```
-iriscli stake edit-validator --from=<key name> --chain-id=test-irishub --fee=0.4iris --commission-rate=0.15
+iriscli stake edit-validator --from=<key name> --chain-id=test-irishub --fee=0.3iris --commission-rate=0.15
 ```
 返回信息：
 ```txt
