@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.12.2
+## 0.12.2-rc0
 
-*February 22th, 2019*
+*February 26th, 2019*
 
 - Set max commission rate and max commission change rate to 100%
 - Implement coin flow record feature for "internal transactions"
