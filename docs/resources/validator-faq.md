@@ -98,11 +98,9 @@ Each validator receives revenue in proportion to its total stake. However, befor
 
 ###  IRISnet Valdiators Risks
 
--   **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in more than half of the last 40,000 blocks and get jailed and removed from current validatorset for 1 day
--   **Double Sign**：If someone reports on IRIShub that a validator signed two different blocks at the same height, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
--   **Censorship**：If someone reports that a validator includes invalid transactions in block, this validator will get jailed remove from current validatorset for 2 days.
-
-All metrics mentioned could be adjusted by `parameter-change` proposals. 
+-   **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in more than  half of the last 34,560 blocks (which amounts to approximately 24 hours, assuming an average block-generating time of 5 seconds)
+-   **Double Sign**:If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
+-   **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed remove from current validatorset for 2 days.
 
 All metrics mentioned could be adjusted by `parameter-change` proposals. 
 
