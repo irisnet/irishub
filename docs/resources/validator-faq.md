@@ -98,9 +98,9 @@ Each validator receives revenue in proportion to its total stake. However, befor
 
 ###  IRISnet Valdiators Risks
 
--   **Double Sign**：If someone reports on IRIShub that a validator signed two different blocks at the same height, this validator will get slashed on IRIShub by 1% and remove from current validatorset for 5 day.
 -   **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in the last 20,000 blocks, 
 the validator will get slashed by 0.5% and remove from current validatorset for 2 days.
+-   **Double Sign**：If someone reports on IRIShub that a validator signed two different blocks at the same height, this validator will get slashed on IRIShub by 1% and remove from current validatorset for 5 day.
 -   **Censorship**：If someone reports that a validator includes invalid transactions in block, this validator will get slashed on IRIShub by 2% and remove from current validatorset for 7 day.
 
 All metrics mentioned could be adjusted by `parameter-change` proposals. 
@@ -161,5 +161,4 @@ Betanet is the first part of launching IRISnet mainnet. Betanet will start at mi
 
 - Riot chat: #irisvalidators:matrix.org
 - IRIShub Validator Working Group QQ Group：834063323
-
 
