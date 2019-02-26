@@ -29,10 +29,10 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.12.2-rc0
+v0.12.2
     
 $ iriscli version
-v0.12.2-rc0
+v0.12.2
 ```
 #### 方法2：源码编译安装
 
@@ -91,7 +91,7 @@ source ~/.bash_profile
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.2-rc0
+cd irishub && git checkout v0.12.2
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 source scripts/setTestEnv.sh
 make all
@@ -102,7 +102,7 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.2-rc0
+cd irishub && git checkout v0.12.2
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make all
 ```
@@ -111,10 +111,10 @@ make all
 
 ```
 $ iris version
-v0.12.2-rc0
+v0.12.2
     
 $ iriscli version
-v0.12.2-rc0
+v0.12.2
 ```
 ### 如何升级IRISHub
 
@@ -124,6 +124,6 @@ v0.12.2-rc0
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.12.2-rc0
+git checkout v0.12.2
 make all
 ```
