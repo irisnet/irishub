@@ -104,6 +104,7 @@ cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout v0.12.2-rc0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+source scripts/setTestEnv.sh
 make all
 ```
 
@@ -114,7 +115,6 @@ cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout v0.12.2-rc0
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-source scripts/setProdEnv.sh
 make all
 ```
 
