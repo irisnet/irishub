@@ -1,6 +1,6 @@
 # 简介
 
-交易费上限使用 --fee指定。Gas是衡量交易需要消耗多少资源的单位。Gas上限用--gas指定。Gas上限太小时，不够交易需要的Gas；交易费太低时，每一单位Gas支付的交易费太低，验证人节点也不会执行这笔交易。交易费(最小单位)/Gas应该大于等于6*10^12。推荐将Gas上限设置为20000，交易费设置为0.12iris。需要多少Gas就会花多少交易费，剩余的交易费会被退还。
+交易费上限使用 --fee指定。Gas是衡量交易需要消耗多少资源的单位。Gas上限用--gas指定。Gas上限太小时，不够交易需要的Gas；交易费太低时，每一单位Gas支付的交易费太低，验证人节点也不会执行这笔交易。交易费(最小单位)/Gas应该大于等于6*10^12。推荐将Gas上限设置为50000，交易费设置为0.3iris。需要多少Gas就会花多少交易费，剩余的交易费会被退还。
 
 ## Fee
 
@@ -24,7 +24,7 @@ Gas价格 = 交易费 / Gas上限，代表用户为每个单位的资源消耗�
 
 例子
 ```
-    iriscli stake unbond  --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.12iris --gas=20000 --chain-id=<chain-id>
+    iriscli stake unbond  --from=test --shares-amount=10 --address-validator=faa1mahw6ymzvt2q3lu4pjj5pau2e8krntklgarrxy  --fee=0.3iris --gas=50000 --chain-id=<chain-id>
 ```
 
-在这个例子中执行的是完成解绑操作，这里设定的交易费上限(--fee)为0.12iris，Gas上限(--gas)为20000，Gas价格就是 6000iris-nano/Gas。假设执行交易总共需要10000个Gas，那么会有 0.06iris 的交易费被支付给验证人节点；剩余的 0.06iris 会被退还给用户。
+在这个例子中执行的是完成解绑操作，这里设定的交易费上限(--fee)为0.12iris，Gas上限(--gas)为50000，Gas价格就是 6000iris-nano/Gas。假设执行交易总共需要10000个Gas，那么会有 0.06iris 的交易费被支付给验证人节点；剩余的 0.24iris 会被退还给用户。

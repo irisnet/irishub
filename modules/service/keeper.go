@@ -425,6 +425,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if !found {
 		return ErrReturnFeeNotExists(k.Codespace(), address)
 	}
+
 	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err
@@ -459,10 +460,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
-		taxCoins = append(taxCoins, sdk.Coin{
-			Denom:  coin.Denom,
-			Amount: taxAmount,
-		})
+		taxCoins = append(taxCoins, sdk.NewCoin(coin.Denom, taxAmount))
 	}
 	taxCoins = taxCoins.Sort()
 
@@ -555,7 +553,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sd
 			return minDeposit, sdk.NewError(DefaultCodespace, CodeIntOverflow, fmt.Sprintf("Int Overflow"))
 		}
 		minInt := price.Amount.Mul(minDepositMultiple)
-		minDeposit = minDeposit.Plus(sdk.Coins{sdk.Coin{Denom: price.Denom, Amount: minInt}})
+		minDeposit = minDeposit.Plus(sdk.Coins{sdk.NewCoin(price.Denom, minInt)})
 	}
 	return minDeposit, nil
 }

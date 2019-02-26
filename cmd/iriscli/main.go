@@ -61,6 +61,7 @@ func main() {
 		tenderminttxcmd.QueryTxCmd(cdc),
 		tenderminttxcmd.SearchTxCmd(cdc),
 		tendermintrpccmd.BlockCommand(),
+		tendermintrpccmd.BlockResultCommand(),
 		tendermintrpccmd.ValidatorCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io"
 	"runtime/debug"
@@ -72,6 +73,9 @@ type BaseApp struct {
 
 	// enable invariant check
 	checkInvariant bool
+
+	// enable track coin flow
+	trackCoinFlow bool
 
 	// flag for sealing
 	sealed bool
@@ -209,6 +213,9 @@ func (app *BaseApp) SetMinimumFees(fees sdk.Coins) { app.minimumFees = fees }
 
 // SetInvariantCheck sets the invariant check config.
 func (app *BaseApp) SetCheckInvariant(check bool) { app.checkInvariant = check }
+
+// SetTrackCoinFlow sets the config about track coin flow
+func (app *BaseApp) SetTrackCoinFlow(enable bool) { app.trackCoinFlow = enable }
 
 // NewContext returns a new Context with the correct store, the given header, and nil txBytes.
 func (app *BaseApp) NewContext(isCheckTx bool, header abci.Header) sdk.Context {
@@ -381,7 +388,7 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 			if err != nil {
 				result = err.Result()
 			} else {
-				result = app.Simulate(tx)
+				result = app.Simulate(tx, txBytes)
 			}
 		case "version":
 			return abci.ResponseQuery{
@@ -499,7 +506,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		gasMeter = sdk.NewInfiniteGasMeter()
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
-		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight()))
+		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowRecord(app.trackCoinFlow))
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 
@@ -588,10 +595,12 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 
 // retrieve the context for the tx w/ txBytes and other memoized values.
 func (app *BaseApp) getContextForTx(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
+	txHash := hex.EncodeToString(tmhash.Sum(txBytes))
 	ctx = app.getState(mode).ctx.
 		WithTxBytes(txBytes).
 		WithVoteInfos(app.voteInfos).
-		WithConsensusParams(app.consensusParams)
+		WithConsensusParams(app.consensusParams).
+		WithCoinFlowTrigger(txHash)
 	if mode == RunTxModeSimulate {
 		ctx, _ = ctx.CacheContext()
 	}
@@ -826,6 +835,9 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// only update state if all messages pass
 	if result.IsOK() {
 		msCache.Write()
+		ctx.CoinFlowTags().TagWrite()
+	} else {
+		ctx.CoinFlowTags().TagClean()
 	}
 
 	return
