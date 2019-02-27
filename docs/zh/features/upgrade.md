@@ -32,13 +32,13 @@ iris start --home=iris
 
 ```
 # 发送升级提议
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9 --commit
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9 --commit
 
 # 对提议进行抵押
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --commit
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=20000 --commit
 
 # 对提议投票
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --commit
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris --gas=20000 --commit
 
 # 查询提议情况 --commit
 iriscli gov query-proposal --proposal-id=1 --trust-node
@@ -85,7 +85,7 @@ iriscli upgrade info --trust-node
 ## 命令详情
 
 ```
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9 --commit
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9 --commit
 ```
 
 * `--type`  "SoftwareUpgrade" 软件升级提议的类型

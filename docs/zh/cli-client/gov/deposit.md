@@ -29,7 +29,7 @@ iriscli gov deposit --help
 ### 充值保证金
 
 ```shell
-iriscli gov deposit --chain-id=<chain-id> --proposal-id=1 --deposit=50iris --from=node0 --fee=0.01iris
+iriscli gov deposit --chain-id=<chain-id> --proposal-id=1 --deposit=50iris --from=node0 --fee=0.3iris
 ```
 
 输入正确的密码后，你就充值了50个iris用以激活提议的投票状态。

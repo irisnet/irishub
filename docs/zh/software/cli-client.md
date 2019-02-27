@@ -27,7 +27,7 @@ iriscli默认关闭dry-run模式。如果想打开dry-run模式，就可以使�
 例子：使用dry-run模式发送命令
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type="ParameterChange" --deposit=600iris --param='mint/Inflation=0.050' --from=x --chain-id=<chain-id> --fee=0.5iris --dry-run
+iriscli gov submit-proposal --title="ABC" --description="test" --type="ParameterChange" --deposit=600iris --param='mint/Inflation=0.050' --from=x --chain-id=<chain-id> --fee=0.3iris --dry-run
 ```
 
 返回：
@@ -51,7 +51,7 @@ iriscli发送的交易默认是sync模式。如果想用其他模式发送交易
 例子：使能generate-only以生成未签名的交易
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --generate-only
+iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --generate-only
 ```
 
 返回：

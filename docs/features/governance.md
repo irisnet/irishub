@@ -123,7 +123,7 @@ Sending this proposal which can terminate the system, the node will be closed af
 
 ```
 # submit the SystemHaltProposal
-iriscli gov submit-proposal  --title=test_title --description=test_description --type=SystemHalt --deposit=10iris --fee=0.005iris --from=x1 --chain-id=<chain-id> --commit
+iriscli gov submit-proposal  --title=test_title --description=test_description --type=SystemHalt --deposit=10iris --fee=0.3iris --from=x1 --chain-id=<chain-id> --commit
 
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=20000

@@ -82,13 +82,13 @@ iriscli gov query-params --module=mint --key=mint/Inflation
 mint/Inflation=0.0400000000
 
 # 发送提议，返回参数修改的内容
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit=8iris  --param mint/Inflation=0.0000000000 --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit=8iris  --param mint/Inflation=0.0000000000 --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # 对提议进行抵押
-iriscli gov deposit --proposal-id=1 --deposit=8iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov deposit --proposal-id=1 --deposit=8iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # 对提议投票
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # 查询提议情况
 iriscli gov query-proposal --proposal-id=1 
@@ -98,19 +98,19 @@ iriscli gov query-proposal --proposal-id=1
 有三种使用方式, `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标受托人账户转移代币，然后受托人将这些代币分发或赠给其他账户。
 ```shell
 # Submit Burn usage proposal
-iriscli gov submit-proposal --title="burn tokens 5%" --description="test" --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description="test" --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # Submit Distribute usage proposal
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # Submit Grant usage proposal
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit
 
 # Vote for a proposal
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000 --commit 
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000 --commit 
 
 # Query the state of a proposal
 iriscli gov query-proposal --proposal-id=1
@@ -122,13 +122,13 @@ iriscli gov query-proposal --proposal-id=1
 
 ```
 # 发送系统终止提议
-iriscli gov submit-proposal  --title=test_title --description=test_description --type=SystemHalt --deposit=10iris --fee=0.005iris --from=x1 --chain-id=<chain-id> --commit
+iriscli gov submit-proposal  --title=test_title --description=test_description --type=SystemHalt --deposit=10iris --fee=0.3iris --from=x1 --chain-id=<chain-id> --commit
 
 # Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000
 
 # Vote for a proposal
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.05iris --gas=200000
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris --gas=200000
 
 # Query the state of a proposal
 iriscli gov query-proposal --proposal-id=1 
