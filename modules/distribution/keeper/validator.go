@@ -130,6 +130,11 @@ func (k Keeper) WithdrawValidatorRewardsAll(ctx sdk.Context, operatorAddr sdk.Va
 	commissionTruncated, _ := commission.TruncateDecimal()
 	resultTags = resultTags.AppendTag(sdk.TagRewardCommission, []byte(commissionTruncated.String()))
 
+	recipient := k.GetDelegatorWithdrawAddr(ctx, sdk.AccAddress(operatorAddr))
+	coins, _ := commission.TruncateDecimal()
+	if !coins.IsZero() {
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, operatorAddr.String(), recipient.String(), coins.String(), sdk.ValidatorCommissionFlow, "")
+	}
 	k.WithdrawToDelegator(ctx, feePool, accAddr, withdraw)
 	return withdraw, resultTags, nil
 }

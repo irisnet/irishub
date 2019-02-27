@@ -19,7 +19,7 @@ It is calculated as:
 
     A delegator may have multiple irishub wallet address. Suppose one of the wallets has many iris token and part of these tokens have been delegated to a validator. The delegator may hope the delegation reward can be paid to another wallet, thus the delegator will have explicit idea about how many tokens he/she has earned.However, by default, the reward will be paid to the wallet(marked as `A`) address which send the delegation transaction. To set another wallet(marked as `B`) as the paid address, delegator need to send another transaction from wallet `A`. The referenced command can be:
     ```bash
-    iriscli distribution set-withdraw-addr [address of wallet B] --fee=0.4iris --from=[key name of wallet A] --chain-id=[chain-id]
+    iriscli distribution set-withdraw-addr [address of wallet B] --fee=0.3iris --from=[key name of wallet A] --chain-id=[chain-id]
     ```  
     To verify the whether the above operation take effect, delegator can execute the following command.
     ```bash
@@ -34,15 +34,15 @@ It is calculated as:
     
     1. Only withdraw the self-delegation reward of from validatorA:
         ```bash
-        iriscli distribution withdraw-rewards --only-from-validator [address of validatorA] --from [key name of wallet A] --fee=0.4iris --chain-id=[chain-id]
+        iriscli distribution withdraw-rewards --only-from-validator [address of validatorA] --from [key name of wallet A] --fee=0.3iris --chain-id=[chain-id]
         ```
     2. Withdraw all delegation reward:
         ```bash
-        iriscli distribution withdraw-rewards --from [key name of wallet A] --fee=0.4iris --chain-id=[chain-id]
+        iriscli distribution withdraw-rewards --from [key name of wallet A] --fee=0.3iris --chain-id=[chain-id]
         ```
     3. Withdraw all delegation reward including commission benefit of `validatorA` :
         ```bash
-        iriscli distribution withdraw-rewards --is-validator=true --from [key name of wallet A] --fee=0.4iris --chain-id=[chain-id]
+        iriscli distribution withdraw-rewards --is-validator=true --from [key name of wallet A] --fee=0.3iris --chain-id=[chain-id]
         ```
         
 3. Query reward token
@@ -50,7 +50,7 @@ It is calculated as:
     Execute the command to get the estimated inflation rewards :
     
     ```bash
-    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.4iris  --commit
+    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=<chain-id> --fee=0.3iris  --commit
     ```
     
     Output is the following，`withdraw-reward-total`is your estimated inflation rewards：
@@ -64,9 +64,9 @@ It is calculated as:
     simulation fee amount = 0
     simulation fee denom =
     simulation tag action = withdraw-delegator-rewards-all
-    simulation tag delegator = faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd
+    simulation tag delegator = iaa1yclscskdtqu9rgufgws293wxp3njsesxnwecxs
     simulation tag withdraw-reward-total = 1308135156755646iris-atto
-    simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646iris-atto
+    simulation tag withdraw-reward-from-validator-iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh = 1308135156755646iris-atto
     simulation tag action = withdraw_delegation_rewards_all    
     
     ```

@@ -236,7 +236,7 @@ func TestHandleAbsentValidator(t *testing.T) {
 	require.False(t, got.IsOK())
 
 	// unrevocation should succeed after jail expiration
-	ctx = ctx.WithBlockHeader(abci.Header{Time: time.Unix(1, 0).Add(keeper.DowntimeUnbondDuration(ctx))})
+	ctx = ctx.WithBlockHeader(abci.Header{Time: time.Unix(1, 0).Add(keeper.DowntimeJailDuration(ctx))})
 	got = slh(ctx, NewMsgUnjail(addr))
 	require.True(t, got.IsOK())
 
@@ -335,7 +335,9 @@ func TestHandleNewValidator(t *testing.T) {
 func TestHandleAlreadyJailed(t *testing.T) {
 
 	// initial setup
-	ctx, _, sk, _, keeper := createTestInput(t, DefaultParamsForTestnet())
+	defaultParams := DefaultParamsForTestnet()
+	defaultParams.SlashFractionDowntime = sdk.NewDecWithPrec(1, 2)
+	ctx, _, sk, _, keeper := createTestInput(t, defaultParams)
 	amtInt := int64(100)
 	addr, val, amt := addrs[0], pks[0], sdk.NewIntWithDecimal(amtInt, 18)
 	sh := stake.NewHandler(sk)

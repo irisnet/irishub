@@ -70,11 +70,11 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 在配置文件 `prometheus.yml` 中添加以下 `jobs` :
 
 ```yaml
-      - job_name: fuxi-5000
+      - job_name: fuxi
           static_configs:
           - targets: ['localhost:36660']
             labels:
-              instance: fuxi-5000
+              instance: fuxi
 ```
 
 > Note：targets 配置项的值为 IRIS Monitor 启动后所占用的 ip 和 port。 

@@ -50,7 +50,7 @@ This specification briefly introduces the functionality of stake module and what
 
 	Then just send a create-validator transaction. This is an example command.
 	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.4iris --chain-id=<chain-id> --from=<key name> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1
+	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.3iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
 	```
 	The more tokens specified by `--amount`, the more probability your full node will be a real validator. Otherwise, it will just be validator candidate.
 
@@ -63,17 +63,17 @@ This specification briefly introduces the functionality of stake module and what
 	Example response:
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
+	faucet  local   iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
 	```
 	Then, example command to query validator:
 	```
-	iriscli stake validator fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
+	iriscli stake validator iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
 	```
 	Example response:
 	```text
     Validator 
-    Operator Address: fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
-    Validator Consensus Pubkey: fvp1zcjduepq8fw9p4zfrl5fknrdd9tc2l24jnqel6waxlugn66y66dxasmeuzhsxl6m5e
+    Operator Address: iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
+    Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
     Jailed: false
     Status: Bonded
     Tokens: 100.0000000000
@@ -88,34 +88,34 @@ This specification briefly introduces the functionality of stake module and what
 4. Edit validator
 
 	```
-	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.4iris --commission-rate=0.15 --moniker=<new name>
+	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new name>
 	```
 	
 5. Increase self-delegation
 
 	```
-	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.4iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
 	```
 
 6. Delegate tokens to other validators
 
 	If you just want to be a delegator, you can skip the above steps.
 	```
-	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.4iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
 	```
 
 7. Unbond tokens from a validator
 
 	Unbond half of total bonded token on a given validator
 	```
-	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.4iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris --share-percent=0.5
 	```
 
 8. Redelegate tokens to another validator
 
 	Redelegate half of total bonded token on a given validator to another one
 	```
-	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.4iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
+	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.3iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
 	```
 
 For other query stake state commands, please refer to [stake cli client](../cli-client/stake/README.md)

@@ -16,9 +16,9 @@ iriscli客户端的默认工作目录是`$HOME/.iriscli`，主要用来保存配
 
 iriscli config 命令可以交互式地配置一些公共参数的默认值，例如chain-id，home，fee 和 node。完成配置后，后续的iriscli命令可以省略对这些flag参数的指定。
 
-## 费和Gas
+## Fee和Gas
 
-iriscli发送交易可以通过`--fee`指定交易费和`--gas`指定Gas（默认值是20000）。Gas除以交易费就是Gas Price，Gas Price不能小于区块链设定的最小值。执行完整个交易以后剩余的交易费会返还给用户。可以设置`--gas="simulate"`, 它可以通过仿真运行估算出交易大致所需要消耗的Gas，并且乘以一个由`--gas-adjustment`指定的系数得到最终的Gas，作为这次交易的Gas。最后交易才会被广播出去。
+iriscli发送交易可以通过`--fee`指定交易费和`--gas`指定Gas（默认值是20000）。交易费除以Gas就是Gas Price，Gas Price不能小于区块链设定的最小值。执行完整个交易以后剩余的交易费会返还给用户。可以设置`--gas="simulate"`, 它可以通过仿真运行估算出交易大致所需要消耗的Gas，并且乘以一个由`--gas-adjustment`指定的系数得到最终的Gas，作为这次交易的Gas。最后交易才会被广播出去。
 
 ## dry-run模式
 
@@ -27,7 +27,7 @@ iriscli默认关闭dry-run模式。如果想打开dry-run模式，就可以使�
 例子：使用dry-run模式发送命令
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type="ParameterChange" --deposit=600iris --param='mint/Inflation=0.050' --from=x --chain-id=test --fee=0.5iris --dry-run
+iriscli gov submit-proposal --title="ABC" --description="test" --type="ParameterChange" --deposit=600iris --param='mint/Inflation=0.050' --from=x --chain-id=<chain-id> --fee=0.3iris --dry-run
 ```
 
 返回：
@@ -51,7 +51,7 @@ iriscli发送的交易默认是sync模式。如果想用其他模式发送交易
 例子：使能generate-only以生成未签名的交易
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000 --generate-only
+iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --generate-only
 ```
 
 返回：
@@ -67,7 +67,7 @@ iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --dep
           "title": "ABC",
           "description": "test",
           "proposal_type": "Text",
-          "proposer": "faa1k47r0nxd6ec8n6sc6tzvk2053u4eff0vx99755",
+          "proposer": "iaa1k47r0nxd6ec8n6sc6tzvk2053u4eff0v72rx5f",
           "initial_deposit": [
             {
               "denom": "iris-atto",

@@ -28,7 +28,7 @@ All commands which can be used to send transactions have these global flags. The
 | --fee            | string | true     | ""                    | Fee to pay along with transaction |
 | --from           | string | false    | ""                    | Name of private key with which to sign |
 | --from-addr      | string | false    | ""                    | Specify from address in generate-only mode |
-| --gas            | int    | false    | 200000                | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
+| --gas            | int    | false    | 50000                | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
 | --gas-adjustment | int    | false    | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
 | --generate-only  | bool   | false    | false                 | Build an unsigned transaction and write it to STDOUT |
 | --help, -h       | string | false    |                       | Print help message |

@@ -25,7 +25,7 @@ iriscli service define [flags]
 
 ### 创建一个新的服务定义
 ```shell
-iriscli service define --chain-id=test  --from=node0 --fee=0.4iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=<chain-id>  --from=node0 --fee=0.3iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 ```
 如果文件项不是空的，将会替换Idl-content.  [IDL内容示例](#idl-content-example).
 

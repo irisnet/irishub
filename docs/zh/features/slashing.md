@@ -61,5 +61,5 @@
 如果validator被jail，并且jail的时间已经过去，则可以通过以下命令unjail。
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.4iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
 ```

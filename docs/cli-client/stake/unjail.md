@@ -20,14 +20,14 @@ iriscli stake unjail --help
 ### Unjail validator previously jailed for downtime
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.4iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
 ```
 ### Common Issue
 
 * Check the jailing time for this validator:
 
 ```$xslt
-iriscli stake signing-info fvp1zcjduepqewwc93xwvt0ym6prxx9ppfzeufs33flkcpu23n5eutjgnnqmgazsw54sfv --node=localhost:36657 --trust-node
+iriscli stake signing-info icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4 --node=localhost:36657 --trust-node
 ```
 If your validator is jailed, it will tell the jailing time.
 
@@ -52,7 +52,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "tags": {
      "action": "unjail",
      "completeConsumedTxFee-iris-atto": "\"918600000000000\"",
-     "validator": "fva12zgt9hc5r5mnxegam9evjspgwhkgn4wzjxkvqy"
+     "validator": "iva12zgt9hc5r5mnxegam9evjspgwhkgn4wz2fs5qe"
    }
  }
 ```

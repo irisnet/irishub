@@ -24,7 +24,7 @@ iriscli service requests [flags]
 
 ### Query service request list
 ```shell
-iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
+iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m
 ```
 
 运行成功以后，返回的结果如下:
@@ -37,8 +37,8 @@ iriscli service requests --def-chain-id=test --service-name=test-service --bind-
     "bind_chain_id": "chain-jsmJQQ",
     "req_chain_id": "chain-jsmJQQ",
     "method_id": 1,
-    "provider": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
-    "consumer": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
+    "provider": "iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m",
+    "consumer": "iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m",
     "input": "Q0NV",
     "service_fee": [
       {

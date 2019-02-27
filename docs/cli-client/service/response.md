@@ -21,7 +21,7 @@ iriscli service response [flags]
 
 ### Query a service response
 ```shell
-iriscli service response --request-chain-id=test --request-id=635-535-0
+iriscli service response --request-chain-id=<chain-id> --request-id=635-535-0
 ```
 
 After that, you will get the response by specified parameters.
@@ -34,8 +34,8 @@ After that, you will get the response by specified parameters.
     "request_height": "535",
     "request_intra_tx_counter": 0,
     "expiration_height": "635",
-    "provider": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
-    "consumer": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
+    "provider": "iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m",
+    "consumer": "iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m",
     "output": "q80=",
     "error_msg": null
   }

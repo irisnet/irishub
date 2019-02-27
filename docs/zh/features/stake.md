@@ -50,7 +50,7 @@
 
 	发送申请成为验证人的交易，示例：
 	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.4iris --chain-id=<chain-id> --from=<key name> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1
+	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.3iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
 	```
 	`--amount`可以指定自己绑定的token数量，这个数越大你越有可能立刻成为验证人，否则只能成为候选验证人。
 
@@ -63,17 +63,17 @@
 	返回结果示例：
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
+	faucet  local   iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
 	```
 	查询命令示例：
 	```
-	iriscli stake validator fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
+	iriscli stake validator iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
 	```
 	返回示例：
 	```text
     Validator 
-    Operator Address: fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
-    Validator Consensus Pubkey: fvp1zcjduepq8fw9p4zfrl5fknrdd9tc2l24jnqel6waxlugn66y66dxasmeuzhsxl6m5e
+    Operator Address: iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
+    Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
     Jailed: false
     Status: Bonded
     Tokens: 100.0000000000
@@ -88,34 +88,34 @@
 4. 修改验证人信息
 
 	```
-	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.4iris --commission-rate=0.15 --moniker=<new name>
+	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new name>
 	```
 
 5. 增加自己在验证人节点上委托的token
 
 	```
-	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.4iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
 	```
 
 6. 委托
 
 	向一个验证人委托一些token
 	```
-	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.4iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
 	```
 
 7. 解绑
 
 	解绑一半的token
 	```
-	iriscli stake unbond --address-validator={address-validator} --chain-id={chain-id} --from=<key name> --fee=0.4iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator={address-validator} --chain-id={chain-id} --from=<key name> --fee=0.3iris  --amount=100iris --share-percent=0.5
 	```
 
 8. 转委托
 
       转委托一半的token到另外一个验证人节点
 	```
-	iriscli stake redelegate --chain-id={chain-id} --from={key-name} --fee=0.4iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
+	iriscli stake redelegate --chain-id={chain-id} --from={key-name} --fee=0.3iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
 	```
 
 

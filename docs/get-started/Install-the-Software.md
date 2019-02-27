@@ -7,10 +7,11 @@ All the blockchains in IRISnet is based on Cosmos-SDK, which is a framework for 
 **Recommanded Configurations:**
 
 1. 2 CPU
-2. Memory: 4GB
-3. Disk: 60GB SSD
+2. Memory: 6GB
+3. Disk: 256GB SSD
 4. OS: Ubuntu 16.04 LTS
-5. Allow all incoming connections on TCP port 26656 and 26657
+5. Bandwidth: 20Mbps
+6. Allow all incoming connections on TCP port 26656 and 26657
 
 ### Step 2: Install Iris
 
@@ -22,7 +23,7 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release v0.12.0 on your computer.
+then get the release v0.12.3 on your computer.
 
 > Note: there are two different binaries available. One for testnet and the other for betanet.
 
@@ -32,23 +33,23 @@ You can verify you have the right version installed by running the following com
 
 ```
 $ iris version
-v0.12.0
+v0.12.3
 
 $ iriscli version
-v0.12.0
+v0.12.3
 ```
 
 #### Compile Source Code
 
-- Install Go 1.10+
+- Install Go 1.11+
 
 ```
 $ sudo add-apt-repository ppa:gophers/archive
 $ sudo apt-get update
-$ sudo apt-get install golang-1.10-go
+$ sudo apt-get install golang-1.11-go
 ```
 
-> Note that golang-1.10-go puts binaries in /usr/lib/go-1.10/bin. If you want them on your PATH, you need to make that change yourself.
+> Note that golang-1.10-go puts binaries in /usr/lib/go-1.11/bin. If you want them on your PATH, you need to make that change yourself.
 
 Using snaps also works quite well:
 
@@ -63,7 +64,7 @@ Then you need to verify the versions of Go:
 
 ```
 $ go version
-go version go1.10.3 darwin/amd64
+go version go1.11.5 darwin/amd64
 ```
 
 Then, you need to add `GOPATH` to system `PATH` , then your system could correctly compile the code.
@@ -101,11 +102,10 @@ Make sure that your server can access to google.com for that our project depends
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.0
+cd irishub && git checkout v0.12.3
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_tools
-make get_vendor_deps
-make build_linux
+source scripts/setTestEnv.sh
+make all
 ```
 
 * To compile for `betanet`:
@@ -113,12 +113,9 @@ make build_linux
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.0
+cd irishub && git checkout v0.12.3
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-make get_tools
-make get_vendor_deps
-source scripts/setProdEnv.sh
-make build_linux
+make all
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
@@ -126,9 +123,9 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.12.0
+v0.12.3
 $ iriscli version
-v0.12.0
+v0.12.3
 ```
 
 ### How to Update
@@ -139,7 +136,6 @@ Get latest code (you can also `git fetch` only the version desired), ensure the 
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.12.0
-make get_vendor_deps
-make build_linux
+git checkout v0.12.3
+make all
 ```
