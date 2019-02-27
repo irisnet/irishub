@@ -10,7 +10,6 @@ but based on their total stake, which is the sum of their own stake and of the s
 
 Delegators have the same state as their validator.
 
-
 Note that delegation are not necessarily bonded. Tokens of each delegator can be delegated and bonded, delegated and unbonding, delegated and unbonded, or loose. 
 
 ## Common operation for Delegators
@@ -19,16 +18,16 @@ Note that delegation are not necessarily bonded. Tokens of each delegator can be
 
 To delegate some IRIS token to a validator, you could run the following command:
 ```$xslt
-iriscli stake delegate  --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=<chain-id> --from=name --gas=2000000 --fee=0.3iris  --amount=10000000000000000000iris 
+iriscli stake delegate --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=irishub --from=name --gas=50000 --fee=0.3iris --amount=10iris
 ```
 > Please notice that the amount is under unit iris-atto, 1iris=10^18 iris-atto
 
-* Query Delegations
+* Query Delegation
 
 You could query your delegation amount with the following command:
 
 ```$xslt
-iriscli stake delegation --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=<chain-id>
+iriscli stake delegation --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=irishub
 ```
 
 The example output is the following:
@@ -41,25 +40,14 @@ Shares: 10000000000000000000/1Height: 215307
 
 > Please notice that the share amount is also correspond to iris-atto, 1iris=10^18 iris-atto
 
-
 * Re-delegate 
 
 Once a delegator has delegated his own IRIS to certain validator, he/she could change the destination of delegation at anytime. If the transaction is executed, the 
-delegation will be placed at the other's pool after 10 minutes. 
-
-The redelegation operation is composed of two phases:
- * redelegate begin
- * redelegate complete
+delegation will be placed at the other's pool after the specified period of the system parameter `unbonding_time`. 
  
- To start, you should run the following command:
+you should run the following command:
 ```$xslt
-iriscli stake redelegate  begin  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator> --address-delegator=<address-delegator>  --chain-id=<chain-id>  --from=name --gas=2000000 --fee=0.3iris --shares-percent=1.0 
-```
-
-Please note that you have to wait 10 minute to run the next command:
-
-```$xslt
-iriscli stake redelegate  complete  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator-source> --address-delegator=<address-delegator>  --chain-id=<chain-id>  --from=name --gas=2000000 --fee=0.3iris 
+iriscli stake redelegate --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --gas=50000 --fee=0.3iris --shares-percent=1.0 
 ```
 
 The example output is the following:
@@ -72,23 +60,12 @@ Shares: 10000000000000000000/1Height: 215459
 
 * Unbond Delegation
 
+Once a delegator has delegated his own IRIS to certain validator, he/she could withdraw the delegation at anytime. If the transaction is executed, the 
+delegation will become liquid after after the specified period of the system parameter `unbonding_time`.  
 
-Once a delegator has delegated his own IRIS to certain validator, he/she could withdraw the  delegation at anytime. If the transaction is executed, the 
-delegation will become liquid after 10 minutes. 
-
-The redelegation operation is composed of two phases:
- * unbond begin
- * unbond complete
- 
- To start, you should run the following command:
+To start, you should run the following command:
 ```$xslt
-iriscli stake unbond  begin  --address-validator=<address-validator> --address-delegator=<address-delegator>  --chain-id=<chain-id>  --from=name --gas=2000000 --fee=0.3iris --shares-percent=1.0 
-```
-
-Please note that you have to wait 10 minute to run the next command:
-
-```$xslt
-iriscli stake unbond  complete   --address-validator=<address-validator> --address-delegator=<address-delegator> --chain-id=<chain-id>  --from=name --gas=2000000 --fee=0.3iris 
+iriscli stake unbond  begin  --address-validator=<address-validator> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --gas=50000 --fee=0.3iris --shares-percent=1.0 
 ```
 
 You could check that the balance of delegator has increased.
