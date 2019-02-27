@@ -53,13 +53,13 @@ The redelegation operation is composed of two phases:
  
  To start, you should run the following command:
 ```$xslt
-iriscli stake redelegate  begin  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator> --address-delegator=<address-delegator>  --chain-id=irishub --from=name --gas=2000000 --fee=0.04iris --shares-percent=1.0 
+iriscli stake redelegate  begin  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator> --address-delegator=<address-delegator>  --chain-id=irishub --from=name --fee=0.3iris --gas=50000 --shares-percent=1.0 
 ```
 
 Please note that you have to wait 10 minute to run the next command:
 
 ```$xslt
-iriscli stake redelegate  complete  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator-source> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --gas=2000000 --fee=0.04iris
+iriscli stake redelegate  complete  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator-source> --address-delegator=<address-delegator>  --chain-id=irishub  --fee=0.3iris --gas=50000 --fee=0.04iris
 ```
 
 The example output is the following:
@@ -82,13 +82,13 @@ The redelegation operation is composed of two phases:
  
  To start, you should run the following command:
 ```$xslt
-iriscli stake unbond  begin  --address-validator=<address-validator> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --gas=2000000 --fee=0.04iris --shares-percent=1.0 
+iriscli stake unbond  begin  --address-validator=<address-validator> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --fee=0.3iris --gas=50000 --shares-percent=1.0 
 ```
 
 Please note that you have to wait 10 minute to run the next command:
 
 ```$xslt
-iriscli stake unbond  complete   --address-validator=<address-validator> --address-delegator=<address-delegator> --chain-id=irishub  --from=name --gas=2000000 --fee=0.04iris 
+iriscli stake unbond  complete   --address-validator=<address-validator> --address-delegator=<address-delegator> --chain-id=irishub  --from=name --fee=0.3iris --gas=50000
 ```
 
 You could check that the balance of delegator has increased.
