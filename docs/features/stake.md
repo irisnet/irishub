@@ -63,7 +63,7 @@ This specification briefly introduces the functionality of stake module and what
 	Example response:
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
+	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
 	```
 	Then, example command to query validator:
 	```

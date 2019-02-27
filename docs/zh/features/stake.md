@@ -63,7 +63,7 @@
 	返回结果示例：
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
+	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
 	```
 	查询命令示例：
 	```
