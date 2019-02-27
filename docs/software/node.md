@@ -18,7 +18,7 @@ iriscli keys add {account_name}
 You can get the account information, including account address, public key address and mnemonic
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-account_name	local	faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
+account_name	local	iaa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
@@ -41,14 +41,14 @@ This commond will generate the transaction in the directory：{path_to_your_home
 
 Use the following command to modify the genesis.json file to assign the initial account balance to the above validator operator account, such as: 150 iris
 ```bash
-iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
+iris add-genesis-account iaa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
 ```
 
 ```json
     {
       "accounts": [
         {
-          "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
+          "address": "iaa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
           "coins": ["150iris"],
           "sequence_number": "0",
           "account_number": "0"

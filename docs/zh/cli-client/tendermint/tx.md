@@ -40,7 +40,7 @@ iriscli tendermint tx 6D361F4BE14B6B9596104A9411DB7962501CA264 --chain-id=irishu
           "value": {
             "inputs": [
               {
-                "address": "faa14d59j363uha3xxk2xqqhav8xaztym2rkdjdf8v",
+                "address": "iaa14d59j363uha3xxk2xqqhav8xaztym2rkdjdf8v",
                 "coins": [
                   {
                     "denom": "iris-atto",
@@ -51,7 +51,7 @@ iriscli tendermint tx 6D361F4BE14B6B9596104A9411DB7962501CA264 --chain-id=irishu
             ],
             "outputs": [
               {
-                "address": "faa18q343g6wje2plmhfekmwyw83jhznqltreqyvs3",
+                "address": "iaa18q343g6wje2plmhfekmwyw83jhznqltreqyvs3",
                 "coins": [
                   {
                     "denom": "iris-atto",

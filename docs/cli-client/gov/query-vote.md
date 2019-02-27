@@ -28,14 +28,14 @@ iriscli gov query-vote --help
 ### Query vote
 
 ```shell
-iriscli gov query-vote --chain-id=test --proposal-id=1 --voter=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
+iriscli gov query-vote --chain-id=test --proposal-id=1 --voter=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
 ```
 
 You could query the voting by specifying the proposal and the voter.
 
 ```txt
 {
-  "voter": "faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
+  "voter": "iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
   "proposal_id": "1",
   "option": "Yes"
 }

@@ -33,7 +33,7 @@ iriscli gov query-deposits --chain-id=test --proposal-id=1
 ```txt
 [
   {
-    "depositor": "faa1c4kjt586r3t353ek9jtzwxum9x9fcgwetyca07",
+    "depositor": "iaa1c4kjt586r3t353ek9jtzwxum9x9fcgwetyca07",
     "proposal_id": "1",
     "amount": [
       {

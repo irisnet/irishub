@@ -26,7 +26,7 @@ iriscli stake delegations-to fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2
 ```json
 [
   {
-    "delegator_addr": "faa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx",
+    "delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx",
     "validator_addr": "fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2",
     "shares": "0.2000000000",
     "height": "290"

@@ -25,12 +25,12 @@ iriscli distribution delegation-distr-info [delegator address]
 ```json
 [
   {
-    "delegator_addr": "faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j",
+    "delegator_addr": "iaa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j",
     "val_operator_addr": "fva14a70gzu0v2w8dlfx462c9sldvja24qaz6vv4sg",
     "del_pool_withdrawal_height": "10859"
   },
   {
-    "delegator_addr": "faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j",
+    "delegator_addr": "iaa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j",
     "val_operator_addr": "fva1ezzh0humhy3329xg4avhcjtay985nll0hpyhf4",
     "del_pool_withdrawal_height": "4044"
   }

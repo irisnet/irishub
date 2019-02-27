@@ -35,8 +35,8 @@ iriscli service response --request-chain-id=test --request-id=635-535-0
     "request_height": "535",
     "request_intra_tx_counter": 0,
     "expiration_height": "635",
-    "provider": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
-    "consumer": "faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
+    "provider": "iaa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
+    "consumer": "iaa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x",
     "output": "q80=",
     "error_msg": null
   }

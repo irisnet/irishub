@@ -39,7 +39,7 @@ iriscli distribution set-withdraw-addr [withdraw-address] --from <key name> --fe
      },
      {
        "key": "delegator",
-       "value": "faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd"
+       "value": "iaa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd"
      }
    ]
  })

@@ -20,7 +20,7 @@ iriscli service fees [account address]
 
 ### 查询服务费
 ```shell
-iriscli service fees faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
+iriscli service fees iaa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
 ```
 
 运行成功以后，返回的结果如下:

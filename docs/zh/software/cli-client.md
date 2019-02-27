@@ -67,7 +67,7 @@ iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --dep
           "title": "ABC",
           "description": "test",
           "proposal_type": "Text",
-          "proposer": "faa1k47r0nxd6ec8n6sc6tzvk2053u4eff0vx99755",
+          "proposer": "iaa1k47r0nxd6ec8n6sc6tzvk2053u4eff0vx99755",
           "initial_deposit": [
             {
               "denom": "iris-atto",

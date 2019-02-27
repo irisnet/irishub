@@ -18,14 +18,14 @@ iriscli keys add <NAME_OF_KEY>
 示例输出如下：
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-tom	local	faa1arlugktm7p64uylcmh6w0g5m09ptvklxm5k69x	fap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrzagazek
+tom	local	iaa1arlugktm7p64uylcmh6w0g5m09ptvklxm5k69x	fap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrzagazek
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
 blast change tumble toddler rival ordinary chicken dirt physical club few language noise oak moment consider enemy claim elephant cruel people adult peanut garden
 ```
 
-你可以查看到该账户的地址和公钥。在IRISHub中，地址经过bech32编码后将以`faa1`为首字节 ，另外公钥将以 `fap1`为首字节.
+你可以查看到该账户的地址和公钥。在IRISHub中，地址经过bech32编码后将以`iaa1`为首字节 ，另外公钥将以 `fap1`为首字节.
 
 账户的助记词(seed phrase)也将被显示出来。你可以使用该长度为24个单词的助记词在任意的机器上恢复你的账户。恢复账户的命令是:
 

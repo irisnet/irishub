@@ -34,8 +34,8 @@ iriscli stake delegation --address-delegator=<address-delegator> --address-valid
 The example output is the following:
 ```$xslt
 Delegation
-Delegator: faa1je9qyff4qate4e0kthum0p8v7q7z8lr7eczsv6
-Validator: faa1dmp6eyjw94u0wzc67qa03cmgl92qwqaph28lxq
+Delegator: iaa1je9qyff4qate4e0kthum0p8v7q7z8lr7eczsv6
+Validator: iaa1dmp6eyjw94u0wzc67qa03cmgl92qwqaph28lxq
 Shares: 10000000000000000000/1Height: 215307
 ```
 
@@ -65,8 +65,8 @@ iriscli stake redelegate  complete  --addr-validator-dest=<addr-validator-dest> 
 The example output is the following:
 ```$xslt
 Delegation
-Delegator: faa1je9qyff4qate4e0kthum0p8v7q7z8lr7eczsv6
-Validator: faa1kepndxvjr6gnc8tjcnelp9hqz8jdcs8mvz7m86
+Delegator: iaa1je9qyff4qate4e0kthum0p8v7q7z8lr7eczsv6
+Validator: iaa1kepndxvjr6gnc8tjcnelp9hqz8jdcs8mvz7m86
 Shares: 10000000000000000000/1Height: 215459
 ```
 

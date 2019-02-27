@@ -67,10 +67,10 @@ If the service consumer needs to initiate a service invocation request, the serv
 
 ```
 # initiate service invocation
-iriscli service call --chain-id=test --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
+iriscli service call --chain-id=test --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=iaa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
 
 # query service requests
-iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
+iriscli service requests --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=iaa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
 
 # respond a service invocation
 iriscli service respond --chain-id=test --from=node0 --fee=0.3iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd

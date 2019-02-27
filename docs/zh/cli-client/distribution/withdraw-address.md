@@ -23,6 +23,6 @@ iriscli distribution withdraw-address [delegator-address]
 ```
 执行结果示例
 ```
-faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+iaa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
 ```
 If the given delegator didn't specify other withdraw address, the query result will be empty.

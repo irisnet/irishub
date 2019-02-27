@@ -19,14 +19,14 @@ Then, you should set a password of at least 8 characters.
 The output will look like the following:
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-tom	local	faa1arlugktm7p64uylcmh6w0g5m09ptvklxm5k69x	fap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrzagazek
+tom	local	iaa1arlugktm7p64uylcmh6w0g5m09ptvklxm5k69x	fap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrzagazek
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
 blast change tumble toddler rival ordinary chicken dirt physical club few language noise oak moment consider enemy claim elephant cruel people adult peanut garden
 ```
 
-You could see the address and public key of this account. Please node that account address in IRISnet will start with `faa` and public key of account will start with `fap`.
+You could see the address and public key of this account. Please node that account address in IRISnet will start with `iaa` and public key of account will start with `fap`.
 
 The seed phrase of this account will also be displayed. You could use these 24 phrases to recover this account in another server. The recover command is:
 ```

@@ -34,7 +34,7 @@ iriscli gov query-votes --chain-id=test --proposal-id=1
 ```txt
 [
   {
-    "voter": "faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
+    "voter": "iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
     "proposal_id": "1",
     "option": "Yes"
   }

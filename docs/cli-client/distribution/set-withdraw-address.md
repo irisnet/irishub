@@ -38,7 +38,7 @@ Example response:
      },
      {
        "key": "delegator",
-       "value": "faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd"
+       "value": "iaa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd"
      }
    ]
  })

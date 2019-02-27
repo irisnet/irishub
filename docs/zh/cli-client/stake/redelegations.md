@@ -26,7 +26,7 @@ iriscli stake redelegations [delegator-address]
 ```json
 [
   {
-    "delegator_addr": "faa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9sytjfk",
+    "delegator_addr": "iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9sytjfk",
     "validator_src_addr": "fva1dayujdfnxjggd5ydlvvgkerp2supknthajpch2",
     "validator_dst_addr": "fva1h27xdw6t9l5jgvun76qdu45kgrx9lqede8hpcd",
     "creation_height": "1130",

@@ -32,7 +32,7 @@ You'll get the local public keys with 'address' and 'pubkey' element of a given 
 
 ```txt
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
-MyKey	local	faa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	fap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
+MyKey	local	iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	fap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
 ```
 
 ### Show Validator Operator Address

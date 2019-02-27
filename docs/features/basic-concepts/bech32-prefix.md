@@ -8,7 +8,7 @@ Bech32 is a new Bitcoin address format proposed by Pieter Wuille and Greg Maxwel
 
 | HRP        | Definition |
 | -----------|:-------------|
-|faa|   IRISnet Account Address|
+|iaa|   IRISnet Account Address|
 |fap|    IRISnet Account Public Key|
 |fva|   IRISnet Validator's Operator Address|
 |fvp|   IRISnet Validator's Operator Public Key|
@@ -28,10 +28,10 @@ Once you create a new address, you should see the following:
 
 ```
 NAME:    TYPE:           ADDRESS:                                PUBKEY:
-test1    local    faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl    fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
+test1    local    iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl    fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
 ```
 
-This means you have created a new address `faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`, its hrp is `faa`. And its public key could be encoded into `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`, its hrp is `fap`. 
+This means you have created a new address `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`, its hrp is `iaa`. And its public key could be encoded into `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`, its hrp is `fap`. 
 
 ## Validator Key Example
 
