@@ -18,7 +18,7 @@ iriscli stake delegations --help
 
 Query all delegations made from one delegator
 ```
-iriscli stake delegations faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2
+iriscli stake delegations iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
 ```
 
 After that, you will get all detailed info of delegations from the specified delegator address.
@@ -26,7 +26,7 @@ After that, you will get all detailed info of delegations from the specified del
 ```json
 [
   {
-    "delegator_addr": "faa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx",
+    "delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm",
     "validator_addr": "fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd",
     "shares": "0.2000000000",
     "height": "290"

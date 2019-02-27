@@ -25,7 +25,7 @@ iriscli stake delegation --help
 
 Query a validator
 ```
-iriscli stake delegation --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-delegator=faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2
+iriscli stake delegation --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-delegator=iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
 
 ```
 
@@ -33,7 +33,7 @@ After that, you will get detailed info of the delegation between specified valid
 
 ```txt
 Delegation
-Delegator: faa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx
+Delegator: iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
 Validator: fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd
 Shares: 200.0000000
 Height: 290

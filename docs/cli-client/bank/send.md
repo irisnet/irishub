@@ -25,7 +25,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain
 ### Send token to a address 
 
 ```
- iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris
+ iriscli bank send --to=iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
 After that, you will get the detail info for the send
@@ -42,8 +42,8 @@ After that, you will get the detail info for the send
     "codespace": "",
     "tags": {
       "action": "send",
-      "recipient": "faa1893x4l2rdshytfzvfpduecpswz7qtpstpr9x4h",
-      "sender": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2"
+      "recipient": "iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742",
+      "sender": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh"
     }
   })
 ```

@@ -34,7 +34,7 @@ You could query the voting of all the voters by specifying the proposal.
 ```txt
 [
   {
-    "voter": "faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd",
+    "voter": "iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs",
     "proposal_id": "1",
     "option": "Yes"
   }

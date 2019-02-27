@@ -31,7 +31,7 @@ iriscli distribution delegation-distr-info --address-delegator=<delegator addres
 执行结果示例
 ```json
 {
-  "delegator_addr": "faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j",
+  "delegator_addr": "iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50",
   "val_operator_addr": "fva1ezzh0humhy3329xg4avhcjtay985nll0hpyhf4",
   "del_pool_withdrawal_height": "4044"
 }

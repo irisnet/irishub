@@ -42,7 +42,7 @@ After that, you're done with creating a new key, but remember to backup your see
 
 ```txt
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-MyKey	local	faa1mmsm487rqkgktl2qgrjad0z3yaf9n8t5pkp33m	fap1addwnpepq2g0u7cnxp5ew0yhqep8j4rth5ugq8ky7gjmunk8tkpze95ss23ak4svkjq
+MyKey	local	iaa1mmsm487rqkgktl2qgrjad0z3yaf9n8t5ee8f3x	fap1addwnpepq2g0u7cnxp5ew0yhqep8j4rth5ugq8ky7gjmunk8tkpze95ss23ak4svkjq
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 

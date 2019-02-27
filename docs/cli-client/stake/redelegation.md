@@ -33,7 +33,7 @@ After that, you will get specified redelegation's info based on delegator and a 
 
 ```txt
 Redelegation
-Delegator: faa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9sytjfk
+Delegator: iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9gtd2ft
 Source Validator: fva1dayujdfnxjggd5ydlvvgkerp2supknthajpch2
 Destination Validator: fva1h27xdw6t9l5jgvun76qdu45kgrx9lqede8hpcd
 Creation height: 1130

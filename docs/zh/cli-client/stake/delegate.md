@@ -44,7 +44,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "codespace": "",
    "tags": {
      "action": "delegate",
-     "delegator": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2",
+     "delegator": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh",
      "destination-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd"
    }
  })

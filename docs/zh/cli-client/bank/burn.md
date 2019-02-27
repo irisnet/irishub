@@ -41,7 +41,7 @@ iriscli bank burn --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount
     "codespace": "",
     "tags": {
       "action": "burn",
-      "burnFrom": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2"
+      "burnFrom": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh"
       "burnAmount": "10iris"
     }
   })

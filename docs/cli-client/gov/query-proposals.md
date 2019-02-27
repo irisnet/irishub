@@ -44,10 +44,10 @@ You could query all the proposals by default.
 Also you can query proposal by filters, such as:
 
 ```shell
-gov query-proposals --chain-id=test --depositor=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
+gov query-proposals --chain-id=test --depositor=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs
 ```
 
-Finally, here shows the proposal who's depositor address is faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd.
+Finally, here shows the proposal who's depositor address is iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs.
 
 ```txt
   2 - new proposal

@@ -47,7 +47,7 @@ Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35
    "tags": {
      "action": "vote",
      "proposal-id": "2",
-     "voter": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz"
+     "voter": "iaa1x25y3ltr4jvp89upymegvfx7n0uduz5krcj7ul"
    }
  })
 ```

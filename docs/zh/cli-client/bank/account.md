@@ -41,7 +41,7 @@ iriscli bank account [address] [flags]
 ### 查询账户信息 
 
 ```
- iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx
+ iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym
 ```
 
 执行完命令后，获得账户的详细信息如下
@@ -49,7 +49,7 @@ iriscli bank account [address] [flags]
 ```
 {
 
-  "address": "faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx",
+  "address": "iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym",
 
   "coins": [
 
@@ -81,8 +81,8 @@ ERROR: decoding bech32 failed: checksum failed. Expected d429yx, got d429zz.
 ```
 如果查询一个空地址，，将会返回如下信息。
 ```
-iriscli bank account faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7
-ERROR: No account with address faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7 was found in the state.
+iriscli bank account iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr
+ERROR: No account with address iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr was found in the state.
 Are you sure there has been a transaction involving it?
 ```
 
