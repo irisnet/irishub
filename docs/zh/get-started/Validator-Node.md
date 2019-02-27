@@ -106,7 +106,7 @@ iriscli status --node=tcp://localhost:26657
 
 ```
 iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=irishub-8000 
-  --details="details"--node=tcp://localhost:26657 --fee=0.3iris  --gas=2000000
+  --details="details"--node=tcp://localhost:26657 --fee=0.3iris  
 ```
 ### 查询验证人信息
 
