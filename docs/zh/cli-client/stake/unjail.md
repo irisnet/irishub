@@ -30,7 +30,7 @@ iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
 * 检查这个验证人保持`jail`状态的截止时间：
 
 ```$xslt
-iriscli stake signing-info fcp1zcjduepqewwc93xwvt0ym6prxx9ppfzeufs33flkcpu23n5eutjgnnqmgazsw54sfv --node=localhost:36657 --trust-node
+iriscli stake signing-info icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx --node=localhost:36657 --trust-node
 ```
 
 如果此验证人状态为`jailed`，那么你可以看到它的jail状态的截止时间
@@ -48,7 +48,7 @@ ERROR: Msg 0 failed: {"codespace":10,"code":102,"abci_code":655462,"message":"va
 过了jail状态的截止时间后，你可以发送一个 `unjail` 交易. 
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=test-irishub
+iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
 ```
 
 输出:
@@ -61,7 +61,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "tags": {
      "action": "unjail",
      "completeConsumedTxFee-iris-atto": "\"918600000000000\"",
-     "validator": "fva12zgt9hc5r5mnxegam9evjspgwhkgn4wzjxkvqy"
+     "validator": "iva12zgt9hc5r5mnxegam9evjspgwhkgn4wz2fs5qe"
    }
  }
 ```

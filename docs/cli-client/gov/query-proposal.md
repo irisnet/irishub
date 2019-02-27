@@ -27,7 +27,7 @@ iriscli gov query-proposal --help
 ### Query proposal
 
 ```shell
-iriscli gov query-proposal --chain-id=test --proposal-id=1
+iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=1
 ```
 
 You could query the details of a specific proposal.

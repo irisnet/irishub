@@ -25,7 +25,7 @@ iriscli service binding [flags]
 ### 查询服务绑定
 
 ```shell
-iriscli service binding --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd
+iriscli service binding --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=iaa1ydhmma8l4m9dygsh7l08fgrwka6yczs0se0tvs
 ```
 
 运行成功以后，返回的结果如下:
@@ -37,7 +37,7 @@ iriscli service binding --def-chain-id=test --service-name=test-service --bind-c
     "def_name": "test-service",
     "def_chain_id": "test",
     "bind_chain_id": "test",
-    "provider": "faa1ydhmma8l4m9dygsh7l08fgrwka6yczs0gkfnvd",
+    "provider": "iaa1ydhmma8l4m9dygsh7l08fgrwka6yczs0se0tvs",
     "binding_type": "Local",
     "deposit": [
       {

@@ -27,7 +27,7 @@ iriscli bank sign <file> [flags]
 First you must use **iriscli bank send**  command with flag **--generate-only** to generate a send recorder. Just like this.
 
 ```shell  
-iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris --generate-only > tx.json
+iriscli bank send --to=iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris --generate-only > tx.json
 ```
 
 
@@ -48,6 +48,6 @@ iriscli bank sign /root/output/output/node0/test_send_10iris.txt --name=test  --
 ```
 
 ```json
-{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"faa1893x4l2rdshytfzvfpduecpswz7qtpstpr9x4h","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"40000000000000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}```
+{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"40000000000000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}```
 ```
 After signing a transaction, it could be broadcast to the network with [broadcastc command](./broadcast.md)

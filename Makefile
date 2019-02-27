@@ -97,10 +97,10 @@ install: update_irislcd_swagger_docs echo_bech32_prefix
 	go install $(BUILD_FLAGS) ./cmd/iristool
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
 build_cur: update_irislcd_swagger_docs echo_bech32_prefix
 	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \

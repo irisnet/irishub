@@ -8,7 +8,7 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release v0.12.2-rc0 on your computer.
+then get the release v0.12.3 on your computer.
 
 > Note: there are two different binaries available. One for testnet and the other for betanet.
 
@@ -18,10 +18,10 @@ You can verify you have the right version installed by running the following com
 
 ```
 $ iris version
-v0.12.2-rc0
+v0.12.3
 
 $ iriscli version
-v0.12.2-rc0
+v0.12.3
 ```
 
 #### Compile Source Code
@@ -87,7 +87,7 @@ Make sure that your server can access to google.com for that our project depends
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.2-rc0
+cd irishub && git checkout v0.12.3
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
@@ -99,7 +99,7 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.2-rc0
+cd irishub && git checkout v0.12.3
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
@@ -112,7 +112,7 @@ Now check your **Iris** version.
 
 ```
 $ iris version
-v0.12.2-rc0
+v0.12.3
 $ iriscli version
-v0.12.2-rc0
+v0.12.3
 ```
