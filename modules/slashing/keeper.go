@@ -164,7 +164,7 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 			// We need to reset the counter & array so that the validator won't be immediately slashed for downtime upon rebonding.
 			signInfo.MissedBlocksCounter = 0
 			signInfo.IndexOffset = 0
-			k.clearValidatorMissedBlockBitArray(ctx, consAddr)
+			k.ClearValidatorMissedBlockBitArray(ctx, consAddr)
 		} else {
 			// Validator was (a) not found or (b) already jailed, don't slash
 			logger.Info("Validator would have been slashed for downtime, but was either not found in store or already jailed",

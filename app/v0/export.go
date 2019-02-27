@@ -179,6 +179,7 @@ func (p *ProtocolV0) prepForZeroHeightGenesis(ctx sdk.Context) {
 	p.slashingKeeper.IterateValidatorSigningInfos(ctx, func(addr sdk.ConsAddress, info slashing.ValidatorSigningInfo) (stop bool) {
 		info.StartHeight = 0
 		p.slashingKeeper.SetValidatorSigningInfo(ctx, addr, info)
+		p.slashingKeeper.ClearValidatorMissedBlockBitArray(ctx, addr)
 		return false
 	})
 

@@ -82,7 +82,7 @@ func (k Keeper) setValidatorMissedBlockBitArray(ctx sdk.Context, address sdk.Con
 }
 
 // Stored by *validator* address (not operator address)
-func (k Keeper) clearValidatorMissedBlockBitArray(ctx sdk.Context, address sdk.ConsAddress) {
+func (k Keeper) ClearValidatorMissedBlockBitArray(ctx sdk.Context, address sdk.ConsAddress) {
 	store := ctx.KVStore(k.storeKey)
 	iter := sdk.KVStorePrefixIterator(store, GetValidatorMissedBlockBitArrayPrefixKey(address))
 	defer iter.Close()
