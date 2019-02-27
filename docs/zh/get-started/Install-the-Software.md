@@ -29,14 +29,14 @@ tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
 
 ```
 $ iris version
-v0.12.2-rc0
+v0.12.2
     
 $ iriscli version
-v0.12.2-rc0
+v0.12.2
 ```
 #### 方法2：源码编译安装
 
-#### 安装Go版本 1.10+ 
+#### 安装Go版本 1.11+ 
 
 
 系统要求：
@@ -44,20 +44,20 @@ v0.12.2-rc0
 Ubuntu LTS 16.04
 
 
-安装IRISHub需要保证Go的版本在1.10以上，
+安装IRISHub需要保证Go的版本在1.11以上，
 
-通过执行以下命令安装1.10版本的Go。
+通过执行以下命令安装1.11版本的Go。
 
 ```
 $ sudo add-apt-repository ppa:gophers/archive
 $ sudo apt-get update
-$ sudo apt-get install golang-1.10-go
+$ sudo apt-get install golang-1.11-go
 ```
 
-以上命令将安装 golang-1.10-go在 /usr/lib/go-1.10/bin. 需要将它加入到PATH中
+以上命令将安装 golang-1.11-go在 /usr/lib/go-1.11/bin. 需要将它加入到PATH中
 
 ```
-echo "export PATH=$PATH:/usr/lib/go-1.10/bin" >> ~/.bash_profile
+echo "export PATH=$PATH:/usr/lib/go-1.11/bin" >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
@@ -91,8 +91,9 @@ source ~/.bash_profile
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.2-rc0
+cd irishub && git checkout v0.12.2
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+source scripts/setTestEnv.sh
 make all
 ```
 
@@ -101,9 +102,8 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.2-rc0
+cd irishub && git checkout v0.12.2
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-source scripts/setProdEnv.sh
 make all
 ```
 
@@ -111,10 +111,10 @@ make all
 
 ```
 $ iris version
-v0.12.2-rc0
+v0.12.2
     
 $ iriscli version
-v0.12.2-rc0
+v0.12.2
 ```
 ### 如何升级IRISHub
 
@@ -124,6 +124,6 @@ v0.12.2-rc0
 iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
-git checkout v0.12.2-rc0
+git checkout v0.12.2
 make all
 ```
