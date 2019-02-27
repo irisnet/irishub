@@ -28,7 +28,7 @@ iriscli gov vote --help
 ### 给提议投票
 
 ```shell
-iriscli gov vote --chain-id=test --proposal-id=1 --option=Yes --from node0 --fee=0.01iris
+iriscli gov vote --chain-id=<chain-id> --proposal-id=1 --option=Yes --from node0 --fee=0.3iris
 ```
 
 输入正确的密码之后，你就完成了对于所指定的提议投票。

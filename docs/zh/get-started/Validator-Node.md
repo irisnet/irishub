@@ -75,7 +75,7 @@ iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3
 也就是说，如果你想要抵押10IRIS在test-irishub链上,你可以执行以下操作：
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.3iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<validator public key> --amount=10iris --moniker={validator-name} --commission-rate=0.1
 ```
 
 ### 查询验证人信息
@@ -106,7 +106,7 @@ iriscli status --node=tcp://localhost:26657
 
 ```
 iriscli stake edit-validator --from= {val-name}  --moniker="choose a moniker"  --website="https://irisnet.org"  --details="team" --chain-id=irishub-8000 
-  --details="details"--node=tcp://localhost:26657 --fee=0.4iris  --gas=2000000
+  --details="details"--node=tcp://localhost:26657 --fee=0.3iris  
 ```
 ### 查询验证人信息
 

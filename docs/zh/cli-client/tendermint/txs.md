@@ -27,7 +27,7 @@ iriscli tendermint txs [flags]
 ### 查询交易
 
 ```shell
-iriscli tendermint txs --tags `action=send&sender=iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=irishub-test --trust-node=true
+iriscli tendermint txs --tags `action=send&sender=iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node=true
 ```
 
 示例结果：

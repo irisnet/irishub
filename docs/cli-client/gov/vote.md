@@ -27,7 +27,7 @@ iriscli gov vote --help
 ### Vote for proposal
 
 ```shell
-iriscli gov vote --chain-id=test --proposal-id=1 --option=Yes --from node0 --fee=0.01iris
+iriscli gov vote --chain-id=<chain-id> --proposal-id=1 --option=Yes --from node0 --fee=0.3iris
 ```
 
 Validators and delegators can vote for proposals which enter voting period.

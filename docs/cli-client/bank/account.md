@@ -91,43 +91,5 @@ Are you sure there has been a transaction involving it?
 Query your account in iris network. If you want to create a validator, you should use `iriscli bank account` to make sure 
 that your balance is above 0.
 
-​    
-### Query your account in Fuxi testnet
-
-If you want to query your account in test-irishub, you should use the following: 
-
-```
-iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym --chain-id=<chain-id>
-```
-
-After that, you will get the detail info for the account.
-
-```
-{
-
-  "address": "iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym",
-
-  "coins": [
-
-    "50iris"
-
-  ],
-
-  "public_key": {
-
-    "type": "tendermint/PubKeySecp256k1",
-
-    "value": "AzlCwiA5Tvxwi7lMB/Hihfp2qnaks5Wrrgkg/Jy7sEkF"
-
-  },
-
-  "account_number": "0",
-
-  "sequence": "1"
-
-}
-
-```
-
 
 ​           

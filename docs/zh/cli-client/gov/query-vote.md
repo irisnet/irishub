@@ -26,7 +26,7 @@ iriscli gov query-vote --help
 ### 查询投票
 
 ```shell
-iriscli gov query-vote --chain-id=test --proposal-id=1 --voter=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs
+iriscli gov query-vote --chain-id=<chain-id> --proposal-id=1 --voter=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs
 ```
 
 通过指定提议、指定投票者查询投票情况。

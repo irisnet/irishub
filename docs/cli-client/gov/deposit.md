@@ -27,7 +27,7 @@ iriscli gov deposit --help
 ### Deposit
 
 ```shell
-iriscli gov deposit --chain-id=test --proposal-id=1 --deposit=50iris --from=node0 --fee=0.01iris
+iriscli gov deposit --chain-id=<chain-id> --proposal-id=1 --deposit=50iris --from=node0 --fee=0.3iris
 ```
 
 After you enter the correct password, you could deposit 50iris to make your proposal active which can be voted, after you enter the correct password, you're done with depositing iris tokens for an activing proposal.
