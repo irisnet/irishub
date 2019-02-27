@@ -25,7 +25,7 @@ iriscli stake delegation --help
 ### 查询验证者
 
 ```
-iriscli stake delegation --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-delegator=iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
+iriscli stake delegation --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-delegator=iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
 
 ```
 
@@ -34,7 +34,7 @@ iriscli stake delegation --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvy
 ```txt
 Delegation
 Delegator: iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
-Validator: fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd
+Validator: iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs
 Shares: 200.0000000
 Height: 290
 ```

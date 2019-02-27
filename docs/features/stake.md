@@ -63,16 +63,16 @@ This specification briefly introduces the functionality of stake module and what
 	Example response:
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
+	faucet  local   iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
 	```
 	Then, example command to query validator:
 	```
-	iriscli stake validator fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
+	iriscli stake validator iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
 	```
 	Example response:
 	```text
     Validator 
-    Operator Address: fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
+    Operator Address: iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
     Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
     Jailed: false
     Status: Bonded

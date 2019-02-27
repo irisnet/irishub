@@ -25,7 +25,7 @@ After that, you will get the specified validator's info.
 
 ```txt
 Validator
-Operator Address: fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd
+Operator Address: iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs
 Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
 Jailed: false
 Status: Bonded

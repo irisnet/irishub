@@ -52,7 +52,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "tags": {
      "action": "unjail",
      "completeConsumedTxFee-iris-atto": "\"918600000000000\"",
-     "validator": "fva12zgt9hc5r5mnxegam9evjspgwhkgn4wzjxkvqy"
+     "validator": "iva12zgt9hc5r5mnxegam9evjspgwhkgn4wz2fs5qe"
    }
  }
 ```

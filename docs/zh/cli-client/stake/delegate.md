@@ -27,7 +27,7 @@ iriscli stake delegate --help
 
 在chain-id为test的链上执行委托10iris的命令：
 ```
-iriscli stake delegate --chain-id=test-irishub --from=KeyName --fee=0.04iris --amount=10iris --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
+iriscli stake delegate --chain-id=test-irishub --from=KeyName --fee=0.04iris --amount=10iris --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms
 ```
 输出信息：
 ```txt
@@ -45,7 +45,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "tags": {
      "action": "delegate",
      "delegator": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh",
-     "destination-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd"
+     "destination-validator": "iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms"
    }
  })
 ```

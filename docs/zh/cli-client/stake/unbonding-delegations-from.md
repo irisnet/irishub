@@ -27,7 +27,7 @@ iriscli stake unbonding-delegations [validator-address]
 [
   {
     "delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm",
-    "validator_addr": "fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd",
+    "validator_addr": "iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs",
     "creation_height": "1310",
     "min_time": "2018-11-15T06:24:22.754703377Z",
     "initial_balance": {

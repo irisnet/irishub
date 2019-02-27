@@ -47,7 +47,7 @@ iriscli keys show alice --bech val
 Then you could see the following:
 ```$xslt
 NAME: TYPE: ADDRESS: PUBKEY:
-alice local fva12nda6xwpmp000jghyneazh4kkgl2tnzy73dmzy ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
+alice local iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
 ```
 
 The result could be use for `--address-validator` in [create a delegation](../stake/delegate.md)
