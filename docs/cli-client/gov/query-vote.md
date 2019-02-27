@@ -28,7 +28,7 @@ iriscli gov query-vote --help
 ### Query vote
 
 ```shell
-iriscli gov query-vote --chain-id=test --proposal-id=1 --voter=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs
+iriscli gov query-vote --chain-id=<chain-id> --proposal-id=1 --voter=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs
 ```
 
 You could query the voting by specifying the proposal and the voter.

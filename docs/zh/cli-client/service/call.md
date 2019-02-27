@@ -26,7 +26,7 @@ iriscli service call [flags]
 
 ### 发起一个服务调用请求
 ```shell
-iriscli service call --chain-id=test --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=iaa1qm54q9ta97kwqaedz9wzd90cacdsp6mqv67kdq --service-fee=1iris --request-data=434355
+iriscli service call --chain-id=<chain-id> --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=iaa1qm54q9ta97kwqaedz9wzd90cacdsp6mqv67kdq --service-fee=1iris --request-data=434355
 ```
 
 运行成功以后，返回的结果如下:

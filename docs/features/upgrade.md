@@ -24,13 +24,13 @@ You need to start a local testnet first:
 
 ```
 # Send an upgrade proposal
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80  --threshold=0.9 --commit
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80  --threshold=0.9 --commit
 
 # Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --commit
+iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --commit
 
 # Vote for a proposal
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --commit
+iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --commit
 
 # Query the state of a proposal
 iriscli gov query-proposal --proposal-id=1 --trust-node
@@ -78,7 +78,7 @@ iriscli upgrade info --trust-node
 ## Command details
 
 ```
-iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=upgrade-test --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80  --threshold=0.9 --commit
+iriscli gov submit-proposal --title=Upgrade --description="SoftwareUpgrade" --type="SoftwareUpgrade" --deposit=10iris --from=x --chain-id=<chain-id> --fee=0.05iris --gas=20000 --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80  --threshold=0.9 --commit
 ```
 
 * `--type`  "SoftwareUpgrade" The type of Software upgrade proposals

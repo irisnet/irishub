@@ -82,7 +82,7 @@ To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-
 In this way, to stake 1IRIS, you need to do:
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.3iris --pubkey=<pubkey> --amount=1iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<pubkey> --amount=1iris --moniker={validator-name} --commission-rate=0.1
 ```
 Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../features/basic-concepts/coin-type.md)
 

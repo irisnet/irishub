@@ -22,7 +22,7 @@ iriscli service respond [flags]
 
 ### 响应一个服务调用 
 ```shell
-iriscli service respond --chain-id=test --from=node0 --fee=0.3iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
+iriscli service respond --chain-id=<chain-id> --from=node0 --fee=0.3iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
 ```
 
 运行成功以后，返回的结果如下:
