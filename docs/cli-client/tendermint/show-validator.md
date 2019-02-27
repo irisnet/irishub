@@ -2,7 +2,7 @@
 
 ## Description
 
-Show the bech32 encoded public key of your validator, with hrp of `fcp`, which derives from private_key.json in {irishome}/config
+Show the bech32 encoded public key of your validator, with hrp of `icp`, which derives from private_key.json in {irishome}/config
 
 ## Usage
 
@@ -36,7 +36,7 @@ iris tendermint show-validator --home={iris-home}
 
 The sample output could be:
 ```$xslt
-fcp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqszqtyn2
+icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqszqtyn2
 ```
 
 The output is encoded in Bech32, to read more about this encoding method, read [this](../../features/basic-concepts/bech32-prefix.md) 

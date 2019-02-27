@@ -66,7 +66,7 @@ It is calculated as:
     simulation tag action = withdraw-delegator-rewards-all
     simulation tag delegator = iaa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd
     simulation tag withdraw-reward-total = 1308135156755646iris-atto
-    simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646iris-atto
+    simulation tag withdraw-reward-from-validator-iva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646iris-atto
     simulation tag action = withdraw_delegation_rewards_all    
     
     ```

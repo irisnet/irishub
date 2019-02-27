@@ -8,11 +8,11 @@ Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除�
 | HRP        | Definition |
 | -----------|:-------------|
 |iaa|   IRISnet Account Address|
-|fap|	IRISnet Account Public Key|
-|fva|   IRISnet Validator's Operator Address|
-|fvp|   IRISnet Validator's Operator Public Key|
-|fca|   Tendermint Consensus Address|
-|fcp|	Tendermint Consensus Public Key|
+|iap|	IRISnet Account Public Key|
+|iva|   IRISnet Validator's Operator Address|
+|ivp|   IRISnet Validator's Operator Public Key|
+|ica|   Tendermint Consensus Address|
+|icp|	Tendermint Consensus Public Key|
 
 ## 编码
 
@@ -24,10 +24,10 @@ Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除�
 
 ```
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
-test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl	fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
+test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl	iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
 ```
 
-这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`， 他的用户可读部分是 `iaa`。他的公钥被密码成  `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`， 他的用户可读部分是 `fap`。 
+这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`， 他的用户可读部分是 `iaa`。他的公钥被密码成  `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`， 他的用户可读部分是 `iap`。 
 
  ## 验证人密钥例子
  
@@ -39,5 +39,5 @@ test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl	fap1addwnpepqgxa40ww28uy9
 
  示例输出:
   ```
-  fcp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
+  icp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
 ```

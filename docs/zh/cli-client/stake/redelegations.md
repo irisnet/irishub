@@ -27,8 +27,8 @@ iriscli stake redelegations [delegator-address]
 [
   {
     "delegator_addr": "iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9sytjfk",
-    "validator_src_addr": "fva1dayujdfnxjggd5ydlvvgkerp2supknthajpch2",
-    "validator_dst_addr": "fva1h27xdw6t9l5jgvun76qdu45kgrx9lqede8hpcd",
+    "validator_src_addr": "iva1dayujdfnxjggd5ydlvvgkerp2supknthajpch2",
+    "validator_dst_addr": "iva1h27xdw6t9l5jgvun76qdu45kgrx9lqede8hpcd",
     "creation_height": "1130",
     "min_time": "2018-11-16T07:22:48.740311064Z",
     "initial_balance": "0.1iris",

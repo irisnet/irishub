@@ -9,11 +9,11 @@ Bech32 is a new Bitcoin address format proposed by Pieter Wuille and Greg Maxwel
 | HRP        | Definition |
 | -----------|:-------------|
 |iaa|   IRISnet Account Address|
-|fap|    IRISnet Account Public Key|
-|fva|   IRISnet Validator's Operator Address|
-|fvp|   IRISnet Validator's Operator Public Key|
-|fca|   Tendermint Consensus Address|
-|fcp|    Tendermint Consensus Public Key|
+|iap|    IRISnet Account Public Key|
+|iva|   IRISnet Validator's Operator Address|
+|ivp|   IRISnet Validator's Operator Public Key|
+|ica|   Tendermint Consensus Address|
+|icp|    Tendermint Consensus Public Key|
 
 ## Encoding
 
@@ -28,10 +28,10 @@ Once you create a new address, you should see the following:
 
 ```
 NAME:    TYPE:           ADDRESS:                                PUBKEY:
-test1    local    iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl    fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
+test1    local    iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl    iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
 ```
 
-This means you have created a new address `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`, its hrp is `iaa`. And its public key could be encoded into `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`, its hrp is `fap`. 
+This means you have created a new address `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`, its hrp is `iaa`. And its public key could be encoded into `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`, its hrp is `iap`. 
 
 ## Validator Key Example
 
@@ -43,5 +43,5 @@ iris tendermint show-validator
 
 Example output:
 ```
-fcp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
+icp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
 ```

@@ -32,5 +32,5 @@ iriscli keys show MyKey
 
 ```txt
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
-MyKey	local	iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	fap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
+MyKey	local	iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	iap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
 ```

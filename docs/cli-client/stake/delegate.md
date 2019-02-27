@@ -25,7 +25,7 @@ iriscli stake delegate --help
 ## Examples
 
 ```
-iriscli stake delegate --chain-id=<chain-id> --from=KeyName --fee=0.04iris  --amount=10iris --address-validator=fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
+iriscli stake delegate --chain-id=<chain-id> --from=KeyName --fee=0.04iris  --amount=10iris --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
 ```
 Output:
 ```txt
@@ -43,7 +43,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "tags": {
      "action": "delegate",
      "delegator": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2",
-     "destination-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd"
+     "destination-validator": "iva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd"
    }
  })
 ```

@@ -18,7 +18,7 @@ iriscli keys add {account_name}
 得到账户信息，包括账户地址、公钥地址、助记词
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-account_name	local	iaa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
+account_name	local	iaa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	iap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 

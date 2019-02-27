@@ -28,7 +28,7 @@ iriscli stake delegations iaa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2
 [
   {
     "delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx",
-    "validator_addr": "fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd",
+    "validator_addr": "iva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd",
     "shares": "200.0000000",
     "height": "290"
   }
