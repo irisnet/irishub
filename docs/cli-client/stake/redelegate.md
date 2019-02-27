@@ -31,7 +31,7 @@ Users must specify the redeleagtion token amount. There two options can do this:
 
 If you want to redelegte 10% of your share:
 ```
-iriscli stake redelegate --chain-id=test-irishub --from=fuxi --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
+iriscli stake redelegate --chain-id=<chain-id> --from=<name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
 ```
 After that, you will get the following ouptut:
 ```txt

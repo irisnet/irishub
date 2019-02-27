@@ -27,7 +27,7 @@ iriscli stake delegate --help
 
 在chain-id为test的链上执行委托10iris的命令：
 ```
-iriscli stake delegate --chain-id=test-irishub --from=KeyName --fee=0.04iris --amount=10iris --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
+iriscli stake delegate --chain-id=<chain-id>-irishub --from=KeyName --fee=0.04iris --amount=10iris --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd
 ```
 输出信息：
 ```txt

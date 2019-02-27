@@ -50,7 +50,7 @@ It is calculated as:
     Execute the command to get the estimated inflation rewards :
     
     ```bash
-    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.3iris  --commit
+    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=<chain-id> --fee=0.3iris  --commit
     ```
     
     Output is the following，`withdraw-reward-total`is your estimated inflation rewards：
