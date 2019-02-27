@@ -26,7 +26,7 @@ iriscli stake validators
 ```txt
 Validator
 Operator Address: fva15grv3xg3ekxh9xrf79zd0w077krgv5xf6d6thd
-Validator Consensus Pubkey: fcp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus2r55he
+Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
 Jailed: false
 Status: Bonded
 Tokens: 100.0000000000

@@ -33,7 +33,7 @@ iris tendermint show-validator --home={iris-home}
 
 示例输出
 ```$xslt
-fcp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqszqtyn2
+icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
 ```
 
 返回的结果是bech32编码的地址, 关于bech32的详细文档请参阅 [bech32-prefix](../../features/basic-concepts/bech32-prefix.md) 

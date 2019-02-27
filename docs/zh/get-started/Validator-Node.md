@@ -63,7 +63,7 @@ iris tendermint show-validator --home= {IRIS-HOME}
 ```
 示例输出:
 ```
-fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
+icp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagans88ltuj
 ```
 然后，使用以上输出作为`iriscli stake create-validator`命令的 `<pubkey>` 字段：
 

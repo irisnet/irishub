@@ -66,7 +66,7 @@ iris tendermint show-validator --home=<IRIS-HOME>
 ```
 Example output:
 ```
-fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
+icp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagans88ltuj
 ```
 Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` command following [this](../cli-client/stake/create-validator.md). :
 

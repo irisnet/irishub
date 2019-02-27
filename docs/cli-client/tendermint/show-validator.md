@@ -36,7 +36,7 @@ iris tendermint show-validator --home={iris-home}
 
 The sample output could be:
 ```$xslt
-fcp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqszqtyn2
+icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
 ```
 
 The output is encoded in Bech32, to read more about this encoding method, read [this](../../features/basic-concepts/bech32-prefix.md) 
