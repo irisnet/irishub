@@ -19,7 +19,7 @@ Note that delegation are not necessarily bonded. Tokens of each delegator can be
 
 To delegate some IRIS token to a validator, you could run the following command:
 ```$xslt
-iriscli stake delegate  --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=irishub --from=name --gas=2000000 --fee=0.04iris  --amount=10000000000000000000iris 
+iriscli stake delegate  --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=irishub --from=name --fee=0.3iris --gas=50000  --amount=10000000000000000000iris 
 ```
 > Please notice that the amount is under unit iris-atto, 1iris=10^18 iris-atto
 
