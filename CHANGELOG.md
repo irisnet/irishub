@@ -5,7 +5,7 @@
 *February 27th, 2019*
 
 - Fix issue of build config for Ledger Nano
-
+- Fix Dockerfile to be compatible with Ledger build
 
 ## 0.12.2
 
