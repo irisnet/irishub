@@ -59,7 +59,7 @@ iriscli stake redelegate  begin  --addr-validator-dest=<addr-validator-dest>  --
 Please note that you have to wait 10 minute to run the next command:
 
 ```$xslt
-iriscli stake redelegate  complete  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator-source> --address-delegator=<address-delegator>  --chain-id=irishub  --fee=0.3iris --gas=50000 --fee=0.04iris
+iriscli stake redelegate  complete  --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator-source> --address-delegator=<address-delegator>  --chain-id=irishub  --fee=0.3iris --gas=50000 
 ```
 
 The example output is the following:
