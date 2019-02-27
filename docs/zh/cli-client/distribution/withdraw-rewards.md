@@ -29,7 +29,7 @@ iriscli distribution withdraw-rewards --help
 
 1. 仅取回某一个委托产生的收益
     ```
-    iriscli distribution withdraw-rewards --only-from-validator fva134mhjjyyc7mehvaay0f3d4hj8qx3ee3w3eq5nq --from mykey --fee=0.3iris --chain-id=irishub-test
+    iriscli distribution withdraw-rewards --only-from-validator iva134mhjjyyc7mehvaay0f3d4hj8qx3ee3wfkxvna --from mykey --fee=0.3iris --chain-id=irishub-test
     ```
 2. 取回所有委托产生的收益，不包含验证人的佣金收益:
     ```

@@ -19,14 +19,14 @@ Then, you should set a password of at least 8 characters.
 The output will look like the following:
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-tom	local	faa1arlugktm7p64uylcmh6w0g5m09ptvklxm5k69x	fap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrzagazek
+tom	local	iaa1arlugktm7p64uylcmh6w0g5m09ptvklxrmsz9m	iap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrz37h9q9
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
 blast change tumble toddler rival ordinary chicken dirt physical club few language noise oak moment consider enemy claim elephant cruel people adult peanut garden
 ```
 
-You could see the address and public key of this account. Please node that account address in IRISnet will start with `faa` and public key of account will start with `fap`.
+You could see the address and public key of this account. Please node that account address in IRISnet will start with `iaa` and public key of account will start with `iap`.
 
 The seed phrase of this account will also be displayed. You could use these 24 phrases to recover this account in another server. The recover command is:
 ```
@@ -55,7 +55,7 @@ iriscli status --node=tcp://localhost:26657
 
 You should also be able to see `catching_up` is `false`. 
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `fcp`, 
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `icp`, 
 it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, 
 please read this [doc](../features/basic-concepts/bech32-prefix.md)
 
@@ -66,7 +66,7 @@ iris tendermint show-validator --home=<IRIS-HOME>
 ```
 Example output:
 ```
-fcp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagansh7gfr7
+icp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagans88ltuj
 ```
 Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` command following [this](../cli-client/stake/create-validator.md). :
 
@@ -96,7 +96,7 @@ View the validator's information with this command:
 iriscli stake validator <val-address-operator>  --chain-id=<chain-id> --node=tcp://localhost:26657 
 ```
 
-The `<val-address-operator>` is your account address that starts with 'fva1'
+The `<val-address-operator>` is your account address that starts with 'iva1'
 
 
 ### Confirm Your Validator is Running

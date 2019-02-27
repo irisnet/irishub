@@ -26,7 +26,7 @@ iriscli service call [flags]
 
 ### Initiate a service invocation request 
 ```shell
-iriscli service call --chain-id=test --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=faa1qm54q9ta97kwqaedz9wzd90cacdsp6mq54cwda --service-fee=1iris --request-data=434355
+iriscli service call --chain-id=test --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service --method-id=1 --bind-chain-id=test --provider=iaa1qm54q9ta97kwqaedz9wzd90cacdsp6mqv67kdq --service-fee=1iris --request-data=434355
 ```
 
 After that, you're done with initiating a service invocation request.
@@ -43,8 +43,8 @@ Committed at block 54 (tx hash: F972ACA7DF74A6C076DFB01E7DD49D8694BF5AA1BA25A1F1
    "codespace": "",
    "tags": {
      "action": "service_call",
-     "consumer": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
-     "provider": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
+     "consumer": "iaa1x25y3ltr4jvp89upymegvfx7n0uduz5krcj7ul",
+     "provider": "iaa1x25y3ltr4jvp89upymegvfx7n0uduz5krcj7ul",
      "request-id": "64-54-0"
    }
  })
