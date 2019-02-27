@@ -24,10 +24,10 @@ Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除�
 
 ```
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
-test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz	fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
+test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz	iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l
 ```
 
-这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`， 他的用户可读部分是 `faa`。他的公钥被密码成  `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`， 他的用户可读部分是 `fap`。 
+这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`， 他的用户可读部分是 `faa`。他的公钥被密码成  `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l`， 他的用户可读部分是 `fap`。 
 
  ## 验证人密钥例子
  

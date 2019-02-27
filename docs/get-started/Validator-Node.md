@@ -19,7 +19,7 @@ Then, you should set a password of at least 8 characters.
 The output will look like the following:
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-tom	local	iaa1arlugktm7p64uylcmh6w0g5m09ptvklxrmsz9m	fap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrzagazek
+tom	local	iaa1arlugktm7p64uylcmh6w0g5m09ptvklxrmsz9m	iap1addwnpepqvlmtpv7tke2k93vlyfpy2sxup93jfulll6r3jty695dkh09tekrz37h9q9
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
