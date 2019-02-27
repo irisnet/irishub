@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.3
+
+*February 27th, 2019*
+
+- Fix issue of build config for Ledger Nano
+
 
 ## 0.12.2
 
