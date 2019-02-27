@@ -6,6 +6,8 @@
 
 - Fix issue of build config for Ledger Nano
 - Fix Dockerfile to be compatible with Ledger build
+- Improve documents about address prefix/fee/chain-id for the mainnet
+
 
 ## 0.12.2
 
