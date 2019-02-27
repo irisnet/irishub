@@ -2,7 +2,7 @@
 
 ## 介绍
 
-在{irishome}/config获取验证人的私钥文件private_key.json，再推导出公钥，然后以`fcp`为hrp进行bech32编码后的结果。
+在{irishome}/config获取验证人的私钥文件private_key.json，再推导出公钥，然后以`icp`为hrp进行bech32编码后的结果。
 
 ## 用法
 
@@ -33,7 +33,7 @@ iris tendermint show-validator --home={iris-home}
 
 示例输出
 ```$xslt
-fcp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqszqtyn2
+icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
 ```
 
 返回的结果是bech32编码的地址, 关于bech32的详细文档请参阅 [bech32-prefix](../../features/basic-concepts/bech32-prefix.md) 

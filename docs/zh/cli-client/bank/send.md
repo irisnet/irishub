@@ -26,7 +26,7 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain
 ### 发送通证到指定地址 
 
 ```
- iriscli bank send --to=faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx  --from=test  --fee=0.3iris --chain-id=irishub-test --amount=10iris
+ iriscli bank send --to=iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
 命令执行完成后，返回执行的细节信息
@@ -43,8 +43,8 @@ Committed at block 87 (tx hash: AEA8E49C1BC9A81CAFEE8ACA3D0D96DA7B5DC43B44C06BAC
    "codespace": "",
    "tags": {
      "action": "send",
-     "recipient": "faa1893x4l2rdshytfzvfpduecpswz7qtpstpr9x4h",
-     "sender": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2"
+     "recipient": "iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742",
+     "sender": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh"
    }
  })
 ```

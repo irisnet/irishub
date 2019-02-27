@@ -20,7 +20,7 @@ iriscli service fees [account address]
 
 ### Query service fees
 ```shell
-iriscli service fees faa1f02ext9duk7h3rx9zm7av0pnlegxve8ne5vw6x
+iriscli service fees iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m
 ```
 
 After that, you will get the service fees by specified address.

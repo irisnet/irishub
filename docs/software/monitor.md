@@ -73,11 +73,11 @@ You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/mas
 Then edit `prometheus.yml` and add `jobs` :
 
 ```yaml
-      - job_name: fuxi-5000
+      - job_name: fuxi
           static_configs:
           - targets: ['localhost:36660']
             labels:
-              instance: fuxi-5000
+              instance: fuxi
 ```
 
 > Note：value of targets is ip:port which used by IRIS monitor 

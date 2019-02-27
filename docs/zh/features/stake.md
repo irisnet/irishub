@@ -63,17 +63,17 @@
 	返回结果示例：
 	```
 	NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-	faucet  local   fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u    fvp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha605ek3w
+	faucet  local   iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
 	```
 	查询命令示例：
 	```
-	iriscli stake validator fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
+	iriscli stake validator iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
 	```
 	返回示例：
 	```text
     Validator 
-    Operator Address: fva1ljemm0yznz58qxxs8xyak7fashcfxf5l9pe40u
-    Validator Consensus Pubkey: fcp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus2r55he
+    Operator Address: iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
+    Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
     Jailed: false
     Status: Bonded
     Tokens: 100.0000000000

@@ -25,7 +25,7 @@ iriscli gov query-deposits --help
 ### 查询所有保证金
 
 ```shell
-iriscli gov query-deposits --chain-id=test --proposal-id=1
+iriscli gov query-deposits --chain-id=<chain-id> --proposal-id=1
 ```
 
 你可以查询到指定提议的所有保证金代币，包括每个存款人的充值详情。
@@ -33,7 +33,7 @@ iriscli gov query-deposits --chain-id=test --proposal-id=1
 ```txt
 [
   {
-    "depositor": "faa1c4kjt586r3t353ek9jtzwxum9x9fcgwetyca07",
+    "depositor": "iaa1c4kjt586r3t353ek9jtzwxum9x9fcgwent790r",
     "proposal_id": "1",
     "amount": [
       {

@@ -38,7 +38,7 @@ After that, you will get the detail info for the send
     "codespace": "",
     "tags": {
       "action": "burn",
-      "burnFrom": "faa106nhdckyf996q69v3qdxwe6y7408pvyvufy0x2"
+      "burnFrom": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh"
       "burnAmount": "10iris"
     }
   })

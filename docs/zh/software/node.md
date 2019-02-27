@@ -18,7 +18,7 @@ iriscli keys add {account_name}
 得到账户信息，包括账户地址、公钥地址、助记词
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-account_name	local	faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
+account_name	local	iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp	iap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd56h6rm0
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
@@ -41,14 +41,14 @@ iris gentx --name={account_name} --home={path_to_your_home}
 
 使用下面命令修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
 ```bash
-iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
+iris add-genesis-account iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp 150iris
 ```
 
 ```json
     {
       "accounts": [
         {
-          "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
+          "address": "iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp",
           "coins": ["150iris"],
           "sequence_number": "0",
           "account_number": "0"

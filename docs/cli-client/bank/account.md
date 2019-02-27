@@ -39,7 +39,7 @@ iriscli bank account [address] [flags]
 ### Query your account in trust-mode
 
 ```
- iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --trust-node=true
+ iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym --trust-node=true
 ```
 
 After that, you will get the detail info for the account.
@@ -47,7 +47,7 @@ After that, you will get the detail info for the account.
 ```
 {
 
-  "address": "faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx",
+  "address": "iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym",
 
   "coins": [
 
@@ -75,13 +75,13 @@ After that, you will get the detail info for the account.
 
 If you query an wrong account, you will get the follow information.
 ```
-iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
-ERROR: decoding bech32 failed: checksum failed. Expected 100, got 0.
+iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
+ERROR: decoding bech32 failed: checksum failed. Expected 46vaym, got d429zz.
 ```
 If you query an empty account, you will get the follow error. But don't panic when you see the following error. 
 ```
-iriscli bank account faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7
-ERROR: No account with address faa1kenrwk5k4ng70e5s9zfsttxpnlesx5ps0gfdv7 was found in the state.
+iriscli bank account iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr
+ERROR: No account with address iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr was found in the state.
 Are you sure there has been a transaction involving it?
 ```
 
@@ -90,44 +90,6 @@ Are you sure there has been a transaction involving it?
 
 Query your account in iris network. If you want to create a validator, you should use `iriscli bank account` to make sure 
 that your balance is above 0.
-
-​    
-### Query your account in Fuxi testnet
-
-If you want to query your account in test-irishub, you should use the following: 
-
-```
-iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx --chain-id=<chain-id>
-```
-
-After that, you will get the detail info for the account.
-
-```
-{
-
-  "address": "faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429yx",
-
-  "coins": [
-
-    "50iris"
-
-  ],
-
-  "public_key": {
-
-    "type": "tendermint/PubKeySecp256k1",
-
-    "value": "AzlCwiA5Tvxwi7lMB/Hihfp2qnaks5Wrrgkg/Jy7sEkF"
-
-  },
-
-  "account_number": "0",
-
-  "sequence": "1"
-
-}
-
-```
 
 
 ​           

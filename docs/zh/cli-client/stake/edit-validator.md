@@ -29,7 +29,7 @@ iriscli stake edit-validator --help
 ## 示例
 
 ```
-iriscli stake edit-validator --from=<key name> --chain-id=test-irishub --fee=0.3iris --commission-rate=0.15
+iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15
 ```
 返回信息：
 ```txt
@@ -46,7 +46,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "codespace": "",
    "tags": {
      "action": "edit_validator",
-     "destination-validator": "fva106nhdckyf996q69v3qdxwe6y7408pvyvfcwqmd",
+     "destination-validator": "iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms",
      "identity": "",
      "moniker": "test2"
    }

@@ -35,7 +35,7 @@ iris tendermint show-address --home={iris-home}
 
 The sample output could be:
 ```$xslt
-fca1jhax359kz6hm70swxpxumpgkaglr7yq80qhwvv
+ica1jhax359kz6hm70swxpxumpgkaglr7yq8h03kv3
 ```
 
 The output is encoded in Bech32, to read more about this encoding method, read [this](../../features/basic-concepts/bech32-prefix.md)

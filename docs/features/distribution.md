@@ -50,7 +50,7 @@ It is calculated as:
     Execute the command to get the estimated inflation rewards :
     
     ```bash
-    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=test-irishub --fee=0.3iris  --commit
+    iriscli distribution withdraw-rewards --from=bob  --dry-run --chain-id=<chain-id> --fee=0.3iris  --commit
     ```
     
     Output is the following，`withdraw-reward-total`is your estimated inflation rewards：
@@ -64,9 +64,9 @@ It is calculated as:
     simulation fee amount = 0
     simulation fee denom =
     simulation tag action = withdraw-delegator-rewards-all
-    simulation tag delegator = faa1yclscskdtqu9rgufgws293wxp3njsesxtplqxd
+    simulation tag delegator = iaa1yclscskdtqu9rgufgws293wxp3njsesxnwecxs
     simulation tag withdraw-reward-total = 1308135156755646iris-atto
-    simulation tag withdraw-reward-from-validator-fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2 = 1308135156755646iris-atto
+    simulation tag withdraw-reward-from-validator-iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh = 1308135156755646iris-atto
     simulation tag action = withdraw_delegation_rewards_all    
     
     ```
