@@ -2,7 +2,7 @@
 
 ## Description
 
-Show the bech32 encoded public key of your validator, with hrp of `fcp`, which derives from private_key.json in {irishome}/config
+Show the bech32 encoded public key of your validator, with hrp of `icp`, which derives from private_key.json in {irishome}/config
 
 ## Usage
 

@@ -76,8 +76,8 @@ iriscli bank account [address] [flags]
 ```
 如果你查询一个错误的地址，将会返回如下信息
 ```
- iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
-ERROR: decoding bech32 failed: checksum failed. Expected d429yx, got d429zz.
+ iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
+ERROR: decoding bech32 failed: checksum failed. Expected 46vaym, got d429zz.
 ```
 如果查询一个空地址，，将会返回如下信息。
 ```

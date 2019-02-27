@@ -75,8 +75,8 @@ After that, you will get the detail info for the account.
 
 If you query an wrong account, you will get the follow information.
 ```
-iriscli bank account faa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
-ERROR: decoding bech32 failed: checksum failed. Expected 100, got 0.
+iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
+ERROR: decoding bech32 failed: checksum failed. Expected 46vaym, got d429zz.
 ```
 If you query an empty account, you will get the follow error. But don't panic when you see the following error. 
 ```
