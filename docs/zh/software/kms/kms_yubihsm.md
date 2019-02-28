@@ -19,31 +19,31 @@ KMS目前正在进行中。细节可能有所不同请谨慎使用，风险自�
 
 可以在[这里](https://github.com/irisnet/kms/blob/master/tmkms.toml.example)找到其他配置示例。
 
-- 使用以下内容创建一个`~/.tmkms/tmkms.toml`文件：
+- 使用以下内容创建一个`tmkms.toml`文件：
 
 ```toml
 # Example KMS configuration file
 [[validator]]
 addr = "tcp://localhost:26658"    # or "unix:///path/to/socket"
-chain_id = "fuxi"
+chain_id = "irishub"
 reconnect = true # true is the default
-secret_key = "~/.tmkms/secret_connection.key"
+secret_key = "secret_connection.key"
 [[providers.yubihsm]]
 adapter = { type = "usb" }
 auth = { key = 1, password = "password" } # Default YubiHSM admin credentials. Change ASAP!
-keys = [{ id = "test", key = 1 }]
+keys = [{ id = "irishub", key = 1 }]
 #serial_number = "0123456789" # identify serial number of a specific YubiHSM to connect to
 ```
 
 - 编辑 `addr` 指向你的 `iris` 实例。
-- 调整 `chain-id` 以匹配你的 `.iris/config/config.toml` 设置。
+- 调整 `chain-id` 以匹配你的 `~/.iris/config/config.toml` 设置。
 - 编辑 `auth` 以授权访问你的yubihsm。
-- 编辑 `keys` 确定您将使用哪个pubkey。[如何导入密钥？](#import-private-key-to-yubihsm))
+- 编辑 `keys` 确定您将使用哪个pubkey。[如何导入密钥？](#导入私钥))
 
-#### Import private key to yubihsm
+#### 导入私钥
 
 ```bash
-tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [id]
+tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [key-id]
 ```
 
 #### 生成连接密钥
@@ -51,7 +51,7 @@ tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [id]
 现在你需要生成secret_key
 
 ```bash
-tmkms keygen ~/.tmkms/secret_connection.key
+tmkms keygen secret_connection.key
 ```
 
 #### 启动KMS
@@ -61,7 +61,7 @@ tmkms keygen ~/.tmkms/secret_connection.key
 启动KMS:
 
 ```bash
-tmkms start -c ~/.tmkms/tmkms.toml
+tmkms start
 ```
 
 The output should look similar to:

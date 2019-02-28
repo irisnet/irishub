@@ -27,7 +27,7 @@ NAME:	TYPE:	ADDRESS:						            PUBKEY:
 test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz	iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l
 ```
 
-这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`， 他的用户可读部分是 `faa`。他的公钥被密码成  `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l`， 他的用户可读部分是 `iap`。 
+这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`， 他的用户可读部分是 `iaa`。他的公钥被密码成  `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l`， 他的用户可读部分是 `iap`。 
 
  ## 验证人密钥例子
  
