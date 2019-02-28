@@ -41,7 +41,7 @@ Then, you should edit its `config.toml` file,
 persistent_peers="sentry_node_id@sentry_listen_address:port" 
 ```
 
-If you want to put multiple sentry info, you need to separate the information with `,`. The port is 26656 by default.
+If you want to put multiple sentry info, you need to separate the information with `,`. And the port is 26656 by default.
 
 Set 
 ```
