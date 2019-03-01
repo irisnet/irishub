@@ -1,6 +1,6 @@
 # 哨兵节点及其搭建
 
-为了保证验证人节点的安全性和可用性，我们建议为验证人节点配置2个以上的哨兵节点。使用哨兵节点的好处在于可以有效地防止DoS攻击等其他针对验证人节点的攻击。
+为了保证验证人节点的安全性和可用性，我们建议为验证人节点配置2个以上的哨兵节点。使用哨兵节点的好处在于可以有效地防止DDoS攻击等其他针对验证人节点的攻击。
 
 ## 初始化一个全节点
 
@@ -10,7 +10,7 @@ iris  init --moniker=<your name> --home=<sentry home>
 ```
 `<sentry home>`是你指定的哨兵节点的地址。示例：
 ```
-iris init --moniker="sentry" --home=sentry --home-client=sentry
+iris init --moniker="sentry" --home=sentry
 {
   "chain_id": "test-chain-hfuDmL",
   "node_id": "937efdf8526e3d9e8b5e887fa953ff1645cc096d",
@@ -31,7 +31,7 @@ private_peers_ids="validator_node_id"
 这里的`<validator node id>`可以在验证人节点上使用iriscli status命令获得。经过这样设置之后然后使用
 
 ```
-iris init --home=<sentry home>
+iris start --home=<sentry home>
 ```
 
 启动哨兵节点。对每个哨兵节点都需要进行这些操作。
@@ -41,14 +41,14 @@ iris init --home=<sentry home>
 接下来需要对验证人节点的`<validator home>/config/`目录下的config.toml进行修改：
 
 ```
-persistent_peers="sentry node id@sentry listen address" 
+persistent_peers="sentry node id@sentry listen address:port" 
 ```
 
-这里只写sentry节点的node id和地址，多个哨兵节点的信息使用逗号分开。
+这里只写sentry节点的node id和地址，多个哨兵节点的信息使用逗号分开。port的默认值为26656。
 
 设置`pex=false` 不与其他节点进行peers交换，这样验证人节点就不会连接除persistent_peers之外的节点。
 这里的`<sentry node id>`可以在哨兵节点上使用iriscli status命令获得。修改完成后需要重启验证人节点使修改生效。
 
 ```
-iris  init --home=<validator node home>
+iris start --home=<validator node home>
 ```
