@@ -55,7 +55,7 @@ Your node needs to know how to find more peers. You'll need to add healthy seed 
 
 ```
 6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656
-a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656"
+a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656
 ```
 
 Meanwhile, you could add some known full node as `Persistent Peer`. Your node could connect to `sentry node` as `persistent peers`.
