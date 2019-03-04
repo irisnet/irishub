@@ -228,21 +228,26 @@ func (k Keeper) GetAllValidators(ctx sdk.Context) (validators []types.Validator)
 }
 
 // return a given amount of all the validators
-func (k Keeper) GetValidators(ctx sdk.Context, maxRetrieve uint16) (validators []types.Validator) {
+func (k Keeper) GetValidators(ctx sdk.Context, page uint64, size uint16) (validators []types.Validator) {
+	skip := sdk.GetSkipCount(page, size)
 	store := ctx.KVStore(k.storeKey)
-	validators = make([]types.Validator, maxRetrieve)
+	validators = make([]types.Validator, size)
 
 	iterator := sdk.KVStorePrefixIterator(store, ValidatorsKey)
 	defer iterator.Close()
 
 	i := 0
-	for ; iterator.Valid() && i < int(maxRetrieve); iterator.Next() {
-		addr := iterator.Key()[1:]
-		validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
-		validators[i] = validator
+	j := 0
+	for ; iterator.Valid() && i < int(skip)+int(size); iterator.Next() {
+		if i >= int(skip) {
+			addr := iterator.Key()[1:]
+			validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
+			validators[j] = validator
+			j++
+		}
 		i++
 	}
-	return validators[:i] // trim if the array length < maxRetrieve
+	return validators[:j] // trim if the array length < maxRetrieve
 }
 
 // get the group of the bonded validators

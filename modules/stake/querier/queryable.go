@@ -32,7 +32,7 @@ func NewQuerier(k keep.Keeper, cdc *codec.Codec) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryValidators:
-			return queryValidators(ctx, cdc, k)
+			return queryValidators(ctx, cdc, req, k)
 		case QueryValidator:
 			return queryValidator(ctx, cdc, req, k)
 		case QueryValidatorDelegations:
@@ -98,12 +98,14 @@ func NewQueryDelegatorParams(delegatorAddr sdk.AccAddress) QueryDelegatorParams 
 		DelegatorAddr: delegatorAddr,
 	}
 }
+
 // creates a new QueryValidatorParams
 func NewQueryValidatorParams(validatorAddr sdk.ValAddress) QueryValidatorParams {
 	return QueryValidatorParams{
 		ValidatorAddr: validatorAddr,
 	}
 }
+
 // creates a new QueryBondsParams
 func NewQueryBondsParams(delegatorAddr sdk.AccAddress, validatorAddr sdk.ValAddress) QueryBondsParams {
 	return QueryBondsParams{
@@ -112,11 +114,15 @@ func NewQueryBondsParams(delegatorAddr sdk.AccAddress, validatorAddr sdk.ValAddr
 	}
 }
 
-func queryValidators(ctx sdk.Context, cdc *codec.Codec, k keep.Keeper) (res []byte, err sdk.Error) {
-	stakeParams := k.GetParams(ctx)
-	validators := k.GetValidators(ctx, stakeParams.MaxValidators)
+func queryValidators(ctx sdk.Context, cdc *codec.Codec, req abci.RequestQuery, k keep.Keeper) (res []byte, err sdk.Error) {
+	var params sdk.PaginationParams
+	errRes := cdc.UnmarshalJSON(req.Data, &params)
+	if errRes != nil {
+		return []byte{}, sdk.ErrInvalidPaginationParams("")
+	}
+	validators := k.GetValidators(ctx, params.Page, params.Size)
 
-	res, errRes := codec.MarshalJSONIndent(cdc, validators)
+	res, errRes = codec.MarshalJSONIndent(cdc, validators)
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
 	}
