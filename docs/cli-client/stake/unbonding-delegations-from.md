@@ -16,9 +16,9 @@ iriscli stake unbonding-delegations-from --help
 
 ## Examples
 
-Query all unbonding delegatations from a validator
+Query all unbonding delegatations-from from a validator
 ```
-iriscli stake unbonding-delegations [validator-address]
+iriscli stake unbonding-delegations-from [validator-address]
 ```
 
 After that, you will get unbonding delegation's detailed info from specified validator.

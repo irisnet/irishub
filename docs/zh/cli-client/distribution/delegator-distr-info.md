@@ -19,7 +19,7 @@ iriscli distribution delegator-distr-info --help
 ## 示例
 
 ```
-iriscli distribution delegation-distr-info [delegator address]
+iriscli distribution delegator-distr-info [delegator address]
 ```
 执行结果示例
 ```json
