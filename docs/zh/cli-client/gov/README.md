@@ -31,7 +31,7 @@ iriscli gov --help
 | [query-deposits](query-deposits.md)   | 查询提议的保证金                                                  |
 | [query-tally](query-tally.md)         | 查询提议投票的统计                                                 |
 | [query-params](query-params.md)       | 查询参数提议的配置                                                 |
-| [submit-proposal](submit-proposal.md) | 提交新的提议                           |
+| [submit-proposal](submit-proposal.md) | 提交提议并抵押初始保证金                                  |
 | [deposit](deposit.md)                 | 充值保证金代币以激活提议                                            |
 | [vote](vote.md)                       | 为有效的提议投票，选项：Yes/No/NoWithVeto/Abstain                   |
 
