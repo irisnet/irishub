@@ -26,7 +26,7 @@ iriscli gov query-tally --help
 ### 查询投票统计
 
 ```shell
-iriscli gov query-tally --chain-id=test --proposal-id=1
+iriscli gov query-tally --chain-id=<chain-id> --proposal-id=1
 ```
 
 可以查询指定提议每个投票选项的投票统计。

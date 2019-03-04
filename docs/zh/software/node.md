@@ -2,7 +2,10 @@
 
 ## 介绍
 
-iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris命令并启动守护进程来加入到IRISnet网络。也可以使用该命令在本地启动自己的测试网络，如需加入IRISnet测试网请参阅[get-started](../get-started/README.md)。
+iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris命令并启动守护进程来加入到IRISnet网络。
+
+## 如何安装IRIShub
+请根据以下[教程](How-to-install-irishub.md)完成安装。
 
 ## 如何在本地启动一个IRISnet网络
 
@@ -15,7 +18,7 @@ iriscli keys add {account_name}
 得到账户信息，包括账户地址、公钥地址、助记词
 ```
 NAME:	TYPE:	ADDRESS:						PUBKEY:
-account_name	local	faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju	fap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd5kpsyzu
+account_name	local	iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp	iap1addwnpepqdne60eyssj2plrsusd8049cs5hhhl5alcxv2xu0xmzlhphy9lyd56h6rm0
 **Important** write this seed phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
@@ -38,14 +41,14 @@ iris gentx --name={account_name} --home={path_to_your_home}
 
 使用下面命令修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
 ```bash
-iris add-genesis-account faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju 150iris
+iris add-genesis-account iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp 150iris
 ```
 
 ```json
     {
       "accounts": [
         {
-          "address": "faa13t6jugwm5uu3h835s5d4zggkklz6rpns59keju",
+          "address": "iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp",
           "coins": ["150iris"],
           "sequence_number": "0",
           "account_number": "0"

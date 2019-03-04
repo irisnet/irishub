@@ -408,6 +408,7 @@ func (k Keeper) Delegate(ctx sdk.Context, delAddr sdk.AccAddress, bondAmt sdk.Co
 
 	if subtractAccount {
 		// Account new shares, save
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, delAddr.String(), validator.OperatorAddr.String(),  bondAmt.String(), sdk.DelegationFlow, "")
 		_, _, err = k.bankKeeper.SubtractCoins(ctx, delegation.DelegatorAddr, sdk.Coins{bondAmt})
 		if err != nil {
 			return
@@ -537,6 +538,9 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 
 	// no need to create the ubd object just complete now
 	if completeNow {
+		if !balance.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), delAddr.String(),  balance.String(), sdk.UndelegationFlow, ctx.CoinFlowTrigger())
+		}
 		_, _, err := k.bankKeeper.AddCoins(ctx, delAddr, sdk.Coins{balance})
 		if err != nil {
 			return types.UnbondingDelegation{}, err
@@ -545,6 +549,7 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	}
 
 	ubd := types.UnbondingDelegation{
+		TxHash:         ctx.CoinFlowTrigger(), //tx hash
 		DelegatorAddr:  delAddr,
 		ValidatorAddr:  valAddr,
 		CreationHeight: height,
@@ -566,7 +571,9 @@ func (k Keeper) CompleteUnbonding(ctx sdk.Context, delAddr sdk.AccAddress, valAd
 	if !found {
 		return types.ErrNoUnbondingDelegation(k.Codespace())
 	}
-
+	if !ubd.Balance.IsZero() {
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), ubd.DelegatorAddr.String(),  ubd.Balance.String(), sdk.UndelegationFlow, ubd.TxHash)
+	}
 	_, _, err := k.bankKeeper.AddCoins(ctx, ubd.DelegatorAddr, sdk.Coins{ubd.Balance})
 	if err != nil {
 		return err

@@ -29,14 +29,14 @@ or
 ### Get block at height 114263
 
 ```shell
-iriscli tendermint block 114263  --chain-id=irishub-test --trust-node=true
+iriscli tendermint block 114263  --chain-id=<chain-id> --trust-node=true
 
 ```
 
 ### Get the latest block
 
 ```shell
-iriscli tendermint block  --chain-id=irishub-test --trust-node=true
+iriscli tendermint block  --chain-id=<chain-id> --trust-node=true
 
 ```
 

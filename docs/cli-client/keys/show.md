@@ -32,7 +32,7 @@ You'll get the local public keys with 'address' and 'pubkey' element of a given 
 
 ```txt
 NAME:	TYPE:	ADDRESS:						            PUBKEY:
-MyKey	local	faa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zakl7lxn5	fap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskww57lw
+MyKey	local	iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zak83e7nf	iap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskzc7exa
 ```
 
 ### Show Validator Operator Address
@@ -47,7 +47,7 @@ iriscli keys show alice --bech val
 Then you could see the following:
 ```$xslt
 NAME: TYPE: ADDRESS: PUBKEY:
-alice local fva12nda6xwpmp000jghyneazh4kkgl2tnzy73dmzy fvp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqh3zvz9
+alice local iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
 ```
 
 The result could be use for `--address-validator` in [create a delegation](../stake/delegate.md)

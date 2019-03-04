@@ -27,8 +27,6 @@ import (
 const (
 	defaultAmount                  = "100" + stakeTypes.StakeTokenName
 	defaultCommissionRate          = "0.1"
-	defaultCommissionMaxRate       = "0.2"
-	defaultCommissionMaxChangeRate = "0.01"
 )
 
 // GenTxCmd builds the iris gentx command.
@@ -44,9 +42,7 @@ following delegation and commission default parameters:
 
 	delegation amount:           %s
 	commission rate:             %s
-	commission max rate:         %s
-	commission max change rate:  %s
-`, defaultAmount, defaultCommissionRate, defaultCommissionMaxRate, defaultCommissionMaxChangeRate),
+`, defaultAmount, defaultCommissionRate),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			config := ctx.Config
@@ -129,12 +125,6 @@ func prepareFlagsForTxCreateValidator(config *cfg.Config, nodeID, ip, chainID st
 	}
 	if viper.GetString(stakecmd.FlagCommissionRate) == "" {
 		viper.Set(stakecmd.FlagCommissionRate, defaultCommissionRate)
-	}
-	if viper.GetString(stakecmd.FlagCommissionMaxRate) == "" {
-		viper.Set(stakecmd.FlagCommissionMaxRate, defaultCommissionMaxRate)
-	}
-	if viper.GetString(stakecmd.FlagCommissionMaxChangeRate) == "" {
-		viper.Set(stakecmd.FlagCommissionMaxChangeRate, defaultCommissionMaxChangeRate)
 	}
 }
 

@@ -21,7 +21,7 @@ iriscli service refund-deposit [flags]
 
 ### Refund all deposit from an unavailable service binding
 ```shell
-iriscli service refund-deposit --chain-id=test  --from=node0 --fee=0.4iris --def-chain-id=test --service-name=test-service
+iriscli service refund-deposit --chain-id=<chain-id>  --from=node0 --fee=0.3iris --def-chain-id=<chain-id> --service-name=test-service
 ```
 
 After that, you're done with refunding all deposit from a service binding.

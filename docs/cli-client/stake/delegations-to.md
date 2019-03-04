@@ -18,7 +18,7 @@ iriscli stake delegations-to --help
 
 Query all delegations to one validator
 ```
-iriscli stake delegations-to fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2
+iriscli stake delegations-to iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh
 ```
 
 After that, you will get all detailed info of delegations from the specified delegator address.
@@ -26,8 +26,8 @@ After that, you will get all detailed info of delegations from the specified del
 ```json
 [
   {
-    "delegator_addr": "faa13lcwnxpyn2ea3skzmek64vvnp97jsk8qmhl6vx",
-    "validator_addr": "fva1yclscskdtqu9rgufgws293wxp3njsesx7s40m2",
+    "delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm",
+    "validator_addr": "iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh",
     "shares": "0.2000000000",
     "height": "290"
   }

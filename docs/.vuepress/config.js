@@ -28,15 +28,19 @@ module.exports = {
                 sidebar: {
                     '/software/': [
                         ['node.md', 'Node'],
+                        ['How-to-install-Irishub.md', 'Install'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
                         ['tool.md', 'Tool'],
-                        ['monitor.md', 'Monitor']
+                        ['monitor.md', 'Monitor'],
+                        ['ledger.md', 'Ledger'],
+                        ['kms/kms.md', 'Kms']
                     ],
                     '/get-started/': [
                         ['Download-Rainbow.md', 'Download Rainbow'],
                         ['Install-the-Software.md', 'Install the Software'],
-                        ['Join-the-Testnet.md', 'Join the Testnet']
+                        ['Join-the-Testnet.md', 'Use the Testnet'],
+                        ['Join-the-Mainnet.md', 'Join the Mainnet']
                     ],
                     '/features/': [{
                         title: 'Basic Concepts',
@@ -149,15 +153,20 @@ module.exports = {
                 sidebar: {
                     '/zh/software/': [
                         ['node.md', 'Node'],
+                        ['How-to-install-irishub.md', 'Install'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
                         ['tool.md', 'Tool'],
-                        ['monitor.md', 'Monitor']
+                        ['monitor.md', 'Monitor'],
+                        ['ledger.md', 'Ledger'],
+                        ['kms/kms.md', 'Kms']
                     ],
                     '/zh/get-started/': [
                         ['Download-Rainbow.md', 'Download Rainbow'],
                         ['Install-the-Software.md', 'Install the Software'],
-                        ['Join-the-Testnet.md', 'Join the Testnet']
+                        ['Join-the-Testnet.md', 'Use the Testnet'],
+                        ['Join-the-Mainnet.md', 'Join the Mainnet']
+
                     ],
                     '/zh/features/': [{
                         title: 'Basic Concepts',

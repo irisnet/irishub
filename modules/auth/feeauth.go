@@ -79,10 +79,9 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		}
 
 		unusedGas := txResult.GasWanted - txResult.GasUsed
-		refundCoin := sdk.Coin{
-			Denom:  totalNativeFee.Denom,
-			Amount: totalNativeFee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))),
-		}
+		refundCoin := sdk.NewCoin(totalNativeFee.Denom,
+			totalNativeFee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))))
+
 		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
 		err = firstAccount.SetCoins(coins.Plus(sdk.Coins{refundCoin}))
 		if err != nil {
@@ -92,10 +91,7 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		am.SetAccount(ctx, firstAccount)
 		fk.RefundCollectedFees(ctx, sdk.Coins{refundCoin})
 
-		actualCostFee = sdk.Coin{
-			Denom:  totalNativeFee.Denom,
-			Amount: totalNativeFee.Amount.Sub(refundCoin.Amount),
-		}
+		actualCostFee = sdk.NewCoin(totalNativeFee.Denom, totalNativeFee.Amount.Sub(refundCoin.Amount))
 		return actualCostFee, nil
 	}
 }
@@ -105,18 +101,12 @@ func (fa FeeAuth) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
 	for _, coin := range coins {
 		if coin.Denom == nativeFeeToken {
 			if coin.Amount.BigInt() == nil {
-				return sdk.Coin{
-					Denom:  coin.Denom,
-					Amount: sdk.ZeroInt(),
-				}
+				return sdk.NewCoin(coin.Denom, sdk.ZeroInt())
 			}
 			return coin
 		}
 	}
-	return sdk.Coin{
-		Denom:  "",
-		Amount: sdk.ZeroInt(),
-	}
+	return sdk.NewCoin("", sdk.ZeroInt())
 }
 
 func (fa FeeAuth) feePreprocess(ctx sdk.Context, params Params, coins sdk.Coins, gasLimit uint64) sdk.Error {

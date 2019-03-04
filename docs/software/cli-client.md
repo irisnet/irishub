@@ -19,7 +19,7 @@ The `iriscli config` command interactively configures some default parameters, s
 
 ## Fee and Gas
 
-`iriscli` can send a transaction with the fee specified by `--fee` and gas(the default is 200000) specified by `--gas` . The gas divided by the fee is gas price, and the gas price can't be less than the minimum value set by the blockchain. The remaining fees after the completion of the entire transaction will be returned to the user. You can set `--gas="simulate"`, which can estimate the gas consumed by the transaction through the simulation run, and multiply the coefficient specified by `--gas-adjustment` to get the final gas as the transaction gas. Finally, the transaction will be broadcast.
+`iriscli` can send a transaction with the fee specified by `--fee` and gas(the default is 200000) specified by `--gas` . The fee divided by the gas is gas price, and the gas price can't be less than the minimum value set by the blockchain. The remaining fees after the completion of the entire transaction will be returned to the user. You can set `--gas="simulate"`, which can estimate the gas consumed by the transaction through the simulation run, and multiply the coefficient specified by `--gas-adjustment` to get the final gas as the transaction gas. Finally, the transaction will be broadcast.
 
 ## Dry-run Mode
 
@@ -28,7 +28,7 @@ The `iriscli config` command interactively configures some default parameters, s
 Example: Send a command using dry-run mode
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000 --dry-run
+iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --dry-run
 ```
 
 Print：
@@ -49,7 +49,7 @@ The transaction sent by iriscli defaults to synchronous mode. Synchronous mode r
 Example: Enable generate-only to generate unsigned transactions
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=gov-test --fee=0.05iris --gas=200000 --generate-only
+iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --generate-only
 ```
 
 Print：
@@ -65,7 +65,7 @@ Print：
           "title": "ABC",
           "description": "test",
           "proposal_type": "Text",
-          "proposer": "faa1k47r0nxd6ec8n6sc6tzvk2053u4eff0vx99755",
+          "proposer": "iaa1k47r0nxd6ec8n6sc6tzvk2053u4eff0v72rx5f",
           "initial_deposit": [
             {
               "denom": "iris-atto",

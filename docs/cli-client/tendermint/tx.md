@@ -25,7 +25,7 @@ iriscli tendermint tx [hash] [flags]
 ### tx
 
 ```shell
-iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=irishub-test --trust-node=true
+iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=<chain-id> --trust-node=true
 ```
 
 You will get the following result.
@@ -43,7 +43,7 @@ You will get the following result.
           "value": {
             "inputs": [
               {
-                "address": "faa1c6al0vufl8efggzsvw34hszua9pr4qqyry37jn",
+                "address": "iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw",
                 "coins": [
                   {
                     "denom": "iris-atto",
@@ -54,7 +54,7 @@ You will get the following result.
             ],
             "outputs": [
               {
-                "address": "faa1v2ezk7yvkgjq87ey54etfuxc87353ulrvq28z9",
+                "address": "iaa1v2ezk7yvkgjq87ey54etfuxc87353ulr50vlzc",
                 "coins": [
                   {
                     "denom": "iris-atto",

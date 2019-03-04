@@ -240,30 +240,30 @@ func DefaultParams() GovParams {
 		return GovParams{
 			CriticalDepositPeriod: time.Duration(sdk.Day),
 			CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
-			CriticalVotingPeriod:  time.Duration(sdk.ThreeDays),
+			CriticalVotingPeriod:  time.Duration(sdk.FiveDays),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
 			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
-			CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
-			ImportantVotingPeriod:  time.Duration(sdk.SixtyHours),
+			ImportantVotingPeriod:  time.Duration(sdk.FiveDays),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
 			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
-			ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
-			NormalVotingPeriod:  time.Duration(sdk.TwoDays),
+			NormalVotingPeriod:  time.Duration(sdk.FiveDays),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
 			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 			NormalVeto:          sdk.NewDecWithPrec(334, 3),
 			NormalParticipation: sdk.NewDecWithPrec(75, 2),
-			NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    20000,
 		}
 	} else {
@@ -275,7 +275,7 @@ func DefaultParams() GovParams {
 			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
-			CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
@@ -284,7 +284,7 @@ func DefaultParams() GovParams {
 			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
-			ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
@@ -293,7 +293,7 @@ func DefaultParams() GovParams {
 			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 			NormalVeto:          sdk.NewDecWithPrec(334, 3),
 			NormalParticipation: sdk.NewDecWithPrec(75, 2),
-			NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    60,
 		}
 	}
@@ -312,7 +312,7 @@ func DefaultParamsForTest() GovParams {
 		CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
 		CriticalVeto:          sdk.NewDecWithPrec(334, 3),
 		CriticalParticipation: sdk.NewDecWithPrec(875, 3),
-		CriticalPenalty:       sdk.NewDecWithPrec(9, 4),
+		CriticalPenalty:       sdk.ZeroDec(),
 
 		ImportantDepositPeriod: time.Duration(30 * time.Second),
 		ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
@@ -321,7 +321,7 @@ func DefaultParamsForTest() GovParams {
 		ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
 		ImportantVeto:          sdk.NewDecWithPrec(334, 3),
 		ImportantParticipation: sdk.NewDecWithPrec(834, 3),
-		ImportantPenalty:       sdk.NewDecWithPrec(7, 4),
+		ImportantPenalty:       sdk.ZeroDec(),
 
 		NormalDepositPeriod: time.Duration(30 * time.Second),
 		NormalMinDeposit:    sdk.Coins{normalMinDeposit},
@@ -330,7 +330,7 @@ func DefaultParamsForTest() GovParams {
 		NormalThreshold:     sdk.NewDecWithPrec(667, 3),
 		NormalVeto:          sdk.NewDecWithPrec(334, 3),
 		NormalParticipation: sdk.NewDecWithPrec(75, 2),
-		NormalPenalty:       sdk.NewDecWithPrec(5, 4),
+		NormalPenalty:       sdk.ZeroDec(),
 		SystemHaltPeriod:    60,
 	}
 }
@@ -466,24 +466,24 @@ func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 }
 
 func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
-	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and %s", vp.VotingPeriod.String(), sdk.ThreeDays.String()))
+	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.Week {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and 1 week", vp.VotingPeriod.String()))
 	}
 	return nil
 }
 
 func validateTallyingProcedure(tp TallyingProcedure, level string) sdk.Error {
 	if tp.Threshold.LTE(sdk.ZeroDec()) || tp.Threshold.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be (0,1)"))
 	}
 	if tp.Participation.LTE(sdk.ZeroDec()) || tp.Participation.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be (0,1)"))
 	}
 	if tp.Veto.LTE(sdk.ZeroDec()) || tp.Veto.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be between 0 and 1"))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be (0,1)"))
 	}
-	if tp.Penalty.LTE(sdk.ZeroDec()) || tp.Penalty.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be between 0 and 1"))
+	if tp.Penalty.LT(sdk.ZeroDec()) || tp.Penalty.GTE(sdk.NewDec(1)) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be [0,1)"))
 	}
 	return nil
 }

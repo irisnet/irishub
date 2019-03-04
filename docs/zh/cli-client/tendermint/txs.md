@@ -27,7 +27,7 @@ iriscli tendermint txs [flags]
 ### 查询交易
 
 ```shell
-iriscli tendermint txs --tags `action=send&sender=faa1c6al0vufl8efggzsvw34hszua9pr4qqyry37jn` --chain-id=irishub-test --trust-node=true
+iriscli tendermint txs --tags `action=send&sender=iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node=true
 ```
 
 示例结果：
@@ -45,7 +45,7 @@ iriscli tendermint txs --tags `action=send&sender=faa1c6al0vufl8efggzsvw34hszua9
           "value": {
             "inputs": [
               {
-                "address": "faa1c6al0vufl8efggzsvw34hszua9pr4qqyry37jn",
+                "address": "iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw",
                 "coins": [
                   {
                     "denom": "iris-atto",
@@ -56,7 +56,7 @@ iriscli tendermint txs --tags `action=send&sender=faa1c6al0vufl8efggzsvw34hszua9
             ],
             "outputs": [
               {
-                "address": "faa1v2ezk7yvkgjq87ey54etfuxc87353ulrvq28z9",
+                "address": "iaa1v2ezk7yvkgjq87ey54etfuxc87353ulr50vlzc",
                 "coins": [
                   {
                     "denom": "iris-atto",

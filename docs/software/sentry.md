@@ -38,10 +38,10 @@ On the validator node's side, you also need to get fully initialized first, and 
 Then, you should edit its `config.toml` file,
 
 ```
-persistent_peers="sentry_node_id@sentry_listen_address" 
+persistent_peers="sentry_node_id@sentry_listen_address:port" 
 ```
 
-If you want to put multiple sentry info, you need to separate the information with `,`
+If you want to put multiple sentry info, you need to separate the information with `,`. And the port is 26656 by default.
 
 Set 
 ```
@@ -52,7 +52,7 @@ In this way, the validator node will diable its peer reactor, so it will not res
 Then you could start your validator node,
 
 ```
-iris  start --home=sentry_home
+iris  start --home=validator_home
 ```
 
 It's also recommanded to enable the firewall of validator node.  

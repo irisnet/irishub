@@ -1,19 +1,18 @@
 package rpc
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
 	"strconv"
 
-	"github.com/spf13/cobra"
-
-	"bytes"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
-	tmtypes "github.com/tendermint/tendermint/types"
-	"net/http"
 	"github.com/irisnet/irishub/client/utils"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/spf13/cobra"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // TODO these next two functions feel kinda hacky based on their placement
@@ -21,12 +20,13 @@ import (
 //ValidatorCommand returns the validator set for a given height
 func ValidatorCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "validator-set [height]",
-		Short: "Get the full tendermint validator set at given height",
+		Use:     "validator-set [height]",
+		Short:   "Get the full tendermint validator set at given height",
 		Example: "iriscli tendermint validator-set",
-		Args:  cobra.MaximumNArgs(1),
-		RunE:  printValidators,
+		Args:    cobra.MaximumNArgs(1),
+		RunE:    printValidators,
 	}
+	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")
@@ -35,10 +35,10 @@ func ValidatorCommand() *cobra.Command {
 
 // Validator output in bech32 format
 type ValidatorOutput struct {
-	Address          sdk.ValAddress `json:"address"` // in bech32
-	PubKey           string         `json:"pub_key"` // in bech32
-	ProposerPriority int64          `json:"proposer_priority"`
-	VotingPower      int64          `json:"voting_power"`
+	Address          sdk.ConsAddress `json:"address"` // in bech32
+	PubKey           string          `json:"pub_key"` // in bech32
+	ProposerPriority int64           `json:"proposer_priority"`
+	VotingPower      int64           `json:"voting_power"`
 }
 
 // Validators at a certain height output in bech32 format
@@ -48,13 +48,13 @@ type ResultValidatorsOutput struct {
 }
 
 func bech32ValidatorOutput(validator *tmtypes.Validator) (ValidatorOutput, error) {
-	bechValPubkey, err := sdk.Bech32ifyValPub(validator.PubKey)
+	bechValPubkey, err := sdk.Bech32ifyConsPub(validator.PubKey)
 	if err != nil {
 		return ValidatorOutput{}, err
 	}
 
 	return ValidatorOutput{
-		Address:          sdk.ValAddress(validator.Address),
+		Address:          sdk.ConsAddress(validator.Address),
 		PubKey:           bechValPubkey,
 		ProposerPriority: validator.ProposerPriority,
 		VotingPower:      validator.VotingPower,

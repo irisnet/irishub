@@ -22,7 +22,7 @@ iriscli service respond [flags]
 
 ### 响应一个服务调用 
 ```shell
-iriscli service respond --chain-id=test --from=node0 --fee=0.4iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
+iriscli service respond --chain-id=<chain-id> --from=node0 --fee=0.3iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
 ```
 
 运行成功以后，返回的结果如下:
@@ -39,8 +39,8 @@ Committed at block 71 (tx hash: C02BC5F4D6E74ED13D8D5A31F040B0FED0D3805AF1C54654
    "codespace": "",
    "tags": {
      "action": "service_respond",
-     "consumer": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
-     "provider": "faa1x25y3ltr4jvp89upymegvfx7n0uduz5kmh5xuz",
+     "consumer": "iaa1x25y3ltr4jvp89upymegvfx7n0uduz5krcj7ul",
+     "provider": "iaa1x25y3ltr4jvp89upymegvfx7n0uduz5krcj7ul",
      "request-id": "78-68-0"
    }
  })
