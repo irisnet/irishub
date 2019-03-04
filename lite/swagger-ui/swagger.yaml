@@ -1413,7 +1413,20 @@ paths:
           description: Invalid delegator address or validator address
         '500':
           description: Internal Server Error
-  /stake/validators:
+  /stake/validators/{page}/{size}:
+    parameters:
+      - in: path
+        name: page
+        description: page
+        required: false
+        schema:
+          type: integer
+      - in: path
+        name: size
+        description: size
+        required: false
+        schema:
+          type: integer
     get:
       summary: Get all validator candidates
       tags:
