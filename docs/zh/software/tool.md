@@ -26,4 +26,8 @@ iristool debug pubkey 4D94D09DFA8EB22F3D49EA17567230FAD9C5267AF85FCA950B453C02C1
 ```bash
 iristool debug tx [hex or base64 transaction]
 ```
+* 查询 addr
 
+```bash
+iristool debug addr faa1lcuw6ewd2gfxap37sejewmta205sgssmv5fnju
+```

@@ -18,7 +18,7 @@ On the sentry node's side, you need to get fully initialized first.
 Then, you should edit its `config.toml` file, and change `private_peers_id` field：
 
 ```
-private_peers_ids="validator_node_id"
+private_peer_ids ="validator_node_id"
 ```
 
 `validator node id` is the `node-id` of validator node. 

@@ -28,7 +28,7 @@ The `iriscli config` command interactively configures some default parameters, s
 Example: Send a command using dry-run mode
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --dry-run
+iriscli gov submit-proposal --chain-id=<chain-id> --from=x --fee=0.3iris --description=t --title=t --usage="Burn" --percent=0.0000000001 --type="TxTaxUsage" --deposit=1000iris --dry-run
 ```
 
 Print：
@@ -49,7 +49,7 @@ The transaction sent by iriscli defaults to synchronous mode. Synchronous mode r
 Example: Enable generate-only to generate unsigned transactions
 
 ```
-iriscli gov submit-proposal --title="ABC" --description="test" --type=Text --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --generate-only
+iriscli gov submit-proposal --chain-id=<chain-id> --from=x --fee=0.3iris --description=t --title=t --usage="Burn" --percent=0.0000000001 --type="TxTaxUsage" --deposit=1000iris --generate-only
 ```
 
 Print：
