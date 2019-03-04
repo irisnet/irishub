@@ -317,9 +317,7 @@ func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 	}
 }
 
-func ConvertPaginationParams(vars map[string]string) (paginationParams sdk.PaginationParams, err error) {
-	pageString := vars["page"]
-	sizeString := vars["size"]
+func ConvertPaginationParams(pageString, sizeString string) (paginationParams sdk.PaginationParams, err error) {
 	page := uint64(0)
 	size := uint16(100)
 	if pageString != "" {

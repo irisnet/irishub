@@ -68,7 +68,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// Get all validators
 	r.HandleFunc(
-		"/stake/validators/{page}/{size}",
+		"/stake/validators",
 		validatorsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -214,8 +214,14 @@ func delegatorValidatorHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) ht
 // HTTP request handler to query list of validators
 func validatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		params, err := ConvertPaginationParams(vars)
+		err := r.ParseForm()
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, sdk.AppendMsgToErr("could not parse query parameters", err.Error()))
+			return
+		}
+		pageStr := r.FormValue("page")
+		sizeStr := r.FormValue("size")
+		params, err := ConvertPaginationParams(pageStr, sizeStr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
