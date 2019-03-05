@@ -48,7 +48,8 @@ const (
 	CodeInvalidTxFee      CodeType = 19
 	CodeInvalidFeeDenom   CodeType = 20
 	CodeExceedsTxSize     CodeType = 21
-    CodeServiceTxLimit    CodeType = 22
+	CodeServiceTxLimit    CodeType = 22
+	CodePaginationParams  CodeType = 23
 	// CodespaceRoot is a codespace for error codes in this file only.
 	// Notice that 0 is an "unset" codespace, which can be overridden with
 	// Error.WithDefaultCodespace().
@@ -181,6 +182,9 @@ func ErrServiceTxLimit(msg string) Error {
 func ErrInvalidLength(codespace CodespaceType, codeType CodeType, descriptor string, got, max int) Error {
 	msg := fmt.Sprintf("bad length for %v, got length %v, max is %v", descriptor, got, max)
 	return NewError(codespace, codeType, msg)
+}
+func ErrInvalidPaginationParams(msg string) Error {
+	return newErrorWithRootCodespace(CodePaginationParams, msg)
 }
 
 //----------------------------------------

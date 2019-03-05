@@ -1415,9 +1415,20 @@ paths:
           description: Internal Server Error
   /stake/validators:
     get:
-      summary: Get all validator candidates
+      summary: Get validators
       tags:
         - ICS21
+      parameters:
+        - in: query
+          name: page
+          description: 'Pagination page, default value 1'
+          schema:
+            type: integer
+        - in: query
+          name: size
+          description: 'Pagination size, default value 100'
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
