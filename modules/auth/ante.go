@@ -248,7 +248,7 @@ func deductFees(acc Account, fee StdFee) (Account, sdk.Result) {
 	}
 	newCoins, ok := coins.SafeMinus(feeAmount)
 	if ok {
-		errMsg := fmt.Sprintf("account balance (%s) is less than %s", coins, feeAmount)
+		errMsg := fmt.Sprintf("%s is less than %s", coins, feeAmount)
 		return nil, sdk.ErrInsufficientFunds(errMsg).Result()
 	}
 	err := acc.SetCoins(newCoins)
