@@ -27,5 +27,4 @@ iriscli stake parameters
 Params
 Unbonding Time: 10m0s
 Max Validators: 100:
-Bonded Coin Denomination: iris-atto
 ```

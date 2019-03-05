@@ -25,7 +25,7 @@ iris init --moniker="sentry" --home=sentry
 
 然后将验证人节点中的genesis.json文件复制到 `<sentry home>/config/`目录下。接下来对`<sentry home>/config/`目录下的config.toml进行编辑。需要进行如下修改：
 ```
-private_peers_ids="validator_node_id"
+private_peer_ids ="validator_node_id"
 ```
 
 这里的`<validator node id>`可以在验证人节点上使用iriscli status命令获得。经过这样设置之后然后使用

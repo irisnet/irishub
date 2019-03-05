@@ -2,7 +2,7 @@
 
 ## 描述
 
-基于验证者地址的所有unbonding-delegation记录查询
+基于验证者地址的所有unbonding-delegation-from记录查询
 
 ## 用法
 
@@ -16,9 +16,9 @@ iriscli stake unbonding-delegations-from --help
 
 ## 示例
 
-基于验证者地址的所有unbonding-delegation记录查询
+基于验证者地址的所有unbonding-delegation-from记录查询
 ```
-iriscli stake unbonding-delegations [validator-address]
+iriscli stake unbonding-delegations-from [validator-address]
 ```
 
 运行成功以后，返回的结果如下：

@@ -62,6 +62,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     5. `PUT /keys/{name}`: 更新秘钥的密码
     6. `DELETE /keys/{name}`: 删除秘钥
     7. `GET /auth/accounts/{address}`: 查询秘钥对象账户的信息
+    8. `POST /keys/{name}/recover`: 通过seed恢复一个账户
 
 3. 创建、签名和广播交易的APIs
 
