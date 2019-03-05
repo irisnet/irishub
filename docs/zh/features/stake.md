@@ -108,7 +108,7 @@
 
 	解绑一半的token
 	```
-	iriscli stake unbond --address-validator={address-validator} --chain-id={chain-id} --from=<key name> --fee=0.3iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator={address-validator} --chain-id={chain-id} --from=<key name> --fee=0.3iris  --share-percent=0.5
 	```
 
 8. 转委托

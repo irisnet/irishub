@@ -26,12 +26,18 @@ genesis文件中定义了区块链网络的初始状态，而config.toml指定�
 
 ```
 cd $IRISHOME/config/
+rm genesis.json
+rm config.toml
+wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/betanet/master/config/config.toml
 ```
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：
 * 将`moniker`字段配置称为自定义的名称，这样便于区分不同的节点
 * `seed`字段用语设置种子节点，在irishub mainnet中的官方种子节点为：
 ```
+6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656
+a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656
 ```
 
 你也可以配置 `moniker` 和 `external_address` 字段. 

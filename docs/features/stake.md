@@ -108,7 +108,7 @@ This specification briefly introduces the functionality of stake module and what
 
 	Unbond half of total bonded token on a given validator
 	```
-	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris --share-percent=0.5
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --share-percent=0.5
 	```
 
 8. Redelegate tokens to another validator

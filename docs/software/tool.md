@@ -26,3 +26,9 @@ Pass in a hex/base64 tx and get back the full JSON
 ```bash
 iristool debug tx [hex or base64 transaction]
 ```
+
+* addr
+
+```bash
+iristool debug addr faa1lcuw6ewd2gfxap37sejewmta205sgssmv5fnju
+```

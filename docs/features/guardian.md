@@ -16,7 +16,12 @@ IRISnet introduce two types of privileged system user controlled by foundations,
 
     Only a profiler can add a new one.
     ```shell
-    iriscli guardian add-profiler --profiler-address=[profiler address] --profiler-name=[name] --chain-id=[chain-id] --from=[key name] --fee=0.3iris 
+    iriscli guardian add-profiler --address=[profiler address] --description=[name] --chain-id=[chain-id] --from=[key name] --fee=0.4iris 
+    ```
+    
+    Add trustee
+    ```shell
+    iriscli guardian add-trustee --chain-id=[chain-id] --from=[key name] --fee=0.4iris  --address=[trustee address] --description=[name]
     ```
     
 2. Query profiler and trustee list
@@ -36,7 +41,7 @@ IRISnet introduce two types of privileged system user controlled by foundations,
 
 4. Profiler Invocate a service by profiling mode
     ```shell
-    iriscli service call --def-chain-id=[def-chain-id] --service-name=[service-name] --method-id=[method-id] --bind-chain-id=[bind-chain-id] --provider=[provider address] --service-fee=1iris --request-data=[request-data] --chain-id=[chain-id] --from=[key name] --fee=0.3iris
+    iriscli service call --def-chain-id=[def-chain-id] --service-name=[service-name] --method-id=[method-id] --bind-chain-id=[bind-chain-id] --provider=[provider address] --service-fee=1iris --request-data=[request-data] --chain-id=[chain-id] --from=[key name] --fee=0.3iris --profiling=true
     ```
     
 5. Trustee to be the destination address of `TxTaxUsage` proposal
@@ -46,4 +51,16 @@ IRISnet introduce two types of privileged system user controlled by foundations,
 6. Trustee withdraw service fee tax
     ```shell
     iriscli service withdraw-tax --dest-address=[destination address] --withdraw-amount=1iris --chain-id=<chain-id> --from=[key name] --fee=0.3iris 
+    ```
+    
+7. delete profiler and trustee
+
+    Delete profiler：
+    ```shell
+    iriscli guardian delete-profiler --chain-id=[chain-id] --from=[key name] --fee=0.4iris --address=[profiler address]
+    ```
+    
+    Delete trustee：
+    ```shell
+    iriscli guardian delete-trustee --chain-id=[chain-id] --from=[key name] --fee=0.4iris --address=[trustee address]
     ```

@@ -11,7 +11,7 @@ The currently supported IDL language is [protobuf](https://developers.google.com
 5. Service Analysis (TODO)
 
 ### System parameters
-The following parameters can be modified by governance(./governance.md)
+The following parameters can be modified by governance(governance.md)
 
 * `MinDepositMultiple`    a multiple of the minimum deposit amount of service binding
 * `MaxRequestTimeout`     maximum number of waiting blocks for service invocation

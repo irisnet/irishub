@@ -11,7 +11,7 @@ IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式
 5. 服务分析 (TODO)
 
 ### 系统参数
-以下参数均可通过governance(./governance.md)修改
+以下参数均可通过governance(governance.md)修改
 
 * `MinDepositMultiple`    服务绑定最小抵押金额的倍数
 * `MaxRequestTimeout`     服务调用最大等待区块个数

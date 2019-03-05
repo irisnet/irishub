@@ -62,6 +62,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     5. `PUT /keys/{name}`: Update the password for this account in the KMS
     6. `DELETE /keys/{name}`: Remove an account
     7. `GET /auth/accounts/{address}`: Get the account information on blockchain
+    8. `POST /keys/{name}/recover`: Recover a account from a seed
 
 3. Create, sign and broadcast transactions
 

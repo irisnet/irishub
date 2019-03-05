@@ -8,11 +8,8 @@ As the centerpiece of IRISnet, IRIS Hub (a.k.a. IRIShub) will be the first regio
 
 ## Fuxi Testnet
 
-To join the Fuxi testnet, follow 
-[this guide](./docs/get-started/README.md).
-
-For status updates and genesis files, see the
-[testnets repo](https://github.com/irisnet/testnets).
+To use Fuxi testnet for testing LCD/iriscli, follow 
+[this guide](./docs/get-started/Join-the-Testnet.md).
 
 ## Install
 

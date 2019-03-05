@@ -19,31 +19,31 @@ In this section, we will configure a KMS to use YubiHSM.
 
 You can find other configuration examples [here](https://github.com/irisnet/kms/blob/master/tmkms.toml.example)
 
-- Create a `~/.tmkms/tmkms.toml` file with the following content:
+- Create a `tmkms.toml` file with the following content:
 
 ```toml
 # Example KMS configuration file
 [[validator]]
 addr = "tcp://localhost:26658"    # or "unix:///path/to/socket"
-chain_id = "fuxi"
+chain_id = "irishub"
 reconnect = true # true is the default
-secret_key = "~/.tmkms/secret_connection.key"
+secret_key = "secret_connection.key"
 [[providers.yubihsm]]
 adapter = { type = "usb" }
 auth = { key = 1, password = "password" } # Default YubiHSM admin credentials. Change ASAP!
-keys = [{ id = "test", key = 1 }]
+keys = [{ id = "irishub", key = 1 }]
 #serial_number = "0123456789" # identify serial number of a specific YubiHSM to connect to
 ```
 
 - Edit `addr` to point to your `iris` instance.
-- Adjust `chain-id` to match your `.iris/config/config.toml` settings.
+- Adjust `chain-id` to match your `~/.iris/config/config.toml` settings.
 - Edit `auth` to authorize access to your yubihsm.
 - Edit `keys` to determine which pubkey you will be using. [How to import key?](#import-private-key))
 
-#### Import private key to yubihsm
+#### Import private key
 
 ```bash
-tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [id]
+tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [key-id]
 ```
 
 #### Generate connection secret key
@@ -51,7 +51,7 @@ tmkms yubihsm keys import  -p ~/.iris/config/priv_validator.json [id]
 Now you need to generate secret_key:
 
 ```bash
-tmkms keygen ~/.tmkms/secret_connection.key
+tmkms keygen secret_connection.key
 ```
 
 #### Start the KMS
@@ -61,7 +61,7 @@ The last step is to retrieve the validator key that you will use in `iris`.
 Start the KMS:
 
 ```bash
-tmkms start -c ~/.tmkms/tmkms.toml
+tmkms start
 ```
 
 The output should look similar to:
