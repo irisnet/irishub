@@ -382,6 +382,11 @@ func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.It
 	return sdk.KVStorePrefixIterator(store, GetRequestsByExpirationPrefix(height))
 }
 
+// Returns an iterator for all the request in the Active Queue
+func (k Keeper) ActiveAllRequestQueueIterator(store sdk.KVStore) sdk.Iterator {
+	return sdk.KVStorePrefixIterator(store, returnedFeeKey)
+}
+
 //__________________________________________________________________________
 
 func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
@@ -556,4 +561,12 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sd
 		minDeposit = minDeposit.Plus(sdk.Coins{sdk.NewCoin(price.Denom, minInt)})
 	}
 	return minDeposit, nil
+}
+
+func (k Keeper) InitMetrics(store sdk.KVStore) {
+	activeIterator := k.ActiveAllRequestQueueIterator(store)
+	defer activeIterator.Close()
+	for ; activeIterator.Valid(); activeIterator.Next() {
+		k.metrics.ActiveRequests.Add(1)
+	}
 }
