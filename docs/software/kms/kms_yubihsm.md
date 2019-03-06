@@ -38,7 +38,7 @@ keys = [{ id = "irishub", key = 1 }]
 - Edit `addr` to point to your `iris` instance.
 - Adjust `chain-id` to match your `~/.iris/config/config.toml` settings.
 - Edit `auth` to authorize access to your yubihsm.
-- Edit `keys` to determine which pubkey you will be using. [How to import key?](#import-private-key))
+- Edit `keys` to determine which pubkey you will be using. [How to import key?](#import-private-key)
 
 #### Import private key
 
