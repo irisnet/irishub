@@ -384,7 +384,7 @@ func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.It
 
 // Returns an iterator for all the request in the Active Queue
 func (k Keeper) ActiveAllRequestQueueIterator(store sdk.KVStore) sdk.Iterator {
-	return sdk.KVStorePrefixIterator(store, returnedFeeKey)
+	return sdk.KVStorePrefixIterator(store, activeRequestKey)
 }
 
 //__________________________________________________________________________

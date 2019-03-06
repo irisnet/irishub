@@ -66,8 +66,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
-	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(tokenPrecision).String(), 64)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
 	}
@@ -93,8 +92,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
 
-	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(tokenPrecision).String(), 64)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
 	}
