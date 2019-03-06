@@ -451,12 +451,10 @@ func (v Validator) GetOperator() sdk.ValAddress  { return v.OperatorAddr }
 func (v Validator) GetConsPubKey() crypto.PubKey { return v.ConsPubKey }
 func (v Validator) GetConsAddr() sdk.ConsAddress { return sdk.ConsAddress(v.ConsPubKey.Address()) }
 func (v Validator) GetPower() sdk.Dec {
-	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	return v.BondedTokens().QuoInt(tokenPrecision)
+	return v.BondedTokens().QuoInt(sdk.AttoPrecision)
 }
 func (v Validator) GetPotentialPower() sdk.Dec {
-	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	return v.Tokens.QuoInt(tokenPrecision)
+	return v.Tokens.QuoInt(sdk.AttoPrecision)
 }
 func (v Validator) GetTokens() sdk.Dec          { return v.Tokens }
 func (v Validator) GetCommission() sdk.Dec      { return v.Commission.Rate }

@@ -178,6 +178,7 @@ func (k Keeper) jailValidator(ctx sdk.Context, validator types.Validator) {
 	if validator.Jailed {
 		panic(fmt.Sprintf("cannot jail already jailed validator, validator: %v\n", validator))
 	}
+	k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(1)
 	ctx.Logger().Info("Validator jailed", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	pool := k.GetPool(ctx)
 	validator.Jailed = true

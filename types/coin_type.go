@@ -66,6 +66,8 @@ var (
 		denom := fmt.Sprintf("%s-%s", coinName, Atto)
 		return NewUnit(denom, 18)
 	}
+
+	AttoPrecision = NewIntWithDecimal(1, 18)
 )
 
 type Origin = byte
