@@ -65,4 +65,4 @@ m / purpose' / coin_type' / account' / change / address_index
 
 IRISnet的coin_type与在[SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)登记的cosmos stake token `ATOM` 118相同。
 
-所以IRISnet密钥BIP44 path的前缀是`44'/118'/`，他的默认值是`44'/118'/0'/0/0`。
+所以IRISnet密钥BIP44 path的前缀为`44'/118'/`，它的默认值是`44'/118'/0'/0/0`。
