@@ -214,3 +214,48 @@ func TestMsgSendSigners(t *testing.T) {
 	require.Equal(t, signers, tx.Signers())
 }
 */
+
+// ----------------------------------------
+// MsgIssue Tests
+
+func TestNewMsgIssue(t *testing.T) {
+	// TODO
+}
+
+func TestMsgIssueRoute(t *testing.T) {
+	// Construct an MsgIssue
+	addr := sdk.AccAddress([]byte("loan-from-bank"))
+	coins := sdk.Coins{sdk.NewInt64Coin("atom", 10)}
+	var msg = MsgIssue{
+		Banker:  sdk.AccAddress([]byte("input")),
+		Outputs: []Output{NewOutput(addr, coins)},
+	}
+
+	// TODO some failures for bad result
+	require.Equal(t, msg.Route(), "bank")
+}
+
+func TestMsgIssueValidation(t *testing.T) {
+	// TODO
+}
+
+func TestMsgIssueGetSignBytes(t *testing.T) {
+	addr := sdk.AccAddress([]byte("loan-from-bank"))
+	coins := sdk.Coins{sdk.NewInt64Coin("atom", 10)}
+	var msg = MsgIssue{
+		Banker:  sdk.AccAddress([]byte("input")),
+		Outputs: []Output{NewOutput(addr, coins)},
+	}
+	res := msg.GetSignBytes()
+
+	expected := `{"banker":"faa1d9h8qat5umnd2g","outputs":[{"address":"faa1d3hkzm3dveex7mfdvfsku6crf5s7g","coins":[{"amount":"10","denom":"atom"}]}]}`
+	require.Equal(t, expected, string(res))
+}
+
+func TestMsgIssueGetSigners(t *testing.T) {
+	var msg = MsgIssue{
+		Banker: sdk.AccAddress([]byte("onlyone")),
+	}
+	res := msg.GetSigners()
+	require.Equal(t, fmt.Sprintf("%v", res), "[6F6E6C796F6E65]")
+}
