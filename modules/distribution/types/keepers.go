@@ -14,7 +14,7 @@ type StakeKeeper interface {
 	TotalPower(ctx sdk.Context) sdk.Dec
 	GetLastTotalPower(ctx sdk.Context) sdk.Int
 	GetLastValidatorPower(ctx sdk.Context, valAddr sdk.ValAddress) sdk.Int
-	IterateValidatorDelegations(ctx sdk.Context, delAddr sdk.ValAddress, fn func(del sdk.Delegation) (stop bool))
+	IterateValidatorDelegations(ctx sdk.Context, valAddr sdk.ValAddress, fn func(del sdk.Delegation) (stop bool))
 }
 
 // expected coin keeper

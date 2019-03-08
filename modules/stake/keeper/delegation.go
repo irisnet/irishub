@@ -64,7 +64,6 @@ func (k Keeper) IterateValidatorDelegations(ctx sdk.Context, valAddr sdk.ValAddr
 				break
 			}
 		}
-
 	}
 }
 
