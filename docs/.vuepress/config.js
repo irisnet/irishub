@@ -50,7 +50,8 @@ module.exports = {
                             ["basic-concepts/fee.md", 'Fee'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
-                            ["basic-concepts/gov-params.md", 'Gov Params']
+                            ["basic-concepts/gov-params.md", 'Gov Params'],
+                            ["basic-concepts/key.md", 'Key']
                         ]
                     },{
                         title: 'Modules',
@@ -176,7 +177,8 @@ module.exports = {
                             ["basic-concepts/fee.md", 'Fee'],
                             ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
                             ["basic-concepts/genesis-file.md", 'Genesis File'],
-                            ["basic-concepts/gov-params.md", 'Gov Params']
+                            ["basic-concepts/gov-params.md", 'Gov Params'],
+                            ["basic-concepts/key.md", 'Key']
                         ]
                     },{
                         title: 'Modules',
