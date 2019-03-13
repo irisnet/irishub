@@ -330,7 +330,7 @@ func ConvertPaginationParams(pageString, sizeString string) (paginationParams sd
 	if sizeString != "" {
 		sizeUint64, err := strconv.ParseUint(sizeString, 10, 16)
 		if err != nil {
-			err = fmt.Errorf("size '%s' is not a valid uint16", pageString)
+			err = fmt.Errorf("size '%s' is not a valid uint16", sizeString)
 			return paginationParams, err
 		}
 		size = uint16(sizeUint64)
