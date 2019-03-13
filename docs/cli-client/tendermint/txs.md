@@ -28,7 +28,7 @@ iriscli tendermint txs [flags]
 ### Search transactions
 
 ```shell
-iriscli tendermint txs --tags `action=send&sender=iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node=true
+iriscli tendermint txs --tags `action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node=true
 ```
 
 You will get the following result.

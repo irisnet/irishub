@@ -89,7 +89,7 @@ func (k Keeper) mustGetValidatorByConsAddr(ctx sdk.Context, consAddr sdk.ConsAdd
 func (k Keeper) SetValidator(ctx sdk.Context, validator types.Validator) {
 	store := ctx.KVStore(k.storeKey)
 	bz := types.MustMarshalValidator(k.cdc, validator)
-	bondedToken, err := strconv.ParseFloat(validator.GetPower().String(), 64)
+	bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
 		k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
 	}
@@ -202,6 +202,7 @@ func (k Keeper) RemoveValidator(ctx sdk.Context, address sdk.ValAddress) {
 	store.Delete(GetValidatorByConsAddrKey(sdk.ConsAddress(validator.ConsPubKey.Address())))
 	store.Delete(GetValidatorsByPowerIndexKey(validator, pool))
 	ctx.Logger().Info("Remove validator", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
+	k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(0)
 
 	// call hook if present
 	if k.hooks != nil {
@@ -228,21 +229,26 @@ func (k Keeper) GetAllValidators(ctx sdk.Context) (validators []types.Validator)
 }
 
 // return a given amount of all the validators
-func (k Keeper) GetValidators(ctx sdk.Context, maxRetrieve uint16) (validators []types.Validator) {
+func (k Keeper) GetValidators(ctx sdk.Context, page uint64, size uint16) (validators []types.Validator) {
+	skip := sdk.GetSkipCount(page, size)
 	store := ctx.KVStore(k.storeKey)
-	validators = make([]types.Validator, maxRetrieve)
+	validators = make([]types.Validator, size)
 
 	iterator := sdk.KVStorePrefixIterator(store, ValidatorsKey)
 	defer iterator.Close()
 
 	i := 0
-	for ; iterator.Valid() && i < int(maxRetrieve); iterator.Next() {
-		addr := iterator.Key()[1:]
-		validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
-		validators[i] = validator
+	j := 0
+	for ; iterator.Valid() && i < int(skip)+int(size); iterator.Next() {
+		if i >= int(skip) {
+			addr := iterator.Key()[1:]
+			validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
+			validators[j] = validator
+			j++
+		}
 		i++
 	}
-	return validators[:i] // trim if the array length < maxRetrieve
+	return validators[:j] // trim if the array length < maxRetrieve
 }
 
 // get the group of the bonded validators
@@ -400,5 +406,30 @@ func (k Keeper) UnbondAllMatureValidatorQueue(ctx sdk.Context) {
 			}
 		}
 		store.Delete(validatorTimesliceIterator.Key())
+	}
+}
+
+// get the set of all validators with no limits, used during genesis dump
+func (k Keeper) AllValidatorsIterator(store sdk.KVStore) sdk.Iterator {
+	return sdk.KVStorePrefixIterator(store, ValidatorsKey)
+}
+
+func (k Keeper) InitMetrics(store sdk.KVStore) {
+	iterator := k.AllValidatorsIterator(store)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		addr := iterator.Key()[1:]
+		validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
+		bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoPrecision).String(), 64)
+		if err == nil {
+			k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
+		}
+		if validator.Jailed {
+			k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(1)
+		}
+		power, err := strconv.ParseFloat(validator.GetPower().RoundInt().String(), 64)
+		if err == nil {
+			k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
+		}
 	}
 }

@@ -43,6 +43,12 @@ func TestNewQuerier(t *testing.T) {
 	require.NotNil(t, err)
 	require.Nil(t, bz)
 
+	paginationParams := sdk.NewPaginationParams(0,1)
+	bz, errRes := cdc.MarshalJSON(paginationParams)
+	require.Nil(t, errRes)
+
+	query.Path = "/custom/stake/validators"
+	query.Data = bz
 	_, err = querier(ctx, []string{"validators"}, query)
 	require.Nil(t, err)
 
@@ -53,7 +59,7 @@ func TestNewQuerier(t *testing.T) {
 	require.Nil(t, err)
 
 	queryValParams := NewQueryValidatorParams(addrVal1)
-	bz, errRes := cdc.MarshalJSON(queryValParams)
+	bz, errRes = cdc.MarshalJSON(queryValParams)
 	require.Nil(t, errRes)
 
 	query.Path = "/custom/stake/validator"
@@ -128,13 +134,19 @@ func TestQueryValidators(t *testing.T) {
 	keeper.SetValidator(ctx, validators[1])
 
 	// Query Validators
-	queriedValidators := keeper.GetValidators(ctx, params.MaxValidators)
+	queriedValidators := keeper.GetValidators(ctx, 0, params.MaxValidators)
 
-	res, err := queryValidators(ctx, cdc, keeper)
+	paginationParams := sdk.NewPaginationParams(0, params.MaxValidators)
+	bz, errRes := cdc.MarshalJSON(paginationParams)
+	query := abci.RequestQuery{
+		Path: "/custom/stake/validators",
+		Data: bz,
+	}
+	res, err := queryValidators(ctx, cdc, query, keeper)
 	require.Nil(t, err)
 
 	var validatorsResp []types.Validator
-	errRes := cdc.UnmarshalJSON(res, &validatorsResp)
+	errRes = cdc.UnmarshalJSON(res, &validatorsResp)
 	require.Nil(t, errRes)
 
 	require.Equal(t, len(queriedValidators), len(validatorsResp))
@@ -142,10 +154,10 @@ func TestQueryValidators(t *testing.T) {
 
 	// Query each validator
 	queryParams := NewQueryValidatorParams(addrVal1)
-	bz, errRes := cdc.MarshalJSON(queryParams)
+	bz, errRes = cdc.MarshalJSON(queryParams)
 	require.Nil(t, errRes)
 
-	query := abci.RequestQuery{
+	query = abci.RequestQuery{
 		Path: "/custom/stake/validator",
 		Data: bz,
 	}

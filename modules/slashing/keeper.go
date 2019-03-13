@@ -42,18 +42,20 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 	time := ctx.BlockHeader().Time
 	age := ctx.BlockHeight() - infractionHeight
 	consAddr := sdk.ConsAddress(addr)
+
+	// To resolve https://github.com/irisnet/irishub/issues/1334
+	// Unbonding period is calculated by time however evidence age is calculated by height.
+	// It is possible that the unbonding period is completed, but evidence is still valid
+	// If a validator is removed once unbonding period is completed, then its pubkey will be deleted, which will result in panic and consensus halt
+	// So here we check the validator existence and validator status first
+	validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
+	if validator == nil || validator.GetStatus() == sdk.Unbonded {
+		return
+	}
+
 	pubkey, err := k.getPubkey(ctx, addr)
 	if err != nil {
 		panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))
-	}
-
-	// Get validator.
-	validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
-	if validator == nil || validator.GetStatus() == sdk.Unbonded {
-		// Defensive.
-		// Simulation doesn't take unbonding periods into account, and
-		// Tendermint might break this assumption at some point.
-		return
 	}
 
 	// Double sign too old

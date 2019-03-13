@@ -102,6 +102,11 @@ func (p *ProtocolV0) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
+func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore){
+	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
+	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
+}
+
 func (p *ProtocolV0) configCodec() {
 	p.cdc = MakeCodec()
 }

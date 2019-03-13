@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.13.0-rc0
+
+*March 13th, 2019*
+
+- [iris] fix unexpect coin flow if tx is out of gas
+- [iris] Improve error message for insufficient balance
+- [iris] Add pagination params for lcd validators query
+- [iris] Check the validator existence and validator status before getting its pubkey
+- [iris] Reset the init value for metrics
+
+- [tendermint] Fix consensus round issue
+- [tendermint] Fix the bug of update the LRU cache
+- [tendermint] Add maximum msg size in CheckTx
+
+
 ## 0.12.3
 
 *February 27th, 2019*

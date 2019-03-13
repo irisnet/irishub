@@ -3,6 +3,7 @@ package lcd
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
@@ -314,4 +315,26 @@ func queryValidator(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 
 		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
+}
+
+func ConvertPaginationParams(pageString, sizeString string) (paginationParams sdk.PaginationParams, err error) {
+	page := uint64(0)
+	size := uint16(100)
+	if pageString != "" {
+		page, err = strconv.ParseUint(pageString, 10, 64)
+		if err != nil {
+			err = fmt.Errorf("page '%s' is not a valid uint64", pageString)
+			return paginationParams, err
+		}
+	}
+	if sizeString != "" {
+		sizeUint64, err := strconv.ParseUint(sizeString, 10, 16)
+		if err != nil {
+			err = fmt.Errorf("size '%s' is not a valid uint16", sizeString)
+			return paginationParams, err
+		}
+		size = uint16(sizeUint64)
+	}
+	paginationParams = sdk.NewPaginationParams(page, size)
+	return paginationParams, err
 }
