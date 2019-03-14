@@ -68,7 +68,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 
 	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+		k.metrics.CommunityTax.Set(communityTaxAmount)
 	}
 
 	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString())
@@ -94,7 +94,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 
 	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+		k.metrics.CommunityTax.Set(communityTaxAmount)
 	}
 
 	k.SetFeePool(ctx, feePool)
