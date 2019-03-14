@@ -38,7 +38,7 @@ keys = [{ id = "irishub", key = 1 }]
 - 编辑 `addr` 指向你的 `iris` 实例。
 - 调整 `chain-id` 以匹配你的 `~/.iris/config/config.toml` 设置。
 - 编辑 `auth` 以授权访问你的yubihsm。
-- 编辑 `keys` 确定您将使用哪个pubkey。[如何导入密钥？](#导入私钥))
+- 编辑 `keys` 确定您将使用哪个pubkey。[如何导入密钥？](#导入私钥)
 
 #### 导入私钥
 
