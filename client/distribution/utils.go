@@ -42,7 +42,7 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 	// get all delegator rewards
 	res, err := cliCtx.QuerySubspace(stakeKeeper.GetDelegationsKey(account), stakeStoreName)
 	if err != nil {
-		panic(err)
+		return sdk.Coins{}
 	}
 
 	feePool := GetFeePool(distrStoreName, cliCtx)
@@ -62,7 +62,7 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 		feePool = newFeePool
 	}
 
-	// get all validator co rewards
+	// get all validator rewards
 	validator := GetValidator(stakeStoreName, cliCtx, sdk.ValAddress(account))
 	if validator.OperatorAddr.Equals(sdk.ValAddress(account)) {
 		wc := GetWithdrawContext(stakeStoreName, cliCtx, feePool, chainHeight, validator)

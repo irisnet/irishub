@@ -207,7 +207,7 @@ func GetRewards(distrStoreName string, stakeStoreName string, cdc *codec.Codec) 
 	cmd := &cobra.Command{
 		Use:     "rewards",
 		Short:   "Query all the rewards of validator or delegator",
-		Example: "iriscli distribution rewards <validator address>",
+		Example: "iriscli distribution rewards <address>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
