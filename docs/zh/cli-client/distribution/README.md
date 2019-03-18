@@ -24,5 +24,6 @@ iriscli distribution --help
 | [delegator-distr-info](delegator-distr-info.md) | 查询委托人所有的委托(delegation)的收益分配记录 |
 | [validator-distr-info](validator-distr-info.md) | 查询验证人收益分配记录 |
 | [withdraw-address](withdraw-address.md) | 查询收益取回地址 |
+| [rewards](rewards.md) | 查询验证人或者委托人的所有收益 |
 | [set-withdraw-address](set-withdraw-address.md)  | 设置收益取回地址 |
 | [withdraw-rewards](withdraw-rewards.md) | 发起取回收益的交易 |

@@ -100,6 +100,7 @@ func main() {
 			distributioncmd.GetDelegationDistInfo("distr", cdc),
 			distributioncmd.GetValidatorDistInfo("distr", cdc),
 			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
+			distributioncmd.GetRewards("distr", "stake", cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
