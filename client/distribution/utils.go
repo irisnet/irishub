@@ -69,11 +69,10 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 		vdi := GetValidatorDistInfo(distrStoreName, cliCtx, valAddr)
 		ddi := GetDelegationDistInfo(distrStoreName, cliCtx, del.DelegatorAddr, del.ValidatorAddr)
 		wc := GetWithdrawContext(stakeStoreName, cliCtx, feePool, chainHeight, validator)
-		_, _, newFeePool, diWithdraw := ddi.WithdrawRewards(log.NewNopLogger(), wc, vdi, validator.GetDelegatorShares(), del.GetShares())
+		_, _, _, diWithdraw := ddi.WithdrawRewards(log.NewNopLogger(), wc, vdi, validator.GetDelegatorShares(), del.GetShares())
 		totalWithdraw = totalWithdraw.Plus(diWithdraw)
 		rewardTruncate, _ := diWithdraw.TruncateDecimal()
 		rewardsOutput.Delegations = append(rewardsOutput.Delegations, DelegationsReward{valAddr, rewardTruncate})
-		feePool = newFeePool
 	}
 
 	// get all validator rewards
