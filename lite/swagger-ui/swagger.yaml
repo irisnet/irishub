@@ -2332,6 +2332,33 @@ paths:
           description: Invalid delegator address
         '500':
           description: Internal Server Error
+  '/distribution/{address}/rewards':
+    parameters:
+      - in: path
+        name: address
+        description: Validator operator address or delegator address
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Query all the rewards of validator or delegator
+      tags:
+        - ICS24
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coin'
+        '204':
+          description: Invalid address
+        '400':
+          description: Invalid address
+        '500':
+          description: Internal Server Error
   /service/definition:
     post:
       summary: Add a service definition

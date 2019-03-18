@@ -2,7 +2,7 @@
 
 ## 介绍
 
-Query all the rewards of validator or delegator
+查询验证人或委托人的所有收益
 
 ## 用法
 
