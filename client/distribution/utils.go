@@ -23,6 +23,17 @@ type ValidatorDistInfoOutput struct {
 	ValCommission           string                  `json:"val_commission"`
 }
 
+type RewardsOutput struct {
+	Total       sdk.Coins           `json:"total"`
+	Delegations []DelegationsReward `json:"delegations"`
+	Commission  sdk.Coins           `json:"commission"`
+}
+
+type DelegationsReward struct {
+	Validator sdk.ValAddress `json:"validator"`
+	Reward    sdk.Coins      `json:"reward"`
+}
+
 func ConvertToValidatorDistInfoOutput(cliCtx context.CLIContext, vdi distribution.ValidatorDistInfo) ValidatorDistInfoOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	delPool := utils.ConvertDecToRat(vdi.DelPool.AmountOf(stakeTypes.StakeDenom)).Mul(exRate).FloatString() + stakeTypes.StakeTokenName
@@ -36,13 +47,14 @@ func ConvertToValidatorDistInfoOutput(cliCtx context.CLIContext, vdi distributio
 	}
 }
 
-func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLIContext, account sdk.AccAddress) sdk.Coins {
+func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLIContext, account sdk.AccAddress) RewardsOutput {
 	totalWithdraw := types.DecCoins{}
+	rewardsOutput := RewardsOutput{}
 
 	// get all delegator rewards
 	res, err := cliCtx.QuerySubspace(stakeKeeper.GetDelegationsKey(account), stakeStoreName)
 	if err != nil {
-		return sdk.Coins{}
+		return RewardsOutput{}
 	}
 
 	feePool := GetFeePool(distrStoreName, cliCtx)
@@ -59,6 +71,8 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 		wc := GetWithdrawContext(stakeStoreName, cliCtx, feePool, chainHeight, validator)
 		_, _, newFeePool, diWithdraw := ddi.WithdrawRewards(log.NewNopLogger(), wc, vdi, validator.GetDelegatorShares(), del.GetShares())
 		totalWithdraw = totalWithdraw.Plus(diWithdraw)
+		rewardTruncate, _ := diWithdraw.TruncateDecimal()
+		rewardsOutput.Delegations = append(rewardsOutput.Delegations, DelegationsReward{valAddr, rewardTruncate})
 		feePool = newFeePool
 	}
 
@@ -69,10 +83,13 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 		valInfo := GetValidatorDistInfo(distrStoreName, cliCtx, validator.GetOperator())
 		valInfo, _, commission := valInfo.WithdrawCommission(log.NewNopLogger(), wc)
 		totalWithdraw = totalWithdraw.Plus(commission)
+		rewardTruncate, _ := commission.TruncateDecimal()
+		rewardsOutput.Commission = rewardTruncate
 	}
 
 	rewardTruncate, _ := totalWithdraw.TruncateDecimal()
-	return rewardTruncate
+	rewardsOutput.Total = rewardTruncate
+	return rewardsOutput
 }
 
 func GetFeePool(storeName string, cliCtx context.CLIContext) (feePool types.FeePool) {
