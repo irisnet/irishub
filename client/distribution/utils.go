@@ -51,6 +51,12 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 	totalWithdraw := types.DecCoins{}
 	rewardsOutput := RewardsOutput{}
 
+	var selfVdi types.ValidatorDistInfo
+	selfValidator := GetValidator(stakeStoreName, cliCtx, sdk.ValAddress(account))
+	if selfValidator.OperatorAddr.Equals(sdk.ValAddress(account)) {
+		selfVdi = GetValidatorDistInfo(distrStoreName, cliCtx, selfValidator.GetOperator())
+	}
+
 	// get all delegator rewards
 	res, err := cliCtx.QuerySubspace(stakeKeeper.GetDelegationsKey(account), stakeStoreName)
 	if err != nil {
@@ -59,6 +65,7 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 
 	feePool := GetFeePool(distrStoreName, cliCtx)
 	chainHeight, err := tendermint.GetChainHeight(cliCtx)
+
 	for _, re := range res {
 		del := stakeTypes.MustUnmarshalDelegation(cliCtx.Codec, re.Key, re.Value)
 		valAddr := del.GetValidatorAddr()
@@ -69,19 +76,20 @@ func GetRewards(distrStoreName string, stakeStoreName string, cliCtx context.CLI
 		vdi := GetValidatorDistInfo(distrStoreName, cliCtx, valAddr)
 		ddi := GetDelegationDistInfo(distrStoreName, cliCtx, del.DelegatorAddr, del.ValidatorAddr)
 		wc := GetWithdrawContext(stakeStoreName, cliCtx, feePool, chainHeight, validator)
-		_, _, newFeePool, diWithdraw := ddi.WithdrawRewards(log.NewNopLogger(), wc, vdi, validator.GetDelegatorShares(), del.GetShares())
+		_, vdi, newFeePool, diWithdraw := ddi.WithdrawRewards(log.NewNopLogger(), wc, vdi, validator.GetDelegatorShares(), del.GetShares())
 		totalWithdraw = totalWithdraw.Plus(diWithdraw)
 		rewardTruncate, _ := diWithdraw.TruncateDecimal()
 		rewardsOutput.Delegations = append(rewardsOutput.Delegations, DelegationsReward{valAddr, rewardTruncate})
+		if vdi.OperatorAddr.Equals(selfValidator.OperatorAddr) {
+			selfVdi = vdi
+		}
 		feePool = newFeePool
 	}
 
 	// get all validator rewards
-	validator := GetValidator(stakeStoreName, cliCtx, sdk.ValAddress(account))
-	if validator.OperatorAddr.Equals(sdk.ValAddress(account)) {
-		wc := GetWithdrawContext(stakeStoreName, cliCtx, feePool, chainHeight, validator)
-		valInfo := GetValidatorDistInfo(distrStoreName, cliCtx, validator.GetOperator())
-		valInfo, _, commission := valInfo.WithdrawCommission(log.NewNopLogger(), wc)
+	if selfVdi.OperatorAddr.Equals(sdk.ValAddress(account)) {
+		wc := GetWithdrawContext(stakeStoreName, cliCtx, feePool, chainHeight, selfValidator)
+		_, _, commission := selfVdi.WithdrawCommission(log.NewNopLogger(), wc)
 		totalWithdraw = totalWithdraw.Plus(commission)
 		rewardTruncate, _ := commission.TruncateDecimal()
 		rewardsOutput.Commission = rewardTruncate
