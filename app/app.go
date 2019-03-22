@@ -56,6 +56,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	app.SetProtocolEngine(&engine)
 	app.MountStoresIAVL(engine.GetKVStoreKeys())
 	app.MountStoresTransient(engine.GetTransientStoreKeys())
+	app.SetPubKeyPeerFilter(v0.FilterPeerByPubKey)
 
 	var err error
 	if viper.GetBool(FlagReplay) {

@@ -431,9 +431,7 @@ func handleQueryP2P(app *BaseApp, path []string, req abci.RequestQuery) (res abc
 			if path[2] == "addr" {
 				return app.FilterPeerByAddrPort(path[3])
 			}
-			if path[2] == "pubkey" {
-				// TODO: this should be changed to `id`
-				// NOTE: this changed in tendermint and we didn't notice...
+			if path[2] == "id" {
 				return app.FilterPeerByPubKey(path[3])
 			}
 		} else {
