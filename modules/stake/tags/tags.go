@@ -21,4 +21,7 @@ var (
 	Moniker      = "moniker"
 	Identity     = "identity"
 	EndTime      = "end-time"
+	Balance      = "balance"
+	SharesSrc    = "shares-src"
+	SharesDst    = "shares-dst"
 )
