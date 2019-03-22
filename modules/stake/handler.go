@@ -247,6 +247,9 @@ func handleMsgBeginRedelegate(ctx sdk.Context, msg types.MsgBeginRedelegate, k k
 		tags.SrcValidator, []byte(msg.ValidatorSrcAddr.String()),
 		tags.DstValidator, []byte(msg.ValidatorDstAddr.String()),
 		tags.EndTime, []byte(red.MinTime.String()),
+		tags.Balance, []byte(red.Balance.String()),
+		tags.SharesSrc, []byte(red.SharesSrc.String()),
+		tags.SharesDst, []byte(red.SharesDst.String()),
 	)
 	return sdk.Result{Data: finishTime, Tags: tags}
 }
