@@ -201,3 +201,32 @@ func GetValidatorDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 	}
 	return cmd
 }
+
+// GetRewards returns the all the rewards of validator or delegator
+func GetRewards(distrStoreName string, stakeStoreName string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "rewards",
+		Short:   "Query all the rewards of validator or delegator",
+		Example: "iriscli distribution rewards <address>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			addrString := args[0]
+			delAddr, err := sdk.AccAddressFromBech32(addrString)
+			if err != nil {
+				return err
+			}
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			rewards := distributionclient.GetRewards(distrStoreName, stakeStoreName, cliCtx, delAddr)
+
+			output, err := codec.MarshalJSONIndent(cdc, rewards)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+	return cmd
+}

@@ -1,12 +1,13 @@
 package lcd
 
 import (
-	"github.com/irisnet/irishub/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/codec"
 )
 
 const storeName = "distr"
+const stakeStoreName = "stake"
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
@@ -21,4 +22,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryDelegatorDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{validatorAddr}/valDistrInfo",
 		QueryValidatorDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
+	r.HandleFunc("/distribution/{address}/rewards",
+		QueryRewardsHandlerFn(storeName, stakeStoreName, cliCtx)).Methods("GET")
 }
