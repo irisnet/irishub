@@ -284,7 +284,7 @@ func validateArbitrationTimeLimit(v time.Duration) sdk.Error {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidArbitrationTimeLimit, fmt.Sprintf("Invalid ArbitrationTimeLimit [%s] should be between [5days, 10days]", v.String()))
 		}
 	} else if v < 20*time.Second {
-		return sdk.NewError(params.DefaultCodespace, params.CodeComplaintRetrospect, fmt.Sprintf("Invalid ComplaintRetrospect [%s] should be between [20seconds, )", v.String()))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidArbitrationTimeLimit, fmt.Sprintf("Invalid ArbitrationTimeLimit [%s] should be between [20seconds, )", v.String()))
 	}
 	return nil
 }

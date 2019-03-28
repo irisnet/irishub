@@ -80,7 +80,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 		cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
 	}
 	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().GetCodec())
-
+	engine.GetCurrentProtocol().InitMetrics(app.cms)
 	return app
 }
 

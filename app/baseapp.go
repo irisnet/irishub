@@ -736,7 +736,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 				result = sdk.ErrInternal(log).Result()
 			}
 		}
-
+		ctx.CoinFlowTags().TagClean()
 		result.GasWanted = gasWanted
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 	}()
@@ -836,8 +836,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	if result.IsOK() {
 		msCache.Write()
 		ctx.CoinFlowTags().TagWrite()
-	} else {
-		ctx.CoinFlowTags().TagClean()
 	}
 
 	return

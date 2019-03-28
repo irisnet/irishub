@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.13.1
+
+### LCD (REST API)
+* [\#1339](https://github.com/irisnet/irishub/pull/1339) Add pagination params for lcd validators query
+* [\#1355](https://github.com/irisnet/irishub/pull/1355) Fix pagination error message
+* [\#1360](https://github.com/irisnet/irishub/pull/1360) Add query API for delegator rewards
+
+### CLI
+* [\#1360](https://github.com/irisnet/irishub/pull/1360) Add query command for delegator rewards
+
+### Node
+* [\#1329](https://github.com/irisnet/irishub/pull/1329) Improve error message for insufficient balance
+* [\#1340](https://github.com/irisnet/irishub/pull/1340) Remove coin flow tags if tx is out of gas
+* [\#1341](https://github.com/irisnet/irishub/pull/1341) Check validator existence and status before getting its pubkey
+* [\#1344](https://github.com/irisnet/irishub/pull/1344) Reset the init value for metrics
+* [\#1354](https://github.com/irisnet/irishub/pull/1354) Fix the bug of metric data accumulation
+* [\#1362](https://github.com/irisnet/irishub/pull/1362) Fix testnet build for Docker
+* [\#1370](https://github.com/irisnet/irishub/pull/1370) Add more tags for Redelgate TxResult
+
+### Tendermint
+* [\#51](https://github.com/irisnet/tendermint/pull/51) Update to irisnet/Tendermint **v0.27.4**
+  * [\#44](https://github.com/irisnet/tendermint/pull/44) [p2p] Cleanup rejected inbound connections
+  * [\#45](https://github.com/irisnet/tendermint/pull/45) [consensus] Fix consensus round issue
+  * [\#46](https://github.com/irisnet/tendermint/pull/46) [mempool] Check max msg size in `CheckTx()`
+  * [\#47](https://github.com/irisnet/tendermint/pull/47) [mempool] Fix the bug of LRU cache update
+  * [\#48](https://github.com/irisnet/tendermint/pull/48) [p2p] Fix infinite loop in `AddrBook`
+  * [\#50](https://github.com/irisnet/tendermint/pull/50) [p2p] Fix FlushStop() in `MConnection`
+
 ## 0.12.3
 
 *February 27th, 2019*
@@ -24,7 +52,7 @@
 - Implement coin flow record feature for "internal transactions"
 - Support Ledger Nano S and KMS
 - Update the default gas_price_threshold to be 6000iris-nano
-- No slashing for Censorship or Downtime 
+- No slashing for Censorship or Downtime
 - No slashing for non-voting for proposals
 - Configure the default build environment as mainnet
 - Set the default gas limit to be 50000
@@ -50,7 +78,7 @@
 - [iris] Enrich log message for all modules
 - [iris] Close all unclosed iterators
 - [iris] Add invariant check level configuration in iris.toml
-- [iriscli] Add share percent in lcd unbond and redelegate 
+- [iriscli] Add share percent in lcd unbond and redelegate
 - [iriscli] Fix tx search bug by page and size query parameter name
 - [iriscli] Improve error message for gov module
 - [irislcd] Upgrade swagger-ui to 3.0 which can support dynamic query parameters
@@ -136,9 +164,9 @@ FEATURES:
 - [iris] Implement the block mint token-economics
 - [iris] Add the service slash feature
 - [iris] Redesign and implement the governance module to setup the new voting, tally, and penalty rules for each level of proposals
-- [iris] Refactor and redefined all the gov/slashing/service/stake/distribution and gasPrice params 
+- [iris] Refactor and redefined all the gov/slashing/service/stake/distribution and gasPrice params
 - [iris] Make gov data types codec wires usable across different protocol versions
-- [iris] Don't export the unfinished proposals and refund the deposits of these proposals before export snapshot 
+- [iris] Don't export the unfinished proposals and refund the deposits of these proposals before export snapshot
 - [iris] Refund service fee and deposit before export service state
 - [iris] Add invariant checking level into makefile
 - [iris] Only the genesis type profiler/trustee can initiate the addition or deletion (rather than prohibiting) transactions of the minor type profiler/trustee record. Everyone can view the profiler/trustee list
@@ -205,7 +233,7 @@ BREAKING CHANGES:
 
 - Use `iristool` to replace the original `irisdebug` and `irismon`
 - `iris init` must specify moniker
- 
+
 FEATURES:
 
 - [iriscli] Optimize the way tags are displayed
@@ -460,8 +488,8 @@ BREAKING CHANGES:
 
 FEATURES:
 
-- [lcd] /tx/send is now the only endpoint for posing transaction to irishub; aminofied all transaction messages 
-- [monitor] Improve the metrics for iris-monitor 
+- [lcd] /tx/send is now the only endpoint for posing transaction to irishub; aminofied all transaction messages
+- [monitor] Improve the metrics for iris-monitor
 
 BUG FIXES
 
@@ -482,7 +510,7 @@ FEATURES:
 
 - [lcd] code refactor
 
-- [cli] improve sendingand querying the  transactions 
+- [cli] improve sendingand querying the  transactions
 
 - [monitor]export data which is collected by Prometheus Server
 

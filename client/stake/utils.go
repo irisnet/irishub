@@ -156,7 +156,7 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		Tokens:           utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
 		DelegatorShares:  utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
 		Description:      v.Description,
-		BondHeight:       v.UnbondingHeight,
+		BondHeight:       v.BondHeight,
 		UnbondingHeight:  v.UnbondingHeight,
 		UnbondingMinTime: v.UnbondingMinTime,
 		Commission:       commission,

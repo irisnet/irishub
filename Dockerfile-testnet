@@ -6,7 +6,7 @@
 FROM golang:1.11.5-alpine3.9 as builder
 
 # Set up dependencies
-ENV PACKAGES make gcc git libc-dev bash
+ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev
 
 # Set up GOPATH & PATH
 

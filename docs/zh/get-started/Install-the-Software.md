@@ -22,7 +22,7 @@ IRIS Hub是用Go语言编写的。它可以在任何能够编译并运行Go语�
 下载对应版本的可执行文件
 解压缩
 ```
-tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
+unzip iris$VERSION.$OS-$ARCH.zip -d /usr/local/bin/
 ```
 拷贝到/usr/local/bin/目录下 
 执行以下命令,若出现对应的版本号则说明安装成功。

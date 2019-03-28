@@ -2,8 +2,9 @@ package upgrade
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"strconv"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // do switch

@@ -25,7 +25,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 			Subsystem: MetricsSubsystem,
 			Name:      "community_tax",
 			Help:      "community tax",
-		}, []string{"height"}),
+		}, []string{}),
 	}
 }
 
