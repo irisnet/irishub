@@ -1,9 +1,7 @@
 package lcd
 
 import (
-	"fmt"
 	"net/http"
-
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -26,6 +24,7 @@ func QueryBalancesRequestHandlerFn(
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
+		cliCtx = cliCtx.WithAccountDecoder(decoder)
 
 		addr, err := sdk.AccAddressFromBech32(bech32addr)
 		if err != nil {
@@ -33,26 +32,17 @@ func QueryBalancesRequestHandlerFn(
 			return
 		}
 
-		res, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), storeName)
+		if err := cliCtx.EnsureAccountExistsFromAddr(addr); err != nil {
+			utils.WriteErrorResponse(w, http.StatusNoContent, err.Error())
+			return
+		}
+
+		acc, err := cliCtx.GetAccount(addr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
 		}
 
-		// the query will return empty if there is no data for this account
-		if len(res) == 0 {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		// decode the value
-		account, err := decoder(res)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, account.GetCoins(), cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, acc.GetCoins(), cliCtx.Indent)
 	}
 }
 
@@ -63,6 +53,7 @@ func QueryAccountRequestHandlerFn(storeName string, cdc *codec.Codec,
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
+		cliCtx = cliCtx.WithAccountDecoder(decoder)
 
 		addr, err := sdk.AccAddressFromBech32(bech32addr)
 		if err != nil {
@@ -70,26 +61,18 @@ func QueryAccountRequestHandlerFn(storeName string, cdc *codec.Codec,
 			return
 		}
 
-		res, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), storeName)
+		if err := cliCtx.EnsureAccountExistsFromAddr(addr); err != nil {
+			utils.WriteErrorResponse(w, http.StatusNoContent, err.Error())
+			return
+		}
+
+		acc, err := cliCtx.GetAccount(addr)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't query account. Error: %s", err.Error()))
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		// the query will return empty if there is no data for this account
-		if len(res) == 0 {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		// decode the value
-		account, err := decoder(res)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't parse query result. Result: %s. Error: %s", res, err.Error()))
-			return
-		}
-
-		accountRes, err := bank.ConvertAccountCoin(cliCtx, account)
+		accountRes, err := bank.ConvertAccountCoin(cliCtx, acc)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

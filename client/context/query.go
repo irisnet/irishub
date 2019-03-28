@@ -67,15 +67,13 @@ func (cliCtx CLIContext) GetAccount(address []byte) (auth.Account, error) {
 		return nil, errors.New("account decoder required but not provided")
 	}
 
-	res, err := cliCtx.QueryStore(auth.AddressStoreKey(address), cliCtx.AccountStore)
+	res, err := cliCtx.queryAccount(address)
 	if err != nil {
 		return nil, err
-	} else if len(res) == 0 {
-		return nil, ErrInvalidAccount(address)
 	}
 
-	account, err := cliCtx.AccDecoder(res)
-	if err != nil {
+	var account auth.Account
+	if err := cliCtx.Codec.UnmarshalJSON(res, &account); err != nil {
 		return nil, err
 	}
 
@@ -138,16 +136,26 @@ func (cliCtx CLIContext) EnsureAccountExists() error {
 // address. Instead of using the context's from name, a direct address is
 // given. An error is returned if it does not.
 func (cliCtx CLIContext) EnsureAccountExistsFromAddr(addr sdk.AccAddress) error {
-	accountBytes, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), cliCtx.AccountStore)
+	_, err := cliCtx.queryAccount(addr)
+	return err
+}
+
+// queryAccount queries an account using custom query endpoint of auth module
+// returns an error if result is `null` otherwise account data
+func (cliCtx CLIContext) queryAccount(addr sdk.AccAddress) ([]byte, error) {
+	bz, err := cliCtx.Codec.MarshalJSON(auth.NewQueryAccountParams(addr))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if len(accountBytes) == 0 {
-		return ErrInvalidAccount(addr)
+	route := fmt.Sprintf("custom/%s/%s", cliCtx.AccountStore, auth.QueryAccount)
+
+	res, err := cliCtx.QueryWithData(route, bz)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return res, nil
 }
 
 // query performs a query from a Tendermint node with the provided store name
@@ -397,7 +405,6 @@ func (cliCtx CLIContext) GetLatestHeight() (int64, error) {
 	}
 	return status.SyncInfo.LatestBlockHeight, nil
 }
-
 
 func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 	client := &http.Client{}

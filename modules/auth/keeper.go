@@ -3,7 +3,7 @@ package auth
 import (
 	"fmt"
 
-	codec "github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -22,7 +22,6 @@ var (
 // This AccountKeeper encodes/decodes accounts using the
 // go-amino (binary) encoding/decoding library.
 type AccountKeeper struct {
-
 	// The (unexposed) key used to access the store from the Context.
 	key sdk.StoreKey
 

@@ -268,7 +268,9 @@ func (p *ProtocolV0) configRouters() {
 		AddRoute("gov", gov.NewHandler(p.govKeeper)).
 		AddRoute("service", service.NewHandler(p.serviceKeeper)).
 		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
+
 	p.queryRouter.
+		AddRoute("acc", auth.NewQuerier(p.accountMapper)).
 		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc))
 }
