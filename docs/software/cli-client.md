@@ -43,13 +43,13 @@ estimated gas = 18604
 
 ## Async Mode
 
---async：Without any validation of the transaction, return the hash of the transaction immediately
+async：Without any validation of the transaction, return the hash of the transaction immediately
 
---sync：Verify the legality of the transaction (transaction format and signature), return the result and transaction hash. Transaction waiting to be packaged out in the blockchain
+sync：Verify the legality of the transaction (transaction format and signature), return the result and transaction hash. Transaction waiting to be packaged out in the blockchain
 
---commit：Waiting for the transaction to be packaged in the blockchain before returning the complete execution result of the transaction，the request will be blocked until transaction return or timeout.
+commit：Waiting for the transaction to be packaged in the blockchain before returning the complete execution result of the transaction，the request will be blocked until transaction return or timeout.
 
-The default transaction mode of `iriscli` is `--sync`. 
+The default transaction mode of `iriscli` is `sync`. 
 
 ## Generate Only
 

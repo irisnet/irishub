@@ -10,7 +10,7 @@ https://github.com/irisnet/irishub/releases/
 
 then get the release <latest_iris_version> (eg. v0.13.1) on your computer.
 
-`tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip` 
+`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` 
 
 You can verify you have the right version installed by running the following commands:
 

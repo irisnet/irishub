@@ -6,7 +6,7 @@
 下载对应版本的可执行文件
 解压缩
 ```
-tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
+unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip
 ```
 拷贝到/usr/local/bin/目录下 
 执行以下命令,若出现对应的版本号则说明安装成功。
