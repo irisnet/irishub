@@ -285,7 +285,7 @@ func GetCmdQueryValidatorDelegations(queryRoute string, cdc *codec.Codec) *cobra
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(validatorAddr)
 
-			if err = queryValidator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryValidatorRedelegations),
+			if err = queryValidator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryValidatorDelegations),
 				params); err != nil {
 				return err
 			}
@@ -452,7 +452,7 @@ func GetCmdQueryRedelegations(queryRoute string, cdc *codec.Codec) *cobra.Comman
 }
 
 // GetCmdQueryPool implements the pool query command.
-func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryPool(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "pool",
 		Short:   "Query the current staking pool values",
@@ -461,7 +461,7 @@ func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, err := cliCtx.QueryWithData("custom/stake/pool", nil)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryPool), nil)
 			if err != nil {
 				return err
 			}
@@ -495,7 +495,7 @@ func GetCmdQueryPool(storeName string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryPool implements the params query command.
-func GetCmdQueryParams(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "parameters",
 		Short:   "Query the current staking parameters information",
@@ -503,7 +503,7 @@ func GetCmdQueryParams(storeName string, cdc *codec.Codec) *cobra.Command {
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bz, err := cliCtx.QueryWithData("custom/stake/"+stake.QueryParameters, nil)
+			bz, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryParameters), nil)
 			if err != nil {
 				return err
 			}

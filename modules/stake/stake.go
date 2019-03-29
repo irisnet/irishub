@@ -102,6 +102,7 @@ const (
 	QueryDelegation                    = querier.QueryDelegation
 	QueryUnbondingDelegation           = querier.QueryUnbondingDelegation
 	QueryDelegatorDelegations          = querier.QueryDelegatorDelegations
+	QueryValidatorDelegations          = querier.QueryValidatorDelegations
 	QueryDelegatorUnbondingDelegations = querier.QueryDelegatorUnbondingDelegations
 	QueryDelegatorRedelegations        = querier.QueryDelegatorRedelegations
 	QueryDelegatorValidators           = querier.QueryDelegatorValidators
