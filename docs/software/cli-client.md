@@ -58,6 +58,7 @@ The default transaction mode of `iriscli` is `--sync`.
 Example: Enable generate-only to generate unsigned transaction
 
 ```
+iriscli gov submit-proposal --chain-id=<chain-id> --from=<user> --fee=0.3iris --description="test" --title="test" --usage="Burn" --percent=0.0000000001 --type="TxTaxUsage" --deposit=1000iris --generate-only
 ```
 
 Print：
