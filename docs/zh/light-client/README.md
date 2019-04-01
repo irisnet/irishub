@@ -47,11 +47,13 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     2. `GET /syncing`: 查询所连接全节点是否处于追赶区块的状态
     3. `GET /blocks/latest`: 获取最新区块
     4. `GET /blocks/{height}`: 获取某一高度的区块
-    5. `GET /validatorsets/latest`: 获取最新的验证人集合
-    6. `GET /validatorsets/{height}`: 获取某一高度的验证人集合
-    7. `GET /txs/{hash}`: 通过交易hash查询交易
-    8. `GET /txs`: 搜索交易
-    9. `POST /txs`: 广播交易
+    5. `GET /blocks-result/latest`: 获取最新区块交易结果
+    6. `GET /blocks-result/{height}`: 获取某一高度区块的交易结果
+    7. `GET /validatorsets/latest`: 获取最新的验证人集合
+    8. `GET /validatorsets/{height}`: 获取某一高度的验证人集合
+    9. `GET /txs/{hash}`: 通过交易hash查询交易
+    10. `GET /txs`: 搜索交易
+    11. `POST /txs`: 广播交易
 
 2. Key management模块的APIs
 
@@ -90,14 +92,15 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     11. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}`: 查询委托人在某个验证人上所有的解委托记录
     12. `GET /stake/validators`: 获取所有委托人信息
     13. `GET /stake/validators/{validatorAddr}`: 获取某个委托人信息
-    14. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: 获取某个验证人上的所有解委托记录
-    15. `GET /stake/validators/{validatorAddr}/redelegations`: 获取某个验证人上的所有转委托记录
-    16. `GET /stake/pool`: 获取权益池信息
-    17. `GET /stake/parameters`: 获取权益证明的参数
+    14. `GET /stake/validators/{validatorAddr}/delegations`:  获取某个验证人上的所有委托记录
+    15. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: 获取某个验证人上的所有解委托记录
+    16. `GET /stake/validators/{validatorAddr}/redelegations`: 获取某个验证人上的所有转委托记录
+    17. `GET /stake/pool`: 获取权益池信息
+    18. `GET /stake/parameters`: 获取权益证明的参数
 
 5. Governance模块的APIs
 
-    1. `POST /gov/proposal`: 发起提交提议交易
+    1. `POST /gov/proposals`: 发起提交提议交易
     2. `GET /gov/proposals`: 查询提议
     3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
     4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
@@ -106,7 +109,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `GET /gov/proposals/{proposalId}`: 查询某个提议
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
-    10. `GET/gov/params`: 查询可供治理的参数
+    10. `GET /gov/params`: 查询可供治理的参数
 
 6. Slashing模块的APIs
 
@@ -122,7 +125,26 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     5. `GET /distribution/{delegatorAddr}/distrInfos`: 查询委托人所有委托的收益分配信息
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: 查询验证人的收益分配信息
 
-8. 查询版本
+8. Service模块的APIs
+
+    1. `POST /service/definition`: 添加服务定义
+    2. `GET /service/definition/{defChainId}/{serviceName}`: 查询服务定义
+    3. `POST /service/binding`: 添加服务绑定
+    4. `GET /service/binding/{defChainId}/{serviceName}/{bindChainId}/{provider}`: 查询服务绑定
+    5. `GET /service/bindings/{defChainId}/{serviceName}`: 查询服务绑定列表
+    6. `PUT /service/binding/{defChainId}/{serviceName}/{provider}`: 更新服务绑定
+    7. `PUT /service/binding/{defChainId}/{serviceName}/{provider}/disable`: 使绑定失效
+    8. `PUT /service/binding/{defChainId}/{serviceName}/{provider}/enable`: 重新启用绑定
+    9. `PUT /service/binding/{defChainId}/{serviceName}/{provider}/deposit/refund`: 取回服务绑定的抵押
+    10. `POST /service/request`: 请求服务
+    11. `GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}`: 查询某服务提供者收到的服务请求
+    12. `POST /service/response`: 响应服务请求
+    13. `GET /service/response/{reqChainId}/{reqId}`: 查询服务响应
+    14. `GET /service/fees/{address}`:  查询（某个地址的）服务费用
+    15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
+    16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
+    
+9. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node_version`: 查询全节点版本
@@ -134,7 +156,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 2. `POST /stake/delegators/{delegatorAddr}/delegate`
 3. `POST /stake/delegators/{delegatorAddr}/redelegate`
 4. `POST /stake/delegators/{delegatorAddr}/unbond`
-5. `POST /gov/proposal`
+5. `POST /gov/proposals`
 6. `POST /gov/proposals/{proposalId}/deposits`
 7. `POST /gov/proposals/{proposalId}/votes`
 8. `POST /slashing/validators/{validatorAddr}/unjail`
