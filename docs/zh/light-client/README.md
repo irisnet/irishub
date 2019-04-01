@@ -11,8 +11,8 @@ IRISLCD有两个子命令:
 
 | 子命令      | 功能                 | 示例命令 |
 | --------------- | --------------------------- | --------------- |
-| version         | 打印版本信息   | irislcd version |
-| start           | 启动一个IRISLCD节点  | irislcd start --chain-id=`<chain-id>` |
+| version         | 打印版本信息   | `irislcd version` |
+| start           | 启动一个IRISLCD节点  | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
 
 `start`子命令有如下参数可配置
 
@@ -28,7 +28,7 @@ IRISLCD有两个子命令:
 
 ## 示例命令
 
-1. 默认情况下，IRISLCD不信任连接全节点。但是如果您确定连接的完整节点是可信的，那么您应该在启动IRISLCD时加上`--trust-node`：
+1. 默认情况下，IRISLCD不信任连接全节点。但是如果您确定连接的全节点是可信的，那么您应该在启动IRISLCD时加上`--trust-node`：
 ```bash
 irislcd start --chain-id=<chain-id> --trust-node
 ```

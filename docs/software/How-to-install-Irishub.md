@@ -8,7 +8,7 @@ Go to the download page:
 
 https://github.com/irisnet/irishub/releases/  
 
-then get the release <latest_iris_version> (eg. v0.13.1) on your computer.
+then get the release v0.13.1 on your computer.
 
 `unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` 
 
@@ -80,12 +80,12 @@ After setup Go correctly, you should be able to compile and run `iris`.
 Make sure that your server can access to google.com for that our project depends on some libraries provided by google.
 
 * To compile for `testnet`:
-Please checkout the latest version（eg. `git checkout v0.13.1`），refer to：https://github.com/irisnet/irishub/releases/
+Please checkout the latest version v0.13.1，refer to：https://github.com/irisnet/irishub/releases/
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout <latest_iris_version>
+cd irishub && git checkout v0.13.1
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
@@ -98,7 +98,7 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout <latest_iris_version>
+cd irishub && git checkout v0.13.1
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps

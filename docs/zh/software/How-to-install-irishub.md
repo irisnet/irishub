@@ -70,12 +70,12 @@ source ~/.bash_profile
 在完成Go的安装后，通过以下命令下载并安装IRIS hub相关程序.(请确保你的电脑可以访问`google.com`， `iris`很多库的依赖由google提供)
 
 * 编译用于`测试网`的可执行文件:
-请下载最新版本的代码编译（例如：`git checkout v0.13.1`），参考：https://github.com/irisnet/irishub/releases/
+请下载最新版本v0.13.1的代码编译，参考：https://github.com/irisnet/irishub/releases/
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout <latest_iris_version>
+cd irishub && git checkout v0.13.1
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
@@ -88,7 +88,7 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout <latest_iris_version>
+cd irishub && git checkout v0.13.1
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
