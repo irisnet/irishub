@@ -9,24 +9,24 @@ import (
 
 type (
 	Keeper = keeper.Keeper
-	Hooks  = keeper.Hooks
+	Hooks = keeper.Hooks
 	Params = types.Params
 
 	DelegatorWithdrawInfo = types.DelegatorWithdrawInfo
-	DelegationDistInfo    = types.DelegationDistInfo
-	ValidatorDistInfo     = types.ValidatorDistInfo
-	TotalAccum            = types.TotalAccum
-	FeePool               = types.FeePool
+	DelegationDistInfo = types.DelegationDistInfo
+	ValidatorDistInfo = types.ValidatorDistInfo
+	TotalAccum = types.TotalAccum
+	FeePool = types.FeePool
 
 	MsgWithdrawDelegatorRewardsAll = types.MsgWithdrawDelegatorRewardsAll
-	MsgWithdrawDelegatorReward     = types.MsgWithdrawDelegatorReward
+	MsgWithdrawDelegatorReward = types.MsgWithdrawDelegatorReward
 	MsgWithdrawValidatorRewardsAll = types.MsgWithdrawValidatorRewardsAll
 
 	GenesisState = types.GenesisState
 
 	// expected keepers
-	StakeKeeper         = types.StakeKeeper
-	BankKeeper          = types.BankKeeper
+	StakeKeeper = types.StakeKeeper
+	BankKeeper = types.BankKeeper
 	FeeCollectionKeeper = types.FeeKeeper
 )
 
@@ -58,6 +58,11 @@ var (
 	NewMsgWithdrawDelegatorRewardsAll = types.NewMsgWithdrawDelegatorRewardsAll
 	NewMsgWithdrawDelegatorReward     = types.NewMsgWithdrawDelegatorReward
 	NewMsgWithdrawValidatorRewardsAll = types.NewMsgWithdrawValidatorRewardsAll
+
+	NewQuerier                       = keeper.NewQuerier
+	NewQueryDelegatorParams          = keeper.NewQueryDelegatorParams
+	NewQueryDelegationDistInfoParams = keeper.NewQueryDelegationDistInfoParams
+	NewQueryRewardsParams            = keeper.NewQueryRewardsParams
 
 	NewTotalAccum = types.NewTotalAccum
 )

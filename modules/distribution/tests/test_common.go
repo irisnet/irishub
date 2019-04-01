@@ -19,7 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 
-	distr "github.com/irisnet/irishub/modules/distribution"
+	distr "github.com/irisnet/irishub/modules/distribution/keeper"
 	"github.com/irisnet/irishub/modules/distribution/types"
 )
 
