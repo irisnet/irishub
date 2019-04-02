@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
@@ -144,20 +145,20 @@ func main() {
 	}
 	stakeCmd.AddCommand(
 		client.GetCommands(
-			stakecmd.GetCmdQueryValidator("stake", cdc),
-			stakecmd.GetCmdQueryValidators("stake", cdc),
-			stakecmd.GetCmdQueryDelegation("stake", cdc),
-			stakecmd.GetCmdQueryDelegations("stake", cdc),
-			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
-			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
-			stakecmd.GetCmdQueryRedelegation("stake", cdc),
-			stakecmd.GetCmdQueryRedelegations("stake", cdc),
-			stakecmd.GetCmdQueryPool("stake", cdc),
-			stakecmd.GetCmdQueryParams("stake", cdc),
-			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
+			stakecmd.GetCmdQueryValidator(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryValidators(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryDelegation(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryDelegations(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryUnbondingDelegation(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryUnbondingDelegations(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryValidatorDelegations(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryRedelegation(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryRedelegations(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryPool(protocol.StakeRouter, cdc),
+			stakecmd.GetCmdQueryParams(protocol.StakeRouter, cdc),
+			slashingcmd.GetCmdQuerySigningInfo(protocol.SlashingRouter, cdc),
 		)...)
 	stakeCmd.AddCommand(
 		client.PostCommands(
