@@ -197,7 +197,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 	ctx, _ = ctx.CacheContext()
 	var selfVdi types.ValidatorDistInfo
 	selfValidator := k.stakeKeeper.Validator(ctx, sdk.ValAddress(params.Address))
-	if selfValidator.GetOperator().Equals(sdk.ValAddress(params.Address)) {
+	if selfValidator != nil && selfValidator.GetOperator().Equals(sdk.ValAddress(params.Address)) {
 		selfVdi = k.GetValidatorDistInfo(ctx, selfValidator.GetOperator())
 	}
 
@@ -208,6 +208,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 		validator := k.stakeKeeper.Validator(ctx, del.GetValidatorAddr())
 		vdi := k.GetValidatorDistInfo(ctx, del.GetValidatorAddr())
 		wc := k.GetWithdrawContext(ctx, del.GetValidatorAddr())
+		wc.FeePool = feePool
 		distInfo := k.GetDelegationDistInfo(ctx, del.GetDelegatorAddr(), del.GetValidatorAddr())
 		_, vdi, newFeePool, diWithdraw := distInfo.WithdrawRewards(log.NewNopLogger(), wc, vdi, validator.GetDelegatorShares(), del.GetShares())
 		totalWithdraw = totalWithdraw.Plus(diWithdraw)
