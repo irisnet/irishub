@@ -6,26 +6,7 @@
 注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.13.1
 ```
 
-有以下两种方式：
-### 方法1：下载发行版安装
-
-进入下载页: https://github.com/irisnet/irishub/releases/
-下载对应版本的可执行文件
-解压缩
-```
-unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip
-```
-拷贝到/usr/local/bin/目录下 
-执行以下命令,若出现对应的版本号则说明安装成功。
-
-```
-$ iris version
-<latest_iris_version>
-    
-$ iriscli version
-<latest_iriscli_version>
-```
-### 方法2：源码编译安装
+### 源码编译安装
 
 #### 安装Go版本 1.10+ 
 

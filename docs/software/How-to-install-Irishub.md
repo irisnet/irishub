@@ -6,27 +6,7 @@ refer to : https://github.com/irisnet/irishub/releases/latest
 Please replace <latest_iris_version> with v0.13.1 while using "git checkout" 
 ```
 
-There are two ways to get `iris` running on your server. You can download the binary files from our release page, or you can download the source code and compile it locally.
-
-#### Download Binary Directly
-
-Go to the download page: 
-
-https://github.com/irisnet/irishub/releases/latest
-
-then get the latest release on your computer.
-
-`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` 
-
-You can verify you have the right version installed by running the following commands:
-
-```
-$ iris version
-<latest_iris_version>
-
-$ iriscli version
-<latest_iris_version>
-```
+You can download the source code from github and compile it locally.
 
 #### Compile Source Code
 
