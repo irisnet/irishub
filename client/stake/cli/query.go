@@ -140,10 +140,13 @@ func GetCmdQueryValidatorUnbondingDelegations(queryRoute string, cdc *codec.Code
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(valAddr)
 
-			if err = queryValidator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryValidatorUnbondingDelegations),
-				params); err != nil {
+			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryValidatorUnbondingDelegations, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
@@ -165,10 +168,13 @@ func GetCmdQueryValidatorRedelegations(queryRoute string, cdc *codec.Codec) *cob
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(valAddr)
 
-			if err = queryValidator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryValidatorRedelegations),
-				params); err != nil {
+			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryValidatorRedelegations, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
@@ -196,41 +202,13 @@ func GetCmdQueryDelegation(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			params := stake.NewQueryBondsParams(delAddr, valAddr)
 
-			bz, err := cdc.MarshalJSON(params)
+			res, err := queryBonds(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryDelegation, params)
+
 			if err != nil {
 				return err
 			}
-
-			res, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryDelegation),
-				bz)
-			if err != nil {
-				return err
-			}
-
-			var delegation stake.Delegation
-			cdc.MustUnmarshalJSON(res, &delegation)
-
-			// parse out the unbonding delegation
-			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				resp, err := delegationOutput.HumanReadableString()
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(resp)
-			case "json":
-				output, err := codec.MarshalJSONIndent(cdc, delegationOutput)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
-				return nil
-			}
-
+			println(string(res))
 			return nil
 		},
 	}
@@ -258,10 +236,13 @@ func GetCmdQueryDelegations(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			if err = queryDelegator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryDelegatorDelegations),
-				params); err != nil {
+			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryDelegatorDelegations, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
@@ -285,10 +266,13 @@ func GetCmdQueryValidatorDelegations(queryRoute string, cdc *codec.Codec) *cobra
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(validatorAddr)
 
-			if err = queryValidator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryValidatorDelegations),
-				params); err != nil {
+			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryValidatorDelegations, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
@@ -316,10 +300,13 @@ func GetCmdQueryUnbondingDelegation(queryRoute string, cdc *codec.Codec) *cobra.
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryBondsParams(delAddr, valAddr)
 
-			if err = queryBonds(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryUnbondingDelegation),
-				params); err != nil {
+			res, err := queryBonds(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryUnbondingDelegation, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
@@ -347,10 +334,13 @@ func GetCmdQueryUnbondingDelegations(queryRoute string, cdc *codec.Codec) *cobra
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			if err = queryDelegator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryDelegatorUnbondingDelegations),
-				params); err != nil {
+			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryDelegatorUnbondingDelegations, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
@@ -440,10 +430,13 @@ func GetCmdQueryRedelegations(queryRoute string, cdc *codec.Codec) *cobra.Comman
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			if err = queryDelegator(cliCtx, fmt.Sprintf("custom/%s/%s", queryRoute, stake.QueryDelegatorRedelegations),
-				params); err != nil {
+			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", queryRoute),
+				stake.QueryDelegatorRedelegations, params)
+
+			if err != nil {
 				return err
 			}
+			println(string(res))
 			return nil
 		},
 	}
