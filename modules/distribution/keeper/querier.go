@@ -120,7 +120,7 @@ func queryAllDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQue
 		}
 		return false
 	}
-	k.IterateDelegationDistInfos(ctx, ddiIter)
+	k.IterateDelegatorDistInfos(ctx, params.DelegatorAddress, ddiIter)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, distInfos)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))

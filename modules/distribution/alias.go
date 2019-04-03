@@ -62,6 +62,7 @@ var (
 	NewQuerier                       = keeper.NewQuerier
 	NewQueryDelegatorParams          = keeper.NewQueryDelegatorParams
 	NewQueryDelegationDistInfoParams = keeper.NewQueryDelegationDistInfoParams
+	NewQueryValidatorDistInfoParams  = keeper.NewQueryValidatorDistInfoParams
 	NewQueryRewardsParams            = keeper.NewQueryRewardsParams
 
 	NewTotalAccum = types.NewTotalAccum
@@ -70,6 +71,14 @@ var (
 const (
 	DefaultCodespace = types.DefaultCodespace
 	CodeInvalidInput = types.CodeInvalidInput
+)
+
+const (
+	QueryWithdrawAddr          = keeper.QueryWithdrawAddr
+	QueryDelegationDistInfo    = keeper.QueryDelegationDistInfo
+	QueryAllDelegationDistInfo = keeper.QueryAllDelegationDistInfo
+	QueryValidatorDistInfo     = keeper.QueryValidatorDistInfo
+	QueryRewards               = keeper.QueryRewards
 )
 
 var (
