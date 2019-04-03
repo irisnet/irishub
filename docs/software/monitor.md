@@ -6,7 +6,7 @@ IRISnet can report and serve the Prometheus metrics, which in their turn can be 
 
 This functionality is disabled by default.
 
-To enable the Prometheus metrics, set `instrumentation.prometheus=true` in your config file. Metrics will be served under /metrics on 26660 port by default. Listen address can be changed in the config file (see instrumentation.prometheus_listen_addr).
+To enable the Prometheus metrics, set `prometheus = true` in your config file(config.toml). Metrics will be served under /metrics on 26660 port by default. Listen address can be changed in the config file (`prometheus_listen_addr = ":26660"`).
 
 ### List of available metrics
 
