@@ -1,19 +1,19 @@
 package lcd
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
-	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/distribution/types"
+	distrClient "github.com/irisnet/irishub/client/distribution"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // QueryWithdrawAddressHandlerFn performs withdraw address query
-func QueryWithdrawAddressHandlerFn(storeName string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryWithdrawAddressHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
@@ -24,27 +24,26 @@ func QueryWithdrawAddressHandlerFn(storeName string, cliCtx context.CLIContext) 
 			return
 		}
 
-		key := distribution.GetDelegatorWithdrawAddrKey(delAddr)
-
-		res, err := cliCtx.QueryStore(key, storeName)
+		params := distribution.NewQueryDelegatorParams(delAddr)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryWithdrawAddr),
+			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		var withdrawAddress sdk.AccAddress
-		if len(res) == 0 {
-			withdrawAddress = delAddr
-		} else {
-			withdrawAddress = sdk.AccAddress(res)
-		}
-
-		w.Write([]byte(withdrawAddress.String()))
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
 
 // QueryDelegatorDistInfoHandlerFn query all delegation distribution info of the specified delegator
-func QueryDelegatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryDelegatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
@@ -54,33 +53,25 @@ func QueryDelegatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		key := distribution.GetDelegationDistInfosKey(delAddr)
-		resKVs, err := cliCtx.QuerySubspace(key, storeName)
+		params := distribution.NewQueryDelegatorParams(delAddr)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		if len(resKVs) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNoContent, "")
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryAllDelegationDistInfo),
+			bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
-		var ddiList []types.DelegationDistInfo
-		for _, kv := range resKVs {
-			var ddi types.DelegationDistInfo
-			err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(kv.Value, &ddi)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			ddiList = append(ddiList, ddi)
-		}
-		utils.PostProcessResponse(w, cliCtx.Codec, ddiList, cliCtx.Indent)
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
 
 // QueryDelegationDistInfoHandlerFn query delegation distribution info
-func QueryDelegationDistInfoHandlerFn(storeName string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryDelegationDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -98,29 +89,25 @@ func QueryDelegationDistInfoHandlerFn(storeName string, cliCtx context.CLIContex
 			return
 		}
 
-		key := distribution.GetDelegationDistInfoKey(delAddr, valAddr)
-		res, err := cliCtx.QueryStore(key, storeName)
+		params := distribution.NewQueryDelegationDistInfoParams(delAddr, valAddr)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNoContent, "")
-			return
-		}
-
-		var ddi types.DelegationDistInfo
-		err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(res, &ddi)
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryDelegationDistInfo),
+			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.PostProcessResponse(w, cliCtx.Codec, ddi, cliCtx.Indent)
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
 
 // QueryValidatorDistInfoHandlerFn query validator distribution info
-func QueryValidatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryValidatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -131,42 +118,52 @@ func QueryValidatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 			return
 		}
 
-		key := distribution.GetValidatorDistInfoKey(valAddr)
-
-		res, err := cliCtx.QueryStore(key, storeName)
+		params := distribution.NewQueryValidatorDistInfoParams(valAddr)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		if len(res) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNoContent, "")
-			return
-		}
-
-		var vdi types.ValidatorDistInfo
-		err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(res, &vdi)
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryValidatorDistInfo),
+			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		vdiOutput := distributionclient.ConvertToValidatorDistInfoOutput(cliCtx, vdi)
 
-		utils.PostProcessResponse(w, cliCtx.Codec, vdiOutput, cliCtx.Indent)
+		var vddInfo distribution.ValidatorDistInfo
+		if err = cliCtx.Codec.UnmarshalJSON(res, &vddInfo); err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		output := distrClient.ConvertToValidatorDistInfoOutput(cliCtx, vddInfo)
+
+		utils.PostProcessResponse(w, cliCtx.Codec, output, cliCtx.Indent)
 	}
 }
 
 // QueryRewardsHandlerFn query the all the rewards of validator or delegator
-func QueryRewardsHandlerFn(distrStoreName string, stakeStoreName string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryRewardsHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
 		AddrStr := vars["address"]
 		accAddress, err := sdk.AccAddressFromBech32(AddrStr)
+		params := distribution.NewQueryRewardsParams(accAddress)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.PostProcessResponse(w, cliCtx.Codec,
-			distributionclient.GetRewards(distrStoreName, stakeStoreName, cliCtx, accAddress), cliCtx.Indent)
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryRewards),
+			bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }

@@ -6,8 +6,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 )
 
-const storeName = "distr"
-const stakeStoreName = "stake"
+const queryRoute = "distr"
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
@@ -15,13 +14,13 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 	r.HandleFunc("/distribution/{delegatorAddr}/withdrawReward", WithdrawRewardsHandlerFn(cdc, cliCtx)).Methods("POST")
 
 	r.HandleFunc("/distribution/{delegatorAddr}/withdrawAddress",
-		QueryWithdrawAddressHandlerFn(storeName, cliCtx)).Methods("GET")
+		QueryWithdrawAddressHandlerFn(queryRoute, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{delegatorAddr}/distrInfo/{validatorAddr}",
-		QueryDelegationDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
+		QueryDelegationDistInfoHandlerFn(queryRoute, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{delegatorAddr}/distrInfos",
-		QueryDelegatorDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
+		QueryDelegatorDistInfoHandlerFn(queryRoute, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{validatorAddr}/valDistrInfo",
-		QueryValidatorDistInfoHandlerFn(storeName, cliCtx)).Methods("GET")
+		QueryValidatorDistInfoHandlerFn(queryRoute, cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{address}/rewards",
-		QueryRewardsHandlerFn(storeName, stakeStoreName, cliCtx)).Methods("GET")
+		QueryRewardsHandlerFn(queryRoute, cliCtx)).Methods("GET")
 }

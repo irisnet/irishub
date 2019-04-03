@@ -9,6 +9,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	distrClient "github.com/irisnet/irishub/client/distribution"
 )
 
 const NULL = "null"
@@ -151,6 +152,18 @@ func GetValidatorDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			var vddInfo distribution.ValidatorDistInfo
+			if err = cliCtx.Codec.UnmarshalJSON(res, &vddInfo); err != nil {
+				return err
+			}
+
+			output := distrClient.ConvertToValidatorDistInfoOutput(cliCtx, vddInfo)
+			res, err = codec.MarshalJSONIndent(cdc, output)
+			if err != nil {
+				return err
+			}
+
 			fmt.Println(string(res))
 			return nil
 		},
