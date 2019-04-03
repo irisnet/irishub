@@ -31,5 +31,5 @@ iris export --height 10000
 ```
 3. 如果想导出105000高度的区块链状态，并且以这个状态启动一条新链，可以尝试这个命令
 ```
-iris export --height=105000 --for-zero-height --home=[your_home]
+iris export --height=105000 --for-zero-height --home=<path_to_your_home>
 ```

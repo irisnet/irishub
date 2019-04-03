@@ -33,6 +33,8 @@ module.exports = {
                         ['light-client.md', 'Light Client'],
                         ['tool.md', 'Tool'],
                         ['monitor.md', 'Monitor'],
+                        ['export.md', 'Export'],
+                        ['sentry.md', 'Sentry'],
                         ['ledger.md', 'Ledger'],
                         ['kms/kms.md', 'Kms']
                     ],
@@ -159,6 +161,8 @@ module.exports = {
                         ['light-client.md', 'Light Client'],
                         ['tool.md', 'Tool'],
                         ['monitor.md', 'Monitor'],
+                        ['export.md', 'Export'],
+                        ['sentry.md', 'Sentry'],
                         ['ledger.md', 'Ledger'],
                         ['kms/kms.md', 'Kms']
                     ],
