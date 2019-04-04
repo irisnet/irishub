@@ -7,18 +7,6 @@ import (
 	"strings"
 )
 
-const (
-	AccountRouter  = "acc"
-	StakeRouter    = "stake"
-	DistrRouter    = "distr"
-	SlashingRouter = "slashing"
-	GovRouter      = "gov"
-	ParamsRouter   = "params"
-	ServiceRouter  = "service"
-	GuardianRouter = "guardian"
-	UpgradeRouter  = "upgrade"
-)
-
 // Router provides handlers for each transaction type.
 type Router interface {
 	AddRoute(r string, h sdk.Handler) (rtr Router)
