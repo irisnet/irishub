@@ -97,11 +97,11 @@ func main() {
 	}
 	distributionCmd.AddCommand(
 		client.GetCommands(
-			distributioncmd.GetWithdrawAddress("distr", cdc),
-			distributioncmd.GetDelegationDistInfo("distr", cdc),
-			distributioncmd.GetValidatorDistInfo("distr", cdc),
-			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
-			distributioncmd.GetRewards("distr", cdc),
+			distributioncmd.GetWithdrawAddress(cdc),
+			distributioncmd.GetDelegationDistInfo(cdc),
+			distributioncmd.GetValidatorDistInfo(cdc),
+			distributioncmd.GetAllDelegationDistInfo(cdc),
+			distributioncmd.GetRewards(cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(

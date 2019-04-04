@@ -10,12 +10,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	distrClient "github.com/irisnet/irishub/client/distribution"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
-const NULL = "null"
-
 // GetWithdrawAddress returns withdraw address of a given delegator address
-func GetWithdrawAddress(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetWithdrawAddress(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:     "withdraw-address",
 		Short:   "Query withdraw address",
@@ -37,7 +36,7 @@ func GetWithdrawAddress(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			res, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryWithdrawAddr),
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryWithdrawAddr),
 				bz)
 			if err != nil {
 				return err
@@ -49,7 +48,7 @@ func GetWithdrawAddress(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetDelegationDistInfo returns the delegation distribution information of a given delegation
-func GetDelegationDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetDelegationDistInfo(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delegation-distr-info",
 		Short:   "Query delegation distribution information",
@@ -72,7 +71,7 @@ func GetDelegationDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			res, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryDelegationDistInfo),
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryDelegationDistInfo),
 				bz)
 			if err != nil {
 				return err
@@ -89,7 +88,7 @@ func GetDelegationDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetAllDelegationDistInfo returns all delegation distribution information of a given delegator
-func GetAllDelegationDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetAllDelegationDistInfo(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delegator-distr-info",
 		Short:   "Query delegator distribution information",
@@ -111,7 +110,7 @@ func GetAllDelegationDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Comman
 				return err
 			}
 			res, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryAllDelegationDistInfo),
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryAllDelegationDistInfo),
 				bz)
 			if err != nil {
 				return err
@@ -124,7 +123,7 @@ func GetAllDelegationDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Comman
 }
 
 // GetValidatorDistInfo returns the validator distribution information of a given validator
-func GetValidatorDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetValidatorDistInfo(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "validator-distr-info",
 		Short:   "Query validator distribution information",
@@ -147,7 +146,7 @@ func GetValidatorDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			res, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryValidatorDistInfo),
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryValidatorDistInfo),
 				bz)
 			if err != nil {
 				return err
@@ -172,7 +171,7 @@ func GetValidatorDistInfo(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetRewards returns the all the rewards of validator or delegator
-func GetRewards(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetRewards(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rewards",
 		Short:   "Query all the rewards of validator or delegator",
@@ -193,7 +192,7 @@ func GetRewards(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			res, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryRewards),
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryRewards),
 				bz)
 			if err != nil {
 				return err
