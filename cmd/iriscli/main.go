@@ -145,28 +145,28 @@ func main() {
 	}
 	stakeCmd.AddCommand(
 		client.GetCommands(
-			stakecmd.GetCmdQueryValidator(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryValidators(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryDelegation(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryDelegations(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryUnbondingDelegation(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryUnbondingDelegations(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryValidatorDelegations(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryValidatorUnbondingDelegations(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryValidatorRedelegations(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryRedelegation(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryRedelegations(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryPool(protocol.StakeRouter, cdc),
-			stakecmd.GetCmdQueryParams(protocol.StakeRouter, cdc),
-			slashingcmd.GetCmdQuerySigningInfo(protocol.SlashingRouter, cdc),
+			stakecmd.GetCmdQueryValidator(cdc),
+			stakecmd.GetCmdQueryValidators(cdc),
+			stakecmd.GetCmdQueryDelegation(cdc),
+			stakecmd.GetCmdQueryDelegations(cdc),
+			stakecmd.GetCmdQueryUnbondingDelegation(cdc),
+			stakecmd.GetCmdQueryUnbondingDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations(cdc),
+			stakecmd.GetCmdQueryRedelegation(cdc),
+			stakecmd.GetCmdQueryRedelegations(cdc),
+			stakecmd.GetCmdQueryPool(cdc),
+			stakecmd.GetCmdQueryParams(cdc),
+			slashingcmd.GetCmdQuerySigningInfo(protocol.SlashingRoute, cdc),
 		)...)
 	stakeCmd.AddCommand(
 		client.PostCommands(
 			stakecmd.GetCmdCreateValidator(cdc),
 			stakecmd.GetCmdEditValidator(cdc),
 			stakecmd.GetCmdDelegate(cdc),
-			stakecmd.GetCmdUnbond("stake", cdc),
-			stakecmd.GetCmdRedelegate("stake", cdc),
+			stakecmd.GetCmdUnbond(cdc),
+			stakecmd.GetCmdRedelegate(cdc),
 			slashingcmd.GetCmdUnrevoke(cdc),
 		)...)
 	rootCmd.AddCommand(

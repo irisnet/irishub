@@ -1,27 +1,28 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/client/context"
+	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/types"
-	stakeClient "github.com/irisnet/irishub/client/stake"
-	"fmt"
 )
 
-func queryBonds(cliCtx context.CLIContext, endpoint string, querier string, params stake.QueryBondsParams) ([]byte, error) {
+func queryBonds(cliCtx context.CLIContext, route string, query string, params stake.QueryBondsParams) ([]byte, error) {
 	cdc := cliCtx.Codec
 	bz, err := cdc.MarshalJSON(params)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", endpoint, querier), bz)
+	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", route, query), bz)
 	if err != nil {
 		return nil, err
 	}
 
-	switch querier {
+	switch query {
 	case stake.QueryUnbondingDelegation:
 		var unbondingDelegation types.UnbondingDelegation
 		if err = cdc.UnmarshalJSON(res, &unbondingDelegation); err != nil {
@@ -55,7 +56,7 @@ func queryBonds(cliCtx context.CLIContext, endpoint string, querier string, para
 	return res, nil
 }
 
-func queryDelegator(cliCtx context.CLIContext, endpoint string, querier string, params stake.QueryDelegatorParams) ([]byte, error) {
+func queryDelegator(cliCtx context.CLIContext, route string, query string, params stake.QueryDelegatorParams) ([]byte, error) {
 
 	cdc := cliCtx.Codec
 	bz, err := cdc.MarshalJSON(params)
@@ -63,12 +64,12 @@ func queryDelegator(cliCtx context.CLIContext, endpoint string, querier string, 
 		return nil, err
 	}
 
-	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", endpoint, querier), bz)
+	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", route, query), bz)
 	if err != nil {
 		return nil, err
 	}
 
-	switch querier {
+	switch query {
 	case stake.QueryDelegatorDelegations:
 		var delegations []types.Delegation
 		// parse out the validators
@@ -137,19 +138,19 @@ func queryDelegator(cliCtx context.CLIContext, endpoint string, querier string, 
 	return res, nil
 }
 
-func queryValidator(cliCtx context.CLIContext, endpoint string, querier string, params stake.QueryValidatorParams) ([]byte, error) {
+func queryValidator(cliCtx context.CLIContext, route string, query string, params stake.QueryValidatorParams) ([]byte, error) {
 	cdc := cliCtx.Codec
 	bz, err := cdc.MarshalJSON(params)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", endpoint, querier), bz)
+	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", route, query), bz)
 	if err != nil {
 		return nil, err
 	}
 
-	switch endpoint {
+	switch query {
 	case stake.QueryValidator:
 		var validator types.Validator
 		if err = cdc.UnmarshalJSON(res, &validator); err != nil {

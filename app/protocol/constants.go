@@ -20,15 +20,15 @@ const (
 	UpgradeStore         = "upgrade"
 
 	// all query route
-	AccountRouter  = AccountStore
-	StakeRouter    = StakeStore
-	DistrRouter    = DistrStore
-	SlashingRouter = SlashingStore
-	GovRouter      = GovStore
-	ParamsRouter   = ParamsStore
-	ServiceRouter  = ServiceStore
-	GuardianRouter = GuardianStore
-	UpgradeRouter  = UpgradeStore
+	AccountRoute  = AccountStore
+	StakeRoute    = StakeStore
+	DistrRoute    = DistrStore
+	SlashingRoute = SlashingStore
+	GovRoute      = GovStore
+	ParamsRoute   = ParamsStore
+	ServiceRoute  = ServiceStore
+	GuardianRoute = GuardianStore
+	UpgradeRoute  = UpgradeStore
 )
 
 var (
