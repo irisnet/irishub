@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
@@ -144,28 +145,28 @@ func main() {
 	}
 	stakeCmd.AddCommand(
 		client.GetCommands(
-			stakecmd.GetCmdQueryValidator("stake", cdc),
-			stakecmd.GetCmdQueryValidators("stake", cdc),
-			stakecmd.GetCmdQueryDelegation("stake", cdc),
-			stakecmd.GetCmdQueryDelegations("stake", cdc),
-			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
-			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
-			stakecmd.GetCmdQueryRedelegation("stake", cdc),
-			stakecmd.GetCmdQueryRedelegations("stake", cdc),
-			stakecmd.GetCmdQueryPool("stake", cdc),
-			stakecmd.GetCmdQueryParams("stake", cdc),
-			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
+			stakecmd.GetCmdQueryValidator(cdc),
+			stakecmd.GetCmdQueryValidators(cdc),
+			stakecmd.GetCmdQueryDelegation(cdc),
+			stakecmd.GetCmdQueryDelegations(cdc),
+			stakecmd.GetCmdQueryUnbondingDelegation(cdc),
+			stakecmd.GetCmdQueryUnbondingDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations(cdc),
+			stakecmd.GetCmdQueryRedelegation(cdc),
+			stakecmd.GetCmdQueryRedelegations(cdc),
+			stakecmd.GetCmdQueryPool(cdc),
+			stakecmd.GetCmdQueryParams(cdc),
+			slashingcmd.GetCmdQuerySigningInfo(protocol.SlashingRoute, cdc),
 		)...)
 	stakeCmd.AddCommand(
 		client.PostCommands(
 			stakecmd.GetCmdCreateValidator(cdc),
 			stakecmd.GetCmdEditValidator(cdc),
 			stakecmd.GetCmdDelegate(cdc),
-			stakecmd.GetCmdUnbond("stake", cdc),
-			stakecmd.GetCmdRedelegate("stake", cdc),
+			stakecmd.GetCmdUnbond(cdc),
+			stakecmd.GetCmdRedelegate(cdc),
 			slashingcmd.GetCmdUnrevoke(cdc),
 		)...)
 	rootCmd.AddCommand(
