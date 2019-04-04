@@ -1,24 +1,12 @@
-# 如何安装IRIShub
-有以下两种方式：
-### 方法1：下载发行版安装
+# 如何安装`iris`
 
-进入下载页: https://github.com/irisnet/irishub/releases/
-下载对应版本的可执行文件
-解压缩
+### 当前IRIShub最新版本为 ： v0.13.1
+获取最新版本 https://github.com/irisnet/irishub/releases/latest
 ```
-tar -C /usr/local/bin -xzf iris$VERSION.$OS-$ARCH.zip
+注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.13.1
 ```
-拷贝到/usr/local/bin/目录下 
-执行以下命令,若出现对应的版本号则说明安装成功。
 
-```
-$ iris version
-v0.12.3
-    
-$ iriscli version
-v0.12.3
-```
-### 方法2：源码编译安装
+### 源码编译安装
 
 #### 安装Go版本 1.10+ 
 
@@ -67,18 +55,19 @@ source ~/.bash_profile
 #### 下载源码并安装
 
 
-在完成Go的安装后，通过以下命令下载并安装IRIS hub相关程序.
+在完成Go的安装后，通过以下命令下载并安装IRIS hub相关程序.(请确保你的电脑可以访问`google.com`， `iris`很多库的依赖由google提供)
 
 * 编译用于`测试网`的可执行文件:
-
+请下载最新版本的代码编译，参考：https://github.com/irisnet/irishub/releases/latest
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.3
+cd irishub && git checkout <latest_iris_version>
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
+source scripts/setTestEnv.sh
 make all
 ```
 
@@ -87,20 +76,19 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.3
+cd irishub && git checkout <latest_iris_version>
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
-source scripts/setProdEnv.sh
 make all
 ```
 
-以上命令将完成iris 和 iriscli的安装. 若出现对应的版本号则说明安装成功。
+以上命令将完成`iris`和`iriscli`的安装. 若出现对应的版本号则说明安装成功。
 
 ```
 $ iris version
-v0.12.3
+<latest_iris_version>
     
 $ iriscli version
-v0.12.3
+<latest_iriscli_version>
 ```
