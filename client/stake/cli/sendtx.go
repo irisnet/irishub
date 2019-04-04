@@ -12,6 +12,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.
@@ -217,7 +218,7 @@ func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdRedelegate implements the redelegate validator command.
-func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdRedelegate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "redelegate",
 		Short:   "redelegate illiquid tokens from one validator to another",
@@ -250,7 +251,7 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
 			sharesAmount, err := stakeClient.GetShares(
-				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
+				protocol.StakeStore, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorSrcAddr,
 			)
 			if err != nil {
@@ -271,7 +272,7 @@ func GetCmdRedelegate(storeName string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdBeginUnbonding implements the begin unbonding validator command.
-func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdUnbond(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "unbond",
 		Short:   "unbond shares from a validator",
@@ -298,7 +299,7 @@ func GetCmdUnbond(storeName string, cdc *codec.Codec) *cobra.Command {
 			sharesAmountStr := viper.GetString(FlagSharesAmount)
 			sharesPercentStr := viper.GetString(FlagSharesPercent)
 			sharesAmount, err := stakeClient.GetShares(
-				storeName, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
+				protocol.StakeStore, cliCtx, cdc, sharesAmountStr, sharesPercentStr,
 				delegatorAddr, validatorAddr,
 			)
 			if err != nil {
