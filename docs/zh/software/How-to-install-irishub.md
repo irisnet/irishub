@@ -1,4 +1,4 @@
-# 如何安装IRIShub
+# 如何安装`iris`
 
 ### 当前IRIShub最新版本为 ： v0.13.1
 获取最新版本 https://github.com/irisnet/irishub/releases/latest

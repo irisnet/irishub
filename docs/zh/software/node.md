@@ -4,7 +4,7 @@
 
 iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris，并启动守护进程来加入到IRISnet网络。你也可以使用iris在本地启动自己的测试网络。
 
-## 如何安装IRIShub
+## 如何安装`iris`
 请根据以下[教程](How-to-install-irishub.md)完成安装。
 
 ## 如何在本地启动一个IRISnet网络

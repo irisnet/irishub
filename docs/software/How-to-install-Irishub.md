@@ -1,4 +1,4 @@
-# How to install IRIShub 
+# How to install `iris` 
 
 ### The Latest version of IRIShub : v0.13.1
 refer to : https://github.com/irisnet/irishub/releases/latest
@@ -62,8 +62,8 @@ $ echo $PATH
 
 - Get the code and compile Iris
 
-After setup Go correctly, you should be able to compile and run `iris`.
-Make sure that your server can access to google.com for that our project depends on some libraries provided by google.
+After setting up Go correctly, you should be able to compile and run `iris`.
+Make sure that your server can access to google.com because our project depends on some libraries provided by google.
 
 * To compile for `testnet`:
 Please checkout the latest version，refer to：https://github.com/irisnet/irishub/releases/latest

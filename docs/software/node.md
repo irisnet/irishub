@@ -2,16 +2,16 @@
 
 ## Introduction
 
-The `iris` executable is the entry point for running a IRISnet network node. All the validator nodes and full nodes need to install the `iris` and launching the daemon to join the IRISnet network. You can also use `iris` to start your own test network locally.
+The `iris` executable is the entry point for running an IRISnet network node. All the validator nodes and full nodes need to install the `iris` and launching the daemon to join the IRISnet network. You can also use `iris` to start your own test network locally.
 
-## How to install IRIShub 
+## How to install `iris` 
 Please follow this [guide](How-to-install-Irishub.md) to install irishub.
 
 ## How to start an IRISnet network locally
 
 ### Initialize node
 
-First you need to create a account as the corresponding validator operator for yourself.
+First you need to create an account as the corresponding validator operator for yourself.
 ```bash
 iriscli keys add <account_name>
 ```
@@ -95,13 +95,13 @@ iris start --home=<path_to_your_home>/node0/iris
 iris start --home=<path_to_your_home>/node1/iris
 ```
 
-To start the node to join the public IRIS Testnet, please refer to [Full-Node](../get-started/Full-Node.md)
+To run a full node on the network, please refer to [Full-Node](../get-started/Full-Node.md)
 
 ## Introduction of home directory 
 
 The home directory is the working directory of the iris node. The home directory contains all the configuration information and all the data that the node runs.
 
-In the iris command, you can specify the home directory of the node by using flag `--home`. If you run multiple nodes on the same machine, you need to specify a different home directory for them. If the `--home` flag is not specified in the iris command, the default value `$HOME/.iris` is used as the home directory.
+In the `iris` command, you can specify the home directory of the node by using flag `--home`. If you run multiple nodes on the same machine, you need to specify a different home directory for them. If the `--home` flag is not specified in the iris command, the default value `$HOME/.iris` is used as the home directory.
 
 The `iris init` command is responsible for initializing the specified `--home` directory and creating the default configuration files. Except the `iris init` command, the home directory used by any other `iris` sub commands must be initialized, otherwise an error will be reported.
 

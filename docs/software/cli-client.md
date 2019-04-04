@@ -73,7 +73,7 @@ Print：
           "title": "test",
           "description": "test",
           "proposal_type": "TxTaxUsage",
-          "proposer": "faa1c8ru5cc3jl73mtmuwhkdskt3wlvk36rf567v2g",
+          "proposer": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx",
           "initial_deposit": [
             {
               "denom": "iris-atto",
