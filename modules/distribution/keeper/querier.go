@@ -214,7 +214,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 		totalWithdraw = totalWithdraw.Plus(diWithdraw)
 		rewardTruncate, _ := diWithdraw.TruncateDecimal()
 		rewards.Delegations = append(rewards.Delegations, DelegationsReward{del.GetValidatorAddr(), rewardTruncate})
-		if vdi.OperatorAddr.Equals(selfValidator.GetOperator()) {
+		if selfValidator != nil && selfValidator.GetOperator().Equals(vdi.OperatorAddr) {
 			selfVdi = vdi
 		}
 		feePool = newFeePool
@@ -223,7 +223,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 	k.stakeKeeper.IterateDelegations(ctx, params.Address, operationAtDelegation)
 
 	// get all validator rewards
-	if selfVdi.OperatorAddr.Equals(sdk.ValAddress(params.Address)) {
+	if !selfVdi.OperatorAddr.Empty() && selfVdi.OperatorAddr.Equals(sdk.ValAddress(params.Address)) {
 		wc := k.GetWithdrawContext(ctx, selfValidator.GetOperator())
 		wc.FeePool = feePool
 		_, _, commission := selfVdi.WithdrawCommission(log.NewNopLogger(), wc)
