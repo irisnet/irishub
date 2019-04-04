@@ -236,6 +236,7 @@ func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, ba
 		ChainID:       baseTx.ChainID,
 		AccountNumber: baseTx.AccountNumber,
 		Sequence:      baseTx.Sequence,
+		Memo:          baseTx.Memo,
 	}
 	txCtx = txCtx.WithCliCtx(cliCtx)
 
