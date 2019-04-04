@@ -10,10 +10,11 @@ import (
 	"github.com/irisnet/irishub/modules/distribution"
 	distrClient "github.com/irisnet/irishub/client/distribution"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
 // QueryWithdrawAddressHandlerFn performs withdraw address query
-func QueryWithdrawAddressHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryWithdrawAddressHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
@@ -31,7 +32,7 @@ func QueryWithdrawAddressHandlerFn(queryRoute string, cliCtx context.CLIContext)
 			return
 		}
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryWithdrawAddr),
+			fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryWithdrawAddr),
 			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -43,7 +44,7 @@ func QueryWithdrawAddressHandlerFn(queryRoute string, cliCtx context.CLIContext)
 }
 
 // QueryDelegatorDistInfoHandlerFn query all delegation distribution info of the specified delegator
-func QueryDelegatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryDelegatorDistInfoHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
@@ -60,7 +61,7 @@ func QueryDelegatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContex
 			return
 		}
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryAllDelegationDistInfo),
+			fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryAllDelegationDistInfo),
 			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -71,7 +72,7 @@ func QueryDelegatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContex
 }
 
 // QueryDelegationDistInfoHandlerFn query delegation distribution info
-func QueryDelegationDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryDelegationDistInfoHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -96,7 +97,7 @@ func QueryDelegationDistInfoHandlerFn(queryRoute string, cliCtx context.CLIConte
 			return
 		}
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryDelegationDistInfo),
+			fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryDelegationDistInfo),
 			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -107,7 +108,7 @@ func QueryDelegationDistInfoHandlerFn(queryRoute string, cliCtx context.CLIConte
 }
 
 // QueryValidatorDistInfoHandlerFn query validator distribution info
-func QueryValidatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryValidatorDistInfoHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -125,7 +126,7 @@ func QueryValidatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContex
 			return
 		}
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryValidatorDistInfo),
+			fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryValidatorDistInfo),
 			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -145,7 +146,7 @@ func QueryValidatorDistInfoHandlerFn(queryRoute string, cliCtx context.CLIContex
 }
 
 // QueryRewardsHandlerFn query the all the rewards of validator or delegator
-func QueryRewardsHandlerFn(queryRoute string, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryRewardsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -158,7 +159,7 @@ func QueryRewardsHandlerFn(queryRoute string, cliCtx context.CLIContext) http.Ha
 			return
 		}
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, distribution.QueryRewards),
+			fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryRewards),
 			bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
