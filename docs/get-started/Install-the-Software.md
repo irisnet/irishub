@@ -133,7 +133,6 @@ v0.12.3
 Get latest code (you can also `git fetch` only the version desired), ensure the dependencies are up to date, then recompile.
 
 ```
-iris unsafe-reset-all --home
 cd $GOPATH/src/github.com/irisnet/irishub
 git fetch -a origin
 git checkout v0.12.3
