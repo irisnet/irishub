@@ -4,6 +4,10 @@
 
 IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
+## 如何安装IRIShub  
+
+请根据以下[教程](../software/How-to-install-Irishub.md) 安装IRIShub。
+
 ## 如何加入IRIShub主网
 
 

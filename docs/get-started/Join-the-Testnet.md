@@ -2,19 +2,19 @@
 
 ## Fuxi  Testnet
 
-The Fuxi testnet is used to provide a stable test environment for developers such as third-party wallets, browsers and other applications.
+The Fuxi Testnet is used to provide a stable test environment for developers such as third-party wallets, browsers and other applications.
 
 ## How to Use Fuxi Testnet
 
-### Step 1: Install Iriscli on Your Server
+### Step 1: Install `iriscli` on Your Server
 
-Please follow this [instruction](Install-the-Software.md) to get **Iricli** installed locally.
+Please follow this [instruction](../software/How-to-install-Irishub.md) to get `iriscli` installed locally.
 
 ### Step 2: Connect to nodes
 
 * RPC
 
-please use the following url as `node` in your iriscli query: http://rpc.testnet.irisnet.org:80
+please use the following url as `node` in your `iriscli` query: http://rpc.testnet.irisnet.org:80
 
 * LCD
 

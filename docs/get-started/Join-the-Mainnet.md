@@ -1,11 +1,10 @@
 # IRIShub Network
 
-
 ## How to Join IRIShub Mainnet
 
-### Step 1: Install Iris on Your Server
+### Step 1: Install `iris` on Your Server
 
-Please follow this [instruction](Install-the-Software.md) to get **Iris** installed locally.
+Please follow this [instruction](../software/How-to-install-Irishub.md) to get `iris` installed locally.
 
 ### Step 2: Run a Full Node
 
@@ -27,7 +26,7 @@ You now have an active full node. What's the next step?
 
 If you have participated in the genesis file generation process, you should be a validator once you are fully synced. 
 
-If you miss the genesis file generation process, you can still upgrade your full node to become a IRISnet Validator. The top 100 validators have the ability to propose new blocks to the IRIS Hub. Continue onto [the Validator Setup](Validator-Node.md).
+If you miss the genesis file generation process, you can still upgrade your full node to become an IRISnet Validator. The top 100 validators have the ability to propose new blocks to the IRIS Hub. Continue onto [the Validator Setup](Validator-Node.md).
 
 ### Setup a sentry node
 

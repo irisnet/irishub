@@ -4,11 +4,11 @@
 
 伏羲测试网（chain-id = fuxi）将运行跟主网一致的软件版本，为开发者社区（钱包、浏览器、Service Providers/Consumers）提供一个稳定的测试环境。
 
-## 如何测试fuxi网络
+## 如何使用fuxi测试网
 
 ### 第一步: 安装IRIScli
 
-请根据以下[教程](Install-the-Software.md) 在服务器上完成**Iriscli**的安装。
+请根据以下[教程](../software/How-to-install-Irishub.md) 在服务器上完成`iriscli`的安装。
 
 ### 第二步: 接入测试网节点
 
