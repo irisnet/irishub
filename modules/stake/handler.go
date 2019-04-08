@@ -229,6 +229,7 @@ func handleMsgBeginUnbonding(ctx sdk.Context, msg types.MsgBeginUnbonding, k kee
 		tags.Delegator, []byte(msg.DelegatorAddr.String()),
 		tags.SrcValidator, []byte(msg.ValidatorAddr.String()),
 		tags.EndTime, []byte(ubd.MinTime.String()),
+		tags.Balance, []byte(ubd.Balance.String()),
 	)
 	return sdk.Result{Data: finishTime, Tags: tags}
 }
