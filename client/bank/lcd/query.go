@@ -1,23 +1,24 @@
 package lcd
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // query accountREST Handler
-func QueryBalancesRequestHandlerFn(
-	storeName string, cdc *codec.Codec,
+func QueryBalancesRequestHandlerFn(cdc *codec.Codec,
 	decoder auth.AccountDecoder, cliCtx context.CLIContext,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +48,7 @@ func QueryBalancesRequestHandlerFn(
 }
 
 // QueryAccountRequestHandlerFn performs account information query
-func QueryAccountRequestHandlerFn(storeName string, cdc *codec.Codec,
+func QueryAccountRequestHandlerFn(cdc *codec.Codec,
 	decoder auth.AccountDecoder, cliCtx context.CLIContext,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -105,76 +106,31 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext, accStore, stakeStore string,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		//Get latest height
-		latestHeight, err := cliCtx.GetLatestHeight()
+		resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryTokenStats), nil)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		cliCtx = cliCtx.WithHeight(latestHeight)
-		// Query acc store
-		var loosenToken sdk.Coins
-		var burnedToken sdk.Coins
-		res, err := cliCtx.QueryStore(auth.TotalLoosenTokenKey, accStore)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		if res == nil {
-			loosenToken = nil
-		} else {
-			cdc.MustUnmarshalBinaryLengthPrefixed(res, &loosenToken)
-		}
-		res, err = cliCtx.QueryStore(auth.BurnedTokenKey, accStore)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		if res == nil {
-			burnedToken = nil
-		} else {
-			cdc.MustUnmarshalBinaryLengthPrefixed(res, &burnedToken)
 		}
 
-		// Query stake store
-		var bondedPool stake.BondedPool
-		res, err = cliCtx.QueryStore(stake.PoolKey, stakeStore)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		if res != nil {
-			cdc.MustUnmarshalBinaryLengthPrefixed(res, &bondedPool)
-		}
-		if !bondedPool.BondedTokens.Equal(bondedPool.BondedTokens.TruncateDec()) {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, "get invalid bonded token amount")
-			return
-		}
-		bondedToken := sdk.NewCoin(stakeTypes.StakeDenom, bondedPool.BondedTokens.TruncateInt())
-
-		//Convert to main coin unit
-		loosenTokenStr, err := cliCtx.ConvertCoinToMainUnit(loosenToken.String())
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		burnedTokenStr, err := cliCtx.ConvertCoinToMainUnit(burnedToken.String())
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		bondedTokenStr, err := cliCtx.ConvertCoinToMainUnit(bondedToken.String())
+		var tokenStats bank.TokenStats
+		err = cdc.UnmarshalJSON(resToken, &tokenStats)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		tokenStats := bank.TokenStats{
-			LoosenToken: loosenTokenStr,
-			BurnedToken: burnedTokenStr,
-			BondedToken: bondedTokenStr[0],
+		resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
+		var poolStatus types.PoolStatus
+		err = cdc.UnmarshalJSON(resPool, &poolStatus)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		tokenStats.BondedToken = poolStatus.BondedTokens
 
 		utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 	}

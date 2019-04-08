@@ -18,9 +18,8 @@ import (
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/irisnet/irishub/app/protocol"
 )
-
-const ctxAccStoreName = "acc"
 
 // CLIContext implements a typical CLI context created in SDK modules for
 // transaction handling and queries.
@@ -62,7 +61,7 @@ func NewCLIContext() CLIContext {
 	return CLIContext{
 		Client:        rpc,
 		NodeURI:       nodeURI,
-		AccountStore:  ctxAccStoreName,
+		AccountStore:  protocol.AccountStore,
 		Height:        viper.GetInt64(client.FlagHeight),
 		TrustNode:     viper.GetBool(client.FlagTrustNode),
 		UseLedger:     viper.GetBool(client.FlagUseLedger),
