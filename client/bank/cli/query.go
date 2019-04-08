@@ -9,7 +9,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 )
@@ -111,7 +111,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, queryRoute string) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var poolStatus types.PoolStatus
+			var poolStatus stakeTypes.PoolStatus
 			err = cdc.UnmarshalJSON(resPool, &poolStatus)
 			if err != nil {
 				return err

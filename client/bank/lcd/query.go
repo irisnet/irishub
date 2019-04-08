@@ -13,14 +13,13 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // query accountREST Handler
-func QueryBalancesRequestHandlerFn(cdc *codec.Codec,
-	decoder auth.AccountDecoder, cliCtx context.CLIContext,
-) http.HandlerFunc {
+func QueryBalancesRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
+	cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
@@ -48,9 +47,8 @@ func QueryBalancesRequestHandlerFn(cdc *codec.Codec,
 }
 
 // QueryAccountRequestHandlerFn performs account information query
-func QueryAccountRequestHandlerFn(cdc *codec.Codec,
-	decoder auth.AccountDecoder, cliCtx context.CLIContext,
-) http.HandlerFunc {
+func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
+	cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
@@ -84,8 +82,7 @@ func QueryAccountRequestHandlerFn(cdc *codec.Codec,
 }
 
 // QueryCoinTypeRequestHandlerFn performs coin type query
-func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
-) http.HandlerFunc {
+func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		coinType := vars["coin-type"]
@@ -103,8 +100,7 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext,
 }
 
 // QueryTokenStatsRequestHandlerFn performs token statistic query
-func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext, accStore, stakeStore string,
-) http.HandlerFunc {
+func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryTokenStats), nil)
 		if err != nil {
@@ -123,7 +119,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		var poolStatus types.PoolStatus
+		var poolStatus stakeTypes.PoolStatus
 		err = cdc.UnmarshalJSON(resPool, &poolStatus)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
