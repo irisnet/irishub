@@ -71,6 +71,24 @@ func (k Keeper) IterateDelegationDistInfos(ctx sdk.Context,
 	}
 }
 
+// iterate over all the validator distribution infos of one delegator
+func (k Keeper) IterateDelegatorDistInfos(ctx sdk.Context, delegator sdk.AccAddress,
+	fn func(index int64, distInfo types.DelegationDistInfo) (stop bool)) {
+
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, GetDelegationDistInfosKey(delegator))
+	defer iter.Close()
+	index := int64(0)
+	for ; iter.Valid(); iter.Next() {
+		var ddi types.DelegationDistInfo
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &ddi)
+		if fn(index, ddi) {
+			return
+		}
+		index++
+	}
+}
+
 //___________________________________________________________________________________________
 
 // get the delegator withdraw address, return the delegator address if not set
@@ -119,7 +137,7 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	recipient := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 	coins, _ := withdraw.TruncateDecimal()
 	if !coins.IsZero() {
-		if delAddr.Equals(sdk.AccAddress(valAddr)){
+		if delAddr.Equals(sdk.AccAddress(valAddr)) {
 			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.ValidatorRewardFlow, "")
 		} else {
 			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.DelegatorRewardFlow, "")

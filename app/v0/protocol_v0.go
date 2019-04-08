@@ -64,7 +64,7 @@ type ProtocolV0 struct {
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 	config       *cfg.InstrumentationConfig
 
-	metrics		*Metrics
+	metrics *Metrics
 }
 
 func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
@@ -102,7 +102,7 @@ func (p *ProtocolV0) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
-func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore){
+func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore) {
 	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
 	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
@@ -215,7 +215,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
 		p.bankKeeper, &stakeKeeper, p.feeKeeper,
-		distr.DefaultCodespace,  distr.PrometheusMetrics(p.config),
+		distr.DefaultCodespace, distr.PrometheusMetrics(p.config),
 	)
 	p.slashingKeeper = slashing.NewKeeper(
 		p.cdc,
@@ -272,7 +272,8 @@ func (p *ProtocolV0) configRouters() {
 	p.queryRouter.
 		AddRoute("acc", auth.NewQuerier(p.accountMapper)).
 		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
-		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc))
+		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc)).
+		AddRoute("distr", distr.NewQuerier(p.distrKeeper))
 }
 
 // configure all Stores
