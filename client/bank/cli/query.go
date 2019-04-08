@@ -88,7 +88,7 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryTokenStats performs token statistic query
-func GetCmdQueryTokenStats(cdc *codec.Codec, queryRoute string) *cobra.Command {
+func GetCmdQueryTokenStats(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "token-stats",
 		Short:   "query token statistics",

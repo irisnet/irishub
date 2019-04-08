@@ -21,7 +21,7 @@ func NewQuerier(keeper AccountKeeper) sdk.Querier {
 		case QueryAccount:
 			return queryAccount(ctx, req, keeper)
 		case QueryTokenStats:
-			return queryTokenStats(ctx, req, keeper)
+			return queryTokenStats(ctx, keeper)
 
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
@@ -59,18 +59,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 	return bz, nil
 }
 
-// defines the params for query: "custom/acc/coin"
-type QueryCoinParams struct {
-	CoinName string
-}
-
-func NewQueryCoinParams(coinName string) QueryCoinParams {
-	return QueryCoinParams{
-		CoinName: coinName,
-	}
-}
-
-func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) ([]byte, sdk.Error) {
+func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) {
 	tokenStats := TokenStats{
 		LoosenToken: keeper.GetTotalLoosenToken(ctx),
 		BurnedToken: keeper.GetBurnedToken(ctx),

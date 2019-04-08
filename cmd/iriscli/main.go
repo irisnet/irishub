@@ -77,7 +77,7 @@ func main() {
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
 			bankcmd.GetAccountCmd(cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetCmdQueryTokenStats(cdc, protocol.AccountRoute),
+			bankcmd.GetCmdQueryTokenStats(cdc),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
