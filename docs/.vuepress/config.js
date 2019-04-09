@@ -18,8 +18,8 @@ module.exports = {
                 nav: [
                     {text: 'Back to IRISnet', link: 'https://www.irisnet.org'},
                     {text: 'Introduction', link: '/introduction/'},
-                    {text: 'Software', link: '/software/node.md'},
                     {text: 'Getting Started', link: '/get-started/'},
+                    {text: 'Software', link: '/software/node.md'},
                     {text: 'Features', link: '/features/basic-concepts/coin-type.md'},
                     {text: 'CLI Client', link: '/cli-client/'},
                     {text: 'Light Client', link: '/light-client/'},
@@ -40,7 +40,9 @@ module.exports = {
                     ],
                     '/get-started/': [
                         ['Join-the-Testnet.md', 'Use the Testnet'],
-                        ['Join-the-Mainnet.md', 'Join the Mainnet']
+                        ['Join-the-Mainnet.md', 'Join the Mainnet'],
+                        ['Full-Node.md', 'Full Node'],
+                        ['Validator-Node.md', 'Validator Node']
                     ],
                     '/features/': [{
                         title: 'Basic Concepts',
@@ -144,8 +146,8 @@ module.exports = {
                 nav: [
                     {text: '返回官网', link: 'https://www.irisnet.org'},
                     {text: '简介', link: '/zh/introduction/'},
-                    {text: '软件', link: '/zh/software/node.md'},
                     {text: '开始', link: '/zh/get-started/'},
+                    {text: '软件', link: '/zh/software/node.md'},
                     {text: '功能', link: '/zh/features/basic-concepts/coin-type.md'},
                     {text: '命令行', link: '/zh/cli-client/'},
                     {text: '轻客户端', link: '/zh/light-client/'},
@@ -166,8 +168,9 @@ module.exports = {
                     ],
                     '/zh/get-started/': [
                         ['Join-the-Testnet.md', 'Use the Testnet'],
-                        ['Join-the-Mainnet.md', 'Join the Mainnet']
-
+                        ['Join-the-Mainnet.md', 'Join the Mainnet'],
+                        ['Full-Node.md', 'Full Node'],
+                        ['Validator-Node.md', 'Validator Node']
                     ],
                     '/zh/features/': [{
                         title: 'Basic Concepts',
