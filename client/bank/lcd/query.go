@@ -32,17 +32,26 @@ func QueryBalancesRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder
 			return
 		}
 
-		if err := cliCtx.EnsureAccountExistsFromAddr(addr); err != nil {
-			utils.WriteErrorResponse(w, http.StatusNoContent, err.Error())
+		res, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), protocol.AccountStore)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		acc, err := cliCtx.GetAccount(addr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		// the query will return empty if there is no data for this account
+		if len(res) == 0 {
+			w.WriteHeader(http.StatusNoContent)
+			return
 		}
 
-		utils.PostProcessResponse(w, cdc, acc.GetCoins(), cliCtx.Indent)
+		// decode the value
+		account, err := decoder(res)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, account.GetCoins(), cliCtx.Indent)
 	}
 }
 
@@ -60,18 +69,26 @@ func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
 			return
 		}
 
-		if err := cliCtx.EnsureAccountExistsFromAddr(addr); err != nil {
-			utils.WriteErrorResponse(w, http.StatusNoContent, err.Error())
-			return
-		}
-
-		acc, err := cliCtx.GetAccount(addr)
+		res, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), protocol.AccountStore)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't query account. Error: %s", err.Error()))
 			return
 		}
 
-		accountRes, err := bank.ConvertAccountCoin(cliCtx, acc)
+		// the query will return empty if there is no data for this account
+		if len(res) == 0 {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		// decode the value
+		account, err := decoder(res)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("couldn't parse query result. Result: %s. Error: %s", res, err.Error()))
+			return
+		}
+
+		accountRes, err := bank.ConvertAccountCoin(cliCtx, account)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
