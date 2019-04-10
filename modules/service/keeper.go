@@ -154,6 +154,11 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChai
 	return svcBinding, false
 }
 
+func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, defChainID, defName string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetBindingsSubspaceKey(defChainID, defName))
+}
+
 func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk.Error {
 	kvStore := ctx.KVStore(k.storeKey)
 	oldBinding, found := k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
@@ -376,6 +381,12 @@ func (k Keeper) GetActiveRequest(ctx sdk.Context, eHeight, rHeight int64, counte
 	return req, true
 }
 
+// Returns an iterator for all the request in the Active Queue of specified service binding
+func (k Keeper) ActiveBindRequestsIterator(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetSubActiveRequestKey(defChainID, defName, bindChainID, provider))
+}
+
 // Returns an iterator for all the request in the Active Queue that expire by block height
 func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
@@ -393,6 +404,16 @@ func (k Keeper) AddResponse(ctx sdk.Context, resp SvcResponse) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
 	store.Set(GetResponseKey(resp.ReqChainID, resp.ExpirationHeight, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
+}
+
+func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight int64, counter int16) (resp SvcResponse, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	value := store.Get(GetResponseKey(reqChainID, eHeight, rHeight, counter))
+	if value == nil {
+		return resp, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &resp)
+	return resp, true
 }
 
 //__________________________________________________________________________
