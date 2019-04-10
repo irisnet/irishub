@@ -49,7 +49,7 @@ type Unit struct {
 如果想查询某种代币的coin_type配置，可以使用如下命令
 
 ```golang
-iriscli  bank coin-type [coin_name]
+iriscli  bank coin-type <coin_name>
 ```
 
 

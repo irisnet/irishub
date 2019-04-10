@@ -27,17 +27,17 @@ NAME:	TYPE:	ADDRESS:						            PUBKEY:
 test1	local	iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz	iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l
 ```
 
-这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`， 他的用户可读部分是 `iaa`。他的公钥被密码成  `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l`， 他的用户可读部分是 `iap`。 
+这意味着你创建了一个新账户地址 `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`， 它的用户可读部分是 `iaa`。他的公钥被编码成  `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l`， 它的用户可读部分是 `iap`。 
 
  ## 验证人密钥例子
  
 在执行 `iris init`命令时回自动产生一个Tendermint的共识密钥给该节点。你可以通过以下命令查询：
    
-  ```
-  iris tendermint show-validator
-  ```
+```
+iris tendermint show-validator --home=<iris_home>
+```
 
- 示例输出:
-  ```
-  icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
-  ```
+示例输出:
+```
+icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
+```

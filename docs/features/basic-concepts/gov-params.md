@@ -1,15 +1,14 @@
 # IRIShub System Parameters
 
 In IRISnet, there are some special parameters can be modified through on-chain governance. 
-All the IRIS holders are able to modify. If the community is not satisfied with certain modifiable 
-parameters, it is available to put up a `parameter-change` proposal in governance module.
+All the IRIS holders are able to modify. If the community is not satisfied with certain modifiable parameters, it is available to submit a `parameter-change` proposal in governance module.
 
 ## Parameters in Auth
 
 | key |Description | Range|
 |----| ---|---|
 |`auth/gasPriceThreshold`  |minimum of gas price |(0, 10^18iris-atto]
-|`auth/txSizeLimit`  |the limit of the normal txsize |[500, 1500]
+|`auth/txSizeLimit`  |the limit of the normal tx size |[500, 1500]
 
 ## Parameters in Stake
 
@@ -17,6 +16,8 @@ parameters, it is available to put up a `parameter-change` proposal in governanc
 |----| ---|---|
 |`stake/MaxValidators`|  maximum number of validators|[100, 200]
 |`stake/UnbondingTime`|  unbonding time|[2week,)
+
+Details in [distribution](../stake.md)
 
 ## Parameters in Distribution
 
@@ -33,6 +34,8 @@ Details in [distribution](../distribution.md)
 | key |Description | Range|
 |----| ---|---|
 |`mint/Inflation` | Inflation coefficient|[0,0.2]
+
+Details in [distribution](../mint.md)
 
 ## Parameters in Slashing
 
@@ -60,6 +63,6 @@ Details in [slashing](../slashing.md)
 | `service/MinDepositMultiple`|      a multiple of the minimum deposit amount of service binding| [500, 5000]
 | `service/ServiceFeeTax`|                tax rate of service fee| (0, 0.2]
 | `service/SlashFraction`|                slash fraction|  (0, 0.01]
-| `service/TxSizeLimit`|                   the limit of the service txsize| [2000, 6000]
+| `service/TxSizeLimit`|                   the limit of the service tx size| [2000, 6000]
 
 Details in [service](../service.md)
