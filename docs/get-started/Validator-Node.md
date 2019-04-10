@@ -117,4 +117,4 @@ iriscli stake edit-validator --from=<key name> --moniker=<your_custom_name> --we
 
 ### Use IRISPlorer
 
-You should also be able to see your validator on the [Explorer](https://testnet.irisplorer.io). 
+You should also be able to see your validator on the [Explorer](https://www.irisplorer.io). 

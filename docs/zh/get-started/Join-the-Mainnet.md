@@ -41,7 +41,7 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 ##  更多链接
 
 
-* Explorer: https://testnet.irisplorer.io/#/home
+* Explorer: https://www.irisplorer.io/#/home
 
 * Riot chat: #irisvalidators:matrix.org
 

@@ -112,4 +112,4 @@ iriscli stake edit-validator --from=<key name> --moniker=<your_custom_name> --we
 
 ### 使用浏览器：IRISPlorer
 
-你可以通过[浏览器](https://testnet.irisplorer.io)确认验证人节点的运行状况。
+你可以通过[浏览器](https://www.irisplorer.io)确认验证人节点的运行状况。
