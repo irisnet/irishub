@@ -28,3 +28,7 @@ func GetSkipCount(page uint64, size uint16) uint64 {
 	}
 	return uint64(int(page-1) * int(size))
 }
+
+func MarshalErr(err error) Error {
+	return ErrInternal(AppendMsgToErr("could not marshal result to JSON", err.Error()))
+}

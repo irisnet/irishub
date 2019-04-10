@@ -226,8 +226,8 @@ func main() {
 	}
 	guardianCmd.AddCommand(
 		client.GetCommands(
-			guardiancmd.GetCmdQueryProfilers("guardian", cdc),
-			guardiancmd.GetCmdQueryTrustees("guardian", cdc),
+			guardiancmd.GetCmdQueryProfilers(cdc),
+			guardiancmd.GetCmdQueryTrustees(cdc),
 		)...)
 
 	guardianCmd.AddCommand(
