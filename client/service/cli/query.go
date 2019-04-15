@@ -5,18 +5,16 @@ import (
 	"os"
 
 	"github.com/irisnet/irishub/client/context"
-	cmn "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/service"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
-const NULL = "null"
-
-func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
 		Short:   "Query service definition",
@@ -28,35 +26,23 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
 
-			res, err := cliCtx.QueryStore(service.GetServiceDefinitionKey(defChainId, name), storeName)
-			if err != nil {
-				return err
-			}
-			if len(res) == 0 {
-				return fmt.Errorf("chain-id [%s] service [%s] is not existed", defChainId, name)
+			params := service.QueryServiceParams{
+				DefChainID:  defChainId,
+				ServiceName: name,
 			}
 
-			var svcDef service.SvcDef
-			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcDef)
-
-			res1, err := cliCtx.QuerySubspace(service.GetMethodsSubspaceKey(defChainId, name), storeName)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			var methods []service.MethodProperty
-			for _, re := range res1 {
-				var method service.MethodProperty
-				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &method)
-				methods = append(methods, method)
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, cmn.DefOutput{Definition: svcDef, Methods: methods})
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryDefinition)
+			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -66,7 +52,7 @@ func GetCmdQuerySvcDef(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcBind(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
 		Short:   "Query service binding",
@@ -84,21 +70,26 @@ func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			res, err := cliCtx.QueryStore(service.GetServiceBindingKey(defChainId, name, bindChainId, provider), storeName)
-			if err != nil {
-				return err
-			}
-			if len(res) == 0 {
-				return fmt.Errorf("def-chain-id [%s] service [%s] bind-chain-id [%s] provider [%s] is not existed", defChainId, name, bindChainId, provider)
+
+			params := service.QueryBindingParams{
+				DefChainID:  defChainId,
+				ServiceName: name,
+				BindChainId: bindChainId,
+				Provider:    provider,
 			}
 
-			var svcBinding service.SvcBinding
-			cdc.MustUnmarshalBinaryLengthPrefixed(res, &svcBinding)
-			output, err := codec.MarshalJSONIndent(cdc, svcBinding)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(output))
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryBinding)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -111,7 +102,7 @@ func GetCmdQuerySvcBind(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcBinds(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
 		Short:   "Query service bindings",
@@ -123,23 +114,23 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
 
-			res, err := cliCtx.QuerySubspace(service.GetBindingsSubspaceKey(defChainId, name), storeName)
+			params := service.QueryServiceParams{
+				DefChainID:  defChainId,
+				ServiceName: name,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			var bindings []service.SvcBinding
-			for _, re := range res {
-				var binding service.SvcBinding
-				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &binding)
-				bindings = append(bindings, binding)
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, bindings)
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryBindings)
+			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(output))
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -149,7 +140,7 @@ func GetCmdQuerySvcBinds(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "requests",
 		Short: "Query service requests",
@@ -169,23 +160,25 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QuerySubspace(service.GetSubActiveRequestKey(defChainId, name, bindChainId, provider), storeName)
+			params := service.QueryBindingParams{
+				DefChainID:  defChainId,
+				ServiceName: name,
+				BindChainId: bindChainId,
+				Provider:    provider,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			var reqs []service.SvcRequest
-			for _, re := range res {
-				var req service.SvcRequest
-				cdc.MustUnmarshalBinaryLengthPrefixed(re.Value, &req)
-				reqs = append(reqs, req)
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, reqs)
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(output))
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -198,7 +191,7 @@ func GetCmdQuerySvcRequests(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcResponse(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response",
 		Short:   "Query a service response",
@@ -210,27 +203,23 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 			reqChainId := viper.GetString(FlagReqChainId)
 			reqId := viper.GetString(FlagReqId)
 
-			eHeight, rHeight, counter, err := service.ConvertRequestID(reqId)
+			params := service.QueryResponseParams{
+				ReqChainId: reqChainId,
+				RequestId:  reqId,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			res, err := cliCtx.QueryStore(service.GetResponseKey(reqChainId, eHeight, rHeight, counter), storeName)
-			var resp service.SvcResponse
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryResponse)
+			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
-			if len(res) > 0 {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res, &resp)
-			} else {
-				fmt.Println(NULL)
-				return nil
-			}
-			output, err := codec.MarshalJSONIndent(cdc, resp)
-			if err != nil {
-				return err
-			}
-			fmt.Println(string(output))
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -241,7 +230,7 @@ func GetCmdQuerySvcResponse(storeName string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQuerySvcFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees",
 		Short:   "Query return and incoming fee of a particular address",
@@ -253,33 +242,27 @@ func GetCmdQuerySvcFees(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			addrString := args[0]
 
-			delAddr, err := sdk.AccAddressFromBech32(addrString)
+			addr, err := sdk.AccAddressFromBech32(addrString)
 			if err != nil {
 				return err
-			}
-			res, err := cliCtx.QueryStore(service.GetReturnedFeeKey(delAddr), storeName)
-			var returnedFee service.ReturnedFee
-			if err != nil {
-				return err
-			}
-			if len(res) > 0 {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res, &returnedFee)
 			}
 
-			res1, err := cliCtx.QueryStore(service.GetIncomingFeeKey(delAddr), storeName)
-			var incomingFee service.IncomingFee
-			if err != nil {
-				return err
-			}
-			if len(res1) > 0 {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res1, &incomingFee)
+			params := service.QueryFeesParams{
+				Address: addr,
 			}
 
-			output, err := codec.MarshalJSONIndent(cdc, cmn.FeesOutput{ReturnedFee: returnedFee.Coins, IncomingFee: incomingFee.Coins})
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(output))
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}

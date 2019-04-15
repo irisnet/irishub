@@ -147,7 +147,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 type QueryResponseParams struct {
 	ReqChainId string
-	RequestID  string
+	RequestId  string
 }
 
 func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
@@ -157,13 +157,13 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	eHeight, rHeight, counter, err := ConvertRequestID(params.RequestID)
+	eHeight, rHeight, counter, err := ConvertRequestID(params.RequestId)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
-	response, found := k.GetResponse(ctx, params.RequestID, eHeight, rHeight, counter)
+	response, found := k.GetResponse(ctx, params.ReqChainId, eHeight, rHeight, counter)
 	if !found {
-		return nil, ErrRequestNotActive(DefaultCodespace, params.RequestID)
+		return nil, ErrNoResponseFound(DefaultCodespace, params.RequestId)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
