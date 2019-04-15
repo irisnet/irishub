@@ -3,15 +3,15 @@ package auth
 import (
 	"fmt"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // query endpoints supported by the auth Querier
 const (
-	QueryAccount = "account"
+	QueryAccount    = "account"
+	QueryTokenStats = "tokenStats"
 )
 
 // creates a querier for auth REST endpoints
@@ -20,6 +20,9 @@ func NewQuerier(keeper AccountKeeper) sdk.Querier {
 		switch path[0] {
 		case QueryAccount:
 			return queryAccount(ctx, req, keeper)
+		case QueryTokenStats:
+			return queryTokenStats(ctx, keeper)
+
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
 		}
@@ -54,4 +57,22 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 	}
 
 	return bz, nil
+}
+
+func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) {
+	tokenStats := TokenStats{
+		LoosenToken: keeper.GetTotalLoosenToken(ctx),
+		BurnedToken: keeper.GetBurnedToken(ctx),
+	}
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokenStats)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+	}
+
+	return bz, nil
+}
+
+type TokenStats struct {
+	LoosenToken sdk.Coins `json:"loosen_token"`
+	BurnedToken sdk.Coins `json:"burned_token"`
 }
