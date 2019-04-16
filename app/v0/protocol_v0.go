@@ -3,6 +3,7 @@ package v0
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
@@ -18,9 +19,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-
-	"strings"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"

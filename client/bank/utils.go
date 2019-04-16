@@ -51,7 +51,7 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 }
 
 type TokenStats struct {
-	LoosenToken []string `json:"loosen_token"`
-	BurnedToken []string `json:"burned_token"`
-	BondedToken string   `json:"bonded_token"`
+	LoosenToken sdk.Coins `json:"loosen_token"`
+	BurnedToken sdk.Coins `json:"burned_token"`
+	BondedToken sdk.Dec   `json:"bonded_token"`
 }
