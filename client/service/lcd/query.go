@@ -1,16 +1,16 @@
 package lcd
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/client/utils"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/service"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {

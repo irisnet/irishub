@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -11,7 +12,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/app/protocol"
 )
 
 func GetCmdQuerySvcDef(cdc *codec.Codec) *cobra.Command {
