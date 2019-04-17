@@ -2,9 +2,10 @@ package protocol
 
 import (
 	"encoding/json"
+
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/codec"
 )
 
 type Protocol interface {
@@ -15,7 +16,7 @@ type Protocol interface {
 	GetFeeRefundHandler() sdk.FeeRefundHandler         // fee handler for fee refund
 	GetFeePreprocessHandler() sdk.FeePreprocessHandler // fee handler for fee preprocessor
 	ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error)
-	ValidateTx(ctx sdk.Context, txBytes []byte,msgs []sdk.Msg) sdk.Error
+	ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error
 
 	// may be nil
 	GetInitChainer() sdk.InitChainer1  // initialize state with validators and state blob

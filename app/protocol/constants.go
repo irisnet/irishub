@@ -19,7 +19,8 @@ const (
 	GuardianStore        = "guardian"
 	UpgradeStore         = "upgrade"
 
-	// all query route
+	// all route for query and handler
+	BankRoute     = "bank"
 	AccountRoute  = AccountStore
 	StakeRoute    = StakeStore
 	DistrRoute    = DistrStore
