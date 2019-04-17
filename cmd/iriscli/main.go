@@ -76,8 +76,8 @@ func main() {
 	bankCmd.AddCommand(
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
-			bankcmd.GetAccountCmd("acc", cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetCmdQueryTokenStats(cdc, "acc", "stake"),
+			bankcmd.GetAccountCmd(cdc, utils.GetAccountDecoder(cdc)),
+			bankcmd.GetCmdQueryTokenStats(cdc),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
@@ -194,12 +194,12 @@ func main() {
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(
-			servicecmd.GetCmdQuerySvcDef("service", cdc),
-			servicecmd.GetCmdQuerySvcBind("service", cdc),
-			servicecmd.GetCmdQuerySvcBinds("service", cdc),
-			servicecmd.GetCmdQuerySvcRequests("service", cdc),
-			servicecmd.GetCmdQuerySvcResponse("service", cdc),
-			servicecmd.GetCmdQuerySvcFees("service", cdc),
+			servicecmd.GetCmdQuerySvcDef(cdc),
+			servicecmd.GetCmdQuerySvcBind(cdc),
+			servicecmd.GetCmdQuerySvcBinds(cdc),
+			servicecmd.GetCmdQuerySvcRequests(cdc),
+			servicecmd.GetCmdQuerySvcResponse(cdc),
+			servicecmd.GetCmdQuerySvcFees(cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
 		servicecmd.GetCmdSvcDef(cdc),

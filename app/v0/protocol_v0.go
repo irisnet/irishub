@@ -3,6 +3,7 @@ package v0
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
@@ -18,9 +19,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-
-	"strings"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -274,7 +272,8 @@ func (p *ProtocolV0) configRouters() {
 		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc)).
 		AddRoute("distr", distr.NewQuerier(p.distrKeeper)).
-		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper))
+		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
+		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper))
 }
 
 // configure all Stores

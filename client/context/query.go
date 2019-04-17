@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
@@ -148,7 +149,7 @@ func (cliCtx CLIContext) queryAccount(addr sdk.AccAddress) ([]byte, error) {
 		return nil, err
 	}
 
-	route := fmt.Sprintf("custom/%s/%s", cliCtx.AccountStore, auth.QueryAccount)
+	route := fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryAccount)
 
 	res, err := cliCtx.QueryWithData(route, bz)
 	if err != nil {
