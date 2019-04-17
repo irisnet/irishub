@@ -37,7 +37,7 @@
 3.基金会
 
 4.出块人收益
-给个验证人在轮到出块的这一轮会获得`出块奖励`, 计算方法：
+每个验证人在轮到出块的这一轮会获得`出块奖励`, 计算方法：
 ```
  proposerReward = (TxFee + InflatedToken) * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
 ```
@@ -53,7 +53,7 @@
 设置钱包B为取回收益的钱包：
 
 ```bash
-iriscli distribution set-withdraw-addr <address_of_wallet_B> --fee=0.3iris --from=<key_nam_of_ wallet_A> --chain-id=[chain-id]
+iriscli distribution set-withdraw-addr <address_of_wallet_B> --fee=0.3iris --from=<key_name_of_ wallet_A> --chain-id=<chain-id>
 ```  
 
 查询委托账户对应的取回收益的钱包地址：
