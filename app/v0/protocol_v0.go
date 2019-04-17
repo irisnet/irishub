@@ -271,7 +271,8 @@ func (p *ProtocolV0) configRouters() {
 		AddRoute("acc", auth.NewQuerier(p.accountMapper)).
 		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
 		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc)).
-		AddRoute("distr", distr.NewQuerier(p.distrKeeper))
+		AddRoute("distr", distr.NewQuerier(p.distrKeeper)).
+		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper))
 }
 
 // configure all Stores
