@@ -503,7 +503,6 @@ func (k Keeper) getBeginInfo(ctx sdk.Context, valSrcAddr sdk.ValAddress) (
 		return minTime, height, false
 
 	case validator.Status == sdk.Unbonded:
-		minTime = ctx.BlockHeader().Time
 		return minTime, height, true
 
 	case validator.Status == sdk.Unbonding:
