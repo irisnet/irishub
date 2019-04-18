@@ -259,19 +259,20 @@ func (p *ProtocolV0) configKeepers() {
 // configure all Routers
 func (p *ProtocolV0) configRouters() {
 	p.router.
-		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
-		AddRoute("stake", stake.NewHandler(p.StakeKeeper)).
-		AddRoute("slashing", slashing.NewHandler(p.slashingKeeper)).
-		AddRoute("distr", distr.NewHandler(p.distrKeeper)).
-		AddRoute("gov", gov.NewHandler(p.govKeeper)).
-		AddRoute("service", service.NewHandler(p.serviceKeeper)).
-		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
+		AddRoute(protocol.BankRoute, bank.NewHandler(p.bankKeeper)).
+		AddRoute(protocol.StakeRoute, stake.NewHandler(p.StakeKeeper)).
+		AddRoute(protocol.SlashingRoute, slashing.NewHandler(p.slashingKeeper)).
+		AddRoute(protocol.DistrRoute, distr.NewHandler(p.distrKeeper)).
+		AddRoute(protocol.GovRoute, gov.NewHandler(p.govKeeper)).
+		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
+		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper))
 
 	p.queryRouter.
-		AddRoute("acc", auth.NewQuerier(p.accountMapper)).
-		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
-		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc)).
-		AddRoute("distr", distr.NewQuerier(p.distrKeeper)).
+		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
+		AddRoute(protocol.GovRoute, gov.NewQuerier(p.govKeeper)).
+		AddRoute(protocol.StakeRoute, stake.NewQuerier(p.StakeKeeper, p.cdc)).
+		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
+		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper))
 }
 
