@@ -43,7 +43,7 @@ func NewQueryAccountParams(addr sdk.AccAddress) QueryAccountParams {
 func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) ([]byte, sdk.Error) {
 	var params QueryAccountParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	account := keeper.GetAccount(ctx, params.Address)
@@ -53,7 +53,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, account)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 
 	return bz, nil
@@ -66,7 +66,7 @@ func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) 
 	}
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokenStats)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 
 	return bz, nil

@@ -5,15 +5,15 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/app/protocol"
 )
 
 func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {

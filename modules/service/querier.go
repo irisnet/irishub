@@ -50,7 +50,7 @@ func queryDefinition(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, 
 	var params QueryServiceParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 	svcDef, found := k.GetServiceDefinition(ctx, params.DefChainID, params.ServiceName)
 	if !found {
@@ -70,7 +70,7 @@ func queryDefinition(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, 
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, definitionOutput)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }
@@ -86,7 +86,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 	var params QueryBindingParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 	svcBinding, found := k.GetServiceBinding(ctx, params.DefChainID, params.ServiceName, params.BindChainId, params.Provider)
 	if !found {
@@ -94,7 +94,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 	}
 	bz, err := codec.MarshalJSONIndent(k.cdc, svcBinding)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }
@@ -103,7 +103,7 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	var params QueryServiceParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	iterator := k.ServiceBindingsIterator(ctx, params.DefChainID, params.ServiceName)
@@ -117,7 +117,7 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, bindings)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }
@@ -126,7 +126,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	var params QueryBindingParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	iterator := k.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainId, params.Provider)
@@ -140,7 +140,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, requests)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }
@@ -154,7 +154,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	var params QueryResponseParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	eHeight, rHeight, counter, err := ConvertRequestID(params.RequestId)
@@ -168,7 +168,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }
@@ -186,7 +186,7 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Er
 	var params QueryFeesParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	var feesOutput FeesOutput
@@ -201,7 +201,7 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Er
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, feesOutput)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }

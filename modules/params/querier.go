@@ -8,12 +8,12 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// query endpoints supported by the auth Querier
+// query endpoints supported by the params Querier
 const (
 	QueryModule = "module"
 )
 
-// creates a querier for auth REST endpoints
+// creates a querier for params REST endpoints
 func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
@@ -21,7 +21,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 			return queryModule(ctx, req, keeper)
 
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown param query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown params query endpoint")
 		}
 	}
 }
@@ -34,7 +34,7 @@ type QueryModuleParams struct {
 func queryModule(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryModuleParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	subspace, ok := keeper.GetSubspace(params.Module)
@@ -51,7 +51,7 @@ func queryModule(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	subspace.GetParamSet(ctx, ps)
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, ps)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 
 	return bz, nil
