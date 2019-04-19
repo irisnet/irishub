@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation, signing, and
     broadcast.
-  version: "0.11.0"
+  version: "0.14.0"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -2065,12 +2065,19 @@ paths:
           description: Found no vote
         '500':
           description: Internal Server Error
-  /gov/params:
+  /gov/params/{module}:
     get:
       summary: Query governance parameters
       description: Query governance parameters
       tags:
         - ICS22
+      parameters:
+        - description: module name
+          name: module
+          required: true
+          in: path
+          schema:
+            type: string
       responses:
         '200':
           description: OK
