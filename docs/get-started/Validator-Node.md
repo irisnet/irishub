@@ -1,8 +1,8 @@
 # Running a Validator Node
 
-Before setting up your validator node, make sure you've already installed  **Iris** by this [guide](Full-Node.md)
+Before setting up your validator node, make sure you've already installed `Iris` by following this [guide](Full-Node.md) and your node is fully synced.
 
-Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
+Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if it becomes unavailable, double-signs a transaction, or doesn't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
 ## Get IRIS Token
 
@@ -11,7 +11,7 @@ Validators are responsible for committing new blocks to the blockchain through c
 You need to get `iris` and `iriscli` installed first. Then, follow the instructions below to create a new account:
 
 ```
-iriscli keys add <NAME_OF_KEY>
+iriscli keys add <key_name>
 ```
 
 Then, you should set a password of at least 8 characters.
@@ -26,21 +26,21 @@ It is the only way to recover your account if you ever forget your password.
 blast change tumble toddler rival ordinary chicken dirt physical club few language noise oak moment consider enemy claim elephant cruel people adult peanut garden
 ```
 
-You could see the address and public key of this account. Please node that account address in IRISnet will start with `iaa` and public key of account will start with `iap`.
+You could see the address and public key of this account. Please notice that account address in IRISnet will start with `iaa1` and public key of account will start with `iap1`.
 
 The seed phrase of this account will also be displayed. You could use these 24 phrases to recover this account in another server. The recover command is:
 ```
-iriscli keys add <NAME_OF_KEY> --recover
+iriscli keys add <key_name> --recover
 ```
 
 
-### Claim tokens
+### Claim tokens (Only for Fuxi Testnet)
 
-You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). The faucet will send you 10IRIS every request, Please don't abuse it.
+You can always get some test tokens by using the [Faucet](https://testnet.irisplorer.io/#/faucet). The faucet will send you 10IRIS for every request, please don't abuse it.
 
-Once you have created your own address, please  then you could use this　account to stake as a validatord. The following command is used to check the balance of your account:
+Once you have created your own address,  you can use it to stake as a validator. The following command is used to check the balance of your account:
 ```
-iriscli bank account <ACCOUNT> --node=http://localhost:26657
+iriscli bank account <account_address> --node=http://localhost:26657
 ```
 
 ## Create Validator
@@ -55,14 +55,13 @@ iriscli status --node=tcp://localhost:26657
 
 You should also be able to see `catching_up` is `false`. 
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `icp`, 
-it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, 
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `icp`, it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRIShub, 
 please read this [doc](../features/basic-concepts/bech32-prefix.md)
 
 You can find your validator's pubkey by running:
 
 ```
-iris tendermint show-validator --home=<IRIS-HOME>
+iris tendermint show-validator --home=<iris_home>
 ```
 Example output:
 ```
@@ -70,33 +69,30 @@ icp1zcjduepq9l2svsakh9946n42ljt0lxv0kpwrc4v9c2pnqhn9chnjmlvagans88ltuj
 ```
 Next, use the output as  `<pubkey>` field for `iriscli stake create-validator` command following [this](../cli-client/stake/create-validator.md). :
 
+In this way, to stake 10IRIS and create as a validator, you need to do:
+
+::: warning
+**Create-validator need more gas and fee， you need to specify --gas=100000 --fee=0.6iris**
+:::
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<pubkey> --amount=10iris --moniker={validator-name} --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --gas=100000 --fee=0.6iris --pubkey=<validator public key> --amount=10iris --moniker=<your_custom_name> --commission-rate=0.1 --identity=<identity_string>
 ```
-Please note the **fee** can be the **decimal** of IRIS token, like `0.01iris`. And you could also use other coin-type like `iris-milli`
+Please note the `fee` and `amount` can be the **decimal** of IRIS token, like `1.01iris`. And you could also use other coin-type like `iris-milli`, To read more about coin-type in IRIShub, you should read [this](../features/basic-concepts/coin-type.md)
 
-To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-concepts/fee.md)
+`identity` is an optional field, please refer to [keybase](https://keybase.io/)
 
-
-In this way, to stake 1IRIS, you need to do:
-
-```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<pubkey> --amount=1iris --moniker={validator-name} --commission-rate=0.1
-```
-Don't forget the `fee` and `gas` field.  To read more about coin-type in IRISHub, you should read [this](../features/basic-concepts/coin-type.md)
-
-
+To read more about fee mechanism in IRIShub throughout the [doc](../features/basic-concepts/fee.md)
 
 ### View Validator Info
 
 View the validator's information with this command:
 
 ```
-iriscli stake validator <val-address-operator>  --chain-id=<chain-id> --node=tcp://localhost:26657 
+iriscli stake validator <address-validator-operator> --chain-id=<chain-id> --node=tcp://localhost:26657 
 ```
 
-The `<val-address-operator>` is your account address that starts with 'iva1'
+The `<address-validator-operator>` is your account address that starts with 'iva1'
 
 
 ### Confirm Your Validator is Running
@@ -107,7 +103,7 @@ Your validator is active if the following command returns anything:
 iriscli status --node=tcp://localhost:26657 
 ```
 
-You should also be able to see your power is above 0 if your bonded toke is in top 100. Also, you should see validator on the [Explorer](https://testnet.irisplorer.io).
+You should also be able to see your `voting_power` is above 0 if your bonded toke is in top 100. Also, you should see validator on the [Explorer](https://testnet.irisplorer.io).
 
 
 ### Edit Validator Description
@@ -117,17 +113,11 @@ You can edit your validator's public description following [this](../cli-client/
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --moniker=<validator name> --details=<details>
-
-```
-### View Validator Description
-
-View the validator's information with this command:
-
-```
-iriscli stake validator <val-address-operato> --chain-id=<chain-id>
+iriscli stake edit-validator --from=<key name> --moniker=<your_custom_name> --website=<your_website> --details=<your_details> --chain-id=<chain-id> --node=tcp://localhost:26657 --fee=0.3iris --identity=<identity_string>
 ```
 
-### Use IRISPlorer
+`identity` is an optional field.
 
-You should also be able to see your validator on the [Explorer](https://testnet.irisplorer.io). 
+### Use the Explorer
+
+You should also be able to see your validator on the [Explorer](https://www.irisplorer.io). 
