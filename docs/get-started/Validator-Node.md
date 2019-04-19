@@ -1,8 +1,8 @@
 # Running a Validator Node
 
-Before setting up your validator node, make sure you've already installed  `Iris` by this [guide](Full-Node.md) and your node is fully synced.
+Before setting up your validator node, make sure you've already installed `Iris` by following this [guide](Full-Node.md) and your node is fully synced.
 
-Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if they become unavailable, double sign a transaction, or don't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
+Validators are responsible for committing new blocks to the blockchain through consensus. A validator's stake will be slashed if it becomes unavailable, double-signs a transaction, or doesn't cast their votes. Please read about Sentry Node Architecture to protect your node from DDOS attacks and to ensure high-availability.
 
 ## Get IRIS Token
 
@@ -34,11 +34,11 @@ iriscli keys add <key_name> --recover
 ```
 
 
-### Claim tokens (Only for fuxi Testnet)
+### Claim tokens (Only for Fuxi Testnet)
 
-You can always get some `IRIS`  by using the [Faucet](https://testnet.irisplorer.io/#/faucet). The faucet will send you 10IRIS for every request, please don't abuse it.
+You can always get some test tokens by using the [Faucet](https://testnet.irisplorer.io/#/faucet). The faucet will send you 10IRIS for every request, please don't abuse it.
 
-Once you have created your own address,  then you could use this account to stake as a validator. The following command is used to check the balance of your account:
+Once you have created your own address,  you can use it to stake as a validator. The following command is used to check the balance of your account:
 ```
 iriscli bank account <account_address> --node=http://localhost:26657
 ```
@@ -55,7 +55,7 @@ iriscli status --node=tcp://localhost:26657
 
 You should also be able to see `catching_up` is `false`. 
 
-You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `icp`, it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRISHub, 
+You need to get the public key of your node before upgrade your node to a validator node. The public key of your node starts with `icp`, it can be used to create a new validator by staking tokens. To understand more about the address encoding in IRIShub, 
 please read this [doc](../features/basic-concepts/bech32-prefix.md)
 
 You can find your validator's pubkey by running:
@@ -76,11 +76,13 @@ In this way, to stake 10IRIS and create as a validator, you need to do:
 :::
 
 ```
-iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --gas=100000 --fee=0.6iris --pubkey=<validator public key> --amount=10iris --moniker=<your_custom_name> --commission-rate=0.1
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --gas=100000 --fee=0.6iris --pubkey=<validator public key> --amount=10iris --moniker=<your_custom_name> --commission-rate=0.1 --identity=<identity_string>
 ```
-Please note the `fee` and `amount` can be the **decimal** of IRIS token, like `1.01iris`. And you could also use other coin-type like `iris-milli`, To read more about coin-type in IRISHub, you should read [this](../features/basic-concepts/coin-type.md)
+Please note the `fee` and `amount` can be the **decimal** of IRIS token, like `1.01iris`. And you could also use other coin-type like `iris-milli`, To read more about coin-type in IRIShub, you should read [this](../features/basic-concepts/coin-type.md)
 
-To read more about fee mechanism in IRISHub, go to this [doc](../features/basic-concepts/fee.md)
+`identity` is an optional field, please refer to [keybase](https://keybase.io/)
+
+To read more about fee mechanism in IRIShub throughout the [doc](../features/basic-concepts/fee.md)
 
 ### View Validator Info
 
@@ -111,10 +113,11 @@ You can edit your validator's public description following [this](../cli-client/
 You should put your name of your team in `details`. 
 
 ```
-iriscli stake edit-validator --from=<key name> --moniker=<your_custom_name> --website=<your_website> --details=<your_details> --chain-id=<chain-id> --node=tcp://localhost:26657 --fee=0.3iris  
-
+iriscli stake edit-validator --from=<key name> --moniker=<your_custom_name> --website=<your_website> --details=<your_details> --chain-id=<chain-id> --node=tcp://localhost:26657 --fee=0.3iris --identity=<identity_string>
 ```
 
-### Use IRISPlorer
+`identity` is an optional field.
+
+### Use the Explorer
 
 You should also be able to see your validator on the [Explorer](https://www.irisplorer.io). 

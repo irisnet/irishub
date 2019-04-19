@@ -21,7 +21,7 @@ If you miss the genesis file generation process, you can still upgrade your full
 
 Please follow this [instruction](Validator-Node.md) to upgrade your full node to validator node.
 
-### Deploy IRISHub Monitor
+### Deploy IRIShub Monitor
 
 Please follow this [guide](../software/monitor.md) to get IRIHub monitor running on your side.
 

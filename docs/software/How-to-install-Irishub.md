@@ -10,7 +10,7 @@ You can download the source code from github and compile it locally.
 
 #### Configure Your Server
 
-All the blockchains in IRISnet are based on Cosmos-SDK, which is a framework for building blockchain applications in Golang. It is being used to build [Cosmos Hub](https://cosmos.network/). It's recommended to run a validator node on Linux server.
+It's recommended that you run a validator node on Linux Server.
 
 **Recommended Configurations:**
 

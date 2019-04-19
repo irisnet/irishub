@@ -18,7 +18,7 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 请根据以下[步骤](Validator-Node.md) 将一个全节点升级成为验证人节点。
 
-### 部署IRISHub Monitor监控
+### 部署IRIShub Monitor监控
 
 请根据以下[链接](../software/monitor.md) 在服务器上部署一个Monitor监控。
 

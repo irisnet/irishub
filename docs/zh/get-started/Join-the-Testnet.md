@@ -4,7 +4,7 @@
 
 伏羲测试网（chain-id = fuxi）将运行跟主网一致的软件版本，为开发者社区（钱包、浏览器、Service Providers/Consumers）提供一个稳定的测试环境。
 
-## 如何使用fuxi测试网
+## 如何使用Fuxi测试网
 
 ### 第一步: 安装IRIScli
 
