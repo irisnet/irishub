@@ -8,6 +8,19 @@ Please replace <latest_iris_version> with v0.13.1 while using "git checkout"
 
 You can download the source code from github and compile it locally.
 
+#### Configure Your Server
+
+It's recommended that you run a validator node on Linux Server.
+
+**Recommended Configurations:**
+
+1. 2 CPU
+2. Memory: 6GB
+3. Disk: 256GB SSD
+4. OS: Ubuntu 16.04 LTS
+5. Bandwidth: 20Mbps
+6. Allow all incoming connections on TCP port 26656 and 26657
+
 #### Compile Source Code
 
 - Install Go 1.10+

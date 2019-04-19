@@ -44,7 +44,7 @@ v0.12.3
 Ubuntu LTS 16.04
 
 
-安装IRISHub需要保证Go的版本在1.11以上，
+安装IRIShub需要保证Go的版本在1.11以上，
 
 通过执行以下命令安装1.11版本的Go。
 
@@ -116,9 +116,9 @@ v0.12.3
 $ iriscli version
 v0.12.3
 ```
-### 如何升级IRISHub
+### 如何升级IRIShub
 
-通过执行一下命令可以完成测试网上IRISHub从v0.12.0到v0.12.1的升级
+通过执行一下命令可以完成测试网上IRIShub从v0.12.0到v0.12.1的升级
 
 ```
 iris unsafe-reset-all --home
