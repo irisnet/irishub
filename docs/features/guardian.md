@@ -11,19 +11,19 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     1. To be the destination address if the usage type of a `TxTaxUsage` proposal is `Distribute` or `grant`.
     2. Send `withdraw-tax` transaction to withdraw coins to an account from system service fee tax pool.
     
-* Genesis Profiler (Defined in genesis.json)
+* Genesis Profiler/Genesis Trustee (Defined in genesis.json)
     1. Only Genesis Profiler can add/delete Ordinary Profiler account
-    2. Only Genesis Profiler can add/delete Trustee account
+    2. Only Genesis Trustee can add/delete Ordinary Trustee account
     
 ## Usage Scenario
-1. Add Profiler and Trustee (Genesis Profiler account only)
+1. Add Profiler and Trustee 
 
-    Add Profiler
+    Add Profiler (Genesis Profiler account only)
     ```shell
     iriscli guardian add-profiler --address=<profiler_address> --description=<profiler_description> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris 
     ```
 
-    Add Trustee
+    Add Trustee (Genesis Trustee account only)
     ```shell
     iriscli guardian add-trustee --address=<trustee_address> --description=<trustee_description> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris 
     ```
@@ -60,14 +60,14 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     iriscli service withdraw-tax --dest-address=<destination_address> --withdraw-amount=1iris --chain-id=<chain-id> --from=<key_name> --fee=0.3iris
     ```
     
-7. Delete Profiler and Trustee (Genesis Profiler account only)
+7. Delete Profiler and Trustee (Genesis Trustee account only)
 
-    Delete Profiler
+    Delete Profiler (Genesis Trustee account only)
     ```shell
     iriscli guardian delete-profiler --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address=<profiler_address>
     ```
     
-    Delete Trustee
+    Delete Trustee (Genesis Trustee account only)
     ```shell
     iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address=<trustee_address>
     ```

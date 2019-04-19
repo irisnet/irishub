@@ -34,7 +34,7 @@ This module is mainly used to transfer coins between accounts、query account ba
 
 4. Sign transactions generated offline
 
-    To improve account security, IRISnet supports offline signing of transactions to protect the account's private key. In any transaction, you can build an unsigned transaction using the flag --generate-only. Use transfer transaction as an example:
+    To improve account security, IRISnet supports offline signing of transactions to protect the account's private key. In any transaction, you can build an unsigned transaction using the flag --generate-only. Take transfer transaction as an example:
     ```bash
     iriscli bank send --to=<address_of_wallet_B> --amount=10iris --fee=0.3iris --from=<key_name_of_wallet_A> --generate-only
     ```

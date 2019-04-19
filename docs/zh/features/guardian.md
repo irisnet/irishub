@@ -11,19 +11,19 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     1. 通过`TxTaxUsage`治理取回交易税费时，只能使用Trustee address作为取回地址。
     2. 发起`withdraw-tax`交易可以从`iService`服务费税池中提取代币到指定账户。
     
-* Genesis Profiler的权益（在创世的genesis.json中定义）
+* Genesis Profiler/Genesis Trustee的权益（在创世的genesis.json中定义）
     1. 只有Genesis Profiler可以 添加/删除 普通Profiler账户
-    2. 只有Genesis Profiler可以 添加/删除 Trustee账户
+    2. 只有Genesis Trustee可以 添加/删除 Trustee账户
     
 ## 使用场景
-1. 添加profiler和trustee （仅限Genesis Profiler）
+1. 添加profiler和trustee 
 
-    添加profiler
+    添加profiler （仅限Genesis Profiler）
     ```shell
     iriscli guardian add-profiler --address=<profiler_address> --description=<profiler_description> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris 
     ```
     
-    添加trustee
+    添加trustee（仅限Genesis Trustee）
     ```shell
     iriscli guardian add-trustee --address=<trustee_address> --description=<trustee_description> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris 
     ```
@@ -60,14 +60,14 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     iriscli service withdraw-tax --dest-address=<destination_address> --withdraw-amount=1iris --chain-id=<chain-id> --from=<key_name> --fee=0.3iris
     ```
     
-7. 删除profiler和trustee（仅限Genesis Profiler）
+7. 删除profiler和trustee
 
-    删除profiler：
+    删除profiler：（仅限Genesis Profiler）
     ```shell
     iriscli guardian delete-profiler --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address=<profiler_address>
     ```
     
-    删除trustee：
+    删除trustee：（仅限Genesis Trustee）
     ```shell
     iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address=<trustee_address>
     ```

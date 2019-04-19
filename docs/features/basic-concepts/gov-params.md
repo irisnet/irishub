@@ -8,7 +8,7 @@ All the IRIS holders are able to modify. If the community is not satisfied with 
 | key |Description | Range|
 |----| ---|---|
 |`auth/gasPriceThreshold`  |minimum of gas price |(0, 10^18iris-atto]
-|`auth/txSizeLimit`  |the limit of the normal tx size |[500, 1500]
+|`auth/txSizeLimit`  |the limitation of the normal tx size |[500, 1500]
 
 ## Parameters in Stake
 
