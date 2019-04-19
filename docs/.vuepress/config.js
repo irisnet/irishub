@@ -68,6 +68,7 @@ module.exports = {
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
                             ['guardian.md', 'Guardian'],
+                            ['mint.md', 'Mint']
                         ]
                     }],
                     '/cli-client/': [{
@@ -196,6 +197,7 @@ module.exports = {
                             ['upgrade.md', '升级'],
                             ['distribution.md', '收益分配'],
                             ['guardian.md', '系统用户'],
+                            ['mint.md', '通胀']
                         ]
                     }],
                     '/zh/cli-client/': [{
