@@ -16,7 +16,7 @@ Specific Proposal for different levels：
 - Important：`ParameterChange`
 - Normal：`TxTaxUsage`
 
-`SoftwareUpgradeProposal` and `SystemHaltProposal` can only be submitted by the profiler.
+`SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
 
 Different levels correspond to different parameters：
 
@@ -25,7 +25,7 @@ Different levels correspond to different parameters：
 | govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critial==1, other(1,)|
+| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critical==1, other(1,)|
 | govTallyingProcedure/Participation | 7/8 | 5/6 | 3/4 |(0,1)|
 | govTallyingProcedure/Threshold | 6/7 | 4/5 | 2/3 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
@@ -37,30 +37,33 @@ Different levels correspond to different parameters：
 * `VotingPeriod` Window period for voting
 * `MaxProposal` The maximum number of proposal that can exist at the same time
 * `Penalty`   The proportion of the slash
-* `Veto`  The ratio that is defined by the govTallyingProcedure/Veto
-* `Threshold` The ratio that is defined by the govTallyingProcedure/Threshold
-* `Participation` The ratio that is defined by the govTallyingProcedure/Participation
+* `Veto`  the power of Veto / all voted power
+* `Threshold` the power of Yes / all voted power
+* `Participation` all voted power / total voting power
 
 ### Deposit Procedure
 
-The proposor which submits proposal mortgages at least 30% of `MinDeposit`  and when the deposit exceeds `MinDeposit`, it can enter the voting procedure. If the proposal exceeds `MaxDepositPeriod` and has not yet exceeds `MinDeposit`, the proposal will be deleted and the full deposit won't be refunded. It is not possible to deposit the proposal which has been in  the voting procedure .
+The proposer at least deposit more the 30% amount of `MinDeposit` to submit a proposal, when the total deposit amount exceeds `MinDeposit`, the proposal enter the voting procedure. If the time exceeds `MaxDepositPeriod` and the total deposit has not yet exceeded `MinDeposit`, the proposal will be deleted and the full deposit won't be refunded. It is not allowed to deposit a proposal which is in voting procedure.
 
 ### Voting Procedure
-Only the validator can vote , and they can't vote again. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
+Only the validator can vote , and they can't vote twice for one proposal. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
 
 ### Tallying Procedure
 
 There are three tallying results: `PASS`，`REJECT`，`REJECTVETO`。
 
- Voter is the validator that has voted. Under the premise that the ratio of all voters' voting power to the total voting power in system is more than `participation`, if the ratio of `NoWithVeto` voting power  to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power  to all voter's voting power  over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`. 
+On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`,if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`. 
+ 
 
 ### Burning Mechanism
 
-If the proposal is passed or not passed, 20% Deposit will be burned. As the cost of the governance, the remaining `Deposit` will be returned in proportion. But if the result of proposal is `REJECTVETO`, destroy all `Deposit`.
+Whether the proposal is passed or not passed, 20% `Deposit` will be burned for the cost of governance. The remaining `Deposit` will be returned. But if the result of proposal is `REJECTVETO`,  all `Deposit` will be burned.
 
 ### Slashing Mechanism
 
-If the proposal enters the voting procedure, the account is a validator and then the proposal enters the tallying procedure, he is still a validator, but if he does not vote, he will be slashed according to the proportion of `Penalty`.
+The validator should be slashed according to the proportion of `Penalty` if he fails to vote for a proposal.
+
+If the validator quit from validator set in voting procedure, then he wont be slashed.
 
 ## Usage Scenario
 
@@ -72,67 +75,49 @@ Change the parameters through the command lines
 # Query parameters can be changed by the modules'name in gov 
 iriscli gov query-params --module=mint
 
-# Results
-iriscli gov query-params --module=mint
+# Result
+mint/Inflation=0.0400000000
 
 # Query parameters can be modified by "key”
 iriscli gov query-params --module=mint --key=mint/Inflation
 
 # Results
-iriscli gov query-params --module=mint
+mint/Inflation=0.0400000000
 
-# Send proposals, return changed parameters
-iriscli gov submit-proposal --title="update MinDeposit" --description="test" --type="ParameterChange" --deposit=8iris  --param mint/Inflation=0.0000000000 --from=x --chain-id=<chain-id> --fee=0.3iris --commit
+# Send proposal for parameters change
+iriscli gov submit-proposal --title=<title> --description=<description> --type=ParameterChange --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Vote for a proposal 
-echo 1234567890 | iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Query the state of a proposal
-iriscli gov query-proposal --proposal-id=1 
-
+iriscli gov query-proposal --proposal-id=<proposal-id>
 ```
 
 ### Proposals on community funds usage
-There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to the destination trustee's account from community funds and then trustee will distribute or grant these tokens to others.
+There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to the destination trustee's account from community funds.
+
 ```shell
 # Submit Burn usage proposal
-iriscli gov submit-proposal --title="burn tokens 5%" --description="test" --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=x --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Submit Distribute usage proposal
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Submit Grant usage proposal
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=[destnation-address] --from=x --chain-id=<chain-id> --fee=0.3iris --commit
-
-# Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris --commit
-
-# Vote for a proposal
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris --commit
-
-# Query the state of a proposal
-iriscli gov query-proposal --proposal-id=1
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 ```
 
 ### Proposals on system halting
 
-Sending this proposal which can terminate the system, the node will be closed after the proposed systemHaltHeight (= proposal height + systemHaltPeriod), and then start to enter the query-only mode.
+Sending this proposal which can terminate the system, the node will be closed after systemHaltHeight (= proposal height + systemHaltPeriod), and only `query-only` mode is available after re-starting the node.
 
 ```
 # submit the SystemHaltProposal
-iriscli gov submit-proposal  --title=test_title --description=test_description --type=SystemHalt --deposit=10iris --fee=0.3iris --from=x1 --chain-id=<chain-id> --commit
-
-# Deposit for a proposal
-iriscli gov deposit --proposal-id=1 --deposit=1iris --from=x --chain-id=<chain-id> --fee=0.3iris 
-
-# Vote for a proposal
-iriscli gov vote --proposal-id=1 --option=Yes  --from=x --chain-id=<chain-id> --fee=0.3iris 
-
-# Query the state of a proposal
-iriscli gov query-proposal --proposal-id=1 
+iriscli gov submit-proposal --title=<title> --description=<description> --type=SystemHalt --deposit=10iris --fee=0.3iris --from=<key_name> --chain-id=<chain-id> --commit
 ```
 
 ### Proposals on software upgrade

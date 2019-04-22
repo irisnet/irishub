@@ -17,9 +17,9 @@ Bech32 is a new Bitcoin address format proposed by Pieter Wuille and Greg Maxwel
 
 ## Encoding
 
-Not all interfaces to users IRISnet should be exposed as bech32 interfaces. Many address are still in hex or base64 encoded form.
+Not all interfaces to users IRISnet should be exposed as bech32 interfaces. Many addresses are still in hex or base64 encoded form.
 
-To covert between other binary reprsentation of addresses and keys, it is important to first apply the Amino enocoding process before bech32 encoding.
+To covert between other binary representation of addresses and keys, it is important to first apply the Amino encoding process before bech32 encoding.
 
 
 ## Account Key Example
@@ -38,7 +38,7 @@ This means you have created a new address `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpc
 A Tendermint Consensus Public key is generated when the node is created with  `iris init`.
 You can get this value with   
 ```
-iris tendermint show-validator
+iris tendermint show-validator --home=<iris_home>
 ```
 
 Example output:

@@ -16,11 +16,16 @@
 
 3. 委托人
 
-	不能或不想运行验证人节点的人仍然可以作为委托人参与到POS网络中。委托人可以将token委托给验证人，委托人将从相应的验证人那里获得一定的token份额。委托token也称为绑定token给验证人。稍后我们将对其进行详细说明。此外，验证节点的所有者也是委托人。通常，验证节点的所有者仅可在其自己的验证节点上抵押token，但在其他验证节点上抵押也可以。
+	不能或不想运行验证人节点的人仍然可以作为委托人参与到POS网络中。委托人可以将token委托给验证人，委托人将从相应的验证人那里获得一定的token份额。委托token也称为绑定token给验证人。稍后我们将对其进行详细说明。此外，验证节点的所有者也是委托人。验证节点的所有者不仅可以在其自己的验证节点上抵押token，而且也可以在其他验证节点上抵押token。
+	
+	::: danger
+    **验证节点的所有者在解绑自己抵押的代币时，切勿完全解绑。 一旦完全解绑，该验证人节点将被处于jailed状态，该节点将收不到任何奖励或者佣金， 在该节点上委托代币的投资人的利益也会收到相应的损失。 所以，无论如何请保留至少1iris在抵押状态。**
+    **如果一旦验证人全部解委托，可以通过重新`delegate`和`unjail`的命令来恢复**
+    :::
 	
 4. 候选验证人
 
-	验证人的数量不能无限增加。太多验证人可能会导致低效的共识，从而降低区块链吞吐率。因此，拜占庭容错的POS区块链网络都有验证人数量上限。通常，这个上限是100。如果有超过100个全节点申请加入验证人集，那么只有具有token数量排名前100的节点才能成为真正的验证人，其他人将是候选验证人，并将根据他们抵押token的数量进行降序排序。一旦一个或多个验证人被从验证人集中踢出，则顶部候选验证人将被自动添加到验证人集中。
+	验证人的数量不能无限增加。太多验证人可能会导致低效的共识，从而降低区块链吞吐率。因此，拜占庭容错的POS区块链网络都有验证人数量上限。通常，这个上限是100。如果有超过100个全节点申请加入验证人集，那么只有具有抵押token数量排名前100的节点才能成为真正的验证人，其他人将是候选验证人，并将根据他们抵押token的数量进行降序排序。一旦一个或多个验证人被从验证人集中踢出，则顶部候选验证人将被自动添加到验证人集中。
 
 5. 绑定，解绑和解绑期
 
@@ -28,11 +33,11 @@
 
 6. 转委托
 
-	委托人可以将其抵押的token从一个验证人转移到另一个验证人。这个可以分为两个步骤：从第一个验证人上解绑和把解绑的token绑定到另一个验证人上。正如我们上面所说，在解绑期结束之前，解绑操作不能立即完成，这意味着委托人不能立即发送再委托交易。
+	委托人可以将其抵押的token从一个验证人转移到另一个验证人。这个可以分为两个步骤：从第一个验证人上解绑和把解绑的token绑定到另一个验证人上。正如我们上面所说，在解绑期结束之前，解绑操作不能立即完成，这意味着委托人不能立即发送再次转委托交易。
 
 7. 作恶证据和惩罚
 
-	拜占庭容错POS区块链网络假设拜占庭节点拥有不到总投票权重的1/3，而且要惩罚这些作恶节点。因此有必要收集作恶行为的证据。根据收集到的证据，stake模块将从相应的验证人和委托人中拿走一定数量的token。被拿走的token会被销毁。此外，作恶验证人将会被踢出验证人集，并被标记为关押状态，而且他们的投票权将立刻变为零。在关押期间，这些节点也不是候选验证人。当关押期结束，他们可以发送交易来解除关押状态并再次成为候选验证人。
+	拜占庭容错POS区块链网络假设拜占庭节点拥有不到总投票权重的1/3，而且要惩罚这些作恶节点。因此有必要收集作恶行为的证据。根据收集到的证据，stake模块将从相应的验证人和委托人中拿走一定数量的token。被拿走的token会被销毁。此外，作恶验证人将会被踢出验证人集，并被标记为关押(jailed)状态，而且他们的投票权将立刻变为零。在关押期间，这些节点也不是候选验证人。当关押期结束，他们可以发送unjail交易来解除关押状态并再次成为候选验证人。
 
 8. 收益
 
@@ -46,19 +51,13 @@
 
 2. 申请成为验证人
 
-      首先你必须有一个IRIShub的钱包，钱包里必须有一定数量的token，另外钱包的私钥已经被导入到iriscli中。
-
-	发送申请成为验证人的交易，示例：
-	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.3iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
-	```
-	`--amount`可以指定自己绑定的token数量，这个数越大你越有可能立刻成为验证人，否则只能成为候选验证人。
+	请参考[run_Validator_Node](../get-started/Validator-Node.md)来申请成为验证人。
 
 3. 查询自己的验证人节点
 
 	把自己的钱包地址转换成验证人地址的编码格式
 	```
-	iriscli keys show [key name] --bech=val
+	iriscli keys show <key_name> --bech=val
 	```
 	返回结果示例：
 	```
@@ -88,35 +87,44 @@
 4. 修改验证人信息
 
 	```
-	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new name>
+	iriscli stake edit-validator --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new_name>
 	```
 
 5. 增加自己在验证人节点上委托的token
 
 	```
-	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris  --amount=100iris 
 	```
 
 6. 委托
 
 	向一个验证人委托一些token
 	```
-	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris  --amount=100iris 
 	```
 
 7. 解绑
-
-	解绑一半的token
+	
+	按share数量解绑， 解绑100shares:
 	```
-	iriscli stake unbond --address-validator={address-validator} --chain-id={chain-id} --from=<key name> --fee=0.3iris  --share-percent=0.5
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris --shares-amount=100
+	```
+	
+	按比例解绑，解绑50%的token:
+	```
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --share-percent=0.5
 	```
 
 8. 转委托
 
-      转委托一半的token到另外一个验证人节点
+    按share数量转委托， 转委托100shares到另外一个验证人节点:
 	```
-	iriscli stake redelegate --chain-id={chain-id} --from={key-name} --fee=0.3iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
+	iriscli stake redelegate --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address-validator-source=<source_validator_address> --address-validator-dest=<destination_validator_address> --shares-amount=100
 	```
-
+	
+    按比例转委托， 转委托50%的token到另外一个验证人节点:
+    ```
+	iriscli stake redelegate --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address-validator-source=<source_validator_address> --address-validator-dest=<destination_validator_address> --shares-percent=0.5
+    ```
 
 对于其他查询stake状态的命令，请参考[stake_cli](../cli-client/stake/README.md)

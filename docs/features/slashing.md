@@ -12,17 +12,20 @@ There are three main types:
 
 ## Punishment mechanism
 
-1. Calculate the number of tokens bound to the validator node based on the voting power owned by the current validator.
+1. Calculate the number of tokens bonded to the validator node based on the voting power owned by the current validator.
 2. Punish validator  with a certain percentage of the token and kick it out of the validator set; at the same time prohibit the validator from re-entering the validator set for a period of time, a process known as the jail validator.
-3. For different types of abnormal behavior, use different penalty ratios and jail time.
+3. For different types of abnormal behavior, different penalty proportion and jail time are used.
 4. Penalty rules:
-1. If the current validator token total is A and the penalty ratio is B, then the number of tokens that the validator can punish at most is A*B.
-2. If there is unbonding delegation and redelegation in the unbonding period at the current height, and the creation height of unbonding delegation and redegetation is less than the execution height of the abnormal behavior, then the tokens of the two parts are penalized by  the ratio B.
-3. The total number of tokens penalized for unbonding delegation and redelegation is S. If S is less than A*B, the validator token punished will be `A*B-S`. Otherwise, the validator bonded token is not penalized.
+
+    4.1 If the total number of tokens which bonded to current validator is A and the penalty ratio is B, then the maximum number of tokens that can be punished is `A*B`.
+    
+    4.2 If there is unbonding delegation and redelegation in the unbonding period at the current height, then the tokens which in unbonding period are penalized by the ratio B.
+    
+    4.3 The total number of tokens penalized for unbonding delegation and redelegation is S. If S is less than `A*B`, the validator token punished will be `A*B-S`. Otherwise, the validator bonded token will not be penalized.
 
 ## Long Downtime
 
-In the fixed time window `SignedBlocksWindow`, the ratio of the time of the validator's absence from the block is less than the value of `MinSignedPerWindow`，the validator's bonded token is penalized in the `SlashFractionDowntime` ratio, and the validator is jailed. Until the jail time exceeds `DowntimeJailDuratio`, the validator can be released by the unjail command.
+In the fixed time window `SignedBlocksWindow`, the ratio of the time of the validator's absence from the block is less than the value of `MinSignedPerWindow`，the validator's bonded token will be penalized in the `SlashFractionDowntime` ratio, and the validator will be jailed. Until the jail time exceeds `DowntimeJailDuration`, the validator can be released by executing `unjail` command.
 
 ### parameters
 
@@ -33,7 +36,7 @@ In the fixed time window `SignedBlocksWindow`, the ratio of the time of the vali
 
 ## Double Sign
 
-When executing a block, it receives evidence that a validator has signed the different blocks of the same round at the same height. If the time of the evidence from the current block time is less than `MaxEvidenceAge`，the validator's bonded token is penalized in the `SlashFractionDoubleSign` ratio, and the validator is jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by the unjail command.
+When executing a block, it receives evidence that a validator has voted for conflicting votes of the same round at the same height. If the time of the evidence from the current block time is less than `MaxEvidenceAge`，the validator's bonded token will be penalized in the `SlashFractionDoubleSign` ratio, and the validator will be jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by executing `unjail` command.
 
 ### parameters
 
@@ -43,8 +46,8 @@ When executing a block, it receives evidence that a validator has signed the dif
 
 ## Proposer Censorship
 
-If the node is in the process of processing a new block, it detects if any transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token is slashed by `SlashFractionCensorship` percent, and the validator is jailed. Until the jail time exceeds `CensorshipJailDuration`, 
-the validator can be unjailed by the `unjail` command after jailing period.
+If the node is in the process of processing a new block, it detects if any transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token will be slashed by `SlashFractionCensorship` percent, and the validator will be jailed. Until the jail time exceeds `CensorshipJailDuration`, 
+the validator can be unjailed by executing the `unjail` command after jailing period.
 
 * `txDecode` Deserialization of Tx
 * `validateTx` Size limit for Tx
@@ -59,7 +62,7 @@ the validator can be unjailed by the `unjail` command after jailing period.
 
 ### unjail
 
-If the validator was jailed and the jailing period passed, release the validator by unjail command.
+If the validator was jailed and the jailing period passed, release the validator by `unjail` command.
 
 ```
 iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>

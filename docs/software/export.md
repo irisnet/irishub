@@ -6,7 +6,7 @@ IRISnet can export blockchain state at any height and output json format string.
 
 ## Usage
 ```		
- iris export [flags]
+ iris export <flags>
 ```
 ### Flags
 
@@ -25,7 +25,7 @@ IRISnet can export blockchain state at any height and output json format string.
 2. Export blockchain state at certain height 
 
 ```		
- iris export --height 10000		
+ iris export --height=10000		
 ```
 
 3. If you want to export the blockchain state at certain height  and use the exported state as genesis state of another blockchain

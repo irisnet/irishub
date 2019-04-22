@@ -4,7 +4,7 @@
 
 ### Step 1: Install `iris` on Your Server
 
-Please follow this [instruction](../software/How-to-install-Irishub.md) to get `iris` installed locally.
+Please follow this [instruction](../software/How-to-install-irishub.md) to get `iris` installed locally.
 
 ### Step 2: Run a Full Node
 

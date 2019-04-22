@@ -18,6 +18,7 @@ module.exports = {
                 nav: [
                     {text: 'Back to IRISnet', link: 'https://www.irisnet.org'},
                     {text: 'Introduction', link: '/introduction/'},
+                    {text: 'Software', link: '/software/node.md'},
                     {text: 'Getting Started', link: '/get-started/'},
                     {text: 'Software', link: '/software/node.md'},
                     {text: 'Features', link: '/features/basic-concepts/coin-type.md'},
@@ -28,7 +29,7 @@ module.exports = {
                 sidebar: {
                     '/software/': [
                         ['node.md', 'Node'],
-                        ['How-to-install-Irishub.md', 'Install'],
+                        ['How-to-install-irishub.md', 'Install'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
                         ['export.md', 'Export'],
@@ -67,6 +68,7 @@ module.exports = {
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
                             ['guardian.md', 'Guardian'],
+                            ['mint.md', 'Mint']
                         ]
                     }],
                     '/cli-client/': [{
@@ -195,6 +197,7 @@ module.exports = {
                             ['upgrade.md', '升级'],
                             ['distribution.md', '收益分配'],
                             ['guardian.md', '系统用户'],
+                            ['mint.md', '通胀']
                         ]
                     }],
                     '/zh/cli-client/': [{

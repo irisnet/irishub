@@ -5,7 +5,7 @@
 The `iris` executable is the entry point for running an IRISnet network node. All the validator nodes and full nodes need to install the `iris` and launching the daemon to join the IRISnet network. You can also use `iris` to start your own test network locally.
 
 ## How to install `iris` 
-Please follow this [guide](How-to-install-Irishub.md) to install irishub.
+Please follow this [guide](How-to-install-irishub.md) to install IRIShub.
 
 ## How to start an IRISnet network locally
 

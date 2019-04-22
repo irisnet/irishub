@@ -1,10 +1,8 @@
 # KMS - 密钥管理系统
 
-....
+## 什么是KMS?
 
-## What is a KMS?
-
-...
+请参阅[kms](https://github.com/irisnet/kms).
 
 ## 构建
 
