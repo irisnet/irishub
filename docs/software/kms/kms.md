@@ -1,10 +1,8 @@
 # KMS - Key Management System
 
-....
-
 ## What is a KMS?
 
-...
+Please refer to [kms](https://github.com/irisnet/kms).
 
 ## Building
 

@@ -29,7 +29,7 @@ module.exports = {
                 sidebar: {
                     '/software/': [
                         ['node.md', 'Node'],
-                        ['How-to-install-Irishub.md', 'Install'],
+                        ['How-to-install-irishub.md', 'Install'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
                         ['export.md', 'Export'],

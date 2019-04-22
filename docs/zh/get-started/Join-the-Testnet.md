@@ -8,7 +8,7 @@
 
 ### 第一步: 安装IRIScli
 
-请根据以下[教程](../software/How-to-install-Irishub.md) 在服务器上完成`iriscli`的安装。
+请根据以下[教程](../software/How-to-install-irishub.md) 在服务器上完成`iriscli`的安装。
 
 ### 第二步: 接入测试网节点
 

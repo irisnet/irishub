@@ -6,7 +6,7 @@ Iris Network (又称IRISnet)是以希腊女神**Iris**命名的，据说它是�
 
 ## 如何安装`iris`
 
-请根据以下[教程](../software/How-to-install-Irishub.md) 安装`iris`。
+请根据以下[教程](../software/How-to-install-irishub.md) 安装`iris`。
 
 ## 如何加入主网
 

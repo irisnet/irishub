@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iris export [flags]
+iris export <flags>
 ```
 
 ## 标志
@@ -27,7 +27,7 @@ iris export
 ```
 2. 导出高度10000的区块链状态
 ```
-iris export --height 10000
+iris export --height=10000
 ```
 3. 如果想导出105000高度的区块链状态，并且以这个状态启动一条新链，可以尝试这个命令
 ```

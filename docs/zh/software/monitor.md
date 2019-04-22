@@ -65,7 +65,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 
 ### 编辑配置文件
 
-从 [https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) 下载默认配置文件到本地：
+从 下载[prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) 默认配置文件到本地：
 
 在配置文件 `prometheus.yml` 中添加以下 `jobs` :
 

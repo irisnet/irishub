@@ -7,7 +7,7 @@ IRIS Network (a.k.a. IRISnet) is named after Greek goddess **Iris**, said to be 
 ## How to install `iris`  
 
 
-Please follow this [instruction](../software/How-to-install-Irishub.md) to install `iris`.
+Please follow this [instruction](../software/How-to-install-irishub.md) to install `iris`.
 
 
 ## How to Join the Mainnet

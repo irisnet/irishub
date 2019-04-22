@@ -8,7 +8,7 @@ The Fuxi Testnet is used to provide a stable test environment for developers suc
 
 ### Step 1: Install `iriscli` on Your Server
 
-Please follow this [instruction](../software/How-to-install-Irishub.md) to get `iriscli` installed locally.
+Please follow this [instruction](../software/How-to-install-irishub.md) to get `iriscli` installed locally.
 
 ### Step 2: Connect to nodes
 
