@@ -273,7 +273,8 @@ func (p *ProtocolV0) configRouters() {
 		AddRoute(protocol.StakeRoute, stake.NewQuerier(p.StakeKeeper, p.cdc)).
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
-		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper))
+		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
+		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper))
 }
 
 // configure all Stores

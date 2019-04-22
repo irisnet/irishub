@@ -1,6 +1,8 @@
 package types
 
-import abci "github.com/tendermint/tendermint/abci/types"
+import (
+	abci "github.com/tendermint/tendermint/abci/types"
+)
 
 // Type for querier functions on keepers to implement to handle custom queries
 type Querier = func(ctx Context, path []string, req abci.RequestQuery) (res []byte, err Error)
@@ -29,6 +31,10 @@ func GetSkipCount(page uint64, size uint16) uint64 {
 	return uint64(int(page-1) * int(size))
 }
 
-func MarshalErr(err error) Error {
+func MarshalResultErr(err error) Error {
 	return ErrInternal(AppendMsgToErr("could not marshal result to JSON", err.Error()))
+}
+
+func ParseParamsErr(err error) Error {
+	return ErrUnknownRequest(AppendMsgToErr("incorrectly formatted request data", err.Error()))
 }

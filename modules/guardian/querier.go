@@ -36,7 +36,7 @@ func queryProfilers(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, profilers)
 	if err != nil {
-		return nil, sdk.MarshalErr(err)
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }
@@ -53,7 +53,7 @@ func queryTrustees(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, trustees)
 	if err != nil {
-		return nil, sdk.MarshalErr(err)
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return bz, nil
 }

@@ -54,7 +54,7 @@ func queryDelegatorWithdrawAddress(ctx sdk.Context, _ []string, req abci.Request
 	var params QueryDelegatorParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	// cache-wrap context as to not persist state changes during querying
@@ -63,7 +63,7 @@ func queryDelegatorWithdrawAddress(ctx sdk.Context, _ []string, req abci.Request
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, withdrawAddr)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 
 	return bz, nil
@@ -87,7 +87,7 @@ func queryDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQuery,
 	var params QueryDelegationDistInfoParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	// cache-wrap context as to not persist state changes during querying
@@ -98,7 +98,7 @@ func queryDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQuery,
 	ddi := k.GetDelegationDistInfo(ctx, params.DelegatorAddress, params.ValidatorAddress)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, ddi)
 	if errRes != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return res, nil
 }
@@ -107,7 +107,7 @@ func queryAllDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQue
 	var params QueryDelegatorParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	// cache-wrap context as to not persist state changes during querying
@@ -123,7 +123,7 @@ func queryAllDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQue
 	k.IterateDelegatorDistInfos(ctx, params.DelegatorAddress, ddiIter)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, distInfos)
 	if errRes != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return res, nil
 }
@@ -144,7 +144,7 @@ func queryValidatorDistInfo(ctx sdk.Context, _ []string, req abci.RequestQuery, 
 	var params QueryValidatorDistInfoParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	// cache-wrap context as to not persist state changes during querying
@@ -155,7 +155,7 @@ func queryValidatorDistInfo(ctx sdk.Context, _ []string, req abci.RequestQuery, 
 	vdi := k.GetValidatorDistInfo(ctx, params.ValidatorAddress)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, vdi)
 	if errRes != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return res, nil
 }
@@ -190,7 +190,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 	var params QueryRewardsParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		return nil, sdk.ParseParamsErr(err)
 	}
 
 	// cache-wrap context as to not persist state changes during querying
@@ -236,7 +236,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 	rewards.Total = rewardTruncate
 	res, errRes := codec.MarshalJSONIndent(k.cdc, rewards)
 	if errRes != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
+		return nil, sdk.MarshalResultErr(err)
 	}
 	return res, nil
 }

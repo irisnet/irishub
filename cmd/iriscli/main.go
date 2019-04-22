@@ -119,14 +119,14 @@ func main() {
 	}
 	govCmd.AddCommand(
 		client.GetCommands(
-			govcmd.GetCmdQueryProposal("gov", cdc),
-			govcmd.GetCmdQueryProposals("gov", cdc),
-			govcmd.GetCmdQueryVote("gov", cdc),
-			govcmd.GetCmdQueryVotes("gov", cdc),
-			govcmd.GetCmdQueryDeposit("gov", cdc),
-			govcmd.GetCmdQueryDeposits("gov", cdc),
-			govcmd.GetCmdQueryTally("gov", cdc),
-			govcmd.GetCmdQueryGovConfig("params", cdc),
+			govcmd.GetCmdQueryProposal(cdc),
+			govcmd.GetCmdQueryProposals(cdc),
+			govcmd.GetCmdQueryVote(cdc),
+			govcmd.GetCmdQueryVotes(cdc),
+			govcmd.GetCmdQueryDeposit(cdc),
+			govcmd.GetCmdQueryDeposits(cdc),
+			govcmd.GetCmdQueryTally(cdc),
+			govcmd.GetCmdQueryGovConfig(cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(

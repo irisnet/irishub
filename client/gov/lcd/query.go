@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
@@ -354,6 +356,32 @@ func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 // nolint: gocyclo
 func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.PostProcessResponse(w, cdc, "", cliCtx.Indent)
+		vars := mux.Vars(r)
+		moduleStr := vars[Module]
+
+		if len(moduleStr) == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			err := errors.New("module name required but not specified")
+			w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		params := params.QueryModuleParams{
+			Module: moduleStr,
+		}
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/module", protocol.ParamsRoute), bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
