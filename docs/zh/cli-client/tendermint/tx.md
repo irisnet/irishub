@@ -14,18 +14,19 @@ iriscli tendermint tx [hash] [flags]
 
 | 名称, 速记 | 默认值                    | 描述                                                             | 必需      |
 | --------------- | -------------------------- | --------------------------------------------------------- | -------- |
-| --chain-id    | 无 | [string] tendermint节点的链ID   | 是       |
-| --node string     |   tcp://localhost:26657                         | 要连接的节点  |                                     
-| --help, -h      |           无| 	下载命令帮助|
-| --trust-node    | true                       | 信任连接的完整节点，关闭响应结果校验                                            |          |
+| --chain-id      | 无 | tendermint节点的Chain ID   | 是  |
+| --node string   |   tcp://localhost:26657   | 要连接的节点 |               
+| --help, -h      |  无| 命令帮助||
+| --trust-node    | true   | 信任连接的完整节点，关闭响应结果校验 |  |
 
 ## 例子
 
 ### 
 
 ```shell
-iriscli tendermint tx 6D361F4BE14B6B9596104A9411DB7962501CA264 --chain-id=irishub-test --trust-node=true
+iriscli tendermint tx 6D361F4BE14B6B9596104A9411DB7962501CA264 --chain-id=<chain-id> --trust-node
 ```
+
 得到得结果如下：
 ```
 {

@@ -7,30 +7,24 @@
 ## 用法
 
 ```
-iris tendermint show-address [flags]
+iris tendermint show-address <flags>
 ```
-
-## 标志
-
-| 名称，速记      | 默认值           | 介绍                                                    | 是否必填 |
-| -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
-| --help, -h           |                   | 打印帮助信息                                                 |  否        |
 
 ### 全局标志
 
 | 名称，速记 | 默认值        | 功能描述                            | 是否必须 |
 | --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] 编码方式 (hex|b64|btc) |          |
-| --home          | $HOME/.iris    | [string] 存放运行数据和配置文件的目录 |   |
-| --output, -o    | text           | [string] 输出格式 (text,json)     |   |
+| --encoding, -e  | hex            | 编码方式 (hex/b64/btc) |          |
+| --home          | $HOME/.iris    | 存放运行数据和配置文件的目录 |   |
+| --output, -o    | text           | 输出格式 (text,json)     |   |
 | --trace         |                | 是否打印callstack和所有错误信息   |    |
 
 ## 示例
 
-### 验证人地址
+### 查询节点地址
 
 ```
-iris tendermint show-address --home={iris-home}
+iris tendermint show-address --home=<path_to_your_home>
 ```
 
 示例返回：

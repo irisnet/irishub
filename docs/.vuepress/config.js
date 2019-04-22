@@ -18,7 +18,6 @@ module.exports = {
                 nav: [
                     {text: 'Back to IRISnet', link: 'https://www.irisnet.org'},
                     {text: 'Introduction', link: '/introduction/'},
-                    {text: 'Software', link: '/software/node.md'},
                     {text: 'Getting Started', link: '/get-started/'},
                     {text: 'Software', link: '/software/node.md'},
                     {text: 'Features', link: '/features/basic-concepts/coin-type.md'},
