@@ -24,7 +24,7 @@
 | --commit         | bool   | false    | false                 | 广播交易并等到交易被打包再返回 |
 | --chain-id       | string | true     | ""                    | tendermint节点的`Chain ID` |
 | --dry-run        | bool   | false    | false                 | 模拟执行交易，并返回消耗的`gas`。`--gas`指定的值会被忽略 |
-| --fee            | string | true     | ""                    | 交易费（指定交易费的上线） |
+| --fee            | string | true     | ""                    | 交易费（指定交易费的上限） |
 | --from           | string | false    | ""                    | 发送交易的账户名称 |
 | --from-addr      | string | false    | ""                    | 签名地址，在`generate-only`为`true`的情况下有效 |
 | --gas            | int    | false    | 50000                | 交易的gas上限; 设置为"simulate"将自动计算相应的阈值 |

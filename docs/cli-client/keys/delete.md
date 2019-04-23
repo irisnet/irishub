@@ -7,7 +7,7 @@ Delete the given key
 ## Usage
 
 ```
-iriscli keys delete <name> [flags]
+iriscli keys delete <name> <flags>
 ```
 
 ## Flags
