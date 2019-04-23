@@ -2,16 +2,14 @@
 
 ## Description
 
-Sending tokens to another address. 
+Sending tokens to another address， this command includes "create/sign/broadcast" transaction.
 
 ## Usage:
 
+Send 10iris
 ```
-iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
+iriscli bank send --to=<address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
-
- 
-
 ## Flags
 
 | Name,shorthand   | Type   | Required | Default               | Description                                                  |
@@ -25,11 +23,10 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain
 ### Send token to a address 
 
 ```
- iriscli bank send --to=iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris
+ iriscli bank send --to=<address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
 After that, you will get the detail info for the send
-
 ```
 [Committed at block 87 (tx hash: AEA8E49C1BC9A81CAFEE8ACA3D0D96DA7B5DC43B44C06BACEC7DCA2F9C4D89FC, response:
   {
@@ -47,10 +44,4 @@ After that, you will get the detail info for the send
     }
   })
 ```
-### Common Issues
 
-* Wrong password
-
-```$xslt
-ERROR: Ciphertext decryption failed
-```

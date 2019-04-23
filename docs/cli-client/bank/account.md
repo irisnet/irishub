@@ -7,10 +7,8 @@ This command is used for querying balance information of certain address.
 ## Usage:
 
 ```
-iriscli bank account [address] [flags] 
+iriscli bank account <address> <flags>
 ```
-
- 
 
 ## Flags
 
@@ -29,9 +27,9 @@ iriscli bank account [address] [flags]
 
 | Name,shorthand        | Default        | Description                                 | Required | Type   |
 | --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) | False    | String |
-| --home string         | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output string   | text           | Output format (text \|json)                 | False    | String |
+| -e, --encoding | hex            | String   Binary encoding (hex\b64\btc ) | False    | String |
+| --home         | /root/.iriscli | Directory for config and data               | False    | String |
+| -o, --output   | text           | Output format (text\json)                 | False    | String |
 | --trace               |                | Print out full stack trace on errors        | False    |        |
 
 ## Examples
@@ -39,11 +37,10 @@ iriscli bank account [address] [flags]
 ### Query your account in trust-mode
 
 ```
- iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym --trust-node=true
+ iriscli bank account <address>
 ```
 
 After that, you will get the detail info for the account.
-
 ```
 {
 
@@ -62,23 +59,20 @@ After that, you will get the detail info for the account.
     "value": "AzlCwiA5Tvxwi7lMB/Hihfp2qnaks5Wrrgkg/Jy7sEkF"
 
   },
-
   "account_number": "0",
-
   "sequence": "1"
-
 }
-
 ```
-### Common Issue
 
+### Common Issue
 
 If you query an wrong account, you will get the follow information.
 ```
 iriscli bank account iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f6d429zz
 ERROR: decoding bech32 failed: checksum failed. Expected 46vaym, got d429zz.
 ```
-If you query an empty account, you will get the follow error. But don't panic when you see the following error. 
+
+If you query an account with no transactions on the chain, you will get the follow error. 
 ```
 iriscli bank account iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr
 ERROR: No account with address iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr was found in the state.
@@ -88,8 +82,7 @@ Are you sure there has been a transaction involving it?
 
 ## Extended description
 
-Query your account in iris network. If you want to create a validator, you should use `iriscli bank account` to make sure 
-that your balance is above 0.
+Query your account in IRISnet. If you want to create a validator, you should use `iriscli bank account` to make sure that your balance is above 1iris.
 
 
 ​           
