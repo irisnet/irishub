@@ -2,13 +2,14 @@
 
 ## Description
 
-Query all outgoing redelegatations from a validator
+Query all outgoing redelegations from a validator
 
 ## Usage
 
 ```
-iriscli stake redelegations-from [validator-address] [flags]
+iriscli stake redelegations-from <validator-address> <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake redelegations-from --help
@@ -18,11 +19,10 @@ iriscli stake redelegations-from --help
 
 Query all outgoing redelegatations
 ```
-iriscli stake redelegations-from [validator-address]
+iriscli stake redelegations-from <validator-address> 
 ```
 
 After that, you will get all outgoing redelegatations' from specified validator
-
 ```json
 [
   {

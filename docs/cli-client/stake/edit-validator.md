@@ -4,6 +4,8 @@
 
 Edit existing validator, such as commission rate, name and other description message.
 
+For more detailed information, please refer to [Running a Validator Node](../../get-started/Validator-Node.md)
+
 ## Usage
 
 ```

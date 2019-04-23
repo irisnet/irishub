@@ -7,8 +7,9 @@ Query a validator
 ## Usage
 
 ```
-iriscli stake validator [validator-address] [flags]
+iriscli stake validator <validator-address> <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake validator --help
@@ -18,7 +19,7 @@ iriscli stake validator --help
 
 Query a validator
 ```
-iriscli stake validator [validator-address]
+iriscli stake validator <validator-address> 
 ```
 
 After that, you will get the specified validator's info.

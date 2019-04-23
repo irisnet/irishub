@@ -7,7 +7,7 @@ Query all redelegations records for one delegator
 ## Usage
 
 ```
-iriscli stake redelegations [delegator-address] [flags]
+iriscli stake redelegations <delegator-address> <flags>
 ```
 Print help messages:
 ```
@@ -18,7 +18,7 @@ iriscli stake redelegations --help
 
 Query all redelegations records
 ```
-iriscli stake redelegations [delegator-address]
+iriscli stake redelegations <delegator-address>
 ```
 
 After that, you will get all redelegations records' info for specified delegator

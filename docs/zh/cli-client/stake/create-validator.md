@@ -2,7 +2,9 @@
 
 ## 介绍
 
-发送交易申请成为验证人，并在在此验证人上委托一定数额的token
+发送交易申请成为验证人，并在在此验证人上委托一定数额的token.
+
+更多详细内容， 请参阅[如何升级成一个验证人节点](../../get-started/Validator-Node.md)
 
 ## 用法
 
@@ -15,6 +17,7 @@ iriscli stake create-validator [flags]
 iriscli stake create-validator --help
 ```
 
+
 ## 特有的标志
 
 | 名称                         | 类型   | 是否必填 | 默认值   | 功能描述         |
@@ -22,7 +25,7 @@ iriscli stake create-validator --help
 | --amount                     | string | true     | ""       | 委托token的数量 |
 | --commission-rate            | float  | true     | 0.0      | 初始佣金比例 |
 | --details                    | string | false    | ""       | 验证人节点的详细信息 |
-| --genesis-format             | bool   | false    | false    | 是否已genesis transaction的方式倒出 |
+| --genesis-format             | bool   | false    | false    | 是否已genesis transaction的方式导出 |
 | --identity                   | string | false    | ""       | 身份信息的签名 |
 | --ip                         | string | false    | ""       | 验证人节点的IP |
 | --moniker                    | string | true     | ""       | 验证人节点名称 |

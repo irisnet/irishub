@@ -7,8 +7,9 @@ Query an unbonding-delegation record based on delegator and validator address
 ## Usage
 
 ```
-iriscli stake unbonding-delegation [flags]
+iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake unbonding-delegation --help
@@ -18,15 +19,15 @@ iriscli stake unbonding-delegation --help
 
 | Name, shorthand     | Default                    | Description                                                         | Required |
 | ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --address-delegator |                            | [string] Bech address of the delegator                              | Yes      |
-| --address-validator |                            | [string] Bech address of the validator                              | Yes      |
+| --address-delegator |                            | Bech address of the delegator                              | Yes      |
+| --address-validator |                            | Bech address of the validator                              | Yes      |
 
 
 ## Examples
 
 Query an unbonding-delegation
 ```
-iriscli stake unbonding-delegation --address-delegator=DelegatorAddress --address-validator=ValidatorAddress
+iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address>
 ```
 
 After that, you will get unbonding delegation's detailed info between specified validator and delegator.

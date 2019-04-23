@@ -7,8 +7,9 @@
 ## 用法
 
 ```
-iriscli stake unbonding-delegation [flags]
+iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake unbonding-delegation --help
@@ -18,8 +19,8 @@ iriscli stake unbonding-delegation --help
 
 | 名称, 速记           | 默认值                     | 描述                                                                 | 必需     |
 | ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --address-delegator |                            | [string] 委托者bech地址                                              | Yes      |
-| --address-validator |                            | [string] 验证者bech地址                                             | Yes      |
+| --address-delegator |                            | 委托者bech地址                                              | Yes      |
+| --address-validator |                            | 验证者bech地址                                             | Yes      |
 
 ## 示例
 
@@ -29,7 +30,6 @@ iriscli stake unbonding-delegation --address-delegator=DelegatorAddress --addres
 ```
 
 运行成功以后，返回的结果如下：
-
 ```txt
 Unbonding Delegation
 Delegator: iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm

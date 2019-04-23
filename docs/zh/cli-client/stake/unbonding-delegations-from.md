@@ -7,8 +7,9 @@
 ## 用法
 
 ```
-iriscli stake unbonding-delegations-from [validator-address] [flags]
+iriscli stake unbonding-delegations-from <validator-address> <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake unbonding-delegations-from --help
@@ -18,11 +19,10 @@ iriscli stake unbonding-delegations-from --help
 
 基于验证者地址的所有unbonding-delegation-from记录查询
 ```
-iriscli stake unbonding-delegations-from [validator-address]
+iriscli stake unbonding-delegations-from <validator-address> 
 ```
 
 运行成功以后，返回的结果如下：
-
 ```json
 [
   {

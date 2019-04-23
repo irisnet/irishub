@@ -7,8 +7,9 @@ Query for all validators
 ## Usage
 
 ```
-iriscli stake validators [flags]
+iriscli stake validators <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake validators --help
@@ -16,7 +17,7 @@ iriscli stake validators --help
 
 ## Examples
 
-Query a validator
+Query for all validators
 ```
 iriscli stake validators
 ```
