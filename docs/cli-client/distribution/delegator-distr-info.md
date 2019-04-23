@@ -7,7 +7,7 @@ Query a delegator distribution information
 ## Usage
 
 ```
-iriscli distribution delegator-distr-info [delegator address] [flags]
+iriscli distribution delegator-distr-info <delegator_address> <flags>
 ```
 
 Print help messages:
@@ -18,7 +18,8 @@ iriscli distribution delegator-distr-info --help
 ## Examples
 
 ```
-iriscli distribution delegator-distr-info [delegator address] 
+iriscli distribution delegator-distr-info <delegator_address> <flags>
+
 ```
 Example response:
 ```json

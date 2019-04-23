@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli distribution rewards <address> [flags]
+iriscli distribution rewards <address> <flags>
 ```
 
 打印帮助信息：
@@ -20,6 +20,7 @@ iriscli distribution rewards --help
 ```
 iriscli distribution rewards <address>
 ```
+
 执行结果示例：
 ```json
 {
