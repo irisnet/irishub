@@ -3,10 +3,11 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 //-----------------------------------------------------------
@@ -50,6 +51,8 @@ type Proposal interface {
 
 	GetTaxUsage() TaxUsage
 	SetTaxUsage(TaxUsage)
+
+	String() string
 }
 
 // checks if two proposals are equal
@@ -89,6 +92,37 @@ type BasicProposal struct {
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
 }
 
+func (bp BasicProposal) String() string {
+	return fmt.Sprintf(`Proposal %d:
+  Title:              %s
+  Type:               %s
+  Status:             %s
+  Submit Time:        %s
+  Deposit End Time:   %s
+  Total Deposit:      %s
+  Voting Start Time:  %s
+  Voting End Time:    %s
+  Description:        %s`,
+		bp.ProposalID, bp.Title, bp.ProposalType,
+		bp.Status, bp.SubmitTime, bp.DepositEndTime,
+		bp.TotalDeposit, bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+	)
+}
+
+// Proposals is an array of proposal
+type Proposals []Proposal
+
+// nolint
+func (p Proposals) String() string {
+	out := "ID - (Status) [Type] Title\n"
+	for _, prop := range p {
+		out += fmt.Sprintf("%d - (%s) [%s] %s\n",
+			prop.GetProposalID(), prop.GetStatus(),
+			prop.GetProposalType(), prop.GetTitle())
+	}
+	return strings.TrimSpace(out)
+}
+
 // Implements Proposal Interface
 var _ Proposal = (*BasicProposal)(nil)
 
@@ -121,7 +155,9 @@ func (tp BasicProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
 func (tp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
-func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
+func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
+	return sdk.ProtocolDefinition{}
+}
 func (tp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
 func (tp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
 func (tp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}

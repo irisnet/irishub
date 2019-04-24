@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
@@ -70,7 +69,20 @@ var (
 	AttoPrecision = NewIntWithDecimal(1, 18)
 )
 
-type Origin = byte
+type Origin byte
+
+func (o Origin) String() string {
+	switch o {
+	case Native:
+		return "native"
+	case External:
+		return "external"
+	case UserIssued:
+		return "userissued"
+	default:
+		return ""
+	}
+}
 
 func ToOrigin(origin string) (og Origin, err error) {
 	switch strings.ToLower(origin) {
@@ -89,6 +101,12 @@ type Unit struct {
 	Decimal int    `json:"decimal"`
 }
 
+func (u Unit) String() string {
+	return fmt.Sprintf("%s: %d",
+		u.Denom, u.Decimal,
+	)
+}
+
 func NewUnit(denom string, decimal int) Unit {
 	return Unit{
 		Denom:   denom,
@@ -99,7 +117,17 @@ func (u Unit) GetPrecision() Int {
 	return NewIntWithDecimal(1, u.Decimal)
 }
 
-type Units = []Unit
+type Units []Unit
+
+func (u Units) String() (out string) {
+	for _, val := range u {
+		out += val.String() + ",  "
+	}
+	if len(out) > 3 {
+		out = out[:len(out)-3]
+	}
+	return
+}
 
 type CoinType struct {
 	Name    string `json:"name"`
@@ -162,8 +190,14 @@ func (ct CoinType) GetMainUnit() (unit Unit) {
 }
 
 func (ct CoinType) String() string {
-	bz, _ := json.Marshal(ct)
-	return string(bz)
+	return fmt.Sprintf(`CoinType:
+  Name:       %s
+  MinUnit:    %s
+  Units:      %s
+  Origin:     %s
+  Desc:       %s`,
+		ct.Name, ct.MinUnit, ct.Units, ct.Origin, ct.Desc,
+	)
 }
 
 func NewDefaultCoinType(name string) CoinType {

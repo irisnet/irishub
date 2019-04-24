@@ -28,6 +28,7 @@ type CLIContext struct {
 	AccDecoder    auth.AccountDecoder
 	Client        rpcclient.Client
 	Logger        io.Writer
+	OutputFormat  string
 	Height        int64
 	NodeURI       string
 	AccountStore  string
@@ -63,6 +64,7 @@ func NewCLIContext() CLIContext {
 		NodeURI:       nodeURI,
 		AccountStore:  protocol.AccountStore,
 		Height:        viper.GetInt64(client.FlagHeight),
+		OutputFormat:  viper.GetString(cli.OutputFlag),
 		TrustNode:     viper.GetBool(client.FlagTrustNode),
 		UseLedger:     viper.GetBool(client.FlagUseLedger),
 		Async:         viper.GetBool(client.FlagAsync),

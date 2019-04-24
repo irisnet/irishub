@@ -45,18 +45,7 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 				return err
 			}
 
-			accountRes, err := bank.ConvertAccountCoin(cliCtx, acc)
-			if err != nil {
-				return err
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, accountRes)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return cliCtx.PrintOutput(acc)
 		},
 	}
 }
@@ -74,13 +63,8 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			output, err := codec.MarshalJSONIndent(cdc, res)
-			if err != nil {
-				return err
-			}
 
-			fmt.Println(string(output))
-			return nil
+			return cliCtx.PrintOutput(res)
 		},
 	}
 
@@ -117,14 +101,9 @@ func GetCmdQueryTokenStats(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			tokenStats.BondedToken = poolStatus.BondedTokens
-			res, err := codec.MarshalJSONIndent(cdc, tokenStats)
-			if err != nil {
-				return err
-			}
+			tokenStats.BondedToken = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
 
-			fmt.Println(string(res))
-			return nil
+			return cliCtx.PrintOutput(tokenStats)
 		},
 	}
 

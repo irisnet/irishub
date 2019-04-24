@@ -6,6 +6,7 @@ import (
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/tendermint/tendermint/crypto"
+	"fmt"
 )
 
 type BaseAccount struct {
@@ -53,5 +54,15 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 type TokenStats struct {
 	LoosenToken sdk.Coins `json:"loosen_token"`
 	BurnedToken sdk.Coins `json:"burned_token"`
-	BondedToken sdk.Dec   `json:"bonded_token"`
+	BondedToken sdk.Coins `json:"bonded_token"`
+}
+
+// String implements fmt.Stringer
+func (ts TokenStats) String() string {
+	return fmt.Sprintf(`TokenStats:
+  LoosenToken:       %s
+  BurnedToken:       %s
+  BondedToken:       %s`,
+		ts.LoosenToken.MainUnitString(), ts.BurnedToken.MainUnitString(), ts.BondedToken.MainUnitString(),
+	)
 }

@@ -41,6 +41,12 @@ func GetWithdrawAddress(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			var acc sdk.AccAddress
+			err = cdc.UnmarshalJSON(res, &acc)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(res))
 			return nil
 		},

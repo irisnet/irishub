@@ -128,6 +128,28 @@ func (coins Coins) String() string {
 	return out[:len(out)-1]
 }
 
+func (coins Coins) MainUnitString() string {
+	if len(coins) == 0 {
+		return ""
+	}
+	out := ""
+	for _, coin := range coins {
+		// only convert iris now
+		if coin.Denom == NativeTokenMinDenom {
+			destCoinStr, err := IRIS.Convert(coin.String(), NativeTokenName)
+			if err == nil {
+				out += fmt.Sprintf("%v,", destCoinStr)
+				continue
+			}
+		}
+		out += fmt.Sprintf("%v,", coin.String())
+	}
+	if len(out) > 0 {
+		out = out[:len(out)-1]
+	}
+	return out
+}
+
 // IsValid asserts the Coins are sorted and have positive amounts.
 func (coins Coins) IsValid() bool {
 	switch len(coins) {

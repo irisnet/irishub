@@ -143,7 +143,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext
 			return
 		}
 
-		tokenStats.BondedToken = poolStatus.BondedTokens
+		tokenStats.BondedToken = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
 
 		utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 	}

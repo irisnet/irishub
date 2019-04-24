@@ -38,8 +38,13 @@ func GetCmdQueryProposal(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var proposal gov.Proposal
+			err = cdc.UnmarshalJSON(res, &proposal)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(proposal)
 		},
 	}
 
@@ -100,8 +105,14 @@ func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(res))
-			return nil
+
+			var proposals gov.Proposals
+			err = cdc.UnmarshalJSON(res, &proposals)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(proposals)
 		},
 	}
 
