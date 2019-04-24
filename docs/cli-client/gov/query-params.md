@@ -7,7 +7,7 @@ Query parameter proposal's config
 ## Usage
 
 ```
-iriscli gov query-params [flags]
+iriscli gov query-params <flags>
 ```
 
 Print help messages:
@@ -19,18 +19,18 @@ iriscli gov query-params --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --key           |                            | [string] Key name of parameter                                                                                                                       |          |
-| --module        |                            | [string] Module name                                                                                                                                 |          |
+| --key           |                            | Key name of parameter                                                                                                                       |          |
+| --module        |                            | Module name                                                                                                                                 |          |
 
 ## Examples
  
 ### Query params by module
 
+Get all the params of stake module.
+
 ```shell
 iriscli gov query-params --module=stake
 ```
-
-You'll get all the params of stake module.
 
 ```txt
  stake/MaxValidators=100
@@ -39,14 +39,25 @@ You'll get all the params of stake module.
 
 ### Query params by key
 
+Get the details of the parameter specified in the stake module.
+
 ```shell
 iriscli gov query-params --key=stake/MaxValidators
 ```
-
-You'll get the details of the parameter specified in the stake module.
 
 ```txt
  stake/MaxValidators=100
 ```
 
 Note: --module and --key cannot be both empty.
+
+### Modules with all configurable parameters
+
+```shell
+iriscli gov query-params --module=auth
+iriscli gov query-params --module=mint
+iriscli gov query-params --module=stake
+iriscli gov query-params --module=slashing
+iriscli gov query-params --module=distr
+iriscli gov query-params --module=service
+```

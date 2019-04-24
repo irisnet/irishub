@@ -2,12 +2,12 @@
 
 ## Description
  
-Deposit tokens for activing proposal
+Deposit tokens for active proposal
  
 ## Usage
  
 ```
-iriscli gov deposit [flags]
+iriscli gov deposit <flags>
 ```
 
 Print help messages:
@@ -19,18 +19,16 @@ iriscli gov deposit --help
  
 | Name, shorthand  | Default                    | Description                                                                                                                                         | Required |
 | ---------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------- |
-| --deposit        |                                       | [string] Deposit of proposal                                                                                                                 | Yes          |
-| --proposal-id  |                                       | [string] ProposalID of proposal depositing on                                                                                    | Yes      |
+| --deposit        |                                       | Deposit of proposal                                                                                                                 | Yes          |
+| --proposal-id  |                                       | ProposalID of proposal depositing on                                                                                    | Yes      |
 
 ## Examples
 
 ### Deposit
 
 ```shell
-iriscli gov deposit --chain-id=<chain-id> --proposal-id=1 --deposit=50iris --from=node0 --fee=0.3iris
+iriscli gov deposit --chain-id=<chain-id> --proposal-id=<proposal-id> --deposit=50iris --from=<key_name> --fee=0.3iris
 ```
-
-After you enter the correct password, you could deposit 50iris to make your proposal active which can be voted, after you enter the correct password, you're done with depositing iris tokens for an activing proposal.
 
 ```txt
 Committed at block 7 (tx hash: C1156A7D383492AE5C2EB1BADE0080C3A36BE8AED491DC5B2331056BED5D60DC, response:
@@ -50,3 +48,16 @@ Committed at block 7 (tx hash: C1156A7D383492AE5C2EB1BADE0080C3A36BE8AED491DC5B2
    }
  })
 ```
+
+When the total deposit amount exceeds `MinDeposit`, the proposal enter the voting procedure. 
+
+| GovParams | Critical | Important | Normal |
+| ------ | ------ | ------ | ------|
+| MinDeposit | 4000 iris | 2000 iris | 1000 iris |
+
+
+### How to query deposit
+
+[query-deposit](query-deposit.md)
+
+[query-deposits](query-deposits.md)

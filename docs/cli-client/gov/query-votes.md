@@ -7,7 +7,7 @@ Query votes on a proposal
 ## Usage
 
 ```
-iriscli gov query-votes [flags]
+iriscli gov query-votes <flags>
 ```
 
 Print help messages:
@@ -19,17 +19,18 @@ iriscli gov query-votes --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | [string] ProposalID of proposal depositing on                                                                                                        | Yes      |
+| --proposal-id   |                            | ProposalID of proposal depositing on                                                                                                        | Yes      |
 
 ## Examples
 
 ### Query votes
 
+You could query the voting of all the voters by specifying the proposal id.
+ 
 ```shell
-iriscli gov query-votes --chain-id=<chain-id> --proposal-id=1
-```
+iriscli gov query-votes --chain-id=<chain-id> --proposal-id=<proposal-id>
 
-You could query the voting of all the voters by specifying the proposal.
+```
  
 ```txt
 [

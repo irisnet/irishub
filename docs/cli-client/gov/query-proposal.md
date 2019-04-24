@@ -7,7 +7,7 @@ Query details of a single proposal
 ## Usage
 
 ```
-iriscli gov query-proposal [flags]
+iriscli gov query-proposal <flags>
 ```
 
 Print help messages:
@@ -20,14 +20,14 @@ iriscli gov query-proposal --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | [string] ProposalID of proposal depositing on                                                                                                        | Yes      |
+| --proposal-id   |                            | ProposalID of proposal depositing on                                                                                                        | Yes      |
 
 ## Examples
 
 ### Query proposal
 
 ```shell
-iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=1
+iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=<proposal-id>
 ```
 
 You could query the details of a specific proposal.

@@ -7,7 +7,7 @@ Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain
 ## Usage
 
 ```
-iriscli gov vote [flags]
+iriscli gov vote <flags>
 ```
 
 Print help messages:
@@ -19,19 +19,19 @@ iriscli gov vote --help
 
 | Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --option         |                            | [string] Vote option {Yes, No, NoWithVeto, Abstain}                                                                                                  | Yes      |
-| --proposal-id    |                            | [string] ProposalID of proposal voting on                                                                                                            | Yes      |
+| --option         |                            | Vote option {Yes, No, NoWithVeto, Abstain}                                                                                                  | Yes      |
+| --proposal-id    |                            | ProposalID of proposal voting on                                                                                                            | Yes      |
 
 ## Examples
 
 ### Vote for proposal
 
+
 ```shell
-iriscli gov vote --chain-id=<chain-id> --proposal-id=1 --option=Yes --from node0 --fee=0.3iris
+iriscli gov vote --chain-id=<chain-id> --proposal-id=<proposal-id> --option=Yes --from=<key_name> --fee=0.3iris
 ```
 
-Validators and delegators can vote for proposals which enter voting period.
-After you enter the correct password, you're done with voting for a 'VotingPeriod' proposal.
+Only validators can vote for proposals which enter voting period.
 
 ```txt
 Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35F11B04C921DB81CC, response:
@@ -48,5 +48,13 @@ Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35
      "proposal-id": "2",
      "voter": "iaa1x25y3ltr4jvp89upymegvfx7n0uduz5krcj7ul"
    }
- })
+ }) 
 ```
+
+### How to query vote
+
+[query-vote](query-vote.md)
+
+[query-votes](query-votes.md)
+
+[query-tally](query-tally.md)

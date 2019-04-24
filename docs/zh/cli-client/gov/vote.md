@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli gov vote [flags]
+iriscli gov vote <flags>
 ```
 
 打印帮助信息:
@@ -20,19 +20,19 @@ iriscli gov vote --help
 
 | 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须 |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --option         |                            | [string] 投票选项 {Yes, No, NoWithVeto, Abstain}                                                                                                  | Yes      |
-| --proposal-id    |                            | [string] 投票的提议ID                                                                                                            | Yes      |
+| --option         |                            | 投票选项 {Yes, No, NoWithVeto, Abstain}                                                                                                  | Yes      |
+| --proposal-id    |                            | 投票的提议ID                                                                                                            | Yes      |
 
 ## 例子
 
 ### 给提议投票
 
+给提议投`yes`票
 ```shell
-iriscli gov vote --chain-id=<chain-id> --proposal-id=1 --option=Yes --from node0 --fee=0.3iris
+iriscli gov vote --chain-id=<chain-id> --proposal-id=<proposal-id> --option=Yes --from=<key_name> --fee=0.3iris
 ```
 
-输入正确的密码之后，你就完成了对于所指定的提议投票。
-注意：验证人和委托人才能对指定提议投票，并且可投票的提议必须是'VotingPeriod'状态。
+注意：只有验证人才能对指定提议投票，并且可投票的提议必须是`VotingPeriod`状态。
 
 ```txt
 Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35F11B04C921DB81CC, response:
@@ -52,9 +52,7 @@ Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35
  })
 ```
 
-如何查询投票详情？
-
-请点击下述链接：
+### 查询投票详情
 
 [query-vote](query-vote.md)
 

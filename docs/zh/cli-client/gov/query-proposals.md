@@ -7,28 +7,30 @@
 ## 使用方式
 
 ```
-iriscli gov query-proposals [flags]
+iriscli gov query-proposals <flags>
 ```
+
 打印帮助信息:
 
 ```
 iriscli gov query-proposals --help
 ```
+
 ## 标志
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --depositor     |                            | [string] （可选）按存款人过滤                                                                                    |          |
-| --limit         |                            | [string] （可选）限制最新[数量]提议。 默认为所有提议                                                                    |          |
-| --status        |                            | [string] （可选）按提议状态过滤提议                                                                                                        |          |
-| --voter         |                            | [string] （可选）按投票人过滤                                                                                            |          |
+| --depositor     |                            |按抵押人过滤 |     否     |
+| --limit         |                            |限制返回最新[数量]提议。 默认为所有提议  |     否     |
+| --status        |                            |按提议状态过滤提议       |     否     |
+| --voter         |                            |按投票人过滤      |     否     |
 
 ## 例子
 
 ### 查询提议
 
 ```shell
-iriscli gov query-proposals --chain-id=test
+iriscli gov query-proposals --chain-id=<chain-id>
 ```
 
 默认查询所有的提议。
@@ -48,3 +50,9 @@ gov query-proposals --chain-id=<chain-id> --depositor=iaa14q5rf9sl2dqd2uxrxykafx
 ```txt
   2 - new proposal
 ```
+
+查询最新的3条提议
+```shell
+iriscli gov query-proposals --chain-id=<chain-id> --limit=3
+```
+

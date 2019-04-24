@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli gov query-proposal [flags]
+iriscli gov query-proposal <flags>
 ```
 打印帮助信息:
 
@@ -19,13 +19,13 @@ iriscli gov query-proposal --help
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | [string] 提议ID                                                                                                        | Yes      |
+| --proposal-id   |                            | 提议ID                                                                                                        | Yes      |
 ## 例子
 
 ### 查询指定的提议
 
 ```shell
-iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=1
+iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=<proposal-id>
 ```
 
 查询指定提议的详情，可以得到结果如下：

@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli gov query-tally [flags]
+iriscli gov query-tally <flags>
 ```
 
 打印帮助信息:
@@ -19,17 +19,17 @@ iriscli gov query-tally --help
 ## 标志
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | [string] 提议ID                                                                                                        | Yes      |
+| --proposal-id   |                            | 提议ID                                                                                                        | Yes      |
 
 ## 例子
 
 ### 查询投票统计
 
-```shell
-iriscli gov query-tally --chain-id=<chain-id> --proposal-id=1
-```
+查询指定提议的投票统计
 
-可以查询指定提议每个投票选项的投票统计。
+```shell
+iriscli gov query-tally --chain-id=<chain-id> --proposal-id=<proposal-id>
+```
 
 ```txt
 {
