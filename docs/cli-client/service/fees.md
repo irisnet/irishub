@@ -2,12 +2,12 @@
 
 ## Description
 
-Query return and incoming fee of a particular address
+Query return and incoming fee of a service provider address
 
 ## Usage
 
 ```
-iriscli service fees [account address]
+iriscli service fees <service_provider_address>
 ```
 
 ## Flags
@@ -19,11 +19,12 @@ iriscli service fees [account address]
 ## Examples
 
 ### Query service fees
+
 ```shell
-iriscli service fees iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m
+iriscli service fees <service_provider_address>
 ```
 
-After that, you will get the service fees by specified address.
+output:
 
 ```json
 {

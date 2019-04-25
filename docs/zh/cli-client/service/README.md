@@ -6,7 +6,7 @@ Service 允许你通过区块链定义、绑定、调用服务。
 ## 用法
 
 ```shell
-iriscli service [command]
+iriscli service <command>
 ```
 
 ## 相关命令

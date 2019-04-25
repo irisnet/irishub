@@ -7,23 +7,25 @@ Respond a service method invocation
 ## Usage
 
 ```
-iriscli service respond [flags]
+iriscli service respond <flags>
 ```
 
 ## Flags
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | [string] the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
-| --request-id          |                         | [string] the ID of the service invocation                                                                                                                                |  Yes     |
-| --response-data       |                         | [string] hex encoded response data of a service invocation                                                                       |         |
+| --request-chain-id    |                         | the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
+| --request-id          |                         | the ID of the service invocation                                                                                                                                |  Yes     |
+| --response-data       |                         | hex encoded response data of a service invocation                                                                       |         |
 
 ## Examples
 
 ### Respond to a service invocation 
+
 ```shell
-iriscli service respond --chain-id=<chain-id> --from=node0 --fee=0.3iris --request-chain-id=<chain-id> --request-id=230-130-0 --response-data=abcd
+iriscli service respond --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --request-chain-id=<request_chain_id> --request-id=<request-id> --response-data=<response-data>
 ```
+> You can figure out the `request-id` in the return of [service call](call.md)
 
 After that, you're done with responding to a service invocation.
 

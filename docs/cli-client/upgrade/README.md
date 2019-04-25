@@ -7,7 +7,7 @@ Be used to participate in the software upgrade process.
 ## Usage
 
 ```shell
-iriscli upgrade [command]
+iriscli upgrade <command>
 ```
 
 ## Available Commands

@@ -7,17 +7,17 @@
 ## 用法
 
 ```
-iriscli service binding [flags]
+iriscli service binding <flags>
 ```
 
 ## 标志
 
 | Name, shorthand | Default                    | Description                                            | Required |
 | --------------- | -------------------------- | ----------------------------------------------------   | -------- |
-| --bind-chain-id |                            | [string] 绑定该服务的区块链ID                             | 是        |
-| --def-chain-id  |                            | [string] 定义该服务的区块链ID                             | 是        |
-| --provider      |                            | [string] 服务提供者的区块链地址(bech32编码)                 | 是        |
-| --service-name  |                            | [string] 服务名称                                        | 是        |
+| --bind-chain-id |                            | 绑定该服务的区块链ID                             | 是        |
+| --def-chain-id  |                            | 定义该服务的区块链ID                             | 是        |
+| --provider      |                            | 服务提供者的区块链地址(bech32编码)                 | 是        |
+| --service-name  |                            | 服务名称                                        | 是        |
 | --help, -h      |                            | 查询绑定命令帮助                                           |          |
 
 ## 示例
@@ -25,7 +25,7 @@ iriscli service binding [flags]
 ### 查询服务绑定
 
 ```shell
-iriscli service binding --def-chain-id=test --service-name=test-service --bind-chain-id=test --provider=iaa1ydhmma8l4m9dygsh7l08fgrwka6yczs0se0tvs
+iriscli service binding --def-chain-id=<service_define_chain-id> --service-name=<service-name> --bind-chain-id=<service_bind_chain-id> --provider=<provider_address>
 ```
 
 运行成功以后，返回的结果如下:

@@ -7,21 +7,24 @@ Refund all deposit from a service binding
 ## Usage
 
 ```
-iriscli service refund-deposit [flags]
+iriscli service refund-deposit <flags>
 ```
 
 ## Flags
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --service-name        |                         |  [string] service name                                                                                                                                |  Yes     |
+| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
+| --service-name        |                         | service name                                                                                                                                |  Yes     |
 
 ## Examples
 
 ### Refund all deposit from an unavailable service binding
+
+Before refunding , you should [disable](disable.md) the service binding first.
+
 ```shell
-iriscli service refund-deposit --chain-id=<chain-id>  --from=node0 --fee=0.3iris --def-chain-id=<chain-id> --service-name=test-service
+iriscli service refund-deposit --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --def-chain-id=<service_define_chain_id> --service-name=<service-name>
 ```
 
 After that, you're done with refunding all deposit from a service binding.

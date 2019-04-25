@@ -7,14 +7,15 @@ Refund all fees from service return fees
 ## Usage
 
 ```
-iriscli service refund-fees [flags]
+iriscli service refund-fees <flags>
 ```
 
 ## Examples
 
 ### Refund fees from service return fees 
+
 ```shell
-iriscli service refund-fees --chain-id=<chain-id> --from=node0 --fee=0.3iris
+iriscli service refund-fees --chain-id=<chain-id> --from=<key_name> --fee=0.3iris
 ```
 
 After that, you're done with refunding fees from service return fees.

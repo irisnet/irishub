@@ -7,15 +7,15 @@
 ## 用法
 
 ```
-iriscli service refund-fees [flags]
+iriscli service refund-fees <flags>
 ```
-
 
 ## 示例
 
 ### 从服务费退款中退还费用 
+
 ```shell
-iriscli service refund-fees --chain-id=<chain-id> --from=node0 --fee=0.3iris
+iriscli service refund-fees --chain-id=<chain-id> --from=<key_name> --fee=0.3iris
 ```
 
 运行成功以后，返回的结果如下:

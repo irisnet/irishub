@@ -7,29 +7,28 @@ Create a new service binding
 ## Usage
 
 ```
-iriscli service bind [flags]
+iriscli service bind <flags>
 ```
 
 ## Flags
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | [int] the average service response time in milliseconds                                                                                               |  Yes     |
-| --bind-type           |                         | [string] type of binding, valid values can be Local and Global                                                                                        |  Yes     |
-| --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --deposit             |                         | [string] deposit of binding                                                                                                                           |  Yes     |
-| --prices              |                         | [strings] prices of binding, will contains all method                                                                                                 |          |
-| --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
-| --usable-time         |                         | [int] an integer represents the number of usable service invocations per 10,000                                                                       |  Yes     |
+| --avg-rsp-time        |                         | the average service response time in milliseconds                                                                                               |  Yes     |
+| --bind-type           |                         | type of binding, valid values can be Local and Global                                                                                        |  Yes     |
+| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
+| --deposit             |                         | deposit of binding                                                                                                                           |  Yes     |
+| --prices              |                         | prices of binding, will contains all method                                                                                                 |          |
+| --service-name        |                         | service name                                                                                                                                 |  Yes     |
+| --usable-time         |                         | an integer represents the number of usable service invocations per 10,000                                                                       |  Yes     |
 
 ## Examples
 
 ### Add a binding to an existing service definition
-In service binding, you need to define `deposit`, minimum deposit = `price` of this service * `MinDepositMultiple` in genesis file
-
+In service binding, you need to define `deposit`,  the minimum mortgage amount of this `deposit` is `price` * `MinDepositMultiple` (defined in genesis file)
 
 ```shell
-iriscli service bind --chain-id=<chain-id> --from=node0 --fee=0.3iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<service-define-chain-id> --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
 ```
 
 After that, you're done with adding a binding to an existing service definition.

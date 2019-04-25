@@ -7,7 +7,7 @@ Query remote node for status
 ## Usage
 
 ```shell
-iriscli status [flags]
+iriscli status <flags>
 ```
 
 ## Flags

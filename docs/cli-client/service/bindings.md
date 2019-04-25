@@ -7,15 +7,15 @@ Query service bindings
 ## Usage
 
 ```
-iriscli service bindings [flags]
+iriscli service bindings <flags>
 ```
 
 ## Flags
 
 | Name, shorthand | Default                    | Description                                                         | Required |
 | --------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --def-chain-id  |                            | [string] the ID of the blockchain defined of the service            | Yes      |
-| --service-name  |                            | [string] service name                                               | Yes      |
+| --def-chain-id  |                            | the ID of the blockchain defined of the service            | Yes      |
+| --service-name  |                            | service name                                               | Yes      |
 | --help, -h      |                            | help for bindings                                                   |          |
 
 ## Examples
@@ -23,7 +23,7 @@ iriscli service bindings [flags]
 ### Query service binding list
 
 ```shell
-iriscli service bindings --def-chain-id=<chain-id> --service-name=test-service
+iriscli service bindings --def-chain-id=<chain-id> --service-name=<service-name>
 ```
 
 After that, you will get a binding list of the service definition.
