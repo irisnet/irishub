@@ -1,22 +1,31 @@
 # Guardian User Guide
 
 ## 简介
-IRISnet引入了两种由基金会控制的特权系统用户，profiler和trustee。 
+IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用户：profiler和trustee。 
 
-* Profiler的特权
+* Profiler的权益
     1. 通过治理提交软件升级/停止提议。
-    2. 使用profiling模式发起服务调用，profiling模式会免除服务费。
+    2. 使用`profiling`模式发起服务调用，`profiling`模式会免除服务费。
     
-* Trustee的特权
-    1. 如果`TxTaxUsage`提议的使用类型是`Distribution`或`Grant`，作为目的地地址。
-    2. 发送交易从系统服务费税池中提取代币到账户。
+* Trustee的权益
+    1. 通过`TxTaxUsage`治理取回交易税费时，只能使用Trustee address作为取回地址。
+    2. 发起`withdraw-tax`交易可以从`iService`服务费税池中提取代币到指定账户。
+    
+* Genesis Profiler/Genesis Trustee的权益（在创世的genesis.json中定义）
+    1. 只有Genesis Profiler可以 添加/删除 普通Profiler账户
+    2. 只有Genesis Trustee可以 添加/删除 Trustee账户
     
 ## 使用场景
-1. 添加profiler
+1. 添加profiler和trustee 
 
-    只有profiler能添加新的profiler
+    添加profiler （仅限Genesis Profiler）
     ```shell
-    iriscli guardian add-profiler --profiler-address=[profiler address] --profiler-name=[name] --chain-id=[chain-id] --from=[key name] --fee=0.4iris 
+    iriscli guardian add-profiler --address=<profiler_address> --description=<profiler_description> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris 
+    ```
+    
+    添加trustee（仅限Genesis Trustee）
+    ```shell
+    iriscli guardian add-trustee --address=<trustee_address> --description=<trustee_description> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris 
     ```
     
 2. 查询profiler和trustee列表
@@ -34,16 +43,31 @@ IRISnet引入了两种由基金会控制的特权系统用户，profiler和trust
 
     详细参考[upgrade](upgrade.md)
 
-4. Profiler使用profiling模式发起服务调用
-    ```shell
-    iriscli service call --def-chain-id=[def-chain-id] --service-name=[service-name] --method-id=[method-id] --bind-chain-id=[bind-chain-id] --provider=[provider address] --service-fee=1iris --request-data=[request-data] --chain-id=[chain-id] --from=[key name] --fee=0.4iris
-    ```
+4. Profiler使用`profiling`模式发起服务调用
     
-5. Trustee作为`TxTaxUsage`提议的目的地地址
+    该模式免除服务费
+    ```shell
+    iriscli service call --def-chain-id=<def-chain-id> --service-name=<service_name> --method-id=<method_id> --bind-chain-id=<bind-chain-id> --provider=<provider_address> --service-fee=1iris --request-data=<request_data> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --profiling=true
+    ```
+
+5. 通过`TxTaxUsage`治理取回交易税费
 
     详细参考[governance](governance.md#proposals-on-transaction-fee-community-tax-usage)
     
-6. Trustee取回服务费税金
+6. Trustee从`iService`服务费税池中提取代币到指定账户
+
     ```shell
-    iriscli service withdraw-tax --dest-address=[destination address] --withdraw-amount=1iris --chain-id=[chain-id] --from=[key name] --fee=0.4iris 
+    iriscli service withdraw-tax --dest-address=<destination_address> --withdraw-amount=1iris --chain-id=<chain-id> --from=<key_name> --fee=0.3iris
+    ```
+    
+7. 删除profiler和trustee
+
+    删除profiler：（仅限Genesis Profiler）
+    ```shell
+    iriscli guardian delete-profiler --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address=<profiler_address>
+    ```
+    
+    删除trustee：（仅限Genesis Trustee）
+    ```shell
+    iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address=<trustee_address>
     ```

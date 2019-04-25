@@ -71,7 +71,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	appPrometheusConfig := *config
 	//Change namespace to appName
 	appPrometheusConfig.Namespace = appPrometheusNamespace
-	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, &appPrometheusConfig))
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -80,7 +80,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 		cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
 	}
 	app.BaseApp.txDecoder = auth.DefaultTxDecoder(engine.GetCurrentProtocol().GetCodec())
-
+	engine.GetCurrentProtocol().InitMetrics(app.cms)
 	return app
 }
 

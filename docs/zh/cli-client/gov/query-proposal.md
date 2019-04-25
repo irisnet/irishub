@@ -25,7 +25,7 @@ iriscli gov query-proposal --help
 ### 查询指定的提议
 
 ```shell
-iriscli gov query-proposal --chain-id=test --proposal-id=1
+iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=1
 ```
 
 查询指定提议的详情，可以得到结果如下：

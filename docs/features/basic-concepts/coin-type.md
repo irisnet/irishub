@@ -36,17 +36,15 @@ type Unit struct {
 }
 ```
 
-* Name : The name of a token, which is also its default unit；for instance,the default unit of `iris` is `iris`.
-* MinUnit：The  minimum unit of coin_type. 
+* Name : The name of a token, which is also its default unit；for instance,the default unit of IRISnet is `iris`.
+* MinUnit：The minimum unit of coin_type. 
 
 The tokens in the system are all stored in the form of minimum unit, 
 such as `iris-atto`. You could choose to use the minimum unit of the tokens when sending a transaction to the IRIShub. 
 If you use the command line client, aka `iriscli`, you can use any system-recognized unit and the system 
 will automatically convert to the minimum unit of this corresponding token. For example, if you execute `send`command 
-to transfer 1iris, the command line will be processed as 10^18 iris-attos in the backend, and you will only 
-see 10^18 `iris-attos` when searching the transaction details by transaction hash.
-
-
+to transfer 1iris, the command line will be processed as 10^18 iris-atto in the backend, and you will only 
+see 10^18 `iris-atto` when searching the transaction details by transaction hash.
 
 `Denom` is defined as the name of this unit, and `Decimal` is defined as the precision of the unit. 
 
@@ -62,7 +60,7 @@ For example, the precision of iris-atto is 18.
 If you want to query the coin_type configuration of a certain token, you can use the following command:
 
 ```golang
-iriscli bank coin-type [coin_name]
+iriscli bank coin-type <coin_name>
 ```
 
 If you query the `coin-type` of `iris` with `iriscli bank coin-type iris`

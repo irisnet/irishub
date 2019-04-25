@@ -66,10 +66,9 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
-	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(tokenPrecision).String(), 64)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+		k.metrics.CommunityTax.Set(communityTaxAmount)
 	}
 
 	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString())
@@ -93,10 +92,9 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
 
-	tokenPrecision := sdk.NewIntWithDecimal(1, 18)
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(tokenPrecision).String(), 64)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.CommunityTax.With("height", strconv.Itoa(int(ctx.BlockHeight()))).Set(communityTaxAmount)
+		k.metrics.CommunityTax.Set(communityTaxAmount)
 	}
 
 	k.SetFeePool(ctx, feePool)
@@ -109,6 +107,9 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 		}
 	} else {
 		logger.Info("Grant community tax to account", "grant_amount", allocateCoins.String(), "grant_address", destAddr.String())
+		if !allocateCoins.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocateCoins.String(), sdk.CommunityTaxUseFlow, "")
+		}
 		_, _, err := k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
 		if err != nil {
 			panic(err)

@@ -27,5 +27,4 @@ After that, you will get the current staking parameters information.
 Params
 Unbonding Time: 10m0s
 Max Validators: 100:
-Bonded Coin Denomination: iris-atto
 ```

@@ -23,8 +23,6 @@ const (
 	FlagDetails  = "details"
 
 	FlagCommissionRate          = "commission-rate"
-	FlagCommissionMaxRate       = "commission-max-rate"
-	FlagCommissionMaxChangeRate = "commission-max-change-rate"
 
 	FlagGenesisFormat = "genesis-format"
 	FlagNodeID        = "node-id"
@@ -58,8 +56,6 @@ func init() {
 	fsDescriptionCreate.String(FlagDetails, "", "optional details")
 	fsCommissionUpdate.String(FlagCommissionRate, "", "The new commission rate percentage")
 	FsCommissionCreate.String(FlagCommissionRate, "", "The initial commission rate percentage")
-	FsCommissionCreate.String(FlagCommissionMaxRate, "", "The maximum commission rate percentage")
-	FsCommissionCreate.String(FlagCommissionMaxChangeRate, "", "The maximum commission change rate percentage (per day)")
 	fsDescriptionEdit.String(FlagMoniker, types.DoNotModifyDesc, "validator name")
 	fsDescriptionEdit.String(FlagIdentity, types.DoNotModifyDesc, "optional identity signature (ex. UPort or Keybase)")
 	fsDescriptionEdit.String(FlagWebsite, types.DoNotModifyDesc, "optional website")

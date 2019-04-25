@@ -61,6 +61,7 @@ func main() {
 		tenderminttxcmd.QueryTxCmd(cdc),
 		tenderminttxcmd.SearchTxCmd(cdc),
 		tendermintrpccmd.BlockCommand(),
+		tendermintrpccmd.BlockResultCommand(),
 		tendermintrpccmd.ValidatorCommand(),
 	)
 	rootCmd.AddCommand(tendermintCmd)
@@ -99,6 +100,7 @@ func main() {
 			distributioncmd.GetDelegationDistInfo("distr", cdc),
 			distributioncmd.GetValidatorDistInfo("distr", cdc),
 			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
+			distributioncmd.GetRewards("distr", "stake", cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(

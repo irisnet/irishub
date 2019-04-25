@@ -34,6 +34,7 @@ type ProtocolV0 struct {
 	logger         log.Logger
 	invariantLevel string
 	checkInvariant bool
+	trackCoinFlow  bool
 
 	// Manage getting and setting accounts
 	accountMapper  auth.AccountKeeper
@@ -66,13 +67,14 @@ type ProtocolV0 struct {
 	metrics		*Metrics
 }
 
-func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
+func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
 	p0 := ProtocolV0{
 		version:        version,
 		logger:         log,
 		protocolKeeper: pk,
 		invariantLevel: strings.ToLower(sdk.InvariantLevel),
 		checkInvariant: checkInvariant,
+		trackCoinFlow:  trackCoinFlow,
 		router:         protocol.NewRouter(),
 		queryRouter:    protocol.NewQueryRouter(),
 		config:         config,
@@ -98,6 +100,11 @@ func (p *ProtocolV0) Init() {
 // verison0 tx codec
 func (p *ProtocolV0) GetCodec() *codec.Codec {
 	return p.cdc
+}
+
+func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore){
+	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
+	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
 
 func (p *ProtocolV0) configCodec() {
@@ -307,6 +314,8 @@ func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 
 	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
 
+	ctx.CoinFlowTags().TagWrite()
+
 	tags = tags.AppendTags(slashTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
@@ -320,6 +329,10 @@ func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
+	if p.trackCoinFlow {
+		ctx.CoinFlowTags().TagWrite()
+		tags = tags.AppendTags(ctx.CoinFlowTags().GetTags())
+	}
 	p.assertRuntimeInvariants(ctx)
 
 	return abci.ResponseEndBlock{

@@ -26,7 +26,7 @@ iriscli gov query-tally --help
 ### Query tally
 
 ```shell
-iriscli gov query-tally --chain-id=test --proposal-id=1
+iriscli gov query-tally --chain-id=<chain-id> --proposal-id=1
 ```
 
 You could query the statistics of each voting option.

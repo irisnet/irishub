@@ -42,18 +42,20 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 	time := ctx.BlockHeader().Time
 	age := ctx.BlockHeight() - infractionHeight
 	consAddr := sdk.ConsAddress(addr)
+
+	// To resolve https://github.com/irisnet/irishub/issues/1334
+	// Unbonding period is calculated by time however evidence age is calculated by height.
+	// It is possible that the unbonding period is completed, but evidence is still valid
+	// If a validator is removed once unbonding period is completed, then its pubkey will be deleted, which will result in panic and consensus halt
+	// So here we check the validator existence and validator status first
+	validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
+	if validator == nil || validator.GetStatus() == sdk.Unbonded {
+		return
+	}
+
 	pubkey, err := k.getPubkey(ctx, addr)
 	if err != nil {
 		panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))
-	}
-
-	// Get validator.
-	validator := k.validatorSet.ValidatorByConsAddr(ctx, consAddr)
-	if validator == nil || validator.GetStatus() == sdk.Unbonded {
-		// Defensive.
-		// Simulation doesn't take unbonding periods into account, and
-		// Tendermint might break this assumption at some point.
-		return
 	}
 
 	// Double sign too old
@@ -98,7 +100,7 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 	if !found {
 		panic(fmt.Sprintf("Expected signing info for validator %s but not found", consAddr))
 	}
-	signInfo.JailedUntil = time.Add(k.DoubleSignUnbondDuration(ctx))
+	signInfo.JailedUntil = time.Add(k.DoubleSignJailDuration(ctx))
 	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
 	return
 }
@@ -160,7 +162,7 @@ func (k Keeper) handleValidatorSignature(ctx sdk.Context, addr crypto.Address, p
 			slashTags := k.validatorSet.Slash(ctx, consAddr, distributionHeight, power, k.SlashFractionDowntime(ctx))
 			tags = tags.AppendTags(slashTags)
 			k.validatorSet.Jail(ctx, consAddr)
-			signInfo.JailedUntil = ctx.BlockHeader().Time.Add(k.DowntimeUnbondDuration(ctx))
+			signInfo.JailedUntil = ctx.BlockHeader().Time.Add(k.DowntimeJailDuration(ctx))
 			// We need to reset the counter & array so that the validator won't be immediately slashed for downtime upon rebonding.
 			signInfo.MissedBlocksCounter = 0
 			signInfo.IndexOffset = 0
@@ -218,7 +220,7 @@ func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, i
 	if !found {
 		panic(fmt.Sprintf("Expected signing info for validator %s but not found", consAddr))
 	}
-	signInfo.JailedUntil = time.Add(k.CensorshipUnbondDuration(ctx))
+	signInfo.JailedUntil = time.Add(k.CensorshipJailDuration(ctx))
 	k.SetValidatorSigningInfo(ctx, consAddr, signInfo)
 	return
 }

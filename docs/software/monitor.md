@@ -6,7 +6,7 @@ IRISnet can report and serve the Prometheus metrics, which in their turn can be 
 
 This functionality is disabled by default.
 
-To enable the Prometheus metrics, set `instrumentation.prometheus=true` in your config file. Metrics will be served under /metrics on 26660 port by default. Listen address can be changed in the config file (see instrumentation.prometheus_listen_addr).
+To enable the Prometheus metrics, set `prometheus = true` in your config file(config.toml). Metrics will be served under /metrics on 26660 port by default. This port can be changed in the config file (`prometheus_listen_addr = ":26660"`).
 
 ### List of available metrics
 
@@ -73,11 +73,11 @@ You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/mas
 Then edit `prometheus.yml` and add `jobs` :
 
 ```yaml
-      - job_name: fuxi-5000
+      - job_name: fuxi
           static_configs:
           - targets: ['localhost:36660']
             labels:
-              instance: fuxi-5000
+              instance: fuxi
 ```
 
 > Note：value of targets is ip:port which used by IRIS monitor 

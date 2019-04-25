@@ -44,6 +44,11 @@ func SetCheckInvariant(check bool) func(*BaseApp) {
 	return func(bap *BaseApp) { bap.SetCheckInvariant(check) }
 }
 
+// SetTrackCoinFlow sets the config about track coin flow
+func SetTrackCoinFlow(enable bool) func(*BaseApp) {
+	return func(bap *BaseApp) { bap.SetTrackCoinFlow(enable) }
+}
+
 // nolint - Setter functions
 func (app *BaseApp) SetName(name string) {
 	if app.sealed {

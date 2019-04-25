@@ -26,4 +26,5 @@ type Protocol interface {
 	Load()
 	Init()
 	GetCodec() *codec.Codec
+	InitMetrics(store sdk.CommitMultiStore) // init metrics
 }

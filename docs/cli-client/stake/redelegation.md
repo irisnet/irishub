@@ -33,9 +33,9 @@ After that, you will get specified redelegation's info based on delegator and a 
 
 ```txt
 Redelegation
-Delegator: faa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9sytjfk
-Source Validator: fva1dayujdfnxjggd5ydlvvgkerp2supknthajpch2
-Destination Validator: fva1h27xdw6t9l5jgvun76qdu45kgrx9lqede8hpcd
+Delegator: iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9gtd2ft
+Source Validator: iva1dayujdfnxjggd5ydlvvgkerp2supknth9a8qhh
+Destination Validator: iva1h27xdw6t9l5jgvun76qdu45kgrx9lqedpg3ecs
 Creation height: 1130
 Min time to unbond (unix): 2018-11-16 07:22:48.740311064 +0000 UTC
 Source shares: 0.1000000000

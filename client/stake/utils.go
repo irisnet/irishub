@@ -137,7 +137,7 @@ func (p PoolOutput) HumanReadableString() string {
 func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Validator) ValidatorOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 
-	bechValPubkey, err := sdk.Bech32ifyValPub(v.ConsPubKey)
+	bechConsPubkey, err := sdk.Bech32ifyConsPub(v.ConsPubKey)
 	if err != nil {
 		panic(err)
 	}
@@ -150,13 +150,13 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 	}
 	return ValidatorOutput{
 		OperatorAddr:     v.OperatorAddr,
-		ConsPubKey:       bechValPubkey,
+		ConsPubKey:       bechConsPubkey,
 		Jailed:           v.Jailed,
 		Status:           v.Status,
 		Tokens:           utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
 		DelegatorShares:  utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
 		Description:      v.Description,
-		BondHeight:       v.UnbondingHeight,
+		BondHeight:       v.BondHeight,
 		UnbondingHeight:  v.UnbondingHeight,
 		UnbondingMinTime: v.UnbondingMinTime,
 		Commission:       commission,

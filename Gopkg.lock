@@ -3,14 +3,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7736fc6da04620727f8f3aa2ced8d77be8e074a302820937aa5993848c769b27"
-  name = "github.com/ZondaX/hid-go"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "48b08affede2cea076a3cf13b2e3f72ed262b743"
-
-[[projects]]
-  branch = "master"
   digest = "1:09a7f74eb6bb3c0f14d8926610c87f569c5cff68e978d30e9a3540aeb626fdf0"
   name = "github.com/bartekn/go-bip39"
   packages = ["."]
@@ -453,7 +445,7 @@
   version = "v0.12.0-iris"
 
 [[projects]]
-  digest = "1:d75069146141c30fa3de3055c8dbcf71cf68295019d4dca22a74794c7d55a64d"
+  digest = "1:f62200291193927002913077c126851e8b653dab2ae308502334c687d53a9233"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -518,9 +510,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "95d1adbd406e7a61e6f4161a62a517a9380224d8"
+  revision = "162bd175531838ef9d56b31ef0acf9e35507253e"
   source = "https://github.com/irisnet/tendermint.git"
-  version = "v0.27.3-iris6"
+  version = "v0.27.4"
 
 [[projects]]
   digest = "1:bf6d9a827ea3cad964c2f863302e4f6823170d0b5ed16f72cf1184a7c615067e"
@@ -531,12 +523,28 @@
   version = "v0.9.0"
 
 [[projects]]
-  digest = "1:7886f86064faff6f8d08a3eb0e8c773648ff5a2e27730831e2bfbf07467f6666"
-  name = "github.com/zondax/ledger-goclient"
+  digest = "1:b73f5e117bc7c6e8fc47128f20db48a873324ad5cfeeebfc505e85c58682b5e4"
+  name = "github.com/zondax/hid"
+  packages = ["."]
+  pruneopts = "T"
+  revision = "302fd402163c34626286195dfa9adac758334acc"
+  version = "v0.9.0"
+
+[[projects]]
+  digest = "1:fca24169988a61ea725d1326de30910d8049fe68bcbc194d28803f9a76dda380"
+  name = "github.com/zondax/ledger-cosmos-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "58598458c11bc0ad1c1b8dac3dc3e11eaf270b79"
-  version = "v0.1.0"
+  revision = "69fdb8ce5e5b9d9c3b22b9248e117b231d4f06dd"
+  version = "v0.9.7"
+
+[[projects]]
+  digest = "1:f8e4c0b959174a1fa5946b12f1f2ac7ea5651bef20a9e4a8dac55dbffcaa6cd6"
+  name = "github.com/zondax/ledger-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "69c15f1333a9b6866e5f66096561c7d138894bc5"
+  version = "v0.8.0"
 
 [[projects]]
   digest = "1:6f6dc6060c4e9ba73cf28aa88f12a69a030d3d19d518ef8e931879eaa099628d"
@@ -690,6 +698,7 @@
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
     "github.com/syndtr/goleveldb/leveldb/opt",
+    "github.com/tendermint/btcd/btcec",
     "github.com/tendermint/go-amino",
     "github.com/tendermint/iavl",
     "github.com/tendermint/tendermint/abci/server",
@@ -727,7 +736,7 @@
     "github.com/tendermint/tendermint/types",
     "github.com/tendermint/tendermint/types/time",
     "github.com/tendermint/tmlibs/cli",
-    "github.com/zondax/ledger-goclient",
+    "github.com/zondax/ledger-cosmos-go",
     "golang.org/x/crypto/bcrypt",
   ]
   solver-name = "gps-cdcl"

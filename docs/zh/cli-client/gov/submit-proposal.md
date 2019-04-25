@@ -38,7 +38,7 @@ iriscli gov submit-proposal --help
 ### 提交一个'ParameterChange'类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal" --param='mint/Inflation=0.050' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.01iris
+iriscli gov submit-proposal --chain-id=<chain-id> --title="update MinDeposit proposal" --param='mint/Inflation=0.050' --type=ParameterChange --description="a new parameter change proposal" --from=node0 --fee=0.3iris
 ```
 
 提交之后，您完成了提交新的“ParameterChange”提议。
@@ -48,7 +48,7 @@ iriscli gov submit-proposal --chain-id=test --title="update MinDeposit proposal"
 ### 提交一个'SoftwareUpgrade'类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=test --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.01iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9
+iriscli gov submit-proposal --chain-id=<chain-id> --title="irishub0.7.0 upgrade proposal" --type=SoftwareUpgrade --description="a new software upgrade proposal" --from=node0 --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9
 ```
 
 在这种场景下，提议的 --title、--type 和--description参数必不可少，另外你也应该保留好提议ID，这是检索所提交提议的唯一方法。

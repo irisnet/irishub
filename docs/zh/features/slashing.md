@@ -17,8 +17,8 @@
 3. 对于不同类型的异常行为，采用不同的惩罚比例和jail的时间。
 4. 惩罚细则：
 	1. 如果当前验证人token总数为A，惩罚比例为B，那么对此验证人最多惩罚的token的数量为A*B。
-	2. 如果在当前高度有处于unbonding阶段的unbonding delegation和redelegation,并且unbonding delegation和redelegation的创建高度小于作恶实施高度，则按比例B先惩罚这两部分的token
-	3. 对unbonding delegation和redelegation总共惩罚的token数量为S。如果S小于A*B，则惩罚验证人的token梳理为`A*B-S`。否则不惩罚绑定在验证人上的token
+	2. 检测到实施作恶时，如果在当前高度上绑定的代币正处于的unbonding delegation或者redelegation的阶段，则按比例B先惩罚这两部分的token
+	3. 对unbonding delegation和redelegation总共惩罚的token数量为S。如果S小于A*B，则惩罚验证人的token梳理为`A*B-S`。否则不惩罚绑定在验证人上的token。
 
 ## 长时间不参与网络共识
 
@@ -33,7 +33,7 @@
 
 ## 恶意投票
 
-执行区块时, 收到某验证人对同一高度同一Round不同区块都进行签名的作恶证据，如果作恶的时间距当前区块时间小于`MaxEvidenceAge`，则以`SlashFractionDoubleSign`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DoubleSignJailDuration`，才能通过unjail命令解除jail。
+执行区块时, 收到某验证人对同一高度同一Round区块进行不同签名的作恶证据（称为Double Sign），如果作恶的时间距当前区块时间小于`MaxEvidenceAge`，则以`SlashFractionDoubleSign`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DoubleSignJailDuration`，才能通过unjail命令解除jail。
 
 ### 参数
 
@@ -61,5 +61,5 @@
 如果validator被jail，并且jail的时间已经过去，则可以通过以下命令unjail。
 
 ```
-iriscli stake unjail --from=<key name> --fee=0.4iris --chain-id=<chain-id>
+iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
 ```

@@ -15,7 +15,7 @@ iriscli gov [command]
 ```
 Print all supported subcommands and flags:
 ```
-iriscli distribution --help
+iriscli gov --help
 ```
 
 ## Available Commands
@@ -30,8 +30,7 @@ iriscli distribution --help
 | [query-deposits](query-deposits.md)   | Query deposits on a proposal                                    |
 | [query-tally](query-tally.md)         | Get the tally of a proposal vote                                |
 | [query-params](query-params.md)       | Query parameter proposal's config                               |
-| [pull-params](pull-params.md)         | Generate param.json file                                        |
-| [submit-proposal](submit-proposal.md) | Create a new key, or import from seed                           |
+| [submit-proposal](submit-proposal.md) | Submit a proposal along with an initial deposit                          |
 | [deposit](deposit.md)                 | Deposit tokens for activing proposal                            |
 | [vote](vote.md)                       | vote for an active proposal, options: Yes/No/NoWithVeto/Abstain |
 

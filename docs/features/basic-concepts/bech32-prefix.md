@@ -8,18 +8,18 @@ Bech32 is a new Bitcoin address format proposed by Pieter Wuille and Greg Maxwel
 
 | HRP        | Definition |
 | -----------|:-------------|
-|faa|   IRISnet Account Address|
-|fap|    IRISnet Account Public Key|
-|fva|   IRISnet Validator's Operator Address|
-|fvp|   IRISnet Validator's Operator Public Key|
-|fca|   Tendermint Consensus Address|
-|fcp|    Tendermint Consensus Public Key|
+|iaa|   IRISnet Account Address|
+|iap|   IRISnet Account Public Key|
+|iva|   IRISnet Validator's Operator Address|
+|ivp|   IRISnet Validator's Operator Public Key|
+|ica|   Tendermint Consensus Address|
+|icp|   Tendermint Consensus Public Key|
 
 ## Encoding
 
-Not all interfaces to users IRISnet should be exposed as bech32 interfaces. Many address are still in hex or base64 encoded form.
+Not all interfaces to users IRISnet should be exposed as bech32 interfaces. Many addresses are still in hex or base64 encoded form.
 
-To covert between other binary reprsentation of addresses and keys, it is important to first apply the Amino enocoding process before bech32 encoding.
+To covert between other binary representation of addresses and keys, it is important to first apply the Amino encoding process before bech32 encoding.
 
 
 ## Account Key Example
@@ -28,20 +28,20 @@ Once you create a new address, you should see the following:
 
 ```
 NAME:    TYPE:           ADDRESS:                                PUBKEY:
-test1    local    faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl    fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv
+test1    local    iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz    iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l
 ```
 
-This means you have created a new address `faa18ekc4dswwrh2a6lfyev4tr25h5y76jkpqsz7kl`, its hrp is `faa`. And its public key could be encoded into `fap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnw6zv8uv`, its hrp is `fap`. 
+This means you have created a new address `iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz`, its hrp is `iaa`. And its public key could be encoded into `iap1addwnpepqgxa40ww28uy9q46gg48g6ulqdzwupyjcwfumgfjpvz7krmg5mrnwk5xq9l`, its hrp is `iap`. 
 
 ## Validator Key Example
 
 A Tendermint Consensus Public key is generated when the node is created with  `iris init`.
 You can get this value with   
 ```
-iris tendermint show-validator
+iris tendermint show-validator --home=<iris_home>
 ```
 
 Example output:
 ```
-fcp1zcjduepqwh0tqpqrewe9lrr87ywgjq50gd3m82mgz0qwsmu62s83pukrqsfs5lv2kw
+icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
 ```

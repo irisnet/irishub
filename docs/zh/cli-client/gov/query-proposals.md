@@ -41,10 +41,10 @@ iriscli gov query-proposals --chain-id=test
 当然这里可以查询指定条件的提议。
 
 ```shell
-gov query-proposals --chain-id=test --depositor=faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd
+gov query-proposals --chain-id=<chain-id> --depositor=iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs
 ```
 
-可以得到存款人是faa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fp9l7pgd地址的提议。
+可以得到存款人是iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs地址的提议。
 ```txt
   2 - new proposal
 ```

@@ -33,7 +33,7 @@ func SearchTxCmd(cdc *codec.Codec) *cobra.Command {
 		Long: strings.TrimSpace(`
 Search for transactions that match exactly the given tags. For example:
 
-$ iriscli query txs --tags '<tag1>:<value1>&<tag2>:<value2>'
+$ iriscli tendermint txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 `),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			tagsStr := viper.GetString(flagTags)
@@ -82,7 +82,7 @@ $ iriscli query txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 			return nil
 		},
 	}
-
+	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	cmd.Flags().Bool(client.FlagTrustNode, false, "Trust connected full node (don't verify proofs for responses)")
 	cmd.Flags().String(client.FlagChainID, "", "Chain ID of Tendermint node")

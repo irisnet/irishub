@@ -79,6 +79,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, config *cfg.Inst
 		bam.SetPruning(viper.GetString("pruning")),
 		bam.SetMinimumFees(viper.GetString("minimum_fees")),
 		bam.SetCheckInvariant(viper.GetBool("check_invariant")),
+		bam.SetTrackCoinFlow(viper.GetBool("track_coin_flow")),
 	)
 }
 

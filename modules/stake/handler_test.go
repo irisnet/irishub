@@ -492,7 +492,7 @@ func TestMultipleMsgCreateValidator(t *testing.T) {
 		require.True(t, got.IsOK(), "expected msg %d to be ok, got %v", i, got)
 
 		//Check that the account is bonded
-		validators := keeper.GetValidators(ctx, 100)
+		validators := keeper.GetValidators(ctx, 0,100)
 		require.Equal(t, (i + 1), len(validators))
 		val := validators[i]
 		balanceExpd := initBond.Sub(sdk.NewIntWithDecimal(10, 18))
@@ -516,7 +516,7 @@ func TestMultipleMsgCreateValidator(t *testing.T) {
 		EndBlocker(ctx, keeper)
 
 		// Check that the validator is deleted from state
-		validators := keeper.GetValidators(ctx, 100)
+		validators := keeper.GetValidators(ctx, 0,100)
 		require.Equal(t, len(validatorAddrs)-(i+1), len(validators),
 			"expected %d validators got %d", len(validatorAddrs)-(i+1), len(validators))
 

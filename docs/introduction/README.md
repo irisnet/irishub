@@ -28,7 +28,7 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 
 # IRIS Services
 
-*IRIS Services* (a.k.a. "iServices") are introduced to bridge the gap between the blockchain world and the conventional business application world, mediating the complete lifecycle of off-chain services -- from their definition, binding (provider registration), invocation, to their governance (profiling and arbitration).
+*IRIS Services* (a.k.a. "iService") are introduced to bridge the gap between the blockchain world and the conventional business application world, mediating the complete lifecycle of off-chain services -- from their definition, binding (provider registration), invocation, to their governance (profiling and arbitration).
 
 ## Lifecycle
 
@@ -42,10 +42,10 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 *Providers* are network users who offer the implementation of one or more iService definitions and often act as *adaptors* of off-chain services and resources located in other public and consortium chains, as well as in enterprise legacy systems.  Providers monitor and process incoming requests and send responses back to the network.  A provider could at the same time act as a consumer by sending requests to other providers.  As planned, providers would be required to charge a fee for any services they might offer, and the service fee, by default, would be priced in the IRIS token.
 
 ## Consumers
-*Consumers* are those users who consume iServices by sending requests to designated provider endpoints and receiving responses from providers in question.
+*Consumers* are those users who consume iService by sending requests to designated provider endpoints and receiving responses from providers in question.
 
 ## Profilers
-*Profilers* are special consumers who act on behalf of the IRIS Foundation Limited, a Hong Kong incorporated company limited by guarantee that takes the lead in building the IRIS network.  Profilers are the sole users authorized to invoke iServices in the *profiling mode*, which is intended to help create and maintain objective provider profiles that consumers refer to for provider screening.
+*Profilers* are special consumers who act on behalf of the IRIS Foundation Limited, a Hong Kong incorporated company limited by guarantee that takes the lead in building the IRIS network.  Profilers are the sole users authorized to invoke iService in the *profiling mode*, which is intended to help create and maintain objective provider profiles that consumers refer to for provider screening.
 
 ## Arbitrators
 *Arbitrators* are self-declared users who, working collectively, arbitrate consumer complaints against provider performance.  The details about the arbitration mechanism are being actively worked on, please keep an eye on our [whitepaper](../resources/whitepaper-en.md).

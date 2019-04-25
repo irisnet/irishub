@@ -20,8 +20,6 @@ iriscli stake create-validator --help
 | Name, shorthand              | type   | Required | Default  | Description                                                         |
 | ---------------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
 | --amount                     | string | true     | ""       | Amount of coins to bond |
-| --commission-max-change-rate | float  | true     | 0.0      | The maximum commission change rate percentage (per day)|
-| --commission-max-rate        | float  | true     | 0.0      | The maximum commission rate percentage |
 | --commission-rate            | float  | true     | 0.0      | The initial commission rate percentage |
 | --details                    | string | false    | ""       | Optional details |
 | --genesis-format             | bool   | false    | false    | Export the transaction in gen-tx format; it implies --generate-only |
@@ -34,7 +32,7 @@ iriscli stake create-validator --help
 ## Examples
 
 ```
-iriscli stake create-validator --chain-id=test-irishub --from=<key name> --fee=0.4iris --pubkey=<Validator PubKey> --commission-max-change-rate=0.01 --commission-max-rate=0.2 --commission-rate=0.1 --amount=100iris --moniker=<validator name>
+iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.3iris --pubkey=<Validator PubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator name>
 ```
 Sample Output:
 ```txt
@@ -51,7 +49,7 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
    "codespace": "",
    "tags": {
      "action": "create_validator",
-     "destination-validator": "fva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll",
+     "destination-validator": "iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6s30mrlz",
      "identity": "",
      "moniker": "test"
    }

@@ -134,7 +134,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 		cmn.Exit(err.Error())
 	}
 
-	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, true, cfg.DefaultInstrumentationConfig()))
+	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, true, false, cfg.DefaultInstrumentationConfig()))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))

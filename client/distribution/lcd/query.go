@@ -3,13 +3,13 @@ package lcd
 import (
 	"net/http"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // QueryWithdrawAddressHandlerFn performs withdraw address query
@@ -152,5 +152,21 @@ func QueryValidatorDistInfoHandlerFn(storeName string, cliCtx context.CLIContext
 		vdiOutput := distributionclient.ConvertToValidatorDistInfoOutput(cliCtx, vdi)
 
 		utils.PostProcessResponse(w, cliCtx.Codec, vdiOutput, cliCtx.Indent)
+	}
+}
+
+// QueryRewardsHandlerFn query the all the rewards of validator or delegator
+func QueryRewardsHandlerFn(distrStoreName string, stakeStoreName string, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		AddrStr := vars["address"]
+		accAddress, err := sdk.AccAddressFromBech32(AddrStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		utils.PostProcessResponse(w, cliCtx.Codec,
+			distributionclient.GetRewards(distrStoreName, stakeStoreName, cliCtx, accAddress), cliCtx.Indent)
 	}
 }

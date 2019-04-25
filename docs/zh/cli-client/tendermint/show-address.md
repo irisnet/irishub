@@ -35,7 +35,7 @@ iris tendermint show-address --home={iris-home}
 
 示例返回：
 ```
-fca1jhax359kz6hm70swxpxumpgkaglr7yq80qhwvv
+ica1jhax359kz6hm70swxpxumpgkaglr7yq8h03kv3
 ```
 
 返回的结果是bech32编码的地址, 关于bech32的详细文档请参阅 [bech32-prefix](../../features/basic-concepts/bech32-prefix.md)
