@@ -40,9 +40,9 @@ irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
 
 ## REST APIs
 
-Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui· page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and briefly introduce their functionality.
+Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui` page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and introduce their functionality briefly.
 
-1. Tendermint APIs, such as query blocks, transactions and validatorset
+1. Tendermint APIs, such as query blocks, transactions and validator set
     1. `GET /node_info`: The properties of the connected node
     2. `GET /syncing`: Syncing state of node
     3. `GET /blocks/latest`: Get the latest block
@@ -50,7 +50,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     5. `GET /blocks-result/latest`: Get the latest block result
     6. `GET /blocks-result/{height}`: Get a block result at a certain height
     7. `GET /validatorsets/latest`: Get the latest validator set
-    8. `GET /validatorsets/{height}`: Get a validator set a certain height
+    8. `GET /validatorsets/{height}`: Get a validator set at a certain height
     9. `GET /txs/{hash}`: Get a Tx by hash
     10. `GET /txs`: Search transactions
     11. `POST /txs`: Broadcast Tx
@@ -68,7 +68,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 
 3. Create, sign and broadcast transactions
 
-    1. `POST /tx/sign`: Sign a transation
+    1. `POST /tx/sign`: Sign a transaction
     2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
     3. `POST /txs/send`: Send non-amino encoding transaction
     4. `GET /bank/coin/{coin-type}`: Get coin type
@@ -87,7 +87,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     6. `GET /stake/delegators/{delegatorAddr}/redelegations`: Get all redelegations from a delegator
     7. `GET /stake/delegators/{delegatorAddr}/validators`: Query all validators that a delegator is bonded to
     8. `GET /stake/delegators/{delegatorAddr}/validators/{validatorAddr}`: Query a validator that a delegator is bonded to
-    9. `GET /stake/delegators/{delegatorAddr}/txs` :Get all staking txs (i.e msgs) from a delegator
+    9. `GET /stake/delegators/{delegatorAddr}/txs` :Get all staking txs from a delegator
     10. `GET /stake/delegators/{delegatorAddr}/delegations/{validatorAddr}`: Query the current delegation between a delegator and a validator
     11. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}`: Query all unbonding delegations between a delegator and a validator
     12. `GET /stake/validators`: Get all validator candidates
@@ -119,7 +119,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 
     1. `POST /distribution/{delegatorAddr}/withdrawAddress`: Set withdraw address
     2. `GET /distribution/{delegatorAddr}/withdrawAddress`: Query withdraw address
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw address
+    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw reward
     4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: Query distribution information for a delegation
     5. `GET /distribution/{delegatorAddr}/distrInfos`: Query distribution information list for a given delegator
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: Query withdraw address
@@ -164,7 +164,7 @@ They all support the these special query parameters below. By default, their val
 
 | parameter name   | Type | Default | Priority | Description                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
-| generate-only   | bool | false | 0 | Build an unsigned transaction and write it back |
+| generate-only   | bool | false | 0 | Build an unsigned transaction and return it back |
 | simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
 | commit          | bool | false | 2 | Wait for transaction being included in a block   |
 | async           | bool | false | 3 | Broadcast transaction asynchronously   |
