@@ -8,7 +8,7 @@ import (
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/params"
+	paramsType "github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -154,8 +154,12 @@ func GetCmdQueryVote(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var vote gov.Vote
+			if err := cdc.UnmarshalJSON(res, &vote); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(vote)
 		},
 	}
 
@@ -189,13 +193,12 @@ func GetCmdQueryVotes(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			if res == nil {
-				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
-				return nil
+			var votes gov.Votes
+			if err := cdc.UnmarshalJSON(res, &votes); err != nil {
+				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			return cliCtx.PrintOutput(votes)
 		},
 	}
 
@@ -234,8 +237,12 @@ func GetCmdQueryDeposit(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var deposit gov.Deposit
+			if err := cdc.UnmarshalJSON(res, &deposit); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(deposit)
 		},
 	}
 
@@ -269,8 +276,12 @@ func GetCmdQueryDeposits(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var deposits gov.Deposits
+			if err := cdc.UnmarshalJSON(res, &deposits); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(deposits)
 		},
 	}
 
@@ -302,8 +313,12 @@ func GetCmdQueryTally(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var tally gov.TallyResult
+			if err := cdc.UnmarshalJSON(res, &tally); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(tally)
 		},
 	}
 
@@ -322,7 +337,7 @@ func GetCmdQueryGovConfig(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := params.QueryModuleParams{
+			params := paramsType.QueryModuleParams{
 				Module: moduleStr,
 			}
 			bz, err := cdc.MarshalJSON(params)
@@ -335,7 +350,12 @@ func GetCmdQueryGovConfig(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
+			var paramSet paramsType.ParamSet
+			if err := cdc.UnmarshalJSON(res, &paramSet); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(paramSet)
 			return nil
 		},
 	}

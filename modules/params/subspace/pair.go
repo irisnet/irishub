@@ -20,4 +20,5 @@ type ParamSet interface {
 	Validate(key string, value string) (interface{}, sdk.Error)
 	GetParamSpace() string
 	StringFromBytes(*codec.Codec, string, []byte) (string, error)
+	String() string
 }

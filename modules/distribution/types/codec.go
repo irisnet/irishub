@@ -13,6 +13,8 @@ func RegisterCodec(cdc *codec.Codec) {
 
 	cdc.RegisterConcrete(DelegationDistInfo{},"irishub/distr/DelegationDistInfo", nil)
 	cdc.RegisterConcrete(FeePool{},"irishub/distr/FeePool", nil)
+
+	cdc.RegisterConcrete(&Params{}, "irishub/distr/Params", nil)
 }
 
 // generic sealed codec to be used throughout module

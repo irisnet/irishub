@@ -18,6 +18,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(Delegation{}, "irishub/stake/Delegation", nil)
 	cdc.RegisterConcrete(UnbondingDelegation{}, "irishub/stake/UnbondingDelegation", nil)
 	cdc.RegisterConcrete(Redelegation{}, "irishub/stake/Redelegation", nil)
+
+	cdc.RegisterConcrete(&Params{}, "irishub/stake/Params", nil)
 }
 
 // generic sealed codec to be used throughout sdk

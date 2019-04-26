@@ -103,6 +103,13 @@ type GovParams struct {
 	SystemHaltPeriod int64 `json:"system_halt_period"`
 }
 
+func (p *GovParams) String() string {
+	return fmt.Sprintf(`Gov Params:
+  Critical Deposit Period:         %s
+  Critical Min Deposit:            %s`,
+		p.CriticalDepositPeriod, p.CriticalMinDeposit)
+}
+
 // Implements params.ParamStruct
 func (p *GovParams) GetParamSpace() string {
 	return DefaultParamSpace

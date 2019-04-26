@@ -25,6 +25,14 @@ type Params struct {
 	BonusProposerReward sdk.Dec `json:"bonus_proposer_reward"`
 }
 
+func (p *Params) String() string {
+	return fmt.Sprintf(`Distribution Params:
+  Community Tax:            %s
+  Base Proposer Reward:     %s
+  Bonus Proposer Reward:    %s`,
+		p.CommunityTax.String(), p.BaseProposerReward.String(), p.BonusProposerReward.String())
+}
+
 // Implements params.Params
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{

@@ -105,7 +105,7 @@ func (bp BasicProposal) String() string {
   Description:        %s`,
 		bp.ProposalID, bp.Title, bp.ProposalType,
 		bp.Status, bp.SubmitTime, bp.DepositEndTime,
-		bp.TotalDeposit, bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+		bp.TotalDeposit.MainUnitString(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
 	)
 }
 
@@ -114,11 +114,11 @@ type Proposals []Proposal
 
 // nolint
 func (p Proposals) String() string {
-	out := "ID - (Status) [Type] Title\n"
+	out := "ID - (Status) [Type] [TotalDeposit] Title\n"
 	for _, prop := range p {
-		out += fmt.Sprintf("%d - (%s) [%s] %s\n",
+		out += fmt.Sprintf("%d - (%s) [%s] [%s] %s\n",
 			prop.GetProposalID(), prop.GetStatus(),
-			prop.GetProposalType(), prop.GetTitle())
+			prop.GetProposalType(), prop.GetTotalDeposit().MainUnitString(), prop.GetTitle())
 	}
 	return strings.TrimSpace(out)
 }
@@ -397,4 +397,12 @@ func (resultA TallyResult) Equals(resultB TallyResult) bool {
 		resultA.Abstain.Equal(resultB.Abstain) &&
 		resultA.No.Equal(resultB.No) &&
 		resultA.NoWithVeto.Equal(resultB.NoWithVeto)
+}
+
+func (tr TallyResult) String() string {
+	return fmt.Sprintf(`Tally Result:
+  Yes:        %s
+  Abstain:    %s
+  No:         %s
+  NoWithVeto: %s`, tr.Yes, tr.Abstain, tr.No, tr.NoWithVeto)
 }

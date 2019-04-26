@@ -111,6 +111,8 @@ func (p *ProtocolV0) configCodec() {
 
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
+	params.RegisterCodec(cdc) // only used by querier
+	mint.RegisterCodec(cdc)   // only used by querier
 	bank.RegisterCodec(cdc)
 	stake.RegisterCodec(cdc)
 	distr.RegisterCodec(cdc)
