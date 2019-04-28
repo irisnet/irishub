@@ -25,7 +25,7 @@ iriscli service bind <flags>
 ## Examples
 
 ### Add a binding to an existing service definition
-In service binding, you need to define `deposit`,  the minimum mortgage amount of this `deposit` is `price` * `MinDepositMultiple` (defined in genesis file)
+In service binding, you need to define `deposit`, the minimum mortgage amount of this `deposit` is `price` * `MinDepositMultiple` (defined by system parameters, can be modified through governance)
 
 ```shell
 iriscli service bind --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<service-define-chain-id> --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999

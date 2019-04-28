@@ -22,17 +22,6 @@
 | --node       | String | 否       | tcp://localhost:26657 | <主机>:<端口> 链上的tendermint rpc 接口。 |
 | --trust-node | String | 否       | True                  | 不验证响应的证明                          |
 
-
-## 全局标志
-
-| 命令，速记            | 默认值         | 描述                                | 是否必须 |
-| --------------------- | -------------- | ----------------------------------- | -------- |
-| -e, --encoding string | hex            | 字符串二进制编码 (hex\b64\btc ) | 否       |
-| --home string         | /root/.iriscli | 配置和数据存储目录                  | 否       |
-| -o, --output string   | text           | 输出格式 (text\json)              | 否       |
-| --trace               |                | 出错时打印完整栈信息                | 否       |
-
-
 ## 例子
 
 ### 查询本地通证`iris`

@@ -22,16 +22,6 @@ iriscli bank account <address> <flags>
 | --trust-node   | String | False    | True                  | Don't verify proofs for responses                            |
 
 
-
-## Global Flags
-
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
-| --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding | hex            | String   Binary encoding (hex\b64\btc ) | False    | String |
-| --home         | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output   | text           | Output format (text\json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
-
 ## Examples
 
 ### Query your account in trust-mode

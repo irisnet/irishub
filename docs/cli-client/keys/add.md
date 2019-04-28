@@ -2,7 +2,7 @@
 
 ## Description
 
-Create a new key, or recover from seed
+Create a new key, or recover from mnemonic
 
 ## Usage
 

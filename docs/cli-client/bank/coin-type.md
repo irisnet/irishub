@@ -24,16 +24,6 @@ Query a special kind of token in IRISnet. The native token in IRIShub is `iris`,
 | --trust-node   | String | False    | True                  | Don't verify proofs for responses                            |
 
 
-
-## Global Flags
-
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
-| --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding  | hex            | String   Binary encoding (hex\b64\btc ) | False    | String |
-| --home          | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output    | text           | Output format (text\json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
-
 ## Examples
 
 ### Query native token `iris`

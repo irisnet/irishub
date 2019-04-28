@@ -21,32 +21,6 @@ iriscli bank sign <file> <flags>
 | --name           | String | true       |                       | Key name for signature                                      |
 | --offline        | Boole | true       | False                 | Offline mode.                                    |
 | --print-sigs     | Bool  | true       | False                 | Print the address where the transaction must be signed and the signed address, then exit  |
-| --chain-id       | string | true     | ""                    | Chain ID of tendermint node  |
-| --dry-run        | bool   | false    | false                 | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it |
-| --fee            | string | true     | ""                    | Fee to pay along with transaction |
-| --from           | string | false    | ""                    | Name of private key with which to sign |
-| --from-addr      | string | false    | ""                    | Specify from address in generate-only mode |
-| --gas            | int    | false    | 50000                | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
-| --gas-adjustment | int    | false    | 1.5                   | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
-| --generate-only  | bool   | false    | false                 | Build an unsigned transaction and write it to STDOUT |
-| --help, -h       | string | false    |                       | Print help message |
-| --indent         | bool   | false    | false                 | Add indent to JSON response |
-| --json           | string | false    | false                 | Return output in json format |
-| --ledger         | bool   | false    | false                 | Use a connected Ledger device |
-| --memo           | string | false    | ""                    | Memo to send along with transaction |
-| --node           | string | false    | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain |
-| --print-response | bool   | false    | false                 | return tx response (only works with async = false)|
-| --sequence       | int    | false    | 0                     | Sequence number to sign the tx |
-| --trust-node     | bool   | false    | true                  | Don't verify proofs for responses | 
-
-## Global Flags
-
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
-| --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding  | hex            | String   Binary encoding (hex\b64\btc ) | False    | String |
-| --home          | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output string   | text           | Output format (text\json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
 
 ## Examples
 

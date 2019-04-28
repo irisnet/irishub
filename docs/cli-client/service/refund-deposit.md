@@ -21,7 +21,7 @@ iriscli service refund-deposit <flags>
 
 ### Refund all deposit from an unavailable service binding
 
-Before refunding , you should [disable](disable.md) the service binding first.
+Before refunding, you should [disable](disable.md) the service binding first.
 
 ```shell
 iriscli service refund-deposit --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --def-chain-id=<service_define_chain_id> --service-name=<service-name>

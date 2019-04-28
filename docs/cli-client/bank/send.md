@@ -2,7 +2,7 @@
 
 ## Description
 
-Sending tokens to another address， this command includes "create/sign/broadcast" transaction.
+Sending tokens to another address， this command includes `create/sign/broadcast` transaction.
 
 ## Usage:
 
