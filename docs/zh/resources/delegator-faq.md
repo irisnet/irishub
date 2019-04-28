@@ -47,3 +47,7 @@ iriscli stake unbond begin  --address-validator=<address-validator> --address-de
 ```
 
 三周后你将会看到，账户余额增加。
+
+请参阅[解绑](../cli-client/stake/unbond.md)
+
+
