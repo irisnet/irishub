@@ -30,8 +30,6 @@ type Account interface {
 
 	GetCoins() sdk.Coins
 	SetCoins(sdk.Coins) error
-
-	String() string
 }
 
 // AccountDecoder unmarshals account bytes

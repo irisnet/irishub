@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 // defines a delegation without type Rat for shares
@@ -21,14 +22,23 @@ type DelegationOutput struct {
 	Height        int64          `json:"height"`
 }
 
-func (d DelegationOutput) HumanReadableString() (string, error) {
-	resp := "Delegation \n"
-	resp += fmt.Sprintf("Delegator: %s\n", d.DelegatorAddr)
-	resp += fmt.Sprintf("Validator: %s\n", d.ValidatorAddr)
-	resp += fmt.Sprintf("Shares: %s\n", d.Shares)
-	resp += fmt.Sprintf("Height: %d", d.Height)
+func (d DelegationOutput) String() string {
+	return fmt.Sprintf(`Delegation:
+  Delegator: %s
+  Validator: %s
+  Shares:    %s
+  Height:    %v`, d.DelegatorAddr,
+		d.ValidatorAddr, d.Shares, d.Height)
+}
 
-	return resp, nil
+// Delegations is a collection of delegations
+type DelegationsOutput []DelegationOutput
+
+func (ds DelegationsOutput) String() (out string) {
+	for _, del := range ds {
+		out += del.String() + "\n"
+	}
+	return strings.TrimSpace(out)
 }
 
 // UnbondingDelegation reflects a delegation's passive unbonding queue.
@@ -41,16 +51,25 @@ type UnbondingDelegationOutput struct {
 	Balance        string         `json:"balance"`         // atoms to receive at completion
 }
 
-func (d UnbondingDelegationOutput) HumanReadableString() (string, error) {
-	resp := "Unbonding Delegation \n"
-	resp += fmt.Sprintf("Delegator: %s\n", d.DelegatorAddr)
-	resp += fmt.Sprintf("Validator: %s\n", d.ValidatorAddr)
-	resp += fmt.Sprintf("Creation height: %v\n", d.CreationHeight)
-	resp += fmt.Sprintf("Min time to unbond (unix): %v\n", d.MinTime)
-	resp += fmt.Sprintf("Expected balance: %s", d.Balance)
+func (d UnbondingDelegationOutput) String() string {
+	return fmt.Sprintf(`Unbonding Delegation:
+  Delegator Address:                 %s
+  Validator Address:                 %s
+  Creation Height:                   %v
+  Min time to unbond (unix):         %s
+  Initial Balance:                   %s
+  Balance:                           %s`,
+		d.DelegatorAddr, d.ValidatorAddr, d.CreationHeight, d.MinTime, d.InitialBalance, d.Balance)
+}
 
-	return resp, nil
+// Validators is a collection of Validator
+type UnbondingDelegationsOutput []UnbondingDelegationOutput
 
+func (v UnbondingDelegationsOutput) String() (out string) {
+	for _, val := range v {
+		out += val.String() + "\n"
+	}
+	return strings.TrimSpace(out)
 }
 
 type RedelegationOutput struct {
@@ -65,25 +84,26 @@ type RedelegationOutput struct {
 	SharesDst        string         `json:"shares_dst"`         // amount of destination shares redelegating
 }
 
-func (d RedelegationOutput) HumanReadableString() (string, error) {
-	resp := "Redelegation \n"
-	resp += fmt.Sprintf("Delegator: %s\n", d.DelegatorAddr)
-	resp += fmt.Sprintf("Source Validator: %s\n", d.ValidatorSrcAddr)
-	resp += fmt.Sprintf("Destination Validator: %s\n", d.ValidatorDstAddr)
-	resp += fmt.Sprintf("Creation height: %v\n", d.CreationHeight)
-	resp += fmt.Sprintf("Min time to unbond (unix): %v\n", d.MinTime)
-	resp += fmt.Sprintf("Source shares: %s\n", d.SharesSrc)
-	resp += fmt.Sprintf("Destination shares: %s", d.SharesDst)
-
-	return resp, nil
-
+func (d RedelegationOutput) String() string {
+	return fmt.Sprintf(`Redelegation:
+  Delegator:                   %s
+  Source Validator:            %s
+  Destination Validator:       %s
+  Creation height:             %v
+  Min time to unbond (unix):   %v
+  Source shares:               %s
+  Destination shares:          %s`, d.DelegatorAddr, d.ValidatorSrcAddr, d.ValidatorDstAddr,
+		d.CreationHeight, d.MinTime, d.SharesSrc, d.SharesDst)
 }
 
-type Commission struct {
-	Rate          string    `json:"rate"`
-	MaxRate       string    `json:"max_rate"`
-	MaxChangeRate string    `json:"max_change_rate"`
-	UpdateTime    time.Time `json:"update_time"`
+// Redelegations are a collection of Redelegation
+type RedelegationsOutput []RedelegationOutput
+
+func (reds RedelegationsOutput) String() (out string) {
+	for _, red := range reds {
+		out += red.String() + "\n"
+	}
+	return strings.TrimSpace(out)
 }
 
 type ValidatorOutput struct {
@@ -97,24 +117,34 @@ type ValidatorOutput struct {
 	BondHeight       int64             `json:"bond_height"`
 	UnbondingHeight  int64             `json:"unbonding_height"`
 	UnbondingMinTime time.Time         `json:"unbonding_time"`
-	Commission       Commission        `json:"commission"`
+	Commission       stake.Commission  `json:"commission"`
 }
 
-func (v ValidatorOutput) HumanReadableString() (string, error) {
-	resp := "Validator \n"
-	resp += fmt.Sprintf("Operator Address: %s\n", v.OperatorAddr)
-	resp += fmt.Sprintf("Validator Consensus Pubkey: %s\n", v.ConsPubKey)
-	resp += fmt.Sprintf("Jailed: %v\n", v.Jailed)
-	resp += fmt.Sprintf("Status: %s\n", sdk.BondStatusToString(v.Status))
-	resp += fmt.Sprintf("Tokens: %s\n", v.Tokens)
-	resp += fmt.Sprintf("Delegator Shares: %s\n", v.DelegatorShares)
-	resp += fmt.Sprintf("Description: %s\n", v.Description)
-	resp += fmt.Sprintf("Bond Height: %d\n", v.BondHeight)
-	resp += fmt.Sprintf("Unbonding Height: %d\n", v.UnbondingHeight)
-	resp += fmt.Sprintf("Minimum Unbonding Time: %v\n", v.UnbondingMinTime)
-	resp += fmt.Sprintf("Commission: {%s}", v.Commission)
+func (v ValidatorOutput) String() string {
+	return fmt.Sprintf(`Validator
+  Operator Address:           %s
+  Validator Consensus Pubkey: %s
+  Jailed:                     %v
+  Status:                     %s
+  Tokens:                     %s
+  Delegator Shares:           %s
+  Description:                %s
+  Unbonding Height:           %d
+  Minimum Unbonding Time:     %v
+  Commission:                 %s`, v.OperatorAddr, v.ConsPubKey,
+		v.Jailed, sdk.BondStatusToString(v.Status), v.Tokens,
+		v.DelegatorShares, v.Description,
+		v.UnbondingHeight, v.UnbondingMinTime, v.Commission)
+}
 
-	return resp, nil
+// Validators is a collection of Validator
+type ValidatorsOutput []ValidatorOutput
+
+func (v ValidatorsOutput) String() (out string) {
+	for _, val := range v {
+		out += val.String() + "\n"
+	}
+	return strings.TrimSpace(out)
 }
 
 type PoolOutput struct {
@@ -124,14 +154,13 @@ type PoolOutput struct {
 	BondedRatio  string `json:"bonded_ratio"`
 }
 
-func (p PoolOutput) HumanReadableString() string {
-
-	resp := "Pool \n"
-	resp += fmt.Sprintf("Loose Tokens: %s\n", p.LooseTokens)
-	resp += fmt.Sprintf("Bonded Tokens: %s\n", p.BondedTokens)
-	resp += fmt.Sprintf("Token Supply: %s\n", p.TokenSupply)
-	resp += fmt.Sprintf("Bonded Ratio: %v", p.BondedRatio)
-	return resp
+func (p PoolOutput) String() string {
+	return fmt.Sprintf(`Pool:
+  Loose Tokens:  %s
+  Bonded Tokens: %s
+  Token Supply:  %s
+  Bonded Ratio:  %v`, p.LooseTokens,
+		p.BondedTokens, p.TokenSupply, p.BondedRatio)
 }
 
 func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Validator) ValidatorOutput {
@@ -142,12 +171,6 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		panic(err)
 	}
 
-	commission := Commission{
-		Rate:          utils.ConvertDecToRat(v.Commission.Rate).FloatString(),
-		MaxRate:       utils.ConvertDecToRat(v.Commission.MaxRate).FloatString(),
-		MaxChangeRate: utils.ConvertDecToRat(v.Commission.MaxChangeRate).FloatString(),
-		UpdateTime:    v.Commission.UpdateTime,
-	}
 	return ValidatorOutput{
 		OperatorAddr:     v.OperatorAddr,
 		ConsPubKey:       bechConsPubkey,
@@ -159,7 +182,7 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		BondHeight:       v.BondHeight,
 		UnbondingHeight:  v.UnbondingHeight,
 		UnbondingMinTime: v.UnbondingMinTime,
-		Commission:       commission,
+		Commission:       v.Commission,
 	}
 }
 
