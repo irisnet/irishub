@@ -45,8 +45,8 @@ type Params struct {
 	TxSizeLimit          uint64        `json:"tx_size_limit"`
 }
 
-func (p *Params) String() string {
-	return fmt.Sprintf(`Mint Params:
+func (p Params) String() string {
+	return fmt.Sprintf(`Service Params:
   Max Request Timeout:         %d
   Min Deposit Multiple:        %d
   Service Fee Tax:             %s

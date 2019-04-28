@@ -24,8 +24,13 @@ func GetCmdQueryProfilers(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var profilers guardian.Profilers
+			err = cdc.UnmarshalJSON(res, &profilers)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(profilers)
 		},
 	}
 	return cmd
@@ -45,8 +50,13 @@ func GetCmdQueryTrustees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var trustees guardian.Trustees
+			err = cdc.UnmarshalJSON(res, &trustees)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(trustees)
 		},
 	}
 	return cmd

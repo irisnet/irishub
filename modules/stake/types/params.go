@@ -44,8 +44,8 @@ type Params struct {
 	MaxValidators uint16        `json:"max_validators"` // maximum number of validators
 }
 
-func (p *Params) String() string {
-	return fmt.Sprintf(`Mint Params:
+func (p Params) String() string {
+	return fmt.Sprintf(`Stake Params:
   Unbonding Time:         %s
   Max Validators:         %d`,
 		p.UnbondingTime, p.MaxValidators)

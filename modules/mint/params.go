@@ -31,7 +31,7 @@ type Params struct {
 	Inflation sdk.Dec `json:"inflation"` // inflation rate
 }
 
-func (p *Params) String() string {
+func (p Params) String() string {
 	return fmt.Sprintf(`Mint Params:
   Inflation:    %s`,
 		p.Inflation.String())

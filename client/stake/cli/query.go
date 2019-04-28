@@ -509,22 +509,7 @@ func GetCmdQueryParams(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				human := params.HumanReadableString()
-
-				fmt.Println(human)
-
-			case "json":
-				// parse out the params
-				output, err := codec.MarshalJSONIndent(cdc, params)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
-			}
-			return nil
+			return cliCtx.PrintOutput(params)
 		},
 	}
 

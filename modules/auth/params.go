@@ -40,7 +40,7 @@ type Params struct {
 	TxSizeLimit       uint64  `json:"tx_size"`             // tx size limit
 }
 
-func (p *Params) String() string {
+func (p Params) String() string {
 	return fmt.Sprintf(`Auth Params:
   Gas Price Threshold:    %s
   Tx Size Limit:          %d`,

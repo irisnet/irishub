@@ -50,7 +50,7 @@ type Params struct {
 	SlashFractionCensorship sdk.Dec       `json:"slash_fraction_censorship"`
 }
 
-func (p *Params) String() string {
+func (p Params) String() string {
 	return fmt.Sprintf(`Slashing Params:
   Max Evidence Age:              %d
   Signed Blocks Window:          %d
