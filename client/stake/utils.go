@@ -2,6 +2,7 @@ package stake
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/irisnet/irishub/client/context"
@@ -11,7 +12,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 // defines a delegation without type Rat for shares
@@ -24,10 +24,10 @@ type DelegationOutput struct {
 
 func (d DelegationOutput) String() string {
 	return fmt.Sprintf(`Delegation:
-  Delegator: %s
-  Validator: %s
-  Shares:    %s
-  Height:    %v`, d.DelegatorAddr,
+  Delegator:  %s
+  Validator:  %s
+  Shares:     %s
+  Height:     %v`, d.DelegatorAddr,
 		d.ValidatorAddr, d.Shares, d.Height)
 }
 
@@ -35,6 +35,9 @@ func (d DelegationOutput) String() string {
 type DelegationsOutput []DelegationOutput
 
 func (ds DelegationsOutput) String() (out string) {
+	if len(ds) == 0 {
+		return "[]"
+	}
 	for _, del := range ds {
 		out += del.String() + "\n"
 	}
@@ -53,20 +56,23 @@ type UnbondingDelegationOutput struct {
 
 func (d UnbondingDelegationOutput) String() string {
 	return fmt.Sprintf(`Unbonding Delegation:
-  Delegator Address:                 %s
-  Validator Address:                 %s
-  Creation Height:                   %v
-  Min time to unbond (unix):         %s
-  Initial Balance:                   %s
-  Balance:                           %s`,
+  Delegator Address:          %s
+  Validator Address:          %s
+  Creation Height:            %v
+  Min time to unbond (unix):  %s
+  Initial Balance:            %s
+  Balance:                    %s`,
 		d.DelegatorAddr, d.ValidatorAddr, d.CreationHeight, d.MinTime, d.InitialBalance, d.Balance)
 }
 
 // Validators is a collection of Validator
 type UnbondingDelegationsOutput []UnbondingDelegationOutput
 
-func (v UnbondingDelegationsOutput) String() (out string) {
-	for _, val := range v {
+func (ubds UnbondingDelegationsOutput) String() (out string) {
+	if len(ubds) == 0 {
+		return "[]"
+	}
+	for _, val := range ubds {
 		out += val.String() + "\n"
 	}
 	return strings.TrimSpace(out)
@@ -86,13 +92,13 @@ type RedelegationOutput struct {
 
 func (d RedelegationOutput) String() string {
 	return fmt.Sprintf(`Redelegation:
-  Delegator:                   %s
-  Source Validator:            %s
-  Destination Validator:       %s
-  Creation height:             %v
-  Min time to unbond (unix):   %v
-  Source shares:               %s
-  Destination shares:          %s`, d.DelegatorAddr, d.ValidatorSrcAddr, d.ValidatorDstAddr,
+  Delegator:                  %s
+  Source Validator:           %s
+  Destination Validator:      %s
+  Creation height:            %v
+  Min time to unbond (unix):  %v
+  Source shares:              %s
+  Destination shares:         %s`, d.DelegatorAddr, d.ValidatorSrcAddr, d.ValidatorDstAddr,
 		d.CreationHeight, d.MinTime, d.SharesSrc, d.SharesDst)
 }
 
@@ -100,6 +106,9 @@ func (d RedelegationOutput) String() string {
 type RedelegationsOutput []RedelegationOutput
 
 func (reds RedelegationsOutput) String() (out string) {
+	if len(reds) == 0 {
+		return "[]"
+	}
 	for _, red := range reds {
 		out += red.String() + "\n"
 	}
@@ -122,16 +131,16 @@ type ValidatorOutput struct {
 
 func (v ValidatorOutput) String() string {
 	return fmt.Sprintf(`Validator
-  Operator Address:           %s
-  Validator Consensus Pubkey: %s
-  Jailed:                     %v
-  Status:                     %s
-  Tokens:                     %s
-  Delegator Shares:           %s
-  Description:                %s
-  Unbonding Height:           %d
-  Minimum Unbonding Time:     %v
-  Commission:                 %s`, v.OperatorAddr, v.ConsPubKey,
+  Operator Address:            %s
+  Validator Consensus Pubkey:  %s
+  Jailed:                      %v
+  Status:                      %s
+  Tokens:                      %s
+  Delegator Shares:            %s
+  Description:                 %s
+  Unbonding Height:            %d
+  Minimum Unbonding Time:      %v
+  Commission:                  %s`, v.OperatorAddr, v.ConsPubKey,
 		v.Jailed, sdk.BondStatusToString(v.Status), v.Tokens,
 		v.DelegatorShares, v.Description,
 		v.UnbondingHeight, v.UnbondingMinTime, v.Commission)
@@ -141,6 +150,9 @@ func (v ValidatorOutput) String() string {
 type ValidatorsOutput []ValidatorOutput
 
 func (v ValidatorsOutput) String() (out string) {
+	if len(v) == 0 {
+		return "[]"
+	}
 	for _, val := range v {
 		out += val.String() + "\n"
 	}
@@ -156,10 +168,10 @@ type PoolOutput struct {
 
 func (p PoolOutput) String() string {
 	return fmt.Sprintf(`Pool:
-  Loose Tokens:  %s
-  Bonded Tokens: %s
-  Token Supply:  %s
-  Bonded Ratio:  %v`, p.LooseTokens,
+  Loose Tokens:   %s
+  Bonded Tokens:  %s
+  Token Supply:   %s
+  Bonded Ratio:   %v`, p.LooseTokens,
 		p.BondedTokens, p.TokenSupply, p.BondedRatio)
 }
 

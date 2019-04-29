@@ -100,24 +100,8 @@ func GetCmdQueryValidatorUnbondingDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(valAddr)
 
-			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryValidatorUnbondingDelegations, params)
-
-			if err != nil {
-				return err
-			}
-
-			var ubds []stake.UnbondingDelegation
-			err = cdc.UnmarshalJSON(res, &ubds)
-			if err != nil {
-				return err
-			}
-
-			var ubdsOutput stakeClient.UnbondingDelegationsOutput
-			for _, ubd := range ubds {
-				ubdsOutput = append(ubdsOutput, stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd))
-			}
-			return cliCtx.PrintOutput(ubdsOutput)
 		},
 	}
 	return cmd
@@ -138,23 +122,8 @@ func GetCmdQueryValidatorRedelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(valAddr)
 
-			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryValidatorRedelegations, params)
-
-			if err != nil {
-				return err
-			}
-			var rds []stake.Redelegation
-			err = cdc.UnmarshalJSON(res, &rds)
-			if err != nil {
-				return err
-			}
-
-			var redsOutput stakeClient.RedelegationsOutput
-			for _, red := range rds {
-				redsOutput = append(redsOutput, stakeClient.ConvertREDToREDOutput(cliCtx, red))
-			}
-			return cliCtx.PrintOutput(redsOutput)
 		},
 	}
 	return cmd
@@ -181,19 +150,8 @@ func GetCmdQueryDelegation(cdc *codec.Codec) *cobra.Command {
 
 			params := stake.NewQueryBondsParams(delAddr, valAddr)
 
-			res, err := queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegation, params)
-
-			if err != nil {
-				return err
-			}
-
-			var delegation stake.Delegation
-			err = cdc.UnmarshalJSON(res, &delegation)
-			if err != nil {
-				return err
-			}
-			return cliCtx.PrintOutput(stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation))
 		},
 	}
 
@@ -220,24 +178,8 @@ func GetCmdQueryDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegatorDelegations, params)
-
-			if err != nil {
-				return err
-			}
-
-			var delegations []stake.Delegation
-			err = cdc.UnmarshalJSON(res, &delegations)
-			if err != nil {
-				return err
-			}
-
-			var delegationsOutput stakeClient.DelegationsOutput
-			for _, delegation := range delegations {
-				delegationsOutput = append(delegationsOutput, stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation))
-			}
-			return cliCtx.PrintOutput(delegationsOutput)
 		},
 	}
 
@@ -260,24 +202,8 @@ func GetCmdQueryValidatorDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(validatorAddr)
 
-			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryValidatorDelegations, params)
-
-			if err != nil {
-				return err
-			}
-
-			var delegations []stake.Delegation
-			err = cdc.UnmarshalJSON(res, &delegations)
-			if err != nil {
-				return err
-			}
-
-			var delegationsOutput stakeClient.DelegationsOutput
-			for _, delegation := range delegations {
-				delegationsOutput = append(delegationsOutput, stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation))
-			}
-			return cliCtx.PrintOutput(delegationsOutput)
 		},
 	}
 	return cmd
@@ -304,19 +230,8 @@ func GetCmdQueryUnbondingDelegation(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryBondsParams(delAddr, valAddr)
 
-			res, err := queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryUnbondingDelegation, params)
-
-			if err != nil {
-				return err
-			}
-
-			var ubd stake.UnbondingDelegation
-			err = cdc.UnmarshalJSON(res, &ubd)
-			if err != nil {
-				return err
-			}
-			return cliCtx.PrintOutput(stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd))
 		},
 	}
 
@@ -343,24 +258,8 @@ func GetCmdQueryUnbondingDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegatorUnbondingDelegations, params)
-
-			if err != nil {
-				return err
-			}
-
-			var ubds []stake.UnbondingDelegation
-			err = cdc.UnmarshalJSON(res, &ubds)
-			if err != nil {
-				return err
-			}
-
-			var ubdsOutput stakeClient.UnbondingDelegationsOutput
-			for _, ubd := range ubds {
-				ubdsOutput = append(ubdsOutput, stakeClient.ConvertUBDToUBDOutput(cliCtx, ubd))
-			}
-			return cliCtx.PrintOutput(ubdsOutput)
 		},
 	}
 
@@ -429,24 +328,8 @@ func GetCmdQueryRedelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegatorRedelegations, params)
-
-			if err != nil {
-				return err
-			}
-
-			var rds []stake.Redelegation
-			err = cdc.UnmarshalJSON(res, &rds)
-			if err != nil {
-				return err
-			}
-
-			var redsOutput stakeClient.RedelegationsOutput
-			for _, red := range rds {
-				redsOutput = append(redsOutput, stakeClient.ConvertREDToREDOutput(cliCtx, red))
-			}
-			return cliCtx.PrintOutput(redsOutput)
 		},
 	}
 

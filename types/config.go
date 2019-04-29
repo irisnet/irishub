@@ -65,6 +65,7 @@ func SetNetworkType(networkType string) {
 
 // GetConfig returns the config instance for the corresponding network type
 func GetConfig() *Config {
+	return mainnetConfig
 	if NetworkType == Mainnet {
 		return mainnetConfig
 	}

@@ -18,12 +18,16 @@ type Guardian struct {
 type Profilers []Guardian
 
 func (ps Profilers) String() (out string) {
+	if len(ps) == 0 {
+		return "[]"
+	}
 	for _, val := range ps {
 		out += fmt.Sprintf(`Profiler
   Address:       %s
   Type:          %s
   Description:   %s
-  AddedBy:       %s`, val.Address, val.AccountType, val.Description, val.AddedBy)
+  AddedBy:       %s
+`, val.Address, val.AccountType, val.Description, val.AddedBy)
 	}
 	return strings.TrimSpace(out)
 }
@@ -31,12 +35,16 @@ func (ps Profilers) String() (out string) {
 type Trustees []Guardian
 
 func (ts Trustees) String() (out string) {
+	if len(ts) == 0 {
+		return "[]"
+	}
 	for _, val := range ts {
 		out += fmt.Sprintf(`Trustee
   Address:       %s
   Type:          %s
   Description:   %s
-  AddedBy:       %s`, val.Address, val.AccountType, val.Description, val.AddedBy)
+  AddedBy:       %s
+`, val.Address, val.AccountType, val.Description, val.AddedBy)
 	}
 	return strings.TrimSpace(out)
 }

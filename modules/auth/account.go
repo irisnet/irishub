@@ -62,11 +62,11 @@ func (acc BaseAccount) String() string {
 	}
 
 	return fmt.Sprintf(`Account:
-  Address:       %s
-  Pubkey:        %s
-  Coins:         %s
-  AccountNumber: %d
-  Sequence:      %d`,
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d`,
 		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
 	)
 }

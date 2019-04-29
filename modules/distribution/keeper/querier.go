@@ -1,12 +1,13 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	"fmt"
 )
 
 // nolint
@@ -184,9 +185,9 @@ func (r Rewards) String() string {
 	for _, val := range r.Delegations {
 		delegations += "\n  " + val.String()
 	}
-	return fmt.Sprintf(`Total:   %s
-Delegations: %s
-Commission:  %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
+	return fmt.Sprintf(`Total:        %s
+Delegations:  %s
+Commission:   %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
 }
 
 type DelegationsReward struct {

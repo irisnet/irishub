@@ -104,10 +104,26 @@ type GovParams struct {
 }
 
 func (p GovParams) String() string {
-	return fmt.Sprintf(`Gov Params:
-  Critical Deposit Period:         %s
-  Critical Min Deposit:            %s`,
-		p.CriticalDepositPeriod, p.CriticalMinDeposit)
+	return fmt.Sprintf(`System Halt Period: %v
+
+Proposal Parameter:    [Critical]    [Important]    [Normal]
+  DepositPeriod:        %v    %v    %v
+  MinDeposit:           %s    %s    %s
+  Voting Period:        %v    %v    %v
+  Max Num:              %v    %v    %v
+  Threshold:            %s    %s    %s
+  Veto:                 %s    %s    %s
+  Participation:        %s    %s    %s
+  Penalty:              %s    %s    %s
+`, p.SystemHaltPeriod,
+		p.CriticalDepositPeriod, p.ImportantDepositPeriod, p.NormalDepositPeriod,
+		p.CriticalMinDeposit, p.ImportantMinDeposit, p.NormalMinDeposit,
+		p.CriticalVotingPeriod, p.ImportantVotingPeriod, p.NormalVotingPeriod,
+		p.CriticalMaxNum, p.ImportantMaxNum, p.NormalMaxNum,
+		p.CriticalThreshold, p.ImportantThreshold, p.NormalThreshold,
+		p.CriticalVeto, p.ImportantVeto, p.NormalVeto,
+		p.CriticalParticipation, p.ImportantParticipation, p.NormalParticipation,
+		p.CriticalPenalty, p.ImportantPenalty, p.NormalPenalty)
 }
 
 // Implements params.ParamStruct

@@ -114,6 +114,9 @@ type Proposals []Proposal
 
 // nolint
 func (p Proposals) String() string {
+	if len(p) == 0 {
+		return "[]"
+	}
 	out := "ID - (Status) [Type] [TotalDeposit] Title\n"
 	for _, prop := range p {
 		out += fmt.Sprintf("%d - (%s) [%s] [%s] %s\n",

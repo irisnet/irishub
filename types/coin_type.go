@@ -191,11 +191,11 @@ func (ct CoinType) GetMainUnit() (unit Unit) {
 
 func (ct CoinType) String() string {
 	return fmt.Sprintf(`CoinType:
-  Name:       %s
-  MinUnit:    %s
-  Units:      %s
-  Origin:     %s
-  Desc:       %s`,
+  Name:     %s
+  MinUnit:  %s
+  Units:    %s
+  Origin:   %s
+  Desc:     %s`,
 		ct.Name, ct.MinUnit, ct.Units, ct.Origin, ct.Desc,
 	)
 }

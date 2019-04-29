@@ -1,12 +1,13 @@
 package bank
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"fmt"
+
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/client/context"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
-	"fmt"
 )
 
 type BaseAccount struct {
@@ -60,9 +61,9 @@ type TokenStats struct {
 // String implements fmt.Stringer
 func (ts TokenStats) String() string {
 	return fmt.Sprintf(`TokenStats:
-  LoosenToken:       %s
-  BurnedToken:       %s
-  BondedToken:       %s`,
+  Loosen Token:  %s
+  Burned Token:  %s
+  Bonded Token:  %s`,
 		ts.LoosenToken.MainUnitString(), ts.BurnedToken.MainUnitString(), ts.BondedToken.MainUnitString(),
 	)
 }

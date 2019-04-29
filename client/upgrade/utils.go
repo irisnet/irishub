@@ -1,9 +1,10 @@
 package upgrade
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-	"fmt"
 )
 
 type UpgradeInfoOutput struct {
@@ -26,8 +27,8 @@ func (p UpgradeInfoOutput) String() string {
 		success = "success"
 	}
 	return fmt.Sprintf(`Upgrade Info:
-  Current Version[%v]:     %s     
-  Last Failed Version:     %v
-  Upgrade In Progress:     %s`,
+  Current Version[%v]:  %s     
+  Last Failed Version:  %v
+  Upgrade In Progress:  %s`,
 		success, p.CurrentVersion.UpgradeInfo, p.LastFailedVersion, p.UpgradeInProgress)
 }
