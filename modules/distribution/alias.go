@@ -17,6 +17,7 @@ type (
 	ValidatorDistInfo = types.ValidatorDistInfo
 	TotalAccum = types.TotalAccum
 	FeePool = types.FeePool
+	Rewards = keeper.Rewards
 
 	MsgWithdrawDelegatorRewardsAll = types.MsgWithdrawDelegatorRewardsAll
 	MsgWithdrawDelegatorReward = types.MsgWithdrawDelegatorReward

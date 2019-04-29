@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/codec" // XXX fix
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/client/context"

@@ -111,9 +111,10 @@ type ValidatorSigningInfo struct {
 
 // Return human readable signing info
 func (i ValidatorSigningInfo) String() string {
-	return fmt.Sprintf(`Start Height:          %d
-Index Offset:          %d
-Jailed Until:          %v
-Missed Blocks Counter: %d`,
+	return fmt.Sprintf(`Signing Info
+  Start Height:          %d
+  Index Offset:          %d
+  Jailed Until:          %v
+  Missed Blocks Counter: %d`,
 		i.StartHeight, i.IndexOffset, i.JailedUntil, i.MissedBlocksCounter)
 }
