@@ -1,16 +1,24 @@
 package subspace
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/stretchr/testify/require"
 )
 
 type testparams struct {
 	i int64
 	b bool
+}
+
+func (tp *testparams) String() string {
+	return fmt.Sprintf(`Test Params:
+  i:         %d
+  b:         %v`,
+		tp.i, tp.b)
 }
 
 func (tp *testparams) KeyValuePairs() KeyValuePairs {
@@ -25,16 +33,15 @@ func (p *testparams) GetParamSpace() string {
 	return "test"
 }
 
-func (p *testparams) Validate(key string, value string) (interface{},sdk.Error) {
+func (p *testparams) Validate(key string, value string) (interface{}, sdk.Error) {
 
-		return nil,nil
+	return nil, nil
 
 }
 
 func (p *testparams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	return "", nil
 }
-
 
 func TestTypeTable(t *testing.T) {
 	table := NewTypeTable()

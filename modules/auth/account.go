@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -48,8 +49,26 @@ type BaseAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         sdk.Coins      `json:"coins"`
 	PubKey        crypto.PubKey  `json:"public_key"`
-	AccountNumber uint64          `json:"account_number"`
-	Sequence      uint64          `json:"sequence"`
+	AccountNumber uint64         `json:"account_number"`
+	Sequence      uint64         `json:"sequence"`
+}
+
+// String implements fmt.Stringer
+func (acc BaseAccount) String() string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d`,
+		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
+	)
 }
 
 // Prototype function for BaseAccount

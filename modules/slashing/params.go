@@ -15,8 +15,8 @@ var _ params.ParamSet = (*Params)(nil)
 // Default parameter namespace
 const (
 	DefaultParamspace = "slashing"
-	BlocksPerMinute   = 12   // 5 seconds a block
-	BlocksPerDay      = BlocksPerMinute * 60 * 24   // 17280
+	BlocksPerMinute   = 12                        // 5 seconds a block
+	BlocksPerDay      = BlocksPerMinute * 60 * 24 // 17280
 )
 
 // Parameter store key
@@ -48,6 +48,23 @@ type Params struct {
 	SlashFractionDoubleSign sdk.Dec       `json:"slash_fraction_double_sign"`
 	SlashFractionDowntime   sdk.Dec       `json:"slash_fraction_downtime"`
 	SlashFractionCensorship sdk.Dec       `json:"slash_fraction_censorship"`
+}
+
+func (p Params) String() string {
+	return fmt.Sprintf(`Slashing Params:
+  Max Evidence Age:              %d
+  Signed Blocks Window:          %d
+  Min Signed Per Window:         %s
+  DoubleSign Jail Duration:      %s
+  Downtime Jail Duration:        %s
+  Censorship Jail Duration:      %s
+  Slash Fraction DoubleSign:     %s
+  Slash Fraction Downtime:       %s
+  Slash Fraction Censorship:     %s`,
+		p.MaxEvidenceAge, p.SignedBlocksWindow, p.MinSignedPerWindow,
+		p.DoubleSignJailDuration, p.DowntimeJailDuration,
+		p.CensorshipJailDuration, p.SlashFractionDoubleSign.String(),
+		p.SlashFractionDowntime.String(), p.SlashFractionCensorship.String())
 }
 
 // Implements params.ParamStruct

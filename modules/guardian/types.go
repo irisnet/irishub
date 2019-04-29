@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"fmt"
 	"encoding/json"
+	"strings"
 )
 
 type Guardian struct {
@@ -12,6 +13,40 @@ type Guardian struct {
 	AccountType AccountType    `json:"type"`
 	Address     sdk.AccAddress `json:"address"`  // this guardian's address
 	AddedBy     sdk.AccAddress `json:"added_by"` // address that initiated the AddGuardian tx
+}
+
+type Profilers []Guardian
+
+func (ps Profilers) String() (out string) {
+	if len(ps) == 0 {
+		return "[]"
+	}
+	for _, val := range ps {
+		out += fmt.Sprintf(`Profiler
+  Address:       %s
+  Type:          %s
+  Description:   %s
+  AddedBy:       %s
+`, val.Address, val.AccountType, val.Description, val.AddedBy)
+	}
+	return strings.TrimSpace(out)
+}
+
+type Trustees []Guardian
+
+func (ts Trustees) String() (out string) {
+	if len(ts) == 0 {
+		return "[]"
+	}
+	for _, val := range ts {
+		out += fmt.Sprintf(`Trustee
+  Address:       %s
+  Type:          %s
+  Description:   %s
+  AddedBy:       %s
+`, val.Address, val.AccountType, val.Description, val.AddedBy)
+	}
+	return strings.TrimSpace(out)
 }
 
 func NewGuardian(description string, accountType AccountType, address, addedBy sdk.AccAddress) Guardian {

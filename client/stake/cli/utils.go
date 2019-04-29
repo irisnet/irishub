@@ -5,68 +5,63 @@ import (
 
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/types"
 )
 
-func queryBonds(cliCtx context.CLIContext, route string, query string, params stake.QueryBondsParams) ([]byte, error) {
+func queryBonds(cliCtx context.CLIContext, route string, query string, params stake.QueryBondsParams) error {
 	cdc := cliCtx.Codec
 	bz, err := cdc.MarshalJSON(params)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", route, query), bz)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	switch query {
 	case stake.QueryUnbondingDelegation:
 		var unbondingDelegation types.UnbondingDelegation
 		if err = cdc.UnmarshalJSON(res, &unbondingDelegation); err != nil {
-			return nil, err
+			return err
 		}
 		unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
-		if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationOutput); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(unbondingDelegationOutput)
+
 	case stake.QueryDelegation:
 		var delegation types.Delegation
 		// parse out the validators
 		if err = cdc.UnmarshalJSON(res, &delegation); err != nil {
-			return nil, err
+			return err
 		}
 		delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
-		if res, err = codec.MarshalJSONIndent(cdc, delegationOutput); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(delegationOutput)
+
 	case stake.QueryDelegatorValidator:
 		var validator types.Validator
 		if err = cdc.UnmarshalJSON(res, &validator); err != nil {
-			return nil, err
+			return err
 		}
 
 		validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-		if res, err = codec.MarshalJSONIndent(cdc, validatorOutput); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(validatorOutput)
 	}
-	return res, nil
+	return nil
 }
 
-func queryDelegator(cliCtx context.CLIContext, route string, query string, params stake.QueryDelegatorParams) ([]byte, error) {
+func queryDelegator(cliCtx context.CLIContext, route string, query string, params stake.QueryDelegatorParams) error {
 
 	cdc := cliCtx.Codec
 	bz, err := cdc.MarshalJSON(params)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", route, query), bz)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	switch query {
@@ -74,139 +69,114 @@ func queryDelegator(cliCtx context.CLIContext, route string, query string, param
 		var delegations []types.Delegation
 		// parse out the validators
 		if err = cdc.UnmarshalJSON(res, &delegations); err != nil {
-			return nil, err
+			return err
 		}
 
-		delegationOutputs := make([]stakeClient.DelegationOutput, len(delegations))
-		for index, delegation := range delegations {
-			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
-			delegationOutputs[index] = delegationOutput
+		var delegationsOutput stakeClient.DelegationsOutput
+		for _, delegation := range delegations {
+			delegationsOutput = append(delegationsOutput, stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation))
 		}
-		if res, err = codec.MarshalJSONIndent(cdc, delegationOutputs); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(delegationsOutput)
 
 	case stake.QueryDelegatorUnbondingDelegations:
 		var unbondingDelegations []types.UnbondingDelegation
 		if err = cdc.UnmarshalJSON(res, &unbondingDelegations); err != nil {
-			return nil, err
+			return err
 		}
-		unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput, len(unbondingDelegations))
-		for index, unbondingDelegation := range unbondingDelegations {
-			unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
-			unbondingDelegationsOutputs[index] = unbondingDelegationOutput
+		var unbondingDelegationsOutput stakeClient.UnbondingDelegationsOutput
+		for _, unbondingDelegation := range unbondingDelegations {
+			unbondingDelegationsOutput = append(unbondingDelegationsOutput,
+				stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation))
 		}
-
-		if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationsOutputs); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(unbondingDelegationsOutput)
 
 	case stake.QueryDelegatorRedelegations:
 		var relegations []types.Redelegation
 		if err = cdc.UnmarshalJSON(res, &relegations); err != nil {
-			return nil, err
+			return err
 		}
 
-		relegationsOutputs := make([]stakeClient.RedelegationOutput, len(relegations))
-		for index, relegation := range relegations {
-			relegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, relegation)
-			relegationsOutputs[index] = relegationOutput
+		var relegationsOutputs stakeClient.RedelegationsOutput
+		for _, relegation := range relegations {
+			relegationsOutputs = append(relegationsOutputs, stakeClient.ConvertREDToREDOutput(cliCtx, relegation))
 		}
-
-		if res, err = codec.MarshalJSONIndent(cdc, relegationsOutputs); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(relegationsOutputs)
 
 	case stake.QueryDelegatorValidators:
 		var validators []types.Validator
 		if err = cdc.UnmarshalJSON(res, &validators); err != nil {
-			return nil, err
+			return err
 		}
 
-		validatorOutputs := make([]stakeClient.ValidatorOutput, len(validators))
-		for index, validator := range validators {
-			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-			validatorOutputs[index] = validatorOutput
+		var validatorOutputs stakeClient.ValidatorsOutput
+		for _, validator := range validators {
+			validatorOutputs = append(validatorOutputs, stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator))
 		}
-
-		if res, err = codec.MarshalJSONIndent(cdc, validatorOutputs); err != nil {
-			return nil, err
-		}
-
+		return cliCtx.PrintOutput(validatorOutputs)
 	}
 
-	return res, nil
+	return nil
 }
 
-func queryValidator(cliCtx context.CLIContext, route string, query string, params stake.QueryValidatorParams) ([]byte, error) {
+func queryValidator(cliCtx context.CLIContext, route string, query string, params stake.QueryValidatorParams) error {
 	cdc := cliCtx.Codec
 	bz, err := cdc.MarshalJSON(params)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	res, err := cliCtx.QueryWithData(fmt.Sprintf("%s/%s", route, query), bz)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	switch query {
 	case stake.QueryValidator:
 		var validator types.Validator
 		if err = cdc.UnmarshalJSON(res, &validator); err != nil {
-			return nil, err
+			return err
 		}
 
 		validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-		if res, err = codec.MarshalJSONIndent(cdc, validatorOutput); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(validatorOutput)
 
 	case stake.QueryValidatorUnbondingDelegations:
 		var unbondingDelegations []types.UnbondingDelegation
 		if err = cdc.UnmarshalJSON(res, &unbondingDelegations); err != nil {
-			return nil, err
+			return err
 		}
-		unbondingDelegationsOutputs := make([]stakeClient.UnbondingDelegationOutput, len(unbondingDelegations))
-		for index, unbondingDelegation := range unbondingDelegations {
-			unbondingDelegationOutput := stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation)
-			unbondingDelegationsOutputs[index] = unbondingDelegationOutput
+		var unbondingDelegationsOutputs stakeClient.UnbondingDelegationsOutput
+		for _, unbondingDelegation := range unbondingDelegations {
+			unbondingDelegationsOutputs = append(unbondingDelegationsOutputs,
+				stakeClient.ConvertUBDToUBDOutput(cliCtx, unbondingDelegation))
 		}
-
-		if res, err = codec.MarshalJSONIndent(cdc, unbondingDelegationsOutputs); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(unbondingDelegationsOutputs)
 
 	case stake.QueryValidatorRedelegations:
 		var redelegations []types.Redelegation
 		if err = cdc.UnmarshalJSON(res, &redelegations); err != nil {
-			return nil, err
+			return err
 		}
 
-		redelegationsOutputs := make([]stakeClient.RedelegationOutput, len(redelegations))
-		for index, redelegation := range redelegations {
-			redelegationOutput := stakeClient.ConvertREDToREDOutput(cliCtx, redelegation)
-			redelegationsOutputs[index] = redelegationOutput
+		var redelegationsOutputs stakeClient.RedelegationsOutput
+		for _, redelegation := range redelegations {
+			redelegationsOutputs = append(redelegationsOutputs,
+				stakeClient.ConvertREDToREDOutput(cliCtx, redelegation))
 		}
+		return cliCtx.PrintOutput(redelegationsOutputs)
 
-		if res, err = codec.MarshalJSONIndent(cdc, redelegationsOutputs); err != nil {
-			return nil, err
-		}
 	case stake.QueryValidatorDelegations:
 		var delegations []types.Delegation
 		if err = cdc.UnmarshalJSON(res, &delegations); err != nil {
-			return nil, err
+			return err
 		}
 
-		delegationOutputs := make([]stakeClient.DelegationOutput, len(delegations))
-		for index, delegation := range delegations {
-			delegationOutput := stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation)
-			delegationOutputs[index] = delegationOutput
+		var delegationOutputs stakeClient.DelegationsOutput
+		for _, delegation := range delegations {
+			delegationOutputs = append(delegationOutputs,
+				stakeClient.ConvertDelegationToDelegationOutput(cliCtx, delegation))
 		}
-
-		if res, err = codec.MarshalJSONIndent(cdc, delegationOutputs); err != nil {
-			return nil, err
-		}
+		return cliCtx.PrintOutput(delegationOutputs)
 	}
-	return res, nil
+	return nil
 }

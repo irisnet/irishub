@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -178,9 +180,24 @@ type Rewards struct {
 	Commission  sdk.Coins           `json:"commission"`
 }
 
+func (r Rewards) String() string {
+	var delegations string
+	for _, val := range r.Delegations {
+		delegations += "\n  " + val.String()
+	}
+	return fmt.Sprintf(`Total:        %s
+Delegations:  %s
+Commission:   %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
+}
+
 type DelegationsReward struct {
 	Validator sdk.ValAddress `json:"validator"`
 	Reward    sdk.Coins      `json:"reward"`
+}
+
+func (dr DelegationsReward) String() string {
+	return fmt.Sprintf(`validator: %s, reward: %s`,
+		dr.Validator, dr.Reward.MainUnitString())
 }
 
 func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {

@@ -63,19 +63,18 @@ func (cliCtx CLIContext) QuerySubspace(subspace []byte, storeName string) (res [
 
 // GetAccount queries for an account given an address and a block height. An
 // error is returned if the query or decoding fails.
-func (cliCtx CLIContext) GetAccount(address []byte) (auth.Account, error) {
+func (cliCtx CLIContext) GetAccount(address []byte) (account auth.BaseAccount, err error) {
 	if cliCtx.AccDecoder == nil {
-		return nil, errors.New("account decoder required but not provided")
+		return account, errors.New("account decoder required but not provided")
 	}
 
 	res, err := cliCtx.queryAccount(address)
 	if err != nil {
-		return nil, err
+		return account, err
 	}
 
-	var account auth.Account
 	if err := cliCtx.Codec.UnmarshalJSON(res, &account); err != nil {
-		return nil, err
+		return account, err
 	}
 
 	return account, nil
@@ -434,4 +433,30 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 	}
 
 	return &res.Result, nil
+}
+
+// PrintOutput prints output while respecting output and indent flags
+// NOTE: pass in marshalled structs that have been unmarshaled
+// because this function will panic on marshaling errors
+func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
+	var out []byte
+
+	switch ctx.OutputFormat {
+	case "text":
+		out = []byte(toPrint.String())
+
+	case "json":
+		if ctx.Indent {
+			out, err = ctx.Codec.MarshalJSONIndent(toPrint, "", "  ")
+		} else {
+			out, err = ctx.Codec.MarshalJSON(toPrint)
+		}
+	}
+
+	if err != nil {
+		return
+	}
+
+	fmt.Println(string(out))
+	return
 }

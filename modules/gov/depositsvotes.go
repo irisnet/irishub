@@ -15,6 +15,21 @@ type Vote struct {
 	Option     VoteOption     `json:"option"`      //  option from OptionSet chosen by the voter
 }
 
+func (v Vote) String() string {
+	return fmt.Sprintf("Voter %s voted with option %s on proposal %d", v.Voter, v.Option, v.ProposalID)
+}
+
+// Votes is a collection of Vote
+type Votes []Vote
+
+func (v Votes) String() string {
+	out := fmt.Sprintf("Votes for Proposal %d:", v[0].ProposalID)
+	for _, vot := range v {
+		out += fmt.Sprintf("\n  %s: %s", vot.Voter, vot.Option)
+	}
+	return out
+}
+
 // Returns whether 2 votes are equal
 func (voteA Vote) Equals(voteB Vote) bool {
 	return voteA.Voter.Equals(voteB.Voter) && voteA.ProposalID == voteB.ProposalID && voteA.Option == voteB.Option
@@ -31,6 +46,25 @@ type Deposit struct {
 	Depositor  sdk.AccAddress `json:"depositor"`   //  Address of the depositor
 	ProposalID uint64         `json:"proposal_id"` //  proposalID of the proposal
 	Amount     sdk.Coins      `json:"amount"`      //  Deposit amount
+}
+
+func (d Deposit) String() string {
+	return fmt.Sprintf("Deposit by %s on Proposal %d is for the amount %s",
+		d.Depositor, d.ProposalID, d.Amount.MainUnitString())
+}
+
+// Deposits is a collection of depoist
+type Deposits []Deposit
+
+func (d Deposits) String() string {
+	if len(d) == 0 {
+		return "[]"
+	}
+	out := fmt.Sprintf("Deposits for Proposal %d:", d[0].ProposalID)
+	for _, dep := range d {
+		out += fmt.Sprintf("\n  %s: %s", dep.Depositor, dep.Amount.MainUnitString())
+	}
+	return out
 }
 
 // Returns whether 2 deposits are equal

@@ -59,13 +59,7 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 
 			upgradeInfoOutput := upgcli.NewUpgradeInfoOutput(currentVersionInfo, lastFailedVersion, upgradeInProgress)
 
-			output, err := codec.MarshalJSONIndent(cdc, upgradeInfoOutput)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return cliCtx.PrintOutput(upgradeInfoOutput)
 		},
 	}
 	return cmd

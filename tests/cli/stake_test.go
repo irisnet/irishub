@@ -13,7 +13,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	t.Parallel()
 	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
 
-	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v --output=json", iriscliHome, servAddr, chainID)
 
 	// start iris server
 	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))

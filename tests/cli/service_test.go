@@ -18,7 +18,7 @@ func TestIrisCLIService(t *testing.T) {
 	t.Parallel()
 	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
 
-	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v --output=json", iriscliHome, servAddr, chainID)
 
 	// start iris server
 	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
@@ -254,8 +254,8 @@ func TestIrisCLIService(t *testing.T) {
 	barAcc1 := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 
 	cliCtx := context.NewCLIContext()
-	oldAmount, _ := cliCtx.ParseCoin(barAcc.Coins[0])
-	newAmount, _ := cliCtx.ParseCoin(barAcc1.Coins[0])
+	oldAmount, _ := cliCtx.ParseCoin(barAcc.Coins[0].String())
+	newAmount, _ := cliCtx.ParseCoin(barAcc1.Coins[0].String())
 	tax, _ := sdk.NewIntFromString("1000000000000000")
 	require.Equal(t, oldAmount.Amount.Add(tax).String(), newAmount.Amount.String())
 }

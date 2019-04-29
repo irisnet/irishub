@@ -43,7 +43,6 @@ func queryModule(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	ps, ok := keeper.GetParamSet(params.Module)
-
 	if !ok {
 		return nil, sdk.NewError(DefaultCodespace, CodeInvalidModule, fmt.Sprintf("The module %s is does not support params change", params.Module))
 	}

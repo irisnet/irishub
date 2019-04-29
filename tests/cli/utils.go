@@ -3,53 +3,46 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
-	"io"
 
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/server"
-	"github.com/irisnet/irishub/tests"
-	sdk "github.com/irisnet/irishub/types"
-	distributiontypes "github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/client/bank"
+	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client/context"
 	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
-	stakecli "github.com/irisnet/irishub/client/stake"
-	upgcli "github.com/irisnet/irishub/client/upgrade"
+	"github.com/irisnet/irishub/client/stake"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	distributiontypes "github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/service"
 	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/auth"
-	"path/filepath"
-	"io/ioutil"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/app/v0"
 )
 
 //___________________________________________________________________________________
 // irisnet helper methods
 
-func convertToIrisBaseAccount(t *testing.T, acc bank.BaseAccount) string {
+func convertToIrisBaseAccount(t *testing.T, acc auth.BaseAccount) string {
 	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
 	cliCtx := context.NewCLIContext().
 		WithCodec(cdc)
 
-	coinstr := acc.Coins[0]
-	for i := 1; i < len(acc.Coins); i++ {
-		coinstr += ("," + acc.Coins[i])
-	}
-
+	coinstr := acc.Coins.String()
 	coins, err := cliCtx.ConvertCoinToMainUnit(coinstr)
 	require.NoError(t, err, "coins %v, err %v", coinstr, err)
 
@@ -104,23 +97,6 @@ func getTestingHomeDirsB() (string, string) {
 	irisHome := fmt.Sprintf("%s%s.test_iris_b", tmpDir, string(os.PathSeparator))
 	iriscliHome := fmt.Sprintf("%s%s.test_iriscli_b", tmpDir, string(os.PathSeparator))
 	return irisHome, iriscliHome
-}
-
-func copyFile(dstFile, srcFile string) error {
-	src, err := os.Open(srcFile)
-	if err != nil {
-		return err
-	}
-
-	defer src.Close()
-	dst, err := os.OpenFile(dstFile, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return err
-	}
-
-	defer dst.Close()
-	_, err = io.Copy(dst, src)
-	return err
 }
 
 //___________________________________________________________________________________
@@ -243,14 +219,13 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 
 // irisnet-module-helper function
 
-func executeGetAccount(t *testing.T, cmdStr string) (acc bank.BaseAccount) {
+func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)
 	require.NoError(t, err, "out %v, err %v", out, err)
 
-	cdc := codec.New()
-	codec.RegisterCrypto(cdc)
+	cdc := app.MakeLatestCodec()
 
 	err = cdc.UnmarshalJSON([]byte(out), &acc)
 	require.NoError(t, err, "acc %v, err %v", string(out), err)
@@ -301,9 +276,9 @@ func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclien
 	return vdi
 }
 
-func executeGetValidator(t *testing.T, cmdStr string) stakecli.ValidatorOutput {
+func executeGetValidator(t *testing.T, cmdStr string) stake.ValidatorOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var validator stakecli.ValidatorOutput
+	var validator stake.ValidatorOutput
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &validator)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
@@ -337,32 +312,13 @@ func executeGetVote(t *testing.T, cmdStr string) gov.Vote {
 	return vote
 }
 
-func executeGetVotes(t *testing.T, cmdStr string) [] gov.Vote {
+func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var votes [] gov.Vote
+	var votes []gov.Vote
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &votes)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return votes
-}
-
-func executeGetParam(t *testing.T, cmdStr string) gov.Param {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var param gov.Param
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &param)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return param
-}
-
-func executeGetUpgradeInfo(t *testing.T, cmdStr string) upgcli.UpgradeInfoOutput {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var info upgcli.UpgradeInfoOutput
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &info)
-
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return info
 }
 
 func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
@@ -426,71 +382,6 @@ func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return feesOutput
-}
-
-func executeSubmitRecordAndGetTxHash(t *testing.T, cmdStr string, writes ...string) string {
-	proc := tests.GoExecuteT(t, cmdStr)
-
-	for _, write := range writes {
-		_, err := proc.StdinPipe.Write([]byte(write + "\n"))
-		require.NoError(t, err)
-	}
-	stdout, stderr, err := proc.ReadAll()
-	if err != nil {
-		fmt.Println("Err on proc.ReadAll()", err, cmdStr)
-	}
-	// Log output.
-	if len(stdout) > 0 {
-		t.Log("Stdout:", cmn.Green(string(stdout)))
-	}
-	if len(stderr) > 0 {
-		t.Log("Stderr:", cmn.Red(string(stderr)))
-	}
-
-	type toJSON struct {
-		Height int64  `json:"Height"`
-		TxHash string `json:"TxHash"`
-		//Response string `json:"Response"`
-	}
-	var res toJSON
-	cdc := app.MakeLatestCodec()
-	err = cdc.UnmarshalJSON([]byte(stdout), &res)
-	require.NoError(t, err, "out %v\n, err %v", stdout, err)
-
-	return res.TxHash
-}
-
-func executeDownloadRecord(t *testing.T, cmdStr string, filePath string, force bool) bool {
-
-	if force {
-		os.Remove(filePath)
-	}
-
-	proc := tests.GoExecuteT(t, cmdStr)
-	stdout, stderr, err := proc.ReadAll()
-	if err != nil {
-		fmt.Println("Err on proc.ReadAll()", err, cmdStr)
-	}
-	// Log output.
-	if len(stdout) > 0 {
-		t.Log("Stdout:", cmn.Green(string(stdout)))
-	}
-	if len(stderr) > 0 {
-		t.Log("Stderr:", cmn.Red(string(stderr)))
-	}
-
-	proc.Wait()
-
-	if !proc.ExitState.Success() {
-		return false
-	}
-
-	// Check whether download file exists
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return false
-	}
-	return true
-
 }
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {

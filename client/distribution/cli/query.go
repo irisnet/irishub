@@ -41,8 +41,14 @@ func GetWithdrawAddress(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(res))
-			return nil
+
+			var acc sdk.AccAddress
+			err = cdc.UnmarshalJSON(res, &acc)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(acc)
 		},
 	}
 }
@@ -197,8 +203,13 @@ func GetRewards(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(res))
-			return nil
+
+			var rewards distribution.Rewards
+			err = cdc.UnmarshalJSON(res, &rewards)
+			if err != nil {
+				return err
+			}
+			return cliCtx.PrintOutput(rewards)
 		},
 	}
 	return cmd

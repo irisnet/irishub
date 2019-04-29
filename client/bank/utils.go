@@ -1,10 +1,12 @@
 package bank
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"fmt"
+
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/client/context"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -53,5 +55,15 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 type TokenStats struct {
 	LoosenToken sdk.Coins `json:"loosen_token"`
 	BurnedToken sdk.Coins `json:"burned_token"`
-	BondedToken sdk.Dec   `json:"bonded_token"`
+	BondedToken sdk.Coins `json:"bonded_token"`
+}
+
+// String implements fmt.Stringer
+func (ts TokenStats) String() string {
+	return fmt.Sprintf(`TokenStats:
+  Loosen Token:  %s
+  Burned Token:  %s
+  Bonded Token:  %s`,
+		ts.LoosenToken.MainUnitString(), ts.BurnedToken.MainUnitString(), ts.BondedToken.MainUnitString(),
+	)
 }

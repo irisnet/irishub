@@ -25,6 +25,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(SvcResponse{},"irishub/service/SvcResponse", nil)
 	cdc.RegisterConcrete(IncomingFee{},"irishub/service/IncomingFee", nil)
 	cdc.RegisterConcrete(ReturnedFee{},"irishub/service/ReturnedFee", nil)
+
+	cdc.RegisterConcrete(&Params{}, "irishub/service/Params", nil)
 }
 
 var msgCdc = codec.New()

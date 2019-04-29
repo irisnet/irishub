@@ -13,7 +13,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	t.Parallel()
 	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
 
-	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v", iriscliHome, servAddr, chainID)
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v --output=json", iriscliHome, servAddr, chainID)
 
 	// start iris server
 	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
@@ -29,7 +29,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	require.Equal(t, "50iris", fooCoin)
 
 	proposalsQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals %v", flags), "")
-	require.Equal(t, "[]", proposalsQuery)
+	require.Equal(t, "null", proposalsQuery)
 
 	// submit a test proposal
 	spStr := fmt.Sprintf("iriscli gov submit-proposal %v", flags)
@@ -100,7 +100,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	require.Equal(t,  gov.OptionYes, votes[0].Option)
 
 	proposalsQuery, _ = tests.ExecuteT(t, fmt.Sprintf("iriscli gov query-proposals --status=DepositPeriod %v", flags), "")
-	require.Equal(t, "[]", proposalsQuery)
+	require.Equal(t, "null", proposalsQuery)
 
 	proposals = executeGetProposals(t, fmt.Sprintf("iriscli gov query-proposals %v", flags))
 	require.Equal(t, 1, len(proposals))

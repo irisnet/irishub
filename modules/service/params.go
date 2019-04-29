@@ -45,6 +45,19 @@ type Params struct {
 	TxSizeLimit          uint64        `json:"tx_size_limit"`
 }
 
+func (p Params) String() string {
+	return fmt.Sprintf(`Service Params:
+  Max Request Timeout:         %d
+  Min Deposit Multiple:        %d
+  Service Fee Tax:             %s
+  Slash Fraction:              %s
+  Complaint Retrospect:        %s
+  Arbitration Time Limit:      %s
+  Tx Size Limit:               %d`,
+		p.MaxRequestTimeout, p.MinDepositMultiple, p.ServiceFeeTax.String(), p.SlashFraction.String(),
+		p.ComplaintRetrospect, p.ArbitrationTimeLimit, p.TxSizeLimit)
+}
+
 // Implements params.ParamStruct
 func (p *Params) GetParamSpace() string {
 	return DefaultParamSpace

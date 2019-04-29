@@ -12,7 +12,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/cli"
 )
 
 // GetCmdQueryValidator implements the validator query command.
@@ -41,30 +40,16 @@ func GetCmdQueryValidator(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			var validator stake.Validator
-			cdc.MustUnmarshalJSON(res, &validator)
-			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				human, err := validatorOutput.HumanReadableString()
-				if err != nil {
-					return err
-				}
-				fmt.Println(human)
-
-			case "json":
-				// parse out the validator
-				output, err := codec.MarshalJSONIndent(cdc, validatorOutput)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
+			err = cdc.UnmarshalJSON(res, &validator)
+			if err != nil {
+				return err
 			}
 
-			// TODO: output with proofs / machine parseable etc.
-			return nil
+			validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
+
+			return cliCtx.PrintOutput(validatorOutput)
 		},
 	}
 
@@ -86,40 +71,14 @@ func GetCmdQueryValidators(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// parse out the validators
-			var validators []stakeClient.ValidatorOutput
+			var validatorsOutput stakeClient.ValidatorsOutput
 			for _, kv := range resKVs {
 				addr := kv.Key[1:]
 				validator := types.MustUnmarshalValidator(cdc, addr, kv.Value)
-				validatorOutput := stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator)
-				if err != nil {
-					return err
-				}
-				validators = append(validators, validatorOutput)
+				validatorsOutput = append(validatorsOutput, stakeClient.ConvertValidatorToValidatorOutput(cliCtx, validator))
 			}
 
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				for _, validator := range validators {
-					resp, err := validator.HumanReadableString()
-					if err != nil {
-						return err
-					}
-
-					fmt.Println(resp)
-				}
-			case "json":
-				output, err := codec.MarshalJSONIndent(cdc, validators)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
-				return nil
-			}
-
-			// TODO: output with proofs / machine parseable etc.
-			return nil
+			return cliCtx.PrintOutput(validatorsOutput)
 		},
 	}
 
@@ -141,14 +100,8 @@ func GetCmdQueryValidatorUnbondingDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(valAddr)
 
-			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryValidatorUnbondingDelegations, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 	return cmd
@@ -169,14 +122,8 @@ func GetCmdQueryValidatorRedelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(valAddr)
 
-			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryValidatorRedelegations, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 	return cmd
@@ -203,14 +150,8 @@ func GetCmdQueryDelegation(cdc *codec.Codec) *cobra.Command {
 
 			params := stake.NewQueryBondsParams(delAddr, valAddr)
 
-			res, err := queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegation, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 
@@ -237,14 +178,8 @@ func GetCmdQueryDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegatorDelegations, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 
@@ -267,14 +202,8 @@ func GetCmdQueryValidatorDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryValidatorParams(validatorAddr)
 
-			res, err := queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryValidator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryValidatorDelegations, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 	return cmd
@@ -301,14 +230,8 @@ func GetCmdQueryUnbondingDelegation(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryBondsParams(delAddr, valAddr)
 
-			res, err := queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryBonds(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryUnbondingDelegation, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 
@@ -335,14 +258,8 @@ func GetCmdQueryUnbondingDelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegatorUnbondingDelegations, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 
@@ -378,33 +295,13 @@ func GetCmdQueryRedelegation(cdc *codec.Codec) *cobra.Command {
 			res, err := cliCtx.QueryStore(key, protocol.StakeStore)
 			if err != nil {
 				return err
-			} else if len(res) == 0 {
-				return fmt.Errorf("no redelegation found with delegator %s from source validator %s to destination validator %s",
-					delAddr, valSrcAddr, valDstAddr)
 			}
 
-			// parse out the unbonding delegation
-			red := types.MustUnmarshalRED(cdc, key, res)
-			redOutput := stakeClient.ConvertREDToREDOutput(cliCtx, red)
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				resp, err := redOutput.HumanReadableString()
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(resp)
-			case "json":
-				output, err := codec.MarshalJSONIndent(cdc, redOutput)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
-				return nil
+			red, err := types.UnmarshalRED(cdc, key, res)
+			if err != nil {
+				return err
 			}
-
-			return nil
+			return cliCtx.PrintOutput(stakeClient.ConvertREDToREDOutput(cliCtx, red))
 		},
 	}
 
@@ -431,14 +328,8 @@ func GetCmdQueryRedelegations(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			params := stake.NewQueryDelegatorParams(delegatorAddr)
 
-			res, err := queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
+			return queryDelegator(cliCtx, fmt.Sprintf("custom/%s", protocol.StakeRoute),
 				stake.QueryDelegatorRedelegations, params)
-
-			if err != nil {
-				return err
-			}
-			println(string(res))
-			return nil
 		},
 	}
 
@@ -459,29 +350,12 @@ func GetCmdQueryPool(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var poolStatus types.PoolStatus
+			var poolStatus stake.PoolStatus
 			err = cdc.UnmarshalJSON(res, &poolStatus)
 			if err != nil {
 				return err
 			}
-			poolOutput := stakeClient.ConvertPoolToPoolOutput(cliCtx, poolStatus)
-
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				human := poolOutput.HumanReadableString()
-
-				fmt.Println(human)
-
-			case "json":
-				// parse out the pool
-				output, err := codec.MarshalJSONIndent(cdc, poolOutput)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
-			}
-			return nil
+			return cliCtx.PrintOutput(stakeClient.ConvertPoolToPoolOutput(cliCtx, poolStatus))
 		},
 	}
 
@@ -509,22 +383,7 @@ func GetCmdQueryParams(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			switch viper.Get(cli.OutputFlag) {
-			case "text":
-				human := params.HumanReadableString()
-
-				fmt.Println(human)
-
-			case "json":
-				// parse out the params
-				output, err := codec.MarshalJSONIndent(cdc, params)
-				if err != nil {
-					return err
-				}
-
-				fmt.Println(string(output))
-			}
-			return nil
+			return cliCtx.PrintOutput(params)
 		},
 	}
 
