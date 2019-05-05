@@ -8,19 +8,24 @@ This specification briefly introduces the functionality of stake module and what
 
 1. Voting power
 
-	Voting power is a consensus concept. IRISHUB is a Byzantine-fault-tolerant POS blockchain network. During the consensus process, a set of validators will vote the proposal block. If a validator thinks the proposal block is valid, it will vote `yes`, otherwise, it will vote nil. The votes from different validator don't have the same weight. The weight of a vote is called the voting power of the corresponding validator.
+	Voting power is a consensus concept. IRIShub is a Byzantine-fault-tolerant POS blockchain network. During the consensus process, a set of validators will vote the proposal block. If a validator thinks the proposal block is valid, it will vote `yes`, otherwise, it will vote nil. The votes from different validator don't have the same weight. The weight of a vote is called the voting power of the corresponding validator.
 	
 2. Validator
 
-    Validator is a full IRISHUB node. If its voting power is zero, it is just a normal full node or a validator candidate. Once its voting power is positive, then it is a real validator.
+    Validator is a full IRIShub node. If its voting power is zero, it is just a normal full node or a validator candidate. Once its voting power is positive, then it is a real validator.
      
 3. Delegator && Delegation
 
-	People that cannot, or do not want to run validator nodes, can still participate in the staking process as delegators. After delegating some tokens to validators, delegators will gain shares from corresponding validators. Delegating tokens is also called bonding tokens to validators. Later we will have detailed description on it. Besides, a validator operator is also a delegator. Usually, a validator operator only has delegation on its own validator. But it can also have delegation on other validators.
-	
+	People that cannot, or do not want to run validator nodes, can still participate in the staking process as delegators. After delegating some tokens to validators, delegators will gain shares from corresponding validators. Delegating tokens is also called bonding tokens to validators. Later we will have detailed description on it. Besides, a validator operator is also a delegator. Usually, a validator operator not only has delegation on its own validator, but also can have delegation on other validators.
+
+    ::: danger
+    **It is strongly NOT recommended that validator operator COMPLETELY unbind self-delegation tokens, Cause the validator will be jailed (removed out of validator set) if he do so. The delegator who bonded tokens to this validator will also suffer losses. 
+    So, it is recommended that validator operator reserve at least 1 iris while unbonding tokens.**
+    :::
+
 4. Validator Candidates
  
-	The quantity of validators can't increase without limit. Too many validators may result in low efficient consensus which slows down the blockchain TPS. So Byzantine-fault-tolerant POS blockchain network will have a limiation to the validator quantity. Usually, the value is 100. If more than 100 full nodes apply to join validator set. Then only these nodes with top 100 most bounded tokens will be real validators. Others will be validator candidates and will be descending sorted according to their bonded token amount. Once the one or more validators are kicked out from validator set, then the top candidates will be added into validator set automatically.
+	The quantity of validators can't increase infinitely. Too many validators may result in low efficient consensus which slows down the blockchain TPS. So Byzantine-fault-tolerant POS blockchain network will have a limiation to the validator quantity. Usually, the value is 100. If more than 100 full nodes apply to join validator set. Then only these nodes with top 100 most bonded tokens will be real validators. Others will be validator candidates and will be descending sorted according to their bonded token amount. Once the one or more validators are kicked out from validator set, then the top candidates will be added into validator set automatically.
 	
 5. Bond && Unbond && Unbonding Period
 
@@ -36,7 +41,7 @@ This specification briefly introduces the functionality of stake module and what
 	
 8. Rewards
 
-	As a delegator, the more bonded tokens it has on validator, the more rewards it will earn. For a validator operator, it will have extra rewards: validator commission. The rewards comes from token inflation and transaction fee. As for how to calculate the rewards and how to get the rewards, please refer to [mint](mint.md) and [distribution](distribution.md).
+	As a delegator, the more bonded tokens it has on validator, the more rewards it will earn. For a validator operator, it will have extra rewards: validator commission. The rewards come from token inflation and transaction fee. As for how to calculate the rewards and how to get the rewards, please refer to [mint](mint.md) and [distribution](distribution.md).
 	
 ## What Users Can Do
 
@@ -46,19 +51,13 @@ This specification briefly introduces the functionality of stake module and what
 
 2. Apply to be validator
 
-	Firstly, you must have a wallet which has a certain amount of iris tokens. Here we assume you have import your wallet to iriscli key store. 
-
-	Then just send a create-validator transaction. This is an example command.
-	```
-	iriscli stake create-validator --amount=100iris --pubkey=$(iris tendermint show-validator) --moniker=<validator name> --fee=0.3iris --chain-id=<chain-id> --from=<key name> --commission-rate=0.1
-	```
-	The more tokens specified by `--amount`, the more probability your full node will be a real validator. Otherwise, it will just be validator candidate.
-
+	Please refer to [run_Validator_Node](../get-started/Validator-Node.md) to create validator.
+	
 3. Query your own validator
 	
 	Users can query their own validators by their wallet address. But firstly users have to convert their wallet addresses to validator operator address pattern:
 	```
-	iriscli keys show [key name] --bech=val
+	iriscli keys show <key_name> --bech=val
 	```
 	Example response:
 	```
@@ -88,34 +87,44 @@ This specification briefly introduces the functionality of stake module and what
 4. Edit validator
 
 	```
-	iriscli stake edit-validator --from=<key name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new name>
+    iriscli stake edit-validator --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new_name>
 	```
 	
 5. Increase self-delegation
 
 	```
-	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris  --amount=100iris 
 	```
 
 6. Delegate tokens to other validators
 
 	If you just want to be a delegator, you can skip the above steps.
 	```
-	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --amount=100iris 
+	iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris  --amount=100iris 
 	```
 
 7. Unbond tokens from a validator
 
-	Unbond half of total bonded token on a given validator
+    use amount for Unbonding
 	```
+	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris --shares-amount=100
+	```
+	
+    use percentage for Unbonding
+    ```
 	iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key name> --fee=0.3iris  --share-percent=0.5
-	```
+    ```
 
 8. Redelegate tokens to another validator
 
-	Redelegate half of total bonded token on a given validator to another one
+    use amount for Redelegation
 	```
-	iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.3iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5
+	iriscli stake redelegate --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address-validator-source=<source_validator_address> --address-validator-dest=<destination_validator_address> --shares-amount=100
 	```
+	
+    use percentage for Redelegation
+    ```
+	iriscli stake redelegate --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --address-validator-source=<source_validator_address> --address-validator-dest=<destination_validator_address> --shares-percent=0.5
+    ```
 
 For other query stake state commands, please refer to [stake cli client](../cli-client/stake/README.md)

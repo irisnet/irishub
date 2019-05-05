@@ -6,7 +6,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 
 默认情况下禁用此功能。
 
-要启用Prometheus metrics，请在配置文件中设置`instrumentation.prometheus=true`。默认情况下，Metrics将在26660端口下的/metrics提供。可以在配置文件中修改服务地址(请参阅 instrumentation.prometheus\_listen\_addr).
+要启用Prometheus metrics，请在配置文件(config.toml)中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供。可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`.
 
 ### List of available metrics
 
@@ -40,7 +40,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 | consensus_missing_validators_power      | Gauge     |          | 块中缺失的precommit对应的验证人所占的投票权重                    |
 | consensus_byzantine_validators          | Gauge     |          | 块中包含的作恶证据对应的验证人数量                   |
 | consensus_byzantine_validators_power    | Gauge     |          | 作恶的验证人的投票权重                  |
-| consensus_block_interval_seconds        | Histogram |          | 从区块被提出到区块执行完毕消耗的时候 |
+| consensus_block_interval_seconds        | Histogram |          | 从区块被提出到区块执行完毕消耗的时间 |
 | consensus_rounds                        | Gauge     |          | 共识状态机所处的round                                                |
 | consensus_num_txs                       | Gauge     |          | 区块中包含的交易数量                                          |
 | consensus_block_parts                   | counter   | peer_id  | 区块被切分的块数                       |
@@ -65,7 +65,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 
 ### 编辑配置文件
 
-从 [https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) 下载默认配置文件到本地：
+从 下载[prometheus.yml](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml) 默认配置文件到本地：
 
 在配置文件 `prometheus.yml` 中添加以下 `jobs` :
 

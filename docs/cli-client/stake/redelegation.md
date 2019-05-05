@@ -2,13 +2,14 @@
 
 ## Description
 
-Query a redelegation record based on delegator and a source and destination validator address
+Query a redelegation record based on delegator and source validator address and destination validator address
 
 ## Usage
 
 ```
-iriscli stake redelegation [flags]
+iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake redelegation --help
@@ -18,9 +19,9 @@ iriscli stake redelegation --help
 
 | Name, shorthand            | Default                    | Description                                                         | Required |
 | -------------------------- | -------------------------- | ------------------------------------------------------------------- | -------- | 
-| --address-delegator        |                            | [string] Bech address of the delegator                              | Yes      |
-| --address-validator-dest   |                            | [string] Bech address of the destination validator                  | Yes      |
-| --address-validator-source |                            | [string] Bech address of the source validator                       | Yes      |
+| --address-delegator        |                            | Bech address of the delegator                              | Yes      |
+| --address-validator-dest   |                            | Bech address of the destination validator                  | Yes      |
+| --address-validator-source |                            | Bech address of the source validator                       | Yes      |
 
 ## Examples
 
@@ -29,7 +30,7 @@ Query a redelegation record
 iriscli stake redelegation --address-validator-source=SourceValidatorAddress --address-validator-dest=DestinationValidatorAddress --address-delegator=DelegatorAddress
 ```
 
-After that, you will get specified redelegation's info based on delegator and a source and destination validator address
+After that, you will get specified redelegation's info based on delegator and source validator address and destination validator address
 
 ```txt
 Redelegation

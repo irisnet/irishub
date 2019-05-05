@@ -2,15 +2,14 @@
 
 ## 描述
 
-发送通证到指定地址 
+发送通证到指定地址, 此条命令同时包含`创建/签名/广播`交易。
 
 ## 使用方式
 
+转账10iris
 ```
-iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
-```
-
- 
+iriscli bank send --to=<address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
+``` 
 
 ## 标志
 
@@ -19,18 +18,15 @@ iriscli bank send --to=<account address> --from <key name> --fee=0.3iris --chain
 | --amount         | String | 是       |                       | 需要发送的通证数量，比如10iris                               |
 | --to             | String | 是       |                       | Bech32 编码的接收通证的地址。                                |
 
-
-
 ## 例子
 
 ### 发送通证到指定地址 
 
 ```
- iriscli bank send --to=iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym  --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris
+ iriscli bank send --to=<address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
 命令执行完成后，返回执行的细节信息
-
 ```
 Committed at block 87 (tx hash: AEA8E49C1BC9A81CAFEE8ACA3D0D96DA7B5DC43B44C06BACEC7DCA2F9C4D89FC, response:
  {

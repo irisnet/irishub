@@ -9,7 +9,7 @@ Tendermint state querying subcommands
 ### Usage
 
 ```
-iriscli tendermint [subcommand]
+iriscli tendermint <subcommand>
 ```
 
 ### Available Subcommands
@@ -17,27 +17,21 @@ iriscli tendermint [subcommand]
 | Name, shorthand | Description        |
 | --------------- | -------------------------- |
 | [tx](tx.md)     |  Matches this txhash over all committed blocks           |  
-| [txs](txs.md)   | Search for all transactions that match the given tags  |                            
+| [txs](txs.md)   | Search for all transactions that match the given tags  |                        
 | [block](block.md)| 	Get verified data for a the block at given height    |   
 | [validator-set](validator-set.md) | Get the full tendermint validator set at given height  |   
-
-### Flags
-
-|Name, shorthand|Description|
-|---			|---		|
-|--help,-h		|help for tendermint|
 
 
 ## iris tendermint
 
 ### Description
 
-This command will return some Tendermint related info to you. 
+This command will return some tendermint related info to you. 
 
 ### Usage
 
 ```shell
-iris tendermint [command]
+iris tendermint <subcommand>
 ```
 
 ### Available Commands
@@ -48,17 +42,11 @@ iris tendermint [command]
 | [show-validator](show-validator.md) | show validator |
 | [show-address](show-address.md) |     show address  |
 
-### Flags
-
-| Name, shorthand | Default | Description   | Required |
-| --------------- | ------- | ------------- | -------- |
-| --help, -h      |         | Help for keys |          |
-
 ### Global Flags
 
 | Name, shorthand | Default        | Description                            | Required |
 | --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
-| --home          | $HOME/.iris    | [string] Directory for config and data |          |
-| --output, -o    | text           | [string] Output format (text|json)     |          |
+| --encoding, -e  | hex            | Binary encoding (hex\b64\btc) |          |
+| --home          | $HOME/.iris    | Directory for config and data |          |
+| --output, -o    | text           | Output format (text\json)     |          |
 | --trace         |                | Print out full stack trace on errors   |          |

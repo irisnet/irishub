@@ -1,28 +1,25 @@
-# How to install IRIShub 
+# How to install `iris` 
 
-There are two ways to get Iris running on your server. You can download the binary files from our release pages, or you can download the source code and compile it locally.
-
-#### Download Binary Directly
-
-Go to the download page: 
-
-https://github.com/irisnet/irishub/releases/  
-
-then get the release v0.12.3 on your computer.
-
-> Note: there are two different binaries available. One for testnet and the other for betanet.
-
-`unzip -C /usr/local/bin  iris$VERSION.$OS-$ARCH.zip` to `/usr/local/bin/ ` 
-
-You can verify you have the right version installed by running the following commands:
-
+### The Latest version of IRIShub : v0.13.1
+refer to : https://github.com/irisnet/irishub/releases/latest
 ```
-$ iris version
-v0.12.3
-
-$ iriscli version
-v0.12.3
+Please replace <latest_iris_version> with v0.13.1 while using "git checkout" 
 ```
+
+You can download the source code from github and compile it locally.
+
+#### Configure Your Server
+
+It's recommended that you run a validator node on Linux Server.
+
+**Recommended Configurations:**
+
+1. 2 CPU
+2. Memory: 6GB
+3. Disk: 256GB SSD
+4. OS: Ubuntu 16.04 LTS
+5. Bandwidth: 20Mbps
+6. Allow all incoming connections on TCP port 26656 and 26657
 
 #### Compile Source Code
 
@@ -78,19 +75,20 @@ $ echo $PATH
 
 - Get the code and compile Iris
 
-After setup Go correctly, you should be able to compile and run **Iris**.
-Make sure that your server can access to google.com for that our project depends on some libraries provided by google.
+After setting up Go correctly, you should be able to compile and run `iris`.
+Make sure that your server can access to google.com because our project depends on some libraries provided by google.
 
 * To compile for `testnet`:
-
+Please checkout the latest version，refer to：https://github.com/irisnet/irishub/releases/latest
 ```
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.3
+cd irishub && git checkout <latest_iris_version>
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
+source scripts/setTestEnv.sh
 make all
 ```
 
@@ -99,20 +97,20 @@ make all
 mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
-cd irishub && git checkout v0.12.3
+cd irishub && git checkout <latest_iris_version>
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
 make get_vendor_deps
-source scripts/setProdEnv.sh
 make all
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
-Now check your **Iris** version.
+Now check your `iris` version.
 
 ```
 $ iris version
-v0.12.3
+<latest_iris_version>
+    
 $ iriscli version
-v0.12.3
+<latest_iris_version>
 ```

@@ -7,7 +7,7 @@ Query the current staking pool values
 ## Usage
 
 ```
-iriscli stake pool [flags]
+iriscli stake pool <flags>
 ```
 Print help messages:
 ```

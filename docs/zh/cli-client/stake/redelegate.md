@@ -1,4 +1,4 @@
-      # iriscli stake redelegate
+# iriscli stake redelegate
 
 ## 介绍
 
@@ -24,15 +24,23 @@ iriscli stake redelegate --help
 | --shares-amount            | float  | false    | 0.0      | 转移的share数量，正数 |
 | --shares-percent           | float  | false    | 0.0      | 转移的比率，0到1之间的正数 |
 
-用户可以用`--shares-amount`或者`--shares-percent`指定装委托的token数量。记住，这两个参数不可同时使用。
+用户可以用`--shares-amount`或者`--shares-percent`指定转委托的token数量(这两个参数不可同时使用)。
 
 ## 示例
 
-执行如下在chain-id为test的网络上重新委托10iris的命令：
+转委托10shares：
+
+```
+iriscli stake redelegate --chain-id=<chain-id> --from=name --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6s30mrlz  --shares-amount=10
+```
+
+
+转委托10%的iris：
 
 ```
 iriscli stake redelegate --chain-id=<chain-id> --from=name --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6s30mrlz  --shares-percent=0.1
 ```
+
 输出信息：
 ```$xslt
 Committed at block 1089 (tx hash: D9A60074B1E15ED33D1C0591AF7B6AD967B13409D342980DC0C858F811021C41, response:

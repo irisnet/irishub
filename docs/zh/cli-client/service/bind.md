@@ -7,28 +7,28 @@
 ## 用法
 
 ```
-iriscli service bind [flags]
+iriscli service bind <flags>
 ```
 
 ## 特殊标志
 
 | Name, shorthand       | Default                 | Description                                                                        | Required |
 | --------------------- | ----------------------- | ---------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | [int]  服务平均返回时间的毫秒数表示                                                     | 是       |
-| --bind-type           |                         | [string] 对服务是本地还是全局的设置，可选值Local/Global                                  | 是       |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                          | 是       |
-| --deposit             |                         | [string] 服务提供者的保证金                                                            | 是       |
-| --prices              |                         | [strings] 服务定价,按照服务方法排序的定价列表                                             |          |
-| --service-name        |                         | [string] 服务名称                                                                    | 是       |
-| --usable-time         |                         | [int] 每一万次服务调用的可用性的整数表示                                                  | 是       |
+| --avg-rsp-time        |                         | 服务平均返回时间的毫秒数表示                                                     | 是       |
+| --bind-type           |                         | 对服务是本地还是全局的设置，可选值Local/Global                                  | 是       |
+| --def-chain-id        |                         | 定义该服务的区块链ID                                                          | 是       |
+| --deposit             |                         | 服务提供者的保证金                                                            | 是       |
+| --prices              |                         | 服务定价,按照服务方法排序的定价列表                                             |          |
+| --service-name        |                         | 服务名称                                                                    | 是       |
+| --usable-time         |                         | 每一万次服务调用的可用性的整数表示                                                  | 是       |
 
 ## 示例
 
 ### 添加服务绑定到已存在的服务定义
-在服务绑定中, 你需要抵押`deposit`指定数量的IRIS, 最小的抵押金额为 该服务的服务费价格`price` * genesis 中定义的`MinDepositMultiple`倍数
+在服务绑定中, 你需要抵押`deposit`指定数量的IRIS, 最小的抵押金额为该服务的服务费价格`price` * genesis 中定义的`MinDepositMultiple`倍数
 
 ```shell
-iriscli service bind --chain-id=<chain-id> --from=node0 --fee=0.3iris --service-name=test-service --def-chain-id=test --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service bind --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<service-define-chain-id> --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
 ```
 
 运行成功以后，返回的结果如下:

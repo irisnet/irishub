@@ -2,12 +2,12 @@
 
 ## Description
 
- Query the token statistic, including total loosen token, total burned token and total bonded token.
+Query the token statistic, including total loosen token, total burned token and total bonded token.
 
 ## Usage:
 
 ```
- iriscli bank token-stats [flags]
+ iriscli bank token-stats <flags>
 ```
 
 ## Flags
@@ -24,25 +24,15 @@
 
 
 
-## Global Flags
-
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
-| --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) | False    | String |
-| --home string         | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output string   | text           | Output format (text \|json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
-
 ## Examples
 
-### Query native token iris
+### Query the token statistic
 
 ```
 iriscli bank token-stats
 ```
 
-Example response:
-
+Output:
 ```json
 {
   "loosen_token": [

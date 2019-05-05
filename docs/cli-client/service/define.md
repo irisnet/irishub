@@ -7,26 +7,28 @@ Create a new service definition
 ## Usage
 
 ```
-iriscli service define [flags]
+iriscli service define <flags>
 ```
 
 ## Flags
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --service-description |                         | [string] service description                                                                                                                          |          |
-| --author-description  |                         | [string] service author description                                                                                                                   |          |
-| --service-name        |                         | [string] service name                                                                                                                                 |   Yes    |
-| --tags                |                         | [strings] service tags                                                                                                                                |          |
-| --idl-content         |                         | [string] content of service interface description language                                                                                            |          |
-| --file                |                         | [string] path of file which contains service interface description language                                                                           |          |
+| --service-description |                         | service description                                                                                                                          |          |
+| --author-description  |                         | service author description                                                                                                                   |          |
+| --service-name        |                         | service name                                                                                                                                 |   Yes    |
+| --tags                |                         | service tags                                                                                                                                |          |
+| --idl-content         |                         | content of service interface description language                                                                                            |          |
+| --file                |                         |  path of file which contains service interface description language                                                                           |          |
 
 ## Examples
 
 ### define a service
+
 ```shell
-iriscli service define --chain-id=<chain-id>  --from=node0 --fee=0.3iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 ```
+
 Idl-content can be replaced by file if the file item is not empty.  [Example of IDL content](#idl-content-example).
 
 After that, you're done with defining a new service.

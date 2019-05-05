@@ -2,12 +2,12 @@
 
 ## 描述
 
-用来参与软件升级的流程，并可查看当前版本的信息。
+该命令用来参与软件升级的流程，并可查看当前版本的信息。
 
 ## 用法
 
 ```shell
-iriscli upgrade [command]
+iriscli upgrade <command>
 ```
 
 ## 相关命令

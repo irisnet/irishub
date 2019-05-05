@@ -7,25 +7,28 @@ Update a service binding
 ## Usage
 
 ```
-iriscli service update-binding [flags]
+iriscli service update-binding <flags>
 ```
 
 ## Flags
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | [int] the average service response time in milliseconds                                                                                               |          |
-| --bind-type           |                         | [string] type of binding, valid values can be Local and Global                                                                                        |          |
-| --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --deposit             |                         | [string] deposit of binding, will add to the current deposit balance                                                                                  |          |
-| --prices              |                         | [strings] prices of binding, will contains all method                                                                                                 |          |
-| --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
-| --usable-time         |                         | [int] an integer represents the number of usable service invocations per 10,000                                                                       |          |
+| --avg-rsp-time        |                         | the average service response time in milliseconds                                                                                               |          |
+| --bind-type           |                         | type of binding, valid values can be Local and Global                                                                                        |          |
+| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
+| --deposit             |                         | deposit of binding, will add to the current deposit balance                                                                                  |          |
+| --prices              |                         | prices of binding, will contains all method                                                                                                 |          |
+| --service-name        |                         | service name                                                                                                                                 |  Yes     |
+| --usable-time         |                         | an integer represents the number of usable service invocations per 10,000                                                                       |          |
 
 ## Examples
 
 ### Update an existing service binding
+
+Update service binding alone with 10iris additional deposit
+
 ```shell
-iriscli service update-binding --chain-id=<chain-id> --from=node0 --fee=0.3iris --service-name=test-service --def-chain-id=<chain-id> --bind-type=Local --deposit=1iris --prices=1iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --service-name=<service_name> --def-chain-id=<service_define_chain_id> --bind-type=Local --deposit=10iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
 ```
 
 After that, you're done with updating an existing service binding.

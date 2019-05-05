@@ -20,7 +20,7 @@ All commands which can be used to send transactions have these global flags. The
 
 | Name, shorthand  | type   | Required | Default               | Description                                                         |
 | -----------------| -----  | -------- | --------------------- | ------------------------------------------------------------------- |
-| --account-number | int    | false    | 0                     | AccountNumber number to sign the tx |
+| --account-number | int    | false    | 0                     | AccountNumber to sign the tx |
 | --async          | bool   | false    | false                 | broadcast transactions asynchronously(only works with commit = false) |
 | --commit         | bool   | false    | false                 | broadcast transaction and wait until the transaction is included by a block |
 | --chain-id       | string | true     | ""                    | Chain ID of tendermint node  |
@@ -29,7 +29,7 @@ All commands which can be used to send transactions have these global flags. The
 | --from           | string | false    | ""                    | Name of private key with which to sign |
 | --from-addr      | string | false    | ""                    | Specify from address in generate-only mode |
 | --gas            | int    | false    | 50000                | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
-| --gas-adjustment | int    | false    | 1                     | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
+| --gas-adjustment | int    | false    | 1.5                   | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
 | --generate-only  | bool   | false    | false                 | Build an unsigned transaction and write it to STDOUT |
 | --help, -h       | string | false    |                       | Print help message |
 | --indent         | bool   | false    | false                 | Add indent to JSON response |
@@ -38,7 +38,7 @@ All commands which can be used to send transactions have these global flags. The
 | --memo           | string | false    | ""                    | Memo to send along with transaction |
 | --node           | string | false    | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain |
 | --print-response | bool   | false    | false                 | return tx response (only works with async = false)|
-| --sequence int   | int    | false    | 0                     | Sequence number to sign the tx |
+| --sequence       | int    | false    | 0                     | Sequence number to sign the tx |
 | --trust-node     | bool   | false    | true                  | Don't verify proofs for responses | 
 
 ## Module command list
@@ -58,3 +58,20 @@ Each module provides a set of command line interfaces. Here we sort these comman
 ## Config command
 
 The `iriscli config` command interactively configures some default parameters, such as chain-id, home, fee, and node.
+
+Example：
+
+```
+root@ubuntu16:~# iriscli config
+> Where is your iriscli home directory? (Default: ~/.iriscli)
+/root/my_cli_home
+> Where is your validator node running? (Default: tcp://localhost:26657)
+tcp://192.168.0.1:26657
+Do you trust this node? [y/n]:y
+> What is your chainID?
+irishub
+> Please specify default fee
+50000
+
+root@ubuntu16:~# iriscli status --home=/root/my_cli_home
+```

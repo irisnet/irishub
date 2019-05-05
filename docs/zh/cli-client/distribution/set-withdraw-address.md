@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli distribution set-withdraw-addr [withdraw-address] [flags]
+iriscli distribution set-withdraw-addr <withdraw_address> <flags>
 ```
 
 打印帮助信息:
@@ -19,8 +19,9 @@ iriscli distribution set-withdraw-addr --help
 ## 示例
 
 ```
-iriscli distribution set-withdraw-addr [withdraw-address] --from <key name> --fee=0.3iris --chain-id=<chain-id>
+iriscli distribution set-withdraw-addr <withdraw_address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id>
 ```
+
 执行结果示例
 
 ```json
@@ -42,5 +43,5 @@ iriscli distribution set-withdraw-addr [withdraw-address] --from <key name> --fe
        "value": "iaa1yclscskdtqu9rgufgws293wxp3njsesxnwecxs"
      }
    ]
- })
+ }
 ```

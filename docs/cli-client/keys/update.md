@@ -7,14 +7,14 @@ Change the password used to protect private key
 ## Usage
 
 ```
-iriscli keys update <name> [flags]
+iriscli keys update <name> <flags>
 ```
 
 ## Flags
 
 | Name, shorthand | Default   | Description                                                  | Required |
 | --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --help, -h      |           | help for udpate                                              |          |
+| --help, -h      |           | help for update                                              |          |
 
 ## Examples
 

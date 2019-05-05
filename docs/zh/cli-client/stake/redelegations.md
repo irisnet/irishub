@@ -2,13 +2,14 @@
 
 ## 描述
 
-基于委托者地址的所有重新委托记录查询
+基于委托者地址的所有转委托记录查询
 
 ## 用法
 
 ```
-iriscli stake redelegations [delegator-address] [flags]
+iriscli stake redelegations <delegator-address> <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake redelegations --help
@@ -16,13 +17,12 @@ iriscli stake redelegations --help
 
 ## 示例
 
-基于委托者地址的所有重新委托记录查询
+基于委托者地址的所有转委托记录查询
 ```
-iriscli stake redelegations [delegator-address]
+iriscli stake redelegations <delegator-address> 
 ```
 
 运行成功以后，返回的结果如下：
-
 ```json
 [
   {

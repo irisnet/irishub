@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli keys list [flags]
+iriscli keys list <flags>
 ```
 
 ## 标志

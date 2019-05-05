@@ -7,7 +7,7 @@ Set withdraw address for delegator
 ## Usage
 
 ```
-iriscli distribution set-withdraw-addr [withdraw-address] [flags]
+iriscli distribution set-withdraw-addr <withdraw_address> <flags>
 ```
 
 Print help messages:
@@ -15,12 +15,12 @@ Print help messages:
 iriscli distribution set-withdraw-addr --help
 ```
 
-
 ## Examples
 
 ```
-iriscli distribution set-withdraw-addr [withdraw address] --from <key name> --fee=0.3iris --chain-id=<chain-id>
+iriscli distribution set-withdraw-addr <withdraw_address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id>
 ```
+
 Example response:
 ```json
 {
@@ -41,5 +41,5 @@ Example response:
        "value": "iaa1yclscskdtqu9rgufgws293wxp3njsesxnwecxs"
      }
    ]
- })
+ }
 ```

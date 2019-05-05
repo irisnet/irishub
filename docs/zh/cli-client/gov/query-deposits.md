@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli gov query-deposits [flags]
+iriscli gov query-deposits <flags>
 ```
 打印帮助信息:
 
@@ -18,17 +18,17 @@ iriscli gov query-deposits --help
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | [string] 提议ID                                                                                                        | Yes      |
+| --proposal-id   |                            | 提议ID                                                                                                        | Yes      |
 
 ## 例子
 
 ### 查询所有保证金
 
 ```shell
-iriscli gov query-deposits --chain-id=<chain-id> --proposal-id=1
+iriscli gov query-deposits --chain-id=<chain-id> --proposal-id=<proposal-id>
 ```
 
-你可以查询到指定提议的所有保证金代币，包括每个存款人的充值详情。
+你可以查询到指定提议的所有保证金代币，包括每个抵押人的保证金详情。
 
 ```txt
 [

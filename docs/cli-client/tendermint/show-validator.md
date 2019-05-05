@@ -2,12 +2,12 @@
 
 ## Description
 
-Show the bech32 encoded public key of your validator, with hrp of `icp`, which derives from private_key.json in {irishome}/config
+Show the bech32 encoded public key of your validator, with hrp of `icp`, which derives from private_key.json in <path_to_your_home>/config
 
 ## Usage
 
 ```
-iris tendermint show-validator [flags]
+iris tendermint show-validator <flags>
 ```
 
 ## Flags
@@ -30,12 +30,12 @@ iris tendermint show-validator [flags]
 
 ### Show Public Key of Your Node
 
-```shell
-iris tendermint show-validator --home={iris-home}
+```
+iris tendermint show-validator --home=<path_to_your_home>
 ```
 
 The sample output could be:
-```$xslt
+```
 icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
 ```
 

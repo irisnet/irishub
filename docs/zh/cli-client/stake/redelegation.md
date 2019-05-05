@@ -2,13 +2,14 @@
 
 ## 描述
 
-基于委托者地址，原源验证者地址和目标验证者地址的重新委托记录查询 
+基于委托者地址，原验证者地址和目标验证者地址的转委托记录查询 
 
 ## 用法
 
 ```
-iriscli stake redelegation [flags]
+iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake redelegation --help
@@ -18,19 +19,18 @@ iriscli stake redelegation --help
 
 | 名称, 速记                  | 默认值                      | 描述                                                                | 必需     |
 | -------------------------- | -------------------------- | ------------------------------------------------------------------- | -------- | 
-| --address-delegator        |                            | [string] 委托者bech地址                                              | Yes      |
-| --address-validator-dest   |                            | [string] 目标验证者bech地址                                          | Yes      |
-| --address-validator-source |                            | [string] 源验证者bech地址                                            | Yes      |
+| --address-delegator        |                            | 委托者bech地址                                              | Yes      |
+| --address-validator-dest   |                            | 目标验证者bech地址                                          | Yes      |
+| --address-validator-source |                            | 源验证者bech地址                                            | Yes      |
 
 ## 示例
 
-查询重新委托记录
+查询转委托记录
 ```
-iriscli stake redelegation --address-validator-source=SourceValidatorAddress --address-validator-dest=DestinationValidatorAddress --address-delegator=DelegatorAddress
+iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
 ```
 
 运行成功以后，返回的结果如下：
-
 ```txt
 Redelegation
 Delegator: iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9gtd2ft

@@ -6,13 +6,13 @@
 
 为了搭建哨兵节点，首先我们需要初始化一些全节点。执行以下命令创建一个全节点(建议在多台不同的服务器上创建多个哨兵节点以提高可用性和安全性)
 ```
-iris  init --moniker=<your name> --home=<sentry home>
+iris init --moniker=<sentry name> --home=<sentry home>
 ```
 `<sentry home>`是你指定的哨兵节点的地址。示例：
 ```
-iris init --moniker="sentry" --home=sentry
+iris init --moniker=<sentry name> --home=<sentry name>
 {
-  "chain_id": "test-chain-hfuDmL",
+  "chain_id": "test-chain",
   "node_id": "937efdf8526e3d9e8b5e887fa953ff1645cc096d",
   "app_message": {
     "secret": "issue envelope dose rail busy glass treat crop royal resemble city deer hungry govern cable angle cousin during mountain december spare stick unveil great"
@@ -25,10 +25,10 @@ iris init --moniker="sentry" --home=sentry
 
 然后将验证人节点中的genesis.json文件复制到 `<sentry home>/config/`目录下。接下来对`<sentry home>/config/`目录下的config.toml进行编辑。需要进行如下修改：
 ```
-private_peer_ids ="validator_node_id"
+private_peer_ids =<validator_node_id>
 ```
 
-这里的`<validator node id>`可以在验证人节点上使用iriscli status命令获得。经过这样设置之后然后使用
+这里的`<validator_node_id>`可以在验证人节点上使用iriscli status命令获得。经过这样设置之后然后使用
 
 ```
 iris start --home=<sentry home>
@@ -41,7 +41,8 @@ iris start --home=<sentry home>
 接下来需要对验证人节点的`<validator home>/config/`目录下的config.toml进行修改：
 
 ```
-persistent_peers="sentry node id@sentry listen address:port" 
+persistent_peers = <sentry node id@sentry listen address:port">
+persistent_peers = "bccb80864e540af719fa1be6ae913ce50a74feaf@ip:26656" 
 ```
 
 这里只写sentry节点的node id和地址，多个哨兵节点的信息使用逗号分开。port的默认值为26656。

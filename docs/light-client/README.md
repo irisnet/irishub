@@ -11,8 +11,8 @@ IRISLCD has two subcommands:
 
 | subcommand      | Description                 | Example command |
 | --------------- | --------------------------- | --------------- |
-| version         | Print the IRISLCD version   | irislcd version |
-| start           | Start a IRISLCD node        | irislcd start --chain-id=`<chain-id>` |
+| version         | Print the IRISLCD version   |  `irislcd version` |
+| start           | Start an IRISLCD node        | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
 
 `start` subcommand has these options:
 
@@ -40,18 +40,20 @@ irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
 
 ## REST APIs
 
-Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui· page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and briedly introduce their functionality.
+Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui` page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and introduce their functionality briefly.
 
-1. Tendermint APIs, such as query blocks, transactions and validatorset
+1. Tendermint APIs, such as query blocks, transactions and validator set
     1. `GET /node_info`: The properties of the connected node
     2. `GET /syncing`: Syncing state of node
     3. `GET /blocks/latest`: Get the latest block
     4. `GET /blocks/{height}`: Get a block at a certain height
-    5. `GET /validatorsets/latest`: Get the latest validator set
-    6. `GET /validatorsets/{height}`: Get a validator set a certain height
-    7. `GET /txs/{hash}`: Get a Tx by hash
-    8. `GET /txs`: Search transactions
-    9. `POST /txs`: Broadcast Tx
+    5. `GET /blocks-result/latest`: Get the latest block result
+    6. `GET /blocks-result/{height}`: Get a block result at a certain height
+    7. `GET /validatorsets/latest`: Get the latest validator set
+    8. `GET /validatorsets/{height}`: Get a validator set at a certain height
+    9. `GET /txs/{hash}`: Get a Tx by hash
+    10. `GET /txs`: Search transactions
+    11. `POST /txs`: Broadcast Tx
 
 2. Key management APIs
 
@@ -66,7 +68,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 
 3. Create, sign and broadcast transactions
 
-    1. `POST /tx/sign`: Sign a transation
+    1. `POST /tx/sign`: Sign a transaction
     2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
     3. `POST /txs/send`: Send non-amino encoding transaction
     4. `GET /bank/coin/{coin-type}`: Get coin type
@@ -85,19 +87,20 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     6. `GET /stake/delegators/{delegatorAddr}/redelegations`: Get all redelegations from a delegator
     7. `GET /stake/delegators/{delegatorAddr}/validators`: Query all validators that a delegator is bonded to
     8. `GET /stake/delegators/{delegatorAddr}/validators/{validatorAddr}`: Query a validator that a delegator is bonded to
-    9. `GET /stake/delegators/{delegatorAddr}/txs` :Get all staking txs (i.e msgs) from a delegator
+    9. `GET /stake/delegators/{delegatorAddr}/txs` :Get all staking txs from a delegator
     10. `GET /stake/delegators/{delegatorAddr}/delegations/{validatorAddr}`: Query the current delegation between a delegator and a validator
     11. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}`: Query all unbonding delegations between a delegator and a validator
     12. `GET /stake/validators`: Get all validator candidates
     13. `GET /stake/validators/{validatorAddr}`: Query the information from a single validator
-    14. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: Get all unbonding delegations from a validator
-    15. `GET /stake/validators/{validatorAddr}/redelegations`: Get all outgoing redelegations from a validator
-    16. `GET /stake/pool`: Get the current state of the staking pool
-    17. `GET /stake/parameters`: Get the current staking parameter values
+    14. `GET /stake/validators/{validatorAddr}/delegations`:  Get all delegations from a validator
+    15. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: Get all unbonding delegations from a validator
+    16. `GET /stake/validators/{validatorAddr}/redelegations`: Get all outgoing redelegations from a validator
+    17. `GET /stake/pool`: Get the current state of the staking pool
+    18. `GET /stake/parameters`: Get the current staking parameter values
 
 5. Governance module APIs
 
-    1. `POST /gov/proposal`: Submit a proposal
+    1. `POST /gov/proposals`: Submit a proposal
     2. `GET /gov/proposals`: Query proposals
     3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
     4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
@@ -106,7 +109,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     7. `GET /gov/proposals/{proposalId}`: Query a proposal
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
-    10. `GET/gov/params`: Query governance parameters
+    10. `GET /gov/params`: Query governance parameters
 
 6. Slashing module APIs
     1. `GET /slashing/validators/{validatorPubKey}/signing_info`: Get sign info of given validator
@@ -116,12 +119,31 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 
     1. `POST /distribution/{delegatorAddr}/withdrawAddress`: Set withdraw address
     2. `GET /distribution/{delegatorAddr}/withdrawAddress`: Query withdraw address
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw address
+    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw reward
     4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: Query distribution information for a delegation
     5. `GET /distribution/{delegatorAddr}/distrInfos`: Query distribution information list for a given delegator
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: Query withdraw address
+    
+8. Service module APIs
 
-8. Query app version
+    1. `POST /service/definition`: Add a service definition
+    2. `GET /service/definition/{defChainId}/{serviceName}`: Query service definition
+    3. `POST /service/binding`: Add a service binding
+    4. `GET /service/binding/{defChainId}/{serviceName}/{bindChainId}/{provider}`: Query service binding
+    5. `GET /service/bindings/{defChainId}/{serviceName}`: Query service binding list
+    6. `PUT /service/binding/{defChainId}/{serviceName}/{provider}`: Update a service binding
+    7. `PUT /service/binding/{defChainId}/{serviceName}/{provider}/disable`: Disable service binding
+    8. `PUT /service/binding/{defChainId}/{serviceName}/{provider}/enable`: Enable service binding
+    9. `PUT /service/binding/{defChainId}/{serviceName}/{provider}/deposit/refund`: Refund deposit from a service binding
+    10. `POST /service/request`: Call service
+    11. `GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}`: Query service requests of a provider
+    12. `POST /service/response`: Respond service call
+    13. `GET /service/response/{reqChainId}/{reqId}`: Query service response
+    14. `GET /service/fees/{address}`:  Query service fees of a address
+    15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
+    16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
+    
+9. Query app version
 
     1. `GET /version`: Version of IRISLCD
     2. `GET /node_version`: Version of the connected node
@@ -133,7 +155,7 @@ These apis are picked out from above section. And they can be used to build and 
 2. `POST /stake/delegators/{delegatorAddr}/delegate`: Submit delegation transaction
 3. `POST /stake/delegators/{delegatorAddr}/redelegate`: Submit redelegation transaction
 4. `POST /stake/delegators/{delegatorAddr}/unbond`: Submit unbonding transaction
-5. `POST /gov/proposal`: Submit a proposal
+5. `POST /gov/proposals`: Submit a proposal
 6. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
 7. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
 8. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
@@ -142,7 +164,7 @@ They all support the these special query parameters below. By default, their val
 
 | parameter name   | Type | Default | Priority | Description                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
-| generate-only   | bool | false | 0 | Build an unsigned transaction and write it back |
+| generate-only   | bool | false | 0 | Build an unsigned transaction and return it back |
 | simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
 | commit          | bool | false | 2 | Wait for transaction being included in a block   |
 | async           | bool | false | 3 | Broadcast transaction asynchronously   |

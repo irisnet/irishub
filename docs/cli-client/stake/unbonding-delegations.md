@@ -7,8 +7,9 @@ Query all unbonding-delegations records for one delegator
 ## Usage
 
 ```
-iriscli stake unbonding-delegations [delegator-address] [flags]
+iriscli stake unbonding-delegations <delegator-address> <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake unbonding-delegations --help
@@ -16,12 +17,12 @@ iriscli stake unbonding-delegations --help
 
 ## Examples
 
-Query an unbonding-delegation
+Query unbonding-delegations
 ```
-iriscli stake unbonding-delegations [delegator-address]
+iriscli stake unbonding-delegations <delegator-address>
 ```
 
-After that, you will get unbonding delegation's detailed info from specified delegator.
+After that, you will get all unbonding delegations' detailed info for one delegator
 
 ```json
 [

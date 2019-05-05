@@ -1,8 +1,8 @@
 # Key
 
-## 关于分层确定性钱包的说明
+## 关于分层确定性钱包(HD wallet)的说明
 
-分层确定性钱包是一种特殊的钱包，最初在比特币的[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)中详细说明，允许用户从单个种子中获取任意数量的帐户。让我们首先定义一些术语便于更好的理解：
+分层确定性钱包(HD wallet)是一种特殊的钱包，最初在比特币的[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)中详细说明，允许用户从单个种子中获取任意数量的帐户。让我们首先定义一些术语便于更好的理解：
 
 - **钱包**: 从给定种子获得的帐户集合。
 - **账号**: 一组公私钥对。 
@@ -56,7 +56,7 @@
 
 ## IRISnet key
 
-IRISnet钱包是基于[BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)的分层确定性钱包。BIP44基于[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)中描述的算法定义确定性钱包的逻辑层次结构，该算法允许处理多个硬币，多个帐户，每个帐户的外部和内部链以及每个链的数百万个地址，例如比特币和以太坊。
+IRISnet钱包是基于[BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)的分层确定性钱包。BIP44基于[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)中描述的算法定义确定性钱包的逻辑层次结构，该算法允许处理多种代币，多个帐户，每个帐户的外部和内部链以及每个链的数百万个地址，例如比特币和以太坊。
 
 BIP44在BIP32路径中定义以下5个级别：
 ```

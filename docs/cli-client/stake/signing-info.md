@@ -7,8 +7,9 @@ Query a validator's signing information
 ## Usage
 
 ```
-iriscli stake signing-info [validator-pubkey] [flags]
+iriscli stake signing-info <validator-pubkey> <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake signing-info --help
@@ -19,7 +20,7 @@ iriscli stake signing-info --help
 ### Query specified validator's signing information
 
 ```
-iriscli stake signing-info [validator-pubkey]
+iriscli stake signing-info <validator-pubkey>
 ```
 
 After that, you will get specified validator's signing information.

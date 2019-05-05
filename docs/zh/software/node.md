@@ -2,9 +2,9 @@
 
 ## 介绍
 
-iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris命令并启动守护进程来加入到IRISnet网络。
+iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点和其他全节点都需要通过安装iris，并启动守护进程来加入到IRISnet网络。你也可以使用iris在本地启动自己的测试网络。
 
-## 如何安装IRIShub
+## 如何安装`iris`
 请根据以下[教程](How-to-install-irishub.md)完成安装。
 
 ## 如何在本地启动一个IRISnet网络
@@ -13,7 +13,7 @@ iris可执行文件是运行IRISnet网络节点的入口，包括验证人节点
 
 首先需要为自己创建对应的验证人账户
 ```bash
-iriscli keys add {account_name}
+iriscli keys add <account_name>
 ```
 得到账户信息，包括账户地址、公钥地址、助记词
 ```
@@ -27,47 +27,49 @@ witness exotic fantasy gaze brass zebra adapt guess drip quote space payment far
 
 初始化genesis.json和config.toml等配置文件
 ```bash
-iris init --home={path_to_your_home} --chain-id={your_chain_id} --moniker={your node name}
+iris init --home=<path_to_your_home> --chain-id=<chain_id> --moniker=<node_name>
 ```
 该命令会在home目录下创建相应文件
 
 创建申请成为验证人的交易，并使用刚才创建的验证人账户对交易进行签名
 ```bash
-iris gentx --name={account_name} --home={path_to_your_home}
+iris gentx --name=<account_name> --home=<path_to_your_home>
 ```
-生成好的交易数据存放在目录：{path_to_your_home}/config/gentx
+生成好的交易数据存放在目录：<path_to_your_home>/config/gentx
 
 ### 配置genesis
 
 使用下面命令修改genesis.json文件，为上述验证人账户分配初始账户余额，如：150个iris
 ```bash
-iris add-genesis-account iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp 150iris
+iris add-genesis-account iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp 150iris --home=<path_to_your_home>
 ```
 
 ```json
     {
-      "accounts": [
-        {
-          "address": "iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp",
-          "coins": ["150iris"],
-          "sequence_number": "0",
-          "account_number": "0"
-        }
-      ]
+        "accounts": [
+              {
+                "address": "iaa13t6jugwm5uu3h835s5d4zggkklz6rpnsv2spjp",
+                "coins": [
+                  "150000000000000000000iris-atto"
+                ],
+                "sequence_number": "0",
+                "account_number": "0"
+              }
+            ]
     }
 ```
 
 配置验证人信息
 ```bash
-iris collect-gentxs --home={path_to_your_home}
+iris collect-gentxs --home=<path_to_your_home>
 ```
-该命令读取 {path_to_your_home}/config/gentx 下的 `CreateValidator` 交易，并将其写入到genesis.json中，完成在创世块中对初始验证人的指定。
+该命令读取 <path_to_your_home>/config/gentx 下的 `CreateValidator` 交易，并将其写入到genesis.json中，完成在创世块中对初始验证人的指定。
 
 ### 启动节点
 
 完成上述配置后，通过以下命令启动全节点。 
 ```bash
-iris start --home {path_to_your_home}
+iris start --home=<path_to_your_home>
 ```
 该命令执行后，iris使用home下面所配置的genesis.json来生成创世区块并更新应用状态，后续根据chain-id所指链的当前区块高度，要么开始和其他peer同步区块，要么进入等待首次出块的流程。
 
@@ -80,9 +82,15 @@ iris start --home {path_to_your_home}
 * 配置genesis：选择其中一个节点的home目录来配置genesis，参考`配置genesis`步骤，把各个节点的账户地址和初始余额配置进来，再把各个节点{path_to_your_home}/config/gentx下的文件拷贝到当前节点的{path_to_your_home}/config/gentx目录下，然后执行`iris collect-gentxs`来生成最终genesis.json，最后把该genesis.json拷贝到各个节点的home目录下，覆盖原有genesis.json
 * 配置config.toml：修改各个节点home目录下的{path_to_your_home}/config/config.toml，为各个节点分配不同的端口，通过`iris tendermint show-node-id`查询各个节点的node-id，然后在`persistent_peers`中加入其它节点的`node-id@ip:port`，使得节点之间能够相互连接
 
-为了简化上面的配置流程，可以使用下面命令来自动完成本地多节点的初始化和genesis、config的配置：
+为了简化上面的配置流程，可以使用下面命令来自动完成本地多节点的初始化和genesis、config的配置：(2个节点为例)
 ```bash
-iris testnet --v 4 --output-dir ./output --chain-id irishub-test --starting-ip-address 127.0.0.1
+iris testnet --v=2 --output-dir=<path_to_your_home> --chain-id=<chain-id> --starting-ip-address 127.0.0.1
+```
+配置node1的端口：修改node1节点home目录下的<path_to_your_home>/node0/iris/config/config.toml，为其分配不同的端口。
+分别启动2个节点：
+```bash
+iris start --home=<path_to_your_home>/node0/iris
+iris start --home=<path_to_your_home>/node1/iris
 ```
 
 启动节点加入公共测试网络Testnet的方法可参阅[Full-Node](../get-started/Full-Node.md)
@@ -99,7 +107,7 @@ home的`data`目录下存放iris节点运行的数据，包括区块链数据、
 
 ### genesis.json
 
-genesis.json为创世块数据，指定了chain_id、共识参数、初始账户代币分配、创建验证人、stake/slashing/gov/upgrade等系统参数。详见[genesis-file](../features/basic-concepts/genesis-file.md)
+genesis.json为创世块数据，指定了chain_id、共识参数、初始账户代币分配、创建验证人、stake/slashing/gov/distr/guardian/mint/upgrade等系统参数。详见[genesis-file](../features/basic-concepts/genesis-file.md)
 
 ### node_key.json
 
@@ -112,3 +120,6 @@ pri_validator.json为验证人在每一轮出块共识投票中对Pre-vote/Pre-c
 ### config.toml
 
 config.toml为该节点的非共识的配置信息，不同节点可根据自己的情况自行配置。常见修改项有`persistent_peers`/`moniker`/`laddr`等。
+
+### iris.toml
+iris.toml为IRIShub提供一些特别的配置，如invariant验证，iris流水跟踪记录等配置。

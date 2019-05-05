@@ -7,8 +7,9 @@
 ## 用法
 
 ```
-iriscli stake pool [flags]
+iriscli stake pool <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake pool --help

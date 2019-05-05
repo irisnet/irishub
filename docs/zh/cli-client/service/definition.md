@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli service definition [flags]
+iriscli service definition <flags>
 ```
 
 ## 标志
@@ -23,7 +23,7 @@ iriscli service definition [flags]
 ### 查询服务定义
 
 ```shell
-iriscli service definition --def-chain-id=test --service-name=test-service
+iriscli service definition --def-chain-id=<service_define_chain_id> --service-name=<service_name>
 ```
 
 运行成功以后，返回的结果如下:

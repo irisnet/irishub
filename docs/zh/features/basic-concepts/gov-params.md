@@ -8,14 +8,16 @@
 | key |描述 | 有效范围|
 |----| ---|---|
 |`auth/gasPriceThreshold`  |最小的gas单价|(0, 10^18iris-atto]
-|`auth/txSizeLimit`  |常交易大小限制 |[500, 1500]
+|`auth/txSizeLimit`  |普通交易大小限制 |[500, 1500]
 
 ## Stake模块可治理参数
 
 | key |描述 | 有效范围|
 |----| ---|---|
-|`stake/MaxValidators`|  最多验证人数目|[100, 200]
+|`stake/MaxValidators`|  验证人的最大数量|[100, 200]
 |`stake/UnbondingTime`|  解绑时间|[2week,)
+
+Details in [distribution](../stake.md)
 
 ## Distribution模块可治理参数
 | key |描述 | 有效范围|
@@ -31,6 +33,8 @@ Details in [distribution](../distribution.md)
 | key |描述 | 有效范围|
 |----| ---|---|
 |`mint/Inflation` | 通胀系数 |[0,0.2]
+
+Details in [distribution](../mint.md)
 
 ## Slashing模块可治理参数
 

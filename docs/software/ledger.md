@@ -26,7 +26,7 @@ Next, click [here](#using-a-ledger-device) to learn how to generate an account.
 
 ## Creating an account
 
-To create an account, you just need to have `iriscli` installed. Before creating it, you need to know where you intend to store and interract with your private keys. The best options are to store them in an offline dedicated computer or a ledger device. Storing them on your regular online computer involves more risk, since anyone who infiltrates your computer through the internet could exfiltrate your private keys and steal your funds.
+To create an account, you just need to have `iriscli` installed. Before creating it, you need to know where you intend to store and interact with your private keys. The best options are to store them in an offline dedicated computer or a ledger device. Storing them on your regular online computer involves more risk, since anyone who infiltrates your computer through the internet could exfiltrate your private keys and steal your funds.
 
 #### Using a ledger device
 

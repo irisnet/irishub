@@ -7,15 +7,15 @@
 ## 用法
 
 ```
-iriscli tendermint txs [flags]
+iriscli tendermint txs <flags>
 ```
 
 ## 标志
 
 | 名称，速记 | 默认值              |功能介绍                                                             | 是否必填     |
 | --------------- | -------------------- | --------------------------------------------------------- | -------- |
-| --chain-id      | ""                   | 区块链网络ID   | yes     |
-| --node string   | tcp://localhost:26657| 节点查询rpc接口|
+| --chain-id      | ""                   | 区块链Chain ID   | yes     |
+| --node          | tcp://localhost:26657| 节点查询rpc接口|
 | --help, -h      |                      | 帮助信息 |    |
 | --trust-node    | true                 | 是否信任查询节点     |          |
 | --tags          | ""                   | 匹配条件     |          |
@@ -27,7 +27,7 @@ iriscli tendermint txs [flags]
 ### 查询交易
 
 ```shell
-iriscli tendermint txs --tags `action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node=true
+iriscli tendermint txs --tags `action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node
 ```
 
 示例结果：
