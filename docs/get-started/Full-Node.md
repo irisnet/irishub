@@ -11,7 +11,7 @@ First, initialize the node and create the necessary config files:
 ```
 iris init --moniker=<your_custom_name> --home=<iris_home> --chain-id=<chain_id>
 ```
-
+> The chain-id of mainnet is `irishub`
 > Note: Only ASCII characters are supported for the `--moniker`. Using Unicode characters will render your node unreachable.
 
 The default <iris_home> is `~/.iris` , You can edit this `moniker` later in `~/.iris/config/config.toml`.

@@ -7,21 +7,22 @@ Disable a available service binding
 ## Usage
 
 ```
-iriscli service disable [flags]
+iriscli service disable <flags>
 ```
 
 ## Flags
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | [string] the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --service-name        |                         | [string] service name                                                                                                                                 |  Yes     |
+| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
+| --service-name        |                         | service name                                                                                                                                 |  Yes     |
 
 ## Examples
 
 ### Disable a available service binding
+
 ```shell
-iriscli service disable --chain-id=<chain-id>  --from=node0 --fee=0.3iris --def-chain-id=<chain-id> --service-name=test-service
+iriscli service disable --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --def-chain-id=<service_define_chain_id> --service-name=<service>
 ```
 
 After that, you're done with disabling a available service binding.

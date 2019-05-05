@@ -7,7 +7,7 @@ Query all the rewards of validator or delegator
 ## Usage
 
 ```
-iriscli distribution rewards <address> [flags]
+iriscli distribution rewards <address> <flags>
 ```
 
 Print help messages:
@@ -20,6 +20,7 @@ iriscli distribution rewards --help
 ```
 iriscli distribution rewards <address>
 ```
+
 Example response:
 ```json
 {

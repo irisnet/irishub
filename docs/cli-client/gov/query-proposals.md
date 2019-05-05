@@ -7,7 +7,7 @@ Query proposals with optional filters
 ## Usage
 
 ```
-iriscli gov query-proposals [flags]
+iriscli gov query-proposals <flags>
 ```
 
 
@@ -21,10 +21,10 @@ iriscli gov query-proposals --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --depositor     |                            | [string] (optional) Filter by proposals deposited on by depositor                                                                                    |          |
-| --limit         |                            | [string] (optional) Limit to latest [number] proposals. Defaults to all proposals                                                                    |          |
-| --status        |                            | [string] (optional) filter proposals by proposal status                                                                                                        |          |
-| --voter         |                            | [string] (optional) Filter by proposals voted on by voted                                                                                            |          |
+| --depositor     |                            | Filter by proposals deposited on by depositor                                                                                    |  false     |
+| --limit         |                            | Limit to latest [number] proposals. Default to all proposals                                                                    |    false      |
+| --status        |                            | filter proposals by proposal status                                                                                                        |    false      |
+| --voter         |                            | Filter by proposals voted on by voted                                                                                            |     false     |
 
 ## Examples
 
@@ -51,4 +51,9 @@ Finally, here shows the proposal who's depositor address is iaa14q5rf9sl2dqd2uxr
 
 ```txt
   2 - new proposal
+```
+
+Query latest 3 proposals
+```shell
+iriscli gov query-proposals --chain-id=<chain-id> --limit=3
 ```

@@ -3,10 +3,11 @@
 ## Description
 
 This command is used for burning tokens from specified address. Anyone can send this transaction type. 
+
 ## Usage:
 
 ```
-iriscli bank burn --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
+iriscli bank burn --from=<key_name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
 ## Flags
@@ -19,13 +20,11 @@ iriscli bank burn --from <key name> --fee=0.3iris --chain-id=<chain-id> --amount
 ## Examples
 
 ### Burn token 
-
 ```
- iriscli bank burn --from=test  --fee=0.3iris --chain-id=<chain-id> --amount=10iris --commit
+ iriscli bank burn --from=<key_name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris
 ```
 
-After that, you will get the detail info for the send
-
+After that, you will get the following detail info:
 ```
 [Committed at block 87 (tx hash: AEA8E49C1BC9A81CAFEE8ACA3D0D96DA7B5DC43B44C06BACEC7DCA2F9C4D89FC, response:
   {
@@ -42,11 +41,4 @@ After that, you will get the detail info for the send
       "burnAmount": "10iris"
     }
   })
-```
-### Common Issues
-
-* Wrong password
-
-```$xslt
-ERROR: Ciphertext decryption failed
 ```

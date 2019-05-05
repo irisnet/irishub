@@ -2,12 +2,12 @@
 
 ## 描述
  
-充值保证金以激活提议
+抵押保证金以激活提议
  
 ## 使用方式
  
 ```
-iriscli gov deposit [flags]
+iriscli gov deposit <flags>
 ```
 
 打印帮助信息:
@@ -21,18 +21,16 @@ iriscli gov deposit --help
  
 | 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --deposit        |                            | [string] 发起提议的保证金                                                                                                                         | Yes      |
-| --proposal-id    |                            | [string] 充值保证金的提议ID                                                                                                        | Yes      |
+| --deposit        |                            | 发起提议的保证金                                                                                                                         | Yes      |
+| --proposal-id    |                            | 抵押保证金的提议ID                                                                                                        | Yes      |
 
 ## 例子
 
-### 充值保证金
+### 抵押保证金
 
 ```shell
-iriscli gov deposit --chain-id=<chain-id> --proposal-id=1 --deposit=50iris --from=node0 --fee=0.3iris
+iriscli gov deposit --chain-id=<chain-id> --proposal-id=<proposal-id> --deposit=50iris --from=<key_name> --fee=0.3iris
 ```
-
-输入正确的密码后，你就充值了50个iris用以激活提议的投票状态。
 
 ```txt
 Committed at block 7 (tx hash: C1156A7D383492AE5C2EB1BADE0080C3A36BE8AED491DC5B2331056BED5D60DC, response:
@@ -53,9 +51,14 @@ Committed at block 7 (tx hash: C1156A7D383492AE5C2EB1BADE0080C3A36BE8AED491DC5B2
  })
 ```
 
-如何查询保证金充值明细？
+当所有的抵押金额超过该提议类型的最小抵押额`MinDeposit`，提议将进入投票阶段
 
-请点击下述链接：
+| GovParams | Critical | Important | Normal |
+| ------ | ------ | ------ | ------|
+| MinDeposit | 4000 iris | 2000 iris | 1000 iris |
+
+
+### 如何查询抵押保证金
 
 [query-deposit](query-deposit.md)
 

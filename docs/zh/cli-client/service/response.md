@@ -7,23 +7,25 @@
 ## 用法
 
 ```
-iriscli service response [flags]
+iriscli service response <flags>
 ```
 
 ## 标志
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | [string] 发起该服务调用的区块链ID                                                                                              | 是       |
-| --request-id          |                         | [string] 该服务调用的ID                                                                                                                                | 是       |
+| --request-chain-id    |                         | 发起该服务调用的区块链ID                                                                                              | 是       |
+| --request-id          |                         | 该服务调用的ID                                                                                                                                | 是       |
 | -h, --help            |                         | 查询响应命令帮助                                                                                                                                         |          |
 
 ## 示例
 
 ### 查询服务响应
+
 ```shell
-iriscli service response --request-chain-id=test --request-id=635-535-0
+iriscli service response --request-chain-id=<request_chain_id> --request-id=<request-id>
 ```
+>  `request-id` 可以从[service call](call.md)的返回中得到。
 
 运行成功以后，返回的结果如下:
 

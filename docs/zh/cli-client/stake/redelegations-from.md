@@ -2,13 +2,14 @@
 
 ## 描述
 
-基于某一验证者的所有重新委托查询
+基于某一验证者的所有转委托查询
 
 ## 用法
 
 ```
-iriscli stake redelegations-from [validator-address] [flags]
+iriscli stake redelegations-from <validator-address> <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake redelegations-from --help
@@ -18,11 +19,10 @@ iriscli stake redelegations-from --help
 
 基于某一验证者的所有重新委托查询
 ```
-iriscli stake redelegations-from [validator-address]
+iriscli stake redelegations-from <validator-address> 
 ```
 
 运行成功以后，返回的结果如下：
-
 ```json
 [
   {

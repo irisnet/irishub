@@ -7,26 +7,27 @@
 ## 用法
 
 ```
-iriscli stake delegation [flags]
+iriscli stake delegation --address-validator=<address-validator> --address-delegator=<address-delegator>
 ```
+
 打印帮助信息
 ```
 iriscli stake delegation --help
 ```
+
 ## 特有的flags
 
 | 名称, 速记             | 默认值                      | 描述                                                                 | 必需     |
 | --------------------- | -------------------------- | -------------------------------------------------------------------- | -------- |
-| --address-delegator   |                            | [string] 委托者bech地址                                               | Yes      |
-| --address-validator   |                            | [string] 验证者bech地址                                               | Yes      |
+| --address-delegator   |                            |委托者bech地址                                               | Yes      |
+| --address-validator   |                            |验证者bech地址                                               | Yes      |
 
 ## 示例
 
-### 查询验证者
+### 查询委托交易
 
 ```
 iriscli stake delegation --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-delegator=iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
-
 ```
 
 运行成功以后，返回的结果如下：

@@ -8,7 +8,7 @@ Get the full tendermint validator set at given height. If no height is specified
 ## Usage
 
 ```
-  iriscli tendermint validator-set [height] [flags]
+  iriscli tendermint validator-set <height> <flags>
 ```
 or
 ```
@@ -20,7 +20,7 @@ or
 | Name, shorthand | Default                    |Description                                                             | Required     |
 | --------------- | -------------------------- | --------------------------------------------------------- | -------- |
 | --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to (default "tcp://localhost:26657")  |                                     
+| --node string     |   tcp://localhost:26657                         | Node to connect to |                                     
 | --help, -h      |       | 	help for block|    |
 | --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
 
@@ -29,21 +29,20 @@ or
 ### Get validator-set at height 114360
 
 ```shell
- iriscli tendermint validator-set 114360 --chain-id=<chain-id> --trust-node=true
-
+ iriscli tendermint validator-set 114360 --chain-id=<chain-id> --trust-node
 ```
 
 ### Get the latest validator-set
 
 ```shell
- iriscli tendermint validator-set --chain-id=<chain-id> --trust-node=true
+ iriscli tendermint validator-set --chain-id=<chain-id> --trust-node
 
 ```
 You will get the following result.
 
 ```json
 {
-  "block_height": "113",
+  "block_height": "114360",
   "validators": [
     {
       "address": "ica1q9zpqvm7cadx5walcg5jkdxklayr8c2uqtmzmx",

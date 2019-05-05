@@ -7,8 +7,9 @@
 ## 用法
 
 ```
-iriscli stake validator [validator-address] [flags]
+iriscli stake validator <validator-address> <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake validator --help
@@ -18,11 +19,10 @@ iriscli stake validator --help
 
 查询验证者
 ```
-iriscli stake validator [validator-address]
+iriscli stake validator <validator-address>
 ```
 
 运行成功以后，返回的结果如下：
-
 ```txt
 Validator
 Operator Address: iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs

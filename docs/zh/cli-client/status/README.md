@@ -7,7 +7,7 @@
 ## 用法
 
 ```shell
-iriscli status [flags]
+iriscli status <flags>
 ```
 
 ## 标志
@@ -15,7 +15,7 @@ iriscli status [flags]
 | 名称, 速记             | 默认值                | 描述                                | 必需     |
 | --------------------- | --------------------- | ----------------------------------- | -------- |
 | --help, -h            |                       | 状态命令帮助                         |          |
-| --node, -n            | tcp://localhost:26657 | [string] 连接的节点                  |          |
+| --node, -n            | tcp://localhost:26657 | Tendermint节点的rpc地址              |          |
 
 ## 例子
 

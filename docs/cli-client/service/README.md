@@ -6,7 +6,7 @@ Service allows you to define、bind、invocate a service on chain.
 ## Usage
 
 ```shell
-iriscli service [command]
+iriscli service <command>
 ```
 
 ## Available Commands

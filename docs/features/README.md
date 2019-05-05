@@ -1,7 +1,7 @@
 # Features
 
 ## Bank
-[Spec](bank.md)
+[Bank](bank.md)
 ## Stake
 [Stake](stake.md)
 ## Service
@@ -16,5 +16,5 @@
 ## Mint
 [Mint](mint.md)
 
-##Upgrade
+## Upgrade
 [Upgrade](upgrade.md)

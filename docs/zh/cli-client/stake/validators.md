@@ -7,8 +7,9 @@
 ## 用法
 
 ```
-iriscli stake validators [flags]
+iriscli stake validators <flags>
 ```
+
 打印帮助信息
 ```
 iriscli stake validators --help
@@ -16,7 +17,7 @@ iriscli stake validators --help
 
 ## 示例
 
-查询验证者
+查询所有验证者
 ```
 iriscli stake validators
 ```

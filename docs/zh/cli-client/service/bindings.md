@@ -7,15 +7,15 @@
 ## 用法
 
 ```
-iriscli service bindings [flags]
+iriscli service bindings <flags>
 ```
 
 ## 标志
 
 | Name, shorthand | Default                    | Description                                            | Required |
 | --------------- | -------------------------- | ------------------------------------------------------ | -------- |
-| --def-chain-id  |                            | [string] 定义该服务的区块链ID                             | 是        |
-| --service-name  |                            | [string] 服务名称                                       | 是        |
+| --def-chain-id  |                            | 定义该服务的区块链ID                             | 是        |
+| --service-name  |                            | 服务名称                                       | 是        |
 | --help, -h      |                            | 查询绑定列表命令帮助                                       |          |
 
 ## 示例
@@ -23,7 +23,7 @@ iriscli service bindings [flags]
 ### 查询服务绑定列表
 
 ```shell
-iriscli service bindings --def-chain-id=test --service-name=test-service
+iriscli service bindings --def-chain-id=<chain-id> --service-name=<service-name>
 ```
 
 运行成功以后，返回的结果如下:

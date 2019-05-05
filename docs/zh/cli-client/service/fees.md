@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli service fees [account address]
+iriscli service fees <service_provider_address>
 ```
 
 ## 标志
@@ -20,7 +20,7 @@ iriscli service fees [account address]
 
 ### 查询服务费
 ```shell
-iriscli service fees iaa1f02ext9duk7h3rx9zm7av0pnlegxve8npm2k6m
+iriscli service fees <service_provider_address>
 ```
 
 运行成功以后，返回的结果如下:

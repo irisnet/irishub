@@ -7,7 +7,7 @@ Search all transactions which match the given tag list
 ## Usage
 
 ```
-iriscli tendermint txs [flags]
+iriscli tendermint txs <flags>
 
 ```
 
@@ -16,8 +16,8 @@ iriscli tendermint txs [flags]
 | Name, shorthand | Default              |Description                                                             | Required     |
 | --------------- | -------------------- | --------------------------------------------------------- | -------- |
 | --chain-id      | ""                   | Chain ID of Tendermint node   | yes     |
-| --node string   | tcp://localhost:26657| Node to connect to (default "tcp://localhost:26657")  |
-| --help, -h      |                      | 	help for txs|    |
+| --node string   | tcp://localhost:26657| Node to connect to  |
+| --help, -h      |                      | Help for txs|    |
 | --trust-node    | true                 | Trust connected full node (don't verify proofs for responses)     |          |
 | --tags          | ""                   | tag:value list of tags that must match     |          |
 | --page          | 0                    | Pagination page     |          |
@@ -28,7 +28,7 @@ iriscli tendermint txs [flags]
 ### Search transactions
 
 ```shell
-iriscli tendermint txs --tags `action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node=true
+iriscli tendermint txs --tags=`action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node
 ```
 
 You will get the following result.

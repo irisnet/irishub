@@ -7,8 +7,7 @@ Search for the transaction which has the same hash in all existing blocks
 ## Usage
 
 ```
-iriscli tendermint tx [hash] [flags]
-
+iriscli tendermint tx <hash> <flags>
 ```
 
 ## Flags
@@ -16,7 +15,7 @@ iriscli tendermint tx [hash] [flags]
 | Name, shorthand | Default                    |Description                                                             | Required     |
 | --------------- | -------------------------- | --------------------------------------------------------- | -------- |
 | --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to (default "tcp://localhost:26657")  |                 
+| --node string     |   tcp://localhost:26657                         | Node to connect to  |                 
 | --help, -h      |       | 	help for tx|    |
 | --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
 
@@ -25,11 +24,10 @@ iriscli tendermint tx [hash] [flags]
 ### tx
 
 ```shell
-iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=<chain-id> --trust-node=true
+iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=<chain-id> --trust-node
 ```
 
 You will get the following result.
-
 ```
 {
   "hash": "CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7",
@@ -109,5 +107,4 @@ You will get the following result.
     ]
   }
 }
-
 ```

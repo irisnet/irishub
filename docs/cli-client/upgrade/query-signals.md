@@ -8,7 +8,7 @@ Query the current information of signals.
 
 | Name, shorthand | Default               | Description                                                                                                                                 | Required |
 | --------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------| -------- |
-| --detail        | false                 | [bool] details of signals                                                                                                                 |          |
+| --detail        | false                 | details of signals                                                                                                                 |          |
 
 ## Usage
 

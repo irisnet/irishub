@@ -7,7 +7,7 @@ Stake module provides a set of subcommands to query staking state and send staki
 ## Usage
 
 ```
-iriscli stake [subcommand] [flags]
+iriscli stake <subcommand>
 ```
 
 Print all supported subcommands and flags:
@@ -34,7 +34,7 @@ iriscli stake --help
 | [parameters](parameters.md)                                   | Query the current staking parameters information                                              |
 | [signing-info](signing-info.md)                               | Query a validator's signing information                                                       |
 | [create-validator](create-validator.md)                       | Create new validator initialized with a self-delegation to it                                 |
-| [edit-validator](edit-validator.md)                           | Edit and existing validator account                                                           |
+| [edit-validator](edit-validator.md)                           | Edit existing validator account                                                           |
 | [delegate](delegate.md)                                       | Delegate liquid tokens to an validator                                                        |
 | [unbond](unbond.md)                                           | Unbond shares from a validator                                                                |
 | [redelegate](redelegate.md)                                   | Redelegate illiquid tokens from one validator to another                                      |

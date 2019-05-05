@@ -7,7 +7,7 @@ Keys allows you to manage your local keystore for tendermint.
 ## Usage
 
 ```shell
-iriscli keys [command]
+iriscli keys <command>
 ```
 
 ## Available Commands
@@ -32,9 +32,9 @@ iriscli keys [command]
 
 | Name, shorthand | Default        | Description                            | Required |
 | --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | [string] Binary encoding (hex|b64|btc) |          |
-| --home          | $HOME/.iriscli | [string] Directory for config and data |          |
-| --output, -o    | text           | [string] Output format (text|json)     |          |
+| --encoding, -e  | hex            | Binary encoding (hex/b64/btc) |          |
+| --home          | $HOME/.iriscli | Directory for config and data |          |
+| --output, -o    | text           | Output format (text/json)     |          |
 | --trace         |                | Print out full stack trace on errors   |          |
 
 ## Extended description

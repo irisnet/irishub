@@ -2,16 +2,14 @@
 
 ## Description
 
-Query  a special  kind of token in IRISnet. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. 
+Query a special kind of token in IRISnet. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. 
 
 
 ## Usage:
 
 ```
- iriscli bank coin-type [coin_name] [flags]
-```
-
- 
+ iriscli bank coin-type <coin_name> <flags>
+``` 
 
 ## Flags
 
@@ -26,28 +24,16 @@ Query  a special  kind of token in IRISnet. The native token in IRIShub is `iris
 | --trust-node   | String | False    | True                  | Don't verify proofs for responses                            |
 
 
-
-## Global Flags
-
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
-| --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) | False    | String |
-| --home string         | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output string   | text           | Output format (text \|json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
-
 ## Examples
 
-### Query native token iris
+### Query native token `iris`
 
 ```
 iriscli bank coin-type iris
 ```
 
-After that, you will get the detail info for the native token iris
-
+After that, you will get the detail info for the native token `iris`
 ```
-[root@ce7da33d46c3 output]# iriscli bank coin-type iris
 {
   "name": "iris",
   "min_unit": {
@@ -93,7 +79,7 @@ After that, you will get the detail info for the native token iris
 
 ## Extended description
 
-Query a special token in iris network.
+Query a special token in IRISnet.
 
 ​    
 

@@ -7,27 +7,29 @@
 ## 用法
 
 ```
-iriscli service define [flags]
+iriscli service define <flags>
 ```
 
 ## 特有标志
 
 | Name, shorthand       | Default                 | Description                                                                       | Required |
 | --------------------- | ----------------------- | --------------------------------------------------------------------------------- | -------- |
-| --service-description |                         | [string] 服务的描述                                                                 |          |
-| --author-description  |                         | [string] 服务创建者的描述                                                            |          |
-| --service-name        |                         | [string] 服务名称                                                                   |   Yes    |
-| --tags                |                         | [strings] 该服务的关键字                                                             |          |
-| --idl-content         |                         | [string] 对该服务描述的接口定义语言内容                                                 |          |
-| --file                |                         | [string] 对该服务描述的接口定义语言内容的文件路径                                         |          |
+| --service-description |                         | 服务的描述                                                                 |          |
+| --author-description  |                         | 服务创建者的描述                                                            |          |
+| --service-name        |                         | 服务名称                                                                   |   Yes    |
+| --tags                |                         | 该服务的关键字                                                             |          |
+| --idl-content         |                         | 对该服务描述的接口定义语言内容                                                 |          |
+| --file                |                         | 对该服务描述的接口定义语言内容的文件路径                                         |          |
 
 ## 示例
 
 ### 创建一个新的服务定义
+
 ```shell
-iriscli service define --chain-id=<chain-id>  --from=node0 --fee=0.3iris --service-name=test-service --service-description=service-description --author-description=author-description --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
 ```
-如果文件项不是空的，将会替换Idl-content.  [IDL内容示例](#idl-content-example).
+
+如果文件项不是空的，将会替换Idl-content.  [IDL内容示例](#IDL内容示例).
 
 运行成功以后，返回的结果如下:
 
@@ -48,6 +50,7 @@ Committed at block 539 (tx hash: 9ED8B36F8DDA7745BF03E0F5271E55B6D0BC34B373BFCDB
 ```
 
 ### IDL内容示例
+
 * IDL内容示例
 
     > syntax = \\"proto3\\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output_privacy: NoPrivacy\n    //@Attribute output_cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n

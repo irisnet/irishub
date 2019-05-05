@@ -7,6 +7,7 @@
 ```
 iris init --moniker=<your_custom_name> --home=<iris_home> --chain-id=<chain_id>
 ```
+> 主网的chain-id：irishub
 
 `iris`在运行过程中所依赖的配置文件和数据会存放在<iris_home>下，所以在运行`iris`前，需要指定一个目录作为<iris_home>(默认为：`~/.iris` )。
 

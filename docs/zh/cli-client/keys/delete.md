@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli keys delete <name> [flags]
+iriscli keys delete <name> <flags>
 ```
 
 ## 标志
@@ -15,7 +15,7 @@ iriscli keys delete <name> [flags]
 | 名称, 速记       | 默认值     | 描述                                                         | 是否必须  |
 | --------------- | --------- | ------------------------------------------------------------ | -------- |
 | --help, -h      |           | 查询命令帮助                                                  |          |
-| --force, -f     |   false   | 无条件地删除密钥，而无需密码 | 否 |
+| --force, -f     |   false   | 无需密码强制删除秘钥 | 否 |
 | --yes, -y       |   false   | 删除离线或ledger密钥引用时跳过确认提示 | 否 | 
 
 ## 例子

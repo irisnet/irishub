@@ -7,23 +7,25 @@
 ## 用法
 
 ```
-iriscli service respond [flags]
+iriscli service respond <flags>
 ```
 
 ## 特有标志
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | [string] 发起该服务调用的区块链ID                                                                                              | 是       |
-| --request-id          |                         | [string] 该服务调用的ID                                                                                                                                | 是       |
-| --response-data       |                         | [string] hex编码的服务调用响应数据                                                                       |        |
+| --request-chain-id    |                         | 发起该服务调用的区块链ID                                                                                              | 是       |
+| --request-id          |                         | 该服务调用的ID                                                                                                                                | 是       |
+| --response-data       |                         | hex编码的服务调用响应数据                                                                       |        |
 
 ## 示例
 
 ### 响应一个服务调用 
+
 ```shell
-iriscli service respond --chain-id=<chain-id> --from=node0 --fee=0.3iris --request-chain-id=test --request-id=230-130-0 --response-data=abcd
+iriscli service respond --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --request-chain-id=<request_chain_id> --request-id=<request-id> --response-data=<response-data>
 ```
+>  `request-id` 可以从[service call](call.md)的返回中得到。
 
 运行成功以后，返回的结果如下:
 

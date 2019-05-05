@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli distribution delegator-distr-info [delegator address] [flags]
+iriscli distribution delegator-distr-info <delegator_address> <flags>
 ```
 
 打印帮助信息
@@ -19,8 +19,9 @@ iriscli distribution delegator-distr-info --help
 ## 示例
 
 ```
-iriscli distribution delegator-distr-info [delegator address]
+iriscli distribution delegator-distr-info <delegator_address> 
 ```
+
 执行结果示例
 ```json
 [

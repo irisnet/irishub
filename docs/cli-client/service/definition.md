@@ -7,15 +7,15 @@ Query service definition
 ## Usage
 
 ```
-iriscli service definition [flags]
+iriscli service definition <flags>
 ```
 
 ## Flags
 
 | Name, shorthand | Default                    | Description                                                         | Required |
 | --------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --def-chain-id  |                            | [string] the ID of the blockchain defined of the service            | Yes      |
-| --service-name  |                            | [string] service name                                               | Yes      |
+| --def-chain-id  |                            | the ID of the blockchain defined of the service            | Yes      |
+| --service-name  |                            | service name                                               | Yes      |
 | --help, -h      |                            | help for definition                                                 |          |
 
 ## Examples
@@ -23,10 +23,10 @@ iriscli service definition [flags]
 ### Query a service definition
 
 ```shell
-iriscli service definition --def-chain-id=<chain-id> --service-name=test-service
+iriscli service definition --def-chain-id=<service_define_chain_id> --service-name=<service_name>
 ```
 
-After that, you will get detail info for the service definition which has the specfied define chain id and service name.
+After that, you will get detail info for the service definition which has the specified define chain id and service name.
 
 ```json
 {

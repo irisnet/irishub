@@ -7,29 +7,31 @@
 ## 使用方式
 
 ```
-iriscli gov query-params [flags]
+iriscli gov query-params <flags>
 ```
+
 打印帮助信息:
 
 ```
 iriscli gov query-params --help
 ```
+
 ## 标志
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --key           |                            | [string] 参数的键名称                                                                                                                       |          |
-| --module        |                            | [string] 模块名称                                                                                                                                 |          |
+| --key           |                            | 参数的键名称                                                                                                                       |          |
+| --module        |                            | 模块名称                                                                                                                                 |          |
 
 ## 例子
  
 ### 通过module查参数
 
+可以检索得到stake模块的所有键值。
+
 ```shell
 iriscli gov query-params --module=stake
 ```
-
-可以检索得到stake模块的所有键值。
 
 ```txt
  stake/MaxValidators=100
@@ -38,14 +40,25 @@ iriscli gov query-params --module=stake
 
 ### 通过key查参数
 
+可以得到gov模块中指定键值的参数详情。
+
 ```shell
 iriscli gov query-params --key=stake/MaxValidators
 ```
-
-可以得到gov模块中指定键值的参数详情。
 
 ```txt
  stake/MaxValidators=100
 ```
 
 注意：--module和--key参数不能同时为空.
+
+### 所有可查询参数的模块
+
+```shell
+iriscli gov query-params --module=auth
+iriscli gov query-params --module=mint
+iriscli gov query-params --module=stake
+iriscli gov query-params --module=slashing
+iriscli gov query-params --module=distr
+iriscli gov query-params --module=service
+```

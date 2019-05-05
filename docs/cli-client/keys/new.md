@@ -10,7 +10,7 @@ and encrypted with the given password. The only input that is required is the en
 ## Usage
 
 ```
-iriscli keys new <name> [flags]
+iriscli keys new <name> <flags>
 ```
 
 ## Flags

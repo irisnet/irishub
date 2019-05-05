@@ -7,7 +7,7 @@ Return public details of one local key.
 ## Usage
 
 ```
-iriscli keys show <name> [flags]
+iriscli keys show <name> <flags>
 ```
 
 ## Flags
@@ -15,9 +15,9 @@ iriscli keys show <name> [flags]
 | Name, shorthand      | Default           | Description                                                    | Required |
 | -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
 | --address            |                   | output the address only (overrides --output)                   |          |
-| --bech               | acc               | [string] The Bech32 prefix encoding for a key (acc|val|cons)   |          |
+| --bech               | acc               | The Bech32 prefix encoding for a key (acc/val/cons)   |          |
 | --help, -h           |                   | help for show                                                  |          |
-| --multisig-threshold | 1                 | [uint] K out of N required signatures                          |          |
+| --multisig-threshold | 1                 | K out of N required signatures                          |          |
 | --pubkey             |                   | output the public key only (overrides --output)                |          |
 
 ## Examples
@@ -37,8 +37,7 @@ MyKey	local	iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zak83e7nf	iap1addwnpepq0gsl90v9dgac
 
 ### Show Validator Operator Address
 
-If an address has bonded to be a validator operator, then you could use `iriscli keys show` to get the operator's 
-address:
+If an address has bonded to be a validator operator, then you could use `--bech val` to get the operator's address:
 
 ```$xslt
 iriscli keys show alice --bech val

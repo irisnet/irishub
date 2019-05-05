@@ -7,8 +7,9 @@ Query the current staking parameters information
 ## Usage
 
 ```
-iriscli stake parameters [flags]
+iriscli stake parameters <flags>
 ```
+
 Print help messages:
 ```
 iriscli stake parameters --help
@@ -24,7 +25,7 @@ iriscli stake parameters
 After that, you will get the current staking parameters information.
 
 ```txt
-Params
-Unbonding Time: 10m0s
-Max Validators: 100:
+Params 
+Unbonding Time: 504h0m0s
+Max Validators: 175: 
 ```

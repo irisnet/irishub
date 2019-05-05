@@ -5,10 +5,10 @@
 Query all unbonding delegatations from a validator
 
 ## Usage
+```
+iriscli stake unbonding-delegations-from <validator-address> <flags>
+```
 
-```
-iriscli stake unbonding-delegations-from [validator-address] [flags]
-```
 Print help messages:
 ```
 iriscli stake unbonding-delegations-from --help
@@ -18,7 +18,7 @@ iriscli stake unbonding-delegations-from --help
 
 Query all unbonding delegatations from a validator
 ```
-iriscli stake unbonding-delegations-from [validator-address]
+iriscli stake unbonding-delegations-from <validator-address> 
 ```
 
 After that, you will get unbonding delegation's detailed info from specified validator.

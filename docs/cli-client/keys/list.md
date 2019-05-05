@@ -8,7 +8,7 @@ along with their associated name and address.
 ## Usage
 
 ```
-iriscli keys list [flags]
+iriscli keys list <flags>
 ```
 
 ## Flags

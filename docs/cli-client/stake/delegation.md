@@ -7,8 +7,9 @@ Query a delegation based on address and validator address
 ## Usage
 
 ```
-iriscli stake delegation [flags]
+iriscli stake delegation --address-validator=<address-validator> --address-delegator=<address-delegator>
 ```
+
 Print help messages:
 ```
 iriscli stake delegation --help
@@ -18,15 +19,14 @@ iriscli stake delegation --help
 
 | Name, shorthand       | Default                    | Description                                                          | Required |
 | --------------------- | -------------------------- | -------------------------------------------------------------------- | -------- |
-| --address-delegator   |                            | [string] Bech address of the delegator                               | Yes      |
-| --address-validator   |                            | [string] Bech address of the validator                               | Yes      |
+| --address-delegator   |                            | Bech address of the delegator                               | Yes      |
+| --address-validator   |                            | Bech address of the validator                               | Yes      |
 
 ## Examples
 
-Query a validator
+Query a delegation
 ```
 iriscli stake delegation --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-delegator=iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
-
 ```
 
 After that, you will get detailed info of the delegation between specified validator and delegator.

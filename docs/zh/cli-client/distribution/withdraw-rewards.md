@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli distribution withdraw-rewards [flags]
+iriscli distribution withdraw-rewards <flags>
 ```
 
 打印帮助信息:
@@ -27,15 +27,15 @@ iriscli distribution withdraw-rewards --help
 
 ## 示例
 
-1. 仅取回某一个委托产生的收益
+1. 仅取回在某一个验证人处的委托收益
     ```
-    iriscli distribution withdraw-rewards --only-from-validator iva134mhjjyyc7mehvaay0f3d4hj8qx3ee3wfkxvna --from mykey --fee=0.3iris --chain-id=<chain-id>
+    iriscli distribution withdraw-rewards --only-from-validator=<validator_address> --from=<key_name> --fee=0.3iris --chain-id=<chain-id>
     ```
-2. 取回所有委托产生的收益，不包含验证人的佣金收益:
+2. 取回所有在外的委托收益，不包含验证人的佣金收益:
     ```
-    iriscli distribution withdraw-rewards --from mykey --fee=0.3iris --chain-id=<chain-id>
+    iriscli distribution withdraw-rewards --from=<key_name> --fee=0.3iris --chain-id=<chain-id>
     ```
-3. 取回所有委托产生的收益以及验证人的佣金收益:
+3. 验证人取回所有委托产生的收益以及验证人的佣金收益（仅限验证人）:
     ```
-    iriscli distribution withdraw-rewards --is-validator=true --from mykey --fee=0.3iris --chain-id=<chain-id>
+    iriscli distribution withdraw-rewards --is-validator=true --from=<key_name> --fee=0.3iris --chain-id=<chain-id>
     ```

@@ -26,8 +26,9 @@ iriscli distribution delegation-distr-info --help
 ## 示例
 
 ```
-iriscli distribution delegation-distr-info --address-delegator=<delegator address> --address-validator=<validator address>
+iriscli distribution delegation-distr-info --address-delegator=<delegator_address> --address-validator=<validator_address>
 ```
+
 执行结果示例
 ```json
 {

@@ -7,22 +7,24 @@ Query a service response
 ## Usage
 
 ```
-iriscli service response [flags]
+iriscli service response <flags>
 ```
 
 ## Flags
 
 | Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
 | --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | [string] the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
-| --request-id          |                         | [string] the ID of the service invocation                                                                                                                                 |  Yes     |
+| --request-chain-id    |                         | the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
+| --request-id          |                         | the ID of the service invocation                                                                                                                                 |  Yes     |
 
 ## Examples
 
 ### Query a service response
+
 ```shell
-iriscli service response --request-chain-id=<chain-id> --request-id=635-535-0
+iriscli service response --request-chain-id=<request_chain_id> --request-id=<request-id>
 ```
+> You can figure out the `request-id` in the return of [service call](call.md)
 
 After that, you will get the response by specified parameters.
 

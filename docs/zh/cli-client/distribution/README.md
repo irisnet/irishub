@@ -7,7 +7,7 @@
 ## 用法
 
 ```
-iriscli distribution [subcommand]
+iriscli distribution <subcommand>
 ```
 
 打印子命令和参数

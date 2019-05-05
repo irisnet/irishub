@@ -7,22 +7,25 @@
 ## 用法
 
 ```
-iriscli service enable [flags]
+iriscli service enable <flags>
 ```
 
 ## 特有标志
 
 | Name, shorthand       | Default                 | Description                                                                       | Required |
 | --------------------- | ----------------------- | --------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | [string] 定义该服务的区块链ID                                                         | 是       |
-| --deposit string      |                         | [string] 绑定押金, 将会增加当前服务绑定押金                                             |          |
-| --service-name        |                         | [string] 服务名称                                                                   | 是       |
+| --def-chain-id        |                         | 定义该服务的区块链ID                                                         | 是       |
+| --deposit string      |                         | 绑定押金, 将会增加当前服务绑定押金                                             |          |
+| --service-name        |                         | 服务名称                                                                   | 是       |
 
 ## 示例
 
 ### 启用一个不可用的服务绑定
+
+启用一个不可用的服务绑定,并且追加10iris的抵押
+
 ```shell
-iriscli service enable --chain-id=<chain-id>  --from=node0 --fee=0.3iris --def-chain-id=test --service-name=test-service
+iriscli service enable --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --def-chain-id=<service_define_chain_id> --service-name=<service_name> --deposit=10iris 
 ```
 
 运行成功以后，返回的结果如下:
