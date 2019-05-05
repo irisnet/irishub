@@ -1,71 +1,53 @@
-# Delegators
+# 委托人
 
-## What is a delegator?
-People that cannot, or do not want to run validator operations, can still participate in the staking process as delegators. Indeed, validators are not chosen based on their own stake 
-but based on their total stake, which is the sum of their own stake and of the stake that is delegated to them. This is an important property, as it makes delegators a safeguard against
- validators that exhibit bad behavior. If a validator misbehaves, its delegators will move their IRIS tokens away from it, thereby reducing its stake. Eventually, if a validator's stake falls 
- under the top 100 addresses with highest stake, it will exit the validator set.
+## 什么是委托人?
 
-## States for a Delegator
+不能或不想运行验证人节点的用户仍然可以作为委托人参与委托过程。事实上，节点被选为验证人不是根据验证人本身自抵押额来选择的，而是根据这个验证人上所有委托的抵押额来被选择的。这是一个重要的属性，因为它使委托人能够制约验证人以防他们出现不良行为。 
 
-Delegators have the same state as their validator.
+如果验证人有不良行为，他的委托人将把他们的iris通证转移，从而减少他的总股份。最后，如果验证人的总委托额跌出了前100名，那么他将被退出验证人集合。
 
-Note that delegation are not necessarily bonded. Tokens of each delegator can be delegated and bonded, delegated and unbonding, delegated and unbonded, or loose. 
+## 委托人抵押的通证
 
-## Common operation for Delegators
+委托人与验证人有相同的状态。请注意，委托的token并不一定是绑定的。它的状态可以为"委托且绑定"、"委托且正在解除绑定"、"委托且已经解除绑定"或"释放"。 
 
-* Delegation
+## 委托人常用操作
 
-To delegate some IRIS token to a validator, you could run the following command:
+* 委托
+
+委托10iris给某个验证人：
 ```$xslt
-iriscli stake delegate --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=irishub --from=name --gas=50000 --fee=0.3iris --amount=10iris
+iriscli stake delegate --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --amount=10iris
 ```
-> Please notice that the amount is under unit iris-atto, 1iris=10^18 iris-atto
+请参阅[委托](../cli-client/stake/delegate.md)
 
-* Query Delegation
-
-You could query your delegation amount with the following command:
-
+* 查询委托
 ```$xslt
-iriscli stake delegation --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=irishub
+iriscli stake delegation --address-delegator=<address-delegator> --address-validator=<address-validator> --chain-id=<chain-id> 
 ```
+请参阅[查询委托](../cli-client/stake/delegation.md)
 
-The example output is the following:
-```$xslt
-Delegation
-Delegator: iaa1je9qyff4qate4e0kthum0p8v7q7z8lr7phygv8
-Validator: iaa1dmp6eyjw94u0wzc67qa03cmgl92qwqap09p8xa
-Shares: 10000000000000000000/1Height: 215307
-```
+* 转委托
 
-> Please notice that the share amount is also correspond to iris-atto, 1iris=10^18 iris-atto
-
-* Re-delegate 
-
-Once a delegator has delegated his own IRIS to certain validator, he/she could change the destination of delegation at anytime. If the transaction is executed, the 
-delegation will be placed at the other's pool after the specified period of the system parameter `unbonding_time`. 
+委托人可以随时更换受委托验证人，当更换受委托验证人时，委托人抵押的通证可直接转入新的受委托人抵押池，而不无需等待3周的解绑期。
  
-you should run the following command:
+转委托100shares给新的验证人：
 ```$xslt
-iriscli stake redelegate --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --gas=50000 --fee=0.3iris --shares-percent=1.0 
+iriscli stake redelegate --addr-validator-dest=<addr-validator-dest>  --addr-validator-source=<addr-validator> --address-delegator=<address-delegator>  --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --shares-amount=100 
 ```
 
-The example output is the following:
+请参阅[转委托](../cli-client/stake/redelegate.md)
+
+* 解绑
+
+若委托人需要取回已委托的通证，可以通过发送[解绑交易](../cli-client/stake/unbond.md)。在IRISnet网络中，解绑期默认为**三周**(解绑期间无收益)。一旦解绑期结束，被绑定的通证将自动成为流通通证。
+
+解绑50% shares：
 ```$xslt
-Delegation
-Delegator: iaa1je9qyff4qate4e0kthum0p8v7q7z8lr7phygv8
-Validator: iaa1kepndxvjr6gnc8tjcnelp9hqz8jdcs8m5dcr88
-Shares: 10000000000000000000/1Height: 215459
+iriscli stake unbond begin  --address-validator=<address-validator> --address-delegator=<address-delegator> --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --shares-percent=0.5
 ```
 
-* Unbond Delegation
+三周后你将会看到，账户余额增加。
 
-Once a delegator has delegated his own IRIS to certain validator, he/she could withdraw the delegation at anytime. If the transaction is executed, the 
-delegation will become liquid after after the specified period of the system parameter `unbonding_time`.  
+请参阅[解绑](../cli-client/stake/unbond.md)
 
-To start, you should run the following command:
-```$xslt
-iriscli stake unbond  begin  --address-validator=<address-validator> --address-delegator=<address-delegator>  --chain-id=irishub  --from=name --gas=50000 --fee=0.3iris --shares-percent=1.0 
-```
 
-You could check that the balance of delegator has increased.

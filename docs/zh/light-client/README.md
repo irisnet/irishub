@@ -3,6 +3,7 @@
 ## 基本功能介绍
 
 1.提供restful API以及swagger-ui
+
 2.验证查询结果
 
 ## IRISLCD的用法
@@ -90,8 +91,8 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     9. `GET /stake/delegators/{delegatorAddr}/txs`: 查询所有委托人相关的委托交易
     10. `GET /stake/delegators/{delegatorAddr}/delegations/{validatorAddr}`: 查询委托人在某个验证人上的委托记录
     11. `GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}`: 查询委托人在某个验证人上所有的解委托记录
-    12. `GET /stake/validators`: 获取所有委托人信息
-    13. `GET /stake/validators/{validatorAddr}`: 获取某个委托人信息
+    12. `GET /stake/validators`: 获取所有验证人信息
+    13. `GET /stake/validators/{validatorAddr}`: 获取某个验证人信息
     14. `GET /stake/validators/{validatorAddr}/delegations`:  获取某个验证人上的所有委托记录
     15. `GET /stake/validators/{validatorAddr}/unbonding_delegations`: 获取某个验证人上的所有解委托记录
     16. `GET /stake/validators/{validatorAddr}/redelegations`: 获取某个验证人上的所有转委托记录
@@ -161,7 +162,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 7. `POST /gov/proposals/{proposalId}/votes`
 8. `POST /slashing/validators/{validatorAddr}/unjail`
 
-上述的API都有三个特殊的查询参数，如上下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`commit`将被忽略。
+上述的API都有四个特殊的查询参数，如下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`commit`将被忽略。
 
 | 参数名字        | 类型 | 默认值 | 优先级 | 功能描述                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |

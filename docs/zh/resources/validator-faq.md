@@ -3,17 +3,18 @@
 
 ## IRISnet介绍
 
-IRISnet是跨链服务基础设施和协议，用于构建可信的分布式商业应用。IRISent是采用Cosmos SDK开发的BPoS区块链网络。它支持对包括公链、联盟链以及现有传统商业系统的集成与互联互通，允许数据及复杂计算跨异构网络被调用，是链接数字经济和实体经济，构建复杂分布式商业应用的下一代公链。
+IRIS网络是上海边界智能和Tendermint团队合作打造的跨链区块链网络，将是Cosmos网络生态中的第一个区域性枢纽(Hub)，并专注于为分布式商业应用提供基础设施和协议。
+IRISnet将面向服务的基础设施融入到Cosmos网络中，支持对包括公链、联盟链以及现有传统商业系统的集成，从而实现互联互通。通过对Cosmos网络的跨链协议进行创新扩展，IRISnet允许数据及复杂计算跨异构网络被调用。就像忠实地在人间和天堂传递信息的希腊彩虹女神Iris, IRISnet的目标是成为链接数字经济和实体经济，支持构建复杂分布式商业应用的下一代公链。
 
 ## IRIS枢纽
 
-在IRISnet的第一个区块链称为 *IRIS枢纽* 的区块链，它是一个基于Tendermint共识引擎构建的Bond-Proof-of-Stake（BPoS）区块链。它将成为第一个连接Cosmos枢纽的区域性枢纽。IRIS网络通过标准的ABCI交易实现IRIS服务（也称为iServices）的注册，绑定，调用，查询，分析和管理。iService提供商充当公共链、联盟区块链以及现有企业系统中业务逻辑的适配器。IRIShub将于从2019年春节后启动，这也标志着[主网启动](https://github.com/irisnet/iris-foundation/blob/master/iris-betanet-plan_cn.md)的第一步。
+在IRISnet的第一个区块链称为 *IRIS枢纽* 的区块链，它是一个基于Tendermint共识引擎构建的Bond-Proof-of-Stake（BPoS）区块链。它将成为第一个连接Cosmos枢纽的区域性枢纽。IRIS网络通过标准的ABCI交易实现IRIS服务（也称为iService）的注册，绑定，调用，查询，分析和管理。iService提供商充当公共链、联盟区块链以及现有企业系统中业务逻辑的适配器。IRIShub已经在2019年春节后启动，这也标志着[主网启动](https://github.com/irisnet/iris-foundation/blob/master/iris-betanet-plan_cn.md)的第一步。
 
 ## IRIS服务
 
 ![IRIS网络图](https://github.com/irisnet/irisnet/blob/master/images/chap2-1.png?raw=true)
 
-引入 *IRIS服务*的目标是弥合区块链世界与传统商业应用世界之间的鸿沟，居中协调链下服务的整个生命周期 - 从定义，绑定（提供者注册），调用，直到它们的治理。
+引入 *IRIS服务* 的目标是弥合区块链世界与传统商业应用世界之间的鸿沟，居中协调链下服务的整个生命周期 - 从定义，绑定（提供者注册），调用，直到它们的治理。
 
 ### 生命周期
 
@@ -27,15 +28,15 @@ IRISnet是跨链服务基础设施和协议，用于构建可信的分布式商�
 
 ### IRIS服务消费者
 
-*消费者* 是那些使用iServices的用户，他们向指定的提供者端点发送请求并接收相关提供者的响应。
+*消费者* 是那些使用iService的用户，他们向指定的提供者端点发送请求并接收相关提供者的响应。
 
 ### IRIS服务分析员
 
-*分析员* 是一种特殊用户，代表了发起建立IRIS网络的IRIS基金会有限公司（IRIS Foundation Limited），这是一家注册在香港的股份有限公司。分析员是在分析模式中调用iServices的唯一授权用户，旨在帮助创建和维护服务提供者的概要文件，通过这些客观的概要文件服务消费者可以选择合适的服务提供者。
+*分析员* 是一种特殊用户，代表了发起建立IRIS网络的IRIS基金会有限公司（IRIS Foundation Limited），这是一家注册在香港的股份有限公司。分析员是在分析模式中调用iService的唯一授权用户，旨在帮助创建和维护服务提供者的分析画像，通过这些客观的分析画像服务消费者可以选择合适的服务提供者。
 
 ### IRIS服务仲裁员
 
-*仲裁员* 是自我声明的一类用户，他们通过协作为消费者对提供者绩效的投诉进行仲裁。有关仲裁机制的细节正在积极设计中，请关注我们的[白皮书](resources/whitepaper-zh.md)。
+*仲裁员* 是自我声明的一类用户，他们通过协作为消费者对提供者绩效的投诉进行仲裁。有关仲裁机制的细节正在积极设计中，请关注我们的[白皮书](../resources/whitepaper-zh.md)。
 
 
 
@@ -43,7 +44,7 @@ IRISnet是跨链服务基础设施和协议，用于构建可信的分布式商�
 
 IRISnet是一个基于 [Tendermint](https://cosmos.network/docs/introduction/tendermint.html) 的BPoS 区块链网络，验证节点是网络运行的核心支柱。验证节点是全节点，他们的维护者成为验证人，其主要任务是**运行并保障验证节点稳定、安全地运行**。想要成为IRIS网络中的验证节点，验证人必须运维一个全节点，并抵押一定数量的**IRIS**通证，抵押通证总量也包括委托人委托给验证人的数量。抵押通证最多的100个全节点将被选为验证节点。各类节点分类如下：  
 - **全节点**
-  全节点即是一个具备完全功能的IRISnet 节点，需要[安装完整的IRIShub软件](https://www.irisnet.org/docs/zh/get-started/Install-the-Software.html)，并完成相应的全节点[配置](https://www.irisnet.org/docs/zh/get-started/Full-Node.html)。全节点具有以下特点： 
+  全节点即是一个具备完全功能的IRISnet 节点，需要[安装完整的IRIShub软件](../software/How-to-install-irishub.md)，并完成相应的[全节点配置](../get-started/Full-Node.md)。全节点具有以下特点： 
   - 投票权重为零；
   - 保存完整的交易账本；
   - 可以作为候选验证人节点。 
@@ -69,9 +70,9 @@ IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通�
 
 ## IRIS网络中用户类型
 ###  IRISnet验证人
-在IRISHub枢纽中，运维验证节点的用户成为验证人。验证人的核心资产是验证节点运行的系统，最重要的是验证节点用于对区块和投票签名的密钥。
+在IRIShub枢纽中，运维验证节点的用户称为验证人。验证人的核心资产是验证节点运行的系统，最重要的是验证节点用于对区块和投票签名的密钥。
 ###  IRISnet委托人
-部署一个验证节点需要付出很多努力，作为IRIS通证持有者，你可以通过委托(Delegate)的方式，将自己的通证抵押出去，同样获得抵押获利。但是你可以随时转换验证人，同时也需要按照验证人的要求缴纳一定比例的佣金。
+部署一个验证节点需要付出很多努力，作为IRIS通证持有者，你可以通过委托(Delegate)的方式，将自己的通证抵押出去，同样获得抵押获利。并且你可以随时转换验证人，同时也需要按照验证人的要求缴纳一定比例的佣金。
 
 ### IRISnet Profiler账户
 只有Profiler账户可以提交链上软件升级SoftwareUpgrade/停止共识Halt提议。
@@ -88,10 +89,10 @@ IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通�
   在IRISnet网络中，所有验证节点将轮流出块。出块的概率和抵押IRIS的数量成正比。作为出块人，验证人将获得额外的出块奖励。
   
 * **抵押获利**
-  接受IRIS通证持有人的委托，抵押委托人的代币用做共识投票的权益证明，并与委托人分享所获得的收益；IRISnet是基于Tendermint的PoS网络，验证人在网络共识中的投票权取决于验证人（包括受委托）[抵押通证（IRIS）的数量](https://www.irisnet.org/docs/zh/features/stake.html#%E4%BB%8B%E7%BB%8D)。网络中抵押的通证数量越多，攻击网络所需的成本也越大，网络也越安全。为了维护验证人及其委托人抵押通证的价值，IRISnet设定通胀增发通证，用于激励验证人及所有IRIS通证持有人将通证抵押。抵押获利[定时发放](https://www.irisnet.org/docs/zh/features/mint.html#%E5%8C%BA%E5%9D%97%E6%97%B6%E9%97%B4)。 通胀率也是社区对[IRIS通证抵押率的调节器](https://www.irisnet.org/docs/zh/features/mint.html#%E9%80%9A%E8%83%80%E7%8E%87)，IRISnet在第一年将通胀设定在4%， **该通胀系数可以通过社区提案的形式通过在线治理投票调整**。网络中IRIS数量将逐年增加。没有被抵押的IRIS的价值将会逐渐被稀释。通胀参数可以通过发起链上治理投票来修改。
+  接受IRIS通证持有人的委托，抵押委托人的代币用做共识投票的权益证明，并与委托人分享所获得的收益；IRISnet是基于Tendermint的PoS网络，验证人在网络共识中的投票权取决于验证人（包括受委托）[抵押通证（IRIS）的数量](../features/stake.md)。网络中抵押的通证数量越多，攻击网络所需的成本也越大，网络也越安全。为了维护验证人及其委托人抵押通证的价值，IRISnet设定通胀增发通证，用于激励验证人及所有IRIS通证持有人将通证抵押。抵押获利[定时发放](../features/mint.md)。 通胀率也是社区对[IRIS通证抵押率的调节器](../features/mint.md)，IRISnet在第一年将通胀设定在4%， **该通胀系数可以通过社区提案的形式通过在线治理投票调整**。网络中IRIS数量将逐年增加。没有被抵押的IRIS的价值将会逐渐被稀释。通胀参数可以通过发起链上治理投票来修改。
 
 * **手续费** 
-在IRIS网络中的各种交易都需要支付一定的手续费。手续费的多少取决于每种交易的[手续费上限 (fee)](https://www.irisnet.org/docs/zh/features/basic-concepts/fee.html#fee)和[交易消耗资源 (Gas) ](https://www.irisnet.org/docs/zh/features/basic-concepts/fee.html#gas)。IRISnet网络的中设定全局的手续费/Gas最小比例。
+在IRIS网络中的各种交易都需要支付一定的手续费。手续费的多少取决于每种交易的[手续费上限 (fee)](../features/basic-concepts/fee.md#Fee)和[交易消耗资源 (Gas) ](../features/basic-concepts/fee.md#Gas)。IRISnet网络的中设定全局的手续费/Gas最小比例。
 
 以上奖励会在验证人和委托人之间按比例分配。
 
@@ -107,9 +108,9 @@ IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通�
 
 ### 通证管理
 * IRIS通证类型
-在IRISnet网络中存在两种类型的IRIS，一种为*可流通*的，一种为*绑定*的。可流通的通证可以在账户间互相转账，也可以在交易所交易。验证人和委托人通过[委托操作](https://www.irisnet.org/docs/cli-client/stake/delegate.html)将可自由流通的IRIS通证变为*绑定*的IRIS。验证节点的[投票权重](https://www.irisnet.org/docs/zh/features/stake.html#%E4%BB%8B%E7%BB%8D)与验证人绑定的通证数量(包括委托通证)成正比。
+在IRISnet网络中存在两种类型的IRIS，一种为*可流通*的，一种为*绑定*的。可流通的通证可以在账户间互相转账，也可以在交易所交易。验证人和委托人通过[委托操作](../cli-client/stake/delegate.md)将可自由流通的IRIS通证变为*绑定*的IRIS。验证节点的[投票权重](../features/stake.md)与验证人绑定的通证数量(包括委托通证)成正比。
 * IRIS通证解绑
-若委托人需要取回已委托的通证，可以通过发送[解绑交易](https://www.irisnet.org/docs/cli-client/stake/unbond.html)。在IRISnet网络中，解绑期默认为**三周**。一旦解绑期结束，被绑定的通证将自动成为流通通证。解绑期机制对PoS区块链网络的安全性很重要。
+若委托人需要取回已委托的通证，可以通过发送[解绑交易](../cli-client/stake/unbond.md)。在IRISnet网络中，解绑期默认为**三周**(解绑期间无收益)。一旦解绑期结束，被绑定的通证将自动成为流通通证。解绑期机制对PoS区块链网络的安全性很重要。
 
 * IRIS通证再委托
 委托人可以随时更换受委托验证人，当更换受委托验证人时，委托人抵押的通证可直接转入新的受委托人抵押池，而不无需等待3周的解绑期。
@@ -118,14 +119,9 @@ IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通�
 
 
 ## 如何成为IRISnet验证人
-若想成为验证人，你需要先参与Fuxi测试网。
-1. 安装软件：
-https://github.com/irisnet/irishub/blob/master/docs/zh/get-started/Install-the-Software.md
-2. 部署全节点：https://github.com/irisnet/irishub/blob/master/docs/zh/get-started/Full-Node.md
-3. 升级成为验证人节点：
-https://github.com/irisnet/irishub/blob/master/docs/zh/get-started/Validator-Node.md
 
-测试网包含许多奖励将在主网上线后发放给社区成员。你需要用你的Keybase签名一个irishub的地址，然后将其发送给团队。
+请参阅[升级IRISnet验证人](../get-started/Validator-Node.md)
+
 **建议**
 为了保障验证人节点安全，稳定的持续工作；提高自身形象，以便获得更多委托人信任，增加自身的投票权重，你还可以： 
  - 公布安全审计结果
@@ -139,18 +135,18 @@ https://github.com/irisnet/irishub/blob/master/docs/zh/get-started/Validator-Nod
 
 
 **浏览器**
-IRISplorer：https://testnet.irisplorer.cn
+https://www.irisplorer.io
 
 ##  IRISnet 测试网与主网
 
 **IRISnet测试网 - Fuxi** 
 
-IRISnet在开发测试阶段建立的测试网取名伏羲（Fuxi),将运行跟主网一致的软件版本，为开发者社区（钱包、浏览器、Service Providers/Consumers）提供一个稳定的测试环境。如何使用：https://www.irisnet.org/docs/zh/get-started/Join-the-Testnet.html
+IRISnet在开发测试阶段建立的测试网取名伏羲（Fuxi),将运行跟主网一致的软件版本，为开发者社区（钱包、浏览器、Service Providers/Consumers）提供一个稳定的测试环境。[如何使用测试网](../get-started/Join-the-Testnet.md)
                                
                              
 **IRISnet主网**
 
-IRISnet主网的第一步：Betanet将在2019年2月中旬启动，主网启动的相关信息将在[IRIS基金会官网](https://www.irisnet.org/mainnet?lang=CN)更新。 
+IRISnet主网的第一步：Betanet已在2019年3月中旬启动，主网启动的相关信息将在[IRIS基金会官网](https://www.irisnet.org/mainnet?lang=CN)更新。 [如何加入测试网](../get-started/Join-the-Mainnet.md)
 
 ##  验证人交流渠道
 
