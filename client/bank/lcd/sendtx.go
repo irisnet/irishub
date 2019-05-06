@@ -1,9 +1,7 @@
 package lcd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,9 +9,8 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/irisnet/irishub/modules/auth"
 )
 
 type sendBody struct {
@@ -141,96 +138,6 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			utils.WriteSimulationResponse(w, cliCtx, simulationResult.GasUsed, simulationResult)
 			return
 		}
-		res, err := cliCtx.BroadcastTx(txBytes)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
-	}
-}
-
-type sendTx struct {
-	Msgs       []string       `json:"msgs"`
-	Fee        auth.StdFee    `json:"fee"`
-	Signatures []stdSignature `json:"signatures"`
-	Memo       string         `json:"memo"`
-}
-
-type stdSignature struct {
-	PubKey        []byte `json:"pub_key"` // optional
-	Signature     []byte `json:"signature"`
-	AccountNumber uint64 `json:"account_number"`
-	Sequence      uint64 `json:"sequence"`
-}
-
-func SendTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var sendTxBody sendTx
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		err = json.Unmarshal(body, &sendTxBody)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
-		var sig = make([]auth.StdSignature, len(sendTxBody.Signatures))
-		for index, s := range sendTxBody.Signatures {
-			var pubkey crypto.PubKey
-			if err := cdc.UnmarshalBinaryBare(s.PubKey, &pubkey); err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			sig[index].PubKey = pubkey
-			sig[index].Signature = s.Signature
-			sig[index].AccountNumber = s.AccountNumber
-			sig[index].Sequence = s.Sequence
-		}
-
-		var msgs = make([]sdk.Msg, len(sendTxBody.Msgs))
-		for index, msgS := range sendTxBody.Msgs {
-			var data = []byte(msgS)
-			var msg sdk.Msg
-			if err := cdc.UnmarshalJSON(data, &msg); err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-			msgs[index] = msg
-		}
-
-		var stdTx = auth.StdTx{
-			Msgs:       msgs,
-			Fee:        sendTxBody.Fee,
-			Signatures: sig,
-			Memo:       sendTxBody.Memo,
-		}
-		txBytes, err := cdc.MarshalBinaryLengthPrefixed(stdTx)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		if cliCtx.DryRun {
-			rawRes, err := cliCtx.Query("/app/simulate", txBytes)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-			var simulationResult sdk.Result
-			if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
-				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-			utils.WriteSimulationResponse(w, cliCtx, simulationResult.GasUsed, simulationResult)
-			return
-		}
-
 		res, err := cliCtx.BroadcastTx(txBytes)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

@@ -102,7 +102,7 @@ func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
 func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		coinType := vars["coin-type"]
+		coinType := vars["type"]
 		res, err := cliCtx.GetCoinType(coinType)
 		if err != nil && strings.Contains(err.Error(), "unsupported coin type") {
 			w.WriteHeader(http.StatusNoContent)
