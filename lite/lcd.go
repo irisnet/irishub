@@ -94,7 +94,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
-	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/node-version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	keyshandler.RegisterRoutes(r, cliCtx.Indent)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc)

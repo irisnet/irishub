@@ -19,8 +19,10 @@ tags:
     description: 'Tendermint APIs, such as query blocks, transactions and validatorset'
   - name: ICS1
     description: Key management APIs
+  - name: ICS2
+    description: 'Sign and broadcast transactions'
   - name: ICS20
-    description: 'Create, sign and broadcast transactions'
+    description: Bank module APIs
   - name: ICS21
     description: Stake module APIs
   - name: ICS22
@@ -43,7 +45,7 @@ paths:
       responses:
         '200':
           description: Plaintext version i.e. "v0.7.0"
-  /node_version:
+  /node-version:
     get:
       summary: Version of the connected node
       tags:
@@ -56,7 +58,7 @@ paths:
           description: Plaintext version i.e. "v0.7.0"
         '500':
           description: failed to query node version
-  /node_info:
+  /node-info:
     get:
       description: Information about the connected node
       summary: The properties of the connected node
@@ -336,10 +338,10 @@ paths:
           after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return
           right away).
         required: true
-  /tx/sign:
+  /txs/sign:
     post:
       tags:
-        - ICS20
+        - ICS2
       summary: Sign a transation
       description: >-
         Sign a transation providing locally stored account and according
@@ -382,10 +384,10 @@ paths:
                   example: true
         description: sign tx
         required: true
-  /tx/broadcast:
+  /txs/broadcast:
     post:
       tags:
-        - ICS20
+        - ICS2
       summary: Broadcast a signed StdTx with amino encoding signature and public key
       description: >-
         Broadcast a signed StdTx with amino encoding signature and public key to
@@ -434,95 +436,14 @@ paths:
                   $ref: '#/components/schemas/StdTx'
         description: broadcast tx
         required: true
-  /txs/send:
-    post:
-      summary: Send non-amino encoding transaction
-      description: Send non-amino encoding transaction
-      tags:
-        - ICS20
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: string
-        '400':
-          description: Bad Request
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                memo:
-                  type: string
-                fee:
-                  type: object
-                  properties:
-                    gas:
-                      type: string
-                      example: '10000'
-                    amount:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/Coin'
-                msgs:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Msg'
-                signatures:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      pub_key:
-                        type: string
-                      signature:
-                        type: string
-                      account_number:
-                        type: string
-                        example: '0'
-                      sequence:
-                        type: string
-                        example: '0'
-        description: stdTx
-        required: true
-  '/bank/coin/{coin-type}':
+  '/bank/coins/{type}':
     get:
       tags:
         - ICS20
       summary: Get coin type
       description: Get the detailed information about the given coin type
       parameters:
-        - name: coin-type
+        - name: type
           in: path
           required: true
           schema:
@@ -972,7 +893,7 @@ paths:
           description: No content about this account address
         '500':
           description: Server internel error
-  '/stake/delegators/{delegatorAddr}/delegate':
+  '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path
         name: delegatorAddr
@@ -980,6 +901,24 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: Get all delegations from a delegator
+      tags:
+        - ICS21
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/Delegation'
+        '400':
+          description: Invalid delegator address
+        '500':
+          description: Internal Server Error
     post:
       summary: Submit delegation
       parameters:
@@ -1043,7 +982,7 @@ paths:
                       type: string
                       example: 10iris
         description: Delegation amount must be specified
-  '/stake/delegators/{delegatorAddr}/redelegate':
+  '/stake/delegators/{delegatorAddr}/unbonding-delegations':
     parameters:
       - in: path
         name: delegatorAddr
@@ -1051,37 +990,8 @@ paths:
         required: true
         schema:
           type: string
-    post:
-      summary: Submit redelegation
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
+    get:
+      summary: Get all unbonding delegations from a delegator
       tags:
         - ICS21
       responses:
@@ -1090,43 +1000,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/UnbondingDelegation'
         '400':
-          description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
+          description: Invalid delegator address
         '500':
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                redelegate:
-                  type: object
-                  properties:
-                    validator_src_addr:
-                      $ref: '#/components/schemas/ValidatorAddress'
-                    validator_dst_addr:
-                      $ref: '#/components/schemas/ValidatorAddress'
-                    shares_amount:
-                      type: string
-                      example: '100'
-                    shares_percent:
-                      type: string
-                      example: '0.1'
-        description: Either specify the shares_amount or the shares_percent, not both
-  '/stake/delegators/{delegatorAddr}/unbond':
-    parameters:
-      - in: path
-        name: delegatorAddr
-        description: Bech32 AccAddress of Delegator
-        required: true
-        schema:
-          type: string
     post:
       summary: Submit unbonding
       parameters:
@@ -1193,58 +1074,6 @@ paths:
                       type: string
                       example: '0.1'
         description: Either specify the shares_amount or the shares_percent, not both
-  '/stake/delegators/{delegatorAddr}/delegations':
-    parameters:
-      - in: path
-        name: delegatorAddr
-        description: Bech32 AccAddress of Delegator
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Get all delegations from a delegator
-      tags:
-        - ICS21
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  $ref: '#/components/schemas/Delegation'
-        '400':
-          description: Invalid delegator address
-        '500':
-          description: Internal Server Error
-  '/stake/delegators/{delegatorAddr}/unbonding_delegations':
-    parameters:
-      - in: path
-        name: delegatorAddr
-        description: Bech32 AccAddress of Delegator
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Get all unbonding delegations from a delegator
-      tags:
-        - ICS21
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  $ref: '#/components/schemas/UnbondingDelegation'
-        '400':
-          description: Invalid delegator address
-        '500':
-          description: Internal Server Error
   '/stake/delegators/{delegatorAddr}/redelegations':
     parameters:
       - in: path
@@ -1381,7 +1210,7 @@ paths:
           description: Invalid delegator address or validator address
         '500':
           description: Internal Server Error
-  '/stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}':
+  '/stake/delegators/{delegatorAddr}/unbonding-delegations/{validatorAddr}':
     parameters:
       - in: path
         name: delegatorAddr
@@ -1488,7 +1317,7 @@ paths:
           description: Invalid validator address
         '500':
           description: Internal Server Error
-  '/stake/validators/{validatorAddr}/unbonding_delegations':
+  '/stake/validators/{validatorAddr}/unbonding-delegations':
     parameters:
       - in: path
         name: validatorAddr
@@ -1582,7 +1411,7 @@ paths:
                     type: string
         '500':
           description: Internal Server Error
-  '/slashing/validators/{validatorPubKey}/signing_info':
+  '/slashing/validators/{validatorPubKey}/signing-info':
     get:
       summary: Get sign info of given validator
       description: Get sign info of given validator
@@ -2237,7 +2066,7 @@ paths:
                   type: boolean
         description: 'if is_validator is true, validator_address should not be presented'
         required: true
-  '/distribution/{delegatorAddr}/distrInfo/{validatorAddr}':
+  '/distribution/{delegatorAddr}/distrInfos/{validatorAddr}':
     parameters:
       - in: path
         name: delegatorAddr
@@ -2382,7 +2211,7 @@ paths:
           description: Invalid address
         '500':
           description: Internal Server Error
-  /service/definition:
+  /service/definitions:
     post:
       summary: Add a service definition
       description: Send transaction to define a service
@@ -2453,7 +2282,7 @@ paths:
                 author_description:
                   type: string
         required: true
-  '/service/definition/{defChainId}/{serviceName}':
+  '/service/definitions/{defChainId}/{serviceName}':
     parameters:
       - in: path
         name: defChainId
@@ -2520,7 +2349,7 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
-  /service/binding:
+  /service/bindings:
     post:
       summary: Add a service binding
       description: Send transaction to add a binding to a service definition
@@ -2594,13 +2423,13 @@ paths:
                   type: object
                   properties:
                     avg_rsp_time:
-                      type: integer
+                      type: string
                     usable_time:
-                      type: integer
+                      type: string
                 provider:
                   $ref: '#/components/schemas/Address'
         required: true
-  '/service/binding/{defChainId}/{serviceName}/{bindChainId}/{provider}':
+  '/service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}':
     parameters:
       - in: path
         name: defChainId
@@ -2747,7 +2576,7 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
-  '/service/binding/{defChainId}/{serviceName}/{provider}':
+  '/service/bindings/{defChainId}/{serviceName}/{provider}':
     put:
       summary: Update a service binding
       description: Send transaction to update a service binding
@@ -2843,7 +2672,7 @@ paths:
                     usable_time:
                       type: integer
         required: true
-  '/service/binding/{defChainId}/{serviceName}/{provider}/disable':
+  '/service/bindings/{defChainId}/{serviceName}/{provider}/disable':
     put:
       summary: Disable service binding
       description: Send transaction to diasble a service binding
@@ -2911,7 +2740,7 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
-  '/service/binding/{defChainId}/{serviceName}/{provider}/enable':
+  '/service/bindings/{defChainId}/{serviceName}/{provider}/enable':
     put:
       summary: Enable service binding
       description: Send transaction to enable a service binding
@@ -2989,7 +2818,7 @@ paths:
                   type: string
                   example: 1iris
         required: true
-  '/service/binding/{defChainId}/{serviceName}/{provider}/deposit/refund':
+  '/service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund':
     put:
       summary: Refund deposit from a service binding
       description: Send transaction to refund deposit from a service binding
@@ -3057,7 +2886,7 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
-  /service/request:
+  /service/requests:
     post:
       summary: Call service
       description: Send transaction to call a method of service which a provider bound it
@@ -3210,7 +3039,7 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
-  /service/response:
+  /service/responses:
     post:
       summary: Respond service call
       description: Send transaction to respond a service call
@@ -3277,7 +3106,7 @@ paths:
                 error_msg:
                   type: string
         required: true
-  '/service/response/{reqChainId}/{reqId}':
+  '/service/responses/{reqChainId}/{reqId}':
     parameters:
       - in: path
         name: reqChainId
