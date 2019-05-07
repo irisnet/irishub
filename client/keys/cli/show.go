@@ -3,16 +3,15 @@ package keys
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
 	cryptokeys "github.com/irisnet/irishub/crypto/keys"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/multisig"
-
-	"github.com/irisnet/irishub/client/keys"
 	"github.com/tendermint/tmlibs/cli"
-
 )
 
 const (
@@ -34,10 +33,10 @@ type multiSigKey struct {
 	key  crypto.PubKey
 }
 
-func (m multiSigKey) GetName() string            { return m.name }
-func (m multiSigKey) GetType() cryptokeys.KeyType      { return cryptokeys.TypeLocal }
-func (m multiSigKey) GetPubKey() crypto.PubKey   { return m.key }
-func (m multiSigKey) GetAddress() sdk.AccAddress { return sdk.AccAddress(m.key.Address()) }
+func (m multiSigKey) GetName() string             { return m.name }
+func (m multiSigKey) GetType() cryptokeys.KeyType { return cryptokeys.TypeLocal }
+func (m multiSigKey) GetPubKey() crypto.PubKey    { return m.key }
+func (m multiSigKey) GetAddress() sdk.AccAddress  { return sdk.AccAddress(m.key.Address()) }
 
 func showKeysCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -52,6 +51,7 @@ func showKeysCmd() *cobra.Command {
 	cmd.Flags().Bool(FlagAddress, false, "output the address only (overrides --output)")
 	cmd.Flags().Bool(FlagPublicKey, false, "output the public key only (overrides --output)")
 	cmd.Flags().Uint(flagMultiSigThreshold, 1, "K out of N required signatures")
+	cmd.Flags().Bool(client.FlagIndentResponse, false, "Add indent to JSON response")
 
 	return cmd
 }
