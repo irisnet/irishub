@@ -61,7 +61,7 @@ func (p Params) String() string {
   Slash Fraction DoubleSign:     %s
   Slash Fraction Downtime:       %s
   Slash Fraction Censorship:     %s`,
-		p.MaxEvidenceAge, p.SignedBlocksWindow, p.MinSignedPerWindow,
+		p.MaxEvidenceAge, p.SignedBlocksWindow, p.MinSignedPerWindow.String(),
 		p.DoubleSignJailDuration, p.DowntimeJailDuration,
 		p.CensorshipJailDuration, p.SlashFractionDoubleSign.String(),
 		p.SlashFractionDowntime.String(), p.SlashFractionCensorship.String())
