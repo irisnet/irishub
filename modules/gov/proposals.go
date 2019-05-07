@@ -407,5 +407,5 @@ func (tr TallyResult) String() string {
   Yes:        %s
   Abstain:    %s
   No:         %s
-  NoWithVeto: %s`, tr.Yes, tr.Abstain, tr.No, tr.NoWithVeto)
+  NoWithVeto: %s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String())
 }
