@@ -289,18 +289,30 @@ func GetCmdQueryRedelegation(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			key := stake.GetREDKey(delAddr, valSrcAddr, valDstAddr)
+			params := stake.QueryRedelegationParams{
+				DelegatorAddr: delAddr,
+				ValDstAddr:    valDstAddr,
+				ValSrcAddr:    valSrcAddr,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, err := cliCtx.QueryStore(key, protocol.StakeStore)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryRedelegation), bz)
 			if err != nil {
 				return err
 			}
 
-			red, err := types.UnmarshalRED(cdc, key, res)
+			var red types.Redelegation
+			if err = cdc.UnmarshalJSON(res, &red); err != nil {
+				return err
+			}
 			if err != nil {
 				return err
 			}
+
 			return cliCtx.PrintOutput(stakeClient.ConvertREDToREDOutput(cliCtx, red))
 		},
 	}
