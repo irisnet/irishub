@@ -110,7 +110,7 @@ func ValidateParams(p Params) error {
 		return nil
 	}
 
-	if err := validateCommunityTax(p.BaseProposerReward); err != nil {
+	if err := validateCommunityTax(p.CommunityTax); err != nil {
 		return err
 	}
 	if err := validateBaseProposerReward(p.BaseProposerReward); err != nil {
