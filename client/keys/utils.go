@@ -211,9 +211,9 @@ func PrintKeyInfo(keyInfo keys.Info, bechKeyOut BechKeyOutFn) {
 		var err error
 
 		if viper.GetBool(client.FlagIndentResponse) {
-			out, err = cdc.MarshalJSONIndent(keyInfo, "", "  ")
+			out, err = cdc.MarshalJSONIndent(ko, "", "  ")
 		} else {
-			out, err = cdc.MarshalJSON(keyInfo)
+			out, err = cdc.MarshalJSON(ko)
 		}
 		if err != nil {
 			panic(err)
