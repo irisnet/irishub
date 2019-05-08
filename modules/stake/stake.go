@@ -29,6 +29,7 @@ type (
 	QueryDelegatorParams = querier.QueryDelegatorParams
 	QueryValidatorParams = querier.QueryValidatorParams
 	QueryBondsParams = querier.QueryBondsParams
+	QueryRedelegationParams = querier.QueryRedelegationParams
 )
 
 var (
@@ -100,6 +101,7 @@ const (
 	QueryValidatorUnbondingDelegations = querier.QueryValidatorUnbondingDelegations
 	QueryValidatorRedelegations        = querier.QueryValidatorRedelegations
 	QueryDelegation                    = querier.QueryDelegation
+	QueryRedelegation                  = querier.QueryRedelegation
 	QueryUnbondingDelegation           = querier.QueryUnbondingDelegation
 	QueryDelegatorDelegations          = querier.QueryDelegatorDelegations
 	QueryValidatorDelegations          = querier.QueryValidatorDelegations

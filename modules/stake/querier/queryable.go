@@ -20,6 +20,7 @@ const (
 	QueryValidatorRedelegations        = "validatorRedelegations"
 	QueryDelegator                     = "delegator"
 	QueryDelegation                    = "delegation"
+	QueryRedelegation                  = "redelegation"
 	QueryUnbondingDelegation           = "unbondingDelegation"
 	QueryDelegatorValidators           = "delegatorValidators"
 	QueryDelegatorValidator            = "delegatorValidator"
@@ -51,6 +52,8 @@ func NewQuerier(k keep.Keeper, cdc *codec.Codec) sdk.Querier {
 			return queryDelegatorUnbondingDelegations(ctx, cdc, req, k)
 		case QueryDelegatorRedelegations:
 			return queryDelegatorRedelegations(ctx, cdc, req, k)
+		case QueryRedelegation:
+			return queryRedelegation(ctx, cdc, req, k)
 		case QueryDelegatorValidators:
 			return queryDelegatorValidators(ctx, cdc, req, k)
 		case QueryDelegatorValidator:
@@ -90,6 +93,12 @@ type QueryValidatorParams struct {
 type QueryBondsParams struct {
 	DelegatorAddr sdk.AccAddress
 	ValidatorAddr sdk.ValAddress
+}
+
+type QueryRedelegationParams struct {
+	DelegatorAddr sdk.AccAddress
+	ValSrcAddr    sdk.ValAddress
+	ValDstAddr    sdk.ValAddress
 }
 
 // creates a new QueryDelegatorParams
@@ -242,6 +251,26 @@ func queryDelegatorRedelegations(ctx sdk.Context, cdc *codec.Codec, req abci.Req
 	redelegations := k.GetAllRedelegations(ctx, params.DelegatorAddr)
 
 	res, errRes = codec.MarshalJSONIndent(cdc, redelegations)
+	if errRes != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+	return res, nil
+}
+
+func queryRedelegation(ctx sdk.Context, cdc *codec.Codec, req abci.RequestQuery, k keep.Keeper) (res []byte, err sdk.Error) {
+	var params QueryRedelegationParams
+
+	errRes := cdc.UnmarshalJSON(req.Data, &params)
+	if errRes != nil {
+		return []byte{}, sdk.ErrUnknownAddress("")
+	}
+
+	redelegation, found := k.GetRedelegation(ctx, params.DelegatorAddr, params.ValSrcAddr, params.ValDstAddr)
+	if !found {
+		return nil, types.ErrNoRedelegation(types.DefaultCodespace)
+	}
+
+	res, errRes = codec.MarshalJSONIndent(cdc, redelegation)
 	if errRes != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
