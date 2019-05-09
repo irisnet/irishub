@@ -5,7 +5,7 @@ PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 
-all:  get_tools get_vendor_deps install build_cur
+all: get_tools get_vendor_deps install build_cur
 
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
@@ -91,22 +91,22 @@ update_irislcd_swagger_docs:
 ########################################
 ### Compile and Install
 install: update_irislcd_swagger_docs echo_bech32_prefix
-	go install $(BUILD_FLAGS) ./cmd/iris
-	go install $(BUILD_FLAGS) ./cmd/iriscli
-	go install $(BUILD_FLAGS) ./cmd/irislcd
-	go install $(BUILD_FLAGS) ./cmd/iristool
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iris
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iriscli
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/irislcd
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iristool
 
 build_linux: update_irislcd_swagger_docs echo_bech32_prefix
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
+	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
+	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
+	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
+	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
 build_cur: update_irislcd_swagger_docs echo_bech32_prefix
-	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \
-	go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
-	go build $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-	go build $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
+	go build -mod=readonly $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \
+	go build -mod=readonly $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
+	go build -mod=readonly $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
+	go build -mod=readonly $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
 
 ########################################
