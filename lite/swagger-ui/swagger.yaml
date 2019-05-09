@@ -512,6 +512,47 @@ paths:
                       type: string
         '500':
           description: Internal Server Error
+  '/bank/accounts/{address}':
+    get:
+      summary: Get the account information on blockchain
+      tags:
+        - ICS20
+      parameters:
+        - in: path
+          name: address
+          description: Account address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account information on the blockchain
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  value:
+                    type: object
+                    properties:
+                      account_number:
+                        type: string
+                      address:
+                        type: string
+                      coins:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Coin'
+                      public_key:
+                        type: string
+                      sequence:
+                        type: string
+        '204':
+          description: No content about this account address
+        '500':
+          description: Server internel error
   '/bank/accounts/{address}/transfers':
     post:
       summary: Send coins (build -> sign -> send)
@@ -831,47 +872,6 @@ paths:
                 password:
                   type: string
         description: The password of the account to remove from the KMS
-  '/auth/accounts/{address}':
-    get:
-      summary: Get the account information on blockchain
-      tags:
-        - ICS1
-      parameters:
-        - in: path
-          name: address
-          description: Account address
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Account information on the blockchain
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  type:
-                    type: string
-                  value:
-                    type: object
-                    properties:
-                      account_number:
-                        type: string
-                      address:
-                        type: string
-                      coins:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Coin'
-                      public_key:
-                        type: string
-                      sequence:
-                        type: string
-        '204':
-          description: No content about this account address
-        '500':
-          description: Server internel error
   '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path

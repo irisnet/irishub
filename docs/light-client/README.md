@@ -63,8 +63,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     4. `GET /keys/{name}`: Get a certain locally stored account
     5. `PUT /keys/{name}`: Update the password for this account in the KMS
     6. `DELETE /keys/{name}`: Remove an account
-    7. `GET /auth/accounts/{address}`: Get the account information on blockchain
-    8. `POST /keys/{name}/recover`: Recover a account from a seed
+    7. `POST /keys/{name}/recover`: Recover a account from a seed
 
 3. Sign and broadcast transactions
 
@@ -74,8 +73,9 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 4. Bank module APIs
     1. `GET /bank/coins/{type}`: Get coin type
     2. `GET /bank/token-stats`: Get token statistic
-    3. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
-    4. `POST /bank/accounts/{address}/burn`: Burn coins
+    3. `GET /bank/accounts/{address}`: Get the account information on blockchain
+    4. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
+    5. `POST /bank/accounts/{address}/burn`: Burn coins
         
 5. Stake module APIs
 

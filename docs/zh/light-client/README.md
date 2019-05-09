@@ -64,8 +64,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     4. `GET /keys/{name}`: 根据秘钥名称查询秘钥
     5. `PUT /keys/{name}`: 更新秘钥的密码
     6. `DELETE /keys/{name}`: 删除秘钥
-    7. `GET /auth/accounts/{address}`: 查询秘钥对象账户的信息
-    8. `POST /keys/{name}/recover`: 通过seed恢复一个账户
+    7. `POST /keys/{name}/recover`: 通过seed恢复一个账户
 
 3. 签名和广播交易的APIs
 
@@ -75,8 +74,9 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 4. Bank模块的APIs
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats`: 查询token统计信息
-    3. `POST /bank/accounts/{address}/transfers`: 发起转账交易
-    4. `POST /bank/accounts/{address}/burn`: 销毁token
+    3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
+    4. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    5. `POST /bank/accounts/{address}/burn`: 销毁token
 
 5. Stake模块的APIs
 

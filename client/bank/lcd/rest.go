@@ -9,7 +9,7 @@ import (
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	r.HandleFunc("/auth/accounts/{address}",
+	r.HandleFunc("/bank/accounts/{address}",
 		QueryAccountRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/coins/{type}",
 		QueryCoinTypeRequestHandlerFn(cdc, cliCtx)).Methods("GET")
