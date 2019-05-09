@@ -11,8 +11,6 @@ import (
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc("/auth/accounts/{address}",
 		QueryAccountRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
-	r.HandleFunc("/bank/balances/{address}",
-		QueryBalancesRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/coins/{type}",
 		QueryCoinTypeRequestHandlerFn(cdc, cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/token-stats",

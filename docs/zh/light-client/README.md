@@ -75,9 +75,8 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 4. Bank模块的APIs
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats`: 查询token统计信息
-    3. `GET /bank/balances/{address}`: 查询账户的token数量
-    4. `POST /bank/accounts/{address}/transfers`: 发起转账交易
-    5. `POST /bank/burn`: 销毁token
+    3. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    4. `POST /bank/burn`: 销毁token
 
 5. Stake模块的APIs
 
@@ -123,8 +122,8 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     1. `POST /distribution/{delegatorAddr}/withdrawAddress`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdrawAddress`: 查询收益取回地址
     3. `POST /distribution/{delegatorAddr}/withdrawReward`: 取回收益
-    4. `GET /distribution/{delegatorAddr}/distrInfos/{validatorAddr}`: 查询某个委托的收益分配信息
-    5. `GET /distribution/{delegatorAddr}/distrInfos`: 查询委托人所有委托的收益分配信息
+    4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: 查询某个委托的收益分配信息
+    5. `GET /distribution/{delegatorAddr}/distrInfo`: 查询委托人所有委托的收益分配信息
     6. `GET /distribution/{validatorAddr}/valDistrInfo`: 查询验证人的收益分配信息
 
 9. Service模块的APIs

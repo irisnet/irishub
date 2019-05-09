@@ -512,31 +512,6 @@ paths:
                       type: string
         '500':
           description: Internal Server Error
-  '/bank/balances/{address}':
-    get:
-      summary: Get the account information on blockchain
-      tags:
-        - ICS20
-      parameters:
-        - in: path
-          name: address
-          description: Account address
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Account information on the blockchain
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Coin'
-        '204':
-          description: No content about this account address
-        '500':
-          description: Server internel error
   '/bank/accounts/{address}/transfers':
     post:
       summary: Send coins (build -> sign -> send)
@@ -2066,7 +2041,7 @@ paths:
                   type: boolean
         description: 'if is_validator is true, validator_address should not be presented'
         required: true
-  '/distribution/{delegatorAddr}/distrInfos/{validatorAddr}':
+  '/distribution/{delegatorAddr}/distrInfo/{validatorAddr}':
     parameters:
       - in: path
         name: delegatorAddr
@@ -2097,7 +2072,7 @@ paths:
           description: Invalid delegator address or validator address
         '500':
           description: Internal Server Error
-  '/distribution/{delegatorAddr}/distrInfos':
+  '/distribution/{delegatorAddr}/distrInfo':
     parameters:
       - in: path
         name: delegatorAddr
