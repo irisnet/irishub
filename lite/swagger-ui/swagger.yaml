@@ -581,7 +581,7 @@ paths:
                   example: 1iris
         description: Parameters to send coins
         required: true
-  /bank/burn:
+  /bank/accounts/{address}/burn:
     post:
       summary: Burn coins
       description: Burn coins
@@ -616,6 +616,12 @@ paths:
           required: false
           schema:
             type: boolean
+        - in: path
+          name: address
+          description: Account address in bech32 format
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Tx was send and will probably be added to the next block
@@ -637,8 +643,6 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                owner:
-                  $ref: '#/components/schemas/Address'
                 amount:
                   type: string
                   example: 1iris

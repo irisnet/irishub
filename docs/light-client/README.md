@@ -75,7 +75,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     1. `GET /bank/coins/{type}`: Get coin type
     2. `GET /bank/token-stats`: Get token statistic
     3. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
-    4. `POST /bank/burn`: Burn coins
+    4. `POST /bank/accounts/{address}/burn`: Burn coins
         
 5. Stake module APIs
 

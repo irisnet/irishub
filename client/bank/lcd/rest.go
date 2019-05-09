@@ -17,5 +17,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryTokenStatsRequestHandlerFn(cdc, cliCtx)).Methods("GET")
 
 	r.HandleFunc("/bank/accounts/{address}/transfers", SendRequestHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc("/bank/burn", BurnRequestHandlerFn(cdc, cliCtx)).Methods("POST")
+	r.HandleFunc("/bank/accounts/{address}/burn", BurnRequestHandlerFn(cdc, cliCtx)).Methods("POST")
 }
