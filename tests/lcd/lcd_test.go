@@ -131,7 +131,7 @@ func TestVersion(t *testing.T) {
 	require.True(t, match, body)
 
 	// node info
-	res, body = Request(t, port, "GET", "/node_version", nil)
+	res, body = Request(t, port, "GET", "/node-version", nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	reg, err = regexp.Compile(`\d+\.\d+\.\d+(-dev)?`)

@@ -18,6 +18,7 @@ import (
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
+	txcmd "github.com/irisnet/irishub/client/tx/cli"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/version"
@@ -50,9 +51,21 @@ func main() {
 	cdc := app.MakeLatestCodec()
 
 	rootCmd.AddCommand(client.ConfigCmd())
-	rootCmd.AddCommand(client.LineBreak)
 
 	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
+	//Add tx commands
+	txCmd := &cobra.Command{
+		Use:   "tx",
+		Short: "Tx subcommands",
+	}
+	txCmd.AddCommand(
+		client.PostCommands(
+			txcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
+			txcmd.GetBroadcastCommand(cdc),
+		)...)
+	rootCmd.AddCommand(
+		txCmd,
+	)
 	//Add state commands
 	tendermintCmd := &cobra.Command{
 		Use:   "tendermint",
@@ -83,8 +96,6 @@ func main() {
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
 			bankcmd.BurnTxCmd(cdc),
-			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,

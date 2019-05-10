@@ -15,7 +15,8 @@ import (
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
-	txhandler "github.com/irisnet/irishub/client/tendermint/tx"
+	ttxhandler "github.com/irisnet/irishub/client/tendermint/tx"
+	txhandler "github.com/irisnet/irishub/client/tx/lcd"
 	"github.com/irisnet/irishub/codec"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
@@ -93,10 +94,11 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout)
 
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
-	r.HandleFunc("/node_version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/node-version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	keyshandler.RegisterRoutes(r, cliCtx.Indent)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc)
+	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	distributionhandler.RegisterRoutes(cliCtx, r, cdc)
 	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
@@ -104,6 +106,6 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	servicehandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
-	txhandler.RegisterRoutes(cliCtx, r, cdc)
+	ttxhandler.RegisterRoutes(cliCtx, r, cdc)
 	return r
 }
