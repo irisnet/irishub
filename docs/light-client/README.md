@@ -74,7 +74,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     1. `GET /bank/coins/{type}`: Get coin type
     2. `GET /bank/token-stats`: Get token statistic
     3. `GET /bank/accounts/{address}`: Get the account information on blockchain
-    4. `POST /bank/accounts/{address}/transfers`: Send coins (build -> sign -> send)
+    4. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
     5. `POST /bank/accounts/{address}/burn`: Burn coins
         
 5. Stake module APIs
@@ -151,7 +151,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 ## Special Parameters
 
 These apis are picked out from above section. And they can be used to build and broadcast transactions:
-1. `POST /bank/accounts/{address}/transfers`: Send tokens (build -> sign -> send)
+1. `POST /bank/accounts/{address}/send`: Send tokens (build -> sign -> send)
 2. `POST /stake/delegators/{delegatorAddr}/delegations`: Submit delegation transaction
 3. `POST /stake/delegators/{delegatorAddr}/redelegations`: Submit redelegation transaction
 4. `POST /stake/delegators/{delegatorAddr}/unbonding-delegations`: Submit unbonding transaction

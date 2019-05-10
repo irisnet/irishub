@@ -75,7 +75,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats`: 查询token统计信息
     3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
-    4. `POST /bank/accounts/{address}/transfers`: 发起转账交易
+    4. `POST /bank/accounts/{address}/send`: 发起转账交易
     5. `POST /bank/accounts/{address}/burn`: 销毁token
 
 5. Stake模块的APIs
@@ -153,7 +153,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 ## 特殊参数
 
 这些是从部分挑选出来的可用于构建和广播交易的APIs：
-1. `POST /bank/accounts/{address}/transfers`
+1. `POST /bank/accounts/{address}/send`
 2. `POST /stake/delegators/{delegatorAddr}/delegations`
 3. `POST /stake/delegators/{delegatorAddr}/redelegations`
 4. `POST /stake/delegators/{delegatorAddr}/unbonding-delegations`

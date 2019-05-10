@@ -553,7 +553,7 @@ paths:
           description: No content about this account address
         '500':
           description: Server internel error
-  '/bank/accounts/{address}/transfers':
+  '/bank/accounts/{address}/send':
     post:
       summary: Send coins (build -> sign -> send)
       description: Send coins (build -> sign -> send)
