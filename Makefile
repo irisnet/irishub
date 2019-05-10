@@ -4,9 +4,7 @@ PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
 PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
-
-all: get_tools get_vendor_deps install build_cur
-
+all: get_tools install build_cur
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 
@@ -72,11 +70,6 @@ get_tools:
 
 get_dev_tools:
 	cd scripts && $(MAKE) get_dev_tools
-
-get_vendor_deps:
-	@rm -rf vendor/
-	@echo "--> Running dep ensure"
-	@dep ensure -v
 
 draw_deps:
 	@# requires brew install graphviz or apt-get install graphviz
