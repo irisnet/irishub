@@ -26,7 +26,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// Get all unbonding delegations from a delegator
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/unbonding_delegations",
+		"/stake/delegators/{delegatorAddr}/unbonding-delegations",
 		delegatorUnbondingDelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -62,7 +62,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// Query all unbonding delegations between a delegator and a validator
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}",
+		"/stake/delegators/{delegatorAddr}/unbonding-delegations/{validatorAddr}",
 		unbondingDelegationHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -86,7 +86,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// Get all unbonding delegations from a validator
 	r.HandleFunc(
-		"/stake/validators/{validatorAddr}/unbonding_delegations",
+		"/stake/validators/{validatorAddr}/unbonding-delegations",
 		validatorUnbondingDelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
-	signcmd "github.com/irisnet/irishub/client/bank/cli"
+	signcmd "github.com/irisnet/irishub/client/tx/cli"
 	"github.com/irisnet/irishub/client/stake/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	"github.com/irisnet/irishub/client/utils"

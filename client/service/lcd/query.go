@@ -17,13 +17,13 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// get a single definition info
 	r.HandleFunc(
-		fmt.Sprintf("/service/definition/{%s}/{%s}", DefChainId, ServiceName),
+		fmt.Sprintf("/service/definitions/{%s}/{%s}", DefChainId, ServiceName),
 		definitionGetHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get a single binding info
 	r.HandleFunc(
-		fmt.Sprintf("/service/binding/{%s}/{%s}/{%s}/{%s}", DefChainId, ServiceName, BindChainId, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", DefChainId, ServiceName, BindChainId, Provider),
 		bindingHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -41,7 +41,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// get a single response
 	r.HandleFunc(
-		fmt.Sprintf("/service/response/{%s}/{%s}", ReqChainId, ReqId),
+		fmt.Sprintf("/service/responses/{%s}/{%s}", ReqChainId, ReqId),
 		responseGetHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 

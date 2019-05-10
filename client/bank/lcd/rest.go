@@ -9,18 +9,13 @@ import (
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	r.HandleFunc("/auth/accounts/{address}",
+	r.HandleFunc("/bank/accounts/{address}",
 		QueryAccountRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
-	r.HandleFunc("/bank/balances/{address}",
-		QueryBalancesRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
-	r.HandleFunc("/bank/coin/{coin-type}",
+	r.HandleFunc("/bank/coins/{type}",
 		QueryCoinTypeRequestHandlerFn(cdc, cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/token-stats",
 		QueryTokenStatsRequestHandlerFn(cdc, cliCtx)).Methods("GET")
 
-	r.HandleFunc("/bank/accounts/{address}/transfers", SendRequestHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc("/bank/burn", BurnRequestHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc("/tx/sign", SignTxRequestHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc("/tx/broadcast", BroadcastTxRequestHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc("/txs/send", SendTxRequestHandlerFn(cliCtx, cdc)).Methods("POST")
+	r.HandleFunc("/bank/accounts/{address}/send", SendRequestHandlerFn(cdc, cliCtx)).Methods("POST")
+	r.HandleFunc("/bank/accounts/{address}/burn", BurnRequestHandlerFn(cdc, cliCtx)).Methods("POST")
 }
