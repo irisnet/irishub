@@ -4,6 +4,8 @@ PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
 PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
+export GO111MODULE = on
+
 all: get_tools install build_cur
 
 COMMIT_HASH := $(shell git rev-parse --short HEAD)

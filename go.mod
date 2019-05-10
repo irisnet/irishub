@@ -36,7 +36,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910
 	github.com/prometheus/common v0.0.0-20181020173914-7e9e6cabbd39
 	github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d
-	github.com/rakyll/statik v0.1.4
+	github.com/rakyll/statik v0.1.6
 	github.com/rcrowley/go-metrics v0.0.0-20180503174638-e2704e165165
 	github.com/rs/cors v1.6.0
 	github.com/spf13/afero v1.1.2

@@ -3,7 +3,7 @@
 # > docker run -v $HOME/.iris:/root/.iris iris init
 # > docker run -v $HOME/.iris:/root/.iris iris start
 
-FROM golang:1.11.5-alpine3.9 as builder
+FROM golang:1.12.5-alpine3.9 as builder
 
 # Set up dependencies
 ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev
@@ -23,11 +23,8 @@ COPY . $REPO_PATH/
 # Install minimum necessary dependencies, build Cosmos SDK, remove packages
 RUN cd $REPO_PATH && \
     apk add --no-cache $PACKAGES && \
-    go get github.com/golang/dep/cmd/dep && \
     make get_tools && \
-    make get_vendor_deps && \
     make test_unit && \
-    make build_linux && \
     make install && \
     make test_cli
 
