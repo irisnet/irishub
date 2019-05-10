@@ -25,6 +25,7 @@ RUN cd $REPO_PATH && \
     apk add --no-cache $PACKAGES && \
     make get_tools && \
     make test_unit && \
+    make build_linux && \
     make install && \
     make test_cli
 

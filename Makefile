@@ -73,6 +73,14 @@ get_tools:
 get_dev_tools:
 	cd scripts && $(MAKE) get_dev_tools
 
+go_mod_cache: go.sum
+	@echo "--> Download go modules to local cache"
+	@go mod download
+
+go.sum: tools
+	@echo "--> Ensure dependencies have not been modified"
+	@go mod verify
+
 draw_deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
@@ -85,19 +93,19 @@ update_irislcd_swagger_docs:
 
 ########################################
 ### Compile and Install
-install: update_irislcd_swagger_docs echo_bech32_prefix
+install: update_irislcd_swagger_docs echo_bech32_prefix go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iris
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iriscli
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/irislcd
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iristool
 
-build_linux: update_irislcd_swagger_docs echo_bech32_prefix
+build_linux: update_irislcd_swagger_docs echo_bech32_prefix go.sum
 	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
 	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
 	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
 	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
 
-build_cur: update_irislcd_swagger_docs echo_bech32_prefix
+build_cur: update_irislcd_swagger_docs echo_bech32_prefix go.sum
 	go build -mod=readonly $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \
 	go build -mod=readonly $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
 	go build -mod=readonly $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
