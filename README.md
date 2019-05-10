@@ -14,7 +14,7 @@ To use Fuxi testnet for testing LCD/iriscli, follow
 ## Install
 
 See the 
-[install instructions](./docs/get-started/Install-the-Software.md).
+[install instructions](./docs/software/How-to-install-irishub.md).
 
 ## Resources
 
