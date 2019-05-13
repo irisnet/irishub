@@ -32,26 +32,12 @@ iriscli bank account <address> <flags>
 
 After that, you will get the detail info for the account.
 ```
-{
-
-  "address": "iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym",
-
-  "coins": [
-
-    "50iris"
-
-  ],
-
-  "public_key": {
-
-    "type": "tendermint/PubKeySecp256k1",
-
-    "value": "AzlCwiA5Tvxwi7lMB/Hihfp2qnaks5Wrrgkg/Jy7sEkF"
-
-  },
-  "account_number": "0",
-  "sequence": "1"
-}
+Account:
+  Address:         iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym
+  Pubkey:          iap1addwnpepqwnsrt9m8tevhy4fdqyarunzuzzgz8e5q8jlceyf7uwpw0q0ptp2cp3lmjt
+  Coins:           50iris
+  Account Number:  0
+  Sequence:        2
 ```
 
 ### Common Issue
@@ -65,8 +51,7 @@ ERROR: decoding bech32 failed: checksum failed. Expected 46vaym, got d429zz.
 If you query an account with no transactions on the chain, you will get the follow error. 
 ```
 iriscli bank account iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr
-ERROR: No account with address iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr was found in the state.
-Are you sure there has been a transaction involving it?
+ERROR: {"codespace":"sdk","code":9,"message":"account iaa1kenrwk5k4ng70e5s9zfsttxpnlesx5psh804vr does not exist"}
 ```
 
 

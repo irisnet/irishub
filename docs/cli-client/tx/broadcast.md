@@ -1,4 +1,4 @@
-# iriscli bank broadcast
+# iriscli tx broadcast
 
 ## Description
 
@@ -7,7 +7,7 @@ This command is used for broadcasting a signed transaction to the network after 
 ## Usage:
 
 ```
-iriscli bank broadcast <tx-file> <flags> 
+iriscli tx broadcast <tx-file> <flags> 
 ```
 
 ## Flags
@@ -26,5 +26,5 @@ iriscli bank broadcast <tx-file> <flags>
 ### Broadcast your transaction
 
 ```
-iriscli bank broadcast sign.json --chain-id=<chain-id>
+iriscli tx broadcast sign.json --chain-id=<chain-id>
 ```

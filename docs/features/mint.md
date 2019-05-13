@@ -62,13 +62,11 @@ There are two command line interfaces and two LCD restful APIs which can query t
     
     Output:
     ```
-    {
-      "loosen_token": [
-        "1864477.596384156921391687iris"
-      ],
-      "burned_token": null,
-      "bonded_token": "425182.329615843078608313iris"
-    }
+    TokenStats:
+      Loosen Token:  1864477.596384156921391687iris
+      Burned Token:  null
+      Bonded Token:  425182.329615843078608313iris
+
     ```
     
 3. `/stake/pool` and `/bank/token-stats`

@@ -36,8 +36,14 @@ iriscli gov query-proposals --chain-id=<chain-id>
 默认查询所有的提议。
 
 ```txt
-  1 - test proposal
-  2 - new proposal
+ID - (Status) [Type] [TotalDeposit] Title
+1 - (Rejected) [TxTaxUsage] [1000iris] t
+2 - (Rejected) [TxTaxUsage] [1000iris] t
+6 - (Rejected) [TxTaxUsage] [1000iris] t
+8 - (Rejected) [TxTaxUsage] [1000iris] t
+9 - (Passed) [ParameterChange] [2000iris] test
+10 - (Passed) [ParameterChange] [2000iris] test
+11 - (Passed) [ParameterChange] [2000iris] test
 ```
 
 当然这里可以查询指定条件的提议。
@@ -48,7 +54,8 @@ gov query-proposals --chain-id=<chain-id> --depositor=iaa14q5rf9sl2dqd2uxrxykafx
 
 可以得到存款人是iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs地址的提议。
 ```txt
-  2 - new proposal
+ID - (Status) [Type] [TotalDeposit] Title
+97 - (VotingPeriod) [TxTaxUsage] [1090iris] t
 ```
 
 查询最新的3条提议

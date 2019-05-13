@@ -25,11 +25,10 @@ iriscli stake delegations iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh
 
 运行成功以后，返回的结果如下：
 
-```json
-{
-"delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm",
-"validator_addr": "iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs",
-"shares": "200.0000000",
-"height": "290"
-}
+```
+Delegation:
+  Delegator:  faa1td4xnefkthfs6jg469x33shzf578fed6n7k7ua
+  Validator:  fva1zkevgrasr5txhgsyqd7l9javln9et2d7k5yycy
+  Shares:     1.0000000000000000000000000000
+  Height:     26
 ```

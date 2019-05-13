@@ -31,16 +31,6 @@ iriscli gov query-deposits --chain-id=<chain-id> --proposal-id=<proposal-id>
 你可以查询到指定提议的所有保证金代币，包括每个抵押人的保证金详情。
 
 ```txt
-[
-  {
-    "depositor": "iaa1c4kjt586r3t353ek9jtzwxum9x9fcgwent790r",
-    "proposal_id": "1",
-    "amount": [
-      {
-        "denom": "iris-atto",
-        "amount": "35000000000000000000"
-      }
-    ]
-  }
-]
+Deposits for Proposal 92:
+  iaa1c4kjt586r3t353ek9jtzwxum9x9fcgwent790r: 995iris
 ```

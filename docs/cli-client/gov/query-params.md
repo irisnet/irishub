@@ -19,7 +19,6 @@ iriscli gov query-params --help
 
 | Name, shorthand | Default                    | Description                                                                                                                                          | Required |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --key           |                            | Key name of parameter                                                                                                                       |          |
 | --module        |                            | Module name                                                                                                                                 |          |
 
 ## Examples
@@ -33,23 +32,11 @@ iriscli gov query-params --module=stake
 ```
 
 ```txt
- stake/MaxValidators=100
- stake/UnbondingTime=504h0m0s
+Stake Params:
+  Unbonding Time:         504h0m0s
+  Max Validators:         100
 ```
 
-### Query params by key
-
-Get the details of the parameter specified in the stake module.
-
-```shell
-iriscli gov query-params --key=stake/MaxValidators
-```
-
-```txt
- stake/MaxValidators=100
-```
-
-Note: --module and --key cannot be both empty.
 
 ### Modules with all configurable parameters
 

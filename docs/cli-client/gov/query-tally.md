@@ -32,10 +32,9 @@ iriscli gov query-tally --chain-id=<chain-id> --proposal-id=<proposal-id>
 ```
 
 ```txt
-{
-  "yes": "100.0000000000",
-  "abstain": "0.0000000000",
-  "no": "200.0000000000",
-  "no_with_veto": "0.0000000000"
-}
+Tally Result:
+  Yes:        0
+  Abstain:    100.0000000000
+  No:         0
+  NoWithVeto: 200.0000000000
 ```

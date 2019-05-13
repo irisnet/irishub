@@ -33,14 +33,5 @@ iriscli gov query-deposit --chain-id=<chain-id> --proposal-id=<proposal-id> --de
 You could query the deposited tokens on a specific proposal by `proposal-id` and `depositor`.
 
 ```txt
-{
-  "depositor": "iaa1c4kjt586r3t353ek9jtzwxum9x9fcgwent790r",
-  "proposal_id": "1",
-  "amount": [
-    {
-      "denom": "iris-atto",
-      "amount": "30000000000000000000"
-    }
-  ]
-}
+Deposit by iaa1c4kjt586r3t353ek9jtzwxum9x9fcgwent790r on Proposal 90 is for the amount 995iris
 ```

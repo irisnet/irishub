@@ -79,31 +79,10 @@ iriscli distribution rewards <delegator_address>
 
 Output：
 ```bash
-{
-  "total": [
-    {
-      "denom": "iris-atto",
-      "amount": "2035754787730512363646"
-    }
-  ],
-  "delegations": [
-    {
-      "validator": <validator_address>,
-      "reward": [
-        {
-          "denom": "iris-atto",
-          "amount": "1052463556823086428786"
-        }
-      ]
-    }
-  ],
-  "commission": [
-    {
-      "denom": "iris-atto",
-      "amount": "983291230907425934859"
-    }
-  ]
-}
+Total:        270.33761964714393479iris
+Delegations:  
+  validator: iva1q7602ujxxx0urfw7twm0uk5m7n6l9gqsgw4pqy, reward: 2.899411557255275253iris
+Commission:   267.438208089888659537iris
 ```
 
 2.Use `dry-run` mode (simulation only , tx won't be broadcast)

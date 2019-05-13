@@ -33,9 +33,9 @@ iriscli stake delegation --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvy
 运行成功以后，返回的结果如下：
 
 ```txt
-Delegation
-Delegator: iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
-Validator: iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs
-Shares: 200.0000000
-Height: 290
+Delegation:
+  Delegator:  iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
+  Validator:  iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs
+  Shares:     1.0000000000000000000000000000
+  Height:     26
 ```

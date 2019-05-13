@@ -60,13 +60,10 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
     
     Output:
     ```
-    {
-      "loosen_token": [
-        "1864477.596384156921391687iris"
-      ],
-      "burned_token": null,
-      "bonded_token": "425182.329615843078608313iris"
-    }
+    TokenStats:
+      Loosen Token:  1864477.596384156921391687iris
+      Burned Token:  null
+      Bonded Token:  425182.329615843078608313iris
     ```
     
     

@@ -23,24 +23,13 @@ iriscli stake redelegations-from <validator-address>
 ```
 
 运行成功以后，返回的结果如下：
-```json
-[
-  {
-    "delegator_addr": "iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9gtd2ft",
-    "validator_src_addr": "iva1dayujdfnxjggd5ydlvvgkerp2supknth9a8qhh",
-    "validator_dst_addr": "iva1h27xdw6t9l5jgvun76qdu45kgrx9lqedpg3ecs",
-    "creation_height": "1130",
-    "min_time": "2018-11-16T07:22:48.740311064Z",
-    "initial_balance": {
-      "denom": "iris-atto",
-      "amount": "100000000000000000"
-    },
-    "balance": {
-      "denom": "iris-atto",
-      "amount": "100000000000000000"
-    },
-    "shares_src": "100000000000000000.0000000000",
-    "shares_dst": "100000000000000000.0000000000"
-  }
-]
+```
+Redelegation
+Delegator: iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9gtd2ft
+Source Validator: iva1dayujdfnxjggd5ydlvvgkerp2supknth9a8qhh
+Destination Validator: iva1h27xdw6t9l5jgvun76qdu45kgrx9lqedpg3ecs
+Creation height: 1130
+Min time to unbond (unix): 2018-11-16 07:22:48.740311064 +0000 UTC
+Source shares: 0.1000000000
+Destination shares: 0.1000000000
 ```

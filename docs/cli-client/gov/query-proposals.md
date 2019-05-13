@@ -37,8 +37,14 @@ iriscli gov query-proposals --chain-id=<chain-id>
 You could query all the proposals by default.
 
 ```txt
-  1 - test proposal
-  2 - new proposal
+ID - (Status) [Type] [TotalDeposit] Title
+1 - (Rejected) [TxTaxUsage] [1000iris] t
+2 - (Rejected) [TxTaxUsage] [1000iris] t
+6 - (Rejected) [TxTaxUsage] [1000iris] t
+8 - (Rejected) [TxTaxUsage] [1000iris] t
+9 - (Passed) [ParameterChange] [2000iris] test
+10 - (Passed) [ParameterChange] [2000iris] test
+11 - (Passed) [ParameterChange] [2000iris] test
 ```
 
 Also you can query proposal by filters, such as:
@@ -50,7 +56,8 @@ gov query-proposals --chain-id=<chain-id> --depositor=iaa14q5rf9sl2dqd2uxrxykafx
 Finally, here shows the proposal who's depositor address is iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs.
 
 ```txt
-  2 - new proposal
+ID - (Status) [Type] [TotalDeposit] Title
+97 - (VotingPeriod) [TxTaxUsage] [1090iris] t
 ```
 
 Query latest 3 proposals
