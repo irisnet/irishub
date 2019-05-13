@@ -24,11 +24,15 @@ iriscli stake delegations-to iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh
 
 After that, you will get all detailed info of delegations from the specified delegator address.
 
-```json
-{
-"delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm",
-"validator_addr": "iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh",
-"shares": "0.2000000000",
-"height": "290"
-}
+```
+Delegation:
+  Delegator:  iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
+  Validator:  iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh
+  Shares:     100.0000000000000000000000000000
+  Height:     0
+Delegation:
+  Delegator:  iaa1td4xnefkthfs6jg469x33shzf578fed6n7k7ua
+  Validator:  iva1yclscskdtqu9rgufgws293wxp3njsesxxlnhmh
+  Shares:     1.0000000000000000000000000000
+  Height:     26
 ```
