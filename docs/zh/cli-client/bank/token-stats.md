@@ -34,14 +34,9 @@ iriscli bank token-stats
 
 示例返回：
 
-```json
-{
-  "loosen_token": [
-    "1864477.596384156921391687iris"
-  ],
-  "burned_token": [
-    "177.59638iris"
-  ],
-  "bonded_token": "425182.329615843078608313iris"
-}
+```
+TokenStats:
+  Loosen Token:  1864477.596384156921391687iris
+  Burned Token:  177.59638iris
+  Bonded Token:  425182.329615843078608313iris
 ```

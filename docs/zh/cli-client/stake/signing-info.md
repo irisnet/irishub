@@ -24,5 +24,9 @@ iriscli stake signing-info <validator-pubkey>
 
 运行成功以后，返回的结果如下：
 ```txt
-Start height: 0, index offset: 2136, jailed until: 1970-01-01 00:00:00 +0000 UTC, missed blocks counter: 0
+  Signing Info
+  Start Height:          0
+  Index Offset:          3506
+  Jailed Until:          1970-01-01 00:00:00 +0000 UTC
+  Missed Blocks Counter: 0
 ```

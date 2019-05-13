@@ -33,8 +33,9 @@ iriscli gov query-params --module=stake
 ```
 
 ```txt
- stake/MaxValidators=100
- stake/UnbondingTime=504h0m0s
+Stake Params:
+  Unbonding Time:         504h0m0s
+  Max Validators:         100
 ```
 
 ### 所有可查询参数的模块

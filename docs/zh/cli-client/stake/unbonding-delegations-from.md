@@ -23,21 +23,11 @@ iriscli stake unbonding-delegations-from <validator-address>
 ```
 
 运行成功以后，返回的结果如下：
-```json
-[
-  {
-    "delegator_addr": "iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm",
-    "validator_addr": "iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs",
-    "creation_height": "1310",
-    "min_time": "2018-11-15T06:24:22.754703377Z",
-    "initial_balance": {
-      "denom": "iris-atto",
-      "amount": "20000000000000000"
-    },
-    "balance": {
-      "denom": "iris-atto",
-      "amount": "20000000000000000"
-    }
-  }
-]
+```
+Unbonding Delegation
+Delegator: iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
+Validator: iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs
+Creation height: 1310
+Min time to unbond (unix): 2018-11-15 06:24:22.754703377 +0000 UTC
+Expected balance: 0.02iris
 ```

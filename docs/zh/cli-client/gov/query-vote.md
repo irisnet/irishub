@@ -32,10 +32,6 @@ iriscli gov query-vote --chain-id=<chain-id> --proposal-id=<proposal-id> --voter
 ```
 
 ```txt
-{
-  "voter": "iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs",
-  "proposal_id": "1",
-  "option": "Yes"
-}
+Voter iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs voted with option Abstain on proposal 99
 ```
 
