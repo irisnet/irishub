@@ -23,52 +23,23 @@ IRIShub是用Go语言编写的。它可以在任何能够编译并运行Go语言
 * 允许的入方向的链接：TCP端口 26656 和 26657
 
 
-#### 安装Go版本 1.10+ 
+#### 安装Go
 
+::: tip
+IRIShub需要 **Go 1.12.1+**.
+:::
 
-系统要求：
+参照[官方文档](https://golang.org/doc/install)安装 `go`。记住要设置 `$GOPATH`，`$GOBIN` 和 `$PATH` 环境变量，示例:
 
-Ubuntu LTS 16.04
-
-
-安装IRIShub需要保证Go的版本在1.10以上，
-
-通过执行以下命令安装1.10版本的Go。
-
-```
-$ sudo add-apt-repository ppa:gophers/archive
-$ sudo apt-get update
-$ sudo apt-get install golang-1.10-go
-```
-
-以上命令将安装 golang-1.10-go在 /usr/lib/go-1.10/bin. 需要将它加入到PATH中
-
-```
-echo "export PATH=$PATH:/usr/lib/go-1.10/bin" >> ~/.bash_profile
-source ~/.bash_profile
-```
-
-同时，你需要指定相关的 $GOPATH, $GOBIN, 和 $PATH 变量, 例如:
-
-```
+```bash
 mkdir -p $HOME/go/bin
 echo "export GOPATH=$HOME/go" >> ~/.bash_profile
-source ~/.bash_profile
 echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
-source ~/.bash_profile
 echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
-参考链接：
-
-1. https://golang.org/doc/install
-2. https://github.com/golang/go/wiki/Ubuntu
-
-
-
 #### 下载源码并安装
-
 
 在完成Go的安装后，通过以下命令下载并安装IRIS hub相关程序.(请确保你的电脑可以访问`google.com`， `iris`很多库的依赖由google提供)
 
