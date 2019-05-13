@@ -31,7 +31,7 @@ Read a transaction from <file>, sign it, and print its JSON encoding.
 The --offline flag makes sure that the client will not reach out to the local cache.
 Thus account number or sequence number lookups will not be performed and it is
 recommended to set such parameters manually.`,
-		Example: "iriscli bank sign <file> --name <key name> --chain-id=<chain-id>",
+		Example: "iriscli tx sign <file> --name <key name> --chain-id=<chain-id>",
 		RunE:    makeSignCmd(codec, decoder),
 		Args:    cobra.ExactArgs(1),
 	}

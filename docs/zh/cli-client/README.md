@@ -9,7 +9,7 @@
 | --help, -h      | string | false    |                       | 打印帮助信息 |
 | --output        | string | false    | text                  | 指定返回的格式 text或者json|
 | --indent        | bool   | false    | false                 | 格式化json字符串|
-| --ledger        | bool   | false    | false                 | 是否使用硬件钱包 |
+| --ledger        | bool   | false    | false                 | 使用ledger设备 |
 | --node          | string | false    | tcp://localhost:26657 | tendermint节点的rpc地址|
 | --trust-node    | bool   | false    | true                  | 是否信任全节点返回的数据，如果不信任，客户端会验证查询结果的正确性 |
 
@@ -86,7 +86,7 @@ root@ubuntu:~# iriscli stake validators --output=json --indent
 | --help, -h       | string | false    |                       | 打印帮助信息 |
 | --indent         | bool   | false    | false                 | 格式化json字符串 |
 | --json           | string | false    | false                 | 指定返回结果的格式，`json`或者`text` |
-| --ledger         | bool   | false    | false                 | 是否使用硬件钱包|
+| --ledger         | bool   | false    | false                 | 使用ledger设备 |
 | --memo           | string | false    | ""                    | 指定交易的memo字段 |
 | --node           | string | false    | tcp://localhost:26657 | tendermint节点的rpc地址 |
 | --print-response | bool   | false    | false                 | 是否打印交易返回结果，仅在`async`为true的情况下有效|
