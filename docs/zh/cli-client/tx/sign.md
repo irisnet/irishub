@@ -1,4 +1,4 @@
-# iriscli bank sign
+# iriscli tx sign
 
 ## 描述
 
@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli bank sign <file> <flags>
+iriscli tx sign <file> <flags>
 ```
 
  
@@ -42,7 +42,7 @@ iriscli bank send --to=<address> --from=<key_name> --fee=0.3iris --chain-id=<cha
 
 接着来签名这个离线文件
 ```
-iriscli bank sign tx.json --name=<key_name> 
+iriscli tx sign tx.json --name=<key_name> 
 
 {"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"40000000000000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
 ```
@@ -52,4 +52,4 @@ iriscli bank sign tx.json --name=<key_name>
 
 **sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==**
 
-签完名后的交易可以在网络中被广播 [broadcast command](./broadcast.md)
+签完名后的交易可以在网络中被广播 [broadcast command](broadcast.md)

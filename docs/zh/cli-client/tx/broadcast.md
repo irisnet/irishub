@@ -1,4 +1,4 @@
-# iriscli bank broadcast
+# iriscli tx broadcast
 
 ## 描述
 
@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
-iriscli bank broadcast <tx-file> <flags> 
+iriscli tx broadcast <tx-file> <flags> 
 ```
 
 ## 标志
@@ -26,5 +26,5 @@ iriscli bank broadcast <tx-file> <flags>
 ### 广播交易
 
 ```
-iriscli bank broadcast sign.json --chain-id=<chain-id>
+iriscli tx broadcast sign.json --chain-id=<chain-id>
 ```
