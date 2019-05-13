@@ -21,57 +21,24 @@ It's recommended that you run a validator node on Linux Server.
 5. Bandwidth: 20Mbps
 6. Allow all incoming connections on TCP port 26656 and 26657
 
+#### Install Go
+
+::: tip
+**Go 1.12.1+** is required for the IRIShub.
+:::
+
+Install `go` by following the [official docs](https://golang.org/doc/install). Remember to set your `$GOPATH`, `$GOBIN`, and `$PATH` environment variables, for example:
+
+```bash
+mkdir -p $HOME/go/bin
+echo "export GOPATH=$HOME/go" >> ~/.bash_profile
+echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
+echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
+source ~/.bash_profile
+```
+
 #### Compile Source Code
 
-- Install Go 1.10+
-
-```
-$ sudo add-apt-repository ppa:gophers/archive
-$ sudo apt-get update
-$ sudo apt-get install golang-1.10-go
-```
-
-> Note that golang-1.10-go puts binaries in /usr/lib/go-1.10/bin. If you want them on your PATH, you need to make that change yourself.
-
-Using snaps also works quite well:
-
-```
-This will give you the latest version of go
-$ sudo snap install --classic go
-```
-
-> A restart is required for the command to be recognized.
-
-Then you need to verify the versions of Go:
-
-```
-$ go version
-go version go1.10.3 darwin/amd64
-```
-
-Then, you need to add `GOPATH` to system `PATH` , then your system could correctly compile the code.
-
-Open your `.profile` in your home directory. Add the following lines at the end of file:
-
-```
-GOPATH=$HOME/go
-PATH=$GOPATH/bin:$PATH
-```
-
-Save the file and exit the editor. Then run the following to make your bash reload your profile configurations.
-
-```
-$ source $HOME/.profile
-```
-
-Now you should see something like this if you echo your\$GOPATH and \$PATH variables
-
-```
-$ echo $GOPATH
-/home/iris/go
-$ echo $PATH
-/home/isir/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-```
 
 - Get the code and compile Iris
 

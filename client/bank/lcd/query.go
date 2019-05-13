@@ -17,44 +17,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// query accountREST Handler
-func QueryBalancesRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
-	cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		vars := mux.Vars(r)
-		bech32addr := vars["address"]
-		cliCtx = cliCtx.WithAccountDecoder(decoder)
-
-		addr, err := sdk.AccAddressFromBech32(bech32addr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		res, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), protocol.AccountStore)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		// the query will return empty if there is no data for this account
-		if len(res) == 0 {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		// decode the value
-		account, err := decoder(res)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, account.GetCoins(), cliCtx.Indent)
-	}
-}
-
 // QueryAccountRequestHandlerFn performs account information query
 func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
 	cliCtx context.CLIContext) http.HandlerFunc {
@@ -102,7 +64,7 @@ func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
 func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		coinType := vars["coin-type"]
+		coinType := vars["type"]
 		res, err := cliCtx.GetCoinType(coinType)
 		if err != nil && strings.Contains(err.Error(), "unsupported coin type") {
 			w.WriteHeader(http.StatusNoContent)
