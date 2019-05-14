@@ -2190,6 +2190,25 @@ paths:
           description: Invalid address
         '500':
           description: Internal Server Error
+  '/distribution/community-tax':
+    get:
+      summary: Query community tax
+      tags:
+        - ICS24
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  amout:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+        '500':
+          description: Internal Server Error
   /service/definitions:
     post:
       summary: Add a service definition

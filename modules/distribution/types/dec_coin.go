@@ -52,6 +52,10 @@ func (coin DecCoin) TruncateDecimal() (sdk.Coin, DecCoin) {
 	return sdk.NewCoin(coin.Denom, truncated), DecCoin{coin.Denom, change}
 }
 
+func (coin DecCoin) String() string {
+	return fmt.Sprintf("%v%v", coin.Amount, coin.Denom)
+}
+
 //_______________________________________________________________________
 
 // coins with decimal
@@ -199,4 +203,40 @@ func (coins DecCoins) IsZero() bool {
 		}
 	}
 	return true
+}
+
+func (coins DecCoins) String() string {
+	if len(coins) == 0 {
+		return ""
+	}
+
+	out := ""
+	for _, coin := range coins {
+		out += fmt.Sprintf("%v,", coin.String())
+	}
+
+	return out[:len(out)-1]
+}
+
+func (coins DecCoins) MainUnitString() string {
+	if len(coins) == 0 {
+		return ""
+	}
+	out := ""
+	for _, coin := range coins {
+		// only convert iris now
+		if coin.Denom == sdk.NativeTokenMinDenom {
+			truncateCoin, _ := coin.TruncateDecimal()
+			destCoinStr, err := sdk.IRIS.Convert(truncateCoin.String(), sdk.NativeTokenName)
+			if err == nil {
+				out += fmt.Sprintf("%v,", destCoinStr)
+				continue
+			}
+		}
+		out += fmt.Sprintf("%v,", coin.String())
+	}
+	if len(out) > 0 {
+		out = out[:len(out)-1]
+	}
+	return out
 }

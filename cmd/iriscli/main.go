@@ -113,6 +113,7 @@ func main() {
 			distributioncmd.GetValidatorDistInfo(cdc),
 			distributioncmd.GetAllDelegationDistInfo(cdc),
 			distributioncmd.GetRewards(cdc),
+			distributioncmd.GetCommunityTax(cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(

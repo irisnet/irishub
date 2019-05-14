@@ -21,4 +21,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryValidatorDistInfoHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{address}/rewards",
 		QueryRewardsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/distribution/community-tax",
+		QueryCommunityTaxFn(cliCtx)).Methods("GET")
 }
