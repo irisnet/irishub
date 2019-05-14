@@ -13,13 +13,11 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/client/context"
-	distributionclient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
-	distributiontypes "github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/service"
@@ -238,42 +236,6 @@ func executeGetValidatorPK(t *testing.T, cmdStr string) string {
 	require.Empty(t, errMsg)
 
 	return out
-}
-
-func executeGetDelegatorDistrInfo(t *testing.T, cmdStr string) []distributiontypes.DelegationDistInfo {
-	out, errMsg := tests.ExecuteT(t, cmdStr, "")
-	require.Empty(t, errMsg)
-
-	cdc := app.MakeLatestCodec()
-	var ddiList []distributiontypes.DelegationDistInfo
-	err := cdc.UnmarshalJSON([]byte(out), &ddiList)
-
-	require.Empty(t, err)
-	return ddiList
-}
-
-func executeGetDelegationDistrInfo(t *testing.T, cmdStr string) distributiontypes.DelegationDistInfo {
-	out, errMsg := tests.ExecuteT(t, cmdStr, "")
-	require.Empty(t, errMsg)
-
-	cdc := app.MakeLatestCodec()
-	var ddi distributiontypes.DelegationDistInfo
-	err := cdc.UnmarshalJSON([]byte(out), &ddi)
-
-	require.Empty(t, err)
-	return ddi
-}
-
-func executeGetValidatorDistrInfo(t *testing.T, cmdStr string) distributionclient.ValidatorDistInfoOutput {
-	out, errMsg := tests.ExecuteT(t, cmdStr, "")
-	require.Empty(t, errMsg)
-
-	cdc := app.MakeLatestCodec()
-	var vdi distributionclient.ValidatorDistInfoOutput
-	err := cdc.UnmarshalJSON([]byte(out), &vdi)
-
-	require.Empty(t, err)
-	return vdi
 }
 
 func executeGetValidator(t *testing.T, cmdStr string) stake.ValidatorOutput {

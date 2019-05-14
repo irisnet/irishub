@@ -168,3 +168,16 @@ func QueryRewardsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
+
+func QueryCommunityTaxFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryCommunityTax),
+			nil)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
+}

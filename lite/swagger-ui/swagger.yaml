@@ -2045,108 +2045,108 @@ paths:
                   type: boolean
         description: 'if is_validator is true, validator_address should not be presented'
         required: true
-  '/distribution/{delegatorAddr}/distrInfo/{validatorAddr}':
-    parameters:
-      - in: path
-        name: delegatorAddr
-        description: Bech32 AccAddress of Delegator
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: validatorAddr
-        description: Bech32 OperatorAddress of validator
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Query distribution information for a delegation
-      tags:
-        - ICS24
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/DelegationDistInfo'
-        '204':
-          description: No content
-        '400':
-          description: Invalid delegator address or validator address
-        '500':
-          description: Internal Server Error
-  '/distribution/{delegatorAddr}/distrInfo':
-    parameters:
-      - in: path
-        name: delegatorAddr
-        description: Bech32 AccAddress of Delegator
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Query distribution information list for a given delegator
-      tags:
-        - ICS24
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DelegationDistInfo'
-        '400':
-          description: Invalid delegator address
-        '500':
-          description: Internal Server Error
-  '/distribution/{validatorAddr}/valDistrInfo':
-    parameters:
-      - in: path
-        name: validatorAddr
-        description: Bech32 ValAddress of Validator
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Query withdraw address
-      tags:
-        - ICS24
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  operator_addr:
-                    type: string
-                  fee_pool_withdrawal_height:
-                    type: string
-                    example: '0'
-                  del_accum:
-                    type: object
-                    properties:
-                      update_height:
-                        type: string
-                        example: '0'
-                      accum:
-                        type: string
-                        example: '0.0000000000'
-                  del_pool:
-                    type: string
-                    example: 0.1iris
-                  val_commission:
-                    type: string
-                    example: 0.1iris
-        '204':
-          description: Invalid delegator address
-        '400':
-          description: Invalid delegator address
-        '500':
-          description: Internal Server Error
+#  '/distribution/{delegatorAddr}/distrInfo/{validatorAddr}':
+#    parameters:
+#      - in: path
+#        name: delegatorAddr
+#        description: Bech32 AccAddress of Delegator
+#        required: true
+#        schema:
+#          type: string
+#      - in: path
+#        name: validatorAddr
+#        description: Bech32 OperatorAddress of validator
+#        required: true
+#        schema:
+#          type: string
+#    get:
+#      summary: Query distribution information for a delegation
+#      tags:
+#        - ICS24
+#      responses:
+#        '200':
+#          description: OK
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: '#/components/schemas/DelegationDistInfo'
+#        '204':
+#          description: No content
+#        '400':
+#          description: Invalid delegator address or validator address
+#        '500':
+#          description: Internal Server Error
+#  '/distribution/{delegatorAddr}/distrInfo':
+#    parameters:
+#      - in: path
+#        name: delegatorAddr
+#        description: Bech32 AccAddress of Delegator
+#        required: true
+#        schema:
+#          type: string
+#    get:
+#      summary: Query distribution information list for a given delegator
+#      tags:
+#        - ICS24
+#      responses:
+#        '200':
+#          description: OK
+#          content:
+#            '*/*':
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/DelegationDistInfo'
+#        '400':
+#          description: Invalid delegator address
+#        '500':
+#          description: Internal Server Error
+#  '/distribution/{validatorAddr}/valDistrInfo':
+#    parameters:
+#      - in: path
+#        name: validatorAddr
+#        description: Bech32 ValAddress of Validator
+#        required: true
+#        schema:
+#          type: string
+#    get:
+#      summary: Query withdraw address
+#      tags:
+#        - ICS24
+#      responses:
+#        '200':
+#          description: OK
+#          content:
+#            '*/*':
+#              schema:
+#                type: object
+#                properties:
+#                  operator_addr:
+#                    type: string
+#                  fee_pool_withdrawal_height:
+#                    type: string
+#                    example: '0'
+#                  del_accum:
+#                    type: object
+#                    properties:
+#                      update_height:
+#                        type: string
+#                        example: '0'
+#                      accum:
+#                        type: string
+#                        example: '0.0000000000'
+#                  del_pool:
+#                    type: string
+#                    example: 0.1iris
+#                  val_commission:
+#                    type: string
+#                    example: 0.1iris
+#        '204':
+#          description: Invalid delegator address
+#        '400':
+#          description: Invalid delegator address
+#        '500':
+#          description: Internal Server Error
   '/distribution/{address}/rewards':
     parameters:
       - in: path
@@ -2188,6 +2188,25 @@ paths:
           description: Invalid address
         '400':
           description: Invalid address
+        '500':
+          description: Internal Server Error
+  '/distribution/community-tax':
+    get:
+      summary: Query community tax
+      tags:
+        - ICS24
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  amout:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
         '500':
           description: Internal Server Error
   /service/definitions:

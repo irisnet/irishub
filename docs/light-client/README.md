@@ -120,9 +120,8 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     1. `POST /distribution/{delegatorAddr}/withdrawAddress`: Set withdraw address
     2. `GET /distribution/{delegatorAddr}/withdrawAddress`: Query withdraw address
     3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw reward
-    4. `GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr}`: Query distribution information for a delegation
-    5. `GET /distribution/{delegatorAddr}/distrInfo`: Query distribution information list for a given delegator
-    6. `GET /distribution/{validatorAddr}/valDistrInfo`: Query withdraw address
+    4. `GET /distribution/{address}/rewards`: Query rewards
+    5. `GET /distribution/community-tax`: Query community tax
     
 9. Service module APIs
 

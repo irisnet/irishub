@@ -18,6 +18,7 @@ type (
 	TotalAccum = types.TotalAccum
 	FeePool = types.FeePool
 	Rewards = keeper.Rewards
+	CommunityTax = keeper.CommunityTax
 
 	MsgWithdrawDelegatorRewardsAll = types.MsgWithdrawDelegatorRewardsAll
 	MsgWithdrawDelegatorReward = types.MsgWithdrawDelegatorReward
@@ -80,6 +81,7 @@ const (
 	QueryAllDelegationDistInfo = keeper.QueryAllDelegationDistInfo
 	QueryValidatorDistInfo     = keeper.QueryValidatorDistInfo
 	QueryRewards               = keeper.QueryRewards
+	QueryCommunityTax          = keeper.QueryCommunityTax
 )
 
 var (

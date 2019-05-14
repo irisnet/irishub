@@ -17,6 +17,7 @@ const (
 	QueryAllDelegationDistInfo = "all_delegation_dist_info"
 	QueryValidatorDistInfo     = "validator_dist_info"
 	QueryRewards               = "rewards"
+	QueryCommunityTax          = "community_tax"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -36,6 +37,9 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 		case QueryRewards:
 			return queryRewards(ctx, path[1:], req, k)
+
+		case QueryCommunityTax:
+			return queryCommunityTax(ctx, k)
 
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown distr query endpoint")
@@ -256,4 +260,25 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 		return nil, sdk.MarshalResultErr(err)
 	}
 	return res, nil
+}
+
+type CommunityTax struct {
+	Amount types.DecCoins `json:"amount"`
+}
+
+func (ct CommunityTax) String() string {
+	return fmt.Sprintf(`Amount:  %s`,
+		ct.Amount.MainUnitString())
+}
+
+func queryCommunityTax(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+	ctx, _ = ctx.CacheContext()
+	feePool := k.GetFeePool(ctx)
+	communityTax := CommunityTax{Amount: feePool.CommunityPool}
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, communityTax)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+	return bz, nil
 }

@@ -214,3 +214,32 @@ func GetRewards(cdc *codec.Codec) *cobra.Command {
 	}
 	return cmd
 }
+
+// GetCommunityTax returns the community tax coins
+func GetCommunityTax(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "community-tax",
+		Short:   "Query community tax",
+		Example: "iriscli distribution community-tax",
+		Args:    cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryCommunityTax),
+				nil)
+			if err != nil {
+				return err
+			}
+
+			var communityTax distribution.CommunityTax
+			err = cdc.UnmarshalJSON(res, &communityTax)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(communityTax)
+		},
+	}
+	return cmd
+}
