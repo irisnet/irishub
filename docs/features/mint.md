@@ -31,9 +31,9 @@ Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then t
 
 ## Impact to users
 
-The inflation calculation is automatically triggered by each block. So once a new block is produced, new tokens will be created and the loosen token will increase accordingly. Users have no directly interface to affect this process. 
+The inflation calculation is automatically triggered by each block. So once a new block is produced, new tokens will be created and the loose tokens will increase accordingly. Users have no directly interface to affect this process. 
 
-There are two command line interfaces and two LCD restful APIs which can query total loosen token amount.
+There are two command line interfaces and two LCD restful APIs which can query total loose tokens amount.
 
 1. `iriscli stake pool`
 
@@ -63,9 +63,9 @@ There are two command line interfaces and two LCD restful APIs which can query t
     Output:
     ```
     TokenStats:
-      Loosen Token:  1864477.596384156921391687iris
-      Burned Token:  null
-      Bonded Token:  425182.329615843078608313iris
+      Loose Tokens:  1864477.596384156921391687iris
+      Burned Tokens:  null
+      Bonded Tokens:  425182.329615843078608313iris
 
     ```
     

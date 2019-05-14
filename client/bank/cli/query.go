@@ -101,7 +101,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			tokenStats.BondedToken = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
+			tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
 
 			return cliCtx.PrintOutput(tokenStats)
 		},

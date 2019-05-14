@@ -490,7 +490,7 @@ paths:
         - ICS20
       summary: Get token statistics
       description: >-
-        Get token statistics, such as total loosen token, total bonded token and
+        Get token statistics, such as total loose tokens, total bonded token and
         total burned token
       responses:
         '200':
@@ -500,13 +500,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  loosen_token:
+                  loose_tokens:
                     type: array
                     items:
                       type: string
-                  bonded_token:
+                  bonded_tokens:
                     type: string
-                  burned_token:
+                  burned_tokens:
                     type: array
                     items:
                       type: string
