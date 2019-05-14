@@ -109,9 +109,9 @@ func main() {
 	distributionCmd.AddCommand(
 		client.GetCommands(
 			distributioncmd.GetWithdrawAddress(cdc),
-			distributioncmd.GetDelegationDistInfo(cdc),
-			distributioncmd.GetValidatorDistInfo(cdc),
-			distributioncmd.GetAllDelegationDistInfo(cdc),
+			//distributioncmd.GetDelegationDistInfo(cdc),
+			//distributioncmd.GetValidatorDistInfo(cdc),
+			//distributioncmd.GetAllDelegationDistInfo(cdc),
 			distributioncmd.GetRewards(cdc),
 			distributioncmd.GetCommunityTax(cdc),
 		)...)

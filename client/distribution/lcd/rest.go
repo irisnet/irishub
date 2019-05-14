@@ -13,14 +13,15 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 
 	r.HandleFunc("/distribution/{delegatorAddr}/withdrawAddress",
 		QueryWithdrawAddressHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/distribution/{delegatorAddr}/distrInfo/{validatorAddr}",
-		QueryDelegationDistInfoHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/distribution/{delegatorAddr}/distrInfo",
-		QueryDelegatorDistInfoHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/distribution/{validatorAddr}/valDistrInfo",
-		QueryValidatorDistInfoHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/{address}/rewards",
 		QueryRewardsHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/distribution/community-tax",
 		QueryCommunityTaxFn(cliCtx)).Methods("GET")
+
+	//r.HandleFunc("/distribution/{delegatorAddr}/distrInfo/{validatorAddr}",
+	//	QueryDelegationDistInfoHandlerFn(cliCtx)).Methods("GET")
+	//r.HandleFunc("/distribution/{delegatorAddr}/distrInfo",
+	//	QueryDelegatorDistInfoHandlerFn(cliCtx)).Methods("GET")
+	//r.HandleFunc("/distribution/{validatorAddr}/valDistrInfo",
+	//	QueryValidatorDistInfoHandlerFn(cliCtx)).Methods("GET")
 }
