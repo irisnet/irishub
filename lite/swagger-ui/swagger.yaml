@@ -1977,7 +1977,7 @@ paths:
           description: Invalid delegator address
         '500':
           description: Internal Server Error
-  /distribution/{delegatorAddr}/withdraw-reward:
+  /distribution/{delegatorAddr}/rewards/withdraw:
     parameters:
       - in: path
         name: delegatorAddr

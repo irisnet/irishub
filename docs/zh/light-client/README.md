@@ -121,7 +121,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
-    3. `POST /distribution/{delegatorAddr}/withdraw-reward`: 取回收益
+    3. `POST /distribution/{delegatorAddr}/rewards/withdraw`: 取回收益
     4. `GET /distribution/{address}/rewards`: 查询收益
     5. `GET /distribution/community-tax`: 查询社区税金
 
