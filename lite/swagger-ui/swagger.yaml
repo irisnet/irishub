@@ -154,7 +154,7 @@ paths:
           description: Request block height doesn't
         '500':
           description: Server internal error
-  /blocks-result/latest:
+  /block-results/latest:
     get:
       summary: Get the latest block result
       tags:
@@ -168,7 +168,7 @@ paths:
                 $ref: '#/components/schemas/BlockResultQuery'
         '500':
           description: Server internal error
-  '/blocks-result/{height}':
+  '/block-results/{height}':
     get:
       summary: Get a block result at a certain height
       tags:
@@ -338,7 +338,7 @@ paths:
           after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return
           right away).
         required: true
-  /txs/sign:
+  /tx/sign:
     post:
       tags:
         - ICS2
@@ -384,7 +384,7 @@ paths:
                   example: true
         description: sign tx
         required: true
-  /txs/broadcast:
+  /tx/broadcast:
     post:
       tags:
         - ICS2
@@ -615,7 +615,7 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                sender:
+                recipient:
                   $ref: '#/components/schemas/Address'
                 amount:
                   type: string
@@ -1892,7 +1892,7 @@ paths:
         '500':
           description: Internal Server Error
 
-  '/distribution/{delegatorAddr}/withdrawAddress':
+  '/distribution/{delegatorAddr}/withdraw-address':
     parameters:
       - in: path
         name: delegatorAddr
@@ -1977,7 +1977,7 @@ paths:
           description: Invalid delegator address
         '500':
           description: Internal Server Error
-  /distribution/{delegatorAddr}/withdrawReward:
+  /distribution/{delegatorAddr}/withdraw-reward:
     parameters:
       - in: path
         name: delegatorAddr
@@ -2040,7 +2040,7 @@ paths:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
                 validator_address:
-                  $ref: '#/components/schemas/Address'
+                  $ref: '#/components/schemas/ValidatorAddress'
                 is_validator:
                   type: boolean
         description: 'if is_validator is true, validator_address should not be presented'
@@ -2175,7 +2175,7 @@ paths:
                     type: array
                     items:
                       validator:
-                        $ref: '#/components/schemas/Address'
+                        $ref: '#/components/schemas/ValidatorAddress'
                       reward:
                         type: array
                         items:

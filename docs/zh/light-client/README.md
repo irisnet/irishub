@@ -48,8 +48,8 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     2. `GET /syncing`: 查询所连接全节点是否处于追赶区块的状态
     3. `GET /blocks/latest`: 获取最新区块
     4. `GET /blocks/{height}`: 获取某一高度的区块
-    5. `GET /blocks-result/latest`: 获取最新区块交易结果
-    6. `GET /blocks-result/{height}`: 获取某一高度区块的交易结果
+    5. `GET /block-results/latest`: 获取最新区块交易结果
+    6. `GET /block-results/{height}`: 获取某一高度区块的交易结果
     7. `GET /validatorsets/latest`: 获取最新的验证人集合
     8. `GET /validatorsets/{height}`: 获取某一高度的验证人集合
     9. `GET /txs/{hash}`: 通过交易hash查询交易
@@ -119,9 +119,9 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 
 8. Distribution模块的APIs
 
-    1. `POST /distribution/{delegatorAddr}/withdrawAddress`: 设置收益取回地址
-    2. `GET /distribution/{delegatorAddr}/withdrawAddress`: 查询收益取回地址
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: 取回收益
+    1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
+    2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
+    3. `POST /distribution/{delegatorAddr}/withdraw-reward`: 取回收益
     4. `GET /distribution/{address}/rewards`: 查询收益
     5. `GET /distribution/community-tax`: 查询社区税金
 

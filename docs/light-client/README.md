@@ -47,8 +47,8 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     2. `GET /syncing`: Syncing state of node
     3. `GET /blocks/latest`: Get the latest block
     4. `GET /blocks/{height}`: Get a block at a certain height
-    5. `GET /blocks-result/latest`: Get the latest block result
-    6. `GET /blocks-result/{height}`: Get a block result at a certain height
+    5. `GET /block-results/latest`: Get the latest block result
+    6. `GET /block-results/{height}`: Get a block result at a certain height
     7. `GET /validatorsets/latest`: Get the latest validator set
     8. `GET /validatorsets/{height}`: Get a validator set at a certain height
     9. `GET /txs/{hash}`: Get a Tx by hash
@@ -117,9 +117,9 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 
 8. Distribution module APIs
 
-    1. `POST /distribution/{delegatorAddr}/withdrawAddress`: Set withdraw address
-    2. `GET /distribution/{delegatorAddr}/withdrawAddress`: Query withdraw address
-    3. `POST /distribution/{delegatorAddr}/withdrawReward`: Withdraw reward
+    1. `POST /distribution/{delegatorAddr}/withdraw-address`: Set withdraw address
+    2. `GET /distribution/{delegatorAddr}/withdraw-address`: Query withdraw address
+    3. `POST /distribution/{delegatorAddr}/withdraw-reward`: Withdraw reward
     4. `GET /distribution/{address}/rewards`: Query rewards
     5. `GET /distribution/community-tax`: Query community tax
     

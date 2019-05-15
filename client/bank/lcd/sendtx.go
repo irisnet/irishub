@@ -13,9 +13,9 @@ import (
 )
 
 type sendBody struct {
-	Amount string       `json:"amount"`
-	Sender string       `json:"sender"`
-	BaseTx utils.BaseTx `json:"base_tx"`
+	Amount    string       `json:"amount"`
+	Recipient string       `json:"recipient"`
+	BaseTx    utils.BaseTx `json:"base_tx"`
 }
 
 type burnBody struct {
@@ -31,7 +31,7 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
-		to, err := sdk.AccAddressFromBech32(bech32addr)
+		sender, err := sdk.AccAddressFromBech32(bech32addr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -51,7 +51,7 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		sender, err := sdk.AccAddressFromBech32(m.Sender)
+		to, err := sdk.AccAddressFromBech32(m.Recipient)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Couldn't decode delegator. Error: %s", err.Error())))
