@@ -31,10 +31,6 @@ func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
-			if err := cliCtx.EnsureAccountExists(); err != nil {
-				return err
-			}
-
 			toStr := viper.GetString(flagTo)
 
 			to, err := sdk.AccAddressFromBech32(toStr)
@@ -54,6 +50,12 @@ func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			// build and sign the transaction, then broadcast to Tendermint
+			msg := bank.BuildBankSendMsg(from, to, coins)
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
+			}
+
 			account, err := cliCtx.GetAccount(from)
 			if err != nil {
 				return err
@@ -62,12 +64,6 @@ func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 			// ensure account has enough coins
 			if !account.GetCoins().IsAllGTE(coins) {
 				return fmt.Errorf("Address %s doesn't have enough coins to pay for this transaction.", from)
-			}
-
-			// build and sign the transaction, then broadcast to Tendermint
-			msg := bank.BuildBankSendMsg(from, to, coins)
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, false)
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -95,10 +91,6 @@ func BurnTxCmd(cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
-			if err := cliCtx.EnsureAccountExists(); err != nil {
-				return err
-			}
-
 			// parse coins trying to be sent
 			amount := viper.GetString(flagAmount)
 			coins, err := cliCtx.ParseCoins(amount)
@@ -111,6 +103,12 @@ func BurnTxCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			// build and sign the transaction, then broadcast to Tendermint
+			msg := bank.BuildBankBurnMsg(from, coins)
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
+			}
+
 			account, err := cliCtx.GetAccount(from)
 			if err != nil {
 				return err
@@ -119,12 +117,6 @@ func BurnTxCmd(cdc *codec.Codec) *cobra.Command {
 			// ensure account has enough coins
 			if !account.GetCoins().IsAllGTE(coins) {
 				return fmt.Errorf("Address %s doesn't have enough coins to pay for this transaction.", from)
-			}
-
-			// build and sign the transaction, then broadcast to Tendermint
-			msg := bank.BuildBankBurnMsg(from, coins)
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, false)
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
