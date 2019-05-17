@@ -306,38 +306,38 @@ paths:
           description: Invalid search tags
         '500':
           description: Internal Server Error
-    post:
-      tags:
-        - ICS0
-      summary: broadcast Tx
-      description: broadcast tx with tendermint rpc
-      responses:
-        '200':
-          description: Broadcast tx result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tx:
-                  type: string
-                return:
-                  type: string
-                  example: block
-        description: >-
-          Build a StdTx transaction and serilize it to a byte array with amino,
-          then the `"tx"` field in the post body will be the base64 encoding of
-          the byte array. The supported return types includes `"block"`(return
-          after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return
-          right away).
-        required: true
+#    post:
+#      tags:
+#        - ICS0
+#      summary: broadcast Tx
+#      description: broadcast tx with tendermint rpc
+#      responses:
+#        '200':
+#          description: Broadcast tx result
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/BroadcastTxCommitResult'
+#        '500':
+#          description: Internal Server Error
+#      requestBody:
+#        content:
+#          application/json:
+#            schema:
+#              type: object
+#              properties:
+#                tx:
+#                  type: string
+#                return:
+#                  type: string
+#                  example: block
+#        description: >-
+#          Build a StdTx transaction and serilize it to a byte array with amino,
+#          then the `"tx"` field in the post body will be the base64 encoding of
+#          the byte array. The supported return types includes `"block"`(return
+#          after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return
+#          right away).
+#        required: true
   /tx/sign:
     post:
       tags:

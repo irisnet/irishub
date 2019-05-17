@@ -54,7 +54,6 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     8. `GET /validatorsets/{height}`: 获取某一高度的验证人集合
     9. `GET /txs/{hash}`: 通过交易hash查询交易
     10. `GET /txs`: 搜索交易
-    11. `POST /txs`: 广播交易
 
 2. Key management模块的APIs
 
