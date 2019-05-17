@@ -61,8 +61,8 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 
 func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) {
 	tokenStats := TokenStats{
-		LoosenToken: keeper.GetTotalLoosenToken(ctx),
-		BurnedToken: keeper.GetBurnedToken(ctx),
+		LooseTokens: keeper.GetTotalLoosenToken(ctx),
+		BurnedTokens: keeper.GetBurnedToken(ctx),
 	}
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokenStats)
 	if err != nil {
@@ -73,6 +73,6 @@ func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) 
 }
 
 type TokenStats struct {
-	LoosenToken sdk.Coins `json:"loosen_token"`
-	BurnedToken sdk.Coins `json:"burned_token"`
+	LooseTokens  sdk.Coins `json:"loose_tokens"`
+	BurnedTokens sdk.Coins `json:"burned_tokens"`
 }
