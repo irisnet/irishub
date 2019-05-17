@@ -43,8 +43,14 @@ github.com/irisnet/iavl v0.12.0-iris h1:NDizAhUNgcJaxHEpTf6iiTD5IvZw5S5VKfWcx3Kn
 github.com/irisnet/iavl v0.12.0-iris/go.mod h1:JRGfj9mLdUSdoBSpYjo14FRe/qyKv3YKHwHnhuxzKaQ=
 github.com/irisnet/tendermint v0.22.3-0.20190507130700-708dddb312c0 h1:gOH5Qi8tT+4PD/niomccLfn+MiV1txGVRUYvAxOEcb4=
 github.com/irisnet/tendermint v0.22.3-0.20190507130700-708dddb312c0/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
+github.com/irisnet/tendermint v0.22.3-0.20190516092700-c101ef8f34ba h1:CN56RuqmmkhRGWhUmmhFsT3yMBQKvAWnKIP/yyY6azE=
+github.com/irisnet/tendermint v0.22.3-0.20190516092700-c101ef8f34ba/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
+github.com/irisnet/tendermint v0.22.3-0.20190517035621-b9ea8b8ba1ef h1:vMt/eykM9+Guof2CFW704kcXjBmCS6ivFFcXYsjX9+k=
+github.com/irisnet/tendermint v0.22.3-0.20190517035621-b9ea8b8ba1ef/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
 github.com/irisnet/tendermint v0.27.4 h1:r3o/l89P2D0hAUyM2iLQDfCCJ1qZSp68+MMGgqfBvjQ=
 github.com/irisnet/tendermint v0.27.4/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
+github.com/irisnet/tendermint v0.28.0 h1:gU12hGvpcGgIfAvDjZ4PuoWl0h6b573BGbxEmYWpbFQ=
+github.com/irisnet/tendermint v0.28.0/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
 github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023/go.mod h1:Q6Qx+uH3RAqyK4rFQroq9RL7mdkABMcfhEI+nNuzMJQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/magiconair/properties v1.8.0 h1:LLgXmsheXeRoUOBOjtwPQCWIYqM/LU1ayDtDePerRcY=
