@@ -53,7 +53,6 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     8. `GET /validatorsets/{height}`: Get a validator set at a certain height
     9. `GET /txs/{hash}`: Get a Tx by hash
     10. `GET /txs`: Search transactions
-    11. `POST /txs`: Broadcast Tx
 
 2. Key management APIs
 
