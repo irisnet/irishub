@@ -3,18 +3,19 @@ package cli
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/params"
+	paramsType "github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // GetCmdQueryProposal implements the query proposal command.
-func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-proposal",
 		Short:   "Query details of a single proposal",
@@ -32,13 +33,18 @@ func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/proposal", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/proposal", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var proposal gov.Proposal
+			err = cdc.UnmarshalJSON(res, &proposal)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(proposal)
 		},
 	}
 
@@ -49,7 +55,7 @@ func GetCmdQueryProposal(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 // nolint: gocyclo
 // GetCmdQueryProposals implements a query proposals command.
-func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-proposals",
 		Short:   "query proposals with optional filters",
@@ -95,12 +101,18 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/proposals", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/proposals", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(res))
-			return nil
+
+			var proposals gov.Proposals
+			err = cdc.UnmarshalJSON(res, &proposals)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(proposals)
 		},
 	}
 
@@ -114,7 +126,7 @@ func GetCmdQueryProposals(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 // Command to Get a Proposal Information
 // GetCmdQueryVote implements the query proposal vote command.
-func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-vote",
 		Short:   "query vote",
@@ -137,13 +149,17 @@ func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/vote", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/vote", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var vote gov.Vote
+			if err := cdc.UnmarshalJSON(res, &vote); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(vote)
 		},
 	}
 
@@ -155,7 +171,7 @@ func GetCmdQueryVote(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryVotes implements the command to query for proposal votes.
-func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryVotes(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-votes",
 		Short:   "query votes on a proposal",
@@ -172,18 +188,17 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/votes", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/votes", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			if res == nil {
-				fmt.Printf("No one votes for the proposal [%v].\n", proposalID)
-				return nil
+			var votes gov.Votes
+			if err := cdc.UnmarshalJSON(res, &votes); err != nil {
+				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			return cliCtx.PrintOutput(votes)
 		},
 	}
 
@@ -194,7 +209,7 @@ func GetCmdQueryVotes(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 // Command to Get a specific Deposit Information
 // GetCmdQueryDeposit implements the query proposal deposit command.
-func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-deposit",
 		Short:   "Query details of a deposit",
@@ -217,13 +232,17 @@ func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/deposit", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/deposit", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var deposit gov.Deposit
+			if err := cdc.UnmarshalJSON(res, &deposit); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(deposit)
 		},
 	}
 
@@ -235,7 +254,7 @@ func GetCmdQueryDeposit(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryDeposits implements the command to query for proposal deposits.
-func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryDeposits(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-deposits",
 		Short:   "Query deposits on a proposal",
@@ -252,13 +271,17 @@ func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/deposits", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/deposits", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var deposits gov.Deposits
+			if err := cdc.UnmarshalJSON(res, &deposits); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(deposits)
 		},
 	}
 
@@ -268,7 +291,7 @@ func GetCmdQueryDeposits(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryDeposits implements the command to query for proposal deposits.
-func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryTally(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-tally",
 		Short:   "Get the tally of a proposal vote",
@@ -285,13 +308,17 @@ func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/tally", queryRoute), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/tally", protocol.GovRoute), bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var tally gov.TallyResult
+			if err := cdc.UnmarshalJSON(res, &tally); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(tally)
 		},
 	}
 
@@ -300,99 +327,40 @@ func GetCmdQueryTally(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryGovConfig(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryGovConfig(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-params",
 		Short:   "query parameter proposal's config",
-		Example: "iriscli gov query-params --module=<module name> --key=<key name>",
+		Example: "iriscli gov query-params --module=<module name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			moduleStr := viper.GetString(flagModule)
-			keyStr := viper.GetString(flagKey)
 
-			ctx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			if moduleStr != "" {
-				// There are four possible outputs if the --module parameter is not empty:
-				// 1.List of the module;
-				// 2.List of keys in the module;
-				// 3.Error: GovParameter of the module does not exist;
-				// 4.Error: The key in the module does not exist;
-				kvs, err := ctx.QuerySubspace([]byte(moduleStr), storeName)
-				if err == nil {
-					if len(kvs) == 0 {
-						// Return an error directly if the --module parameter is incorrect.
-						return sdk.NewError(params.DefaultCodespace, params.CodeInvalidModule, fmt.Sprintf("The  module %s is not existed", moduleStr))
-					}
-
-					if keyStr != "" {
-						// There are two possible outputs if the --key parameter is not empty:
-						// 1.The value of the key;
-						// 2.Error: The key in the module does not exist;
-						res, err := ctx.QueryStore([]byte(keyStr), storeName)
-						if err != nil {
-							return err
-						}
-						return printParam(cdc, keyStr, res)
-					}
-
-					// Print module list
-					err := printParams(cdc, kvs)
-					if err != nil {
-						return err
-					}
-					return nil
-				} else {
-					// Throw RPC client query exception
-					return err
-				}
+			params := paramsType.QueryModuleParams{
+				Module: moduleStr,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
 			}
 
-			// Check --key parameter if the --module parameter is empty.
-			if keyStr != "" {
-				// There are two possible outputs if the --key parameter is not empty:
-				// 1.The value of the key;
-				// 2.Error: The key in the module does not exist;
-
-				res, err := ctx.QueryStore([]byte(keyStr), storeName)
-				if err != nil {
-					return err
-				}
-				return printParam(cdc, keyStr, res)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/module", protocol.ParamsRoute), bz)
+			if err != nil {
+				return err
 			}
 
-			// Return error if the --module & --key parameters are all empty.
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidQueryParams, fmt.Sprintf("--module and --key can't both be empty"))
+			var paramSet paramsType.ParamSet
+			if err := cdc.UnmarshalJSON(res, &paramSet); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(paramSet)
+			return nil
 		},
 	}
 
 	cmd.Flags().String(flagModule, "", "module name")
-	cmd.Flags().String(flagKey, "", "key name of parameter")
+	cmd.MarkFlagRequired(flagModule)
 	return cmd
-}
-
-func printParam(cdc *codec.Codec, keyStr string, res []byte) (err error) {
-	if p, ok := client.ParamSets[params.GetParamSpaceFromKey(keyStr)]; ok {
-		if len(res) == 0 {
-			// Return an error directly if the --key parameter is incorrect.
-			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf(keyStr+" is not existed"))
-		}
-		// Print key json in the module
-		valueStr, err := p.StringFromBytes(cdc, params.GetParamKey(keyStr), res)
-		if err != nil {
-			return err
-		}
-		fmt.Printf(" %s=%s\n", keyStr, valueStr)
-		return nil
-	} else {
-		return gov.ErrInvalidParam(gov.DefaultCodespace,params.GetParamSpaceFromKey(keyStr))
-	}
-}
-
-func printParams(cdc *codec.Codec, kvs []sdk.KVPair) (err error) {
-	for _, kv := range kvs {
-		if err := printParam(cdc, string(kv.Key), kv.Value); err != nil {
-			return err
-		}
-	}
-	return nil
 }

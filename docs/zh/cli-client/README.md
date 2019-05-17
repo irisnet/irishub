@@ -7,12 +7,65 @@
 | --chain-id      | string | false    | ""                    | tendermint节点的Chain ID |
 | --height        | int    | false    | 0                     | 查询某个高度的区块链数据，如果是0，则返回最新的区块链数据 |
 | --help, -h      | string | false    |                       | 打印帮助信息 |
+| --output        | string | false    | text                  | 指定返回的格式 text或者json|
 | --indent        | bool   | false    | false                 | 格式化json字符串|
-| --ledger        | bool   | false    | false                 | 是否使用硬件钱包 |
+| --ledger        | bool   | false    | false                 | 使用ledger设备 |
 | --node          | string | false    | tcp://localhost:26657 | tendermint节点的rpc地址|
 | --trust-node    | bool   | false    | true                  | 是否信任全节点返回的数据，如果不信任，客户端会验证查询结果的正确性 |
 
 每个区块链状态查询命令都包含上表中的flags，同时不同查询命令还可能会有自己独有的flags。
+
+### 格式化json返回
+
+`output`字段可以指定查询的返回格式：
+
+不指定，默认以text方式返回：
+
+```
+root@ubuntu:~# iriscli stake validators
+Validator
+  Operator Address:            iva1gfcee5u5f54kfcnufv4ypcfyldw0vu0zpwl52q
+  Validator Consensus Pubkey:  icp1zcjduepquednrr0aqw4nkt8jnkhpmg4acfc7vlr0yre4uud4z0ups68hcpfsx4x9ng
+  Jailed:                      false
+  Status:                      Bonded
+  Tokens:                      1361.0004000000246900000000000000
+  Delegator Shares:            1361.0004000000246900000000000000
+  Description:                 {B-2  3_C a1_}
+  Unbonding Height:            0
+  Minimum Unbonding Time:      1970-01-01 00:00:00 +0000 UTC
+  Commission:                  rate: 0.1001000000, maxRate: 1.0000000000, maxChangeRate: 1.0000000000, updateTime: 2019-05-09 03:13:39.720700953 +0000 UTC
+```
+
+指定`output`和`indent`，以格式化后的json方式返回：
+
+```
+root@ubuntu:~# iriscli stake validators --output=json --indent
+[
+  {
+    "operator_address": "iva1gfcee5u5f54kfcnufv4ypcfyldw0vu0zpwl52q",
+    "consensus_pubkey": "icp1zcjduepquednrr0aqw4nkt8jnkhpmg4acfc7vlr0yre4uud4z0ups68hcpfsx4x9ng",
+    "jailed": false,
+    "status": 2,
+    "tokens": "1361.0004000000246900000000000000",
+    "delegator_shares": "1361.0004000000246900000000000000",
+    "description": {
+      "moniker": "B-2",
+      "identity": "",
+      "website": "3_C",
+      "details": "a1_"
+    },
+    "bond_height": "0",
+    "unbonding_height": "0",
+    "unbonding_time": "1970-01-01T00:00:00Z",
+    "commission": {
+      "rate": "0.1001000000",
+      "max_rate": "1.0000000000",
+      "max_change_rate": "1.0000000000",
+      "update_time": "2019-05-09T03:13:39.720700953Z"
+    }
+  }
+]
+```
 
 ## 发送交易命令的flags
 
@@ -33,7 +86,7 @@
 | --help, -h       | string | false    |                       | 打印帮助信息 |
 | --indent         | bool   | false    | false                 | 格式化json字符串 |
 | --json           | string | false    | false                 | 指定返回结果的格式，`json`或者`text` |
-| --ledger         | bool   | false    | false                 | 是否使用硬件钱包|
+| --ledger         | bool   | false    | false                 | 使用ledger设备 |
 | --memo           | string | false    | ""                    | 指定交易的memo字段 |
 | --node           | string | false    | tcp://localhost:26657 | tendermint节点的rpc地址 |
 | --print-response | bool   | false    | false                 | 是否打印交易返回结果，仅在`async`为true的情况下有效|

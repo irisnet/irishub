@@ -32,9 +32,9 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
 
 ## 对用户的影响
 
-通胀计算是一个自动过程，没有用户接口能直接干预此过程。每产生一个新的区块，就会增发一定数量的token，loosen token的数量也会因此增加。
+通胀计算是一个自动过程，没有用户接口能直接干预此过程。每产生一个新的区块，就会增发一定数量的token，loose tokens的数量也会因此增加。
 
-这里有两个命令行接口和两个restful api来查询总的loosen token的数量：
+这里有两个命令行接口和两个restful api来查询总的loose tokens的数量：
 
 1. `iriscli stake pool`
     
@@ -60,13 +60,10 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
     
     Output:
     ```
-    {
-      "loosen_token": [
-        "1864477.596384156921391687iris"
-      ],
-      "burned_token": null,
-      "bonded_token": "425182.329615843078608313iris"
-    }
+    TokenStats:
+      Loose Tokens:  1864477.596384156921391687iris
+      Burned Tokens:  177.59638iris
+      Bonded Tokens:  425182.329615843078608313iris
     ```
     
     

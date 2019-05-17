@@ -15,15 +15,15 @@ const (
 )
 
 var (
-	IRIS = NewDefaultCoinType(NativeTokenName)
-	InitialIssue = NewIntWithDecimal(2, 9)	// 2 billion
+	IRIS             = NewDefaultCoinType(NativeTokenName)
+	InitialIssue     = NewIntWithDecimal(2, 9) // 2 billion
 	FreeToken4Val, _ = IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(100), NativeTokenName))
 	FreeToken4Acc, _ = IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), NativeTokenName))
 )
 
 // Can be configured through environment variables
 var (
-	NetworkType = Testnet
+	NetworkType    = Testnet
 	InvariantLevel = InvariantPanic
 )
 

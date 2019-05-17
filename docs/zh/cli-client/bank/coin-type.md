@@ -33,45 +33,12 @@ iriscli bank coin-type iris
 执行命令后我们获取到的iris通证详细信息如下：
 
 ```
-{
-  "name": "iris",
-  "min_unit": {
-    "denom": "iris-atto",
-    "decimal": "18"
-  },
-  "units": [
-    {
-      "denom": "iris",
-      "decimal": "0"
-    },
-    {
-      "denom": "iris-milli",
-      "decimal": "3"
-    },
-    {
-      "denom": "iris-micro",
-      "decimal": "6"
-    },
-    {
-      "denom": "iris-nano",
-      "decimal": "9"
-    },
-    {
-      "denom": "iris-pico",
-      "decimal": "12"
-    },
-    {
-      "denom": "iris-femto",
-      "decimal": "15"
-    },
-    {
-      "denom": "iris-atto",
-      "decimal": "18"
-    }
-  ],
-  "origin": 1,
-  "desc": "IRIS Network"
-}
+CoinType:
+  Name:     iris
+  MinUnit:  iris-atto: 18
+  Units:    iris: 0,  iris-milli: 3,  iris-micro: 6,  iris-nano: 9,  iris-pico: 12,  iris-femto: 15,  iris-atto: 18
+  Origin:   native
+  Desc:     IRIS Network
 ```
 
 

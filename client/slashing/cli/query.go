@@ -4,10 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/cli"
-
-	"github.com/irisnet/irishub/codec" // XXX fix
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/irisnet/irishub/client/context"
@@ -37,25 +34,13 @@ func GetCmdQuerySigningInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("the signing information of this validator %s is empty, please make sure its existence", args[0])
 			}
 
-			signingInfo := new(slashing.ValidatorSigningInfo)
-			cdc.MustUnmarshalBinaryLengthPrefixed(res, signingInfo)
-
-			switch viper.Get(cli.OutputFlag) {
-
-			case "text":
-				human := signingInfo.HumanReadableString()
-				fmt.Println(human)
-
-			case "json":
-				// parse out the signing info
-				output, err := codec.MarshalJSONIndent(cdc, signingInfo)
-				if err != nil {
-					return err
-				}
-				fmt.Println(string(output))
+			var signingInfo slashing.ValidatorSigningInfo
+			err = cdc.UnmarshalBinaryLengthPrefixed(res, &signingInfo)
+			if err != nil {
+				return err
 			}
 
-			return nil
+			return cliCtx.PrintOutput(signingInfo)
 		},
 	}
 

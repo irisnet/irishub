@@ -3,6 +3,7 @@ package v0
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/codec"
@@ -18,9 +19,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/upgrade"
 	sdk "github.com/irisnet/irishub/types"
-
-	"strings"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -64,7 +62,7 @@ type ProtocolV0 struct {
 	endBlocker   sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
 	config       *cfg.InstrumentationConfig
 
-	metrics		*Metrics
+	metrics *Metrics
 }
 
 func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV0 {
@@ -102,7 +100,7 @@ func (p *ProtocolV0) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
-func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore){
+func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore) {
 	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
 	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
@@ -113,6 +111,8 @@ func (p *ProtocolV0) configCodec() {
 
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
+	params.RegisterCodec(cdc) // only used by querier
+	mint.RegisterCodec(cdc)   // only used by querier
 	bank.RegisterCodec(cdc)
 	stake.RegisterCodec(cdc)
 	distr.RegisterCodec(cdc)
@@ -215,7 +215,7 @@ func (p *ProtocolV0) configKeepers() {
 		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
 		p.bankKeeper, &stakeKeeper, p.feeKeeper,
-		distr.DefaultCodespace,  distr.PrometheusMetrics(p.config),
+		distr.DefaultCodespace, distr.PrometheusMetrics(p.config),
 	)
 	p.slashingKeeper = slashing.NewKeeper(
 		p.cdc,
@@ -261,16 +261,22 @@ func (p *ProtocolV0) configKeepers() {
 // configure all Routers
 func (p *ProtocolV0) configRouters() {
 	p.router.
-		AddRoute("bank", bank.NewHandler(p.bankKeeper)).
-		AddRoute("stake", stake.NewHandler(p.StakeKeeper)).
-		AddRoute("slashing", slashing.NewHandler(p.slashingKeeper)).
-		AddRoute("distr", distr.NewHandler(p.distrKeeper)).
-		AddRoute("gov", gov.NewHandler(p.govKeeper)).
-		AddRoute("service", service.NewHandler(p.serviceKeeper)).
-		AddRoute("guardian", guardian.NewHandler(p.guardianKeeper))
+		AddRoute(protocol.BankRoute, bank.NewHandler(p.bankKeeper)).
+		AddRoute(protocol.StakeRoute, stake.NewHandler(p.StakeKeeper)).
+		AddRoute(protocol.SlashingRoute, slashing.NewHandler(p.slashingKeeper)).
+		AddRoute(protocol.DistrRoute, distr.NewHandler(p.distrKeeper)).
+		AddRoute(protocol.GovRoute, gov.NewHandler(p.govKeeper)).
+		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
+		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper))
+
 	p.queryRouter.
-		AddRoute("gov", gov.NewQuerier(p.govKeeper)).
-		AddRoute("stake", stake.NewQuerier(p.StakeKeeper, p.cdc))
+		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
+		AddRoute(protocol.GovRoute, gov.NewQuerier(p.govKeeper)).
+		AddRoute(protocol.StakeRoute, stake.NewQuerier(p.StakeKeeper, p.cdc)).
+		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
+		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
+		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
+		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper))
 }
 
 // configure all Stores

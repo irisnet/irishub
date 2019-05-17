@@ -193,3 +193,7 @@ func ErrNotTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Erro
 func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("[%s] is not a profiler address", profiler))
 }
+
+func ErrNoResponseFound(codespace sdk.CodespaceType, requestID string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("response is not existed for request %s", requestID))
+}

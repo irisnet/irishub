@@ -16,49 +16,49 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// Add a new service definition
 	r.HandleFunc(
-		"/service/definition",
+		"/service/definitions",
 		definitionPostHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// Add a new service binding
 	r.HandleFunc(
-		"/service/binding",
+		"/service/bindings",
 		bindingAddHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// Update a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/binding/{%s}/{%s}/{%s}", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", DefChainId, ServiceName, Provider),
 		bindingUpdateHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// disable a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/binding/{%s}/{%s}/{%s}/disable", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", DefChainId, ServiceName, Provider),
 		bindingDisableHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// enable a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/binding/{%s}/{%s}/{%s}/enable", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", DefChainId, ServiceName, Provider),
 		bindingEnableHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// refund deposit from a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/binding/{%s}/{%s}/{%s}/deposit/refund", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", DefChainId, ServiceName, Provider),
 		bindingRefundHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// Add a request for a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/request"),
+		fmt.Sprintf("/service/requests"),
 		requestAddHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// Add a response for a service request
 	r.HandleFunc(
-		fmt.Sprintf("/service/response"),
+		fmt.Sprintf("/service/responses"),
 		responseAddHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 

@@ -15,7 +15,7 @@ func GetBroadcastCommand(codec *amino.Codec) *cobra.Command {
 		Short: "Broadcast transactions generated offline",
 		Long: `Broadcast transactions created with the --generate-only flag and signed with the sign command.
 Read a transaction from <file> and broadcast it to a node.`,
-		Example: "iriscli bank broadcast <file>",
+		Example: "iriscli tx broadcast <file>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			cliCtx := context.NewCLIContext().WithLogger(os.Stdout).WithCodec(codec)

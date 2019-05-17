@@ -14,17 +14,17 @@ import (
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/delegate",
+		"/stake/delegators/{delegatorAddr}/delegations",
 		delegationsRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/redelegate",
+		"/stake/delegators/{delegatorAddr}/redelegations",
 		beginRedelegatesRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	r.HandleFunc(
-		"/stake/delegators/{delegatorAddr}/unbond",
+		"/stake/delegators/{delegatorAddr}/unbonding-delegations",
 		beginUnbondingRequestHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }

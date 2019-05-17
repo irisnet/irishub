@@ -31,32 +31,14 @@ iriscli gov query-proposal --chain-id=<chain-id> --proposal-id=<proposal-id>
 查询指定提议的详情，可以得到结果如下：
 
 ```txt
-{
-  "proposal_id": "1",
-  "title": "test proposal",
-  "description": "a new text proposal",
-  "proposal_type": "Text",
-  "proposal_status": "DepositPeriod",
-  "tally_result": {
-    "yes": "0.0000000000",
-    "abstain": "0.0000000000",
-    "no": "0.0000000000",
-    "no_with_veto": "0.0000000000"
-  },
-  "submit_time": "2018-11-14T09:10:19.365363Z",
-  "deposit_end_time": "2018-11-16T09:10:19.365363Z",
-  "total_deposit": [
-    {
-      "denom": "iris-atto",
-      "amount": "49000000000000000050"
-    }
-  ],
-  "voting_start_time": "0001-01-01T00:00:00Z",
-  "voting_end_time": "0001-01-01T00:00:00Z",
-  "param": {
-    "key": "",
-    "value": "",
-    "op": ""
-  }
-}
+Proposal 94:
+  Title:              test proposal
+  Type:               TxTaxUsage
+  Status:             Rejected
+  Submit Time:        2019-05-10 06:37:18.776274942 +0000 UTC
+  Deposit End Time:   2019-05-10 06:37:28.776274942 +0000 UTC
+  Total Deposit:      1100iris
+  Voting Start Time:  2019-05-10 06:37:18.776274942 +0000 UTC
+  Voting End Time:    2019-05-10 06:37:28.776274942 +0000 UTC
+  Description:        a new text proposal
 ```

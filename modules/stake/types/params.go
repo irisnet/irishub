@@ -3,12 +3,12 @@ package types
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -41,7 +41,14 @@ var _ params.ParamSet = (*Params)(nil)
 // Params defines the high level settings for staking
 type Params struct {
 	UnbondingTime time.Duration `json:"unbonding_time"`
-	MaxValidators uint16 `json:"max_validators"` // maximum number of validators
+	MaxValidators uint16        `json:"max_validators"` // maximum number of validators
+}
+
+func (p Params) String() string {
+	return fmt.Sprintf(`Stake Params:
+  Unbonding Time:         %s
+  Max Validators:         %d`,
+		p.UnbondingTime, p.MaxValidators)
 }
 
 // Implements params.Params

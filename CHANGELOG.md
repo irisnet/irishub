@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.14.0
+
+### LCD (REST API)
+* [\#1245](https://github.com/irisnet/irishub/issues/1245) Follow best-practice URI naming guide -- API BREAKING!
+* [\#1416](https://github.com/irisnet/irishub/issues/1416) Drop three useless distribution queries -- API BREAKING!
+* [\#1444](https://github.com/irisnet/irishub/pull/1444) Fix `/bank/token-stats` output format -- API BREAKING!
+* [\#1374](https://github.com/irisnet/irishub/issues/1374) Use `Querier` pattern to improve query implementation
+* [\#1426](https://github.com/irisnet/irishub/issues/1426) Add query for community tax
+* [\#1386](https://github.com/irisnet/irishub/issues/1386) Fix `memo` support bug in LCD
+
+### CLI
+* [\#1245](https://github.com/irisnet/irishub/issues/1245) Move `sign` and `broadcast` subcmd under `tx` cmd
+* [\#1375](https://github.com/irisnet/irishub/issues/1375) Unify the output formats of return data
+* [\#1411](https://github.com/irisnet/irishub/issues/1411) Fix incorrect json indent output for `keys` commands
+* [\#1419](https://github.com/irisnet/irishub/pull/1419) Fix incorrect decimal output in plain-text format
+* [\#1443](https://github.com/irisnet/irishub/issues/1443) Allow users to generate send tx offline
+
+### Application
+* [\#1383](https://github.com/irisnet/irishub/issues/1383) Improve result tags for unbond and redelegate
+* [\#1409](https://github.com/irisnet/irishub/issues/1409) Fix validation bug for `community_tax` parameter
+* [\#1422](https://github.com/irisnet/irishub/issues/1422) Replace dep with Go Module
+
+### Tendermint
+* Update to irisnet/tendermint [v0.28.0](https://github.com/irisnet/tendermint/releases/tag/v0.28.0)
+  * [\#1408](https://github.com/irisnet/irishub/issues/1408) [mempool] Fix `broadcastTxRoutine` leak
+  * [\#1428](https://github.com/irisnet/irishub/issues/1428) [rpc] Fix `/tx_search` bug when results are empty
+  * [\#1429](https://github.com/irisnet/irishub/issues/1429) [privval] Retry `RemoteSigner` connections on error
+  * [\#1430](https://github.com/irisnet/irishub/issues/1430) [privval] Memorize pubkey on startup
+  * [\#1431](https://github.com/irisnet/irishub/issues/1431) [p2p] Make `SecretConnection` thread safe
+  * [\#1434](https://github.com/irisnet/irishub/issues/1434) [consensus] Log `peerID` on ignored votes
+  * [\#1435](https://github.com/irisnet/irishub/issues/1435) [rpc] Include peer's remote IP in `/net_info`
+  * [\#1436](https://github.com/irisnet/irishub/issues/1436) [crypto] Update btcd fork for rare signRFC6979 bug
+  * [\#1438](https://github.com/irisnet/irishub/issues/1438) [privval] Fix race between sign and ping requests
+  * [\#1439](https://github.com/irisnet/irishub/issues/1439) [p2p] Fix MITM bug on `SecretConnection`
+  * [\#1440](https://github.com/irisnet/irishub/issues/1440) [node] Start `EventBus` and `IndexerService` before first block
+
+### Documentation
+* [\#1376](https://github.com/irisnet/irishub/issues/1376) Improve v0.13.1 docs
+
 ## 0.13.1
 
 ### LCD (REST API)
@@ -10,7 +49,7 @@
 ### CLI
 * [\#1360](https://github.com/irisnet/irishub/pull/1360) Add query command for delegator rewards
 
-### Node
+### Application
 * [\#1329](https://github.com/irisnet/irishub/pull/1329) Improve error message for insufficient balance
 * [\#1340](https://github.com/irisnet/irishub/pull/1340) Remove coin flow tags if tx is out of gas
 * [\#1341](https://github.com/irisnet/irishub/pull/1341) Check validator existence and status before getting its pubkey

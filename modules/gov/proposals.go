@@ -3,10 +3,11 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 //-----------------------------------------------------------
@@ -50,6 +51,8 @@ type Proposal interface {
 
 	GetTaxUsage() TaxUsage
 	SetTaxUsage(TaxUsage)
+
+	String() string
 }
 
 // checks if two proposals are equal
@@ -89,6 +92,40 @@ type BasicProposal struct {
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
 }
 
+func (bp BasicProposal) String() string {
+	return fmt.Sprintf(`Proposal %d:
+  Title:              %s
+  Type:               %s
+  Status:             %s
+  Submit Time:        %s
+  Deposit End Time:   %s
+  Total Deposit:      %s
+  Voting Start Time:  %s
+  Voting End Time:    %s
+  Description:        %s`,
+		bp.ProposalID, bp.Title, bp.ProposalType,
+		bp.Status, bp.SubmitTime, bp.DepositEndTime,
+		bp.TotalDeposit.MainUnitString(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+	)
+}
+
+// Proposals is an array of proposal
+type Proposals []Proposal
+
+// nolint
+func (p Proposals) String() string {
+	if len(p) == 0 {
+		return "[]"
+	}
+	out := "ID - (Status) [Type] [TotalDeposit] Title\n"
+	for _, prop := range p {
+		out += fmt.Sprintf("%d - (%s) [%s] [%s] %s\n",
+			prop.GetProposalID(), prop.GetStatus(),
+			prop.GetProposalType(), prop.GetTotalDeposit().MainUnitString(), prop.GetTitle())
+	}
+	return strings.TrimSpace(out)
+}
+
 // Implements Proposal Interface
 var _ Proposal = (*BasicProposal)(nil)
 
@@ -121,7 +158,9 @@ func (tp BasicProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
 func (tp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
 	tp.VotingEndTime = votingEndTime
 }
-func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition { return sdk.ProtocolDefinition{} }
+func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
+	return sdk.ProtocolDefinition{}
+}
 func (tp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
 func (tp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
 func (tp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
@@ -361,4 +400,12 @@ func (resultA TallyResult) Equals(resultB TallyResult) bool {
 		resultA.Abstain.Equal(resultB.Abstain) &&
 		resultA.No.Equal(resultB.No) &&
 		resultA.NoWithVeto.Equal(resultB.NoWithVeto)
+}
+
+func (tr TallyResult) String() string {
+	return fmt.Sprintf(`Tally Result:
+  Yes:        %s
+  Abstain:    %s
+  No:         %s
+  NoWithVeto: %s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String())
 }

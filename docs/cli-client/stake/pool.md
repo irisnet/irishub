@@ -25,8 +25,8 @@ After that, you will get the current staking pool values.
 
 ```txt
 Pool
-Loose Tokens: 49.8289125612
-Bonded Tokens: 100.1800000000
-Token Supply: 150.0089125612
-Bonded Ratio: 0.6678269863
+    Loose Tokens: 49.8289125612
+    Bonded Tokens: 100.1800000000
+    Token Supply: 150.0089125612
+    Bonded Ratio: 0.6678269863
 ```

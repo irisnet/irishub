@@ -3,20 +3,18 @@ package cli
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/client/context"
-	distributionclient "github.com/irisnet/irishub/client/distribution"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/distribution"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	distrClient "github.com/irisnet/irishub/client/distribution"
+	"github.com/irisnet/irishub/app/protocol"
 )
 
-const NULL = "null"
-
 // GetWithdrawAddress returns withdraw address of a given delegator address
-func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetWithdrawAddress(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:     "withdraw-address",
 		Short:   "Query withdraw address",
@@ -25,36 +23,38 @@ func GetWithdrawAddress(storeName string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// find the key to look up the account
 			addrString := args[0]
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			delAddr, err := sdk.AccAddressFromBech32(addrString)
 			if err != nil {
 				return err
 			}
 
-			key := distribution.GetDelegatorWithdrawAddrKey(delAddr)
-
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, err := cliCtx.QueryStore(key, storeName)
+			params := distribution.NewQueryDelegatorParams(delAddr)
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryWithdrawAddr),
+				bz)
 			if err != nil {
 				return err
 			}
 
-			var withdrawAddress sdk.AccAddress
-			if len(res) == 0 {
-				withdrawAddress = delAddr
-			} else {
-				withdrawAddress = sdk.AccAddress(res)
+			var acc sdk.AccAddress
+			err = cdc.UnmarshalJSON(res, &acc)
+			if err != nil {
+				return err
 			}
 
-			fmt.Println(withdrawAddress.String())
-			return nil
+			return cliCtx.PrintOutput(acc)
 		},
 	}
 }
 
 // GetDelegationDistInfo returns the delegation distribution information of a given delegation
-func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetDelegationDistInfo(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delegation-distr-info",
 		Short:   "Query delegation distribution information",
@@ -69,31 +69,20 @@ func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			key := distribution.GetDelegationDistInfoKey(delAddr, valAddr)
-
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, err := cliCtx.QueryStore(key, storeName)
+			params := distribution.NewQueryDelegationDistInfoParams(delAddr, valAddr)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
-			if len(res) == 0 {
-				fmt.Println(NULL)
-				return nil
-			}
-			var ddi types.DelegationDistInfo
-			err = cdc.UnmarshalBinaryLengthPrefixed(res, &ddi)
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryDelegationDistInfo),
+				bz)
 			if err != nil {
 				return err
 			}
-
-			output, err := codec.MarshalJSONIndent(cdc, ddi)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -105,7 +94,7 @@ func GetDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetAllDelegationDistInfo returns all delegation distribution information of a given delegator
-func GetAllDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetAllDelegationDistInfo(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delegator-distr-info",
 		Short:   "Query delegator distribution information",
@@ -119,34 +108,20 @@ func GetAllDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command
 				return err
 			}
 
-			key := distribution.GetDelegationDistInfosKey(delAddr)
-
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			resKVs, err := cliCtx.QuerySubspace(key, storeName)
+			params := distribution.NewQueryDelegatorParams(delAddr)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
-			if len(resKVs) == 0 {
-				fmt.Println(NULL)
-				return nil
-			}
-			var ddiList []types.DelegationDistInfo
-			for _, kv := range resKVs {
-				var ddi types.DelegationDistInfo
-				err = cdc.UnmarshalBinaryLengthPrefixed(kv.Value, &ddi)
-				if err != nil {
-					return err
-				}
-				ddiList = append(ddiList, ddi)
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, ddiList)
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryAllDelegationDistInfo),
+				bz)
 			if err != nil {
 				return err
 			}
-
-			fmt.Println(string(output))
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -154,7 +129,7 @@ func GetAllDelegationDistInfo(storeName string, cdc *codec.Codec) *cobra.Command
 }
 
 // GetValidatorDistInfo returns the validator distribution information of a given validator
-func GetValidatorDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
+func GetValidatorDistInfo(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "validator-distr-info",
 		Short:   "Query validator distribution information",
@@ -169,33 +144,32 @@ func GetValidatorDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			key := distribution.GetValidatorDistInfoKey(valAddr)
-
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, err := cliCtx.QueryStore(key, storeName)
+			params := distribution.NewQueryValidatorDistInfoParams(valAddr)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
-			if len(res) == 0 {
-				fmt.Println(NULL)
-				return nil
-			}
-
-			var vdi types.ValidatorDistInfo
-			err = cdc.UnmarshalBinaryLengthPrefixed(res, &vdi)
-			if err != nil {
-				return err
-			}
-
-			vdiOutput := distributionclient.ConvertToValidatorDistInfoOutput(cliCtx, vdi)
-
-			output, err := codec.MarshalJSONIndent(cdc, vdiOutput)
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryValidatorDistInfo),
+				bz)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
+			var vddInfo distribution.ValidatorDistInfo
+			if err = cliCtx.Codec.UnmarshalJSON(res, &vddInfo); err != nil {
+				return err
+			}
+
+			output := distrClient.ConvertToValidatorDistInfoOutput(cliCtx, vddInfo)
+			res, err = codec.MarshalJSONIndent(cdc, output)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(res))
 			return nil
 		},
 	}
@@ -203,7 +177,7 @@ func GetValidatorDistInfo(storeName string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetRewards returns the all the rewards of validator or delegator
-func GetRewards(distrStoreName string, stakeStoreName string, cdc *codec.Codec) *cobra.Command {
+func GetRewards(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rewards",
 		Short:   "Query all the rewards of validator or delegator",
@@ -212,20 +186,59 @@ func GetRewards(distrStoreName string, stakeStoreName string, cdc *codec.Codec) 
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			addrString := args[0]
-			delAddr, err := sdk.AccAddressFromBech32(addrString)
+			address, err := sdk.AccAddressFromBech32(addrString)
 			if err != nil {
 				return err
 			}
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			rewards := distributionclient.GetRewards(distrStoreName, stakeStoreName, cliCtx, delAddr)
-
-			output, err := codec.MarshalJSONIndent(cdc, rewards)
+			params := distribution.NewQueryRewardsParams(address)
+			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(output))
-			return nil
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryRewards),
+				bz)
+			if err != nil {
+				return err
+			}
+
+			var rewards distribution.Rewards
+			err = cdc.UnmarshalJSON(res, &rewards)
+			if err != nil {
+				return err
+			}
+			return cliCtx.PrintOutput(rewards)
+		},
+	}
+	return cmd
+}
+
+// GetCommunityTax returns the community tax coins
+func GetCommunityTax(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "community-tax",
+		Short:   "Query community tax",
+		Example: "iriscli distribution community-tax",
+		Args:    cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			res, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", protocol.DistrRoute, distribution.QueryCommunityTax),
+				nil)
+			if err != nil {
+				return err
+			}
+
+			var communityTax distribution.CommunityTax
+			err = cdc.UnmarshalJSON(res, &communityTax)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(communityTax)
 		},
 	}
 	return cmd

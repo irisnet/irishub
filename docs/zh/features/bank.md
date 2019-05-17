@@ -55,7 +55,7 @@
     
     对上述的离线交易进行签名:
     ```bash
-    iriscli bank sign <file> --chain-id=<chain-id>  --name=<key_name>
+    iriscli tx sign <file> --chain-id=<chain-id>  --name=<key_name>
     ```
     将返回已签名的交易:
     ```json
@@ -85,7 +85,7 @@
 
     广播离线产生的已签名的交易，在这里，你可以使用上面的sign命令生成的交易。当然，您可以通过任何方法生成已签名的交易，例如：[irisnet-crypto](https://github.com/irisnet/irisnet-crypto)。
     ```bash
-    iriscli bank broadcast <file>
+    iriscli tx broadcast <file>
     ```
     该交易将在IRISnet中广播并执行。
      

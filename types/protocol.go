@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/irisnet/irishub/codec"
+	"fmt"
 )
 
 const (
@@ -28,6 +29,12 @@ type UpgradeConfig struct {
 	Protocol   ProtocolDefinition
 }
 
+func (uc UpgradeConfig) String() string {
+	return fmt.Sprintf("proposalID: %v, version: %v, software: %s, height: %v, threshold: %s",
+		uc.ProposalID, uc.Protocol.Version, uc.Protocol.Software, uc.Protocol.Height, uc.Protocol.Threshold.String(),
+	)
+}
+
 func NewProtocolDefinition(version uint64, software string, height uint64, threshold Dec) ProtocolDefinition {
 	return ProtocolDefinition{
 		version,
@@ -36,7 +43,6 @@ func NewProtocolDefinition(version uint64, software string, height uint64, thres
 		threshold,
 	}
 }
-
 
 func NewUpgradeConfig(proposalID uint64, protocol ProtocolDefinition) UpgradeConfig {
 	return UpgradeConfig{

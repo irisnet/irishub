@@ -20,7 +20,6 @@ iriscli gov query-params --help
 
 | 名称, 速记       | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --key           |                            | 参数的键名称                                                                                                                       |          |
 | --module        |                            | 模块名称                                                                                                                                 |          |
 
 ## 例子
@@ -34,23 +33,10 @@ iriscli gov query-params --module=stake
 ```
 
 ```txt
- stake/MaxValidators=100
- stake/UnbondingTime=504h0m0s
+Stake Params:
+  Unbonding Time:         504h0m0s
+  Max Validators:         100
 ```
-
-### 通过key查参数
-
-可以得到gov模块中指定键值的参数详情。
-
-```shell
-iriscli gov query-params --key=stake/MaxValidators
-```
-
-```txt
- stake/MaxValidators=100
-```
-
-注意：--module和--key参数不能同时为空.
 
 ### 所有可查询参数的模块
 

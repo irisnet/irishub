@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
@@ -16,7 +17,7 @@ import (
 // GetAccountCmd returns a query account that will display the state of the
 // account at a given address.
 // nolint: unparam
-func GetAccountCmd(storeName string, cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
+func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	return &cobra.Command{
 		Use:     "account [address]",
 		Short:   "Query account balance",
@@ -44,18 +45,7 @@ func GetAccountCmd(storeName string, cdc *codec.Codec, decoder auth.AccountDecod
 				return err
 			}
 
-			accountRes, err := bank.ConvertAccountCoin(cliCtx, acc)
-			if err != nil {
-				return err
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, accountRes)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return cliCtx.PrintOutput(acc)
 		},
 	}
 }
@@ -73,13 +63,8 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			output, err := codec.MarshalJSONIndent(cdc, res)
-			if err != nil {
-				return err
-			}
 
-			fmt.Println(string(output))
-			return nil
+			return cliCtx.PrintOutput(res)
 		},
 	}
 
@@ -87,7 +72,7 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryTokenStats performs token statistic query
-func GetCmdQueryTokenStats(cdc *codec.Codec, accStore, stakeStore string) *cobra.Command {
+func GetCmdQueryTokenStats(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "token-stats",
 		Short:   "query token statistics",
@@ -95,75 +80,30 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, accStore, stakeStore string) *cobra
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			//Get latest height
-			latestHeight, err := cliCtx.GetLatestHeight()
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithHeight(latestHeight)
-			// Query acc store
-			var loosenToken sdk.Coins
-			var burnedToken sdk.Coins
-			res, err := cliCtx.QueryStore(auth.TotalLoosenTokenKey, accStore)
-			if err != nil {
-				return err
-			}
-			if res == nil {
-				loosenToken = nil
-			} else {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res, &loosenToken)
-			}
-			res, err = cliCtx.QueryStore(auth.BurnedTokenKey, accStore)
-			if err != nil {
-				return err
-			}
-			if res == nil {
-				burnedToken = nil
-			} else {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res, &burnedToken)
-			}
-
-			// Query stake store
-			var bondedPool stake.BondedPool
-			res, err = cliCtx.QueryStore(stake.PoolKey, stakeStore)
-			if err != nil {
-				return err
-			}
-			if res != nil {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res, &bondedPool)
-			}
-			if !bondedPool.BondedTokens.Equal(bondedPool.BondedTokens.TruncateDec()) {
-				return fmt.Errorf("get invalid bonded token amount")
-			}
-			bondedToken := sdk.NewCoin(stakeTypes.StakeDenom, bondedPool.BondedTokens.TruncateInt())
-
-			//Convert to main coin unit
-			loosenTokenStr, err := cliCtx.ConvertCoinToMainUnit(loosenToken.String())
-			if err != nil {
-				return err
-			}
-			burnedTokenStr, err := cliCtx.ConvertCoinToMainUnit(burnedToken.String())
-			if err != nil {
-				return err
-			}
-			bondedTokenStr, err := cliCtx.ConvertCoinToMainUnit(bondedToken.String())
+			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryTokenStats), nil)
 			if err != nil {
 				return err
 			}
 
-			tokenStats := bank.TokenStats{
-				LoosenToken: loosenTokenStr,
-				BurnedToken: burnedTokenStr,
-				BondedToken: bondedTokenStr[0],
-			}
-
-			output, err := codec.MarshalJSONIndent(cdc, tokenStats)
+			var tokenStats bank.TokenStats
+			err = cdc.UnmarshalJSON(resToken, &tokenStats)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(output))
-			return nil
+			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
+			if err != nil {
+				return err
+			}
+			var poolStatus stakeTypes.PoolStatus
+			err = cdc.UnmarshalJSON(resPool, &poolStatus)
+			if err != nil {
+				return err
+			}
+
+			tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
+
+			return cliCtx.PrintOutput(tokenStats)
 		},
 	}
 

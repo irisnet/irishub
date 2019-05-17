@@ -1,8 +1,9 @@
 package protocol
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"fmt"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type ProtocolEngine struct {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
@@ -62,21 +63,18 @@ func (cliCtx CLIContext) QuerySubspace(subspace []byte, storeName string) (res [
 
 // GetAccount queries for an account given an address and a block height. An
 // error is returned if the query or decoding fails.
-func (cliCtx CLIContext) GetAccount(address []byte) (auth.Account, error) {
+func (cliCtx CLIContext) GetAccount(address []byte) (account auth.BaseAccount, err error) {
 	if cliCtx.AccDecoder == nil {
-		return nil, errors.New("account decoder required but not provided")
+		return account, errors.New("account decoder required but not provided")
 	}
 
-	res, err := cliCtx.QueryStore(auth.AddressStoreKey(address), cliCtx.AccountStore)
+	res, err := cliCtx.queryAccount(address)
 	if err != nil {
-		return nil, err
-	} else if len(res) == 0 {
-		return nil, ErrInvalidAccount(address)
+		return account, err
 	}
 
-	account, err := cliCtx.AccDecoder(res)
-	if err != nil {
-		return nil, err
+	if err := cliCtx.Codec.UnmarshalJSON(res, &account); err != nil {
+		return account, err
 	}
 
 	return account, nil
@@ -138,16 +136,26 @@ func (cliCtx CLIContext) EnsureAccountExists() error {
 // address. Instead of using the context's from name, a direct address is
 // given. An error is returned if it does not.
 func (cliCtx CLIContext) EnsureAccountExistsFromAddr(addr sdk.AccAddress) error {
-	accountBytes, err := cliCtx.QueryStore(auth.AddressStoreKey(addr), cliCtx.AccountStore)
+	_, err := cliCtx.queryAccount(addr)
+	return err
+}
+
+// queryAccount queries an account using custom query endpoint of auth module
+// returns an error if result is `null` otherwise account data
+func (cliCtx CLIContext) queryAccount(addr sdk.AccAddress) ([]byte, error) {
+	bz, err := cliCtx.Codec.MarshalJSON(auth.NewQueryAccountParams(addr))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if len(accountBytes) == 0 {
-		return ErrInvalidAccount(addr)
+	route := fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryAccount)
+
+	res, err := cliCtx.QueryWithData(route, bz)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return res, nil
 }
 
 // query performs a query from a Tendermint node with the provided store name
@@ -398,7 +406,6 @@ func (cliCtx CLIContext) GetLatestHeight() (int64, error) {
 	return status.SyncInfo.LatestBlockHeight, nil
 }
 
-
 func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, error) {
 	client := &http.Client{}
 	url := strings.Replace(cliCtx.NodeURI, "tcp", "http", 1)
@@ -426,4 +433,30 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 	}
 
 	return &res.Result, nil
+}
+
+// PrintOutput prints output while respecting output and indent flags
+// NOTE: pass in marshalled structs that have been unmarshaled
+// because this function will panic on marshaling errors
+func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
+	var out []byte
+
+	switch ctx.OutputFormat {
+	case "text":
+		out = []byte(toPrint.String())
+
+	case "json":
+		if ctx.Indent {
+			out, err = ctx.Codec.MarshalJSONIndent(toPrint, "", "  ")
+		} else {
+			out, err = ctx.Codec.MarshalJSON(toPrint)
+		}
+	}
+
+	if err != nil {
+		return
+	}
+
+	fmt.Println(string(out))
+	return
 }

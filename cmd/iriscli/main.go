@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
@@ -17,6 +18,7 @@ import (
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
+	txcmd "github.com/irisnet/irishub/client/tx/cli"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/version"
@@ -49,9 +51,21 @@ func main() {
 	cdc := app.MakeLatestCodec()
 
 	rootCmd.AddCommand(client.ConfigCmd())
-	rootCmd.AddCommand(client.LineBreak)
 
 	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
+	//Add tx commands
+	txCmd := &cobra.Command{
+		Use:   "tx",
+		Short: "Tx subcommands",
+	}
+	txCmd.AddCommand(
+		client.PostCommands(
+			txcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
+			txcmd.GetBroadcastCommand(cdc),
+		)...)
+	rootCmd.AddCommand(
+		txCmd,
+	)
 	//Add state commands
 	tendermintCmd := &cobra.Command{
 		Use:   "tendermint",
@@ -75,15 +89,13 @@ func main() {
 	bankCmd.AddCommand(
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
-			bankcmd.GetAccountCmd("acc", cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetCmdQueryTokenStats(cdc, "acc", "stake"),
+			bankcmd.GetAccountCmd(cdc, utils.GetAccountDecoder(cdc)),
+			bankcmd.GetCmdQueryTokenStats(cdc),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
 			bankcmd.BurnTxCmd(cdc),
-			bankcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,
@@ -96,11 +108,12 @@ func main() {
 	}
 	distributionCmd.AddCommand(
 		client.GetCommands(
-			distributioncmd.GetWithdrawAddress("distr", cdc),
-			distributioncmd.GetDelegationDistInfo("distr", cdc),
-			distributioncmd.GetValidatorDistInfo("distr", cdc),
-			distributioncmd.GetAllDelegationDistInfo("distr", cdc),
-			distributioncmd.GetRewards("distr", "stake", cdc),
+			distributioncmd.GetWithdrawAddress(cdc),
+			//distributioncmd.GetDelegationDistInfo(cdc),
+			//distributioncmd.GetValidatorDistInfo(cdc),
+			//distributioncmd.GetAllDelegationDistInfo(cdc),
+			distributioncmd.GetRewards(cdc),
+			distributioncmd.GetCommunityTax(cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
@@ -118,14 +131,14 @@ func main() {
 	}
 	govCmd.AddCommand(
 		client.GetCommands(
-			govcmd.GetCmdQueryProposal("gov", cdc),
-			govcmd.GetCmdQueryProposals("gov", cdc),
-			govcmd.GetCmdQueryVote("gov", cdc),
-			govcmd.GetCmdQueryVotes("gov", cdc),
-			govcmd.GetCmdQueryDeposit("gov", cdc),
-			govcmd.GetCmdQueryDeposits("gov", cdc),
-			govcmd.GetCmdQueryTally("gov", cdc),
-			govcmd.GetCmdQueryGovConfig("params", cdc),
+			govcmd.GetCmdQueryProposal(cdc),
+			govcmd.GetCmdQueryProposals(cdc),
+			govcmd.GetCmdQueryVote(cdc),
+			govcmd.GetCmdQueryVotes(cdc),
+			govcmd.GetCmdQueryDeposit(cdc),
+			govcmd.GetCmdQueryDeposits(cdc),
+			govcmd.GetCmdQueryTally(cdc),
+			govcmd.GetCmdQueryGovConfig(cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -144,28 +157,28 @@ func main() {
 	}
 	stakeCmd.AddCommand(
 		client.GetCommands(
-			stakecmd.GetCmdQueryValidator("stake", cdc),
-			stakecmd.GetCmdQueryValidators("stake", cdc),
-			stakecmd.GetCmdQueryDelegation("stake", cdc),
-			stakecmd.GetCmdQueryDelegations("stake", cdc),
-			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
-			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorUnbondingDelegations("stake", cdc),
-			stakecmd.GetCmdQueryValidatorRedelegations("stake", cdc),
-			stakecmd.GetCmdQueryRedelegation("stake", cdc),
-			stakecmd.GetCmdQueryRedelegations("stake", cdc),
-			stakecmd.GetCmdQueryPool("stake", cdc),
-			stakecmd.GetCmdQueryParams("stake", cdc),
-			slashingcmd.GetCmdQuerySigningInfo("slashing", cdc),
+			stakecmd.GetCmdQueryValidator(cdc),
+			stakecmd.GetCmdQueryValidators(cdc),
+			stakecmd.GetCmdQueryDelegation(cdc),
+			stakecmd.GetCmdQueryDelegations(cdc),
+			stakecmd.GetCmdQueryUnbondingDelegation(cdc),
+			stakecmd.GetCmdQueryUnbondingDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorUnbondingDelegations(cdc),
+			stakecmd.GetCmdQueryValidatorRedelegations(cdc),
+			stakecmd.GetCmdQueryRedelegation(cdc),
+			stakecmd.GetCmdQueryRedelegations(cdc),
+			stakecmd.GetCmdQueryPool(cdc),
+			stakecmd.GetCmdQueryParams(cdc),
+			slashingcmd.GetCmdQuerySigningInfo(protocol.SlashingRoute, cdc),
 		)...)
 	stakeCmd.AddCommand(
 		client.PostCommands(
 			stakecmd.GetCmdCreateValidator(cdc),
 			stakecmd.GetCmdEditValidator(cdc),
 			stakecmd.GetCmdDelegate(cdc),
-			stakecmd.GetCmdUnbond("stake", cdc),
-			stakecmd.GetCmdRedelegate("stake", cdc),
+			stakecmd.GetCmdUnbond(cdc),
+			stakecmd.GetCmdRedelegate(cdc),
 			slashingcmd.GetCmdUnrevoke(cdc),
 		)...)
 	rootCmd.AddCommand(
@@ -193,12 +206,12 @@ func main() {
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(
-			servicecmd.GetCmdQuerySvcDef("service", cdc),
-			servicecmd.GetCmdQuerySvcBind("service", cdc),
-			servicecmd.GetCmdQuerySvcBinds("service", cdc),
-			servicecmd.GetCmdQuerySvcRequests("service", cdc),
-			servicecmd.GetCmdQuerySvcResponse("service", cdc),
-			servicecmd.GetCmdQuerySvcFees("service", cdc),
+			servicecmd.GetCmdQuerySvcDef(cdc),
+			servicecmd.GetCmdQuerySvcBind(cdc),
+			servicecmd.GetCmdQuerySvcBinds(cdc),
+			servicecmd.GetCmdQuerySvcRequests(cdc),
+			servicecmd.GetCmdQuerySvcResponse(cdc),
+			servicecmd.GetCmdQuerySvcFees(cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
 		servicecmd.GetCmdSvcDef(cdc),
@@ -225,8 +238,8 @@ func main() {
 	}
 	guardianCmd.AddCommand(
 		client.GetCommands(
-			guardiancmd.GetCmdQueryProfilers("guardian", cdc),
-			guardiancmd.GetCmdQueryTrustees("guardian", cdc),
+			guardiancmd.GetCmdQueryProfilers(cdc),
+			guardiancmd.GetCmdQueryTrustees(cdc),
 		)...)
 
 	guardianCmd.AddCommand(

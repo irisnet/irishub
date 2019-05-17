@@ -15,7 +15,7 @@ Application metrics, namespace: `iris`
 | **Name** | **Type** | **Tags** | **Description** |
 | ---- | ---- | ---- | ----------- |
 | module_stake_bonded_token | Gauge | validator_address | Total bonded token by validator |
-| module_stake_loosen_token | Gauge |                   | Total loosen token |
+| module_stake_loosen_token | Gauge |                   | Total loose tokens |
 | module_stake_burned_token | Gauge |                   | Total burned token |
 | module_stake_slashed_token | Counter | validator_address | Total slashed token by validator |
 | module_stake_jailed        | Gauge | validator_address | Jailed status by validator, either 0 (not jailed) or 1 (jailed) |

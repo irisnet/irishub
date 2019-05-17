@@ -2,7 +2,7 @@
 
 ## Description
 
-Query the token statistic, including total loosen token, total burned token and total bonded token.
+Query the token statistic, including total loose tokens, total burned token and total bonded token.
 
 ## Usage:
 
@@ -33,16 +33,11 @@ iriscli bank token-stats
 ```
 
 Output:
-```json
-{
-  "loosen_token": [
-    "1864477.596384156921391687iris"
-  ],
-  "burned_token": [
-    "177.59638iris"
-  ],
-  "bonded_token": "425182.329615843078608313iris"
-}
+```
+TokenStats:
+  Loose Tokens:  1864477.596384156921391687iris
+  Burned Tokens:  177.59638iris
+  Bonded Tokens:  425182.329615843078608313iris
 ```
 
 ​    

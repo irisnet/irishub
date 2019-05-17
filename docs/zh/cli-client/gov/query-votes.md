@@ -33,11 +33,7 @@ iriscli gov query-votes --chain-id=<chain-id> --proposal-id=<proposal-id>
 ```
  
 ```txt
-[
-  {
-    "voter": "iaa14q5rf9sl2dqd2uxrxykafxq3nu3lj2fpascegs",
-    "proposal_id": "1",
-    "option": "Yes"
-  }
-]
+Votes for Proposal 99:
+  iaa1gfcee5u5f54kfcnufv4ypcfyldw0vu0z5l4mh8: Abstain
+  iaa15x7ph3pz5dvh92dzhjfcrglswu2r9uygly5vmu: NoWithVeto
 ```

@@ -207,7 +207,14 @@ func PrintKeyInfo(keyInfo keys.Info, bechKeyOut BechKeyOutFn) {
 		fmt.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
 		PrintKeyOutput(ko)
 	case "json":
-		out, err := MarshalJSON(ko)
+		var out []byte
+		var err error
+
+		if viper.GetBool(client.FlagIndentResponse) {
+			out, err = cdc.MarshalJSONIndent(ko, "", "  ")
+		} else {
+			out, err = cdc.MarshalJSON(ko)
+		}
 		if err != nil {
 			panic(err)
 		}
@@ -228,7 +235,15 @@ func PrintInfos(cdc *codec.Codec, infos []keys.Info) {
 			PrintKeyOutput(ko)
 		}
 	case "json":
-		out, err := cdc.MarshalJSON(kos)
+		var out []byte
+		var err error
+
+		if viper.GetBool(client.FlagIndentResponse) {
+			out, err = cdc.MarshalJSONIndent(kos, "", "  ")
+		} else {
+			out, err = cdc.MarshalJSON(kos)
+		}
+
 		if err != nil {
 			panic(err)
 		}

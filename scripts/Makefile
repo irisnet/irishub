@@ -2,9 +2,7 @@ all: get_tools
 
 
 ########################################
-### DEP
 
-DEP = github.com/golang/dep/cmd/dep
 GOLINT = github.com/tendermint/lint/golint
 GOMETALINTER = gopkg.in/alecthomas/gometalinter.v2
 UNCONVERT = github.com/mdempsky/unconvert
@@ -14,7 +12,6 @@ ERRCHECK = github.com/kisielk/errcheck
 UNPARAM = mvdan.cc/unparam
 STATIK = github.com/rakyll/statik
 
-DEP_CHECK := $(shell command -v dep 2> /dev/null)
 GOLINT_CHECK := $(shell command -v golint 2> /dev/null)
 GOMETALINTER_CHECK := $(shell command -v gometalinter.v2 2> /dev/null)
 UNCONVERT_CHECK := $(shell command -v unconvert 2> /dev/null)
@@ -26,11 +23,6 @@ STATIK_CHECK := $(shell command -v statik 2> /dev/null)
 
 
 check_tools:
-ifndef DEP_CHECK
-	@echo "No dep in path.  Install with 'make get_tools'."
-else
-	@echo "Found dep in path."
-endif
 ifndef STATIK_CHECK
 	@echo "No statik in path.  Install with 'make get_tools'."
 else
@@ -76,12 +68,6 @@ else
 endif
 
 get_tools:
-ifdef DEP_CHECK
-	@echo "Dep is already installed.  Run 'make update_tools' to update."
-else
-	@echo "Installing dep"
-	go get -v $(DEP)
-endif
 ifdef STATIK_CHECK
 	@echo "Statik is already installed.  Run 'make update_tools' to update."
 else
@@ -140,10 +126,6 @@ else
 	@echo "Installing statik"
 	go get -v $(STATIK)
 endif
-
-update_tools:
-	@echo "Updating dep"
-	go get -u -v $(DEP)
 
 update_dev_tools:
 	$(MAKE) update_tools

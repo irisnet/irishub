@@ -408,7 +408,7 @@ func (k Keeper) Delegate(ctx sdk.Context, delAddr sdk.AccAddress, bondAmt sdk.Co
 
 	if subtractAccount {
 		// Account new shares, save
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, delAddr.String(), validator.OperatorAddr.String(),  bondAmt.String(), sdk.DelegationFlow, "")
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, delAddr.String(), validator.OperatorAddr.String(), bondAmt.String(), sdk.DelegationFlow, "")
 		_, _, err = k.bankKeeper.SubtractCoins(ctx, delegation.DelegatorAddr, sdk.Coins{bondAmt})
 		if err != nil {
 			return
@@ -442,7 +442,7 @@ func (k Keeper) unbond(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValA
 
 	// retrieve the amount to remove
 	if delegation.Shares.LT(shares) {
-		err = types.ErrNotEnoughDelegationShares(k.Codespace(), delegation.Shares.QuoInt(sdk.NewIntWithDecimal(1,18)).RoundInt().String())
+		err = types.ErrNotEnoughDelegationShares(k.Codespace(), delegation.Shares.QuoInt(sdk.NewIntWithDecimal(1, 18)).RoundInt().String())
 		return
 	}
 
@@ -539,13 +539,13 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	// no need to create the ubd object just complete now
 	if completeNow {
 		if !balance.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), delAddr.String(),  balance.String(), sdk.UndelegationFlow, ctx.CoinFlowTrigger())
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), delAddr.String(), balance.String(), sdk.UndelegationFlow, ctx.CoinFlowTrigger())
 		}
 		_, _, err := k.bankKeeper.AddCoins(ctx, delAddr, sdk.Coins{balance})
 		if err != nil {
 			return types.UnbondingDelegation{}, err
 		}
-		return types.UnbondingDelegation{MinTime: minTime}, nil
+		return types.UnbondingDelegation{MinTime: minTime, Balance: balance}, nil
 	}
 
 	ubd := types.UnbondingDelegation{
@@ -572,7 +572,7 @@ func (k Keeper) CompleteUnbonding(ctx sdk.Context, delAddr sdk.AccAddress, valAd
 		return types.ErrNoUnbondingDelegation(k.Codespace())
 	}
 	if !ubd.Balance.IsZero() {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), ubd.DelegatorAddr.String(),  ubd.Balance.String(), sdk.UndelegationFlow, ubd.TxHash)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), ubd.DelegatorAddr.String(), ubd.Balance.String(), sdk.UndelegationFlow, ubd.TxHash)
 	}
 	_, _, err := k.bankKeeper.AddCoins(ctx, ubd.DelegatorAddr, sdk.Coins{ubd.Balance})
 	if err != nil {
@@ -629,7 +629,8 @@ func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 		"shares_src", sharesAmount.String(), "shares_dst", sharesCreated, "balance", returnCoin)
 
 	if completeNow { // no need to create the redelegation object
-		return types.Redelegation{MinTime: minTime}, nil
+		return types.Redelegation{MinTime: minTime, SharesDst: sharesCreated, SharesSrc: sharesAmount,
+			Balance: returnCoin}, nil
 	}
 
 	red := types.Redelegation{
