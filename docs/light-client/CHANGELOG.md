@@ -13,8 +13,8 @@
 
 #### Tendermint APIs
 
-| [v0.13.1]      | [v0.14.0]        | 
-| --------------- | --------------- |
+| [v0.13.1]      | [v0.14.0]        | change of output/input |  
+| --------------- | --------------- | --------------- |
 | GET /node_info  | GET /node-info   | 
 | GET /blocks-result/latest | GET /block-results/latest | 
 | GET /blocks-result/{height}  | GET /block-results/{height}  | 
@@ -40,7 +40,6 @@
 | GET /bank/balances/{address} | GET /bank/accounts/{address} | 
 | POST /bank/accounts/{address}/transfers | POST /bank/accounts/{address}/send | 
 | POST /bank/burn | POST /bank/accounts/{address}/burn | 
-
 
 #### Stake module APIs
 
