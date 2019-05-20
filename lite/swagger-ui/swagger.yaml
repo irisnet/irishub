@@ -1079,6 +1079,74 @@ paths:
           description: Invalid delegator address
         '500':
           description: Internal Server Error
+    post:
+      summary: Submit redelegation
+      parameters:
+        - in: query
+          name: async
+          description: 'if true, broadcast transaction asynchronously'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: commit
+          description: >-
+            if true, response will be returned after the transaction is included
+            in a block.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: simulate
+          description: >-
+            if true, ignore the gas field and perform a simulation of a
+            transaction, but don't broadcast it
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: generate-only
+          description: 'if true, build an unsigned transaction and write it back'
+          required: false
+          schema:
+            type: boolean
+      tags:
+        - Stake
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BroadcastTxCommitResult'
+        '400':
+          description: Invalid delegator address or delegation body
+        '401':
+          description: Key password is wrong
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                redelegate:
+                  type: object
+                  properties:
+                    validator_src_addr:
+                      $ref: '#/components/schemas/ValidatorAddress'
+                    validator_dst_addr:
+                      $ref: '#/components/schemas/ValidatorAddress'
+                    shares_amount:
+                      type: string
+                      example: '100'
+                    shares_percent:
+                      type: string
+                      example: '0.1'
+        description: Either specify the shares_amount or the shares_percent, not both
   '/stake/delegators/{delegatorAddr}/validators':
     parameters:
       - in: path
