@@ -15,32 +15,32 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-  - name: ICS0
+  - name: Tendermint
     description: 'Tendermint APIs, such as query blocks, transactions and validatorset'
-  - name: ICS1
+  - name: Key
     description: Key management APIs
-  - name: ICS2
+  - name: Tx
     description: 'Sign and broadcast transactions'
-  - name: ICS20
+  - name: Bank
     description: Bank module APIs
-  - name: ICS21
+  - name: Stake
     description: Stake module APIs
-  - name: ICS22
+  - name: Gov
     description: Governance module APIs
-  - name: ICS23
+  - name: Slashing
     description: Slashing module APIs
-  - name: ICS24
+  - name: Distribution
     description: Distribution module APIs
-  - name: ICS25
+  - name: Service
     description: Service module APIs
-  - name: version
+  - name: Version
     description: Query app version
 paths:
   /version:
     get:
       summary: Version of irislcd
       tags:
-        - version
+        - Version
       description: Get the version of irislcd running locally to compare against expected
       responses:
         '200':
@@ -49,7 +49,7 @@ paths:
     get:
       summary: Version of the connected node
       tags:
-        - version
+        - Version
       description: >-
         Get the version of the SDK running on the connected node to compare
         against expected
@@ -63,7 +63,7 @@ paths:
       description: Information about the connected node
       summary: The properties of the connected node
       tags:
-        - ICS0
+        - Tendermint
       responses:
         '200':
           description: Node status
@@ -100,7 +100,7 @@ paths:
     get:
       summary: Syncing state of node
       tags:
-        - ICS0
+        - Tendermint
       description: Get if the node is currently syning with other nodes
       responses:
         '200':
@@ -119,7 +119,7 @@ paths:
     get:
       summary: Get the latest block
       tags:
-        - ICS0
+        - Tendermint
       responses:
         '200':
           description: The latest block
@@ -133,7 +133,7 @@ paths:
     get:
       summary: Get a block at a certain height
       tags:
-        - ICS0
+        - Tendermint
       parameters:
         - in: path
           name: height
@@ -158,7 +158,7 @@ paths:
     get:
       summary: Get the latest block result
       tags:
-        - ICS0
+        - Tendermint
       responses:
         '200':
           description: The latest block result
@@ -172,7 +172,7 @@ paths:
     get:
       summary: Get a block result at a certain height
       tags:
-        - ICS0
+        - Tendermint
       parameters:
         - in: path
           name: height
@@ -197,7 +197,7 @@ paths:
     get:
       summary: Get the latest validator set
       tags:
-        - ICS0
+        - Tendermint
       responses:
         '200':
           description: The validator set at the latest block height
@@ -218,7 +218,7 @@ paths:
     get:
       summary: Get a validator set a certain height
       tags:
-        - ICS0
+        - Tendermint
       parameters:
         - in: path
           name: height
@@ -250,7 +250,7 @@ paths:
     get:
       summary: Get a Tx by hash
       tags:
-        - ICS0
+        - Tendermint
       parameters:
         - in: path
           name: hash
@@ -270,7 +270,7 @@ paths:
   /txs:
     get:
       tags:
-        - ICS0
+        - Tendermint
       summary: Search transactions
       description: Search transactions by tag(s).
       parameters:
@@ -308,7 +308,7 @@ paths:
           description: Internal Server Error
 #    post:
 #      tags:
-#        - ICS0
+#        - Tendermint
 #      summary: broadcast Tx
 #      description: broadcast tx with tendermint rpc
 #      responses:
@@ -341,7 +341,7 @@ paths:
   /tx/sign:
     post:
       tags:
-        - ICS2
+        - Tx
       summary: Sign a transation
       description: >-
         Sign a transation providing locally stored account and according
@@ -387,7 +387,7 @@ paths:
   /tx/broadcast:
     post:
       tags:
-        - ICS2
+        - Tx
       summary: Broadcast a signed StdTx with amino encoding signature and public key
       description: >-
         Broadcast a signed StdTx with amino encoding signature and public key to
@@ -439,7 +439,7 @@ paths:
   '/bank/coins/{type}':
     get:
       tags:
-        - ICS20
+        - Bank
       summary: Get coin type
       description: Get the detailed information about the given coin type
       parameters:
@@ -487,7 +487,7 @@ paths:
   /bank/token-stats:
     get:
       tags:
-        - ICS20
+        - Bank
       summary: Get token statistics
       description: >-
         Get token statistics, such as total loose tokens, total bonded token and
@@ -516,7 +516,7 @@ paths:
     get:
       summary: Get the account information on blockchain
       tags:
-        - ICS20
+        - Bank
       parameters:
         - in: path
           name: address
@@ -558,7 +558,7 @@ paths:
       summary: Send coins (build -> sign -> send)
       description: Send coins (build -> sign -> send)
       tags:
-        - ICS20
+        - Bank
       parameters:
         - in: query
           name: async
@@ -627,7 +627,7 @@ paths:
       summary: Burn coins
       description: Burn coins
       tags:
-        - ICS20
+        - Bank
       parameters:
         - in: query
           name: async
@@ -693,7 +693,7 @@ paths:
     get:
       summary: List of accounts stored locally
       tags:
-        - ICS1
+        - Key
       responses:
         '200':
           description: Array of accounts
@@ -708,7 +708,7 @@ paths:
     post:
       summary: Create a new account locally
       tags:
-        - ICS1
+        - Key
       responses:
         '200':
           description: Returns account information of the created key
@@ -743,7 +743,7 @@ paths:
     get:
       summary: Create a new seed to create a new account with
       tags:
-        - ICS1
+        - Key
       responses:
         '200':
           description: 24 word Seed
@@ -762,7 +762,7 @@ paths:
     post:
       summary: Recover a account from a seed
       tags:
-        - ICS1
+        - Key
       parameters:
         - in: path
           name: name
@@ -808,7 +808,7 @@ paths:
     get:
       summary: Get a certain locally stored account
       tags:
-        - ICS1
+        - Key
       parameters:
         - in: query
           name: bech
@@ -828,7 +828,7 @@ paths:
     put:
       summary: Update the password for this account in the KMS
       tags:
-        - ICS1
+        - Key
       responses:
         '200':
           description: Updated password
@@ -853,7 +853,7 @@ paths:
     delete:
       summary: Remove an account
       tags:
-        - ICS1
+        - Key
       responses:
         '200':
           description: Removed account
@@ -883,7 +883,7 @@ paths:
     get:
       summary: Get all delegations from a delegator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -930,7 +930,7 @@ paths:
           schema:
             type: boolean
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -972,7 +972,7 @@ paths:
     get:
       summary: Get all unbonding delegations from a delegator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1019,7 +1019,7 @@ paths:
           schema:
             type: boolean
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1064,7 +1064,7 @@ paths:
     get:
       summary: Get all redelegations from a delegator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1090,7 +1090,7 @@ paths:
     get:
       summary: Query all validators that a delegator is bonded to
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1121,7 +1121,7 @@ paths:
     get:
       summary: Query a validator that a delegator is bonded to
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1144,7 +1144,7 @@ paths:
     get:
       summary: Get all staking txs (i.e msgs) from a delegator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1177,7 +1177,7 @@ paths:
     get:
       summary: Query the current delegation between a delegator and a validator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1206,7 +1206,7 @@ paths:
     get:
       summary: Query all unbonding delegations between a delegator and a validator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1225,7 +1225,7 @@ paths:
     get:
       summary: Get validators
       tags:
-        - ICS21
+        - Stake
       parameters:
         - in: query
           name: page
@@ -1259,7 +1259,7 @@ paths:
     get:
       summary: Query the information from a single validator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1282,7 +1282,7 @@ paths:
     get:
       summary: Get all delegations from a validator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1307,7 +1307,7 @@ paths:
     get:
       summary: Get all unbonding delegations from a validator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1332,7 +1332,7 @@ paths:
     get:
       summary: Get all outgoing redelegations from a validator
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1350,7 +1350,7 @@ paths:
     get:
       summary: Get the current state of the staking pool
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1373,7 +1373,7 @@ paths:
     get:
       summary: Get the current staking parameter values
       tags:
-        - ICS21
+        - Stake
       responses:
         '200':
           description: OK
@@ -1395,7 +1395,7 @@ paths:
       summary: Get sign info of given validator
       description: Get sign info of given validator
       tags:
-        - ICS23
+        - Slashing
       parameters:
         - description: Bech32 validator public key
           name: validatorPubKey
@@ -1430,7 +1430,7 @@ paths:
       summary: Unjail a jailed validator
       description: Send transaction to unjail a jailed validator
       tags:
-        - ICS23
+        - Slashing
       parameters:
         - in: query
           name: async
@@ -1486,7 +1486,7 @@ paths:
       summary: Submit a proposal
       description: Send transaction to submit a proposal
       tags:
-        - ICS22
+        - Gov
       parameters:
         - in: query
           name: async
@@ -1557,7 +1557,7 @@ paths:
       summary: Query proposals
       description: Query proposals information with parameters
       tags:
-        - ICS22
+        - Gov
       parameters:
         - in: query
           name: voter
@@ -1603,7 +1603,7 @@ paths:
       summary: Deposit tokens to a proposal
       description: Send transaction to deposit tokens to a proposal
       tags:
-        - ICS22
+        - Gov
       parameters:
         - in: query
           name: async
@@ -1670,7 +1670,7 @@ paths:
       summary: Query deposits
       description: Query deposits by proposalId
       tags:
-        - ICS22
+        - Gov
       parameters:
         - name: proposalId
           required: true
@@ -1695,7 +1695,7 @@ paths:
       summary: Vote a proposal
       description: Send transaction to vote a proposal
       tags:
-        - ICS22
+        - Gov
       parameters:
         - in: query
           name: async
@@ -1765,7 +1765,7 @@ paths:
       summary: Query voters
       description: Query voters information by proposalId
       tags:
-        - ICS22
+        - Gov
       parameters:
         - description: proposal id
           name: proposalId
@@ -1791,7 +1791,7 @@ paths:
       summary: Query a proposal
       description: Query a proposal by id
       tags:
-        - ICS22
+        - Gov
       parameters:
         - name: proposalId
           required: true
@@ -1814,7 +1814,7 @@ paths:
       summary: Query deposit
       description: Query deposit by proposalId and depositor address
       tags:
-        - ICS22
+        - Gov
       parameters:
         - description: proposal id
           name: proposalId
@@ -1846,7 +1846,7 @@ paths:
       summary: Query vote
       description: Query vote information by proposalId and voter address
       tags:
-        - ICS22
+        - Gov
       parameters:
         - description: proposal id
           name: proposalId
@@ -1878,7 +1878,7 @@ paths:
       summary: Query governance parameters
       description: Query governance parameters
       tags:
-        - ICS22
+        - Gov
       parameters:
         - description: module name
           name: module
@@ -1903,7 +1903,7 @@ paths:
     post:
       summary: Set withdraw address
       tags:
-        - ICS24
+        - Distribution
       parameters:
         - in: query
           name: async
@@ -1960,7 +1960,7 @@ paths:
     get:
       summary: Query withdraw address
       tags:
-        - ICS24
+        - Distribution
       responses:
         '200':
           description: OK
@@ -1988,7 +1988,7 @@ paths:
     post:
       summary: Withdraw rewards
       tags:
-        - ICS24
+        - Distribution
       parameters:
         - in: query
           name: async
@@ -2062,7 +2062,7 @@ paths:
 #    get:
 #      summary: Query distribution information for a delegation
 #      tags:
-#        - ICS24
+#        - Distribution
 #      responses:
 #        '200':
 #          description: OK
@@ -2087,7 +2087,7 @@ paths:
 #    get:
 #      summary: Query distribution information list for a given delegator
 #      tags:
-#        - ICS24
+#        - Distribution
 #      responses:
 #        '200':
 #          description: OK
@@ -2112,7 +2112,7 @@ paths:
 #    get:
 #      summary: Query withdraw address
 #      tags:
-#        - ICS24
+#        - Distribution
 #      responses:
 #        '200':
 #          description: OK
@@ -2158,7 +2158,7 @@ paths:
     get:
       summary: Query all the rewards of validator or delegator
       tags:
-        - ICS24
+        - Distribution
       responses:
         '200':
           description: OK
@@ -2194,7 +2194,7 @@ paths:
     get:
       summary: Query community tax
       tags:
-        - ICS24
+        - Distribution
       responses:
         '200':
           description: OK
@@ -2214,7 +2214,7 @@ paths:
       summary: Add a service definition
       description: Send transaction to define a service
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2298,7 +2298,7 @@ paths:
       summary: Query service definition
       description: Query a service definition
       tags:
-        - ICS25
+        - Service
       responses:
         '200':
           description: OK
@@ -2352,7 +2352,7 @@ paths:
       summary: Add a service binding
       description: Send transaction to add a binding to a service definition
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2457,7 +2457,7 @@ paths:
       summary: Query service binding
       description: Query a service binding
       tags:
-        - ICS25
+        - Service
       responses:
         '200':
           description: OK
@@ -2524,7 +2524,7 @@ paths:
       summary: Query service binding list
       description: Query service binding list
       tags:
-        - ICS25
+        - Service
       responses:
         '200':
           description: OK
@@ -2579,7 +2579,7 @@ paths:
       summary: Update a service binding
       description: Send transaction to update a service binding
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2675,7 +2675,7 @@ paths:
       summary: Disable service binding
       description: Send transaction to diasble a service binding
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2743,7 +2743,7 @@ paths:
       summary: Enable service binding
       description: Send transaction to enable a service binding
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2821,7 +2821,7 @@ paths:
       summary: Refund deposit from a service binding
       description: Send transaction to refund deposit from a service binding
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2889,7 +2889,7 @@ paths:
       summary: Call service
       description: Send transaction to call a method of service which a provider bound it
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -2992,7 +2992,7 @@ paths:
       summary: Query service requests of a provider
       description: Query service requests of a provider
       tags:
-        - ICS25
+        - Service
       responses:
         '200':
           description: OK
@@ -3042,7 +3042,7 @@ paths:
       summary: Respond service call
       description: Send transaction to respond a service call
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -3122,7 +3122,7 @@ paths:
       summary: Query service response
       description: Query service response
       tags:
-        - ICS25
+        - Service
       responses:
         '200':
           description: OK
@@ -3170,7 +3170,7 @@ paths:
       summary: Query service fees of a address
       description: Query service fees of a address
       tags:
-        - ICS25
+        - Service
       responses:
         '200':
           description: OK
@@ -3198,7 +3198,7 @@ paths:
       summary: Refund service return fee of consumer
       description: Send transaction to refund service return fee of consumer
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
@@ -3254,7 +3254,7 @@ paths:
       summary: Withdraw service incoming fee of provider
       description: Send transaction to withdraw service incoming fee of provider
       tags:
-        - ICS25
+        - Service
       parameters:
         - in: query
           name: async
