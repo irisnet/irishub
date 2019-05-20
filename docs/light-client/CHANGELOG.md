@@ -16,8 +16,8 @@
 | [v0.13.1]      | [v0.14.0]        | 
 | --------------- | --------------- |
 | GET /node_info  | GET /node-info   | 
-| GET /blocks-result/latest | GET /blocks-results/latest | 
-| GET /blocks-result/{height}  | GET /blocks-results/{height}  | 
+| GET /blocks-result/latest | GET /block-results/latest | 
+| GET /blocks-result/{height}  | GET /block-results/{height}  | 
 | POST /txs  | N/A | 
 
 #### Key management APIs
@@ -31,21 +31,15 @@
 | [v0.13.1]      | [v0.14.0]        | 
 | --------------- | --------------- |
 | POST /txs/send  |  N/A | 
-| GET /bank/coin/{coin-type} |  N/A | 
-| GET /bank/token-stats  |  N/A | 
-| GET /bank/balances/{address}  |  N/A | 
-| POST /bank/accounts/{address}/transfers  |  N/A | 
-| POST /bank/burn  |  N/A | 
 
 #### Bank module APIs
 
 | [v0.13.1]      | [v0.14.0]        | 
 | --------------- | --------------- |
-| N/A | GET /bank/coins/{type} | 
-| N/A | GET /bank/token-stats | 
-| N/A | GET /bank/accounts/{address} | 
-| N/A | POST /bank/accounts/{address}/send | 
-| N/A | POST /bank/accounts/{address}/burn | 
+| GET /bank/coin/{coin-type} | GET /bank/coins/{type} | 
+| GET /bank/balances/{address} | GET /bank/accounts/{address} | 
+| POST /bank/accounts/{address}/transfers | POST /bank/accounts/{address}/send | 
+| POST /bank/burn | POST /bank/accounts/{address}/burn | 
 
 
 #### Stake module APIs
