@@ -63,6 +63,6 @@ func Test_queryTokenStats(t *testing.T) {
 
 	var tokenStats TokenStats
 	require.Nil(t, input.cdc.UnmarshalJSON(res, &tokenStats))
-	require.Equal(t, loosenToken.String(), tokenStats.LoosenToken.String())
-	require.Equal(t, burnedToken.String(), tokenStats.BurnedToken.String())
+	require.Equal(t, loosenToken.String(), tokenStats.LooseTokens.String())
+	require.Equal(t, burnedToken.String(), tokenStats.BurnedTokens.String())
 }
