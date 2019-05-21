@@ -68,8 +68,8 @@
 | GET /distribution/{delegatorAddr}/distrInfo/{validatorAddr} | N/A | / | / |
 | GET /distribution/{delegatorAddr}/distrInfos | N/A | / | / |
 | GET /distribution/{validatorAddr}/valDistrInfo | N/A | / | / |
-| N/A | GET /distribution/{address}/rewards | / | / | / | / |
-| N/A | GET /distribution/community-tax | / | / | / | / |
+| N/A | GET /distribution/{address}/rewards | / | / |
+| N/A | GET /distribution/community-tax | / | / | 
 
 #### Service 模块
 
