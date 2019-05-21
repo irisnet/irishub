@@ -168,3 +168,6 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 | simulate        | bool | false | 1 | 用仿真的方式去执行交易 |
 | commit          | bool | false | 2 | 等待交易被打包入块  |
 | async           | bool | false | 3 | 用异步地方式广播交易  |
+
+## 更新日志
+请参阅 [CHANGELOG](CHANGELOG.md)

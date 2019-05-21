@@ -1,39 +1,39 @@
-# IRISLCD Change Log
+# IRISLCD 更新日志
 
 ## v0.14.0
 
 *May 20th, 2019*
 
-### BREAKING CHANGES:
+### 不兼容修改:
 
-- Change/drop some api interfaces of `IRISLCD`
-- Add bank module APIs
-- Add `community-tax` and `rewards` APIs in distribution module
+- 修改/删除 一些`IRISLCD`的API接口
+- 添加了bank模块的API
+- 在distribution模块中添加了 `community-tax` 和 `rewards` API接口
 
-#### Tendermint APIs
+#### Tendermint 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- | --------------- |--------------- |
 | GET /node_info  | GET /node-info   | No | No |
 | GET /blocks-result/latest | GET /block-results/latest | No | No |
 | GET /blocks-result/{height}  | GET /block-results/{height}  | No | No |
 | POST /txs  | N/A | / | / |
 
-#### Key management APIs
+#### Key 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- | --------------- | --------------- |
 | GET /auth/accounts/{address}  |  N/A | / | / |
     
-#### Sign and broadcast transactions
+#### Sign and broadcast 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- | --------------- | --------------- |
 | POST /txs/send  |  N/A | / | / |
 
-#### Bank module APIs
+#### Bank 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- | --------------- | --------------- |
 | GET /bank/coin/{coin-type} | GET /bank/coins/{type} | No | No |
 | GET /bank/token-stats | GET /bank/token-stats | No | Yes |
@@ -41,9 +41,9 @@
 | POST /bank/accounts/{address}/transfers | POST /bank/accounts/{address}/send | Yes | No |
 | POST /bank/burn | POST /bank/accounts/{address}/burn | Yes | No |
 
-#### Stake module APIs
+#### Stake 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- |--------------- | --------------- |
 | POST /stake/delegators/{delegatorAddr}/delegate | POST /stake/delegators/{delegatorAddr}/delegations | No | No |
 | POST /stake/delegators/{delegatorAddr}/redelegate | POST /stake/delegators/{delegatorAddr}/redelegations | No | No |
@@ -52,15 +52,15 @@
 | GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr} | GET /stake/delegators/{delegatorAddr}/unbonding-delegations/{validatorAddr} | No | No |
 | GET /stake/validators/{validatorAddr}/unbonding_delegations | GET /stake/validators/{validatorAddr}/unbonding-delegations | No | No |
 
-#### Slash module APIs
+#### Slash 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- |--------------- | --------------- |
 | GET /slashing/validators/{validatorPubKey}/signing_info | GET /slashing/validators/{validatorPubKey}/signing-info | No | No |
   
-#### Distribution module APIs
+#### Distribution 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- |--------------- | --------------- |
 | POST /distribution/{delegatorAddr}/withdrawAddress | POST /distribution/{delegatorAddr}/withdraw-address | No | No |
 | GET /distribution/{delegatorAddr}/withdrawAddress | GET /distribution/{delegatorAddr}/withdraw-address | No | No |
@@ -71,9 +71,9 @@
 | N/A | GET /distribution/{address}/rewards | / | / | / | / |
 | N/A | GET /distribution/community-tax | / | / | / | / |
 
-#### Service module APIs
+#### Service 模块
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- |--------------- | --------------- |
 | POST /service/definition | POST /service/definitions | No | No |
 | GET /service/definition/{defChainId}/{serviceName} | GET /service/definitions/{defChainId}/{serviceName} | No | No |
@@ -87,8 +87,8 @@
 | POST /service/response | POST /service/responses | No | No |
 | GET /service/response/{reqChainId}/{reqId} | GET /service/responses/{reqChainId}/{reqId} | No | No |
 
-#### Query app version
+#### 查询App版本
 
-| [v0.13.1]      | [v0.14.0]        | input changed | output changed |
+| [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- |--------------- | --------------- |
 | GET /node_version | GET /node-version | No | No |
