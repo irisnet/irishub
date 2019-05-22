@@ -29,8 +29,9 @@ IRIShub是用Go语言编写的。它可以在任何能够编译并运行Go语言
 IRIShub需要 **Go 1.12.1+**.
 :::
 
-参照[官方文档](https://golang.org/doc/install)安装 `go`。记住要设置 `$GOPATH`，`$GOBIN` 和 `$PATH` 环境变量，示例:
+参照[官方文档](https://golang.org/doc/install)安装 `go`。
 
+记住要设置 `$GOPATH`，`$GOBIN` 和 `$PATH` 环境变量，示例:
 ```bash
 mkdir -p $HOME/go/bin
 echo "export GOPATH=$HOME/go" >> ~/.bash_profile
@@ -38,6 +39,23 @@ echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
 echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
 source ~/.bash_profile
 ```
+
+确认Go是否安装成功：
+```bash
+go verison
+```
+
+::: tip
+macOS 快速安装GO
+
+Step 1: 安装 `brew`
+
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Step 2: 使用 `brew` 安装GO
+
+brew install go
+:::
 
 #### 下载源码并安装
 

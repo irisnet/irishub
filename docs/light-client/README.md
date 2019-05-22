@@ -167,3 +167,5 @@ They all support the these special query parameters below. By default, their val
 | commit          | bool | false | 2 | Wait for transaction being included in a block   |
 | async           | bool | false | 3 | Broadcast transaction asynchronously   |
 
+## Change Log
+Please refer to [CHANGELOG](CHANGELOG.md)

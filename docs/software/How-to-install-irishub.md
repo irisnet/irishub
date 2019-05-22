@@ -27,7 +27,9 @@ It's recommended that you run a validator node on Linux Server.
 **Go 1.12.1+** is required for the IRIShub.
 :::
 
-Install `go` by following the [official docs](https://golang.org/doc/install). Remember to set your `$GOPATH`, `$GOBIN`, and `$PATH` environment variables, for example:
+Install `go` by following the [official docs](https://golang.org/doc/install).
+ 
+Remember to set your `$GOPATH`, `$GOBIN`, and `$PATH` environment variables, for example:
 
 ```bash
 mkdir -p $HOME/go/bin
@@ -37,8 +39,24 @@ echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
-#### Compile Source Code
+Verify that Go has been installed successfully：
+```bash
+go verison
+```
 
+::: tip
+Quick install for macOS
+
+Step 1: install `brew`
+
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Step 2: install `go` with `brew`
+
+brew install go
+:::
+
+#### Compile Source Code
 
 - Get the code and compile Iris
 
