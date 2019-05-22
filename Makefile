@@ -1,5 +1,5 @@
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
-PACKAGES_MODULES=$(shell go list ./... | grep 'modules')
+PACKAGES_MODULES=$(shell go list ./... | grep -e 'modules' -e 'app')
 PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
 PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
