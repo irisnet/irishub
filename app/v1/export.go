@@ -1,26 +1,26 @@
-package v0
+package v1
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	distr "github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/app/v1/auth"
+	distr "github.com/irisnet/irishub/app/v1/distribution"
+	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/slashing"
-	stake "github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/slashing"
+	stake "github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v1/upgrade"
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // export the state of iris for a genesis file
-func (p *ProtocolV0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
+func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	if forZeroHeight {
@@ -75,7 +75,7 @@ func (p *ProtocolV0) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 }
 
 // prepare for fresh start at zero height
-func (p *ProtocolV0) prepForZeroHeightGenesis(ctx sdk.Context) {
+func (p *ProtocolV1) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle fee distribution state. */
 
