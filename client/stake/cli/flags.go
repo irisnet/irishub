@@ -3,7 +3,7 @@ package cli
 import (
 	flag "github.com/spf13/pflag"
 
-	"github.com/irisnet/irishub/modules/stake/types"
+	"github.com/irisnet/irishub/app/v1/stake/types"
 )
 
 // nolint
@@ -22,7 +22,7 @@ const (
 	FlagWebsite  = "website"
 	FlagDetails  = "details"
 
-	FlagCommissionRate          = "commission-rate"
+	FlagCommissionRate = "commission-rate"
 
 	FlagGenesisFormat = "genesis-format"
 	FlagNodeID        = "node-id"

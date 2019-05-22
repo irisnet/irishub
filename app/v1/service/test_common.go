@@ -13,9 +13,9 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/app/v1/mock"
 	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 )

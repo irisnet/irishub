@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"

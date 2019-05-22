@@ -2,8 +2,8 @@ package lcd
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/codec"
 )
 
 // RegisterRoutes registers service REST handlers to a router

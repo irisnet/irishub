@@ -3,10 +3,10 @@ package cli
 import (
 	"os"
 
+	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/slashing"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 )

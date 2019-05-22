@@ -3,14 +3,14 @@ package cli
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/client/context"
+	distrClient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/distribution"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	distrClient "github.com/irisnet/irishub/client/distribution"
-	"github.com/irisnet/irishub/app/protocol"
 )
 
 // GetWithdrawAddress returns withdraw address of a given delegator address

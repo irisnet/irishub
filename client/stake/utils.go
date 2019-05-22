@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )

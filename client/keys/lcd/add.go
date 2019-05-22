@@ -4,10 +4,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	cryptokeys "github.com/irisnet/irishub/crypto/keys"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/client/utils"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
 )
 
 // NewKeyBody - the request body for create or recover new keys
@@ -96,6 +96,7 @@ func getSeed(algo cryptokeys.SigningAlgo) string {
 type seedOutput struct {
 	Seed string `json:"seed"`
 }
+
 // Seed REST request handler
 func SeedRequestHandler(indent bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

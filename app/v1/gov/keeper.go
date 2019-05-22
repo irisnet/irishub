@@ -5,9 +5,9 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution"
-	"github.com/irisnet/irishub/modules/guardian"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 
 	"github.com/irisnet/irishub/app/v1/params"
