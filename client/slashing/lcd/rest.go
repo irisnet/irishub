@@ -1,9 +1,9 @@
 package lcd
 
 import (
-	"github.com/irisnet/irishub/codec"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/codec"
 )
 
 // RegisterRoutes registers staking-related REST handlers to a router

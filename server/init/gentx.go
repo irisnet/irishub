@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 
 	"github.com/irisnet/irishub/app"
+	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client"
-	signcmd "github.com/irisnet/irishub/client/tx/cli"
 	"github.com/irisnet/irishub/client/stake/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
+	signcmd "github.com/irisnet/irishub/client/tx/cli"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	"github.com/irisnet/irishub/server"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
@@ -25,8 +25,8 @@ import (
 )
 
 const (
-	defaultAmount                  = "100" + stakeTypes.StakeTokenName
-	defaultCommissionRate          = "0.1"
+	defaultAmount         = "100" + stakeTypes.StakeTokenName
+	defaultCommissionRate = "0.1"
 )
 
 // GenTxCmd builds the iris gentx command.

@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/keys"
-	"strings"
 	"github.com/irisnet/irishub/client/utils"
+	"strings"
 )
 
 // update key request REST body

@@ -6,11 +6,12 @@ import (
 	"io"
 	"os"
 
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/codec"
 	cskeys "github.com/irisnet/irishub/crypto/keys"
-	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -18,7 +19,6 @@ import (
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	"github.com/irisnet/irishub/app/protocol"
 )
 
 // CLIContext implements a typical CLI context created in SDK modules for

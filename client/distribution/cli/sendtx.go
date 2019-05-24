@@ -1,14 +1,14 @@
-  // nolint
+// nolint
 package cli
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

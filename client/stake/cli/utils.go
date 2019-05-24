@@ -3,10 +3,10 @@ package cli
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 func queryBonds(cliCtx context.CLIContext, route string, query string, params stake.QueryBondsParams) error {

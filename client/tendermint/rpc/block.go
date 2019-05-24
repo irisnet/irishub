@@ -5,21 +5,21 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/spf13/cobra"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	"net/http"
 	"strconv"
-	"github.com/irisnet/irishub/client/utils"
 )
 
 //BlockCommand returns the verified block data for a given heights
 func BlockCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "block [height]",
-		Short: "Get verified data for the block at given height",
+		Use:     "block [height]",
+		Short:   "Get verified data for the block at given height",
 		Example: "iriscli tendermint block",
-		Args:  cobra.MaximumNArgs(1),
-		RunE:  printBlock,
+		Args:    cobra.MaximumNArgs(1),
+		RunE:    printBlock,
 	}
 	cmd.Flags().Bool(client.FlagIndentResponse, true, "Add indent to JSON response")
 	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")

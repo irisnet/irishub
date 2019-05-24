@@ -3,10 +3,10 @@ package keys
 import (
 	"net/http"
 
-	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/keys"
 	keycli "github.com/irisnet/irishub/client/keys/cli"
+	"github.com/irisnet/irishub/crypto/keys/keyerror"
 )
 
 ///////////////////////////

@@ -1,8 +1,9 @@
 package types
 
 import (
-	"github.com/irisnet/irishub/codec"
 	"fmt"
+
+	"github.com/irisnet/irishub/codec"
 )
 
 const (
@@ -51,10 +52,10 @@ func NewUpgradeConfig(proposalID uint64, protocol ProtocolDefinition) UpgradeCon
 	}
 }
 
-func DefaultUpgradeConfig(software string) UpgradeConfig {
+func DefaultUpgradeConfig(protocolId uint64, software string) UpgradeConfig {
 	return UpgradeConfig{
 		ProposalID: uint64(0),
-		Protocol:   NewProtocolDefinition(uint64(0), software, uint64(1), NewDecWithPrec(9, 1)),
+		Protocol:   NewProtocolDefinition(protocolId, software, uint64(1), NewDecWithPrec(9, 1)),
 	}
 }
 

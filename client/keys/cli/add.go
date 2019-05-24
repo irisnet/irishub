@@ -31,7 +31,7 @@ func addKeyCommand() *cobra.Command {
 If you select --seed/-s you can recover a key from the seed
 phrase, otherwise, a new key will be generated.`,
 		Example: "iriscli keys add <key name>",
-		RunE: runAddCmd,
+		RunE:    runAddCmd,
 	}
 	cmd.Flags().StringP(flagType, "t", "secp256k1", "Type of private key (secp256k1|ed25519)")
 	cmd.Flags().Bool(client.FlagUseLedger, false, "Store a local reference to a private key on a Ledger device")
