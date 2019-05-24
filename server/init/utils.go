@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"time"
 
+	v1 "github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/server"
 	"github.com/tendermint/go-amino"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
@@ -14,8 +16,6 @@ import (
 	"github.com/tendermint/tendermint/p2p"
 	"github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/types"
-	"github.com/irisnet/irishub/app/v0"
-	"github.com/irisnet/irishub/server"
 )
 
 // ExportGenesisFile creates and writes the genesis configuration to disk. An
@@ -128,5 +128,5 @@ func initializeEmptyGenesis(
 		return nil, fmt.Errorf("genesis.json file already exists: %v", genFile)
 	}
 
-	return codec.MarshalJSONIndent(cdc, v0.NewDefaultGenesisFileState())
+	return codec.MarshalJSONIndent(cdc, v1.NewDefaultGenesisFileState())
 }
