@@ -7,6 +7,8 @@ import (
 
 func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 	switch p.GetProposalType() {
+	case ProposalTypePlainText:
+		return nil
 	case ProposalTypeParameterChange:
 		return ParameterProposalExecute(ctx, gk, p.(*ParameterProposal))
 	case ProposalTypeSystemHalt:
