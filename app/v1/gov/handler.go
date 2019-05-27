@@ -46,14 +46,16 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	}
 
 	if msg.ProposalType == ProposalTypeParameterChange {
-		for _, param := range msg.Params {
-			if p, ok := keeper.paramsKeeper.GetParamSet(param.Subspace); ok {
-				if _, err := p.Validate(param.Key, param.Value); err != nil {
-					return err.Result()
-				}
-			} else {
-				return ErrInvalidParam(DefaultCodespace, param.Subspace).Result()
+		if len(msg.Params) > 1 {
+			return ErrInvalidParamNum(DefaultCodespace).Result()
+		}
+		param := msg.Params[0]
+		if p, ok := keeper.paramsKeeper.GetParamSet(param.Subspace); ok {
+			if _, err := p.Validate(param.Key, param.Value); err != nil {
+				return err.Result()
 			}
+		} else {
+			return ErrInvalidParam(DefaultCodespace, param.Subspace).Result()
 		}
 	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
