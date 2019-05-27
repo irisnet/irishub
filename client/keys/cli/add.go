@@ -1,16 +1,20 @@
 package keys
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	ccrypto "github.com/irisnet/irishub/crypto"
-	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"os"
+	"sort"
 
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
+	ccrypto "github.com/irisnet/irishub/crypto"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
@@ -21,6 +25,8 @@ const (
 	flagDryRun   = "dry-run"
 	flagAccount  = "account"
 	flagIndex    = "index"
+	flagMultisig = "multisig"
+	flagNoSort   = "nosort"
 )
 
 func addKeyCommand() *cobra.Command {
@@ -33,6 +39,9 @@ phrase, otherwise, a new key will be generated.`,
 		Example: "iriscli keys add <key name>",
 		RunE:    runAddCmd,
 	}
+	cmd.Flags().StringSlice(flagMultisig, nil, "Construct and store a multisig public key (implies --pubkey)")
+	cmd.Flags().Uint(flagMultiSigThreshold, 1, "K out of N required signatures. For use in conjunction with --multisig")
+	cmd.Flags().Bool(flagNoSort, false, "Keys passed to --multisig are taken in the order they're supplied")
 	cmd.Flags().StringP(flagType, "t", "secp256k1", "Type of private key (secp256k1|ed25519)")
 	cmd.Flags().Bool(client.FlagUseLedger, false, "Store a local reference to a private key on a Ledger device")
 	cmd.Flags().Bool(flagRecover, false, "Provide seed phrase to recover existing key instead of creating")
@@ -46,7 +55,7 @@ phrase, otherwise, a new key will be generated.`,
 
 // nolint: gocyclo
 // TODO remove the above when addressing #1446
-func runAddCmd(cmd *cobra.Command, args []string) error {
+func runAddCmd(_ *cobra.Command, args []string) error {
 	var kb cryptokeys.Keybase
 	var err error
 	var name, pass string
@@ -75,6 +84,39 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 				fmt.Sprintf("override the existing name %s", name), buf); err != nil || !response {
 				return err
 			}
+		}
+
+		multisigKeys := viper.GetStringSlice(flagMultisig)
+		if len(multisigKeys) != 0 {
+			var pks []crypto.PubKey
+
+			multisigThreshold := viper.GetInt(flagMultiSigThreshold)
+			if err := validateMultisigThreshold(multisigThreshold, len(multisigKeys)); err != nil {
+				return err
+			}
+
+			for _, keyname := range multisigKeys {
+				k, err := kb.Get(keyname)
+				if err != nil {
+					return err
+				}
+				pks = append(pks, k.GetPubKey())
+			}
+
+			// Handle --nosort
+			if !viper.GetBool(flagNoSort) {
+				sort.Slice(pks, func(i, j int) bool {
+					return bytes.Compare(pks[i].Address(), pks[j].Address()) < 0
+				})
+			}
+
+			pk := multisig.NewPubKeyMultisigThreshold(multisigThreshold, pks)
+			if _, err := kb.CreateMulti(name, pk); err != nil {
+				return err
+			}
+
+			fmt.Fprintf(os.Stderr, "Key %q saved to disk.\n", name)
+			return nil
 		}
 
 		// ask for a password when generating a local key

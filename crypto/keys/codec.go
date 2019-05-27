@@ -2,7 +2,7 @@ package keys
 
 import (
 	ccrypto "github.com/irisnet/irishub/crypto"
-	amino "github.com/tendermint/go-amino"
+	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/crypto/encoding/amino"
 )
 
@@ -16,4 +16,5 @@ func init() {
 	cdc.RegisterConcrete(localInfo{}, "crypto/keys/localInfo", nil)
 	cdc.RegisterConcrete(ledgerInfo{}, "crypto/keys/ledgerInfo", nil)
 	cdc.RegisterConcrete(offlineInfo{}, "crypto/keys/offlineInfo", nil)
+	cdc.RegisterConcrete(multiInfo{}, "crypto/keys/multiInfo", nil)
 }
