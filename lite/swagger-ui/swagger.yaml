@@ -1619,7 +1619,7 @@ paths:
                   example: 10iris
         description: >-
           valid value of `"proposal_type"` can be `"PlainText"`, `"ParameterChange"`,
-          `"SoftwareUpgrade"`
+          `"SoftwareUpgrade"`,`"SystemHalt"`,`"TxTaxUsage"`
         required: true
     get:
       summary: Query proposals
