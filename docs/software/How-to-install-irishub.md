@@ -1,9 +1,9 @@
 # How to install `iris` 
 
-### The Latest version of IRIShub : v0.13.1
+### The Latest version of IRIShub : v0.14.0
 refer to : https://github.com/irisnet/irishub/releases/latest
 ```
-Please replace <latest_iris_version> with v0.13.1 while using "git checkout" 
+Please replace <latest_iris_version> with v0.14.0 while using "git checkout" 
 ```
 
 You can download the source code from github and compile it locally.
@@ -70,9 +70,7 @@ mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout <latest_iris_version>
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
-make get_vendor_deps
 source scripts/setTestEnv.sh
 make all
 ```
@@ -83,9 +81,7 @@ mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout <latest_iris_version>
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
-make get_vendor_deps
 make all
 ```
 
