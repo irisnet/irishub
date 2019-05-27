@@ -1,9 +1,9 @@
 # 如何安装`iris`
 
-### 当前IRIShub最新版本为 ： v0.13.1
+### 当前IRIShub最新版本为 ： v0.14.0
 获取最新版本 https://github.com/irisnet/irishub/releases/latest
 ```
-注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.13.1
+注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.14.0
 ```
 
 ### 源码编译安装
@@ -68,9 +68,7 @@ mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout <latest_iris_version>
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
-make get_vendor_deps
 source scripts/setTestEnv.sh
 make all
 ```
@@ -81,9 +79,7 @@ mkdir -p $GOPATH/src/github.com/irisnet
 cd $GOPATH/src/github.com/irisnet
 git clone https://github.com/irisnet/irishub
 cd irishub && git checkout <latest_iris_version>
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 make get_tools
-make get_vendor_deps
 make all
 ```
 
