@@ -64,6 +64,9 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 		if len(msg.Params) == 0 {
 			return ErrEmptyParam(DefaultCodespace)
 		}
+		if len(msg.Params) > 1 {
+			return ErrInvalidParamNum(DefaultCodespace)
+		}
 	}
 	return nil
 }

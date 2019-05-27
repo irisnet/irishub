@@ -39,7 +39,8 @@ func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (e
 
 func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal) (err error) {
 	ctx.Logger().Info("Execute ParameterProposal begin")
-	if len(pp.Params) > 1 {
+	//check again
+	if len(pp.Params) != 1 {
 		ctx.Logger().Error("Execute ParameterProposal Failure", "info",
 			"the length of ParameterProposal's param should be one", "ProposalId", pp.ProposalID)
 		return

@@ -73,15 +73,13 @@ func NormalizeProposalStatus(status string) string {
 	return status
 }
 
-func ValidateParam(params gov.Params) error {
-	for _, param := range params {
-		if p, ok := ParamSets[param.Subspace]; ok {
-			if _, err := p.Validate(param.Key, param.Value); err != nil {
-				return err
-			}
-		} else {
-			return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
+func ValidateParam(param gov.Param) error {
+	if p, ok := ParamSets[param.Subspace]; ok {
+		if _, err := p.Validate(param.Key, param.Value); err != nil {
+			return err
 		}
+	} else {
+		return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
 	}
 	return nil
 }
