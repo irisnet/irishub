@@ -1618,7 +1618,7 @@ paths:
                   type: string
                   example: 10iris
         description: >-
-          valid value of `"proposal_type"` can be `"Text"`, `"ParameterChange"`,
+          valid value of `"proposal_type"` can be `"PlainText"`, `"ParameterChange"`,
           `"SoftwareUpgrade"`
         required: true
     get:
