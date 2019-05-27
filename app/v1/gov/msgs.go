@@ -299,14 +299,8 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	if len(msg.Title) > 70 {
 		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "title", len(msg.Title), 70)
 	}
-	if msg.ProposalType == ProposalTypePlainText {
-		if len(msg.Description) > 2000 {
-			return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "description", len(msg.Description), 2000)
-		}
-	} else {
-		if len(msg.Description) > 280 {
-			return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "description", len(msg.Description), 280)
-		}
+	if len(msg.Description) > 2000 {
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "description", len(msg.Description), 2000)
 	}
 
 	return nil
