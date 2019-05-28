@@ -60,9 +60,9 @@ func ErrInvalidWebsite(codespace sdk.CodespaceType, msg string) sdk.Error {
 }
 
 func ErrUnkwownMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
+	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
 }
 
 func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
+	return sdk.NewError(codespace, CodeInvalidGenesis, msg)
 }
