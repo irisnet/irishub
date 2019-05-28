@@ -607,7 +607,7 @@ func TestConsumeSignatureVerificationGas(t *testing.T) {
 		gasConsumed uint64
 		shouldErr   bool
 	}{
-		{"PubKeyEd25519", args{sdk.NewInfiniteGasMeter(), nil, ed25519.GenPrivKey().PubKey(), params}, ed25519VerifyCost, true},
+		{"PubKeyEd25519", args{sdk.NewInfiniteGasMeter(), nil, ed25519.GenPrivKey().PubKey(), params}, ed25519VerifyCost, false},
 		{"PubKeySecp256k1", args{sdk.NewInfiniteGasMeter(), nil, secp256k1.GenPrivKey().PubKey(), params}, secp256k1VerifyCost, false},
 		{"Multisig", args{sdk.NewInfiniteGasMeter(), multisignature1.Marshal(), multisigKey1, params}, expectedCost1, false},
 		{"unknown key", args{sdk.NewInfiniteGasMeter(), nil, nil, params}, 0, true},
@@ -686,23 +686,23 @@ func TestCountSubkeys(t *testing.T) {
 		}
 		return ret
 	}
-	genMultiKey := func(n, k int, keysGen func(n int) []crypto.PubKey) crypto.PubKey {
-		return multisig.NewPubKeyMultisigThreshold(k, keysGen(n))
-	}
+	singleKey := secp256k1.GenPrivKey().PubKey()
+	singleLevelMultiKey := multisig.NewPubKeyMultisigThreshold(4, genPubKeys(5))
+	multiLevelSubKey1 := multisig.NewPubKeyMultisigThreshold(4, genPubKeys(5))
+	multiLevelSubKey2 := multisig.NewPubKeyMultisigThreshold(4, genPubKeys(5))
+	multiLevelMultiKey := multisig.NewPubKeyMultisigThreshold(2, []crypto.PubKey{
+		multiLevelSubKey1, multiLevelSubKey2, secp256k1.GenPrivKey().PubKey()})
 	type args struct {
 		pub crypto.PubKey
 	}
-	mkey := genMultiKey(5, 4, genPubKeys)
-	mkeyType := mkey.(*multisig.PubKeyMultisigThreshold)
-	mkeyType.PubKeys = append(mkeyType.PubKeys, genMultiKey(6, 5, genPubKeys))
 	tests := []struct {
 		name string
 		args args
 		want int
 	}{
-		{"single key", args{secp256k1.GenPrivKey().PubKey()}, 1},
-		{"multi sig key", args{genMultiKey(5, 4, genPubKeys)}, 5},
-		{"multi multi sig", args{mkey}, 11},
+		{"single key", args{singleKey}, 1},
+		{"single level multikey", args{singleLevelMultiKey}, 5},
+		{"multi level multikey", args{multiLevelMultiKey}, 11},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(T *testing.T) {

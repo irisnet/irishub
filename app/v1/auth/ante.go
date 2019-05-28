@@ -228,7 +228,7 @@ func consumeSignatureVerificationGas(meter sdk.GasMeter, sig []byte, pubkey cryp
 	switch {
 	case strings.Contains(pubkeyType, "ed25519"):
 		meter.ConsumeGas(ed25519VerifyCost, "ante verify: ed25519")
-		return sdk.ErrInvalidPubKey("ED25519 public keys are unsupported").Result()
+		return sdk.Result{}
 
 	case strings.Contains(pubkeyType, "secp256k1"):
 		meter.ConsumeGas(secp256k1VerifyCost, "ante verify: secp256k1")

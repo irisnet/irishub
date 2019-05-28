@@ -5,6 +5,7 @@ import (
 	"github.com/irisnet/irishub/crypto/keys/hd"
 	"github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/multisig"
 )
 
 // Keybase exposes operations on a generic keystore
@@ -197,19 +198,19 @@ type multiInfo struct {
 }
 
 func NewMultiInfo(name string, pub crypto.PubKey) Info {
-	//multiPK := pub.(ed25519.PubKeyEd25519)
-	//
-	//pubKeys := make([]multisigPubKeyInfo, len(multiPK.PubKeys))
-	//for i, pk := range multiPK.PubKeys {
-	//	// TODO: Recursively check pk for total weight?
-	//	pubKeys[i] = multisigPubKeyInfo{pk, 1}
-	//}
+	multiPK := pub.(multisig.PubKeyMultisigThreshold)
+
+	pubKeys := make([]multisigPubKeyInfo, len(multiPK.PubKeys))
+	for i, pk := range multiPK.PubKeys {
+		// TODO: Recursively check pk for total weight?
+		pubKeys[i] = multisigPubKeyInfo{pk, 1}
+	}
 
 	return &multiInfo{
 		Name:   name,
 		PubKey: pub,
-		//Threshold: multiPK.K,
-		//PubKeys:   pubKeys,
+		Threshold: multiPK.K,
+		PubKeys:   pubKeys,
 	}
 }
 
