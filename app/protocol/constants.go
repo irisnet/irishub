@@ -30,6 +30,9 @@ const (
 	ServiceRoute  = ServiceStore
 	GuardianRoute = GuardianStore
 	UpgradeRoute  = UpgradeStore
+
+	//temporarily set for the iriscli asset
+	AssetRoute     = "asset"
 )
 
 var (
