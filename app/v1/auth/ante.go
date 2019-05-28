@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"strings"
+
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
@@ -166,7 +169,10 @@ func processSig(ctx sdk.Context,
 		return nil, sdk.ErrInternal("setting PubKey on signer's account").Result()
 	}
 
-	consumeSignatureVerificationGas(ctx.GasMeter(), pubKey)
+	if res := consumeSignatureVerificationGas(ctx.GasMeter(), sig.Signature, pubKey); !res.IsOK() {
+		return nil, res
+	}
+
 	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
 		return nil, sdk.ErrUnauthorized("signature verification failed").Result()
 	}
@@ -215,14 +221,42 @@ func processPubKey(acc Account, sig StdSignature, simulate bool) (crypto.PubKey,
 	return pubKey, sdk.Result{}
 }
 
-func consumeSignatureVerificationGas(meter sdk.GasMeter, pubkey crypto.PubKey) {
-	switch pubkey.(type) {
-	case ed25519.PubKeyEd25519:
+func consumeSignatureVerificationGas(meter sdk.GasMeter, sig []byte, pubkey crypto.PubKey) sdk.Result {
+
+	pubkeyType := strings.ToLower(fmt.Sprintf("%T", pubkey))
+
+	switch {
+	case strings.Contains(pubkeyType, "ed25519"):
 		meter.ConsumeGas(ed25519VerifyCost, "ante verify: ed25519")
-	case secp256k1.PubKeySecp256k1:
+		return sdk.ErrInvalidPubKey("ED25519 public keys are unsupported").Result()
+
+	case strings.Contains(pubkeyType, "secp256k1"):
 		meter.ConsumeGas(secp256k1VerifyCost, "ante verify: secp256k1")
+		return sdk.Result{}
+
+	case strings.Contains(pubkeyType, "multisigthreshold"):
+		var multisignature multisig.Multisignature
+		codec.Cdc.MustUnmarshalBinaryBare(sig, &multisignature)
+
+		multisigPubKey := pubkey.(multisig.PubKeyMultisigThreshold)
+		consumeMultisignatureVerificationGas(meter, multisignature, multisigPubKey)
+		return sdk.Result{}
+
 	default:
-		panic("Unrecognized signature type")
+		return sdk.ErrInvalidPubKey(fmt.Sprintf("unrecognized public key type: %s", pubkeyType)).Result()
+	}
+}
+
+func consumeMultisignatureVerificationGas(meter sdk.GasMeter,
+	sig multisig.Multisignature, pubkey multisig.PubKeyMultisigThreshold) {
+
+	size := sig.BitArray.Size()
+	sigIndex := 0
+	for i := 0; i < size; i++ {
+		if sig.BitArray.GetIndex(i) {
+			consumeSignatureVerificationGas(meter, sig.Sigs[sigIndex], pubkey.PubKeys[i])
+			sigIndex++
+		}
 	}
 }
 
