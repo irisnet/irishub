@@ -9,11 +9,11 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
-	CodeInvalidMoniker sdk.CodeType = 1
-	CodeInvalidDetails sdk.CodeType = 2
-	CodeInvalidWebsite sdk.CodeType = 3
-	CodeUnknownMoniker sdk.CodeType = 4
-	CodeInvalidGenesis sdk.CodeType = 5
+	CodeInvalidMoniker sdk.CodeType = 100
+	CodeInvalidDetails sdk.CodeType = 101
+	CodeInvalidWebsite sdk.CodeType = 102
+	CodeUnknownMoniker sdk.CodeType = 103
+	CodeInvalidGenesis sdk.CodeType = 104
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
