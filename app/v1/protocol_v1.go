@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
@@ -48,6 +49,7 @@ type ProtocolV1 struct {
 	serviceKeeper  service.Keeper
 	guardianKeeper guardian.Keeper
 	upgradeKeeper  upgrade.Keeper
+	assetKeeper    asset.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -123,6 +125,7 @@ func MakeCodec() *codec.Codec {
 	guardian.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
+	asset.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
 }
@@ -256,6 +259,8 @@ func (p *ProtocolV1) configKeepers() {
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
+
+	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, asset.DefaultParamSpace)
 }
 
 // configure all Routers
@@ -267,7 +272,8 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.DistrRoute, distr.NewHandler(p.distrKeeper)).
 		AddRoute(protocol.GovRoute, gov.NewHandler(p.govKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
-		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper))
+		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
+		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
@@ -276,7 +282,8 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
-		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper))
+		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
+		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper))
 }
 
 // configure all Stores
