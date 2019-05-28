@@ -9,6 +9,8 @@ func RegisterCodec(cdc *codec.Codec) {
 
 	// TODO
 	cdc.RegisterConcrete(&Params{}, "irishub/asset/Params", nil)
+	cdc.RegisterConcrete(&MsgCreateGateway{}, "irishub/asset/MsgCreateGateway", nil)
+	cdc.RegisterConcrete(&MsgEditGateway{}, "irishub/asset/MsgEditGateway", nil)
 }
 
 var msgCdc = codec.New()

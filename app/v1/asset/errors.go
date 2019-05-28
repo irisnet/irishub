@@ -8,6 +8,12 @@ import (
 // Asset errors reserve 100 ~ 199.
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
+
+	CodeInvalidMoniker sdk.CodeType = 1
+	CodeInvalidDetails sdk.CodeType = 2
+	CodeInvalidWebsite sdk.CodeType = 3
+	CodeUnknownMoniker sdk.CodeType = 4
+	CodeInvalidGenesis sdk.CodeType = 5
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -36,4 +42,27 @@ func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
 func newError(codespace sdk.CodespaceType, code sdk.CodeType, msg string) sdk.Error {
 	msg = msgOrDefaultMsg(msg, code)
 	return sdk.NewError(codespace, code, msg)
+}
+
+//----------------------------------------
+// Error constructors
+
+func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
+}
+
+func ErrInvalidDetails(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDetails, msg)
+}
+
+func ErrInvalidWebsite(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
+}
+
+func ErrUnkwownMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
+}
+
+func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
 }
