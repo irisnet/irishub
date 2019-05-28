@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -106,7 +107,8 @@ func makeMultiSignCmd(cdc *amino.Codec, decoder auth.AccountDecoder) func(cmd *c
 			}
 		}
 
-		newStdSig := auth.StdSignature{Signature: cdc.MustMarshalBinaryBare(multisigSig), PubKey: multisigPub}
+		newStdSig := auth.StdSignature{Signature: cdc.MustMarshalBinaryBare(multisigSig),
+			AccountNumber: txCtx.AccountNumber, Sequence: txCtx.Sequence, PubKey: multisigPub}
 		newTx := auth.NewStdTx(stdTx.GetMsgs(), stdTx.Fee, []auth.StdSignature{newStdSig}, stdTx.GetMemo())
 
 		sigOnly := viper.GetBool(flagSigOnly)
@@ -150,6 +152,10 @@ func readAndUnmarshalStdSignature(cdc *amino.Codec, filename string) (stdSig aut
 		return
 	}
 	if err = cdc.UnmarshalJSON(bytes, &stdSig); err != nil {
+		return
+	}
+	if stdSig.PubKey == nil {
+		err = errors.New("can not get pubkey from signature")
 		return
 	}
 	return

@@ -64,6 +64,7 @@ be generated via the 'multisign' command.`,
 	)
 
 	cmd.Flags().String(client.FlagName, "", "Name of private key with which to sign")
+	cmd.Flags().Bool(flagSigOnly, false, "Print only the generated signature, then exit")
 	cmd.Flags().Bool(flagOffline, false, "Offline mode. Do not query local cache.")
 	cmd.Flags().String(flagOutfile, "", "The document will be written to the given file instead of STDOUT")
 	return cmd
@@ -125,12 +126,33 @@ func makeSignCmd(cdc *amino.Codec, decoder auth.AccountDecoder) func(cmd *cobra.
 			appendSig := viper.GetBool(flagAppend) && !generateSignatureOnly
 			newTx, err = utils.SignStdTx(txCtx, cliCtx, name, stdTx, appendSig, offline)
 		}
-		var json []byte
-		if cliCtx.Indent {
-			json, err = cdc.MarshalJSONIndent(newTx, "", "  ")
-		} else {
-			json, err = cdc.MarshalJSON(newTx)
+
+		if err != nil {
+			return err
 		}
+
+		var json []byte
+
+		switch generateSignatureOnly {
+		case true:
+			switch cliCtx.Indent {
+			case true:
+				json, err = cdc.MarshalJSONIndent(newTx.Signatures[0], "", "  ")
+
+			default:
+				json, err = cdc.MarshalJSON(newTx.Signatures[0])
+			}
+
+		default:
+			switch cliCtx.Indent {
+			case true:
+				json, err = cdc.MarshalJSONIndent(newTx, "", "  ")
+
+			default:
+				json, err = cdc.MarshalJSON(newTx)
+			}
+		}
+
 		if err != nil {
 			return err
 		}

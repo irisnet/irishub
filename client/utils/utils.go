@@ -176,11 +176,10 @@ func SignStdTxWithSignerAddress(txCtx TxContext, cliCtx context.CLIContext,
 	}
 
 	if !offline {
-		accSeq, err := cliCtx.GetAccountSequence(addr)
+		txCtx, err = populateAccountFromState(txCtx, cliCtx, addr)
 		if err != nil {
 			return signedStdTx, err
 		}
-		txCtx = txCtx.WithSequence(accSeq)
 	}
 
 	passphrase, err := keys.GetPassphrase(name)
