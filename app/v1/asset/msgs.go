@@ -3,6 +3,7 @@ package asset
 import (
 	sdk "github.com/irisnet/irishub/types"
 	"math"
+	"regexp"
 )
 
 const (
@@ -50,7 +51,38 @@ func (msg MsgIssueAsset) Type() string  { return "issue" }
 // Implements Msg.
 func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 
-	// TODO
+	// only accepts alphanumeric characters, _ and -
+	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+
+	if msg.Owner == nil {
+		return ErrNilAssetOwner(DefaultCodespace)
+	}
+
+	if _, found := MsgIssueFamily[msg.Family]; len(msg.Family) > 0 && !found {
+		return ErrInvalidAssetFamily(DefaultCodespace, msg.Family)
+
+	}
+
+	if len(msg.Name) == 0 || !reg.Match([]byte(msg.Name)) {
+		return ErrInvalidAssetName(DefaultCodespace, msg.Name)
+	}
+
+	if len(msg.Symbol) == 0 || !reg.Match([]byte(msg.Symbol)) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, msg.Symbol)
+	}
+
+	if msg.InitSupply == 0 || msg.InitSupply > MaxInitSupply {
+		return ErrInvalidAssetInitSupply(DefaultCodespace, msg.InitSupply)
+	}
+
+	if msg.MaxSupply > 0 && msg.MaxSupply < msg.InitSupply {
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, msg.MaxSupply)
+	}
+
+	if msg.Decimal > 18 {
+		return ErrInvalidAssetDecimal(DefaultCodespace, msg.Decimal)
+	}
+
 	return nil
 }
 
