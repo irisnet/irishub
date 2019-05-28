@@ -149,15 +149,33 @@ func SignStdTx(txCtx TxContext, cliCtx context.CLIContext, name string, stdTx au
 		fmt.Fprintf(os.Stderr, "WARNING: The generated transaction's intended signer does not match the given signer: '%v'\n", name)
 	}
 
-	if !offline && txCtx.AccountNumber == 0 {
-		accNum, err := cliCtx.GetAccountNumber(addr)
+	if !offline {
+		txCtx, err = populateAccountFromState(txCtx, cliCtx, sdk.AccAddress(addr))
 		if err != nil {
 			return signedStdTx, err
 		}
-		txCtx = txCtx.WithAccountNumber(accNum)
 	}
 
-	if !offline && txCtx.Sequence == 0 {
+	passphrase, err := keys.GetPassphrase(name)
+	if err != nil {
+		return signedStdTx, err
+	}
+	return txCtx.SignStdTx(name, passphrase, stdTx, appendSig)
+}
+
+// SignStdTxWithSignerAddress attaches a signature to a StdTx and returns a copy of a it.
+// Don't perform online validation or lookups if offline is true, else
+// populate account and sequence numbers from a foreign account.
+func SignStdTxWithSignerAddress(txCtx TxContext, cliCtx context.CLIContext,
+	addr sdk.AccAddress, name string, stdTx auth.StdTx,
+	offline bool) (signedStdTx auth.StdTx, err error) {
+
+	// Check whether the address is a signer
+	if !isTxSigner(sdk.AccAddress(addr), stdTx.GetSigners()) {
+		fmt.Fprintf(os.Stderr, "WARNING: The generated transaction's intended signer does not match the given signer: '%v'\n", name)
+	}
+
+	if !offline {
 		accSeq, err := cliCtx.GetAccountSequence(addr)
 		if err != nil {
 			return signedStdTx, err
@@ -169,7 +187,8 @@ func SignStdTx(txCtx TxContext, cliCtx context.CLIContext, name string, stdTx au
 	if err != nil {
 		return signedStdTx, err
 	}
-	return txCtx.SignStdTx(name, passphrase, stdTx, appendSig)
+
+	return txCtx.SignStdTx(name, passphrase, stdTx, false)
 }
 
 // nolint
@@ -227,6 +246,23 @@ func buildUnsignedStdTx(txCtx TxContext, cliCtx context.CLIContext, msgs []sdk.M
 		return
 	}
 	return buildUnsignedStdTxOffline(txCtx, cliCtx, msgs)
+}
+
+func populateAccountFromState(
+	txCtx TxContext, cliCtx context.CLIContext, addr sdk.AccAddress,
+) (TxContext, error) {
+
+	accNum, err := cliCtx.GetAccountNumber(addr)
+	if err != nil {
+		return txCtx, err
+	}
+
+	accSeq, err := cliCtx.GetAccountSequence(addr)
+	if err != nil {
+		return txCtx, err
+	}
+
+	return txCtx.WithAccountNumber(accNum).WithSequence(accSeq), nil
 }
 
 func buildUnsignedStdTxOffline(txCtx TxContext, cliCtx context.CLIContext, msgs []sdk.Msg) (stdTx auth.StdTx, err error) {

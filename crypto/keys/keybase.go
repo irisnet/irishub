@@ -260,8 +260,7 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 		if err != nil {
 			return
 		}
-	case offlineInfo:
-		linfo := info.(offlineInfo)
+	case offlineInfo, multiInfo:
 		_, err := fmt.Fprintf(os.Stderr, "Bytes to sign:\n%s", msg)
 		if err != nil {
 			return nil, nil, err
@@ -276,8 +275,10 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 		if err != nil {
 			return nil, nil, err
 		}
-		cdc.MustUnmarshalBinaryLengthPrefixed([]byte(signed), sig)
-		return sig, linfo.GetPubKey(), nil
+		if err := cdc.UnmarshalBinaryLengthPrefixed([]byte(signed), sig); err != nil {
+			return nil, nil, errors.Wrap(err, "failed to decode signature")
+		}
+		return sig, info.GetPubKey(), nil
 	}
 	sig, err = priv.Sign(msg)
 	if err != nil {
