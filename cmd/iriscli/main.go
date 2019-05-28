@@ -19,6 +19,7 @@ import (
 	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
 	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
 	txcmd "github.com/irisnet/irishub/client/tx/cli"
+	assetcmd "github.com/irisnet/irishub/client/asset/cli"
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/version"
@@ -251,6 +252,24 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		guardianCmd,
+	)
+
+	//add asset command
+	assetCmd := &cobra.Command{
+		Use:   "asset",
+		Short: "Asset subcommands",
+	}
+	assetCmd.AddCommand(
+		client.GetCommands(
+			//assetcmd.GetCmdQueryAsset(cdc),
+		)...)
+
+	assetCmd.AddCommand(
+		client.PostCommands(
+			assetcmd.GetCmdIssueAsset(cdc),
+		)...)
+	rootCmd.AddCommand(
+		assetCmd,
 	)
 
 	//Add keys and version commands
