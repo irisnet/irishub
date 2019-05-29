@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// MsgRoute idetifies transaction types
+	// MsgRoute identifies transaction types
 	MsgRoute = "asset"
 )
 
