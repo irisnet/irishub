@@ -54,10 +54,10 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				if len(params) > 1 || len(params) == 0 {
+				if len(params) != 1 {
 					return errors.New("the length of ParameterProposal's param should be one")
 				}
-				if err := client.ValidateParam(params); err != nil {
+				if err := client.ValidateParam(params[0]); err != nil {
 					return err
 				}
 			}
