@@ -7,9 +7,6 @@ import (
 )
 
 var (
-	// the separator for string key
-	emptyByte = []byte{0x00}
-
 	KeyNextGatewayID = []byte("newGatewayID") // key for the next gateway ID
 	KeyGatewayCount  = []byte("gatewayCount") // key for the total number of all the gateways
 )
@@ -32,17 +29,4 @@ func KeyMoniker(moniker string) []byte {
 // KeyOwnerGatewayCount returns the key which means the count of the gateways with the specified owner
 func KeyOwnerGatewayCount(owner sdk.AccAddress) []byte {
 	return []byte(fmt.Sprintf("ownerGatewayCount:%d", owner))
-}
-
-func getStringsKey(ss []string) (result []byte) {
-	for _, s := range ss {
-		result = append(append(
-			result,
-			[]byte(s)...),
-			emptyByte...)
-	}
-	if len(result) > 0 {
-		return result[0 : len(result)-1]
-	}
-	return
 }
