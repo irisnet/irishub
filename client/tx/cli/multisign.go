@@ -17,7 +17,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/multisig"
 )
 
-// GetSignCommand returns the sign command
+// GetMultiSignCommand returns the multisign command
 func GetMultiSignCommand(codec *amino.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "multisign [file] [name] [[signature]...]",
