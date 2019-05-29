@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// name to idetify transaction types
+	// MsgRoute idetifies transaction types
 	MsgRoute = "asset"
 )
 
@@ -51,7 +51,28 @@ func (msg MsgCreateGateway) Type() string { return "create_gateway" }
 
 // ValidateBasic implements Msg
 func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
-	// TODO
+	// check the moniker
+	if len(msg.Moniker) == 0 || uint32(len(msg.Moniker)) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", MaximumGatewayMonikerSize))
+	}
+
+	// check the details
+	if uint32(len(msg.Details)) > MaximumGatewayDetailsSize {
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be [0,%d]", MaximumGatewayDetailsSize))
+	}
+
+	// check the website
+	if uint32(len(msg.Website)) > MaximumGatewayWebsiteSize {
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be [0,%d]", MaximumGatewayWebsiteSize))
+	}
+
+	// check if the owner is included in operators
+	for _, op := range msg.Operators {
+		if op.Equals(msg.Owner) {
+			return ErrOwnerIsOperator(DefaultCodespace, "the owner can not be an operator")
+		}
+	}
+
 	return nil
 }
 
