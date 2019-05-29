@@ -1,15 +1,14 @@
 package asset
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-)
-
-var (
-	KeyNextGatewayID = []byte("newGatewayID") // key for the next gateway ID
 )
 
 type Keeper struct {
@@ -41,18 +40,154 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 }
 
 // CreateGateway creates a gateway
-func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) {
+func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) (sdk.Tags, sdk.Error) {
+	// check if the moniker already exists
+	if k.HasGateway(ctx, msg.Moniker) {
+		return nil, ErrGatewayAlreadyExists(k.codespace, fmt.Sprintf("moniker already exists:%s", msg.Moniker))
+	}
+
+	// get the next gateway id
+	gatewayID, err := k.getNewGatewayID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var gateway = Gateway{
+		ID:         gatewayID,
+		Owner:      msg.Owner,
+		Identity:   msg.Identity,
+		Moniker:    msg.Moniker,
+		Details:    msg.Details,
+		Website:    msg.Website,
+		RedeemAddr: msg.RedeemAddr,
+		Operators:  msg.Operators,
+	}
+
+	// save the gateway with the creation enabled
+	k.saveGateway(ctx, gateway, true)
+
 	// TODO
+	createTags := sdk.NewTags(
+		"id", []byte(strconv.FormatUint(gatewayID, 10)),
+		"moniker", []byte(msg.Moniker),
+	)
+
+	return createTags, nil
 }
 
-// EditGateway edits the specified gateway by moniker
-func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) {
+// EditGateway edits the specified gateway
+func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.Error) {
 	// TODO
+	return nil, nil
 }
 
-// getGateway retrieves the gateway of the given moniker
-func (k Keeper) getGateway(moniker string) {
+// GetGateway retrieves the gateway of the given id
+func (k Keeper) GetGateway(ctx sdk.Context, gatewayID uint64) (Gateway, sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyGateway(gatewayID))
+	if bz == nil {
+		return Gateway{}, ErrUnkwownGateway(k.codespace, fmt.Sprintf("Unknown gateway id:%d", gatewayID))
+	}
 
+	var gateway Gateway
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &gateway)
+
+	return gateway, nil
+}
+
+// GetGatewayByMoniker retrieves the gateway of the given moniker
+func (k Keeper) GetGatewayByMoniker(ctx sdk.Context, moniker string) (Gateway, sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyMoniker(moniker))
+	if bz == nil {
+		return Gateway{}, ErrUnkwownGateway(k.codespace, fmt.Sprintf("Unknown gateway moniker:%s", moniker))
+	}
+
+	var gatewayID uint64
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &gatewayID)
+
+	return k.GetGateway(ctx, gatewayID)
+}
+
+// HasGateway checks if the given gateway exists. Return true if exists, false otherwise
+func (k Keeper) HasGateway(ctx sdk.Context, moniker string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(KeyMoniker(moniker))
+}
+
+// saveGateway saves the gateway, which behaves by the specified mode
+func (k Keeper) saveGateway(ctx sdk.Context, gateway Gateway, creation bool) {
+	k.setGateway(ctx, gateway)
+
+	if creation {
+		k.setMoniker(ctx, gateway.Moniker, gateway.ID)
+		k.setOwnerGatewayID(ctx, gateway.Owner, gateway.ID)
+		k.increaseOwnerGatewayCount(ctx, gateway.Owner)
+		k.increaseGatewayCount(ctx)
+	}
+}
+
+// setGateway stores the given gateway into underlying storage
+func (k Keeper) setGateway(ctx sdk.Context, gateway Gateway) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gateway)
+
+	// set KeyGateway
+	store.Set(KeyGateway(gateway.ID), bz)
+}
+
+// setMoniker stores the gateway ID into storage by the key KeyMoniker
+func (k Keeper) setMoniker(ctx sdk.Context, moniker string, gatewayID uint64) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gatewayID)
+
+	// set KeyMoniker
+	store.Set(KeyMoniker(moniker), bz)
+}
+
+// setOwnerGatewayID stores the gateway ID into storage by the key KeyOwnerGateway. Intended for iteration on ids of an owner
+func (k Keeper) setOwnerGatewayID(ctx sdk.Context, owner sdk.AccAddress, gatewayID uint64) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gatewayID)
+
+	// set KeyOwnerGatewayID
+	store.Set(KeyOwnerGatewayID(owner, gatewayID), bz)
+}
+
+// increaseOwnerGatewayCount increases the count of the gateways of the given owner
+func (k Keeper) increaseOwnerGatewayCount(ctx sdk.Context, owner sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyOwnerGatewayCount(owner))
+
+	var count uint64
+	if bz == nil {
+		count = 0
+	} else {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &count)
+	}
+
+	bz = k.cdc.MustMarshalBinaryLengthPrefixed(count + 1)
+
+	// set KeyOwnerGatewayCount
+	store.Set(KeyOwnerGatewayCount(owner), bz)
+}
+
+// increaseGatewayCount increases the count of all the gateways
+func (k Keeper) increaseGatewayCount(ctx sdk.Context) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyGatewayCount)
+
+	var count uint64
+	if bz == nil {
+		count = 0
+	} else {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &count)
+	}
+
+	bz = k.cdc.MustMarshalBinaryLengthPrefixed(count + 1)
+
+	// set KeyGatewayCount
+	store.Set(KeyGatewayCount, bz)
 }
 
 // getNewGatewayID gets the next available gateway ID and increments it
@@ -68,4 +203,18 @@ func (k Keeper) getNewGatewayID(ctx sdk.Context) (gatewayID uint64, err sdk.Erro
 	store.Set(KeyNextGatewayID, bz)
 
 	return gatewayID, nil
+}
+
+// setInitialGatewayID sets the initial gateway id in genesis
+func (k Keeper) setInitialGatewayID(ctx sdk.Context, gatewayID uint64) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyNextGatewayID)
+	if bz != nil {
+		return ErrInvalidGenesis(k.codespace, "Initial gateway ID already set")
+	}
+
+	bz = k.cdc.MustMarshalBinaryLengthPrefixed(gatewayID)
+	store.Set(KeyNextGatewayID, bz)
+
+	return nil
 }
