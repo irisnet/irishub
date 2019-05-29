@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/client/keys"
 	ccrypto "github.com/irisnet/irishub/crypto"
 	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,6 +43,7 @@ phrase, otherwise, a new key will be generated.`,
 	cmd.Flags().StringSlice(flagMultisig, nil, "Construct and store a multisig public key (implies --pubkey)")
 	cmd.Flags().Uint(flagMultiSigThreshold, 1, "K out of N required signatures. For use in conjunction with --multisig")
 	cmd.Flags().Bool(flagNoSort, false, "Keys passed to --multisig are taken in the order they're supplied")
+	cmd.Flags().String(FlagPublicKey, "", "Parse a public key in bech32 format and save it to disk")
 	cmd.Flags().StringP(flagType, "t", "secp256k1", "Type of private key (secp256k1|ed25519)")
 	cmd.Flags().Bool(client.FlagUseLedger, false, "Store a local reference to a private key on a Ledger device")
 	cmd.Flags().Bool(flagRecover, false, "Provide seed phrase to recover existing key instead of creating")
@@ -120,7 +122,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 		}
 
 		// ask for a password when generating a local key
-		if !viper.GetBool(client.FlagUseLedger) {
+		if viper.GetString(FlagPublicKey) == "" && !viper.GetBool(client.FlagUseLedger) {
 			pass, err = keys.GetCheckPassword(
 				"Enter a passphrase for your key:",
 				"Repeat the passphrase:", buf)
@@ -128,6 +130,18 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 				return err
 			}
 		}
+	}
+
+	if viper.GetString(FlagPublicKey) != "" {
+		pk, err := sdk.GetAccPubKeyBech32(viper.GetString(FlagPublicKey))
+		if err != nil {
+			return err
+		}
+		_, err = kb.CreateOffline(name, pk)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if viper.GetBool(client.FlagUseLedger) {
