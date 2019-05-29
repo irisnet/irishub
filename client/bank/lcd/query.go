@@ -50,13 +50,7 @@ func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
 			return
 		}
 
-		accountRes, err := bank.ConvertAccountCoin(cliCtx, account)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, accountRes, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, account, cliCtx.Indent)
 	}
 }
 
