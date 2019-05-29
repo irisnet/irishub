@@ -9,11 +9,13 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
-	CodeInvalidMoniker sdk.CodeType = 100
-	CodeInvalidDetails sdk.CodeType = 101
-	CodeInvalidWebsite sdk.CodeType = 102
-	CodeUnknownMoniker sdk.CodeType = 103
-	CodeInvalidGenesis sdk.CodeType = 104
+	CodeInvalidMoniker       sdk.CodeType = 100
+	CodeInvalidDetails       sdk.CodeType = 101
+	CodeInvalidWebsite       sdk.CodeType = 102
+	CodeUnknownGateway       sdk.CodeType = 103
+	CodeGatewayAlreadyExists sdk.CodeType = 104
+	CodeOwnerIsOperator      sdk.CodeType = 105
+	CodeInvalidGenesis       sdk.CodeType = 106
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -59,8 +61,16 @@ func ErrInvalidWebsite(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
 }
 
-func ErrUnkwownMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
+func ErrUnkwownGateway(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownGateway, msg)
+}
+
+func ErrGatewayAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeGatewayAlreadyExists, msg)
+}
+
+func ErrOwnerIsOperator(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeOwnerIsOperator, msg)
 }
 
 func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
