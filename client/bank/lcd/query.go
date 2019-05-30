@@ -27,7 +27,7 @@ func QueryAccountRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder,
 
 		addr, err := sdk.AccAddressFromBech32(bech32addr)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
