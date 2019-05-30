@@ -38,7 +38,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 		stake.NopMetrics())
-	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace), nil)
+	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace))
 
 	mapp.Router().AddRoute("asset", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
 

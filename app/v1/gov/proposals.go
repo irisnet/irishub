@@ -182,11 +182,14 @@ const (
 	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
 	ProposalTypeSystemHalt      ProposalKind = 0x03
 	ProposalTypeTxTaxUsage      ProposalKind = 0x04
+	ProposalTypePlainText       ProposalKind = 0x05
 )
 
 // String to proposalType byte.  Returns ff if invalid.
 func ProposalTypeFromString(str string) (ProposalKind, error) {
 	switch str {
+	case "PlainText":
+		return ProposalTypePlainText, nil
 	case "ParameterChange":
 		return ProposalTypeParameterChange, nil
 	case "SoftwareUpgrade":
@@ -205,7 +208,8 @@ func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
 		pt == ProposalTypeSystemHalt ||
-		pt == ProposalTypeTxTaxUsage {
+		pt == ProposalTypeTxTaxUsage ||
+		pt == ProposalTypePlainText {
 		return true
 	}
 	return false
@@ -246,6 +250,8 @@ func (pt *ProposalKind) UnmarshalJSON(data []byte) error {
 // Turns VoteOption byte to String
 func (pt ProposalKind) String() string {
 	switch pt {
+	case ProposalTypePlainText:
+		return "PlainText"
 	case ProposalTypeParameterChange:
 		return "ParameterChange"
 	case ProposalTypeSoftwareUpgrade:

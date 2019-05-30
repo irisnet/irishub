@@ -15,6 +15,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*Proposal)(nil), nil)
 	cdc.RegisterConcrete(&BasicProposal{}, "irishub/gov/BasicProposal", nil)
 	cdc.RegisterConcrete(&ParameterProposal{}, "irishub/gov/ParameterProposal", nil)
+	cdc.RegisterConcrete(&PlainTextProposal{}, "irishub/gov/PlainTextProposal", nil)
 	cdc.RegisterConcrete(&SoftwareUpgradeProposal{}, "irishub/gov/SoftwareUpgradeProposal", nil)
 	cdc.RegisterConcrete(&SystemHaltProposal{}, "irishub/gov/SystemHaltProposal", nil)
 	cdc.RegisterConcrete(&TaxUsageProposal{}, "irishub/gov/TaxUsageProposal", nil)

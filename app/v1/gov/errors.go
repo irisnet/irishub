@@ -39,6 +39,7 @@ const (
 	CodeMoreThanMaxProposal     sdk.CodeType = 27
 	CodeInvalidUpgradeParams    sdk.CodeType = 28
 	CodeEmptyParam              sdk.CodeType = 29
+	CodeInvalidParamNum         sdk.CodeType = 30
 )
 
 //----------------------------------------
@@ -86,6 +87,10 @@ func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidParam(codespace sdk.CodespaceType, str string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidParam, fmt.Sprintf("%s Params don't support the ParameterChange.", str))
+}
+
+func ErrInvalidParamNum(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidParamNum, fmt.Sprintf("Params's length must be one"))
 }
 
 func ErrEmptyParam(codespace sdk.CodespaceType) sdk.Error {
