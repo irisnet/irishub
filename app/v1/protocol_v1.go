@@ -260,7 +260,7 @@ func (p *ProtocolV1) configKeepers() {
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, asset.DefaultParamSpace)
+	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
 }
 
 // configure all Routers
@@ -307,15 +307,15 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyParams,
 		protocol.KeyUpgrade,
 		protocol.KeyService,
-		protocol.KeyGuardian，
-		protocol.KeyAsset
+		protocol.KeyGuardian,
+		protocol.KeyAsset,
 	}
 }
 
 // configure all Stores
 func (p *ProtocolV1) configParams() {
 
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}，&asset.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
 
 }
 
