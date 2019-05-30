@@ -1,6 +1,7 @@
 package bank
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -121,7 +122,8 @@ func TestMsgSendValidation(t *testing.T) {
 		valid bool
 		tx    MsgSend
 	}{
-		{false, MsgSend{}},                           // no input or output
+		{false, MsgSend{}},
+		{false, MsgSend{Inputs: []Input{}}},// no input or output
 		{false, MsgSend{Inputs: []Input{input1}}},    // just input
 		{false, MsgSend{Outputs: []Output{output1}}}, // just output
 		{false, MsgSend{
@@ -255,6 +257,89 @@ func TestMsgIssueGetSignBytes(t *testing.T) {
 func TestMsgIssueGetSigners(t *testing.T) {
 	var msg = MsgIssue{
 		Banker: sdk.AccAddress([]byte("onlyone")),
+	}
+	res := msg.GetSigners()
+	require.Equal(t, fmt.Sprintf("%v", res), "[6F6E6C796F6E65]")
+}
+
+
+// ----------------------------------------
+// MsgFreeze Tests
+
+func TestNewMsgFreeze(t *testing.T) {
+	// TODO
+}
+
+func TestMsgFreezeRoute(t *testing.T) {
+	// Construct an MsgFreeze
+	addr := sdk.AccAddress([]byte("onlyone"))
+	coin := sdk.NewInt64Coin("atom", 10)
+	var msg = MsgFreeze{
+		Holder:  addr,
+		Coin: coin,
+	}
+
+	// TODO some failures for bad result
+	require.Equal(t, msg.Route(), "bank/freeze")
+}
+
+func TestMsgFreezeTokenValidation(t *testing.T) {
+	// TODO
+	addr := sdk.AccAddress([]byte("onlyone"))
+	emptyAddr:=sdk.AccAddress{}
+	someCoin := sdk.NewInt64Coin("atom", 123)
+	emptyCoin := sdk.NewInt64Coin("",0)
+	zeroCoin:=sdk.NewInt64Coin("atom", 0)
+
+
+	cases := []struct {
+		valid bool
+		tx MsgFreeze
+	}{
+		// auth works with different apps
+		{false, MsgFreeze{}},
+		{false, MsgFreeze{Holder:addr,Coin:emptyCoin}},
+		{false, MsgFreeze{Holder:addr,Coin:zeroCoin}},
+		{false, MsgFreeze{Holder:emptyAddr,Coin:emptyCoin}},
+		{false, MsgFreeze{Holder:emptyAddr,Coin:zeroCoin}},
+
+		{true, MsgFreeze{Holder:addr,Coin:someCoin}},
+
+	}
+
+	for i, tc := range cases {
+		err := tc.tx.ValidateBasic()
+		if tc.valid {
+			require.Nil(t, err, "%d: %+v", i, err)
+		} else {
+			require.NotNil(t, err, "%d", i)
+		}
+	}
+}
+
+func TestMsgFreezeGetSignBytes(t *testing.T) {
+	addr := sdk.AccAddress([]byte("onlyone"))
+	addrjson,_:=addr.MarshalJSON();
+	coin := sdk.NewInt64Coin("atom", 10)
+	var msg = MsgFreeze{
+		Holder:  addr,
+		Coin: coin,
+	}
+	res := msg.GetSignBytes()
+
+	var buf bytes.Buffer
+	buf.WriteString(`{"coin":{"amount":"10","denom":"atom"}`)
+	buf.WriteString(`,"holder"`)
+	buf.WriteString(`:`)
+	buf.WriteString(string(addrjson))
+	buf.WriteString(`}`)
+	require.Equal(t, buf.String(), string(res))
+}
+
+func TestMsgFreezeGetSigners(t *testing.T) {
+	var msg = MsgFreeze{
+		Holder: sdk.AccAddress([]byte("onlyone")),
+		Coin:sdk.NewInt64Coin("atom", 123),
 	}
 	res := msg.GetSigners()
 	require.Equal(t, fmt.Sprintf("%v", res), "[6F6E6C796F6E65]")

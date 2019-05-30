@@ -2,7 +2,6 @@ package bank
 
 import (
 	"encoding/json"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -274,4 +273,53 @@ func (msg MsgBurn) GetSignBytes() []byte {
 // Implements Msg.
 func (msg MsgBurn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+//----------------------------------------
+// MsgFreeze
+
+// MsgFreeze - high level transaction of the coin module
+type MsgFreeze struct {
+	Holder sdk.AccAddress `json:"holder"`
+	Coin  sdk.Coin      `json:"coin"`
+}
+
+var _ sdk.Msg = MsgFreeze{}
+
+// NewMsgFreeze - construct freeze msg.
+func NewMsgFreeze(holder sdk.AccAddress, coin sdk.Coin) MsgFreeze {
+	return MsgFreeze{Holder: holder, Coin: coin}
+}
+
+// Implements Msg.
+// nolint
+func (msg MsgFreeze) Route() string { return "bank/freeze" }
+func (msg MsgFreeze) Type() string  { return "freeze" }
+
+// Implements Msg.
+func (msg MsgFreeze) ValidateBasic() sdk.Error {
+	// XXX
+	if len(msg.Holder) == 0 {
+		return sdk.ErrInvalidAddress(msg.Holder.String())
+	}
+	if !msg.Coin.IsPositive() {
+		return ErrFreezeEmptyCoin(DefaultCodespace)
+	}
+
+
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgFreeze) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgFreeze) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Holder}
 }
