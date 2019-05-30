@@ -307,7 +307,9 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyParams,
 		protocol.KeyUpgrade,
 		protocol.KeyService,
-		protocol.KeyGuardian}
+		protocol.KeyGuardian，
+		protocol.KeyAsset
+	}
 }
 
 // configure all Stores
