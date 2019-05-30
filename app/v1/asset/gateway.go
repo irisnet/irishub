@@ -6,7 +6,7 @@ import (
 
 // Gateway represents the gateway
 type Gateway struct {
-	ID         uint64           `json:"id"`             //  ID of the gateway
+	ID         uint8            `json:"id"`             //  ID of the gateway
 	Owner      sdk.AccAddress   `json:"owner"`          //  Owner address of the gateway
 	Identity   string           `json:"identity"`       //  Identity of the gateway
 	Moniker    string           `json:"moniker"`        //  Moniker of the gateway

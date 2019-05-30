@@ -6,7 +6,7 @@ import (
 
 const (
 	// StartingGatewayID is the initial number from which the gateway ids start
-	StartingGatewayID = 1
+	StartingGatewayID = 2
 )
 
 // GenesisState - all asset state that must be provided at genesis
