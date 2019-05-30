@@ -315,7 +315,7 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 // configure all Stores
 func (p *ProtocolV1) configParams() {
 
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}，&asset.Params{})
 
 }
 
@@ -392,6 +392,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
+	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)
