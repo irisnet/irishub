@@ -2,7 +2,7 @@
 
 ## 描述
 
-提交区块链治理提议以及发起提议所涉及的初始保证金，其中提议的类型包括Text/ParameterChange/SoftwareUpgrade这三种类型。
+提交区块链治理提议以及发起提议所涉及的初始保证金，其中提议的类型包括PlainText/ParameterChange/SoftwareUpgrade这三种类型。
 
 ## 使用方式
 
@@ -20,9 +20,9 @@ iriscli gov submit-proposal --help
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --deposit        |                            | 提议的保证金（至少30%minDeposit）                                                                                                                         |          |
 | --description    |                            | 提议的描述                                                                                                           | Yes      |
-| --param          |                            | 提议参数,例如: [{key:key,value:value,op:update}]                                                                                 |          |
+| --param          |                            | 提议参数,例如: mint/Inflation=0.050                                                                                |          |
 | --title          |                            | 提议标题                                                                                                                           | Yes      |
-| --type           |                            | 提议类型,例如:ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | 提议类型,例如:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | 新协议的版本信息                                                                           |       |
 | --software           |           " "                 |  新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     |  新版本协议升级的高度                                                     |       |

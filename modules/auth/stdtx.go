@@ -3,10 +3,10 @@ package auth
 import (
 	"encoding/json"
 
+	"fmt"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
-	"fmt"
 	"github.com/tendermint/tendermint/crypto/multisig"
 )
 
@@ -67,7 +67,7 @@ func (tx StdTx) ValidateBasic() sdk.Error {
 	return nil
 }
 func countSubKeys(pub crypto.PubKey) int {
-	v, ok := pub.(*multisig.PubKeyMultisigThreshold)
+	v, ok := pub.(multisig.PubKeyMultisigThreshold)
 	if !ok {
 		return 1
 	}
@@ -151,12 +151,12 @@ func (fee StdFee) Bytes() []byte {
 // and the Sequence numbers for each signature (prevent
 // inchain replay and enforce tx ordering per account).
 type StdSignDoc struct {
-	AccountNumber uint64             `json:"account_number"`
+	AccountNumber uint64            `json:"account_number"`
 	ChainID       string            `json:"chain_id"`
 	Fee           json.RawMessage   `json:"fee"`
 	Memo          string            `json:"memo"`
 	Msgs          []json.RawMessage `json:"msgs"`
-	Sequence      uint64             `json:"sequence"`
+	Sequence      uint64            `json:"sequence"`
 }
 
 // StdSignBytes returns the bytes to sign for a transaction.
@@ -183,8 +183,8 @@ func StdSignBytes(chainID string, accnum uint64, sequence uint64, fee StdFee, ms
 type StdSignature struct {
 	crypto.PubKey `json:"pub_key"` // optional
 	Signature     []byte           `json:"signature"`
-	AccountNumber uint64            `json:"account_number"`
-	Sequence      uint64            `json:"sequence"`
+	AccountNumber uint64           `json:"account_number"`
+	Sequence      uint64           `json:"sequence"`
 }
 
 // logic for standard transaction decoding

@@ -14,7 +14,7 @@
 Specific Proposal for different levels：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
 - Important：`ParameterChange`
-- Normal：`TxTaxUsage`
+- Normal：`TxTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
 
