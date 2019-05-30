@@ -14,7 +14,7 @@ const (
 	CodeInvalidWebsite       sdk.CodeType = 102
 	CodeUnknownGateway       sdk.CodeType = 103
 	CodeGatewayAlreadyExists sdk.CodeType = 104
-	CodeOwnerIsOperator      sdk.CodeType = 105
+	CodeInvalidOperator      sdk.CodeType = 105
 	CodeInvalidGenesis       sdk.CodeType = 106
 )
 
@@ -69,8 +69,8 @@ func ErrGatewayAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error 
 	return sdk.NewError(codespace, CodeGatewayAlreadyExists, msg)
 }
 
-func ErrOwnerIsOperator(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeOwnerIsOperator, msg)
+func ErrInvalidOperator(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidOperator, msg)
 }
 
 func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {

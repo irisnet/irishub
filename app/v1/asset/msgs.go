@@ -69,7 +69,7 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 	// check if the owner is included in operators
 	for _, op := range msg.Operators {
 		if op.Equals(msg.Owner) {
-			return ErrOwnerIsOperator(DefaultCodespace, "the owner can not be an operator")
+			return ErrInvalidOperator(DefaultCodespace, "the owner can not be an operator")
 		}
 	}
 
