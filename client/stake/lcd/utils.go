@@ -58,6 +58,11 @@ func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) ht
 		bech32validator := vars["validatorAddr"]
 
 		delegatorAddr, err := sdk.AccAddressFromBech32(bech32delegator)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		validatorAddr, err := sdk.ValAddressFromBech32(bech32validator)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
