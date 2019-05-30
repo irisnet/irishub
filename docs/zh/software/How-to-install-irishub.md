@@ -1,9 +1,9 @@
 # 如何安装`iris`
 
-### 当前IRIShub最新版本为 ： v0.14.0
+### 当前IRIShub最新版本为 ： v0.14.1
 获取最新版本 https://github.com/irisnet/irishub/releases/latest
 ```
-注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.14.0
+注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.14.1
 ```
 
 ### 源码编译安装
