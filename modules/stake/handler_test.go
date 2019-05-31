@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	sdk "github.com/irisnet/irishub/types"
 	keep "github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/version"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -722,9 +722,62 @@ func TestUnbondingFromUnbondingValidator(t *testing.T) {
 	// Run the EndBlocker
 	EndBlocker(ctx, keeper)
 
-	// unbond the validators bond portion
-	msgBeginUnbondingValidator := NewMsgBeginUnbonding(sdk.AccAddress(validatorAddr), validatorAddr, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
-	got = handleMsgBeginUnbonding(ctx, msgBeginUnbondingValidator, keeper)
+	// validate the unbonding object does not exist as it was never created
+	_, found := keeper.GetUnbondingDelegation(ctx, delegatorAddr, validatorAddr)
+	require.False(t, found, "unbonding object should not exist")
+
+	// reproduce same sequence except past fork height
+	ctx, _, keeper = keep.CreateTestInput(t, false, sdk.NewInt(1000))
+	validatorAddr, delegatorAddr = sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
+	ctx = ctx.WithBlockHeight(version.H001_UNDELEGATE_PATCH)
+
+	// create the validator
+	msgCreateValidator = NewTestMsgCreateValidator(validatorAddr, keep.PKs[0], sdk.NewInt(10))
+	got = handleMsgCreateValidator(ctx, msgCreateValidator, keeper)
+	require.True(t, got.IsOK(), "expected no error on runMsgCreateValidator")
+
+	// bond a delegator
+	msgDelegate = NewTestMsgDelegate(delegatorAddr, validatorAddr, sdk.NewInt(10))
+	got = handleMsgDelegate(ctx, msgDelegate, keeper)
+	require.True(t, got.IsOK(), "expected ok, got %v", got)
+
+	// unbond the delegator from the validator
+	msgUndelegateDelegator := NewMsgBeginUnbonding(delegatorAddr, validatorAddr, sdk.NewDec(10))
+	got = handleMsgBeginUnbonding(ctx, msgUndelegateDelegator, keeper)
+	require.True(t, got.IsOK(), "expected no error")
+
+	EndBlocker(ctx, keeper)
+
+	// validate the unbonding object exists prior to the unbonding period expiring
+	_, found = keeper.GetUnbondingDelegation(ctx, delegatorAddr, validatorAddr)
+	require.True(t, found, "unbonding object should exist")
+
+	// move to past unbonding period
+	ctx = ctx.WithBlockTime(ctx.BlockHeader().Time.Add(keeper.UnbondingTime(ctx)))
+	EndBlocker(ctx, keeper)
+
+	// validate the unbonding object no longer exists as the unbonding period has expired
+	_, found = keeper.GetUnbondingDelegation(ctx, delegatorAddr, validatorAddr)
+	require.False(t, found, "unbonding object should not exist")
+}
+
+func TestUnbondingFork(t *testing.T) {
+	ctx, _, keeper := keep.CreateTestInput(t, false, sdk.NewInt(1000))
+	validatorAddr, delegatorAddr := sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
+
+	// create the validator
+	msgCreateValidator := NewTestMsgCreateValidator(validatorAddr, keep.PKs[0], sdk.NewInt(10))
+	got := handleMsgCreateValidator(ctx, msgCreateValidator, keeper)
+	require.True(t, got.IsOK(), "expected no error on runMsgCreateValidator")
+
+	// bond a delegator
+	msgDelegate := NewTestMsgDelegate(delegatorAddr, validatorAddr, sdk.NewInt(10))
+	got = handleMsgDelegate(ctx, msgDelegate, keeper)
+	require.True(t, got.IsOK(), "expected ok, got %v", got)
+
+	// unbond the delegator from the validator
+	msgUndelegateDelegator := NewMsgBeginUnbonding(delegatorAddr, validatorAddr, sdk.NewDec(10))
+	got = handleMsgBeginUnbonding(ctx, msgUndelegateDelegator, keeper)
 	require.True(t, got.IsOK(), "expected no error")
 
 	// Run the EndBlocker

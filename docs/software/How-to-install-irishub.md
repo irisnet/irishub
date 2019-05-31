@@ -1,9 +1,9 @@
 # How to install `iris` 
 
-### The Latest version of IRIShub : v0.14.0
+### The Latest version of IRIShub : v0.14.1
 refer to : https://github.com/irisnet/irishub/releases/latest
 ```
-Please replace <latest_iris_version> with v0.14.0 while using "git checkout" 
+Please replace <latest_iris_version> with v0.14.1 while using "git checkout" 
 ```
 
 You can download the source code from github and compile it locally.

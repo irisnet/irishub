@@ -1,5 +1,19 @@
 # IRISLCD Change Log
 
+## v0.14.1
+
+*May 30th, 2019*
+
+### BREAKING CHANGES:
+
+- Change some api interfaces of `IRISLCD`
+
+#### Bank module APIs
+
+| [v0.14.0]      | [v0.14.1]        | input changed | output changed |
+| --------------- | --------------- | --------------- | --------------- |
+| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes |
+
 ## v0.14.0
 
 *May 20th, 2019*

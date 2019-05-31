@@ -5,12 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client/context"
+	distrClient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/modules/distribution"
-	distrClient "github.com/irisnet/irishub/client/distribution"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/app/protocol"
 )
 
 // QueryWithdrawAddressHandlerFn performs withdraw address query
@@ -152,6 +152,11 @@ func QueryRewardsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		AddrStr := vars["address"]
 		accAddress, err := sdk.AccAddressFromBech32(AddrStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		params := distribution.NewQueryRewardsParams(accAddress)
 		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
