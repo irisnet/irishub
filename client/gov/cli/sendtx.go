@@ -2,6 +2,9 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/client/context"
@@ -12,8 +15,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
-	"strings"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
