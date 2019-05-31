@@ -35,6 +35,12 @@ func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk
 
 // handleMsgEditGateway handles MsgEditGateway
 func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Result {
-	// TODO
-	return sdk.Result{}
+	tags, err := k.EditGateway(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
