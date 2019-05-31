@@ -6,5 +6,5 @@ package version
 */
 const (
 	// 001: 0 - protocol version, 01 - patch number for protocol v0
-	H001_UNDELEGATE_PATCH = 75000
+	H001_UNDELEGATE_PATCH = 1159800
 )
