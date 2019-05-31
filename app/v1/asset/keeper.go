@@ -76,8 +76,34 @@ func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) (sdk.Tags, 
 
 // EditGateway edits the specified gateway
 func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.Error) {
+	// get the destination gateway
+	gateway, err := k.GetGatewayByMoniker(ctx, msg.Moniker)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if the given owner matches with the owner of the destination gateway
+	if !msg.Owner.Equals(gateway.Owner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the gateway %s", msg.Owner, msg.Moniker))
+	}
+
+	// update the gateway
+	gateway.Identity = msg.Identity
+	gateway.Details = msg.Details
+	gateway.Website = msg.Website
+	gateway.RedeemAddr = msg.RedeemAddr
+	gateway.Operators = msg.Operators
+
+	// save the gateway with the creation disabled
+	k.saveGateway(ctx, gateway, false)
+
 	// TODO
-	return nil, nil
+	editTags := sdk.NewTags(
+		"id", []byte{gateway.ID},
+		"moniker", []byte(msg.Moniker),
+	)
+
+	return editTags, nil
 }
 
 // GetGateway retrieves the gateway of the given id
