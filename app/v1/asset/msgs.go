@@ -127,6 +127,11 @@ func (msg MsgEditGateway) Type() string { return "edit_gateway" }
 
 // ValidateBasic implements Msg
 func (msg MsgEditGateway) ValidateBasic() sdk.Error {
+	// check the owner
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
+	}
+
 	// check the moniker
 	if len(msg.Moniker) == 0 || uint32(len(msg.Moniker)) > MaximumGatewayMonikerSize {
 		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", MaximumGatewayMonikerSize))
