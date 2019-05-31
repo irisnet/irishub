@@ -729,7 +729,7 @@ func TestUnbondingFromUnbondingValidator(t *testing.T) {
 	// reproduce same sequence except past fork height
 	ctx, _, keeper = keep.CreateTestInput(t, false, sdk.NewInt(1000))
 	validatorAddr, delegatorAddr = sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
-	ctx = ctx.WithBlockHeight(version.P001_UNDELEGATE_HEIGHT)
+	ctx = ctx.WithBlockHeight(version.H001_UNDELEGATE_PATCH)
 
 	// create the validator
 	msgCreateValidator = NewTestMsgCreateValidator(validatorAddr, keep.PKs[0], sdk.NewInt(10))

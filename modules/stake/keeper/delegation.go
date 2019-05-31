@@ -527,7 +527,7 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	}
 
 	// create the unbonding delegation
-	if ctx.BlockHeight() < version.P001_UNDELEGATE_HEIGHT {
+	if ctx.BlockHeight() < version.H001_UNDELEGATE_PATCH {
 		minTime, height, completeNow := k.getBeginInfo(ctx, valAddr)
 
 		returnAmount, err := k.unbond(ctx, delAddr, valAddr, sharesAmount)
