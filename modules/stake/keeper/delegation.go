@@ -2,11 +2,11 @@ package keeper
 
 import (
 	"bytes"
-	"github.com/irisnet/irishub/version"
 	"time"
 
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/version"
 )
 
 // return a specific delegation
