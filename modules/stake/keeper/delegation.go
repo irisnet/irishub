@@ -2,10 +2,11 @@ package keeper
 
 import (
 	"bytes"
+	"github.com/irisnet/irishub/version"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // return a specific delegation
@@ -526,7 +527,41 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	}
 
 	// create the unbonding delegation
-	minTime, height, completeNow := k.getBeginInfo(ctx, valAddr)
+	if ctx.BlockHeight() < version.P001_UNDELEGATE_HEIGHT {
+		minTime, height, completeNow := k.getBeginInfo(ctx, valAddr)
+
+		returnAmount, err := k.unbond(ctx, delAddr, valAddr, sharesAmount)
+		if err != nil {
+			return types.UnbondingDelegation{}, err
+		}
+
+		rounded := returnAmount.TruncateInt()
+		balance := sdk.NewCoin(k.BondDenom(), rounded)
+
+		// no need to create the ubd object just complete now
+		if completeNow {
+			if !balance.IsZero() {
+				ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), delAddr.String(), balance.String(), sdk.UndelegationFlow, ctx.CoinFlowTrigger())
+			}
+			_, _, err := k.bankKeeper.AddCoins(ctx, delAddr, sdk.Coins{balance})
+			if err != nil {
+				return types.UnbondingDelegation{}, err
+			}
+			return types.UnbondingDelegation{MinTime: minTime, Balance: balance}, nil
+		}
+		ubd := types.UnbondingDelegation{
+			TxHash:         ctx.CoinFlowTrigger(), //tx hash
+			DelegatorAddr:  delAddr,
+			ValidatorAddr:  valAddr,
+			CreationHeight: height,
+			MinTime:        minTime,
+			Balance:        balance,
+			InitialBalance: balance,
+		}
+		k.SetUnbondingDelegation(ctx, ubd)
+		k.InsertUnbondingQueue(ctx, ubd)
+		return ubd, nil
+	}
 
 	returnAmount, err := k.unbond(ctx, delAddr, valAddr, sharesAmount)
 	if err != nil {
@@ -535,31 +570,18 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 
 	rounded := returnAmount.TruncateInt()
 	balance := sdk.NewCoin(k.BondDenom(), rounded)
-
-	// no need to create the ubd object just complete now
-	if completeNow {
-		if !balance.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), delAddr.String(), balance.String(), sdk.UndelegationFlow, ctx.CoinFlowTrigger())
-		}
-		_, _, err := k.bankKeeper.AddCoins(ctx, delAddr, sdk.Coins{balance})
-		if err != nil {
-			return types.UnbondingDelegation{}, err
-		}
-		return types.UnbondingDelegation{MinTime: minTime, Balance: balance}, nil
-	}
-
+	completionTime := ctx.BlockHeader().Time.Add(k.UnbondingTime(ctx))
 	ubd := types.UnbondingDelegation{
 		TxHash:         ctx.CoinFlowTrigger(), //tx hash
 		DelegatorAddr:  delAddr,
 		ValidatorAddr:  valAddr,
-		CreationHeight: height,
-		MinTime:        minTime,
+		CreationHeight: ctx.BlockHeight(),
+		MinTime:        completionTime,
 		Balance:        balance,
 		InitialBalance: balance,
 	}
 	k.SetUnbondingDelegation(ctx, ubd)
 	k.InsertUnbondingQueue(ctx, ubd)
-
 	return ubd, nil
 }
 
