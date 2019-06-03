@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.14.1
+
+### LCD (REST API)
+* [\#1486](https://github.com/irisnet/irishub/issues/1486) Ensure `/bank/account/{address}` has consistent json output
+* [\#1495](https://github.com/irisnet/irishub/issues/1495) Improve error handling for query parameters
+
+### Application
+* [\#1506](https://github.com/irisnet/irishub/issues/1506) Enforce `unbonding_time` regardless of validator status
+
 ## 0.14.0
 
 ### LCD (REST API)
