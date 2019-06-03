@@ -58,7 +58,7 @@ func TestKeyManagement(t *testing.T) {
 	require.NotNil(t, err)
 	_, err = cstore.GetByAddress(accAddr(i2))
 	require.NoError(t, err)
-	addr, err := types.AccAddressFromBech32("cosmos1yq8lgssgxlx9smjhes6ryjasmqmd3ts2559g0t")
+	addr, err := types.AccAddressFromBech32("faa13783q5ae9jcqz24k02mr7tgg4d0tt5phzzsck4")
 	require.NoError(t, err)
 	_, err = cstore.GetByAddress(addr)
 	require.NotNil(t, err)
@@ -97,9 +97,9 @@ func TestKeyManagement(t *testing.T) {
 
 	// delete the offline key
 	err = cstore.Delete(o1, "no", false)
-	require.NotNil(t, err)
-	err = cstore.Delete(o1, "yes", false)
 	require.NoError(t, err)
+	err = cstore.Delete(o1, "yes", false)
+	require.NotNil(t, err)
 	keyS, err = cstore.List()
 	require.NoError(t, err)
 	require.Equal(t, 1, len(keyS))

@@ -1,7 +1,4 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
-PACKAGES_MODULES=$(shell go list ./... | grep -e 'modules' -e 'app')
-PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
-PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/server' | grep -v '/tests')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 export GO111MODULE = on
@@ -120,10 +117,7 @@ test: test_unit test_cli test_lcd test_sim
 test_sim: test_sim_modules test_sim_benchmark test_sim_iris_nondeterminism test_sim_iris_fast
 
 test_unit:
-	#@go test $(PACKAGES_NOSIMULATION)
-	@go test $(PACKAGES_MODULES)
-	@go test $(PACKAGES_TYPES)
-	@go test $(PACKAGES_STORE)
+	@go test $(PACKAGES_NOSIMULATION)
 
 test_cli:
 	@go test  -timeout 20m -count 1 -p 4 tests/cli/*
