@@ -96,6 +96,11 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	gateway.RedeemAddr = msg.RedeemAddr
 	gateway.Operators = msg.Operators
 
+	// check the redeem address. If not given, set to the owner
+	if len(msg.RedeemAddr) == 0 {
+		gateway.RedeemAddr = msg.Owner
+	}
+
 	// set the new gateway
 	k.SetGateway(ctx, gateway)
 
