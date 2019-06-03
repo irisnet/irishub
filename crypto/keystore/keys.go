@@ -32,6 +32,13 @@ func (m *keyManager) ExportAsKeyStore(password string) (*EncryptedKeyJSON, error
 	return generateKeyStore(m.GetPrivKey(), password)
 }
 
+func NewKeyManager(privKey crypto.PrivKey) KeyManager {
+	k := keyManager{}
+	k.privKey = privKey
+	k.addr = ctypes.AccAddress(privKey.PubKey().Address())
+	return &k
+}
+
 func NewKeyStoreKeyManager(file string, auth string) (KeyManager, error) {
 	k := keyManager{}
 	err := k.recoveryFromKeyStore(file, auth)
@@ -60,10 +67,10 @@ func (m *keyManager) recoveryFromKeyStore(keystoreFile string, auth string) erro
 	}
 	var keyBytesArray [32]byte
 	copy(keyBytesArray[:], keyBytes[:32])
-	priKey := secp256k1.PrivKeySecp256k1(keyBytesArray)
-	addr := ctypes.AccAddress(priKey.PubKey().Address())
+	privKey := secp256k1.PrivKeySecp256k1(keyBytesArray)
+	addr := ctypes.AccAddress(privKey.PubKey().Address())
 	m.addr = addr
-	m.privKey = priKey
+	m.privKey = privKey
 	return nil
 }
 

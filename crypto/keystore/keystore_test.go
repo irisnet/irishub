@@ -18,9 +18,7 @@ func TestKeystore(t *testing.T) {
 	secret, _ := hex.DecodeString("55A3160577979EC014A2CE85C430E1FF0FF06EFD230B7CE41AEAE2EF00EDF175")
 	var priv [32]byte
 	copy(priv[:], secret[0:32])
-	km := keyManager{
-		privKey: secp256k1.PrivKeySecp256k1(priv),
-	}
+	km := NewKeyManager(secp256k1.PrivKeySecp256k1(priv))
 	encryPlain1, err := km.GetPrivKey().Sign([]byte("test plain"))
 	assert.NoError(t, err)
 
