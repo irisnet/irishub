@@ -172,7 +172,6 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			println(info)
 			// print out results without the seed phrase
 			viper.Set(flagNoBackup, true)
 			printCreate(info, "")
