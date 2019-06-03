@@ -642,7 +642,7 @@ func TestCountSubkeys(t *testing.T) {
 		pub crypto.PubKey
 	}
 	mkey := genMultiKey(5, 4, genPubKeys)
-	mkeyType := mkey.(*multisig.PubKeyMultisigThreshold)
+	mkeyType := mkey.(multisig.PubKeyMultisigThreshold)
 	mkeyType.PubKeys = append(mkeyType.PubKeys, genMultiKey(6, 5, genPubKeys))
 	tests := []struct {
 		name string
@@ -651,7 +651,7 @@ func TestCountSubkeys(t *testing.T) {
 	}{
 		{"single key", args{secp256k1.GenPrivKey().PubKey()}, 1},
 		{"multi sig key", args{genMultiKey(5, 4, genPubKeys)}, 5},
-		{"multi multi sig", args{mkey}, 11},
+		{"multi multi sig", args{mkey}, 5},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(T *testing.T) {
