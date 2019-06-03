@@ -113,6 +113,17 @@ func (kb dbKeybase) CreateMnemonic(name string, language Language, passwd string
 	return
 }
 
+func (kb dbKeybase) CreatePrivateKey(name string, passwd string, privKey tmcrypto.PrivKey) (info Info, err error) {
+	switch privKey.(type) {
+	case secp256k1.PrivKeySecp256k1:
+		info = kb.writeLocalKey(privKey, name, passwd)
+		return
+	default:
+		return nil, ErrUnsupportedLanguage
+	}
+	return
+}
+
 // TEMPORARY METHOD UNTIL WE FIGURE OUT USER FACING HD DERIVATION API
 func (kb dbKeybase) CreateKey(name, mnemonic, passwd string) (info Info, err error) {
 	words := strings.Split(mnemonic, " ")

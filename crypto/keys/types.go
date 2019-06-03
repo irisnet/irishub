@@ -22,6 +22,11 @@ type Keybase interface {
 	// CreateMnemonic creates a new mnemonic, and derives a hierarchical deterministic
 	// key from that.
 	CreateMnemonic(name string, language Language, passwd string, algo SigningAlgo) (info Info, seed string, err error)
+
+	// CreateMnemonic creates a new mnemonic, and derives a hierarchical deterministic
+	// key from that.
+	CreatePrivateKey(name string, passwd string, privKey crypto.PrivKey) (info Info, err error)
+
 	// CreateKey takes a mnemonic and derives, a password. This method is temporary
 	CreateKey(name, mnemonic, passwd string) (info Info, err error)
 	// CreateFundraiserKey takes a mnemonic and derives, a password
@@ -31,7 +36,7 @@ type Keybase interface {
 	// Encrypt the key to disk using encryptPasswd.
 	// See https://github.com/irisnet/irishub/issues/2095
 	Derive(name, mnemonic, bip39Passwd,
-	encryptPasswd string, params hd.BIP44Params) (Info, error)
+		encryptPasswd string, params hd.BIP44Params) (Info, error)
 	// Create, store, and return a new Ledger key reference
 	CreateLedger(name string, path ccrypto.DerivationPath, algo SigningAlgo) (info Info, err error)
 
