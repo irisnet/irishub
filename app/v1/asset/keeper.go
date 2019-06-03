@@ -62,8 +62,10 @@ func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) (sdk.Tags, 
 		Operators:  msg.Operators,
 	}
 
-	// save the gateway with the creation enabled
-	k.saveGateway(ctx, gateway, true)
+	// set the gateway and related keys
+	k.SetGateway(ctx, gateway)
+	k.SetMoniker(ctx, msg.Moniker, gatewayID)
+	k.SetOwnerGatewayID(ctx, msg.Owner, gatewayID)
 
 	// TODO
 	createTags := sdk.NewTags(
@@ -94,8 +96,8 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	gateway.RedeemAddr = msg.RedeemAddr
 	gateway.Operators = msg.Operators
 
-	// save the gateway with the creation disabled
-	k.saveGateway(ctx, gateway, false)
+	// set the new gateway
+	k.SetGateway(ctx, gateway)
 
 	// TODO
 	editTags := sdk.NewTags(
@@ -140,18 +142,8 @@ func (k Keeper) HasGateway(ctx sdk.Context, moniker string) bool {
 	return store.Has(KeyMoniker(moniker))
 }
 
-// saveGateway saves the gateway, which behaves by the specified mode
-func (k Keeper) saveGateway(ctx sdk.Context, gateway Gateway, creation bool) {
-	k.setGateway(ctx, gateway)
-
-	if creation {
-		k.setMoniker(ctx, gateway.Moniker, gateway.ID)
-		k.setOwnerGatewayID(ctx, gateway.Owner, gateway.ID)
-	}
-}
-
-// setGateway stores the given gateway into underlying storage
-func (k Keeper) setGateway(ctx sdk.Context, gateway Gateway) {
+// SetGateway stores the given gateway into underlying storage
+func (k Keeper) SetGateway(ctx sdk.Context, gateway Gateway) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gateway)
 
@@ -159,8 +151,8 @@ func (k Keeper) setGateway(ctx sdk.Context, gateway Gateway) {
 	store.Set(KeyGateway(gateway.ID), bz)
 }
 
-// setMoniker stores the gateway ID into storage by the key KeyMoniker
-func (k Keeper) setMoniker(ctx sdk.Context, moniker string, gatewayID uint8) {
+// SetMoniker stores the gateway ID into storage by the key KeyMoniker
+func (k Keeper) SetMoniker(ctx sdk.Context, moniker string, gatewayID uint8) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gatewayID)
 
@@ -168,8 +160,8 @@ func (k Keeper) setMoniker(ctx sdk.Context, moniker string, gatewayID uint8) {
 	store.Set(KeyMoniker(moniker), bz)
 }
 
-// setOwnerGatewayID stores the gateway ID into storage by the key KeyOwnerGateway. Intended for iteration on ids of an owner
-func (k Keeper) setOwnerGatewayID(ctx sdk.Context, owner sdk.AccAddress, gatewayID uint8) {
+// SetOwnerGatewayID stores the gateway ID into storage by the key KeyOwnerGateway. Intended for iteration on ids of an owner
+func (k Keeper) SetOwnerGatewayID(ctx sdk.Context, owner sdk.AccAddress, gatewayID uint8) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gatewayID)
 
