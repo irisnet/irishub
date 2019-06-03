@@ -385,7 +385,14 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 
 	validator := keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr))
 	if validator == nil {
-		return ErrOnlyValidatorVote(keeper.codespace, voterAddr)
+		isDelegator := false
+		keeper.ds.IterateDelegations(ctx, voterAddr, func(index int64, delegation sdk.Delegation) (stop bool) {
+			isDelegator = true
+			return isDelegator
+		})
+		if !isDelegator {
+			return ErrOnlyValidatorOrDelegatorVote(keeper.codespace, voterAddr)
+		}
 	}
 
 	if _, ok := keeper.GetVote(ctx, proposalID, voterAddr); ok {
@@ -402,7 +409,9 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 		Option:     option,
 	}
 	keeper.setVote(ctx, proposalID, voterAddr, vote)
-	keeper.metrics.Vote.With(ValidatorLabel, validator.GetConsAddr().String(), ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(float64(option))
+	if validator != nil {
+		keeper.metrics.Vote.With(ValidatorLabel, validator.GetConsAddr().String(), ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(float64(option))
+	}
 	return nil
 }
 
