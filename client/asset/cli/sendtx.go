@@ -50,9 +50,9 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 					operatorAddr, err := sdk.AccAddressFromBech32(operator)
 					if err != nil {
 						return err
-					} else {
-						operators = append(operators, operatorAddr)
 					}
+
+					operators = append(operators, operatorAddr)
 				}
 			}
 
