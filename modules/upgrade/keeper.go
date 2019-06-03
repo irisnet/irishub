@@ -78,3 +78,13 @@ func (k Keeper) DeleteSignal(ctx sdk.Context, protocol uint64, address string) b
 	}
 	return false
 }
+
+func (k Keeper) ClearSignals(ctx sdk.Context, protocol uint64) {
+	kvStore := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(kvStore, GetSignalPrefixKey(protocol))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		kvStore.Delete(iterator.Key())
+	}
+}

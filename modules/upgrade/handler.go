@@ -54,6 +54,7 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 			}
 
 			uk.AddNewVersionInfo(ctx, NewVersionInfo(upgradeConfig, success))
+			uk.ClearSignals(ctx, upgradeConfig.Protocol.Version)
 			uk.protocolKeeper.ClearUpgradeConfig(ctx)
 		}
 	} else {
