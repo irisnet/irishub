@@ -1,3 +1,4 @@
+// reference: https://github.com/binance-chain/go-sdk/blob/master/common/common.go
 package keystore
 
 import (

@@ -1,3 +1,4 @@
+// reference: https://github.com/binance-chain/go-sdk/blob/master/common/uuid/generator.go
 package uuid
 
 import (

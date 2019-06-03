@@ -110,13 +110,13 @@ func (kb dbKeybase) CreateMnemonic(name string, language Language, passwd string
 	return
 }
 
-func (kb dbKeybase) CreatePrivateKey(name string, passwd string, privKey tmcrypto.PrivKey) (info Info, err error) {
+func (kb dbKeybase) ImportPrivateKey(name string, passwd string, privKey tmcrypto.PrivKey) (info Info, err error) {
 	switch privKey.(type) {
 	case secp256k1.PrivKeySecp256k1:
 		info = kb.writeLocalKey(privKey, name, passwd)
 		return
 	default:
-		return nil, ErrUnsupportedLanguage
+		return nil, ErrUnsupportedSigningAlgo
 	}
 	return
 }

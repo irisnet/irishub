@@ -49,7 +49,7 @@ phrase, otherwise, a new key will be generated.`,
 	cmd.Flags().StringP(flagType, "t", "secp256k1", "Type of private key (secp256k1|ed25519)")
 	cmd.Flags().Bool(client.FlagUseLedger, false, "Store a local reference to a private key on a Ledger device")
 	cmd.Flags().Bool(flagRecover, false, "Provide seed phrase to recover existing key instead of creating")
-	cmd.Flags().String(flagKeystore, "", "Provide keystore file to recover existing key instead of creating")
+	cmd.Flags().String(flagKeystore, "", "Provide keystore file to recover existing key instead of creating. For use in conjunction with --recover")
 	cmd.Flags().Bool(flagNoBackup, false, "Don't print out seed phrase (if others are watching the terminal)")
 	cmd.Flags().Bool(flagDryRun, false, "Perform action, but don't add key to local keystore")
 	cmd.Flags().Uint32(flagAccount, 0, "Account number for HD derivation")
@@ -168,7 +168,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 				return fmt.Errorf("Error reading passphrase: %v", err)
 			}
 			km, err := keystore.NewKeyStoreKeyManager(keystoreFile, passphrase)
-			info, err := kb.CreatePrivateKey(name, pass, km.GetPrivKey())
+			info, err := kb.ImportPrivateKey(name, pass, km.GetPrivKey())
 			if err != nil {
 				return err
 			}

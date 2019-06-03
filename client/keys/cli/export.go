@@ -21,14 +21,13 @@ func exportKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export <name>",
 		Short: "Export an existing key",
-		Long: `Add a public/private key pair to the key store.
-If you select --seed/-s you can recover a key from the seed
-phrase, otherwise, a new key will be generated.`,
+		Long: `Export an existing key to the file,
+You can import the file by keys add --recover --keystore=<file>.`,
 		Example: "iriscli keys export <key name>",
 		RunE:    runExportCmd,
 		Args:    cobra.ExactArgs(1),
 	}
-	cmd.Flags().String(flagOutfile, "", "The key store will be written to the given file instead of STDOUT")
+	cmd.Flags().String(flagOutfile, "", "The keystore info will be written to the given file instead of STDOUT")
 	cmd.Flags().Bool(client.FlagIndentResponse, false, "Add indent to JSON response")
 	return cmd
 }

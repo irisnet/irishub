@@ -1,3 +1,4 @@
+// reference: https://github.com/binance-chain/go-sdk/blob/master/common/uuid/codec.go
 package uuid
 
 import (
