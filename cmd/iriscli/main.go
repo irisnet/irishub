@@ -61,6 +61,7 @@ func main() {
 	txCmd.AddCommand(
 		client.PostCommands(
 			txcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
+			txcmd.GetMultiSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			txcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(

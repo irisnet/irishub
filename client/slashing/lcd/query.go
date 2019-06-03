@@ -2,12 +2,12 @@ package lcd
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/slashing"
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"net/http"
 )
 

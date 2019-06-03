@@ -1,15 +1,15 @@
 package gov
 
 import (
+	"github.com/irisnet/irishub/app/v1/auth"
+	distr "github.com/irisnet/irishub/app/v1/distribution"
+	"github.com/irisnet/irishub/app/v1/gov"
+	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/slashing"
+	"github.com/irisnet/irishub/app/v1/stake"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov"
-	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 var ParamSets = make(map[string]params.ParamSet)
@@ -73,15 +73,13 @@ func NormalizeProposalStatus(status string) string {
 	return status
 }
 
-func ValidateParam(params gov.Params) error {
-	for _, param := range params {
-		if p, ok := ParamSets[param.Subspace]; ok {
-			if _, err := p.Validate(param.Key, param.Value); err != nil {
-				return err
-			}
-		} else {
-			return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
+func ValidateParam(param gov.Param) error {
+	if p, ok := ParamSets[param.Subspace]; ok {
+		if _, err := p.Validate(param.Key, param.Value); err != nil {
+			return err
 		}
+	} else {
+		return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
 	}
 	return nil
 }

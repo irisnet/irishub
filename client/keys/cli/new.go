@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/bartekn/go-bip39"
-	cryptokeys "github.com/irisnet/irishub/crypto/keys"
-	"github.com/irisnet/irishub/crypto/keys/hd"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/crypto/keys/hd"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

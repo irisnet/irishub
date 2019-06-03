@@ -6,10 +6,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/client/context"
 	distrClient "github.com/irisnet/irishub/client/distribution"
 	"github.com/irisnet/irishub/client/utils"
-	"github.com/irisnet/irishub/modules/distribution"
 	sdk "github.com/irisnet/irishub/types"
 )
 

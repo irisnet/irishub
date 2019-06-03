@@ -11,17 +11,17 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/gov"
+	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
@@ -62,7 +62,7 @@ func getAmountFromCoinStr(coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
+func modifyGenesisState(genesisState v1.GenesisFileState) v1.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
@@ -113,10 +113,10 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState v0.GenesisFileState
+	var appState v1.GenesisFileState
 	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []v0.GenesisFileAccount{v0.NewDefaultGenesisFileAccount(fooAddr)}
+	appState.Accounts = []v1.GenesisFileAccount{v1.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)

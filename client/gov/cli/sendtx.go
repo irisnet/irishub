@@ -3,17 +3,18 @@ package cli
 import (
 	"fmt"
 	"os"
-	"github.com/pkg/errors"
+	"strings"
+
+	"github.com/irisnet/irishub/app/v1/gov"
+	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/gov"
-	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 // GetCmdSubmitProposal implements submitting a proposal transaction command.
@@ -49,12 +50,15 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 			}
 			var params gov.Params
 			if proposalType == gov.ProposalTypeParameterChange {
-				paramStr := viper.GetStringSlice(flagParam)
+				paramStr := viper.GetString(flagParam)
 				params, err = getParamFromString(paramStr)
 				if err != nil {
 					return err
 				}
-				if err := client.ValidateParam(params); err != nil {
+				if len(params) > 1 || len(params) == 0 {
+					return errors.New("the length of ParameterProposal's param should be one")
+				}
+				if err := client.ValidateParam(params[0]); err != nil {
 					return err
 				}
 			}
@@ -112,9 +116,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
-	cmd.Flags().StringSlice(flagParam, []string{}, "parameter of proposal,eg. [{key:key,value:value,op:update}]")
+	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
 	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
@@ -130,21 +134,19 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func getParamFromString(paramsStr []string) (gov.Params, error) {
+func getParamFromString(paramsStr string) (gov.Params, error) {
 	var govParams gov.Params
-	for _, paramstr := range paramsStr {
-		str := strings.Split(paramstr, "=")
-		if len(str) != 2 {
-			return gov.Params{}, fmt.Errorf("%s is not valid", paramstr)
-		}
-		//str = []string{"mint/Inflation","0.0000000000"}
-		//params.GetParamSpaceFromKey(str[0]) == "mint"
-		//params.GetParamKey(str[0])          == "Inflation"
-		govParams = append(govParams,
-			gov.Param{Subspace: params.GetParamSpaceFromKey(str[0]),
-				Key: params.GetParamKey(str[0]),
-				Value: str[1]})
+	str := strings.Split(paramsStr, "=")
+	if len(str) != 2 {
+		return gov.Params{}, fmt.Errorf("%s is not valid", paramsStr)
 	}
+	//str = []string{"mint/Inflation","0.0000000000"}
+	//params.GetParamSpaceFromKey(str[0]) == "mint"
+	//params.GetParamKey(str[0])          == "Inflation"
+	govParams = append(govParams,
+		gov.Param{Subspace: params.GetParamSpaceFromKey(str[0]),
+			Key:   params.GetParamKey(str[0]),
+			Value: str[1]})
 	return govParams, nil
 }
 

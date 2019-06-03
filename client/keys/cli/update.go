@@ -8,11 +8,11 @@ import (
 
 func updateKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update <name>",
-		Short: "Change the password used to protect private key",
+		Use:     "update <name>",
+		Short:   "Change the password used to protect private key",
 		Example: "iriscli keys update <key name>",
-		RunE:  runUpdateCmd,
-		Args:  cobra.ExactArgs(1),
+		RunE:    runUpdateCmd,
+		Args:    cobra.ExactArgs(1),
 	}
 	return cmd
 }

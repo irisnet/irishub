@@ -30,22 +30,20 @@ func BlockResultCommand() *cobra.Command {
 	return cmd
 }
 
-
-
 type ResponseDeliverTx struct {
-	Code      uint32        `json:"code"`
-	Data      []byte        `json:"data"`
-	Log       string        `json:"log"`
-	Info      string        `json:"info"`
-	GasWanted int64         `json:"gas_wanted"`
-	GasUsed   int64         `json:"gas_used"`
+	Code      uint32                   `json:"code"`
+	Data      []byte                   `json:"data"`
+	Log       string                   `json:"log"`
+	Info      string                   `json:"info"`
+	GasWanted int64                    `json:"gas_wanted"`
+	GasUsed   int64                    `json:"gas_used"`
 	Tags      []tendermint.ReadableTag `json:"tags"`
 }
 
 type ResponseEndBlock struct {
-	ValidatorUpdates      []abci.ValidatorUpdate `json:"validator_updates"`
-	ConsensusParamUpdates *abci.ConsensusParams  `json:"consensus_param_updates"`
-	Tags                  []tendermint.ReadableTag          `json:"tags"`
+	ValidatorUpdates      []abci.ValidatorUpdate   `json:"validator_updates"`
+	ConsensusParamUpdates *abci.ConsensusParams    `json:"consensus_param_updates"`
+	Tags                  []tendermint.ReadableTag `json:"tags"`
 }
 
 type ResponseBeginBlock struct {
@@ -126,7 +124,7 @@ func GetTxCoinFlow(cliCtx context.CLIContext, height *int64, hashStr string) ([]
 	var coinFlowTags []string
 	endBlockTags := tendermint.MakeTagsHumanReadable(res.Results.EndBlock.Tags)
 	found := false
-	for _,tag := range endBlockTags {
+	for _, tag := range endBlockTags {
 		if tag.Key == hashStr {
 			coinFlowTags = append(coinFlowTags, tag.Value)
 			found = true

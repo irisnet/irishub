@@ -2,12 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/context"
 	"io/ioutil"
 	"net/http"
 	"net/url"

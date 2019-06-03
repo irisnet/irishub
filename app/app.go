@@ -10,11 +10,11 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
-	sdk "github.com/irisnet/irishub/types"
-
 	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
@@ -25,11 +25,11 @@ import (
 )
 
 const (
-	appName               = "IrisApp"
-	appPrometheusNamespace= "iris"
-	FlagReplay            = "replay-last-block"
-	DefaultSyncableHeight = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
-	DefaultCacheSize      = store.NumRecent     // Multistore saves last 100 blocks
+	appName                = "IrisApp"
+	appPrometheusNamespace = "iris"
+	FlagReplay             = "replay-last-block"
+	DefaultSyncableHeight  = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
+	DefaultCacheSize       = store.NumRecent     // Multistore saves last 100 blocks
 )
 
 // default home directories for expected binaries
@@ -72,6 +72,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	//Change namespace to appName
 	appPrometheusConfig.Namespace = appPrometheusNamespace
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
+	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -86,7 +87,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 
 // latest version of codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v0.MakeCodec() // replace with latest protocol version
+	var cdc = v1.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 

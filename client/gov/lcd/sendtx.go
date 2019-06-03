@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/gov"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -20,7 +20,7 @@ type postProposalReq struct {
 	ProposalType   string         `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
-	Params         gov.Params     `json:"param"`
+	Param          gov.Param      `json:"param"`
 	Usage          gov.UsageType  `json:"usage"`
 	DestAddress    sdk.AccAddress `json:"dest_address"`
 	Percent        sdk.Dec        `json:"percent"`
@@ -67,7 +67,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		// create the message
-		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, req.Params)
+		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, gov.Params{req.Param})
 		if msg.ProposalType == gov.ProposalTypeTxTaxUsage {
 			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
 			err = msg.ValidateBasic()
@@ -79,7 +79,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 		if proposalType == gov.ProposalTypeParameterChange {
-			if err := client.ValidateParam(req.Params); err != nil {
+			if err := client.ValidateParam(req.Param); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
