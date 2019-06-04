@@ -90,15 +90,14 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	}
 
 	// update the gateway
-	gateway.Identity = msg.Identity
-	gateway.Details = msg.Details
-	gateway.Website = msg.Website
-	gateway.RedeemAddr = msg.RedeemAddr
-	gateway.Operators = msg.Operators
-
-	// check the redeem address. If not given, set to the owner
-	if len(msg.RedeemAddr) == 0 {
-		gateway.RedeemAddr = msg.Owner
+	if msg.Identity != nil {
+		gateway.Identity = *msg.Identity
+	}
+	if msg.Details != nil {
+		gateway.Details = *msg.Details
+	}
+	if msg.Website != nil {
+		gateway.Website = *msg.Website
 	}
 
 	// set the new gateway
