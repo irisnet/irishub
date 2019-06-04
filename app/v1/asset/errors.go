@@ -10,6 +10,14 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
+	CodeInvalidMoniker       sdk.CodeType = 100
+	CodeInvalidDetails       sdk.CodeType = 101
+	CodeInvalidWebsite       sdk.CodeType = 102
+	CodeUnknownGateway       sdk.CodeType = 103
+	CodeGatewayAlreadyExists sdk.CodeType = 104
+	CodeInvalidOperator      sdk.CodeType = 105
+	CodeInvalidGenesis       sdk.CodeType = 106
+
 	CodeNilAssetOwner          sdk.CodeType = 110
 	CodeInvalidAssetFamily     sdk.CodeType = 111
 	CodeInvalidAssetName       sdk.CodeType = 112
@@ -51,3 +59,31 @@ func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, decimal uint8) sdk.Erro
 }
 
 //----------------------------------------
+
+func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
+}
+
+func ErrInvalidDetails(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDetails, msg)
+}
+
+func ErrInvalidWebsite(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
+}
+
+func ErrUnkwownGateway(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownGateway, msg)
+}
+
+func ErrGatewayAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeGatewayAlreadyExists, msg)
+}
+
+func ErrInvalidOperator(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidOperator, msg)
+}
+
+func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidGenesis, msg)
+}

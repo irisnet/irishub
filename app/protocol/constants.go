@@ -18,6 +18,7 @@ const (
 	ServiceStore         = "service"
 	GuardianStore        = "guardian"
 	UpgradeStore         = "upgrade"
+	AssetStore           = "asset"
 
 	// all route for query and handler
 	BankRoute     = "bank"
@@ -30,9 +31,7 @@ const (
 	ServiceRoute  = ServiceStore
 	GuardianRoute = GuardianStore
 	UpgradeRoute  = UpgradeStore
-
-	//temporarily set for the iriscli asset
-	AssetRoute     = "asset"
+	AssetRoute    = AssetStore
 )
 
 var (
@@ -51,4 +50,5 @@ var (
 	KeyService  = sdk.NewKVStoreKey(ServiceStore)
 	KeyGuardian = sdk.NewKVStoreKey(GuardianStore)
 	KeyUpgrade  = sdk.NewKVStoreKey(UpgradeStore)
+	KeyAsset    = sdk.NewKVStoreKey(AssetStore)
 )

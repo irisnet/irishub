@@ -39,18 +39,22 @@ func TaxUsageProposalExecute(ctx sdk.Context, gk Keeper, p *TaxUsageProposal) (e
 
 func ParameterProposalExecute(ctx sdk.Context, gk Keeper, pp *ParameterProposal) (err error) {
 	ctx.Logger().Info("Execute ParameterProposal begin")
-	for _, param := range pp.Params {
-		paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
-		value, _ := paramSet.Validate(param.Key, param.Value)
-		subspace, found := gk.paramsKeeper.GetSubspace(param.Subspace)
-		if found {
-			SetParameterMetrics(gk.metrics, param.Key, value)
-			subspace.Set(ctx, []byte(param.Key), value)
-			ctx.Logger().Info("Execute ParameterProposal Successed", "key", param.Key, "value", param.Value)
-		} else {
-			ctx.Logger().Info("Execute ParameterProposal Failed", "key", param.Key, "value", param.Value)
-		}
-
+	//check again
+	if len(pp.Params) != 1 {
+		ctx.Logger().Error("Execute ParameterProposal Failure", "info",
+			"the length of ParameterProposal's param should be one", "ProposalId", pp.ProposalID)
+		return
+	}
+	param := pp.Params[0]
+	paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
+	value, _ := paramSet.Validate(param.Key, param.Value)
+	subspace, found := gk.paramsKeeper.GetSubspace(param.Subspace)
+	if found {
+		SetParameterMetrics(gk.metrics, param.Key, value)
+		subspace.Set(ctx, []byte(param.Key), value)
+		ctx.Logger().Info("Execute ParameterProposal Success", "key", param.Key, "value", param.Value)
+	} else {
+		ctx.Logger().Info("Execute ParameterProposal Failed", "key", param.Key, "value", param.Value)
 	}
 
 	return
