@@ -2,6 +2,8 @@ package gov
 
 import (
 	"bytes"
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
@@ -51,7 +53,9 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.NopMetrics())
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace, distribution.NopMetrics())
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), ck, dk, guardianKeeper, sk, DefaultCodespace, NopMetrics())
+	ak := asset.NewKeeper(mapp.Cdc, protocol.KeyAsset, ck, guardianKeeper, asset.DefaultCodespace, paramsKeeper.Subspace(asset.DefaultParamSpace))
+
+	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), ck, dk, guardianKeeper, sk, DefaultCodespace, NopMetrics(), ak)
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 

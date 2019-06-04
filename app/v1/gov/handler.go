@@ -24,6 +24,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgSubmitSoftwareUpgradeProposal(ctx, keeper, msg)
 		case MsgVote:
 			return handleMsgVote(ctx, keeper, msg)
+		case MsgSubmitAddAssetProposal:
+			return handleSubmitAddAssetProposal(ctx, keeper, msg)
 		default:
 			errMsg := "Unrecognized gov msg type"
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -214,6 +216,44 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 		tags.ProposalID, proposalIDBytes,
 	)
 	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+//TODO
+func handleSubmitAddAssetProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitAddAssetProposal) sdk.Result {
+	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
+		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	}
+	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
+
+	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
+	if err != nil {
+		return err.Result()
+	}
+
+	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
+
+	var paramBytes []byte
+	if msg.ProposalType == ProposalTypeParameterChange {
+		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
+	}
+
+	resTags := sdk.NewTags(
+		tags.Proposer, []byte(msg.Proposer.String()),
+		tags.ProposalID, proposalIDBytes,
+
+		tags.Param, paramBytes,
+	)
+
+	if votingStarted {
+		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
+	}
+
+	keeper.AddProposalNum(ctx, proposal)
+	return sdk.Result{
+		Data: proposalIDBytes,
 		Tags: resTags,
 	}
 }

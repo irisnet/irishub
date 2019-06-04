@@ -228,20 +228,6 @@ func (p *ProtocolV1) configKeepers() {
 		slashing.PrometheusMetrics(p.config),
 	)
 
-	p.govKeeper = gov.NewKeeper(
-		protocol.KeyGov,
-		p.cdc,
-		p.paramsKeeper.Subspace(gov.DefaultParamSpace),
-		p.paramsKeeper,
-		p.protocolKeeper,
-		p.bankKeeper,
-		p.distrKeeper,
-		p.guardianKeeper,
-		&stakeKeeper,
-		gov.DefaultCodespace,
-		gov.PrometheusMetrics(p.config),
-	)
-
 	p.serviceKeeper = service.NewKeeper(
 		p.cdc,
 		protocol.KeyService,
@@ -261,6 +247,21 @@ func (p *ProtocolV1) configKeepers() {
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
 	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+
+	p.govKeeper = gov.NewKeeper(
+		protocol.KeyGov,
+		p.cdc,
+		p.paramsKeeper.Subspace(gov.DefaultParamSpace),
+		p.paramsKeeper,
+		p.protocolKeeper,
+		p.bankKeeper,
+		p.distrKeeper,
+		p.guardianKeeper,
+		&stakeKeeper,
+		gov.DefaultCodespace,
+		gov.PrometheusMetrics(p.config),
+		p.assetKeeper,
+	)
 }
 
 // configure all Routers

@@ -183,6 +183,7 @@ const (
 	ProposalTypeSystemHalt      ProposalKind = 0x03
 	ProposalTypeTxTaxUsage      ProposalKind = 0x04
 	ProposalTypePlainText       ProposalKind = 0x05
+	ProposalTypeAddAsset        ProposalKind = 0x06
 )
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -198,6 +199,8 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 		return ProposalTypeSystemHalt, nil
 	case "TxTaxUsage":
 		return ProposalTypeTxTaxUsage, nil
+	case "AddAsset":
+		return ProposalTypeAddAsset, nil
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
@@ -209,7 +212,8 @@ func ValidProposalType(pt ProposalKind) bool {
 		pt == ProposalTypeSoftwareUpgrade ||
 		pt == ProposalTypeSystemHalt ||
 		pt == ProposalTypeTxTaxUsage ||
-		pt == ProposalTypePlainText {
+		pt == ProposalTypePlainText ||
+		pt == ProposalTypeAddAsset {
 		return true
 	}
 	return false
@@ -260,6 +264,8 @@ func (pt ProposalKind) String() string {
 		return "SystemHalt"
 	case ProposalTypeTxTaxUsage:
 		return "TxTaxUsage"
+	case ProposalTypeAddAsset:
+		return "AddAsset"
 	default:
 		return ""
 	}

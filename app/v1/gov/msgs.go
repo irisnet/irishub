@@ -308,3 +308,28 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 
 	return nil
 }
+
+//TODO
+type MsgSubmitAddAssetProposal struct {
+	MsgSubmitProposal
+}
+
+func (msg MsgSubmitAddAssetProposal) Route() string { return MsgRoute }
+func (msg MsgSubmitAddAssetProposal) Type() string  { return "submit_add_asset_proposal" }
+
+//TODO
+func (msg MsgSubmitAddAssetProposal) ValidateBasic() sdk.Error {
+	return nil
+}
+func (msg MsgSubmitAddAssetProposal) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+//TODO
+func (msg MsgSubmitAddAssetProposal) GetSigners() []sdk.AccAddress {
+	return nil
+}

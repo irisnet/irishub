@@ -1,6 +1,7 @@
 package gov
 
 import (
+	"github.com/irisnet/irishub/app/v1/asset"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -53,6 +54,8 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 
 	metrics *Metrics
+
+	ak asset.Keeper
 }
 
 // NewProtocolKeeper returns a governance keeper. It handles:
@@ -60,7 +63,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
+func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics, ak asset.Keeper) Keeper {
 	return Keeper{
 		key,
 		cdc,
@@ -74,6 +77,7 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 		ds,
 		codespace,
 		metrics,
+		ak,
 	}
 }
 
@@ -88,6 +92,8 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSystemHalt:
 		return keeper.NewSystemHaltProposal(ctx, title, description, proposalType)
+	case ProposalTypeAddAsset:
+		return keeper.NewAddAssetProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -224,6 +230,29 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 			msg.Software,
 			msg.SwitchHeight,
 			msg.Threshold},
+	}
+	keeper.saveProposal(ctx, proposal)
+	return proposal
+}
+
+func (keeper Keeper) NewAddAssetProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var textProposal = BasicProposal{
+		ProposalID:   proposalID,
+		Title:        title,
+		Description:  description,
+		ProposalType: proposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+	// TODO
+	var proposal Proposal = &AddAssetProposal{
+		textProposal,
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
