@@ -24,3 +24,8 @@ func KeyOwnerGatewayID(owner sdk.AccAddress, gatewayID uint8) []byte {
 func KeyMoniker(moniker string) []byte {
 	return []byte(fmt.Sprintf("gateways:%s", moniker))
 }
+
+// KeyGatewaysSubspace returns the key prefix for all the gateways of the specified owner
+func KeyGatewaysSubspace(owner sdk.AccAddress) []byte {
+	return []byte(fmt.Sprintf("gateways:%d:", owner))
+}

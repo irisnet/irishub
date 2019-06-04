@@ -173,6 +173,12 @@ func (k Keeper) SetOwnerGatewayID(ctx sdk.Context, owner sdk.AccAddress, gateway
 	store.Set(KeyOwnerGatewayID(owner, gatewayID), bz)
 }
 
+// GetGateways retrieves all the gateways of the given owner
+func (k Keeper) GetGateways(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, KeyGatewaysSubspace(owner))
+}
+
 // getNewGatewayID gets the next available gateway ID and increments it
 func (k Keeper) getNewGatewayID(ctx sdk.Context) (gatewayID uint8, err sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
