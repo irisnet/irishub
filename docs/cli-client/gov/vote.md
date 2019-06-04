@@ -31,7 +31,7 @@ iriscli gov vote --help
 iriscli gov vote --chain-id=<chain-id> --proposal-id=<proposal-id> --option=Yes --from=<key_name> --fee=0.3iris
 ```
 
-Only validators can vote for proposals which enter voting period.
+Only validators and delegator can vote for proposals which enter voting period.
 
 ```txt
 Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35F11B04C921DB81CC, response:

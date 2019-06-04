@@ -14,9 +14,11 @@ const (
 
 // validatorGovInfo used for tallying
 type validatorGovInfo struct {
-	Address sdk.ValAddress // address of the validator operator
-	Power   sdk.Dec        // Power of a Validator
-	Vote    VoteOption     // Vote of the validator
+	Address             sdk.ValAddress // address of the validator operator
+	Vote                VoteOption     // Vote of the validator
+	Tokens              sdk.Dec        // Token of a Validator
+	DelegatorShares     sdk.Dec        // Total outstanding delegator shares
+	DelegatorDeductions sdk.Dec        // Delegator deductions from validator's delegators voting independently
 }
 
 func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalResult, tallyResults TallyResult, votingVals map[string]bool) {
@@ -26,17 +28,22 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 	results[OptionNo] = sdk.ZeroDec()
 	results[OptionNoWithVeto] = sdk.ZeroDec()
 
+	//voted votingPower
 	totalVotingPower := sdk.ZeroDec()
+	//all votingPower
 	systemVotingPower := sdk.ZeroDec()
 	currValidators := make(map[string]validatorGovInfo)
 	votingVals = make(map[string]bool)
+
 	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
 		currValidators[validator.GetOperator().String()] = validatorGovInfo{
-			Address: validator.GetOperator(),
-			Power:   validator.GetPower(),
-			Vote:    OptionEmpty,
+			Address:             validator.GetOperator(),
+			Tokens:              validator.GetTokens(),
+			Vote:                OptionEmpty,
+			DelegatorShares:     validator.GetDelegatorShares(),
+			DelegatorDeductions: sdk.ZeroDec(),
 		}
-		systemVotingPower = systemVotingPower.Add(validator.GetPower())
+		systemVotingPower = systemVotingPower.Add(validator.GetTokens())
 		return false
 	})
 	// iterate over all the votes
@@ -50,19 +57,50 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 		valAddrStr := sdk.ValAddress(vote.Voter).String()
 		if val, ok := currValidators[valAddrStr]; ok {
 			val.Vote = vote.Option
-			results[val.Vote] = results[val.Vote].Add(val.Power)
-			totalVotingPower = totalVotingPower.Add(val.Power)
 			votingVals[valAddrStr] = true
+			currValidators[valAddrStr] = val
+		} else {
+			// if delegator tally voting power
+			keeper.ds.IterateDelegations(ctx, vote.Voter, func(index int64, delegation sdk.Delegation) (stop bool) {
+				valAddrStr := delegation.GetValidatorAddr().String()
+				//only tally the delegator voting power under the validator
+				if val, ok := currValidators[valAddrStr]; ok {
+					val.DelegatorDeductions = val.DelegatorDeductions.Add(delegation.GetShares())
+					currValidators[valAddrStr] = val
+
+					delegatorShare := delegation.GetShares().Quo(val.DelegatorShares)
+					votingPower := delegatorShare.Mul(val.Tokens)
+
+					results[vote.Option] = results[vote.Option].Add(votingPower)
+					totalVotingPower = totalVotingPower.Add(votingPower)
+				}
+				return false
+			})
 		}
+		keeper.deleteVote(ctx, vote.ProposalID, vote.Voter)
+	}
+
+	// iterate over the validators again to tally their voting power
+	for _, val := range currValidators {
+		if val.Vote == OptionEmpty {
+			continue
+		}
+
+		sharesAfterDeductions := val.DelegatorShares.Sub(val.DelegatorDeductions)
+		fractionAfterDeductions := sharesAfterDeductions.Quo(val.DelegatorShares)
+		votingPower := fractionAfterDeductions.Mul(val.Tokens)
+
+		results[val.Vote] = results[val.Vote].Add(votingPower)
+		totalVotingPower = totalVotingPower.Add(votingPower)
 	}
 
 	tallyingProcedure := keeper.GetTallyingProcedure(ctx, proposal)
 
 	tallyResults = TallyResult{
-		Yes:        results[OptionYes],
-		Abstain:    results[OptionAbstain],
-		No:         results[OptionNo],
-		NoWithVeto: results[OptionNoWithVeto],
+		Yes:        results[OptionYes].QuoInt(sdk.AttoPrecision),
+		Abstain:    results[OptionAbstain].QuoInt(sdk.AttoPrecision),
+		No:         results[OptionNo].QuoInt(sdk.AttoPrecision),
+		NoWithVeto: results[OptionNoWithVeto].QuoInt(sdk.AttoPrecision),
 	}
 
 	// If no one votes, proposal fails
