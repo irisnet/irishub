@@ -112,7 +112,7 @@ func generateKeyStore(privateKey crypto.PrivKey, password string) (*EncryptedKey
 		return nil, err
 	}
 	cryptoStruct := CryptoJSON{
-		Cipher:       "aes-256-ctr",
+		Cipher:       "aes-128-ctr",
 		CipherText:   hex.EncodeToString(cipherText),
 		CipherParams: cipherParamsJSON,
 		KDF:          "pbkdf2",

@@ -168,12 +168,14 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 				return fmt.Errorf("Error reading passphrase: %v", err)
 			}
 			km, err := keystore.NewKeyStoreKeyManager(keystoreFile, passphrase)
+			if err != nil {
+				return err
+			}
 			info, err := kb.ImportPrivateKey(name, pass, km.GetPrivKey())
 			if err != nil {
 				return err
 			}
-			println(info)
-			// print out results without the seed phrase
+
 			viper.Set(flagNoBackup, true)
 			printCreate(info, "")
 		} else {
