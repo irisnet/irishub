@@ -222,10 +222,12 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 
 //TODO
 func handleSubmitAddAssetProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitAddAssetProposal) sdk.Result {
+
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
 	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
+
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
 
 	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
@@ -234,17 +236,9 @@ func handleSubmitAddAssetProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitA
 	}
 
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
-
-	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
-	}
-
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-
-		tags.Param, paramBytes,
 	)
 
 	if votingStarted {
