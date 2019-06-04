@@ -3,13 +3,13 @@
 ## Description
 
 IRISnet can export blockchain state and output json format string. Save the out json string to a json file and the json file can be used as genesis file of a new blockchain. This can be accomplished by command `iris export`.
-If you want to export the state of the historical block height, you need to [reset](app-state-reset.md) the app state to the specified height. 
+If you want to export the state of the historical block height, you need to [reset](reset.md) the blockchain state to the specified height. 
 
 ## Usage
 ```		
  iris export <flags>
 ```
-### Flags
+## Flags
 
  | Name，shorthand     | type   | Required | Default  | Description    |		
  | ------------------- | -----  | -------- | -------- | -------------- |		
@@ -17,6 +17,7 @@ If you want to export the state of the historical block height, you need to [res
  | --home              | string | false    | $HOME/.iris       | Specify the directory which stores node config and blockchain data |		
  | --output-file       | string | false    | genesis.json |  Target file to save exported state |
   
+## Examples
 
 1. Export the current blockchain state 
 
