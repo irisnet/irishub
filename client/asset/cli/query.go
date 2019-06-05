@@ -22,8 +22,8 @@ func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			moniker := viper.GetString(FlagMoniker)
-			if len(moniker) == 0 || uint32(len(moniker)) > MaximumMonikerSize {
-				return ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", MaximumMonikerSize))
+			if len(moniker) == 0 || uint32(len(moniker)) > asset.MaximumGatewayMonikerSize {
+				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", asset.MaximumGatewayMonikerSize))
 			}
 
 			params := asset.QueryGatewayParams{
