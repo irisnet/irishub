@@ -16,7 +16,10 @@ const (
 	CodeUnknownGateway       sdk.CodeType = 103
 	CodeGatewayAlreadyExists sdk.CodeType = 104
 	CodeInvalidOperator      sdk.CodeType = 105
-	CodeInvalidGenesis       sdk.CodeType = 106
+	CodeInvalidOwner         sdk.CodeType = 106
+	CodeNoUpdatesProvided    sdk.CodeType = 107
+	CodeInvalidAddress       sdk.CodeType = 108
+	CodeInvalidGenesis       sdk.CodeType = 109
 
 	CodeNilAssetOwner          sdk.CodeType = 110
 	CodeInvalidAssetFamily     sdk.CodeType = 111
@@ -28,7 +31,7 @@ const (
 )
 
 //----------------------------------------
-// Error constructors
+// Asset Error constructors
 
 func ErrNilAssetOwner(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNilAssetOwner, fmt.Sprintf("nil asset owner"))
@@ -59,6 +62,7 @@ func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, decimal uint8) sdk.Erro
 }
 
 //----------------------------------------
+// Error constructors
 
 func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
@@ -82,6 +86,18 @@ func ErrGatewayAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error 
 
 func ErrInvalidOperator(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidOperator, msg)
+}
+
+func ErrInvalidOwner(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidOwner, msg)
+}
+
+func ErrNoUpdatesProvided(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeNoUpdatesProvided, msg)
+}
+
+func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAddress, msg)
 }
 
 func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {

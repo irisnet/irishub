@@ -19,7 +19,7 @@ var (
 	MaximumGatewayWebsiteSize = uint32(128) // limitation for the length of the gateway's website
 
 	MaximumAssetInitSupply  = uint64(1e+12)
-	MaximumAssetTotalSupply = math.MaxUint64
+	MaximumAssetTotalSupply = uint64(math.MaxUint64)
 	MaximumAssetDecimal     = uint8(18)
 
 	// 00 - fungible; 01 - non-fungible
@@ -108,25 +108,21 @@ func (msg MsgCreateGateway) GetSigners() []sdk.AccAddress {
 
 // MsgEditGateway for editing a specified gateway
 type MsgEditGateway struct {
-	Owner      sdk.AccAddress   `json:"owner"`          //  Owner of the gateway
-	Moniker    string           `json:"moniker"`        //  Moniker of the gateway
-	Identity   string           `json:"identity"`       //  Identity of the gateway
-	Details    string           `json:"details"`        //  Details of the gateway
-	Website    string           `json:"website"`        //  Website of the gateway
-	RedeemAddr sdk.AccAddress   `json:"redeem_address"` //  Redeem address of the gateway
-	Operators  []sdk.AccAddress `json:"operators"`      //  Operators approved by the gateway
+	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
+	Moniker  string         `json:"moniker"`  //  Moniker of the gateway
+	Identity *string        `json:"identity"` //  Identity of the gateway
+	Details  *string        `json:"details"`  //  Details of the gateway
+	Website  *string        `json:"website"`  //  Website of the gateway
 }
 
 // NewMsgEditGateway creates a MsgEditGateway
-func NewMsgEditGateway(identity, moniker, details, website string, redeemAddr, owner sdk.AccAddress, operators []sdk.AccAddress) MsgEditGateway {
+func NewMsgEditGateway(owner sdk.AccAddress, moniker string, identity, details, website *string) MsgEditGateway {
 	return MsgEditGateway{
-		Identity:   identity,
-		Moniker:    moniker,
-		Details:    details,
-		Website:    website,
-		RedeemAddr: redeemAddr,
-		Owner:      owner,
-		Operators:  operators,
+		Owner:    owner,
+		Moniker:  moniker,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
 	}
 }
 
@@ -138,13 +134,37 @@ func (msg MsgEditGateway) Type() string { return "edit_gateway" }
 
 // ValidateBasic implements Msg
 func (msg MsgEditGateway) ValidateBasic() sdk.Error {
-	// TODO
+	// check the owner
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
+	}
+
+	// check the moniker
+	if len(msg.Moniker) == 0 || uint32(len(msg.Moniker)) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", MaximumGatewayMonikerSize))
+	}
+
+	// check the details
+	if msg.Details != nil && uint32(len(*msg.Details)) > MaximumGatewayDetailsSize {
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be [0,%d]", MaximumGatewayDetailsSize))
+	}
+
+	// check the website
+	if msg.Website != nil && uint32(len(*msg.Website)) > MaximumGatewayWebsiteSize {
+		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be [0,%d]", MaximumGatewayWebsiteSize))
+	}
+
+	// check if updates occur
+	if msg.Identity == nil && msg.Details == nil && msg.Website == nil {
+		return ErrNoUpdatesProvided(DefaultCodespace, fmt.Sprintf("no updated values provided"))
+	}
+
 	return nil
 }
 
 // String returns the representation of the msg
 func (msg MsgEditGateway) String() string {
-	return fmt.Sprintf("MsgEditGateway{%s, %s, %s, %s, %s, %s, %v}", msg.Owner, msg.Identity, msg.Moniker, msg.Details, msg.Website, msg.RedeemAddr, msg.Operators)
+	return fmt.Sprintf("MsgEditGateway{%s, %s, %s, %s, %s}", msg.Owner, msg.Moniker, *msg.Identity, *msg.Details, *msg.Website)
 }
 
 // GetSignBytes implements Msg
@@ -237,4 +257,5 @@ func (msg MsgIssueAsset) GetSignBytes() []byte {
 func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
+
 // ---------------------------------------------------------

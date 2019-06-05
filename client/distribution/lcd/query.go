@@ -152,6 +152,11 @@ func QueryRewardsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		AddrStr := vars["address"]
 		accAddress, err := sdk.AccAddressFromBech32(AddrStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		params := distribution.NewQueryRewardsParams(accAddress)
 		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {

@@ -53,8 +53,8 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		}
 		to, err := sdk.AccAddressFromBech32(m.Recipient)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("Couldn't decode delegator. Error: %s", err.Error())))
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("Couldn't decode address. Error: %s", err.Error())))
 			return
 		}
 		msg := bank.BuildBankSendMsg(sender, to, amount)
