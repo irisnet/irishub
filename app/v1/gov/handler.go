@@ -278,7 +278,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
-		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result)
+		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result, "tallyResults", tallyResults)
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 

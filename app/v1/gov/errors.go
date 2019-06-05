@@ -10,36 +10,36 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "gov"
 
-	CodeUnknownProposal         sdk.CodeType = 1
-	CodeInactiveProposal        sdk.CodeType = 2
-	CodeAlreadyActiveProposal   sdk.CodeType = 3
-	CodeAlreadyFinishedProposal sdk.CodeType = 4
-	CodeAddressNotStaked        sdk.CodeType = 5
-	CodeInvalidTitle            sdk.CodeType = 6
-	CodeInvalidDescription      sdk.CodeType = 7
-	CodeInvalidProposalType     sdk.CodeType = 8
-	CodeInvalidVote             sdk.CodeType = 9
-	CodeInvalidGenesis          sdk.CodeType = 10
-	CodeInvalidProposalStatus   sdk.CodeType = 11
-	CodeInvalidParam            sdk.CodeType = 12
-	CodeInvalidParamOp          sdk.CodeType = 13
-	CodeSwitchPeriodInProcess   sdk.CodeType = 14
-	CodeInvalidPercent          sdk.CodeType = 15
-	CodeInvalidUsageType        sdk.CodeType = 16
-	CodeInvalidInput            sdk.CodeType = 17
-	CodeInvalidVersion          sdk.CodeType = 18
-	CodeInvalidProposal         sdk.CodeType = 19
-	CodeNotEnoughInitialDeposit sdk.CodeType = 20
-	CodeDepositDeleted          sdk.CodeType = 21
-	CodeVoteNotExisted          sdk.CodeType = 22
-	CodeDepositNotExisted       sdk.CodeType = 23
-	CodeNotInDepositPeriod      sdk.CodeType = 24
-	CodeAlreadyVote             sdk.CodeType = 25
-	CodeOnlyValidatorVote       sdk.CodeType = 26
-	CodeMoreThanMaxProposal     sdk.CodeType = 27
-	CodeInvalidUpgradeParams    sdk.CodeType = 28
-	CodeEmptyParam              sdk.CodeType = 29
-	CodeInvalidParamNum         sdk.CodeType = 30
+	CodeUnknownProposal              sdk.CodeType = 1
+	CodeInactiveProposal             sdk.CodeType = 2
+	CodeAlreadyActiveProposal        sdk.CodeType = 3
+	CodeAlreadyFinishedProposal      sdk.CodeType = 4
+	CodeAddressNotStaked             sdk.CodeType = 5
+	CodeInvalidTitle                 sdk.CodeType = 6
+	CodeInvalidDescription           sdk.CodeType = 7
+	CodeInvalidProposalType          sdk.CodeType = 8
+	CodeInvalidVote                  sdk.CodeType = 9
+	CodeInvalidGenesis               sdk.CodeType = 10
+	CodeInvalidProposalStatus        sdk.CodeType = 11
+	CodeInvalidParam                 sdk.CodeType = 12
+	CodeInvalidParamOp               sdk.CodeType = 13
+	CodeSwitchPeriodInProcess        sdk.CodeType = 14
+	CodeInvalidPercent               sdk.CodeType = 15
+	CodeInvalidUsageType             sdk.CodeType = 16
+	CodeInvalidInput                 sdk.CodeType = 17
+	CodeInvalidVersion               sdk.CodeType = 18
+	CodeInvalidProposal              sdk.CodeType = 19
+	CodeNotEnoughInitialDeposit      sdk.CodeType = 20
+	CodeDepositDeleted               sdk.CodeType = 21
+	CodeVoteNotExisted               sdk.CodeType = 22
+	CodeDepositNotExisted            sdk.CodeType = 23
+	CodeNotInDepositPeriod           sdk.CodeType = 24
+	CodeAlreadyVote                  sdk.CodeType = 25
+	CodeOnlyValidatorOrDelegatorVote sdk.CodeType = 26
+	CodeMoreThanMaxProposal          sdk.CodeType = 27
+	CodeInvalidUpgradeParams         sdk.CodeType = 28
+	CodeEmptyParam                   sdk.CodeType = 29
+	CodeInvalidParamNum              sdk.CodeType = 30
 )
 
 //----------------------------------------
@@ -147,8 +147,8 @@ func ErrAlreadyVote(codespace sdk.CodespaceType, address sdk.AccAddress, proposa
 	return sdk.NewError(codespace, CodeAlreadyVote, fmt.Sprintf("Address %s has voted for the proposal [%d]", address, proposalID))
 }
 
-func ErrOnlyValidatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeOnlyValidatorVote, fmt.Sprintf("Address %s isn't a validator, so can't vote.", address))
+func ErrOnlyValidatorOrDelegatorVote(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeOnlyValidatorOrDelegatorVote, fmt.Sprintf("Address %s is neither a validator nor a delegator, so can't vote.", address))
 }
 
 func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLevel string) sdk.Error {

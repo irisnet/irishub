@@ -32,7 +32,7 @@ iriscli gov vote --help
 iriscli gov vote --chain-id=<chain-id> --proposal-id=<proposal-id> --option=Yes --from=<key_name> --fee=0.3iris
 ```
 
-注意：只有验证人才能对指定提议投票，并且可投票的提议必须是`VotingPeriod`状态。
+注意：只有验证人和委托人才能对指定提议投票，并且可投票的提议必须是`VotingPeriod`状态。
 
 ```txt
 Committed at block 43 (tx hash: 01C4C3B00C6048A12AE2CF2294F63C55A69011381B819C35F11B04C921DB81CC, response:

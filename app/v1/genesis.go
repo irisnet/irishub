@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/gov"
@@ -38,12 +39,13 @@ type GenesisState struct {
 	SlashingData slashing.GenesisState `json:"slashing"`
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
+	AssetData    asset.GenesisState    `json:"asset"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState) GenesisState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -56,6 +58,7 @@ func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stak
 		ServiceData:  serviceData,
 		GuardianData: guardianData,
 		SlashingData: slashingData,
+		AssetData:    assetData,
 	}
 }
 
@@ -333,6 +336,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		SlashingData: genesisFileState.SlashingData,
 		ServiceData:  genesisFileState.ServiceData,
 		GuardianData: genesisFileState.GuardianData,
+		AssetData:    genesisFileState.AssetData,
 		GenTxs:       genesisFileState.GenTxs,
 	}
 }
@@ -348,6 +352,7 @@ type GenesisFileState struct {
 	SlashingData slashing.GenesisState `json:"slashing"`
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
+	AssetData    asset.GenesisState    `json:"asset"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
@@ -373,7 +378,7 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:     accounts,
@@ -386,6 +391,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 		ServiceData:  serviceData,
 		GuardianData: guardianData,
 		SlashingData: slashingData,
+		AssetData:    assetData,
 	}
 }
 
@@ -402,6 +408,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		ServiceData:  service.DefaultGenesisState(),
 		GuardianData: guardian.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
+		AssetData:    asset.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }

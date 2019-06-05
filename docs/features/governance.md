@@ -46,7 +46,7 @@ Different levels correspond to different parameters：
 The proposer at least deposit more the 30% amount of `MinDeposit` to submit a proposal, when the total deposit amount exceeds `MinDeposit`, the proposal enter the voting procedure. If the time exceeds `MaxDepositPeriod` and the total deposit has not yet exceeded `MinDeposit`, the proposal will be deleted and the full deposit won't be refunded. It is not allowed to deposit a proposal which is in voting procedure.
 
 ### Voting Procedure
-Only the validator can vote , and they can't vote twice for one proposal. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
+Only the validator and delegator can vote , and they can't vote twice for one proposal. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
 
 ### Tallying Procedure
 

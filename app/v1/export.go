@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
-	stake "github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -64,6 +65,7 @@ func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		service.ExportGenesis(ctx, p.serviceKeeper),
 		guardian.ExportGenesis(ctx, p.guardianKeeper),
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
+		asset.ExportGenesis(ctx, p.assetKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {
