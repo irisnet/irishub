@@ -91,7 +91,7 @@ func MakeLatestCodec() *codec.Codec {
 	return cdc
 }
 
-func (app *IrisApp) ExportOrReplay(replayHeight int64) (replay bool, height int64) {
+func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64) {
 	lastBlockHeight := app.BaseApp.LastBlockHeight()
 	if replayHeight > lastBlockHeight {
 		replayHeight = lastBlockHeight
