@@ -135,10 +135,11 @@ func makeMultiSignCmd(cdc *amino.Codec, decoder auth.AccountDecoder) func(cmd *c
 		fp, err := os.OpenFile(
 			viper.GetString(flagOutfile), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644,
 		)
+		defer fp.Close()
+
 		if err != nil {
 			return err
 		}
-		defer fp.Close()
 
 		fmt.Fprintf(fp, "%s\n", json)
 
