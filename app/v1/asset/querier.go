@@ -44,9 +44,9 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	gateway, err := keeper.GetGatewayByMoniker(ctx, params.Moniker)
+	gateway, err2 := keeper.GetGatewayByMoniker(ctx, params.Moniker)
 	if err != nil {
-		return nil, err
+		return nil, err2
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateway)
