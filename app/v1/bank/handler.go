@@ -14,6 +14,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgIssue(ctx, k, msg)
 		case MsgBurn:
 			return handleMsgBurn(ctx, k, msg)
+		case MsgFreeze:
+			return handleMsgFreeze(ctx, k, msg)
+		case MsgUnfreeze:
+			return handleMsgUnfreeze(ctx, k, msg)
 		default:
 			errMsg := "Unrecognized bank Msg type: %s" + msg.Type()
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -49,6 +53,35 @@ func handleMsgBurn(ctx sdk.Context, k Keeper, msg MsgBurn) sdk.Result {
 		return err.Result()
 	}
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), "", msg.Coins.String(), sdk.BurnFlow, "")
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// Handle MsgFreeze.
+func handleMsgFreeze(ctx sdk.Context, k Keeper, msg MsgFreeze) sdk.Result {
+
+	tags, err := k.FreezeCoinFromAddr(ctx, msg.Owner, msg.Coin)
+
+	if err != nil {
+		return err.Result()
+	}
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), "", msg.Coin.String(), sdk.FreezeFlow, "")
+
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// Handle MsgUnfreeze.
+func handleMsgUnfreeze(ctx sdk.Context, k Keeper, msg MsgUnfreeze) sdk.Result {
+
+	tags, err := k.UnfreezeCoinFromAddr(ctx, msg.Owner, msg.Coin)
+
+	if err != nil {
+		return err.Result()
+	}
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), "", msg.Coin.String(), sdk.UnfreezeFlow, "")
 	return sdk.Result{
 		Tags: tags,
 	}

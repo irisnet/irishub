@@ -16,6 +16,9 @@ const (
 	costSetCoins       sdk.Gas = 100
 	costSubtractCoins  sdk.Gas = 10
 	costAddCoins       sdk.Gas = 10
+	costGetFrozenCoin  sdk.Gas = 10
+	costFreezeCoin     sdk.Gas = 10
+	costUnfreezeCoin   sdk.Gas = 10
 )
 
 // Keeper defines a module interface that facilitates the transfer of coins
@@ -28,6 +31,8 @@ type Keeper interface {
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	BurnCoinsFromAddr(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
 	BurnCoinsFromPool(ctx sdk.Context, pool string, amt sdk.Coins) (sdk.Tags, sdk.Error)
+	FreezeCoinFromAddr(ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin) (sdk.Tags, sdk.Error)
+	UnfreezeCoinFromAddr(ctx sdk.Context, Addr sdk.AccAddress,  amt sdk.Coin) (sdk.Tags, sdk.Error)
 }
 
 var _ Keeper = (*BaseKeeper)(nil)
@@ -56,6 +61,16 @@ func (keeper BaseKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
 // GetLoosenCoins returns the burned coins
 func (keeper BaseKeeper) GetBurnedCoins(ctx sdk.Context) sdk.Coins {
 	return getBurnedCoins(ctx, keeper.am)
+}
+
+//provide interface to search the total frozen token for specific coin
+func (keeper BaseKeeper) GetFrozenCoin(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, denom string) sdk.Coin {
+	ctx.GasMeter().ConsumeGas(costGetFrozenCoin, "getfrozenCoin")
+	acc := am.GetAccount(ctx, addr)
+	if acc == nil {
+		return sdk.Coin{}
+	}
+	return acc.GetFrozenCoinByDenom(denom)
 }
 
 // HasCoins returns whether or not an account has at least amt coins.
@@ -114,6 +129,44 @@ func (keeper BaseKeeper) BurnCoinsFromPool(
 	ctx sdk.Context, pool string, amt sdk.Coins,
 ) (sdk.Tags, sdk.Error) {
 	return burnCoins(ctx, keeper.am, pool, amt)
+}
+
+// FreezeCoinFromAddr freezes coins from one account
+func (keeper BaseKeeper) FreezeCoinFromAddr(
+	ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin,
+) (sdk.Tags, sdk.Error) {
+	_, _, err := subtractCoins(ctx, keeper.am, Addr, sdk.Coins{amt})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = increaseFrozenCoin(ctx, keeper.am, Addr, amt)
+	if err != nil {
+		return nil, err
+	}
+
+	//send the frozen token to specific account
+	//if msg.owner=msg.holder, then send the token to account.frozen coins
+	//if msg.owner=msg.holder, then move the token to msg.owner account.frozen coins
+
+
+	return freezeCoin(ctx, keeper.am, Addr.String(), amt)
+}
+
+// UnfreezeCoinFromAddr unfreezes coins from one account
+func (keeper BaseKeeper) UnfreezeCoinFromAddr(
+	ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin,
+) (sdk.Tags, sdk.Error) {
+
+	_, err := decreaseFrozenCoin(ctx, keeper.am, Addr, amt)
+	if err != nil {
+		return nil, err
+	}
+	_, _, err = addCoins(ctx, keeper.am, Addr, sdk.Coins{amt})
+	if err != nil {
+		return nil, err
+	}
+	return unfreezeCoin(ctx, keeper.am, Addr.String(), amt)
 }
 
 // InputOutputCoins handles a list of inputs and outputs
@@ -259,6 +312,43 @@ func setCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 	return nil
 }
 
+//set the frozen coins for holders.the frozen coin will be stored in othFrozenTokens or FrozenTokens
+func setFrozenCoin(ctx sdk.Context, am auth.AccountKeeper, Addr sdk.AccAddress, amt sdk.Coin) sdk.Error {
+	ctx.GasMeter().ConsumeGas(costFreezeCoin, "setFrozenCoins")
+	acc := am.GetAccount(ctx, Addr)
+	if acc == nil {
+		acc = am.NewAccountWithAddress(ctx, Addr)
+	}
+
+	err := acc.SetFrozenCoin(amt)
+	if err != nil {
+		// Handle w/ #870
+		panic(err)
+	}
+
+	am.SetAccount(ctx, acc)
+	return nil
+}
+
+func deductFrozenCoin(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coin) sdk.Error {
+	ctx.GasMeter().ConsumeGas(costFreezeCoin, "setFrozenCoins")
+	acc := am.GetAccount(ctx, addr)
+	if acc == nil {
+		acc = am.NewAccountWithAddress(ctx, addr)
+	}
+	var err error
+
+	err = acc.DeductFrozenCoin(amt)
+
+	if err != nil {
+		// Handle w/ #870
+		panic(err)
+		//return err
+	}
+	am.SetAccount(ctx, acc)
+	return nil
+}
+
 // HasCoins returns whether or not an account has at least amt coins.
 func hasCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) bool {
 	ctx.GasMeter().ConsumeGas(costHasCoins, "hasCoins")
@@ -276,6 +366,26 @@ func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, 
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("sender", []byte(addr.String()))
 	return newCoins, tags, err
+}
+
+//increaseFrozenCoins increases the frozen the coins at addr.
+func increaseFrozenCoin(ctx sdk.Context, am auth.AccountKeeper, Addr sdk.AccAddress, amt sdk.Coin) (sdk.Tags, sdk.Error) {
+	ctx.GasMeter().ConsumeGas(costFreezeCoin, "frozenCoins")
+	var err sdk.Error
+	var tags sdk.Tags
+	err = setFrozenCoin(ctx, am, Addr, amt)
+
+	tags = sdk.NewTags("sender", []byte(Addr.String()))
+	return tags, err
+}
+
+//decreaseFrozenCoins increases the frozen the coins at addr.
+func decreaseFrozenCoin(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coin) (sdk.Tags, sdk.Error) {
+	ctx.GasMeter().ConsumeGas(costUnfreezeCoin, "unfrozenCoins")
+	var err sdk.Error
+	err = deductFrozenCoin(ctx, am, addr, amt)
+	tags := sdk.NewTags("sender", []byte(addr.String()))
+	return tags, err
 }
 
 // AddCoins adds amt to the coins at the addr.
@@ -321,6 +431,43 @@ func burnCoins(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coin
 	ctx.Logger().Info("Execute Burntoken Successed", "burnFrom", from, "burnAmount", amt.String())
 
 	return burnTags, nil
+}
+
+//getTotalFrozenToken get the total frozen token for specific coin
+func getTotalFrozenToken(ctx sdk.Context, am auth.AccountKeeper, denom string) sdk.Coin {
+	return am.GetFrozenToken(ctx, []byte(denom))
+}
+
+// freezeCoin moves coins to frozen token from
+// NOTE: Make sure to revert state changes from tx on error
+func freezeCoin(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coin) (sdk.Tags, sdk.Error) {
+	ctx.GasMeter().ConsumeGas(costFreezeCoin, "freezeCoins")
+
+	am.IncreaseFrozenToken(ctx, amt)
+	freezeTags := sdk.NewTags(
+		"freezeFrom", []byte(from),
+		"freezeAmount", []byte(amt.String()),
+	)
+
+	ctx.Logger().Info("Execute Frozentoken Successed", "freezeFrom", from, "freezeAmount", amt.String())
+
+	return freezeTags, nil
+}
+
+// unfreezeCoins add moves frozen token to coins
+// NOTE: Make sure to revert state changes from tx on error
+func unfreezeCoin(ctx sdk.Context, am auth.AccountKeeper, from string, amt sdk.Coin) (sdk.Tags, sdk.Error) {
+	ctx.GasMeter().ConsumeGas(costFreezeCoin, "unfreezeCoins")
+
+	am.DecreaseFrozenToken(ctx, amt)
+	unfreezeTags := sdk.NewTags(
+		"unfreezeFrom", []byte(from),
+		"unfreezeAmount", []byte(amt.String()),
+	)
+
+	ctx.Logger().Info("Execute Unfrozentoken Successed", "unfreezeFrom", from, "unfreezeAmount", amt.String())
+
+	return unfreezeTags, nil
 }
 
 // InputOutputCoins handles a list of inputs and outputs

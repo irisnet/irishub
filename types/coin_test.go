@@ -10,6 +10,11 @@ import (
 // ----------------------------------------------------------------------------
 // Coin tests
 
+func TestCoins_IsValid(t *testing.T) {
+	coins := Coins{Coin{"iris",Int{}}}
+	println(coins.IsValid())
+}
+
 func TestCoin(t *testing.T) {
 	require.Panics(t, func() { NewInt64Coin("A", -1) })
 	require.Panics(t, func() { NewCoin("A", NewInt(-1)) })

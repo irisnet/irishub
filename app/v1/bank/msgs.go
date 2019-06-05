@@ -280,32 +280,31 @@ func (msg MsgBurn) GetSigners() []sdk.AccAddress {
 
 // MsgFreeze - high level transaction of the coin module
 type MsgFreeze struct {
-	Holder sdk.AccAddress `json:"holder"`
-	Coin  sdk.Coin      `json:"coin"`
+	Owner  sdk.AccAddress `json:"owner"`
+	Coin   sdk.Coin       `json:"coin"`
 }
 
 var _ sdk.Msg = MsgFreeze{}
 
 // NewMsgFreeze - construct freeze msg.
-func NewMsgFreeze(holder sdk.AccAddress, coin sdk.Coin) MsgFreeze {
-	return MsgFreeze{Holder: holder, Coin: coin}
+func NewMsgFreeze(owner sdk.AccAddress, coin sdk.Coin) MsgFreeze {
+	return MsgFreeze{Owner: owner, Coin: coin}
 }
 
 // Implements Msg.
 // nolint
-func (msg MsgFreeze) Route() string { return "bank/freeze" }
+func (msg MsgFreeze) Route() string { return "bank" }
 func (msg MsgFreeze) Type() string  { return "freeze" }
 
 // Implements Msg.
 func (msg MsgFreeze) ValidateBasic() sdk.Error {
 	// XXX
-	if len(msg.Holder) == 0 {
-		return sdk.ErrInvalidAddress(msg.Holder.String())
+	if len(msg.Owner) == 0 {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
 	if !msg.Coin.IsPositive() {
-		return ErrFreezeEmptyCoin(DefaultCodespace)
+		return ErrUnfreezeEmptyCoin(DefaultCodespace)
 	}
-
 
 	return nil
 }
@@ -321,5 +320,54 @@ func (msg MsgFreeze) GetSignBytes() []byte {
 
 // Implements Msg.
 func (msg MsgFreeze) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Holder}
+	return []sdk.AccAddress{msg.Owner}
+}
+
+
+//----------------------------------------
+// MsgUnfreeze
+
+// MsgUnfreeze - high level transaction of the coin module
+type MsgUnfreeze struct {
+	Owner  sdk.AccAddress `json:"owner"`
+	Coin   sdk.Coin       `json:"coin"`
+}
+
+var _ sdk.Msg = MsgUnfreeze{}
+
+// NewMsgUnfreeze - construct unfreeze msg.
+func NewMsgUnfreeze(owner sdk.AccAddress, coin sdk.Coin,) MsgUnfreeze {
+	return MsgUnfreeze{Owner: owner, Coin: coin}
+}
+
+// Implements Msg.
+// nolint
+func (msg MsgUnfreeze) Route() string { return "bank" }
+func (msg MsgUnfreeze) Type() string  { return "unfreeze" }
+
+// Implements Msg.
+func (msg MsgUnfreeze) ValidateBasic() sdk.Error {
+	// XXX
+	if len(msg.Owner) == 0 {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+	if !msg.Coin.IsPositive() {
+		return ErrUnfreezeEmptyCoin(DefaultCodespace)
+	}
+
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgUnfreeze) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgUnfreeze) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
 }

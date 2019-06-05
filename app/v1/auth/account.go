@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"fmt"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -30,6 +29,11 @@ type Account interface {
 
 	GetCoins() sdk.Coins
 	SetCoins(sdk.Coins) error
+
+	GetFrozenCoins() sdk.Coins
+	GetFrozenCoinByDenom(denom string) sdk.Coin
+	SetFrozenCoin(sdk.Coin) error
+	DeductFrozenCoin(sdk.Coin) error
 }
 
 // AccountDecoder unmarshals account bytes
@@ -46,11 +50,12 @@ var _ Account = (*BaseAccount)(nil)
 // However one doesn't have to use BaseAccount as long as your struct
 // implements Account.
 type BaseAccount struct {
-	Address       sdk.AccAddress `json:"address"`
-	Coins         sdk.Coins      `json:"coins"`
-	PubKey        crypto.PubKey  `json:"public_key"`
-	AccountNumber uint64         `json:"account_number"`
-	Sequence      uint64         `json:"sequence"`
+	Address        sdk.AccAddress `json:"address"`
+	Coins          sdk.Coins      `json:"coins"`
+	PubKey         crypto.PubKey  `json:"public_key"`
+	AccountNumber  uint64         `json:"account_number"`
+	Sequence       uint64         `json:"sequence"`
+	FrozenCoins    sdk.Coins      `json:"frozen_coins"`
 }
 
 // String implements fmt.Stringer
@@ -65,9 +70,10 @@ func (acc BaseAccount) String() string {
   Address:         %s
   Pubkey:          %s
   Coins:           %s
+  Frozen coins:    %s
   Account Number:  %d
   Sequence:        %d`,
-		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
+		acc.Address, pubkey, acc.Coins.MainUnitString(),acc.FrozenCoins.MainUnitString(), acc.AccountNumber, acc.Sequence,
 	)
 }
 
@@ -115,6 +121,41 @@ func (acc *BaseAccount) GetCoins() sdk.Coins {
 // Implements sdk.Account.
 func (acc *BaseAccount) SetCoins(coins sdk.Coins) error {
 	acc.Coins = coins
+	return nil
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) GetFrozenCoinByDenom(denom string) sdk.Coin {
+	for _, coin := range acc.FrozenCoins {
+		if coin.Denom == denom {
+			return coin
+		}
+	}
+	return sdk.Coin{}
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) GetFrozenCoins() sdk.Coins {
+	return acc.FrozenCoins
+}
+
+// Implements sdk.Account. plus frozen token to account.FrozenToken.
+func (acc *BaseAccount) SetFrozenCoin(coin sdk.Coin) error {
+	acc.FrozenCoins = acc.FrozenCoins.Plus(sdk.Coins{coin})
+	return nil
+}
+
+// Implements sdk.Account.deduct frozen token from frozen coin
+func (acc *BaseAccount) DeductFrozenCoin(coin sdk.Coin) error {
+	if acc.FrozenCoins == nil {
+		return errors.New("this account has no frozen coin")
+	}
+	oldCoins := acc.FrozenCoins
+	diff, hasNeg := oldCoins.SafeMinus(sdk.Coins{coin})
+	if hasNeg {
+		return errors.New("this account has not enough frozen coin")
+	}
+	acc.FrozenCoins = diff
 	return nil
 }
 

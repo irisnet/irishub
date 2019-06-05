@@ -52,7 +52,20 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 	return msg
 }
 
+// BuildBankFreezeMsg builds the freeze coin msg
+func BuildBankFreezeMsg(owner sdk.AccAddress, coin sdk.Coin) sdk.Msg {
+	msg := bank.NewMsgFreeze(owner, coin)
+	return msg
+}
+
+// BuildBankUnfreezeMsg builds the freeze coin msg
+func BuildBankUnfreezeMsg(owner sdk.AccAddress,coin sdk.Coin) sdk.Msg {
+	msg := bank.NewMsgUnfreeze(owner,coin)
+	return msg
+}
+
 type TokenStats struct {
+	FrozenTokens sdk.Coins `json:"frozen_tokens"`
 	LooseTokens  sdk.Coins `json:"loose_tokens"`
 	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	BondedTokens sdk.Coins `json:"bonded_tokens"`

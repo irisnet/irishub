@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/irisnet/irishub/codec"
@@ -15,8 +16,9 @@ var (
 	globalAccountNumberKey = []byte("globalAccountNumber")
 
 	TotalLoosenTokenKey = []byte("totalLoosenToken")
+	BurnedTokenKey      = []byte("burnedToken")
 
-	BurnedTokenKey = []byte("burnedToken")
+	frozenTokenKeyPrefix = []byte("frozenToken:")
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -186,6 +188,20 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 	return burnToken
 }
 
+func (am AccountKeeper) GetFrozenToken(ctx sdk.Context, denom []byte) sdk.Coin {
+	// read from db
+	var freezeToken sdk.Coin
+	store := ctx.KVStore(am.key)
+	FrozenTokenKey := bytes.Join([][]byte{frozenTokenKeyPrefix, denom}, []byte{})
+	bz := store.Get(FrozenTokenKey)
+	if bz == nil {
+		freezeToken = sdk.NewCoin(string(denom), sdk.NewInt(0))
+	} else {
+		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &freezeToken)
+	}
+	return freezeToken
+}
+
 func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 	// parameter checking
 	if coins == nil || !coins.IsValid() {
@@ -201,6 +217,51 @@ func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
 	store := ctx.KVStore(am.key)
 	store.Set(BurnedTokenKey, bzNew)
+}
+
+func (am AccountKeeper) IncreaseFrozenToken(ctx sdk.Context, coin sdk.Coin) {
+	// parameter checking
+	//if coin.Amount==nil {
+	//	return false
+	//}
+	if !coin.IsPositive() {
+		return
+	}
+	frozenToken := am.GetFrozenToken(ctx, []byte(coin.Denom))
+
+	// increase frozen token amount
+	frozenToken = frozenToken.Plus(coin)
+	if !frozenToken.IsNotNegative() {
+		panic(fmt.Errorf("freeze token is negative"))
+	}
+
+	// write back to db
+	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(frozenToken)
+	store := ctx.KVStore(am.key)
+
+	FrozenTokenKey := bytes.Join([][]byte{frozenTokenKeyPrefix, []byte(coin.Denom)}, []byte{})
+	store.Set(FrozenTokenKey, bzNew)
+}
+
+func (am AccountKeeper) DecreaseFrozenToken(ctx sdk.Context, coin sdk.Coin) {
+	// parameter checking
+	if !coin.IsPositive() {
+		return
+	}
+	frozenToken := am.GetFrozenToken(ctx, []byte(coin.Denom))
+
+	// increase frozen token amount
+	frozenToken = frozenToken.Minus(coin)
+	if !frozenToken.IsNotNegative() {
+		panic(fmt.Errorf("freeze token is negative"))
+	}
+
+	// write back to db
+	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(frozenToken)
+	store := ctx.KVStore(am.key)
+
+	FrozenTokenKey := bytes.Join([][]byte{frozenTokenKeyPrefix, []byte(coin.Denom)}, []byte{})
+	store.Set(FrozenTokenKey, bzNew)
 }
 
 func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {

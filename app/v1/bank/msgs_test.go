@@ -123,7 +123,7 @@ func TestMsgSendValidation(t *testing.T) {
 		tx    MsgSend
 	}{
 		{false, MsgSend{}},
-		{false, MsgSend{Inputs: []Input{}}},// no input or output
+		{false, MsgSend{Inputs: []Input{}}},          // no input or output
 		{false, MsgSend{Inputs: []Input{input1}}},    // just input
 		{false, MsgSend{Outputs: []Output{output1}}}, // just output
 		{false, MsgSend{
@@ -249,7 +249,6 @@ func TestMsgIssueGetSignBytes(t *testing.T) {
 		Outputs: []Output{NewOutput(addr, coins)},
 	}
 	res := msg.GetSignBytes()
-
 	expected := `{"banker":"faa1d9h8qat5umnd2g","outputs":[{"address":"faa1d3hkzm3dveex7mfdvfsku6crf5s7g","coins":[{"amount":"10","denom":"atom"}]}]}`
 	require.Equal(t, expected, string(res))
 }
@@ -261,7 +260,6 @@ func TestMsgIssueGetSigners(t *testing.T) {
 	res := msg.GetSigners()
 	require.Equal(t, fmt.Sprintf("%v", res), "[6F6E6C796F6E65]")
 }
-
 
 // ----------------------------------------
 // MsgFreeze Tests
@@ -275,8 +273,8 @@ func TestMsgFreezeRoute(t *testing.T) {
 	addr := sdk.AccAddress([]byte("onlyone"))
 	coin := sdk.NewInt64Coin("atom", 10)
 	var msg = MsgFreeze{
-		Holder:  addr,
-		Coin: coin,
+		Owner: addr,
+		Coin:  coin,
 	}
 
 	// TODO some failures for bad result
@@ -286,25 +284,23 @@ func TestMsgFreezeRoute(t *testing.T) {
 func TestMsgFreezeTokenValidation(t *testing.T) {
 	// TODO
 	addr := sdk.AccAddress([]byte("onlyone"))
-	emptyAddr:=sdk.AccAddress{}
+	emptyAddr := sdk.AccAddress{}
 	someCoin := sdk.NewInt64Coin("atom", 123)
-	emptyCoin := sdk.NewInt64Coin("",0)
-	zeroCoin:=sdk.NewInt64Coin("atom", 0)
-
+	emptyCoin := sdk.NewInt64Coin("", 0)
+	zeroCoin := sdk.NewInt64Coin("atom", 0)
 
 	cases := []struct {
 		valid bool
-		tx MsgFreeze
+		tx    MsgFreeze
 	}{
 		// auth works with different apps
 		{false, MsgFreeze{}},
-		{false, MsgFreeze{Holder:addr,Coin:emptyCoin}},
-		{false, MsgFreeze{Holder:addr,Coin:zeroCoin}},
-		{false, MsgFreeze{Holder:emptyAddr,Coin:emptyCoin}},
-		{false, MsgFreeze{Holder:emptyAddr,Coin:zeroCoin}},
+		{false, MsgFreeze{Coin: emptyCoin, Owner: addr}},
+		{false, MsgFreeze{Coin: zeroCoin, Owner: addr}},
+		{false, MsgFreeze{Owner: emptyAddr, Coin: emptyCoin}},
+		{false, MsgFreeze{Owner: emptyAddr, Coin: zeroCoin}},
 
-		{true, MsgFreeze{Holder:addr,Coin:someCoin}},
-
+		{true, MsgFreeze{Coin: someCoin, Owner: addr}},
 	}
 
 	for i, tc := range cases {
@@ -319,27 +315,111 @@ func TestMsgFreezeTokenValidation(t *testing.T) {
 
 func TestMsgFreezeGetSignBytes(t *testing.T) {
 	addr := sdk.AccAddress([]byte("onlyone"))
-	addrjson,_:=addr.MarshalJSON();
+	addrjson, _ := addr.MarshalJSON()
 	coin := sdk.NewInt64Coin("atom", 10)
 	var msg = MsgFreeze{
-		Holder:  addr,
-		Coin: coin,
+		Owner: addr,
+		Coin:  coin,
 	}
 	res := msg.GetSignBytes()
-
 	var buf bytes.Buffer
+	buf.WriteString(`{"type":"irishub/bank/Freeze","value":`)
 	buf.WriteString(`{"coin":{"amount":"10","denom":"atom"}`)
-	buf.WriteString(`,"holder"`)
+
+
+	buf.WriteString(`,"owner"`)
 	buf.WriteString(`:`)
 	buf.WriteString(string(addrjson))
-	buf.WriteString(`}`)
+	buf.WriteString(`}}`)
 	require.Equal(t, buf.String(), string(res))
 }
 
 func TestMsgFreezeGetSigners(t *testing.T) {
 	var msg = MsgFreeze{
-		Holder: sdk.AccAddress([]byte("onlyone")),
-		Coin:sdk.NewInt64Coin("atom", 123),
+		Owner: sdk.AccAddress([]byte("onlyone")),
+		Coin:  sdk.NewInt64Coin("atom", 123),
+	}
+	res := msg.GetSigners()
+	require.Equal(t, fmt.Sprintf("%v", res), "[6F6E6C796F6E65]")
+}
+
+// ----------------------------------------
+// MsgUnfreeze Tests
+
+func TestNewMsgUnfreeze(t *testing.T) {
+	// TODO
+}
+
+func TestMsgUnfreezeRoute(t *testing.T) {
+	// Construct an MsgFreeze
+	addr := sdk.AccAddress([]byte("onlyone"))
+	coin := sdk.NewInt64Coin("atom", 10)
+	var msg = MsgUnfreeze{
+		Owner: addr,
+		Coin:  coin,
+	}
+
+	// TODO some failures for bad result
+	require.Equal(t, msg.Route(), "bank/unfreeze")
+}
+
+func TestMsgUnfreezeTokenValidation(t *testing.T) {
+	// TODO
+	addr := sdk.AccAddress([]byte("onlyone"))
+	emptyAddr := sdk.AccAddress{}
+	someCoin := sdk.NewInt64Coin("atom", 123)
+	emptyCoin := sdk.NewInt64Coin("", 0)
+	zeroCoin := sdk.NewInt64Coin("atom", 0)
+
+	cases := []struct {
+		valid bool
+		tx    MsgUnfreeze
+	}{
+		// auth works with different apps
+		{false, MsgUnfreeze{}},
+		{false, MsgUnfreeze{Owner: addr, Coin: emptyCoin}},
+		{false, MsgUnfreeze{Owner: addr, Coin: zeroCoin}},
+		{false, MsgUnfreeze{Owner: emptyAddr, Coin: emptyCoin}},
+		{false, MsgUnfreeze{Owner: emptyAddr, Coin: zeroCoin}},
+
+		{true, MsgUnfreeze{Owner: addr, Coin: someCoin}},
+	}
+
+	for i, tc := range cases {
+		err := tc.tx.ValidateBasic()
+		if tc.valid {
+			require.Nil(t, err, "%d: %+v", i, err)
+		} else {
+			require.NotNil(t, err, "%d", i)
+		}
+	}
+}
+
+func TestMsgUnfreezeGetSignBytes(t *testing.T) {
+	addr := sdk.AccAddress([]byte("onlyone"))
+	addrjson, _ := addr.MarshalJSON()
+	coin := sdk.NewInt64Coin("atom", 10)
+	var msg = MsgUnfreeze{
+		Owner: addr,
+		Coin:  coin,
+	}
+	res := msg.GetSignBytes()
+
+	var buf bytes.Buffer
+	buf.WriteString(`{"type":"irishub/bank/Unfreeze","value":`)
+	buf.WriteString(`{"coin":{"amount":"10","denom":"atom"}`)
+
+	buf.WriteString(`,"owner"`)
+	buf.WriteString(`:`)
+	buf.WriteString(string(addrjson))
+	buf.WriteString(`}}`)
+	require.Equal(t, buf.String(), string(res))
+}
+
+func TestMsgUnfreezeGetSigners(t *testing.T) {
+	var msg = MsgUnfreeze{
+		Owner: sdk.AccAddress([]byte("onlyone")),
+		Coin:  sdk.NewInt64Coin("atom", 123),
 	}
 	res := msg.GetSigners()
 	require.Equal(t, fmt.Sprintf("%v", res), "[6F6E6C796F6E65]")

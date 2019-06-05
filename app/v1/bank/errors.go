@@ -2,6 +2,7 @@
 package bank
 
 import (
+	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -9,9 +10,12 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "bank"
 
-	CodeInvalidInput   sdk.CodeType = 101
-	CodeInvalidOutput  sdk.CodeType = 102
-	CodeBurnEmptyCoins sdk.CodeType = 103
+	CodeInvalidInput       sdk.CodeType = 101
+	CodeInvalidOutput      sdk.CodeType = 102
+	CodeBurnEmptyCoins     sdk.CodeType = 103
+	CodeFreezeEmptyCoin   sdk.CodeType = 104
+	CodeUnfreezeEmptyCoin sdk.CodeType = 105
+	CodeEmptyDenom         sdk.CodeType = 106
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -31,8 +35,17 @@ func codeToDefaultMsg(code sdk.CodeType) string {
 //----------------------------------------
 // Error constructors
 
-func ErrInvalidInput(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return newError(codespace, CodeInvalidInput, msg)
+func ErrFreezeEmptyCoin(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeFreezeEmptyCoin, fmt.Sprintf("freeze empty coins"))
+}
+
+
+func ErrEmptyDenom(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeEmptyDenom, fmt.Sprintf("empty denom for token"))
+}
+
+func ErrUnfreezeEmptyCoin(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeUnfreezeEmptyCoin, fmt.Sprintf("unfreeze empty coins"))
 }
 
 func ErrNoInputs(codespace sdk.CodespaceType) sdk.Error {

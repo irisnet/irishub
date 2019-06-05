@@ -97,6 +97,8 @@ func main() {
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
 			bankcmd.BurnTxCmd(cdc),
+			bankcmd.FreezeTxCmd(cdc),
+			bankcmd.UnfreezeTxCmd(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,

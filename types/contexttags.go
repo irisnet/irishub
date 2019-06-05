@@ -20,6 +20,8 @@ const (
 	GovDepositRefundFlow     = "GovDepositRefund"
 	ServiceDepositFlow       = "ServiceDeposit"
 	ServiceDepositRefundFlow = "ServiceDepositRefund"
+	FreezeFlow                 = "Freeze"
+	UnfreezeFlow                 = "Unfreeze"
 
 	//Trigger: transaction hash, module endBlock
 	GovEndBlocker     = "govEndBlocker"
