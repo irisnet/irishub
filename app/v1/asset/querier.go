@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	QueryAsset   = "asset"
-	QueryGateway = "gateway"
+	QueryAsset    = "asset"
+	QueryGateway  = "gateway"
+	QueryGateways = "gateways"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -18,6 +19,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryAsset(ctx, req, k)
 		case QueryGateway:
 			return queryGateway(ctx, req, k)
+		case QueryGateways:
+			return queryGateways(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
 		}
@@ -27,6 +30,30 @@ func NewQuerier(k Keeper) sdk.Querier {
 func queryAsset(context sdk.Context, query abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	// TODO
 	return nil, nil
+}
+
+// QueryGatewayParams is the query parameters for 'custom/asset/gateway'
+type QueryGatewayParams struct {
+	Moniker string
+}
+
+func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryGatewayParams
+	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	gateway, err := keeper.GetGatewayByMoniker(ctx, params.Moniker)
+	if err != nil {
+		return nil, err
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateway)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+	return bz, nil
 }
 
 // QueryGatewaysParams is the query parameters for 'custom/asset/gateways'
@@ -57,30 +84,6 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateways)
-	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
-	}
-	return bz, nil
-}
-
-// QueryGatewayParams is the query parameters for 'custom/asset/gateway'
-type QueryGatewayParams struct {
-	Moniker string
-}
-
-func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryGatewayParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
-	}
-
-	gateway, err := keeper.GetGatewayByMoniker(ctx, params.Moniker)
-	if err != nil {
-		return nil, err
-	}
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateway)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
