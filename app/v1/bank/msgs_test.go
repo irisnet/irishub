@@ -323,12 +323,7 @@ func TestMsgFreezeGetSignBytes(t *testing.T) {
 	}
 	res := msg.GetSignBytes()
 	var buf bytes.Buffer
-	buf.WriteString(`{"type":"irishub/bank/Freeze","value":`)
-	buf.WriteString(`{"coin":{"amount":"10","denom":"atom"}`)
-
-
-	buf.WriteString(`,"owner"`)
-	buf.WriteString(`:`)
+	buf.WriteString(`{"type":"irishub/bank/Freeze","value":{"coin":{"amount":"10","denom":"atom"},"owner":`)
 	buf.WriteString(string(addrjson))
 	buf.WriteString(`}}`)
 	require.Equal(t, buf.String(), string(res))
@@ -360,7 +355,7 @@ func TestMsgUnfreezeRoute(t *testing.T) {
 	}
 
 	// TODO some failures for bad result
-	require.Equal(t, msg.Route(), "bank/unfreeze")
+	require.Equal(t, msg.Route(), "bank")
 }
 
 func TestMsgUnfreezeTokenValidation(t *testing.T) {
@@ -406,11 +401,7 @@ func TestMsgUnfreezeGetSignBytes(t *testing.T) {
 	res := msg.GetSignBytes()
 
 	var buf bytes.Buffer
-	buf.WriteString(`{"type":"irishub/bank/Unfreeze","value":`)
-	buf.WriteString(`{"coin":{"amount":"10","denom":"atom"}`)
-
-	buf.WriteString(`,"owner"`)
-	buf.WriteString(`:`)
+	buf.WriteString(`{"type":"irishub/bank/Unfreeze","value":{"coin":{"amount":"10","denom":"atom"},"owner":`)
 	buf.WriteString(string(addrjson))
 	buf.WriteString(`}}`)
 	require.Equal(t, buf.String(), string(res))

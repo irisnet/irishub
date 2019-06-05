@@ -16,7 +16,6 @@ import (
 const (
 	flagTo     = "to"
 	flagAmount = "amount"
-	flagHolder = "holder"
 )
 
 // SendTxCmd will create a send tx and sign it with the given key.
@@ -109,16 +108,6 @@ func BurnTxCmd(cdc *codec.Codec) *cobra.Command {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
 			}
 
-			//account, err := cliCtx.GetAccount(from)
-			//if err != nil {
-			//	return err
-			//}
-			//
-			//// ensure account has enough coins
-			//if !account.GetCoins().IsAllGTE(coins) {
-			//	return fmt.Errorf("Address %s doesn't have enough coins to pay for this transaction.", from)
-			//}
-
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -142,7 +131,7 @@ func FreezeTxCmd(cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
-			// parse coins trying to be sent
+			// parse coins trying to be freeze
 			amount := viper.GetString(flagAmount)
 			coin, err := cliCtx.ParseCoin(amount)
 			if err != nil {
@@ -183,7 +172,7 @@ func UnfreezeTxCmd(cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
-			// parse coins trying to be sent
+			// parse coins trying to be unfreeze
 			amount := viper.GetString(flagAmount)
 			coin, err := cliCtx.ParseCoin(amount)
 			if err != nil {
@@ -194,7 +183,7 @@ func UnfreezeTxCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			// build and sign the transaction, then broadcast to Tendermint
-			msg := bank.BuildBankUnfreezeMsg(from,coin)
+			msg := bank.BuildBankUnfreezeMsg(from, coin)
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
 			}
@@ -204,7 +193,6 @@ func UnfreezeTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(flagAmount, "", "Amount of coins to freeeze, for instance: 10iris")
-	cmd.Flags().String(flagHolder, "", "address of token-holder, only asset-owner can pass this param")
 	cmd.MarkFlagRequired(flagAmount)
 
 	return cmd

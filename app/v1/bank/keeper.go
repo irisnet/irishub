@@ -32,7 +32,7 @@ type Keeper interface {
 	BurnCoinsFromAddr(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
 	BurnCoinsFromPool(ctx sdk.Context, pool string, amt sdk.Coins) (sdk.Tags, sdk.Error)
 	FreezeCoinFromAddr(ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin) (sdk.Tags, sdk.Error)
-	UnfreezeCoinFromAddr(ctx sdk.Context, Addr sdk.AccAddress,  amt sdk.Coin) (sdk.Tags, sdk.Error)
+	UnfreezeCoinFromAddr(ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin) (sdk.Tags, sdk.Error)
 }
 
 var _ Keeper = (*BaseKeeper)(nil)
@@ -135,21 +135,20 @@ func (keeper BaseKeeper) BurnCoinsFromPool(
 func (keeper BaseKeeper) FreezeCoinFromAddr(
 	ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin,
 ) (sdk.Tags, sdk.Error) {
+
+	//subtract the coin from addr
 	_, _, err := subtractCoins(ctx, keeper.am, Addr, sdk.Coins{amt})
 	if err != nil {
 		return nil, err
 	}
 
+	//increase the frozen coin to addr
 	_, err = increaseFrozenCoin(ctx, keeper.am, Addr, amt)
 	if err != nil {
 		return nil, err
 	}
 
-	//send the frozen token to specific account
-	//if msg.owner=msg.holder, then send the token to account.frozen coins
-	//if msg.owner=msg.holder, then move the token to msg.owner account.frozen coins
-
-
+	//increase the global frozenToken
 	return freezeCoin(ctx, keeper.am, Addr.String(), amt)
 }
 
@@ -158,14 +157,19 @@ func (keeper BaseKeeper) UnfreezeCoinFromAddr(
 	ctx sdk.Context, Addr sdk.AccAddress, amt sdk.Coin,
 ) (sdk.Tags, sdk.Error) {
 
+	//add the coin to addr
 	_, err := decreaseFrozenCoin(ctx, keeper.am, Addr, amt)
 	if err != nil {
 		return nil, err
 	}
+
+	//decrease the frozen coin from addr
 	_, _, err = addCoins(ctx, keeper.am, Addr, sdk.Coins{amt})
 	if err != nil {
 		return nil, err
 	}
+
+	//decrease the global frozenToken
 	return unfreezeCoin(ctx, keeper.am, Addr.String(), amt)
 }
 
@@ -336,9 +340,8 @@ func deductFrozenCoin(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddres
 	if acc == nil {
 		acc = am.NewAccountWithAddress(ctx, addr)
 	}
-	var err error
 
-	err = acc.DeductFrozenCoin(amt)
+	err := acc.DeductFrozenCoin(amt)
 
 	if err != nil {
 		// Handle w/ #870

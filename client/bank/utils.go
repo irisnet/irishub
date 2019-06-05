@@ -58,9 +58,9 @@ func BuildBankFreezeMsg(owner sdk.AccAddress, coin sdk.Coin) sdk.Msg {
 	return msg
 }
 
-// BuildBankUnfreezeMsg builds the freeze coin msg
-func BuildBankUnfreezeMsg(owner sdk.AccAddress,coin sdk.Coin) sdk.Msg {
-	msg := bank.NewMsgUnfreeze(owner,coin)
+// BuildBankUnfreezeMsg builds the unfreeze coin msg
+func BuildBankUnfreezeMsg(owner sdk.AccAddress, coin sdk.Coin) sdk.Msg {
+	msg := bank.NewMsgUnfreeze(owner, coin)
 	return msg
 }
 

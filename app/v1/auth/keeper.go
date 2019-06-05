@@ -220,10 +220,7 @@ func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
 }
 
 func (am AccountKeeper) IncreaseFrozenToken(ctx sdk.Context, coin sdk.Coin) {
-	// parameter checking
-	//if coin.Amount==nil {
-	//	return false
-	//}
+
 	if !coin.IsPositive() {
 		return
 	}
