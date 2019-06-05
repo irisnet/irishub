@@ -8,7 +8,7 @@ import (
 	cfg "github.com/tendermint/tendermint/config"
 )
 
-const MetricsSubsystem = "v0"
+const MetricsSubsystem = "v1"
 
 type Metrics struct {
 	InvariantFailure metrics.Counter
