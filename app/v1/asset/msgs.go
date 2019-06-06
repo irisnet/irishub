@@ -40,10 +40,8 @@ type MsgIssueAsset struct {
 	Operators  []sdk.AccAddress `json:"operators"`
 }
 
-var _ sdk.Msg = MsgIssueAsset{}
-
-// NewMsgIssue - construct asset issue msg.
-func NewMsgIssue(family string, name string, symbol string, source string, initSupply uint64, maxSupply uint64, decimal uint8, mintable bool, owner sdk.AccAddress, operators []sdk.AccAddress) MsgIssueAsset {
+// NewMsgIssueAsset - construct asset issue msg.
+func NewMsgIssueAsset(family string, name string, symbol string, source string, initSupply uint64, maxSupply uint64, decimal uint8, mintable bool, owner sdk.AccAddress, operators []sdk.AccAddress) MsgIssueAsset {
 	return MsgIssueAsset{Family: family, Name: name, Symbol: symbol, Source: source, InitSupply: initSupply, MaxSupply: maxSupply, Decimal: decimal, Mintable: mintable, Owner: owner, Operators: operators}
 }
 
@@ -66,11 +64,11 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 
 	}
 
-	if len(msg.Name) == 0 || !reg.Match([]byte(msg.Name)) {
+	if len(msg.Name) == 0 || reg.Match([]byte(msg.Name)) {
 		return ErrInvalidAssetName(DefaultCodespace, msg.Name)
 	}
 
-	if len(msg.Symbol) == 0 || !reg.Match([]byte(msg.Symbol)) {
+	if len(msg.Symbol) == 0 || reg.Match([]byte(msg.Symbol)) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, msg.Symbol)
 	}
 
@@ -78,7 +76,7 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 		return ErrInvalidAssetInitSupply(DefaultCodespace, msg.InitSupply)
 	}
 
-	if msg.MaxSupply > 0 && msg.MaxSupply < msg.InitSupply {
+	if msg.MaxSupply < msg.InitSupply || msg.MaxSupply > MaxInitSupply {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, msg.MaxSupply)
 	}
 
