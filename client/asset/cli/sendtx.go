@@ -18,7 +18,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Use:   "create-gateway",
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details>" +
-			"--website=<website> --redeem-address=<redeeming address> --operators=<comma-seperated operator addresses>",
+			"--website=<website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -32,30 +32,6 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var redeemAddr sdk.AccAddress
-			redeemAddrStr := viper.GetString(FlagRedeemAddress)
-			if redeemAddrStr == "" {
-				redeemAddr = owner
-			} else {
-				redeemAddr, err = sdk.AccAddressFromBech32(redeemAddrStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			var operators []sdk.AccAddress
-			operatorSlice := viper.GetStringSlice(FlagOperators)
-			for _, operator := range operatorSlice {
-				if len(operator) > 0 {
-					operatorAddr, err := sdk.AccAddressFromBech32(operator)
-					if err != nil {
-						return err
-					}
-
-					operators = append(operators, operatorAddr)
-				}
-			}
-
 			moniker := viper.GetString(FlagMoniker)
 			identity := viper.GetString(FlagIdentity)
 			details := viper.GetString(FlagDetails)
@@ -63,7 +39,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				identity, moniker, details, website, redeemAddr, owner, operators,
+				owner, moniker, identity, details, website,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
