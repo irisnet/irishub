@@ -26,6 +26,10 @@ func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
 			}
 
+			if !asset.IsAlpha(moniker) {
+				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+			}
+
 			params := asset.QueryGatewayParams{
 				Moniker: moniker,
 			}

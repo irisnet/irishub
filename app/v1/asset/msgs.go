@@ -18,7 +18,7 @@ var (
 	MaximumGatewayDetailsSize = 280 // maximal limitation for the length of the gateway's details
 	MaximumGatewayWebsiteSize = 128 // maximal limitation for the length of the gateway's website
 
-	isAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
+	IsAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 )
 
 var _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}
@@ -62,7 +62,7 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 	}
 
 	// check the moniker format
-	if !isAlpha(msg.Moniker) {
+	if !IsAlpha(msg.Moniker) {
 		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 	}
 
@@ -137,7 +137,7 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 	}
 
 	// check the moniker format
-	if !isAlpha(msg.Moniker) {
+	if !IsAlpha(msg.Moniker) {
 		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 	}
 
