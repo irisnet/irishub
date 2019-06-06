@@ -266,6 +266,12 @@ func main() {
 			assetcmd.GetCmdCreateGateway(cdc),
 		)...)
 
+	assetCmd.AddCommand(
+		client.GetCommands(
+			assetcmd.GetCmdQueryGateway(cdc),
+			assetcmd.GetCmdQueryGateways(cdc),
+		)...)
+
 	rootCmd.AddCommand(
 		assetCmd,
 	)
