@@ -5,12 +5,11 @@ import (
 )
 
 const (
-	FlagIdentity      = "identity"
-	FlagMoniker       = "moniker"
-	FlagDetails       = "details"
-	FlagWebsite       = "website"
-	FlagRedeemAddress = "redeem-address"
-	FlagOperators     = "operators"
+	FlagOwner    = "owner"
+	FlagMoniker  = "moniker"
+	FlagIdentity = "identity"
+	FlagDetails  = "details"
+	FlagWebsite  = "website"
 )
 
 var (
@@ -18,10 +17,8 @@ var (
 )
 
 func init() {
-	FsGatewayCreate.String(FlagIdentity, "", "gateway identity")
-	FsGatewayCreate.String(FlagMoniker, "", "gateway moniker")
-	FsGatewayCreate.String(FlagDetails, "", "gateway description")
-	FsGatewayCreate.String(FlagWebsite, "", "gateway website")
-	FsGatewayCreate.String(FlagRedeemAddress, "", "the redeeming address of the gateway")
-	FsGatewayCreate.StringSlice(FlagOperators, []string{}, "a set of addresses which are authorized to operate the gateway")
+	FsGatewayCreate.String(FlagMoniker, "", "the unique gateway name")
+	FsGatewayCreate.String(FlagIdentity, "", "the gateway identity")
+	FsGatewayCreate.String(FlagDetails, "", "the gateway description")
+	FsGatewayCreate.String(FlagWebsite, "", "the external website")
 }

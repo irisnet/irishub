@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -11,4 +13,8 @@ type Gateway struct {
 	Identity string         `json:"identity"` //  the identity of the gateway
 	Details  string         `json:"details"`  //  the description of the gateway
 	Website  string         `json:"website"`  //  the external website of the gateway
+}
+
+func (g Gateway) String() string {
+	return fmt.Sprintf("Gateway{%s, %s, %s, %s, %s}", g.Owner, g.Moniker, g.Identity, g.Details, g.Website)
 }
