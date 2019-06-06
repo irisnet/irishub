@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// test ValidateBasic for MsgCreateValidator
+// test ValidateBasic for MsgIssueAsset
 func TestMsgIssueAsset(t *testing.T) {
 	addr := sdk.AccAddress("test")
 	tests := []struct {

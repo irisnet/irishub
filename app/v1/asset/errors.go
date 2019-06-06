@@ -29,6 +29,7 @@ const (
 	CodeInvalidAssetInitSupply sdk.CodeType = 114
 	CodeInvalidAssetMaxSupply  sdk.CodeType = 115
 	CodeInvalidAssetDecimal    sdk.CodeType = 116
+	CodeAssetAlreadyExists     sdk.CodeType = 117
 )
 
 //----------------------------------------
@@ -60,6 +61,10 @@ func ErrInvalidAssetMaxSupply(codespace sdk.CodespaceType, maxSupply uint64) sdk
 
 func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, decimal uint8) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAssetDecimal, fmt.Sprintf("invalid asset decimal %s, max decimal is 18", string(decimal)))
+}
+
+func ErrAssetAlreadyExists(codespace sdk.CodespaceType, symbol string) sdk.Error {
+	return sdk.NewError(codespace, CodeAssetAlreadyExists, fmt.Sprintf("asset already exists:%s", symbol))
 }
 
 //----------------------------------------
