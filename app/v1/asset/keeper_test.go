@@ -39,7 +39,7 @@ func TestKeeper_IssueAsset(t *testing.T) {
 	addr2 := sdk.AccAddress([]byte("addr2"))
 	addr3 := sdk.AccAddress([]byte("addr3"))
 
-	msg := NewMsgIssueAsset("a", "b", "c", "d", 100,
+	msg := NewMsgIssueAsset(0x00, "b", "c", "d", 100,
 		100, 18, false, addr, []sdk.AccAddress{addr2, addr3})
 	_, err := keeper.IssueAsset(ctx, msg)
 	assert.NoError(t, err)

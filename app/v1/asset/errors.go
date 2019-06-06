@@ -24,12 +24,13 @@ const (
 
 	CodeNilAssetOwner          sdk.CodeType = 110
 	CodeInvalidAssetFamily     sdk.CodeType = 111
-	CodeInvalidAssetName       sdk.CodeType = 112
-	CodeInvalidAssetSymbol     sdk.CodeType = 113
-	CodeInvalidAssetInitSupply sdk.CodeType = 114
-	CodeInvalidAssetMaxSupply  sdk.CodeType = 115
-	CodeInvalidAssetDecimal    sdk.CodeType = 116
-	CodeAssetAlreadyExists     sdk.CodeType = 117
+	CodeInvalidAssetSource     sdk.CodeType = 112
+	CodeInvalidAssetName       sdk.CodeType = 113
+	CodeInvalidAssetSymbol     sdk.CodeType = 114
+	CodeInvalidAssetInitSupply sdk.CodeType = 115
+	CodeInvalidAssetMaxSupply  sdk.CodeType = 116
+	CodeInvalidAssetDecimal    sdk.CodeType = 117
+	CodeAssetAlreadyExists     sdk.CodeType = 118
 )
 
 //----------------------------------------
@@ -39,8 +40,12 @@ func ErrNilAssetOwner(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNilAssetOwner, fmt.Sprintf("nil asset owner"))
 }
 
-func ErrInvalidAssetFamily(codespace sdk.CodespaceType, family string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetFamily, fmt.Sprintf("invalid asset family %s, only accepts 00, 01", family))
+func ErrInvalidAssetFamily(codespace sdk.CodespaceType, family byte) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetFamily, fmt.Sprintf("invalid asset family type %d", family))
+}
+
+func ErrInvalidAssetSource(codespace sdk.CodespaceType, source byte) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSource, fmt.Sprintf("invalid asset source type %d", source))
 }
 
 func ErrInvalidAssetName(codespace sdk.CodespaceType, name string) sdk.Error {

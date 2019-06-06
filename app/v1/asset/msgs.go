@@ -1,10 +1,12 @@
 package asset
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -15,9 +17,8 @@ const (
 
 var (
 	// 00 - fungible; 01 - non-fungible
-	MsgIssueFamily = map[string]bool{"00": true, "01": true}
-	// Reserved - 00 (native); 01 (external); Gateway IDs
-	MsgIssueSource = map[string]bool{"00": true, "01": true}
+	IssueFamilyMap     = map[FamilyKind]string{0x00: "fungible", 0x01: "non-fungible"}
+	IssueFamilyNameMap = map[string]FamilyKind{"fungible": 0x00, "non-fungible": 0x01}
 
 	MaximumGatewayMonikerSize = uint32(8)   // limitation for the length of the gateway's moniker
 	MaximumGatewayDetailsSize = uint32(280) // limitation for the length of the gateway's details
@@ -28,10 +29,10 @@ var _, _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}, MsgIssueAsset{}
 
 // MsgIssueAsset
 type MsgIssueAsset struct {
-	Family     string           `json:"family"`
-	Name       string           `json:"name"`
-	Symbol     string           `json:"symbol"`
+	Family     FamilyKind       `json:"family"`
 	Source     string           `json:"source"`
+	Symbol     string           `json:"symbol"`
+	Name       string           `json:"name"`
 	InitSupply uint64           `json:"init_supply"`
 	MaxSupply  uint64           `json:"max_supply"`
 	Decimal    uint8            `json:"decimal"`
@@ -41,8 +42,8 @@ type MsgIssueAsset struct {
 }
 
 // NewMsgIssueAsset - construct asset issue msg.
-func NewMsgIssueAsset(family string, name string, symbol string, source string, initSupply uint64, maxSupply uint64, decimal uint8, mintable bool, owner sdk.AccAddress, operators []sdk.AccAddress) MsgIssueAsset {
-	return MsgIssueAsset{Family: family, Name: name, Symbol: symbol, Source: source, InitSupply: initSupply, MaxSupply: maxSupply, Decimal: decimal, Mintable: mintable, Owner: owner, Operators: operators}
+func NewMsgIssueAsset(family FamilyKind, source string, name string, symbol string, initSupply uint64, maxSupply uint64, decimal uint8, mintable bool, owner sdk.AccAddress, operators []sdk.AccAddress) MsgIssueAsset {
+	return MsgIssueAsset{Family: family, Source: source, Name: name, Symbol: symbol, InitSupply: initSupply, MaxSupply: maxSupply, Decimal: decimal, Mintable: mintable, Owner: owner, Operators: operators}
 }
 
 // Implements Msg.
@@ -59,9 +60,8 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 		return ErrNilAssetOwner(DefaultCodespace)
 	}
 
-	if _, found := MsgIssueFamily[msg.Family]; len(msg.Family) > 0 && !found {
-		return ErrInvalidAssetFamily(DefaultCodespace, msg.Family)
-
+	if _, found := IssueFamilyMap[msg.Family]; !found {
+		return ErrInvalidAssetFamily(DefaultCodespace, byte(msg.Family))
 	}
 
 	if len(msg.Name) == 0 || reg.Match([]byte(msg.Name)) {
@@ -250,4 +250,62 @@ func (msg MsgEditGateway) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgEditGateway) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+type FamilyKind byte
+
+// Marshal needed for protobuf compatibility
+func (fk FamilyKind) Marshal() ([]byte, error) {
+	return []byte{byte(fk)}, nil
+}
+
+// Unmarshal needed for protobuf compatibility
+func (fk *FamilyKind) Unmarshal(data []byte) error {
+	*fk = FamilyKind(data[0])
+	return nil
+}
+
+// Marshals to JSON using string
+func (fk FamilyKind) MarshalJSON() ([]byte, error) {
+	return json.Marshal(fk.String())
+}
+
+// Unmarshals from JSON assuming Bech32 encoding
+func (fk *FamilyKind) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz2, err := FamilyKindFromString(s)
+	if err != nil {
+		return err
+	}
+	*fk = bz2
+	return nil
+}
+
+// Turns VoteOption byte to String
+func (fk FamilyKind) String() string {
+	if name, ok := IssueFamilyMap[fk]; ok {
+		return name
+	}
+	return ""
+}
+
+func FamilyKindFromString(str string) (FamilyKind, error) {
+	if kind, ok := IssueFamilyNameMap[str]; ok {
+		return kind, nil
+	}
+	return FamilyKind(0xff), errors.Errorf("'%s' is not a valid family kind", str)
+}
+
+func (fk FamilyKind) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		s.Write([]byte(fk.String()))
+	default:
+		s.Write([]byte(fmt.Sprintf("%v", byte(fk))))
+	}
 }
