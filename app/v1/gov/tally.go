@@ -68,10 +68,8 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 			}
 			//only tally the delegator voting power under the validator
 			if val, ok := currValidators[valAddr]; ok {
-				if valAddr != valAddrStr {
-					val.DelegatorDeductions = val.DelegatorDeductions.Add(delegation.GetShares())
-					currValidators[valAddr] = val
-				}
+				val.DelegatorDeductions = val.DelegatorDeductions.Add(delegation.GetShares())
+				currValidators[valAddr] = val
 
 				votingPower := delegation.GetShares().Mul(val.TokenPerShare)
 				results[vote.Option] = results[vote.Option].Add(votingPower)
