@@ -1616,7 +1616,7 @@ paths:
                   type: string
                 proposal_type:
                   type: string
-                  example: Text
+                  example: PlainText
                 proposer:
                   $ref: '#/components/schemas/Address'
                 initial_deposit:

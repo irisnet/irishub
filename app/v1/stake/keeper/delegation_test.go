@@ -339,8 +339,10 @@ func TestUndelegateFromUnbondingValidator(t *testing.T) {
 	ubd, found := keeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
 	require.True(t, found)
 	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18))))
-	assert.Equal(t, blockHeight, ubd.CreationHeight)
-	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
+	// always equal block height
+	assert.Equal(t, ctx.BlockHeight(), ubd.CreationHeight)
+	// always UnbondingTime delay
+	assert.True(t, ctx.BlockHeader().Time.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }
 
 func TestUndelegateFromUnbondedValidator(t *testing.T) {
@@ -408,8 +410,19 @@ func TestUndelegateFromUnbondedValidator(t *testing.T) {
 	_, err = keeper.BeginUnbonding(ctx, addrDels[0], addrVals[0], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
-	// no ubd should have been found, coins should have been returned direcly to account
 	ubd, found := keeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
+	require.True(t, found, "%v", ubd)
+
+	ctx = ctx.WithBlockTime(ctx.BlockHeader().Time.Add(params.UnbondingTime))
+	matureUnbonds := keeper.DequeueAllMatureUnbondingQueue(ctx, ctx.BlockHeader().Time)
+	for _, dvPair := range matureUnbonds {
+		err := keeper.CompleteUnbonding(ctx, dvPair.DelegatorAddr, dvPair.ValidatorAddr)
+		if err != nil {
+			continue
+		}
+	}
+	// no ubd should have been found, coins should have been returned direcly to account
+	ubd, found = keeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
 	require.False(t, found, "%v", ubd)
 
 	// unbond rest of the other delegation's shares

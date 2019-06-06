@@ -64,17 +64,16 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
-	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
-	}
-
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-
-		tags.Param, paramBytes,
 	)
+
+	var paramBytes []byte
+	if msg.ProposalType == ProposalTypeParameterChange {
+		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
+		resTags = resTags.AppendTag(tags.Param, paramBytes)
+	}
 
 	if votingStarted {
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
