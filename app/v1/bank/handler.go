@@ -10,8 +10,6 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgSend:
 			return handleMsgSend(ctx, k, msg)
-		case MsgIssue:
-			return handleMsgIssue(ctx, k, msg)
 		case MsgBurn:
 			return handleMsgBurn(ctx, k, msg)
 		default:
@@ -33,11 +31,6 @@ func handleMsgSend(ctx sdk.Context, k Keeper, msg MsgSend) sdk.Result {
 	return sdk.Result{
 		Tags: tags,
 	}
-}
-
-// Handle MsgIssue.
-func handleMsgIssue(ctx sdk.Context, k Keeper, msg MsgIssue) sdk.Result {
-	panic("not implemented yet")
 }
 
 // Handle MsgBurn.
