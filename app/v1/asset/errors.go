@@ -14,11 +14,9 @@ const (
 	CodeInvalidWebsite       sdk.CodeType = 102
 	CodeUnknownGateway       sdk.CodeType = 103
 	CodeGatewayAlreadyExists sdk.CodeType = 104
-	CodeInvalidOperator      sdk.CodeType = 105
-	CodeInvalidOwner         sdk.CodeType = 106
-	CodeNoUpdatesProvided    sdk.CodeType = 107
-	CodeInvalidAddress       sdk.CodeType = 108
-	CodeInvalidGenesis       sdk.CodeType = 109
+	CodeInvalidOwner         sdk.CodeType = 105
+	CodeNoUpdatesProvided    sdk.CodeType = 106
+	CodeInvalidAddress       sdk.CodeType = 107
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -72,10 +70,6 @@ func ErrGatewayAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error 
 	return sdk.NewError(codespace, CodeGatewayAlreadyExists, msg)
 }
 
-func ErrInvalidOperator(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidOperator, msg)
-}
-
 func ErrInvalidOwner(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidOwner, msg)
 }
@@ -86,8 +80,4 @@ func ErrNoUpdatesProvided(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
-}
-
-func ErrInvalidGenesis(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidGenesis, msg)
 }
