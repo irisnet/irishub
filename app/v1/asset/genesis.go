@@ -4,11 +4,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-const (
-	// StartingGatewayID is the initial number from which the gateway ids start
-	StartingGatewayID = 2
-)
-
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
 	Params Params `json:"params"` // asset params
@@ -23,11 +18,6 @@ func NewGenesisState(params Params) GenesisState {
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
-		panic(err.Error())
-	}
-
-	// set the initial gateway id
-	if err := k.setInitialGatewayID(ctx, StartingGatewayID); err != nil {
 		panic(err.Error())
 	}
 
