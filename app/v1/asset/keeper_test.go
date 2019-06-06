@@ -19,7 +19,7 @@ import (
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
 	db := dbm.NewMemDB()
-	authKey := sdk.NewKVStoreKey("authkey")
+	authKey := sdk.NewKVStoreKey("assetkey")
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, db)
 	ms.LoadLatestVersion()
@@ -27,18 +27,17 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
 }
 
 func TestCreateKeeper(t *testing.T) {
-	ms, authKey := setupMultiStore()
+	ms, assetKey := setupMultiStore()
 
 	cdc := codec.New()
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
-	guardianKeeper := guardian.NewKeeper(cdc, protocol.KeyGuardian, guardian.DefaultCodespace)
+	bankKeeper := bank.BaseKeeper{}
+	guardianKeeper := guardian.Keeper{}
 	paramsKeeper := params.NewKeeper(cdc, protocol.KeyParams, protocol.TkeyParams)
 
-	createKeeper := NewKeeper(cdc, protocol.KeyAsset, bankKeeper, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	createKeeper := NewKeeper(cdc, assetKey, bankKeeper, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// define variables
 	owner := sdk.AccAddress([]byte("owner"))
