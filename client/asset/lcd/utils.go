@@ -19,8 +19,13 @@ func queryGateway(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) 
 		vars := mux.Vars(r)
 
 		moniker := vars["Moniker"]
-		if len(moniker) == 0 || uint32(len(moniker)) > asset.MaximumGatewayMonikerSize {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the length of the moniker must be (0,%d]", asset.MaximumGatewayMonikerSize))
+		if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
+			return
+		}
+
+		if !asset.IsAlpha(moniker) {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the moniker must contain only letters"))
 			return
 		}
 
