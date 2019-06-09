@@ -138,3 +138,9 @@ func (k Keeper) IterateValidatorDistInfos(ctx sdk.Context,
 		index++
 	}
 }
+
+func (k Keeper) Init(ctx sdk.Context) {
+	// TODO
+	//   - move community pool balance to AccAddress
+	//   - remove community pool store key/value
+}

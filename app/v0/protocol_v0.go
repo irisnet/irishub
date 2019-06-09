@@ -81,7 +81,7 @@ func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkI
 	return &p0
 }
 
-// load the configuration of this Protocol
+// Load the configuration of this Protocol
 func (p *ProtocolV0) Load() {
 	p.configCodec()
 	p.configKeepers()
@@ -90,12 +90,10 @@ func (p *ProtocolV0) Load() {
 	p.configParams()
 }
 
-// verison0 don't need the init
-func (p *ProtocolV0) Init() {
-
+// Initialize this Protocol, only needed for version > 0
+func (p *ProtocolV0) Init(ctx sdk.Context) {
 }
 
-// verison0 tx codec
 func (p *ProtocolV0) GetCodec() *codec.Codec {
 	return p.cdc
 }

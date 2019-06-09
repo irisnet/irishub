@@ -201,3 +201,7 @@ func (k Keeper) setInitialGatewayID(ctx sdk.Context, gatewayID uint8) sdk.Error 
 
 	return nil
 }
+
+func (k Keeper) Init(ctx sdk.Context) {
+	k.SetParamSet(ctx, DefaultParams())
+}
