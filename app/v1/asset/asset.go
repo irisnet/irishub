@@ -6,7 +6,6 @@ import (
 )
 
 type Asset interface {
-	GetFamily() AssetFamily
 	GetDecimal() uint8
 	IsMintable() bool
 	GetUniqueID() string
@@ -25,6 +24,22 @@ type BaseAsset struct {
 	MaxSupply      uint64           `json:"max_supply"`
 	Mintable       bool             `json:"mintable"`
 	Owner          types.AccAddress `json:"owner"`
+}
+
+func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner types.AccAddress) BaseAsset {
+	return BaseAsset{
+		Family:         family,
+		Source:         source,
+		Gateway:        gateway,
+		Symbol:         symbol,
+		Name:           name,
+		Decimal:        decimal,
+		SymbolMinAlias: alias,
+		InitialSupply:  initialSupply,
+		MaxSupply:      maxSupply,
+		Mintable:       mintable,
+		Owner:          owner,
+	}
 }
 
 func (BaseAsset) GetFamily() AssetFamily {
@@ -74,8 +89,12 @@ type FungibleToken struct {
 	BaseAsset
 }
 
-func (FungibleToken) GetFamily() AssetFamily {
-	return FUNGIBLE
+func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner types.AccAddress) FungibleToken {
+	return FungibleToken{
+		BaseAsset: NewBaseAsset(
+			FUNGIBLE, source, gateway, symbol, name, decimal, alias, initialSupply, maxSupply, mintable, owner,
+		),
+	}
 }
 
 func (ft FungibleToken) GetDecimal() uint8 {
@@ -89,10 +108,6 @@ func (ft FungibleToken) IsMintable() bool {
 // Non-fungible Token
 type NonFungibleToken struct {
 	BaseAsset
-}
-
-func (NonFungibleToken) GetFamily() AssetFamily {
-	return NON_FUNGIBLE
 }
 
 func (nft NonFungibleToken) GetDecimal() uint8 {
