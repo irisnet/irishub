@@ -3,7 +3,9 @@ package bank
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -44,12 +46,13 @@ var _ Keeper = (*BaseKeeper)(nil)
 // BaseKeeper manages transfers between accounts. It implements the Keeper
 // interface.
 type BaseKeeper struct {
-	am auth.AccountKeeper
+	am  auth.AccountKeeper
+	cdc *codec.Codec
 }
 
 // NewBaseKeeper returns a new BaseKeeper
-func NewBaseKeeper(am auth.AccountKeeper) BaseKeeper {
-	return BaseKeeper{am: am}
+func NewBaseKeeper(cdc *codec.Codec, am auth.AccountKeeper) BaseKeeper {
+	return BaseKeeper{am: am, cdc: cdc}
 }
 
 // GetCoins returns the coins at the addr.
@@ -76,7 +79,6 @@ func (keeper BaseKeeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.
 func (keeper BaseKeeper) SubtractCoins(
 	ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins,
 ) (sdk.Coins, sdk.Tags, sdk.Error) {
-
 	return subtractCoins(ctx, keeper.am, addr, amt)
 }
 
@@ -84,7 +86,6 @@ func (keeper BaseKeeper) SubtractCoins(
 func (keeper BaseKeeper) AddCoins(
 	ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins,
 ) (sdk.Coins, sdk.Tags, sdk.Error) {
-
 	return addCoins(ctx, keeper.am, addr, amt)
 }
 
@@ -92,7 +93,6 @@ func (keeper BaseKeeper) AddCoins(
 func (keeper BaseKeeper) SendCoins(
 	ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins,
 ) (sdk.Tags, sdk.Error) {
-
 	return sendCoins(ctx, keeper.am, fromAddr, toAddr, amt)
 }
 
@@ -127,6 +127,18 @@ func (keeper BaseKeeper) BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt
 // InputOutputCoins handles a list of inputs and outputs
 func (keeper BaseKeeper) InputOutputCoins(ctx sdk.Context, inputs []Input, outputs []Output) (sdk.Tags, sdk.Error) {
 	return inputOutputCoins(ctx, keeper.am, inputs, outputs)
+}
+
+func (keeper BaseKeeper) Init(ctx sdk.Context) {
+	var burnedCoins sdk.Coins
+	store := ctx.KVStore(protocol.KeyAccount)
+	bz := store.Get([]byte("burnedToken"))
+	if bz == nil {
+		burnedCoins = sdk.Coins{}
+	} else {
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &burnedCoins)
+	}
+	keeper.AddCoins(ctx, BurnedCoinsAccAddr, burnedCoins)
 }
 
 //______________________________________________________________________________________________

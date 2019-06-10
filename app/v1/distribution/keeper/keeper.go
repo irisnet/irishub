@@ -5,6 +5,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // keeper of the stake store
@@ -139,7 +140,12 @@ func (k Keeper) IterateValidatorDistInfos(ctx sdk.Context,
 }
 
 func (k Keeper) Init(ctx sdk.Context) {
-	// TODO
-	//   - move community pool balance to AccAddress
-	//   - remove community pool store key/value
+	feePool := k.GetFeePool(ctx)
+
+	communityTaxCoins, change := feePool.CommunityPool.TruncateDecimal()
+	k.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, communityTaxCoins)
+
+	feePool.CommunityPool = types.NewDecCoins(sdk.Coins{})
+	feePool.ValPool = feePool.ValPool.Plus(change)
+	k.SetFeePool(ctx, feePool)
 }
