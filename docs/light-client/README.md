@@ -140,8 +140,12 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     14. `GET /service/fees/{address}`:  Query service fees of a address
     15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
     16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
-    
-10. Query app version
+
+10. Asset module APIs
+    1. `GET /asset/gateways/{moniker}/gateway`: Query the gateway of a given moniker
+    2. `GET /asset/gateways/{owner}/gateways`: Query all gateways of an owner
+
+11. Query app version
 
     1. `GET /version`: Version of IRISLCD
     2. `GET /node-version`: Version of the connected node
