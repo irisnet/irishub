@@ -88,7 +88,7 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var gateways []asset.Gateway
+			var gateways asset.Gateways
 			err = cdc.UnmarshalJSON(res, &gateways)
 			if err != nil {
 				return err
