@@ -5,10 +5,11 @@ import (
 )
 
 // handle all "asset" type messages.
-// TODO
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
+		case MsgIssueAsset:
+			return handleIssueAsset(ctx, k, msg)
 		case MsgCreateGateway:
 			return handleMsgCreateGateway(ctx, k, msg)
 		case MsgEditGateway:
@@ -18,6 +19,18 @@ func NewHandler(k Keeper) sdk.Handler {
 		}
 
 		return sdk.ErrTxDecode("invalid message parse in asset module").Result()
+	}
+}
+
+// handleIssueAsset handles MsgIssueAsset
+func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
+	tags, err := k.IssueAsset(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
 	}
 }
 

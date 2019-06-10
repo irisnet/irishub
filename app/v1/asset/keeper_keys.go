@@ -10,6 +10,11 @@ var (
 	KeyNextGatewayID = []byte("newGatewayID") // key for the next gateway ID
 )
 
+// KeyAsset returns the key of the specified asset symbol
+func KeyAsset(symbol string) []byte {
+	return []byte(fmt.Sprintf("assets:%s", symbol))
+}
+
 // KeyGateway returns the key of the specified gateway id
 func KeyGateway(gatewayID uint8) []byte {
 	return []byte(fmt.Sprintf("gateways:%d", gatewayID))

@@ -42,10 +42,6 @@ func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol
 	}
 }
 
-func (BaseAsset) GetFamily() AssetFamily {
-	panic("implement me")
-}
-
 func (BaseAsset) GetDecimal() uint8 {
 	panic("implement me")
 }

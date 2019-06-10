@@ -40,11 +40,11 @@ type Params struct {
 func (p Params) String() string {
 	return fmt.Sprintf(`Asset Params:
   Asset Tax Rate:                                           %s
-  Base Fee for Issuing Fungible Token:                      %s
+  Base Fee for Issuing Fungible Token:                      %d
   Base Fee Ratio for Minting (vs Issuing) Fungible Token:   %s
-  Fee for Creating Gateway:                                 %s
+  Fee for Creating Gateway:                                 %d
   Fee Ratio for Gateway (vs Native) Assets:                 %s`,
-		p.AssetTaxRate, p.IssueFTBaseFee, p.MintFTBaseFeeRatio, p.CreateGatewayFee, p.GatewayAssetFeeRatio)
+		p.AssetTaxRate.String(), p.IssueFTBaseFee, p.MintFTBaseFeeRatio.String(), p.CreateGatewayFee, p.GatewayAssetFeeRatio.String())
 }
 
 // Implements params.ParamSet

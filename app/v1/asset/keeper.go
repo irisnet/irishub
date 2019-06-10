@@ -38,6 +38,44 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
+// IssueAsset issue a new asset
+func (k Keeper) IssueAsset(ctx sdk.Context, msg MsgIssueAsset) (sdk.Tags, sdk.Error) {
+	if k.HasAsset(ctx, msg.Asset.GetDenom()) {
+		return nil, ErrAssetAlreadyExists(k.codespace, msg.Asset.GetDenom())
+	}
+	asset := msg.Asset
+	k.SetAsset(ctx, asset)
+	createTags := sdk.NewTags(
+		"denom", []byte(msg.Asset.GetDenom()),
+		"owner", []byte(msg.Asset.(BaseAsset).Owner.String()),
+	)
+
+	return createTags, nil
+}
+
+func (k Keeper) HasAsset(ctx sdk.Context, symbol string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(KeyAsset(symbol))
+}
+
+func (k Keeper) SetAsset(ctx sdk.Context, asset Asset) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(asset)
+
+	store.Set(KeyAsset(asset.GetDenom()), bz)
+}
+
+func (k Keeper) getAsset(ctx sdk.Context, symbol string) (asset Asset, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyAsset(symbol))
+	if bz == nil {
+		return asset, false
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &asset)
+	return asset, true
+}
+
 // CreateGateway creates a gateway
 func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) (sdk.Tags, sdk.Error) {
 	// check if the moniker already exists

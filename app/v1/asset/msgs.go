@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+	"regexp"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -18,6 +19,76 @@ var (
 )
 
 var _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}
+
+// MsgIssueAsset
+type MsgIssueAsset struct {
+	Asset
+}
+
+// NewMsgIssueAsset - construct asset issue msg.
+func NewMsgIssueAsset(asset Asset) MsgIssueAsset {
+	return MsgIssueAsset{asset}
+}
+
+// Implements Msg.
+func (msg MsgIssueAsset) Route() string { return MsgRoute }
+func (msg MsgIssueAsset) Type() string  { return "issue_asset" }
+
+// Implements Msg.
+func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
+	// only accepts alphanumeric characters, _ and -
+	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+
+	baseAsset := msg.Asset.(BaseAsset)
+
+	if baseAsset.Owner == nil {
+		return ErrNilAssetOwner(DefaultCodespace)
+	}
+
+	if _, found := AssetFamilyToStringMap[baseAsset.Family]; !found {
+		return ErrInvalidAssetFamily(DefaultCodespace, byte(baseAsset.Family))
+	}
+
+	if _, found := AssetSourceToStringMap[baseAsset.Source]; !found {
+		return ErrInvalidAssetSource(DefaultCodespace, byte(baseAsset.Source))
+	}
+
+	if len(baseAsset.Name) == 0 || reg.Match([]byte(baseAsset.Name)) {
+		return ErrInvalidAssetName(DefaultCodespace, baseAsset.Name)
+	}
+
+	if len(baseAsset.Symbol) == 0 || reg.Match([]byte(baseAsset.Symbol)) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, baseAsset.Symbol)
+	}
+
+	if baseAsset.InitialSupply == 0 {
+		return ErrInvalidAssetInitSupply(DefaultCodespace, baseAsset.InitialSupply)
+	}
+
+	if baseAsset.MaxSupply < baseAsset.InitialSupply {
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, baseAsset.MaxSupply)
+	}
+
+	if baseAsset.Decimal > 18 {
+		return ErrInvalidAssetDecimal(DefaultCodespace, baseAsset.Decimal)
+	}
+
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgIssueAsset) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Asset.(BaseAsset).Owner}
+}
 
 // MsgCreateGateway for creating the gateway
 type MsgCreateGateway struct {

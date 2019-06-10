@@ -93,8 +93,8 @@ func (p *ProtocolV1) Load() {
 }
 
 func (p *ProtocolV1) Init(ctx sdk.Context) {
-	p.assetKeeper.Init(ctx);	// initialize asset params
-	p.distrKeeper.Init(ctx);	// move community pool balance to AccAddress
+	p.assetKeeper.Init(ctx) // initialize asset params
+	p.distrKeeper.Init(ctx) // move community pool balance to AccAddress
 }
 
 func (p *ProtocolV1) GetCodec() *codec.Codec {
