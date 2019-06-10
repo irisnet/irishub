@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"strings"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -36,6 +38,9 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 
 // handleMsgCreateGateway handles MsgCreateGateway
 func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
+	// convert moniker to lowercase
+	msg.Moniker = strings.ToLower(msg.Moniker)
+
 	tags, err := k.CreateGateway(ctx, msg)
 	if err != nil {
 		return err.Result()
@@ -48,6 +53,9 @@ func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk
 
 // handleMsgEditGateway handles MsgEditGateway
 func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Result {
+	// convert moniker to lowercase
+	msg.Moniker = strings.ToLower(msg.Moniker)
+
 	tags, err := k.EditGateway(ctx, msg)
 	if err != nil {
 		return err.Result()

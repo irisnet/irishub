@@ -13,9 +13,12 @@ const (
 )
 
 var (
-	MaximumGatewayMonikerSize = uint32(8)   // limitation for the length of the gateway's moniker
-	MaximumGatewayDetailsSize = uint32(280) // limitation for the length of the gateway's details
-	MaximumGatewayWebsiteSize = uint32(128) // limitation for the length of the gateway's website
+	MinimumGatewayMonikerSize = 3   // minimal limitation for the length of the gateway's moniker
+	MaximumGatewayMonikerSize = 8   // maximal limitation for the length of the gateway's moniker
+	MaximumGatewayDetailsSize = 280 // maximal limitation for the length of the gateway's details
+	MaximumGatewayWebsiteSize = 128 // maximal limitation for the length of the gateway's website
+
+	IsAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 )
 
 var _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}
@@ -90,27 +93,23 @@ func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Asset.(BaseAsset).Owner}
 }
 
-// MsgCreateGateway for creating the gateway
+// MsgCreateGateway for creating a gateway
 type MsgCreateGateway struct {
-	Identity   string           `json:"identity"`       //  Identity of the gateway
-	Moniker    string           `json:"moniker"`        //  Moniker of the gateway
-	Details    string           `json:"details"`        //  Details of the gateway
-	Website    string           `json:"website"`        //  Website of the gateway
-	RedeemAddr sdk.AccAddress   `json:"redeem_address"` //  Redeem address of the gateway
-	Owner      sdk.AccAddress   `json:"owner"`          //  Owner address of the gateway
-	Operators  []sdk.AccAddress `json:"operators"`      //  Operators approved by the gateway
+	Owner    sdk.AccAddress `json:"owner"`    //  the owner address of the gateway
+	Moniker  string         `json:"moniker"`  //  the globally unique name of the gateway
+	Identity string         `json:"identity"` //  the identity of the gateway
+	Details  string         `json:"details"`  //  the description of the gateway
+	Website  string         `json:"website"`  //  the external website of the gateway
 }
 
 // NewMsgCreateGateway creates a MsgCreateGateway
-func NewMsgCreateGateway(identity, moniker, details, website string, redeemAddr, owner sdk.AccAddress, operators []sdk.AccAddress) MsgCreateGateway {
+func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string) MsgCreateGateway {
 	return MsgCreateGateway{
-		Identity:   identity,
-		Moniker:    moniker,
-		Details:    details,
-		Website:    website,
-		RedeemAddr: redeemAddr,
-		Owner:      owner,
-		Operators:  operators,
+		Owner:    owner,
+		Moniker:  moniker,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
 	}
 }
 
@@ -122,26 +121,29 @@ func (msg MsgCreateGateway) Type() string { return "create_gateway" }
 
 // ValidateBasic implements Msg
 func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
-	// check the moniker
-	if len(msg.Moniker) == 0 || uint32(len(msg.Moniker)) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", MaximumGatewayMonikerSize))
+	// check the owner
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
+	}
+
+	// check the moniker size
+	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	// check the moniker format
+	if !IsAlpha(msg.Moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 	}
 
 	// check the details
-	if uint32(len(msg.Details)) > MaximumGatewayDetailsSize {
+	if len(msg.Details) > MaximumGatewayDetailsSize {
 		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be [0,%d]", MaximumGatewayDetailsSize))
 	}
 
 	// check the website
-	if uint32(len(msg.Website)) > MaximumGatewayWebsiteSize {
+	if len(msg.Website) > MaximumGatewayWebsiteSize {
 		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be [0,%d]", MaximumGatewayWebsiteSize))
-	}
-
-	// check if the owner is included in operators
-	for _, op := range msg.Operators {
-		if op.Equals(msg.Owner) {
-			return ErrInvalidOperator(DefaultCodespace, "the owner can not be an operator")
-		}
 	}
 
 	return nil
@@ -149,7 +151,7 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 
 // String returns the representation of the msg
 func (msg MsgCreateGateway) String() string {
-	return fmt.Sprintf("MsgCreateGateway{%s, %s, %s, %s, %s, %s, %v}", msg.Identity, msg.Moniker, msg.Details, msg.Website, msg.Owner, msg.RedeemAddr, msg.Operators)
+	return fmt.Sprintf("MsgCreateGateway{%s, %s, %s, %s, %s}", msg.Owner, msg.Moniker, msg.Identity, msg.Details, msg.Website)
 }
 
 // GetSignBytes implements Msg
@@ -199,18 +201,23 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
 	}
 
-	// check the moniker
-	if len(msg.Moniker) == 0 || uint32(len(msg.Moniker)) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be (0,%d]", MaximumGatewayMonikerSize))
+	// check the moniker size
+	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	// check the moniker format
+	if !IsAlpha(msg.Moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 	}
 
 	// check the details
-	if msg.Details != nil && uint32(len(*msg.Details)) > MaximumGatewayDetailsSize {
+	if msg.Details != nil && len(*msg.Details) > MaximumGatewayDetailsSize {
 		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be [0,%d]", MaximumGatewayDetailsSize))
 	}
 
 	// check the website
-	if msg.Website != nil && uint32(len(*msg.Website)) > MaximumGatewayWebsiteSize {
+	if msg.Website != nil && len(*msg.Website) > MaximumGatewayWebsiteSize {
 		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be [0,%d]", MaximumGatewayWebsiteSize))
 	}
 
