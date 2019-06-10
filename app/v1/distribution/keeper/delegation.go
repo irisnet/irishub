@@ -128,7 +128,7 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	validator := k.stakeKeeper.Validator(ctx, valAddr)
 	delegation := k.stakeKeeper.Delegation(ctx, delAddr, valAddr)
 
-	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "total_power", wc.TotalPower, "validator_power", wc.ValPower, "community_pool", wc.FeePool.CommunityPool, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool, "validator_total_delegation_shares", validator.GetDelegatorShares().String(), "delegation_shares", delegation.GetShares().String())
+	logger.Debug("Withdraw context", "commission_rate", wc.CommissionRate.String(), "total_power", wc.TotalPower, "validator_power", wc.ValPower, "total_accum", wc.FeePool.TotalValAccum, "validator_pool", wc.FeePool.ValPool, "validator_total_delegation_shares", validator.GetDelegatorShares().String(), "delegation_shares", delegation.GetShares().String())
 	logger.Debug("Before withdraw", "validator_distInfo", valInfo.String())
 	delInfo, valInfo, feePool, withdraw := delInfo.WithdrawRewards(logger, wc, valInfo,
 		validator.GetDelegatorShares(), delegation.GetShares())
@@ -173,7 +173,8 @@ func (k Keeper) WithdrawToDelegator(ctx sdk.Context, feePool types.FeePool,
 
 	withdrawAddr := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 	coinsToAdd, change := amount.TruncateDecimal()
-	feePool.CommunityPool = feePool.CommunityPool.Plus(change)
+//	feePool.CommunityPool = feePool.CommunityPool.Plus(change)
+	feePool.ValPool = feePool.ValPool.Plus(change)
 	k.SetFeePool(ctx, feePool)
 
 	ctx.Logger().Debug("Withdraw reward to delegator", "reward", coinsToAdd.String(), "change", change.ToString(), "delegator", delAddr.String())

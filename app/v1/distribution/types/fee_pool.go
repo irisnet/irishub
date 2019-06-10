@@ -9,7 +9,7 @@ import (
 type FeePool struct {
 	TotalValAccum TotalAccum `json:"val_accum"`      // total valdator accum held by validators
 	ValPool       DecCoins   `json:"val_pool"`       // funds for all validators which have yet to be withdrawn
-	CommunityPool DecCoins   `json:"community_pool"` // pool for community funds yet to be spent
+	//CommunityPool DecCoins   `json:"community_pool"` // pool for community funds yet to be spent
 }
 
 // update total validator accumulation factor
@@ -29,6 +29,6 @@ func InitialFeePool() FeePool {
 	return FeePool{
 		TotalValAccum: NewTotalAccum(0),
 		ValPool:       DecCoins{},
-		CommunityPool: DecCoins{},
+		//CommunityPool: DecCoins{},
 	}
 }

@@ -35,8 +35,7 @@ func handleMsgSend(ctx sdk.Context, k Keeper, msg MsgSend) sdk.Result {
 
 // Handle MsgBurn.
 func handleMsgBurn(ctx sdk.Context, k Keeper, msg MsgBurn) sdk.Result {
-
-	tags, err := k.BurnCoinsFromAddr(ctx, msg.Owner, msg.Coins)
+	tags, err := k.BurnCoins(ctx, msg.Owner, msg.Coins)
 
 	if err != nil {
 		return err.Result()

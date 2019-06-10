@@ -94,7 +94,7 @@ func SupplyInvariants(ck bank.Keeper, k Keeper,
 		loose = loose.Add(sdk.NewDecFromInt(f.GetCollectedFees(ctx).AmountOf(types.StakeDenom)))
 
 		// add community pool
-		loose = loose.Add(feePool.CommunityPool.AmountOf(types.StakeDenom))
+		//loose = loose.Add(feePool.CommunityPool.AmountOf(types.StakeDenom))
 
 		// add validator distribution pool
 		loose = loose.Add(feePool.ValPool.AmountOf(types.StakeDenom))

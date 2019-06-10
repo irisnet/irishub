@@ -103,7 +103,7 @@ func (vi ValidatorDistInfo) TakeFeePoolRewards(logger log.Logger, wc WithdrawCon
 
 	fp.TotalValAccum.Accum = fp.TotalValAccum.Accum.Sub(accum)
 	fp.ValPool = remValPool
-	logger.Debug("Global fee pool", "total_accum", fp.TotalValAccum.Accum.String(), "update_height", fp.TotalValAccum.UpdateHeight, "val_pool", fp.ValPool.ToString(), "community_pool", fp.CommunityPool.ToString())
+	logger.Debug("Global fee pool", "total_accum", fp.TotalValAccum.Accum.String(), "update_height", fp.TotalValAccum.UpdateHeight, "val_pool", fp.ValPool.ToString())
 	vi.ValCommission = vi.ValCommission.Plus(commission)
 	vi.DelPool = vi.DelPool.Plus(afterCommission)
 	logger.Debug("Take fee pool reward", "withdraw_token", withdrawalTokens.ToString(), "commission_rate", wc.CommissionRate.String(), "commission", commission.ToString(), "after_commission", afterCommission.ToString())

@@ -138,7 +138,7 @@ func TestSendKeeper(t *testing.T) {
 	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)}))
 	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 5)}))
 
-	bankKeeper.BurnCoinsFromAddr(ctx, addr, bankKeeper.GetCoins(ctx, addr))
+	bankKeeper.BurnCoins(ctx, addr, bankKeeper.GetCoins(ctx, addr))
 	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
 	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
 	// Test SendCoins
