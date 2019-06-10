@@ -31,7 +31,7 @@ func TestKeeper(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := NewBaseKeeper(accountKeeper)
+	bankKeeper := NewBaseKeeper(cdc, accountKeeper)
 
 	addr := sdk.AccAddress([]byte("addr1"))
 	addr2 := sdk.AccAddress([]byte("addr2"))
@@ -116,7 +116,7 @@ func TestSendKeeper(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := NewBaseKeeper(accountKeeper)
+	bankKeeper := NewBaseKeeper(cdc, accountKeeper)
 	sendKeeper := NewBaseSendKeeper(accountKeeper)
 
 	addr := sdk.AccAddress([]byte("addr1"))
@@ -189,7 +189,7 @@ func TestViewKeeper(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := NewBaseKeeper(accountKeeper)
+	bankKeeper := NewBaseKeeper(cdc, accountKeeper)
 	viewKeeper := NewBaseViewKeeper(accountKeeper)
 
 	addr := sdk.AccAddress([]byte("addr1"))

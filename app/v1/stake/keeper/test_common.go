@@ -100,7 +100,7 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins sdk.Int) (sdk.Conte
 		auth.ProtoBaseAccount, // prototype
 	)
 
-	ck := bank.NewBaseKeeper(accountKeeper)
+	ck := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
 	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(types.DefaultParamSpace), types.DefaultCodespace, NopMetrics())

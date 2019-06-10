@@ -19,7 +19,7 @@ func getMockApp(t *testing.T) (*mock.App, Keeper) {
 
 	RegisterCodec(mApp.Cdc)
 
-	bankKeeper := bank.NewBaseKeeper(mApp.AccountKeeper)
+	bankKeeper := bank.NewBaseKeeper(mApp.Cdc, mApp.AccountKeeper)
 	pk := params.NewKeeper(mApp.Cdc, mApp.KeyParams, mApp.TkeyParams)
 
 	keeper := NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, pk.Subspace(DefaultParamspace), DefaultCodespace, NopMetrics())
