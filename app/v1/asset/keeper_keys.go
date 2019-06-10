@@ -6,21 +6,17 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-var (
-	KeyNextGatewayID = []byte("newGatewayID") // key for the next gateway ID
-)
-
-// KeyGateway returns the key of the specified gateway id
-func KeyGateway(gatewayID uint8) []byte {
-	return []byte(fmt.Sprintf("gateways:%d", gatewayID))
-}
-
-// KeyOwnerGatewayID returns the key of the specifed gateway owner and ID. Intended for querying all gateway ids of a owner
-func KeyOwnerGatewayID(owner sdk.AccAddress, gatewayID uint8) []byte {
-	return []byte(fmt.Sprintf("gateways:%d:%d", owner, gatewayID))
-}
-
-// KeyMoniker returns the key of the specified gateway moniker
-func KeyMoniker(moniker string) []byte {
+// KeyGateway returns the key of the specified moniker
+func KeyGateway(moniker string) []byte {
 	return []byte(fmt.Sprintf("gateways:%s", moniker))
+}
+
+// KeyOwnerGateway returns the key of the specifed owner and moniker. Intended for querying all gateways of an owner
+func KeyOwnerGateway(owner sdk.AccAddress, moniker string) []byte {
+	return []byte(fmt.Sprintf("gateways:%d:%s", owner, moniker))
+}
+
+// KeyGatewaysSubspace returns the key prefix for iterating on all gateways of an owner
+func KeyGatewaysSubspace(owner sdk.AccAddress) []byte {
+	return []byte(fmt.Sprintf("gateways:%d:", owner))
 }

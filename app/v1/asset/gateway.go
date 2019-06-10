@@ -1,17 +1,33 @@
 package asset
 
 import (
+	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// Gateway represents the gateway
+// Gateway represents a gateway
 type Gateway struct {
-	ID         uint8            `json:"id"`             //  ID of the gateway
-	Owner      sdk.AccAddress   `json:"owner"`          //  Owner address of the gateway
-	Identity   string           `json:"identity"`       //  Identity of the gateway
-	Moniker    string           `json:"moniker"`        //  Moniker of the gateway
-	Details    string           `json:"details"`        //  Details of the gateway
-	Website    string           `json:"website"`        //  Website of the gateway
-	RedeemAddr sdk.AccAddress   `json:"redeem_address"` //  Redeem address of the gateway
-	Operators  []sdk.AccAddress `json:"operators"`      //  Operators approved by the gateway
+	Owner    sdk.AccAddress `json:"owner"`    //  the owner address of the gateway
+	Moniker  string         `json:"moniker"`  //  the globally unique name of the gateway
+	Identity string         `json:"identity"` //  the identity of the gateway
+	Details  string         `json:"details"`  //  the description of the gateway
+	Website  string         `json:"website"`  //  the external website of the gateway
+}
+
+// String implements fmt.Stringer
+func (g Gateway) String() string {
+	return fmt.Sprintf("Gateway{%s, %s, %s, %s, %s}", g.Owner, g.Moniker, g.Identity, g.Details, g.Website)
+}
+
+// Gateways is a set of gateways
+type Gateways []Gateway
+
+// String implements fmt.Stringer
+func (gs Gateways) String() string {
+	str := fmt.Sprintf("Gateways for owner %s:", gs[0].Owner)
+	for _, g := range gs {
+		str += fmt.Sprintf("\n  %s: %s: %s : %s", g.Moniker, g.Identity, g.Details, g.Website)
+	}
+	return str
 }
