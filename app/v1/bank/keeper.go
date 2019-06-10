@@ -111,10 +111,10 @@ func (keeper BaseKeeper) DecreaseLoosenToken(
 func (keeper BaseKeeper) BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error) {
 	ctx.GasMeter().ConsumeGas(costBurnCoins, "burnCoins")
 
-	keeper.DecreaseLoosenToken(ctx, amt)
 	if _, err := keeper.SendCoins(ctx, fromAddr, BurnedCoinsAccAddr, amt); err != nil {
 		return nil, err
 	}
+	keeper.DecreaseLoosenToken(ctx, amt)
 
 	burnTags := sdk.NewTags(
 		"burnAmount", []byte(amt.String()),
