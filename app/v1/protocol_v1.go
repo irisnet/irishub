@@ -275,7 +275,7 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper))
 
 	p.queryRouter.
-		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
+		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
 		AddRoute(protocol.GovRoute, gov.NewQuerier(p.govKeeper)).
 		AddRoute(protocol.StakeRoute, stake.NewQuerier(p.StakeKeeper, p.cdc)).
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
