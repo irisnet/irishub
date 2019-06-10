@@ -25,12 +25,36 @@ var _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}
 
 // MsgIssueAsset
 type MsgIssueAsset struct {
-	Asset
+	Family         AssetFamily    `json:"family"`
+	Source         AssetSource    `json:"source"`
+	Gateway        string         `json:"gateway"`
+	Symbol         string         `json:"symbol"`
+	Name           string         `json:"name"`
+	Decimal        uint8          `json:"decimal"`
+	SymbolMinAlias string         `json:"symbol_min_alias"`
+	InitialSupply  uint64         `json:"initial_supply"`
+	MaxSupply      uint64         `json:"max_supply"`
+	Mintable       bool           `json:"mintable"`
+	Owner          sdk.AccAddress `json:"owner"`
+	IssueFee       sdk.Coins      `json:"issue_fee"`
 }
 
 // NewMsgIssueAsset - construct asset issue msg.
-func NewMsgIssueAsset(asset Asset) MsgIssueAsset {
-	return MsgIssueAsset{asset}
+func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueAsset {
+	return MsgIssueAsset{
+		Family:         family,
+		Source:         source,
+		Gateway:        gateway,
+		Symbol:         symbol,
+		Name:           name,
+		Decimal:        decimal,
+		SymbolMinAlias: alias,
+		InitialSupply:  initialSupply,
+		MaxSupply:      maxSupply,
+		Mintable:       mintable,
+		Owner:          owner,
+		IssueFee:       fee,
+	}
 }
 
 // Implements Msg.
@@ -42,38 +66,36 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 	// only accepts alphanumeric characters, _ and -
 	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
 
-	baseAsset := msg.Asset.(BaseAsset)
-
-	if baseAsset.Owner == nil {
+	if msg.Owner == nil {
 		return ErrNilAssetOwner(DefaultCodespace)
 	}
 
-	if _, found := AssetFamilyToStringMap[baseAsset.Family]; !found {
-		return ErrInvalidAssetFamily(DefaultCodespace, byte(baseAsset.Family))
+	if _, found := AssetFamilyToStringMap[msg.Family]; !found {
+		return ErrInvalidAssetFamily(DefaultCodespace, byte(msg.Family))
 	}
 
-	if _, found := AssetSourceToStringMap[baseAsset.Source]; !found {
-		return ErrInvalidAssetSource(DefaultCodespace, byte(baseAsset.Source))
+	if _, found := AssetSourceToStringMap[msg.Source]; !found {
+		return ErrInvalidAssetSource(DefaultCodespace, byte(msg.Source))
 	}
 
-	if len(baseAsset.Name) == 0 || reg.Match([]byte(baseAsset.Name)) {
-		return ErrInvalidAssetName(DefaultCodespace, baseAsset.Name)
+	if len(msg.Name) == 0 || reg.Match([]byte(msg.Name)) {
+		return ErrInvalidAssetName(DefaultCodespace, msg.Name)
 	}
 
-	if len(baseAsset.Symbol) == 0 || reg.Match([]byte(baseAsset.Symbol)) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, baseAsset.Symbol)
+	if len(msg.Symbol) == 0 || reg.Match([]byte(msg.Symbol)) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, msg.Symbol)
 	}
 
-	if baseAsset.InitialSupply == 0 {
-		return ErrInvalidAssetInitSupply(DefaultCodespace, baseAsset.InitialSupply)
+	if msg.InitialSupply == 0 {
+		return ErrInvalidAssetInitSupply(DefaultCodespace, msg.InitialSupply)
 	}
 
-	if baseAsset.MaxSupply < baseAsset.InitialSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, baseAsset.MaxSupply)
+	if msg.MaxSupply < msg.InitialSupply {
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, msg.MaxSupply)
 	}
 
-	if baseAsset.Decimal > 18 {
-		return ErrInvalidAssetDecimal(DefaultCodespace, baseAsset.Decimal)
+	if msg.Decimal > 18 {
+		return ErrInvalidAssetDecimal(DefaultCodespace, msg.Decimal)
 	}
 
 	return nil
@@ -90,7 +112,7 @@ func (msg MsgIssueAsset) GetSignBytes() []byte {
 
 // Implements Msg.
 func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Asset.(BaseAsset).Owner}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // MsgCreateGateway for creating a gateway

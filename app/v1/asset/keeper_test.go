@@ -34,7 +34,8 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.T
 func TestKeeper_IssueAsset(t *testing.T) {
 	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
 
-	cdc := msgCdc
+	cdc := codec.New()
+	RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -43,16 +44,16 @@ func TestKeeper_IssueAsset(t *testing.T) {
 
 	addr := sdk.AccAddress([]byte("addr1"))
 
-	msg := NewMsgIssueAsset(BaseAsset{0x00, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr})
+	msg := NewIssueAsset(0x00, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{})
 	_, err := keeper.IssueAsset(ctx, msg)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasAsset(ctx, msg.GetDenom()))
+	assert.True(t, keeper.HasAsset(ctx, msg.Asset.GetSource(), msg.Asset.GetSymbol()))
 
-	asset, found := keeper.getAsset(ctx, msg.GetDenom())
+	asset, found := keeper.getAsset(ctx, msg.Asset.GetSource(), msg.Asset.GetSymbol())
 	assert.True(t, found)
 
-	assert.Equal(t, msg.GetDenom(), asset.GetDenom())
+	assert.Equal(t, msg.Asset.GetDenom(), asset.GetDenom())
 	assert.Equal(t, msg.Asset.(BaseAsset).Owner, msg.Asset.(BaseAsset).Owner)
 
 	msgJson, _ := json.Marshal(msg.Asset)
@@ -60,10 +61,62 @@ func TestKeeper_IssueAsset(t *testing.T) {
 	assert.Equal(t, msgJson, assetJson)
 }
 
+func TestKeeper_IssueGatewayAsset(t *testing.T) {
+	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
+
+	cdc := codec.New()
+	RegisterCodec(cdc)
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
+	keeper := NewKeeper(cdc, assetKey, bank.BaseKeeper{}, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+
+	owner := sdk.AccAddress([]byte("owner"))
+	gatewayOwner := sdk.AccAddress([]byte("gatewayOwner"))
+	moniker := "moniker"
+	identity := "identity"
+	details := "details"
+	website := "website"
+
+	// construct a test gateway
+	gateway := Gateway{
+		Owner:    gatewayOwner,
+		Moniker:  moniker,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
+	}
+	gatewayAsset := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", 1, 1, true, owner}
+	gatewayAsset1 := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", 1, 1, true, gatewayOwner}
+
+	// unknown gateway moniker
+	_, err := keeper.IssueAsset(ctx, gatewayAsset1)
+	assert.Error(t, err)
+	asset, found := keeper.getAsset(ctx, GATEWAY, "d")
+	assert.False(t, found)
+	assert.Nil(t, asset)
+
+	// no unauthorized creator
+	keeper.SetGateway(ctx, gateway)
+	_, err = keeper.IssueAsset(ctx, gatewayAsset)
+	assert.Error(t, err)
+	asset, found = keeper.getAsset(ctx, GATEWAY, "d")
+	assert.False(t, found)
+	assert.Nil(t, asset)
+
+	_, err = keeper.IssueAsset(ctx, gatewayAsset1)
+	assert.NoError(t, err)
+	asset, found = keeper.getAsset(ctx, GATEWAY, "d")
+	assert.True(t, found)
+	assert.Equal(t, "moniker.d", asset.GetUniqueID())
+}
+
 func TestCreateKeeper(t *testing.T) {
 	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
+	RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())

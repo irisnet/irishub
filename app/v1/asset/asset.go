@@ -10,6 +10,11 @@ type Asset interface {
 	IsMintable() bool
 	GetUniqueID() string
 	GetDenom() string
+
+	GetOwner() types.AccAddress
+	GetSource() AssetSource
+	GetSymbol() string
+	GetGateway() string
 }
 
 type BaseAsset struct {
@@ -48,6 +53,22 @@ func (BaseAsset) GetDecimal() uint8 {
 
 func (BaseAsset) IsMintable() bool {
 	panic("implement me")
+}
+
+func (ba BaseAsset) GetOwner() types.AccAddress {
+	return ba.Owner
+}
+
+func (ba BaseAsset) GetSource() AssetSource {
+	return ba.Source
+}
+
+func (ba BaseAsset) GetSymbol() string {
+	return ba.Symbol
+}
+
+func (ba BaseAsset) GetGateway() string {
+	return ba.Gateway
 }
 
 func (ba BaseAsset) GetUniqueID() string {

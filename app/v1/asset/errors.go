@@ -19,15 +19,16 @@ const (
 	CodeNoUpdatesProvided    sdk.CodeType = 106
 	CodeInvalidAddress       sdk.CodeType = 107
 
-	CodeNilAssetOwner          sdk.CodeType = 110
-	CodeInvalidAssetFamily     sdk.CodeType = 111
-	CodeInvalidAssetSource     sdk.CodeType = 112
-	CodeInvalidAssetName       sdk.CodeType = 113
-	CodeInvalidAssetSymbol     sdk.CodeType = 114
-	CodeInvalidAssetInitSupply sdk.CodeType = 115
-	CodeInvalidAssetMaxSupply  sdk.CodeType = 116
-	CodeInvalidAssetDecimal    sdk.CodeType = 117
-	CodeAssetAlreadyExists     sdk.CodeType = 118
+	CodeNilAssetOwner                 sdk.CodeType = 110
+	CodeInvalidAssetFamily            sdk.CodeType = 111
+	CodeInvalidAssetSource            sdk.CodeType = 112
+	CodeInvalidAssetName              sdk.CodeType = 113
+	CodeInvalidAssetSymbol            sdk.CodeType = 114
+	CodeInvalidAssetInitSupply        sdk.CodeType = 115
+	CodeInvalidAssetMaxSupply         sdk.CodeType = 116
+	CodeInvalidAssetDecimal           sdk.CodeType = 117
+	CodeAssetAlreadyExists            sdk.CodeType = 118
+	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 119
 )
 
 //----------------------------------------
@@ -102,4 +103,8 @@ func ErrNoUpdatesProvided(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
+}
+
+func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
 }

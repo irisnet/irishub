@@ -39,35 +39,47 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 }
 
 // IssueAsset issue a new asset
-func (k Keeper) IssueAsset(ctx sdk.Context, msg MsgIssueAsset) (sdk.Tags, sdk.Error) {
-	if k.HasAsset(ctx, msg.Asset.GetDenom()) {
-		return nil, ErrAssetAlreadyExists(k.codespace, msg.Asset.GetDenom())
+func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
+	if k.HasAsset(ctx, asset.GetSource(), asset.GetSymbol()) {
+		return nil, ErrAssetAlreadyExists(k.codespace, asset.GetUniqueID())
 	}
-	asset := msg.Asset
+
+	if asset.GetSource() == GATEWAY {
+		gateway, err := k.GetGateway(ctx, asset.GetGateway())
+		if err != nil {
+			return nil, err
+		}
+		if !gateway.Owner.Equals(asset.GetOwner()) {
+			return nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
+				fmt.Sprintf("Gateway %s asset can only be created by %s, unauthorized creator %s",
+					gateway.Moniker, gateway.Owner, asset.GetOwner()))
+		}
+	}
+
 	k.SetAsset(ctx, asset)
 	createTags := sdk.NewTags(
-		"denom", []byte(msg.Asset.GetDenom()),
-		"owner", []byte(msg.Asset.(BaseAsset).Owner.String()),
+		"denom", []byte(asset.GetDenom()),
+		"owner", []byte(asset.GetOwner().String()),
 	)
 
 	return createTags, nil
 }
 
-func (k Keeper) HasAsset(ctx sdk.Context, symbol string) bool {
+func (k Keeper) HasAsset(ctx sdk.Context, source AssetSource, symbol string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyAsset(symbol))
+	return store.Has(KeyAsset(source, symbol))
 }
 
 func (k Keeper) SetAsset(ctx sdk.Context, asset Asset) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(asset)
 
-	store.Set(KeyAsset(asset.GetDenom()), bz)
+	store.Set(KeyAsset(asset.GetSource(), asset.GetSymbol()), bz)
 }
 
-func (k Keeper) getAsset(ctx sdk.Context, symbol string) (asset Asset, found bool) {
+func (k Keeper) getAsset(ctx sdk.Context, source AssetSource, symbol string) (asset Asset, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyAsset(symbol))
+	bz := store.Get(KeyAsset(source, symbol))
 	if bz == nil {
 		return asset, false
 	}

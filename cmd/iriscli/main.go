@@ -264,6 +264,7 @@ func main() {
 	assetCmd.AddCommand(
 		client.PostCommands(
 			assetcmd.GetCmdCreateGateway(cdc),
+			assetcmd.GetCmdIssueAsset(cdc),
 		)...)
 
 	assetCmd.AddCommand(
