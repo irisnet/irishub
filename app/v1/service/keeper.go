@@ -8,13 +8,8 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/tools/protoidl"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
 	"time"
 )
-
-var DepositedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
-var RequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
-var TaxCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
 
 type Keeper struct {
 	storeKey sdk.StoreKey
@@ -131,7 +126,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk.Er
 	}
 
 	// Subtract coins from provider's account
-	_, err = k.ck.SendCoins(ctx, svcBinding.Provider, DepositedCoinsAccAddr, svcBinding.Deposit)
+	_, err = k.ck.SendCoins(ctx, svcBinding.Provider, bank.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -184,7 +179,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk
 	}
 
 	// Subtract coins from provider's account
-	_, err := k.ck.SendCoins(ctx, svcBinding.Provider, DepositedCoinsAccAddr, svcBinding.Deposit)
+	_, err := k.ck.SendCoins(ctx, svcBinding.Provider, bank.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -256,7 +251,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	// Subtract coins from provider's account
-	_, err = k.ck.SendCoins(ctx, binding.Provider, DepositedCoinsAccAddr, deposit)
+	_, err = k.ck.SendCoins(ctx, binding.Provider, bank.ServiceDepositCoinsAccAddr, deposit)
 	if err != nil {
 		return err
 	}
@@ -291,7 +286,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 	}
 
 	// Add coins to provider's account
-	_, err := k.ck.SendCoins(ctx, DepositedCoinsAccAddr, binding.Provider, binding.Deposit)
+	_, err := k.ck.SendCoins(ctx, bank.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -337,7 +332,7 @@ func (k Keeper) AddRequest(ctx sdk.Context, req SvcRequest) (SvcRequest, sdk.Err
 	store.Set(GetRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
 		req.RequestHeight, req.RequestIntraTxCounter), bz)
 
-	_, err := k.ck.SendCoins(ctx, req.Consumer, RequestCoinsAccAddr, req.ServiceFee)
+	_, err := k.ck.SendCoins(ctx, req.Consumer, bank.ServiceRequestCoinsAccAddr, req.ServiceFee)
 	if err != nil {
 		return req, err
 	}
@@ -452,7 +447,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return ErrReturnFeeNotExists(k.Codespace(), address)
 	}
 
-	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, address, fee.Coins)
+	_, err := k.ck.SendCoins(ctx, bank.ServiceRequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err
 	}
@@ -490,7 +485,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	}
 	taxCoins = taxCoins.Sort()
 
-	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, TaxCoinsAccAddr, taxCoins)
+	_, err := k.ck.SendCoins(ctx, bank.ServiceRequestCoinsAccAddr, bank.ServiceTaxCoinsAccAddr, taxCoins)
 	if err != nil {
 		return err
 	}
@@ -516,7 +511,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	if !found {
 		return ErrWithdrawFeeNotExists(k.Codespace(), address)
 	}
-	_, err := k.ck.SendCoins(ctx, RequestCoinsAccAddr, address, fee.Coins)
+	_, err := k.ck.SendCoins(ctx, bank.ServiceRequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err
 	}

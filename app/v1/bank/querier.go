@@ -1,4 +1,4 @@
-package auth
+package bank
 
 import (
 	"fmt"
@@ -15,13 +15,13 @@ const (
 )
 
 // creates a querier for auth REST endpoints
-func NewQuerier(keeper AccountKeeper) sdk.Querier {
+func NewQuerier(keeper Keeper, cdc *codec.Codec) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
 		case QueryAccount:
-			return queryAccount(ctx, req, keeper)
+			return queryAccount(ctx, req, keeper, cdc)
 		case QueryTokenStats:
-			return queryTokenStats(ctx, keeper)
+			return queryTokenStats(ctx, keeper, cdc)
 
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
@@ -40,18 +40,19 @@ func NewQueryAccountParams(addr sdk.AccAddress) QueryAccountParams {
 	}
 }
 
-func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) ([]byte, sdk.Error) {
+func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
 	var params QueryAccountParams
-	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+	bk := keeper.(BaseKeeper)
+	if err := cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	account := keeper.GetAccount(ctx, params.Address)
+	account := bk.am.GetAccount(ctx, params.Address)
 	if account == nil {
 		return nil, sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", params.Address))
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, account)
+	bz, err := codec.MarshalJSONIndent(cdc, account)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
@@ -59,12 +60,13 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 	return bz, nil
 }
 
-func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) {
+func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+	bk := keeper.(BaseKeeper)
 	tokenStats := TokenStats{
-		LooseTokens:  keeper.GetTotalLoosenToken(ctx),
-		BurnedTokens: keeper.GetBurnedToken(ctx),
+		LooseTokens:  bk.GetLoosenCoins(ctx),
+		BurnedTokens: bk.GetCoins(ctx, BurnedCoinsAccAddr),
 	}
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokenStats)
+	bz, err := codec.MarshalJSONIndent(cdc, tokenStats)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}

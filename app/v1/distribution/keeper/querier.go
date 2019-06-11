@@ -8,6 +8,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // nolint
@@ -273,8 +274,8 @@ func (ct CommunityTax) String() string {
 
 func queryCommunityTax(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 	ctx, _ = ctx.CacheContext()
-	feePool := k.GetFeePool(ctx)
-	communityTax := CommunityTax{Amount: feePool.CommunityPool}
+	//feePool := k.GetFeePool(ctx)
+	communityTax := k.bankKeeper.GetCoins(ctx, bank.CommunityTaxCoinsAccAddr)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, communityTax)
 	if err != nil {

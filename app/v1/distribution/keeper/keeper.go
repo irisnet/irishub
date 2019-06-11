@@ -5,6 +5,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // keeper of the stake store
@@ -53,9 +54,9 @@ func (k Keeper) GetFeePool(ctx sdk.Context) (feePool types.FeePool) {
 
 // set the global fee pool distribution info
 func (k Keeper) SetGenesisFeePool(ctx sdk.Context, feePool types.FeePool) {
-	coins, _ := feePool.CommunityPool.TruncateDecimal()
-	k.bankKeeper.IncreaseLoosenToken(ctx, coins)
-	feePool.CommunityPool = types.NewDecCoins(coins)
+	//coins, _ := feePool.CommunityPool.TruncateDecimal()
+	//k.bankKeeper.IncreaseLoosenToken(ctx, coins)
+	//feePool.CommunityPool = types.NewDecCoins(coins)
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshalBinaryLengthPrefixed(feePool)
 	store.Set(FeePoolKey, b)
@@ -71,7 +72,6 @@ func (k Keeper) SetFeePool(ctx sdk.Context, feePool types.FeePool) {
 // get the total validator accum for the ctx height
 // in the fee pool
 func (k Keeper) GetFeePoolValAccum(ctx sdk.Context) sdk.Dec {
-
 	// withdraw self-delegation
 	height := ctx.BlockHeight()
 	totalPower := sdk.NewDecFromInt(k.stakeKeeper.GetLastTotalPower(ctx))
@@ -140,7 +140,12 @@ func (k Keeper) IterateValidatorDistInfos(ctx sdk.Context,
 }
 
 func (k Keeper) Init(ctx sdk.Context) {
-	// TODO
-	//   - move community pool balance to AccAddress
-	//   - remove community pool store key/value
+	feePool := k.GetFeePool(ctx)
+
+	communityTaxCoins, change := feePool.CommunityPool.TruncateDecimal()
+	k.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, communityTaxCoins)
+
+	feePool.CommunityPool = types.NewDecCoins(sdk.Coins{})
+	feePool.ValPool = feePool.ValPool.Plus(change)
+	k.SetFeePool(ctx, feePool)
 }

@@ -158,13 +158,15 @@ func (k Keeper) BondDenom() string {
 }
 
 func (k Keeper) UpdateMetrics(ctx sdk.Context) {
-	burnedToken, err := strconv.ParseFloat(sdk.NewDecFromInt(k.bankKeeper.GetBurnedCoins(ctx).AmountOf(types.StakeDenom)).QuoInt(sdk.AttoPrecision).String(), 64)
+	burnedCoins := k.bankKeeper.GetCoins(ctx, bank.BurnedCoinsAccAddr)
+	burnedAmount, err := strconv.ParseFloat(sdk.NewDecFromInt(burnedCoins.AmountOf(types.StakeDenom)).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.BurnedToken.Set(burnedToken)
+		k.metrics.BurnedToken.Set(burnedAmount)
 	}
 
-	loosenToken, err := strconv.ParseFloat(sdk.NewDecFromInt(k.bankKeeper.GetLoosenCoins(ctx).AmountOf(types.StakeDenom)).QuoInt(sdk.AttoPrecision).String(), 64)
+	looseCoins := k.bankKeeper.GetLoosenCoins(ctx)
+	looseAmount, err := strconv.ParseFloat(sdk.NewDecFromInt(looseCoins.AmountOf(types.StakeDenom)).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.LoosenToken.Set(loosenToken)
+		k.metrics.LoosenToken.Set(looseAmount)
 	}
 }
