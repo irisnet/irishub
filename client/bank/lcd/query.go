@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
+	bankv1 "github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/bank"
@@ -75,7 +76,7 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 // QueryTokenStatsRequestHandlerFn performs token statistic query
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryTokenStats), nil)
+		resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -29,8 +30,9 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
-		feePool.CommunityPool = feePool.CommunityPool.Plus(feesCollectedDec)
-		k.SetFeePool(ctx, feePool)
+		k.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, feesCollected)
+		//		feePool.CommunityPool = feePool.CommunityPool.Plus(feesCollectedDec)
+		//		k.SetFeePool(ctx, feePool)
 		k.feeKeeper.ClearCollectedFees(ctx)
 		return
 	}
@@ -64,17 +66,23 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	// allocate community funding
 	communityTax := k.GetCommunityTax(ctx)
 	communityFunding := feesCollectedDec.MulDec(communityTax)
-	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
+	//	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
+	fundingCoins, change := communityFunding.TruncateDecimal()
+	k.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, fundingCoins)
+
+	communityTaxCoins := k.bankKeeper.GetCoins(ctx, bank.CommunityTaxCoinsAccAddr)
+	communityTaxDec := sdk.NewDecFromInt(communityTaxCoins.AmountOf(sdk.NativeTokenMinDenom))
+	communityTaxFloat, err := strconv.ParseFloat(communityTaxDec.QuoInt(sdk.AttoPrecision).String(), 64)
+	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.CommunityTax.Set(communityTaxAmount)
+		k.metrics.CommunityTax.Set(communityTaxFloat)
 	}
 
-	logger.Info("Allocate reward to community tax fund", "allocate_amount", communityFunding.ToString(), "total_community_tax", feePool.CommunityPool.ToString())
+	logger.Info("Allocate reward to community tax fund", "allocate_amount", fundingCoins.String(), "total_community_tax", communityTaxCoins.String())
 
 	// set the global pool within the distribution module
-	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding)
+	poolReceived := feesCollectedDec.Minus(proposerReward).Minus(communityFunding).Plus(change)
 	feePool.ValPool = feePool.ValPool.Plus(poolReceived)
 	k.SetFeePool(ctx, feePool)
 
@@ -87,30 +95,38 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 // Allocate fee tax from the community fee pool, burn or send to trustee account
 func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent sdk.Dec, burn bool) {
 	logger := ctx.Logger()
-	feePool := k.GetFeePool(ctx)
-	communityPool := feePool.CommunityPool
-	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
-	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
+	//feePool := k.GetFeePool(ctx)
+	//communityPool := feePool.CommunityPool
+	//allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
+	//feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
+	taxCoins := k.bankKeeper.GetCoins(ctx, bank.CommunityTaxCoinsAccAddr)
+	taxDecCoins := types.NewDecCoins(taxCoins)
+	allocatedDecCoins := taxDecCoins.MulDec(percent)
+	allocatedCoins, _ := allocatedDecCoins.TruncateDecimal()
+	taxLeftDecCoins := taxDecCoins.Minus(allocatedDecCoins)
+
+	taxLeftDec := taxLeftDecCoins.AmountOf(sdk.NativeTokenMinDenom)
+	taxLeftFloat, err := strconv.ParseFloat(taxLeftDec.QuoInt(sdk.AttoPrecision).String(), 64)
+	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
-		k.metrics.CommunityTax.Set(communityTaxAmount)
+		k.metrics.CommunityTax.Set(taxLeftFloat)
 	}
 
-	k.SetFeePool(ctx, feePool)
-	logger.Info("Spend community tax fund", "total_community_tax_fund", communityPool.ToString(), "left_community_tax_fund", feePool.CommunityPool.ToString())
+	//k.SetFeePool(ctx, feePool)
+	logger.Info("Spend community tax fund", "total_community_tax_fund", taxCoins.String(), "left_community_tax_fund", taxLeftDecCoins.String())
 	if burn {
-		logger.Info("Burn community tax", "burn_amount", allocateCoins.String())
-		_, err := k.bankKeeper.BurnCoinsFromPool(ctx, "communityTax", allocateCoins)
+		logger.Info("Burn community tax", "burn_amount", allocatedCoins.String())
+		_, err := k.bankKeeper.BurnCoins(ctx, bank.CommunityTaxCoinsAccAddr, allocatedCoins)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		logger.Info("Grant community tax to account", "grant_amount", allocateCoins.String(), "grant_address", destAddr.String())
-		if !allocateCoins.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocateCoins.String(), sdk.CommunityTaxUseFlow, "")
+		logger.Info("Grant community tax to account", "grant_amount", allocatedCoins.String(), "grant_address", destAddr.String())
+		if !allocatedCoins.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocatedCoins.String(), sdk.CommunityTaxUseFlow, "")
 		}
-		_, _, err := k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
+		_, err := k.bankKeeper.SendCoins(ctx, bank.CommunityTaxCoinsAccAddr, destAddr, allocatedCoins)
 		if err != nil {
 			panic(err)
 		}

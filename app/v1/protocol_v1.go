@@ -93,8 +93,14 @@ func (p *ProtocolV1) Load() {
 }
 
 func (p *ProtocolV1) Init(ctx sdk.Context) {
-	p.assetKeeper.Init(ctx) // initialize asset params
-	p.distrKeeper.Init(ctx) // move community pool balance to AccAddress
+	// initialize asset params
+	p.assetKeeper.Init(ctx)
+
+	// move burned coins into AccAddress
+	p.bankKeeper.(bank.BaseKeeper).Init(ctx)
+
+	// move community pool balance to AccAddress
+	p.distrKeeper.Init(ctx)
 }
 
 func (p *ProtocolV1) GetCodec() *codec.Codec {
@@ -192,7 +198,10 @@ func (p *ProtocolV1) configKeepers() {
 		protocol.KeyGuardian,
 		guardian.DefaultCodespace,
 	)
-	p.bankKeeper = bank.NewBaseKeeper(p.accountMapper)
+	p.bankKeeper = bank.NewBaseKeeper(
+		p.cdc,
+		p.accountMapper,
+	)
 	p.paramsKeeper = params.NewKeeper(
 		p.cdc,
 		protocol.KeyParams, protocol.TkeyParams,
@@ -275,7 +284,7 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper))
 
 	p.queryRouter.
-		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
+		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
 		AddRoute(protocol.GovRoute, gov.NewQuerier(p.govKeeper)).
 		AddRoute(protocol.StakeRoute, stake.NewQuerier(p.StakeKeeper, p.cdc)).
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).

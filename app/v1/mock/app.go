@@ -112,7 +112,7 @@ func NewApp() *App {
 		app.KeyParams, app.TkeyParams,
 	)
 
-	app.BankKeeper = bank.NewBaseKeeper(app.AccountKeeper)
+	app.BankKeeper = bank.NewBaseKeeper(app.Cdc, app.AccountKeeper)
 	app.FeeKeeper = auth.NewFeeKeeper(app.Cdc, app.KeyFee, app.ParamsKeeper.Subspace(auth.DefaultParamSpace))
 
 	app.SetInitChainer(app.InitChainer)

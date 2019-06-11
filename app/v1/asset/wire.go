@@ -14,9 +14,9 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(BaseAsset{}, "irishub/asset/BaseAsset", nil)
 	cdc.RegisterConcrete(FungibleToken{}, "irishub/asset/FungibleToken", nil)
 	cdc.RegisterConcrete(NonFungibleToken{}, "irishub/asset/NonFungibleToken", nil)
-	cdc.RegisterConcrete(Gateway{}, "irishub/asset/Gateway", nil)
 
 	cdc.RegisterConcrete(&Params{}, "irishub/asset/Params", nil)
+	cdc.RegisterConcrete(&Gateway{}, "irishub/asset/Gateway", nil)
 }
 
 var msgCdc = codec.New()

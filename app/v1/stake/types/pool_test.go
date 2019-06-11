@@ -28,7 +28,7 @@ func TestAddBondedTokens(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
@@ -51,7 +51,7 @@ func TestRemoveBondedTokens(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
