@@ -10,9 +10,9 @@ import (
 
 var (
 	// Prefix for account-by-address store
-	addressStoreKeyPrefix = []byte("account:")
+	addressStoreKeyPrefix  = []byte("account:")
 	globalAccountNumberKey = []byte("globalAccountNumber")
-	TotalLoosenTokenKey = []byte("totalLoosenToken")
+	TotalLoosenTokenKey    = []byte("totalLoosenToken")
 	//BurnedTokenKey = []byte("burnedToken")
 )
 

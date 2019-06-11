@@ -3,12 +3,12 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // nolint

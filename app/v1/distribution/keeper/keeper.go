@@ -1,11 +1,11 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // keeper of the stake store

@@ -16,8 +16,8 @@ import (
 
 // nolint
 var (
-	BurnRate              = sdk.NewDecWithPrec(2, 1)
-	MinDepositRate        = sdk.NewDecWithPrec(3, 1)
+	BurnRate       = sdk.NewDecWithPrec(2, 1)
+	MinDepositRate = sdk.NewDecWithPrec(3, 1)
 )
 
 // Governance ProtocolKeeper
