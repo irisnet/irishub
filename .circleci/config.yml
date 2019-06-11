@@ -6,8 +6,8 @@ workflows:
       - build_docker_image:
           filters:
             branches:
-              ignore:
-                - /.*/
+              only:
+                - master
             tags:
               only:
                 - /v.*/
@@ -19,15 +19,21 @@ jobs:
       - checkout
       - run: |
           docker login -u $DOCKER_USER -p $DOCKER_PASS
+          export TAG=""
+          if [[ $CIRCLE_BRANCH == "master" ]]; then
+            export TAG="latest";
+          else
+            export TAG=$CIRCLE_TAG;
+          fi
       - run:
           name: build irishub mainnet image
-          command: docker build -t irisnet/irishub:$CIRCLE_TAG .
+          command: docker build -t irisnet/irishub:$TAG .
       - run:
           name: push irishub mainnet image
-          command: docker push irisnet/irishub:$CIRCLE_TAG
+          command: docker push irisnet/irishub:$TAG
       - run:
           name: build irishub testnet image
-          command: docker build -t irisnet/irishub:testnet-$CIRCLE_TAG --build-arg NetworkType=testnet .
+          command: docker build -t irisnet/irishub:testnet-$TAG --build-arg NetworkType=testnet .
       - run:
           name: push irishub testnet image
-          command: docker push irisnet/irishub:testnet-$CIRCLE_TAG
+          command: docker push irisnet/irishub:testnet-$TAG
