@@ -44,19 +44,19 @@ func TestKeeper_IssueAsset(t *testing.T) {
 
 	addr := sdk.AccAddress([]byte("addr1"))
 
-	msg := NewIssueAsset(0x00, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{})
-	_, err := keeper.IssueAsset(ctx, msg)
+	ft := NewFungibleToken(0x00, "c", "d", "e", 1, "f", 1, 1, true, addr)
+	_, err := keeper.IssueAsset(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasAsset(ctx, msg.Asset.GetSource(), msg.Asset.GetSymbol()))
+	assert.True(t, keeper.HasAsset(ctx, "i.d"))
 
-	asset, found := keeper.getAsset(ctx, msg.Asset.GetSource(), msg.Asset.GetSymbol())
+	asset, found := keeper.getAsset(ctx, "i.d")
 	assert.True(t, found)
 
-	assert.Equal(t, msg.Asset.GetDenom(), asset.GetDenom())
-	assert.Equal(t, msg.Asset.(BaseAsset).Owner, msg.Asset.(BaseAsset).Owner)
+	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
+	assert.Equal(t, ft.Owner, ft.Owner)
 
-	msgJson, _ := json.Marshal(msg.Asset)
+	msgJson, _ := json.Marshal(ft)
 	assetJson, _ := json.Marshal(asset)
 	assert.Equal(t, msgJson, assetJson)
 }
@@ -93,7 +93,7 @@ func TestKeeper_IssueGatewayAsset(t *testing.T) {
 	// unknown gateway moniker
 	_, err := keeper.IssueAsset(ctx, gatewayAsset1)
 	assert.Error(t, err)
-	asset, found := keeper.getAsset(ctx, GATEWAY, "d")
+	asset, found := keeper.getAsset(ctx, "moniker.d")
 	assert.False(t, found)
 	assert.Nil(t, asset)
 
@@ -101,13 +101,13 @@ func TestKeeper_IssueGatewayAsset(t *testing.T) {
 	keeper.SetGateway(ctx, gateway)
 	_, err = keeper.IssueAsset(ctx, gatewayAsset)
 	assert.Error(t, err)
-	asset, found = keeper.getAsset(ctx, GATEWAY, "d")
+	asset, found = keeper.getAsset(ctx, "moniker.d")
 	assert.False(t, found)
 	assert.Nil(t, asset)
 
 	_, err = keeper.IssueAsset(ctx, gatewayAsset1)
 	assert.NoError(t, err)
-	asset, found = keeper.getAsset(ctx, GATEWAY, "d")
+	asset, found = keeper.getAsset(ctx, "moniker.d")
 	assert.True(t, found)
 	assert.Equal(t, "moniker.d", asset.GetUniqueID())
 }

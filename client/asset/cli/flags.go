@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/irisnet/irishub/app/v1/asset"
 	flag "github.com/spf13/pflag"
 )
 
@@ -37,7 +38,7 @@ func init() {
 	FsAssetIssue.Uint8(FlagDecimal, 0, "the asset decimal. The maximum value is 18")
 	FsAssetIssue.String(FlagSymbolMinAlias, "", "the asset symbol minimum alias")
 	FsAssetIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of asset")
-	FsAssetIssue.Uint64(FlagMaxSupply, 0, "the max supply token of asset")
+	FsAssetIssue.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply token of asset")
 	FsAssetIssue.Bool(FlagMintable, false, "whether the asset can be minted, default false")
 
 	FsGatewayCreate.String(FlagMoniker, "", "the unique gateway name")

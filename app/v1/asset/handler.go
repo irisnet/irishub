@@ -31,7 +31,7 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 	case FUNGIBLE:
 		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, msg.Owner)
 	default:
-		return ErrInvalidAssetFamily(k.codespace, byte(msg.Family)).Result()
+		return ErrInvalidAssetFamily(k.codespace, msg.Family).Result()
 	}
 	tags, err := k.IssueAsset(ctx, asset)
 	if err != nil {

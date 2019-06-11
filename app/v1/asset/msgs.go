@@ -2,9 +2,8 @@ package asset
 
 import (
 	"fmt"
-	"regexp"
-
 	sdk "github.com/irisnet/irishub/types"
+	"regexp"
 )
 
 const (
@@ -13,6 +12,8 @@ const (
 )
 
 var (
+	MaximumAssetMaxSupply = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
+
 	MinimumGatewayMonikerSize = 3   // minimal limitation for the length of the gateway's moniker
 	MaximumGatewayMonikerSize = 8   // maximal limitation for the length of the gateway's moniker
 	MaximumGatewayDetailsSize = 280 // maximal limitation for the length of the gateway's details
@@ -21,7 +22,7 @@ var (
 	IsAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 )
 
-var _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}
+var _, _, _ sdk.Msg = &MsgIssueAsset{}, &MsgCreateGateway{}, &MsgEditGateway{}
 
 // MsgIssueAsset
 type MsgIssueAsset struct {
@@ -71,11 +72,11 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 	}
 
 	if _, found := AssetFamilyToStringMap[msg.Family]; !found {
-		return ErrInvalidAssetFamily(DefaultCodespace, byte(msg.Family))
+		return ErrInvalidAssetFamily(DefaultCodespace, msg.Family)
 	}
 
 	if _, found := AssetSourceToStringMap[msg.Source]; !found {
-		return ErrInvalidAssetSource(DefaultCodespace, byte(msg.Source))
+		return ErrInvalidAssetSource(DefaultCodespace, msg.Source)
 	}
 
 	if len(msg.Name) == 0 || reg.Match([]byte(msg.Name)) {
@@ -90,7 +91,7 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 		return ErrInvalidAssetInitSupply(DefaultCodespace, msg.InitialSupply)
 	}
 
-	if msg.MaxSupply < msg.InitialSupply {
+	if msg.MaxSupply < msg.InitialSupply || msg.MaxSupply > MaximumAssetMaxSupply {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, msg.MaxSupply)
 	}
 

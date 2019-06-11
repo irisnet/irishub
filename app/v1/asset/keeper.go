@@ -40,7 +40,11 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // IssueAsset issue a new asset
 func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
-	if k.HasAsset(ctx, asset.GetSource(), asset.GetSymbol()) {
+	assetID, err := GetKeyID(asset.GetSource(), asset.GetSymbol(), asset.GetGateway())
+	if err != nil {
+		return nil, err
+	}
+	if k.HasAsset(ctx, assetID) {
 		return nil, ErrAssetAlreadyExists(k.codespace, asset.GetUniqueID())
 	}
 
@@ -56,7 +60,10 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 		}
 	}
 
-	k.SetAsset(ctx, asset)
+	err = k.SetAsset(ctx, asset)
+	if err != nil {
+		return nil, err
+	}
 	createTags := sdk.NewTags(
 		"denom", []byte(asset.GetDenom()),
 		"owner", []byte(asset.GetOwner().String()),
@@ -65,21 +72,27 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 	return createTags, nil
 }
 
-func (k Keeper) HasAsset(ctx sdk.Context, source AssetSource, symbol string) bool {
+func (k Keeper) HasAsset(ctx sdk.Context, id string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyAsset(source, symbol))
+	return store.Has(KeyAsset(id))
 }
 
-func (k Keeper) SetAsset(ctx sdk.Context, asset Asset) {
+func (k Keeper) SetAsset(ctx sdk.Context, asset Asset) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(asset)
 
-	store.Set(KeyAsset(asset.GetSource(), asset.GetSymbol()), bz)
+	assetID, err := GetKeyID(asset.GetSource(), asset.GetSymbol(), asset.GetGateway())
+	if err != nil {
+		return err
+	}
+
+	store.Set(KeyAsset(assetID), bz)
+	return nil
 }
 
-func (k Keeper) getAsset(ctx sdk.Context, source AssetSource, symbol string) (asset Asset, found bool) {
+func (k Keeper) getAsset(ctx sdk.Context, id string) (asset Asset, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyAsset(source, symbol))
+	bz := store.Get(KeyAsset(id))
 	if bz == nil {
 		return asset, false
 	}
