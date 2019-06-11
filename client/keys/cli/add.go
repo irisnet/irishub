@@ -1,16 +1,22 @@
 package keys
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	ccrypto "github.com/irisnet/irishub/crypto"
-	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"os"
+	"sort"
 
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
+	ccrypto "github.com/irisnet/irishub/crypto"
+	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/crypto/keystore"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
@@ -21,6 +27,9 @@ const (
 	flagDryRun   = "dry-run"
 	flagAccount  = "account"
 	flagIndex    = "index"
+	flagMultisig = "multisig"
+	flagNoSort   = "nosort"
+	flagKeystore = "keystore"
 )
 
 func addKeyCommand() *cobra.Command {
@@ -33,9 +42,14 @@ phrase, otherwise, a new key will be generated.`,
 		Example: "iriscli keys add <key name>",
 		RunE:    runAddCmd,
 	}
+	cmd.Flags().StringSlice(flagMultisig, nil, "Construct and store a multisig public key (implies --pubkey)")
+	cmd.Flags().Uint(flagMultiSigThreshold, 1, "K out of N required signatures. For use in conjunction with --multisig")
+	cmd.Flags().Bool(flagNoSort, false, "Keys passed to --multisig are taken in the order they're supplied")
+	cmd.Flags().String(FlagPublicKey, "", "Parse a public key in bech32 format and save it to disk")
 	cmd.Flags().StringP(flagType, "t", "secp256k1", "Type of private key (secp256k1|ed25519)")
 	cmd.Flags().Bool(client.FlagUseLedger, false, "Store a local reference to a private key on a Ledger device")
 	cmd.Flags().Bool(flagRecover, false, "Provide seed phrase to recover existing key instead of creating")
+	cmd.Flags().String(flagKeystore, "", "Provide keystore file to recover existing key instead of creating. For use in conjunction with --recover")
 	cmd.Flags().Bool(flagNoBackup, false, "Don't print out seed phrase (if others are watching the terminal)")
 	cmd.Flags().Bool(flagDryRun, false, "Perform action, but don't add key to local keystore")
 	cmd.Flags().Uint32(flagAccount, 0, "Account number for HD derivation")
@@ -46,7 +60,7 @@ phrase, otherwise, a new key will be generated.`,
 
 // nolint: gocyclo
 // TODO remove the above when addressing #1446
-func runAddCmd(cmd *cobra.Command, args []string) error {
+func runAddCmd(_ *cobra.Command, args []string) error {
 	var kb cryptokeys.Keybase
 	var err error
 	var name, pass string
@@ -77,8 +91,41 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 
+		multisigKeys := viper.GetStringSlice(flagMultisig)
+		if len(multisigKeys) != 0 {
+			var pks []crypto.PubKey
+
+			multisigThreshold := viper.GetInt(flagMultiSigThreshold)
+			if err := validateMultisigThreshold(multisigThreshold, len(multisigKeys)); err != nil {
+				return err
+			}
+
+			for _, keyname := range multisigKeys {
+				k, err := kb.Get(keyname)
+				if err != nil {
+					return err
+				}
+				pks = append(pks, k.GetPubKey())
+			}
+
+			// Handle --nosort
+			if !viper.GetBool(flagNoSort) {
+				sort.Slice(pks, func(i, j int) bool {
+					return bytes.Compare(pks[i].Address(), pks[j].Address()) < 0
+				})
+			}
+
+			pk := multisig.NewPubKeyMultisigThreshold(multisigThreshold, pks)
+			if _, err := kb.CreateMulti(name, pk); err != nil {
+				return err
+			}
+
+			fmt.Fprintf(os.Stderr, "Key %q saved to disk.\n", name)
+			return nil
+		}
+
 		// ask for a password when generating a local key
-		if !viper.GetBool(client.FlagUseLedger) {
+		if viper.GetString(FlagPublicKey) == "" && !viper.GetBool(client.FlagUseLedger) {
 			pass, err = keys.GetCheckPassword(
 				"Enter a passphrase for your key:",
 				"Repeat the passphrase:", buf)
@@ -86,6 +133,18 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 				return err
 			}
 		}
+	}
+
+	if viper.GetString(FlagPublicKey) != "" {
+		pk, err := sdk.GetAccPubKeyBech32(viper.GetString(FlagPublicKey))
+		if err != nil {
+			return err
+		}
+		_, err = kb.CreateOffline(name, pk)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if viper.GetBool(client.FlagUseLedger) {
@@ -99,18 +158,40 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 		}
 		printCreate(info, "")
 	} else if viper.GetBool(flagRecover) {
-		seed, err := keys.GetSeed(
-			"Enter your recovery seed phrase:", buf)
-		if err != nil {
-			return err
+		keystoreFile := viper.GetString(flagKeystore)
+		if len(keystoreFile) > 0 {
+			buf := keys.BufferStdin()
+			prompt := fmt.Sprintf("Password of the keystore file:")
+
+			passphrase, err := keys.GetPassword(prompt, buf)
+			if err != nil {
+				return fmt.Errorf("Error reading passphrase: %v", err)
+			}
+			km, err := keystore.NewKeyStoreKeyManager(keystoreFile, passphrase)
+			if err != nil {
+				return err
+			}
+			info, err := kb.ImportPrivateKey(name, pass, km.GetPrivKey())
+			if err != nil {
+				return err
+			}
+			// print out results without the seed phrase
+			viper.Set(flagNoBackup, true)
+			printCreate(info, "")
+		} else {
+			seed, err := keys.GetSeed(
+				"Enter your recovery seed phrase:", buf)
+			if err != nil {
+				return err
+			}
+			info, err := kb.CreateKey(name, seed, pass)
+			if err != nil {
+				return err
+			}
+			// print out results without the seed phrase
+			viper.Set(flagNoBackup, true)
+			printCreate(info, "")
 		}
-		info, err := kb.CreateKey(name, seed, pass)
-		if err != nil {
-			return err
-		}
-		// print out results without the seed phrase
-		viper.Set(flagNoBackup, true)
-		printCreate(info, "")
 	} else {
 		algo := cryptokeys.SigningAlgo(viper.GetString(flagType))
 		info, seed, err := kb.CreateMnemonic(name, cryptokeys.English, pass, algo)

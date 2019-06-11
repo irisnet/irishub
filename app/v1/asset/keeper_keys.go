@@ -1,23 +1,22 @@
 package asset
 
-var (
-	// the separator for string key
-	emptyByte = []byte{0x00}
+import (
+	"fmt"
 
-	// Keys for store prefixes
-
-	// TODO
+	sdk "github.com/irisnet/irishub/types"
 )
 
-func getStringsKey(ss []string) (result []byte) {
-	for _, s := range ss {
-		result = append(append(
-			result,
-			[]byte(s)...),
-			emptyByte...)
-	}
-	if len(result) > 0 {
-		return result[0 : len(result)-1]
-	}
-	return
+// KeyGateway returns the key of the specified moniker
+func KeyGateway(moniker string) []byte {
+	return []byte(fmt.Sprintf("gateways:%s", moniker))
+}
+
+// KeyOwnerGateway returns the key of the specifed owner and moniker. Intended for querying all gateways of an owner
+func KeyOwnerGateway(owner sdk.AccAddress, moniker string) []byte {
+	return []byte(fmt.Sprintf("gateways:%d:%s", owner, moniker))
+}
+
+// KeyGatewaysSubspace returns the key prefix for iterating on all gateways of an owner
+func KeyGatewaysSubspace(owner sdk.AccAddress) []byte {
+	return []byte(fmt.Sprintf("gateways:%d:", owner))
 }

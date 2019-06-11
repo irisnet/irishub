@@ -61,6 +61,7 @@ func main() {
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
+		server.ResetCmd(ctx, cdc, resetAppState),
 		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
 		client.LineBreak,
 	)
@@ -84,18 +85,24 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, config *cfg.Inst
 }
 
 func exportAppStateAndTMValidators(ctx *server.Context,
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, forZeroHeight bool,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
+	return gApp.ExportAppStateAndValidators(forZeroHeight)
+}
+
+func resetAppState(ctx *server.Context,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64) error {
+	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
 	if height > 0 {
-		if replay, replayHeight := gApp.ExportOrReplay(height); replay {
+		if replay, replayHeight := gApp.ResetOrReplay(height); replay {
 			_, err := startNodeAndReplay(ctx, gApp, replayHeight)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 		}
 	}
-	return gApp.ExportAppStateAndValidators(forZeroHeight)
+	return nil
 }
 
 func startNodeAndReplay(ctx *server.Context, app *app.IrisApp, height int64) (n *node.Node, err error) {

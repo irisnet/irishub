@@ -22,9 +22,9 @@ iriscli gov submit-proposal --help
 | ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | --deposit        |                            | Deposit of proposal(at least  30% of minDeposit)                                                                               |          |
 | --description    |                            | Description of proposal                                                                                                                     | Yes      |
-| --param          |                            | Parameter of proposal,eg. [{key:key,value:value,op:update}]                                                                                 |          |
+| --param          |                            | Parameter of proposal,eg. mint/Inflation=0.050                                                                                 |          |
 | --title          |                            | Title of proposal                                                                                                                           | Yes      |
-| --type           |                            | ProposalType of proposal,eg:ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | ProposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
 | --version           |            0                | the version of the new protocol                                                                            |       |
 | --software           |           " "                 | the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | the switch height of the new protocol                                                         |       |

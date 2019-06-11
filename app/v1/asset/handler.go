@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"strings"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -8,22 +10,45 @@ import (
 // TODO
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
-		//switch msg := msg.(type) {
-		//case ...
-		//default:
-		//	return sdk.ErrTxDecode("invalid message parse in asset module").Result()
-		//}
+		switch msg := msg.(type) {
+		case MsgCreateGateway:
+			return handleMsgCreateGateway(ctx, k, msg)
+		case MsgEditGateway:
+			return handleMsgEditGateway(ctx, k, msg)
+		default:
+			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
+		}
 
 		return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 	}
 }
 
-// Called every block, update request status
-// TODO
-func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/asset"))
+// handleMsgCreateGateway handles MsgCreateGateway
+func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
+	// convert moniker to lowercase
+	msg.Moniker = strings.ToLower(msg.Moniker)
 
-	resTags = sdk.NewTags()
+	tags, err := k.CreateGateway(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
 
-	return resTags
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// handleMsgEditGateway handles MsgEditGateway
+func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Result {
+	// convert moniker to lowercase
+	msg.Moniker = strings.ToLower(msg.Moniker)
+
+	tags, err := k.EditGateway(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }

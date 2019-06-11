@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation, signing, and
     broadcast.
-  version: "0.15.0-rc0"
+  version: "0.15.0-dev"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -546,7 +546,12 @@ paths:
                         items:
                           $ref: '#/components/schemas/Coin'
                       public_key:
-                        type: string
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          value:
+                            type: string
                       sequence:
                         type: string
         '204':
@@ -1611,7 +1616,7 @@ paths:
                   type: string
                 proposal_type:
                   type: string
-                  example: Text
+                  example: PlainText
                 proposer:
                   $ref: '#/components/schemas/Address'
                 initial_deposit:

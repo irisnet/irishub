@@ -1,7 +1,4 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/prometheus' | grep -v '/clitest' | grep -v '/lcd' | grep -v '/protobuf')
-PACKAGES_MODULES=$(shell go list ./... | grep -e 'modules' -e 'app')
-PACKAGES_TYPES=$(shell go list ./... | grep 'irisnet/irishub/types')
-PACKAGES_STORE=$(shell go list ./... | grep 'irisnet/irishub/store')
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/server' | grep -v '/tests')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 export GO111MODULE = on
@@ -120,36 +117,33 @@ test: test_unit test_cli test_lcd test_sim
 test_sim: test_sim_modules test_sim_benchmark test_sim_iris_nondeterminism test_sim_iris_fast
 
 test_unit:
-	#@go test $(PACKAGES_NOSIMULATION)
-	@go test $(PACKAGES_MODULES)
-	@go test $(PACKAGES_TYPES)
-	@go test $(PACKAGES_STORE)
+	@go test -mod=readonly $(PACKAGES_NOSIMULATION)
 
 test_cli:
-	@go test  -timeout 20m -count 1 -p 4 tests/cli/*
+	@go test -mod=readonly -timeout 20m -count 1 -p 4 tests/cli/*
 
 test_lcd:
-	@go test `go list github.com/irisnet/irishub/client/lcd`
+	@go test -mod=readonly `go list github.com/irisnet/irishub/client/lcd`
 
 test_sim_modules:
 	@echo "Running individual module simulations..."
-	@go test $(PACKAGES_SIMTEST)
+	@go test -mod=readonly $(PACKAGES_SIMTEST)
 
 test_sim_benchmark:
 	@echo "Running benchmark test..."
-	@go test ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -timeout 24h
+	@go test -mod=readonly ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -timeout 24h
 
 test_sim_iris_nondeterminism:
 	@echo "Running nondeterminism test..."
-	@go test ./app -run TestAppStateDeterminism -v -SimulationEnabled=true -timeout 10m
+	@go test -mod=readonly ./app -run TestAppStateDeterminism -v -SimulationEnabled=true -timeout 10m
 
 test_sim_iris_fast:
 	@echo "Running quick Iris simulation. This may take several minutes..."
-	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
+	@go test -mod=readonly ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
 
 test_sim_iris_slow:
 	@echo "Running full Iris simulation. This may take awhile!"
-	@go test ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
+	@go test -mod=readonly ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
 
 testnet_init:
 	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi

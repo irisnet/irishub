@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
@@ -48,6 +49,7 @@ type ProtocolV1 struct {
 	serviceKeeper  service.Keeper
 	guardianKeeper guardian.Keeper
 	upgradeKeeper  upgrade.Keeper
+	assetKeeper    asset.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -90,12 +92,11 @@ func (p *ProtocolV1) Load() {
 	p.configParams()
 }
 
-// verison0 don't need the init
-func (p *ProtocolV1) Init() {
-
+func (p *ProtocolV1) Init(ctx sdk.Context) {
+	p.assetKeeper.Init(ctx);	// initialize asset params
+	p.distrKeeper.Init(ctx);	// move community pool balance to AccAddress
 }
 
-// verison0 tx codec
 func (p *ProtocolV1) GetCodec() *codec.Codec {
 	return p.cdc
 }
@@ -123,6 +124,7 @@ func MakeCodec() *codec.Codec {
 	guardian.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
+	asset.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
 }
@@ -256,6 +258,8 @@ func (p *ProtocolV1) configKeepers() {
 		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
+
+	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
 }
 
 // configure all Routers
@@ -267,7 +271,8 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.DistrRoute, distr.NewHandler(p.distrKeeper)).
 		AddRoute(protocol.GovRoute, gov.NewHandler(p.govKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
-		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper))
+		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
+		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
@@ -276,17 +281,17 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
-		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper))
+		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
+		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper))
 }
 
-// configure all Stores
+// configure all FeeHandlers
 func (p *ProtocolV1) configFeeHandlers() {
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
 
-// configure all Stores
 func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		protocol.KeyMain,
@@ -300,14 +305,14 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyParams,
 		protocol.KeyUpgrade,
 		protocol.KeyService,
-		protocol.KeyGuardian}
+		protocol.KeyGuardian,
+		protocol.KeyAsset,
+	}
 }
 
-// configure all Stores
+// configure all Params
 func (p *ProtocolV1) configParams() {
-
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
-
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
 }
 
 // application updates every end block
@@ -347,8 +352,8 @@ func (p *ProtocolV1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	}
 }
 
-// custom logic for iris initialization
-// just 0 version need Initchainer
+// Custom logic for iris initialization
+// Only v0 needs InitChainer
 func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
@@ -383,6 +388,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
+	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)

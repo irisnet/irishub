@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
+	assetcmd "github.com/irisnet/irishub/client/asset/cli"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
@@ -61,6 +62,7 @@ func main() {
 	txCmd.AddCommand(
 		client.PostCommands(
 			txcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
+			txcmd.GetMultiSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			txcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
@@ -251,6 +253,27 @@ func main() {
 		)...)
 	rootCmd.AddCommand(
 		guardianCmd,
+	)
+
+	// add asset commands
+	assetCmd := &cobra.Command{
+		Use:   "asset",
+		Short: "Asset subcommands",
+	}
+
+	assetCmd.AddCommand(
+		client.PostCommands(
+			assetcmd.GetCmdCreateGateway(cdc),
+		)...)
+
+	assetCmd.AddCommand(
+		client.GetCommands(
+			assetcmd.GetCmdQueryGateway(cdc),
+			assetcmd.GetCmdQueryGateways(cdc),
+		)...)
+
+	rootCmd.AddCommand(
+		assetCmd,
 	)
 
 	//Add keys and version commands

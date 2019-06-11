@@ -46,14 +46,13 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 	}
 
 	if msg.ProposalType == ProposalTypeParameterChange {
-		for _, param := range msg.Params {
-			if p, ok := keeper.paramsKeeper.GetParamSet(param.Subspace); ok {
-				if _, err := p.Validate(param.Key, param.Value); err != nil {
-					return err.Result()
-				}
-			} else {
-				return ErrInvalidParam(DefaultCodespace, param.Subspace).Result()
+		param := msg.Params[0]
+		if p, ok := keeper.paramsKeeper.GetParamSet(param.Subspace); ok {
+			if _, err := p.Validate(param.Key, param.Value); err != nil {
+				return err.Result()
 			}
+		} else {
+			return ErrInvalidParam(DefaultCodespace, param.Subspace).Result()
 		}
 	}
 	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
@@ -65,17 +64,16 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitPropos
 
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 
-	var paramBytes []byte
-	if msg.ProposalType == ProposalTypeParameterChange {
-		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
-	}
-
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-
-		tags.Param, paramBytes,
 	)
+
+	var paramBytes []byte
+	if msg.ProposalType == ProposalTypeParameterChange {
+		paramBytes, _ = json.Marshal(proposal.(*ParameterProposal).Params)
+		resTags = resTags.AppendTag(tags.Param, paramBytes)
+	}
 
 	if votingStarted {
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
@@ -279,7 +277,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.RemoveFromActiveProposalQueue(ctx, activeProposal.GetVotingEndTime(), activeProposal.GetProposalID())
 		activeProposal.SetTallyResult(tallyResults)
 		keeper.SetProposal(ctx, activeProposal)
-		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result)
+		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result, "tallyResults", tallyResults)
 		resTags = resTags.AppendTag(tags.Action, action)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 

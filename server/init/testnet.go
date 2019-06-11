@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	v1 "github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/client"

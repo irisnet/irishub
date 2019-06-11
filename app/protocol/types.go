@@ -25,7 +25,7 @@ type Protocol interface {
 
 	GetKVStoreKeyList() []*sdk.KVStoreKey
 	Load()
-	Init()
+	Init(ctx sdk.Context)
 	GetCodec() *codec.Codec
 	InitMetrics(store sdk.CommitMultiStore) // init metrics
 }

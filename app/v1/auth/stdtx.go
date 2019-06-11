@@ -21,7 +21,7 @@ var (
 )
 
 func countSubKeys(pub crypto.PubKey) int {
-	v, ok := pub.(*multisig.PubKeyMultisigThreshold)
+	v, ok := pub.(multisig.PubKeyMultisigThreshold)
 	if !ok {
 		return 1
 	}
