@@ -33,6 +33,8 @@ tags:
     description: Distribution module APIs
   - name: Service
     description: Service module APIs
+  - name: Asset
+    description: Asset module APIs
   - name: Version
     description: Query app version
 paths:
@@ -3378,6 +3380,54 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
+  '/asset/gateways/{moniker}/gateway':
+    parameters:
+      - in: path
+        name: moniker
+        description: the unique name of the destination gateway
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Query the gateway with the specified moniker
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gateway'
+        '400':
+          description: Invalid moniker
+        '500':
+          description: Internal Server Error
+  '/asset/gateways/{owner}/gateways':
+    parameters:
+      - in: path
+        name: owner
+        description: Bech32 address of an owner
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all gateways of an owner
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Gateway'
+        '400':
+          description: Invalid owner address
+        '500':
+          description: Internal Server Error
 components:
   requestBodies:
     Unjailbody:
@@ -3979,3 +4029,16 @@ components:
         del_pool_withdrawal_height:
           type: string
           example: '0'
+    Gateway:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/Address'
+        moniker:
+          type: string
+        identity:
+          type: string
+        details:
+          type: string
+        website:
+          type: string
