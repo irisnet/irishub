@@ -16,8 +16,8 @@ As the owner of that asset, you don’t need to take care of any the technical d
 
 #### External Assets
 
-Instead of creating a `native asset` where the full control over supply is in the hands of the issuer, we can also create an `external asset` which is already exists on any other blockchains and let the market deal with demand and supply.
-The only way to create an `external asset` is to create an `add-asset`[*TODO*] proposal on IRISHub Governance, however the top 20 of CMC will be pre-configured in system.
+Instead of creating a `native asset` where the full control over supply is in the hands of the issuer, we can also create an `external asset` which is already exists on another blockchain and let the market deal with demand and supply.
+The only way to create an `external asset` is by submitting an `AddAssetProposal`[*TODO*] via Governance, except that the top 20 CMC tokens are pre-configured in the system for users' convenience.
 
 ### Gateways
 
