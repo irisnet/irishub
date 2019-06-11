@@ -20,6 +20,8 @@ ARG NetworkType=mainnet
 
 RUN make build_cur
 
+# ----------------------------
+
 FROM alpine:3.9
 
 # p2p port
