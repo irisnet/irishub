@@ -5,16 +5,16 @@ import (
 	"math/rand"
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/mock"
-	"github.com/irisnet/irishub/mock/simulation"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // TestStakeWithRandomMessages
@@ -36,8 +36,8 @@ func TestStakeWithRandomMessages(t *testing.T) {
 
 	paramstore := params.NewKeeper(mapp.Cdc, paramsKey, paramsTKey)
 	feeCollectionKeeper := auth.NewFeeKeeper(mapp.Cdc, feeKey, paramstore.Subspace(auth.DefaultParamSpace))
-	stakeKeeper := stake.NewKeeper(mapp.Cdc, stakeKey, stakeTKey, bankKeeper, paramstore.Subspace(stake.DefaultParamspace), stake.DefaultCodespace)
-	distrKeeper := distribution.NewKeeper(mapp.Cdc, distrKey, paramstore.Subspace(distribution.DefaultParamspace), bankKeeper, stakeKeeper, feeCollectionKeeper, distribution.DefaultCodespace)
+	stakeKeeper := stake.NewKeeper(mapp.Cdc, stakeKey, stakeTKey, bankKeeper, paramstore.Subspace(stake.DefaultParamspace), stake.DefaultCodespace, stake.NopMetrics())
+	distrKeeper := distribution.NewKeeper(mapp.Cdc, distrKey, paramstore.Subspace(distribution.DefaultParamspace), bankKeeper, stakeKeeper, feeCollectionKeeper, distribution.DefaultCodespace, distribution.NopMetrics())
 	mapp.Router().AddRoute("stake", []*sdk.KVStoreKey{stakeKey, mapp.KeyAccount, distrKey}, stake.NewHandler(stakeKeeper))
 	mapp.SetEndBlocker(func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 		validatorUpdates := stake.EndBlocker(ctx, stakeKeeper)

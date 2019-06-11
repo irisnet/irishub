@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	v1 "github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/server"
 	"github.com/tendermint/go-amino"

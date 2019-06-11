@@ -22,6 +22,7 @@ type Keybase interface {
 	// CreateMnemonic creates a new mnemonic, and derives a hierarchical deterministic
 	// key from that.
 	CreateMnemonic(name string, language Language, passwd string, algo SigningAlgo) (info Info, seed string, err error)
+
 	// CreateKey takes a mnemonic and derives, a password. This method is temporary
 	CreateKey(name, mnemonic, passwd string) (info Info, err error)
 	// CreateFundraiserKey takes a mnemonic and derives, a password
@@ -47,6 +48,9 @@ type Keybase interface {
 	ImportPubKey(name string, armor string) (err error)
 	Export(name string) (armor string, err error)
 	ExportPubKey(name string) (armor string, err error)
+
+	// import from private key and store it
+	ImportPrivateKey(name string, passwd string, privKey crypto.PrivKey) (info Info, err error)
 
 	// *only* works on locally-stored keys. Temporary method until we redo the exporting API
 	ExportPrivateKeyObject(name string, passphrase string) (crypto.PrivKey, error)
@@ -207,8 +211,8 @@ func NewMultiInfo(name string, pub crypto.PubKey) Info {
 	}
 
 	return &multiInfo{
-		Name:   name,
-		PubKey: pub,
+		Name:      name,
+		PubKey:    pub,
 		Threshold: multiPK.K,
 		PubKeys:   pubKeys,
 	}

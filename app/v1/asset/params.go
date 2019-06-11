@@ -5,20 +5,22 @@ import (
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"strconv"
 )
 
 var _ params.ParamSet = (*Params)(nil)
 
-// default paramSpace for asset keeper
 const (
 	DefaultParamSpace = "asset"
 )
 
-//Parameter store key
+// parameter keys
 var (
-	// params store for asset params
-
-	// TODO
+	KeyAssetTaxRate         = []byte("AssetTaxRate")
+	KeyIssueFTBaseFee       = []byte("IssueFTBaseFee")
+	KeyMintFTBaseFeeRatio   = []byte("MintFTBaseFeeRatio")
+	KeyCreateGatewayFee     = []byte("CreateGatewayFee")
+	KeyGatewayAssetFeeRatio = []byte("GatewayAssetFeeRatio")
 )
 
 // ParamTable for asset module
@@ -28,52 +30,107 @@ func ParamTypeTable() params.TypeTable {
 
 // asset params
 type Params struct {
-	// TODO
-}
+	AssetTaxRate         sdk.Dec `json:"asset_tax_rate"`          // e.g., 40%
+	IssueFTBaseFee       uint32  `json:"issue_ft_base_fee"`       // e.g., 300000
+	MintFTBaseFeeRatio   sdk.Dec `json:"mint_ft_base_fee_ratio"`  // e.g., 10%
+	CreateGatewayFee     uint32  `json:"create_gateway_fee"`      // e.g., 600000
+	GatewayAssetFeeRatio sdk.Dec `json:"gateway_asset_fee_ratio"` // e.g., 10%
+} // issuance fee = IssueFTBaseFee / (ln(len(symbol))/ln3)^4
 
 func (p Params) String() string {
-	// TODO
-	return fmt.Sprintf(`Asset Params:`)
+	return fmt.Sprintf(`Asset Params:
+  Asset Tax Rate:                                           %s
+  Base Fee for Issuing Fungible Token:                      %d
+  Base Fee Ratio for Minting (vs Issuing) Fungible Token:   %s
+  Fee for Creating Gateway:                                 %d
+  Fee Ratio for Gateway (vs Native) Assets:                 %s`,
+		p.AssetTaxRate.String(), p.IssueFTBaseFee, p.MintFTBaseFeeRatio.String(), p.CreateGatewayFee, p.GatewayAssetFeeRatio.String())
 }
 
-// Implements params.ParamStruct
+// Implements params.ParamSet
 func (p *Params) GetParamSpace() string {
 	return DefaultParamSpace
 }
 
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
-		// TODO
+		{KeyAssetTaxRate, &p.AssetTaxRate},
+		{KeyIssueFTBaseFee, &p.IssueFTBaseFee},
+		{KeyMintFTBaseFeeRatio, &p.MintFTBaseFeeRatio},
+		{KeyCreateGatewayFee, &p.CreateGatewayFee},
+		{KeyGatewayAssetFeeRatio, &p.GatewayAssetFeeRatio},
 	}
 }
 
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
-	// TODO
+	case string(KeyAssetTaxRate):
+		rate, err := sdk.NewDecFromStr(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateAssetTaxRate(rate); err != nil {
+			return nil, err
+		}
+		return rate, nil
+	case string(KeyIssueFTBaseFee):
+		fee, err := strconv.ParseUint(value, 10, 32)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		return uint32(fee), nil
+	case string(KeyMintFTBaseFeeRatio):
+		ratio, err := sdk.NewDecFromStr(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateMintFTBaseFeeRatio(ratio); err != nil {
+			return nil, err
+		}
+		return ratio, nil
+	case string(KeyCreateGatewayFee):
+		fee, err := strconv.ParseUint(value, 10, 32)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		return uint32(fee), nil
+	case string(KeyGatewayAssetFeeRatio):
+		ratio, err := sdk.NewDecFromStr(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateGatewayAssetFeeRatio(ratio); err != nil {
+			return nil, err
+		}
+		return ratio, nil
 	default:
-		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
+		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is an invalid key", key))
 	}
 }
 
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
-	switch key {
-	// TODO
-	default:
-		return "", fmt.Errorf("%s is not existed", key)
-	}
+	return "", fmt.Errorf("This method is not implemented!")
 }
 
 // default asset module params
 func DefaultParams() Params {
 	return Params{
-		// TODO
+		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
+		IssueFTBaseFee:       300000,
+		MintFTBaseFeeRatio:   sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
+		CreateGatewayFee:     600000,
+		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
 
 // default asset module params for test
 func DefaultParamsForTest() Params {
 	return Params{
-		// TODO
+		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
+		IssueFTBaseFee:       300000,
+		MintFTBaseFeeRatio:   sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
+		CreateGatewayFee:     600000,
+		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
 
@@ -82,11 +139,51 @@ func validateParams(p Params) error {
 		return nil
 	}
 
-	// TODO
+	if err := validateAssetTaxRate(p.AssetTaxRate); err != nil {
+		return err
+	}
+	if err := validateMintFTBaseFeeRatio(p.MintFTBaseFeeRatio); err != nil {
+		return err
+	}
+	if err := validateGatewayAssetFeeRatio(p.GatewayAssetFeeRatio); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-//______________________________________________________________________
+func validateAssetTaxRate(v sdk.Dec) sdk.Error {
+	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidAssetTaxRate,
+			fmt.Sprintf("Asset Tax Rate [%s] should be between [0, 1]", v.String()),
+		)
+	}
+	return nil
+}
+
+func validateMintFTBaseFeeRatio(v sdk.Dec) sdk.Error {
+	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidMintFTBaseFeeRatio,
+			fmt.Sprintf("Base Fee Ratio for Minting FTs [%s] should be between [0, 1]", v.String()),
+		)
+	}
+	return nil
+}
+
+func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
+	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidGatewayAssetFeeRatio,
+			fmt.Sprintf("Fee Ratio for Gateway Assets [%s] should be between [0, 1]", v.String()),
+		)
+	}
+	return nil
+}
 
 // get asset params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) Params {
@@ -99,5 +196,3 @@ func (k Keeper) GetParamSet(ctx sdk.Context) Params {
 func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
-
-//______________________________________________________________________

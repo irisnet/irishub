@@ -11,12 +11,9 @@ import (
 var (
 	// Prefix for account-by-address store
 	addressStoreKeyPrefix = []byte("account:")
-
 	globalAccountNumberKey = []byte("globalAccountNumber")
-
 	TotalLoosenTokenKey = []byte("totalLoosenToken")
-
-	BurnedTokenKey = []byte("burnedToken")
+	//BurnedTokenKey = []byte("burnedToken")
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -173,35 +170,35 @@ func (am AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	return accNumber
 }
 
-func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
-	// read from db
-	var burnToken sdk.Coins
-	store := ctx.KVStore(am.key)
-	bz := store.Get(BurnedTokenKey)
-	if bz == nil {
-		burnToken = nil
-	} else {
-		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &burnToken)
-	}
-	return burnToken
-}
+//func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
+//	// read from db
+//	var burnToken sdk.Coins
+//	store := ctx.KVStore(am.key)
+//	bz := store.Get(BurnedTokenKey)
+//	if bz == nil {
+//		burnToken = nil
+//	} else {
+//		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &burnToken)
+//	}
+//	return burnToken
+//}
 
-func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
-		return
-	}
-	burnToken := am.GetBurnedToken(ctx)
-	// increase burn token amount
-	burnToken = burnToken.Plus(coins)
-	if !burnToken.IsNotNegative() {
-		panic(fmt.Errorf("burn token is negative"))
-	}
-	// write back to db
-	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
-	store := ctx.KVStore(am.key)
-	store.Set(BurnedTokenKey, bzNew)
-}
+//func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
+//	// parameter checking
+//	if coins == nil || !coins.IsValid() {
+//		return
+//	}
+//	burnToken := am.GetBurnedToken(ctx)
+//	// increase burn token amount
+//	burnToken = burnToken.Plus(coins)
+//	if !burnToken.IsNotNegative() {
+//		panic(fmt.Errorf("burn token is negative"))
+//	}
+//	// write back to db
+//	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
+//	store := ctx.KVStore(am.key)
+//	store.Set(BurnedTokenKey, bzNew)
+//}
 
 func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 	// read from db

@@ -92,12 +92,17 @@ func (p *ProtocolV1) Load() {
 	p.configParams()
 }
 
-// verison0 don't need the init
-func (p *ProtocolV1) Init() {
+func (p *ProtocolV1) Init(ctx sdk.Context) {
+	// initialize asset params
+	p.assetKeeper.Init(ctx)
 
+	// move burned coins into AccAddress
+	p.bankKeeper.(bank.BaseKeeper).Init(ctx)
+
+	// move community pool balance to AccAddress
+	p.distrKeeper.Init(ctx)
 }
 
-// verison0 tx codec
 func (p *ProtocolV1) GetCodec() *codec.Codec {
 	return p.cdc
 }
@@ -193,7 +198,10 @@ func (p *ProtocolV1) configKeepers() {
 		protocol.KeyGuardian,
 		guardian.DefaultCodespace,
 	)
-	p.bankKeeper = bank.NewBaseKeeper(p.accountMapper)
+	p.bankKeeper = bank.NewBaseKeeper(
+		p.cdc,
+		p.accountMapper,
+	)
 	p.paramsKeeper = params.NewKeeper(
 		p.cdc,
 		protocol.KeyParams, protocol.TkeyParams,
@@ -277,7 +285,7 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper))
 
 	p.queryRouter.
-		AddRoute(protocol.AccountRoute, auth.NewQuerier(p.accountMapper)).
+		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
 		AddRoute(protocol.GovRoute, gov.NewQuerier(p.govKeeper)).
 		AddRoute(protocol.StakeRoute, stake.NewQuerier(p.StakeKeeper, p.cdc)).
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
@@ -287,14 +295,13 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper))
 }
 
-// configure all Stores
+// configure all FeeHandlers
 func (p *ProtocolV1) configFeeHandlers() {
 	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
 
-// configure all Stores
 func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		protocol.KeyMain,
@@ -313,11 +320,9 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	}
 }
 
-// configure all Stores
+// configure all Params
 func (p *ProtocolV1) configParams() {
-
 	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
-
 }
 
 // application updates every end block
@@ -357,8 +362,8 @@ func (p *ProtocolV1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	}
 }
 
-// custom logic for iris initialization
-// just 0 version need Initchainer
+// Custom logic for iris initialization
+// Only v0 needs InitChainer
 func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 

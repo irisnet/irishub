@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/client/keys"
 	ccrypto "github.com/irisnet/irishub/crypto"
 	cryptokeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/crypto/keystore"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -28,6 +29,7 @@ const (
 	flagIndex    = "index"
 	flagMultisig = "multisig"
 	flagNoSort   = "nosort"
+	flagKeystore = "keystore"
 )
 
 func addKeyCommand() *cobra.Command {
@@ -47,6 +49,7 @@ phrase, otherwise, a new key will be generated.`,
 	cmd.Flags().StringP(flagType, "t", "secp256k1", "Type of private key (secp256k1|ed25519)")
 	cmd.Flags().Bool(client.FlagUseLedger, false, "Store a local reference to a private key on a Ledger device")
 	cmd.Flags().Bool(flagRecover, false, "Provide seed phrase to recover existing key instead of creating")
+	cmd.Flags().String(flagKeystore, "", "Provide keystore file to recover existing key instead of creating. For use in conjunction with --recover")
 	cmd.Flags().Bool(flagNoBackup, false, "Don't print out seed phrase (if others are watching the terminal)")
 	cmd.Flags().Bool(flagDryRun, false, "Perform action, but don't add key to local keystore")
 	cmd.Flags().Uint32(flagAccount, 0, "Account number for HD derivation")
@@ -155,18 +158,40 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 		}
 		printCreate(info, "")
 	} else if viper.GetBool(flagRecover) {
-		seed, err := keys.GetSeed(
-			"Enter your recovery seed phrase:", buf)
-		if err != nil {
-			return err
+		keystoreFile := viper.GetString(flagKeystore)
+		if len(keystoreFile) > 0 {
+			buf := keys.BufferStdin()
+			prompt := fmt.Sprintf("Password of the keystore file:")
+
+			passphrase, err := keys.GetPassword(prompt, buf)
+			if err != nil {
+				return fmt.Errorf("Error reading passphrase: %v", err)
+			}
+			km, err := keystore.NewKeyStoreKeyManager(keystoreFile, passphrase)
+			if err != nil {
+				return err
+			}
+			info, err := kb.ImportPrivateKey(name, pass, km.GetPrivKey())
+			if err != nil {
+				return err
+			}
+			// print out results without the seed phrase
+			viper.Set(flagNoBackup, true)
+			printCreate(info, "")
+		} else {
+			seed, err := keys.GetSeed(
+				"Enter your recovery seed phrase:", buf)
+			if err != nil {
+				return err
+			}
+			info, err := kb.CreateKey(name, seed, pass)
+			if err != nil {
+				return err
+			}
+			// print out results without the seed phrase
+			viper.Set(flagNoBackup, true)
+			printCreate(info, "")
 		}
-		info, err := kb.CreateKey(name, seed, pass)
-		if err != nil {
-			return err
-		}
-		// print out results without the seed phrase
-		viper.Set(flagNoBackup, true)
-		printCreate(info, "")
 	} else {
 		algo := cryptokeys.SigningAlgo(viper.GetString(flagType))
 		info, seed, err := kb.CreateMnemonic(name, cryptokeys.English, pass, algo)

@@ -44,7 +44,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		paramsKeeper.Subspace(auth.DefaultParamSpace),
 	)
 
-	ck := bank.NewBaseKeeper(mapp.AccountKeeper)
+	ck := bank.NewBaseKeeper(mapp.Cdc, mapp.AccountKeeper)
 	sk := stake.NewKeeper(
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,

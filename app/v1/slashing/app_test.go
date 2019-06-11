@@ -27,7 +27,7 @@ func getMockApp(t *testing.T) (*mock.App, stake.Keeper, Keeper) {
 
 	RegisterCodec(mApp.Cdc)
 	keySlashing := sdk.NewKVStoreKey("slashing")
-	bankKeeper := bank.NewBaseKeeper(mApp.AccountKeeper)
+	bankKeeper := bank.NewBaseKeeper(mApp.Cdc, mApp.AccountKeeper)
 
 	paramsKeeper := params.NewKeeper(mApp.Cdc, mApp.KeyParams, mApp.TkeyParams)
 	stakeKeeper := stake.NewKeeper(mApp.Cdc, mApp.KeyStake, mApp.TkeyStake, bankKeeper, paramsKeeper.Subspace(stake.DefaultParamspace), stake.DefaultCodespace, stake.NopMetrics())
