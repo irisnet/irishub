@@ -16,11 +16,12 @@ iriscli keys <command>
 | ----------------------- | -------------------------------------------------------------------------------------------- |
 | [mnemonic](mnemonic.md) | Create a bip39 mnemonic, sometimes called a seed phrase, by reading from the system entropy. |
 | [new](new.md)           | Derive a new private key using an interactive command that will prompt you for each input.   |
-| [add](add.md)           | Create a new key, or import from seed                                                        |
+| [add](add.md)           | Create a new key, or import from seed , or import from a keystore file                      |
 | [list](list.md)         | List all keys                                                                                |
 | [show](show.md)         | Show key info for the given name                                                             |
 | [delete](delete.md)     | Delete the given key                                                                         |
 | [update](update.md)     | Change the password used to protect private key                                              |
+| [export](export.md)     | Export keystore to a json file                                                                         |
 
 ## Flags
 

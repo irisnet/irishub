@@ -21,6 +21,7 @@ iriscli keys add <name> <flags>
 | --ledger        |           | 使用ledger设备                                               |          |
 | --no-backup     |           | 不输出助记词（如果其他人正在看着操作终端）                              |          |
 | --recover       |           | 提供助记词以恢复现有密钥而不是新建                                     |          |
+| --keystore      |           | 从已备份的keystore导入秘钥                                     |          |
 | --type, -t      | secp256k1 | 私钥类型 (secp256k\|ed25519)                              |          |
 
 ## 例子
@@ -67,3 +68,9 @@ Repeat the passphrase:
 Enter your recovery seed phrase:
 ```
 
+### 通过keystore导入秘钥
+
+使用备份时指定的密码,导入key。
+```shell
+iriscli keys add Mykey --recover --keystore=<path_to_backup_keystore>
+```

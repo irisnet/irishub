@@ -21,7 +21,8 @@ iriscli keys add <name> [flags]
 | --ledger        |           | Store a local reference to a private key on a Ledger device       |          |
 | --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
 | --recover       |           | Provide seed phrase to recover existing key instead of creating   |          |
-| --type, -t      | secp256k1 | Type of private key (secp256k\|ed25519)                  |          |
+| --keystore      |           | Recover a key from keystore                                  |          |
+| --type, -t      | secp256k1 | Type of private key (secp256k\ed25519)                  |          |
 
 ## Examples
 
@@ -67,3 +68,8 @@ Repeat the passphrase:
 Enter your recovery seed phrase:
 ```
 
+### Recover a key from keystore
+
+```shell
+iriscli keys add Mykey --recover --keystore=<path_to_backup_keystore>
+```
