@@ -146,6 +146,8 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 10. Asset模块的APIs
     1. `GET /asset/gateways/{moniker}/gateway`: 查询指定名字所对应的网关信息
     2. `GET /asset/gateways/{owner}/gateways`: 查询由一个地址所创建的全部网关
+    3. `POST /asset/gateways/{owner}/create`: 创建一个网关
+    4. `POST /asset/gateways/{owner}/edit`: 编辑一个存在的网关
  
 11. 查询版本
 
