@@ -176,6 +176,12 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+		return err
+	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
@@ -250,6 +256,12 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+		return err
+	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
@@ -317,6 +329,12 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+		return err
+	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
@@ -371,6 +389,12 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	}
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+		return err
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
@@ -427,6 +451,12 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	}
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
+	}
+	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+		return err
 	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
@@ -499,6 +529,15 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+		return err
+	}
+	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
+		return err
+	}
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
@@ -559,6 +598,9 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidReqChainId(DefaultCodespace)
+	}
+	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
+		return err
 	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
@@ -700,6 +742,11 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 	if err := ensureNameLength(msg.Name); err != nil {
 		return err
 	}
+
+	if err := ensureChainIdLength(msg.ChainId, "chain_id"); err != nil {
+		return err
+	}
+
 	if len(msg.Description) > 280 {
 		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "description", len(msg.Description), 280)
 	}
@@ -721,6 +768,13 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 func ensureNameLength(name string) sdk.Error {
 	if len(name) > 70 {
 		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "name", len(name), 70)
+	}
+	return nil
+}
+
+func ensureChainIdLength(chainId, fieldNm string) sdk.Error {
+	if len(chainId) > 50 {
+		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, fieldNm, len(chainId), 50)
 	}
 	return nil
 }
