@@ -14,6 +14,7 @@ const (
 
 var (
 	FsGatewayCreate = flag.NewFlagSet("", flag.ContinueOnError)
+	FsGatewayEdit   = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -21,4 +22,9 @@ func init() {
 	FsGatewayCreate.String(FlagIdentity, "", "the gateway identity")
 	FsGatewayCreate.String(FlagDetails, "", "the gateway description")
 	FsGatewayCreate.String(FlagWebsite, "", "the external website")
+
+	FsGatewayEdit.String(FlagMoniker, "", "the unique gateway name")
+	FsGatewayEdit.String(FlagIdentity, "", "the gateway identity")
+	FsGatewayEdit.String(FlagDetails, "", "the gateway description")
+	FsGatewayEdit.String(FlagWebsite, "", "the external website")
 }
