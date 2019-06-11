@@ -20,7 +20,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// edit a gateway
 	r.HandleFunc(
-		"/asset/gateways/{owner}/edit",
+		"/asset/gateways/{moniker}/edit",
 		editGatewayHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
@@ -34,11 +34,11 @@ type createGatewayReq struct {
 }
 
 type editGatewayReq struct {
-	BaseTx   utils.BaseTx `json:"base_tx"`
-	Moniker  string       `json:"moniker"`  //  Name of the gateway
-	Identity *string      `json:"identity"` //  Identity of the gateway
-	Details  *string      `json:"details"`  //  Description of the gateway
-	Website  *string      `json:"website"`  //  Website of the gateway
+	BaseTx   utils.BaseTx   `json:"base_tx"`
+	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
+	Identity *string        `json:"identity"` //  Identity of the gateway
+	Details  *string        `json:"details"`  //  Description of the gateway
+	Website  *string        `json:"website"`  //  Website of the gateway
 }
 
 func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -82,16 +82,10 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
 		vars := mux.Vars(r)
-		ownerStr := vars["owner"]
-
-		owner, err := sdk.AccAddressFromBech32(ownerStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		moniker := vars["moniker"]
 
 		var req editGatewayReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
+		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
@@ -102,7 +96,7 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		}
 
 		// create the MsgEditGateway message
-		msg := asset.NewMsgEditGateway(owner, req.Moniker, req.Identity, req.Details, req.Website)
+		msg := asset.NewMsgEditGateway(req.Owner, moniker, req.Identity, req.Details, req.Website)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
