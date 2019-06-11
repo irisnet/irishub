@@ -1,0 +1,33 @@
+version: 2
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build_docker_image:
+          filters:
+            branches:
+              ignore:
+                - /.*/
+            tags:
+              only:
+                - /v.*/
+jobs:
+  build_docker_image:
+    machine:
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: build irishub mainnet image
+          command: docker build -t irisnet/irishub:$CIRCLE_TAG .
+      - run:
+          name: push irishub mainnet image
+          command: docker push irisnet/irishub:$CIRCLE_TAG
+      - run:
+          name: build irishub testnet image
+          command: docker build -t irisnet/irishub:testnet-$CIRCLE_TAG --build-arg NetworkType=testnet .
+      - run:
+          name: push irishub testnet image
+          command: docker push irisnet/irishub:testnet-$CIRCLE_TAG
