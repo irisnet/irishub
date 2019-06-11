@@ -15,14 +15,14 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 	// create a gateway
 	r.HandleFunc(
 		"/asset/gateways/{owner}/create",
-		createGatewayHandlerFn(cliCtx, cdc),
-	).Methods("GET")
+		createGatewayHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 
 	// edit a gateway
 	r.HandleFunc(
 		"/asset/gateways/{owner}/edit",
-		editGatewayHandlerFn(cliCtx, cdc),
-	).Methods("GET")
+		editGatewayHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 }
 
 type createGatewayReq struct {
@@ -45,8 +45,8 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
-		vars = mux.Vars(r)
-		ownerStr = vars["owner"]
+		vars := mux.Vars(r)
+		ownerStr := vars["owner"]
 
 		owner, err := sdk.AccAddressFromBech32(ownerStr)
 		if err != nil {
@@ -55,7 +55,7 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		var req createGatewayReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
+		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
@@ -81,8 +81,8 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
-		vars = mux.Vars(r)
-		ownerStr = vars["owner"]
+		vars := mux.Vars(r)
+		ownerStr := vars["owner"]
 
 		owner, err := sdk.AccAddressFromBech32(ownerStr)
 		if err != nil {
