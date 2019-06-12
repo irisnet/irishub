@@ -4,10 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
-	"strings"
-
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/app/v1"
@@ -22,6 +18,9 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"io"
+	"os"
+	"strings"
 )
 
 const (
@@ -91,14 +90,32 @@ func MakeLatestCodec() *codec.Codec {
 	return cdc
 }
 
+func (app *IrisApp) LastBlockHeight() int64 {
+	return app.BaseApp.LastBlockHeight()
+}
+
 func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64) {
 	lastBlockHeight := app.BaseApp.LastBlockHeight()
 	if replayHeight > lastBlockHeight {
 		replayHeight = lastBlockHeight
 	}
 
+	app.Logger.Info("This Reset operation will change the application store, backup your node home directory before proceeding!!")
+
+	app.Logger.Info(fmt.Sprintf("The last block height is %v, reset height to %v.", lastBlockHeight, replayHeight))
+	app.Logger.Info("Are you sure to proceed? (y/n)")
+	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		cmn.Exit(err.Error())
+	}
+	confirm := strings.ToLower(strings.TrimSpace(input))
+	if confirm != "y" && confirm != "yes" {
+		cmn.Exit("Reset operation aborted.")
+	}
+
 	if lastBlockHeight-replayHeight <= DefaultCacheSize {
-		err := app.LoadVersion(replayHeight, protocol.KeyMain, false)
+		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
+		app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
 		if err != nil {
 			cmn.Exit(err.Error())
 		}
@@ -106,7 +123,7 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 	}
 
 	loadHeight := app.replayToHeight(replayHeight, app.Logger)
-	err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
@@ -133,16 +150,6 @@ func (app *IrisApp) replayToHeight(replayHeight int64, logger log.Logger) int64 
 	} else {
 		// version 1 will always be kept
 		loadHeight = 1
-	}
-	logger.Info("This replay operation will change the application store, backup your node home directory before proceeding!!")
-	logger.Info("Are you sure to proceed? (y/n)")
-	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-	if err != nil {
-		cmn.Exit(err.Error())
-	}
-	confirm := strings.ToLower(strings.TrimSpace(input))
-	if confirm != "y" && confirm != "yes" {
-		cmn.Exit("Replay operation aborted.")
 	}
 	return loadHeight
 }
