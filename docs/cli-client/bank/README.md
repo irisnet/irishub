@@ -20,8 +20,6 @@ Bank allows you to manage assets in your local account
 | [account](account.md)   | Query account balance               |
 | [send](send.md)      | Create/sign/broadcast a send tx           |
 | [burn](burn.md)     | Burn tokens |
-| [sign](sign.md)     | Sign transactions generated offline |
-| [broadcast](broadcast.md)|Broadcast a signed transaction to the network|
 
 ## Global Flags
 

@@ -22,6 +22,8 @@ iriscli keys add <name> <flags>
 | --no-backup     |           | 不输出助记词（如果其他人正在看着操作终端）                              |          |
 | --recover       |           | 提供助记词以恢复现有密钥而不是新建                                     |          |
 | --keystore      |           | 从已备份的keystore导入秘钥                                     |          |
+| --multisig      |           | 创建多签账户                                     |          |
+| --multisig-threshold|       | 指定多签账户最少签名人数                           |          |
 | --type, -t      | secp256k1 | 私钥类型 (secp256k\|ed25519)                              |          |
 
 ## 例子
@@ -74,3 +76,13 @@ Enter your recovery seed phrase:
 ```shell
 iriscli keys add Mykey --recover --keystore=<path_to_backup_keystore>
 ```
+
+### 创建多签账户
+
+例子：创建一个包含3个子账户的多签账户，且指定签名人数必须大于等于2人，该交易才能被正常广播。
+
+```  
+iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<user_1>,<user_2>,<user_3>
+```
+
+如何使用多签账户发交易， 请参阅 [multisig](../tx/multisig.md)
