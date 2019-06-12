@@ -144,6 +144,13 @@ func (rs *rootMultiStore) LoadVersion(ver int64, overwrite bool) error {
 	// Success.
 	rs.lastCommitID = cInfo.CommitID()
 	rs.stores = newStores
+
+	// update latest version
+	if overwrite {
+		batch := rs.db.NewBatch()
+		setLatestVersion(batch, ver)
+		batch.Write()
+	}
 	return nil
 }
 
@@ -394,7 +401,6 @@ type storeParams struct {
 
 // NOTE: Keep commitInfo a simple immutable struct.
 type commitInfo struct {
-
 	// Version
 	Version int64
 
