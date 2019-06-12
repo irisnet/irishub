@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -96,10 +97,6 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 	} else {
 		// if the owner not given
 		gateways = queryAllGateways(ctx, keeper)
-	}
-
-	if len(gateways) == 0 {
-		return nil, nil
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateways)
