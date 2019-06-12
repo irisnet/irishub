@@ -18,7 +18,7 @@ func queryGateway(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		moniker := vars["Moniker"]
+		moniker := vars["moniker"]
 		if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
 			return

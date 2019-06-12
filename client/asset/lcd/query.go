@@ -11,13 +11,13 @@ import (
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// Get the gateway from a moniker
 	r.HandleFunc(
-		"/asset/gateways/{Moniker}/gateway",
+		"/asset/gateways/{moniker}",
 		monikerGatewayHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all gateways from an owner
 	r.HandleFunc(
-		"/asset/gateways/{Owner}/gateways",
+		"/asset/gateways",
 		ownerGatewaysHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }

@@ -3380,18 +3380,18 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
-  '/asset/gateways/{moniker}/gateway':
-    parameters:
-      - in: path
-        name: moniker
-        description: the unique name of the destination gateway
-        required: true
-        schema:
-          type: string
+  '/asset/gateways/{moniker}':
     get:
       summary: Query the gateway with the specified moniker
       tags:
         - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -3403,18 +3403,18 @@ paths:
           description: Invalid moniker
         '500':
           description: Internal Server Error
-  '/asset/gateways/{owner}/gateways':
-    parameters:
-      - in: path
-        name: owner
-        description: Bech32 address of an owner
-        required: true
-        schema:
-          type: string
+  '/asset/gateways':
     get:
       summary: Get all gateways of an owner
       tags:
         - Asset
+      parameters:
+      - in: query
+        name: owner
+        description: the owner address to be queried
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: OK

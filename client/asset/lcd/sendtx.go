@@ -14,7 +14,7 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// create a gateway
 	r.HandleFunc(
-		"/asset/gateways/{owner}/create",
+		"/asset/gateways",
 		createGatewayHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
@@ -26,11 +26,12 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 }
 
 type createGatewayReq struct {
-	BaseTx   utils.BaseTx `json:"base_tx"`
-	Moniker  string       `json:"moniker"`  //  Name of the gateway
-	Identity string       `json:"identity"` //  Identity of the gateway
-	Details  string       `json:"details"`  //  Description of the gateway
-	Website  string       `json:"website"`  //  Website of the gateway
+	BaseTx   utils.BaseTx   `json:"base_tx"`
+	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
+	Moniker  string         `json:"moniker"`  //  Name of the gateway
+	Identity string         `json:"identity"` //  Identity of the gateway
+	Details  string         `json:"details"`  //  Description of the gateway
+	Website  string         `json:"website"`  //  Website of the gateway
 }
 
 type editGatewayReq struct {
@@ -45,17 +46,8 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
-		vars := mux.Vars(r)
-		ownerStr := vars["owner"]
-
-		owner, err := sdk.AccAddressFromBech32(ownerStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		var req createGatewayReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
+		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
@@ -66,7 +58,7 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		// create the MsgCreateGateway message
-		msg := asset.NewMsgCreateGateway(owner, req.Moniker, req.Identity, req.Details, req.Website)
+		msg := asset.NewMsgCreateGateway(req.Owner, req.Moniker, req.Identity, req.Details, req.Website)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
