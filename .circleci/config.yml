@@ -17,14 +17,18 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
-      - run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASS
-          export TAG=""
-          if [[ $CIRCLE_BRANCH == "master" ]]; then
-            export TAG="latest";
-          else
-            export TAG=$CIRCLE_TAG;
-          fi
+      - run:
+          name: Login dockerhub
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: Get image tag
+          command: |
+            if [[ $CIRCLE_BRANCH == "master" ]]; then
+              echo 'export TAG="latest"' >> $BASH_ENV;
+            else
+              echo 'export TAG=$CIRCLE_TAG' >> $BASH_ENV;
+            fi
+            source $BASH_ENV
       - run:
           name: build irishub mainnet image
           command: docker build -t irisnet/irishub:$TAG .
