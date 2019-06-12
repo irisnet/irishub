@@ -115,7 +115,8 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
 	var appState v1.GenesisFileState
-	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
 	appState.Accounts = []v1.GenesisFileAccount{v1.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)

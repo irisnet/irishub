@@ -41,7 +41,7 @@ source ~/.bash_profile
 
 Verify that Go has been installed successfully：
 ```bash
-go verison
+go version
 ```
 
 ::: tip

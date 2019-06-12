@@ -2,9 +2,17 @@ package asset
 
 import (
 	"fmt"
-
 	sdk "github.com/irisnet/irishub/types"
 )
+
+var (
+	KeyNextGatewayID = []byte("newGatewayID") // key for the next gateway ID
+)
+
+// KeyAsset returns the key of the specified asset source and id
+func KeyAsset(id string) []byte {
+	return []byte(fmt.Sprintf("assets:%s", id))
+}
 
 // KeyGateway returns the key of the specified moniker
 func KeyGateway(moniker string) []byte {

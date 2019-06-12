@@ -265,10 +265,12 @@ func main() {
 		client.PostCommands(
 			assetcmd.GetCmdCreateGateway(cdc),
 			assetcmd.GetCmdEditGateway(cdc),
+			assetcmd.GetCmdIssueAsset(cdc),
 		)...)
 
 	assetCmd.AddCommand(
 		client.GetCommands(
+			assetcmd.GetCmdQueryAsset(cdc),
 			assetcmd.GetCmdQueryGateway(cdc),
 			assetcmd.GetCmdQueryGateways(cdc),
 		)...)
