@@ -3405,14 +3405,14 @@ paths:
           description: Internal Server Error
   '/asset/gateways':
     get:
-      summary: Get all gateways of an owner
+      summary: Get a set of gateways according to the given parameter
       tags:
         - Asset
       parameters:
       - in: query
         name: owner
         description: the owner address to be queried
-        required: true
+        required: false
         schema:
           type: string
       responses:
@@ -3425,7 +3425,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Gateway'
         '400':
-          description: Invalid owner address
+          description: Invalid owner address if owner given
         '500':
           description: Internal Server Error
 components:

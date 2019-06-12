@@ -6,6 +6,10 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+var (
+	PrefixGateway = []byte("gateways:") // prefix for the gateway store
+)
+
 // KeyGateway returns the key of the specified moniker
 func KeyGateway(moniker string) []byte {
 	return []byte(fmt.Sprintf("gateways:%s", moniker))

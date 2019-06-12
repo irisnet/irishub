@@ -50,16 +50,23 @@ func queryGateway(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) 
 	}
 }
 
-// queryGateways queries all gateways of an owner from the specified endpoint
+// queryGateways queries a set of gateways from the specified endpoint
 func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-
 		ownerStr := vars["owner"]
-		owner, err := sdk.AccAddressFromBech32(ownerStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+
+		var (
+			owner sdk.AccAddress
+			err   error
+		)
+
+		if ownerStr != "" {
+			owner, err = sdk.AccAddressFromBech32(ownerStr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 		}
 
 		params := asset.QueryGatewaysParams{

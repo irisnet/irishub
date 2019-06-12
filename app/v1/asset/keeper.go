@@ -144,6 +144,12 @@ func (k Keeper) GetGateways(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator 
 	return sdk.KVStorePrefixIterator(store, KeyGatewaysSubspace(owner))
 }
 
+// GetAllGateways retrieves all the gateways
+func (k Keeper) GetAllGateways(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, PrefixGateway)
+}
+
 func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, DefaultParams())
 }
