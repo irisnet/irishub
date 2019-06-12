@@ -20,9 +20,9 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// edit a gateway
 	r.HandleFunc(
-		"/asset/gateways/{moniker}/edit",
+		"/asset/gateways/{moniker}",
 		editGatewayHandlerFn(cdc, cliCtx),
-	).Methods("POST")
+	).Methods("PUT")
 }
 
 type createGatewayReq struct {
