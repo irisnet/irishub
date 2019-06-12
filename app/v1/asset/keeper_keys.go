@@ -2,11 +2,12 @@ package asset
 
 import (
 	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
-	KeyNextGatewayID = []byte("newGatewayID") // key for the next gateway ID
+	PrefixGateway = []byte("gateways:") // prefix for the gateway store
 )
 
 // KeyAsset returns the key of the specified asset source and id
