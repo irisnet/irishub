@@ -21,7 +21,10 @@ iriscli keys add <name> [flags]
 | --ledger        |           | Store a local reference to a private key on a Ledger device       |          |
 | --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
 | --recover       |           | Provide seed phrase to recover existing key instead of creating   |          |
-| --type, -t      | secp256k1 | Type of private key (secp256k\|ed25519)                  |          |
+| --keystore      |           | Recover a key from keystore                                  |          |
+| --multisig      |           | Create multisig account                             |          |
+| --multisig-threshold|       | Specify the minimum number of signatures for multisig account                     |          |
+| --type, -t      | secp256k1 | Type of private key (secp256k\ed25519)                  |          |
 
 ## Examples
 
@@ -67,3 +70,18 @@ Repeat the passphrase:
 Enter your recovery seed phrase:
 ```
 
+### Recover a key from keystore
+
+```shell
+iriscli keys add Mykey --recover --keystore=<path_to_backup_keystore>
+```
+
+### Create multisig account
+
+Create a multisig account with 3 sub-accounts，specify the minimum number of signatures，such as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
+
+```  
+iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<user_1>,<user_2>,<user_3>
+```
+
+How to use multisig account to broadcast a transaction， please refer to [multisig](../tx/multisig.md)
