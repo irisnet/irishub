@@ -144,6 +144,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+		fmt.Fprintf(os.Stderr, "Key %q saved to disk.\n", name)
 		return nil
 	}
 
