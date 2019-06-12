@@ -106,11 +106,14 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			var owner sdk.AccAddress
-			ownerStr := viper.GetString(FlagOwner)
+			var (
+				owner sdk.AccAddress
+				err   error
+			)
 
+			ownerStr := viper.GetString(FlagOwner)
 			if ownerStr != "" {
-				owner, err := sdk.AccAddressFromBech32(ownerStr)
+				owner, err = sdk.AccAddressFromBech32(ownerStr)
 				if err != nil {
 					return err
 				}
