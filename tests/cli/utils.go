@@ -11,7 +11,8 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/v1"
+	v1 "github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/service"
@@ -345,6 +346,24 @@ func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return feesOutput
+}
+
+func executeGetGateway(t *testing.T, cmdStr string) asset.Gateway {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var gateway asset.Gateway
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &gateway)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return gateway
+}
+
+func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var gateways []asset.Gateway
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &gateways)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return gateways
 }
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {

@@ -89,7 +89,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-gateway",
 		Short: "create a gateway",
-		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details>" +
+		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
 			"--website=<website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -123,6 +123,64 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsGatewayCreate)
+	cmd.MarkFlagRequired(FlagMoniker)
+
+	return cmd
+}
+
+// GetCmdEditGateway implements the edit gateway command
+func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "edit-gateway",
+		Short: "edit a gateway",
+		Example: "iriscli asset edit-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
+			"--website=<website>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			moniker := viper.GetString(FlagMoniker)
+			identity := viper.Get(FlagIdentity)
+			details := viper.Get(FlagDetails)
+			website := viper.Get(FlagWebsite)
+
+			pIdentity := (*string)(nil)
+			pDetails := (*string)(nil)
+			pWebsite := (*string)(nil)
+
+			if identity != nil {
+				pIdentity = &identity
+			}
+			if details != nil {
+				pDetails = &details
+			}
+			if website != nil {
+				pWebsite = &website
+			}
+
+			var msg sdk.Msg
+			msg = asset.NewMsgEditGateway(
+				owner, moniker, pIdentity, pDetails, pWebsite,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsGatewayEdit)
 	cmd.MarkFlagRequired(FlagMoniker)
 
 	return cmd
