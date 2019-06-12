@@ -100,11 +100,19 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 				return err
 			}
 
+			addressMap := make(map[string]interface{})
 			for _, keyname := range multisigKeys {
 				k, err := kb.Get(keyname)
 				if err != nil {
 					return err
 				}
+				if k.GetType() == cryptokeys.TypeMulti {
+					return errors.New("can not create multi-sign key with other multi-sign keys")
+				}
+				if _, ok := addressMap[k.GetAddress().String()]; ok {
+					return fmt.Errorf("can not create multi-sign key with duplicate address %s", k.GetAddress().String())
+				}
+				addressMap[k.GetAddress().String()] = nil
 				pks = append(pks, k.GetPubKey())
 			}
 
