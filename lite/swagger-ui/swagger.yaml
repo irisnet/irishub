@@ -3405,7 +3405,7 @@ paths:
           description: Internal Server Error
   '/asset/gateways':
     get:
-      summary: Get a set of gateways according to the given parameter
+      summary: Get all the gateways with an optional owner
       tags:
         - Asset
       parameters:

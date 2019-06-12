@@ -15,7 +15,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		monikerGatewayHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// Get a set of gateways according to the given params
+	// Get all gateways with an optional owner
 	r.HandleFunc(
 		"/asset/gateways",
 		gatewaysHandlerFn(cliCtx, cdc),

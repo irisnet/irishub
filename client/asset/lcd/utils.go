@@ -50,7 +50,7 @@ func queryGateway(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) 
 	}
 }
 
-// queryGateways queries a set of gateways from the specified endpoint
+// queryGateways queries all gateways with an optional owner from the specified endpoint
 func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
