@@ -2,6 +2,7 @@
 package asset
 
 import (
+	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -17,38 +18,60 @@ const (
 	CodeInvalidOwner         sdk.CodeType = 105
 	CodeNoUpdatesProvided    sdk.CodeType = 106
 	CodeInvalidAddress       sdk.CodeType = 107
+
+	CodeNilAssetOwner                 sdk.CodeType = 110
+	CodeInvalidAssetFamily            sdk.CodeType = 111
+	CodeInvalidAssetSource            sdk.CodeType = 112
+	CodeInvalidAssetName              sdk.CodeType = 113
+	CodeInvalidAssetSymbol            sdk.CodeType = 114
+	CodeInvalidAssetInitSupply        sdk.CodeType = 115
+	CodeInvalidAssetMaxSupply         sdk.CodeType = 116
+	CodeInvalidAssetDecimal           sdk.CodeType = 117
+	CodeAssetAlreadyExists            sdk.CodeType = 118
+	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 119
 )
 
-// NOTE: Don't stringer this, we'll put better messages in later.
-func codeToDefaultMsg(code sdk.CodeType) string {
-	switch code {
+//----------------------------------------
+// Asset error constructors
 
-	default:
-		return sdk.CodeToDefaultMsg(code)
-	}
+func ErrNilAssetOwner(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeNilAssetOwner, fmt.Sprintf("nil asset owner"))
+}
+
+func ErrInvalidAssetFamily(codespace sdk.CodespaceType, family AssetFamily) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetFamily, fmt.Sprintf("invalid asset family type %s", family))
+}
+
+func ErrInvalidAssetSource(codespace sdk.CodespaceType, source AssetSource) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSource, fmt.Sprintf("invalid asset source type %s", source))
+}
+
+func ErrInvalidAssetName(codespace sdk.CodespaceType, name string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetName, fmt.Sprintf("invalid asset name %s, only accepts alphanumeric characters, _ and -, length between 0 and 32", name))
+}
+
+func ErrInvalidAssetSymbol(codespace sdk.CodespaceType, symbol string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSymbol, fmt.Sprintf("invalid asset symbol %s, only accepts alphanumeric characters, _ and -, length between 3 and 6", symbol))
+}
+
+func ErrInvalidAssetInitSupply(codespace sdk.CodespaceType, initSupply uint64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetInitSupply, fmt.Sprintf("invalid asset initial supply %d", initSupply))
+}
+
+func ErrInvalidAssetMaxSupply(codespace sdk.CodespaceType, maxSupply uint64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetMaxSupply, fmt.Sprintf("invalid asset max supply %d", maxSupply))
+}
+
+func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, decimal uint8) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetDecimal, fmt.Sprintf("invalid asset decimal %d, max decimal is 18", decimal))
+}
+
+func ErrAssetAlreadyExists(codespace sdk.CodespaceType, symbol string) sdk.Error {
+	return sdk.NewError(codespace, CodeAssetAlreadyExists, fmt.Sprintf("asset already exists: %s", symbol))
 }
 
 //----------------------------------------
-// Error constructors
-
-// TODO
-
-//----------------------------------------
-
-func msgOrDefaultMsg(msg string, code sdk.CodeType) string {
-	if msg != "" {
-		return msg
-	}
-	return codeToDefaultMsg(code)
-}
-
-func newError(codespace sdk.CodespaceType, code sdk.CodeType, msg string) sdk.Error {
-	msg = msgOrDefaultMsg(msg, code)
-	return sdk.NewError(codespace, code, msg)
-}
-
-//----------------------------------------
-// Error constructors
+// Gateway error constructors
 
 func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
@@ -80,4 +103,8 @@ func ErrNoUpdatesProvided(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
+}
+
+func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
 }

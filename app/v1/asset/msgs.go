@@ -2,9 +2,8 @@ package asset
 
 import (
 	"fmt"
-	"regexp"
-
 	sdk "github.com/irisnet/irishub/types"
+	"regexp"
 )
 
 const (
@@ -13,6 +12,8 @@ const (
 )
 
 var (
+	MaximumAssetMaxSupply = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
+
 	MinimumGatewayMonikerSize = 3   // minimal limitation for the length of the gateway's moniker
 	MaximumGatewayMonikerSize = 8   // maximal limitation for the length of the gateway's moniker
 	MaximumGatewayDetailsSize = 280 // maximal limitation for the length of the gateway's details
@@ -21,7 +22,99 @@ var (
 	IsAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 )
 
-var _, _ sdk.Msg = &MsgCreateGateway{}, &MsgEditGateway{}
+var _, _, _ sdk.Msg = &MsgIssueAsset{}, &MsgCreateGateway{}, &MsgEditGateway{}
+
+// MsgIssueAsset
+type MsgIssueAsset struct {
+	Family         AssetFamily    `json:"family"`
+	Source         AssetSource    `json:"source"`
+	Gateway        string         `json:"gateway"`
+	Symbol         string         `json:"symbol"`
+	Name           string         `json:"name"`
+	Decimal        uint8          `json:"decimal"`
+	SymbolMinAlias string         `json:"symbol_min_alias"`
+	InitialSupply  uint64         `json:"initial_supply"`
+	MaxSupply      uint64         `json:"max_supply"`
+	Mintable       bool           `json:"mintable"`
+	Owner          sdk.AccAddress `json:"owner"`
+	IssueFee       sdk.Coins      `json:"issue_fee"`
+}
+
+// NewMsgIssueAsset - construct asset issue msg.
+func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueAsset {
+	return MsgIssueAsset{
+		Family:         family,
+		Source:         source,
+		Gateway:        gateway,
+		Symbol:         symbol,
+		Name:           name,
+		Decimal:        decimal,
+		SymbolMinAlias: alias,
+		InitialSupply:  initialSupply,
+		MaxSupply:      maxSupply,
+		Mintable:       mintable,
+		Owner:          owner,
+		IssueFee:       fee,
+	}
+}
+
+// Implements Msg.
+func (msg MsgIssueAsset) Route() string { return MsgRoute }
+func (msg MsgIssueAsset) Type() string  { return "issue_asset" }
+
+// Implements Msg.
+func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
+	// only accepts alphanumeric characters, _ and -
+	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+
+	if msg.Owner == nil {
+		return ErrNilAssetOwner(DefaultCodespace)
+	}
+
+	if _, found := AssetFamilyToStringMap[msg.Family]; !found {
+		return ErrInvalidAssetFamily(DefaultCodespace, msg.Family)
+	}
+
+	if _, found := AssetSourceToStringMap[msg.Source]; !found {
+		return ErrInvalidAssetSource(DefaultCodespace, msg.Source)
+	}
+
+	if len(msg.Name) == 0 || reg.Match([]byte(msg.Name)) {
+		return ErrInvalidAssetName(DefaultCodespace, msg.Name)
+	}
+
+	if len(msg.Symbol) == 0 || reg.Match([]byte(msg.Symbol)) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, msg.Symbol)
+	}
+
+	if msg.InitialSupply == 0 {
+		return ErrInvalidAssetInitSupply(DefaultCodespace, msg.InitialSupply)
+	}
+
+	if msg.MaxSupply < msg.InitialSupply || msg.MaxSupply > MaximumAssetMaxSupply {
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, msg.MaxSupply)
+	}
+
+	if msg.Decimal > 18 {
+		return ErrInvalidAssetDecimal(DefaultCodespace, msg.Decimal)
+	}
+
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgIssueAsset) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
 
 // MsgCreateGateway for creating a gateway
 type MsgCreateGateway struct {

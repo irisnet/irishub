@@ -81,6 +81,10 @@ func decryptKey(keyProtected *EncryptedKeyJSON, auth string) ([]byte, error) {
 
 func getKDFKey(cryptoJSON CryptoJSON, auth string) ([]byte, error) {
 	authArray := []byte(auth)
+	if cryptoJSON.KDFParams["salt"] == nil || cryptoJSON.KDFParams["dklen"] == nil ||
+		cryptoJSON.KDFParams["c"] == nil || cryptoJSON.KDFParams["prf"] == nil {
+		return nil, errors.New("invalid KDF params, must contains c, dklen, prf and salt")
+	}
 	salt, err := hex.DecodeString(cryptoJSON.KDFParams["salt"].(string))
 	if err != nil {
 		return nil, err

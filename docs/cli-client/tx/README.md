@@ -16,3 +16,4 @@ Tx allows you to sign or broadcast transactions
 | --------- | ----------------------------------- |
 | [sign](sign.md)     | Sign transactions generated offline |
 | [broadcast](broadcast.md)|Broadcast a signed transaction to the network|
+| [multisig](multisig.md)|Sign the same transaction by multiple accounts|

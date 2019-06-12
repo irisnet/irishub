@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"fmt"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -27,9 +28,28 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-func queryAsset(context sdk.Context, query abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	// TODO
-	return nil, nil
+// QueryAssetParams is the query parameters for 'custom/asset/asset'
+type QueryAssetParams struct {
+	Asset string
+}
+
+func queryAsset(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryAssetParams
+	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	asset, found := keeper.getAsset(ctx, GetKeyIDFromUniqueID(params.Asset))
+	if !found {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("asset %s does not exist", params.Asset))
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, asset)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+	return bz, nil
 }
 
 // QueryGatewayParams is the query parameters for 'custom/asset/gateway'

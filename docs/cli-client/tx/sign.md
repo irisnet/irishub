@@ -4,13 +4,11 @@
 
 Sign transactions in generated offline file. The file created with the --generate-only flag.
 
-## Usage:
+## Usage
 
 ```
 iriscli tx sign <file> <flags>
 ```
-
-## 标志
 
 ## Flags
 

@@ -1,9 +1,7 @@
 package keys
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/cosmos/go-bip39"
@@ -271,25 +269,30 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 		if err != nil {
 			return
 		}
-	case offlineInfo, multiInfo:
-		_, err := fmt.Fprintf(os.Stderr, "Bytes to sign:\n%s", msg)
-		if err != nil {
-			return nil, nil, err
-		}
-		buf := bufio.NewReader(os.Stdin)
-		_, err = fmt.Fprintf(os.Stderr, "\nEnter Amino-encoded signature:\n")
-		if err != nil {
-			return nil, nil, err
-		}
-		// Will block until user inputs the signature
-		signed, err := buf.ReadString('\n')
-		if err != nil {
-			return nil, nil, err
-		}
-		if err := cdc.UnmarshalBinaryLengthPrefixed([]byte(signed), sig); err != nil {
-			return nil, nil, errors.Wrap(err, "failed to decode signature")
-		}
-		return sig, info.GetPubKey(), nil
+	case offlineInfo:
+		err = fmt.Errorf("can not sign tx using offline key")
+		return
+	case multiInfo:
+		err = fmt.Errorf("can not sign tx using multi-sign key")
+		return
+		//_, err := fmt.Fprintf(os.Stderr, "Bytes to sign:\n%s", msg)
+		//if err != nil {
+		//	return nil, nil, err
+		//}
+		//buf := bufio.NewReader(os.Stdin)
+		//_, err = fmt.Fprintf(os.Stderr, "\nEnter Amino-encoded signature:\n")
+		//if err != nil {
+		//	return nil, nil, err
+		//}
+		//// Will block until user inputs the signature
+		//signed, err := buf.ReadString('\n')
+		//if err != nil {
+		//	return nil, nil, err
+		//}
+		//if err := cdc.UnmarshalBinaryLengthPrefixed([]byte(signed), sig); err != nil {
+		//	return nil, nil, errors.Wrap(err, "failed to decode signature")
+		//}
+		//return sig, info.GetPubKey(), nil
 	}
 	sig, err = priv.Sign(msg)
 	if err != nil {

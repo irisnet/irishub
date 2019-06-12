@@ -79,6 +79,13 @@ module.exports = {
                         ]
                     },
                     {
+                        title: 'Tx(sign/broadcast)',
+                        collapsable: false,
+                        children: [
+                            ['tx/', 'iriscli tx']
+                        ]
+                    },
+                    {
                         title: 'Tendermint',
                         collapsable: false,
                         children: [
@@ -213,6 +220,13 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['tendermint/', 'iriscli tendermint']
+                        ]
+                    },
+                    {
+                        title: '交易（签名/广播）',
+                        collapsable: false,
+                        children: [
+                            ['tx/', 'iriscli tx']
                         ]
                     },
                     {
