@@ -158,13 +158,16 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 			pWebsite := (*string)(nil)
 
 			if identity != nil {
-				pIdentity = &identity
+				sIdentity := identity.(string)
+				pIdentity = &sIdentity
 			}
 			if details != nil {
-				pDetails = &details
+				sDetails := details.(string)
+				pDetails = &sDetails
 			}
 			if website != nil {
-				pWebsite = &website
+				sWebsite := website.(string)
+				pWebsite = &sWebsite
 			}
 
 			var msg sdk.Msg
