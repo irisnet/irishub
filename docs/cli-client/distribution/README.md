@@ -24,4 +24,3 @@ iriscli distribution --help
 | [rewards](rewards.md) | Query all the rewards of validator or delegator |
 | [set-withdraw-address](set-withdraw-address.md)  | change withdraw address |
 | [withdraw-rewards](withdraw-rewards.md) | withdraw rewards for either: all-delegations, a delegation, or a validator |
-| [community-tax](community-tax.md) | Query community tax |
