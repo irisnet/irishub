@@ -25,6 +25,10 @@ type Gateways []Gateway
 
 // String implements fmt.Stringer
 func (gs Gateways) String() string {
+	if len(gs) == 0 {
+		return "[]"
+	}
+
 	str := fmt.Sprintf("Gateways for owner %s:", gs[0].Owner)
 	for _, g := range gs {
 		str += fmt.Sprintf("\n  %s: %s: %s : %s", g.Moniker, g.Identity, g.Details, g.Website)
