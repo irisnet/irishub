@@ -246,24 +246,27 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
+		// if not Profiling mode,should slash provider
 		slashCoins := sdk.Coins{}
-		binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
-		if found {
-			for _, coin := range binding.Deposit {
-				taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-				slashCoins = append(slashCoins, sdk.NewCoin(coin.Denom, taxAmount))
+		if !req.Profiling {
+			binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
+			if found {
+				for _, coin := range binding.Deposit {
+					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+					slashCoins = append(slashCoins, sdk.NewCoin(coin.Denom, taxAmount))
+				}
 			}
-		}
 
-		slashCoins = slashCoins.Sort()
+			slashCoins = slashCoins.Sort()
 
-		_, err := keeper.ck.BurnCoins(ctx, bank.ServiceDepositCoinsAccAddr, slashCoins)
-		if err != nil {
-			panic(err)
-		}
-		err = keeper.Slash(ctx, binding, slashCoins)
-		if err != nil {
-			panic(err)
+			_, err := keeper.ck.BurnCoins(ctx, bank.ServiceDepositCoinsAccAddr, slashCoins)
+			if err != nil {
+				panic(err)
+			}
+			err = keeper.Slash(ctx, binding, slashCoins)
+			if err != nil {
+				panic(err)
+			}
 		}
 
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
