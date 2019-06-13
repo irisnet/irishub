@@ -66,7 +66,7 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	}
 
 	gateway, err2 := keeper.GetGateway(ctx, params.Moniker)
-	if err != nil {
+	if err2 != nil {
 		return nil, err2
 	}
 
