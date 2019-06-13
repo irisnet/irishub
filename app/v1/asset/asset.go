@@ -18,6 +18,7 @@ type Asset interface {
 	GetSource() AssetSource
 	GetSymbol() string
 	GetGateway() string
+	GetInitSupply() uint64
 }
 
 type BaseAsset struct {
@@ -102,6 +103,10 @@ func (ba BaseAsset) GetDenom() string {
 	sb.WriteString(ba.GetUniqueID())
 	sb.WriteString("-min")
 	return strings.ToLower(sb.String())
+}
+
+func (ba BaseAsset) GetInitSupply() uint64 {
+	return ba.InitialSupply
 }
 
 // String implements fmt.Stringer

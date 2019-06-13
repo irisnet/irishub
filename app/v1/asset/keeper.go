@@ -13,7 +13,7 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	ck       bank.Keeper
+	bk       bank.Keeper
 	gk       guardian.Keeper
 
 	// codespace
@@ -22,11 +22,11 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		cdc:        cdc,
-		ck:         ck,
+		bk:         bk,
 		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
@@ -48,6 +48,7 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 		return nil, ErrAssetAlreadyExists(k.codespace, asset.GetUniqueID())
 	}
 
+	var owner sdk.AccAddress
 	if asset.GetSource() == GATEWAY {
 		gateway, err := k.GetGateway(ctx, asset.GetGateway())
 		if err != nil {
@@ -58,12 +59,27 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 				fmt.Sprintf("Gateway %s asset can only be created by %s, unauthorized creator %s",
 					gateway.Moniker, gateway.Owner, asset.GetOwner()))
 		}
+
+		owner = gateway.Owner
+	} else if asset.GetSource() == NATIVE {
+		owner = asset.GetOwner()
 	}
 
 	err = k.SetAsset(ctx, asset)
 	if err != nil {
 		return nil, err
 	}
+
+	if owner != nil {
+		newCoin := sdk.Coins{sdk.NewCoin(asset.GetDenom(), sdk.NewIntWithDecimal(int64(asset.GetInitSupply()), int(asset.GetDecimal())))}
+
+		// Increase LoosenToken
+		k.bk.IncreaseLoosenToken(ctx, newCoin)
+
+		// Add coins into owner's account
+		k.bk.AddCoins(ctx, owner, newCoin)
+	}
+
 	createTags := sdk.NewTags(
 		"denom", []byte(asset.GetDenom()),
 		"owner", []byte(asset.GetOwner().String()),
