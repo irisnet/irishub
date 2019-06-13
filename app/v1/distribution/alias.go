@@ -81,7 +81,6 @@ const (
 	QueryAllDelegationDistInfo = keeper.QueryAllDelegationDistInfo
 	QueryValidatorDistInfo     = keeper.QueryValidatorDistInfo
 	QueryRewards               = keeper.QueryRewards
-	QueryCommunityTax          = keeper.QueryCommunityTax
 )
 
 var (
