@@ -10,6 +10,7 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
@@ -100,9 +101,9 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 		replayHeight = lastBlockHeight
 	}
 
-	app.Logger.Info("This Reset operation will change the application store, backup your node home directory before proceeding!!")
+	app.Logger.Info("This Reset operation will change the application store, backup your node home directory before proceeding!!!")
+	app.Logger.Info(fmt.Sprintf("The last block height is %v, will reset height to %v.", lastBlockHeight, replayHeight))
 
-	app.Logger.Info(fmt.Sprintf("The last block height is %v, reset height to %v.", lastBlockHeight, replayHeight))
 	app.Logger.Info("Are you sure to proceed? (y/n)")
 	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
@@ -115,10 +116,10 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 
 	if lastBlockHeight-replayHeight <= DefaultCacheSize {
 		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
-		app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
 		if err != nil {
 			cmn.Exit(err.Error())
 		}
+		app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
 		return false, replayHeight
 	}
 
@@ -127,6 +128,7 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+	app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
 	app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
 	return true, replayHeight
 
