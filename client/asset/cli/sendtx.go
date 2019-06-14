@@ -90,7 +90,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Use:   "create-gateway",
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website>",
+			"--website=<website> --gateway-fee=<gateway create fee>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -108,10 +108,16 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			identity := viper.GetString(FlagIdentity)
 			details := viper.GetString(FlagDetails)
 			website := viper.GetString(FlagWebsite)
+			gatewayFee := viper.GetString(FlagGatewayFee)
+
+			gatewayFeeCoins, err := sdk.ParseCoins(gatewayFee)
+			if err != nil {
+				return err
+			}
 
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website,
+				owner, moniker, identity, details, website, gatewayFeeCoins,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -124,6 +130,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsGatewayCreate)
 	cmd.MarkFlagRequired(FlagMoniker)
+	cmd.MarkFlagRequired(FlagGatewayFee)
 
 	return cmd
 }
