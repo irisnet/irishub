@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -65,7 +66,7 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	}
 
 	gateway, err2 := keeper.GetGateway(ctx, params.Moniker)
-	if err != nil {
+	if err2 != nil {
 		return nil, err2
 	}
 
@@ -90,7 +91,25 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 
 	var gateways []Gateway
 
-	gatewaysIterator := keeper.GetGateways(ctx, params.Owner)
+	if len(params.Owner) != 0 {
+		// if the owner provided
+		gateways = queryGatewaysByOwner(ctx, params.Owner, keeper)
+	} else {
+		// if the owner not given
+		gateways = queryAllGateways(ctx, keeper)
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateways)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+	return bz, nil
+}
+
+func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) []Gateway {
+	var gateways []Gateway
+
+	gatewaysIterator := keeper.GetGateways(ctx, owner)
 	defer gatewaysIterator.Close()
 
 	for ; gatewaysIterator.Valid(); gatewaysIterator.Next() {
@@ -105,13 +124,21 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 		gateways = append(gateways, gateway)
 	}
 
-	if len(gateways) == 0 {
-		return nil, nil
+	return gateways
+}
+
+func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
+	var gateways []Gateway
+
+	gatewaysIterator := keeper.GetAllGateways(ctx)
+	defer gatewaysIterator.Close()
+
+	for ; gatewaysIterator.Valid(); gatewaysIterator.Next() {
+		var gateway Gateway
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(gatewaysIterator.Value(), &gateway)
+
+		gateways = append(gateways, gateway)
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, gateways)
-	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
-	}
-	return bz, nil
+	return gateways
 }

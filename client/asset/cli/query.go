@@ -101,14 +101,22 @@ func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-gateways",
-		Short:   "Query all the gateways of the specified owner",
+		Short:   "Query all gateways with an optional owner",
 		Example: "iriscli asset query-gateways --owner=<gateway owner>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			owner, err := sdk.AccAddressFromBech32(viper.GetString(FlagOwner))
-			if err != nil {
-				return err
+			var (
+				owner sdk.AccAddress
+				err   error
+			)
+
+			ownerStr := viper.GetString(FlagOwner)
+			if ownerStr != "" {
+				owner, err = sdk.AccAddressFromBech32(ownerStr)
+				if err != nil {
+					return err
+				}
 			}
 
 			params := asset.QueryGatewaysParams{
@@ -136,7 +144,6 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(FlagOwner, "", "the owner address to be queried")
-	cmd.MarkFlagRequired(FlagOwner)
 
 	return cmd
 }
