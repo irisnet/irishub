@@ -18,21 +18,23 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
 	db := dbm.NewMemDB()
+	accountKey := sdk.NewKVStoreKey("accountKey")
 	assetKey := sdk.NewKVStoreKey("assetKey")
 	paramskey := sdk.NewKVStoreKey("params")
 	paramsTkey := sdk.NewTransientStoreKey("transient_params")
 	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(assetKey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(paramsTkey, sdk.StoreTypeIAVL, db)
 	ms.LoadLatestVersion()
-	return ms, assetKey, paramskey, paramsTkey
+	return ms, accountKey, assetKey, paramskey, paramsTkey
 }
 
 func TestKeeper_IssueAsset(t *testing.T) {
-	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	RegisterCodec(cdc)
@@ -40,17 +42,20 @@ func TestKeeper_IssueAsset(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
-	keeper := NewKeeper(cdc, assetKey, bank.BaseKeeper{}, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
-
+	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
-	ft := NewFungibleToken(0x00, "c", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, addr)
+	acc := ak.NewAccountWithAddress(ctx, addr)
+
+	ft := NewFungibleToken(0x00, "c", "btc", "btc", 1, "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	_, err := keeper.IssueAsset(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasAsset(ctx, "i.d"))
+	assert.True(t, keeper.HasAsset(ctx, "i.btc"))
 
-	asset, found := keeper.getAsset(ctx, "i.d")
+	asset, found := keeper.getAsset(ctx, "i.btc")
 	assert.True(t, found)
 
 	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
@@ -62,7 +67,7 @@ func TestKeeper_IssueAsset(t *testing.T) {
 }
 
 func TestKeeper_IssueGatewayAsset(t *testing.T) {
-	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, _, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	RegisterCodec(cdc)
@@ -113,7 +118,7 @@ func TestKeeper_IssueGatewayAsset(t *testing.T) {
 }
 
 func TestCreateGatewayKeeper(t *testing.T) {
-	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, _, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	RegisterCodec(cdc)
@@ -155,7 +160,7 @@ func TestCreateGatewayKeeper(t *testing.T) {
 }
 
 func TestQueryGatewayKeeper(t *testing.T) {
-	ms, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, _, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	RegisterCodec(cdc)
