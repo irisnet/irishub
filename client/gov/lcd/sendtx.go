@@ -24,6 +24,18 @@ type postProposalReq struct {
 	Usage          gov.UsageType  `json:"usage"`
 	DestAddress    sdk.AccAddress `json:"dest_address"`
 	Percent        sdk.Dec        `json:"percent"`
+	Asset          asset          `json:"asset"`
+}
+
+type asset struct {
+	Family         string `json:"family"`
+	Symbol         string `json:"symbol"`
+	Name           string `json:"name"`
+	Decimal        uint8  `json:"decimal"`
+	SymbolMinAlias string `json:"symbol_min_alias"`
+	InitialSupply  uint64 `json:"initial_supply"`
+	MaxSupply      uint64 `json:"max_supply"`
+	Mintable       bool   `json:"mintable"`
 }
 
 type depositReq struct {
@@ -83,6 +95,16 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+		}
+		if msg.ProposalType == gov.ProposalTypeAddAsset {
+			asset := req.Asset
+			assetMsg := gov.NewMsgSubmitAddAssetProposal(msg, asset.Family, asset.Symbol, asset.Name, asset.SymbolMinAlias, asset.Decimal, asset.InitialSupply, asset.MaxSupply, asset.Mintable)
+			if assetMsg.ValidateBasic() != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{assetMsg})
+			return
 		}
 		err = msg.ValidateBasic()
 		if err != nil {

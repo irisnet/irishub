@@ -2,7 +2,7 @@
 
 ## 描述
 
-提交区块链治理提议以及发起提议所涉及的初始保证金，其中提议的类型包括PlainText/ParameterChange/SoftwareUpgrade这三种类型。
+提交区块链治理提议以及发起提议所涉及的初始保证金，其中提议的类型包括PlainText/ParameterChange/SoftwareUpgrade/AddAsset这几种类型。
 
 ## 使用方式
 
@@ -22,11 +22,19 @@ iriscli gov submit-proposal --help
 | --description    |                            | 提议的描述                                                                                                           | Yes      |
 | --param          |                            | 提议参数,例如: mint/Inflation=0.050                                                                                |          |
 | --title          |                            | 提议标题                                                                                                                           | Yes      |
-| --type           |                            | 提议类型,例如:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage                                                                            | Yes      |
+| --type           |                            | 提议类型,例如:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage/AddAsset                                                                  | Yes      |
 | --version           |            0                | 新协议的版本信息                                                                           |       |
 | --software           |           " "                 |  新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     |  新版本协议升级的高度                                                     |       |
 | --threshold        | "0.8"   |  软件升级的阈值                                              |               |
+| --asset-family |  | 资产簇 | |
+| --asset-symbol |  | 资产符号 | |
+| --asset-name |  | 资产名称 | |
+| --asset-decimal |  | 资产精度 | |
+| --asset-symbol-min-alias |  | 资产别名 | |
+| --asset-initial-supply |  | 资产初始总量 | |
+| --asset-max-supply |  | 资产最大总量 | |
+| --asset-mintable |  | 是否可以增发 | |
 
 ## 例子
 
@@ -44,6 +52,12 @@ iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --par
 
 ```shell
 iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --description=<proposal_description>  --type=SoftwareUpgrade --description=<proposal_description> --from=<key_name> --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.9.0 --version=2 --switch-height=80 --threshold=0.9 --deposit="3000iris" 
+```
+
+### 提交一个'AddAsset'类型的提议
+
+```shell
+iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddAsset --description=test --title=test-proposal --deposit=3000iris --commit --home=$iris_root_path --asset-decimal=18 --asset-family=fungible --asset-initial-supply=100000000 --asset-max-supply=2000000000 --asset-mintable=true --asset-name=IETH --asset-symbol=ETH --asset-symbol-min-alias=eth-atto
 ```
 
 ###  如何查询提议详情？
