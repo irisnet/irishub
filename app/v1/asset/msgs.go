@@ -119,23 +119,23 @@ func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
 
 // MsgCreateGateway for creating a gateway
 type MsgCreateGateway struct {
-	Owner     sdk.AccAddress `json:"owner"`      //  the owner address of the gateway
-	Moniker   string         `json:"moniker"`    //  the globally unique name of the gateway
-	Identity  string         `json:"identity"`   //  the identity of the gateway
-	Details   string         `json:"details"`    //  the description of the gateway
-	Website   string         `json:"website"`    //  the external website of the gateway
-	CreateFee sdk.Coins      `json:"create_fee"` // the fee for gateway creation
+	Owner    sdk.AccAddress `json:"owner"`    //  the owner address of the gateway
+	Moniker  string         `json:"moniker"`  //  the globally unique name of the gateway
+	Identity string         `json:"identity"` //  the identity of the gateway
+	Details  string         `json:"details"`  //  the description of the gateway
+	Website  string         `json:"website"`  //  the external website of the gateway
+	Fee      sdk.Coins      `json:"fee"`      //  the fee for gateway creation
 }
 
 // NewMsgCreateGateway creates a MsgCreateGateway
-func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string, createFee sdk.Coins) MsgCreateGateway {
+func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string, fee sdk.Coins) MsgCreateGateway {
 	return MsgCreateGateway{
-		Owner:     owner,
-		Moniker:   moniker,
-		Identity:  identity,
-		Details:   details,
-		Website:   website,
-		CreateFee: createFee,
+		Owner:    owner,
+		Moniker:  moniker,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
+		Fee:      fee,
 	}
 }
 
@@ -172,8 +172,8 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
 	}
 
-	// check the create fee
-	if !msg.CreateFee.IsNotNegative() {
+	// check the fee
+	if !msg.Fee.IsNotNegative() {
 		return ErrNegativeFee(DefaultCodespace, "the fee must not be negative")
 	}
 

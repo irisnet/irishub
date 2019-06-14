@@ -19,7 +19,7 @@ const (
 var (
 	KeyAssetTaxRate         = []byte("AssetTaxRate")
 	KeyIssueFTBaseFee       = []byte("IssueFTBaseFee")
-	KeyMintFTFeeRatio       = []byte("MintFTBaseRatio")
+	KeyMintFTFeeRatio       = []byte("MintFTFeeRatio")
 	KeyCreateGatewayBaseFee = []byte("CreateGatewayBaseFee")
 	KeyGatewayAssetFeeRatio = []byte("GatewayAssetFeeRatio")
 )

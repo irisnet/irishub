@@ -49,7 +49,7 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 // handleMsgCreateGateway handles MsgCreateGateway
 func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
 	// handle fee
-	if err := GatewayFeeHandler(ctx, k, msg.Owner, msg.Moniker, msg.CreateFee); err != nil {
+	if err := GatewayFeeHandler(ctx, k, msg.Owner, msg.Moniker, msg.Fee); err != nil {
 		return err.Result()
 	}
 
