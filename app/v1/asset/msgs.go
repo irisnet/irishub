@@ -13,14 +13,24 @@ const (
 )
 
 var (
-	MaximumAssetMaxSupply = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
+	MaximumAssetMaxSupply          = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
+	MaximumAssetInitSupply         = uint64(10000000000)   // maximal limitation for asset initial supply，100 billion
+	MaximumAssetDecimal            = uint8(18)             // maximal limitation for asset decimal
+	MinimumAssetSymbolSize         = 3                     // minimal limitation for the length of the asset's symbol / symbol_at_source
+	MaximumAssetSymbolSize         = 8                     // maximal limitation for the length of the asset's symbol / symbol_at_source
+	MinimumAssetSymbolMinAliasSize = 3                     // minimal limitation for the length of the asset's symbol_min_alias
+	MaximumAssetSymbolMinAliasSize = 10                    // maximal limitation for the length of the asset's symbol_min_alias
+	MaximumAssetNameSize           = 32                    // maximal limitation for the length of the asset's name
 
 	MinimumGatewayMonikerSize = 3   // minimal limitation for the length of the gateway's moniker
 	MaximumGatewayMonikerSize = 8   // maximal limitation for the length of the gateway's moniker
 	MaximumGatewayDetailsSize = 280 // maximal limitation for the length of the gateway's details
 	MaximumGatewayWebsiteSize = 128 // maximal limitation for the length of the gateway's website
 
-	IsAlpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
+	IsAlpha            = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
+	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
+	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
+	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
 )
 
 var _, _, _ sdk.Msg = &MsgIssueAsset{}, &MsgCreateGateway{}, &MsgEditGateway{}
@@ -31,6 +41,7 @@ type MsgIssueAsset struct {
 	Source         AssetSource    `json:"source"`
 	Gateway        string         `json:"gateway"`
 	Symbol         string         `json:"symbol"`
+	SymbolAtSource string         `json:"symbol_at_source"`
 	Name           string         `json:"name"`
 	Decimal        uint8          `json:"decimal"`
 	SymbolMinAlias string         `json:"symbol_min_alias"`
@@ -38,16 +49,17 @@ type MsgIssueAsset struct {
 	MaxSupply      uint64         `json:"max_supply"`
 	Mintable       bool           `json:"mintable"`
 	Owner          sdk.AccAddress `json:"owner"`
-	IssueFee       sdk.Coins      `json:"issue_fee"`
+	Fee            sdk.Coins      `json:"fee"`
 }
 
 // NewMsgIssueAsset - construct asset issue msg.
-func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueAsset {
+func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueAsset {
 	return MsgIssueAsset{
 		Family:         family,
 		Source:         source,
 		Gateway:        gateway,
 		Symbol:         symbol,
+		SymbolAtSource: symbolAtSource,
 		Name:           name,
 		Decimal:        decimal,
 		SymbolMinAlias: alias,
@@ -55,7 +67,7 @@ func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, sy
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,
 		Owner:          owner,
-		IssueFee:       fee,
+		Fee:            fee,
 	}
 }
 
@@ -65,39 +77,64 @@ func (msg MsgIssueAsset) Type() string  { return "issue_asset" }
 
 // Implements Msg.
 func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
-	// only accepts alphanumeric characters, _ and -
-	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
 
-	if msg.Owner == nil {
-		return ErrNilAssetOwner(DefaultCodespace)
+	switch msg.Source {
+	case NATIVE:
+		// require owner for native asset
+		if msg.Owner.Empty() {
+			return ErrNilAssetOwner(DefaultCodespace, "the owner of the asset must be specified")
+		}
+		// ignore SymbolAtSource for native asset
+		msg.SymbolAtSource = ""
+
+		break
+	case EXTERNAL:
+		break
+	case GATEWAY:
+		// require gateway moniker for gateway asset
+		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {
+			return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("invalid gateway moniker, length [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+		}
+
+		break
+	default:
+		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", msg.Source))
 	}
 
 	if _, found := AssetFamilyToStringMap[msg.Family]; !found {
-		return ErrInvalidAssetFamily(DefaultCodespace, msg.Family)
+		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family))
 	}
 
-	if _, found := AssetSourceToStringMap[msg.Source]; !found {
-		return ErrInvalidAssetSource(DefaultCodespace, msg.Source)
+	nameLen := len(msg.Name)
+	if nameLen == 0 || nameLen > MaximumAssetNameSize {
+		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid asset name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
 	}
 
-	if len(msg.Name) == 0 || reg.Match([]byte(msg.Name)) {
-		return ErrInvalidAssetName(DefaultCodespace, msg.Name)
+	symbolLen := len(msg.Symbol)
+	if symbolLen < MinimumAssetSymbolSize || symbolLen > MaximumAssetSymbolSize || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
-	if len(msg.Symbol) == 0 || reg.Match([]byte(msg.Symbol)) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, msg.Symbol)
+	symbolAtSourceLen := len(msg.SymbolAtSource)
+	if symbolAtSourceLen > 0 && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
+		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid asset symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
-	if msg.InitialSupply == 0 {
-		return ErrInvalidAssetInitSupply(DefaultCodespace, msg.InitialSupply)
+	symbolMinAliasLen := len(msg.SymbolMinAlias)
+	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) {
+		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid asset symbol_min_alias %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
+	}
+
+	if msg.InitialSupply > MaximumAssetInitSupply {
+		return ErrInvalidAssetInitSupply(DefaultCodespace, fmt.Sprintf("invalid asset initial supply %d, only accepts value [0, %d]", msg.InitialSupply, MaximumAssetInitSupply))
 	}
 
 	if msg.MaxSupply < msg.InitialSupply || msg.MaxSupply > MaximumAssetMaxSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, msg.MaxSupply)
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid asset max supply %d, only accepts value [%d, %d]", msg.MaxSupply, msg.InitialSupply, MaximumAssetMaxSupply))
 	}
 
-	if msg.Decimal > 18 {
-		return ErrInvalidAssetDecimal(DefaultCodespace, msg.Decimal)
+	if msg.Decimal > MaximumAssetDecimal {
+		return ErrInvalidAssetDecimal(DefaultCodespace, fmt.Sprintf("invalid asset decimal %d, only accepts value [0, %d]", msg.Decimal, MaximumAssetDecimal))
 	}
 
 	return nil

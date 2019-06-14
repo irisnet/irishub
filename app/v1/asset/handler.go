@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"fmt"
 	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -33,7 +34,7 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 		decimal := int(msg.Decimal)
 		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	default:
-		return ErrInvalidAssetFamily(k.codespace, msg.Family).Result()
+		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
 	}
 
 	tags, err := k.IssueAsset(ctx, asset)
