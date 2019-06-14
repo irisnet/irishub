@@ -30,7 +30,6 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 
 	// compute fee
 	totalFee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcGatewayFeeFactor(moniker))
-	feeCoin := sdk.NewCoin(sdk.NativeTokenMinDenom, totalFee.TruncateInt())
 
 	// check if the provided fee is enough
 	if fee.AmountOf(sdk.NativeTokenMinDenom).LT(totalFee.TruncateInt()) {
