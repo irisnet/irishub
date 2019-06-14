@@ -41,18 +41,13 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 	communityTax := sdk.NewCoin(sdk.NativeTokenMinDenom, assetTaxRate.Mul(totalFee).TruncateInt())
 	burnedCoin := sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewDec(1).Sub(assetTaxRate).Mul(totalFee).TruncateInt())
 
-	// substract coin from owner
-	if _, _, err := k.bk.SubtractCoins(ctx, owner, sdk.Coins{feeCoin}); err != nil {
+	// send community tax
+	if _, err := k.bk.SendCoins(ctx, owner, bank.CommunityTaxCoinsAccAddr, sdk.Coins{communityTax}); err != nil {
 		return err
 	}
 
-	// add community tax
-	if _, _, err := k.bk.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, sdk.Coins{communityTax}); err != nil {
-		return err
-	}
-
-	// burn
-	if _, _, err := k.bk.AddCoins(ctx, bank.BurnedCoinsAccAddr, sdk.Coins{burnedCoin}); err != nil {
+	// burn burnedCoin
+	if _, err := k.bk.BurnCoins(ctx, owner, sdk.Coins{burnedCoin}); err != nil {
 		return err
 	}
 
