@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	staketypes "github.com/irisnet/irishub/app/v1/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -197,10 +196,12 @@ func CanWithdrawInvariant(k Keeper, sk StakeKeeper) sdk.Invariant {
 		if !feePool.TotalValAccum.Accum.IsZero() {
 			return fmt.Errorf("unexpected leftover validator accum")
 		}
-		if !feePool.ValPool.AmountOf(staketypes.StakeDenom).IsZero() {
-			return fmt.Errorf("unexpected leftover validator pool coins: %v",
-				feePool.ValPool.AmountOf(staketypes.StakeDenom).String())
-		}
+
+		// We increase the truncate decimal coins to ValPool on withdraw-rewards, not check it now.
+		//if !feePool.ValPool.AmountOf(staketypes.StakeDenom).IsZero() {
+		//	return fmt.Errorf("unexpected leftover validator pool coins: %v",
+		//		feePool.ValPool.AmountOf(staketypes.StakeDenom).String())
+		//}
 
 		vdiIterCheck := func(_ int64, valInfo ValidatorDistInfo) (stop bool) {
 			if !valInfo.DelAccum.Accum.IsZero() {

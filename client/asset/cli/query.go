@@ -12,6 +12,43 @@ import (
 	"github.com/spf13/viper"
 )
 
+// GetCmdQueryAsset implements the query asset command.
+func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "query-asset",
+		Short:   "Query details of a asset",
+		Example: "iriscli asset query-asset <asset>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			params := asset.QueryAssetParams{
+				Asset: args[0],
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+			if err != nil {
+				return err
+			}
+
+			var asset asset.Asset
+			err = cdc.UnmarshalJSON(res, &asset)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(asset)
+		},
+	}
+
+	return cmd
+}
+
 // GetCmdQueryGateway implements the query gateway command.
 func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -64,14 +101,22 @@ func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-gateways",
-		Short:   "Query all the gateways of the specified owner",
+		Short:   "Query all gateways with an optional owner",
 		Example: "iriscli asset query-gateways --owner=<gateway owner>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			owner, err := sdk.AccAddressFromBech32(viper.GetString(FlagOwner))
-			if err != nil {
-				return err
+			var (
+				owner sdk.AccAddress
+				err   error
+			)
+
+			ownerStr := viper.GetString(FlagOwner)
+			if ownerStr != "" {
+				owner, err = sdk.AccAddressFromBech32(ownerStr)
+				if err != nil {
+					return err
+				}
 			}
 
 			params := asset.QueryGatewaysParams{
@@ -99,7 +144,6 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(FlagOwner, "", "the owner address to be queried")
-	cmd.MarkFlagRequired(FlagOwner)
 
 	return cmd
 }

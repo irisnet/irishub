@@ -24,4 +24,3 @@ iriscli distribution --help
 | [rewards](rewards.md) | 查询验证人或者委托人的所有收益 |
 | [set-withdraw-address](set-withdraw-address.md)  | 设置收益取回地址 |
 | [withdraw-rewards](withdraw-rewards.md) | 发起取回收益的交易 |
-| [community-tax](community-tax.md) | 查询社区税金 |

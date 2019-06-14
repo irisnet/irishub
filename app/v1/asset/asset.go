@@ -1,8 +1,10 @@
 package asset
 
 import (
-	"github.com/irisnet/irishub/types"
+	"fmt"
 	"strings"
+
+	"github.com/irisnet/irishub/types"
 )
 
 type Asset interface {
@@ -10,6 +12,12 @@ type Asset interface {
 	IsMintable() bool
 	GetUniqueID() string
 	GetDenom() string
+	String() string
+
+	GetOwner() types.AccAddress
+	GetSource() AssetSource
+	GetSymbol() string
+	GetGateway() string
 }
 
 type BaseAsset struct {
@@ -42,16 +50,28 @@ func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol
 	}
 }
 
-func (BaseAsset) GetFamily() AssetFamily {
-	panic("implement me")
-}
-
 func (BaseAsset) GetDecimal() uint8 {
 	panic("implement me")
 }
 
 func (BaseAsset) IsMintable() bool {
 	panic("implement me")
+}
+
+func (ba BaseAsset) GetOwner() types.AccAddress {
+	return ba.Owner
+}
+
+func (ba BaseAsset) GetSource() AssetSource {
+	return ba.Source
+}
+
+func (ba BaseAsset) GetSymbol() string {
+	return ba.Symbol
+}
+
+func (ba BaseAsset) GetGateway() string {
+	return ba.Gateway
 }
 
 func (ba BaseAsset) GetUniqueID() string {
@@ -82,6 +102,22 @@ func (ba BaseAsset) GetDenom() string {
 	sb.WriteString(ba.GetUniqueID())
 	sb.WriteString("-min")
 	return strings.ToLower(sb.String())
+}
+
+// String implements fmt.Stringer
+func (ba BaseAsset) String() string {
+	return fmt.Sprintf(`Asset %s:
+  Family:            %s
+  Source:            %s
+  Symbol:            %s
+  Symbol Min Alias:  %s
+  Decimal:           %d
+  Initial Supply:    %d
+  Max Supply:        %d
+  Mintable:          %v
+  Owner:             %s`,
+		ba.GetUniqueID(), ba.Family, ba.Source, ba.Symbol, ba.SymbolMinAlias,
+		ba.Decimal, ba.InitialSupply, ba.MaxSupply, ba.Mintable, ba.Owner.String())
 }
 
 // Fungible Token
@@ -116,4 +152,25 @@ func (nft NonFungibleToken) GetDecimal() uint8 {
 
 func (nft NonFungibleToken) IsMintable() bool {
 	return true
+}
+
+func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.Error) {
+	switch source {
+	case NATIVE:
+		return strings.ToLower(fmt.Sprintf("i.%s", symbol)), nil
+	case EXTERNAL:
+		return strings.ToLower(fmt.Sprintf("x.%s", symbol)), nil
+	case GATEWAY:
+		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol)), nil
+	default:
+		return "", ErrInvalidAssetSource(DefaultCodespace, source)
+	}
+}
+
+func GetKeyIDFromUniqueID(uniqueID string) string {
+	if strings.Contains(uniqueID, ".") {
+		return strings.ToLower(uniqueID)
+	} else {
+		return strings.ToLower(fmt.Sprintf("i.%s", uniqueID))
+	}
 }

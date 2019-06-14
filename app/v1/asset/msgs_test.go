@@ -15,6 +15,36 @@ var (
 	addr2 = sdk.AccAddress([]byte("addr2"))
 )
 
+// test ValidateBasic for MsgIssueAsset
+func TestMsgIssueAsset(t *testing.T) {
+	addr := sdk.AccAddress("test")
+	tests := []struct {
+		testCase string
+		MsgIssueAsset
+		expectPass bool
+	}{
+		{"basic good", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, true},
+		{"error family", MsgIssueAsset{0x02, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"error source", MsgIssueAsset{0x00, 0x03, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"empty symbol", MsgIssueAsset{0x00, 0x00, "c", "", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"error symbol", MsgIssueAsset{0x00, 0x00, "c", "434,23d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"empty name", MsgIssueAsset{0x00, 0x00, "c", "d", "", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"error name", MsgIssueAsset{0x00, 0x00, "c", "d", "2123<s", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"zero supply bigger", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 0, 1, true, addr, sdk.Coins{}}, false},
+		{"zero max supply", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 1, 0, true, addr, sdk.Coins{}}, false},
+		{"init supply bigger than max supply", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 10, 9, true, addr, sdk.Coins{}}, false},
+		{"error decimal", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 19, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+	}
+
+	for _, tc := range tests {
+		if tc.expectPass {
+			require.Nil(t, tc.MsgIssueAsset.ValidateBasic(), "test: %v", tc.testCase)
+		} else {
+			require.NotNil(t, tc.MsgIssueAsset.ValidateBasic(), "test: %v", tc.testCase)
+		}
+	}
+}
+
 func TestNewMsgCreateGateway(t *testing.T) {}
 
 func TestMsgCreateGatewayRoute(t *testing.T) {

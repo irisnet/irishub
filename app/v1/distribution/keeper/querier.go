@@ -8,7 +8,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // nolint
@@ -18,7 +17,6 @@ const (
 	QueryAllDelegationDistInfo = "all_delegation_dist_info"
 	QueryValidatorDistInfo     = "validator_dist_info"
 	QueryRewards               = "rewards"
-	QueryCommunityTax          = "community_tax"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -38,9 +36,6 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 		case QueryRewards:
 			return queryRewards(ctx, path[1:], req, k)
-
-		case QueryCommunityTax:
-			return queryCommunityTax(ctx, k)
 
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown distr query endpoint")
@@ -270,16 +265,4 @@ type CommunityTax struct {
 func (ct CommunityTax) String() string {
 	return fmt.Sprintf(`Amount:  %s`,
 		ct.Amount.MainUnitString())
-}
-
-func queryCommunityTax(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
-	ctx, _ = ctx.CacheContext()
-	//feePool := k.GetFeePool(ctx)
-	communityTax := k.bankKeeper.GetCoins(ctx, bank.CommunityTaxCoinsAccAddr)
-
-	bz, err := codec.MarshalJSONIndent(k.cdc, communityTax)
-	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
-	}
-	return bz, nil
 }

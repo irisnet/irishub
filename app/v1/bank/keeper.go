@@ -114,7 +114,6 @@ func (keeper BaseKeeper) BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt
 	if _, err := keeper.SendCoins(ctx, fromAddr, BurnedCoinsAccAddr, amt); err != nil {
 		return nil, err
 	}
-	keeper.DecreaseLoosenToken(ctx, amt)
 
 	burnTags := sdk.NewTags(
 		"burnAmount", []byte(amt.String()),
@@ -307,6 +306,12 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
 	}
 	err := setCoins(ctx, am, addr, newCoins)
+
+	// adding coins to BurnedCoinsAccAddr is equivalent to burning coins
+	if addr.Equals(BurnedCoinsAccAddr) {
+		am.DecreaseTotalLoosenToken(ctx, amt)
+	}
+
 	tags := sdk.NewTags("recipient", []byte(addr.String()))
 	return newCoins, tags, err
 }

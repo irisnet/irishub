@@ -38,6 +38,69 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
+// IssueAsset issue a new asset
+func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
+	assetID, err := GetKeyID(asset.GetSource(), asset.GetSymbol(), asset.GetGateway())
+	if err != nil {
+		return nil, err
+	}
+	if k.HasAsset(ctx, assetID) {
+		return nil, ErrAssetAlreadyExists(k.codespace, asset.GetUniqueID())
+	}
+
+	if asset.GetSource() == GATEWAY {
+		gateway, err := k.GetGateway(ctx, asset.GetGateway())
+		if err != nil {
+			return nil, err
+		}
+		if !gateway.Owner.Equals(asset.GetOwner()) {
+			return nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
+				fmt.Sprintf("Gateway %s asset can only be created by %s, unauthorized creator %s",
+					gateway.Moniker, gateway.Owner, asset.GetOwner()))
+		}
+	}
+
+	err = k.SetAsset(ctx, asset)
+	if err != nil {
+		return nil, err
+	}
+	createTags := sdk.NewTags(
+		"denom", []byte(asset.GetDenom()),
+		"owner", []byte(asset.GetOwner().String()),
+	)
+
+	return createTags, nil
+}
+
+func (k Keeper) HasAsset(ctx sdk.Context, id string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(KeyAsset(id))
+}
+
+func (k Keeper) SetAsset(ctx sdk.Context, asset Asset) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(asset)
+
+	assetID, err := GetKeyID(asset.GetSource(), asset.GetSymbol(), asset.GetGateway())
+	if err != nil {
+		return err
+	}
+
+	store.Set(KeyAsset(assetID), bz)
+	return nil
+}
+
+func (k Keeper) getAsset(ctx sdk.Context, id string) (asset Asset, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyAsset(id))
+	if bz == nil {
+		return asset, false
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &asset)
+	return asset, true
+}
+
 // CreateGateway creates a gateway
 func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) (sdk.Tags, sdk.Error) {
 	// check if the moniker already exists
@@ -142,6 +205,12 @@ func (k Keeper) SetOwnerGateway(ctx sdk.Context, owner sdk.AccAddress, moniker s
 func (k Keeper) GetGateways(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, KeyGatewaysSubspace(owner))
+}
+
+// GetAllGateways retrieves all the gateways
+func (k Keeper) GetAllGateways(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, PrefixGateway)
 }
 
 func (k Keeper) Init(ctx sdk.Context) {

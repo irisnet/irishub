@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/app/v1/bank"
 )
 
 // Allocate fees handles distribution of the collected fees
@@ -31,8 +31,8 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
 		k.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, feesCollected)
-//		feePool.CommunityPool = feePool.CommunityPool.Plus(feesCollectedDec)
-//		k.SetFeePool(ctx, feePool)
+		//		feePool.CommunityPool = feePool.CommunityPool.Plus(feesCollectedDec)
+		//		k.SetFeePool(ctx, feePool)
 		k.feeKeeper.ClearCollectedFees(ctx)
 		return
 	}
