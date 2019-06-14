@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/client/context"
@@ -149,7 +150,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().Uint8(flagAssetDecimal, 0, "the asset decimal. The maximum value is 18")
 	cmd.Flags().String(flagAssetSymbolMinAlias, "", "the asset symbol minimum alias")
 	cmd.Flags().Uint64(flagAssetInitialSupply, 0, "the initial supply token of asset")
-	cmd.Flags().Uint64(flagAssetMaxSupply, 1000000000000, "the max supply token of asset")
+	cmd.Flags().Uint64(flagAssetMaxSupply, asset.MaximumAssetMaxSupply, "the max supply token of asset")
 	cmd.Flags().Bool(flagAssetMintable, false, "whether the asset can be minted, default false")
 
 	cmd.MarkFlagRequired(flagTitle)
