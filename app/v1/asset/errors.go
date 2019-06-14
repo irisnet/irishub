@@ -2,7 +2,6 @@
 package asset
 
 import (
-	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -24,50 +23,60 @@ const (
 	CodeInvalidAssetSource            sdk.CodeType = 112
 	CodeInvalidAssetName              sdk.CodeType = 113
 	CodeInvalidAssetSymbol            sdk.CodeType = 114
-	CodeInvalidAssetInitSupply        sdk.CodeType = 115
-	CodeInvalidAssetMaxSupply         sdk.CodeType = 116
-	CodeInvalidAssetDecimal           sdk.CodeType = 117
-	CodeAssetAlreadyExists            sdk.CodeType = 118
-	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 119
+	CodeInvalidAssetSymbolAtSource    sdk.CodeType = 115
+	CodeInvalidAssetSymbolMinAlias    sdk.CodeType = 116
+	CodeInvalidAssetInitSupply        sdk.CodeType = 117
+	CodeInvalidAssetMaxSupply         sdk.CodeType = 118
+	CodeInvalidAssetDecimal           sdk.CodeType = 119
+	CodeAssetAlreadyExists            sdk.CodeType = 120
+	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
+
 )
 
 //----------------------------------------
 // Asset error constructors
 
-func ErrNilAssetOwner(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeNilAssetOwner, fmt.Sprintf("nil asset owner"))
+func ErrNilAssetOwner(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeNilAssetOwner, msg)
 }
 
-func ErrInvalidAssetFamily(codespace sdk.CodespaceType, family AssetFamily) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetFamily, fmt.Sprintf("invalid asset family type %s", family))
+func ErrInvalidAssetFamily(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetFamily, msg)
 }
 
-func ErrInvalidAssetSource(codespace sdk.CodespaceType, source AssetSource) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetSource, fmt.Sprintf("invalid asset source type %s", source))
+func ErrInvalidAssetSource(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSource, msg)
 }
 
-func ErrInvalidAssetName(codespace sdk.CodespaceType, name string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetName, fmt.Sprintf("invalid asset name %s, only accepts alphanumeric characters, _ and -, length between 0 and 32", name))
+func ErrInvalidAssetName(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetName, msg)
 }
 
-func ErrInvalidAssetSymbol(codespace sdk.CodespaceType, symbol string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetSymbol, fmt.Sprintf("invalid asset symbol %s, only accepts alphanumeric characters, _ and -, length between 3 and 6", symbol))
+func ErrInvalidAssetSymbolAtSource(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSymbolAtSource, msg)
 }
 
-func ErrInvalidAssetInitSupply(codespace sdk.CodespaceType, initSupply uint64) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetInitSupply, fmt.Sprintf("invalid asset initial supply %d", initSupply))
+func ErrInvalidAssetSymbolMinAlias(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSymbolMinAlias, msg)
 }
 
-func ErrInvalidAssetMaxSupply(codespace sdk.CodespaceType, maxSupply uint64) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetMaxSupply, fmt.Sprintf("invalid asset max supply %d", maxSupply))
+func ErrInvalidAssetSymbol(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetSymbol, msg)
+}
+func ErrInvalidAssetInitSupply(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetInitSupply, msg)
 }
 
-func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, decimal uint8) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetDecimal, fmt.Sprintf("invalid asset decimal %d, max decimal is 18", decimal))
+func ErrInvalidAssetMaxSupply(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetMaxSupply, msg)
 }
 
-func ErrAssetAlreadyExists(codespace sdk.CodespaceType, symbol string) sdk.Error {
-	return sdk.NewError(codespace, CodeAssetAlreadyExists, fmt.Sprintf("asset already exists: %s", symbol))
+func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetDecimal, msg)
+}
+
+func ErrAssetAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeAssetAlreadyExists, msg)
 }
 
 //----------------------------------------

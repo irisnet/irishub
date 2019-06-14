@@ -45,7 +45,7 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 		return nil, err
 	}
 	if k.HasAsset(ctx, assetID) {
-		return nil, ErrAssetAlreadyExists(k.codespace, asset.GetUniqueID())
+		return nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("asset already exists: %s", asset.GetUniqueID()))
 	}
 
 	var owner sdk.AccAddress

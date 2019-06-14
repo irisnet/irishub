@@ -176,7 +176,7 @@ func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.
 	case GATEWAY:
 		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol)), nil
 	default:
-		return "", ErrInvalidAssetSource(DefaultCodespace, source)
+		return "", ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", source))
 	}
 }
 
