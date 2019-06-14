@@ -165,7 +165,7 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 
 	assetParams := keeper.GetParamSet(ctx)
 	gatewayBaseFee := assetParams.CreateGatewayBaseFee
-	fee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcGatewayFeeFactor(moniker))
+	fee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcFeeFactor(moniker))
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
 	if err != nil {
