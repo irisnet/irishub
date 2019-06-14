@@ -142,3 +142,32 @@ func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
 
 	return gateways
 }
+
+// QueryGatewayFeeParams is the query parameters for 'custom/asset/gatewayFee'
+type QueryGatewayFeeParams struct {
+	Moniker string
+}
+
+func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryGatewayFeeParams
+	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	moniker := params.Moniker
+	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
+		return nil, ErrInvalidMoniker(keeper.Codespace(), fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	assetParams := keeper.GetParamSet(ctx)
+	gatewayBaseFee := assetParams.CreateGatewayBaseFee
+	fee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcGatewayFeeFactor(moniker))
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
