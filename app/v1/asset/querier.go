@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	QueryAsset    = "asset"
-	QueryGateway  = "gateway"
-	QueryGateways = "gateways"
+	QueryAsset      = "asset"
+	QueryGateway    = "gateway"
+	QueryGateways   = "gateways"
+	QueryGatewayFee = "gatewayFee"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -23,6 +24,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryGateway(ctx, req, k)
 		case QueryGateways:
 			return queryGateways(ctx, req, k)
+		case QueryGatewayFee:
+			return queryGatewayFee(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
 		}
