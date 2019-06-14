@@ -17,6 +17,8 @@ func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 		return TaxUsageProposalExecute(ctx, gk, p.(*TaxUsageProposal))
 	case ProposalTypeSoftwareUpgrade:
 		return SoftwareUpgradeProposalExecute(ctx, gk, p.(*SoftwareUpgradeProposal))
+	case ProposalTypeAddAsset:
+		return AddAssetProposalExecute(ctx, gk, p.(*AddAssetProposal))
 	}
 	return nil
 }
@@ -95,5 +97,16 @@ func SystemHaltProposalExecute(ctx sdk.Context, gk Keeper) error {
 		logger.Info("SystemHalt Period is in process", "SystemHaltHeight", gk.GetSystemHaltHeight(ctx))
 
 	}
+	return nil
+}
+
+func AddAssetProposalExecute(ctx sdk.Context, gk Keeper, ap *AddAssetProposal) error {
+	logger := ctx.Logger()
+	_, err := gk.ak.IssueAsset(ctx, ap.Assert)
+	if err != nil {
+		logger.Error("Execute AddAssetProposal failed", "height", ctx.BlockHeight(), "proposalId", ap.ProposalID, "asset_symbol", ap.Assert.Symbol)
+		return err
+	}
+	logger.Info("Execute AddAssetProposal success", "height", ctx.BlockHeight(), "proposalId", ap.ProposalID, "asset_symbol", ap.Assert.Symbol)
 	return nil
 }

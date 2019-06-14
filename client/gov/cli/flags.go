@@ -23,4 +23,14 @@ const (
 	flagSoftware     = "software"
 	flagSwitchHeight = "switch-height"
 	flagThreshold    = "threshold"
+
+	//for addAssetProposal
+	flagAssetFamily         = "asset-family"
+	flagAssetSymbol         = "asset-symbol"
+	flagAssetName           = "asset-name"
+	flagAssetDecimal        = "asset-decimal"
+	flagAssetSymbolMinAlias = "asset-symbol-min-alias"
+	flagAssetInitialSupply  = "asset-initial-supply"
+	flagAssetMaxSupply      = "asset-max-supply"
+	flagAssetMintable       = "asset-mintable"
 )

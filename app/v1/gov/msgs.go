@@ -3,6 +3,7 @@ package gov
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/asset"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -309,17 +310,49 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	return nil
 }
 
-//TODO
 type MsgSubmitAddAssetProposal struct {
 	MsgSubmitProposal
+	Family         string `json:"family"`
+	Symbol         string `json:"symbol"`
+	Name           string `json:"name"`
+	Decimal        uint8  `json:"decimal"`
+	SymbolMinAlias string `json:"symbol_min_alias"`
+	InitialSupply  uint64 `json:"initial_supply"`
+	MaxSupply      uint64 `json:"max_supply"`
+	Mintable       bool   `json:"mintable"`
+}
+
+func NewMsgSubmitAddAssetProposal(msgSubmitProposal MsgSubmitProposal, family, symbol, name, symbolMinAlias string, decimal uint8, initialSupply, maxSupply uint64, mintable bool) MsgSubmitAddAssetProposal {
+	return MsgSubmitAddAssetProposal{
+		MsgSubmitProposal: msgSubmitProposal,
+		Family:            family,
+		Symbol:            symbol,
+		Name:              name,
+		Decimal:           decimal,
+		SymbolMinAlias:    symbolMinAlias,
+		InitialSupply:     initialSupply,
+		MaxSupply:         maxSupply,
+		Mintable:          mintable,
+	}
 }
 
 func (msg MsgSubmitAddAssetProposal) Route() string { return MsgRoute }
 func (msg MsgSubmitAddAssetProposal) Type() string  { return "submit_add_asset_proposal" }
 
-//TODO
 func (msg MsgSubmitAddAssetProposal) ValidateBasic() sdk.Error {
-	return nil
+	err := msg.MsgSubmitProposal.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	family, e := asset.AssetFamilyFromString(msg.Family)
+	if e != nil {
+		return asset.ErrInvalidAssetFamily(DefaultCodespace, family)
+	}
+
+	msgAsset := asset.NewMsgIssueAsset(family, asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, nil, nil)
+
+	return msgAsset.ValidateBasic()
 }
 func (msg MsgSubmitAddAssetProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -327,9 +360,4 @@ func (msg MsgSubmitAddAssetProposal) GetSignBytes() []byte {
 		panic(err)
 	}
 	return sdk.MustSortJSON(b)
-}
-
-//TODO
-func (msg MsgSubmitAddAssetProposal) GetSigners() []sdk.AccAddress {
-	return nil
 }

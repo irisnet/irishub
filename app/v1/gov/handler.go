@@ -2,6 +2,7 @@ package gov
 
 import (
 	"encoding/json"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"strconv"
 
 	"github.com/irisnet/irishub/app/v1/gov/tags"
@@ -219,7 +220,6 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 	}
 }
 
-//TODO
 func handleSubmitAddAssetProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitAddAssetProposal) sdk.Result {
 
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
@@ -227,23 +227,26 @@ func handleSubmitAddAssetProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitA
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
-	proposal := keeper.NewProposal(ctx, msg.Title, msg.Description, msg.ProposalType, msg.Params)
+	proposal := keeper.NewAddAssetProposal(ctx, msg)
 
 	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
-
+	assetId := proposal.(*AddAssetProposal).Assert.GetUniqueID()
+	if keeper.ak.HasAsset(ctx, assetId) {
+		return asset.ErrAssetAlreadyExists(keeper.codespace, assetId).Result()
+	}
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
+		tags.AssetId, []byte(assetId),
 	)
 
 	if votingStarted {
 		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
 	}
-
 	keeper.AddProposalNum(ctx, proposal)
 	return sdk.Result{
 		Data: proposalIDBytes,

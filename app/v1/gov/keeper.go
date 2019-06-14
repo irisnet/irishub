@@ -90,8 +90,6 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 		return keeper.NewParametersProposal(ctx, title, description, proposalType, param)
 	case ProposalTypeSystemHalt:
 		return keeper.NewSystemHaltProposal(ctx, title, description, proposalType)
-	case ProposalTypeAddAsset:
-		return keeper.NewAddAssetProposal(ctx, title, description, proposalType)
 	}
 	return nil
 }
@@ -233,24 +231,36 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	return proposal
 }
 
-func (keeper Keeper) NewAddAssetProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind) Proposal {
+func (keeper Keeper) NewAddAssetProposal(ctx sdk.Context, msg MsgSubmitAddAssetProposal) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
 	}
 	var textProposal = BasicProposal{
 		ProposalID:   proposalID,
-		Title:        title,
-		Description:  description,
-		ProposalType: proposalType,
+		Title:        msg.Title,
+		Description:  msg.Description,
+		ProposalType: msg.ProposalType,
 		Status:       StatusDepositPeriod,
 		TallyResult:  EmptyTallyResult(),
 		TotalDeposit: sdk.Coins{},
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
-	// TODO
+
+	family, _ := asset.AssetFamilyFromString(msg.Family)
 	var proposal Proposal = &AddAssetProposal{
 		textProposal,
+		asset.BaseAsset{
+			Family:         family,
+			Source:         asset.EXTERNAL,
+			Symbol:         msg.Symbol,
+			Name:           msg.Name,
+			Decimal:        msg.Decimal,
+			SymbolMinAlias: msg.SymbolMinAlias,
+			InitialSupply:  msg.InitialSupply,
+			MaxSupply:      msg.MaxSupply,
+			Mintable:       msg.Mintable,
+		},
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal
