@@ -29,7 +29,7 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 	assetTaxRate := params.AssetTaxRate
 
 	// compute fee
-	totalFee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcGatewayFeeFactor(moniker))
+	totalFee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcFeeFactor(moniker))
 
 	// check if the provided fee is enough
 	if fee.AmountOf(sdk.NativeTokenName).LT(totalFee.TruncateInt()) {
@@ -37,11 +37,12 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 	}
 
 	// compute tax and burned coin
-	communityTax := sdk.NewCoin(sdk.NativeTokenName, assetTaxRate.Mul(totalFee).TruncateInt())
-	burnedCoin := sdk.NewCoin(sdk.NativeTokenName, sdk.NewDec(1).Sub(assetTaxRate).Mul(totalFee).TruncateInt())
+	communityTax := assetTaxRate.Mul(totalFee)
+	communityTaxCoin := sdk.NewCoin(sdk.NativeTokenName, communityTax.TruncateInt())
+	burnedCoin := sdk.NewCoin(sdk.NativeTokenName, totalFee.Sub(communityTax).TruncateInt())
 
 	// send community tax
-	if _, err := k.bk.SendCoins(ctx, owner, bank.CommunityTaxCoinsAccAddr, sdk.Coins{communityTax}); err != nil {
+	if _, err := k.bk.SendCoins(ctx, owner, bank.CommunityTaxCoinsAccAddr, sdk.Coins{communityTaxCoin}); err != nil {
 		return err
 	}
 
@@ -56,15 +57,12 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 	return nil
 }
 
-// calcGatewayFeeFactor computes the fee factor of the given moniker
-func calcGatewayFeeFactor(moniker string) sdk.Dec {
-	len := len(moniker)
-
-	if len < MinimumGatewayMonikerSize || len > MaximumGatewayMonikerSize {
-		return sdk.ZeroDec()
-	}
+// calcFeeFactor computes the fee factor of the given string
+// Note: make sure that the name size is examined first
+func calcFeeFactor(name string) sdk.Dec {
+	nameLen := len(name)
 
 	// error ignored
-	feeFactor, _ := sdk.NewDecFromStr(FeeFactorSetBySize[len-startingSize])
+	feeFactor, _ := sdk.NewDecFromStr(FeeFactorSetBySize[nameLen-startingSize])
 	return feeFactor
 }
