@@ -48,11 +48,11 @@ type MsgIssueAsset struct {
 	MaxSupply      uint64         `json:"max_supply"`
 	Mintable       bool           `json:"mintable"`
 	Owner          sdk.AccAddress `json:"owner"`
-	AssetFee       sdk.Coins      `json:"asset_fee"`
+	Fee            sdk.Coins      `json:"fee"`
 }
 
 // NewMsgIssueAsset - construct asset issue msg.
-func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, assetFee sdk.Coins) MsgIssueAsset {
+func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueAsset {
 	return MsgIssueAsset{
 		Family:         family,
 		Source:         source,
@@ -66,7 +66,7 @@ func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, sy
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,
 		Owner:          owner,
-		AssetFee:       assetFee,
+		Fee:            fee,
 	}
 }
 
