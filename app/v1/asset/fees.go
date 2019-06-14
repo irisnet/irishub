@@ -51,6 +51,11 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 		return err
 	}
 
+	// burn
+	if _, _, err := k.bk.AddCoins(ctx, bank.BurnedCoinsAccAddr, sdk.Coins{burnedCoin}); err != nil {
+		return err
+	}
+
 	// decrease loosen tokens
 	k.bk.DecreaseLoosenToken(ctx, sdk.Coins{burnedCoin})
 
