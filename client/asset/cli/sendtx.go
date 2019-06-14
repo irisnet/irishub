@@ -26,8 +26,8 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-asset",
 		Short: "issue an asset",
-		Example: "iriscli asset issue-asset --family <family> --source <source> --gateway <gateway>" +
-			" --symbol <symbol> --name <name> --init",
+		Example: "iriscli asset issue-asset --family=<family> --source=<source> --gateway=<gateway>" +
+			" --symbol=<symbol> --name=<asset-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
 		PreRun: preSignCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().

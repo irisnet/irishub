@@ -17,7 +17,7 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-asset",
 		Short:   "Query details of a asset",
-		Example: "iriscli asset query-asset <asset>",
+		Example: "iriscli asset query-asset <asset-id>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
