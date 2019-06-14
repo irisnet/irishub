@@ -29,10 +29,13 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 	var asset Asset
 	switch msg.Family {
 	case FUNGIBLE:
-		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, msg.Owner)
+		totalSupply := msg.InitialSupply
+		decimal := int(msg.Decimal)
+		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	default:
 		return ErrInvalidAssetFamily(k.codespace, msg.Family).Result()
 	}
+
 	tags, err := k.IssueAsset(ctx, asset)
 	if err != nil {
 		return err.Result()

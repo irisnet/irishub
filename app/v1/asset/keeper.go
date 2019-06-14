@@ -71,13 +71,13 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 	}
 
 	if owner != nil {
-		newCoin := sdk.Coins{sdk.NewCoin(asset.GetDenom(), sdk.NewIntWithDecimal(int64(asset.GetInitSupply()), int(asset.GetDecimal())))}
-
-		// Increase LoosenToken
-		k.bk.IncreaseLoosenToken(ctx, newCoin)
+		newCoin := sdk.Coins{sdk.NewCoin(asset.GetDenom(), asset.GetInitSupply())}
 
 		// Add coins into owner's account
-		k.bk.AddCoins(ctx, owner, newCoin)
+		_, _, err := k.bk.AddCoins(ctx, owner, newCoin)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	createTags := sdk.NewTags(
