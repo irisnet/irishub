@@ -116,11 +116,17 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 
 	if lastBlockHeight-replayHeight <= DefaultCacheSize {
 		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
+
 		if err != nil {
-			cmn.Exit(err.Error())
+			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to", replayHeight)) {
+				app.Logger.Info(fmt.Sprintf("Can not found the target version %d, switch target to an earlier version and replay blocks", replayHeight))
+			} else {
+				cmn.Exit(err.Error())
+			}
+		} else {
+			app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
+			return false, replayHeight
 		}
-		app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
-		return false, replayHeight
 	}
 
 	loadHeight := app.replayToHeight(replayHeight, app.Logger)

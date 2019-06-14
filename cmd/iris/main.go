@@ -99,7 +99,7 @@ func exportAppStateAndTMValidators(ctx *server.Context,
 	if height > 0 {
 		err := gApp.LoadVersion(height, protocol.KeyMain, false)
 		if err != nil {
-			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to ", height)) {
+			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to", height)) {
 				return nil, nil, fmt.Errorf("unable to export snapshot height state %v that does not exist. "+
 					"If necessary, reset the application state to the specified height using command reset, and then export the state", height)
 			}
