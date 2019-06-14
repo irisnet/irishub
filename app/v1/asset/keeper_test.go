@@ -44,7 +44,7 @@ func TestKeeper_IssueAsset(t *testing.T) {
 
 	addr := sdk.AccAddress([]byte("addr1"))
 
-	ft := NewFungibleToken(0x00, "c", "d", "e", 1, "f", 1, 1, true, addr)
+	ft := NewFungibleToken(0x00, "c", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, addr)
 	_, err := keeper.IssueAsset(ctx, ft)
 	assert.NoError(t, err)
 
@@ -87,8 +87,8 @@ func TestKeeper_IssueGatewayAsset(t *testing.T) {
 		Details:  details,
 		Website:  website,
 	}
-	gatewayAsset := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", 1, 1, true, owner}
-	gatewayAsset1 := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", 1, 1, true, gatewayOwner}
+	gatewayAsset := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner}
+	gatewayAsset1 := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner}
 
 	// unknown gateway moniker
 	_, err := keeper.IssueAsset(ctx, gatewayAsset1)
