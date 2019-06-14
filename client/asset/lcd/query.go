@@ -20,6 +20,12 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		"/asset/gateways",
 		gatewaysHandlerFn(cliCtx, cdc),
 	).Methods("GET")
+
+	// Get gateway creation fee
+	r.HandleFunc(
+		"/asset/fees/gateway",
+		gatewayFeeHandlerFn(cliCtx, cdc),
+	).Methods("GET")
 }
 
 // monikerGatewayHandlerFn is the HTTP request handler to query a gateway of the given moniker
@@ -30,4 +36,9 @@ func monikerGatewayHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.H
 // gatewaysHandlerFn is the HTTP request handler to query a set of gateways
 func gatewaysHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryGateways(cliCtx, cdc, "custom/asset/gateways")
+}
+
+// gatewayFeeHandlerFn is the HTTP request handler to query gateway creation fee
+func gatewayFeeHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return queryGatewayFee(cliCtx, cdc, "custom/asset/gatewayFee")
 }
