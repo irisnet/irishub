@@ -45,6 +45,11 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 
 // handleMsgCreateGateway handles MsgCreateGateway
 func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
+	// handle fee
+	if err := GatewayFeeHandler(ctx, k, msg.Owner, msg.Moniker, msg.CreateFee); err != nil {
+		return err.Result()
+	}
+
 	// convert moniker to lowercase
 	msg.Moniker = strings.ToLower(msg.Moniker)
 

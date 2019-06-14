@@ -3,6 +3,7 @@ package asset
 
 import (
 	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -29,6 +30,9 @@ const (
 	CodeInvalidAssetDecimal           sdk.CodeType = 117
 	CodeAssetAlreadyExists            sdk.CodeType = 118
 	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 119
+
+	CodeNegativeFee     sdk.CodeType = 120
+	CodeInsufficientFee sdk.CodeType = 121
 )
 
 //----------------------------------------
@@ -107,4 +111,15 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
+}
+
+//----------------------------------------
+// Fee error constructors
+
+func ErrNegativeFee(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeNegativeFee, msg)
+}
+
+func ErrInsufficientFee(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInsufficientFee, msg)
 }

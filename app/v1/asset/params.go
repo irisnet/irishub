@@ -2,10 +2,11 @@ package asset
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"strconv"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -19,7 +20,7 @@ var (
 	KeyAssetTaxRate         = []byte("AssetTaxRate")
 	KeyIssueFTBaseFee       = []byte("IssueFTBaseFee")
 	KeyMintFTBaseFeeRatio   = []byte("MintFTBaseFeeRatio")
-	KeyCreateGatewayFee     = []byte("CreateGatewayFee")
+	KeyCreateGatewayBaseFee = []byte("CreateGatewayBaseFee")
 	KeyGatewayAssetFeeRatio = []byte("GatewayAssetFeeRatio")
 )
 
@@ -33,7 +34,7 @@ type Params struct {
 	AssetTaxRate         sdk.Dec `json:"asset_tax_rate"`          // e.g., 40%
 	IssueFTBaseFee       uint32  `json:"issue_ft_base_fee"`       // e.g., 300000
 	MintFTBaseFeeRatio   sdk.Dec `json:"mint_ft_base_fee_ratio"`  // e.g., 10%
-	CreateGatewayFee     uint32  `json:"create_gateway_fee"`      // e.g., 600000
+	CreateGatewayBaseFee uint32  `json:"create_gateway_base_fee"` // e.g., 600000
 	GatewayAssetFeeRatio sdk.Dec `json:"gateway_asset_fee_ratio"` // e.g., 10%
 } // issuance fee = IssueFTBaseFee / (ln(len(symbol))/ln3)^4
 
@@ -42,9 +43,9 @@ func (p Params) String() string {
   Asset Tax Rate:                                           %s
   Base Fee for Issuing Fungible Token:                      %d
   Base Fee Ratio for Minting (vs Issuing) Fungible Token:   %s
-  Fee for Creating Gateway:                                 %d
+  Base Fee for Creating Gateway:                                 %d
   Fee Ratio for Gateway (vs Native) Assets:                 %s`,
-		p.AssetTaxRate.String(), p.IssueFTBaseFee, p.MintFTBaseFeeRatio.String(), p.CreateGatewayFee, p.GatewayAssetFeeRatio.String())
+		p.AssetTaxRate.String(), p.IssueFTBaseFee, p.MintFTBaseFeeRatio.String(), p.CreateGatewayBaseFee, p.GatewayAssetFeeRatio.String())
 }
 
 // Implements params.ParamSet
@@ -57,7 +58,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 		{KeyAssetTaxRate, &p.AssetTaxRate},
 		{KeyIssueFTBaseFee, &p.IssueFTBaseFee},
 		{KeyMintFTBaseFeeRatio, &p.MintFTBaseFeeRatio},
-		{KeyCreateGatewayFee, &p.CreateGatewayFee},
+		{KeyCreateGatewayBaseFee, &p.CreateGatewayBaseFee},
 		{KeyGatewayAssetFeeRatio, &p.GatewayAssetFeeRatio},
 	}
 }
@@ -88,7 +89,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, err
 		}
 		return ratio, nil
-	case string(KeyCreateGatewayFee):
+	case string(KeyCreateGatewayBaseFee):
 		fee, err := strconv.ParseUint(value, 10, 32)
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
@@ -118,7 +119,7 @@ func DefaultParams() Params {
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 		IssueFTBaseFee:       300000,
 		MintFTBaseFeeRatio:   sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayFee:     600000,
+		CreateGatewayBaseFee: 600000,
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
@@ -129,7 +130,7 @@ func DefaultParamsForTest() Params {
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 		IssueFTBaseFee:       300000,
 		MintFTBaseFeeRatio:   sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayFee:     600000,
+		CreateGatewayBaseFee: 600000,
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
