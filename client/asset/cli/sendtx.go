@@ -57,7 +57,6 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 				Source:         source,
 				Gateway:        viper.GetString(FlagGateway),
 				Symbol:         viper.GetString(FlagSymbol),
-				Symbol:         viper.GetString(FlagSymbol),
 				Name:           viper.GetString(FlagName),
 				Decimal:        uint8(viper.GetInt(FlagDecimal)),
 				SymbolMinAlias: viper.GetString(FlagSymbolMinAlias),
@@ -111,14 +110,14 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			website := viper.GetString(FlagWebsite)
 			gatewayFee := viper.GetString(FlagGatewayFee)
 
-			gatewayFeeCoins, err := sdk.ParseCoins(gatewayFee)
+			gatewayFeeCoin, err := sdk.ParseCoin(gatewayFee)
 			if err != nil {
 				return err
 			}
 
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website, gatewayFeeCoins,
+				owner, moniker, identity, details, website, gatewayFeeCoin,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
