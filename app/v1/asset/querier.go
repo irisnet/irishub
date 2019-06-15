@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	QueryAsset      = "asset"
-	QueryGateway    = "gateway"
-	QueryGateways   = "gateways"
-	QueryGatewayFee = "gatewayFee"
+	QueryAsset    = "asset"
+	QueryGateway  = "gateway"
+	QueryGateways = "gateways"
+	QueryFees     = "fees"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -24,8 +24,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryGateway(ctx, req, k)
 		case QueryGateways:
 			return queryGateways(ctx, req, k)
-		case QueryGatewayFee:
-			return queryGatewayFee(ctx, req, k)
+		case QueryFees:
+			return queryFees(ctx, path[1:], req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
 		}
@@ -146,7 +146,18 @@ func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
 	return gateways
 }
 
-// QueryGatewayFeeParams is the query parameters for 'custom/asset/gatewayFee'
+func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	switch path[0] {
+	case "gateways":
+		return queryGatewayFee(ctx, req, keeper)
+	case "fungible-tokens":
+		return queryFTFees(ctx, req, keeper)
+	default:
+		return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
+	}
+}
+
+// QueryFeeParams is the query parameters for 'custom/asset/fees/gateways'
 type QueryGatewayFeeParams struct {
 	Moniker string
 }
@@ -165,9 +176,47 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 
 	assetParams := keeper.GetParamSet(ctx)
 	gatewayBaseFee := assetParams.CreateGatewayBaseFee
-	fee := sdk.NewDec(int64(gatewayBaseFee)).Quo(calcFeeFactor(moniker))
+	fee := sdk.NewCoin(gatewayBaseFee.Denom, calcFee(moniker, gatewayBaseFee.Amount))
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
+// QueryFTFeesParams is the query parameters for 'custom/asset/fees/fungible-tokens'
+type QueryFTFeesParams struct {
+	ID string
+}
+
+// FTFeesOutput is the query result for 'custom/asset/fees/fungible-tokens'
+type FTFeesOutput struct {
+	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
+	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
+}
+
+func queryFTFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryFTFeesParams
+	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	// id := params.ID
+
+	// TODO
+	// compute fees
+	issueFee := sdk.Coin{}
+	mintFee := sdk.Coin{}
+
+	fees := FTFeesOutput{
+		IssueFee: issueFee,
+		MintFee:  mintFee,
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, fees)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
