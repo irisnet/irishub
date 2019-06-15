@@ -57,7 +57,7 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 				return errors.Errorf("Height must greater than or equal to zero")
 			}
 			forZeroHeight := viper.GetBool(flagForZeroHeight)
-			appState, validators, err := appExporter(ctx, ctx.Logger, db, traceWriter, height, forZeroHeight)
+			exportHeight, appState, validators, err := appExporter(ctx, ctx.Logger, db, traceWriter, height, forZeroHeight)
 			if err != nil {
 				return errors.Errorf("error exporting state: %v\n", err)
 			}
@@ -82,7 +82,7 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			if err != nil {
 				return err
 			}
-			fmt.Printf("export state to file %s successfully\n", outputFile)
+			fmt.Printf("export state from height %d to file %s successfully\n", exportHeight, outputFile)
 			return nil
 		},
 	}

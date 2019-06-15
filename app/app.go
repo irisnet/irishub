@@ -119,23 +119,23 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 
 		if err != nil {
 			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to", replayHeight)) {
-				app.Logger.Info(fmt.Sprintf("Can not found the target version %d, switch target to an earlier version and replay blocks", replayHeight))
+				app.Logger.Info(fmt.Sprintf("Can not find the target version %d, trying to load an earlier version and replay blocks", replayHeight))
 			} else {
 				cmn.Exit(err.Error())
 			}
 		} else {
-			app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
+			app.Logger.Info(fmt.Sprintf("The last block height is %d, loaded store at %d", lastBlockHeight, replayHeight))
 			return false, replayHeight
 		}
 	}
 
 	loadHeight := app.replayToHeight(replayHeight, app.Logger)
-	err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-	app.Logger.Info(fmt.Sprintf("The last block height is %d, load store at %d", lastBlockHeight, replayHeight))
-	app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+	app.Logger.Info(fmt.Sprintf("The last block height is %d, want to load store at %d", lastBlockHeight, replayHeight))
+	app.Logger.Info(fmt.Sprintf("Loaded store at %d, start to replay to %d", loadHeight, replayHeight))
 	return true, replayHeight
 
 }
