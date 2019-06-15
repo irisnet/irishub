@@ -130,11 +130,19 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 	}
 
 	loadHeight := app.replayToHeight(replayHeight, app.Logger)
-	err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+
 	app.Logger.Info(fmt.Sprintf("The last block height is %d, want to load store at %d", lastBlockHeight, replayHeight))
+
+	// Version 1 does not need replay
+	if replayHeight == 1 {
+		app.Logger.Info(fmt.Sprintf("Loaded store at %d", loadHeight))
+		return false, replayHeight
+	}
+
 	app.Logger.Info(fmt.Sprintf("Loaded store at %d, start to replay to %d", loadHeight, replayHeight))
 	return true, replayHeight
 
