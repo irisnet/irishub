@@ -2,8 +2,9 @@ package asset
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"regexp"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -160,16 +161,18 @@ type MsgCreateGateway struct {
 	Identity string         `json:"identity"` //  the identity of the gateway
 	Details  string         `json:"details"`  //  the description of the gateway
 	Website  string         `json:"website"`  //  the external website of the gateway
+	Fee      sdk.Coin       `json:"fee"`      //  the fee for gateway creation
 }
 
 // NewMsgCreateGateway creates a MsgCreateGateway
-func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string) MsgCreateGateway {
+func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string, fee sdk.Coin) MsgCreateGateway {
 	return MsgCreateGateway{
 		Owner:    owner,
 		Moniker:  moniker,
 		Identity: identity,
 		Details:  details,
 		Website:  website,
+		Fee:      fee,
 	}
 }
 
@@ -188,7 +191,7 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 
 	// check the moniker size
 	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
 	}
 
 	// check the moniker format
@@ -198,12 +201,17 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 
 	// check the details
 	if len(msg.Details) > MaximumGatewayDetailsSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be [0,%d]", MaximumGatewayDetailsSize))
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
 	}
 
 	// check the website
 	if len(msg.Website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be [0,%d]", MaximumGatewayWebsiteSize))
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
+	}
+
+	// check the fee
+	if !msg.Fee.IsNotNegative() {
+		return ErrNegativeFee(DefaultCodespace, "the fee must not be negative")
 	}
 
 	return nil
@@ -211,7 +219,13 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 
 // String returns the representation of the msg
 func (msg MsgCreateGateway) String() string {
-	return fmt.Sprintf("MsgCreateGateway{%s, %s, %s, %s, %s}", msg.Owner, msg.Moniker, msg.Identity, msg.Details, msg.Website)
+	return fmt.Sprintf(`MsgCreateGateway:
+  Owner:             %s
+  Moniker:           %s
+  Identity:          %s
+  Details:           %s
+  Website:           %s`,
+		msg.Owner, msg.Moniker, msg.Identity, msg.Details, msg.Website)
 }
 
 // GetSignBytes implements Msg
@@ -263,7 +277,7 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 
 	// check the moniker size
 	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
 	}
 
 	// check the moniker format
@@ -273,12 +287,12 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 
 	// check the details
 	if msg.Details != nil && len(*msg.Details) > MaximumGatewayDetailsSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be [0,%d]", MaximumGatewayDetailsSize))
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
 	}
 
 	// check the website
 	if msg.Website != nil && len(*msg.Website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be [0,%d]", MaximumGatewayWebsiteSize))
+		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
 	}
 
 	// check if updates occur
@@ -291,7 +305,13 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 
 // String returns the representation of the msg
 func (msg MsgEditGateway) String() string {
-	return fmt.Sprintf("MsgEditGateway{%s, %s, %s, %s, %s}", msg.Owner, msg.Moniker, *msg.Identity, *msg.Details, *msg.Website)
+	return fmt.Sprintf(`MsgEditGateway:
+  Owner:             %s
+  Moniker:           %s
+  Identity:          %s
+  Details:           %s
+  Website:           %s`,
+		msg.Owner, msg.Moniker, *msg.Identity, *msg.Details, *msg.Website)
 }
 
 // GetSignBytes implements Msg
