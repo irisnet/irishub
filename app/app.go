@@ -91,26 +91,59 @@ func MakeLatestCodec() *codec.Codec {
 	return cdc
 }
 
+func (app *IrisApp) LastBlockHeight() int64 {
+	return app.BaseApp.LastBlockHeight()
+}
+
 func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64) {
 	lastBlockHeight := app.BaseApp.LastBlockHeight()
 	if replayHeight > lastBlockHeight {
 		replayHeight = lastBlockHeight
 	}
 
-	if lastBlockHeight-replayHeight <= DefaultCacheSize {
-		err := app.LoadVersion(replayHeight, protocol.KeyMain, false)
-		if err != nil {
-			cmn.Exit(err.Error())
-		}
-		return false, replayHeight
-	}
+	app.Logger.Info("This Reset operation will change the application store, backup your node home directory before proceeding!!!")
+	app.Logger.Info(fmt.Sprintf("The last block height is %v, will reset height to %v.", lastBlockHeight, replayHeight))
 
-	loadHeight := app.replayToHeight(replayHeight, app.Logger)
-	err := app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	app.Logger.Info("Are you sure to proceed? (y/n)")
+	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-	app.Logger.Info(fmt.Sprintf("Load store at %d, start to replay to %d", loadHeight, replayHeight))
+	confirm := strings.ToLower(strings.TrimSpace(input))
+	if confirm != "y" && confirm != "yes" {
+		cmn.Exit("Reset operation aborted.")
+	}
+
+	if lastBlockHeight-replayHeight <= DefaultCacheSize {
+		err := app.LoadVersion(replayHeight, protocol.KeyMain, true)
+
+		if err != nil {
+			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to", replayHeight)) {
+				app.Logger.Info(fmt.Sprintf("Can not find the target version %d, trying to load an earlier version and replay blocks", replayHeight))
+			} else {
+				cmn.Exit(err.Error())
+			}
+		} else {
+			app.Logger.Info(fmt.Sprintf("The last block height is %d, loaded store at %d", lastBlockHeight, replayHeight))
+			return false, replayHeight
+		}
+	}
+
+	loadHeight := app.replayToHeight(replayHeight, app.Logger)
+	err = app.LoadVersion(loadHeight, protocol.KeyMain, true)
+	if err != nil {
+		cmn.Exit(err.Error())
+	}
+
+	app.Logger.Info(fmt.Sprintf("The last block height is %d, want to load store at %d", lastBlockHeight, replayHeight))
+
+	// Version 1 does not need replay
+	if replayHeight == 1 {
+		app.Logger.Info(fmt.Sprintf("Loaded store at %d", loadHeight))
+		return false, replayHeight
+	}
+
+	app.Logger.Info(fmt.Sprintf("Loaded store at %d, start to replay to %d", loadHeight, replayHeight))
 	return true, replayHeight
 
 }
@@ -133,16 +166,6 @@ func (app *IrisApp) replayToHeight(replayHeight int64, logger log.Logger) int64 
 	} else {
 		// version 1 will always be kept
 		loadHeight = 1
-	}
-	logger.Info("This replay operation will change the application store, backup your node home directory before proceeding!!")
-	logger.Info("Are you sure to proceed? (y/n)")
-	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-	if err != nil {
-		cmn.Exit(err.Error())
-	}
-	confirm := strings.ToLower(strings.TrimSpace(input))
-	if confirm != "y" && confirm != "yes" {
-		cmn.Exit("Replay operation aborted.")
 	}
 	return loadHeight
 }
