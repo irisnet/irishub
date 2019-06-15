@@ -23,8 +23,14 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// Get gateway creation fee
 	r.HandleFunc(
-		"/asset/fees/gateway",
+		"/asset/fees/gateways/{moniker}",
 		gatewayFeeHandlerFn(cliCtx, cdc),
+	).Methods("GET")
+
+	// Get fungible token fees
+	r.HandleFunc(
+		"/asset/fees/fungible-tokens/{id}",
+		ftFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
 
@@ -40,5 +46,10 @@ func gatewaysHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 
 // gatewayFeeHandlerFn is the HTTP request handler to query gateway creation fee
 func gatewayFeeHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryGatewayFee(cliCtx, cdc, "custom/asset/gatewayFee")
+	return queryGatewayFee(cliCtx, cdc, "custom/asset/fees/gateways")
+}
+
+// ftFeesHandlerFn is the HTTP request handler to query FTs fees
+func ftFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return queryFTFees(cliCtx, cdc, "custom/asset/fees/fungible-tokens")
 }
