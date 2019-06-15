@@ -29,6 +29,7 @@ type BaseAsset struct {
 	Symbol         string           `json:"symbol"`
 	Name           string           `json:"name"`
 	Decimal        uint8            `json:"decimal"`
+	SymbolAtSource string           `json:"symbol_at_source"`
 	SymbolMinAlias string           `json:"symbol_min_alias"`
 	InitialSupply  types.Int        `json:"initial_supply"`
 	TotalSupply    types.Int        `json:"total_supply"`
@@ -37,7 +38,7 @@ type BaseAsset struct {
 	Owner          types.AccAddress `json:"owner"`
 }
 
-func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseAsset {
+func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseAsset {
 	return BaseAsset{
 		Family:         family,
 		Source:         source,
@@ -45,7 +46,8 @@ func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol
 		Symbol:         symbol,
 		Name:           name,
 		Decimal:        decimal,
-		SymbolMinAlias: alias,
+		SymbolAtSource: symbolAtSource,
+		SymbolMinAlias: symbolMinAlias,
 		InitialSupply:  initialSupply,
 		TotalSupply:    totalSupply,
 		MaxSupply:      maxSupply,
@@ -121,7 +123,10 @@ func (ba BaseAsset) String() string {
 	return fmt.Sprintf(`Asset %s:
   Family:            %s
   Source:            %s
+  Gateway:           %s
+  Name:              %s
   Symbol:            %s
+  Symbol At Source:  %s
   Symbol Min Alias:  %s
   Decimal:           %d
   Initial Supply:    %s
@@ -129,7 +134,7 @@ func (ba BaseAsset) String() string {
   Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
-		ba.GetUniqueID(), ba.Family, ba.Source, ba.Symbol, ba.SymbolMinAlias,
+		ba.GetUniqueID(), ba.Family, ba.Source, ba.Gateway, ba.Name, ba.Symbol, ba.SymbolAtSource, ba.SymbolMinAlias,
 		ba.Decimal, ba.InitialSupply.String(), ba.TotalSupply.String(), ba.MaxSupply.String(), ba.Mintable, ba.Owner.String())
 }
 
@@ -138,10 +143,10 @@ type FungibleToken struct {
 	BaseAsset
 }
 
-func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	return FungibleToken{
 		BaseAsset: NewBaseAsset(
-			FUNGIBLE, source, gateway, symbol, name, decimal, alias, initialSupply, totalSupply, maxSupply, mintable, owner,
+			FUNGIBLE, source, gateway, symbol, name, decimal, symbolAtSource, symbolMinAlias, initialSupply, totalSupply, maxSupply, mintable, owner,
 		),
 	}
 }

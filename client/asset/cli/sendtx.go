@@ -57,7 +57,7 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 				Source:         source,
 				Gateway:        viper.GetString(FlagGateway),
 				Symbol:         viper.GetString(FlagSymbol),
-				Symbol:         viper.GetString(FlagSymbol),
+				SymbolAtSource: viper.GetString(FlagSymbolAtSource),
 				Name:           viper.GetString(FlagName),
 				Decimal:        uint8(viper.GetInt(FlagDecimal)),
 				SymbolMinAlias: viper.GetString(FlagSymbolMinAlias),
