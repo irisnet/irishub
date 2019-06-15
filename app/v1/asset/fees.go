@@ -4,7 +4,6 @@ package asset
 import (
 	"fmt"
 	"math"
-	"math/big"
 
 	bank "github.com/irisnet/irishub/app/v1/bank"
 	sdk "github.com/irisnet/irishub/types"
@@ -62,10 +61,10 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 
 // calcFee computes the actual fee according to the given base fee
 func calcFee(name string, baseFee sdk.Int) sdk.Int {
-	feeFactor, _ := big.NewFloat(calcFeeFactor(name)).Int64()
-	actualFee := baseFee.Div(sdk.NewInt(feeFactor))
+	feeFactor := calcFeeFactor(name)
+	actualFee := int64(math.Round(float64(baseFee.Int64()) / feeFactor))
 
-	return actualFee
+	return sdk.NewInt(actualFee)
 }
 
 // calcFeeFactor computes the fee factor of the given name(common for gateway and asset)
