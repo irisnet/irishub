@@ -2,7 +2,6 @@ package asset
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
@@ -31,21 +30,21 @@ func ParamTypeTable() params.TypeTable {
 
 // asset params
 type Params struct {
-	AssetTaxRate         sdk.Dec `json:"asset_tax_rate"`          // e.g., 40%
-	IssueFTBaseFee       uint32  `json:"issue_ft_base_fee"`       // e.g., 300000
-	MintFTFeeRatio       sdk.Dec `json:"mint_ft_fee_ratio"`       // e.g., 10%
-	CreateGatewayBaseFee uint32  `json:"create_gateway_base_fee"` // e.g., 600000
-	GatewayAssetFeeRatio sdk.Dec `json:"gateway_asset_fee_ratio"` // e.g., 10%
+	AssetTaxRate         sdk.Dec  `json:"asset_tax_rate"`          // e.g., 40%
+	IssueFTBaseFee       sdk.Coin `json:"issue_ft_base_fee"`       // e.g., 300000*10^18iris-atto
+	MintFTFeeRatio       sdk.Dec  `json:"mint_ft_fee_ratio"`       // e.g., 10%
+	CreateGatewayBaseFee sdk.Coin `json:"create_gateway_base_fee"` // e.g., 600000*10^18iris-atto
+	GatewayAssetFeeRatio sdk.Dec  `json:"gateway_asset_fee_ratio"` // e.g., 10%
 } // issuance fee = IssueFTBaseFee / (ln(len(symbol))/ln3)^4
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Asset Params:
   Asset Tax Rate:                                           %s
-  Base Fee for Issuing Fungible Token:                      %d
+  Base Fee for Issuing Fungible Token:                      %s
   Fee Ratio for Minting (vs Issuing) Fungible Token:        %s
-  Base Fee for Creating Gateway:                            %d
+  Base Fee for Creating Gateway:                            %s
   Fee Ratio for Gateway (vs Native) Assets:                 %s`,
-		p.AssetTaxRate.String(), p.IssueFTBaseFee, p.MintFTFeeRatio.String(), p.CreateGatewayBaseFee, p.GatewayAssetFeeRatio.String())
+		p.AssetTaxRate.String(), p.IssueFTBaseFee.String(), p.MintFTFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
 }
 
 // Implements params.ParamSet
@@ -75,11 +74,11 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		}
 		return rate, nil
 	case string(KeyIssueFTBaseFee):
-		fee, err := strconv.ParseUint(value, 10, 32)
-		if err != nil {
+		fee, err := sdk.ParseCoin(value)
+		if err != nil || fee.Denom != sdk.NativeTokenMinDenom {
 			return nil, params.ErrInvalidString(value)
 		}
-		return uint32(fee), nil
+		return fee, nil
 	case string(KeyMintFTFeeRatio):
 		ratio, err := sdk.NewDecFromStr(value)
 		if err != nil {
@@ -90,11 +89,12 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		}
 		return ratio, nil
 	case string(KeyCreateGatewayBaseFee):
-		fee, err := strconv.ParseUint(value, 10, 32)
-		if err != nil {
+		fee, err := sdk.ParseCoin(value)
+		if err != nil || fee.Denom != sdk.NativeTokenMinDenom {
 			return nil, params.ErrInvalidString(value)
 		}
-		return uint32(fee), nil
+
+		return fee, nil
 	case string(KeyGatewayAssetFeeRatio):
 		ratio, err := sdk.NewDecFromStr(value)
 		if err != nil {
@@ -117,9 +117,9 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 func DefaultParams() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueFTBaseFee:       300000,
+		IssueFTBaseFee:       sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
 		MintFTFeeRatio:       sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: 600000,
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
@@ -128,9 +128,9 @@ func DefaultParams() Params {
 func DefaultParamsForTest() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueFTBaseFee:       300000,
+		IssueFTBaseFee:       sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
 		MintFTFeeRatio:       sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: 600000,
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }

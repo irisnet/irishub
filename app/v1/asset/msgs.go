@@ -161,11 +161,11 @@ type MsgCreateGateway struct {
 	Identity string         `json:"identity"` //  the identity of the gateway
 	Details  string         `json:"details"`  //  the description of the gateway
 	Website  string         `json:"website"`  //  the external website of the gateway
-	Fee      sdk.Coins      `json:"fee"`      //  the fee for gateway creation
+	Fee      sdk.Coin       `json:"fee"`      //  the fee for gateway creation
 }
 
 // NewMsgCreateGateway creates a MsgCreateGateway
-func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string, fee sdk.Coins) MsgCreateGateway {
+func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string, fee sdk.Coin) MsgCreateGateway {
 	return MsgCreateGateway{
 		Owner:    owner,
 		Moniker:  moniker,
