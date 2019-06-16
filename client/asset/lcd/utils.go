@@ -94,7 +94,17 @@ func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string)
 func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+
 		moniker := vars["moniker"]
+        if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
+			return
+		}
+
+		if !asset.IsAlpha(moniker) {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the moniker must contain only letters"))
+			return
+		}
 
 		params := asset.QueryGatewayFeeParams{
 			Moniker: moniker,
@@ -121,7 +131,9 @@ func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint strin
 func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+
 		id := vars["id"]
+		// TODO: id check
 
 		params := asset.QueryFTFeesParams{
 			ID: id,

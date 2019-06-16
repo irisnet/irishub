@@ -49,7 +49,7 @@ func gatewayFeeHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 	return queryGatewayFee(cliCtx, cdc, "custom/asset/fees/gateways")
 }
 
-// ftFeesHandlerFn is the HTTP request handler to query FTs fees
+// ftFeesHandlerFn is the HTTP request handler to query FT fees
 func ftFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryFTFees(cliCtx, cdc, "custom/asset/fees/fungible-tokens")
 }
