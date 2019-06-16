@@ -454,7 +454,7 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /bank/token-stats:
+  /bank/token-stats/{id}:
     get:
       tags:
         - Bank
@@ -462,6 +462,12 @@ paths:
       description: >-
         Get token statistics, such as total loose tokens, total bonded token and
         total burned token
+      parameters:
+        - name: id
+          in: path
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: OK

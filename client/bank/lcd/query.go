@@ -2,16 +2,16 @@ package lcd
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/stake"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
-	bankv1 "github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/stake"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
-	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -74,34 +74,81 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 }
 
 // QueryTokenStatsRequestHandlerFn performs token statistic query
-func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		vars := mux.Vars(r)
+		assetId := vars["id"]
+
+		if len(assetId) == 0 {
+			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryTokenStats), nil)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			}
+
+			var tokenStats bank.TokenStats
+			err = cdc.UnmarshalJSON(resToken, &tokenStats)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			var poolStatus stakeTypes.PoolStatus
+			err = cdc.UnmarshalJSON(resPool, &poolStatus)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+
+			tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
+
+			utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
+		} else {
+			cliCtx = cliCtx.WithAccountDecoder(decoder)
+			params := asset.QueryAssetParams{
+				Asset: assetId,
+			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			var nAsset asset.Asset
+			err = cdc.UnmarshalJSON(res, &nAsset)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			var tokenStats bank.TokenStatsOfAsset
+
+			//get loose token from asset
+
+			looseToken := sdk.Coin{}
+			looseToken.Denom = nAsset.GetDenom()
+			looseToken.Amount = nAsset.GetTotalSupply()
+			tokenStats.LooseToken = looseToken
+
+			//get burned token from burnAddress
+			burnedAcc, err := cliCtx.GetAccount(bank.BurnedCoinsAccAddr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			burnToken := sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
+			tokenStats.BurnedToken = burnToken
+			utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 		}
 
-		var tokenStats bank.TokenStats
-		err = cdc.UnmarshalJSON(resToken, &tokenStats)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		var poolStatus stakeTypes.PoolStatus
-		err = cdc.UnmarshalJSON(resPool, &poolStatus)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
-
-		utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 	}
 }

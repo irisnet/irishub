@@ -67,3 +67,19 @@ func (ts TokenStats) String() string {
 		ts.LooseTokens.MainUnitString(), ts.BurnedTokens.MainUnitString(), ts.BondedTokens.MainUnitString(),
 	)
 }
+
+type TokenStatsOfAsset struct {
+	LooseToken  sdk.Coin `json:"loose_token"`
+	BurnedToken sdk.Coin `json:"burned_token"`
+	BondedToken sdk.Coin `json:"bonded_token"`
+}
+
+// String implements fmt.Stringer
+func (ts TokenStatsOfAsset) String() string {
+	return fmt.Sprintf(`TokenStats:
+  Loose Token:  %s
+  Burned Token:  %s
+  Bonded Token:  %s`,
+		ts.LooseToken.String(), ts.BurnedToken.String(), ts.BondedToken.String(),
+	)
+}
