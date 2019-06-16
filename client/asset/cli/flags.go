@@ -26,13 +26,14 @@ const (
 	FlagGatewayFee = "gateway-fee"
 
 	FlagSubject = "subject"
-	FlagID="id"
+	FlagID      = "id"
 )
 
 var (
 	FsAssetIssue    = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayCreate = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayEdit   = flag.NewFlagSet("", flag.ContinueOnError)
+	FsFeeQuery      = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -58,4 +59,8 @@ func init() {
 	FsGatewayEdit.String(FlagIdentity, "", "the gateway identity")
 	FsGatewayEdit.String(FlagDetails, "", "the gateway description")
 	FsGatewayEdit.String(FlagWebsite, "", "the external website")
+
+	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
+	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
+	FsFeeQuery.String(FlagID, "", "the fungible token id")
 }

@@ -206,7 +206,7 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var fees sdk.FTFeesOutput
-			err = cdc.UnmarshalJSON(res, &fee)
+			err = cdc.UnmarshalJSON(res, &fees)
 			if err != nil {
 				return err
 			}
