@@ -22,8 +22,8 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := asset.QueryAssetParams{
-				Asset: args[0],
+			params := asset.QueryTokenParams{
+				TokenId: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -31,7 +31,7 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
 			if err != nil {
 				return err
 			}

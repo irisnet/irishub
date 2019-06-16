@@ -120,7 +120,7 @@ func (ba BaseAsset) GetTotalSupply() types.Int {
 
 // String implements fmt.Stringer
 func (ba BaseAsset) String() string {
-	return fmt.Sprintf(`Asset %s:
+	return fmt.Sprintf(`Token %s:
   Family:            %s
   Source:            %s
   Gateway:           %s

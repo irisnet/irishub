@@ -13,6 +13,33 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+func queryToken(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		tokenId := vars["id"]
+
+		params := asset.QueryTokenParams{
+			TokenId: tokenId,
+		}
+
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
+}
+
 // queryGateway queries a gateway of the given moniker from the specified endpoint
 func queryGateway(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
