@@ -157,7 +157,7 @@ func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 	}
 }
 
-// QueryFeeParams is the query parameters for 'custom/asset/fees/gateways'
+// QueryGatewayFeeParams is the query parameters for 'custom/asset/fees/gateways'
 type QueryGatewayFeeParams struct {
 	Moniker string
 }
@@ -172,6 +172,10 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	moniker := params.Moniker
 	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
 		return nil, ErrInvalidMoniker(keeper.Codespace(), fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	if !IsAlpha(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 	}
 
 	assetParams := keeper.GetParamSet(ctx)
@@ -205,9 +209,9 @@ func queryFTFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	// id := params.ID
+	// TODO: id check
 
-	// TODO
-	// compute fees
+	// TODO: compute fees
 	issueFee := sdk.Coin{}
 	mintFee := sdk.Coin{}
 

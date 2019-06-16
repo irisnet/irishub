@@ -148,26 +148,51 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryGatewayFee implements the query gateway fee command.
-func GetCmdQueryGatewayFee(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryFee implements the query asset-related fees command.
+func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-gateway-fee",
-		Short:   "Query the creation fee for a gateway with the given moniker",
-		Example: "iriscli asset query-gateway-fee --moniker=<gateway moniker>",
+		Use:     "query-fee",
+		Short:   "Query the asset-related fees",
+		Example: "iriscli asset query-fee --subject=<gateway|fungible-token> --moniker=<gateway moniker> --id=<asset id>",
+		PreRunE: preQueryFeeCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			
+			// subject validity is check in PreRunE
+			subject := viper.GetString(FlagSubject)
+			
+			var (
+				moniker string
+				id      string
+				path    string
+			)
+			
+			if subject == "gateway" {
+				moniker = viper.GetString(FlagMoniker)
+				if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
+					return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
+				}
+	
+				if !asset.IsAlpha(moniker) {
+					return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+				}
 
-			moniker := viper.GetString(FlagMoniker)
-			if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
-				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
-			}
+				params = asset.QueryGatewayFeeParams{
+					Moniker: moniker,
+				}
 
-			if !asset.IsAlpha(moniker) {
-				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
-			}
+				path = fmt.Sprintf("custom/%s/fees/gateway", protocol.AssetRoute)
 
-			params := asset.QueryGatewayFeeParams{
-				Moniker: moniker,
+			} else {
+				id = viper.GetString(FlagID)
+
+				// TODO: id check
+
+				params =  asset.QueryFTFeesParams{
+					ID: id,
+				}
+
+				path = fmt.Sprintf("custom/%s/fees/fungible-token", protocol.AssetRoute)
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -175,23 +200,40 @@ func GetCmdQueryGatewayFee(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/gatewayFee", protocol.AssetRoute), bz)
+			res, err := cliCtx.QueryWithData(path, bz)
 			if err != nil {
 				return err
 			}
 
-			var fee sdk.Dec
+			var fees sdk.FTFeesOutput
 			err = cdc.UnmarshalJSON(res, &fee)
 			if err != nil {
 				return err
 			}
 
-			return cliCtx.PrintOutput(fee)
+			return cliCtx.PrintOutput(fees)
 		},
 	}
 
-	cmd.Flags().String(FlagMoniker, "", "the unique name of the destination gateway")
-	cmd.MarkFlagRequired(FlagMoniker)
+	cmd.Flags().AddFlagSet(FsFeeQuery)
+	cmd.MarkFlagRequired(FlagSubject)
 
 	return cmd
+}
+
+// preQueryFeeCmd is used to check if the subject is valid and the corresponding flag to the subject is provided
+func preQueryFeeCmd(cmd *cobra.Command, args []string) error {
+	subject := viper.GetString(FlagSubject)
+
+	if subject != "gateway" && subject != "fungible-token" {
+		return fmt.Errorf("the subject must be gateway or fungible-token")
+	}
+
+	if subject == "gateway" {
+		cmd.MarkFlagRequired(FlagMoniker)
+	} else if subject == "fungible-token" {
+		cmd.MarkFlagRequired(FlagID)
+	}
+
+	return nil
 }

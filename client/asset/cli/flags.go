@@ -24,6 +24,9 @@ const (
 	FlagDetails    = "details"
 	FlagWebsite    = "website"
 	FlagGatewayFee = "gateway-fee"
+
+	FlagSubject = "subject"
+	FlagID="id"
 )
 
 var (
