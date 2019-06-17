@@ -49,7 +49,7 @@ func TestKeeper_IssueAsset(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(0x00, "c", "btc", "btc", 1, "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := NewFungibleToken(NATIVE, "gdex", "btc", "btc", 1, "btc", "satoshi",sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	_, err := keeper.IssueAsset(ctx, ft)
 	assert.NoError(t, err)
 
@@ -92,8 +92,8 @@ func TestKeeper_IssueGatewayAsset(t *testing.T) {
 		Details:  details,
 		Website:  website,
 	}
-	gatewayAsset := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner}
-	gatewayAsset1 := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner}
+	gatewayAsset := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", "g", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner}
+	gatewayAsset1 := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", "g", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner}
 
 	// unknown gateway moniker
 	_, err := keeper.IssueAsset(ctx, gatewayAsset1)
