@@ -191,25 +191,29 @@ func GetKeyIDFromUniqueID(uniqueID string) string {
 
 // IsAssetIDValid checks if the given asset id is valid
 func IsAssetIDValid(id string) (bool, sdk.Error) {
-	if strings.Contains(id, ".") {
-		parts := strings.Split(id, ".")
+	var symbol string
+	parts := strings.Split(id, ".")
+
+	if len(parts) > 1 {
+		// external or gateway asset
 		source := parts[0]
-		symbol := parts[1]
+		symbol = strings.Join(parts[1:], ".")
 
 		// check gateway moniker
-		if source != "i" && source != "x" {
+		if source != "x" {
 			if len(source) < MinimumGatewayMonikerSize || len(source) > MaximumGatewayMonikerSize || !IsAlpha(source) {
 				return false, ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("invalid gateway moniker: %s", source))
 			}
 		}
-
-		// check asset symbol
-		if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
-			return false, ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
-		}
-
-		return true, nil
+	} else {
+		// native asset
+		symbol = id
 	}
 
-	return false, ErrInvalidAssetSource(DefaultCodespace, "the asset source must be provided")
+	// check symbol
+	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
+		return false, ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+	}
+
+	return true, nil
 }
