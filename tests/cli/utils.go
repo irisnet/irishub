@@ -234,7 +234,7 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
 	return acc
 }
 
-func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenS bank.TokenStatsOfAsset) {
+func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenS bank.TokenStats) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)

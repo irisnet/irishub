@@ -79,9 +79,3 @@ type TokenStats struct {
 	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	BondedTokens sdk.Coins `json:"bonded_tokens"`
 }
-
-type TokenStatsOfAsset struct {
-	LooseToken  sdk.Coin `json:"loose_token"`
-	BurnedToken sdk.Coin `json:"burned_token"`
-	BondedToken sdk.Coin `json:"bonded_token"`
-}

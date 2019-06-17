@@ -81,7 +81,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
-			if len(args) == 0 {
+			if len(args) == 0 || args[0] == "iris" || args[0] == "iris-atto" {
 				//get the token-stats of iris
 				resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
 				if err != nil {
@@ -128,13 +128,13 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 				if err != nil {
 					return err
 				}
-				var tokenStats bank.TokenStatsOfAsset
+				var tokenStats bank.TokenStats
 
 				//get loose token from asset
 				looseToken := sdk.Coin{}
 				looseToken.Denom = nAsset.GetDenom()
 				looseToken.Amount = nAsset.GetTotalSupply()
-				tokenStats.LooseToken = looseToken
+				tokenStats.LooseTokens = append(tokenStats.LooseTokens, looseToken)
 
 				//get burned token from burnAddress
 				burnedAcc, err := cliCtx.GetAccount(bankv1.BurnedCoinsAccAddr)
@@ -142,7 +142,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 					return err
 				}
 				burnToken := sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
-				tokenStats.BurnedToken = burnToken
+				tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
 				return cliCtx.PrintOutput(tokenStats)
 			}
 

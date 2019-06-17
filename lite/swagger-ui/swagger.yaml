@@ -476,21 +476,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  loose_token:
+                  loose_tokens:
                     type: object
                     properties:
                       denom:
                         type: string
                       decimal:
                         type: integer
-                  bonded_token:
+                  bonded_tokens:
                     type: object
                     properties:
                       denom:
                         type: string
                       decimal:
                         type: integer
-                  burned_token:
+                  burned_tokens:
                     type: object
                     properties:
                       denom:

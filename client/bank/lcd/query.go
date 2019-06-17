@@ -79,7 +79,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		vars := mux.Vars(r)
 		assetId := vars["id"]
 
-		if len(assetId) == 0 {
+		if len(assetId) == 0 || assetId == "iris" || assetId == "iris-atto" {
 			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryTokenStats), nil)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -130,14 +130,14 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			var tokenStats bank.TokenStatsOfAsset
+			var tokenStats bank.TokenStats
 
 			//get loose token from asset
 
 			looseToken := sdk.Coin{}
 			looseToken.Denom = nAsset.GetDenom()
 			looseToken.Amount = nAsset.GetTotalSupply()
-			tokenStats.LooseToken = looseToken
+			tokenStats.LooseTokens = append(tokenStats.LooseTokens, looseToken)
 
 			//get burned token from burnAddress
 			burnedAcc, err := cliCtx.GetAccount(bank.BurnedCoinsAccAddr)
@@ -146,7 +146,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 				return
 			}
 			burnToken := sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
-			tokenStats.BurnedToken = burnToken
+			tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
 			utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 		}
 
