@@ -6,12 +6,12 @@ import (
 
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgIssueAsset{}, "irishub/asset/MsgIssueAsset", nil)
+	cdc.RegisterConcrete(MsgIssueToken{}, "irishub/asset/MsgIssueToken", nil)
 	cdc.RegisterConcrete(MsgCreateGateway{}, "irishub/asset/MsgCreateGateway", nil)
 	cdc.RegisterConcrete(MsgEditGateway{}, "irishub/asset/MsgEditGateway", nil)
 
-	cdc.RegisterInterface((*Asset)(nil), nil)
-	cdc.RegisterConcrete(BaseAsset{}, "irishub/asset/BaseAsset", nil)
+	cdc.RegisterInterface((*Token)(nil), nil)
+	cdc.RegisterConcrete(BaseToken{}, "irishub/asset/BaseToken", nil)
 	cdc.RegisterConcrete(FungibleToken{}, "irishub/asset/FungibleToken", nil)
 	cdc.RegisterConcrete(NonFungibleToken{}, "irishub/asset/NonFungibleToken", nil)
 

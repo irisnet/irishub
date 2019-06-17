@@ -52,16 +52,16 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		page := 0
 		size := 100
 
-		var source asset.AssetSource
+		var source asset.TokenSource
 		if len(sourceStr) > 0 {
-			_source, ok := asset.StringToAssetSourceMap[sourceStr]
+			_source, ok := asset.StringToTokenSourceMap[sourceStr]
 			if !ok {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid source %s", sourceStr))
 				return
 			}
 			source = _source
 		} else if len(owner) > 0 {
-			source, _ = asset.StringToAssetSourceMap["native"]
+			source, _ = asset.StringToTokenSourceMap["native"]
 		}
 
 		queryTags := []string{fmt.Sprintf("%s='%s'", tags.Action, string(tags.ActionIssueToken))}
@@ -84,22 +84,22 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 			return
 		}
 
-		var tokens []asset.Asset
+		var tokens []asset.Token
 		for _, info := range infos {
 			if info.Result.Code != abci.CodeTypeOK {
 				continue
 			}
 
 			for _, msg := range info.Tx.GetMsgs() {
-				if msg.Type() == asset.MsgTypeIssueAsset {
-					msgIssueAsset := msg.(asset.MsgIssueAsset)
+				if msg.Type() == asset.MsgTypeIssueToken {
+					msgIssueAsset := msg.(asset.MsgIssueToken)
 
-					var token asset.Asset
+					var token asset.Token
 					switch msgIssueAsset.Family {
 					case asset.FUNGIBLE:
 						totalSupply := msgIssueAsset.InitialSupply
 						decimal := int(msgIssueAsset.Decimal)
-						token = asset.NewBaseAsset(asset.FUNGIBLE, msgIssueAsset.Source, msgIssueAsset.Gateway, msgIssueAsset.Symbol, msgIssueAsset.Name, msgIssueAsset.Decimal, msgIssueAsset.SymbolAtSource, msgIssueAsset.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msgIssueAsset.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msgIssueAsset.MaxSupply), decimal), msgIssueAsset.Mintable, msgIssueAsset.Owner)
+						token = asset.NewBaseToken(asset.FUNGIBLE, msgIssueAsset.Source, msgIssueAsset.Gateway, msgIssueAsset.Symbol, msgIssueAsset.Name, msgIssueAsset.Decimal, msgIssueAsset.SymbolAtSource, msgIssueAsset.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msgIssueAsset.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msgIssueAsset.MaxSupply), decimal), msgIssueAsset.Mintable, msgIssueAsset.Owner)
 					default:
 						continue
 					}
@@ -110,7 +110,7 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		}
 
 		if len(tokens) == 0 {
-			tokens = make([]asset.Asset, 0)
+			tokens = make([]asset.Token, 0)
 		}
 
 		utils.PostProcessResponse(w, cliCtx.Codec, tokens, cliCtx.Indent)

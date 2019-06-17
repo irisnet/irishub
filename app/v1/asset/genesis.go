@@ -7,7 +7,7 @@ import (
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
 	Params Params  `json:"params"` // asset params
-	Assets []Asset `json:"assets"` // issued assets
+	Assets []Token `json:"assets"` // issued assets
 }
 
 // InitGenesis - store genesis parameters
@@ -23,7 +23,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	assets := []Asset{} // TODO: extract existing assets from app state
+	assets := []Token{} // TODO: extract existing assets from app state
 	return GenesisState{
 		Params: k.GetParamSet(ctx),
 		Assets: assets,
@@ -34,7 +34,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
 		Params: DefaultParams(),
-		Assets: []Asset{},
+		Assets: []Token{},
 	}
 }
 
@@ -42,7 +42,7 @@ func DefaultGenesisState() GenesisState {
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
 		Params: DefaultParamsForTest(),
-		Assets: []Asset{},
+		Assets: []Token{},
 	}
 }
 
