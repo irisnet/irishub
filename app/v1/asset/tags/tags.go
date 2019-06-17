@@ -9,9 +9,10 @@ var (
 	ActionIssueToken = []byte("issue-token")
 
 	Action  = sdk.TagAction
-	Denom   = "denom"
-	Symbol  = "symbol"
-	Owner   = "owner"
-	Gateway = "gateway"
-	Source  = "source"
+	Id      = "token-id"
+	Denom   = "token-denom"
+	Symbol  = "token-symbol"
+	Owner   = "token-owner"
+	Gateway = "token-gateway"
+	Source  = "token-source"
 )

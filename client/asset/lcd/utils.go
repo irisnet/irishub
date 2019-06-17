@@ -2,19 +2,17 @@ package lcd
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset/tags"
-	"net/http"
-	"strings"
-
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/tags"
 	"github.com/irisnet/irishub/client/context"
 	tmtx "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"net/http"
 )
 
 func queryToken(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
@@ -49,6 +47,8 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		sourceStr := r.FormValue("source")
 		gateway := r.FormValue("gateway")
 		owner := r.FormValue("owner")
+
+		// TODO: pagination support
 		page := 0
 		size := 100
 
@@ -78,40 +78,13 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 			queryTags = append(queryTags, fmt.Sprintf("%s='%s'", tags.Owner, owner))
 		}
 
-		query := strings.Join(queryTags, " AND ")
-
-		// get the node
-		node, err := cliCtx.GetNode()
+		infos, err := tmtx.SearchTxs(cliCtx, cdc, queryTags, page, size)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		prove := !cliCtx.TrustNode
-
-		res, err := node.TxSearch(query, prove, page, size)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		if prove {
-			for _, tx := range res.Txs {
-				err := tmtx.ValidateTxResult(cliCtx, tx)
-				if err != nil {
-					utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-					return
-				}
-			}
-		}
-
-		infos, err := tmtx.FormatTxResults(cdc, res.Txs)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		var tokens []asset.BaseAsset
+		var tokens []asset.Asset
 		for _, info := range infos {
 			if info.Result.Code != abci.CodeTypeOK {
 				continue
@@ -121,7 +94,7 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 				if msg.Type() == asset.MsgTypeIssueAsset {
 					msgIssueAsset := msg.(asset.MsgIssueAsset)
 
-					var token asset.BaseAsset
+					var token asset.Asset
 					switch msgIssueAsset.Family {
 					case asset.FUNGIBLE:
 						totalSupply := msgIssueAsset.InitialSupply
@@ -137,8 +110,7 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		}
 
 		if len(tokens) == 0 {
-			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("token not found"))
-			return
+			tokens = make([]asset.Asset, 0)
 		}
 
 		utils.PostProcessResponse(w, cliCtx.Codec, tokens, cliCtx.Indent)

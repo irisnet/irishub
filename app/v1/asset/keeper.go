@@ -83,6 +83,7 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 
 	createTags := sdk.NewTags(
 		tags.Action, tags.ActionIssueToken,
+		tags.Id, []byte(asset.GetUniqueID()),
 		tags.Denom, []byte(asset.GetDenom()),
 		tags.Source, []byte(asset.GetSource().String()),
 		tags.Gateway, []byte(asset.GetGateway()),

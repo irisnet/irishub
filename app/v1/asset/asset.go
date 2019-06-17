@@ -140,7 +140,7 @@ func (ba BaseAsset) String() string {
 
 // Fungible Token
 type FungibleToken struct {
-	BaseAsset
+	BaseAsset `json:"base_asset"`
 }
 
 func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
@@ -161,7 +161,7 @@ func (ft FungibleToken) IsMintable() bool {
 
 // Non-fungible Token
 type NonFungibleToken struct {
-	BaseAsset
+	BaseAsset `json:"base_asset"`
 }
 
 func (nft NonFungibleToken) GetDecimal() uint8 {

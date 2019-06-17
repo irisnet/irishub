@@ -1,7 +1,6 @@
 package asset
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/irisnet/irishub/codec"
@@ -50,8 +49,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 	}
 
-	// TODO: use codec.MarshalJSONIndent
-	bz, err := json.Marshal(token)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
 
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
