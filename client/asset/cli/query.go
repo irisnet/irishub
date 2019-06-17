@@ -157,22 +157,23 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 		PreRunE: preQueryFeeCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			
-			// subject validity is check in PreRunE
+
+			// subject validity is checked in PreRunE
 			subject := viper.GetString(FlagSubject)
-			
+
 			var (
 				moniker string
 				id      string
 				path    string
+				params  interface{}
 			)
-			
+
 			if subject == "gateway" {
 				moniker = viper.GetString(FlagMoniker)
 				if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
 					return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
 				}
-	
+
 				if !asset.IsAlpha(moniker) {
 					return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 				}
@@ -182,13 +183,13 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 				}
 
 				path = fmt.Sprintf("custom/%s/fees/gateway", protocol.AssetRoute)
-
 			} else {
 				id = viper.GetString(FlagID)
+				if ok, err := asset.IsAssetIDValid(id); !ok {
+					return err
+				}
 
-				// TODO: id check
-
-				params =  asset.QueryFTFeesParams{
+				params = asset.QueryFTFeesParams{
 					ID: id,
 				}
 
@@ -205,7 +206,7 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var fees sdk.FTFeesOutput
+			var fees asset.FTFeesOutput
 			err = cdc.UnmarshalJSON(res, &fees)
 			if err != nil {
 				return err

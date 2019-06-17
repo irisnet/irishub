@@ -96,7 +96,7 @@ func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint strin
 		vars := mux.Vars(r)
 
 		moniker := vars["moniker"]
-        if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
+		if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
 			return
 		}
@@ -133,7 +133,10 @@ func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		vars := mux.Vars(r)
 
 		id := vars["id"]
-		// TODO: id check
+		if ok, err := asset.IsAssetIDValid(id); !ok {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		params := asset.QueryFTFeesParams{
 			ID: id,
