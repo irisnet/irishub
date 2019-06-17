@@ -178,12 +178,9 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 		return nil, err
 	}
 
-	assetParams := keeper.GetParamSet(ctx)
-	gatewayBaseFee := assetParams.CreateGatewayBaseFee
-
 	fee := GatewayFeeOutput{
 		Exist: keeper.HasGateway(ctx, moniker),
-		Fee:   sdk.NewCoin(gatewayBaseFee.Denom, getGatewayCreateFee(ctx, keeper, moniker)),
+		Fee:   sdk.NewCoin(sdk.NativeTokenName, getGatewayCreateFee(ctx, keeper, moniker)),
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
@@ -226,13 +223,10 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		mintFee = getGatewayTokenMintFee(ctx, keeper, symbol)
 	}
 
-	assetParams := keeper.GetParamSet(ctx)
-	issueFTBaseFee := assetParams.IssueFTBaseFee
-
 	fees := TokenFeesOutput{
 		Exist:    keeper.HasAsset(ctx, id),
-		IssueFee: sdk.NewCoin(issueFTBaseFee.Denom, issueFee),
-		MintFee:  sdk.NewCoin(issueFTBaseFee.Denom, mintFee),
+		IssueFee: sdk.NewCoin(sdk.NativeTokenName, issueFee),
+		MintFee:  sdk.NewCoin(sdk.NativeTokenName, mintFee),
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fees)

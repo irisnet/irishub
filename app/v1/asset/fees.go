@@ -4,6 +4,7 @@ package asset
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 
 	bank "github.com/irisnet/irishub/app/v1/bank"
@@ -30,12 +31,15 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 	// get the actual fee
 	actualFee := getGatewayCreateFee(ctx, k, moniker)
 
+	// convert to native token min denom
+	actualFeeMin := sdk.NewInt(actualFee.Int64() * int64(math.Pow10(18)))
+
 	// check if the provided fee is enough
-	if fee.Amount.LT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway create fee: expected %d, got %d", actualFee, fee.Amount))
+	if fee.Amount.LT(actualFeeMin) {
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway create fee: expected %d, got %d", actualFeeMin, fee.Amount))
 	}
 
-	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFee))
+	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFeeMin))
 }
 
 // TokenIssueFeeHandler performs fee handling for issuing token
@@ -52,12 +56,15 @@ func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbo
 	// get the actual fee
 	actualFee := getTokenIssueFee(ctx, k, symbol)
 
+	// convert to native token min denom
+	actualFeeMin := sdk.NewInt(actualFee.Int64() * int64(math.Pow10(18)))
+
 	// check if the provided fee is enough
-	if fee.Amount.LT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token issurance fee: expected %d, got %d", actualFee, fee.Amount))
+	if fee.Amount.LT(actualFeeMin) {
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token issurance fee: expected %d, got %d", actualFeeMin, fee.Amount))
 	}
 
-	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFee))
+	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFeeMin))
 }
 
 // TokenMintFeeHandler performs fee handling for minting token
@@ -74,12 +81,15 @@ func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol
 	// get the actual fee
 	actualFee := getTokenMintFee(ctx, k, symbol)
 
+	// convert to native token min denom
+	actualFeeMin := sdk.NewInt(actualFee.Int64() * int64(math.Pow10(18)))
+
 	// check if the provided fee is enough
-	if fee.Amount.LT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token mint fee: expected %d, got %d", actualFee, fee.Amount))
+	if fee.Amount.LT(actualFeeMin) {
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token mint fee: expected %d, got %d", actualFeeMin, fee.Amount))
 	}
 
-	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFee))
+	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFeeMin))
 }
 
 // GatewayTokenIssueFeeHandler performs fee handling for issuing gateway token
@@ -96,12 +106,15 @@ func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress
 	// get the actual fee
 	actualFee := getGatewayTokenIssueFee(ctx, k, symbol)
 
+	// convert to native token min denom
+	actualFeeMin := sdk.NewInt(actualFee.Int64() * int64(math.Pow10(18)))
+
 	// check if the provided fee is enough
-	if fee.Amount.LT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token issurance fee: expected %d, got %d", actualFee, fee.Amount))
+	if fee.Amount.LT(actualFeeMin) {
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token issurance fee: expected %d, got %d", actualFeeMin, fee.Amount))
 	}
 
-	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFee))
+	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFeeMin))
 }
 
 // GatewayTokenMintFeeHandler performs fee handling for minting gateway token
@@ -118,12 +131,15 @@ func GatewayTokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress,
 	// get the actual fee
 	actualFee := getGatewayTokenMintFee(ctx, k, symbol)
 
+	// convert to native token min denom
+	actualFeeMin := sdk.NewInt(actualFee.Int64() * int64(math.Pow10(18)))
+
 	// check if the provided fee is enough
-	if fee.Amount.LT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token mint fee: expected %d, got %d", actualFee, fee.Amount))
+	if fee.Amount.LT(actualFeeMin) {
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token mint fee: expected %d, got %d", actualFeeMin, fee.Amount))
 	}
 
-	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFee))
+	return feeHandler(ctx, k, owner, sdk.NewCoin(fee.Denom, actualFeeMin))
 }
 
 // feeHandler handles the fee of gateway or asset
@@ -157,7 +173,8 @@ func getGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Int {
 	// compute the fee
 	fee := calcFeeByBase(moniker, gatewayBaseFee.Amount)
 
-	return fee
+	// convert to native token
+	return convertFeeToNativeToken(fee)
 }
 
 // getTokenIssueFee returns the token issurance fee
@@ -169,7 +186,8 @@ func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 	// compute the fee
 	fee := calcFeeByBase(symbol, issueFTBaseFee.Amount)
 
-	return fee
+	// convert to native token
+	return convertFeeToNativeToken(fee)
 }
 
 // getTokenMintFee returns the token mint fee
@@ -180,9 +198,13 @@ func getTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 
 	// compute the issurance fee and mint fee
 	issueFee := getTokenIssueFee(ctx, k, symbol)
-	mintFee := sdk.NewDecFromInt(issueFee).Mul(mintFTFeeRate).TruncateInt()
+	mintFee := sdk.NewDecFromInt(issueFee).Mul(mintFTFeeRate)
 
-	return mintFee
+	// error ignored
+	mintFeeFloat64, _ := strconv.ParseFloat(mintFee.String(), 64)
+
+	// convert to native token
+	return convertFeeToNativeToken(mintFeeFloat64)
 }
 
 // getGatewayTokenIssueFee returns the gateway token issurance fee
@@ -193,9 +215,13 @@ func getGatewayTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 
 	// compute the native token issurance fee and gateway token issurance fee
 	nativeTokenIssueFee := getTokenIssueFee(ctx, k, symbol)
-	gatewayTokenIssueFee := sdk.NewDecFromInt(nativeTokenIssueFee).Mul(gatewayAssetFeeRatio).TruncateInt()
+	gatewayTokenIssueFee := sdk.NewDecFromInt(nativeTokenIssueFee).Mul(gatewayAssetFeeRatio)
 
-	return gatewayTokenIssueFee
+	// error ignored
+	gwTokenIssueFeeF64, _ := strconv.ParseFloat(gatewayTokenIssueFee.String(), 64)
+
+	// convert to native token
+	return convertFeeToNativeToken(gwTokenIssueFeeF64)
 }
 
 // getGatewayTokenMintFee returns the gateway token mint fee
@@ -206,17 +232,21 @@ func getGatewayTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 
 	// compute the native token mint fee and gateway token mint fee
 	nativeTokenMintFee := getTokenMintFee(ctx, k, symbol)
-	gatewayTokenMintFee := sdk.NewDecFromInt(nativeTokenMintFee).Mul(gatewayAssetFeeRatio).TruncateInt()
+	gatewayTokenMintFee := sdk.NewDecFromInt(nativeTokenMintFee).Mul(gatewayAssetFeeRatio)
 
-	return gatewayTokenMintFee
+	// error ignored
+	gwTokenMintFeeF64, _ := strconv.ParseFloat(gatewayTokenMintFee.String(), 64)
+
+	// convert to native token
+	return convertFeeToNativeToken(gwTokenMintFeeF64)
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee
-func calcFeeByBase(name string, baseFee sdk.Int) sdk.Int {
+func calcFeeByBase(name string, baseFee sdk.Int) float64 {
 	feeFactor := calcFeeFactor(name)
-	actualFee := int64(math.Round(float64(baseFee.Int64()) / feeFactor))
+	actualFee := float64(baseFee.Int64()) / feeFactor
 
-	return sdk.NewInt(actualFee)
+	return actualFee
 }
 
 // calcFeeFactor computes the fee factor of the given name(common for gateway and asset)
@@ -233,6 +263,18 @@ func calcFeeFactor(name string) float64 {
 	// error ignored
 	feeFactor := math.Pow(numerator/denominator, FeeFactorExp)
 	return feeFactor
+}
+
+// convertFeeToNativeToken converts fee to native token
+func convertFeeToNativeToken(fee float64) sdk.Int {
+	nativeTokenAmount := fee / math.Pow10(18)
+	if nativeTokenAmount > 1 {
+		nativeTokenAmount = math.Round(nativeTokenAmount)
+	} else {
+		nativeTokenAmount = 1
+	}
+
+	return sdk.NewInt(int64(nativeTokenAmount))
 }
 
 // GatewayFeeOutput is for the gateway fee query output
