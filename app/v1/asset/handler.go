@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"fmt"
 	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -29,10 +30,13 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 	var asset Asset
 	switch msg.Family {
 	case FUNGIBLE:
-		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, msg.Owner)
+		totalSupply := msg.InitialSupply
+		decimal := int(msg.Decimal)
+		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	default:
-		return ErrInvalidAssetFamily(k.codespace, msg.Family).Result()
+		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
 	}
+
 	tags, err := k.IssueAsset(ctx, asset)
 	if err != nil {
 		return err.Result()
@@ -45,6 +49,11 @@ func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
 
 // handleMsgCreateGateway handles MsgCreateGateway
 func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
+	// handle fee
+	if err := GatewayFeeHandler(ctx, k, msg.Owner, msg.Moniker, msg.Fee); err != nil {
+		return err.Result()
+	}
+
 	// convert moniker to lowercase
 	msg.Moniker = strings.ToLower(msg.Moniker)
 

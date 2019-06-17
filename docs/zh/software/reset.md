@@ -12,12 +12,12 @@ IRISnet支持重置区块链状态到任意高度，这里介绍重置区块链�
 
  | Name，shorthand     | type   | Required | Default  | Description    |		
  | ------------------- | -----  | -------- | -------- | -------------- |		
- | --height            | int    | false    | 0        | Specify the height, default value is 0 which means to export the latest state |		
- | --home              | string | false    | $HOME/.iris       | Specify the directory which stores node config and blockchain data |		
+ | --height            | uint   | false    | 0        | 重置状态为特定高度(大于最新高度表示最新高度) |		
+ | --home              | string | false    | $HOME/.iris  | 指定存储配置和区块链数据的目录 |		
  
 ## 示例
  
 1. 重置区块链状态到区块100:
-```		
+```
  iris reset --height 100 --home=<path_to_your_home>
 ```

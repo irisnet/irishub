@@ -17,7 +17,7 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-asset",
 		Short:   "Query details of a asset",
-		Example: "iriscli asset query-asset <asset>",
+		Example: "iriscli asset query-asset <asset-id>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -144,6 +144,54 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(FlagOwner, "", "the owner address to be queried")
+
+	return cmd
+}
+
+// GetCmdQueryGatewayFee implements the query gateway fee command.
+func GetCmdQueryGatewayFee(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "query-gateway-fee",
+		Short:   "Query the creation fee for a gateway with the given moniker",
+		Example: "iriscli asset query-gateway-fee --moniker=<gateway moniker>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			moniker := viper.GetString(FlagMoniker)
+			if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
+				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
+			}
+
+			if !asset.IsAlpha(moniker) {
+				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+			}
+
+			params := asset.QueryGatewayFeeParams{
+				Moniker: moniker,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/gatewayFee", protocol.AssetRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			var fee sdk.Dec
+			err = cdc.UnmarshalJSON(res, &fee)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(fee)
+		},
+	}
+
+	cmd.Flags().String(FlagMoniker, "", "the unique name of the destination gateway")
+	cmd.MarkFlagRequired(FlagMoniker)
 
 	return cmd
 }

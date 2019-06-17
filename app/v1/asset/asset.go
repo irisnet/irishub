@@ -18,6 +18,8 @@ type Asset interface {
 	GetSource() AssetSource
 	GetSymbol() string
 	GetGateway() string
+	GetInitSupply() types.Int
+	GetTotalSupply() types.Int
 }
 
 type BaseAsset struct {
@@ -28,13 +30,14 @@ type BaseAsset struct {
 	Name           string           `json:"name"`
 	Decimal        uint8            `json:"decimal"`
 	SymbolMinAlias string           `json:"symbol_min_alias"`
-	InitialSupply  uint64           `json:"initial_supply"`
-	MaxSupply      uint64           `json:"max_supply"`
+	InitialSupply  types.Int        `json:"initial_supply"`
+	TotalSupply    types.Int        `json:"total_supply"`
+	MaxSupply      types.Int        `json:"max_supply"`
 	Mintable       bool             `json:"mintable"`
 	Owner          types.AccAddress `json:"owner"`
 }
 
-func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner types.AccAddress) BaseAsset {
+func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseAsset {
 	return BaseAsset{
 		Family:         family,
 		Source:         source,
@@ -44,6 +47,7 @@ func NewBaseAsset(family AssetFamily, source AssetSource, gateway string, symbol
 		Decimal:        decimal,
 		SymbolMinAlias: alias,
 		InitialSupply:  initialSupply,
+		TotalSupply:    totalSupply,
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,
 		Owner:          owner,
@@ -104,6 +108,14 @@ func (ba BaseAsset) GetDenom() string {
 	return strings.ToLower(sb.String())
 }
 
+func (ba BaseAsset) GetInitSupply() types.Int {
+	return ba.InitialSupply
+}
+
+func (ba BaseAsset) GetTotalSupply() types.Int {
+	return ba.TotalSupply
+}
+
 // String implements fmt.Stringer
 func (ba BaseAsset) String() string {
 	return fmt.Sprintf(`Asset %s:
@@ -112,12 +124,13 @@ func (ba BaseAsset) String() string {
   Symbol:            %s
   Symbol Min Alias:  %s
   Decimal:           %d
-  Initial Supply:    %d
-  Max Supply:        %d
+  Initial Supply:    %s
+  Total Supply:      %s
+  Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
 		ba.GetUniqueID(), ba.Family, ba.Source, ba.Symbol, ba.SymbolMinAlias,
-		ba.Decimal, ba.InitialSupply, ba.MaxSupply, ba.Mintable, ba.Owner.String())
+		ba.Decimal, ba.InitialSupply.String(), ba.TotalSupply.String(), ba.MaxSupply.String(), ba.Mintable, ba.Owner.String())
 }
 
 // Fungible Token
@@ -125,10 +138,10 @@ type FungibleToken struct {
 	BaseAsset
 }
 
-func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, alias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	return FungibleToken{
 		BaseAsset: NewBaseAsset(
-			FUNGIBLE, source, gateway, symbol, name, decimal, alias, initialSupply, maxSupply, mintable, owner,
+			FUNGIBLE, source, gateway, symbol, name, decimal, alias, initialSupply, totalSupply, maxSupply, mintable, owner,
 		),
 	}
 }
@@ -163,7 +176,7 @@ func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.
 	case GATEWAY:
 		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol)), nil
 	default:
-		return "", ErrInvalidAssetSource(DefaultCodespace, source)
+		return "", ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", source))
 	}
 }
 

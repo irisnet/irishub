@@ -137,6 +137,15 @@ func (keeper BaseKeeper) Init(ctx sdk.Context) {
 	} else {
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &burnedCoins)
 	}
+
+	// If someone send coins to BurnedCoinsAccAddr in protocol v0,
+	// It is handled as burned coins in protocol v1.
+	// Subtract all BurnedCoinsAccAddr coins in v0 from looseToken.
+	v0burnedCoins := keeper.GetCoins(ctx, BurnedCoinsAccAddr)
+	if !v0burnedCoins.Empty() {
+		keeper.DecreaseLoosenToken(ctx, v0burnedCoins)
+	}
+
 	keeper.AddCoins(ctx, BurnedCoinsAccAddr, burnedCoins)
 }
 

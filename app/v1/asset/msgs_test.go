@@ -23,17 +23,19 @@ func TestMsgIssueAsset(t *testing.T) {
 		MsgIssueAsset
 		expectPass bool
 	}{
-		{"basic good", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, true},
-		{"error family", MsgIssueAsset{0x02, 0x00, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
-		{"error source", MsgIssueAsset{0x00, 0x03, "c", "d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
-		{"empty symbol", MsgIssueAsset{0x00, 0x00, "c", "", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
-		{"error symbol", MsgIssueAsset{0x00, 0x00, "c", "434,23d", "e", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
-		{"empty name", MsgIssueAsset{0x00, 0x00, "c", "d", "", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
-		{"error name", MsgIssueAsset{0x00, 0x00, "c", "d", "2123<s", 1, "f", 1, 1, true, addr, sdk.Coins{}}, false},
-		{"zero supply bigger", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 0, 1, true, addr, sdk.Coins{}}, false},
-		{"zero max supply", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 1, 0, true, addr, sdk.Coins{}}, false},
-		{"init supply bigger than max supply", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 1, "f", 10, 9, true, addr, sdk.Coins{}}, false},
-		{"error decimal", MsgIssueAsset{0x00, 0x00, "c", "d", "e", 19, "f", 1, 1, true, addr, sdk.Coins{}}, false},
+		{"basic good", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), true},
+		{"error family", NewMsgIssueAsset(0x02, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error source", NewMsgIssueAsset(FUNGIBLE, 0x03, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"empty symbol", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "", "btc", "btc", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol_at_source", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "434,23d", "btcccccccccc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol_min_alias", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshiiiiiii", 1, 1, true, addr, sdk.Coins{}), false},
+		{"empty name", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error name", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"zero supply bigger", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "e", "btc", 1, "satoshi", 0, 1, true, addr, sdk.Coins{}), true},
+		{"zero max supply", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr, sdk.Coins{}), false},
+		{"init supply bigger than max supply", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr, sdk.Coins{}), false},
+		{"error decimal", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 	}
 
 	for _, tc := range tests {

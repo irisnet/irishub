@@ -9,10 +9,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	flagHeight = "height"
-)
-
 // ResetCmd reset app state to particular height
 func ResetCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Command {
 	cmd := &cobra.Command{
@@ -40,19 +36,19 @@ func ResetCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Command 
 				return err
 			}
 			height := viper.GetInt64(flagHeight)
-			if height < 0 {
-				return errors.Errorf("Height must greater than or equal to zero")
+			if height <= 0 {
+				return errors.Errorf("Height must greater than zero")
 			}
 			err = appReset(ctx, ctx.Logger, db, traceWriter, height)
 			if err != nil {
 				return errors.Errorf("Error reset state: %v\n", err)
 			}
 
-			fmt.Printf("Reset app state to height %d successfully\n", height)
+			fmt.Println("Reset app state successfully")
 			return nil
 		},
 	}
-	cmd.Flags().Int64(flagHeight, 0, "Reset state from a particular height (0 or greater than latest height means latest height)")
+	cmd.Flags().Uint64(flagHeight, 0, "Reset state from a particular height (greater than latest height means latest height)")
 	cmd.MarkFlagRequired(flagHeight)
 	return cmd
 }

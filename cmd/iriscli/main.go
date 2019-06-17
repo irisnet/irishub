@@ -269,6 +269,7 @@ func main() {
 			assetcmd.GetCmdQueryAsset(cdc),
 			assetcmd.GetCmdQueryGateway(cdc),
 			assetcmd.GetCmdQueryGateways(cdc),
+			assetcmd.GetCmdQueryGatewayFee(cdc),
 		)...)
 
 	rootCmd.AddCommand(

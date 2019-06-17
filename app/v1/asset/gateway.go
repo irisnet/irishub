@@ -17,7 +17,13 @@ type Gateway struct {
 
 // String implements fmt.Stringer
 func (g Gateway) String() string {
-	return fmt.Sprintf("Gateway{%s, %s, %s, %s, %s}", g.Owner, g.Moniker, g.Identity, g.Details, g.Website)
+	return fmt.Sprintf(`Gateway:
+  Owner:             %s
+  Moniker:           %s
+  Identity:          %s
+  Details:           %s
+  Website:           %s`,
+		g.Owner, g.Moniker, g.Identity, g.Details, g.Website)
 }
 
 // Gateways is a set of gateways
@@ -31,7 +37,7 @@ func (gs Gateways) String() string {
 
 	str := fmt.Sprintf("Gateways for owner %s:", gs[0].Owner)
 	for _, g := range gs {
-		str += fmt.Sprintf("\n  %s: %s: %s : %s", g.Moniker, g.Identity, g.Details, g.Website)
+		str += fmt.Sprintf("\n  Moniker: %s, Identity: %s, Details: %s, Website: %s", g.Moniker, g.Identity, g.Details, g.Website)
 	}
 	return str
 }

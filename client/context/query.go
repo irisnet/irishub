@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/store"
@@ -299,19 +300,35 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	if coinName == sdk.NativeTokenName {
 		coinType = sdk.IRIS
 	} else {
-		key := types.CoinTypeKey(coinName)
-		bz, err := cliCtx.QueryStore([]byte(key), "params")
-		if err != nil {
-			return coinType, err
+
+		params := asset.QueryAssetParams{
+			Asset: coinName,
 		}
 
-		if bz == nil {
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			return types.CoinType{}, err
+		}
+
+		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+		if err != nil {
 			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		if err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(bz, &coinType); err != nil {
-			return coinType, err
+		var asset asset.Asset
+		err = cliCtx.Codec.UnmarshalJSON(res, &asset)
+		if err != nil {
+			return types.CoinType{}, err
 		}
+
+		units := make(sdk.Units, 2)
+		units[0] = sdk.NewUnit(coinName, 0)
+		units[1] = sdk.NewUnit(asset.GetDenom(), int(asset.GetDecimal()))
+		return sdk.CoinType{
+			Name:    coinName,
+			MinUnit: units[1],
+			Units:   units,
+		}, nil
 	}
 
 	return coinType, nil

@@ -26,8 +26,8 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-asset",
 		Short: "issue an asset",
-		Example: "iriscli asset issue-asset --family <family> --source <source> --gateway <gateway>" +
-			" --symbol <symbol> --name <name> --init",
+		Example: "iriscli asset issue-asset --family=<family> --source=<source> --gateway=<gateway>" +
+			" --symbol=<symbol> --name=<asset-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
 		PreRun: preSignCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -90,7 +90,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Use:   "create-gateway",
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website>",
+			"--website=<website> --gateway-fee=<gateway create fee>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -108,10 +108,16 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			identity := viper.GetString(FlagIdentity)
 			details := viper.GetString(FlagDetails)
 			website := viper.GetString(FlagWebsite)
+			gatewayFee := viper.GetString(FlagGatewayFee)
+
+			gatewayFeeCoin, err := sdk.ParseCoin(gatewayFee)
+			if err != nil {
+				return err
+			}
 
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website,
+				owner, moniker, identity, details, website, gatewayFeeCoin,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -124,6 +130,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsGatewayCreate)
 	cmd.MarkFlagRequired(FlagMoniker)
+	cmd.MarkFlagRequired(FlagGatewayFee)
 
 	return cmd
 }
