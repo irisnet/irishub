@@ -153,7 +153,7 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-fee",
 		Short:   "Query the asset-related fees",
-		Example: "iriscli asset query-fee --subject=<gateway|token> --moniker=<gateway moniker> --id=<asset id>",
+		Example: "iriscli asset query-fee --subject=<gateway|token> --moniker=<gateway moniker> --id=<token id>",
 		PreRunE: preQueryFeeCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -170,12 +170,8 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 
 			if subject == "gateway" {
 				moniker = viper.GetString(FlagMoniker)
-				if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
-					return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
-				}
-
-				if !asset.IsAlpha(moniker) {
-					return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+				if err := asset.ValidateMoniker(moniker); err != nil {
+					return err
 				}
 
 				params = asset.QueryGatewayFeeParams{

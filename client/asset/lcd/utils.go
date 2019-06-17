@@ -96,13 +96,8 @@ func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint strin
 		vars := mux.Vars(r)
 
 		moniker := vars["moniker"]
-		if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
-			return
-		}
-
-		if !asset.IsAlpha(moniker) {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the moniker must contain only letters"))
+		if err := asset.ValidateMoniker(moniker); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
