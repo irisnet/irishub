@@ -16,7 +16,7 @@ const (
 
 // parameter keys
 var (
-	KeyTokenTaxRate         = []byte("TokenTaxRate")
+	KeyAssetTaxRate         = []byte("AssetTaxRate")
 	KeyIssueFTBaseFee       = []byte("IssueFTBaseFee")
 	KeyMintFTFeeRatio       = []byte("MintFTFeeRatio")
 	KeyCreateGatewayBaseFee = []byte("CreateGatewayBaseFee")
@@ -30,7 +30,7 @@ func ParamTypeTable() params.TypeTable {
 
 // asset params
 type Params struct {
-	TokenTaxRate         sdk.Dec  `json:"asset_tax_rate"`          // e.g., 40%
+	AssetTaxRate         sdk.Dec  `json:"asset_tax_rate"`          // e.g., 40%
 	IssueFTBaseFee       sdk.Coin `json:"issue_ft_base_fee"`       // e.g., 300000*10^18iris-atto
 	MintFTFeeRatio       sdk.Dec  `json:"mint_ft_fee_ratio"`       // e.g., 10%
 	CreateGatewayBaseFee sdk.Coin `json:"create_gateway_base_fee"` // e.g., 600000*10^18iris-atto
@@ -38,13 +38,13 @@ type Params struct {
 } // issuance fee = IssueFTBaseFee / (ln(len(symbol))/ln3)^4
 
 func (p Params) String() string {
-	return fmt.Sprintf(`Token Params:
-  Token Tax Rate:                                           %s
+	return fmt.Sprintf(`Asset Params:
+  Asset Tax Rate:                                           %s
   Base Fee for Issuing Fungible Token:                      %s
   Fee Ratio for Minting (vs Issuing) Fungible Token:        %s
   Base Fee for Creating Gateway:                            %s
-  Fee Ratio for Gateway (vs Native) Assets:                 %s`,
-		p.TokenTaxRate.String(), p.IssueFTBaseFee.String(), p.MintFTFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
+  Fee Ratio for Gateway (vs Native) FungibleTokens:         %s`,
+		p.AssetTaxRate.String(), p.IssueFTBaseFee.String(), p.MintFTFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
 }
 
 // Implements params.ParamSet
@@ -54,7 +54,7 @@ func (p *Params) GetParamSpace() string {
 
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
-		{KeyTokenTaxRate, &p.TokenTaxRate},
+		{KeyAssetTaxRate, &p.AssetTaxRate},
 		{KeyIssueFTBaseFee, &p.IssueFTBaseFee},
 		{KeyMintFTFeeRatio, &p.MintFTFeeRatio},
 		{KeyCreateGatewayBaseFee, &p.CreateGatewayBaseFee},
@@ -64,7 +64,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
-	case string(KeyTokenTaxRate):
+	case string(KeyAssetTaxRate):
 		rate, err := sdk.NewDecFromStr(value)
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
@@ -116,7 +116,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 // default asset module params
 func DefaultParams() Params {
 	return Params{
-		TokenTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
+		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 		IssueFTBaseFee:       sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
 		MintFTFeeRatio:       sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
@@ -127,7 +127,7 @@ func DefaultParams() Params {
 // default asset module params for test
 func DefaultParamsForTest() Params {
 	return Params{
-		TokenTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
+		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 		IssueFTBaseFee:       sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
 		MintFTFeeRatio:       sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
@@ -140,7 +140,7 @@ func validateParams(p Params) error {
 		return nil
 	}
 
-	if err := validateAssetTaxRate(p.TokenTaxRate); err != nil {
+	if err := validateAssetTaxRate(p.AssetTaxRate); err != nil {
 		return err
 	}
 	if err := validateMintFTBaseFeeRatio(p.MintFTFeeRatio); err != nil {
@@ -180,7 +180,7 @@ func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidGatewayAssetFeeRatio,
-			fmt.Sprintf("Fee Ratio for Gateway Assets [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Fee Ratio for Gateway FungibleTokens [%s] should be between [0, 1]", v.String()),
 		)
 	}
 	return nil

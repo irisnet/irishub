@@ -136,7 +136,7 @@ func (v Validator) HumanReadableString() (string, error) {
 	resp += fmt.Sprintf("Validator Consensus Pubkey: %s\n", bechConsPubKey)
 	resp += fmt.Sprintf("Jailed: %v\n", v.Jailed)
 	resp += fmt.Sprintf("Status: %s\n", sdk.BondStatusToString(v.Status))
-	resp += fmt.Sprintf("Tokens: %s\n", v.Tokens)
+	resp += fmt.Sprintf("FungibleTokens: %s\n", v.Tokens)
 	resp += fmt.Sprintf("Delegator Shares: %s\n", v.DelegatorShares)
 	resp += fmt.Sprintf("Description: %s\n", v.Description)
 	resp += fmt.Sprintf("Bond Height: %d\n", v.BondHeight)
@@ -159,8 +159,8 @@ type bechValidator struct {
 	Tokens          sdk.Dec        `json:"tokens"`           // delegated tokens (incl. self-delegation)
 	DelegatorShares sdk.Dec        `json:"delegator_shares"` // total shares issued to a validator's delegators
 
-	Description        Description `json:"description"`           // description terms for the validator
-	BondHeight         int64       `json:"bond_height"`           // earliest height as a bonded validator
+	Description Description `json:"description"` // description terms for the validator
+	BondHeight  int64       `json:"bond_height"` // earliest height as a bonded validator
 
 	UnbondingHeight  int64     `json:"unbonding_height"` // if unbonding, height at which this validator has begun unbonding
 	UnbondingMinTime time.Time `json:"unbonding_time"`   // if unbonding, min time for the validator to complete unbonding

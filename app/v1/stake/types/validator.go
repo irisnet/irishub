@@ -136,7 +136,7 @@ func (v Validator) HumanReadableString() (string, error) {
 	resp += fmt.Sprintf("Validator Consensus Pubkey: %s\n", bechConsPubKey)
 	resp += fmt.Sprintf("Jailed: %v\n", v.Jailed)
 	resp += fmt.Sprintf("Status: %s\n", sdk.BondStatusToString(v.Status))
-	resp += fmt.Sprintf("Tokens: %s\n", v.Tokens)
+	resp += fmt.Sprintf("FungibleTokens: %s\n", v.Tokens)
 	resp += fmt.Sprintf("Delegator Shares: %s\n", v.DelegatorShares)
 	resp += fmt.Sprintf("Description: %s\n", v.Description)
 	resp += fmt.Sprintf("Bond Height: %d\n", v.BondHeight)

@@ -52,16 +52,16 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		page := 0
 		size := 100
 
-		var source asset.TokenSource
+		var source asset.AssetSource
 		if len(sourceStr) > 0 {
-			_source, ok := asset.StringToTokenSourceMap[sourceStr]
+			_source, ok := asset.StringToAssetSourceMap[sourceStr]
 			if !ok {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid source %s", sourceStr))
 				return
 			}
 			source = _source
 		} else if len(owner) > 0 {
-			source, _ = asset.StringToTokenSourceMap["native"]
+			source, _ = asset.StringToAssetSourceMap["native"]
 		}
 
 		queryTags := []string{fmt.Sprintf("%s='%s'", tags.Action, string(tags.ActionIssueToken))}

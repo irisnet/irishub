@@ -118,7 +118,7 @@ func (keeper BaseKeeper) BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt
 	burnTags := sdk.NewTags(
 		"burnAmount", []byte(amt.String()),
 	)
-	ctx.Logger().Info("Tokens Burned Successfully", "burnFrom", fromAddr, "burnAmount", amt.String())
+	ctx.Logger().Info("FungibleTokens Burned Successfully", "burnFrom", fromAddr, "burnAmount", amt.String())
 
 	return burnTags, nil
 }

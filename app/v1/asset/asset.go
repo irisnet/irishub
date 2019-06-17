@@ -15,7 +15,7 @@ type Token interface {
 	String() string
 
 	GetOwner() types.AccAddress
-	GetSource() TokenSource
+	GetSource() AssetSource
 	GetSymbol() string
 	GetGateway() string
 	GetInitSupply() types.Int
@@ -25,8 +25,8 @@ type Token interface {
 
 type BaseToken struct {
 	Id             string           `json:"id"`
-	Family         TokenFamily      `json:"family"`
-	Source         TokenSource      `json:"source"`
+	Family         AssetFamily      `json:"family"`
+	Source         AssetSource      `json:"source"`
 	Gateway        string           `json:"gateway"`
 	Symbol         string           `json:"symbol"`
 	Name           string           `json:"name"`
@@ -40,7 +40,7 @@ type BaseToken struct {
 	Owner          types.AccAddress `json:"owner"`
 }
 
-func NewBaseToken(family TokenFamily, source TokenSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
+func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
 	baseToken := BaseToken{
 		Family:         family,
 		Source:         source,
@@ -83,7 +83,7 @@ func (ba BaseToken) GetOwner() types.AccAddress {
 	return ba.Owner
 }
 
-func (ba BaseToken) GetSource() TokenSource {
+func (ba BaseToken) GetSource() AssetSource {
 	return ba.Source
 }
 
@@ -138,7 +138,7 @@ type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
 
-func NewFungibleToken(source TokenSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	return FungibleToken{
 		BaseToken: NewBaseToken(
 			FUNGIBLE, source, gateway, symbol, name, decimal, symbolAtSource, symbolMinAlias, initialSupply, totalSupply, maxSupply, mintable, owner,
@@ -206,7 +206,7 @@ func (nft NonFungibleToken) IsMintable() bool {
 	return true
 }
 
-func GetKeyID(source TokenSource, symbol string, gateway string) (string, types.Error) {
+func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.Error) {
 	switch source {
 	case NATIVE:
 		return strings.ToLower(fmt.Sprintf("i.%s", symbol)), nil

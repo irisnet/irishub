@@ -84,7 +84,7 @@ func (k Keeper) handleDoubleSign(ctx sdk.Context, addr crypto.Address, infractio
 
 	// Slash validator
 	// `power` is the int64 power of the validator as provided to/by
-	// Tendermint. This value is validator.Tokens as sent to Tendermint via
+	// Tendermint. This value is validator.FungibleTokens as sent to Tendermint via
 	// ABCI, and now received as evidence.
 	// The revisedFraction (which is the new fraction to be slashed) is passed
 	// in separately to separately slash unbonding and rebonding delegations.
@@ -204,7 +204,7 @@ func (k Keeper) handleProposerCensorship(ctx sdk.Context, addr crypto.Address, i
 	distributionHeight := infractionHeight - stake.ValidatorUpdateDelay
 	// Slash validator
 	// `power` is the int64 power of the validator as provided to/by
-	// Tendermint. This value is validator.Tokens as sent to Tendermint via
+	// Tendermint. This value is validator.FungibleTokens as sent to Tendermint via
 	// ABCI, and now received as evidence.
 	// The revisedFraction (which is the new fraction to be slashed) is passed
 	// in separately to separately slash unbonding and rebonding delegations.

@@ -42,12 +42,12 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			family, ok := asset.StringToTokenFamilyMap[viper.GetString(FlagFamily)]
+			family, ok := asset.StringToAssetFamilyMap[viper.GetString(FlagFamily)]
 			if !ok {
 				return fmt.Errorf("invalid token family type %s", viper.GetString(FlagFamily))
 			}
 
-			source, ok := asset.StringToTokenSourceMap[viper.GetString(FlagSource)]
+			source, ok := asset.StringToAssetSourceMap[viper.GetString(FlagSource)]
 			if !ok {
 				return fmt.Errorf("invalid token source type %s", viper.GetString(FlagSource))
 			}

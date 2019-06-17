@@ -38,8 +38,8 @@ var _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgCreateGateway{}, &MsgEditGateway{}
 
 // MsgIssueToken
 type MsgIssueToken struct {
-	Family         TokenFamily    `json:"family"`
-	Source         TokenSource    `json:"source"`
+	Family         AssetFamily    `json:"family"`
+	Source         AssetSource    `json:"source"`
 	Gateway        string         `json:"gateway"`
 	Symbol         string         `json:"symbol"`
 	SymbolAtSource string         `json:"symbol_at_source"`
@@ -54,7 +54,7 @@ type MsgIssueToken struct {
 }
 
 // NewMsgIssueToken - construct asset issue msg.
-func NewMsgIssueToken(family TokenFamily, source TokenSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueToken {
+func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueToken {
 	return MsgIssueToken{
 		Family:         family,
 		Source:         source,
@@ -102,7 +102,7 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", msg.Source))
 	}
 
-	if _, found := TokenFamilyToStringMap[msg.Family]; !found {
+	if _, found := AssetFamilyToStringMap[msg.Family]; !found {
 		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family))
 	}
 

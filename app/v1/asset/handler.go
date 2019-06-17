@@ -27,17 +27,17 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleIssueToken handles MsgIssueToken
 func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
-	var asset Token
+	var token Token
 	switch msg.Family {
 	case FUNGIBLE:
 		totalSupply := msg.InitialSupply
 		decimal := int(msg.Decimal)
-		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
+		token = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	default:
-		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
+		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid token family type %s", msg.Family)).Result()
 	}
 
-	tags, err := k.IssueToken(ctx, asset)
+	tags, err := k.IssueToken(ctx, token)
 	if err != nil {
 		return err.Result()
 	}

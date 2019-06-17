@@ -88,8 +88,8 @@ func (p PoolStatus) BondedRatio() sdk.Dec {
 func (p PoolStatus) HumanReadableString() string {
 
 	resp := "Pool \n"
-	resp += fmt.Sprintf("Loose Tokens: %s\n", p.LooseTokens)
-	resp += fmt.Sprintf("Bonded Tokens: %s\n", p.BondedTokens)
+	resp += fmt.Sprintf("Loose FungibleTokens: %s\n", p.LooseTokens)
+	resp += fmt.Sprintf("Bonded FungibleTokens: %s\n", p.BondedTokens)
 	resp += fmt.Sprintf("Token Supply: %s\n", p.TokenSupply())
 	resp += fmt.Sprintf("Bonded Ratio: %v\n", p.BondedRatio())
 	return resp

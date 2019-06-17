@@ -40,7 +40,7 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 // feeHandler handles the fee of gateway or asset
 func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) sdk.Error {
 	params := k.GetParamSet(ctx)
-	assetTaxRate := params.TokenTaxRate
+	assetTaxRate := params.AssetTaxRate
 
 	// compute community tax and burned coin
 	communityTaxCoin := sdk.NewCoin(fee.Denom, sdk.NewDecFromInt(fee.Amount).Mul(assetTaxRate).TruncateInt())
