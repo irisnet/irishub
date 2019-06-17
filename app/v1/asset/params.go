@@ -136,10 +136,6 @@ func DefaultParamsForTest() Params {
 }
 
 func validateParams(p Params) error {
-	if sdk.NetworkType != sdk.Mainnet {
-		return nil
-	}
-
 	if err := validateAssetTaxRate(p.AssetTaxRate); err != nil {
 		return err
 	}
@@ -154,7 +150,7 @@ func validateParams(p Params) error {
 }
 
 func validateAssetTaxRate(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+	if v.GT(sdk.NewDec(1)) || v.LT(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidAssetTaxRate,
@@ -165,7 +161,7 @@ func validateAssetTaxRate(v sdk.Dec) sdk.Error {
 }
 
 func validateMintFTBaseFeeRatio(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+	if v.GT(sdk.NewDec(1)) || v.LT(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidMintFTBaseFeeRatio,
@@ -176,7 +172,7 @@ func validateMintFTBaseFeeRatio(v sdk.Dec) sdk.Error {
 }
 
 func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+	if v.GT(sdk.NewDec(1)) || v.LT(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidGatewayAssetFeeRatio,
