@@ -476,16 +476,27 @@ paths:
               schema:
                 type: object
                 properties:
-                  loose_tokens:
-                    type: array
-                    items:
-                      type: string
-                  bonded_tokens:
-                    type: string
-                  burned_tokens:
-                    type: array
-                    items:
-                      type: string
+                  loose_token:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      decimal:
+                        type: integer
+                  bonded_token:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      decimal:
+                        type: integer
+                  burned_token:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      decimal:
+                        type: integer
         '500':
           description: Internal Server Error
   '/bank/accounts/{address}':

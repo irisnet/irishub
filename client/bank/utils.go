@@ -77,9 +77,15 @@ type TokenStatsOfAsset struct {
 // String implements fmt.Stringer
 func (ts TokenStatsOfAsset) String() string {
 	return fmt.Sprintf(`TokenStats:
-  Loose Token:  %s
-  Burned Token:  %s
-  Bonded Token:  %s`,
-		ts.LooseToken.String(), ts.BurnedToken.String(), ts.BondedToken.String(),
+  Loose Token:  
+	denom:%v
+	amount:%v
+  Burned Token: 
+	denom:%v
+	amount:%v
+  Bonded Token:  
+	denom:%v
+	amount:%v`,
+		ts.LooseToken.Denom, ts.LooseToken.Amount, ts.BurnedToken.Denom, ts.BurnedToken.Amount, ts.BondedToken.Denom, ts.BondedToken.Amount,
 	)
 }

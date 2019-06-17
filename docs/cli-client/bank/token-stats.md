@@ -14,6 +14,7 @@ Query the token statistic, including total loose tokens, total burned token and 
 
 | Name,shorthand | Type   | Required | Default               | Description                                                  |
 | -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
+| --id           |  String| False    |                       | id of asset                                                  |
 | -h, --help     |        | False    |                       | Help for coin-type                                           |
 | --chain-id     | String | False    |                       | Chain ID of tendermint node                                  |
 | --height       | Int    | False    |                       | Block height to query, omit to get most recent provable block |
@@ -29,15 +30,21 @@ Query the token statistic, including total loose tokens, total burned token and 
 ### Query the token statistic
 
 ```
-iriscli bank token-stats
+iriscli bank token-stats --id=iris
 ```
 
 Output:
 ```
 TokenStats:
-  Loose Tokens:  1864477.596384156921391687iris
-  Burned Tokens:  177.59638iris
-  Bonded Tokens:  425182.329615843078608313iris
+  Loose Token:  
+    denom:iris
+    amount:1864477.596384156921391687
+  Burned Token:
+    denom:iris
+    amount:7177.596384156921391687
+  Bonded Token:  
+    denom:iris
+    amount:1857300.596384156921391687
 ```
 
 ​    
