@@ -30,7 +30,7 @@
 ### 查询token统计数据
 
 ```
-iriscli bank token-stats --id iris
+iriscli bank token-stats iris
 ```
 
 示例返回：

@@ -78,7 +78,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 	cmd := &cobra.Command{
 		Use:     "token-stats [id]",
 		Short:   "query token statistics",
-		Example: "iriscli bank token-stats --id",
+		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
 			if len(args) == 0 {

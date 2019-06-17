@@ -30,7 +30,7 @@ Query the token statistic, including total loose tokens, total burned token and 
 ### Query the token statistic
 
 ```
-iriscli bank token-stats --id=iris
+iriscli bank token-stats iris
 ```
 
 Output:
