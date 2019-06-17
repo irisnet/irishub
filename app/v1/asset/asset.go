@@ -220,14 +220,14 @@ func IsAssetIDValid(id string) (bool, sdk.Error) {
 
 // ParseAssetID returns the source and symbol
 func ParseAssetID(id string) (source string, symbol string) {
-	parts := strings.Split(id, ".")
+	parts := strings.Split(strings.ToLower(id), ".")
 
 	if len(parts) > 1 {
 		// external or gateway asset
 		source = parts[0]
 		symbol = strings.Join(parts[1:], ".")
 	} else {
-		symbol = id
+		symbol = parts[0]
 	}
 
 	return

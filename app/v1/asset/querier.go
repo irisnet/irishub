@@ -211,14 +211,28 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		return nil, err
 	}
 
-	// TODO: compute fees
-	issueFee := sdk.Coin{}
-	mintFee := sdk.Coin{}
+	source, symbol := ParseAssetID(id)
+
+	var (
+		issueFee sdk.Int
+		mintFee  sdk.Int
+	)
+
+	if source == "" || source == "x" {
+		issueFee = getTokenIssueFee(ctx, keeper, symbol)
+		mintFee = getTokenMintFee(ctx, keeper, symbol)
+	} else {
+		issueFee = getGatewayTokenIssueFee(ctx, keeper, symbol)
+		mintFee = getGatewayTokenMintFee(ctx, keeper, symbol)
+	}
+
+	assetParams := keeper.GetParamSet(ctx)
+	issueFTBaseFee := assetParams.IssueFTBaseFee
 
 	fees := TokenFeesOutput{
 		Exist:    keeper.HasAsset(ctx, id),
-		IssueFee: issueFee,
-		MintFee:  mintFee,
+		IssueFee: sdk.NewCoin(issueFTBaseFee.Denom, issueFee),
+		MintFee:  sdk.NewCoin(issueFTBaseFee.Denom, mintFee),
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fees)
