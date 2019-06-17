@@ -3,6 +3,7 @@ package asset
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -189,14 +190,9 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
 	}
 
-	// check the moniker size
-	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-	}
-
-	// check the moniker format
-	if !IsAlpha(msg.Moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	// check the moniker
+	if err := ValidateMoniker(msg.Moniker); err != nil {
+		return err
 	}
 
 	// check the details
@@ -275,14 +271,9 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
 	}
 
-	// check the moniker size
-	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-	}
-
-	// check the moniker format
-	if !IsAlpha(msg.Moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	// check the moniker
+	if err := ValidateMoniker(msg.Moniker); err != nil {
+		return err
 	}
 
 	// check the details
@@ -326,4 +317,24 @@ func (msg MsgEditGateway) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgEditGateway) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+// ValidateMoniker checks if the specified moniker is valid
+func ValidateMoniker(moniker string) sdk.Error {
+	// check the moniker size
+	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	// check the moniker format
+	if !IsAlpha(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	}
+
+	// check if the moniker contains the native token name
+	if strings.Contains(strings.ToLower(moniker), sdk.NativeTokenName) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
+	}
+
+	return nil
 }

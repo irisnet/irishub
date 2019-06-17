@@ -68,6 +68,10 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 		return nil, sdk.ParseParamsErr(err)
 	}
 
+	if err := ValidateMoniker(params.Moniker); err != nil {
+		return nil, err
+	}
+
 	gateway, err2 := keeper.GetGateway(ctx, params.Moniker)
 	if err2 != nil {
 		return nil, err2
@@ -170,12 +174,8 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	}
 
 	moniker := params.Moniker
-	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
-		return nil, ErrInvalidMoniker(keeper.Codespace(), fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-	}
-
-	if !IsAlpha(moniker) {
-		return nil, ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	if err := ValidateMoniker(moniker); err != nil {
+		return nil, err
 	}
 
 	assetParams := keeper.GetParamSet(ctx)
@@ -183,7 +183,7 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 
 	fee := GatewayFeeOutput{
 		Exist: keeper.HasGateway(ctx, moniker),
-		Fee:   sdk.NewCoin(gatewayBaseFee.Denom, calcFee(moniker, gatewayBaseFee.Amount)),
+		Fee:   sdk.NewCoin(gatewayBaseFee.Denom, getGatewayCreateFee(ctx, keeper, moniker)),
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
