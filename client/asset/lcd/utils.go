@@ -127,8 +127,8 @@ func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint strin
 	}
 }
 
-// queryFTFees queries the asset related fees from the specified endpoint
-func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+// queryTokenFees queries the token related fees from the specified endpoint
+func queryTokenFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -138,7 +138,7 @@ func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 			return
 		}
 
-		params := asset.QueryFTFeesParams{
+		params := asset.QueryTokenFeesParams{
 			ID: id,
 		}
 
@@ -149,7 +149,7 @@ func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		}
 
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s/fungible-tokens", protocol.AssetRoute, asset.QueryFees), bz)
+			fmt.Sprintf("custom/%s/%s/tokens", protocol.AssetRoute, asset.QueryFees), bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

@@ -4,6 +4,7 @@ package asset
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	bank "github.com/irisnet/irishub/app/v1/bank"
 	sdk "github.com/irisnet/irishub/types"
@@ -81,4 +82,44 @@ func calcFeeFactor(name string) float64 {
 	// error ignored
 	feeFactor := math.Pow(numerator/denominator, FeeFactorExp)
 	return feeFactor
+}
+
+// GatewayFeeOutput is for the gateway fee query output
+type GatewayFeeOutput struct {
+	Exist bool     `exist` // indicate if the gateway has existed
+	Fee   sdk.Coin `fee`   // creation fee
+}
+
+// String implements stringer
+func (gfo GatewayFeeOutput) String() string {
+	var out strings.Builder
+	if gfo.Exist {
+		out.WriteString("The gateway moniker has existed\n")
+	}
+
+	out.WriteString(fmt.Sprintf("Fee: %s", gfo.Fee.String()))
+
+	return out.String()
+}
+
+// TokenFeesOutput is for the token fees query output
+type TokenFeesOutput struct {
+	Exist    bool     `exist`            // indicate if the token has existed
+	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
+	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
+}
+
+// String implements stringer
+func (tfo TokenFeesOutput) String() string {
+	var out strings.Builder
+	if tfo.Exist {
+		out.WriteString("The token id has existed\n")
+	}
+
+	out.WriteString(fmt.Sprintf(`Fees:
+  IssueFee: %s
+  MintFee:  %s`,
+		tfo.IssueFee.String(), tfo.MintFee.String()))
+
+	return out.String()
 }

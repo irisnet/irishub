@@ -153,7 +153,7 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-fee",
 		Short:   "Query the asset-related fees",
-		Example: "iriscli asset query-fee --subject=<gateway|fungible-token> --moniker=<gateway moniker> --id=<asset id>",
+		Example: "iriscli asset query-fee --subject=<gateway|token> --moniker=<gateway moniker> --id=<asset id>",
 		PreRunE: preQueryFeeCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -182,18 +182,18 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 					Moniker: moniker,
 				}
 
-				path = fmt.Sprintf("custom/%s/fees/gateway", protocol.AssetRoute)
+				path = fmt.Sprintf("custom/%s/fees/gateways", protocol.AssetRoute)
 			} else {
 				id = viper.GetString(FlagID)
 				if ok, err := asset.IsAssetIDValid(id); !ok {
 					return err
 				}
 
-				params = asset.QueryFTFeesParams{
+				params = asset.QueryTokenFeesParams{
 					ID: id,
 				}
 
-				path = fmt.Sprintf("custom/%s/fees/fungible-token", protocol.AssetRoute)
+				path = fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -206,7 +206,7 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var fees asset.FTFeesOutput
+			var fees asset.TokenFeesOutput
 			err = cdc.UnmarshalJSON(res, &fees)
 			if err != nil {
 				return err
@@ -226,13 +226,13 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 func preQueryFeeCmd(cmd *cobra.Command, args []string) error {
 	subject := viper.GetString(FlagSubject)
 
-	if subject != "gateway" && subject != "fungible-token" {
-		return fmt.Errorf("the subject must be gateway or fungible-token")
+	if subject != "gateway" && subject != "token" {
+		return fmt.Errorf("the subject must be gateway or token")
 	}
 
 	if subject == "gateway" {
 		cmd.MarkFlagRequired(FlagMoniker)
-	} else if subject == "fungible-token" {
+	} else if subject == "token" {
 		cmd.MarkFlagRequired(FlagID)
 	}
 
