@@ -3250,6 +3250,41 @@ paths:
           description: Invalid token id
         '500':
           description: Internal Server Error
+  '/asset/tokens':
+    get:
+      summary: Query the token with the specified params
+      tags:
+        - Asset
+      parameters:
+        - in: query
+          name: source
+          description: 'the source of the destination token, options: native, external, gateway'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: owner
+          description: 'the owner address of the destination token, optional when source is native, ignored when source is not native'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: gateway
+          description: 'the gateway moniker of the destination token, optional when source is gateway'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
   '/asset/gateways/{moniker}':
     get:
       summary: Query the gateway with the specified moniker
@@ -3913,7 +3948,7 @@ components:
         name:
           type: string
         decimal:
-          type: string
+          type: integer
         symbol_at_source:
           type: string
         symbol_min_alias:
