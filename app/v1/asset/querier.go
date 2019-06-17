@@ -175,7 +175,7 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	}
 
 	if !IsAlpha(moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+		return nil, ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
 	}
 
 	assetParams := keeper.GetParamSet(ctx)
@@ -201,6 +201,14 @@ type FTFeesOutput struct {
 	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
 }
 
+// String implements stringer
+func (fo FTFeesOutput) String() string {
+	return fmt.Sprintf(`Fungible Token Fees:
+  IssueFee: %s
+  MintFee:  %s`,
+		fo.IssueFee.String(), fo.MintFee.String())
+}
+
 func queryFTFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryFTFeesParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
@@ -208,8 +216,10 @@ func queryFTFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	// id := params.ID
-	// TODO: id check
+	id := params.ID
+	if ok, err := IsAssetIDValid(id); !ok {
+		return nil, err
+	}
 
 	// TODO: compute fees
 	issueFee := sdk.Coin{}
