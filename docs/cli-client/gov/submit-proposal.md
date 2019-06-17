@@ -36,7 +36,7 @@ iriscli gov submit-proposal --help
 | --asset-symbol-min-alias |  | the asset symbol minimum alias | |
 | --asset-initial-supply |  | the initial supply token of asset | |
 | --asset-max-supply |  | the max supply token of asset | |
-| asset-mintable |  | whether the asset can be minted, default false | |
+| --asset-mintable |  | whether the asset can be minted, default false | |
 
 ## Examples
 
