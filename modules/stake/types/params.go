@@ -150,7 +150,7 @@ func validateUnbondingTime(v time.Duration) sdk.Error {
 
 func validateMaxValidators(v uint16) sdk.Error {
 	if v < 50 || v > 200 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxValidators, fmt.Sprintf("Invalid MaxValidators [%d] should be between [100, 200]", v))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxValidators, fmt.Sprintf("Invalid MaxValidators [%d] should be between [50, 200]", v))
 	}
 	return nil
 }
