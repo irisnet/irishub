@@ -5,24 +5,23 @@ import (
 	"fmt"
 	"io"
 	"runtime/debug"
+	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	dbm "github.com/tendermint/tendermint/libs/db"
-	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
+	v0 "github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
+	"github.com/pkg/errors"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 	tmstate "github.com/tendermint/tendermint/state"
-	"strconv"
 )
 
 // Key to store the consensus params in the main store.
@@ -311,6 +310,14 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	// Initialize the deliver state and check state with ChainID and run initChain
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
+
+	// load initial protocol with the upgrade info defined in the genesis file
+	stateJSON := req.AppStateBytes
+	var genesisFileState v0.GenesisFileState
+	v0.MakeCodec().MustUnmarshalJSON(stateJSON, &genesisFileState)
+	initProtocol := genesisFileState.UpgradeData.GenesisVersion.UpgradeInfo.Protocol.Version
+	app.Engine.LoadInitProtocol(initProtocol)
+	app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 
 	initChainer := app.Engine.GetCurrentProtocol().GetInitChainer()
 	if initChainer == nil {
