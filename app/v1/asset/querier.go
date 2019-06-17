@@ -30,7 +30,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-// QueryTokenParams is the query parameters for 'custom/asset/tokens'
+// QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
 type QueryTokenParams struct {
 	TokenId string
 }

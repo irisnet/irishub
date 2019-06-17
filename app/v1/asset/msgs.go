@@ -8,7 +8,8 @@ import (
 
 const (
 	// MsgRoute identifies transaction types
-	MsgRoute = "asset"
+	MsgRoute          = "asset"
+	MsgTypeIssueAsset = "issue_asset"
 )
 
 var (
@@ -72,7 +73,7 @@ func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, sy
 
 // Implements Msg.
 func (msg MsgIssueAsset) Route() string { return MsgRoute }
-func (msg MsgIssueAsset) Type() string  { return "issue_asset" }
+func (msg MsgIssueAsset) Type() string  { return MsgTypeIssueAsset }
 
 // Implements Msg.
 func (msg MsgIssueAsset) ValidateBasic() sdk.Error {

@@ -2,15 +2,19 @@ package lcd
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset/tags"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/client/context"
+	tmtx "github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func queryToken(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
@@ -37,6 +41,107 @@ func queryToken(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) ht
 		}
 
 		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
+}
+
+func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sourceStr := r.FormValue("source")
+		gateway := r.FormValue("gateway")
+		owner := r.FormValue("owner")
+		page := 0
+		size := 100
+
+		var source asset.AssetSource
+		if len(sourceStr) > 0 {
+			_source, ok := asset.StringToAssetSourceMap[sourceStr]
+			if !ok {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid source %s", sourceStr))
+				return
+			}
+			source = _source
+		} else if len(owner) > 0 {
+			source, _ = asset.StringToAssetSourceMap["native"]
+		}
+
+		queryTags := []string{fmt.Sprintf("%s='%s'", tags.Action, string(tags.ActionIssueToken))}
+
+		if len(sourceStr) > 0 {
+			queryTags = append(queryTags, fmt.Sprintf("%s='%s'", tags.Source, source.String()))
+		}
+
+		if len(gateway) > 0 {
+			queryTags = append(queryTags, fmt.Sprintf("%s='%s'", tags.Gateway, gateway))
+		}
+
+		if len(owner) > 0 {
+			queryTags = append(queryTags, fmt.Sprintf("%s='%s'", tags.Owner, owner))
+		}
+
+		query := strings.Join(queryTags, " AND ")
+
+		// get the node
+		node, err := cliCtx.GetNode()
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		prove := !cliCtx.TrustNode
+
+		res, err := node.TxSearch(query, prove, page, size)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if prove {
+			for _, tx := range res.Txs {
+				err := tmtx.ValidateTxResult(cliCtx, tx)
+				if err != nil {
+					utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+					return
+				}
+			}
+		}
+
+		infos, err := tmtx.FormatTxResults(cdc, res.Txs)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var tokens []asset.BaseAsset
+		for _, info := range infos {
+			if info.Result.Code != abci.CodeTypeOK {
+				continue
+			}
+
+			for _, msg := range info.Tx.GetMsgs() {
+				if msg.Type() == asset.MsgTypeIssueAsset {
+					msgIssueAsset := msg.(asset.MsgIssueAsset)
+
+					var token asset.BaseAsset
+					switch msgIssueAsset.Family {
+					case asset.FUNGIBLE:
+						totalSupply := msgIssueAsset.InitialSupply
+						decimal := int(msgIssueAsset.Decimal)
+						token = asset.NewBaseAsset(asset.FUNGIBLE, msgIssueAsset.Source, msgIssueAsset.Gateway, msgIssueAsset.Symbol, msgIssueAsset.Name, msgIssueAsset.Decimal, msgIssueAsset.SymbolAtSource, msgIssueAsset.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msgIssueAsset.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msgIssueAsset.MaxSupply), decimal), msgIssueAsset.Mintable, msgIssueAsset.Owner)
+					default:
+						continue
+					}
+
+					tokens = append(tokens, token)
+				}
+			}
+		}
+
+		if len(tokens) == 0 {
+			utils.WriteErrorResponse(w, http.StatusNotFound, fmt.Sprintf("token not found"))
+			return
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, tokens, cliCtx.Indent)
 	}
 }
 
