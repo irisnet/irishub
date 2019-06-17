@@ -138,11 +138,11 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 
 				//get burned token from burnAddress
 				burnedAcc, err := cliCtx.GetAccount(bankv1.BurnedCoinsAccAddr)
-				if err != nil {
-					return err
+				burnToken := sdk.Coin{}
+				if err == nil {
+					burnToken = sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
+					tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
 				}
-				burnToken := sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
-				tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
 				return cliCtx.PrintOutput(tokenStats)
 			}
 
