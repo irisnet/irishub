@@ -191,27 +191,17 @@ func GetKeyIDFromUniqueID(uniqueID string) string {
 
 // IsAssetIDValid checks if the given asset id is valid
 func IsAssetIDValid(id string) (bool, sdk.Error) {
-	var symbol string
-	parts := strings.Split(id, ".")
+	source, symbol := ParseAssetID(id)
 
-	if len(parts) > 1 {
-		// external or gateway asset
-		source := parts[0]
-		symbol = strings.Join(parts[1:], ".")
-
-		// check gateway moniker
-		if source != "x" {
-			if len(source) < MinimumGatewayMonikerSize || len(source) > MaximumGatewayMonikerSize || !IsAlpha(source) {
-				return false, ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("invalid gateway moniker: %s", source))
-			}
+	// check gateway moniker
+	if source != "" && source != "x" {
+		if err := ValidateMoniker(source); err != nil {
+			return false, err
 		}
-	} else {
-		// native asset
-		symbol = id
 	}
 
 	// check symbol
-	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
+	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.NativeTokenName) {
 		return false, ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
 	}
 
