@@ -189,10 +189,12 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 
+				out.Fee = sdk.NewCoin(sdk.NativeTokenName, out.Fee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
+
 				return cliCtx.PrintOutput(out)
 			} else {
 				id := viper.GetString(FlagID)
-				if ok, err := asset.IsAssetIDValid(id); !ok {
+				if ok, err := asset.CheckAssetID(id); !ok {
 					return err
 				}
 
@@ -217,6 +219,9 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
+
+				out.IssueFee = sdk.NewCoin(sdk.NativeTokenName, out.IssueFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
+				out.MintFee = sdk.NewCoin(sdk.NativeTokenName, out.MintFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
 
 				return cliCtx.PrintOutput(out)
 			}

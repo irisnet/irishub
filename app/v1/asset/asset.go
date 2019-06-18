@@ -170,8 +170,8 @@ func GetKeyIDFromUniqueID(uniqueID string) string {
 	}
 }
 
-// IsAssetIDValid checks if the given asset id is valid
-func IsAssetIDValid(id string) (bool, sdk.Error) {
+// CheckAssetID checks if the given asset id is valid
+func CheckAssetID(id string) (bool, sdk.Error) {
 	source, symbol := ParseAssetID(id)
 
 	// check gateway moniker

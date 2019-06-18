@@ -182,7 +182,7 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 
 	fee := GatewayFeeOutput{
 		Exist: keeper.HasGateway(ctx, moniker),
-		Fee:   sdk.NewCoin(sdk.NativeTokenName, getGatewayCreateFee(ctx, keeper, moniker)),
+		Fee:   getGatewayCreateFee(ctx, keeper, moniker),
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
@@ -206,15 +206,15 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	}
 
 	id := params.ID
-	if ok, err := IsAssetIDValid(id); !ok {
+	if ok, err := CheckAssetID(id); !ok {
 		return nil, err
 	}
 
 	source, symbol := ParseAssetID(id)
 
 	var (
-		issueFee sdk.Int
-		mintFee  sdk.Int
+		issueFee sdk.Coin
+		mintFee  sdk.Coin
 	)
 
 	if source == "" || source == "x" {
@@ -227,8 +227,8 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 
 	fees := TokenFeesOutput{
 		Exist:    keeper.HasToken(ctx, id),
-		IssueFee: sdk.NewCoin(sdk.NativeTokenName, issueFee),
-		MintFee:  sdk.NewCoin(sdk.NativeTokenName, mintFee),
+		IssueFee: issueFee,
+		MintFee:  mintFee,
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fees)

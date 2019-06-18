@@ -2,6 +2,8 @@ package lcd
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -12,7 +14,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"net/http"
 )
 
 func queryToken(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
@@ -232,7 +233,7 @@ func queryTokenFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 		vars := mux.Vars(r)
 
 		id := vars["id"]
-		if ok, err := asset.IsAssetIDValid(id); !ok {
+		if ok, err := asset.CheckAssetID(id); !ok {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
