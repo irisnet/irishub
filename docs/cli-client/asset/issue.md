@@ -6,7 +6,7 @@ This command is used to issue token in IRIS Hub.
 
 ## Usage
 
-issue  100000000000 iris
+issue  10000000000 kitty
 ```
 iriscli asset issue-token [flags]
 ```
@@ -36,19 +36,19 @@ iriscli asset issue-token [flags]
 ### Issue native token
 
 ```
-iriscli asset issue-token --family=fungible --name=kettyToken --symbol=ketty --source=native --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
+iriscli asset issue-token --family=fungible --name=kittyToken --symbol=kitty --source=native --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
 ```
 
 ### Issue external token
 
 ```
-iriscli asset issue-token --family=fungible --symbol-at-source=pig --name=piggyToken --symbol=piggy --source=external --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>   --fee=1iris
+iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=external --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>   --fee=1iris
 ```
 
 ### Issue gateway token
 
 ```
-iriscli asset issue-token --family=fungible --symbol-at-source=pig --name=piggyToken --symbol=piggy --source=gateway --gateway=gtty --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>  --fee=1iris
+iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=gateway --gateway=gtty --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>  --fee=1iris
 ```
 
 Output:
@@ -76,11 +76,11 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
       },
       {
         "key": "token-id",
-        "value": "doggy"
+        "value": "kitty"
       },
       {
         "key": "token-denom",
-        "value": "doggy-min"
+        "value": "kitty-min"
       },
       {
         "key": "token-source",

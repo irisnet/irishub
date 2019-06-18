@@ -6,7 +6,7 @@
 
 ## 使用方式
 
-发行100000000000iris
+发行10000000000 kitty
 ```
 iriscli asset issue [flags]
 ```
@@ -37,19 +37,19 @@ iriscli asset issue [flags]
 
 
 ```
-iriscli asset issue-token --family=fungible --name=kettyToken --symbol=ketty --source=native --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
+iriscli asset issue-token --family=fungible --name=kittyToken --symbol=kitty --source=native --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
 ```
 
 ### 发行外部资产
 
 ```
-iriscli asset issue-token --family=fungible --symbol-at-source=pig --name=piggyToken --symbol=piggy --source=external --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>   --fee=1iris
+iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=external --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>   --fee=1iris
 ```
 
 ### 发行网关资产
 
 ```
-iriscli asset issue-token --family=fungible --symbol-at-source=pig --name=piggyToken --symbol=piggy --source=gateway --gateway=gtty --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>  --fee=1iris
+iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=gateway --gateway=gtty --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>  --fee=1iris
 ```
 
 输出信息:
@@ -77,11 +77,11 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
       },
       {
         "key": "token-id",
-        "value": "doggy"
+        "value": "kitty"
       },
       {
         "key": "token-denom",
-        "value": "doggy-min"
+        "value": "kitty-min"
       },
       {
         "key": "token-source",
