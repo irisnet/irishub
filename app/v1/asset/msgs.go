@@ -90,7 +90,7 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 
 		break
 	case EXTERNAL:
-		break
+		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
 	case GATEWAY:
 		// require gateway moniker for gateway asset
 		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {

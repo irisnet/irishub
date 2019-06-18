@@ -42,7 +42,7 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 	}
 }
 
-// Fungible FungibleToken
+// FungibleToken
 type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
