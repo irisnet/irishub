@@ -194,7 +194,7 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 				return cliCtx.PrintOutput(out)
 			} else {
 				id := viper.GetString(FlagID)
-				if ok, err := asset.CheckAssetID(id); !ok {
+				if err := asset.CheckAssetID(id); err != nil {
 					return err
 				}
 

@@ -206,7 +206,7 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	}
 
 	id := params.ID
-	if ok, err := CheckAssetID(id); !ok {
+	if err := CheckAssetID(id); err != nil {
 		return nil, err
 	}
 

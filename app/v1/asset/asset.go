@@ -171,22 +171,22 @@ func GetKeyIDFromUniqueID(uniqueID string) string {
 }
 
 // CheckAssetID checks if the given asset id is valid
-func CheckAssetID(id string) (bool, sdk.Error) {
+func CheckAssetID(id string) sdk.Error {
 	source, symbol := ParseAssetID(id)
 
 	// check gateway moniker
 	if source != "" && source != "x" {
 		if err := ValidateMoniker(source); err != nil {
-			return false, err
+			return err
 		}
 	}
 
 	// check symbol
 	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.NativeTokenName) {
-		return false, ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
 	}
 
-	return true, nil
+	return nil
 }
 
 // ParseAssetID returns the source and symbol
