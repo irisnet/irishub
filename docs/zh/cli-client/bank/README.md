@@ -21,8 +21,6 @@
 | [account](account.md)   | 查询账户余额           |
 | [send](send.md)      | 创建/签名/广播一个转账请求 |
 | [burn](burn.md)      | 销毁token |
-| [sign](sign.md)      | 签名离线传输文件       |
-| [broadcast](broadcast.md)|广播一个已签名的交易|
 
 ## 标志
 

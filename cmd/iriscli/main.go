@@ -111,11 +111,7 @@ func main() {
 	distributionCmd.AddCommand(
 		client.GetCommands(
 			distributioncmd.GetWithdrawAddress(cdc),
-			//distributioncmd.GetDelegationDistInfo(cdc),
-			//distributioncmd.GetValidatorDistInfo(cdc),
-			//distributioncmd.GetAllDelegationDistInfo(cdc),
 			distributioncmd.GetRewards(cdc),
-			distributioncmd.GetCommunityTax(cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
@@ -264,12 +260,16 @@ func main() {
 	assetCmd.AddCommand(
 		client.PostCommands(
 			assetcmd.GetCmdCreateGateway(cdc),
+			assetcmd.GetCmdEditGateway(cdc),
+			assetcmd.GetCmdIssueAsset(cdc),
 		)...)
 
 	assetCmd.AddCommand(
 		client.GetCommands(
+			assetcmd.GetCmdQueryAsset(cdc),
 			assetcmd.GetCmdQueryGateway(cdc),
 			assetcmd.GetCmdQueryGateways(cdc),
+			assetcmd.GetCmdQueryGatewayFee(cdc),
 		)...)
 
 	rootCmd.AddCommand(

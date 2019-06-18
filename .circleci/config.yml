@@ -1,0 +1,43 @@
+version: 2
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build_docker_image:
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only:
+                - /v.*/
+jobs:
+  build_docker_image:
+    machine:
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          name: Login dockerhub
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: Get image tag
+          command: |
+            if [[ $CIRCLE_BRANCH == "master" ]]; then
+              echo 'export TAG="latest"' >> $BASH_ENV;
+            else
+              echo 'export TAG=$CIRCLE_TAG' >> $BASH_ENV;
+            fi
+            source $BASH_ENV
+      - run:
+          name: build irishub mainnet image
+          command: docker build -t irisnet/irishub:$TAG .
+      - run:
+          name: push irishub mainnet image
+          command: docker push irisnet/irishub:$TAG
+      - run:
+          name: build irishub testnet image
+          command: docker build -t irisnet/irishub:testnet-$TAG --build-arg NetworkType=testnet .
+      - run:
+          name: push irishub testnet image
+          command: docker push irisnet/irishub:testnet-$TAG

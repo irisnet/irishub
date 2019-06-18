@@ -33,6 +33,8 @@ tags:
     description: Distribution module APIs
   - name: Service
     description: Service module APIs
+  - name: Asset
+    description: Asset module APIs
   - name: Version
     description: Query app version
 paths:
@@ -306,38 +308,6 @@ paths:
           description: Invalid search tags
         '500':
           description: Internal Server Error
-#    post:
-#      tags:
-#        - Tendermint
-#      summary: broadcast Tx
-#      description: broadcast tx with tendermint rpc
-#      responses:
-#        '200':
-#          description: Broadcast tx result
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/BroadcastTxCommitResult'
-#        '500':
-#          description: Internal Server Error
-#      requestBody:
-#        content:
-#          application/json:
-#            schema:
-#              type: object
-#              properties:
-#                tx:
-#                  type: string
-#                return:
-#                  type: string
-#                  example: block
-#        description: >-
-#          Build a StdTx transaction and serilize it to a byte array with amino,
-#          then the `"tx"` field in the post body will be the base64 encoding of
-#          the byte array. The supported return types includes `"block"`(return
-#          after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return
-#          right away).
-#        required: true
   /tx/sign:
     post:
       tags:
@@ -2118,108 +2088,6 @@ paths:
                   type: boolean
         description: 'if is_validator is true, validator_address should not be presented'
         required: true
-#  '/distribution/{delegatorAddr}/distrInfo/{validatorAddr}':
-#    parameters:
-#      - in: path
-#        name: delegatorAddr
-#        description: Bech32 AccAddress of Delegator
-#        required: true
-#        schema:
-#          type: string
-#      - in: path
-#        name: validatorAddr
-#        description: Bech32 OperatorAddress of validator
-#        required: true
-#        schema:
-#          type: string
-#    get:
-#      summary: Query distribution information for a delegation
-#      tags:
-#        - Distribution
-#      responses:
-#        '200':
-#          description: OK
-#          content:
-#            '*/*':
-#              schema:
-#                $ref: '#/components/schemas/DelegationDistInfo'
-#        '204':
-#          description: No content
-#        '400':
-#          description: Invalid delegator address or validator address
-#        '500':
-#          description: Internal Server Error
-#  '/distribution/{delegatorAddr}/distrInfo':
-#    parameters:
-#      - in: path
-#        name: delegatorAddr
-#        description: Bech32 AccAddress of Delegator
-#        required: true
-#        schema:
-#          type: string
-#    get:
-#      summary: Query distribution information list for a given delegator
-#      tags:
-#        - Distribution
-#      responses:
-#        '200':
-#          description: OK
-#          content:
-#            '*/*':
-#              schema:
-#                type: array
-#                items:
-#                  $ref: '#/components/schemas/DelegationDistInfo'
-#        '400':
-#          description: Invalid delegator address
-#        '500':
-#          description: Internal Server Error
-#  '/distribution/{validatorAddr}/valDistrInfo':
-#    parameters:
-#      - in: path
-#        name: validatorAddr
-#        description: Bech32 ValAddress of Validator
-#        required: true
-#        schema:
-#          type: string
-#    get:
-#      summary: Query withdraw address
-#      tags:
-#        - Distribution
-#      responses:
-#        '200':
-#          description: OK
-#          content:
-#            '*/*':
-#              schema:
-#                type: object
-#                properties:
-#                  operator_addr:
-#                    type: string
-#                  fee_pool_withdrawal_height:
-#                    type: string
-#                    example: '0'
-#                  del_accum:
-#                    type: object
-#                    properties:
-#                      update_height:
-#                        type: string
-#                        example: '0'
-#                      accum:
-#                        type: string
-#                        example: '0.0000000000'
-#                  del_pool:
-#                    type: string
-#                    example: 0.1iris
-#                  val_commission:
-#                    type: string
-#                    example: 0.1iris
-#        '204':
-#          description: Invalid delegator address
-#        '400':
-#          description: Invalid delegator address
-#        '500':
-#          description: Internal Server Error
   '/distribution/{address}/rewards':
     parameters:
       - in: path
@@ -2261,25 +2129,6 @@ paths:
           description: Invalid address
         '400':
           description: Invalid address
-        '500':
-          description: Internal Server Error
-  '/distribution/community-tax':
-    get:
-      summary: Query community tax
-      tags:
-        - Distribution
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  amout:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Coin'
         '500':
           description: Internal Server Error
   /service/definitions:
@@ -3378,6 +3227,112 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
+  '/asset/tokens/{id}':
+    get:
+      summary: Query the token with the specified id
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: id
+          description: the unique id of the destination token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+  '/asset/tokens':
+    get:
+      summary: Query the token with the specified params
+      tags:
+        - Asset
+      parameters:
+        - in: query
+          name: source
+          description: 'the source of the destination token, options: native, external, gateway'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: owner
+          description: 'the owner address of the destination token, optional when source is native, ignored when source is not native'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: gateway
+          description: 'the gateway moniker of the destination token, optional when source is gateway'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+  '/asset/gateways/{moniker}':
+    get:
+      summary: Query the gateway with the specified moniker
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gateway'
+        '400':
+          description: Invalid moniker
+        '500':
+          description: Internal Server Error
+  '/asset/gateways':
+    get:
+      summary: Get all the gateways with an optional owner
+      tags:
+        - Asset
+      parameters:
+      - in: query
+        name: owner
+        description: the owner address to be queried
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Gateway'
+        '400':
+          description: Invalid owner address if owner given
+        '500':
+          description: Internal Server Error
 components:
   requestBodies:
     Unjailbody:
@@ -3979,3 +3934,45 @@ components:
         del_pool_withdrawal_height:
           type: string
           example: '0'
+    Token:
+      type: object
+      properties:
+        family:
+          type: string
+        source:
+          type: string
+        gateway:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        decimal:
+          type: integer
+        symbol_at_source:
+          type: string
+        symbol_min_alias:
+          type: string
+        initial_supply:
+          type: string
+        total_supply:
+          type: string
+        max_supply:
+          type: string
+        mintable:
+          type: boolean
+        owner:
+          $ref: '#/components/schemas/Address'
+    Gateway:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/Address'
+        moniker:
+          type: string
+        identity:
+          type: string
+        details:
+          type: string
+        website:
+          type: string

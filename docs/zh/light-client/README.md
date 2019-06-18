@@ -142,8 +142,14 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     14. `GET /service/fees/{address}`:  查询（某个地址的）服务费用
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
-    
-10. 查询版本
+
+10. Asset模块的APIs
+    1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
+    2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
+    3. `POST /asset/gateways`: 创建一个网关
+    4. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
+ 
+11. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node-version`: 查询全节点版本

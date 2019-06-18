@@ -53,7 +53,7 @@ func runDeleteCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	buf := client.BufferStdin()
-	if info.GetType() == keys.TypeLedger || info.GetType() == keys.TypeOffline {
+	if info.GetType() == keys.TypeLedger || info.GetType() == keys.TypeOffline || info.GetType() == keys.TypeMulti {
 		if !viper.GetBool(flagYes) {
 			if err := confirmDeletion(buf); err != nil {
 				return err

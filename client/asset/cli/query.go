@@ -12,6 +12,43 @@ import (
 	"github.com/spf13/viper"
 )
 
+// GetCmdQueryAsset implements the query asset command.
+func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "query-token",
+		Short:   "Query details of a token",
+		Example: "iriscli asset query-token <token-id>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			params := asset.QueryTokenParams{
+				TokenId: args[0],
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
+			if err != nil {
+				return err
+			}
+
+			var token asset.FungibleToken
+			err = cdc.UnmarshalJSON(res, &token)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(token)
+		},
+	}
+
+	return cmd
+}
+
 // GetCmdQueryGateway implements the query gateway command.
 func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -64,14 +101,22 @@ func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-gateways",
-		Short:   "Query all the gateways of the specified owner",
+		Short:   "Query all gateways with an optional owner",
 		Example: "iriscli asset query-gateways --owner=<gateway owner>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			owner, err := sdk.AccAddressFromBech32(viper.GetString(FlagOwner))
-			if err != nil {
-				return err
+			var (
+				owner sdk.AccAddress
+				err   error
+			)
+
+			ownerStr := viper.GetString(FlagOwner)
+			if ownerStr != "" {
+				owner, err = sdk.AccAddressFromBech32(ownerStr)
+				if err != nil {
+					return err
+				}
 			}
 
 			params := asset.QueryGatewaysParams{
@@ -99,7 +144,54 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().String(FlagOwner, "", "the owner address to be queried")
-	cmd.MarkFlagRequired(FlagOwner)
+
+	return cmd
+}
+
+// GetCmdQueryGatewayFee implements the query gateway fee command.
+func GetCmdQueryGatewayFee(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "query-gateway-fee",
+		Short:   "Query the creation fee for a gateway with the given moniker",
+		Example: "iriscli asset query-gateway-fee --moniker=<gateway moniker>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			moniker := viper.GetString(FlagMoniker)
+			if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
+				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
+			}
+
+			if !asset.IsAlpha(moniker) {
+				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+			}
+
+			params := asset.QueryGatewayFeeParams{
+				Moniker: moniker,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/gatewayFee", protocol.AssetRoute), bz)
+			if err != nil {
+				return err
+			}
+
+			var fee sdk.Dec
+			err = cdc.UnmarshalJSON(res, &fee)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(fee)
+		},
+	}
+
+	cmd.Flags().String(FlagMoniker, "", "the unique name of the destination gateway")
+	cmd.MarkFlagRequired(FlagMoniker)
 
 	return cmd
 }

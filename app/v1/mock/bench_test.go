@@ -16,7 +16,7 @@ func getBenchmarkMockApp() (*App, error) {
 	mapp := NewApp()
 
 	bank.RegisterCodec(mapp.Cdc)
-	bankKeeper := bank.NewBaseKeeper(mapp.AccountKeeper)
+	bankKeeper := bank.NewBaseKeeper(mapp.Cdc, mapp.AccountKeeper)
 	mapp.Router().AddRoute("bank", []*sdk.KVStoreKey{mapp.KeyAccount}, bank.NewHandler(bankKeeper))
 
 	err := mapp.CompleteSetup()

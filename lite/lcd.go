@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
+	assethandler "github.com/irisnet/irishub/client/asset/lcd"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
@@ -97,6 +98,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	r.HandleFunc("/node-version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	keyshandler.RegisterRoutes(r, cliCtx.Indent)
+	assethandler.RegisterRoutes(cliCtx, r, cdc)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	distributionhandler.RegisterRoutes(cliCtx, r, cdc)

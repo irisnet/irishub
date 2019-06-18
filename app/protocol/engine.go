@@ -23,6 +23,15 @@ func NewProtocolEngine(protocolKeeper sdk.ProtocolKeeper) ProtocolEngine {
 	return engine
 }
 
+func (pe *ProtocolEngine) LoadInitProtocol(version uint64) {
+	p, flag := pe.protocols[version]
+	if flag == false {
+		panic("unknown protocol version!!!")
+	}
+	p.Load()
+	pe.current = version
+}
+
 func (pe *ProtocolEngine) LoadCurrentProtocol(kvStore sdk.KVStore) (bool, uint64) {
 	// find the current version from store
 	current := pe.ProtocolKeeper.GetCurrentVersionByStore(kvStore)
@@ -80,7 +89,9 @@ func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 		KeyParams,
 		KeyUpgrade,
 		KeyService,
-		KeyGuardian}
+		KeyGuardian,
+		KeyAsset,
+	}
 }
 
 func (pe *ProtocolEngine) GetTransientStoreKeys() []*sdk.TransientStoreKey {

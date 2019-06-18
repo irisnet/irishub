@@ -92,7 +92,7 @@ func TestRemoveTokens(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	validator := Validator{
 		OperatorAddr:    addr1,
@@ -139,7 +139,7 @@ func TestAddTokensValidatorBonded(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
@@ -166,7 +166,7 @@ func TestAddTokensValidatorUnbonding(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
@@ -194,7 +194,7 @@ func TestAddTokensValidatorUnbonded(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
@@ -222,7 +222,7 @@ func TestRemoveDelShares(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	valA := Validator{
 		OperatorAddr:    addr1,
@@ -290,7 +290,7 @@ func TestUpdateStatus(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	bondedPool := InitialBondedPool()
 	pool := Pool{
@@ -326,7 +326,7 @@ func TestPossibleOverflow(t *testing.T) {
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper)
+	bankKeeper := bank.NewBaseKeeper(cdc, accountKeeper)
 
 	poolTokens := sdk.NewDec(2159)
 	delShares := sdk.NewDec(391432570689183511).Quo(sdk.NewDec(40113011844664))

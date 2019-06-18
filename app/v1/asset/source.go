@@ -32,7 +32,7 @@ func AssetSourceFromString(str string) (AssetSource, error) {
 	if source, ok := StringToAssetSourceMap[strings.ToLower(str)]; ok {
 		return source, nil
 	}
-	return AssetSource(0xff), errors.Errorf("'%s' is not a valid asset source", str)
+	return AssetSource(0xff), errors.Errorf("'%s' is not a valid token source", str)
 }
 
 func IsValidAssetSource(source AssetSource) bool {

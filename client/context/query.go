@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -143,12 +145,12 @@ func (cliCtx CLIContext) EnsureAccountExistsFromAddr(addr sdk.AccAddress) error 
 // queryAccount queries an account using custom query endpoint of auth module
 // returns an error if result is `null` otherwise account data
 func (cliCtx CLIContext) queryAccount(addr sdk.AccAddress) ([]byte, error) {
-	bz, err := cliCtx.Codec.MarshalJSON(auth.NewQueryAccountParams(addr))
+	bz, err := cliCtx.Codec.MarshalJSON(bank.NewQueryAccountParams(addr))
 	if err != nil {
 		return nil, err
 	}
 
-	route := fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryAccount)
+	route := fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryAccount)
 
 	res, err := cliCtx.QueryWithData(route, bz)
 	if err != nil {
@@ -298,19 +300,28 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 	if coinName == sdk.NativeTokenName {
 		coinType = sdk.IRIS
 	} else {
-		key := types.CoinTypeKey(coinName)
-		bz, err := cliCtx.QueryStore([]byte(key), "params")
-		if err != nil {
-			return coinType, err
+
+		params := asset.QueryTokenParams{
+			TokenId: coinName,
 		}
 
-		if bz == nil {
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			return types.CoinType{}, err
+		}
+
+		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
+		if err != nil {
 			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		if err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(bz, &coinType); err != nil {
-			return coinType, err
+		var token asset.FungibleToken
+		err = cliCtx.Codec.UnmarshalJSON(res, &token)
+		if err != nil {
+			return types.CoinType{}, err
 		}
+
+		return token.GetCoinType(), nil
 	}
 
 	return coinType, nil

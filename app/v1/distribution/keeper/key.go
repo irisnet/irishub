@@ -11,11 +11,6 @@ var (
 	DelegationDistInfoKey    = []byte{0x02} // prefix for each key to a delegation distribution
 	DelegatorWithdrawInfoKey = []byte{0x03} // prefix for each key to a delegator withdraw info
 	ProposerKey              = []byte{0x04} // key for storing the proposer operator address
-
-	// params store
-	ParamStoreKeyCommunityTax        = []byte("communitytax")
-	ParamStoreKeyBaseProposerReward  = []byte("baseproposerreward")
-	ParamStoreKeyBonusProposerReward = []byte("bonusproposerreward")
 )
 
 const (

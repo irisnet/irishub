@@ -5,6 +5,7 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
+	bankv1 "github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/bank"
@@ -45,6 +46,13 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 				return err
 			}
 
+			coins, err := cliCtx.ParseCoins(acc.GetCoins().String())
+			if err != nil {
+				return err
+			}
+
+			acc.SetCoins(coins)
+
 			return cliCtx.PrintOutput(acc)
 		},
 	}
@@ -80,7 +88,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryTokenStats), nil)
+			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
 			if err != nil {
 				return err
 			}

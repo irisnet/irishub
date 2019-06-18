@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset/tags"
 
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -13,7 +14,7 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	ck       bank.Keeper
+	bk       bank.Keeper
 	gk       guardian.Keeper
 
 	// codespace
@@ -22,11 +23,11 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		cdc:        cdc,
-		ck:         ck,
+		bk:         bk,
 		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
@@ -36,6 +37,89 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.K
 // return the codespace
 func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
+}
+
+// IssueToken issue a new token
+func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
+	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return nil, err
+	}
+	if k.HasToken(ctx, assetID) {
+		return nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
+	}
+
+	var owner sdk.AccAddress
+	if token.GetSource() == GATEWAY {
+		gateway, err := k.GetGateway(ctx, token.GetGateway())
+		if err != nil {
+			return nil, err
+		}
+		if !gateway.Owner.Equals(token.GetOwner()) {
+			return nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
+				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
+					gateway.Moniker, gateway.Owner, token.GetOwner()))
+		}
+
+		owner = gateway.Owner
+	} else if token.GetSource() == NATIVE {
+		owner = token.GetOwner()
+	}
+
+	err = k.SetToken(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	if owner != nil {
+		newCoin := sdk.Coins{sdk.NewCoin(token.GetDenom(), token.GetInitSupply())}
+
+		// Add coins into owner's account
+		_, _, err := k.bk.AddCoins(ctx, owner, newCoin)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	createTags := sdk.NewTags(
+		tags.Action, tags.ActionIssueToken,
+		tags.Id, []byte(token.GetUniqueID()),
+		tags.Denom, []byte(token.GetDenom()),
+		tags.Source, []byte(token.GetSource().String()),
+		tags.Gateway, []byte(token.GetGateway()),
+		tags.Owner, []byte(token.GetOwner().String()),
+	)
+
+	return createTags, nil
+}
+
+func (k Keeper) HasToken(ctx sdk.Context, id string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(KeyToken(id))
+}
+
+func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
+
+	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return err
+	}
+
+	store.Set(KeyToken(assetID), bz)
+	return nil
+}
+
+func (k Keeper) getToken(ctx sdk.Context, id string) (token FungibleToken, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyToken(id))
+	if bz == nil {
+		return token, false
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
+	return token, true
 }
 
 // CreateGateway creates a gateway
@@ -142,6 +226,12 @@ func (k Keeper) SetOwnerGateway(ctx sdk.Context, owner sdk.AccAddress, moniker s
 func (k Keeper) GetGateways(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, KeyGatewaysSubspace(owner))
+}
+
+// GetAllGateways retrieves all the gateways
+func (k Keeper) GetAllGateways(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, PrefixGateway)
 }
 
 func (k Keeper) Init(ctx sdk.Context) {
