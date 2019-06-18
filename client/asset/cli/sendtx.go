@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/client/context"
@@ -24,10 +25,10 @@ func preSignCmd(cmd *cobra.Command, _ []string) {
 // GetCmdIssueAsset implements the issue asset command
 func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "issue-asset",
-		Short: "issue an asset",
-		Example: "iriscli asset issue-asset --family=<family> --source=<source> --gateway=<gateway>" +
-			" --symbol=<symbol> --name=<asset-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
+		Use:   "issue-token",
+		Short: "issue a new token",
+		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker>" +
+			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
 		PreRun: preSignCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -42,17 +43,17 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			family, ok := asset.StringToAssetFamilyMap[viper.GetString(FlagFamily)]
+			family, ok := asset.StringToAssetFamilyMap[strings.ToLower(viper.GetString(FlagFamily))]
 			if !ok {
-				return fmt.Errorf("invalid asset family type %s", viper.GetString(FlagFamily))
+				return fmt.Errorf("invalid token family type %s", viper.GetString(FlagFamily))
 			}
 
-			source, ok := asset.StringToAssetSourceMap[viper.GetString(FlagSource)]
+			source, ok := asset.StringToAssetSourceMap[strings.ToLower(viper.GetString(FlagSource))]
 			if !ok {
-				return fmt.Errorf("invalid asset source type %s", viper.GetString(FlagSource))
+				return fmt.Errorf("invalid token source type %s", viper.GetString(FlagSource))
 			}
 
-			msg := asset.MsgIssueAsset{
+			msg := asset.MsgIssueToken{
 				Family:         family,
 				Source:         source,
 				Gateway:        viper.GetString(FlagGateway),

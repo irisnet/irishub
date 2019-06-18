@@ -2,6 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset"
+	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -9,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/stake"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/bank"
+	bankcli "github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -46,7 +49,18 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 				return err
 			}
 
-			return cliCtx.PrintOutput(acc)
+			coins, err := bankcli.ConvertToMainUnit(cliCtx, acc.GetCoins())
+			if err != nil {
+				return err
+			}
+
+			acc1, err := bankcli.ConvertAccountCoin(cliCtx, acc)
+			if err != nil {
+				return err
+			}
+
+			acc1.Coins = coins
+			return cliCtx.PrintOutput(acc1)
 		},
 	}
 }
@@ -72,39 +86,88 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+func isIris(assetId string) bool {
+	for _, ir := range sdk.IRIS.Units {
+		if assetId == ir.Denom {
+			return true
+		}
+	}
+	return false
+}
+
 // GetCmdQueryTokenStats performs token statistic query
-func GetCmdQueryTokenStats(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "token-stats",
+		Use:     "token-stats [id]",
 		Short:   "query token statistics",
-		Example: "iriscli bank token-stats",
+		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
+			if len(args) == 0 || isIris(strings.ToLower(args[0])) {
+				//get the token-stats of iris
+				resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
+				if err != nil {
+					return err
+				}
 
-			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
-			if err != nil {
-				return err
+				var tokenStats bank.TokenStats
+				err = cdc.UnmarshalJSON(resToken, &tokenStats)
+				if err != nil {
+					return err
+				}
+
+				resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
+				if err != nil {
+					return err
+				}
+				var poolStatus stakeTypes.PoolStatus
+				err = cdc.UnmarshalJSON(resPool, &poolStatus)
+				if err != nil {
+					return err
+				}
+
+				tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
+
+				return cliCtx.PrintOutput(tokenStats)
+			} else {
+				//get the token-stats of other assets
+				assetId := args[0]
+				params := asset.QueryTokenParams{
+					TokenId: assetId,
+				}
+				bz, err := cdc.MarshalJSON(params)
+				if err != nil {
+					return err
+				}
+
+				res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
+				if err != nil {
+					return err
+				}
+
+				var nAsset asset.FungibleToken
+				err = cdc.UnmarshalJSON(res, &nAsset)
+				if err != nil {
+					return err
+				}
+				var tokenStats bank.TokenStats
+
+				//get loose token from asset
+				looseToken := sdk.Coin{}
+				looseToken.Denom = nAsset.GetDenom()
+				looseToken.Amount = nAsset.GetTotalSupply()
+				tokenStats.LooseTokens = append(tokenStats.LooseTokens, looseToken)
+
+				//get burned token from burnAddress
+				burnedAcc, err := cliCtx.GetAccount(bankv1.BurnedCoinsAccAddr)
+				if err != nil {
+					return err
+				}
+				burnToken := sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
+				tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
+				return cliCtx.PrintOutput(tokenStats)
 			}
 
-			var tokenStats bank.TokenStats
-			err = cdc.UnmarshalJSON(resToken, &tokenStats)
-			if err != nil {
-				return err
-			}
-
-			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
-			if err != nil {
-				return err
-			}
-			var poolStatus stakeTypes.PoolStatus
-			err = cdc.UnmarshalJSON(resPool, &poolStatus)
-			if err != nil {
-				return err
-			}
-
-			tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
-
-			return cliCtx.PrintOutput(tokenStats)
 		},
 	}
 
