@@ -268,6 +268,7 @@ func calcFeeFactor(name string) float64 {
 // convertFeeToNativeToken converts fee to native token
 func convertFeeToNativeToken(fee float64) sdk.Int {
 	nativeTokenAmount := fee / math.Pow10(18)
+
 	if nativeTokenAmount > 1 {
 		nativeTokenAmount = math.Round(nativeTokenAmount)
 	} else {
@@ -279,8 +280,8 @@ func convertFeeToNativeToken(fee float64) sdk.Int {
 
 // GatewayFeeOutput is for the gateway fee query output
 type GatewayFeeOutput struct {
-	Exist bool     `exist` // indicate if the gateway has existed
-	Fee   sdk.Coin `fee`   // creation fee
+	Exist bool     `json:"exist"` // indicate if the gateway has existed
+	Fee   sdk.Coin `json:"fee"`   // creation fee
 }
 
 // String implements stringer
