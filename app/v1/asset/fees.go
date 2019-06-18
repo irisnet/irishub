@@ -24,7 +24,7 @@ func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker 
 
 	// check if the provided fee is enough
 	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway create fee: expected %s, got %s", actualFee, fee))
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway creation fee: expected %s, got %s", actualFee, fee))
 	}
 
 	return feeHandler(ctx, k, owner, actualFee)
@@ -37,7 +37,7 @@ func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbo
 
 	// check if the provided fee is enough
 	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token issurance fee: expected %s, got %s", actualFee, fee))
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token issuance fee: expected %s, got %s", actualFee, fee))
 	}
 
 	return feeHandler(ctx, k, owner, actualFee)
@@ -50,7 +50,7 @@ func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol
 
 	// check if the provided fee is enough
 	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token mint fee: expected %s, got %s", actualFee, fee))
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token minting fee: expected %s, got %s", actualFee, fee))
 	}
 
 	return feeHandler(ctx, k, owner, actualFee)
@@ -63,7 +63,7 @@ func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress
 
 	// check if the provided fee is enough
 	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token issurance fee: expected %s, got %s", actualFee, fee))
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token issuance fee: expected %s, got %s", actualFee, fee))
 	}
 
 	return feeHandler(ctx, k, owner, actualFee)
@@ -76,7 +76,7 @@ func GatewayTokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress,
 
 	// check if the provided fee is enough
 	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token mint fee: expected %s, got %s", actualFee, fee))
+		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token minting fee: expected %s, got %s", actualFee, fee))
 	}
 
 	return feeHandler(ctx, k, owner, actualFee)
@@ -120,10 +120,10 @@ func getGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Coin {
 func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
-	issueFTBaseFee := params.IssueTokenBaseFee
+	issueTokenBaseFee := params.IssueTokenBaseFee
 
 	// compute the fee
-	fee := calcFeeByBase(symbol, issueFTBaseFee.Amount)
+	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
 
 	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(fee))
 }
@@ -132,11 +132,11 @@ func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 func getTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
-	mintFTFeeRate := params.MintTokenFeeRatio
+	mintTokenFeeRate := params.MintTokenFeeRatio
 
 	// compute the issurance fee and mint fee
 	issueFee := getTokenIssueFee(ctx, k, symbol)
-	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintFTFeeRate)
+	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRate)
 
 	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(mintFee))
 }
