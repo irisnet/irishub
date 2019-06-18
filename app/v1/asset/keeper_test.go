@@ -33,7 +33,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.K
 	return ms, accountKey, assetKey, paramskey, paramsTkey
 }
 
-func TestKeeper_IssueAsset(t *testing.T) {
+func TestKeeper_IssueToken(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
@@ -49,13 +49,13 @@ func TestKeeper_IssueAsset(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(0x00, "c", "btc", "btc", 1, "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
-	_, err := keeper.IssueAsset(ctx, ft)
+	ft := NewFungibleToken(NATIVE, "gdex", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasAsset(ctx, "i.btc"))
+	assert.True(t, keeper.HasToken(ctx, "i.btc"))
 
-	asset, found := keeper.getAsset(ctx, "i.btc")
+	asset, found := keeper.getToken(ctx, "i.btc")
 	assert.True(t, found)
 
 	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
@@ -66,7 +66,7 @@ func TestKeeper_IssueAsset(t *testing.T) {
 	assert.Equal(t, msgJson, assetJson)
 }
 
-func TestKeeper_IssueGatewayAsset(t *testing.T) {
+func TestKeeper_IssueGatewayToken(t *testing.T) {
 	ms, _, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
@@ -92,27 +92,27 @@ func TestKeeper_IssueGatewayAsset(t *testing.T) {
 		Details:  details,
 		Website:  website,
 	}
-	gatewayAsset := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner}
-	gatewayAsset1 := BaseAsset{FUNGIBLE, GATEWAY, "moniker", "d", "e", 1, "f", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner}
+	gatewayToken := NewFungibleToken(GATEWAY, "moniker", "d", "e", 1, "f", "g", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner)
+	gatewayToken1 := NewFungibleToken(GATEWAY, "moniker", "d", "e", 1, "f", "g", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner)
 
 	// unknown gateway moniker
-	_, err := keeper.IssueAsset(ctx, gatewayAsset1)
+	_, err := keeper.IssueToken(ctx, gatewayToken1)
 	assert.Error(t, err)
-	asset, found := keeper.getAsset(ctx, "moniker.d")
+	asset, found := keeper.getToken(ctx, "moniker.d")
 	assert.False(t, found)
 	assert.Nil(t, asset)
 
 	// no unauthorized creator
 	keeper.SetGateway(ctx, gateway)
-	_, err = keeper.IssueAsset(ctx, gatewayAsset)
+	_, err = keeper.IssueToken(ctx, gatewayToken)
 	assert.Error(t, err)
-	asset, found = keeper.getAsset(ctx, "moniker.d")
+	asset, found = keeper.getToken(ctx, "moniker.d")
 	assert.False(t, found)
 	assert.Nil(t, asset)
 
-	_, err = keeper.IssueAsset(ctx, gatewayAsset1)
+	_, err = keeper.IssueToken(ctx, gatewayToken1)
 	assert.NoError(t, err)
-	asset, found = keeper.getAsset(ctx, "moniker.d")
+	asset, found = keeper.getToken(ctx, "moniker.d")
 	assert.True(t, found)
 	assert.Equal(t, "moniker.d", asset.GetUniqueID())
 }

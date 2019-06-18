@@ -13,7 +13,7 @@ const (
 	FlagSymbolAtSource = "symbol-at-source"
 	FlagName           = "name"
 	FlagDecimal        = "decimal"
-	FlagSymbolMinAlias = "symbol-mi-alias"
+	FlagSymbolMinAlias = "symbol-min-alias"
 	FlagInitialSupply  = "initial-supply"
 	FlagMaxSupply      = "max-supply"
 	FlagMintable       = "mintable"

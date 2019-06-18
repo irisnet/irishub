@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	bank "github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/bank"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -136,7 +136,7 @@ func getGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Int {
 func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 	// get params
 	params := k.GetParamSet(ctx)
-	issueFTBaseFee := params.IssueFTBaseFee
+	issueFTBaseFee := params.IssueTokenBaseFee
 
 	// compute the fee
 	fee := calcFeeByBase(symbol, issueFTBaseFee.Amount)
@@ -149,7 +149,7 @@ func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 func getTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Int {
 	// get params
 	params := k.GetParamSet(ctx)
-	mintFTFeeRate := params.MintFTFeeRatio
+	mintFTFeeRate := params.MintTokenFeeRatio
 
 	// compute the issurance fee and mint fee
 	issueFee := getTokenIssueFee(ctx, k, symbol)

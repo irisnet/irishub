@@ -15,15 +15,15 @@ import (
 // GetCmdQueryAsset implements the query asset command.
 func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-asset",
-		Short:   "Query details of a asset",
-		Example: "iriscli asset query-asset <asset-id>",
+		Use:     "query-token",
+		Short:   "Query details of a token",
+		Example: "iriscli asset query-token <token-id>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := asset.QueryAssetParams{
-				Asset: args[0],
+			params := asset.QueryTokenParams{
+				TokenId: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -31,18 +31,18 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
 			if err != nil {
 				return err
 			}
 
-			var asset asset.Asset
-			err = cdc.UnmarshalJSON(res, &asset)
+			var token asset.FungibleToken
+			err = cdc.UnmarshalJSON(res, &token)
 			if err != nil {
 				return err
 			}
 
-			return cliCtx.PrintOutput(asset)
+			return cliCtx.PrintOutput(token)
 		},
 	}
 

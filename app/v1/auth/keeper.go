@@ -218,10 +218,18 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	if coins == nil || !coins.IsValid() {
 		return
 	}
+
+	// loose token only contains iris-atto
+	increaseAmount := coins.AmountOf(sdk.NativeTokenMinDenom)
+	if increaseAmount.IsZero() {
+		return
+	}
+	increaseCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, increaseAmount)}
+
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// increase totalLoosenToken
-	totalLoosenToken = totalLoosenToken.Plus(coins)
+	totalLoosenToken = totalLoosenToken.Plus(increaseCoins)
 	if !totalLoosenToken.IsNotNegative() {
 		panic(fmt.Errorf("total loosen token is overflow"))
 	}
@@ -231,7 +239,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	store.Set(TotalLoosenTokenKey, bzNew)
 
 	ctx.Logger().Info("Execute IncreaseTotalLoosenToken Successed",
-		"increaseCoins", coins.String(), "totalLoosenToken", totalLoosenToken.String())
+		"increaseCoins", increaseCoins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
@@ -239,10 +247,18 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	if coins == nil || !coins.IsValid() {
 		return
 	}
+
+	// loose token only contains iris-atto
+	decreaseAmount := coins.AmountOf(sdk.NativeTokenMinDenom)
+	if decreaseAmount.IsZero() {
+		return
+	}
+	decreaseCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, decreaseAmount)}
+
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// decrease totalLoosenToken
-	totalLoosenToken, negative := totalLoosenToken.SafeMinus(coins)
+	totalLoosenToken, negative := totalLoosenToken.SafeMinus(decreaseCoins)
 	if negative {
 		panic(fmt.Errorf("total loosen token is negative"))
 	}
@@ -252,7 +268,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	store.Set(TotalLoosenTokenKey, bzNew)
 
 	ctx.Logger().Info("Execute DecreaseTotalLoosenToken Successed",
-		"decreaseCoins", coins.String(), "totalLoosenToken", totalLoosenToken.String())
+		"decreaseCoins", decreaseCoins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
 //----------------------------------------

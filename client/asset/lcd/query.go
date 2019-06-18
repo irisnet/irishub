@@ -9,6 +9,16 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
+	// Get token by id
+	r.HandleFunc(
+		"/asset/tokens/{id}",
+		queryTokenHandlerFn(cliCtx, cdc),
+	).Methods("GET")
+	// Search tokens
+	r.HandleFunc(
+		"/asset/tokens",
+		queryTokensHandlerFn(cliCtx, cdc),
+	).Methods("GET")
 	// Get the gateway from a moniker
 	r.HandleFunc(
 		"/asset/gateways/{moniker}",
@@ -32,6 +42,16 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		"/asset/fees/tokens/{id}",
 		tokenFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
+}
+
+// queryTokenHandlerFn performs token information query
+func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return queryToken(cliCtx, cdc, "custom/asset/tokens/{id}")
+}
+
+// queryTokenHandlerFn performs token information query
+func queryTokensHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return queryTokens(cliCtx, cdc, "custom/asset/tokens")
 }
 
 // monikerGatewayHandlerFn is the HTTP request handler to query a gateway of the given moniker
