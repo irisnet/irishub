@@ -39,40 +39,40 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
-// IssueAsset issue a new asset
-func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
-	assetID, err := GetKeyID(asset.GetSource(), asset.GetSymbol(), asset.GetGateway())
+// IssueToken issue a new token
+func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
+	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return nil, err
 	}
-	if k.HasAsset(ctx, assetID) {
-		return nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("asset already exists: %s", asset.GetUniqueID()))
+	if k.HasToken(ctx, assetID) {
+		return nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
 	}
 
 	var owner sdk.AccAddress
-	if asset.GetSource() == GATEWAY {
-		gateway, err := k.GetGateway(ctx, asset.GetGateway())
+	if token.GetSource() == GATEWAY {
+		gateway, err := k.GetGateway(ctx, token.GetGateway())
 		if err != nil {
 			return nil, err
 		}
-		if !gateway.Owner.Equals(asset.GetOwner()) {
+		if !gateway.Owner.Equals(token.GetOwner()) {
 			return nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
-				fmt.Sprintf("Gateway %s asset can only be created by %s, unauthorized creator %s",
-					gateway.Moniker, gateway.Owner, asset.GetOwner()))
+				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
+					gateway.Moniker, gateway.Owner, token.GetOwner()))
 		}
 
 		owner = gateway.Owner
-	} else if asset.GetSource() == NATIVE {
-		owner = asset.GetOwner()
+	} else if token.GetSource() == NATIVE {
+		owner = token.GetOwner()
 	}
 
-	err = k.SetAsset(ctx, asset)
+	err = k.SetToken(ctx, token)
 	if err != nil {
 		return nil, err
 	}
 
 	if owner != nil {
-		newCoin := sdk.Coins{sdk.NewCoin(asset.GetDenom(), asset.GetInitSupply())}
+		newCoin := sdk.Coins{sdk.NewCoin(token.GetDenom(), token.GetInitSupply())}
 
 		// Add coins into owner's account
 		_, _, err := k.bk.AddCoins(ctx, owner, newCoin)
@@ -83,43 +83,43 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 
 	createTags := sdk.NewTags(
 		tags.Action, tags.ActionIssueToken,
-		tags.Id, []byte(asset.GetUniqueID()),
-		tags.Denom, []byte(asset.GetDenom()),
-		tags.Source, []byte(asset.GetSource().String()),
-		tags.Gateway, []byte(asset.GetGateway()),
-		tags.Owner, []byte(asset.GetOwner().String()),
+		tags.Id, []byte(token.GetUniqueID()),
+		tags.Denom, []byte(token.GetDenom()),
+		tags.Source, []byte(token.GetSource().String()),
+		tags.Gateway, []byte(token.GetGateway()),
+		tags.Owner, []byte(token.GetOwner().String()),
 	)
 
 	return createTags, nil
 }
 
-func (k Keeper) HasAsset(ctx sdk.Context, id string) bool {
+func (k Keeper) HasToken(ctx sdk.Context, id string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyAsset(id))
+	return store.Has(KeyToken(id))
 }
 
-func (k Keeper) SetAsset(ctx sdk.Context, asset Asset) sdk.Error {
+func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(asset)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	assetID, err := GetKeyID(asset.GetSource(), asset.GetSymbol(), asset.GetGateway())
+	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
 
-	store.Set(KeyAsset(assetID), bz)
+	store.Set(KeyToken(assetID), bz)
 	return nil
 }
 
-func (k Keeper) getAsset(ctx sdk.Context, id string) (asset Asset, found bool) {
+func (k Keeper) getToken(ctx sdk.Context, id string) (token FungibleToken, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyAsset(id))
+	bz := store.Get(KeyToken(id))
 	if bz == nil {
-		return asset, false
+		return token, false
 	}
 
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &asset)
-	return asset, true
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
+	return token, true
 }
 
 // CreateGateway creates a gateway

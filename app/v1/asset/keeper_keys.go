@@ -10,9 +10,9 @@ var (
 	PrefixGateway = []byte("gateways:") // prefix for the gateway store
 )
 
-// KeyAsset returns the key of the specified asset source and id
-func KeyAsset(id string) []byte {
-	return []byte(fmt.Sprintf("assets:%s", id))
+// KeyToken returns the key of the specified token source and id
+func KeyToken(id string) []byte {
+	return []byte(fmt.Sprintf("token:%s", id))
 }
 
 // KeyGateway returns the key of the specified moniker

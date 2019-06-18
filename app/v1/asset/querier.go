@@ -44,7 +44,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	token, found := keeper.getAsset(ctx, GetKeyIDFromUniqueID(params.TokenId))
+	token, found := keeper.getToken(ctx, GetKeyIDFromUniqueID(params.TokenId))
 	if !found {
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 	}
