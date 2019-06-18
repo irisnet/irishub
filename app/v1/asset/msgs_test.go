@@ -84,7 +84,7 @@ func TestMsgCreateGatewayValidation(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website)
+		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website, sdk.Coin{})
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
