@@ -141,11 +141,12 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 
 			//get burned token from burnAddress
 			burnedAcc, err := cliCtx.GetAccount(bank.BurnedCoinsAccAddr)
-			burnToken := sdk.Coin{}
-			if err == nil {
-				burnToken = sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
-				tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
 			}
+			burnToken := sdk.Coin{nAsset.GetDenom(), burnedAcc.Coins.AmountOf(nAsset.GetDenom())}
+			tokenStats.BurnedTokens = append(tokenStats.BurnedTokens, burnToken)
 			utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 		}
 
