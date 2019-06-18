@@ -2,6 +2,8 @@ package lcd
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -12,7 +14,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"net/http"
 )
 
 func queryToken(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
@@ -198,7 +199,12 @@ func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string)
 func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+
 		moniker := vars["moniker"]
+		if err := asset.ValidateMoniker(moniker); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		params := asset.QueryGatewayFeeParams{
 			Moniker: moniker,
@@ -221,13 +227,18 @@ func queryGatewayFee(cliCtx context.CLIContext, cdc *codec.Codec, endpoint strin
 	}
 }
 
-// queryFTFees queries the asset related fees from the specified endpoint
-func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
+// queryTokenFees queries the token related fees from the specified endpoint
+func queryTokenFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
 
-		params := asset.QueryFTFeesParams{
+		id := vars["id"]
+		if err := asset.CheckAssetID(id); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		params := asset.QueryTokenFeesParams{
 			ID: id,
 		}
 
@@ -238,7 +249,7 @@ func queryFTFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 		}
 
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s/fungible-tokens", protocol.AssetRoute, asset.QueryFees), bz)
+			fmt.Sprintf("custom/%s/%s/tokens", protocol.AssetRoute, asset.QueryFees), bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
