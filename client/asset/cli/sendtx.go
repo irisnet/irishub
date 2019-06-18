@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/client/context"
@@ -42,12 +43,12 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			family, ok := asset.StringToAssetFamilyMap[viper.GetString(FlagFamily)]
+			family, ok := asset.StringToAssetFamilyMap[strings.ToLower(viper.GetString(FlagFamily))]
 			if !ok {
 				return fmt.Errorf("invalid token family type %s", viper.GetString(FlagFamily))
 			}
 
-			source, ok := asset.StringToAssetSourceMap[viper.GetString(FlagSource)]
+			source, ok := asset.StringToAssetSourceMap[strings.ToLower(viper.GetString(FlagSource))]
 			if !ok {
 				return fmt.Errorf("invalid token source type %s", viper.GetString(FlagSource))
 			}
