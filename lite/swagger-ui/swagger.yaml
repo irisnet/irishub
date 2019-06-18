@@ -477,11 +477,17 @@ paths:
                 type: object
                 properties:
                   loose_tokens:
-                    $ref: '#/components/schemas/Coin'
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
                   bonded_tokens:
-                    $ref: '#/components/schemas/Coin'
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
                   burned_tokens:
-                    $ref: '#/components/schemas/Coin'r
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
         '500':
           description: Internal Server Error
   '/bank/accounts/{address}':
