@@ -85,6 +85,15 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+func isIris(assetId string) bool {
+	for _, ir := range sdk.IRIS.Units {
+		if assetId == ir.Denom {
+			return true
+		}
+	}
+	return false
+}
+
 // GetCmdQueryTokenStats performs token statistic query
 func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	cmd := &cobra.Command{
@@ -93,7 +102,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
-			if len(args) == 0 || args[0] == "iris" || args[0] == "iris-atto" {
+			if len(args) == 0 || isIris(args[0]) {
 				//get the token-stats of iris
 				resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
 				if err != nil {
@@ -135,7 +144,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 					return err
 				}
 
-				var nAsset asset.Asset
+				var nAsset asset.FungibleToken
 				err = cdc.UnmarshalJSON(res, &nAsset)
 				if err != nil {
 					return err

@@ -79,7 +79,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		vars := mux.Vars(r)
 		assetId := vars["id"]
 
-		if len(assetId) == 0 || assetId == "iris" || assetId == "iris-atto" {
+		if len(assetId) == 0 || isIris(assetId) {
 			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryTokenStats), nil)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -124,7 +124,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 				return
 			}
 
-			var nAsset asset.Asset
+			var nAsset asset.FungibleToken
 			err = cdc.UnmarshalJSON(res, &nAsset)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -151,4 +151,13 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		}
 
 	}
+}
+
+func isIris(assetId string) bool {
+	for _, ir := range sdk.IRIS.Units {
+		if assetId == ir.Denom {
+			return true
+		}
+	}
+	return false
 }
