@@ -5,7 +5,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// FungibleToken errors reserve 100 ~ 199.
+// Asset errors reserve 100 ~ 199.
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
@@ -37,7 +37,7 @@ const (
 )
 
 //----------------------------------------
-// FungibleToken error constructors
+// Asset error constructors
 
 func ErrNilAssetOwner(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeNilAssetOwner, msg)

@@ -29,7 +29,7 @@ func AssetFamilyFromString(str string) (AssetFamily, error) {
 	if family, ok := StringToAssetFamilyMap[strings.ToLower(str)]; ok {
 		return family, nil
 	}
-	return AssetFamily(0xff), errors.Errorf("'%s' is not a valid token family", str)
+	return AssetFamily(0xff), errors.Errorf("'%s' is not a valid asset family", str)
 }
 
 func IsValidAssetFamily(family AssetFamily) bool {
