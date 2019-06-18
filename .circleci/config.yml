@@ -48,7 +48,7 @@ jobs:
       - run:
           name: push irishub testnet image
           command: docker push irisnet/irishub:testnet-$TAG
-  RunTests:
+  UnitTest:
     docker:
       - image: circleci/golang:1.12.5
     steps:
