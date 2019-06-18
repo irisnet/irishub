@@ -6,8 +6,8 @@ import (
 
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
-	Params         Params          `json:"params"` // asset params
-	FungibleTokens []FungibleToken `json:"tokens"` // issued assets
+	Params Params          `json:"params"` // asset params
+	Tokens []FungibleToken `json:"tokens"` // issued assets
 }
 
 // InitGenesis - store genesis parameters
@@ -18,31 +18,31 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 	k.SetParamSet(ctx, data.Params)
 
-	// TODO: init assets with data.FungibleTokens
+	// TODO: init assets with data.Tokens
 }
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	var tokens []FungibleToken // TODO: extract existing tokens from app state
 	return GenesisState{
-		Params:         k.GetParamSet(ctx),
-		FungibleTokens: tokens,
+		Params: k.GetParamSet(ctx),
+		Tokens: tokens,
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		Params:         DefaultParams(),
-		FungibleTokens: []FungibleToken{},
+		Params: DefaultParams(),
+		Tokens: []FungibleToken{},
 	}
 }
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
-		Params:         DefaultParamsForTest(),
-		FungibleTokens: []FungibleToken{},
+		Params: DefaultParamsForTest(),
+		Tokens: []FungibleToken{},
 	}
 }
 

@@ -135,7 +135,7 @@ func (v ValidatorOutput) String() string {
   Validator Consensus Pubkey:  %s
   Jailed:                      %v
   Status:                      %s
-  FungibleTokens:                      %s
+  Tokens:                      %s
   Delegator Shares:            %s
   Description:                 %s
   Unbonding Height:            %d
@@ -168,8 +168,8 @@ type PoolOutput struct {
 
 func (p PoolOutput) String() string {
 	return fmt.Sprintf(`Pool:
-  Loose FungibleTokens:   %s
-  Bonded FungibleTokens:  %s
+  Loose Tokens:   %s
+  Bonded Tokens:  %s
   Token Supply:   %s
   Bonded Ratio:   %v`, p.LooseTokens,
 		p.BondedTokens, p.TokenSupply, p.BondedRatio)
