@@ -128,9 +128,9 @@ func DefaultParams() Params {
 func DefaultParamsForTest() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
+		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(30, 18)),
 		MintTokenFeeRatio:    sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(60, 18)),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }

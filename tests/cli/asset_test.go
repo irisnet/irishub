@@ -29,14 +29,13 @@ func TestIrisCLIGateway(t *testing.T) {
 	require.Equal(t, "50iris", fooCoin)
 
 	gatewayQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli asset query-gateway --moniker=uniquenm %v", flags), "")
-	require.Equal(t, "null", gatewayQuery)
-
-	// TODO: delete this comment after realizing gateway creation
+	//TODO
+	require.Equal(t, "", gatewayQuery)
 
 	// define constant gateway fields
 	moniker := "testgw"
-	identity := "test gateway identity"
-	details := "test gateway"
+	identity := "test-gateway-identity"
+	details := "test-gateway"
 	website := "https://www.test-gateway.io"
 
 	// create a gateway
@@ -46,17 +45,19 @@ func TestIrisCLIGateway(t *testing.T) {
 	spStr += fmt.Sprintf(" --identity=%s", identity)
 	spStr += fmt.Sprintf(" --details=%s", details)
 	spStr += fmt.Sprintf(" --website=%s", website)
+	spStr += fmt.Sprintf(" --create-fee=%s", "30iris")
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
-	executeWrite(t, spStr, sdk.DefaultKeyPass)
+	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	num := getAmountFromCoinStr(fooCoin)
 
-	if !(num > 44 && num < 45) {
-		t.Error("Test Failed: (44, 45) expected, recieved:", num)
+	// TODO: balance - create-fee
+	if !(num > 41 && num < 45) {
+		t.Error("Test Failed: (41, 45) expected, recieved:", num)
 	}
 
 	gateway := executeGetGateway(t, fmt.Sprintf("iriscli asset query-gateway --moniker=testgw --output=json %v", flags))
@@ -65,6 +66,6 @@ func TestIrisCLIGateway(t *testing.T) {
 	require.Equal(t, details, gateway.Details)
 	require.Equal(t, website, gateway.Website)
 
-	gateways := executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=foo %v", flags))
+	gateways := executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", fooAddr.String(), flags))
 	require.Equal(t, 1, len(gateways))
 }
