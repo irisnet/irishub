@@ -18,7 +18,6 @@ type BaseToken struct {
 	SymbolAtSource string           `json:"symbol_at_source"`
 	SymbolMinAlias string           `json:"symbol_min_alias"`
 	InitialSupply  types.Int        `json:"initial_supply"`
-	TotalSupply    types.Int        `json:"total_supply"`
 	MaxSupply      types.Int        `json:"max_supply"`
 	Mintable       bool             `json:"mintable"`
 	Owner          types.AccAddress `json:"owner"`
@@ -35,14 +34,13 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 		SymbolAtSource: strings.ToLower(symbolAtSource),
 		SymbolMinAlias: strings.ToLower(symbolMinAlias),
 		InitialSupply:  initialSupply,
-		TotalSupply:    totalSupply,
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,
 		Owner:          owner,
 	}
 }
 
-// Fungible FungibleToken
+// FungibleToken
 type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
@@ -102,10 +100,6 @@ func (ft FungibleToken) GetInitSupply() types.Int {
 	return ft.InitialSupply
 }
 
-func (ft FungibleToken) GetTotalSupply() types.Int {
-	return ft.TotalSupply
-}
-
 func (ft FungibleToken) GetCoinType() types.CoinType {
 
 	units := make(types.Units, 2)
@@ -126,7 +120,6 @@ func (ft FungibleToken) String() string {
 
 	initSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.InitialSupply).String(), ft.GetUniqueID())
 	maxSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.MaxSupply).String(), ft.GetUniqueID())
-	totalSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.TotalSupply).String(), ft.GetUniqueID())
 
 	return fmt.Sprintf(`FungibleToken %s:
   Family:            %s
@@ -138,12 +131,11 @@ func (ft FungibleToken) String() string {
   Symbol Min Alias:  %s
   Decimal:           %d
   Initial Supply:    %s
-  Total Supply:      %s
   Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
 		ft.GetUniqueID(), ft.Family, ft.Source, ft.Gateway, ft.Name, ft.Symbol, ft.SymbolAtSource, ft.SymbolMinAlias,
-		ft.Decimal, initSupply, totalSupply, maxSupply, ft.Mintable, ft.Owner.String())
+		ft.Decimal, initSupply, maxSupply, ft.Mintable, ft.Owner.String())
 }
 
 // -----------------------------
