@@ -18,18 +18,22 @@ const (
 	FlagMaxSupply      = "max-supply"
 	FlagMintable       = "mintable"
 
-	FlagOwner      = "owner"
-	FlagMoniker    = "moniker"
-	FlagIdentity   = "identity"
-	FlagDetails    = "details"
-	FlagWebsite    = "website"
-	FlagGatewayFee = "gateway-fee"
+	FlagOwner     = "owner"
+	FlagMoniker   = "moniker"
+	FlagIdentity  = "identity"
+	FlagDetails   = "details"
+	FlagWebsite   = "website"
+	FlagCreateFee = "create-fee"
+
+	FlagSubject = "subject"
+	FlagID      = "id"
 )
 
 var (
 	FsAssetIssue    = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayCreate = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayEdit   = flag.NewFlagSet("", flag.ContinueOnError)
+	FsFeeQuery      = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -49,10 +53,14 @@ func init() {
 	FsGatewayCreate.String(FlagIdentity, "", "the gateway identity")
 	FsGatewayCreate.String(FlagDetails, "", "the gateway description")
 	FsGatewayCreate.String(FlagWebsite, "", "the external website")
-	FsGatewayCreate.String(FlagGatewayFee, "", "the fee for gateway creation")
+	FsGatewayCreate.String(FlagCreateFee, "", "the fee for gateway creation")
 
 	FsGatewayEdit.String(FlagMoniker, "", "the unique gateway name")
 	FsGatewayEdit.String(FlagIdentity, "", "the gateway identity")
 	FsGatewayEdit.String(FlagDetails, "", "the gateway description")
 	FsGatewayEdit.String(FlagWebsite, "", "the external website")
+
+	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
+	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
+	FsFeeQuery.String(FlagID, "", "the fungible token id")
 }

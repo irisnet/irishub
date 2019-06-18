@@ -37,10 +37,10 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		gatewayFeeHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// Get fungible token fees
+	// Get token fees
 	r.HandleFunc(
-		"/asset/fees/fungible-tokens/{id}",
-		ftFeesHandlerFn(cliCtx, cdc),
+		"/asset/fees/tokens/{id}",
+		tokenFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
 
@@ -69,7 +69,7 @@ func gatewayFeeHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 	return queryGatewayFee(cliCtx, cdc, "custom/asset/fees/gateways")
 }
 
-// ftFeesHandlerFn is the HTTP request handler to query FTs fees
-func ftFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryFTFees(cliCtx, cdc, "custom/asset/fees/fungible-tokens")
+// tokenFeesHandlerFn is the HTTP request handler to query token fees
+func tokenFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return queryTokenFees(cliCtx, cdc, "custom/asset/fees/tokens")
 }
