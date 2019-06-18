@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/asset"
+	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -102,7 +103,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
-			if len(args) == 0 || isIris(args[0]) {
+			if len(args) == 0 || isIris(strings.ToLower(args[0])) {
 				//get the token-stats of iris
 				resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), nil)
 				if err != nil {

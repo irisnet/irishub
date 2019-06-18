@@ -79,7 +79,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		vars := mux.Vars(r)
 		assetId := vars["id"]
 
-		if len(assetId) == 0 || isIris(assetId) {
+		if isIris(strings.ToLower(assetId)) {
 			resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryTokenStats), nil)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
