@@ -3,21 +3,21 @@ workflows:
   Deploy:
     jobs:
       - BuildAndDeploy:
-        filters:
-          branches:
-            only:
-              - master
-          tags:
-            only:
-              - /v.*/
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only:
+                - /v.*/
   Tests:
     jobs:
       - UnitTest:
-        filters:
-          branches:
-            only:
-              - master
-              - develop
+          filters:
+            branches:
+              only:
+                - master
+                - develop
 jobs:
   BuildAndDeploy:
     machine:
