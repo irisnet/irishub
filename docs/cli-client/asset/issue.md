@@ -39,11 +39,6 @@ iriscli asset issue-token [flags]
 iriscli asset issue-token --family=fungible --name=kittyToken --symbol=kitty --source=native --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
 ```
 
-### Issue external token
-
-```
-iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=external --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>   --fee=1iris
-```
 
 ### Issue gateway token
 
