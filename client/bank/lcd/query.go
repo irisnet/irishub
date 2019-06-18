@@ -109,8 +109,8 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 			utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 		} else {
 			cliCtx = cliCtx.WithAccountDecoder(decoder)
-			params := asset.QueryAssetParams{
-				Asset: assetId,
+			params := asset.QueryTokenParams{
+				TokenId: assetId,
 			}
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
@@ -118,7 +118,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 				return
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return

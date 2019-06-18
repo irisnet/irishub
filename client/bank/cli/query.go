@@ -110,15 +110,15 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 			} else {
 				//get the token-stats of other assets
 				assetId := args[0]
-				params := asset.QueryAssetParams{
-					Asset: assetId,
+				params := asset.QueryTokenParams{
+					TokenId: assetId,
 				}
 				bz, err := cdc.MarshalJSON(params)
 				if err != nil {
 					return err
 				}
 
-				res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+				res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
 				if err != nil {
 					return err
 				}
