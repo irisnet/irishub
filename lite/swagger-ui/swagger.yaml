@@ -3244,6 +3244,64 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
+  '/asset/tokens/{id}':
+    get:
+      summary: Query the token with the specified id
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: id
+          description: the unique id of the destination token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+  '/asset/tokens':
+    get:
+      summary: Query the token with the specified params
+      tags:
+        - Asset
+      parameters:
+        - in: query
+          name: source
+          description: 'the source of the destination token, options: native, external, gateway'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: owner
+          description: 'the owner address of the destination token, optional when source is native, ignored when source is not native'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: gateway
+          description: 'the gateway moniker of the destination token, optional when source is gateway'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
   '/asset/gateways/{moniker}':
     get:
       summary: Query the gateway with the specified moniker
@@ -3893,6 +3951,35 @@ components:
         del_pool_withdrawal_height:
           type: string
           example: '0'
+    Token:
+      type: object
+      properties:
+        family:
+          type: string
+        source:
+          type: string
+        gateway:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        decimal:
+          type: integer
+        symbol_at_source:
+          type: string
+        symbol_min_alias:
+          type: string
+        initial_supply:
+          type: string
+        total_supply:
+          type: string
+        max_supply:
+          type: string
+        mintable:
+          type: boolean
+        owner:
+          $ref: '#/components/schemas/Address'
     Gateway:
       type: object
       properties:

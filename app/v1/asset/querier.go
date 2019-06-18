@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	QueryAsset    = "asset"
+	QueryToken    = "token"
 	QueryGateway  = "gateway"
 	QueryGateways = "gateways"
 	QueryFees     = "fees"
@@ -18,8 +18,8 @@ const (
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryAsset:
-			return queryAsset(ctx, req, k)
+		case QueryToken:
+			return queryToken(ctx, req, k)
 		case QueryGateway:
 			return queryGateway(ctx, req, k)
 		case QueryGateways:
@@ -32,24 +32,25 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-// QueryAssetParams is the query parameters for 'custom/asset/asset'
-type QueryAssetParams struct {
-	Asset string
+// QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
+type QueryTokenParams struct {
+	TokenId string
 }
 
-func queryAsset(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryAssetParams
+func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryTokenParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	asset, found := keeper.getAsset(ctx, GetKeyIDFromUniqueID(params.Asset))
+	token, found := keeper.getAsset(ctx, GetKeyIDFromUniqueID(params.TokenId))
 	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("asset %s does not exist", params.Asset))
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, asset)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
+
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}

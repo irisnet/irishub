@@ -2,14 +2,15 @@ package asset
 
 import (
 	"fmt"
-	"regexp"
-
 	sdk "github.com/irisnet/irishub/types"
+	"regexp"
+	"strings"
 )
 
 const (
 	// MsgRoute identifies transaction types
-	MsgRoute = "asset"
+	MsgRoute          = "asset"
+	MsgTypeIssueAsset = "issue_asset"
 )
 
 var (
@@ -73,7 +74,7 @@ func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, sy
 
 // Implements Msg.
 func (msg MsgIssueAsset) Route() string { return MsgRoute }
-func (msg MsgIssueAsset) Type() string  { return "issue_asset" }
+func (msg MsgIssueAsset) Type() string  { return MsgTypeIssueAsset }
 
 // Implements Msg.
 func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
@@ -113,6 +114,10 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 	symbolLen := len(msg.Symbol)
 	if symbolLen < MinimumAssetSymbolSize || symbolLen > MaximumAssetSymbolSize || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	}
+
+	if strings.Contains(strings.ToLower(msg.Symbol), sdk.NativeTokenName) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol %s, cat not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
 	}
 
 	symbolAtSourceLen := len(msg.SymbolAtSource)

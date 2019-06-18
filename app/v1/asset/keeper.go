@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset/tags"
 
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -81,8 +82,12 @@ func (k Keeper) IssueAsset(ctx sdk.Context, asset Asset) (sdk.Tags, sdk.Error) {
 	}
 
 	createTags := sdk.NewTags(
-		"denom", []byte(asset.GetDenom()),
-		"owner", []byte(asset.GetOwner().String()),
+		tags.Action, tags.ActionIssueToken,
+		tags.Id, []byte(asset.GetUniqueID()),
+		tags.Denom, []byte(asset.GetDenom()),
+		tags.Source, []byte(asset.GetSource().String()),
+		tags.Gateway, []byte(asset.GetGateway()),
+		tags.Owner, []byte(asset.GetOwner().String()),
 	)
 
 	return createTags, nil
