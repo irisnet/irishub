@@ -49,18 +49,21 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 				return err
 			}
 
-			coins, err := bankcli.ConvertToMainUnit(cliCtx, acc.GetCoins())
-			if err != nil {
-				return err
-			}
+			if cliCtx.OutputFormat == "text" {
+				coins, err := bankcli.ConvertToMainUnit(cliCtx, acc.GetCoins())
+				if err != nil {
+					return err
+				}
 
-			acc1, err := bankcli.ConvertAccountCoin(cliCtx, acc)
-			if err != nil {
-				return err
-			}
+				acc1, err := bankcli.ConvertAccountCoin(cliCtx, acc)
+				if err != nil {
+					return err
+				}
 
-			acc1.Coins = coins
-			return cliCtx.PrintOutput(acc1)
+				acc1.Coins = coins
+				return cliCtx.PrintOutput(acc1)
+			}
+			return cliCtx.PrintOutput(acc)
 		},
 	}
 }

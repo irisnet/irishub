@@ -69,6 +69,7 @@ func modifyGenesisState(genesisState v1.GenesisFileState) v1.GenesisFileState {
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
+	genesisState.AssetData = asset.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
