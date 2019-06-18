@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math"
 
-	bank "github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/bank"
 	sdk "github.com/irisnet/irishub/types"
 )
 

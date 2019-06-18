@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/stake"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/bank"
+	bankcli "github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -47,7 +48,18 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 				return err
 			}
 
-			return cliCtx.PrintOutput(acc)
+			coins, err := bankcli.ConvertToMainUnit(cliCtx, acc.GetCoins())
+			if err != nil {
+				return err
+			}
+
+			acc1, err := bankcli.ConvertAccountCoin(cliCtx, acc)
+			if err != nil {
+				return err
+			}
+
+			acc1.Coins = coins
+			return cliCtx.PrintOutput(acc1)
 		},
 	}
 }

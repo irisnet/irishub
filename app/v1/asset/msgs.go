@@ -10,7 +10,7 @@ import (
 const (
 	// MsgRoute identifies transaction types
 	MsgRoute          = "asset"
-	MsgTypeIssueAsset = "issue_asset"
+	MsgTypeIssueToken = "issue_token"
 )
 
 var (
@@ -34,10 +34,10 @@ var (
 	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
 )
 
-var _, _, _ sdk.Msg = &MsgIssueAsset{}, &MsgCreateGateway{}, &MsgEditGateway{}
+var _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgCreateGateway{}, &MsgEditGateway{}
 
-// MsgIssueAsset
-type MsgIssueAsset struct {
+// MsgIssueToken
+type MsgIssueToken struct {
 	Family         AssetFamily    `json:"family"`
 	Source         AssetSource    `json:"source"`
 	Gateway        string         `json:"gateway"`
@@ -53,9 +53,9 @@ type MsgIssueAsset struct {
 	Fee            sdk.Coins      `json:"fee"`
 }
 
-// NewMsgIssueAsset - construct asset issue msg.
-func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueAsset {
-	return MsgIssueAsset{
+// NewMsgIssueToken - construct asset issue msg.
+func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueToken {
+	return MsgIssueToken{
 		Family:         family,
 		Source:         source,
 		Gateway:        gateway,
@@ -73,11 +73,11 @@ func NewMsgIssueAsset(family AssetFamily, source AssetSource, gateway string, sy
 }
 
 // Implements Msg.
-func (msg MsgIssueAsset) Route() string { return MsgRoute }
-func (msg MsgIssueAsset) Type() string  { return MsgTypeIssueAsset }
+func (msg MsgIssueToken) Route() string { return MsgRoute }
+func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
 // Implements Msg.
-func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
+func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 
 	switch msg.Source {
 	case NATIVE:
@@ -146,7 +146,7 @@ func (msg MsgIssueAsset) ValidateBasic() sdk.Error {
 }
 
 // Implements Msg.
-func (msg MsgIssueAsset) GetSignBytes() []byte {
+func (msg MsgIssueToken) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -155,7 +155,7 @@ func (msg MsgIssueAsset) GetSignBytes() []byte {
 }
 
 // Implements Msg.
-func (msg MsgIssueAsset) GetSigners() []sdk.AccAddress {
+func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
 

@@ -11,8 +11,8 @@ import (
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case MsgIssueAsset:
-			return handleIssueAsset(ctx, k, msg)
+		case MsgIssueToken:
+			return handleIssueToken(ctx, k, msg)
 		case MsgCreateGateway:
 			return handleMsgCreateGateway(ctx, k, msg)
 		case MsgEditGateway:
@@ -25,19 +25,19 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
-// handleIssueAsset handles MsgIssueAsset
-func handleIssueAsset(ctx sdk.Context, k Keeper, msg MsgIssueAsset) sdk.Result {
-	var asset Asset
+// handleIssueToken handles MsgIssueToken
+func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
+	var token FungibleToken
 	switch msg.Family {
 	case FUNGIBLE:
 		totalSupply := msg.InitialSupply
 		decimal := int(msg.Decimal)
-		asset = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
+		token = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	default:
-		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
+		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid token family type %s", msg.Family)).Result()
 	}
 
-	tags, err := k.IssueAsset(ctx, asset)
+	tags, err := k.IssueToken(ctx, token)
 	if err != nil {
 		return err.Result()
 	}
