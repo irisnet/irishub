@@ -206,6 +206,10 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 	}
 
 	// check the fee
+	if msg.Fee.Denom != sdk.NativeTokenMinDenom {
+		return ErrIncorrectFeeDenom(DefaultCodespace, fmt.Sprintf("incorrect fee denom: expected %s, got %s", sdk.NativeTokenMinDenom, msg.Fee.Denom))
+	}
+
 	if !msg.Fee.IsNotNegative() {
 		return ErrNegativeFee(DefaultCodespace, "the fee must not be negative")
 	}

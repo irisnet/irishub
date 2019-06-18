@@ -151,6 +151,7 @@ func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
 }
 
 func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	fmt.Println(path)
 	switch path[0] {
 	case "gateways":
 		return queryGatewayFee(ctx, req, keeper)

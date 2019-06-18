@@ -18,12 +18,12 @@ const (
 	FlagMaxSupply      = "max-supply"
 	FlagMintable       = "mintable"
 
-	FlagOwner      = "owner"
-	FlagMoniker    = "moniker"
-	FlagIdentity   = "identity"
-	FlagDetails    = "details"
-	FlagWebsite    = "website"
-	FlagGatewayFee = "gateway-fee"
+	FlagOwner     = "owner"
+	FlagMoniker   = "moniker"
+	FlagIdentity  = "identity"
+	FlagDetails   = "details"
+	FlagWebsite   = "website"
+	FlagCreateFee = "create-fee"
 
 	FlagSubject = "subject"
 	FlagID      = "id"
@@ -53,7 +53,7 @@ func init() {
 	FsGatewayCreate.String(FlagIdentity, "", "the gateway identity")
 	FsGatewayCreate.String(FlagDetails, "", "the gateway description")
 	FsGatewayCreate.String(FlagWebsite, "", "the external website")
-	FsGatewayCreate.String(FlagGatewayFee, "", "the fee for gateway creation")
+	FsGatewayCreate.String(FlagCreateFee, "", "the fee for gateway creation")
 
 	FsGatewayEdit.String(FlagMoniker, "", "the unique gateway name")
 	FsGatewayEdit.String(FlagIdentity, "", "the gateway identity")

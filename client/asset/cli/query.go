@@ -161,54 +161,65 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 			// subject validity is checked in PreRunE
 			subject := viper.GetString(FlagSubject)
 
-			var (
-				moniker string
-				id      string
-				path    string
-				params  interface{}
-			)
-
 			if subject == "gateway" {
-				moniker = viper.GetString(FlagMoniker)
+				moniker := viper.GetString(FlagMoniker)
 				if err := asset.ValidateMoniker(moniker); err != nil {
 					return err
 				}
 
-				params = asset.QueryGatewayFeeParams{
+				params := asset.QueryGatewayFeeParams{
 					Moniker: moniker,
 				}
 
-				path = fmt.Sprintf("custom/%s/fees/gateways", protocol.AssetRoute)
+				bz, err := cdc.MarshalJSON(params)
+				if err != nil {
+					return err
+				}
+
+				path := fmt.Sprintf("custom/%s/fees/gateways", protocol.AssetRoute)
+
+				res, err := cliCtx.QueryWithData(path, bz)
+				if err != nil {
+					return err
+				}
+
+				var out asset.GatewayFeeOutput
+				err = cdc.UnmarshalJSON(res, &out)
+				if err != nil {
+					return err
+				}
+
+				return cliCtx.PrintOutput(out)
 			} else {
-				id = viper.GetString(FlagID)
+				id := viper.GetString(FlagID)
 				if ok, err := asset.IsAssetIDValid(id); !ok {
 					return err
 				}
 
-				params = asset.QueryTokenFeesParams{
+				params := asset.QueryTokenFeesParams{
 					ID: id,
 				}
 
-				path = fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
-			}
+				bz, err := cdc.MarshalJSON(params)
+				if err != nil {
+					return err
+				}
 
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
+				path := fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
 
-			res, err := cliCtx.QueryWithData(path, bz)
-			if err != nil {
-				return err
-			}
+				res, err := cliCtx.QueryWithData(path, bz)
+				if err != nil {
+					return err
+				}
 
-			var fees asset.TokenFeesOutput
-			err = cdc.UnmarshalJSON(res, &fees)
-			if err != nil {
-				return err
-			}
+				var out asset.TokenFeesOutput
+				err = cdc.UnmarshalJSON(res, &out)
+				if err != nil {
+					return err
+				}
 
-			return cliCtx.PrintOutput(fees)
+				return cliCtx.PrintOutput(out)
+			}
 		},
 	}
 
