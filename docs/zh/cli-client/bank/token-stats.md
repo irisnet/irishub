@@ -7,14 +7,13 @@
 ## 使用方式
 
 ```
- iriscli bank token-stats <flags>
+ iriscli bank token-stats <tokenId> <flags>
 ```
 
 ## 标志
 
 | 命令，速记   | 类型   | 是否必须 | 默认值                | 描述                                      |
 | ------------ | ------ | -------- | --------------------- | ----------------------------------------- |
-| --id         |  String| 否       |                       | 资产ID                                     |
 | -h, --help   |        | 否       |                       | 帮助                                      |
 | --chain-id   | String | 否       |                       | tendermint 节点Chain ID                     |
 | --height     | Int    | 否       |                       | 查询的区块高度用于获取最新的区块。        |

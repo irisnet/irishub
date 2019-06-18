@@ -7,14 +7,13 @@ Query the token statistic, including total loose tokens, total burned token and 
 ## Usage:
 
 ```
- iriscli bank token-stats <flags>
+ iriscli bank token-stats <tokenId> <flags>
 ```
 
 ## Flags
 
 | Name,shorthand | Type   | Required | Default               | Description                                                  |
 | -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| --id           |  String| False    |                       | id of asset                                                  |
 | -h, --help     |        | False    |                       | Help for coin-type                                           |
 | --chain-id     | String | False    |                       | Chain ID of tendermint node                                  |
 | --height       | Int    | False    |                       | Block height to query, omit to get most recent provable block |

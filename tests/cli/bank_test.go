@@ -104,7 +104,7 @@ func TestIrisCLIBankTokenStatsById(t *testing.T) {
 	_ = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 
 	tokenS := executeGetTokenStatsForAsset(t, fmt.Sprintf("iriscli bank token-stats %v tttt", flags))
-
-	fmt.Printf("tokenStats:%s\n", tokenS.String())
-
+	s := tokenS.LooseTokens.String()
+	require.Equal(t, "1000tttt-min", s)
+	require.Equal(t, "10tttt-min", tokenS.BurnedTokens.String())
 }
