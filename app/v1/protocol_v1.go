@@ -376,6 +376,10 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 		return genesisState.Accounts[i].AccountNumber < genesisState.Accounts[j].AccountNumber
 	})
 
+	// init system accounts
+	p.bankKeeper.AddCoins(ctx, bank.BurnedCoinsAccAddr, sdk.Coins{})
+	p.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, sdk.Coins{})
+
 	// load the accounts
 	for _, gacc := range genesisState.Accounts {
 		acc := gacc.ToAccount()

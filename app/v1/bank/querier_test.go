@@ -53,14 +53,14 @@ func TestQueryTokenStats(t *testing.T) {
 	require.NotNil(t, err)
 	require.Nil(t, res)
 
-	totalToken := sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(100))}
+	totalToken := sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(100))}
 	input.bk.IncreaseLoosenToken(input.ctx, totalToken)
 
 	_, _, addr := keyPubAddr()
 	input.bk.am.SetAccount(input.ctx, input.bk.am.NewAccountWithAddress(input.ctx, addr))
 	input.bk.AddCoins(input.ctx, addr, totalToken)
 
-	burnedToken := sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(50))}
+	burnedToken := sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(50))}
 	input.bk.BurnCoins(input.ctx, addr, burnedToken)
 
 	res, err = queryTokenStats(input.ctx, input.bk, input.cdc)

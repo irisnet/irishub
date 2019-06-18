@@ -7,7 +7,7 @@
 ## 使用方式
 
 ```
- iriscli bank token-stats <flags>
+ iriscli bank token-stats <tokenId> <flags>
 ```
 
 ## 标志
@@ -29,14 +29,20 @@
 ### 查询token统计数据
 
 ```
-iriscli bank token-stats
+iriscli bank token-stats iris
 ```
 
 示例返回：
 
 ```
 TokenStats:
-  Loose Tokens:  1864477.596384156921391687iris
-  Burned Tokens:  177.59638iris
-  Bonded Tokens:  425182.329615843078608313iris
+  Loose Token:  
+    denom:iris
+    amount:1864477.596384156921391687
+  Burned Token:
+    denom:iris
+    amount:7177.596384156921391687
+  Bonded Token:  
+    denom:iris
+    amount:1857300.596384156921391687
 ```

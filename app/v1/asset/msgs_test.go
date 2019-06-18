@@ -15,34 +15,34 @@ var (
 	addr2 = sdk.AccAddress([]byte("addr2"))
 )
 
-// test ValidateBasic for MsgIssueAsset
+// test ValidateBasic for MsgIssueToken
 func TestMsgIssueAsset(t *testing.T) {
 	addr := sdk.AccAddress("test")
 	tests := []struct {
 		testCase string
-		MsgIssueAsset
+		MsgIssueToken
 		expectPass bool
 	}{
-		{"basic good", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), true},
-		{"error family", NewMsgIssueAsset(0x02, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error source", NewMsgIssueAsset(FUNGIBLE, 0x03, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"empty symbol", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "", "btc", "btc", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error symbol", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error symbol_at_source", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "434,23d", "btcccccccccc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error symbol_min_alias", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshiiiiiii", 1, 1, true, addr, sdk.Coins{}), false},
-		{"empty name", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error name", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"zero supply bigger", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "e", "btc", 1, "satoshi", 0, 1, true, addr, sdk.Coins{}), true},
-		{"zero max supply", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr, sdk.Coins{}), false},
-		{"init supply bigger than max supply", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr, sdk.Coins{}), false},
-		{"error decimal", NewMsgIssueAsset(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), true},
+		{"error family", NewMsgIssueToken(0x02, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error source", NewMsgIssueToken(FUNGIBLE, 0x03, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"empty symbol", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "", "btc", "btc", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol_at_source", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "434,23d", "btcccccccccc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol_min_alias", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshiiiiiii", 1, 1, true, addr, sdk.Coins{}), false},
+		{"empty name", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error name", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"zero supply bigger", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "e", "btc", 1, "satoshi", 0, 1, true, addr, sdk.Coins{}), true},
+		{"zero max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr, sdk.Coins{}), false},
+		{"init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr, sdk.Coins{}), false},
+		{"error decimal", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 	}
 
 	for _, tc := range tests {
 		if tc.expectPass {
-			require.Nil(t, tc.MsgIssueAsset.ValidateBasic(), "test: %v", tc.testCase)
+			require.Nil(t, tc.MsgIssueToken.ValidateBasic(), "test: %v", tc.testCase)
 		} else {
-			require.NotNil(t, tc.MsgIssueAsset.ValidateBasic(), "test: %v", tc.testCase)
+			require.NotNil(t, tc.MsgIssueToken.ValidateBasic(), "test: %v", tc.testCase)
 		}
 	}
 }
@@ -84,7 +84,7 @@ func TestMsgCreateGatewayValidation(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website)
+		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website, sdk.Coin{Denom: sdk.NativeTokenName, Amount: sdk.NewInt(100)})
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
@@ -104,7 +104,7 @@ func TestMsgCreateGatewayGetSignBytes(t *testing.T) {
 
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/asset/MsgCreateGateway","value":{"details":"details","identity":"identity","moniker":"moniker","owner":"faa1damkuetjqqah8w","website":"website"}}`
+	expected := "{\"type\":\"irishub/asset/MsgCreateGateway\",\"value\":{\"details\":\"details\",\"fee\":{\"amount\":\"0\",\"denom\":\"\"},\"identity\":\"identity\",\"moniker\":\"moniker\",\"owner\":\"faa1damkuetjqqah8w\",\"website\":\"website\"}}"
 	require.Equal(t, expected, string(res))
 }
 

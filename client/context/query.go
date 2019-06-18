@@ -301,8 +301,8 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 		coinType = sdk.IRIS
 	} else {
 
-		params := asset.QueryAssetParams{
-			Asset: coinName,
+		params := asset.QueryTokenParams{
+			TokenId: coinName,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -310,25 +310,18 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 			return types.CoinType{}, err
 		}
 
-		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryAsset), bz)
+		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
 		if err != nil {
 			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		var asset asset.Asset
-		err = cliCtx.Codec.UnmarshalJSON(res, &asset)
+		var token asset.FungibleToken
+		err = cliCtx.Codec.UnmarshalJSON(res, &token)
 		if err != nil {
 			return types.CoinType{}, err
 		}
 
-		units := make(sdk.Units, 2)
-		units[0] = sdk.NewUnit(coinName, 0)
-		units[1] = sdk.NewUnit(asset.GetDenom(), int(asset.GetDecimal()))
-		return sdk.CoinType{
-			Name:    coinName,
-			MinUnit: units[1],
-			Units:   units,
-		}, nil
+		return token.GetCoinType(), nil
 	}
 
 	return coinType, nil

@@ -61,9 +61,9 @@ const (
 	CodeInvalidSlashParams sdk.CodeType = 800
 
 	//asset
-	CodeInvalidAssetTaxRate         sdk.CodeType = 900
-	CodeInvalidMintFTBaseFeeRatio   sdk.CodeType = 901
-	CodeInvalidGatewayAssetFeeRatio sdk.CodeType = 902
+	CodeInvalidAssetTaxRate          sdk.CodeType = 900
+	CodeInvalidMintTokenBaseFeeRatio sdk.CodeType = 901
+	CodeInvalidGatewayAssetFeeRatio  sdk.CodeType = 902
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {
