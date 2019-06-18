@@ -40,7 +40,7 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 }
 
 // IssueToken issue a new token
-func (k Keeper) IssueToken(ctx sdk.Context, token Token) (sdk.Tags, sdk.Error) {
+func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
 	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (k Keeper) HasToken(ctx sdk.Context, id string) bool {
 	return store.Has(KeyToken(id))
 }
 
-func (k Keeper) SetToken(ctx sdk.Context, token Token) sdk.Error {
+func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
@@ -111,7 +111,7 @@ func (k Keeper) SetToken(ctx sdk.Context, token Token) sdk.Error {
 	return nil
 }
 
-func (k Keeper) getToken(ctx sdk.Context, id string) (token Token, found bool) {
+func (k Keeper) getToken(ctx sdk.Context, id string) (token FungibleToken, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(KeyToken(id))
 	if bz == nil {

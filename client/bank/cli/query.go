@@ -46,6 +46,13 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 				return err
 			}
 
+			coins, err := cliCtx.ParseCoins(acc.GetCoins().String())
+			if err != nil {
+				return err
+			}
+
+			acc.SetCoins(coins)
+
 			return cliCtx.PrintOutput(acc)
 		},
 	}

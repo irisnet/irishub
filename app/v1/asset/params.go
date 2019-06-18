@@ -40,8 +40,8 @@ type Params struct {
 func (p Params) String() string {
 	return fmt.Sprintf(`Asset Params:
   Asset Tax Rate:                                           %s
-  Base Fee for Issuing Fungible Token:                      %s
-  Fee Ratio for Minting (vs Issuing) Fungible Token:        %s
+  Base Fee for Issuing Fungible FungibleToken:                      %s
+  Fee Ratio for Minting (vs Issuing) Fungible FungibleToken:        %s
   Base Fee for Creating Gateway:                            %s
   Fee Ratio for Gateway (vs Native) FungibleTokens:         %s`,
 		p.AssetTaxRate.String(), p.IssueFTBaseFee.String(), p.MintFTFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
@@ -158,7 +158,7 @@ func validateAssetTaxRate(v sdk.Dec) sdk.Error {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidAssetTaxRate,
-			fmt.Sprintf("Token Tax Rate [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("FungibleToken Tax Rate [%s] should be between [0, 1]", v.String()),
 		)
 	}
 	return nil

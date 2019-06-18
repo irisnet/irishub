@@ -36,7 +36,7 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var token asset.Token
+			var token asset.FungibleToken
 			err = cdc.UnmarshalJSON(res, &token)
 			if err != nil {
 				return err

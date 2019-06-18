@@ -7,22 +7,6 @@ import (
 	"github.com/irisnet/irishub/types"
 )
 
-type Token interface {
-	GetDecimal() uint8
-	IsMintable() bool
-	GetUniqueID() string
-	GetDenom() string
-	String() string
-
-	GetOwner() types.AccAddress
-	GetSource() AssetSource
-	GetSymbol() string
-	GetGateway() string
-	GetInitSupply() types.Int
-	GetTotalSupply() types.Int
-	GetCoinType() types.CoinType
-}
-
 type BaseToken struct {
 	Id             string           `json:"id"`
 	Family         AssetFamily      `json:"family"`
@@ -41,7 +25,7 @@ type BaseToken struct {
 }
 
 func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
-	baseToken := BaseToken{
+	return BaseToken{
 		Family:         family,
 		Source:         source,
 		Gateway:        strings.ToLower(gateway),
@@ -56,94 +40,22 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 		Mintable:       mintable,
 		Owner:          owner,
 	}
-
-	baseToken.Id = baseToken.GetUniqueID()
-
-	return baseToken
 }
 
-func (ba BaseToken) GetDecimal() uint8 {
-	panic("implement me")
-}
-
-func (BaseToken) IsMintable() bool {
-	panic("implement me")
-}
-
-func (BaseToken) GetCoinType() types.CoinType {
-	panic("implement me")
-}
-
-// String implements fmt.Stringer
-func (ba BaseToken) String() string {
-	panic("implement me")
-}
-
-func (ba BaseToken) GetOwner() types.AccAddress {
-	return ba.Owner
-}
-
-func (ba BaseToken) GetSource() AssetSource {
-	return ba.Source
-}
-
-func (ba BaseToken) GetSymbol() string {
-	return ba.Symbol
-}
-
-func (ba BaseToken) GetGateway() string {
-	return ba.Gateway
-}
-
-func (ba BaseToken) GetUniqueID() string {
-	if ba.Source == NATIVE {
-		return strings.ToLower(ba.Symbol)
-	}
-
-	var sb strings.Builder
-
-	if ba.Source == EXTERNAL {
-		sb.WriteString("x.")
-		sb.WriteString(ba.Symbol)
-		return strings.ToLower(sb.String())
-	}
-
-	if ba.Source == GATEWAY {
-		sb.WriteString(ba.Gateway)
-		sb.WriteString(".")
-		sb.WriteString(ba.Symbol)
-		return strings.ToLower(sb.String())
-	}
-
-	return "invalid_token_id"
-}
-
-func (ba BaseToken) GetDenom() string {
-	var sb strings.Builder
-	sb.WriteString(ba.GetUniqueID())
-	sb.WriteString("-min")
-	return strings.ToLower(sb.String())
-}
-
-func (ba BaseToken) GetInitSupply() types.Int {
-	return ba.InitialSupply
-}
-
-func (ba BaseToken) GetTotalSupply() types.Int {
-	return ba.TotalSupply
-}
-
-// Fungible Token
+// Fungible FungibleToken
 type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
 
 func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
-	return FungibleToken{
+	token := FungibleToken{
 		BaseToken: NewBaseToken(
 			FUNGIBLE, source, gateway, symbol, name, decimal, symbolAtSource, symbolMinAlias, initialSupply, totalSupply, maxSupply, mintable, owner,
 		),
 	}
+
+	token.Id = token.GetUniqueID()
+	return token
 }
 
 func (ft FungibleToken) GetDecimal() uint8 {
@@ -153,8 +65,49 @@ func (ft FungibleToken) GetDecimal() uint8 {
 func (ft FungibleToken) IsMintable() bool {
 	return ft.Mintable
 }
+func (ft FungibleToken) GetOwner() types.AccAddress {
+	return ft.Owner
+}
+
+func (ft FungibleToken) GetSource() AssetSource {
+	return ft.Source
+}
+
+func (ft FungibleToken) GetSymbol() string {
+	return ft.Symbol
+}
+
+func (ft FungibleToken) GetGateway() string {
+	return ft.Gateway
+}
+
+func (ft FungibleToken) GetUniqueID() string {
+	switch ft.Source {
+	case NATIVE:
+		return strings.ToLower(ft.Symbol)
+	case EXTERNAL:
+		return strings.ToLower(fmt.Sprintf("x.%s", ft.Symbol))
+	case GATEWAY:
+		return strings.ToLower(fmt.Sprintf("%s.%s", ft.Gateway, ft.Symbol))
+	default:
+		return ""
+	}
+}
+
+func (ft FungibleToken) GetDenom() string {
+	return strings.ToLower(fmt.Sprintf("%s-min", ft.GetUniqueID()))
+}
+
+func (ft FungibleToken) GetInitSupply() types.Int {
+	return ft.InitialSupply
+}
+
+func (ft FungibleToken) GetTotalSupply() types.Int {
+	return ft.TotalSupply
+}
 
 func (ft FungibleToken) GetCoinType() types.CoinType {
+
 	units := make(types.Units, 2)
 	units[0] = types.NewUnit(ft.GetUniqueID(), 0)
 	units[1] = types.NewUnit(ft.GetDenom(), int(ft.Decimal))
@@ -175,7 +128,7 @@ func (ft FungibleToken) String() string {
 	maxSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.MaxSupply).String(), ft.GetUniqueID())
 	totalSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.TotalSupply).String(), ft.GetUniqueID())
 
-	return fmt.Sprintf(`Token %s:
+	return fmt.Sprintf(`FungibleToken %s:
   Family:            %s
   Source:            %s
   Gateway:           %s
@@ -193,18 +146,7 @@ func (ft FungibleToken) String() string {
 		ft.Decimal, initSupply, totalSupply, maxSupply, ft.Mintable, ft.Owner.String())
 }
 
-// Non-fungible Token
-type NonFungibleToken struct {
-	BaseToken `json:"base_token"`
-}
-
-func (nft NonFungibleToken) GetDecimal() uint8 {
-	return 0
-}
-
-func (nft NonFungibleToken) IsMintable() bool {
-	return true
-}
+// -----------------------------
 
 func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.Error) {
 	switch source {

@@ -27,7 +27,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleIssueToken handles MsgIssueToken
 func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
-	var token Token
+	var token FungibleToken
 	switch msg.Family {
 	case FUNGIBLE:
 		totalSupply := msg.InitialSupply

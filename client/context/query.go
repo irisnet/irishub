@@ -315,7 +315,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		var token asset.Token
+		var token asset.FungibleToken
 		err = cliCtx.Codec.UnmarshalJSON(res, &token)
 		if err != nil {
 			return types.CoinType{}, err
