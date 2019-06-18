@@ -132,11 +132,11 @@ func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 func getTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
-	mintTokenFeeRate := params.MintTokenFeeRatio
+	mintTokenFeeRatio := params.MintTokenFeeRatio
 
 	// compute the issurance fee and mint fee
 	issueFee := getTokenIssueFee(ctx, k, symbol)
-	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRate)
+	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
 
 	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(mintFee))
 }
