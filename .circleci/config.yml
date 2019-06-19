@@ -47,7 +47,7 @@ jobs:
   UnitTest:
     machine:
       docker_layer_caching: true
-      steps:
+    steps:
       - checkout
       - run:
           name: Run unit tests
