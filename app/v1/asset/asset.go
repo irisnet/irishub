@@ -26,15 +26,22 @@ type BaseToken struct {
 }
 
 func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
+
+	gateway = strings.ToLower(strings.Trim(gateway, " "))
+	symbol = strings.ToLower(strings.Trim(symbol, " "))
+	symbolAtSource = strings.ToLower(strings.Trim(symbolAtSource, " "))
+	symbolMinAlias = strings.ToLower(strings.Trim(symbolMinAlias, " "))
+	name = strings.Trim(name, " ")
+
 	return BaseToken{
 		Family:         family,
 		Source:         source,
-		Gateway:        strings.ToLower(gateway),
-		Symbol:         strings.ToLower(symbol),
+		Gateway:        gateway,
+		Symbol:         symbol,
 		Name:           name,
 		Decimal:        decimal,
-		SymbolAtSource: strings.ToLower(symbolAtSource),
-		SymbolMinAlias: strings.ToLower(symbolMinAlias),
+		SymbolAtSource: symbolAtSource,
+		SymbolMinAlias: symbolMinAlias,
 		InitialSupply:  initialSupply,
 		TotalSupply:    totalSupply,
 		MaxSupply:      maxSupply,

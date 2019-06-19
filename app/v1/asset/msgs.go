@@ -56,7 +56,6 @@ type MsgIssueToken struct {
 
 // NewMsgIssueToken - construct asset issue msg.
 func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueToken {
-	fmt.Println(symbolAtSource)
 	return MsgIssueToken{
 		Family:         family,
 		Source:         source,
@@ -80,6 +79,12 @@ func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
 // Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() sdk.Error {
+
+	msg.Gateway = strings.ToLower(strings.Trim(msg.Gateway, " "))
+	msg.Symbol = strings.ToLower(strings.Trim(msg.Symbol, " "))
+	msg.SymbolAtSource = strings.ToLower(strings.Trim(msg.SymbolAtSource, " "))
+	msg.SymbolMinAlias = strings.ToLower(strings.Trim(msg.SymbolMinAlias, " "))
+	msg.Name = strings.Trim(msg.Name, " ")
 
 	switch msg.Source {
 	case NATIVE:
@@ -110,38 +115,38 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 
 	nameLen := len(msg.Name)
 	if nameLen == 0 || nameLen > MaximumAssetNameSize {
-		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid asset name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
+		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
 	}
 
 	symbolLen := len(msg.Symbol)
 	if symbolLen < MinimumAssetSymbolSize || symbolLen > MaximumAssetSymbolSize || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
 	if strings.Contains(strings.ToLower(msg.Symbol), sdk.NativeTokenName) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol %s, cat not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
 	}
 
 	symbolAtSourceLen := len(msg.SymbolAtSource)
 	if symbolAtSourceLen > 0 && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
-		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid asset symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid token symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
 	symbolMinAliasLen := len(msg.SymbolMinAlias)
 	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) || !IsBeginWithAlpha(msg.Symbol) {
-		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid asset symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
+		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
 	}
 
 	if msg.InitialSupply > MaximumAssetInitSupply {
-		return ErrInvalidAssetInitSupply(DefaultCodespace, fmt.Sprintf("invalid asset initial supply %d, only accepts value [0, %d]", msg.InitialSupply, MaximumAssetInitSupply))
+		return ErrInvalidAssetInitSupply(DefaultCodespace, fmt.Sprintf("invalid token initial supply %d, only accepts value [0, %d]", msg.InitialSupply, MaximumAssetInitSupply))
 	}
 
 	if msg.MaxSupply < msg.InitialSupply || msg.MaxSupply > MaximumAssetMaxSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid asset max supply %d, only accepts value [%d, %d]", msg.MaxSupply, msg.InitialSupply, MaximumAssetMaxSupply))
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value [%d, %d]", msg.MaxSupply, msg.InitialSupply, MaximumAssetMaxSupply))
 	}
 
 	if msg.Decimal > MaximumAssetDecimal {
-		return ErrInvalidAssetDecimal(DefaultCodespace, fmt.Sprintf("invalid asset decimal %d, only accepts value [0, %d]", msg.Decimal, MaximumAssetDecimal))
+		return ErrInvalidAssetDecimal(DefaultCodespace, fmt.Sprintf("invalid token decimal %d, only accepts value [0, %d]", msg.Decimal, MaximumAssetDecimal))
 	}
 
 	return nil
