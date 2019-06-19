@@ -16,7 +16,7 @@ const (
 
 var (
 	MaximumAssetMaxSupply          = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
-	MaximumAssetInitSupply         = uint64(10000000000)   // maximal limitation for asset initial supply，100 billion
+	MaximumAssetInitSupply         = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
 	MaximumAssetDecimal            = uint8(18)             // maximal limitation for asset decimal
 	MinimumAssetSymbolSize         = 3                     // minimal limitation for the length of the asset's symbol / symbol_at_source
 	MaximumAssetSymbolSize         = 8                     // maximal limitation for the length of the asset's symbol / symbol_at_source
