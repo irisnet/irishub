@@ -11,17 +11,17 @@ type AssetFamily byte
 
 const (
 	FUNGIBLE     AssetFamily = 0x00
-	NON_FUNGIBLE AssetFamily = 0x01
+	//NON_FUNGIBLE AssetFamily = 0x01
 )
 
 var (
 	AssetFamilyToStringMap = map[AssetFamily]string{
 		FUNGIBLE:     "fungible",
-		NON_FUNGIBLE: "non-fungible",
+		//NON_FUNGIBLE: "non-fungible",
 	}
 	StringToAssetFamilyMap = map[string]AssetFamily{
 		"fungible":     FUNGIBLE,
-		"non-fungible": NON_FUNGIBLE,
+		//"non-fungible": NON_FUNGIBLE,
 	}
 )
 

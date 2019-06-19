@@ -148,50 +148,105 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryGatewayFee implements the query gateway fee command.
-func GetCmdQueryGatewayFee(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryFee implements the query asset-related fees command.
+func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-gateway-fee",
-		Short:   "Query the creation fee for a gateway with the given moniker",
-		Example: "iriscli asset query-gateway-fee --moniker=<gateway moniker>",
+		Use:     "query-fee",
+		Short:   "Query the asset-related fees",
+		Example: "iriscli asset query-fee --subject=<gateway|token> --moniker=<gateway moniker> --id=<token id>",
+		PreRunE: preQueryFeeCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			moniker := viper.GetString(FlagMoniker)
-			if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
-				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
-			}
+			// subject validity is checked in PreRunE
+			subject := viper.GetString(FlagSubject)
 
-			if !asset.IsAlpha(moniker) {
-				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
-			}
+			if subject == "gateway" {
+				moniker := viper.GetString(FlagMoniker)
+				if err := asset.ValidateMoniker(moniker); err != nil {
+					return err
+				}
 
-			params := asset.QueryGatewayFeeParams{
-				Moniker: moniker,
-			}
+				params := asset.QueryGatewayFeeParams{
+					Moniker: moniker,
+				}
 
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
+				bz, err := cdc.MarshalJSON(params)
+				if err != nil {
+					return err
+				}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/gatewayFee", protocol.AssetRoute), bz)
-			if err != nil {
-				return err
-			}
+				path := fmt.Sprintf("custom/%s/fees/gateways", protocol.AssetRoute)
 
-			var fee sdk.Dec
-			err = cdc.UnmarshalJSON(res, &fee)
-			if err != nil {
-				return err
-			}
+				res, err := cliCtx.QueryWithData(path, bz)
+				if err != nil {
+					return err
+				}
 
-			return cliCtx.PrintOutput(fee)
+				var out asset.GatewayFeeOutput
+				err = cdc.UnmarshalJSON(res, &out)
+				if err != nil {
+					return err
+				}
+
+				out.Fee = sdk.NewCoin(sdk.NativeTokenName, out.Fee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
+
+				return cliCtx.PrintOutput(out)
+			} else {
+				id := viper.GetString(FlagID)
+				if err := asset.CheckAssetID(id); err != nil {
+					return err
+				}
+
+				params := asset.QueryTokenFeesParams{
+					ID: id,
+				}
+
+				bz, err := cdc.MarshalJSON(params)
+				if err != nil {
+					return err
+				}
+
+				path := fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
+
+				res, err := cliCtx.QueryWithData(path, bz)
+				if err != nil {
+					return err
+				}
+
+				var out asset.TokenFeesOutput
+				err = cdc.UnmarshalJSON(res, &out)
+				if err != nil {
+					return err
+				}
+
+				out.IssueFee = sdk.NewCoin(sdk.NativeTokenName, out.IssueFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
+				out.MintFee = sdk.NewCoin(sdk.NativeTokenName, out.MintFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
+
+				return cliCtx.PrintOutput(out)
+			}
 		},
 	}
 
-	cmd.Flags().String(FlagMoniker, "", "the unique name of the destination gateway")
-	cmd.MarkFlagRequired(FlagMoniker)
+	cmd.Flags().AddFlagSet(FsFeeQuery)
+	cmd.MarkFlagRequired(FlagSubject)
 
 	return cmd
+}
+
+// preQueryFeeCmd is used to check if the subject is valid and the corresponding flag to the subject is provided
+func preQueryFeeCmd(cmd *cobra.Command, args []string) error {
+	subject := viper.GetString(FlagSubject)
+
+	if subject != "gateway" && subject != "token" {
+		return fmt.Errorf("the subject must be gateway or token")
+	}
+
+	if subject == "gateway" {
+		cmd.MarkFlagRequired(FlagMoniker)
+	} else if subject == "token" {
+		cmd.MarkFlagRequired(FlagID)
+	}
+
+	return nil
 }

@@ -39,11 +39,11 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Asset Params:
-  Asset Tax Rate:                                  %s
-  Base Fee for Issuing Token:                      %s
-  Fee Ratio for Minting (vs Issuing) Token:        %s
-  Base Fee for Creating Gateway:                   %s
-  Fee Ratio for Gateway (vs Native) Tokens:        %s`,
+  Asset Tax Rate:                              %s
+  Base Fee for Issuing Token:                  %s
+  Fee Ratio for Minting (vs Issuing) Token:    %s
+  Base Fee for Creating Gateway:               %s
+  Fee Ratio for Gateway (vs Native) Token:     %s`,
 		p.AssetTaxRate.String(), p.IssueTokenBaseFee.String(), p.MintTokenFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
 }
 
@@ -84,7 +84,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateMintTokenBaseFeeRatio(ratio); err != nil {
+		if err := validateMintTokenFeeRatio(ratio); err != nil {
 			return nil, err
 		}
 		return ratio, nil
@@ -128,22 +128,18 @@ func DefaultParams() Params {
 func DefaultParamsForTest() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
+		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(30, 18)),
 		MintTokenFeeRatio:    sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(60, 18)),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
 
 func validateParams(p Params) error {
-	if sdk.NetworkType != sdk.Mainnet {
-		return nil
-	}
-
 	if err := validateAssetTaxRate(p.AssetTaxRate); err != nil {
 		return err
 	}
-	if err := validateMintTokenBaseFeeRatio(p.MintTokenFeeRatio); err != nil {
+	if err := validateMintTokenFeeRatio(p.MintTokenFeeRatio); err != nil {
 		return err
 	}
 	if err := validateGatewayAssetFeeRatio(p.GatewayAssetFeeRatio); err != nil {
@@ -154,33 +150,33 @@ func validateParams(p Params) error {
 }
 
 func validateAssetTaxRate(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+	if v.GT(sdk.NewDec(1)) || v.LTE(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidAssetTaxRate,
-			fmt.Sprintf("Asset Tax Rate [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Asset Tax Rate [%s] should be between (0, 1]", v.String()),
 		)
 	}
 	return nil
 }
 
-func validateMintTokenBaseFeeRatio(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+func validateMintTokenFeeRatio(v sdk.Dec) sdk.Error {
+	if v.GTE(sdk.NewDec(1)) || v.LTE(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
-			params.CodeInvalidMintTokenBaseFeeRatio,
-			fmt.Sprintf("Base Fee Ratio for Minting Tokens [%s] should be between [0, 1]", v.String()),
+			params.CodeInvalidMintTokenFeeRatio,
+			fmt.Sprintf("Fee Ratio for Minting Tokens [%s] should be between (0, 1)", v.String()),
 		)
 	}
 	return nil
 }
 
 func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDecWithPrec(1, 0)) || v.LT(sdk.NewDecWithPrec(0, 0)) {
+	if v.GTE(sdk.NewDec(1)) || v.LTE(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidGatewayAssetFeeRatio,
-			fmt.Sprintf("Fee Ratio for Gateway Tokens [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Fee Ratio for Gateway Tokens [%s] should be between (0, 1)", v.String()),
 		)
 	}
 	return nil

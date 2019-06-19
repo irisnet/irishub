@@ -92,7 +92,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Use:   "create-gateway",
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website> --gateway-fee=<gateway create fee>",
+			"--website=<website> --create-fee=<gateway create fee>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -110,16 +110,20 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			identity := viper.GetString(FlagIdentity)
 			details := viper.GetString(FlagDetails)
 			website := viper.GetString(FlagWebsite)
-			gatewayFee := viper.GetString(FlagGatewayFee)
+			createFee := viper.GetString(FlagCreateFee)
 
-			gatewayFeeCoin, err := sdk.ParseCoin(gatewayFee)
+			createFeeCoin, err := sdk.ParseCoin(createFee)
 			if err != nil {
 				return err
 			}
 
+			if createFeeCoin.Denom == sdk.NativeTokenName {
+				createFeeCoin = sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(createFeeCoin.Amount.Int64(), 18))
+			}
+
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website, gatewayFeeCoin,
+				owner, moniker, identity, details, website, createFeeCoin,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -132,7 +136,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsGatewayCreate)
 	cmd.MarkFlagRequired(FlagMoniker)
-	cmd.MarkFlagRequired(FlagGatewayFee)
+	cmd.MarkFlagRequired(FlagCreateFee)
 
 	return cmd
 }

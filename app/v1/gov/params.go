@@ -359,10 +359,6 @@ func DefaultParamsForTest() GovParams {
 }
 
 func validateParams(p GovParams) sdk.Error {
-	if sdk.NetworkType != sdk.Mainnet {
-		return nil
-	}
-
 	if err := validateDepositProcedure(DepositProcedure{
 		MaxDepositPeriod: p.CriticalDepositPeriod,
 		MinDeposit:       p.CriticalMinDeposit,
@@ -472,7 +468,7 @@ type TallyingProcedure struct {
 
 func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 	if dp.MinDeposit[0].Denom != stakeTypes.StakeDenom {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit should be %s!", stakeTypes.StakeDenom))
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit denom should be %s!", stakeTypes.StakeDenom))
 	}
 
 	LowerBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
