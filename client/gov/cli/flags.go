@@ -24,13 +24,13 @@ const (
 	flagSwitchHeight = "switch-height"
 	flagThreshold    = "threshold"
 
-	//for addAssetProposal
-	flagAssetFamily         = "asset-family"
-	flagAssetSymbol         = "asset-symbol"
-	flagAssetName           = "asset-name"
-	flagAssetDecimal        = "asset-decimal"
-	flagAssetSymbolMinAlias = "asset-symbol-min-alias"
-	flagAssetInitialSupply  = "asset-initial-supply"
-	flagAssetMaxSupply      = "asset-max-supply"
-	flagAssetMintable       = "asset-mintable"
+	//for addTokenProposal
+	flagTokenSymbol         = "token-symbol"
+	flagTokenSymbolAtSource = "token-symbol-at-source"
+	flagTokenName           = "token-name"
+	flagTokenDecimal        = "token-decimal"
+	flagTokenSymbolMinAlias = "token-symbol-min-alias"
+	flagTokenInitialSupply  = "token-initial-supply"
+	flagTokenMaxSupply      = "token-max-supply"
+	flagTokenMintable       = "token-mintable"
 )

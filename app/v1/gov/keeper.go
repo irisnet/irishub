@@ -231,7 +231,7 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 	return proposal
 }
 
-func (keeper Keeper) NewAddAssetProposal(ctx sdk.Context, msg MsgSubmitAddAssetProposal) Proposal {
+func (keeper Keeper) NewAddTokenProposal(ctx sdk.Context, msg MsgSubmitAddTokenProposal) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
 		return nil
@@ -247,20 +247,14 @@ func (keeper Keeper) NewAddAssetProposal(ctx sdk.Context, msg MsgSubmitAddAssetP
 		SubmitTime:   ctx.BlockHeader().Time,
 	}
 
-	family, _ := asset.AssetFamilyFromString(msg.Family)
-	var proposal Proposal = &AddAssetProposal{
+	decimal := int(msg.Decimal)
+	initialSupply := sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal)
+	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal)
+
+	fToken := asset.NewFungibleToken(asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, initialSupply, sdk.ZeroInt(), maxSupply, msg.Mintable, nil)
+	var proposal Proposal = &AddTokenProposal{
 		textProposal,
-		asset.BaseAsset{
-			Family:         family,
-			Source:         asset.EXTERNAL,
-			Symbol:         msg.Symbol,
-			Name:           msg.Name,
-			Decimal:        msg.Decimal,
-			SymbolMinAlias: msg.SymbolMinAlias,
-			InitialSupply:  msg.InitialSupply,
-			MaxSupply:      msg.MaxSupply,
-			Mintable:       msg.Mintable,
-		},
+		fToken,
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal

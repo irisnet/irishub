@@ -24,12 +24,12 @@ type postProposalReq struct {
 	Usage          gov.UsageType  `json:"usage"`
 	DestAddress    sdk.AccAddress `json:"dest_address"`
 	Percent        sdk.Dec        `json:"percent"`
-	Asset          asset          `json:"asset"`
+	Token          token          `json:"token"`
 }
 
-type asset struct {
-	Family         string `json:"family"`
+type token struct {
 	Symbol         string `json:"symbol"`
+	SymbolAtSource string `json:"symbol_at_source"`
 	Name           string `json:"name"`
 	Decimal        uint8  `json:"decimal"`
 	SymbolMinAlias string `json:"symbol_min_alias"`
@@ -96,14 +96,14 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 				return
 			}
 		}
-		if msg.ProposalType == gov.ProposalTypeAddAsset {
-			asset := req.Asset
-			assetMsg := gov.NewMsgSubmitAddAssetProposal(msg, asset.Family, asset.Symbol, asset.Name, asset.SymbolMinAlias, asset.Decimal, asset.InitialSupply, asset.MaxSupply, asset.Mintable)
-			if assetMsg.ValidateBasic() != nil {
+		if msg.ProposalType == gov.ProposalTypeAddToken {
+			token := req.Token
+			tokenMsg := gov.NewMsgSubmitAddTokenProposal(msg, token.Symbol, token.SymbolAtSource, token.Name, token.SymbolMinAlias, token.Decimal, token.InitialSupply, token.MaxSupply, token.Mintable)
+			if tokenMsg.ValidateBasic() != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{assetMsg})
+			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{tokenMsg})
 			return
 		}
 		err = msg.ValidateBasic()

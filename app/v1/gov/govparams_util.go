@@ -39,7 +39,7 @@ func GetProposalLevelByProposalKind(p ProposalKind) ProposalLevel {
 	switch p {
 	case ProposalTypeTxTaxUsage, ProposalTypePlainText:
 		return ProposalLevelNormal
-	case ProposalTypeParameterChange, ProposalTypeAddAsset:
+	case ProposalTypeParameterChange, ProposalTypeAddToken:
 		return ProposalLevelImportant
 	case ProposalTypeSystemHalt:
 		return ProposalLevelCritical

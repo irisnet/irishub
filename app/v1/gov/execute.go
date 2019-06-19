@@ -17,8 +17,8 @@ func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 		return TaxUsageProposalExecute(ctx, gk, p.(*TaxUsageProposal))
 	case ProposalTypeSoftwareUpgrade:
 		return SoftwareUpgradeProposalExecute(ctx, gk, p.(*SoftwareUpgradeProposal))
-	case ProposalTypeAddAsset:
-		return AddAssetProposalExecute(ctx, gk, p.(*AddAssetProposal))
+	case ProposalTypeAddToken:
+		return AddTokenProposalExecute(ctx, gk, p.(*AddTokenProposal))
 	}
 	return nil
 }
@@ -100,13 +100,13 @@ func SystemHaltProposalExecute(ctx sdk.Context, gk Keeper) error {
 	return nil
 }
 
-func AddAssetProposalExecute(ctx sdk.Context, gk Keeper, ap *AddAssetProposal) error {
+func AddTokenProposalExecute(ctx sdk.Context, gk Keeper, tp *AddTokenProposal) error {
 	logger := ctx.Logger()
-	_, err := gk.ak.IssueAsset(ctx, ap.Assert)
+	_, err := gk.ak.IssueToken(ctx, tp.FToken)
 	if err != nil {
-		logger.Error("Execute AddAssetProposal failed", "height", ctx.BlockHeight(), "proposalId", ap.ProposalID, "asset_symbol", ap.Assert.Symbol)
+		logger.Error("Execute AddTokenProposal failed", "height", ctx.BlockHeight(), "proposalId", tp.ProposalID, "asset_symbol", tp.FToken.Symbol)
 		return err
 	}
-	logger.Info("Execute AddAssetProposal success", "height", ctx.BlockHeight(), "proposalId", ap.ProposalID, "asset_symbol", ap.Assert.Symbol)
+	logger.Info("Execute AddTokenProposal success", "height", ctx.BlockHeight(), "proposalId", tp.ProposalID, "asset_symbol", tp.FToken.Symbol)
 	return nil
 }

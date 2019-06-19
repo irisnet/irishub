@@ -25,8 +25,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgSubmitSoftwareUpgradeProposal(ctx, keeper, msg)
 		case MsgVote:
 			return handleMsgVote(ctx, keeper, msg)
-		case MsgSubmitAddAssetProposal:
-			return handleSubmitAddAssetProposal(ctx, keeper, msg)
+		case MsgSubmitAddTokenProposal:
+			return handleMsgSubmitAddTokenProposal(ctx, keeper, msg)
 		default:
 			errMsg := "Unrecognized gov msg type"
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -220,28 +220,28 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 	}
 }
 
-func handleSubmitAddAssetProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitAddAssetProposal) sdk.Result {
+func handleMsgSubmitAddTokenProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitAddTokenProposal) sdk.Result {
 
 	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
 	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
 		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
 	}
 
-	proposal := keeper.NewAddAssetProposal(ctx, msg)
+	proposal := keeper.NewAddTokenProposal(ctx, msg)
 
 	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
 	if err != nil {
 		return err.Result()
 	}
-	assetId := proposal.(*AddAssetProposal).Assert.GetUniqueID()
-	if keeper.ak.HasAsset(ctx, assetId) {
-		return asset.ErrAssetAlreadyExists(keeper.codespace, assetId).Result()
+	tokenId := proposal.(*AddTokenProposal).FToken.GetUniqueID()
+	if keeper.ak.HasToken(ctx, tokenId) {
+		return asset.ErrAssetAlreadyExists(keeper.codespace, tokenId).Result()
 	}
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
 	resTags := sdk.NewTags(
 		tags.Proposer, []byte(msg.Proposer.String()),
 		tags.ProposalID, proposalIDBytes,
-		tags.AssetId, []byte(assetId),
+		tags.TokenId, []byte(tokenId),
 	)
 
 	if votingStarted {

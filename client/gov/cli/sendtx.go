@@ -112,17 +112,17 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 
-			if proposalType == gov.ProposalTypeAddAsset {
-				family := viper.GetString(flagAssetFamily)
-				symbol := viper.GetString(flagAssetSymbol)
-				name := viper.GetString(flagAssetName)
-				decimal := uint8(viper.GetInt(flagAssetDecimal))
-				alias := viper.GetString(flagAssetSymbolMinAlias)
-				initialSupply := uint64(viper.GetInt64(flagAssetInitialSupply))
-				maxSupply := uint64(viper.GetInt64(flagAssetMaxSupply))
-				mintable := viper.GetBool(flagAssetMintable)
+			if proposalType == gov.ProposalTypeAddToken {
+				symbol := viper.GetString(flagTokenSymbol)
+				symbolAtSource := viper.GetString(flagTokenSymbolAtSource)
+				name := viper.GetString(flagTokenName)
+				decimal := uint8(viper.GetInt(flagTokenDecimal))
+				alias := viper.GetString(flagTokenSymbolMinAlias)
+				initialSupply := uint64(viper.GetInt64(flagTokenInitialSupply))
+				maxSupply := uint64(viper.GetInt64(flagTokenMaxSupply))
+				mintable := viper.GetBool(flagTokenMintable)
 
-				msg := gov.NewMsgSubmitAddAssetProposal(msg, family, symbol, name, alias, decimal, initialSupply, maxSupply, mintable)
+				msg := gov.NewMsgSubmitAddTokenProposal(msg, symbol, symbolAtSource, name, alias, decimal, initialSupply, maxSupply, mintable)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -131,7 +131,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage/AddAsset")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage/AddToken")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
@@ -143,15 +143,15 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	cmd.Flags().String(flagThreshold, "0.8", "the upgrade signal threshold of the software upgrade")
 
-	//for addAssetProposal
-	cmd.Flags().String(flagAssetFamily, "", "the asset family, valid values can be fungible and non-fungible")
-	cmd.Flags().String(flagAssetSymbol, "", "the asset symbol. Once created, it cannot be modified")
-	cmd.Flags().String(flagAssetName, "", "the asset name")
-	cmd.Flags().Uint8(flagAssetDecimal, 0, "the asset decimal. The maximum value is 18")
-	cmd.Flags().String(flagAssetSymbolMinAlias, "", "the asset symbol minimum alias")
-	cmd.Flags().Uint64(flagAssetInitialSupply, 0, "the initial supply token of asset")
-	cmd.Flags().Uint64(flagAssetMaxSupply, asset.MaximumAssetMaxSupply, "the max supply token of asset")
-	cmd.Flags().Bool(flagAssetMintable, false, "whether the asset can be minted, default false")
+	//for AddTokenProposal
+	cmd.Flags().String(flagTokenSymbol, "", "the asset symbol. Once created, it cannot be modified")
+	cmd.Flags().String(flagTokenSymbolAtSource, "", "the source symbol of a external asset")
+	cmd.Flags().String(flagTokenName, "", "the asset name")
+	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
+	cmd.Flags().String(flagTokenSymbolMinAlias, "", "the asset symbol minimum alias")
+	cmd.Flags().Uint64(flagTokenInitialSupply, 0, "the initial supply token of asset")
+	cmd.Flags().Uint64(flagTokenMaxSupply, asset.MaximumAssetMaxSupply, "the max supply token of asset")
+	cmd.Flags().Bool(flagTokenMintable, false, "whether the asset can be minted, default false")
 
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)

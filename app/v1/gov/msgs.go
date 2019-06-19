@@ -310,10 +310,10 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	return nil
 }
 
-type MsgSubmitAddAssetProposal struct {
+type MsgSubmitAddTokenProposal struct {
 	MsgSubmitProposal
-	Family         string `json:"family"`
 	Symbol         string `json:"symbol"`
+	SymbolAtSource string `json:"symbol_at_source"`
 	Name           string `json:"name"`
 	Decimal        uint8  `json:"decimal"`
 	SymbolMinAlias string `json:"symbol_min_alias"`
@@ -322,11 +322,11 @@ type MsgSubmitAddAssetProposal struct {
 	Mintable       bool   `json:"mintable"`
 }
 
-func NewMsgSubmitAddAssetProposal(msgSubmitProposal MsgSubmitProposal, family, symbol, name, symbolMinAlias string, decimal uint8, initialSupply, maxSupply uint64, mintable bool) MsgSubmitAddAssetProposal {
-	return MsgSubmitAddAssetProposal{
+func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, symbolAtSource, name, symbolMinAlias string, decimal uint8, initialSupply, maxSupply uint64, mintable bool) MsgSubmitAddTokenProposal {
+	return MsgSubmitAddTokenProposal{
 		MsgSubmitProposal: msgSubmitProposal,
-		Family:            family,
 		Symbol:            symbol,
+		SymbolAtSource:    symbolAtSource,
 		Name:              name,
 		Decimal:           decimal,
 		SymbolMinAlias:    symbolMinAlias,
@@ -336,25 +336,22 @@ func NewMsgSubmitAddAssetProposal(msgSubmitProposal MsgSubmitProposal, family, s
 	}
 }
 
-func (msg MsgSubmitAddAssetProposal) Route() string { return MsgRoute }
-func (msg MsgSubmitAddAssetProposal) Type() string  { return "submit_add_asset_proposal" }
-
-func (msg MsgSubmitAddAssetProposal) ValidateBasic() sdk.Error {
+func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
 	err := msg.MsgSubmitProposal.ValidateBasic()
 	if err != nil {
 		return err
 	}
 
-	family, e := asset.AssetFamilyFromString(msg.Family)
-	if e != nil {
-		return asset.ErrInvalidAssetFamily(DefaultCodespace, family)
+	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, nil, nil)
+
+	err = issueToken.ValidateBasic()
+	// skip this error code
+	if err.Code() == asset.CodeInvalidAssetSource {
+		return nil
 	}
-
-	msgAsset := asset.NewMsgIssueAsset(family, asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, nil, nil)
-
-	return msgAsset.ValidateBasic()
+	return err
 }
-func (msg MsgSubmitAddAssetProposal) GetSignBytes() []byte {
+func (msg MsgSubmitAddTokenProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
