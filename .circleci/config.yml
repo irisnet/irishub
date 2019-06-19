@@ -45,10 +45,10 @@ jobs:
           name: push irishub testnet image
           command: docker push irisnet/irishub:testnet-$TAG
   UnitTest:
-    docker:
-      - image: circleci/golang:1.12.5
-    steps:
+    machine:
+      docker_layer_caching: true
+      steps:
       - checkout
       - run:
           name: Run unit tests
-          command: make test_unit
+          command: docker run -it -v $(pwd):/irishub irisnet/golang sh -c "make test_unit"
