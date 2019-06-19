@@ -63,7 +63,7 @@ func TestQueryTokenStats(t *testing.T) {
 	burnedToken := sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(50))}
 	input.bk.BurnCoins(input.ctx, addr, burnedToken)
 
-	res, err = queryTokenStats(input.ctx, input.bk, input.cdc)
+	res, err = queryTokenStats(input.ctx, req, input.bk, input.cdc)
 	require.Nil(t, err)
 	require.NotNil(t, res)
 

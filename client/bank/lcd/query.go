@@ -105,7 +105,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 			}
 
 			tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
-
+			tokenStats.TotalSupply = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.TokenSupply().TruncateInt()}}
 			utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 		} else {
 			cliCtx = cliCtx.WithAccountDecoder(decoder)
@@ -132,11 +132,15 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 			}
 			var tokenStats bank.TokenStats
 
-			//get loose token from asset
-
+			// TODO: query total supply from /custom/bank/token-stats
+			//tokenStatsRes, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.BankRoute, bank.QueryTokenStats), bz)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 			looseToken := sdk.Coin{}
 			looseToken.Denom = nAsset.GetDenom()
-			looseToken.Amount = nAsset.GetTotalSupply()
+			//looseToken.Amount = nAsset.GetTotalSupply()
 			tokenStats.LooseTokens = append(tokenStats.LooseTokens, looseToken)
 
 			//get burned token from burnAddress

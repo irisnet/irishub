@@ -21,7 +21,7 @@ func NewQuerier(keeper Keeper, cdc *codec.Codec) sdk.Querier {
 		case QueryAccount:
 			return queryAccount(ctx, req, keeper, cdc)
 		case QueryTokenStats:
-			return queryTokenStats(ctx, keeper, cdc)
+			return queryTokenStats(ctx, req, keeper, cdc)
 
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
@@ -60,8 +60,20 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *co
 	return bz, nil
 }
 
-func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+// defines the params for query: "custom/bank/token-stats"
+type QueryTokenStatsParams struct {
+	TokenId string
+}
+
+func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+	var params QueryTokenStatsParams
 	bk := keeper.(BaseKeeper)
+	if err := cdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	// TODO: query total supply by id
+
 	tokenStats := TokenStats{
 		LooseTokens:  bk.GetLoosenCoins(ctx),
 		BurnedTokens: bk.GetCoins(ctx, BurnedCoinsAccAddr),
@@ -78,4 +90,5 @@ type TokenStats struct {
 	LooseTokens  sdk.Coins `json:"loose_tokens"`
 	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	BondedTokens sdk.Coins `json:"bonded_tokens"`
+	TotalSupply  sdk.Coins `json:"total_supply"`
 }

@@ -158,7 +158,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 				//get loose token from asset
 				looseToken := sdk.Coin{}
 				looseToken.Denom = nAsset.GetDenom()
-				looseToken.Amount = nAsset.GetTotalSupply()
+				//looseToken.Amount = nAsset.GetTotalSupply()
 				tokenStats.LooseTokens = append(tokenStats.LooseTokens, looseToken)
 
 				//get burned token from burnAddress

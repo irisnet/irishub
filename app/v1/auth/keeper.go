@@ -14,6 +14,7 @@ var (
 	globalAccountNumberKey = []byte("globalAccountNumber")
 	TotalLoosenTokenKey    = []byte("totalLoosenToken")
 	//BurnedTokenKey = []byte("burnedToken")
+	totalSupplyKeyPrefix = []byte("totalSupply:")
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -269,6 +270,83 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 
 	ctx.Logger().Info("Execute DecreaseTotalLoosenToken Successed",
 		"decreaseCoins", decreaseCoins.String(), "totalLoosenToken", totalLoosenToken.String())
+}
+
+// Turn a token demom to key used to get it from the account store
+func TotalSupplyStoreKey(denom string) []byte {
+	return append(totalSupplyKeyPrefix, []byte(denom)...)
+}
+
+func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
+	// parameter checking
+	if coin == (sdk.Coin{}) || !coin.IsPositive() || coin.IsZero() {
+		return sdk.ErrInsufficientCoins("total supply amount to increase must be positive")
+	}
+
+	// read from db
+	totalSupply, found := am.GetTotalSupply(ctx, coin.Denom)
+	if !found {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid denom %s, unable to get total supply", coin.Denom))
+	}
+
+	// increase totalSupply
+	totalSupply = totalSupply.Plus(coin)
+	if !totalSupply.IsNotNegative() {
+		panic(fmt.Errorf("total supply is overflow"))
+	}
+
+	// write back to db
+	am.SetTotalSupply(ctx, totalSupply)
+
+	ctx.Logger().Info("Execute IncreaseTotalSupply Succeeded",
+		"increaseCoins", coin.String(), "totalSupply", totalSupply.String())
+
+	return nil
+}
+
+func (am AccountKeeper) DecreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
+	// parameter checking
+	if coin == (sdk.Coin{}) || !coin.IsPositive() || coin.IsZero() {
+		return sdk.ErrInsufficientCoins("total supply amount to decrease must be positive")
+	}
+
+	// read from db
+	totalSupply, found := am.GetTotalSupply(ctx, coin.Denom)
+	if !found {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid denom %s, unable to get total supply", coin.Denom))
+	}
+
+	// decrease totalSupply
+	totalSupply = totalSupply.Minus(coin)
+	if !totalSupply.IsNotNegative() {
+		panic(fmt.Errorf("total supply is negative"))
+	}
+
+	// write back to db
+	am.SetTotalSupply(ctx, totalSupply)
+
+	ctx.Logger().Info("Execute DecreaseTotalSupply Succeeded",
+		"decreaseCoins", coin.String(), "totalSupply", totalSupply.String())
+
+	return nil
+}
+
+func (am AccountKeeper) GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.Coin, found bool) {
+	store := ctx.KVStore(am.key)
+	bz := store.Get(TotalSupplyStoreKey(denom))
+	if bz == nil {
+		return coin, false
+	}
+
+	am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &coin)
+	return coin, true
+}
+
+func (am AccountKeeper) SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin) {
+	// write back to db
+	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalSupply)
+	store := ctx.KVStore(am.key)
+	store.Set(TotalSupplyStoreKey(totalSupply.Denom), bzNew)
 }
 
 //----------------------------------------

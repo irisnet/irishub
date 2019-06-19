@@ -71,13 +71,16 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 	}
 
 	if owner != nil {
-		newCoin := sdk.Coins{sdk.NewCoin(token.GetDenom(), token.GetInitSupply())}
+		initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
 
 		// Add coins into owner's account
-		_, _, err := k.bk.AddCoins(ctx, owner, newCoin)
+		_, _, err := k.bk.AddCoins(ctx, owner, sdk.Coins{initialSupply})
 		if err != nil {
 			return nil, err
 		}
+
+		// Set total supply
+		k.bk.SetTotalSupply(ctx, initialSupply)
 	}
 
 	createTags := sdk.NewTags(
