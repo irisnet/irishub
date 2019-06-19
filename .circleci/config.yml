@@ -1,3 +1,4 @@
+version: 2.1
 workflows:
   version: 2
   Deploy:
@@ -12,12 +13,7 @@ workflows:
                 - /v.*/
   Tests:
     jobs:
-      - UnitTest:
-          filters:
-            branches:
-              only:
-                - master
-                - develop
+      - UnitTest
 jobs:
   BuildAndDeploy:
     machine:
