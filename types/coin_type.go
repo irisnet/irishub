@@ -230,7 +230,7 @@ func GetDefaultUnits(coin string) Units {
 
 func GetCoin(coinStr string) (denom, amount string, err error) {
 	var (
-		reDnm  = `[A-Za-z0-9\.\-]{3,20}`
+		reDnm  = `[A-Za-z0-9\.\-]{3,21}`
 		reAmt  = `[0-9]+[.]?[0-9]*`
 		reSpc  = `[[:space:]]*`
 		reCoin = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmt, reSpc, reDnm))
