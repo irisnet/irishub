@@ -56,6 +56,7 @@ type MsgIssueToken struct {
 
 // NewMsgIssueToken - construct asset issue msg.
 func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueToken {
+	fmt.Println(symbolAtSource)
 	return MsgIssueToken{
 		Family:         family,
 		Source:         source,
@@ -127,8 +128,8 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	}
 
 	symbolMinAliasLen := len(msg.SymbolMinAlias)
-	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) {
-		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid asset symbol_min_alias %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
+	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) || !IsBeginWithAlpha(msg.Symbol) {
+		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid asset symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
 	}
 
 	if msg.InitialSupply > MaximumAssetInitSupply {

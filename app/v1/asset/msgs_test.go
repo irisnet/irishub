@@ -23,19 +23,19 @@ func TestMsgIssueAsset(t *testing.T) {
 		MsgIssueToken
 		expectPass bool
 	}{
-		{"basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), true},
-		{"error family", NewMsgIssueToken(0x02, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), true},
+		{"error family", NewMsgIssueToken(0x02, NATIVE, "b", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 		{"error source", NewMsgIssueToken(FUNGIBLE, 0x03, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"empty symbol", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "", "btc", "btc", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error symbol", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error symbol_at_source", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "434,23d", "btcccccccccc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error symbol_min_alias", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "434,23d", "btc", "btc", 1, "satoshiiiiiii", 1, 1, true, addr, sdk.Coins{}), false},
-		{"empty name", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
-		{"error name", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-		{"zero supply bigger", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "e", "btc", 1, "satoshi", 0, 1, true, addr, sdk.Coins{}), true},
-		{"zero max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr, sdk.Coins{}), false},
-		{"init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr, sdk.Coins{}), false},
-		{"error decimal", NewMsgIssueToken(FUNGIBLE, NATIVE, "c", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"empty symbol", NewMsgIssueToken(FUNGIBLE, NATIVE, "d", "", "btc", "btc", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "434,23d", "btc", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol_at_source", NewMsgIssueToken(FUNGIBLE, NATIVE, "f", "434,23d", "b", "btc", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error symbol_min_alias", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "434,23d", "btc", "btc", 1, "satoshiiiiiii", 1, 1, true, addr, sdk.Coins{}), false},
+		{"empty name", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "", 1, "g", 1, 1, true, addr, sdk.Coins{}), false},
+		{"error name", NewMsgIssueToken(FUNGIBLE, NATIVE, "i", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
+		{"zero supply bigger", NewMsgIssueToken(FUNGIBLE, NATIVE, "j", "btc", "btc", "btc", 1, "satoshi", 0, 1, true, addr, sdk.Coins{}), true},
+		{"zero max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "k", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr, sdk.Coins{}), false},
+		{"init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "l", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr, sdk.Coins{}), false},
+		{"error decimal", NewMsgIssueToken(FUNGIBLE, NATIVE, "m", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 	}
 
 	for _, tc := range tests {
