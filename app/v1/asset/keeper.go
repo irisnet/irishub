@@ -3,7 +3,6 @@ package asset
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/asset/tags"
-
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"

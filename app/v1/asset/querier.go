@@ -69,6 +69,10 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 		return nil, sdk.ParseParamsErr(err)
 	}
 
+	if err := ValidateMoniker(params.Moniker); err != nil {
+		return nil, err
+	}
+
 	gateway, err2 := keeper.GetGateway(ctx, params.Moniker)
 	if err2 != nil {
 		return nil, err2
@@ -148,17 +152,18 @@ func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
 }
 
 func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	fmt.Println(path)
 	switch path[0] {
 	case "gateways":
 		return queryGatewayFee(ctx, req, keeper)
-	case "fungible-tokens":
-		return queryFTFees(ctx, req, keeper)
+	case "tokens":
+		return queryTokenFees(ctx, req, keeper)
 	default:
 		return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
 	}
 }
 
-// QueryFeeParams is the query parameters for 'custom/asset/fees/gateways'
+// QueryGatewayFeeParams is the query parameters for 'custom/asset/fees/gateways'
 type QueryGatewayFeeParams struct {
 	Moniker string
 }
@@ -171,13 +176,14 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	}
 
 	moniker := params.Moniker
-	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
-		return nil, ErrInvalidMoniker(keeper.Codespace(), fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	if err := ValidateMoniker(moniker); err != nil {
+		return nil, err
 	}
 
-	assetParams := keeper.GetParamSet(ctx)
-	gatewayBaseFee := assetParams.CreateGatewayBaseFee
-	fee := sdk.NewCoin(gatewayBaseFee.Denom, calcFee(moniker, gatewayBaseFee.Amount))
+	fee := GatewayFeeOutput{
+		Exist: keeper.HasGateway(ctx, moniker),
+		Fee:   getGatewayCreateFee(ctx, keeper, moniker),
+	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
 	if err != nil {
@@ -187,32 +193,40 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	return bz, nil
 }
 
-// QueryFTFeesParams is the query parameters for 'custom/asset/fees/fungible-tokens'
-type QueryFTFeesParams struct {
+// QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
+type QueryTokenFeesParams struct {
 	ID string
 }
 
-// FTFeesOutput is the query result for 'custom/asset/fees/fungible-tokens'
-type FTFeesOutput struct {
-	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
-	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
-}
-
-func queryFTFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryFTFeesParams
+func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryTokenFeesParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	// id := params.ID
+	id := params.ID
+	if err := CheckAssetID(id); err != nil {
+		return nil, err
+	}
 
-	// TODO
-	// compute fees
-	issueFee := sdk.Coin{}
-	mintFee := sdk.Coin{}
+	source, symbol := ParseAssetID(id)
 
-	fees := FTFeesOutput{
+	var (
+		issueFee sdk.Coin
+		mintFee  sdk.Coin
+	)
+
+	if source == "" || source == "x" {
+		issueFee = getTokenIssueFee(ctx, keeper, symbol)
+		mintFee = getTokenMintFee(ctx, keeper, symbol)
+	} else {
+		issueFee = getGatewayTokenIssueFee(ctx, keeper, symbol)
+		mintFee = getGatewayTokenMintFee(ctx, keeper, symbol)
+	}
+
+	fees := TokenFeesOutput{
+		Exist:    keeper.HasToken(ctx, id),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
 	}

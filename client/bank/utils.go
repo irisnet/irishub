@@ -2,6 +2,7 @@ package bank
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -18,7 +19,48 @@ type BaseAccount struct {
 	Sequence      uint64         `json:"sequence"`
 }
 
-func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.Account) (BaseAccount, error) {
+// String implements fmt.Stringer
+func (acc BaseAccount) String() string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d`,
+		acc.Address, pubkey, strings.Join(acc.Coins, ","), acc.AccountNumber, acc.Sequence,
+	)
+}
+
+func ConvertToMainUnit(cliCtx context.CLIContext, coins sdk.Coins) (resCoins []string, err error) {
+	for _, coin := range coins {
+		mainUnit, err := sdk.GetCoinName(coin.String())
+		if err != nil {
+			return nil, err
+		}
+
+		ct, err := cliCtx.GetCoinType(mainUnit)
+		if err != nil {
+			return nil, err
+		}
+
+		destCoinStr, err := ct.Convert(coin.String(), mainUnit)
+		if err != nil {
+			return nil, err
+		}
+
+		resCoins = append(resCoins, destCoinStr)
+	}
+
+	return resCoins, nil
+}
+
+func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.BaseAccount) (BaseAccount, error) {
 	var accCoins []string
 	for _, coin := range acc.GetCoins() {
 		coinString, err := cliCtx.ConvertCoinToMainUnit(coin.String())

@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/store"
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -291,11 +290,11 @@ func parseQueryStorePath(path string) (storeName string, err error) {
 	return paths[1], nil
 }
 
-func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
-	var coinType types.CoinType
+func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
+	var coinType sdk.CoinType
 	coinName = strings.ToLower(coinName)
 	if coinName == "" {
-		return types.CoinType{}, fmt.Errorf("coin name is empty")
+		return sdk.CoinType{}, fmt.Errorf("coin name is empty")
 	}
 	if coinName == sdk.NativeTokenName {
 		coinType = sdk.IRIS
@@ -307,18 +306,18 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (types.CoinType, error) {
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
-			return types.CoinType{}, err
+			return sdk.CoinType{}, err
 		}
 
 		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
 		if err != nil {
-			return types.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
+			return sdk.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
 		var token asset.FungibleToken
 		err = cliCtx.Codec.UnmarshalJSON(res, &token)
 		if err != nil {
-			return types.CoinType{}, err
+			return sdk.CoinType{}, err
 		}
 
 		return token.GetCoinType(), nil
@@ -335,7 +334,7 @@ func (cliCtx CLIContext) ConvertCoinToMainUnit(coinsStr string) (coins []string,
 
 	coinStrs := strings.Split(coinsStr, ",")
 	for _, coinStr := range coinStrs {
-		mainUnit, err := types.GetCoinName(coinStr)
+		mainUnit, err := sdk.GetCoinName(coinStr)
 		coinType, err := cliCtx.GetCoinType(mainUnit)
 		if err != nil {
 			return nil, err
@@ -351,7 +350,7 @@ func (cliCtx CLIContext) ConvertCoinToMainUnit(coinsStr string) (coins []string,
 }
 
 func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
-	mainUnit, err := types.GetCoinName(coinStr)
+	mainUnit, err := sdk.GetCoinName(coinStr)
 	coinType, err := cliCtx.GetCoinType(mainUnit)
 	if err != nil {
 		return sdk.Coin{}, err

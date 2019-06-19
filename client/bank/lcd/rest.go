@@ -13,8 +13,8 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryAccountRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/coins/{type}",
 		QueryCoinTypeRequestHandlerFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc("/bank/token-stats",
-		QueryTokenStatsRequestHandlerFn(cdc, cliCtx)).Methods("GET")
+	r.HandleFunc("/bank/token-stats/{id}",
+		QueryTokenStatsRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
 
 	r.HandleFunc("/bank/accounts/{address}/send", SendRequestHandlerFn(cdc, cliCtx)).Methods("POST")
 	r.HandleFunc("/bank/accounts/{address}/burn", BurnRequestHandlerFn(cdc, cliCtx)).Methods("POST")

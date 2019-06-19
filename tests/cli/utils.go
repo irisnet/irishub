@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/client/bank"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -68,6 +69,7 @@ func modifyGenesisState(genesisState v1.GenesisFileState) v1.GenesisFileState {
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
+	genesisState.AssetData = asset.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
@@ -231,6 +233,20 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
 	require.NoError(t, err, "acc %v, err %v", string(out), err)
 
 	return acc
+}
+
+func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenS bank.TokenStats) {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var initRes map[string]json.RawMessage
+	err := json.Unmarshal([]byte(out), &initRes)
+	require.NoError(t, err, "out %v, err %v", out, err)
+
+	cdc := app.MakeLatestCodec()
+
+	err = cdc.UnmarshalJSON([]byte(out), &tokenS)
+	require.NoError(t, err, "token-stats %v, err %v", string(out), err)
+
+	return tokenS
 }
 
 func executeGetValidatorPK(t *testing.T, cmdStr string) string {

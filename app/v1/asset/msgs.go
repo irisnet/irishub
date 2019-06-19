@@ -2,9 +2,10 @@ package asset
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"regexp"
 	"strings"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -90,7 +91,7 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 
 		break
 	case EXTERNAL:
-		break
+		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
 	case GATEWAY:
 		// require gateway moniker for gateway asset
 		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {
@@ -194,14 +195,9 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
 	}
 
-	// check the moniker size
-	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-	}
-
-	// check the moniker format
-	if !IsAlpha(msg.Moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	// check the moniker
+	if err := ValidateMoniker(msg.Moniker); err != nil {
+		return err
 	}
 
 	// check the details
@@ -215,6 +211,10 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 	}
 
 	// check the fee
+	if msg.Fee.Denom != sdk.NativeTokenMinDenom {
+		return ErrIncorrectFeeDenom(DefaultCodespace, fmt.Sprintf("incorrect fee denom: expected %s, got %s", sdk.NativeTokenMinDenom, msg.Fee.Denom))
+	}
+
 	if !msg.Fee.IsNotNegative() {
 		return ErrNegativeFee(DefaultCodespace, "the fee must not be negative")
 	}
@@ -280,14 +280,9 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
 	}
 
-	// check the moniker size
-	if len(msg.Moniker) < MinimumGatewayMonikerSize || len(msg.Moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-	}
-
-	// check the moniker format
-	if !IsAlpha(msg.Moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	// check the moniker
+	if err := ValidateMoniker(msg.Moniker); err != nil {
+		return err
 	}
 
 	// check the details
@@ -331,4 +326,24 @@ func (msg MsgEditGateway) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgEditGateway) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+// ValidateMoniker checks if the specified moniker is valid
+func ValidateMoniker(moniker string) sdk.Error {
+	// check the moniker size
+	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	// check the moniker format
+	if !IsAlpha(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	}
+
+	// check if the moniker contains the native token name
+	if strings.Contains(strings.ToLower(moniker), sdk.NativeTokenName) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
+	}
+
+	return nil
 }

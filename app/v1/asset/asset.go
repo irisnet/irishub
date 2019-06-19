@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type BaseToken struct {
@@ -159,4 +160,38 @@ func GetKeyIDFromUniqueID(uniqueID string) string {
 	} else {
 		return strings.ToLower(fmt.Sprintf("i.%s", uniqueID))
 	}
+}
+
+// CheckAssetID checks if the given asset id is valid
+func CheckAssetID(id string) sdk.Error {
+	source, symbol := ParseAssetID(id)
+
+	// check gateway moniker
+	if source != "" && source != "x" {
+		if err := ValidateMoniker(source); err != nil {
+			return err
+		}
+	}
+
+	// check symbol
+	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.NativeTokenName) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+	}
+
+	return nil
+}
+
+// ParseAssetID returns the source and symbol
+func ParseAssetID(id string) (source string, symbol string) {
+	parts := strings.Split(strings.ToLower(id), ".")
+
+	if len(parts) > 1 {
+		// external or gateway asset
+		source = parts[0]
+		symbol = strings.Join(parts[1:], ".")
+	} else {
+		symbol = parts[0]
+	}
+
+	return
 }

@@ -77,4 +77,5 @@ func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, 
 type TokenStats struct {
 	LooseTokens  sdk.Coins `json:"loose_tokens"`
 	BurnedTokens sdk.Coins `json:"burned_tokens"`
+	BondedTokens sdk.Coins `json:"bonded_tokens"`
 }

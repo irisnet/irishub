@@ -82,11 +82,7 @@ func DefaultParams() Params {
 }
 
 func validateParams(p Params) error {
-	if sdk.NetworkType != sdk.Mainnet {
-		return nil
-	}
-
-	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.NewDecWithPrec(0, 0)) {
+	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.ZeroDec()) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMintInflation, fmt.Sprintf("Mint Inflation [%s] should be between [0, 0.2] ", p.Inflation.String()))
 	}
 	return nil

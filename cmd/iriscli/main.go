@@ -92,7 +92,7 @@ func main() {
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
 			bankcmd.GetAccountCmd(cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetCmdQueryTokenStats(cdc),
+			bankcmd.GetCmdQueryTokenStats(cdc, utils.GetAccountDecoder(cdc)),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
@@ -269,7 +269,7 @@ func main() {
 			assetcmd.GetCmdQueryAsset(cdc),
 			assetcmd.GetCmdQueryGateway(cdc),
 			assetcmd.GetCmdQueryGateways(cdc),
-			assetcmd.GetCmdQueryGatewayFee(cdc),
+			assetcmd.GetCmdQueryFee(cdc),
 		)...)
 
 	rootCmd.AddCommand(
