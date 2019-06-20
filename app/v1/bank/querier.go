@@ -2,7 +2,6 @@ package bank
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -62,9 +61,12 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *co
 
 func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
 	bk := keeper.(BaseKeeper)
+	irisBurnedToken := sdk.Coin{}
+	irisBurnedToken.Denom = "iris"
+	irisBurnedToken.Amount = bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf("iris")
 	tokenStats := TokenStats{
 		LooseTokens:  bk.GetLoosenCoins(ctx),
-		BurnedTokens: bk.GetCoins(ctx, BurnedCoinsAccAddr),
+		BurnedTokens: sdk.Coins{irisBurnedToken},
 	}
 	bz, err := codec.MarshalJSONIndent(cdc, tokenStats)
 	if err != nil {
