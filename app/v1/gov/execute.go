@@ -104,9 +104,9 @@ func AddTokenProposalExecute(ctx sdk.Context, gk Keeper, tp *AddTokenProposal) e
 	logger := ctx.Logger()
 	_, err := gk.ak.IssueToken(ctx, tp.FToken)
 	if err != nil {
-		logger.Error("Execute AddTokenProposal failed", "height", ctx.BlockHeight(), "proposalId", tp.ProposalID, "asset_symbol", tp.FToken.Symbol)
+		logger.Error("Execute AddTokenProposal failed", "height", ctx.BlockHeight(), "proposalId", tp.ProposalID, "token_id", tp.FToken.Id)
 		return err
 	}
-	logger.Info("Execute AddTokenProposal success", "height", ctx.BlockHeight(), "proposalId", tp.ProposalID, "asset_symbol", tp.FToken.Symbol)
+	logger.Info("Execute AddTokenProposal success", "height", ctx.BlockHeight(), "proposalId", tp.ProposalID, "token_id", tp.FToken.Id)
 	return nil
 }
