@@ -10,7 +10,7 @@ import (
 )
 
 // queryGatewayFee retrieves the gateway creation fee for the specified moniker
-func queryGatewayFee(cliCtx *context.CLIContext, moniker string) (asset.GatewayFeeOutput, error) {
+func queryGatewayFee(cliCtx context.CLIContext, moniker string) (asset.GatewayFeeOutput, error) {
 	params := asset.QueryGatewayFeeParams{
 		Moniker: moniker,
 	}
@@ -33,12 +33,11 @@ func queryGatewayFee(cliCtx *context.CLIContext, moniker string) (asset.GatewayF
 		return asset.GatewayFeeOutput{}, err
 	}
 
-	out.Fee = sdk.NewCoin(sdk.NativeTokenName, out.Fee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
 	return out, nil
 }
 
 // queryTokenFees retrieves the fees of token issuance and minting for the specified id
-func queryTokenFees(cliCtx *context.CLIContext, tokenID string) (asset.TokenFeesOutput, error) {
+func queryTokenFees(cliCtx context.CLIContext, tokenID string) (asset.TokenFeesOutput, error) {
 	params := asset.QueryTokenFeesParams{
 		ID: tokenID,
 	}
@@ -61,8 +60,23 @@ func queryTokenFees(cliCtx *context.CLIContext, tokenID string) (asset.TokenFees
 		return asset.TokenFeesOutput{}, err
 	}
 
-	out.IssueFee = sdk.NewCoin(sdk.NativeTokenName, out.IssueFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
-	out.MintFee = sdk.NewCoin(sdk.NativeTokenName, out.MintFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
-
 	return out, nil
+}
+
+// ConvertToNativeToken converts the coin with native token min denom to the coin with native token name
+func ConvertToNativeToken(minDenomCoin sdk.Coin) sdk.Coin {
+	if minDenomCoin.Denom != sdk.NativeTokenMinDenom {
+		panic(fmt.Sprintf("the denom of the input coin must be %s", sdk.NativeTokenMinDenom))
+	}
+
+	return sdk.NewCoin(sdk.NativeTokenName, minDenomCoin.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
+}
+
+// ConvertToNativeTokenMin converts the coin with native token name to the coin with native token min denom
+func ConvertToNativeTokenMin(nativeTokenCoin sdk.Coin) sdk.Coin {
+	if nativeTokenCoin.Denom != sdk.NativeTokenName {
+		panic(fmt.Sprintf("the denom of the input coin must be %s", sdk.NativeTokenName))
+	}
+
+	return sdk.NewCoin(sdk.NativeTokenMinDenom, nativeTokenCoin.Amount.Mul(sdk.NewIntWithDecimal(1, 18)))
 }
