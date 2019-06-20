@@ -33,6 +33,14 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 	symbolMinAlias = strings.ToLower(strings.TrimSpace(symbolMinAlias))
 	name = strings.TrimSpace(name)
 
+	if maxSupply.IsZero() {
+		if mintable {
+			maxSupply = sdk.NewInt(int64(MaximumAssetMaxSupply))
+		} else {
+			maxSupply = initialSupply
+		}
+	}
+
 	return BaseToken{
 		Family:         family,
 		Source:         source,

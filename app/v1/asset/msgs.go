@@ -86,6 +86,14 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	msg.SymbolMinAlias = strings.ToLower(strings.TrimSpace(msg.SymbolMinAlias))
 	msg.Name = strings.TrimSpace(msg.Name)
 
+	if msg.MaxSupply == 0 {
+		if msg.Mintable {
+			msg.MaxSupply = MaximumAssetMaxSupply
+		} else {
+			msg.MaxSupply = msg.InitialSupply
+		}
+	}
+
 	switch msg.Source {
 	case NATIVE:
 		// require owner for native asset
