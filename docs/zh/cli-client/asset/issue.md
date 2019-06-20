@@ -23,7 +23,7 @@ iriscli asset issue [flags]
 | --symbol-min-alias| string    | 否       |                    | 资产最小单位别名，alphanumeric，首字符必须为字母，长度[3,10]，toLowerCase                                                                                                                                                                                   |
 | --source          | string    | 否       |  native            | 可选：native; external; gateway                                                                                                             |
 | --initial-supply  | uint64    | 是       |                    | 该资产的初始发行量，该值不能超过1000亿                                                                                                                 |
-| --max-supply      | uint64    | 是       |  1000000000000     | 该资产的最大发行量，资产的总供应量不能超过该值                                                                                                                 |
+| --max-supply      | uint64    | 否       |  1000000000000     | 该资产的最大发行量，资产的总供应量不能超过该值                                                                                                                 |
 | --decimal         | uint8     | 否       |  0                 | 该资产值允许的最高小数位，最大为18位                                                                                                                   |
 | --mintable        | boolean   | 否       |  false             | 初始发行后，该资产是否允许增发                                                                                                                        |
 | --operators       | []Address | 否       |  []                | 资产的操纵者拥有除转让资产所有者的所有权限。但当资产所有者丢失私钥且存在两个及两个以上的资产操纵者时，操纵者们可以通过发送由超过2/3的资产操纵者签名的转让资产交易来转让资产所有者。|
@@ -65,10 +65,6 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
       {
         "key": "action",
         "value": "issue_token"
-      },
-      {
-        "key": "action",
-        "value": "issue-token"
       },
       {
         "key": "token-id",
