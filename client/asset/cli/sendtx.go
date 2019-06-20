@@ -144,7 +144,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 				// check if the provided fee is enough
 				if createFeeCoin.IsLT(actualFee.Fee) {
-					return fmt.Errorf("insufficient creation fee: expected %s, got %s", actualFee.Fee, createFeeCoin)
+					return fmt.Errorf("insufficient gateway creation fee: expected %s, got %s", ConvertToNativeToken(actualFee.Fee), ConvertToNativeToken(createFeeCoin))
 				}
 
 				// append actual fee to prompt
@@ -153,14 +153,14 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// a confirmation is needed
-			prompt += "\nAre you sure to proceed? (y/n)"
+			prompt += "\nAre you sure to proceed?"
 			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
 			if err != nil {
 				return err
 			}
 
 			if !confirmed {
-				return fmt.Errorf("transaction aborted")
+				return fmt.Errorf("The operation aborted")
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
