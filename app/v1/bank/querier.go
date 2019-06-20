@@ -62,8 +62,8 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *co
 func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
 	bk := keeper.(BaseKeeper)
 	irisBurnedToken := sdk.Coin{}
-	irisBurnedToken.Denom = "iris"
-	irisBurnedToken.Amount = bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf("iris")
+	irisBurnedToken.Denom = "iris-atto"
+	irisBurnedToken.Amount = bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf("iris-atto")
 	tokenStats := TokenStats{
 		LooseTokens:  bk.GetLoosenCoins(ctx),
 		BurnedTokens: sdk.Coins{irisBurnedToken},
