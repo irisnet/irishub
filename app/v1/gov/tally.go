@@ -95,10 +95,11 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 	tallyingProcedure := keeper.GetTallyingProcedure(ctx, proposal)
 
 	tallyResults = TallyResult{
-		Yes:        results[OptionYes].QuoInt(sdk.AttoPrecision),
-		Abstain:    results[OptionAbstain].QuoInt(sdk.AttoPrecision),
-		No:         results[OptionNo].QuoInt(sdk.AttoPrecision),
-		NoWithVeto: results[OptionNoWithVeto].QuoInt(sdk.AttoPrecision),
+		Yes:               results[OptionYes].QuoInt(sdk.AttoPrecision),
+		Abstain:           results[OptionAbstain].QuoInt(sdk.AttoPrecision),
+		No:                results[OptionNo].QuoInt(sdk.AttoPrecision),
+		NoWithVeto:        results[OptionNoWithVeto].QuoInt(sdk.AttoPrecision),
+		SystemVotingPower: systemVotingPower.QuoInt(sdk.AttoPrecision),
 	}
 
 	// If no one votes, proposal fails

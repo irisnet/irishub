@@ -2,6 +2,7 @@ package gov
 
 import (
 	"encoding/json"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"strconv"
 
 	"github.com/irisnet/irishub/app/v1/gov/tags"
@@ -24,6 +25,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgSubmitSoftwareUpgradeProposal(ctx, keeper, msg)
 		case MsgVote:
 			return handleMsgVote(ctx, keeper, msg)
+		case MsgSubmitAddTokenProposal:
+			return handleMsgSubmitAddTokenProposal(ctx, keeper, msg)
 		default:
 			errMsg := "Unrecognized gov msg type"
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -213,6 +216,40 @@ func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 		tags.ProposalID, proposalIDBytes,
 	)
 	return sdk.Result{
+		Tags: resTags,
+	}
+}
+
+func handleMsgSubmitAddTokenProposal(ctx sdk.Context, keeper Keeper, msg MsgSubmitAddTokenProposal) sdk.Result {
+
+	proposalLevel := GetProposalLevelByProposalKind(msg.ProposalType)
+	if num, ok := keeper.HasReachedTheMaxProposalNum(ctx, proposalLevel); ok {
+		return ErrMoreThanMaxProposal(keeper.codespace, num, proposalLevel.string()).Result()
+	}
+
+	proposal := keeper.NewAddTokenProposal(ctx, msg)
+
+	err, votingStarted := keeper.AddInitialDeposit(ctx, proposal, msg.Proposer, msg.InitialDeposit)
+	if err != nil {
+		return err.Result()
+	}
+	tokenId := proposal.(*AddTokenProposal).FToken.GetUniqueID()
+	if keeper.ak.HasToken(ctx, tokenId) {
+		return asset.ErrAssetAlreadyExists(keeper.codespace, tokenId).Result()
+	}
+	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
+	resTags := sdk.NewTags(
+		tags.Proposer, []byte(msg.Proposer.String()),
+		tags.ProposalID, proposalIDBytes,
+		tags.TokenId, []byte(tokenId),
+	)
+
+	if votingStarted {
+		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
+	}
+	keeper.AddProposalNum(ctx, proposal)
+	return sdk.Result{
+		Data: proposalIDBytes,
 		Tags: resTags,
 	}
 }
