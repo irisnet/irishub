@@ -49,7 +49,7 @@ func TestKeeper_IssueToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(NATIVE, "gdex", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
