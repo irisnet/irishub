@@ -390,34 +390,38 @@ func (status ProposalStatus) Format(s fmt.State, verb rune) {
 //-----------------------------------------------------------
 // Tally Results
 type TallyResult struct {
-	Yes        sdk.Dec `json:"yes"`
-	Abstain    sdk.Dec `json:"abstain"`
-	No         sdk.Dec `json:"no"`
-	NoWithVeto sdk.Dec `json:"no_with_veto"`
+	Yes               sdk.Dec `json:"yes"`
+	Abstain           sdk.Dec `json:"abstain"`
+	No                sdk.Dec `json:"no"`
+	NoWithVeto        sdk.Dec `json:"no_with_veto"`
+	SystemVotingPower sdk.Dec `json:"system_voting_power"`
 }
 
 // checks if two proposals are equal
 func EmptyTallyResult() TallyResult {
 	return TallyResult{
-		Yes:        sdk.ZeroDec(),
-		Abstain:    sdk.ZeroDec(),
-		No:         sdk.ZeroDec(),
-		NoWithVeto: sdk.ZeroDec(),
+		Yes:               sdk.ZeroDec(),
+		Abstain:           sdk.ZeroDec(),
+		No:                sdk.ZeroDec(),
+		NoWithVeto:        sdk.ZeroDec(),
+		SystemVotingPower: sdk.ZeroDec(),
 	}
 }
 
 // checks if two proposals are equal
-func (resultA TallyResult) Equals(resultB TallyResult) bool {
-	return resultA.Yes.Equal(resultB.Yes) &&
-		resultA.Abstain.Equal(resultB.Abstain) &&
-		resultA.No.Equal(resultB.No) &&
-		resultA.NoWithVeto.Equal(resultB.NoWithVeto)
+func (tr TallyResult) Equals(resultB TallyResult) bool {
+	return tr.Yes.Equal(resultB.Yes) &&
+		tr.Abstain.Equal(resultB.Abstain) &&
+		tr.No.Equal(resultB.No) &&
+		tr.NoWithVeto.Equal(resultB.NoWithVeto) &&
+		tr.SystemVotingPower.Equal(resultB.SystemVotingPower)
 }
 
 func (tr TallyResult) String() string {
 	return fmt.Sprintf(`Tally Result:
-  Yes:        %s
-  Abstain:    %s
-  No:         %s
-  NoWithVeto: %s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String())
+  Yes:				%s
+  Abstain:			%s
+  No:				%s
+  NoWithVeto:		%s
+  SystemVotingPower:%s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String(), tr.SystemVotingPower.String())
 }
