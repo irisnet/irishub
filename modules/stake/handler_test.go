@@ -705,7 +705,7 @@ func TestUnbondingPeriod(t *testing.T) {
 	require.False(t, found, "should have unbonded")
 }
 
-func TestUnbondingFromUnbondingValidator(t *testing.T) {
+func TestUnbondingFork(t *testing.T) {
 	ctx, _, keeper := keep.CreateTestInput(t, false, sdk.NewIntWithDecimal(1000, 18))
 	validatorAddr, delegatorAddr := sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
 
@@ -759,50 +759,6 @@ func TestUnbondingFromUnbondingValidator(t *testing.T) {
 	// validate the unbonding object no longer exists as the unbonding period has expired
 	_, found = keeper.GetUnbondingDelegation(ctx, delegatorAddr, validatorAddr)
 	require.False(t, found, "unbonding object should not exist")
-}
-
-func TestUnbondingFork(t *testing.T) {
-	ctx, _, keeper := keep.CreateTestInput(t, false, sdk.NewInt(1000))
-	validatorAddr, delegatorAddr := sdk.ValAddress(keep.Addrs[0]), keep.Addrs[1]
-
-	// create the validator
-	msgCreateValidator := NewTestMsgCreateValidator(validatorAddr, keep.PKs[0], sdk.NewInt(10))
-	got := handleMsgCreateValidator(ctx, msgCreateValidator, keeper)
-	require.True(t, got.IsOK(), "expected no error on runMsgCreateValidator")
-
-	// bond a delegator
-	msgDelegate := NewTestMsgDelegate(delegatorAddr, validatorAddr, sdk.NewInt(10))
-	got = handleMsgDelegate(ctx, msgDelegate, keeper)
-	require.True(t, got.IsOK(), "expected ok, got %v", got)
-
-	// unbond the delegator from the validator
-	msgUndelegateDelegator := NewMsgBeginUnbonding(delegatorAddr, validatorAddr, sdk.NewDec(10))
-	got = handleMsgBeginUnbonding(ctx, msgUndelegateDelegator, keeper)
-	require.True(t, got.IsOK(), "expected no error")
-
-	// Run the EndBlocker
-	EndBlocker(ctx, keeper)
-
-	// change the ctx to Block Time one second before the validator would have unbonded
-	var finishTime time.Time
-	types.MsgCdc.MustUnmarshalBinaryLengthPrefixed(got.Data, &finishTime)
-	ctx = ctx.WithBlockTime(finishTime.Add(time.Second * -1))
-
-	// unbond the delegator from the validator
-	msgBeginUnbondingDelegator := NewMsgBeginUnbonding(delegatorAddr, validatorAddr, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
-	got = handleMsgBeginUnbonding(ctx, msgBeginUnbondingDelegator, keeper)
-	require.True(t, got.IsOK(), "expected no error")
-
-	// move the Block time forward by one second
-	ctx = ctx.WithBlockTime(ctx.BlockHeader().Time.Add(time.Second * 1))
-
-	// Run the EndBlocker
-	EndBlocker(ctx, keeper)
-
-	// Check to make sure that the unbonding delegation is no longer in state
-	// (meaning it was deleted in the above EndBlocker)
-	_, found := keeper.GetUnbondingDelegation(ctx, delegatorAddr, validatorAddr)
-	require.False(t, found, "should be removed from state")
 }
 
 func TestRedelegationPeriod(t *testing.T) {
