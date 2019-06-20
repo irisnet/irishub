@@ -33,8 +33,6 @@ iriscli gov submit-proposal --help
 | --token-decimal |  | 代币最大精度 | |
 | --token-symbol-min-alias |  | 代币最小单温别名 | |
 | --token-initial-supply |  | 代币初始总量 | |
-| --token-max-supply |  | 代币最大总量 | |
-| --token-mintable |  | 代币是否可以增发 | |
 
 ## 例子
 
@@ -57,7 +55,7 @@ iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --des
 ### 提交一个`AddToken`类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000 --token-max-supply=200000 --token-mintable=false
+iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000
 ```
 
 ###  如何查询提议详情？

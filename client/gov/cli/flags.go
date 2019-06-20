@@ -31,6 +31,4 @@ const (
 	flagTokenDecimal        = "token-decimal"
 	flagTokenSymbolMinAlias = "token-symbol-min-alias"
 	flagTokenInitialSupply  = "token-initial-supply"
-	flagTokenMaxSupply      = "token-max-supply"
-	flagTokenMintable       = "token-mintable"
 )

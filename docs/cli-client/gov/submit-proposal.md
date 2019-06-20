@@ -35,8 +35,6 @@ iriscli gov submit-proposal --help
 | --token-decimal |  | the token decimal. The maximum value is 18 | |
 | --token-symbol-min-alias |  | the token symbol minimum alias | |
 | --token-initial-supply |  | the initial supply token of token | |
-| --token-max-supply |  | the max supply token of token | |
-| --token-mintable |  | whether the token can be minted, default false | |
 
 ## Examples
 
@@ -61,7 +59,7 @@ In this case, 'title'、 'type' and 'description' of the proposal is required pa
 ### Submit a `AddToken` type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000 --token-max-supply=200000 --token-mintable=false
+iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000
 ```
 
 ###  How to query proposal

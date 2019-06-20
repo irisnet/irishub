@@ -249,9 +249,9 @@ func (keeper Keeper) NewAddTokenProposal(ctx sdk.Context, msg MsgSubmitAddTokenP
 
 	decimal := int(msg.Decimal)
 	initialSupply := sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal)
-	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal)
+	maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
 
-	fToken := asset.NewFungibleToken(asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, initialSupply, sdk.ZeroInt(), maxSupply, msg.Mintable, nil)
+	fToken := asset.NewFungibleToken(asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, initialSupply, sdk.ZeroInt(), maxSupply, false, nil)
 	var proposal Proposal = &AddTokenProposal{
 		textProposal,
 		fToken,

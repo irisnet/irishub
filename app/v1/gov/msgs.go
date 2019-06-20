@@ -318,11 +318,9 @@ type MsgSubmitAddTokenProposal struct {
 	Decimal        uint8  `json:"decimal"`
 	SymbolMinAlias string `json:"symbol_min_alias"`
 	InitialSupply  uint64 `json:"initial_supply"`
-	MaxSupply      uint64 `json:"max_supply"`
-	Mintable       bool   `json:"mintable"`
 }
 
-func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, symbolAtSource, name, symbolMinAlias string, decimal uint8, initialSupply, maxSupply uint64, mintable bool) MsgSubmitAddTokenProposal {
+func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, symbolAtSource, name, symbolMinAlias string, decimal uint8, initialSupply uint64) MsgSubmitAddTokenProposal {
 	return MsgSubmitAddTokenProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Symbol:            symbol,
@@ -331,8 +329,6 @@ func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, s
 		Decimal:           decimal,
 		SymbolMinAlias:    symbolMinAlias,
 		InitialSupply:     initialSupply,
-		MaxSupply:         maxSupply,
-		Mintable:          mintable,
 	}
 }
 
@@ -342,7 +338,7 @@ func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, msg.MaxSupply, msg.Mintable, nil, nil)
+	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil, nil)
 
 	err = issueToken.ValidateBasic()
 	// skip this error code
