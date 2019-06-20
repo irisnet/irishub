@@ -1,11 +1,13 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -118,7 +120,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			}
 
 			if createFeeCoin.Denom == sdk.NativeTokenName {
-				createFeeCoin = sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(createFeeCoin.Amount.Int64(), 18))
+				createFeeCoin = ConvertToNativeTokenMin(createFeeCoin)
 			}
 
 			var msg sdk.Msg
@@ -128,6 +130,36 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
+			}
+
+			var prompt = "The gateway creation transaction will consume extra fee"
+
+			if !viper.GetBool(client.FlagGenerateOnly) {
+				// query fee
+				actualFee, err := queryGatewayFee(cliCtx, moniker)
+				if err != nil {
+					return fmt.Errorf("failed to query gateway creation fee: %s", err.Error())
+				}
+
+				// check if the provided fee is enough
+				if createFeeCoin.IsLT(actualFee.Fee) {
+					return fmt.Errorf("insufficient creation fee: expected %s, got %s", actualFee.Fee, createFeeCoin)
+				}
+
+				// append actual fee to prompt
+				actualNativeTokenFee := ConvertToNativeToken(actualFee.Fee)
+				prompt += fmt.Sprintf(": %s", actualNativeTokenFee)
+			}
+
+			// a confirmation is needed
+			prompt += "\nAre you sure to proceed? (y/n)"
+			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
+			if err != nil {
+				return err
+			}
+
+			if !confirmed {
+				return fmt.Errorf("transaction aborted")
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
