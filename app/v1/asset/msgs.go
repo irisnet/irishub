@@ -80,11 +80,11 @@ func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 // Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 
-	msg.Gateway = strings.ToLower(strings.Trim(msg.Gateway, " "))
-	msg.Symbol = strings.ToLower(strings.Trim(msg.Symbol, " "))
-	msg.SymbolAtSource = strings.ToLower(strings.Trim(msg.SymbolAtSource, " "))
-	msg.SymbolMinAlias = strings.ToLower(strings.Trim(msg.SymbolMinAlias, " "))
-	msg.Name = strings.Trim(msg.Name, " ")
+	msg.Gateway = strings.ToLower(strings.TrimSpace(msg.Gateway))
+	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
+	msg.SymbolAtSource = strings.ToLower(strings.TrimSpace(msg.SymbolAtSource))
+	msg.SymbolMinAlias = strings.ToLower(strings.TrimSpace(msg.SymbolMinAlias))
+	msg.Name = strings.TrimSpace(msg.Name)
 
 	switch msg.Source {
 	case NATIVE:
