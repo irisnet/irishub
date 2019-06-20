@@ -1,9 +1,8 @@
-version: 2
 workflows:
   version: 2
-  deploy:
+  Deploy:
     jobs:
-      - build_docker_image:
+      - BuildAndDeploy:
           filters:
             branches:
               only:
@@ -11,8 +10,16 @@ workflows:
             tags:
               only:
                 - /v.*/
+  Tests:
+    jobs:
+      - UnitTest:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
 jobs:
-  build_docker_image:
+  BuildAndDeploy:
     machine:
       docker_layer_caching: true
     steps:
@@ -41,3 +48,11 @@ jobs:
       - run:
           name: push irishub testnet image
           command: docker push irisnet/irishub:testnet-$TAG
+  UnitTest:
+    docker:
+      - image: circleci/golang:1.12.5
+    steps:
+      - checkout
+      - run:
+          name: Run unit tests
+          command: make test_unit

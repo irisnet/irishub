@@ -3,7 +3,6 @@
 
 [![License](https://img.shields.io/github/license/irisnet/irishub.svg)](https://github.com/irisnet/irishub/blob/master/LICENSE)
 [![Version](https://img.shields.io/github/tag/irisnet/irishub.svg)](https://github.com/irisnet/irishub/releases)
-[![Lines](https://tokei.rs/b1/github/irisnet/irishub)](https://github.com/irisnet/irishub)
 [![Go Report Card](https://goreportcard.com/badge/github.com/irisnet/irishub)](https://goreportcard.com/report/github.com/irisnet/irishub)
 [![Forum](https://img.shields.io/discourse/https/forum.irisnet.org/topics.svg)](https://forum.irisnet.org/)
 

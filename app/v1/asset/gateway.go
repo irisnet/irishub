@@ -35,9 +35,27 @@ func (gs Gateways) String() string {
 		return "[]"
 	}
 
-	str := fmt.Sprintf("Gateways for owner %s:", gs[0].Owner)
+	var owners []string
+	ownerToGateways := make(map[string][]Gateway)
+
 	for _, g := range gs {
-		str += fmt.Sprintf("\n  Moniker: %s, Identity: %s, Details: %s, Website: %s", g.Moniker, g.Identity, g.Details, g.Website)
+		owner := g.Owner.String()
+
+		if _, ok := ownerToGateways[owner]; !ok {
+			owners = append(owners, owner)
+		}
+
+		ownerToGateways[owner] = append(ownerToGateways[owner], g)
 	}
+
+	var str string
+	for _, o := range owners {
+		str += fmt.Sprintf("Gateways for owner %s:\n", o)
+
+		for _, g := range ownerToGateways[o] {
+			str += fmt.Sprintf("  Moniker: %s, Identity: %s, Details: %s, Website: %s\n", g.Moniker, g.Identity, g.Details, g.Website)
+		}
+	}
+
 	return str
 }
