@@ -36,14 +36,14 @@ iriscli asset issue-token [flags]
 ### Issue native token
 
 ```
-iriscli asset issue-token --family=fungible --name=kittyToken --symbol=kitty --source=native --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
+iriscli asset issue-token --family=fungible --name=kittyToken --symbol=kitty --source=native --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>    --fee=1iris
 ```
 
 
 ### Issue gateway token
 
 ```
-iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=gateway --gateway=gtty --initial-supply=10000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>  --fee=1iris
+iriscli asset issue-token --family=fungible --symbol-at-source=cat --name=kittyToken --symbol=kitty --source=gateway --gateway=gtty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=<true/false>  --fee=1iris
 ```
 
 Output:
