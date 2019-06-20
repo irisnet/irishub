@@ -24,7 +24,7 @@ iriscli asset issue-token [flags]
 | --symbol-min-alias| string    | false       |                    | The alias of minim uint                                                                                                                                                                                    |
 | --source          | string    | false       |  native            | native, external or Gateway IDs                                                                                                                                                                                                                               |
 | --initial-supply  | uint64    | true        |                    | The initial supply for this asset. The amount before boosting should not exceed 100 billion. The amount should be positive integer                                                                                                                                               |
-| --max-supply      | uint64    | false       |  1000000000000     | The hard cap of this asset, total supply can not exceed max supply. The amount should be positive integer                                                                                                                                                                        |
+| --max-supply      | uint64    | true        |  1000000000000     | The hard cap of this asset, total supply can not exceed max supply. The amount should be positive integer                                                                                                                                                                        |
 | --decimal         | uint8     | false       |  0                 | The asset can have a maximum of 18 digits of decimal                                                                                                                                                                                                                             |
 | --mintable        | boolean   | false       |  false             | Whether this asset could be minted(increased) after the initial issuing                                                                                                                                                                                                          |
 
@@ -64,6 +64,10 @@ Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314
       {
         "key": "action",
         "value": "issue_token"
+      },
+      {
+        "key": "action",
+        "value": "issue-token"
       },
       {
         "key": "token-id",
