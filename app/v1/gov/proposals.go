@@ -419,9 +419,9 @@ func (tr TallyResult) Equals(resultB TallyResult) bool {
 
 func (tr TallyResult) String() string {
 	return fmt.Sprintf(`Tally Result:
-  Yes:				%s
-  Abstain:			%s
-  No:				%s
-  NoWithVeto:		%s
-  SystemVotingPower:%s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String(), tr.SystemVotingPower.String())
+  Yes:                %s
+  Abstain:            %s
+  No:                 %s
+  NoWithVeto:         %s
+  SystemVotingPower:  %s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String(), tr.SystemVotingPower.String())
 }
