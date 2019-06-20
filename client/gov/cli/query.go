@@ -43,7 +43,6 @@ func GetCmdQueryProposal(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			return cliCtx.PrintOutput(proposal)
 		},
 	}
