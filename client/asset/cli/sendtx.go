@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -162,30 +163,31 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 			}
 
 			moniker := viper.GetString(FlagMoniker)
-			identity := viper.Get(FlagIdentity)
-			details := viper.Get(FlagDetails)
-			website := viper.Get(FlagWebsite)
+			identity := (*string)(nil)
+			details := (*string)(nil)
+			website := (*string)(nil)
 
-			pIdentity := (*string)(nil)
-			pDetails := (*string)(nil)
-			pWebsite := (*string)(nil)
+			flags := cmd.Flags()
+			flags.Visit(func(f *pflag.Flag) {
+				if f.Name == FlagIdentity {
+					value := f.Value.String()
+					identity = &value
+				}
 
-			if identity != nil {
-				sIdentity := identity.(string)
-				pIdentity = &sIdentity
-			}
-			if details != nil {
-				sDetails := details.(string)
-				pDetails = &sDetails
-			}
-			if website != nil {
-				sWebsite := website.(string)
-				pWebsite = &sWebsite
-			}
+				if f.Name == FlagDetails {
+					value := f.Value.String()
+					details = &value
+				}
+
+				if f.Name == FlagWebsite {
+					value := f.Value.String()
+					website = &value
+				}
+			})
 
 			var msg sdk.Msg
 			msg = asset.NewMsgEditGateway(
-				owner, moniker, pIdentity, pDetails, pWebsite,
+				owner, moniker, identity, details, website,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
