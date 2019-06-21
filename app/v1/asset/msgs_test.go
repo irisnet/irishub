@@ -48,7 +48,6 @@ func TestMsgIssueAsset(t *testing.T) {
 		{"gateway symbol_at_source error", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a1,d", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 		{"gateway symbol_at_source too long", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "abcdefghijklmn", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 		{"gateway symbol_at_source too short", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-
 	}
 
 	for _, tc := range tests {
@@ -226,4 +225,65 @@ func TestMsgEditGatewayGetSigners(t *testing.T) {
 
 	expected := "[6F776E6572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// test ValidateBasic for MsgIssueToken
+func TestMsgEditAsset(t *testing.T) {
+	addr := sdk.AccAddress("test")
+	tests := []struct {
+		testCase string
+		MsgEditToken
+		expectPass bool
+	}{
+		{"native basic good", NewMsgEditToken(addr, "btc", "btc"), true},
+		{"empty owner", NewMsgEditToken(emptyAddr, "btc", "btc"), false},
+		{"native symbol empty", NewMsgEditToken(addr, "btc", ""), false},
+		{"native symbol error", NewMsgEditToken(addr, "btc", "ab,c"), false},
+		{"native symbol first letter is num", NewMsgEditToken(addr, "btc", "4iris"), false},
+		{"native symbol too long", NewMsgEditToken(addr, "btc", "aaaaaaaaa"), false},
+		{"native symbol too short", NewMsgEditToken(addr, "btc", "e"), false},
+		{"native name empty", NewMsgEditToken(addr, "", "btc"), false},
+		{"native name blank", NewMsgEditToken(addr, " ", "btc"), false},
+		{"native name too long", NewMsgEditToken(addr, "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), false},
+		{"no updated fields", NewMsgEditToken(addr, "", ""), false},
+	}
+
+	for _, tc := range tests {
+		if tc.expectPass {
+			require.Nil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
+		} else {
+			require.NotNil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
+		}
+	}
+}
+
+func TestMsgEditTokenRoute(t *testing.T) {
+	owner := sdk.AccAddress([]byte("owner"))
+	name := "btc"
+	symbol := "btc"
+
+	// build a MsgEditToken
+	msg := MsgEditToken{
+		Owner:  owner,
+		Name:   name,
+		Symbol: symbol,
+	}
+
+	require.Equal(t, "asset", msg.Route())
+}
+
+func TestMsgEditTokenGetSignBytes(t *testing.T) {
+	name := "btc"
+	symbol := "btc"
+
+	var msg = MsgEditToken{
+		Owner:  sdk.AccAddress([]byte("owner")),
+		Name:   name,
+		Symbol: symbol,
+	}
+
+	res := msg.GetSignBytes()
+
+	expected := `{"name":"btc","owner":"faa1damkuetjqqah8w","symbol":"btc"}`
+	require.Equal(t, expected, string(res))
 }

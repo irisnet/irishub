@@ -382,6 +382,15 @@ func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
 	return gateways
 }
 
+func executeGetToken(t *testing.T, cmdStr string) asset.FungibleToken {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var token asset.FungibleToken
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &token)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return token
+}
+
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
 	require.True(t, executeWrite(t, cmdStr, writes...))
 }

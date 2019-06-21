@@ -361,3 +361,81 @@ func ValidateMoniker(moniker string) sdk.Error {
 
 	return nil
 }
+
+// MsgEditToken for editing a specified gateway
+type MsgEditToken struct {
+	Owner  sdk.AccAddress `json:"owner"`  //  Owner of the asset
+	Name   string         `json:"name"`   //  name of asset
+	Symbol string         `json:"symbol"` //  symbol of asset
+}
+
+// NewMsgEditToken creates a MsgEditAsset
+func NewMsgEditToken(owner sdk.AccAddress, name string, symbol string) MsgEditToken {
+	return MsgEditToken{
+		Owner:  owner,
+		Name:   name,
+		Symbol: symbol,
+	}
+}
+
+// Route implements Msg
+func (msg MsgEditToken) Route() string { return MsgRoute }
+
+// Type implements Msg
+func (msg MsgEditToken) Type() string { return "edit_asset" }
+
+// ValidateBasic implements Msg
+func (msg MsgEditToken) ValidateBasic() sdk.Error {
+
+	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
+	msg.Name = strings.TrimSpace(msg.Name)
+
+	// check the owner
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the asset must be specified"))
+	}
+
+	nameLen := len(msg.Name)
+	if nameLen == 0 || nameLen > MaximumAssetNameSize {
+		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
+	}
+
+	symbolLen := len(msg.Symbol)
+	if symbolLen < MinimumAssetSymbolSize || symbolLen > MaximumAssetSymbolSize || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	}
+
+	if strings.Contains(strings.ToLower(msg.Symbol), sdk.NativeTokenName) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
+	}
+
+	// check if updates occur
+	if msg.Symbol == "" && msg.Name == "" {
+		return ErrNoUpdatesProvided(DefaultCodespace, fmt.Sprintf("no updated values provided"))
+	}
+
+	return nil
+}
+
+// String returns the representation of the msg
+func (msg MsgEditToken) String() string {
+	return fmt.Sprintf(`MsgEditAsset:
+  Owner:             %s
+  Name:           %s
+  Symbol:          %s`,
+		msg.Owner, msg.Name, msg.Symbol)
+}
+
+// GetSignBytes implements Msg
+func (msg MsgEditToken) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}

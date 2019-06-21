@@ -184,6 +184,18 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	return editTags, nil
 }
 
+// EditToken edits the specified token
+func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Error) {
+	// get the destination asset
+
+	// TODO
+	editTags := sdk.NewTags(
+		"token", []byte(msg.Symbol),
+	)
+
+	return editTags, nil
+}
+
 // GetGateway retrieves the gateway of the given moniker
 func (k Keeper) GetGateway(ctx sdk.Context, moniker string) (Gateway, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)

@@ -203,3 +203,45 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 
 	return cmd
 }
+
+// GetCmdEditGateway implements the edit asset command
+func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "edit-token",
+		Short:   "edit a token",
+		Example: "iriscli asset edit-token --name=<name> --symbol=<symbol> ",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			name := viper.GetString(FlagName)
+			symbol := viper.GetString(FlagSymbol)
+
+			var msg sdk.Msg
+			msg = asset.NewMsgEditToken(
+				owner, name, symbol,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsTokenEdit)
+	cmd.MarkFlagRequired(FlagName)
+	cmd.MarkFlagRequired(FlagSymbol)
+
+	return cmd
+}
