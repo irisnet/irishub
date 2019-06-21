@@ -300,7 +300,7 @@ func TestKeeper_EditToken(t *testing.T) {
 	assert.Equal(t, msgJson, assetJson)
 
 	//TODO:finish the edit token
-	msgEditToken := NewMsgEditToken(addr, "btc", "btc")
+	msgEditToken := NewMsgEditToken(addr, "btc", "btc", "btc")
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
 }

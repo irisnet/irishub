@@ -364,17 +364,19 @@ func ValidateMoniker(moniker string) sdk.Error {
 
 // MsgEditToken for editing a specified gateway
 type MsgEditToken struct {
-	Owner  sdk.AccAddress `json:"owner"`  //  Owner of the asset
-	Name   string         `json:"name"`   //  name of asset
-	Symbol string         `json:"symbol"` //  symbol of asset
+	Owner   sdk.AccAddress `json:"owner"`   //  Owner of the asset
+	Name    string         `json:"name"`    //  name of asset
+	TokenId string         `json:"tokenId"` //  id of asset
+	Symbol  string         `json:"symbol"`  //  symbol of asset
 }
 
 // NewMsgEditToken creates a MsgEditAsset
-func NewMsgEditToken(owner sdk.AccAddress, name string, symbol string) MsgEditToken {
+func NewMsgEditToken(owner sdk.AccAddress, id string, name string, symbol string) MsgEditToken {
 	return MsgEditToken{
-		Owner:  owner,
-		Name:   name,
-		Symbol: symbol,
+		Owner:   owner,
+		Name:    name,
+		TokenId: id,
+		Symbol:  symbol,
 	}
 }
 
@@ -382,7 +384,7 @@ func NewMsgEditToken(owner sdk.AccAddress, name string, symbol string) MsgEditTo
 func (msg MsgEditToken) Route() string { return MsgRoute }
 
 // Type implements Msg
-func (msg MsgEditToken) Type() string { return "edit_asset" }
+func (msg MsgEditToken) Type() string { return "edit_token" }
 
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() sdk.Error {
@@ -392,7 +394,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 
 	// check the owner
 	if len(msg.Owner) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the asset must be specified"))
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
 	}
 
 	nameLen := len(msg.Name)
@@ -419,11 +421,12 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 
 // String returns the representation of the msg
 func (msg MsgEditToken) String() string {
-	return fmt.Sprintf(`MsgEditAsset:
-  Owner:             %s
+	return fmt.Sprintf(`MsgEditToken:
+  Owner:          %s
+  TokenId: 		  %s
   Name:           %s
-  Symbol:          %s`,
-		msg.Owner, msg.Name, msg.Symbol)
+  Symbol:         %s`,
+		msg.Owner, msg.TokenId, msg.Name, msg.Symbol)
 }
 
 // GetSignBytes implements Msg

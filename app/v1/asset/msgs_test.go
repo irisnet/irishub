@@ -235,17 +235,17 @@ func TestMsgEditAsset(t *testing.T) {
 		MsgEditToken
 		expectPass bool
 	}{
-		{"native basic good", NewMsgEditToken(addr, "btc", "btc"), true},
-		{"empty owner", NewMsgEditToken(emptyAddr, "btc", "btc"), false},
-		{"native symbol empty", NewMsgEditToken(addr, "btc", ""), false},
-		{"native symbol error", NewMsgEditToken(addr, "btc", "ab,c"), false},
-		{"native symbol first letter is num", NewMsgEditToken(addr, "btc", "4iris"), false},
-		{"native symbol too long", NewMsgEditToken(addr, "btc", "aaaaaaaaa"), false},
-		{"native symbol too short", NewMsgEditToken(addr, "btc", "e"), false},
-		{"native name empty", NewMsgEditToken(addr, "", "btc"), false},
-		{"native name blank", NewMsgEditToken(addr, " ", "btc"), false},
-		{"native name too long", NewMsgEditToken(addr, "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), false},
-		{"no updated fields", NewMsgEditToken(addr, "", ""), false},
+		{"native basic good", NewMsgEditToken(addr, "btc", "btc", "btc"), true},
+		{"empty owner", NewMsgEditToken(emptyAddr, "btc", "btc", "btc"), false},
+		{"native symbol empty", NewMsgEditToken(addr, "btc", "btc", ""), false},
+		{"native symbol error", NewMsgEditToken(addr, "btc", "btc", "ab,c"), false},
+		{"native symbol first letter is num", NewMsgEditToken(addr, "btc", "btc", "4iris"), false},
+		{"native symbol too long", NewMsgEditToken(addr, "btc", "btc", "aaaaaaaaa"), false},
+		{"native symbol too short", NewMsgEditToken(addr, "btc", "btc", "e"), false},
+		{"native name empty", NewMsgEditToken(addr, "btc", "", "btc"), false},
+		{"native name blank", NewMsgEditToken(addr, "btc", " ", "btc"), false},
+		{"native name too long", NewMsgEditToken(addr, "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), false},
+		{"no updated fields", NewMsgEditToken(addr, "btc", "", ""), false},
 	}
 
 	for _, tc := range tests {
@@ -261,12 +261,14 @@ func TestMsgEditTokenRoute(t *testing.T) {
 	owner := sdk.AccAddress([]byte("owner"))
 	name := "btc"
 	symbol := "btc"
+	tokenId := "btc"
 
 	// build a MsgEditToken
 	msg := MsgEditToken{
-		Owner:  owner,
-		Name:   name,
-		Symbol: symbol,
+		Owner:   owner,
+		Name:    name,
+		Symbol:  symbol,
+		TokenId: tokenId,
 	}
 
 	require.Equal(t, "asset", msg.Route())
@@ -275,15 +277,17 @@ func TestMsgEditTokenRoute(t *testing.T) {
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	name := "btc"
 	symbol := "btc"
+	tokenId := "btc"
 
 	var msg = MsgEditToken{
-		Owner:  sdk.AccAddress([]byte("owner")),
-		Name:   name,
-		Symbol: symbol,
+		Owner:   sdk.AccAddress([]byte("owner")),
+		Name:    name,
+		Symbol:  symbol,
+		TokenId: tokenId,
 	}
 
 	res := msg.GetSignBytes()
 
-	expected := `{"name":"btc","owner":"faa1damkuetjqqah8w","symbol":"btc"}`
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"name":"btc","owner":"faa1damkuetjqqah8w","symbol":"btc","tokenId":"btc"}}`
 	require.Equal(t, expected, string(res))
 }

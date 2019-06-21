@@ -209,7 +209,8 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit-token",
 		Short:   "edit a token",
-		Example: "iriscli asset edit-token --name=<name> --symbol=<symbol> ",
+		Example: "iriscli asset edit-token <asset-id> --name=<name> --symbol=<symbol> ",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -226,9 +227,10 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagName)
 			symbol := viper.GetString(FlagSymbol)
 
+			tokenId := args[0]
 			var msg sdk.Msg
 			msg = asset.NewMsgEditToken(
-				owner, name, symbol,
+				owner, tokenId, name, symbol,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
