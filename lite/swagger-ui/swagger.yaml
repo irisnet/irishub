@@ -3804,6 +3804,9 @@ components:
         gas_adjustment:
           type: string
           example: '1.2'
+        memo:
+          type: string
+          example: 'memo'
     TendermintValidator:
       type: object
       properties:
