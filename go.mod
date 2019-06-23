@@ -50,7 +50,7 @@ require (
 	github.com/tendermint/btcd v0.1.0
 	github.com/tendermint/go-amino v0.14.0
 	github.com/tendermint/iavl v0.12.0
-	github.com/tendermint/tendermint v0.27.4
+	github.com/tendermint/tendermint v0.28.0
 	github.com/tendermint/tmlibs v0.9.0
 	github.com/zondax/hid v0.9.0
 	github.com/zondax/ledger-cosmos-go v0.9.7
@@ -65,7 +65,7 @@ require (
 )
 
 replace (
-	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.0-iris
+	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.0
 	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.28.0
 	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
 )
