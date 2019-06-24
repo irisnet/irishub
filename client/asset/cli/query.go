@@ -172,7 +172,10 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 
-				fee.Fee, _ = sdk.ParseCoin(sdk.Coins{fee.Fee}.MainUnitString())
+				fee.Fee, err = sdk.ParseCoin(sdk.Coins{fee.Fee}.MainUnitString())
+				if err != nil {
+					return err
+				}
 
 				return cliCtx.PrintOutput(fee)
 
@@ -187,8 +190,15 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 
-				fees.IssueFee, _ = sdk.ParseCoin(sdk.Coins{fees.IssueFee}.MainUnitString())
-				fees.MintFee, _ = sdk.ParseCoin(sdk.Coins{fees.MintFee}.MainUnitString())
+				fees.IssueFee, err = sdk.ParseCoin(sdk.Coins{fees.IssueFee}.MainUnitString())
+				if err != nil {
+					return err
+				}
+
+				fees.MintFee, err = sdk.ParseCoin(sdk.Coins{fees.MintFee}.MainUnitString())
+				if err != nil {
+					return err
+				}
 
 				return cliCtx.PrintOutput(fees)
 			}
