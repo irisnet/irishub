@@ -109,7 +109,8 @@ func (ft FungibleToken) GetUniqueID() string {
 }
 
 func (ft FungibleToken) GetDenom() string {
-	return strings.ToLower(fmt.Sprintf("%s-min", ft.GetUniqueID()))
+	denom, _ := sdk.GetCoinDenom(ft.GetUniqueID())
+	return denom
 }
 
 func (ft FungibleToken) GetInitSupply() types.Int {

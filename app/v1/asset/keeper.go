@@ -72,6 +72,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 		return nil, err
 	}
 
+	// for native and gateway tokens
 	if owner != nil {
 		initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
 

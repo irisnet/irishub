@@ -342,6 +342,11 @@ func (am AccountKeeper) GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.
 	return coin, true
 }
 
+func (am AccountKeeper) GetTotalSupplies(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(am.key)
+	return sdk.KVStorePrefixIterator(store, TotalSupplyStoreKey(""))
+}
+
 func (am AccountKeeper) SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin) {
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalSupply)

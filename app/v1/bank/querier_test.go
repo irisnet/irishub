@@ -1,6 +1,7 @@
 package bank
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -45,22 +46,31 @@ func TestQueryAccount(t *testing.T) {
 
 func TestQueryTokenStats(t *testing.T) {
 	input := setupTestInput()
+
+	// Test IRIS Start ---------------
+	params := QueryTokenStatsParams{
+		TokenId: sdk.NativeTokenName,
+	}
+
+	bz, err := json.Marshal(params)
+	require.Nil(t, err)
+
 	req := abci.RequestQuery{
 		Path: fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, QueryTokenStats),
-		Data: []byte{},
+		Data: bz,
 	}
 	res, err := queryAccount(input.ctx, req, input.bk, input.cdc)
 	require.NotNil(t, err)
 	require.Nil(t, res)
 
-	totalToken := sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(100))}
+	totalToken := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewInt(100))}
 	input.bk.IncreaseLoosenToken(input.ctx, totalToken)
 
 	_, _, addr := keyPubAddr()
 	input.bk.am.SetAccount(input.ctx, input.bk.am.NewAccountWithAddress(input.ctx, addr))
 	input.bk.AddCoins(input.ctx, addr, totalToken)
 
-	burnedToken := sdk.Coins{sdk.NewCoin("iris-atto", sdk.NewInt(50))}
+	burnedToken := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewInt(50))}
 	input.bk.BurnCoins(input.ctx, addr, burnedToken)
 
 	res, err = queryTokenStats(input.ctx, req, input.bk, input.cdc)
@@ -70,5 +80,43 @@ func TestQueryTokenStats(t *testing.T) {
 	var tokenStats TokenStats
 	require.Nil(t, input.cdc.UnmarshalJSON(res, &tokenStats))
 	require.Equal(t, totalToken.String(), (tokenStats.LooseTokens.Plus(burnedToken)).String())
+	require.Equal(t, burnedToken.String(), tokenStats.BurnedTokens.String())
+
+	// Test IRIS End ---------------
+
+	// Test !IRIS Start ---------------
+	params = QueryTokenStatsParams{
+		TokenId: "abc",
+	}
+
+	denom := "abc-min"
+	bz, err = json.Marshal(params)
+	require.Nil(t, err)
+
+	req = abci.RequestQuery{
+		Path: fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, QueryTokenStats),
+		Data: bz,
+	}
+	res, err = queryAccount(input.ctx, req, input.bk, input.cdc)
+	require.NotNil(t, err)
+	require.Nil(t, res)
+
+	totalToken = sdk.Coins{sdk.NewCoin(denom, sdk.NewInt(100))}
+	input.bk.SetTotalSupply(input.ctx, sdk.Coin{ Denom: denom, Amount: totalToken.AmountOf(denom)})
+
+	_, _, addr = keyPubAddr()
+	input.bk.am.SetAccount(input.ctx, input.bk.am.NewAccountWithAddress(input.ctx, addr))
+	input.bk.AddCoins(input.ctx, addr, totalToken)
+
+	burnedToken = sdk.Coins{sdk.NewCoin(denom, sdk.NewInt(50))}
+	input.bk.BurnCoins(input.ctx, addr, burnedToken)
+
+	res, err = queryTokenStats(input.ctx, req, input.bk, input.cdc)
+	require.Nil(t, err)
+	require.NotNil(t, res)
+
+	tokenStats = TokenStats{}
+	require.Nil(t, input.cdc.UnmarshalJSON(res, &tokenStats))
+	require.Equal(t, totalToken.String(), (tokenStats.TotalSupply.Plus(burnedToken)).String())
 	require.Equal(t, burnedToken.String(), tokenStats.BurnedTokens.String())
 }

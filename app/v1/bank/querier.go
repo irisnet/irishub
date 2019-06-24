@@ -66,19 +66,50 @@ type QueryTokenStatsParams struct {
 
 func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
 	var params QueryTokenStatsParams
-	bk := keeper.(BaseKeeper)
+
 	if err := cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	// TODO: query total supply by id
+	bk := keeper.(BaseKeeper)
+	looseTokens := sdk.Coins{}
+	burnedTokens := sdk.Coins{}
+	totalSupplies := sdk.Coins{}
+	// TODO: bonded tokens for iris
 
-	irisBurnedToken := sdk.Coin{}
-	irisBurnedToken.Denom = sdk.NativeTokenMinDenom
-	irisBurnedToken.Amount = bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom)
+	if params.TokenId == "" { // query all
+		looseTokens = bk.GetLoosenCoins(ctx)
+		burnedTokens = bk.GetCoins(ctx, BurnedCoinsAccAddr)
+		iter := bk.am.GetTotalSupplies(ctx)
+		defer iter.Close()
+		for ; iter.Valid(); iter.Next() {
+			var ts sdk.Coin
+			cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &ts)
+			totalSupplies = append(totalSupplies, ts)
+		}
+
+	} else if params.TokenId == sdk.NativeTokenName { // query iris
+		looseTokens = bk.GetLoosenCoins(ctx)
+		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom))}
+	} else { // query !iris
+		denom, err := sdk.GetCoinDenom(params.TokenId)
+		if err != nil {
+			return nil, sdk.ParseParamsErr(err)
+		}
+		burnedTokens = sdk.Coins{sdk.NewCoin(denom, bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(denom))}
+
+		ts, found := bk.GetTotalSupply(ctx, denom)
+		if !found {
+			return nil, sdk.ErrUnknownRequest("unknown token id")
+		}
+
+		totalSupplies = append(totalSupplies, ts)
+	}
+
 	tokenStats := TokenStats{
-		LooseTokens:  bk.GetLoosenCoins(ctx),
-		BurnedTokens: sdk.Coins{irisBurnedToken},
+		LooseTokens:  looseTokens,
+		BurnedTokens: burnedTokens,
+		TotalSupply:  totalSupplies,
 	}
 	bz, err := codec.MarshalJSONIndent(cdc, tokenStats)
 	if err != nil {
@@ -93,4 +124,13 @@ type TokenStats struct {
 	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	BondedTokens sdk.Coins `json:"bonded_tokens"`
 	TotalSupply  sdk.Coins `json:"total_supply"`
+}
+
+func (ts TokenStats) String() string {
+	return fmt.Sprintf(`TokenStats:
+  Loose Tokens:             %s
+  Burned Tokens:            %s
+  Bonded Tokens:            %s
+  Total Supply:             %s`,
+		ts.LooseTokens.String(), ts.BurnedTokens.String(), ts.BondedTokens.String(), ts.TotalSupply.String())
 }

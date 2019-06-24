@@ -3,7 +3,7 @@ package auth
 import (
 	"testing"
 
-	codec "github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
@@ -205,4 +205,51 @@ func BenchmarkAccountMapperSetAccountWithCoins(b *testing.B) {
 		acc.SetCoins(coins)
 		mapper.SetAccount(ctx, acc)
 	}
+}
+
+func TestTotalSupply(t *testing.T) {
+	ms, capKey, _, _, _ := setupMultiStore()
+	cdc := codec.New()
+	RegisterBaseAccount(cdc)
+
+	// make context and mapper
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	mapper := NewAccountKeeper(cdc, capKey, ProtoBaseAccount)
+
+	// Test SetTotalSupply
+	totalSupply1 := sdk.NewCoin("abc-min", sdk.NewInt(100))
+	mapper.SetTotalSupply(ctx, totalSupply1)
+
+	// Test GetTotalSupply
+	getTotalSupply1, found := mapper.GetTotalSupply(ctx, totalSupply1.Denom)
+	require.True(t, found)
+	require.Equal(t, getTotalSupply1.Amount, totalSupply1.Amount)
+
+	totalSupply2 := sdk.NewCoin("bcd-min", sdk.NewInt(100))
+	mapper.SetTotalSupply(ctx, totalSupply2)
+
+	// Test GetTotalSupplies
+	var getTotalSupplies sdk.Coins
+	iter := mapper.GetTotalSupplies(ctx)
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+		var ts sdk.Coin
+		mapper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &ts)
+		getTotalSupplies = append(getTotalSupplies, ts)
+	}
+
+	require.Equal(t, totalSupply1.Amount, getTotalSupplies.AmountOf(totalSupply1.Denom))
+	require.Equal(t, totalSupply2.Amount, getTotalSupplies.AmountOf(totalSupply2.Denom))
+
+	// Test IncreaseTotalSupply
+	increaseAmt := sdk.NewInt(100)
+	mapper.IncreaseTotalSupply(ctx, sdk.NewCoin("abc-min", increaseAmt))
+	getTotalSupply1, found = mapper.GetTotalSupply(ctx, totalSupply1.Denom)
+	require.Equal(t, getTotalSupply1.Amount, totalSupply1.Amount.Add(increaseAmt))
+
+	// Test DecreaseTotalSupply
+	decreaseAmt := sdk.NewInt(50)
+	mapper.DecreaseTotalSupply(ctx, sdk.NewCoin("bcd-min", decreaseAmt))
+	getTotalSupply2, found := mapper.GetTotalSupply(ctx, totalSupply2.Denom)
+	require.Equal(t, getTotalSupply2.Amount, totalSupply2.Minus(sdk.NewCoin("bcd-min", decreaseAmt)).Amount)
 }

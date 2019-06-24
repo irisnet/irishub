@@ -57,6 +57,10 @@ func (keeper BaseKeeper) GetTotalSupply(ctx sdk.Context, denom string) (coin sdk
 	return keeper.am.GetTotalSupply(ctx, denom)
 }
 
+func (keeper BaseKeeper) GetTotalSupplies(ctx sdk.Context) sdk.Iterator {
+	return keeper.am.GetTotalSupplies(ctx)
+}
+
 // NewBaseKeeper returns a new BaseKeeper
 func NewBaseKeeper(cdc *codec.Codec, am auth.AccountKeeper) BaseKeeper {
 	return BaseKeeper{am: am, cdc: cdc}
@@ -346,7 +350,15 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 
 	// adding coins to BurnedCoinsAccAddr is equivalent to burning coins
 	if addr.Equals(BurnedCoinsAccAddr) {
-		am.DecreaseTotalLoosenToken(ctx, amt)
+		for _, coin := range amt {
+			if coin.Denom == sdk.NativeTokenMinDenom {
+				// Decrease total loose token for iris
+				am.DecreaseTotalLoosenToken(ctx, sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, amt.AmountOf(sdk.NativeTokenMinDenom))})
+			} else {
+				// Decrease total supply for tokens other than iris
+				am.DecreaseTotalSupply(ctx, coin)
+			}
+		}
 	}
 
 	tags := sdk.NewTags("recipient", []byte(addr.String()))
