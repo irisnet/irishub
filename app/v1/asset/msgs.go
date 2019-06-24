@@ -222,12 +222,12 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 
 	// check the details
 	if len(msg.Details) > MaximumGatewayDetailsSize {
-		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
 	}
 
 	// check the website
 	if len(msg.Website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
+		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
 	}
 
 	// check the fee
