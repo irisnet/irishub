@@ -209,7 +209,7 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "transfer-gateway-owner",
 		Short: "transfer the owner of a gateway. The command is only used to generate the transaction which " +
-			"will be signed twice in order by the current and new owners using the 'iriscli tx sign' command.",
+			"will be signed in order by the current and new owners using the 'iriscli tx sign' command seperately.",
 		Example: "iriscli asset transfer-gateway-owner --moniker=<moniker> --to=<new owner>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -239,6 +239,9 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
+			// enable generate-only
+			cliCtx.GenerateOnly = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
