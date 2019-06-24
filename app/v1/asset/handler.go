@@ -39,9 +39,21 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
 	}
 
-	// handle fee
-	if err := TokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol, getTokenIssueFee(ctx, k, msg.Symbol)); err != nil {
-		return err.Result()
+	switch msg.Source {
+	case NATIVE:
+		// handle fee for native token
+		if err := TokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol, getTokenIssueFee(ctx, k, msg.Symbol)); err != nil {
+			return err.Result()
+		}
+		break
+	case GATEWAY:
+		// handle fee for gateway token
+		if err := GatewayTokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol, getGatewayTokenIssueFee(ctx, k, msg.Symbol)); err != nil {
+			return err.Result()
+		}
+		break
+	default:
+		break
 	}
 
 	tags, err := k.IssueToken(ctx, token)

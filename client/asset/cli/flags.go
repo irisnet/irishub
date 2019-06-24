@@ -34,7 +34,6 @@ var (
 	FsGatewayCreate = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayEdit   = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFeeQuery      = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTokenEdit     = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -63,8 +62,5 @@ func init() {
 
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
-	FsFeeQuery.String(FlagID, "", "the fungible token id")
-
-	FsTokenEdit.String(FlagName, "", "the token name")
-	FsTokenEdit.String(FlagSymbol, "", "the unique asset symbol")
+	FsFeeQuery.String(FlagID, "", "the token id")
 }
