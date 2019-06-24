@@ -250,7 +250,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 
 	// loose token only contains iris-atto
 	decreaseAmount := coins.AmountOf(sdk.NativeTokenMinDenom)
-	if decreaseAmount.IsZero() {
+	if !decreaseAmount.GT(sdk.ZeroInt()) {
 		return
 	}
 	decreaseCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, decreaseAmount)}
