@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 
@@ -158,8 +159,7 @@ func queryGateway(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) 
 // queryGateways queries all gateways with an optional owner from the specified endpoint
 func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		ownerStr := vars["owner"]
+		ownerStr := r.FormValue("owner")
 
 		var (
 			owner sdk.AccAddress
@@ -189,6 +189,10 @@ func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
+		}
+
+		if bytes.Equal(res, []byte("null")) {
+			res = []byte("[]")
 		}
 
 		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
