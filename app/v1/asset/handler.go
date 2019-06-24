@@ -17,6 +17,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgCreateGateway(ctx, k, msg)
 		case MsgEditGateway:
 			return handleMsgEditGateway(ctx, k, msg)
+		case MsgTransferGatewayOwner:
+			return handleMsgTransferGatewayOwner(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 		}
@@ -78,6 +80,21 @@ func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Res
 	msg.Moniker = strings.ToLower(msg.Moniker)
 
 	tags, err := k.EditGateway(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// handleMsgTransferGatewayOwner handles MsgTransferGatewayOwner
+func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGatewayOwner) sdk.Result {
+	// convert moniker to lowercase
+	msg.Moniker = strings.ToLower(msg.Moniker)
+
+	tags, err := k.TransferGatewayOwner(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
