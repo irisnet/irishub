@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -95,7 +94,6 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
 			"--website=<website> --create-fee=<gateway create fee>",
-		PreRun: preRunCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -151,7 +149,6 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 		Short: "edit a gateway",
 		Example: "iriscli asset edit-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
 			"--website=<website>",
-		PreRun: preRunCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -211,10 +208,9 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "transfer-gateway-owner",
-		Short: "transfer the owner of a gateway. The command is only used to generate the transaction, " +
-			"so the generate-only flag must be specified.",
-		Example: "iriscli asset transfer-gateway-owner --moniker=<moniker> --to=<new owner> --generate-only",
-		PreRun:  preRunCmd,
+		Short: "transfer the owner of a gateway. The command is only used to generate the transaction which " +
+			"will be signed twice in order by the current and new owners using the 'iriscli tx sign' command.",
+		Example: "iriscli asset transfer-gateway-owner --moniker=<moniker> --to=<new owner>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -251,14 +247,6 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(FsGatewayOwnerTransfer)
 	cmd.MarkFlagRequired(FlagMoniker)
 	cmd.MarkFlagRequired(FlagTo)
-	cmd.MarkFlagRequired(client.FlagGenerateOnly)
 
 	return cmd
-}
-
-func preRunCmd(cmd *cobra.Command, args []string) {
-	if viper.GetBool(client.FlagGenerateOnly) {
-		// if the generate-only flag is true, then the chain id is unnecessary
-		cmd.Flags().SetAnnotation(client.FlagChainID, cobra.BashCompOneRequiredFlag, []string{"false"})
-	}
 }
