@@ -17,6 +17,7 @@ const (
 	CodeInvalidOwner         sdk.CodeType = 105
 	CodeNoUpdatesProvided    sdk.CodeType = 106
 	CodeInvalidAddress       sdk.CodeType = 107
+	CodeInvalidToAddress     sdk.CodeType = 108
 
 	CodeNilAssetOwner                 sdk.CodeType = 110
 	CodeInvalidAssetFamily            sdk.CodeType = 111
@@ -115,6 +116,10 @@ func ErrNoUpdatesProvided(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
+}
+
+func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidToAddress, msg)
 }
 
 func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
