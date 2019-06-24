@@ -49,8 +49,8 @@ require (
 	github.com/syndtr/goleveldb v0.0.0-20180708030551-c4c61651e9e3
 	github.com/tendermint/btcd v0.1.0
 	github.com/tendermint/go-amino v0.14.0
-	github.com/tendermint/iavl v0.12.0
-	github.com/tendermint/tendermint v0.27.4
+	github.com/tendermint/iavl v0.12.1
+	github.com/tendermint/tendermint v0.30.0
 	github.com/tendermint/tmlibs v0.9.0
 	github.com/zondax/hid v0.9.0
 	github.com/zondax/ledger-cosmos-go v0.9.7
@@ -65,7 +65,7 @@ require (
 )
 
 replace (
-	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.0-iris
-	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.22.3-0.20190527110704-aff684d6c906
+	github.com/tendermint/iavl => github.com/irisnet/iavl v0.8.2-0.20190621103457-d534994fdffd
+	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.22.3-0.20190621081259-2398bfb090db
 	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
 )

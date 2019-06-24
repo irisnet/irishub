@@ -23,4 +23,5 @@ var (
 	Usage             = "usage"
 	Percent           = "percent"
 	DestAddress       = "dest-address"
+	TokenId           = "token-id"
 )

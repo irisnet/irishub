@@ -40,11 +40,11 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // IssueToken issue a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
-	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return nil, err
 	}
-	if k.HasToken(ctx, assetID) {
+	if k.HasToken(ctx, tokenId) {
 		return nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
 	}
 
@@ -63,6 +63,8 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 		owner = gateway.Owner
 	} else if token.GetSource() == NATIVE {
 		owner = token.GetOwner()
+		token.SymbolAtSource = ""
+		token.Gateway = ""
 	}
 
 	err = k.SetToken(ctx, token)
@@ -84,7 +86,6 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 	}
 
 	createTags := sdk.NewTags(
-		tags.Action, tags.ActionIssueToken,
 		tags.Id, []byte(token.GetUniqueID()),
 		tags.Denom, []byte(token.GetDenom()),
 		tags.Source, []byte(token.GetSource().String()),
@@ -104,12 +105,12 @@ func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	assetID, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
 
-	store.Set(KeyToken(assetID), bz)
+	store.Set(KeyToken(tokenId), bz)
 	return nil
 }
 

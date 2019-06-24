@@ -1,3 +1,4 @@
+version: 2.1
 workflows:
   version: 2
   Deploy:
@@ -12,12 +13,7 @@ workflows:
                 - /v.*/
   Tests:
     jobs:
-      - UnitTest:
-          filters:
-            branches:
-              only:
-                - master
-                - develop
+      - UnitTest
 jobs:
   BuildAndDeploy:
     machine:
@@ -49,10 +45,10 @@ jobs:
           name: push irishub testnet image
           command: docker push irisnet/irishub:testnet-$TAG
   UnitTest:
-    docker:
-      - image: circleci/golang:1.12.5
+    machine:
+      docker_layer_caching: true
     steps:
       - checkout
       - run:
           name: Run unit tests
-          command: make test_unit
+          command: docker run -it -v $(pwd):/irishub irisnet/golang sh -c "make test_unit"

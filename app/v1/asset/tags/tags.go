@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ActionIssueToken = []byte("issue-token")
+	ActionIssueToken = []byte("issue_token")
 
 	Action  = sdk.TagAction
 	Id      = "token-id"

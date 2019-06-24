@@ -25,15 +25,30 @@ type BaseToken struct {
 }
 
 func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
+
+	gateway = strings.ToLower(strings.TrimSpace(gateway))
+	symbol = strings.ToLower(strings.TrimSpace(symbol))
+	symbolAtSource = strings.ToLower(strings.TrimSpace(symbolAtSource))
+	symbolMinAlias = strings.ToLower(strings.TrimSpace(symbolMinAlias))
+	name = strings.TrimSpace(name)
+
+	if maxSupply.IsZero() {
+		if mintable {
+			maxSupply = sdk.NewInt(int64(MaximumAssetMaxSupply))
+		} else {
+			maxSupply = initialSupply
+		}
+	}
+
 	return BaseToken{
 		Family:         family,
 		Source:         source,
-		Gateway:        strings.ToLower(gateway),
-		Symbol:         strings.ToLower(symbol),
+		Gateway:        gateway,
+		Symbol:         symbol,
 		Name:           name,
 		Decimal:        decimal,
-		SymbolAtSource: strings.ToLower(symbolAtSource),
-		SymbolMinAlias: strings.ToLower(symbolMinAlias),
+		SymbolAtSource: symbolAtSource,
+		SymbolMinAlias: symbolMinAlias,
 		InitialSupply:  initialSupply,
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,

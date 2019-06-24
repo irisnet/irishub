@@ -110,13 +110,25 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				msg := gov.NewMsgSubmitSoftwareUpgradeProposal(msg, version, software, switchHeight, threshold)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
+
+			if proposalType == gov.ProposalTypeAddToken {
+				symbol := viper.GetString(flagTokenSymbol)
+				symbolAtSource := viper.GetString(flagTokenSymbolAtSource)
+				name := viper.GetString(flagTokenName)
+				decimal := uint8(viper.GetInt(flagTokenDecimal))
+				alias := viper.GetString(flagTokenSymbolMinAlias)
+				initialSupply := uint64(viper.GetInt64(flagTokenInitialSupply))
+
+				msg := gov.NewMsgSubmitAddTokenProposal(msg, symbol, symbolAtSource, name, alias, decimal, initialSupply)
+				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage/AddToken")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
@@ -127,6 +139,14 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	cmd.Flags().String(flagThreshold, "0.8", "the upgrade signal threshold of the software upgrade")
+
+	//for AddTokenProposal
+	cmd.Flags().String(flagTokenSymbol, "", "the asset symbol. Once created, it cannot be modified")
+	cmd.Flags().String(flagTokenSymbolAtSource, "", "the source symbol of a external asset")
+	cmd.Flags().String(flagTokenName, "", "the asset name")
+	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
+	cmd.Flags().String(flagTokenSymbolMinAlias, "", "the asset symbol minimum alias")
+	cmd.Flags().Uint64(flagTokenInitialSupply, 0, "the initial supply token of asset")
 
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)
