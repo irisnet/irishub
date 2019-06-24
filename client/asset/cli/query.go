@@ -167,63 +167,40 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 
-				params := asset.QueryGatewayFeeParams{
-					Moniker: moniker,
-				}
-
-				bz, err := cdc.MarshalJSON(params)
+				fee, err := queryGatewayFee(cliCtx, moniker)
 				if err != nil {
 					return err
 				}
 
-				path := fmt.Sprintf("custom/%s/fees/gateways", protocol.AssetRoute)
-
-				res, err := cliCtx.QueryWithData(path, bz)
+				fee.Fee, err = sdk.ParseCoin(sdk.Coins{fee.Fee}.MainUnitString())
 				if err != nil {
 					return err
 				}
 
-				var out asset.GatewayFeeOutput
-				err = cdc.UnmarshalJSON(res, &out)
-				if err != nil {
-					return err
-				}
+				return cliCtx.PrintOutput(fee)
 
-				out.Fee = sdk.NewCoin(sdk.NativeTokenName, out.Fee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
-
-				return cliCtx.PrintOutput(out)
 			} else {
 				id := viper.GetString(FlagID)
 				if err := asset.CheckAssetID(id); err != nil {
 					return err
 				}
 
-				params := asset.QueryTokenFeesParams{
-					ID: id,
-				}
-
-				bz, err := cdc.MarshalJSON(params)
+				fees, err := queryTokenFees(cliCtx, id)
 				if err != nil {
 					return err
 				}
 
-				path := fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
-
-				res, err := cliCtx.QueryWithData(path, bz)
+				fees.IssueFee, err = sdk.ParseCoin(sdk.Coins{fees.IssueFee}.MainUnitString())
 				if err != nil {
 					return err
 				}
 
-				var out asset.TokenFeesOutput
-				err = cdc.UnmarshalJSON(res, &out)
+				fees.MintFee, err = sdk.ParseCoin(sdk.Coins{fees.MintFee}.MainUnitString())
 				if err != nil {
 					return err
 				}
 
-				out.IssueFee = sdk.NewCoin(sdk.NativeTokenName, out.IssueFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
-				out.MintFee = sdk.NewCoin(sdk.NativeTokenName, out.MintFee.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
-
-				return cliCtx.PrintOutput(out)
+				return cliCtx.PrintOutput(fees)
 			}
 		},
 	}
