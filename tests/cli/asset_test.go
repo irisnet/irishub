@@ -39,7 +39,7 @@ func TestIrisCLIToken(t *testing.T) {
 	symbolMinAlias := "Satoshi"
 	gateway := "ABC"
 
-	assetRes, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli asset query-token %s %v", symbol, flags), "")
+	assetRes, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli asset query-token %s %v", strings.ToLower(strings.TrimSpace(symbol)), flags), "")
 	require.Equal(t, "", assetRes)
 
 
@@ -72,10 +72,10 @@ func TestIrisCLIToken(t *testing.T) {
 	require.Equal(t, strings.ToLower(strings.TrimSpace(family)), token.Family.String())
 	require.Equal(t, strings.ToLower(strings.TrimSpace(source)), token.Source.String())
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
-	require.Equal(t, strings.ToLower(strings.TrimSpace(name)), token.Name)
+	require.Equal(t, strings.TrimSpace(name), token.Name)
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbolMinAlias)), token.SymbolMinAlias)
-	require.Equal(t, initialSupply, token.InitialSupply)
-	require.Equal(t, decimal, token.Decimal)
+	require.Equal(t, sdk.NewIntWithDecimal(int64(initialSupply), decimal), token.InitialSupply)
+	require.Equal(t, uint8(decimal), token.Decimal)
 	require.Equal(t, "", token.SymbolAtSource) // ignored by native token
 	require.Equal(t, "", token.Gateway) // ignored by native token
 
