@@ -6,7 +6,6 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/client/context"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 // queryGatewayFee retrieves the gateway creation fee for the specified moniker
@@ -61,22 +60,4 @@ func queryTokenFees(cliCtx context.CLIContext, tokenID string) (asset.TokenFeesO
 	}
 
 	return out, nil
-}
-
-// ConvertToNativeToken converts the coin with native token min denom to the coin with native token name
-func ConvertToNativeToken(minDenomCoin sdk.Coin) sdk.Coin {
-	if minDenomCoin.Denom != sdk.NativeTokenMinDenom {
-		panic(fmt.Sprintf("the denom of the input coin must be %s", sdk.NativeTokenMinDenom))
-	}
-
-	return sdk.NewCoin(sdk.NativeTokenName, minDenomCoin.Amount.Div(sdk.NewIntWithDecimal(1, 18)))
-}
-
-// ConvertToNativeTokenMin converts the coin with native token name to the coin with native token min denom
-func ConvertToNativeTokenMin(nativeTokenCoin sdk.Coin) sdk.Coin {
-	if nativeTokenCoin.Denom != sdk.NativeTokenName {
-		panic(fmt.Sprintf("the denom of the input coin must be %s", sdk.NativeTokenName))
-	}
-
-	return sdk.NewCoin(sdk.NativeTokenMinDenom, nativeTokenCoin.Amount.Mul(sdk.NewIntWithDecimal(1, 18)))
 }

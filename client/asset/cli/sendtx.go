@@ -115,13 +115,9 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			website := viper.GetString(FlagWebsite)
 			createFee := viper.GetString(FlagCreateFee)
 
-			createFeeCoin, err := sdk.ParseCoin(createFee)
+			createFeeCoin, err := sdk.IRIS.ConvertToMinCoin(createFee)
 			if err != nil {
 				return err
-			}
-
-			if createFeeCoin.Denom == sdk.NativeTokenName {
-				createFeeCoin = ConvertToNativeTokenMin(createFeeCoin)
 			}
 
 			var msg sdk.Msg
@@ -142,13 +138,8 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 					return fmt.Errorf("failed to query gateway creation fee: %s", err.Error())
 				}
 
-				// check if the provided fee is enough
-				if createFeeCoin.IsLT(actualFee.Fee) {
-					return fmt.Errorf("insufficient gateway creation fee: expected %s, got %s", ConvertToNativeToken(actualFee.Fee), ConvertToNativeToken(createFeeCoin))
-				}
-
 				// append actual fee to prompt
-				actualNativeTokenFee := ConvertToNativeToken(actualFee.Fee)
+				actualNativeTokenFee := sdk.Coins{actualFee.Fee}.MainUnitString()
 				prompt += fmt.Sprintf(": %s", actualNativeTokenFee)
 			}
 
