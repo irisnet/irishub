@@ -244,7 +244,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
 	// parameter checking
-	if coins == nil || !coins.IsValid() {
+	if coins == nil {
 		return
 	}
 
