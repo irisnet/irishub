@@ -1602,7 +1602,7 @@ paths:
                   example: 10iris
         description: >-
           valid value of `"proposal_type"` can be `"PlainText"`, `"ParameterChange"`,
-          `"SoftwareUpgrade"`,`"SystemHalt"`,`"TxTaxUsage"`
+          `"SoftwareUpgrade"`,`"SystemHalt"`,`"TxTaxUsage"`,`AddToken`
         required: true
     get:
       summary: Query proposals
@@ -3767,6 +3767,9 @@ components:
         gas_adjustment:
           type: string
           example: '1.2'
+        memo:
+          type: string
+          example: 'memo'
     TendermintValidator:
       type: object
       properties:

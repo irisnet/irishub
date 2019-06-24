@@ -1,6 +1,7 @@
 package gov
 
 import (
+	"github.com/irisnet/irishub/app/v1/asset"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -51,6 +52,8 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 
 	metrics *Metrics
+
+	ak asset.Keeper
 }
 
 // NewProtocolKeeper returns a governance keeper. It handles:
@@ -58,7 +61,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
+func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics, ak asset.Keeper) Keeper {
 	return Keeper{
 		key,
 		cdc,
@@ -72,6 +75,7 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 		ds,
 		codespace,
 		metrics,
+		ak,
 	}
 }
 
@@ -222,6 +226,35 @@ func (keeper Keeper) NewSoftwareUpgradeProposal(ctx sdk.Context, msg MsgSubmitSo
 			msg.Software,
 			msg.SwitchHeight,
 			msg.Threshold},
+	}
+	keeper.saveProposal(ctx, proposal)
+	return proposal
+}
+
+func (keeper Keeper) NewAddTokenProposal(ctx sdk.Context, msg MsgSubmitAddTokenProposal) Proposal {
+	proposalID, err := keeper.getNewProposalID(ctx)
+	if err != nil {
+		return nil
+	}
+	var textProposal = BasicProposal{
+		ProposalID:   proposalID,
+		Title:        msg.Title,
+		Description:  msg.Description,
+		ProposalType: msg.ProposalType,
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		SubmitTime:   ctx.BlockHeader().Time,
+	}
+
+	decimal := int(msg.Decimal)
+	initialSupply := sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal)
+	maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
+
+	fToken := asset.NewFungibleToken(asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, initialSupply, sdk.ZeroInt(), maxSupply, false, nil)
+	var proposal Proposal = &AddTokenProposal{
+		textProposal,
+		fToken,
 	}
 	keeper.saveProposal(ctx, proposal)
 	return proposal

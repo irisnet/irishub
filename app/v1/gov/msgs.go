@@ -3,6 +3,7 @@ package gov
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/asset"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -307,4 +308,49 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	}
 
 	return nil
+}
+
+type MsgSubmitAddTokenProposal struct {
+	MsgSubmitProposal
+	Symbol         string `json:"symbol"`
+	SymbolAtSource string `json:"symbol_at_source"`
+	Name           string `json:"name"`
+	Decimal        uint8  `json:"decimal"`
+	SymbolMinAlias string `json:"symbol_min_alias"`
+	InitialSupply  uint64 `json:"initial_supply"`
+}
+
+func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, symbolAtSource, name, symbolMinAlias string, decimal uint8, initialSupply uint64) MsgSubmitAddTokenProposal {
+	return MsgSubmitAddTokenProposal{
+		MsgSubmitProposal: msgSubmitProposal,
+		Symbol:            symbol,
+		SymbolAtSource:    symbolAtSource,
+		Name:              name,
+		Decimal:           decimal,
+		SymbolMinAlias:    symbolMinAlias,
+		InitialSupply:     initialSupply,
+	}
+}
+
+func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
+	err := msg.MsgSubmitProposal.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil, nil)
+
+	err = issueToken.ValidateBasic()
+	// skip this error code
+	if err.Code() == asset.CodeInvalidAssetSource {
+		return nil
+	}
+	return err
+}
+func (msg MsgSubmitAddTokenProposal) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
 }
