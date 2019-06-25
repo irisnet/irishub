@@ -17,6 +17,7 @@ const (
 	CodeInvalidOwner         sdk.CodeType = 105
 	CodeNoUpdatesProvided    sdk.CodeType = 106
 	CodeInvalidAddress       sdk.CodeType = 107
+	CodeInvalidIdentity      sdk.CodeType = 108
 
 	CodeNilAssetOwner                 sdk.CodeType = 110
 	CodeInvalidAssetFamily            sdk.CodeType = 111
@@ -92,6 +93,10 @@ func ErrAssetNotExists(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
+}
+
+func ErrInvalidIdentity(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidIdentity, msg)
 }
 
 func ErrInvalidDetails(codespace sdk.CodespaceType, msg string) sdk.Error {

@@ -24,10 +24,11 @@ var (
 	MaximumAssetSymbolMinAliasSize = 10                    // maximal limitation for the length of the asset's symbol_min_alias
 	MaximumAssetNameSize           = 32                    // maximal limitation for the length of the asset's name
 
-	MinimumGatewayMonikerSize = 3   // minimal limitation for the length of the gateway's moniker
-	MaximumGatewayMonikerSize = 8   // maximal limitation for the length of the gateway's moniker
-	MaximumGatewayDetailsSize = 280 // maximal limitation for the length of the gateway's details
-	MaximumGatewayWebsiteSize = 128 // maximal limitation for the length of the gateway's website
+	MinimumGatewayMonikerSize  = 3   // minimal limitation for the length of the gateway's moniker
+	MaximumGatewayMonikerSize  = 8   // maximal limitation for the length of the gateway's moniker
+	MaximumGatewayIdentitySize = 128 // maximal limitation for the length of the gateway's identity
+	MaximumGatewayDetailsSize  = 280 // maximal limitation for the length of the gateway's details
+	MaximumGatewayWebsiteSize  = 128 // maximal limitation for the length of the gateway's website
 
 	IsAlpha            = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
@@ -214,6 +215,11 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 		return err
 	}
 
+	// check the identity
+	if len(msg.Identity) > MaximumGatewayIdentitySize {
+		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
+	}
+
 	// check the details
 	if len(msg.Details) > MaximumGatewayDetailsSize {
 		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
@@ -221,7 +227,7 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 
 	// check the website
 	if len(msg.Website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
+		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
 	}
 
 	// check the fee
@@ -297,6 +303,11 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 	// check the moniker
 	if err := ValidateMoniker(msg.Moniker); err != nil {
 		return err
+	}
+
+	// check the identity
+	if msg.Identity != nil && len(*msg.Identity) > MaximumGatewayIdentitySize {
+		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
 	}
 
 	// check the details
