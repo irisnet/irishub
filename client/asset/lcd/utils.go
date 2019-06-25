@@ -1,7 +1,6 @@
 package lcd
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 
@@ -189,10 +188,6 @@ func queryGateways(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
-		}
-
-		if bytes.Equal(res, []byte("null")) {
-			res = []byte("[]")
 		}
 
 		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
