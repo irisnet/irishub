@@ -10,14 +10,15 @@ const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
 	CodeInvalidMoniker       sdk.CodeType = 100
-	CodeInvalidDetails       sdk.CodeType = 101
-	CodeInvalidWebsite       sdk.CodeType = 102
-	CodeUnknownGateway       sdk.CodeType = 103
-	CodeGatewayAlreadyExists sdk.CodeType = 104
-	CodeInvalidOwner         sdk.CodeType = 105
-	CodeNoUpdatesProvided    sdk.CodeType = 106
-	CodeInvalidAddress       sdk.CodeType = 107
-	CodeInvalidIdentity      sdk.CodeType = 108
+	CodeInvalidIdentity      sdk.CodeType = 101
+	CodeInvalidDetails       sdk.CodeType = 102
+	CodeInvalidWebsite       sdk.CodeType = 103
+	CodeUnknownGateway       sdk.CodeType = 104
+	CodeGatewayAlreadyExists sdk.CodeType = 105
+	CodeInvalidOwner         sdk.CodeType = 106
+	CodeNoUpdatesProvided    sdk.CodeType = 107
+	CodeInvalidAddress       sdk.CodeType = 108
+	CodeInvalidToAddress     sdk.CodeType = 109
 
 	CodeNilAssetOwner                 sdk.CodeType = 110
 	CodeInvalidAssetFamily            sdk.CodeType = 111
@@ -31,10 +32,6 @@ const (
 	CodeInvalidAssetDecimal           sdk.CodeType = 119
 	CodeAssetAlreadyExists            sdk.CodeType = 120
 	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
-
-	CodeNegativeFee       sdk.CodeType = 122
-	CodeInsufficientFee   sdk.CodeType = 123
-	CodeIncorrectFeeDenom sdk.CodeType = 124
 )
 
 //----------------------------------------
@@ -122,21 +119,10 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
 }
 
+func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidToAddress, msg)
+}
+
 func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
-}
-
-//----------------------------------------
-// Fee error constructors
-
-func ErrNegativeFee(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeNegativeFee, msg)
-}
-
-func ErrInsufficientFee(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInsufficientFee, msg)
-}
-
-func ErrIncorrectFeeDenom(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeIncorrectFeeDenom, msg)
 }

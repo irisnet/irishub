@@ -95,7 +95,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Use:   "create-gateway",
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website> --create-fee=<gateway create fee>",
+			"--website=<website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -113,16 +113,10 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			identity := viper.GetString(FlagIdentity)
 			details := viper.GetString(FlagDetails)
 			website := viper.GetString(FlagWebsite)
-			createFee := viper.GetString(FlagCreateFee)
-
-			createFeeCoin, err := sdk.IRIS.ConvertToMinCoin(createFee)
-			if err != nil {
-				return err
-			}
 
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website, createFeeCoin,
+				owner, moniker, identity, details, website,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -133,14 +127,14 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
 				// query fee
-				actualFee, err := queryGatewayFee(cliCtx, moniker)
+				creationFee, err := queryGatewayFee(cliCtx, moniker)
 				if err != nil {
 					return fmt.Errorf("failed to query gateway creation fee: %s", err.Error())
 				}
 
-				// append actual fee to prompt
-				actualNativeTokenFee := sdk.Coins{actualFee.Fee}.MainUnitString()
-				prompt += fmt.Sprintf(": %s", actualNativeTokenFee)
+				// append creation fee to prompt
+				creationFeeMainUnit := sdk.Coins{creationFee.Fee}.MainUnitString()
+				prompt += fmt.Sprintf(": %s", creationFeeMainUnit)
 			}
 
 			// a confirmation is needed
@@ -160,7 +154,6 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsGatewayCreate)
 	cmd.MarkFlagRequired(FlagMoniker)
-	cmd.MarkFlagRequired(FlagCreateFee)
 
 	return cmd
 }
@@ -223,6 +216,56 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsGatewayEdit)
 	cmd.MarkFlagRequired(FlagMoniker)
+
+	return cmd
+}
+
+// GetCmdTransferGatewayOwner implements the transfer gateway owner command
+func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "transfer-gateway-owner",
+		Short: "transfer the owner of a gateway. The command is only used to generate the transaction which " +
+			"will be signed in order by the current and new owners using the 'iriscli tx sign' command seperately.",
+		Example: "iriscli asset transfer-gateway-owner --moniker=<moniker> --to=<new owner>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			moniker := viper.GetString(FlagMoniker)
+
+			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
+			if err != nil {
+				return err
+			}
+
+			var msg sdk.Msg
+			msg = asset.NewMsgTransferGatewayOwner(
+				owner, moniker, to,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			// enable generate-only
+			cliCtx.GenerateOnly = true
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsGatewayOwnerTransfer)
+	cmd.MarkFlagRequired(FlagMoniker)
+	cmd.MarkFlagRequired(FlagTo)
 
 	return cmd
 }

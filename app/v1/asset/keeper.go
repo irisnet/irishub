@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/asset/tags"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -184,6 +185,34 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	return editTags, nil
 }
 
+// TransferGatewayOwner transfers the owner of the specified gateway to a new one
+func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg MsgTransferGatewayOwner) (sdk.Tags, sdk.Error) {
+	// get the destination gateway
+	gateway, err := k.GetGateway(ctx, msg.Moniker)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if the given owner matches with the owner of the destination gateway
+	if !msg.Owner.Equals(gateway.Owner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the gateway %s", msg.Owner, msg.Moniker))
+	}
+
+	// change the ownership
+	gateway.Owner = msg.To
+
+	// update the gateway and related keys
+	k.SetGateway(ctx, gateway)
+	k.UpdateOwnerGateway(ctx, gateway.Moniker, msg.Owner, msg.To)
+
+	// TODO
+	transferTags := sdk.NewTags(
+		"moniker", []byte(msg.Moniker),
+	)
+
+	return transferTags, nil
+}
+
 // GetGateway retrieves the gateway of the given moniker
 func (k Keeper) GetGateway(ctx sdk.Context, moniker string) (Gateway, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
@@ -220,6 +249,18 @@ func (k Keeper) SetOwnerGateway(ctx sdk.Context, owner sdk.AccAddress, moniker s
 
 	// set KeyOwnerGateway
 	store.Set(KeyOwnerGateway(owner, moniker), bz)
+}
+
+// UpdateOwnerGateway updates the KeyOwnerGateway key of the given moniker from an owner to another
+func (k Keeper) UpdateOwnerGateway(ctx sdk.Context, moniker string, originOwner, newOwner sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+
+	// delete the old key
+	store.Delete(KeyOwnerGateway(originOwner, moniker))
+
+	// add the new key
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(moniker)
+	store.Set(KeyOwnerGateway(newOwner, moniker), bz)
 }
 
 // GetGateways retrieves all the gateways of the given owner

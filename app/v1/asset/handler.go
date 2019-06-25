@@ -17,6 +17,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgCreateGateway(ctx, k, msg)
 		case MsgEditGateway:
 			return handleMsgEditGateway(ctx, k, msg)
+		case MsgTransferGatewayOwner:
+			return handleMsgTransferGatewayOwner(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 		}
@@ -40,13 +42,13 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 	switch msg.Source {
 	case NATIVE:
 		// handle fee for native token
-		if err := TokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol, getTokenIssueFee(ctx, k, msg.Symbol)); err != nil {
+		if err := TokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol); err != nil {
 			return err.Result()
 		}
 		break
 	case GATEWAY:
 		// handle fee for gateway token
-		if err := GatewayTokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol, getGatewayTokenIssueFee(ctx, k, msg.Symbol)); err != nil {
+		if err := GatewayTokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol); err != nil {
 			return err.Result()
 		}
 		break
@@ -67,7 +69,7 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 // handleMsgCreateGateway handles MsgCreateGateway
 func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
 	// handle fee
-	if err := GatewayFeeHandler(ctx, k, msg.Owner, msg.Moniker, msg.Fee); err != nil {
+	if err := GatewayCreateFeeHandler(ctx, k, msg.Owner, msg.Moniker); err != nil {
 		return err.Result()
 	}
 
@@ -90,6 +92,21 @@ func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Res
 	msg.Moniker = strings.ToLower(msg.Moniker)
 
 	tags, err := k.EditGateway(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// handleMsgTransferGatewayOwner handles MsgTransferGatewayOwner
+func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGatewayOwner) sdk.Result {
+	// convert moniker to lowercase
+	msg.Moniker = strings.ToLower(msg.Moniker)
+
+	tags, err := k.TransferGatewayOwner(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}

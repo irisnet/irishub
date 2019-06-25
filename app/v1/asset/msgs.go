@@ -36,7 +36,7 @@ var (
 	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
 )
 
-var _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgCreateGateway{}, &MsgEditGateway{}
+var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgCreateGateway{}, &MsgEditGateway{}, &MsgTransferGatewayOwner{}
 
 // MsgIssueToken
 type MsgIssueToken struct {
@@ -182,18 +182,16 @@ type MsgCreateGateway struct {
 	Identity string         `json:"identity"` //  the identity of the gateway
 	Details  string         `json:"details"`  //  the description of the gateway
 	Website  string         `json:"website"`  //  the external website of the gateway
-	Fee      sdk.Coin       `json:"fee"`      //  the fee for gateway creation
 }
 
 // NewMsgCreateGateway creates a MsgCreateGateway
-func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string, fee sdk.Coin) MsgCreateGateway {
+func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, website string) MsgCreateGateway {
 	return MsgCreateGateway{
 		Owner:    owner,
 		Moniker:  moniker,
 		Identity: identity,
 		Details:  details,
 		Website:  website,
-		Fee:      fee,
 	}
 }
 
@@ -228,15 +226,6 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 	// check the website
 	if len(msg.Website) > MaximumGatewayWebsiteSize {
 		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
-	}
-
-	// check the fee
-	if msg.Fee.Denom != sdk.NativeTokenMinDenom {
-		return ErrIncorrectFeeDenom(DefaultCodespace, fmt.Sprintf("incorrect fee denom: expected %s, got %s", sdk.NativeTokenMinDenom, msg.Fee.Denom))
-	}
-
-	if !msg.Fee.IsNotNegative() {
-		return ErrNegativeFee(DefaultCodespace, "the fee must not be negative")
 	}
 
 	return nil
@@ -351,6 +340,77 @@ func (msg MsgEditGateway) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgEditGateway) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+// MsgTransferGatewayOwner for transferring the gateway owner
+type MsgTransferGatewayOwner struct {
+	Owner   sdk.AccAddress `json:"owner"`   //  the current owner address of the gateway
+	Moniker string         `json:"moniker"` //  the unique name of the gateway to be transferred
+	To      sdk.AccAddress `json:"to"`      // the new owner to which the gateway ownership will be transferred
+}
+
+// NewMsgTransferGatewayOwner creates a MsgTransferGatewayOwner
+func NewMsgTransferGatewayOwner(owner sdk.AccAddress, moniker string, to sdk.AccAddress) MsgTransferGatewayOwner {
+	return MsgTransferGatewayOwner{
+		Owner:   owner,
+		Moniker: moniker,
+		To:      to,
+	}
+}
+
+// Route implements Msg
+func (msg MsgTransferGatewayOwner) Route() string { return MsgRoute }
+
+// Type implements Msg
+func (msg MsgTransferGatewayOwner) Type() string { return "transfer_gateway_owner" }
+
+// ValidateBasic implements Msg
+func (msg MsgTransferGatewayOwner) ValidateBasic() sdk.Error {
+	// check the owner
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
+	}
+
+	// check if the `to` is empty
+	if len(msg.To) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the new owner of the gateway must be specified"))
+	}
+
+	// check if the `to` is same as the original owner
+	if msg.To.Equals(msg.Owner) {
+		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
+	}
+
+	// check the moniker
+	if err := ValidateMoniker(msg.Moniker); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// String returns the representation of the msg
+func (msg MsgTransferGatewayOwner) String() string {
+	return fmt.Sprintf(`MsgTransferGatewayOwner:
+  Owner:             %s
+  Moniker:           %s
+  To:                %s`,
+		msg.Owner, msg.Moniker, msg.To)
+}
+
+// GetSignBytes implements Msg
+func (msg MsgTransferGatewayOwner) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgTransferGatewayOwner) GetSigners() []sdk.AccAddress {
+	// the msg needs signatures from both the original owner and the new one
+	return []sdk.AccAddress{msg.Owner, msg.To}
 }
 
 // ValidateMoniker checks if the specified moniker is valid

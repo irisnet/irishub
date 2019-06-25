@@ -32,7 +32,6 @@ type createGatewayReq struct {
 	Identity string         `json:"identity"` //  Identity of the gateway
 	Details  string         `json:"details"`  //  Description of the gateway
 	Website  string         `json:"website"`  //  Website of the gateway
-	Fee      sdk.Coin       `json:"fee"`      //  Creation fee of the gateway
 }
 
 type editGatewayReq struct {
@@ -59,7 +58,7 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		// create the MsgCreateGateway message
-		msg := asset.NewMsgCreateGateway(req.Owner, req.Moniker, req.Identity, req.Details, req.Website, req.Fee)
+		msg := asset.NewMsgCreateGateway(req.Owner, req.Moniker, req.Identity, req.Details, req.Website)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
