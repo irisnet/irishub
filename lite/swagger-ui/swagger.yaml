@@ -3341,6 +3341,84 @@ paths:
           description: Invalid owner address if owner given
         '500':
           description: Internal Server Error
+  '/asset/token/{token-id}':
+    put:
+      summary: edit token information
+      parameters:
+        - in: path
+          name: token-id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: async
+          description: 'if true, broadcast transaction asynchronously'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: commit
+          description: >-
+            if true, response will be returned after the transaction is included
+            in a block.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: simulate
+          description: >-
+            if true, ignore the gas field and perform a simulation of a
+            transaction, but don't broadcast it
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: generate-only
+          description: 'if true, build an unsigned transaction and write it back'
+          required: false
+          schema:
+            type: boolean
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BroadcastTxCommitResult'
+        '401':
+          description: Key password is wrong
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                symbol_at_source:
+                  type: string
+                  example: 'btc'
+                symbol_min_alias:
+                  type: string
+                  example: 'satoshi'
+                max_supply:
+                  type: int
+                  example: '21000000'
+                mintable:
+                  type: boolean
+                  example: false
+                name:
+                  type: string
+                  example: 'BTC Token'
+
+
 components:
   requestBodies:
     Unjailbody:
