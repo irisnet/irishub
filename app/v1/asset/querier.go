@@ -44,9 +44,23 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	token, found := keeper.getToken(ctx, GetKeyIDFromUniqueID(params.TokenId))
-	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
+	var token FungibleToken
+	if params.TokenId == sdk.NativeTokenName {
+		initSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.InitialIssue).String())
+		if err != nil {
+			return nil, sdk.MarshalResultErr(err)
+		}
+		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(MaximumAssetMaxSupply))).String())
+		if err != nil {
+			return nil, sdk.MarshalResultErr(err)
+		}
+		token = NewFungibleToken(NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+	} else {
+		var found bool
+		token, found = keeper.getToken(ctx, GetKeyIDFromUniqueID(params.TokenId))
+		if !found {
+			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
+		}
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
