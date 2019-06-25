@@ -282,7 +282,7 @@ func TestKeeper_EditToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
@@ -300,7 +300,8 @@ func TestKeeper_EditToken(t *testing.T) {
 	assert.Equal(t, msgJson, assetJson)
 
 	//TODO:finish the edit token
-	msgEditToken := NewMsgEditToken(addr, "btc", "btc", "btc")
+	mintable := false
+	msgEditToken := NewMsgEditToken("BTC Token", "btc", "btc", "x.btc", 21000000, &mintable, acc.GetAddress())
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
 }

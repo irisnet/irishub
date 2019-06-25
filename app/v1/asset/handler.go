@@ -103,14 +103,10 @@ func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Res
 
 // handleMsgEditToken handles MsgEditToken
 func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result {
-	// convert moniker to lowercase
-	msg.Name = strings.ToLower(msg.Name)
-	msg.Symbol = strings.ToLower(msg.Symbol)
 	tags, err := k.EditToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
-
 	return sdk.Result{
 		Tags: tags,
 	}

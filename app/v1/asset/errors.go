@@ -34,6 +34,7 @@ const (
 	CodeNegativeFee       sdk.CodeType = 122
 	CodeInsufficientFee   sdk.CodeType = 123
 	CodeIncorrectFeeDenom sdk.CodeType = 124
+	CodeAssetNotExists    sdk.CodeType = 125
 )
 
 //----------------------------------------
@@ -80,6 +81,10 @@ func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrAssetAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeAssetAlreadyExists, msg)
+}
+
+func ErrAssetNotExists(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeAssetNotExists, msg)
 }
 
 //----------------------------------------

@@ -364,19 +364,28 @@ func ValidateMoniker(moniker string) sdk.Error {
 
 // MsgEditToken for editing a specified gateway
 type MsgEditToken struct {
-	Owner   sdk.AccAddress `json:"owner"`   //  Owner of the asset
-	Name    string         `json:"name"`    //  name of asset
-	TokenId string         `json:"tokenId"` //  id of asset
-	Symbol  string         `json:"symbol"`  //  symbol of asset
+	TokenId        string         `json:"token_id"`         //  id of asset
+	Owner          sdk.AccAddress `json:"owner"`            // owner of asset
+	SymbolAtSource string         `json:"symbol_at_source"` //  symbol_at_source of asset
+	SymbolMinAlias string         `json:"symbol_min_alias"` //  symbol_min_alias of asset
+	MaxSupply      uint64         `json:"max_supply"`
+	Mintable       *bool          `json:"mintable"` //  mintable of asset
+	Name           string         `json:"name"`
 }
 
 // NewMsgEditToken creates a MsgEditAsset
-func NewMsgEditToken(owner sdk.AccAddress, id string, name string, symbol string) MsgEditToken {
+func NewMsgEditToken(name, symbolAtSource, symbolMinAlias, tokenId string, maxSupply uint64, mintable *bool, owner sdk.AccAddress) MsgEditToken {
+	name = strings.TrimSpace(name)
+	symbolAtSource = strings.ToLower(strings.TrimSpace(symbolAtSource))
+	symbolMinAlias = strings.ToLower(strings.TrimSpace(symbolMinAlias))
 	return MsgEditToken{
-		Owner:   owner,
-		Name:    name,
-		TokenId: id,
-		Symbol:  symbol,
+		Name:           name,
+		SymbolAtSource: symbolAtSource,
+		SymbolMinAlias: symbolMinAlias,
+		TokenId:        tokenId,
+		MaxSupply:      maxSupply,
+		Mintable:       mintable,
+		Owner:          owner,
 	}
 }
 
@@ -389,44 +398,39 @@ func (msg MsgEditToken) Type() string { return "edit_token" }
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() sdk.Error {
 
-	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
-	msg.Name = strings.TrimSpace(msg.Name)
-
-	// check the owner
-	if len(msg.Owner) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
+	//check owner
+	if msg.Owner.Empty() {
+		return ErrNilAssetOwner(DefaultCodespace, "the owner of the asset must be specified")
 	}
 
 	nameLen := len(msg.Name)
-	if nameLen == 0 || nameLen > MaximumAssetNameSize {
+	if nameLen > 0 && nameLen > MaximumAssetNameSize {
 		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
 	}
 
-	symbolLen := len(msg.Symbol)
-	if symbolLen < MinimumAssetSymbolSize || symbolLen > MaximumAssetSymbolSize || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	//check max_supply for fast failed
+	if msg.MaxSupply > MaximumAssetMaxSupply {
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, must be less than %d", msg.MaxSupply, MaximumAssetMaxSupply))
 	}
 
-	if strings.Contains(strings.ToLower(msg.Symbol), sdk.NativeTokenName) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
+	//check token_id
+	if err := CheckAssetID(msg.TokenId); err != nil {
+		return err
 	}
 
-	// check if updates occur
-	if msg.Symbol == "" && msg.Name == "" {
-		return ErrNoUpdatesProvided(DefaultCodespace, fmt.Sprintf("no updated values provided"))
+	//check symbol_at_source
+	symbolAtSourceLen := len(msg.SymbolAtSource)
+	if symbolAtSourceLen > 0 && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
+		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid token symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	}
+
+	//check symbol_min_alias
+	symbolMinAliasLen := len(msg.SymbolMinAlias)
+	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) {
+		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
 	}
 
 	return nil
-}
-
-// String returns the representation of the msg
-func (msg MsgEditToken) String() string {
-	return fmt.Sprintf(`MsgEditToken:
-  Owner:          %s
-  TokenId: 		  %s
-  Name:           %s
-  Symbol:         %s`,
-		msg.Owner, msg.TokenId, msg.Name, msg.Symbol)
 }
 
 // GetSignBytes implements Msg

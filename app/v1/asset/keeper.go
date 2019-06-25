@@ -186,11 +186,43 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 
 // EditToken edits the specified token
 func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Error) {
-	// get the destination asset
+	// get the destination token
+	token, exist := k.getToken(ctx, GetKeyIDFromUniqueID(msg.TokenId))
+	if !exist {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
+	}
 
-	// TODO
+	if !msg.Owner.Equals(token.Owner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
+	}
+
+	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(token.Decimal))
+	if maxSupply.GT(sdk.ZeroInt()) && (token.InitialSupply.GT(maxSupply) || maxSupply.GT(token.MaxSupply)) {
+		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max_supply must be greater than %s and less than %s", token.InitialSupply.String(), token.MaxSupply.String()))
+	}
+
+	if len(msg.Name) > 0 {
+		token.Name = msg.Name
+	}
+	if len(msg.SymbolAtSource) > 0 {
+		token.SymbolAtSource = msg.SymbolAtSource
+	}
+	if len(msg.SymbolMinAlias) > 0 {
+		token.SymbolMinAlias = msg.SymbolMinAlias
+	}
+	if maxSupply.GT(sdk.ZeroInt()) {
+		token.MaxSupply = maxSupply
+	}
+	if msg.Mintable != nil {
+		token.Mintable = *msg.Mintable
+	}
+
+	if err := k.SetToken(ctx, token); err != nil {
+		return nil, err
+	}
+
 	editTags := sdk.NewTags(
-		"token", []byte(msg.Symbol),
+		tags.Id, []byte(msg.TokenId),
 	)
 
 	return editTags, nil
