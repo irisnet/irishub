@@ -48,7 +48,6 @@ func TestMsgIssueAsset(t *testing.T) {
 		{"gateway symbol_at_source error", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a1,d", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 		{"gateway symbol_at_source too long", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "abcdefghijklmn", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
 		{"gateway symbol_at_source too short", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a", "btc", 18, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
-
 	}
 
 	for _, tc := range tests {
@@ -225,5 +224,79 @@ func TestMsgEditGatewayGetSigners(t *testing.T) {
 	res := msg.GetSigners()
 
 	expected := "[6F776E6572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+func TestNewMsgTransferGatewayOwner(t *testing.T) {
+	owner := sdk.AccAddress([]byte("owner"))
+	moniker := "mon"
+	newOwner := sdk.AccAddress([]byte("newOwner"))
+
+	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
+
+	require.Equal(t, owner, msg.Owner)
+	require.Equal(t, moniker, msg.Moniker)
+	require.Equal(t, newOwner, msg.To)
+}
+
+func TestMsgTransferGatewayOwnerRoute(t *testing.T) {
+	owner := sdk.AccAddress([]byte("owner"))
+	moniker := "mon"
+	newOwner := sdk.AccAddress([]byte("newOwner"))
+
+	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
+	require.Equal(t, "asset", msg.Route())
+}
+
+func TestMsgTransferGatewayOwnerValidation(t *testing.T) {
+	testData := []struct {
+		name       string
+		owner      sdk.AccAddress
+		moniker    string
+		to         sdk.AccAddress
+		expectPass bool
+	}{
+		{"empty owner", emptyAddr, "mon", addr1, false},
+		{"empty moniker", addr1, "", addr2, false},
+		{"too short moniker", addr1, "mo", addr2, false},
+		{"too long moniker", addr1, "monikermo", addr2, false},
+		{"moniker contains illegal characters", addr1, "moni2", addr2, false},
+		{"empty to address", addr1, "mon", emptyAddr, false},
+		{"the to address is same as the owner", addr1, "mon", addr1, false},
+		{"basic good", addr1, "mon", addr2, true},
+	}
+
+	for _, td := range testData {
+		msg := NewMsgTransferGatewayOwner(td.owner, td.moniker, td.to)
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+		}
+	}
+}
+
+func TestMsgTransferGatewayOwnerGetSignBytes(t *testing.T) {
+	owner := sdk.AccAddress([]byte("owner"))
+	moniker := "mon"
+	newOwner := sdk.AccAddress([]byte("newOwner"))
+
+	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/asset/MsgTransferGatewayOwner","value":{"moniker":"mon","owner":"faa1damkuetjqqah8w","to":"faa1dejhwnmhdejhyxslsx8"}}`
+	require.Equal(t, expected, string(res))
+}
+
+func TestMsgTransferGatewayOwnerGetSigners(t *testing.T) {
+	owner := sdk.AccAddress([]byte("owner"))
+	moniker := "mon"
+	newOwner := sdk.AccAddress([]byte("newOwner"))
+
+	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
+
+	res := msg.GetSigners()
+
+	expected := "[6F776E6572 6E65774F776E6572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
