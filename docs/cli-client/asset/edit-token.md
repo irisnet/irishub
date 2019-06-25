@@ -1,57 +1,53 @@
 # iriscli asset edit-token
 
-## 描述
+## Description
 
-编辑指定ID的资产信息
+edit token's information by token-id
 
-## 使用方式
+## Usage
 
-```
-iriscli asset edit-token <token-id> [flags]
-```
-
-打印帮助信息:
-```
-iriscli asset edit-token <token-id> --help
+```shell
+iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-source> --symbol-min-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris
 ```
 
-## 特有的标志
+## Flags
 
-| 命令, 速记     | 类型   | 是否必须 | 默认值  | 描述                                                         |
+| Name | Type | Required | Default | Description                                              |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --name           | string | 是    |        | 资产的新名字，限定为32位的Unicode字符，如 "IRISnet"|
-| --symbol         | string | 是    |        | 资产设置的新的唯一标志，限定为3-8位的中英文字母、数字和_的组合 |
+| --name           | string | No | "" | the asset name, e.g. IRIS Network |
+| --symbol-at-source | string | No | "" | the source symbol of a gateway or external asset |
+| --symbol-min-alias | string | No | "" | the asset symbol minimum alias |
+| --max-supply | uint | No | 0 | the max supply token of asset |
+| --mintable | bool | No | false | whether the asset can be minted, default false |
 
 
-## 示例
+## Example
 
-```
-iriscli asset edit-token kitty  --name=kittyToken --symbol=cat    --fee=1iris
+```shell
+iriscli asset edit-token eth --name="ETH TOKEN" --symbol-at-source="ETH" --symbol-min-alias=atto --max-supply=100000000000 --mintable=true --from=node0 --chain-id=irishub-test --fee=0.4iris  --home=$iris_root_path --commit
 ```
 
 输出信息:
 ```txt
-Committed at block 14 (tx hash: D24319D696F16C42E4F0508B28889A3EC3CC371EE92786F1945BA97BA1F6223D, response:
-```
-
-```json
+Password to sign with 'node0':
+Committed at block 502 (tx hash: 3D131F2D1E0B200206E8023E70C9442142DA27EBC42675451E39BF84B6343C6F, response:
  {
-      "code": 0,
-      "data": null,
-      "log": "Msg 0: ",
-      "info": "",
-      "gas_wanted": 50000,
-      "gas_used": 3696,
-      "codespace": "",
-      "tags": [
-        {
-          "key": "action",
-          "value": "edit_token"
-        },
-        {
-          "key": "token",
-          "value": "cat"
-        }
-      ]
-    }
+   "code": 0,
+   "data": null,
+   "log": "Msg 0: ",
+   "info": "",
+   "gas_wanted": 50000,
+   "gas_used": 5350,
+   "codespace": "",
+   "tags": [
+     {
+       "key": "action",
+       "value": "edit_token"
+     },
+     {
+       "key": "token-id",
+       "value": "eth"
+     }
+   ]
+ })
 ```
