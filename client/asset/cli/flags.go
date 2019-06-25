@@ -24,16 +24,18 @@ const (
 	FlagDetails   = "details"
 	FlagWebsite   = "website"
 	FlagCreateFee = "create-fee"
+	FlagTo        = "to"
 
 	FlagSubject = "subject"
 	FlagID      = "id"
 )
 
 var (
-	FsAssetIssue    = flag.NewFlagSet("", flag.ContinueOnError)
-	FsGatewayCreate = flag.NewFlagSet("", flag.ContinueOnError)
-	FsGatewayEdit   = flag.NewFlagSet("", flag.ContinueOnError)
-	FsFeeQuery      = flag.NewFlagSet("", flag.ContinueOnError)
+	FsAssetIssue           = flag.NewFlagSet("", flag.ContinueOnError)
+	FsGatewayCreate        = flag.NewFlagSet("", flag.ContinueOnError)
+	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
+	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
+	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -59,6 +61,9 @@ func init() {
 	FsGatewayEdit.String(FlagIdentity, "", "the gateway identity")
 	FsGatewayEdit.String(FlagDetails, "", "the gateway description")
 	FsGatewayEdit.String(FlagWebsite, "", "the external website")
+
+	FsGatewayOwnerTransfer.String(FlagMoniker, "", "the unique name of the gateway to be transferred")
+	FsGatewayOwnerTransfer.String(FlagTo, "", "the new owner")
 
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
