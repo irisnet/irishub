@@ -39,10 +39,6 @@ func TestIrisCLIToken(t *testing.T) {
 	symbolMinAlias := "Satoshi"
 	gateway := "ABC"
 
-	assetRes, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli asset query-token %s %v", strings.ToLower(strings.TrimSpace(symbol)), flags), "")
-	require.Equal(t, "", assetRes)
-
-
 	// issue a token
 	spStr := fmt.Sprintf("iriscli asset issue-token %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")

@@ -353,7 +353,7 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 		for _, coin := range amt {
 			if coin.Denom == sdk.NativeTokenMinDenom {
 				// Decrease total loose token for iris
-				am.DecreaseTotalLoosenToken(ctx, sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, amt.AmountOf(sdk.NativeTokenMinDenom))})
+				am.DecreaseTotalLoosenToken(ctx, sdk.Coins{coin})
 			} else {
 				// Decrease total supply for tokens other than iris
 				am.DecreaseTotalSupply(ctx, coin)
