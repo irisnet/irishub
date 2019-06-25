@@ -170,14 +170,6 @@ func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.
 	}
 }
 
-func GetKeyIDFromUniqueID(uniqueID string) string {
-	if strings.Contains(uniqueID, ".") {
-		return strings.ToLower(uniqueID)
-	} else {
-		return strings.ToLower(fmt.Sprintf("i.%s", uniqueID))
-	}
-}
-
 // CheckAssetID checks if the given asset id is valid
 func CheckAssetID(id string) sdk.Error {
 	source, symbol := ParseAssetID(id)

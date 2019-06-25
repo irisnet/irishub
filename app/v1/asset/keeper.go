@@ -98,9 +98,9 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 	return createTags, nil
 }
 
-func (k Keeper) HasToken(ctx sdk.Context, id string) bool {
+func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyToken(id))
+	return store.Has(KeyToken(tokenId))
 }
 
 func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
@@ -116,9 +116,9 @@ func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
 	return nil
 }
 
-func (k Keeper) getToken(ctx sdk.Context, id string) (token FungibleToken, found bool) {
+func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token FungibleToken, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyToken(id))
+	bz := store.Get(KeyToken(tokenId))
 	if bz == nil {
 		return token, false
 	}

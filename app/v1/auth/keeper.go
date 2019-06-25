@@ -272,9 +272,10 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		"decreaseCoins", decreaseCoins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
-// Turn a token demom to key used to get it from the account store
+// Turn a token id to key used to get it from the account store
 func TotalSupplyStoreKey(denom string) []byte {
-	return append(totalSupplyKeyPrefix, []byte(denom)...)
+	keyId, _ := sdk.ConvertDenomToTokenKeyId(denom)
+	return append(totalSupplyKeyPrefix, keyId...)
 }
 
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {

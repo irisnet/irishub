@@ -53,9 +53,9 @@ func TestKeeper_IssueToken(t *testing.T) {
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, "i.btc"))
+	assert.True(t, keeper.HasToken(ctx, "btc"))
 
-	asset, found := keeper.getToken(ctx, "i.btc")
+	asset, found := keeper.getToken(ctx, "btc")
 	assert.True(t, found)
 
 	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
@@ -95,7 +95,7 @@ func TestKeeper_IssueGatewayToken(t *testing.T) {
 		Details:  details,
 		Website:  website,
 	}
-	gatewayToken := NewFungibleToken(GATEWAY, "test", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0),  sdk.NewIntWithDecimal(1, 0), true, owner.GetAddress())
+	gatewayToken := NewFungibleToken(GATEWAY, "test", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner.GetAddress())
 	gatewayToken1 := NewFungibleToken(GATEWAY, "moniker", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner.GetAddress())
 
 	// unknown gateway moniker
