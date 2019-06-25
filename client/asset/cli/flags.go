@@ -67,5 +67,5 @@ func init() {
 
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
-	FsFeeQuery.String(FlagID, "", "the fungible token id")
+	FsFeeQuery.String(FlagID, "", "the token id")
 }

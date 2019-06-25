@@ -115,7 +115,7 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 }
 
 func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) []Gateway {
-	var gateways []Gateway
+	var gateways = make([]Gateway, 0)
 
 	gatewaysIterator := keeper.GetGateways(ctx, owner)
 	defer gatewaysIterator.Close()
@@ -136,7 +136,7 @@ func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) 
 }
 
 func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
-	var gateways []Gateway
+	var gateways = make([]Gateway, 0)
 
 	gatewaysIterator := keeper.GetAllGateways(ctx)
 	defer gatewaysIterator.Close()
