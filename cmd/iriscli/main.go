@@ -261,6 +261,7 @@ func main() {
 		client.PostCommands(
 			assetcmd.GetCmdCreateGateway(cdc),
 			assetcmd.GetCmdEditGateway(cdc),
+			assetcmd.GetCmdTransferGatewayOwner(cdc),
 			assetcmd.GetCmdIssueAsset(cdc),
 			assetcmd.GetCmdEditAsset(cdc),
 		)...)

@@ -305,3 +305,59 @@ func TestKeeper_EditToken(t *testing.T) {
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
 }
+
+func TestTransferGatewayKeeper(t *testing.T) {
+	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+
+	cdc := codec.New()
+	RegisterCodec(cdc)
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	guardianKeeper := guardian.Keeper{}
+	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
+	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+
+	// define variables
+	originOwner := ak.NewAccountWithAddress(ctx, []byte("originOwner"))
+	moniker := "moniker"
+	identity := "identity"
+	details := "details"
+	website := "website"
+
+	// construct a test gateway
+	gateway := Gateway{
+		Owner:    originOwner.GetAddress(),
+		Moniker:  moniker,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
+	}
+
+	// create a gateway
+	keeper.SetGateway(ctx, gateway)
+
+	// assert GetGateway will return the gateway with the previous owner
+	res, _ := keeper.GetGateway(ctx, moniker)
+	require.Equal(t, originOwner.GetAddress(), res.Owner)
+
+	// build a msg for transferring the gateway owner
+	newOwner := ak.NewAccountWithAddress(ctx, []byte("newOwner"))
+	transferMsg := NewMsgTransferGatewayOwner(originOwner.GetAddress(), moniker, newOwner.GetAddress())
+
+	// transfer
+	_, err := keeper.TransferGatewayOwner(ctx, transferMsg)
+	assert.NoError(t, err)
+
+	// assert GetGateway will return the gateway with the new owner and the KeyOwnerGateway has been updated
+	res, err = keeper.GetGateway(ctx, moniker)
+	require.Equal(t, newOwner.GetAddress(), res.Owner)
+	require.Equal(t, false, ctx.KVStore(keeper.storeKey).Has(KeyOwnerGateway(originOwner.GetAddress(), moniker)))
+	require.Equal(t, true, ctx.KVStore(keeper.storeKey).Has(KeyOwnerGateway(newOwner.GetAddress(), moniker)))
+
+	// transfer again and assert that the error will occur because of the ownership has been transferred
+	_, err = keeper.TransferGatewayOwner(ctx, transferMsg)
+	assert.Error(t, err)
+}
