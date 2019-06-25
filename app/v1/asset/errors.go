@@ -32,10 +32,6 @@ const (
 	CodeInvalidAssetDecimal           sdk.CodeType = 119
 	CodeAssetAlreadyExists            sdk.CodeType = 120
 	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
-
-	CodeNegativeFee       sdk.CodeType = 122
-	CodeInsufficientFee   sdk.CodeType = 123
-	CodeIncorrectFeeDenom sdk.CodeType = 124
 )
 
 //----------------------------------------
@@ -129,19 +125,4 @@ func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
-}
-
-//----------------------------------------
-// Fee error constructors
-
-func ErrNegativeFee(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeNegativeFee, msg)
-}
-
-func ErrInsufficientFee(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInsufficientFee, msg)
-}
-
-func ErrIncorrectFeeDenom(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeIncorrectFeeDenom, msg)
 }
