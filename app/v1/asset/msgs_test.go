@@ -255,7 +255,7 @@ func TestMsgEditAsset(t *testing.T) {
 
 func TestMsgEditTokenRoute(t *testing.T) {
 	symbolAtSource := "btc"
-	symbolMinAlias := "btc-min"
+	symbolMinAlias := "satoshi"
 	tokenId := "x.btc"
 	mintable := false
 	// build a MsgEditToken
@@ -271,16 +271,19 @@ func TestMsgEditTokenRoute(t *testing.T) {
 }
 
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
+	mintable := false
 	var msg = MsgEditToken{
 		Name:           "BTC TOKEN",
 		Owner:          sdk.AccAddress([]byte("owner")),
 		TokenId:        "x.btc",
 		SymbolAtSource: "btc",
-		SymbolMinAlias: "btc-min",
+		SymbolMinAlias: "satoshi",
+		MaxSupply:      21000000,
+		Mintable:       &mintable,
 	}
 
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/asset/MsgEditToken","value":{"max_supply":"0","mintable":false,"owner":"faa1damkuetjqqah8w","symbol_at_source":"btc","symbol_min_alias":"btc-min","tokenId":"x.btc"}}`
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"max_supply":"21000000","mintable":false,"name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","symbol_at_source":"btc","symbol_min_alias":"satoshi","token_id":"x.btc"}}`
 	require.Equal(t, expected, string(res))
 }
