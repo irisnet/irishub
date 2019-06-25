@@ -4,7 +4,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 )
 
-// Register concrete types on codec codec
+// Register concrete types on codec
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgIssueToken{}, "irishub/asset/MsgIssueToken", nil)
 	cdc.RegisterConcrete(MsgCreateGateway{}, "irishub/asset/MsgCreateGateway", nil)
