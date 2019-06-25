@@ -10,15 +10,15 @@ const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
 	CodeInvalidMoniker       sdk.CodeType = 100
-	CodeInvalidDetails       sdk.CodeType = 101
-	CodeInvalidWebsite       sdk.CodeType = 102
-	CodeUnknownGateway       sdk.CodeType = 103
-	CodeGatewayAlreadyExists sdk.CodeType = 104
-	CodeInvalidOwner         sdk.CodeType = 105
-	CodeNoUpdatesProvided    sdk.CodeType = 106
-	CodeInvalidAddress       sdk.CodeType = 107
-  CodeInvalidToAddress     sdk.CodeType = 108
-  CodeInvalidIdentity      sdk.CodeType = 109
+	CodeInvalidIdentity      sdk.CodeType = 101
+	CodeInvalidDetails       sdk.CodeType = 102
+	CodeInvalidWebsite       sdk.CodeType = 103
+	CodeUnknownGateway       sdk.CodeType = 104
+	CodeGatewayAlreadyExists sdk.CodeType = 105
+	CodeInvalidOwner         sdk.CodeType = 106
+	CodeNoUpdatesProvided    sdk.CodeType = 107
+	CodeInvalidAddress       sdk.CodeType = 108
+	CodeInvalidToAddress     sdk.CodeType = 109
 
 	CodeNilAssetOwner                 sdk.CodeType = 110
 	CodeInvalidAssetFamily            sdk.CodeType = 111
