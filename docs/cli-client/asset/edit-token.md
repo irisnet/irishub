@@ -2,7 +2,7 @@
 
 ## Description
 
-edit token's information by token-id
+Edit token informations
 
 ## Usage
 
@@ -14,11 +14,11 @@ iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-
 
 | Name | Type | Required | Default | Description                                              |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --name           | string | No | "" | the asset name, e.g. IRIS Network |
-| --symbol-at-source | string | No | "" | the source symbol of a gateway or external asset |
-| --symbol-min-alias | string | No | "" | the asset symbol minimum alias |
-| --max-supply | uint | No | 0 | the max supply token of asset |
-| --mintable | bool | No | false | whether the asset can be minted, default false |
+| --name           | string | No | "" | the token name, e.g. IRIS Network |
+| --symbol-at-source | string | No | "" | the source symbol of a gateway or external token |
+| --symbol-min-alias | string | No | "" | the token symbol minimum alias |
+| --max-supply | uint | No | 0 | the max supply of the token |
+| --mintable | bool | No | false | whether the token can be minted, default false |
 
 
 ## Example
