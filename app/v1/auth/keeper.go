@@ -279,7 +279,7 @@ func TotalSupplyStoreKey(denom string) []byte {
 
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
 	// parameter checking
-	if coin == (sdk.Coin{}) || !coin.IsPositive() || coin.IsZero() {
+	if coin == (sdk.Coin{}) || !coin.IsPositive() {
 		return sdk.ErrInsufficientCoins("total supply amount to increase must be positive")
 	}
 
@@ -306,7 +306,7 @@ func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.
 
 func (am AccountKeeper) DecreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
 	// parameter checking
-	if coin == (sdk.Coin{}) || !coin.IsPositive() || coin.IsZero() {
+	if coin == (sdk.Coin{}) || !coin.IsPositive() {
 		return sdk.ErrInsufficientCoins("total supply amount to decrease must be positive")
 	}
 
