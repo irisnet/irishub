@@ -70,9 +70,9 @@ func init() {
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
 	FsFeeQuery.String(FlagID, "", "the token id")
 
-	FsEditToken.String(FlagName, "", "the asset name, e.g. IRIS Network")
-	FsEditToken.String(FlagSymbolAtSource, "", "the source symbol of a gateway or external asset")
-	FsEditToken.String(FlagSymbolMinAlias, "", "the asset symbol minimum alias")
-	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply token of asset")
-	FsEditToken.Bool(FlagMintable, false, "whether the asset can be minted, default false")
+	FsEditToken.String(FlagName, "", "the token name, e.g. IRIS Network")
+	FsEditToken.String(FlagSymbolAtSource, "", "the source symbol of a gateway or external token")
+	FsEditToken.String(FlagSymbolMinAlias, "", "the token symbol minimum alias")
+	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
+	FsEditToken.Bool(FlagMintable, false, "whether the token can be minted, default false")
 }
