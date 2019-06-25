@@ -97,12 +97,12 @@ func TestIrisCLIBankTokenStatsById(t *testing.T) {
 	executeWrite(t, fmt.Sprintf("iriscli asset issue-token %v --family=fungible --source=native  --symbol=kitty --name=eeee --initial-supply=1000 --from=foo  --fee=0.6iris", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	executeWrite(t, fmt.Sprintf("iriscli bank burn --amount=10kitty %v", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank burn --from=foo --amount=10kitty %v", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	tokenS := executeGetTokenStatsForAsset(t, fmt.Sprintf("iriscli bank token-stats %v kitty", flags))
-	require.Nil(t, tokenS.LooseTokens)
-	require.Nil(t, tokenS.BondedTokens)
-	require.Contains(t, tokenS.TotalSupply, "990kitty")
-	require.Contains(t, tokenS.BurnedTokens, "10kitty")
+	tokenStats := executeGetTokenStatsForAsset(t, fmt.Sprintf("iriscli bank token-stats %v kitty", flags))
+	require.Nil(t, tokenStats.LooseTokens)
+	require.Nil(t, tokenStats.BondedTokens)
+	require.Contains(t, tokenStats.TotalSupply, sdk.NewCoin("kitty-min", sdk.NewIntWithDecimal(990, 0)))
+	require.Contains(t, tokenStats.BurnedTokens, sdk.NewCoin("kitty-min", sdk.NewIntWithDecimal(10, 0)))
 }
