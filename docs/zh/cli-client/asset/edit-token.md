@@ -14,7 +14,7 @@ iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-
 
 | Name               | Type   | Required | Default | Description                                                  |
 | ------------------ | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --name             | string | 否       | ""      | 资产名称, 例如：IRIS Network                                 |
+| --name             | string | 否       | ""      | 资产名称，例如：IRIS Network                                 |
 | --symbol-at-source | string | 否       | ""      | Source为 external 或 gateway 的时候，可以用来指定在源链上的Symbol |
 | --symbol-min-alias | string | 否       | ""      | 资产最小单位别名                                             |
 | --max-supply       | uint   | 否       | 0       | 以基准单位计的最大发行量                                     |
