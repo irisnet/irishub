@@ -121,16 +121,16 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 
 type TokenStats struct {
 	LooseTokens  sdk.Coins `json:"loose_tokens"`
-	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	BondedTokens sdk.Coins `json:"bonded_tokens"`
+	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	TotalSupply  sdk.Coins `json:"total_supply"`
 }
 
 func (ts TokenStats) String() string {
 	return fmt.Sprintf(`TokenStats:
   Loose Tokens:             %s
-  Burned Tokens:            %s
   Bonded Tokens:            %s
+  Burned Tokens:            %s
   Total Supply:             %s`,
-		ts.LooseTokens.String(), ts.BurnedTokens.String(), ts.BondedTokens.String(), ts.TotalSupply.String())
+		ts.LooseTokens.String(), ts.BondedTokens.String(), ts.BurnedTokens.String(), ts.TotalSupply.String())
 }

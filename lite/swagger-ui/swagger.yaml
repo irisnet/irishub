@@ -454,6 +454,36 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
+  /bank/token-stats:
+    get:
+      tags:
+        - Bank
+      summary: Get all token statistics
+      description: >-
+        Get token statistics, such as total loose tokens, total bonded token and
+        total burned token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  loose_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  bonded_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  burned_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+        '500':
+          description: Internal Server Error
   /bank/token-stats/{id}:
     get:
       tags:
