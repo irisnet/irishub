@@ -20,7 +20,7 @@ func NewQuerier(keeper Keeper, cdc *codec.Codec) sdk.Querier {
 		case QueryAccount:
 			return queryAccount(ctx, req, keeper, cdc)
 		case QueryTokenStats:
-			return queryTokenStats(ctx, keeper, cdc)
+			return queryTokenStats(ctx, req, keeper, cdc)
 
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
@@ -59,14 +59,57 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *co
 	return bz, nil
 }
 
-func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+// defines the params for query: "custom/bank/token-stats"
+type QueryTokenStatsParams struct {
+	TokenId string
+}
+
+func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
+	var params QueryTokenStatsParams
+
+	if err := cdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
 	bk := keeper.(BaseKeeper)
-	irisBurnedToken := sdk.Coin{}
-	irisBurnedToken.Denom = sdk.NativeTokenMinDenom
-	irisBurnedToken.Amount = bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom)
+	looseTokens := sdk.Coins{}
+	burnedTokens := sdk.Coins{}
+	totalSupplies := sdk.Coins{}
+	// TODO: bonded tokens for iris
+
+	if params.TokenId == "" { // query all
+		looseTokens = bk.GetLoosenCoins(ctx)
+		burnedTokens = bk.GetCoins(ctx, BurnedCoinsAccAddr)
+		iter := bk.am.GetTotalSupplies(ctx)
+		defer iter.Close()
+		for ; iter.Valid(); iter.Next() {
+			var ts sdk.Coin
+			cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &ts)
+			totalSupplies = append(totalSupplies, ts)
+		}
+
+	} else if params.TokenId == sdk.NativeTokenName { // query iris
+		looseTokens = bk.GetLoosenCoins(ctx)
+		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom))}
+	} else { // query !iris
+		denom, err := sdk.GetCoinDenom(params.TokenId)
+		if err != nil {
+			return nil, sdk.ParseParamsErr(err)
+		}
+		burnedTokens = sdk.Coins{sdk.NewCoin(denom, bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(denom))}
+
+		ts, found := bk.GetTotalSupply(ctx, denom)
+		if !found {
+			return nil, sdk.ErrUnknownRequest("unknown token id")
+		}
+
+		totalSupplies = append(totalSupplies, ts)
+	}
+
 	tokenStats := TokenStats{
-		LooseTokens:  bk.GetLoosenCoins(ctx),
-		BurnedTokens: sdk.Coins{irisBurnedToken},
+		LooseTokens:  looseTokens,
+		BurnedTokens: burnedTokens,
+		TotalSupply:  totalSupplies,
 	}
 	bz, err := codec.MarshalJSONIndent(cdc, tokenStats)
 	if err != nil {
@@ -78,6 +121,16 @@ func queryTokenStats(ctx sdk.Context, keeper Keeper, cdc *codec.Codec) ([]byte, 
 
 type TokenStats struct {
 	LooseTokens  sdk.Coins `json:"loose_tokens"`
-	BurnedTokens sdk.Coins `json:"burned_tokens"`
 	BondedTokens sdk.Coins `json:"bonded_tokens"`
+	BurnedTokens sdk.Coins `json:"burned_tokens"`
+	TotalSupply  sdk.Coins `json:"total_supply"`
+}
+
+func (ts TokenStats) String() string {
+	return fmt.Sprintf(`TokenStats:
+  Loose Tokens:             %s
+  Bonded Tokens:            %s
+  Burned Tokens:            %s
+  Total Supply:             %s`,
+		ts.LooseTokens.String(), ts.BondedTokens.String(), ts.BurnedTokens.String(), ts.TotalSupply.String())
 }

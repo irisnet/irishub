@@ -3,7 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/irisnet/irishub/client/bank"
+	"github.com/irisnet/irishub/app/v1/bank"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -235,7 +235,7 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
 	return acc
 }
 
-func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenS bank.TokenStats) {
+func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenStats bank.TokenStats) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)
@@ -243,10 +243,10 @@ func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenS bank.Toke
 
 	cdc := app.MakeLatestCodec()
 
-	err = cdc.UnmarshalJSON([]byte(out), &tokenS)
+	err = cdc.UnmarshalJSON([]byte(out), &tokenStats)
 	require.NoError(t, err, "token-stats %v, err %v", string(out), err)
 
-	return tokenS
+	return tokenStats
 }
 
 func executeGetValidatorPK(t *testing.T, cmdStr string) string {

@@ -98,9 +98,8 @@ func queryTokens(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) h
 					var token asset.FungibleToken
 					switch msgIssueAsset.Family {
 					case asset.FUNGIBLE:
-						totalSupply := msgIssueAsset.InitialSupply
 						decimal := int(msgIssueAsset.Decimal)
-						token = asset.NewFungibleToken(msgIssueAsset.Source, msgIssueAsset.Gateway, msgIssueAsset.Symbol, msgIssueAsset.Name, msgIssueAsset.Decimal, msgIssueAsset.SymbolAtSource, msgIssueAsset.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msgIssueAsset.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(totalSupply), decimal), sdk.NewIntWithDecimal(int64(msgIssueAsset.MaxSupply), decimal), msgIssueAsset.Mintable, msgIssueAsset.Owner)
+						token = asset.NewFungibleToken(msgIssueAsset.Source, msgIssueAsset.Gateway, msgIssueAsset.Symbol, msgIssueAsset.Name, msgIssueAsset.Decimal, msgIssueAsset.SymbolAtSource, msgIssueAsset.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msgIssueAsset.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(msgIssueAsset.MaxSupply), decimal), msgIssueAsset.Mintable, msgIssueAsset.Owner)
 					default:
 						continue
 					}
