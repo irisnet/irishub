@@ -286,7 +286,7 @@ func (k Keeper) Init(ctx sdk.Context) {
 // TransferTokenOwner transfers the owner of the specified token to a new one
 func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
 	// get the destination token TODO
-	token, _ := k.getToken(ctx, GetKeyIDFromUniqueID(msg.TokenId))
+	token, _ := k.getToken(ctx, msg.TokenId)
 	//if !exist {
 	//	return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
 	//}
