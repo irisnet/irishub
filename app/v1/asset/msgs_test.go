@@ -300,3 +300,39 @@ func TestMsgTransferGatewayOwnerGetSigners(t *testing.T) {
 	expected := "[6F776E6572 6E65774F776E6572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
+
+func TestMsgTransferTokenOwnerValidation(t *testing.T) {
+	testData := []struct {
+		name       string
+		srcOwner   sdk.AccAddress
+		tokenId    string
+		dstOwner   sdk.AccAddress
+		expectPass bool
+	}{
+		{"empty srcOwner", emptyAddr, "btc", addr1, false},
+		{"empty tokenId", addr1, "", addr2, false},
+		{"empty dstOwner", addr1, "btc", emptyAddr, false},
+		{"invalid tokenId", addr1, "btc-min", addr2, false},
+		{"basic good", addr1, "x.btc", addr2, true},
+	}
+
+	for _, td := range testData {
+		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.tokenId)
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+		}
+	}
+}
+
+func TestMsgTransferTokenOwnerGetSignBytes(t *testing.T) {
+	owner := sdk.AccAddress([]byte("srcOwner"))
+	tokenId := "btc"
+	newOwner := sdk.AccAddress([]byte("dstOwner"))
+
+	msg := NewMsgTransferGatewayOwner(owner, tokenId, newOwner)
+	res := msg.GetSignBytes()
+	expected := `{"type":"irishub/asset/MsgTransferGatewayOwner","value":{"moniker":"btc","owner":"faa1wdexxnmhdejhywzqzta","to":"faa1v3ehgnmhdejhysljv64"}}`
+	require.Equal(t, expected, string(res))
+}
