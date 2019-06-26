@@ -35,6 +35,7 @@ var (
 	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
+	FsEditToken            = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {

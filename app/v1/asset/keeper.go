@@ -278,3 +278,9 @@ func (k Keeper) GetAllGateways(ctx sdk.Context) sdk.Iterator {
 func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, DefaultParams())
 }
+
+// TransferTokenOwner transfers the owner of the specified token to a new one
+func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
+	//TODO
+	return nil, nil
+}

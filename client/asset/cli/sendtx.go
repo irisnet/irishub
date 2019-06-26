@@ -269,3 +269,22 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 
 	return cmd
 }
+
+// GetCmdTransferTokenOwner implements the transfer token owner command
+func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "transfer-token-owner",
+		Short: "transfer the owner of a token. The command is only used to generate the transaction which " +
+			"will be signed in order by the current and new owners using the 'iriscli tx sign' command seperately.",
+		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			//TODO
+			return nil
+		},
+	}
+	cmd.Flags().AddFlagSet(FsEditToken)
+	cmd.MarkFlagRequired(FlagTo)
+
+	return cmd
+}

@@ -349,6 +349,38 @@ type MsgTransferGatewayOwner struct {
 	To      sdk.AccAddress `json:"to"`      // the new owner to which the gateway ownership will be transferred
 }
 
+// MsgTransferTokenOwner for transferring the token owner
+type MsgTransferTokenOwner struct {
+	SrcOwner sdk.AccAddress `json:"src_owner"` // the current owner address of the token
+	DstOwner sdk.AccAddress `json:"dst_owner"` // the new owner
+	TokenId  string         `json:"token_id"`
+}
+
+// GetSignBytes implements Msg
+func (msg MsgTransferTokenOwner) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.SrcOwner, msg.DstOwner}
+}
+
+//TODO
+func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
+	return nil
+}
+
+// Route implements Msg
+func (msg MsgTransferTokenOwner) Route() string { return MsgRoute }
+
+// Type implements Msg
+func (msg MsgTransferTokenOwner) Type() string { return "transfer_token_owner" }
+
 // NewMsgTransferGatewayOwner creates a MsgTransferGatewayOwner
 func NewMsgTransferGatewayOwner(owner sdk.AccAddress, moniker string, to sdk.AccAddress) MsgTransferGatewayOwner {
 	return MsgTransferGatewayOwner{
