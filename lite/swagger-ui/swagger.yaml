@@ -3097,8 +3097,8 @@ paths:
         schema:
           type: string
     get:
-      summary: Query service fees of a address
-      description: Query service fees of a address
+      summary: Query service fees of an address
+      description: Query service fees of an address
       tags:
         - Service
       responses:
@@ -3339,6 +3339,52 @@ paths:
                   $ref: '#/components/schemas/Gateway'
         '400':
           description: Invalid owner address if owner given
+        '500':
+          description: Internal Server Error
+  '/asset/fees/gateways/{moniker}':
+    get:
+      summary: Query the fee for the creation of the gateway with the given moniker
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of a gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayFeeOutput'
+        '400':
+          description: Invalid moniker
+        '500':
+          description: Internal Server Error
+  '/asset/fees/tokens/{id}':
+    get:
+      summary: Query the fees for the issuance and minting of the token with the given id
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: id
+          description: the token id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenFeesOutput'
+        '400':
+          description: Invalid id
         '500':
           description: Internal Server Error
   '/asset/token/{token-id}':
@@ -4065,3 +4111,19 @@ components:
           type: string
         website:
           type: string
+    GatewayFeeOutput:
+      type: object
+      properties:
+        exist:
+          type: boolean
+        fee:
+          $ref: '#/components/schemas/Coin'
+    TokenFeesOutput:
+      type: object
+      properties:
+        exist:
+          type: boolean
+        issue_fee:
+          $ref: '#/components/schemas/Coin'
+        mint_fee:
+          $ref: '#/components/schemas/Coin'

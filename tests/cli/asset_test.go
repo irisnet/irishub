@@ -116,7 +116,6 @@ func TestIrisCLIGateway(t *testing.T) {
 	spStr += fmt.Sprintf(" --identity=%s", identity)
 	spStr += fmt.Sprintf(" --details=%s", details)
 	spStr += fmt.Sprintf(" --website=%s", website)
-	spStr += fmt.Sprintf(" --create-fee=%s", "30iris")
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))

@@ -96,7 +96,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 		Use:   "create-gateway",
 		Short: "create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website> --create-fee=<gateway create fee>",
+			"--website=<website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -114,16 +114,10 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 			identity := viper.GetString(FlagIdentity)
 			details := viper.GetString(FlagDetails)
 			website := viper.GetString(FlagWebsite)
-			createFee := viper.GetString(FlagCreateFee)
-
-			createFeeCoin, err := sdk.IRIS.ConvertToMinCoin(createFee)
-			if err != nil {
-				return err
-			}
 
 			var msg sdk.Msg
 			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website, createFeeCoin,
+				owner, moniker, identity, details, website,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -134,14 +128,14 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
 				// query fee
-				actualFee, err := queryGatewayFee(cliCtx, moniker)
+				creationFee, err := queryGatewayFee(cliCtx, moniker)
 				if err != nil {
 					return fmt.Errorf("failed to query gateway creation fee: %s", err.Error())
 				}
 
-				// append actual fee to prompt
-				actualNativeTokenFee := sdk.Coins{actualFee.Fee}.MainUnitString()
-				prompt += fmt.Sprintf(": %s", actualNativeTokenFee)
+				// append creation fee to prompt
+				creationFeeMainUnit := sdk.Coins{creationFee.Fee}.MainUnitString()
+				prompt += fmt.Sprintf(": %s", creationFeeMainUnit)
 			}
 
 			// a confirmation is needed
@@ -161,7 +155,6 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsGatewayCreate)
 	cmd.MarkFlagRequired(FlagMoniker)
-	cmd.MarkFlagRequired(FlagCreateFee)
 
 	return cmd
 }
