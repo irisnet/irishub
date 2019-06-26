@@ -90,6 +90,9 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 
 	if source == GATEWAY { // ignore gateway moniker if source != GATEWAY
 		gateway = params.Gateway
+		if len(gateway) == 0 {
+			return nil, sdk.ErrUnknownRequest("gateway moniker is required for querying gateway tokens")
+		}
 	}
 
 	if len(params.Owner) > 0 && source != EXTERNAL { // ignore owner if source == EXTERNAL
@@ -127,8 +130,12 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	iter := keeper.getTokens(ctx, owner, nonSymbolTokenId)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		var token FungibleToken
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &token)
+		var tokenId string
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &tokenId)
+		token, found := keeper.getToken(ctx, tokenId)
+		if !found {
+			continue
+		}
 		tokens = append(tokens, token)
 	}
 
