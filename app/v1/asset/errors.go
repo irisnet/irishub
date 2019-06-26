@@ -32,6 +32,7 @@ const (
 	CodeInvalidAssetDecimal           sdk.CodeType = 119
 	CodeAssetAlreadyExists            sdk.CodeType = 120
 	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
+	CodeAssetNotExists                sdk.CodeType = 122
 )
 
 //----------------------------------------
