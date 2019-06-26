@@ -282,7 +282,7 @@ func TestKeeper_EditToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(10000, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
 
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
