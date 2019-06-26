@@ -119,7 +119,6 @@ func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGat
 }
 
 // handleMsgTransferTokenOwner handles MsgTransferTokenOwner
-// TODO
 func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferTokenOwner) sdk.Result {
 	tags, err := k.TransferTokenOwner(ctx, msg)
 	if err != nil {

@@ -35,7 +35,7 @@ var (
 	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
-	FsEditToken            = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTransferTokenOwner   = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -67,4 +67,6 @@ func init() {
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
 	FsFeeQuery.String(FlagID, "", "the token id")
+
+	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
 }

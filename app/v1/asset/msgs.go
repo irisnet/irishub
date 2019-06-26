@@ -356,6 +356,15 @@ type MsgTransferTokenOwner struct {
 	TokenId  string         `json:"token_id"`
 }
 
+func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, tokenId string) MsgTransferTokenOwner {
+	tokenId = strings.TrimSpace(tokenId)
+	return MsgTransferTokenOwner{
+		SrcOwner: srcOwner,
+		DstOwner: dstOwner,
+		TokenId:  tokenId,
+	}
+}
+
 // GetSignBytes implements Msg
 func (msg MsgTransferTokenOwner) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -370,8 +379,27 @@ func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.SrcOwner, msg.DstOwner}
 }
 
-//TODO
 func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
+	// check the SrcOwner
+	if len(msg.SrcOwner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
+	}
+
+	// check if the `DstOwner` is empty
+	if len(msg.DstOwner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the new owner of the token must be specified"))
+	}
+
+	// check if the `DstOwner` is same as the original owner
+	if msg.SrcOwner.Equals(msg.DstOwner) {
+		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
+	}
+
+	// check the tokenId
+	if err := CheckAssetID(msg.TokenId); err != nil {
+		return err
+	}
+
 	return nil
 }
 

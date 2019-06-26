@@ -281,6 +281,31 @@ func (k Keeper) Init(ctx sdk.Context) {
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
 func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
-	//TODO
+	// get the destination token TODO
+	token, _ := k.getToken(ctx, GetKeyIDFromUniqueID(msg.TokenId))
+	//if !exist {
+	//	return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
+	//}
+
+	if token.Source != NATIVE {
+		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the source of the token is native can be transferd,but current the source of the token is %s", token.Source.String()))
+	}
+
+	if !msg.SrcOwner.Equals(token.Owner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.SrcOwner, token.Owner))
+	}
+
+	token.Owner = msg.DstOwner
+
+	if err := k.SetToken(ctx, token); err != nil {
+		return nil, err
+	}
+
+	editTags := sdk.NewTags(
+		tags.Id, []byte(msg.TokenId),
+	)
+
+	return editTags, nil
+
 	return nil, nil
 }
