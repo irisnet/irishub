@@ -12,6 +12,8 @@ const (
 	// MsgRoute identifies transaction types
 	MsgRoute          = "asset"
 	MsgTypeIssueToken = "issue_token"
+	// constant used in flags to indicate that description field should not be updated
+	DoNotModifyDesc = "[do-not-modify]"
 )
 
 var (
@@ -475,7 +477,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 	}
 
 	nameLen := len(msg.Name)
-	if nameLen > 0 && nameLen > MaximumAssetNameSize {
+	if DoNotModifyDesc != msg.Name && nameLen > MaximumAssetNameSize {
 		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
 	}
 
@@ -491,13 +493,13 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 
 	//check symbol_at_source
 	symbolAtSourceLen := len(msg.SymbolAtSource)
-	if symbolAtSourceLen > 0 && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
+	if DoNotModifyDesc != msg.SymbolAtSource && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
 		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid token symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
 	//check symbol_min_alias
 	symbolMinAliasLen := len(msg.SymbolMinAlias)
-	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) {
+	if DoNotModifyDesc != msg.SymbolMinAlias && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias) || !IsBeginWithAlpha(msg.SymbolMinAlias)) {
 		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
 	}
 

@@ -202,13 +202,13 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max_supply must be greater than %s and less than %s", token.InitialSupply.String(), token.MaxSupply.String()))
 	}
 
-	if len(msg.Name) > 0 {
+	if msg.Name != DoNotModifyDesc {
 		token.Name = msg.Name
 	}
-	if len(msg.SymbolAtSource) > 0 {
+	if msg.SymbolAtSource != DoNotModifyDesc {
 		token.SymbolAtSource = msg.SymbolAtSource
 	}
-	if len(msg.SymbolMinAlias) > 0 {
+	if msg.SymbolMinAlias != DoNotModifyDesc {
 		token.SymbolMinAlias = msg.SymbolMinAlias
 	}
 	if maxSupply.GT(sdk.ZeroInt()) {
