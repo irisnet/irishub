@@ -273,3 +273,17 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	}
 	return coinName, nil
 }
+
+func GetCoinDenom(coinName string) (denom string, err error) {
+	name := strings.ToLower(strings.TrimSpace(coinName))
+	isMainUnit := regexp.MustCompile(`^[a-zA-Z0-9\.]+$`).MatchString
+	if !isMainUnit(name) {
+		return "", fmt.Errorf("invalid coin expression: %s", coinName)
+	}
+
+	if name == IRIS.GetMainUnit().Denom {
+		return IRIS.MinUnit.Denom, nil
+	}
+
+	return fmt.Sprintf("%s-min", name), nil
+}

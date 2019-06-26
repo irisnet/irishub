@@ -19,13 +19,12 @@ type BaseToken struct {
 	SymbolAtSource string           `json:"symbol_at_source"`
 	SymbolMinAlias string           `json:"symbol_min_alias"`
 	InitialSupply  types.Int        `json:"initial_supply"`
-	TotalSupply    types.Int        `json:"total_supply"`
 	MaxSupply      types.Int        `json:"max_supply"`
 	Mintable       bool             `json:"mintable"`
 	Owner          types.AccAddress `json:"owner"`
 }
 
-func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
+func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
 
 	gateway = strings.ToLower(strings.TrimSpace(gateway))
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
@@ -51,7 +50,6 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 		SymbolAtSource: symbolAtSource,
 		SymbolMinAlias: symbolMinAlias,
 		InitialSupply:  initialSupply,
-		TotalSupply:    totalSupply,
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,
 		Owner:          owner,
@@ -63,10 +61,10 @@ type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
 
-func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, totalSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	token := FungibleToken{
 		BaseToken: NewBaseToken(
-			FUNGIBLE, source, gateway, symbol, name, decimal, symbolAtSource, symbolMinAlias, initialSupply, totalSupply, maxSupply, mintable, owner,
+			FUNGIBLE, source, gateway, symbol, name, decimal, symbolAtSource, symbolMinAlias, initialSupply, maxSupply, mintable, owner,
 		),
 	}
 
@@ -111,15 +109,12 @@ func (ft FungibleToken) GetUniqueID() string {
 }
 
 func (ft FungibleToken) GetDenom() string {
-	return strings.ToLower(fmt.Sprintf("%s-min", ft.GetUniqueID()))
+	denom, _ := sdk.GetCoinDenom(ft.GetUniqueID())
+	return denom
 }
 
 func (ft FungibleToken) GetInitSupply() types.Int {
 	return ft.InitialSupply
-}
-
-func (ft FungibleToken) GetTotalSupply() types.Int {
-	return ft.TotalSupply
 }
 
 func (ft FungibleToken) GetCoinType() types.CoinType {
@@ -142,7 +137,6 @@ func (ft FungibleToken) String() string {
 
 	initSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.InitialSupply).String(), ft.GetUniqueID())
 	maxSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.MaxSupply).String(), ft.GetUniqueID())
-	totalSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.TotalSupply).String(), ft.GetUniqueID())
 
 	return fmt.Sprintf(`FungibleToken %s:
   Family:            %s
@@ -154,12 +148,11 @@ func (ft FungibleToken) String() string {
   Symbol Min Alias:  %s
   Decimal:           %d
   Initial Supply:    %s
-  Total Supply:      %s
   Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
 		ft.GetUniqueID(), ft.Family, ft.Source, ft.Gateway, ft.Name, ft.Symbol, ft.SymbolAtSource, ft.SymbolMinAlias,
-		ft.Decimal, initSupply, totalSupply, maxSupply, ft.Mintable, ft.Owner.String())
+		ft.Decimal, initSupply, maxSupply, ft.Mintable, ft.Owner.String())
 }
 
 // -----------------------------
@@ -174,14 +167,6 @@ func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.
 		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol)), nil
 	default:
 		return "", ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", source))
-	}
-}
-
-func GetKeyIDFromUniqueID(uniqueID string) string {
-	if strings.Contains(uniqueID, ".") {
-		return strings.ToLower(uniqueID)
-	} else {
-		return strings.ToLower(fmt.Sprintf("i.%s", uniqueID))
 	}
 }
 
