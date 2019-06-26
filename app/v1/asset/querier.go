@@ -54,10 +54,10 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token = NewFungibleToken(NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token = NewFungibleToken(NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 	} else {
 		var found bool
-		token, found = keeper.getToken(ctx, GetKeyIDFromUniqueID(params.TokenId))
+		token, found = keeper.getToken(ctx, params.TokenId)
 		if !found {
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 		}

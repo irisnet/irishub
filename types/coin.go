@@ -100,14 +100,14 @@ func (coin Coin) Minus(coinB Coin) Coin {
 //
 // TODO: Remove once unsigned integers are used.
 func (coin Coin) IsPositive() bool {
-	return (coin.Amount.Sign() == 1)
+	return coin.Amount.Sign() == 1
 }
 
 // IsNotNegative returns true if coin amount is not negative and false otherwise.
 //
 // TODO: Remove once unsigned integers are used.
 func (coin Coin) IsNotNegative() bool {
-	return (coin.Amount.Sign() != -1)
+	return coin.Amount.Sign() != -1
 }
 
 //-----------------------------------------------------------------------------

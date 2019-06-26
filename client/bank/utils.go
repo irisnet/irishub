@@ -95,17 +95,19 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 }
 
 type TokenStats struct {
-	LooseTokens  sdk.Coins `json:"loose_tokens"`
-	BurnedTokens sdk.Coins `json:"burned_tokens"`
-	BondedTokens sdk.Coins `json:"bonded_tokens"`
+	LooseTokens  []string `json:"loose_tokens"`
+	BurnedTokens []string `json:"burned_tokens"`
+	BondedTokens []string `json:"bonded_tokens"`
+	TotalSupply  []string `json:"total_supply"`
 }
 
 // String implements fmt.Stringer
 func (ts TokenStats) String() string {
 	return fmt.Sprintf(`TokenStats:
-  Loose Tokens:  %s
+  Loose Tokens:   %s
+  Bonded Tokens:  %s
   Burned Tokens:  %s
-  Bonded Tokens:  %s`,
-		ts.LooseTokens.MainUnitString(), ts.BurnedTokens.MainUnitString(), ts.BondedTokens.MainUnitString(),
+  Total Supply:   %s`,
+		strings.Join(ts.LooseTokens, ","), strings.Join(ts.BondedTokens, ","), strings.Join(ts.BurnedTokens, ","), strings.Join(ts.TotalSupply, ","),
 	)
 }

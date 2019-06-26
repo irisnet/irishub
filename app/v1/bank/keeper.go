@@ -39,6 +39,9 @@ type Keeper interface {
 	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
+	SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin)
+	IncreaseTotalSupply(ctx sdk.Context, amt sdk.Coin) sdk.Error
+	DecreaseTotalSupply(ctx sdk.Context, amt sdk.Coin) sdk.Error
 }
 
 var _ Keeper = (*BaseKeeper)(nil)
@@ -48,6 +51,14 @@ var _ Keeper = (*BaseKeeper)(nil)
 type BaseKeeper struct {
 	am  auth.AccountKeeper
 	cdc *codec.Codec
+}
+
+func (keeper BaseKeeper) GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.Coin, found bool) {
+	return keeper.am.GetTotalSupply(ctx, denom)
+}
+
+func (keeper BaseKeeper) GetTotalSupplies(ctx sdk.Context) sdk.Iterator {
+	return keeper.am.GetTotalSupplies(ctx)
 }
 
 // NewBaseKeeper returns a new BaseKeeper
@@ -121,6 +132,18 @@ func (keeper BaseKeeper) BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt
 	ctx.Logger().Info("Tokens Burned Successfully", "burnFrom", fromAddr, "burnAmount", amt.String())
 
 	return burnTags, nil
+}
+
+func (keeper BaseKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
+	return keeper.am.IncreaseTotalSupply(ctx, coin)
+}
+
+func (keeper BaseKeeper) DecreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
+	return keeper.am.DecreaseTotalSupply(ctx, coin)
+}
+
+func (keeper BaseKeeper) SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin) {
+	keeper.am.SetTotalSupply(ctx, totalSupply)
 }
 
 // InputOutputCoins handles a list of inputs and outputs
@@ -208,6 +231,10 @@ func (keeper BaseSendKeeper) InputOutputCoins(
 	return inputOutputCoins(ctx, keeper.am, inputs, outputs)
 }
 
+func (keeper BaseSendKeeper) GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.Coin, found bool) {
+	return keeper.am.GetTotalSupply(ctx, denom)
+}
+
 //______________________________________________________________________________________________
 
 // ViewKeeper defines a module interface that facilitates read only access to
@@ -217,6 +244,7 @@ type ViewKeeper interface {
 	GetLoosenCoins(ctx sdk.Context) sdk.Coins
 	//GetBurnedCoins(ctx sdk.Context) sdk.Coins
 	HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) bool
+	GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.Coin, found bool)
 }
 
 var _ ViewKeeper = (*BaseViewKeeper)(nil)
@@ -249,6 +277,10 @@ func (keeper BaseViewKeeper) GetLoosenCoins(ctx sdk.Context) sdk.Coins {
 // HasCoins returns whether or not an account has at least amt coins.
 func (keeper BaseViewKeeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) bool {
 	return hasCoins(ctx, keeper.am, addr, amt)
+}
+
+func (keeper BaseViewKeeper) GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.Coin, found bool) {
+	return keeper.am.GetTotalSupply(ctx, denom)
 }
 
 //______________________________________________________________________________________________
@@ -318,7 +350,15 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 
 	// adding coins to BurnedCoinsAccAddr is equivalent to burning coins
 	if addr.Equals(BurnedCoinsAccAddr) {
-		am.DecreaseTotalLoosenToken(ctx, amt)
+		for _, coin := range amt {
+			if coin.Denom == sdk.NativeTokenMinDenom {
+				// Decrease total loose token for iris
+				am.DecreaseTotalLoosenToken(ctx, sdk.Coins{coin})
+			} else {
+				// Decrease total supply for tokens other than iris
+				am.DecreaseTotalSupply(ctx, coin)
+			}
+		}
 	}
 
 	tags := sdk.NewTags("recipient", []byte(addr.String()))

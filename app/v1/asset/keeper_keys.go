@@ -11,8 +11,9 @@ var (
 )
 
 // KeyToken returns the key of the specified token source and id
-func KeyToken(id string) []byte {
-	return []byte(fmt.Sprintf("token:%s", id))
+func KeyToken(tokenId string) []byte {
+	keyId, _ := sdk.ConvertIdToTokenKeyId(tokenId)
+	return []byte(fmt.Sprintf("token:%s", keyId))
 }
 
 // KeyGateway returns the key of the specified moniker
