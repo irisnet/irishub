@@ -96,7 +96,7 @@ func TestMsgCreateGatewayValidation(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website, sdk.Coin{Denom: sdk.NativeTokenMinDenom, Amount: sdk.NewInt(100)})
+		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website)
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
@@ -116,7 +116,7 @@ func TestMsgCreateGatewayGetSignBytes(t *testing.T) {
 
 	res := msg.GetSignBytes()
 
-	expected := "{\"type\":\"irishub/asset/MsgCreateGateway\",\"value\":{\"details\":\"details\",\"fee\":{\"amount\":\"0\",\"denom\":\"\"},\"identity\":\"identity\",\"moniker\":\"moniker\",\"owner\":\"faa1damkuetjqqah8w\",\"website\":\"website\"}}"
+	expected := "{\"type\":\"irishub/asset/MsgCreateGateway\",\"value\":{\"details\":\"details\",\"identity\":\"identity\",\"moniker\":\"moniker\",\"owner\":\"faa1damkuetjqqah8w\",\"website\":\"website\"}}"
 	require.Equal(t, expected, string(res))
 }
 

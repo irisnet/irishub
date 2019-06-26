@@ -17,69 +17,44 @@ const (
 	FeeFactorExp  = 4
 )
 
-// GatewayFeeHandler performs fee handling for creating a gateway
-func GatewayFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker string, fee sdk.Coin) sdk.Error {
-	// get the actual fee
-	actualFee := getGatewayCreateFee(ctx, k, moniker)
+// GatewayCreateFeeHandler performs fee handling for creating a gateway
+func GatewayCreateFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker string) sdk.Error {
+	// get the required creation fee
+	fee := getGatewayCreateFee(ctx, k, moniker)
 
-	// check if the provided fee is enough
-	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway creation fee: expected %s, got %s", actualFee, fee))
-	}
-
-	return feeHandler(ctx, k, owner, actualFee)
+	return feeHandler(ctx, k, owner, fee)
 }
 
 // TokenIssueFeeHandler performs fee handling for issuing token
-func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string, fee sdk.Coin) sdk.Error {
-	// get the actual fee
-	actualFee := getTokenIssueFee(ctx, k, symbol)
+func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+	// get the required issuance fee
+	fee := getTokenIssueFee(ctx, k, symbol)
 
-	// check if the provided fee is enough
-	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token issuance fee: expected %s, got %s", actualFee, fee))
-	}
-
-	return feeHandler(ctx, k, owner, actualFee)
+	return feeHandler(ctx, k, owner, fee)
 }
 
 // TokenMintFeeHandler performs fee handling for minting token
-func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string, fee sdk.Coin) sdk.Error {
-	// get the actual fee
-	actualFee := getTokenMintFee(ctx, k, symbol)
+func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+	// get the required minting fee
+	fee := getTokenMintFee(ctx, k, symbol)
 
-	// check if the provided fee is enough
-	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient token minting fee: expected %s, got %s", actualFee, fee))
-	}
-
-	return feeHandler(ctx, k, owner, actualFee)
+	return feeHandler(ctx, k, owner, fee)
 }
 
 // GatewayTokenIssueFeeHandler performs fee handling for issuing gateway token
-func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string, fee sdk.Coin) sdk.Error {
-	// get the actual fee
-	actualFee := getGatewayTokenIssueFee(ctx, k, symbol)
+func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+	// get the required issuance fee
+	fee := getGatewayTokenIssueFee(ctx, k, symbol)
 
-	// check if the provided fee is enough
-	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token issuance fee: expected %s, got %s", actualFee, fee))
-	}
-
-	return feeHandler(ctx, k, owner, actualFee)
+	return feeHandler(ctx, k, owner, fee)
 }
 
 // GatewayTokenMintFeeHandler performs fee handling for minting gateway token
-func GatewayTokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string, fee sdk.Coin) sdk.Error {
-	// get the actual fee
-	actualFee := getGatewayTokenMintFee(ctx, k, symbol)
+func GatewayTokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+	// get the required minting fee
+	fee := getGatewayTokenMintFee(ctx, k, symbol)
 
-	// check if the provided fee is enough
-	if fee.IsLT(actualFee) {
-		return ErrInsufficientFee(k.Codespace(), fmt.Sprintf("insufficient gateway token minting fee: expected %s, got %s", actualFee, fee))
-	}
-
-	return feeHandler(ctx, k, owner, actualFee)
+	return feeHandler(ctx, k, owner, fee)
 }
 
 // feeHandler handles the fee of gateway or asset

@@ -73,7 +73,7 @@ func TestIrisCLIToken(t *testing.T) {
 	require.Equal(t, sdk.NewIntWithDecimal(int64(initialSupply), decimal), token.InitialSupply)
 	require.Equal(t, uint8(decimal), token.Decimal)
 	require.Equal(t, "", token.SymbolAtSource) // ignored by native token
-	require.Equal(t, "", token.Gateway) // ignored by native token
+	require.Equal(t, "", token.Gateway)        // ignored by native token
 
 }
 
@@ -113,7 +113,6 @@ func TestIrisCLIGateway(t *testing.T) {
 	spStr += fmt.Sprintf(" --identity=%s", identity)
 	spStr += fmt.Sprintf(" --details=%s", details)
 	spStr += fmt.Sprintf(" --website=%s", website)
-	spStr += fmt.Sprintf(" --create-fee=%s", "30iris")
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
