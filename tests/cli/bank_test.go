@@ -90,21 +90,19 @@ func TestIrisCLIBankTokenStatsById(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
-	barAddr := "faa108a0ts008fphurftmsvj5p2q8ltq8qeduq57d6"
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	executeWrite(t, fmt.Sprintf("iriscli asset issue-token %v --family=fungible --source=native  --symbol=tttt --name=eeee --initial-supply=1000 --from=foo  --fee=0.6iris", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli asset issue-token %v --family=fungible --source=native  --symbol=kitty --name=eeee --initial-supply=1000 --from=foo  --fee=0.6iris", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	executeWrite(t, fmt.Sprintf("iriscli bank send %v --amount=10tttt-min --to=%s --from=foo --gas=10000 --fee=0.3iris", flags, barAddr), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli bank burn --from=foo --amount=10kitty %v", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	_ = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
-
-	tokenS := executeGetTokenStatsForAsset(t, fmt.Sprintf("iriscli bank token-stats %v tttt", flags))
-	s := tokenS.LooseTokens.String()
-	require.Equal(t, "1000tttt-min", s)
-	require.Equal(t, "10tttt-min", tokenS.BurnedTokens.String())
+	tokenStats := executeGetTokenStatsForAsset(t, fmt.Sprintf("iriscli bank token-stats %v kitty", flags))
+	require.Nil(t, tokenStats.LooseTokens)
+	require.Nil(t, tokenStats.BondedTokens)
+	require.Contains(t, tokenStats.TotalSupply, sdk.NewCoin("kitty-min", sdk.NewIntWithDecimal(990, 0)))
+	require.Contains(t, tokenStats.BurnedTokens, sdk.NewCoin("kitty-min", sdk.NewIntWithDecimal(10, 0)))
 }
