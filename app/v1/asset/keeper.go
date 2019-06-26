@@ -192,7 +192,7 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 // EditToken edits the specified token
 func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Error) {
 	// get the destination token
-	token, exist := k.getToken(ctx, GetKeyIDFromUniqueID(msg.TokenId))
+	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
 	}
