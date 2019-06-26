@@ -305,6 +305,9 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (
 		return nil, err
 	}
 
+	//TODO
+	// Update all stores with owner as key
+
 	editTags := sdk.NewTags(
 		tags.Id, []byte(msg.TokenId),
 	)
