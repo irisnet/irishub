@@ -3387,7 +3387,7 @@ paths:
           description: Invalid id
         '500':
           description: Internal Server Error
-  '/asset/token/{token-id}':
+  '/asset/tokens/{token-id}':
     put:
       summary: edit token information
       parameters:

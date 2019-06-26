@@ -26,7 +26,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// edit a token
 	r.HandleFunc(
-		"/asset/token/{token-id}",
+		"/asset/tokens/{token-id}",
 		editTokenHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 }

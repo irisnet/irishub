@@ -146,7 +146,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     2. `GET /asset/gateways`: Query all the gateways with an optional owner
     3. `POST /asset/gateways`: Create a gateway
     4. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
-5. `PUT /asset/token/{token-id}`: Edit an existing token
+5. `PUT /asset/tokens/{token-id}`: Edit an existing token
     
 11. Query app version
 
