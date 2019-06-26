@@ -183,10 +183,10 @@ func TestIrisCLIGateway(t *testing.T) {
 
 	gateways = executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", barAddr.String(), flags))
 	require.Equal(t, 1, len(gateways))
-	require.Equal(t, moniker, gateway[0].Moniker)
-	require.Equal(t, identity, gateway[0].Identity)
-	require.Equal(t, details, gateway[0].Details)
-	require.Equal(t, website, gateway[0].Website)
+	require.Equal(t, moniker, gateways[0].Moniker)
+	require.Equal(t, identity, gateways[0].Identity)
+	require.Equal(t, details, gateways[0].Details)
+	require.Equal(t, website, gateways[0].Website)
 
 	gateways = executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", fooAddr.String(), flags))
 	require.Equal(t, 0, len(gateways))
