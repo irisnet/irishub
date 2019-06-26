@@ -10,6 +10,7 @@ import (
 
 const (
 	QueryToken    = "token"
+	QueryTokens   = "tokens"
 	QueryGateway  = "gateway"
 	QueryGateways = "gateways"
 	QueryFees     = "fees"
@@ -20,6 +21,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case QueryToken:
 			return queryToken(ctx, req, k)
+		case QueryTokens:
+			return queryTokens(ctx, req, k)
 		case QueryGateway:
 			return queryGateway(ctx, req, k)
 		case QueryGateways:
@@ -50,6 +53,74 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
+
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+	return bz, nil
+}
+
+// QueryTokensParams is the query parameters for 'custom/asset/tokens'
+type QueryTokensParams struct {
+	Source  string
+	Gateway string
+	Owner   string
+}
+
+func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var params QueryTokensParams
+	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	source := NATIVE
+	gateway := ""
+	owner := sdk.AccAddress{}
+	nonSymbolTokenId := ""
+
+	if len(params.Source) > 0 { // if source is specified
+		source, err = AssetSourceFromString(params.Source)
+		if err != nil {
+			return nil, sdk.ParseParamsErr(err)
+		}
+	} else if len(params.Gateway) > 0 { // if source is not specified, and gateway is specified
+		source = GATEWAY
+	}
+
+	if source == GATEWAY { // ignore gateway moniker if source != GATEWAY
+		gateway = params.Gateway
+	}
+
+	if len(params.Owner) > 0 && source != EXTERNAL { // ignore owner if source == EXTERNAL
+		owner, err = sdk.AccAddressFromBech32(params.Owner)
+		if err != nil {
+			return nil, sdk.ParseParamsErr(err)
+		}
+	}
+
+	if len(params.Source) > 0 || len(params.Gateway) > 0 {
+		nonSymbolTokenId, err = GetTokenID(source, "", gateway)
+	}
+
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	var tokens []FungibleToken
+	iter := keeper.getTokens(ctx, owner, nonSymbolTokenId)
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+		var token FungibleToken
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &token)
+		tokens = append(tokens, token)
+	}
+
+	if len(tokens) == 0 {
+		tokens = make([]FungibleToken, 0)
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
 
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
@@ -152,7 +223,6 @@ func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
 }
 
 func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	fmt.Println(path)
 	switch path[0] {
 	case "gateways":
 		return queryGatewayFee(ctx, req, keeper)

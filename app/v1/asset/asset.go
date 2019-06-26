@@ -157,7 +157,7 @@ func (ft FungibleToken) String() string {
 
 // -----------------------------
 
-func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.Error) {
+func GetTokenID(source AssetSource, symbol string, gateway string) (string, types.Error) {
 	switch source {
 	case NATIVE:
 		return strings.ToLower(fmt.Sprintf("i.%s", symbol)), nil
