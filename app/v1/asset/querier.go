@@ -108,6 +108,22 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	var tokens []FungibleToken
+
+	// Add iris to the list
+	if source == NATIVE && owner.Empty() {
+		initSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.InitialIssue).String())
+		if err != nil {
+			return nil, sdk.MarshalResultErr(err)
+		}
+		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(MaximumAssetMaxSupply))).String())
+		if err != nil {
+			return nil, sdk.MarshalResultErr(err)
+		}
+		token := NewFungibleToken(NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		tokens = append(tokens, token)
+	}
+
+	// Query from db
 	iter := keeper.getTokens(ctx, owner, nonSymbolTokenId)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
