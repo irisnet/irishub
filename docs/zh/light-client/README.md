@@ -151,7 +151,8 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     5. `POST /asset/gateways`: 创建一个网关
     6. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
     7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
- 
+    8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
+
 11. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -217,6 +218,58 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(FsGatewayEdit)
 	cmd.MarkFlagRequired(FlagMoniker)
 
+	return cmd
+}
+
+// GetCmdEditGateway implements the edit asset command
+func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "edit-token",
+		Short:   "edit a existed token",
+		Example: "iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-source> --symbol-min-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			tokenId := args[0]
+			name := viper.GetString(FlagName)
+			symbolAtSource := viper.GetString(FlagSymbolAtSource)
+			symbolMinAlias := viper.GetString(FlagSymbolMinAlias)
+			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
+			mintable := (*bool)(nil)
+
+			flags := cmd.Flags()
+			flags.Visit(func(f *pflag.Flag) {
+				if f.Name == FlagMintable {
+					value := f.Value.String()
+					if b, err := strconv.ParseBool(value); err == nil {
+						mintable = &b
+					}
+				}
+			})
+			var msg sdk.Msg
+			msg = asset.NewMsgEditToken(name,
+				symbolAtSource, symbolMinAlias, tokenId, maxSupply, mintable, owner)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsEditToken)
 	return cmd
 }
 

@@ -216,13 +216,13 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
 	// parameter checking
-	if coins == nil || !coins.IsValid() {
+	if coins == nil {
 		return
 	}
 
 	// loose token only contains iris-atto
 	increaseAmount := coins.AmountOf(sdk.NativeTokenMinDenom)
-	if increaseAmount.IsZero() {
+	if !increaseAmount.GT(sdk.ZeroInt()) {
 		return
 	}
 	increaseCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, increaseAmount)}
