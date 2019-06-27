@@ -148,9 +148,9 @@ func TestMsgEditGatewayRoute(t *testing.T) {
 	msg := MsgEditGateway{
 		Owner:    owner,
 		Moniker:  moniker,
-		Identity: &identity,
-		Details:  &details,
-		Website:  &website,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
 	}
 
 	require.Equal(t, "asset", msg.Route())
@@ -162,21 +162,20 @@ func TestMsgEditGatewayValidation(t *testing.T) {
 	website := "w"
 
 	testData := []struct {
-		name                       string
-		owner                      sdk.AccAddress
-		moniker                    string
-		identity, details, website *string
-		expectPass                 bool
+		name                                string
+		owner                               sdk.AccAddress
+		moniker, identity, details, website string
+		expectPass                          bool
 	}{
-		{"empty owner", emptyAddr, "mon", &identity, &details, &website, false},
-		{"empty moniker", addr1, "", &identity, &details, &website, false},
-		{"too short moniker", addr1, "mo", &identity, &details, &website, false},
-		{"too long moniker", addr1, "monikermo", &identity, &details, &website, false},
-		{"moniker contains illegal characters", addr2, "moni2", &identity, &details, &website, false},
-		{"empty identity allowed", addr2, "mon", nil, &details, &website, true},
-		{"empty details allowed", addr2, "mon", &identity, nil, &website, true},
-		{"empty website allowed", addr2, "mon", &identity, &details, nil, true},
-		{"no updated fields", addr2, "mon", nil, nil, nil, false},
+		{"empty owner", emptyAddr, "mon", identity, details, website, false},
+		{"empty moniker", addr1, "", identity, details, website, false},
+		{"too short moniker", addr1, "mo", identity, details, website, false},
+		{"too long moniker", addr1, "monikermo", identity, details, website, false},
+		{"moniker contains illegal characters", addr2, "moni2", identity, details, website, false},
+		{"identity not updated", addr2, "mon", DoNotModify, details, website, true},
+		{"details not updated", addr2, "mon", identity, DoNotModify, website, true},
+		{"website not updated", addr2, "mon", identity, details, DoNotModify, true},
+		{"no updated fields", addr2, "mon", DoNotModify, DoNotModify, DoNotModify, false},
 	}
 
 	for _, td := range testData {
@@ -197,9 +196,9 @@ func TestMsgEditGatewayGetSignBytes(t *testing.T) {
 	var msg = MsgEditGateway{
 		Owner:    sdk.AccAddress([]byte("owner")),
 		Moniker:  "mon",
-		Identity: &identity,
-		Details:  &details,
-		Website:  &website,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
 	}
 
 	res := msg.GetSignBytes()
@@ -216,9 +215,9 @@ func TestMsgEditGatewayGetSigners(t *testing.T) {
 	var msg = MsgEditGateway{
 		Owner:    sdk.AccAddress([]byte("owner")),
 		Moniker:  "mon",
-		Identity: &identity,
-		Details:  &details,
-		Website:  &website,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
 	}
 
 	res := msg.GetSigners()
@@ -228,7 +227,7 @@ func TestMsgEditGatewayGetSigners(t *testing.T) {
 }
 
 // test ValidateBasic for MsgIssueToken
-func TestMsgEditAsset(t *testing.T) {
+func TestMsgEditToken(t *testing.T) {
 	owner := sdk.AccAddress([]byte("owner"))
 	mintable := false
 	tests := []struct {
