@@ -49,9 +49,9 @@ type createGatewayReq struct {
 type editGatewayReq struct {
 	BaseTx   utils.BaseTx   `json:"base_tx"`
 	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
-	Identity *string        `json:"identity"` //  Identity of the gateway
-	Details  *string        `json:"details"`  //  Description of the gateway
-	Website  *string        `json:"website"`  //  Website of the gateway
+	Identity string         `json:"identity"` //  Identity of the gateway
+	Details  string         `json:"details"`  //  Description of the gateway
+	Website  string         `json:"website"`  //  Website of the gateway
 }
 
 type transferGatewayOwnerReq struct {
