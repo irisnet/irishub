@@ -23,6 +23,12 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		"/asset/gateways/{moniker}",
 		editGatewayHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
+
+	// transfer the ownership of a gateway
+	r.HandleFunc(
+		"/asset/gateways/{moniker}/transfer",
+		transferGatewayOwnerHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 }
 
 type createGatewayReq struct {
@@ -40,6 +46,12 @@ type editGatewayReq struct {
 	Identity *string        `json:"identity"` //  Identity of the gateway
 	Details  *string        `json:"details"`  //  Description of the gateway
 	Website  *string        `json:"website"`  //  Website of the gateway
+}
+
+type transferGatewayOwnerReq struct {
+	BaseTx utils.BaseTx   `json:"base_tx"`
+	Owner  sdk.AccAddress `json:"owner"` // Current Owner of the gateway
+	To     sdk.AccAddress `json:"to"`    // New owner of the gateway
 }
 
 func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -89,6 +101,36 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 
 		// create the MsgEditGateway message
 		msg := asset.NewMsgEditGateway(req.Owner, moniker, req.Identity, req.Details, req.Website)
+		err = msg.ValidateBasic()
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+	}
+}
+
+func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
+		vars := mux.Vars(r)
+		moniker := vars["moniker"]
+
+		var req transferGatewayOwnerReq
+		err := utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
+		}
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
+			return
+		}
+
+		// create the MsgTransferGatewayOwner message
+		msg := asset.NewMsgTransferGatewayOwner(req.Owner, moniker, req.To)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

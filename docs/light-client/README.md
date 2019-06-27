@@ -144,8 +144,11 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 10. Asset module APIs
     1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
     2. `GET /asset/gateways`: Query all the gateways with an optional owner
-    3. `POST /asset/gateways`: Create a gateway
-    4. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
+    3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
+    4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
+    5. `POST /asset/gateways`: Create a gateway
+    6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
+    7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
 
 11. Query app version
 
