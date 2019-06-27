@@ -199,14 +199,14 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	}
 
 	// update the gateway
-	if msg.Identity != nil {
-		gateway.Identity = *msg.Identity
+	if msg.Identity != DoNotModify {
+		gateway.Identity = msg.Identity
 	}
-	if msg.Details != nil {
-		gateway.Details = *msg.Details
+	if msg.Details != DoNotModify {
+		gateway.Details = msg.Details
 	}
-	if msg.Website != nil {
-		gateway.Website = *msg.Website
+	if msg.Website != DoNotModify {
+		gateway.Website = msg.Website
 	}
 
 	// set the new gateway
@@ -237,13 +237,13 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max_supply must be greater than %s and less than %s", token.InitialSupply.String(), token.MaxSupply.String()))
 	}
 
-	if msg.Name != DoNotModifyDesc {
+	if msg.Name != DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != DoNotModifyDesc {
+	if msg.SymbolAtSource != DoNotModify {
 		token.SymbolAtSource = msg.SymbolAtSource
 	}
-	if msg.SymbolMinAlias != DoNotModifyDesc {
+	if msg.SymbolMinAlias != DoNotModify {
 		token.SymbolMinAlias = msg.SymbolMinAlias
 	}
 	if maxSupply.GT(sdk.ZeroInt()) {

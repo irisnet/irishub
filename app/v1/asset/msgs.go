@@ -12,8 +12,9 @@ const (
 	// MsgRoute identifies transaction types
 	MsgRoute          = "asset"
 	MsgTypeIssueToken = "issue_token"
-	// constant used in flags to indicate that description field should not be updated
-	DoNotModifyDesc = "[do-not-modify]"
+
+	// constant used to indicate that some field should not be updated
+	DoNotModify = "[do-not-modify]"
 )
 
 var (
@@ -262,13 +263,13 @@ func (msg MsgCreateGateway) GetSigners() []sdk.AccAddress {
 type MsgEditGateway struct {
 	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
 	Moniker  string         `json:"moniker"`  //  Moniker of the gateway
-	Identity *string        `json:"identity"` //  Identity of the gateway
-	Details  *string        `json:"details"`  //  Details of the gateway
-	Website  *string        `json:"website"`  //  Website of the gateway
+	Identity string         `json:"identity"` //  Identity of the gateway
+	Details  string         `json:"details"`  //  Details of the gateway
+	Website  string         `json:"website"`  //  Website of the gateway
 }
 
 // NewMsgEditGateway creates a MsgEditGateway
-func NewMsgEditGateway(owner sdk.AccAddress, moniker string, identity, details, website *string) MsgEditGateway {
+func NewMsgEditGateway(owner sdk.AccAddress, moniker, identity, details, website string) MsgEditGateway {
 	return MsgEditGateway{
 		Owner:    owner,
 		Moniker:  moniker,
@@ -297,22 +298,22 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 	}
 
 	// check the identity
-	if msg.Identity != nil && len(*msg.Identity) > MaximumGatewayIdentitySize {
+	if msg.Identity != DoNotModify && len(msg.Identity) > MaximumGatewayIdentitySize {
 		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
 	}
 
 	// check the details
-	if msg.Details != nil && len(*msg.Details) > MaximumGatewayDetailsSize {
+	if msg.Details != DoNotModify && len(msg.Details) > MaximumGatewayDetailsSize {
 		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
 	}
 
 	// check the website
-	if msg.Website != nil && len(*msg.Website) > MaximumGatewayWebsiteSize {
+	if msg.Website != DoNotModify && len(msg.Website) > MaximumGatewayWebsiteSize {
 		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
 	}
 
 	// check if updates occur
-	if msg.Identity == nil && msg.Details == nil && msg.Website == nil {
+	if msg.Identity == DoNotModify && msg.Details == DoNotModify && msg.Website == DoNotModify {
 		return ErrNoUpdatesProvided(DefaultCodespace, fmt.Sprintf("no updated values provided"))
 	}
 
@@ -327,7 +328,7 @@ func (msg MsgEditGateway) String() string {
   Identity:          %s
   Details:           %s
   Website:           %s`,
-		msg.Owner, msg.Moniker, *msg.Identity, *msg.Details, *msg.Website)
+		msg.Owner, msg.Moniker, msg.Identity, msg.Details, msg.Website)
 }
 
 // GetSignBytes implements Msg
@@ -495,18 +496,18 @@ func ValidateMoniker(moniker string) sdk.Error {
 	return nil
 }
 
-// MsgEditToken for editing a specified gateway
+// MsgEditToken for editing a specified token
 type MsgEditToken struct {
-	TokenId        string         `json:"token_id"`         //  id of asset
-	Owner          sdk.AccAddress `json:"owner"`            // owner of asset
-	SymbolAtSource string         `json:"symbol_at_source"` //  symbol_at_source of asset
-	SymbolMinAlias string         `json:"symbol_min_alias"` //  symbol_min_alias of asset
+	TokenId        string         `json:"token_id"`         //  id of token
+	Owner          sdk.AccAddress `json:"owner"`            //  owner of token
+	SymbolAtSource string         `json:"symbol_at_source"` //  symbol_at_source of token
+	SymbolMinAlias string         `json:"symbol_min_alias"` //  symbol_min_alias of token
 	MaxSupply      uint64         `json:"max_supply"`
-	Mintable       *bool          `json:"mintable"` //  mintable of asset
+	Mintable       *bool          `json:"mintable"` //  mintable of token
 	Name           string         `json:"name"`
 }
 
-// NewMsgEditToken creates a MsgEditAsset
+// NewMsgEditToken creates a MsgEditToken
 func NewMsgEditToken(name, symbolAtSource, symbolMinAlias, tokenId string, maxSupply uint64, mintable *bool, owner sdk.AccAddress) MsgEditToken {
 	name = strings.TrimSpace(name)
 	symbolAtSource = strings.ToLower(strings.TrimSpace(symbolAtSource))
@@ -537,7 +538,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 	}
 
 	nameLen := len(msg.Name)
-	if DoNotModifyDesc != msg.Name && nameLen > MaximumAssetNameSize {
+	if DoNotModify != msg.Name && nameLen > MaximumAssetNameSize {
 		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
 	}
 
@@ -553,13 +554,13 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 
 	//check symbol_at_source
 	symbolAtSourceLen := len(msg.SymbolAtSource)
-	if DoNotModifyDesc != msg.SymbolAtSource && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
+	if DoNotModify != msg.SymbolAtSource && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
 		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid token symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
 	//check symbol_min_alias
 	symbolMinAliasLen := len(msg.SymbolMinAlias)
-	if DoNotModifyDesc != msg.SymbolMinAlias && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias) || !IsBeginWithAlpha(msg.SymbolMinAlias)) {
+	if DoNotModify != msg.SymbolMinAlias && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias) || !IsBeginWithAlpha(msg.SymbolMinAlias)) {
 		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
 	}
 
