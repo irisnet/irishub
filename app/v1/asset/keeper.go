@@ -329,11 +329,11 @@ func (k Keeper) Init(ctx sdk.Context) {
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
 func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
-	// get the destination token TODO
-	token, _ := k.getToken(ctx, msg.TokenId)
-	//if !exist {
-	//	return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
-	//}
+	// get the destination token
+	token, exist := k.getToken(ctx, msg.TokenId)
+	if !exist {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
+	}
 
 	if token.Source != NATIVE {
 		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the source of the token is native can be transferd,but current the source of the token is %s", token.Source.String()))
@@ -345,18 +345,29 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (
 
 	token.Owner = msg.DstOwner
 
+	// update token information
 	if err := k.SetToken(ctx, token); err != nil {
 		return nil, err
 	}
 
-	//TODO
-	// Update all stores with owner as key
-
-	editTags := sdk.NewTags(
+	// reset all index for query-token
+	if err := k.resetStoreKeyForQueryToken(ctx, msg, token); err != nil {
+		return nil, err
+	}
+	tags := sdk.NewTags(
 		tags.Id, []byte(msg.TokenId),
 	)
 
-	return editTags, nil
+	return tags, nil
+}
 
-	return nil, nil
+// reset all index by DstOwner of token for query-token command
+func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg MsgTransferTokenOwner, token FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+
+	// delete the old key
+	store.Delete(KeyTokens(msg.SrcOwner, msg.TokenId))
+
+	// add the new key
+	return k.SetTokens(ctx, msg.DstOwner, token)
 }
