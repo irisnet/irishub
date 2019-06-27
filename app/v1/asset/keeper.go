@@ -41,7 +41,7 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // IssueToken issue a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
-	tokenId, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +69,18 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 	}
 
 	err = k.SetToken(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set token to be prefixed with owner and source
+	err = k.SetTokens(ctx, owner, token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set token to be prefixed with source
+	err = k.SetTokens(ctx, sdk.AccAddress{}, token)
 	if err != nil {
 		return nil, err
 	}
@@ -107,12 +119,26 @@ func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	tokenId, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
 
 	store.Set(KeyToken(tokenId), bz)
+	return nil
+}
+
+func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return err
+	}
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenId)
+
+	store.Set(KeyTokens(owner, tokenId), bz)
 	return nil
 }
 
@@ -125,6 +151,11 @@ func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token FungibleToken, 
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
 	return token, true
+}
+
+func (k Keeper) getTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenId string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, KeyTokens(owner, nonSymbolTokenId))
 }
 
 // CreateGateway creates a gateway
@@ -168,14 +199,14 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.
 	}
 
 	// update the gateway
-	if msg.Identity != nil {
-		gateway.Identity = *msg.Identity
+	if msg.Identity != DoNotModify {
+		gateway.Identity = msg.Identity
 	}
-	if msg.Details != nil {
-		gateway.Details = *msg.Details
+	if msg.Details != DoNotModify {
+		gateway.Details = msg.Details
 	}
-	if msg.Website != nil {
-		gateway.Website = *msg.Website
+	if msg.Website != DoNotModify {
+		gateway.Website = msg.Website
 	}
 
 	// set the new gateway
@@ -206,13 +237,13 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max_supply must be greater than %s and less than %s", token.InitialSupply.String(), token.MaxSupply.String()))
 	}
 
-	if msg.Name != DoNotModifyDesc {
+	if msg.Name != DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != DoNotModifyDesc {
+	if msg.SymbolAtSource != DoNotModify {
 		token.SymbolAtSource = msg.SymbolAtSource
 	}
-	if msg.SymbolMinAlias != DoNotModifyDesc {
+	if msg.SymbolMinAlias != DoNotModify {
 		token.SymbolMinAlias = msg.SymbolMinAlias
 	}
 	if maxSupply.GT(sdk.ZeroInt()) {

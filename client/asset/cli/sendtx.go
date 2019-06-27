@@ -180,27 +180,9 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 			}
 
 			moniker := viper.GetString(FlagMoniker)
-			identity := (*string)(nil)
-			details := (*string)(nil)
-			website := (*string)(nil)
-
-			flags := cmd.Flags()
-			flags.Visit(func(f *pflag.Flag) {
-				if f.Name == FlagIdentity {
-					value := f.Value.String()
-					identity = &value
-				}
-
-				if f.Name == FlagDetails {
-					value := f.Value.String()
-					details = &value
-				}
-
-				if f.Name == FlagWebsite {
-					value := f.Value.String()
-					website = &value
-				}
-			})
+			identity := viper.GetString(FlagIdentity)
+			details := viper.GetString(FlagDetails)
+			website := viper.GetString(FlagWebsite)
 
 			var msg sdk.Msg
 			msg = asset.NewMsgEditGateway(
@@ -276,10 +258,8 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 // GetCmdTransferGatewayOwner implements the transfer gateway owner command
 func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "transfer-gateway-owner",
-		Short: "transfer the owner of a gateway. The command is only used to generate the transaction which " +
-			"will be signed in order by the current and new owners using the 'iriscli tx sign' command seperately.",
-		Example: "iriscli asset transfer-gateway-owner --moniker=<moniker> --to=<new owner>",
+		Use:   "transfer-gateway-owner",
+		Short: "build an unsigned tx to transfer the owner of a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).

@@ -91,10 +91,15 @@ func TestIrisCLIGateway(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
+	barAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show bar --output=json --home=%s", iriscliHome))
 
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
+
+	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
+	barCoin := convertToIrisBaseAccount(t, barAcc)
+	require.Equal(t, "50iris", barCoin)
 
 	gatewayQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli asset query-gateway --moniker=uniquenm %v", flags), "")
 	//TODO
@@ -107,15 +112,15 @@ func TestIrisCLIGateway(t *testing.T) {
 	website := "https://www.test-gateway.io"
 
 	// create a gateway
-	spStr := fmt.Sprintf("iriscli asset create-gateway %v", flags)
-	spStr += fmt.Sprintf(" --from=%s", "foo")
-	spStr += fmt.Sprintf(" --moniker=%s", moniker)
-	spStr += fmt.Sprintf(" --identity=%s", identity)
-	spStr += fmt.Sprintf(" --details=%s", details)
-	spStr += fmt.Sprintf(" --website=%s", website)
-	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+	cgStr := fmt.Sprintf("iriscli asset create-gateway %v", flags)
+	cgStr += fmt.Sprintf(" --from=%s", "foo")
+	cgStr += fmt.Sprintf(" --moniker=%s", moniker)
+	cgStr += fmt.Sprintf(" --identity=%s", identity)
+	cgStr += fmt.Sprintf(" --details=%s", details)
+	cgStr += fmt.Sprintf(" --website=%s", website)
+	cgStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
-	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
+	require.True(t, executeWrite(t, cgStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -135,4 +140,54 @@ func TestIrisCLIGateway(t *testing.T) {
 
 	gateways := executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", fooAddr.String(), flags))
 	require.Equal(t, 1, len(gateways))
+
+	// transfer the gateway owner
+	tgStr := fmt.Sprintf("iriscli asset transfer-gateway-owner %v", flags)
+	tgStr += fmt.Sprintf(" --from=%s", "foo")
+	tgStr += fmt.Sprintf(" --moniker=%s", moniker)
+	tgStr += fmt.Sprintf(" --to=%s", barAddr.String())
+	tgStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+
+	// execute cmd and return sdtout(unsigned tx)
+	success, stdout, _ := executeWriteRetStdStreams(t, tgStr, sdk.DefaultKeyPass)
+	require.True(t, success)
+
+	// write unsigned tx to a file
+	file := "tx.json"
+	echoStr := fmt.Sprintf("echo %s >> %s", stdout, file)
+	require.True(t, executeWrite(t, echoStr, sdk.DefaultKeyPass))
+
+	// sign the tx using the current owner
+	ownerSignStr := fmt.Sprintf("iriscli tx sign %s %v", file, flags)
+	ownerSignStr += fmt.Sprintf(" --output-document=%s", file)
+	ownerSignStr += fmt.Sprintf(" --name=%s", "foo")
+
+	require.True(t, executeWrite(t, ownerSignStr, sdk.DefaultKeyPass))
+
+	// sign the tx using the new owner
+	newOwnerSignStr := fmt.Sprintf("iriscli tx sign %s %v", file, flags)
+	newOwnerSignStr += fmt.Sprintf(" --output-document=%s", file)
+	newOwnerSignStr += fmt.Sprintf(" --name=%s", "bar")
+
+	require.True(t, executeWrite(t, newOwnerSignStr, sdk.DefaultKeyPass))
+
+	// broadcast the signed tx
+	bcTxStr := fmt.Sprintf("iriscli tx broadcast %s %v", file, flags)
+	bcTxStr += " --commit"
+
+	require.True(t, executeWrite(t, newOwnerSignStr, sdk.DefaultKeyPass))
+	tests.WaitForNextNBlocksTM(2, port)
+
+	gateway = executeGetGateway(t, fmt.Sprintf("iriscli asset query-gateway --moniker=%s %v", moniker, flags))
+	require.Equal(t, barAddr.String(), gateway.Owner)
+
+	gateways = executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", barAddr.String(), flags))
+	require.Equal(t, 1, len(gateways))
+	require.Equal(t, moniker, gateways[0].Moniker)
+	require.Equal(t, identity, gateways[0].Identity)
+	require.Equal(t, details, gateways[0].Details)
+	require.Equal(t, website, gateways[0].Website)
+
+	gateways = executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", fooAddr.String(), flags))
+	require.Equal(t, 0, len(gateways))
 }
