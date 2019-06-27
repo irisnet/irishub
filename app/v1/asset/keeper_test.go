@@ -160,6 +160,71 @@ func TestCreateGatewayKeeper(t *testing.T) {
 	require.Equal(t, gateway, res)
 }
 
+func TestEditGatewayKeeper(t *testing.T) {
+	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+
+	cdc := codec.New()
+	RegisterCodec(cdc)
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	guardianKeeper := guardian.Keeper{}
+	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
+	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+
+	// define variables
+	owner := ak.NewAccountWithAddress(ctx, []byte("owner")).GetAddress()
+	moniker := "moniker"
+	identity := "identity"
+	details := "details"
+	website := "website"
+	newIdentity := "new identity"
+	newDetails := "new details"
+	newWebsite := "new website"
+
+	// build a MsgCreateGateway
+	createMsg := NewMsgCreateGateway(owner, moniker, identity, details, website)
+
+	// create a gateway and assert that the gateway exists now
+	_, err := keeper.CreateGateway(ctx, createMsg)
+	require.Nil(t, err)
+	require.True(t, keeper.HasGateway(ctx, moniker))
+
+	// assert GetGateway will return the previous gateway
+	res, _ := keeper.GetGateway(ctx, moniker)
+	require.Equal(t, identity, res.Identity)
+	require.Equal(t, details, res.Details)
+	require.Equal(t, website, res.Website)
+
+	// build a MsgEditGateway
+	editMsg := NewMsgEditGateway(owner, moniker, newIdentity, newDetails, newWebsite)
+
+	// edit the gateway
+	_, err = keeper.EditGateway(ctx, editMsg)
+	require.Nil(t, err)
+
+	// assert GetGateway will return the new filed values
+	res, _ = keeper.GetGateway(ctx, moniker)
+	require.Equal(t, newIdentity, res.Identity)
+	require.Equal(t, newDetails, res.Details)
+	require.Equal(t, newWebsite, res.Website)
+
+	// build another MsgEditGateway with details and website not updated
+	editMsg = NewMsgEditGateway(owner, moniker, identity, DoNotModify, DoNotModify)
+
+	// edit the gateway again
+	_, err = keeper.EditGateway(ctx, editMsg)
+	require.Nil(t, err)
+
+	// assert GetGateway will return the gateway with only identity updated
+	res, _ = keeper.GetGateway(ctx, moniker)
+	require.Equal(t, identity, res.Identity)
+	require.Equal(t, newDetails, res.Details)
+	require.Equal(t, newWebsite, res.Website)
+}
+
 func TestQueryGatewayKeeper(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 
