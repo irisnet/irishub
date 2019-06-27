@@ -366,5 +366,6 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsMintToken)
+	cmd.MarkFlagRequired(FlagAmount)
 	return cmd
 }

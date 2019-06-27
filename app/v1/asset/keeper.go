@@ -2,7 +2,6 @@ package asset
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/app/v1/asset/tags"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -330,29 +329,33 @@ func (k Keeper) Init(ctx sdk.Context) {
 func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Error) {
 	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
-		// TODO
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
 	}
 
 	if !token.Owner.Equals(msg.Owner) {
 		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
 	}
 
-	totalAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
+	hasIssueAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
 	if !found {
-		//error
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s don't exist", token.GetDenom()))
 	}
 
 	//check the denom
-	if token.GetDenom() != totalAmt.Denom {
-		//error
+	expDenom := token.GetDenom()
+	if expDenom != hasIssueAmt.Denom {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssueAmt.Denom))
 	}
 
 	mintAmt := sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Decimal))
-	if mintAmt.Add(totalAmt.Amount).GT(token.MaxSupply) {
-		//
+	if mintAmt.Add(hasIssueAmt.Amount).GT(token.MaxSupply) {
+		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
+		canAmt := token.MaxSupply.Sub(hasIssueAmt.Amount).Div(exp)
+		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
 	}
 
-	mintCoin := sdk.NewCoin(totalAmt.Denom, mintAmt)
+	mintCoin := sdk.NewCoin(expDenom, mintAmt)
+	//add TotalSupply
 	if err := k.bk.IncreaseTotalSupply(ctx, mintCoin); err != nil {
 		return nil, err
 	}
@@ -361,10 +364,11 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 	if mintAcc.Empty() {
 		mintAcc = token.Owner
 	}
-	balance, tags, err := k.bk.AddCoins(ctx, mintAcc, sdk.Coins{mintCoin})
+
+	//add mintCoin to special account
+	_, tags, err := k.bk.AddCoins(ctx, mintAcc, sdk.Coins{mintCoin})
 	if err != nil {
 		return nil, err
 	}
-	tags.AppendTag("balance", []byte(balance.String()))
 	return tags, nil
 }
