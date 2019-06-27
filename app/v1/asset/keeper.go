@@ -396,8 +396,12 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (
 func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg MsgTransferTokenOwner, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return err
+	}
 	// delete the old key
-	store.Delete(KeyTokens(msg.SrcOwner, msg.TokenId))
+	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
 
 	// add the new key
 	return k.SetTokens(ctx, msg.DstOwner, token)
