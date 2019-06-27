@@ -225,7 +225,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 	// get the destination token
 	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
-		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
