@@ -290,10 +290,13 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 			}
 
 			amount := uint64(viper.GetInt64(FlagAmount))
-
-			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
-			if err != nil {
-				return err
+			var to sdk.AccAddress
+			addr := viper.GetString(FlagTo)
+			if len(strings.TrimSpace(addr)) > 0 {
+				to, err = sdk.AccAddressFromBech32(addr)
+				if err != nil {
+					return err
+				}
 			}
 
 			var msg sdk.Msg

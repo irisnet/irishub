@@ -283,7 +283,44 @@ func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, DefaultParams())
 }
 
-//TODO
 func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Error) {
-	return nil, nil
+	token, exist := k.getToken(ctx, msg.TokenId)
+	if !exist {
+		// TODO
+	}
+
+	if !token.Owner.Equals(msg.Owner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
+	}
+
+	totalAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
+	if !found {
+		//error
+	}
+
+	//check the denom
+	if token.GetDenom() != totalAmt.Denom {
+		//error
+	}
+
+	mintAmt := sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Decimal))
+	if mintAmt.Add(totalAmt.Amount).GT(token.MaxSupply) {
+		//
+	}
+
+	mintCoin := sdk.NewCoin(totalAmt.Denom, mintAmt)
+	if err := k.bk.IncreaseTotalSupply(ctx, mintCoin); err != nil {
+		return nil, err
+	}
+
+	mintAcc := msg.To
+	if mintAcc.Empty() {
+		mintAcc = token.Owner
+	}
+	balance, tags, err := k.bk.AddCoins(ctx, mintAcc, sdk.Coins{mintCoin})
+	if err != nil {
+		return nil, err
+	}
+	tags.AppendTag("balance", []byte(balance.String()))
+	return tags, nil
 }
