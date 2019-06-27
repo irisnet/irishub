@@ -102,7 +102,7 @@ func TestQueryTokenStats(t *testing.T) {
 	require.Nil(t, res)
 
 	totalToken = sdk.Coins{sdk.NewCoin(denom, sdk.NewInt(100))}
-	input.bk.SetTotalSupply(input.ctx, sdk.Coin{ Denom: denom, Amount: totalToken.AmountOf(denom)})
+	input.bk.SetTotalSupply(input.ctx, sdk.Coin{Denom: denom, Amount: totalToken.AmountOf(denom)})
 
 	_, _, addr = keyPubAddr()
 	input.bk.am.SetAccount(input.ctx, input.bk.am.NewAccountWithAddress(input.ctx, addr))

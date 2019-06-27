@@ -75,7 +75,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     3. `GET /bank/accounts/{address}`: Get the account information on blockchain
     4. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
     5. `POST /bank/accounts/{address}/burn`: Burn coins
-        
+    
 5. Stake module APIs
 
     1. `POST /stake/delegators/{delegatorAddr}/delegations`: Submit delegation transaction
@@ -146,7 +146,8 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     2. `GET /asset/gateways`: Query all the gateways with an optional owner
     3. `POST /asset/gateways`: Create a gateway
     4. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
-
+5. `PUT /asset/tokens/{token-id}`: Edit an existing token
+    
 11. Query app version
 
     1. `GET /version`: Version of IRISLCD
