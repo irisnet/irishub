@@ -17,6 +17,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgCreateGateway(ctx, k, msg)
 		case MsgEditGateway:
 			return handleMsgEditGateway(ctx, k, msg)
+		case MsgEditToken:
+			return handleMsgEditToken(ctx, k, msg)
 		case MsgTransferGatewayOwner:
 			return handleMsgTransferGatewayOwner(ctx, k, msg)
 		case MsgMintToken:
@@ -97,6 +99,17 @@ func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Res
 		return err.Result()
 	}
 
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// handleMsgEditToken handles MsgEditToken
+func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result {
+	tags, err := k.EditToken(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
 	return sdk.Result{
 		Tags: tags,
 	}

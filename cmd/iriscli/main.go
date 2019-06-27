@@ -264,6 +264,7 @@ func main() {
 			assetcmd.GetCmdTransferGatewayOwner(cdc),
 			assetcmd.GetCmdIssueAsset(cdc),
 			assetcmd.GetCmdMintToken(cdc),
+			assetcmd.GetCmdEditAsset(cdc),
 		)...)
 
 	assetCmd.AddCommand(
