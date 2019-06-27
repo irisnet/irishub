@@ -153,6 +153,7 @@ func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
+		cliCtx.GenerateOnly = true
 		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
 	}
 }
