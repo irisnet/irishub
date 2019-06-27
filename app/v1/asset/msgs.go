@@ -144,7 +144,7 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	}
 
 	symbolMinAliasLen := len(msg.SymbolMinAlias)
-	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) || !IsBeginWithAlpha(msg.Symbol) {
+	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias)) || !IsBeginWithAlpha(msg.SymbolMinAlias) {
 		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
 	}
 
