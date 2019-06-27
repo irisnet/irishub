@@ -16,6 +16,14 @@ func KeyToken(tokenId string) []byte {
 	return []byte(fmt.Sprintf("token:%s", keyId))
 }
 
+// KeyTokens returns the key of the specifed owner and token id. Intended for querying all tokens of an owner
+func KeyTokens(owner sdk.AccAddress, tokenId string) []byte {
+	if owner.Empty() {
+		return []byte(fmt.Sprintf("tokens:%s", tokenId))
+	}
+	return []byte(fmt.Sprintf("ownerTokens:%s:%s", owner, tokenId))
+}
+
 // KeyGateway returns the key of the specified moniker
 func KeyGateway(moniker string) []byte {
 	return []byte(fmt.Sprintf("gateways:%s", moniker))
