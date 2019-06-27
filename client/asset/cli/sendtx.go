@@ -302,3 +302,47 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 
 	return cmd
 }
+
+// GetCmdTransferTokenOwner implements the transfer token owner command
+func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "transfer-token-owner",
+		Short:   "build an unsigned tx to transfer the owner of a token",
+		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
+			if err != nil {
+				return err
+			}
+
+			var msg sdk.Msg
+			msg = asset.NewMsgTransferTokenOwner(owner, to, args[0])
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			// enable generate-only
+			cliCtx.GenerateOnly = true
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+	cmd.Flags().AddFlagSet(FsTransferTokenOwner)
+	cmd.MarkFlagRequired(FlagTo)
+
+	return cmd
+}
