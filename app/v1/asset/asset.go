@@ -137,6 +137,10 @@ func (ft FungibleToken) String() string {
 
 	initSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.InitialSupply).String(), ft.GetUniqueID())
 	maxSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.MaxSupply).String(), ft.GetUniqueID())
+	owner := ""
+	if !ft.Owner.Empty() {
+		owner = ft.Owner.String()
+	}
 
 	return fmt.Sprintf(`FungibleToken %s:
   Family:            %s
@@ -152,12 +156,12 @@ func (ft FungibleToken) String() string {
   Mintable:          %v
   Owner:             %s`,
 		ft.GetUniqueID(), ft.Family, ft.Source, ft.Gateway, ft.Name, ft.Symbol, ft.SymbolAtSource, ft.SymbolMinAlias,
-		ft.Decimal, initSupply, maxSupply, ft.Mintable, ft.Owner.String())
+		ft.Decimal, initSupply, maxSupply, ft.Mintable, owner)
 }
 
 // -----------------------------
 
-func GetKeyID(source AssetSource, symbol string, gateway string) (string, types.Error) {
+func GetTokenID(source AssetSource, symbol string, gateway string) (string, types.Error) {
 	switch source {
 	case NATIVE:
 		return strings.ToLower(fmt.Sprintf("i.%s", symbol)), nil

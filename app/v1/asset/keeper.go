@@ -40,7 +40,7 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // IssueToken issue a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
-	tokenId, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +68,18 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 	}
 
 	err = k.SetToken(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set token to be prefixed with owner and source
+	err = k.SetTokens(ctx, owner, token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set token to be prefixed with source
+	err = k.SetTokens(ctx, sdk.AccAddress{}, token)
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +118,26 @@ func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	tokenId, err := GetKeyID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
 
 	store.Set(KeyToken(tokenId), bz)
+	return nil
+}
+
+func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return err
+	}
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenId)
+
+	store.Set(KeyTokens(owner, tokenId), bz)
 	return nil
 }
 
@@ -124,6 +150,11 @@ func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token FungibleToken, 
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
 	return token, true
+}
+
+func (k Keeper) getTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenId string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, KeyTokens(owner, nonSymbolTokenId))
 }
 
 // CreateGateway creates a gateway

@@ -117,7 +117,6 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 			tokenStats.TotalSupply = tokenStats.TotalSupply.Plus(tokenStats.LooseTokens.Plus(tokenStats.BondedTokens))
 		}
 
-
 		utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 	}
 }
