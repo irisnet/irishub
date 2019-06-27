@@ -30,6 +30,7 @@ const (
 )
 
 var (
+	FsEditToken            = flag.NewFlagSet("", flag.ContinueOnError)
 	FsAssetIssue           = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayCreate        = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
@@ -66,4 +67,10 @@ func init() {
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
 	FsFeeQuery.String(FlagID, "", "the token id")
+
+	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
+	FsEditToken.String(FlagSymbolAtSource, "[do-not-modify]", "the source symbol of a gateway or external token")
+	FsEditToken.String(FlagSymbolMinAlias, "[do-not-modify]", "the token symbol minimum alias")
+	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
+	FsEditToken.Bool(FlagMintable, false, "whether the token can be minted, default false")
 }

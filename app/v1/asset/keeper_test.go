@@ -265,6 +265,47 @@ func TestQueryGatewayKeeper(t *testing.T) {
 	require.Equal(t, []Gateway{gateway2, gateway1}, gateways3)
 }
 
+//TODO:finish the test
+func TestKeeper_EditToken(t *testing.T) {
+	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+
+	cdc := codec.New()
+	RegisterCodec(cdc)
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
+	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	addr := sdk.AccAddress([]byte("addr1"))
+
+	acc := ak.NewAccountWithAddress(ctx, addr)
+
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+
+	_, err := keeper.IssueToken(ctx, ft)
+	assert.NoError(t, err)
+
+	assert.True(t, keeper.HasToken(ctx, "i.btc"))
+
+	asset, found := keeper.getToken(ctx, "i.btc")
+	assert.True(t, found)
+
+	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
+	assert.Equal(t, ft.Owner, asset.Owner)
+
+	msgJson, _ := json.Marshal(ft)
+	assetJson, _ := json.Marshal(asset)
+	assert.Equal(t, msgJson, assetJson)
+
+	//TODO:finish the edit token
+	mintable := false
+	msgEditToken := NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, &mintable, acc.GetAddress())
+	_, err = keeper.EditToken(ctx, msgEditToken)
+	assert.NoError(t, err)
+}
+
 func TestTransferGatewayKeeper(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 

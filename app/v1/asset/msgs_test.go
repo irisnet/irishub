@@ -35,7 +35,7 @@ func TestMsgIssueAsset(t *testing.T) {
 		{"native symbol_min_alias error", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a1,3d", 1, 1, true, addr, sdk.Coins{}), false},
 		{"native symbol_min_alias too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "aaaaaaaaaaaaa", 1, 1, true, addr, sdk.Coins{}), false},
 		{"native symbol_min_alias too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a", 1, 1, true, addr, sdk.Coins{}), false},
-		{"native symbol_min_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "1btc", "btc", 1, "a", 1, 1, true, addr, sdk.Coins{}), false},
+		{"native symbol_min_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "1a", 1, 1, true, addr, sdk.Coins{}), false},
 		{"native name empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "", 1, "btc", 1, 1, true, addr, sdk.Coins{}), false},
 		{"native name blank", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "  ", 1, "btc", 1, 1, true, addr, sdk.Coins{}), false},
 		{"native name too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "i", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr, sdk.Coins{}), false},
@@ -225,6 +225,67 @@ func TestMsgEditGatewayGetSigners(t *testing.T) {
 
 	expected := "[6F776E6572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// test ValidateBasic for MsgIssueToken
+func TestMsgEditAsset(t *testing.T) {
+	owner := sdk.AccAddress([]byte("owner"))
+	mintable := false
+	tests := []struct {
+		testCase string
+		MsgEditToken
+		expectPass bool
+	}{
+		{"native basic good", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000, &mintable, owner), true},
+		{"wrong symbol_at_source", NewMsgEditToken("BTC Token", "HT", "satoshi", "x.btc", 10000, &mintable, owner), false},
+		{"wrong symbol_min_alias", NewMsgEditToken("BTC Token", "btc", "btc-min", "x.ht", 10000, &mintable, owner), false},
+		{"wrong token_id", NewMsgEditToken("BTC Token", "HTC", "HT", "i.ht", 10000, &mintable, owner), false},
+		{"wrong max_supply", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000000000000, &mintable, owner), false},
+		{"loss owner", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000, &mintable, nil), false},
+	}
+
+	for _, tc := range tests {
+		if tc.expectPass {
+			require.Nil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
+		} else {
+			require.NotNil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
+		}
+	}
+}
+
+func TestMsgEditTokenRoute(t *testing.T) {
+	symbolAtSource := "btc"
+	symbolMinAlias := "satoshi"
+	tokenId := "x.btc"
+	mintable := false
+	// build a MsgEditToken
+	msg := MsgEditToken{
+		SymbolAtSource: symbolAtSource,
+		SymbolMinAlias: symbolMinAlias,
+		MaxSupply:      10000000,
+		Mintable:       &mintable,
+		TokenId:        tokenId,
+	}
+
+	require.Equal(t, "asset", msg.Route())
+}
+
+func TestMsgEditTokenGetSignBytes(t *testing.T) {
+	mintable := false
+	var msg = MsgEditToken{
+		Name:           "BTC TOKEN",
+		Owner:          sdk.AccAddress([]byte("owner")),
+		TokenId:        "x.btc",
+		SymbolAtSource: "btc",
+		SymbolMinAlias: "satoshi",
+		MaxSupply:      21000000,
+		Mintable:       &mintable,
+	}
+
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"max_supply":"21000000","mintable":false,"name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","symbol_at_source":"btc","symbol_min_alias":"satoshi","token_id":"x.btc"}}`
+	require.Equal(t, expected, string(res))
 }
 
 func TestNewMsgTransferGatewayOwner(t *testing.T) {
