@@ -276,10 +276,8 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 // GetCmdTransferGatewayOwner implements the transfer gateway owner command
 func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "transfer-gateway-owner",
-		Short: "transfer the owner of a gateway. The command is only used to generate the transaction which " +
-			"will be signed in order by the current and new owners using the 'iriscli tx sign' command seperately.",
-		Example: "iriscli asset transfer-gateway-owner --moniker=<moniker> --to=<new owner>",
+		Use:   "transfer-gateway-owner",
+		Short: "build an unsigned tx to transfer the owner of a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
