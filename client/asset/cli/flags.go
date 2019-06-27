@@ -58,17 +58,17 @@ func init() {
 	FsGatewayCreate.String(FlagDetails, "", "the gateway description")
 	FsGatewayCreate.String(FlagWebsite, "", "the external website")
 
-	FsGatewayEdit.String(FlagMoniker, "", "the unique gateway name")
-	FsGatewayEdit.String(FlagIdentity, "", "the gateway identity")
-	FsGatewayEdit.String(FlagDetails, "", "the gateway description")
-	FsGatewayEdit.String(FlagWebsite, "", "the external website")
+	FsGatewayEdit.String(FlagMoniker, asset.DoNotModify, "the unique gateway name")
+	FsGatewayEdit.String(FlagIdentity, asset.DoNotModify, "the gateway identity")
+	FsGatewayEdit.String(FlagDetails, asset.DoNotModify, "the gateway description")
+	FsGatewayEdit.String(FlagWebsite, asset.DoNotModify, "the external website")
 
 	FsGatewayOwnerTransfer.String(FlagMoniker, "", "the unique name of the gateway to be transferred")
 	FsGatewayOwnerTransfer.String(FlagTo, "", "the new owner")
 
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
-	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
-	FsFeeQuery.String(FlagID, "", "the token id")
+	FsFeeQuery.String(FlagMoniker, "", "the gateway name, required if the subject is gateway")
+	FsFeeQuery.String(FlagID, "", "the token id, required if the subject is token")
 
 	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
 	FsEditToken.String(FlagSymbolAtSource, "[do-not-modify]", "the source symbol of a gateway or external token")

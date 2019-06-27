@@ -2,7 +2,7 @@
 
 ## 描述
 
-查询由指定地址所创建的全部网关信息。
+查询所有网关信息，支持可选的owner参数
 
 ## 使用方式
 
@@ -19,31 +19,37 @@ iriscli asset query-gateways --help
 
 | 命令, 速记     | 类型   | 是否必须 | 默认值  | 描述                                                         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --owner           | Address | 是     |        | 要查询的目标地址 |
+| --owner           | Address | 否     |        | 要查询的目标所有者地址 |
 
 
 ## 示例
 
 ```
-iriscli asset query-gateways --owner=<owner address> --chain-id=<chain-id>
+iriscli asset query-gateways --owner=faa1an4wfvsnxrp97lug5fngct6melhgcuvdv2qye3
 ```
 
 输出信息:
 ```txt
-Committed at block 306 (tx hash: 5A4C6E00F4F6BF795EB05D2D388CBA0E8A6E6CF17669314B1EE6A31729A22450, response: {Code:0 Data:[] Log:Msg 0:  Info: GasWanted:200000 GasUsed:3398 Tags:[{Key:[97 99 116 105 111 110] Value:[115 101 114 118 105 99 101 45 119 105 116 104 100 114 97 119 45 102 101 101 115] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0} {Key:[99 111 109 112 108 101 116 101 67 111 110 115 117 109 101 100 84 120 70 101 101 45 105 114 105 115 45 97 116 116 111] Value:[34 54 55 57 54 48 48 48 48 48 48 48 48 48 48 48 34] XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0}] Codespace: XXX_NoUnkeyedLiteral:{} XXX_unrecognized:[] XXX_sizecache:0})
+Gateways for owner faa1an4wfvsnxrp97lug5fngct6melhgcuvdv2qye3:
+  Moniker: tgw, Identity: exchange, Details: testgateway, Website: http://testgateway.io
+  Moniker: tgwx, Identity: exchange, Details: testgateway2, Website: http://testgateway2.io
 ```
 
 ```json
- {
-   "code": 0,
-   "data": null,
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 200000,
-   "gas_used": 16462,
-   "codespace": "",
-   "tags": {
-     "moniker": "testgw"
-   }
- })
+[
+  {
+    "owner": "faa1an4wfvsnxrp97lug5fngct6melhgcuvdv2qye3",
+    "moniker": "tgw",
+    "identity": "exchange",
+    "details": "testgateway",
+    "website": "http://testgateway.io"
+  },
+  {
+    "owner": "faa1an4wfvsnxrp97lug5fngct6melhgcuvdv2qye3",
+    "moniker": "tgwx",
+    "identity": "exchange",
+    "details": "testgateway2",
+    "website": "http://testgateway2.io"
+  }
+]
 ```
