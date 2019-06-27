@@ -32,6 +32,7 @@ const (
 	CodeInvalidAssetDecimal           sdk.CodeType = 119
 	CodeAssetAlreadyExists            sdk.CodeType = 120
 	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
+	CodeAssetNotExists                sdk.CodeType = 122
 )
 
 //----------------------------------------
@@ -78,6 +79,10 @@ func ErrInvalidAssetDecimal(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrAssetAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeAssetAlreadyExists, msg)
+}
+
+func ErrAssetNotExists(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeAssetNotExists, msg)
 }
 
 //----------------------------------------
