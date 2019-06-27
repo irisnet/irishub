@@ -19,6 +19,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgEditGateway(ctx, k, msg)
 		case MsgTransferGatewayOwner:
 			return handleMsgTransferGatewayOwner(ctx, k, msg)
+		case MsgMintToken:
+			return handleMsgMintToken(ctx, k, msg)
 		default:
 			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 		}
@@ -106,6 +108,18 @@ func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGat
 	msg.Moniker = strings.ToLower(msg.Moniker)
 
 	tags, err := k.TransferGatewayOwner(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// handleMsgMintToken handles MsgMintToken
+func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
+	tags, err := k.MintToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}

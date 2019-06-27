@@ -27,6 +27,7 @@ const (
 
 	FlagSubject = "subject"
 	FlagID      = "id"
+	FlagAmount  = "amount"
 )
 
 var (
@@ -35,6 +36,7 @@ var (
 	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
+	FsMintToken            = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -66,4 +68,7 @@ func init() {
 	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
 	FsFeeQuery.String(FlagMoniker, "", "the gateway name")
 	FsFeeQuery.String(FlagID, "", "the token id")
+
+	FsMintToken.String(FlagTo, "", "address of mint token to")
+	FsMintToken.Uint64(FlagAmount, 0, "amount of mint token")
 }

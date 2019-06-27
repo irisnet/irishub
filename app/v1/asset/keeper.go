@@ -282,3 +282,8 @@ func (k Keeper) GetAllGateways(ctx sdk.Context) sdk.Iterator {
 func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, DefaultParams())
 }
+
+//TODO
+func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Error) {
+	return nil, nil
+}

@@ -269,3 +269,46 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 
 	return cmd
 }
+
+func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "mint-token",
+		Short:   "The asset owner and operator can directly mint tokens to a specified address",
+		Example: "iriscli asset mint-token <token-id> [flags]",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			amount := uint64(viper.GetInt64(FlagAmount))
+
+			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
+			if err != nil {
+				return err
+			}
+
+			var msg sdk.Msg
+			msg = asset.NewMsgMintToken(
+				args[0], owner, to, amount,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsMintToken)
+	return cmd
+}
