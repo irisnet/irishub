@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Transfer the ownership of a gateway from the current owner to the new owner. The command is only used to generate the transaction which will be signed in order by the current and new owners using the 'iriscli tx sign' command seperately.
+Transfer the ownership of a gateway from the current owner to the new owner. The command is only used to generate the unsigned tx.
 
 ## Usage
 
