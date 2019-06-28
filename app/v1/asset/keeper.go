@@ -367,6 +367,10 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
 	}
 
+	if !token.Mintable {
+		return nil, ErrAssetNotMintAble(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
+	}
+
 	hasIssueAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
 	if !found {
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s don't exist", token.GetDenom()))
