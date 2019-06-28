@@ -37,6 +37,7 @@ var (
 	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTransferTokenOwner   = flag.NewFlagSet("", flag.ContinueOnError)
 	FsMintToken            = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
@@ -75,6 +76,8 @@ func init() {
 	FsEditToken.String(FlagSymbolMinAlias, "[do-not-modify]", "the token symbol minimum alias")
 	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
 	FsEditToken.Bool(FlagMintable, false, "whether the token can be minted, default false")
+
+	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
 
 	FsMintToken.String(FlagTo, "", "address of mint token to")
 	FsMintToken.Uint64(FlagAmount, 0, "amount of mint token")

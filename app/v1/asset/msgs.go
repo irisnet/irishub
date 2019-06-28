@@ -352,6 +352,66 @@ type MsgTransferGatewayOwner struct {
 	To      sdk.AccAddress `json:"to"`      // the new owner to which the gateway ownership will be transferred
 }
 
+// MsgTransferTokenOwner for transferring the token owner
+type MsgTransferTokenOwner struct {
+	SrcOwner sdk.AccAddress `json:"src_owner"` // the current owner address of the token
+	DstOwner sdk.AccAddress `json:"dst_owner"` // the new owner
+	TokenId  string         `json:"token_id"`
+}
+
+func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, tokenId string) MsgTransferTokenOwner {
+	tokenId = strings.TrimSpace(tokenId)
+	return MsgTransferTokenOwner{
+		SrcOwner: srcOwner,
+		DstOwner: dstOwner,
+		TokenId:  tokenId,
+	}
+}
+
+// GetSignBytes implements Msg
+func (msg MsgTransferTokenOwner) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.SrcOwner, msg.DstOwner}
+}
+
+func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
+	// check the SrcOwner
+	if len(msg.SrcOwner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
+	}
+
+	// check if the `DstOwner` is empty
+	if len(msg.DstOwner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the new owner of the token must be specified"))
+	}
+
+	// check if the `DstOwner` is same as the original owner
+	if msg.SrcOwner.Equals(msg.DstOwner) {
+		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
+	}
+
+	// check the tokenId
+	if err := CheckAssetID(msg.TokenId); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Route implements Msg
+func (msg MsgTransferTokenOwner) Route() string { return MsgRoute }
+
+// Type implements Msg
+func (msg MsgTransferTokenOwner) Type() string { return "transfer_token_owner" }
+
 // NewMsgTransferGatewayOwner creates a MsgTransferGatewayOwner
 func NewMsgTransferGatewayOwner(owner sdk.AccAddress, moniker string, to sdk.AccAddress) MsgTransferGatewayOwner {
 	return MsgTransferGatewayOwner{

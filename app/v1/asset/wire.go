@@ -12,6 +12,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgEditToken{}, "irishub/asset/MsgEditToken", nil)
 	cdc.RegisterConcrete(MsgTransferGatewayOwner{}, "irishub/asset/MsgTransferGatewayOwner", nil)
 	cdc.RegisterConcrete(MsgMintToken{}, "irishub/asset/MsgMintToken", nil)
+	cdc.RegisterConcrete(MsgTransferTokenOwner{}, "irishub/asset/MsgTransferTokenOwner", nil)
 
 	cdc.RegisterConcrete(BaseToken{}, "irishub/asset/BaseToken", nil)
 	cdc.RegisterConcrete(FungibleToken{}, "irishub/asset/FungibleToken", nil)
