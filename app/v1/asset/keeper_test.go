@@ -253,14 +253,10 @@ func TestQueryGatewayKeeper(t *testing.T) {
 
 	// query all gateways
 	var gateways3 []Gateway
-	iter3 := keeper.GetAllGateways(ctx)
-	defer iter3.Close()
-
-	for ; iter3.Valid(); iter3.Next() {
-		var gateway Gateway
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter3.Value(), &gateway)
-		gateways3 = append(gateways3, gateway)
-	}
+	keeper.IterateGateways(ctx, func(gw Gateway) (stop bool) {
+		gateways3 = append(gateways3, gw)
+		return false
+	})
 
 	require.Equal(t, []Gateway{gateway2, gateway1}, gateways3)
 }
