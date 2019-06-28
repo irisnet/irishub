@@ -216,19 +216,9 @@ func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	// check the identity
-	if len(msg.Identity) > MaximumGatewayIdentitySize {
-		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
-	}
-
-	// check the details
-	if len(msg.Details) > MaximumGatewayDetailsSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
-	}
-
-	// check the website
-	if len(msg.Website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
+	// check gateway description fields
+	if err := validateGatewayDesc(&msg.Identity, &msg.Details, &msg.Website); err != nil {
+		return err
 	}
 
 	return nil
@@ -297,24 +287,35 @@ func (msg MsgEditGateway) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	// check the identity
-	if msg.Identity != DoNotModify && len(msg.Identity) > MaximumGatewayIdentitySize {
-		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
+	var (
+		identity = (*string)(nil)
+		details  = (*string)(nil)
+		website  = (*string)(nil)
+	)
+
+	// check if the identity is updated
+	if msg.Identity != DoNotModify {
+		identity = &msg.Identity
 	}
 
-	// check the details
-	if msg.Details != DoNotModify && len(msg.Details) > MaximumGatewayDetailsSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
+	// check if the details is updated
+	if msg.Details != DoNotModify {
+		details = &msg.Details
 	}
 
-	// check the website
-	if msg.Website != DoNotModify && len(msg.Website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
+	// check if the website is updated
+	if msg.Website != DoNotModify {
+		website = &msg.Website
 	}
 
 	// check if updates occur
-	if msg.Identity == DoNotModify && msg.Details == DoNotModify && msg.Website == DoNotModify {
+	if identity == nil && details == nil && website == nil {
 		return ErrNoUpdatesProvided(DefaultCodespace, fmt.Sprintf("no updated values provided"))
+	}
+
+	// check the description fields
+	if err := validateGatewayDesc(identity, details, website); err != nil {
+		return err
 	}
 
 	return nil
@@ -476,26 +477,6 @@ func (msg MsgTransferGatewayOwner) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner, msg.To}
 }
 
-// ValidateMoniker checks if the specified moniker is valid
-func ValidateMoniker(moniker string) sdk.Error {
-	// check the moniker size
-	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-	}
-
-	// check the moniker format
-	if !IsAlpha(moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
-	}
-
-	// check if the moniker contains the native token name
-	if strings.Contains(strings.ToLower(moniker), sdk.NativeTokenName) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
-	}
-
-	return nil
-}
-
 // MsgEditToken for editing a specified token
 type MsgEditToken struct {
 	TokenId        string         `json:"token_id"`         //  id of token
@@ -579,4 +560,44 @@ func (msg MsgEditToken) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+// ValidateMoniker checks if the specified moniker is valid
+func ValidateMoniker(moniker string) sdk.Error {
+	// check the moniker size
+	if len(moniker) < MinimumGatewayMonikerSize || len(moniker) > MaximumGatewayMonikerSize {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the length of the moniker must be between [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
+	}
+
+	// check the moniker format
+	if !IsAlpha(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	}
+
+	// check if the moniker contains the native token name
+	if strings.Contains(strings.ToLower(moniker), sdk.NativeTokenName) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
+	}
+
+	return nil
+}
+
+// validateGatewayDesc checks if the given description fileds are valid
+func validateGatewayDesc(identity, details, website *string) sdk.Error {
+	// check the identity
+	if identity != nil && len(*identity) > MaximumGatewayIdentitySize {
+		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
+	}
+
+	// check the details
+	if details != nil && len(*details) > MaximumGatewayDetailsSize {
+		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
+	}
+
+	// check the website
+	if website != nil && len(*website) > MaximumGatewayWebsiteSize {
+		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
+	}
+
+	return nil
 }
