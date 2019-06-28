@@ -361,6 +361,35 @@ func TestMsgTransferGatewayOwnerGetSigners(t *testing.T) {
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
+func TestMsgMintTokenValidateBasic(t *testing.T) {
+	testData := []struct {
+		msg        string
+		tokeId     string
+		owner      sdk.AccAddress
+		to         sdk.AccAddress
+		amount     uint64
+		expectPass bool
+	}{
+		{"empty tokeId", "", addr1, addr2, 1000, false},
+		{"wrong tokeId", "p.btc", addr1, addr2, 1000, false},
+		{"empty owner", "btc", emptyAddr, addr2, 1000, false},
+		{"empty to", "btc", addr1, emptyAddr, 1000, true},
+		{"not empty to", "btc", addr1, addr2, 1000, true},
+		{"invalid amount", "btc", addr1, addr2, 0, false},
+		{"exceed max supply", "btc", addr1, addr2, 100000000000000, false},
+		{"basic good", "btc", addr1, addr2, 1000, true},
+	}
+
+	for _, td := range testData {
+		msg := NewMsgMintToken(td.tokeId, td.owner, td.to, td.amount)
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.msg)
+		}
+	}
+}
+
 func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	testData := []struct {
 		name       string

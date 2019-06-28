@@ -399,7 +399,7 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 	}
 
 	// check the tokenId
-	if err := CheckAssetID(msg.TokenId); err != nil {
+	if err := CheckTokenID(msg.TokenId); err != nil {
 		return err
 	}
 
@@ -548,7 +548,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 	}
 
 	//check token_id
-	if err := CheckAssetID(msg.TokenId); err != nil {
+	if err := CheckTokenID(msg.TokenId); err != nil {
 		return err
 	}
 
@@ -579,4 +579,57 @@ func (msg MsgEditToken) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
+}
+
+// MsgMintToken for mint the token to a specified address
+type MsgMintToken struct {
+	TokenId string         `json:"token_id"` // the unique id of the token
+	Owner   sdk.AccAddress `json:"owner"`    // the current owner address of the token
+	To      sdk.AccAddress `json:"to"`       // address of mint token to
+	Amount  uint64         `json:"amount"`   // amount of mint token
+}
+
+// NewMsgMintToken creates a MsgMintToken
+func NewMsgMintToken(tokenId string, owner, to sdk.AccAddress, amount uint64) MsgMintToken {
+	tokenId = strings.TrimSpace(tokenId)
+	return MsgMintToken{
+		TokenId: tokenId,
+		Owner:   owner,
+		To:      to,
+		Amount:  amount,
+	}
+}
+
+// Route implements Msg
+func (msg MsgMintToken) Route() string { return MsgRoute }
+
+// Type implements Msg
+func (msg MsgMintToken) Type() string { return "mint_token" }
+
+// GetSignBytes implements Msg
+func (msg MsgMintToken) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+// ValidateBasic implements Msg
+func (msg MsgMintToken) ValidateBasic() sdk.Error {
+	// check the owner
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
+	}
+
+	if msg.Amount <= 0 || msg.Amount > MaximumAssetMaxSupply {
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
+	}
+
+	return CheckTokenID(msg.TokenId)
 }

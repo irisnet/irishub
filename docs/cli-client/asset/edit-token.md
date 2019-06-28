@@ -27,7 +27,7 @@ iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-
 iriscli asset edit-token eth --name="ETH TOKEN" --symbol-at-source="ETH" --symbol-min-alias=atto --max-supply=100000000000 --mintable=true --from=node0 --chain-id=irishub-test --fee=0.4iris  --home=$iris_root_path --commit
 ```
 
-输出信息:
+Output:
 ```txt
 Password to sign with 'node0':
 Committed at block 502 (tx hash: 3D131F2D1E0B200206E8023E70C9442142DA27EBC42675451E39BF84B6343C6F, response:

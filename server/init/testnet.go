@@ -238,6 +238,7 @@ func initGenFiles(
 	cdc *codec.Codec, chainID string, accs []v1.GenesisFileAccount,
 	genFiles []string, numValidators int,
 ) error {
+
 	appGenState := v1.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
 

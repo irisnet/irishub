@@ -27,6 +27,7 @@ const (
 
 	FlagSubject = "subject"
 	FlagID      = "id"
+	FlagAmount  = "amount"
 )
 
 var (
@@ -37,6 +38,7 @@ var (
 	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
 	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
 	FsTransferTokenOwner   = flag.NewFlagSet("", flag.ContinueOnError)
+	FsMintToken            = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -76,4 +78,7 @@ func init() {
 	FsEditToken.Bool(FlagMintable, false, "whether the token can be minted, default false")
 
 	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
+
+	FsMintToken.String(FlagTo, "", "address of mint token to")
+	FsMintToken.Uint64(FlagAmount, 0, "amount of mint token")
 }

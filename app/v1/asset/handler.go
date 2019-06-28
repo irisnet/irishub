@@ -21,6 +21,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgEditToken(ctx, k, msg)
 		case MsgTransferGatewayOwner:
 			return handleMsgTransferGatewayOwner(ctx, k, msg)
+		case MsgMintToken:
+			return handleMsgMintToken(ctx, k, msg)
 		case MsgTransferTokenOwner:
 			return handleMsgTransferTokenOwner(ctx, k, msg)
 		default:
@@ -133,6 +135,18 @@ func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGat
 // handleMsgTransferTokenOwner handles MsgTransferTokenOwner
 func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferTokenOwner) sdk.Result {
 	tags, err := k.TransferTokenOwner(ctx, msg)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// handleMsgMintToken handles MsgMintToken
+func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
+	tags, err := k.MintToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
