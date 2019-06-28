@@ -313,20 +313,20 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	}
 
 	id := params.ID
-	if err := CheckAssetID(id); err != nil {
+	if err := CheckTokenID(id); err != nil {
 		return nil, err
 	}
 
-	source, symbol := ParseAssetID(id)
+	prefix, symbol := ParseTokenID(id)
 
 	var (
 		issueFee sdk.Coin
 		mintFee  sdk.Coin
 	)
 
-	if source == "x" {
+	if prefix == "x" {
 		return nil, sdk.ErrUnknownRequest("unsupported token source: external")
-	} else if source == "" || source == "i" {
+	} else if prefix == "" || prefix == "i" {
 		issueFee = getTokenIssueFee(ctx, keeper, symbol)
 		mintFee = getTokenMintFee(ctx, keeper, symbol)
 	} else {

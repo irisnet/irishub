@@ -174,13 +174,13 @@ func GetTokenID(source AssetSource, symbol string, gateway string) (string, type
 	}
 }
 
-// CheckAssetID checks if the given asset id is valid
-func CheckAssetID(id string) sdk.Error {
-	source, symbol := ParseAssetID(id)
+// CheckTokenID checks if the given token id is valid
+func CheckTokenID(id string) sdk.Error {
+	prefix, symbol := ParseTokenID(id)
 
 	// check gateway moniker
-	if source != "" && source != "i" && source != "x" {
-		if err := ValidateMoniker(source); err != nil {
+	if prefix != "" && prefix != "i" && prefix != "x" {
+		if err := ValidateMoniker(prefix); err != nil {
 			return err
 		}
 	}
@@ -193,13 +193,13 @@ func CheckAssetID(id string) sdk.Error {
 	return nil
 }
 
-// ParseAssetID returns the source and symbol
-func ParseAssetID(id string) (source string, symbol string) {
+// ParseTokenID returns the source prefix and symbol
+func ParseTokenID(id string) (prefix string, symbol string) {
 	parts := strings.Split(strings.ToLower(id), ".")
 
 	if len(parts) > 1 {
 		// external or gateway asset
-		source = parts[0]
+		prefix = parts[0]
 		symbol = strings.Join(parts[1:], ".")
 	} else {
 		symbol = parts[0]

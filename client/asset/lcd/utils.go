@@ -185,7 +185,7 @@ func queryTokenFees(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 		vars := mux.Vars(r)
 
 		id := vars["id"]
-		if err := asset.CheckAssetID(id); err != nil {
+		if err := asset.CheckTokenID(id); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
