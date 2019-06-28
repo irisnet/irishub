@@ -51,6 +51,7 @@ func TestIrisCLIToken(t *testing.T) {
 	spStr += fmt.Sprintf(" --symbol-at-source=%s", symbolAtSource)
 	spStr += fmt.Sprintf(" --symbol-min-alias=%s", symbolMinAlias)
 	spStr += fmt.Sprintf(" --gateway=%s", gateway)
+	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
@@ -190,4 +191,69 @@ func TestIrisCLIGateway(t *testing.T) {
 
 	gateways = executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", fooAddr.String(), flags))
 	require.Equal(t, 0, len(gateways))
+}
+
+func TestIrisCLIEditToken(t *testing.T) {
+	t.Parallel()
+	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
+
+	flags := fmt.Sprintf("--home=%s --node=%v --chain-id=%v --output=json", iriscliHome, servAddr, chainID)
+
+	// start iris server
+	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
+
+	defer proc.Stop(false)
+	tests.WaitForTMStart(port)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
+
+	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooCoin := convertToIrisBaseAccount(t, fooAcc)
+	require.Equal(t, "50iris", fooCoin)
+
+	family := "fungible"
+	source := "native"
+	symbol := "AbcdefgH"
+	name := "Bitcoin"
+	initialSupply := 100000000
+	decimal := 18
+	symbolAtSource := "Btc"
+	symbolMinAlias := "Satoshi"
+	gateway := "ABC"
+
+	// issue a token
+	spStr := fmt.Sprintf("iriscli asset issue-token %v", flags)
+	spStr += fmt.Sprintf(" --from=%s", "foo")
+	spStr += fmt.Sprintf(" --family=%s", family)
+	spStr += fmt.Sprintf(" --source=%s", source)
+	spStr += fmt.Sprintf(" --symbol=%s", symbol)
+	spStr += fmt.Sprintf(" --name=%s", name)
+	spStr += fmt.Sprintf(" --initial-supply=%d", initialSupply)
+	spStr += fmt.Sprintf(" --decimal=%d", decimal)
+	spStr += fmt.Sprintf(" --symbol-at-source=%s", symbolAtSource)
+	spStr += fmt.Sprintf(" --symbol-min-alias=%s", symbolMinAlias)
+	spStr += fmt.Sprintf(" --gateway=%s", gateway)
+	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+
+	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
+	tests.WaitForNextNBlocksTM(2, port)
+
+	//
+	editTokenStr := fmt.Sprintf("iriscli asset edit-token %s", strings.ToLower(strings.TrimSpace(symbol)))
+	editTokenStr += fmt.Sprintf(" --from=%s", "foo")
+	editTokenStr += fmt.Sprintf(" --name=%s", "BTC_Token")
+	editTokenStr += fmt.Sprintf(" --symbol-at-source=%s", "BTC1")
+	editTokenStr += fmt.Sprintf(" --max-supply=%d", 200000000)
+	editTokenStr += fmt.Sprintf(" --mintable=%v", true)
+	editTokenStr += fmt.Sprintf(" --fee=%s %v", "0.4iris", flags)
+	require.True(t, executeWrite(t, editTokenStr, sdk.DefaultKeyPass))
+	tests.WaitForNextNBlocksTM(2, port)
+
+	token := executeGetToken(t, fmt.Sprintf("iriscli asset query-token %s --output=json %v", strings.ToLower(strings.TrimSpace(symbol)), flags))
+
+	require.Equal(t, "BTC_Token", token.Name)
+	require.Equal(t, "btc1", token.SymbolAtSource)
+	require.Equal(t, sdk.NewIntWithDecimal(int64(200000000), decimal), token.MaxSupply)
+	require.Equal(t, true, token.Mintable)
 }

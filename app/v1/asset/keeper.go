@@ -225,7 +225,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 	// get the destination token
 	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
-		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
@@ -356,4 +356,53 @@ func (k Keeper) GetAllGateways(ctx sdk.Context) sdk.Iterator {
 
 func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, DefaultParams())
+}
+
+// TransferTokenOwner transfers the owner of the specified token to a new one
+func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
+	// get the destination token
+	token, exist := k.getToken(ctx, msg.TokenId)
+	if !exist {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s don't exist", msg.TokenId))
+	}
+
+	if token.Source != NATIVE {
+		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the source of the token is native can be transferd,but current the source of the token is %s", token.Source.String()))
+	}
+
+	if !msg.SrcOwner.Equals(token.Owner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.SrcOwner, token.Owner))
+	}
+
+	token.Owner = msg.DstOwner
+
+	// update token information
+	if err := k.SetToken(ctx, token); err != nil {
+		return nil, err
+	}
+
+	// reset all index for query-token
+	if err := k.resetStoreKeyForQueryToken(ctx, msg, token); err != nil {
+		return nil, err
+	}
+	tags := sdk.NewTags(
+		tags.Id, []byte(msg.TokenId),
+	)
+
+	return tags, nil
+}
+
+// reset all index by DstOwner of token for query-token command
+func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg MsgTransferTokenOwner, token FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return err
+	}
+	// delete the old key
+	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
+
+	// add the new key
+	return k.SetTokens(ctx, msg.DstOwner, token)
 }
