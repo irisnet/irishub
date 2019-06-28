@@ -14,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func TestGatewayExportGenesis(t *testing.T) {
+func TestExportGatewayGenesis(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
@@ -27,6 +27,9 @@ func TestGatewayExportGenesis(t *testing.T) {
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+
+	// init params
+	keeper.Init(ctx)
 
 	// define variables
 	owners := []sdk.AccAddress{
