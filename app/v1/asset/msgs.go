@@ -624,7 +624,7 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 func (msg MsgMintToken) ValidateBasic() sdk.Error {
 	// check the owner
 	if len(msg.Owner) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the gateway must be specified"))
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
 	}
 
 	if msg.Amount <= 0 || msg.Amount > MaximumAssetMaxSupply {

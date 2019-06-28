@@ -417,7 +417,7 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 	}
 
 	if !token.Mintable {
-		return nil, ErrAssetNotMintAble(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
+		return nil, ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
 	}
 
 	hasIssueAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
