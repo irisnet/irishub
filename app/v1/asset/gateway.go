@@ -15,6 +15,17 @@ type Gateway struct {
 	Website  string         `json:"website"`  //  the external website of the gateway
 }
 
+// NewGateway constructs a gateway
+func NewGateway(owner sdk.AccAddress, moniker, identity, details, website string) Gateway {
+	return Gateway{
+		Owner:    owner,
+		Moniker:  moniker,
+		Identity: identity,
+		Details:  details,
+		Website:  website,
+	}
+}
+
 // Validate checks if a gateway is valid
 func (g Gateway) Validate() sdk.Error {
 	// check the moniker
