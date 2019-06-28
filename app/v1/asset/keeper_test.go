@@ -439,9 +439,15 @@ func TestMintTokenKeeper(t *testing.T) {
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	keeper.Init(ctx)
+
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
+	amtCoin, _ := sdk.NewIntFromString("1000000000000000000000000000")
+	coin := sdk.Coins{sdk.NewCoin("iris-atto", amtCoin)}
+	bk.AddCoins(ctx, addr, coin)
+	ak.IncreaseTotalLoosenToken(ctx, coin)
 
 	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
 	_, err := keeper.IssueToken(ctx, ft)
