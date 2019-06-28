@@ -317,7 +317,7 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		return nil, err
 	}
 
-	prefix, symbol := ParseTokenID(id)
+	prefix, symbol := GetTokenIDParts(id)
 
 	var (
 		issueFee sdk.Coin

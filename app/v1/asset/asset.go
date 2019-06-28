@@ -176,7 +176,7 @@ func GetTokenID(source AssetSource, symbol string, gateway string) (string, type
 
 // CheckTokenID checks if the given token id is valid
 func CheckTokenID(id string) sdk.Error {
-	prefix, symbol := ParseTokenID(id)
+	prefix, symbol := GetTokenIDParts(id)
 
 	// check gateway moniker
 	if prefix != "" && prefix != "i" && prefix != "x" {
@@ -193,8 +193,8 @@ func CheckTokenID(id string) sdk.Error {
 	return nil
 }
 
-// ParseTokenID returns the source prefix and symbol
-func ParseTokenID(id string) (prefix string, symbol string) {
+// GetTokenIDParts returns the source prefix and symbol
+func GetTokenIDParts(id string) (prefix string, symbol string) {
 	parts := strings.Split(strings.ToLower(id), ".")
 
 	if len(parts) > 1 {
