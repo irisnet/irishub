@@ -26,8 +26,8 @@ func preSignCmd(cmd *cobra.Command, _ []string) {
 	}
 }
 
-// GetCmdIssueAsset implements the issue asset command
-func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
+// GetCmdIssueToken implements the issue asset command
+func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
 		Short: "issue a new token",
@@ -53,7 +53,7 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 			}
 
 			source, ok := asset.StringToAssetSourceMap[strings.ToLower(viper.GetString(FlagSource))]
-			if !ok {
+			if !ok || source == asset.EXTERNAL {
 				return fmt.Errorf("invalid token source type %s", viper.GetString(FlagSource))
 			}
 
@@ -74,6 +74,36 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
+			}
+
+			var prompt = "The token issue transaction will consume extra fee"
+
+			if !viper.GetBool(client.FlagGenerateOnly) {
+				tokenId, err := asset.GetTokenID(msg.Source, msg.Symbol, msg.Gateway)
+				if err != nil {
+					return fmt.Errorf("failed to query token issue fee: %s", err.Error())
+				}
+
+				// query fee
+				fee, err1 := queryTokenFees(cliCtx, tokenId)
+				if err1 != nil {
+					return fmt.Errorf("failed to query token issue fee: %s", err1.Error())
+				}
+
+				// append issue fee to prompt
+				issueFeeMainUnit := sdk.Coins{fee.IssueFee}.MainUnitString()
+				prompt += fmt.Sprintf(": %s", issueFeeMainUnit)
+			}
+
+			// a confirmation is needed
+			prompt += "\nAre you sure to proceed?"
+			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
+			if err != nil {
+				return err
+			}
+
+			if !confirmed {
+				return fmt.Errorf("operation aborted")
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -300,6 +330,53 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagMoniker)
 	cmd.MarkFlagRequired(FlagTo)
 
+	return cmd
+}
+
+func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "mint-token",
+		Short:   "The asset owner and operator can directly mint tokens to a specified address",
+		Example: "iriscli asset mint-token <token-id> [flags]",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			owner, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			amount := uint64(viper.GetInt64(FlagAmount))
+			var to sdk.AccAddress
+			addr := viper.GetString(FlagTo)
+			if len(strings.TrimSpace(addr)) > 0 {
+				to, err = sdk.AccAddressFromBech32(addr)
+				if err != nil {
+					return err
+				}
+			}
+
+			var msg sdk.Msg
+			msg = asset.NewMsgMintToken(
+				args[0], owner, to, amount,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsMintToken)
+	cmd.MarkFlagRequired(FlagAmount)
 	return cmd
 }
 

@@ -147,6 +147,71 @@ func TestCreateGatewayKeeper(t *testing.T) {
 	require.Equal(t, gateway, res)
 }
 
+func TestEditGatewayKeeper(t *testing.T) {
+	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+
+	cdc := codec.New()
+	RegisterCodec(cdc)
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	guardianKeeper := guardian.Keeper{}
+	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
+	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+
+	// define variables
+	owner := ak.NewAccountWithAddress(ctx, []byte("owner")).GetAddress()
+	moniker := "moniker"
+	identity := "identity"
+	details := "details"
+	website := "website"
+	newIdentity := "new identity"
+	newDetails := "new details"
+	newWebsite := "new website"
+
+	// build a MsgCreateGateway
+	createMsg := NewMsgCreateGateway(owner, moniker, identity, details, website)
+
+	// create a gateway and assert that the gateway exists now
+	_, err := keeper.CreateGateway(ctx, createMsg)
+	require.Nil(t, err)
+	require.True(t, keeper.HasGateway(ctx, moniker))
+
+	// assert GetGateway will return the previous gateway
+	res, _ := keeper.GetGateway(ctx, moniker)
+	require.Equal(t, identity, res.Identity)
+	require.Equal(t, details, res.Details)
+	require.Equal(t, website, res.Website)
+
+	// build a MsgEditGateway
+	editMsg := NewMsgEditGateway(owner, moniker, newIdentity, newDetails, newWebsite)
+
+	// edit the gateway
+	_, err = keeper.EditGateway(ctx, editMsg)
+	require.Nil(t, err)
+
+	// assert GetGateway will return the new filed values
+	res, _ = keeper.GetGateway(ctx, moniker)
+	require.Equal(t, newIdentity, res.Identity)
+	require.Equal(t, newDetails, res.Details)
+	require.Equal(t, newWebsite, res.Website)
+
+	// build another MsgEditGateway with details and website not updated
+	editMsg = NewMsgEditGateway(owner, moniker, identity, DoNotModify, DoNotModify)
+
+	// edit the gateway again
+	_, err = keeper.EditGateway(ctx, editMsg)
+	require.Nil(t, err)
+
+	// assert GetGateway will return the gateway with only identity updated
+	res, _ = keeper.GetGateway(ctx, moniker)
+	require.Equal(t, identity, res.Identity)
+	require.Equal(t, newDetails, res.Details)
+	require.Equal(t, newWebsite, res.Website)
+}
+
 func TestQueryGatewayKeeper(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 
@@ -324,6 +389,47 @@ func TestTransferGatewayKeeper(t *testing.T) {
 	// transfer again and assert that the error will occur because of the ownership has been transferred
 	_, err = keeper.TransferGatewayOwner(ctx, transferMsg)
 	assert.Error(t, err)
+}
+
+func TestMintTokenKeeper(t *testing.T) {
+	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+
+	cdc := codec.New()
+	RegisterCodec(cdc)
+	auth.RegisterBaseAccount(cdc)
+
+	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
+	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
+	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	addr := sdk.AccAddress([]byte("addr1"))
+
+	acc := ak.NewAccountWithAddress(ctx, addr)
+
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
+	_, err := keeper.IssueToken(ctx, ft)
+	assert.NoError(t, err)
+
+	assert.True(t, keeper.HasToken(ctx, "btc"))
+
+	asset, found := keeper.getToken(ctx, "btc")
+	assert.True(t, found)
+
+	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
+	assert.Equal(t, ft.Owner, ft.Owner)
+
+	msgJson, _ := json.Marshal(ft)
+	assetJson, _ := json.Marshal(asset)
+	assert.Equal(t, msgJson, assetJson)
+
+	msgMintToken := NewMsgMintToken("btc", acc.GetAddress(), nil, 1000)
+	_, err = keeper.MintToken(ctx, msgMintToken)
+	assert.NoError(t, err)
+
+	balance := bk.GetCoins(ctx, acc.GetAddress())
+	amt := balance.AmountOf("btc-min")
+	assert.Equal(t, "2000", amt.String())
 }
 
 func TestTransferOwnerKeeper(t *testing.T) {

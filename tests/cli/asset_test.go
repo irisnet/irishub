@@ -53,7 +53,7 @@ func TestIrisCLIToken(t *testing.T) {
 	spStr += fmt.Sprintf(" --gateway=%s", gateway)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
-	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, "y", sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// TODO: check balance
