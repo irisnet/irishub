@@ -583,7 +583,7 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 
 // MsgMintToken for mint the token to a specified address
 type MsgMintToken struct {
-	TokenId string         `json:"token_Id"` // the unique id of the token
+	TokenId string         `json:"token_id"` // the unique id of the token
 	Owner   sdk.AccAddress `json:"owner"`    // the current owner address of the token
 	To      sdk.AccAddress `json:"to"`       // address of mint token to
 	Amount  uint64         `json:"amount"`   // amount of mint token
