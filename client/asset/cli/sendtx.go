@@ -26,8 +26,8 @@ func preSignCmd(cmd *cobra.Command, _ []string) {
 	}
 }
 
-// GetCmdIssueAsset implements the issue asset command
-func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
+// GetCmdIssueToken implements the issue asset command
+func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
 		Short: "issue a new token",
@@ -53,7 +53,7 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 			}
 
 			source, ok := asset.StringToAssetSourceMap[strings.ToLower(viper.GetString(FlagSource))]
-			if !ok {
+			if !ok || source == asset.EXTERNAL {
 				return fmt.Errorf("invalid token source type %s", viper.GetString(FlagSource))
 			}
 
@@ -74,6 +74,36 @@ func GetCmdIssueAsset(cdc *codec.Codec) *cobra.Command {
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
+			}
+
+			var prompt = "The token issue transaction will consume extra fee"
+
+			if !viper.GetBool(client.FlagGenerateOnly) {
+				tokenId, err := asset.GetTokenID(msg.Source, msg.Symbol, msg.Gateway)
+				if err != nil {
+					return fmt.Errorf("failed to query token issue fee: %s", err.Error())
+				}
+
+				// query fee
+				fee, err1 := queryTokenFees(cliCtx, tokenId)
+				if err1 != nil {
+					return fmt.Errorf("failed to query token issue fee: %s", err1.Error())
+				}
+
+				// append issue fee to prompt
+				issueFeeMainUnit := sdk.Coins{fee.IssueFee}.MainUnitString()
+				prompt += fmt.Sprintf(": %s", issueFeeMainUnit)
+			}
+
+			// a confirmation is needed
+			prompt += "\nAre you sure to proceed?"
+			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
+			if err != nil {
+				return err
+			}
+
+			if !confirmed {
+				return fmt.Errorf("operation aborted")
 			}
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})

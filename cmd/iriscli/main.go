@@ -262,10 +262,10 @@ func main() {
 			assetcmd.GetCmdCreateGateway(cdc),
 			assetcmd.GetCmdEditGateway(cdc),
 			assetcmd.GetCmdTransferGatewayOwner(cdc),
-			assetcmd.GetCmdIssueAsset(cdc),
-			assetcmd.GetCmdMintToken(cdc),
+			assetcmd.GetCmdIssueToken(cdc),
 			assetcmd.GetCmdTransferTokenOwner(cdc),
 			assetcmd.GetCmdEditAsset(cdc),
+			assetcmd.GetCmdMintToken(cdc),
 		)...)
 
 	assetCmd.AddCommand(
