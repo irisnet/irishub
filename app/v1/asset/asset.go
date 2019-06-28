@@ -179,7 +179,7 @@ func CheckAssetID(id string) sdk.Error {
 	source, symbol := ParseAssetID(id)
 
 	// check gateway moniker
-	if source != "" && source != "x" {
+	if source != "" && source != "i" && source != "x" {
 		if err := ValidateMoniker(source); err != nil {
 			return err
 		}

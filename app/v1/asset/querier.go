@@ -324,7 +324,9 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		mintFee  sdk.Coin
 	)
 
-	if source == "" || source == "x" {
+	if source == "x" {
+		return nil, sdk.ErrUnknownRequest("unsupported token source: external")
+	} else if source == "" || source == "i" {
 		issueFee = getTokenIssueFee(ctx, keeper, symbol)
 		mintFee = getTokenMintFee(ctx, keeper, symbol)
 	} else {
