@@ -399,7 +399,7 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 	}
 
 	// check the tokenId
-	if err := CheckAssetID(msg.TokenId); err != nil {
+	if err := CheckTokenID(msg.TokenId); err != nil {
 		return err
 	}
 
@@ -548,7 +548,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 	}
 
 	//check token_id
-	if err := CheckAssetID(msg.TokenId); err != nil {
+	if err := CheckTokenID(msg.TokenId); err != nil {
 		return err
 	}
 
