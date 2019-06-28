@@ -15,6 +15,21 @@ type Gateway struct {
 	Website  string         `json:"website"`  //  the external website of the gateway
 }
 
+// Validate checks if a gateway is valid
+func (g Gateway) Validate() sdk.Error {
+	// check the moniker
+	if err := ValidateMoniker(g.Moniker); err != nil {
+		return err
+	}
+
+	// check the description fields
+	if err := validateGatewayDesc(&g.Identity, &g.Details, &g.Website); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // String implements fmt.Stringer
 func (g Gateway) String() string {
 	return fmt.Sprintf(`Gateway:
