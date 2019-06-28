@@ -438,6 +438,23 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
 	}
 
+	switch token.Source {
+	case NATIVE:
+		// handle fee for native token
+		if err := TokenMintFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
+			return nil, err
+		}
+		break
+	case GATEWAY:
+		// handle fee for gateway token
+		if err := GatewayTokenMintFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
+			return nil, err
+		}
+		break
+	default:
+		break
+	}
+
 	mintCoin := sdk.NewCoin(expDenom, mintAmt)
 	//add TotalSupply
 	if err := k.bk.IncreaseTotalSupply(ctx, mintCoin); err != nil {
