@@ -7,9 +7,8 @@
 ## 使用方式
 
 ```
-iriscli asset issue [flags]
+iriscli asset issue-token [flags]
 ```
-
 
 ## 标志
 
