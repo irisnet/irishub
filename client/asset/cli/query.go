@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// GetCmdQueryAsset implements the query asset command.
-func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryToken implements the query token command.
+func GetCmdQueryToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-token",
 		Short:   "Query details of a token",
@@ -45,6 +45,46 @@ func GetCmdQueryAsset(cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(token)
 		},
 	}
+
+	return cmd
+}
+
+// GetCmdQueryTokens implements the query tokens command.
+func GetCmdQueryTokens(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "query-tokens",
+		Short:   "Query details of a group of tokens",
+		Example: "iriscli asset query-tokens --source=<native|gateway|external> --gateway=<gateway_moniker> --owner=<address>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			params := asset.QueryTokensParams{
+				Source:  viper.GetString(FlagSource),
+				Gateway: viper.GetString(FlagGateway),
+				Owner:   viper.GetString(FlagOwner),
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryTokens), bz)
+			if err != nil {
+				return err
+			}
+
+			var tokens asset.Tokens
+			err = cdc.UnmarshalJSON(res, &tokens)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(tokens)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsTokensQuery)
 
 	return cmd
 }

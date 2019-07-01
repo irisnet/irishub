@@ -124,7 +124,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var tokens []FungibleToken
+	var tokens Tokens
 
 	// Add iris to the list
 	if source == NATIVE && owner.Empty() {
@@ -246,15 +246,10 @@ func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) 
 func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
 	var gateways = make([]Gateway, 0)
 
-	gatewaysIterator := keeper.GetAllGateways(ctx)
-	defer gatewaysIterator.Close()
-
-	for ; gatewaysIterator.Valid(); gatewaysIterator.Next() {
-		var gateway Gateway
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(gatewaysIterator.Value(), &gateway)
-
-		gateways = append(gateways, gateway)
-	}
+	keeper.IterateGateways(ctx, func(gw Gateway) (stop bool) {
+		gateways = append(gateways, gw)
+		return false
+	})
 
 	return gateways
 }
