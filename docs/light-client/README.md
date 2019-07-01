@@ -150,7 +150,9 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
     7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
     8. `PUT /asset/tokens/{token-id}`: Edit an existing token
-
+9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
+    10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
+    
 11. Query app version
 
     1. `GET /version`: Version of IRISLCD

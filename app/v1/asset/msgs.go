@@ -380,7 +380,7 @@ func (msg MsgTransferTokenOwner) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.SrcOwner, msg.DstOwner}
+	return []sdk.AccAddress{msg.SrcOwner}
 }
 
 func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
