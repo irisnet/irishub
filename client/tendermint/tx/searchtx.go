@@ -70,7 +70,7 @@ $ iriscli tendermint txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			txs, err := searchTxs(cliCtx, cdc, tmTags, page, size)
+			txs, err := SearchTxs(cliCtx, cdc, tmTags, page, size)
 			if err != nil {
 				return err
 			}
@@ -96,7 +96,7 @@ $ iriscli tendermint txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 	return cmd
 }
 
-func searchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page, size int) ([]Info, error) {
+func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page, size int) ([]Info, error) {
 	if len(tags) == 0 {
 		return nil, errors.New("must declare at least one tag to search")
 	}
@@ -207,7 +207,7 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		txs, err = searchTxs(cliCtx, cdc, tags, int(page), int(size))
+		txs, err = SearchTxs(cliCtx, cdc, tags, int(page), int(size))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
