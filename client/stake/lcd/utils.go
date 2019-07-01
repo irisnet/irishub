@@ -15,7 +15,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake/tags"
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
 
 // contains checks if the a given query contains one of the tx types
@@ -29,26 +28,14 @@ func contains(stringSlice []string, txType string) bool {
 }
 
 // queries staking txs
-func queryTxs(node rpcclient.Client, cliCtx context.CLIContext, cdc *codec.Codec, tag string, delegatorAddr string) ([]tx.Info, error) {
+func queryTxs(cliCtx context.CLIContext, cdc *codec.Codec, tag string, delegatorAddr string) ([]tx.Info, error) {
 	page := 0
 	perPage := 100
-	prove := !cliCtx.TrustNode
-	query := fmt.Sprintf("%s='%s' AND %s='%s'", tags.Action, tag, tags.Delegator, delegatorAddr)
-	res, err := node.TxSearch(query, prove, page, perPage)
-	if err != nil {
-		return nil, err
+	tags := []string{
+		fmt.Sprintf("%s='%s'", tags.Action, tag),
+		fmt.Sprintf("%s='%s'", tags.Delegator, delegatorAddr),
 	}
-
-	if prove {
-		for _, txData := range res.Txs {
-			err := tx.ValidateTxResult(cliCtx, txData)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return tx.FormatTxResults(cdc, res.Txs)
+	return tx.SearchTxs(cliCtx, cdc, tags, page, perPage)
 }
 
 func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
