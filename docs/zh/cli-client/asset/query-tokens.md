@@ -16,7 +16,7 @@ iriscli asset query-tokens [flags]
 | ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
 | --source           | string  | false    | all           | 资产源: native / gateway / external                           |
 | --gateway          | string  | false    |               | 网关的唯一标识，当 source 为 gateway 时必填                  |
-| --owner            | string  | false    |               | 网关的唯一标识，当 source 为 gateway 时必填                  |
+| --owner            | string  | false    |               | 资产所有人                   |
 
 ## 查询规则
 
