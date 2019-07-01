@@ -149,34 +149,7 @@ func TestIrisCLIGateway(t *testing.T) {
 	tgStr += fmt.Sprintf(" --to=%s", barAddr.String())
 	tgStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
-	// execute cmd and return sdtout(unsigned tx)
-	success, stdout, _ := executeWriteRetStdStreams(t, tgStr, sdk.DefaultKeyPass)
-	require.True(t, success)
-
-	// write unsigned tx to a file
-	file := "tx.json"
-	echoStr := fmt.Sprintf("echo %s >> %s", stdout, file)
-	require.True(t, executeWrite(t, echoStr, sdk.DefaultKeyPass))
-
-	// sign the tx using the current owner
-	ownerSignStr := fmt.Sprintf("iriscli tx sign %s %v", file, flags)
-	ownerSignStr += fmt.Sprintf(" --output-document=%s", file)
-	ownerSignStr += fmt.Sprintf(" --name=%s", "foo")
-
-	require.True(t, executeWrite(t, ownerSignStr, sdk.DefaultKeyPass))
-
-	// sign the tx using the new owner
-	newOwnerSignStr := fmt.Sprintf("iriscli tx sign %s %v", file, flags)
-	newOwnerSignStr += fmt.Sprintf(" --output-document=%s", file)
-	newOwnerSignStr += fmt.Sprintf(" --name=%s", "bar")
-
-	require.True(t, executeWrite(t, newOwnerSignStr, sdk.DefaultKeyPass))
-
-	// broadcast the signed tx
-	bcTxStr := fmt.Sprintf("iriscli tx broadcast %s %v", file, flags)
-	bcTxStr += " --commit"
-
-	require.True(t, executeWrite(t, newOwnerSignStr, sdk.DefaultKeyPass))
+	require.True(t, executeWrite(t, tgStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
 	gateway = executeGetGateway(t, fmt.Sprintf("iriscli asset query-gateway --moniker=%s %v", moniker, flags))
