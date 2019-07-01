@@ -289,7 +289,7 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "transfer-gateway-owner",
-		Short: "build an unsigned tx to transfer the owner of a gateway",
+		Short: "transfer the owner of a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -318,9 +318,6 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-
-			// enable generate-only
-			cliCtx.GenerateOnly = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},

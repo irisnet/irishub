@@ -473,8 +473,7 @@ func (msg MsgTransferGatewayOwner) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgTransferGatewayOwner) GetSigners() []sdk.AccAddress {
-	// the msg needs signatures from both the original owner and the new one
-	return []sdk.AccAddress{msg.Owner, msg.To}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // MsgEditToken for editing a specified token
