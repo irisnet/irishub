@@ -87,14 +87,7 @@ func TestKeeper_IssueGatewayToken(t *testing.T) {
 	details := "details"
 	website := "website"
 
-	// construct a test gateway
-	gateway := Gateway{
-		Owner:    gatewayOwner.GetAddress(),
-		Moniker:  moniker,
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
+	gateway := NewGateway(gatewayOwner.GetAddress(), moniker, identity, details, website)
 	gatewayToken := NewFungibleToken(GATEWAY, "test", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner.GetAddress())
 	gatewayToken1 := NewFungibleToken(GATEWAY, "moniker", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner.GetAddress())
 
@@ -140,13 +133,7 @@ func TestCreateGatewayKeeper(t *testing.T) {
 	website := "website"
 
 	// construct a test gateway
-	gateway := Gateway{
-		Owner:    owner.GetAddress(),
-		Moniker:  moniker,
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
+	gateway := NewGateway(owner.GetAddress(), moniker, identity, details, website)
 
 	// assert the gateway of the given moniker does not exist at the beginning
 	require.False(t, keeper.HasGateway(ctx, moniker))
@@ -249,21 +236,8 @@ func TestQueryGatewayKeeper(t *testing.T) {
 	)
 
 	// construct gateways
-	gateway1 := Gateway{
-		Owner:    owners[0],
-		Moniker:  monikers[0],
-		Identity: identities[0],
-		Details:  details[0],
-		Website:  websites[0],
-	}
-
-	gateway2 := Gateway{
-		Owner:    owners[1],
-		Moniker:  monikers[1],
-		Identity: identities[1],
-		Details:  details[1],
-		Website:  websites[1],
-	}
+	gateway1 := NewGateway(owners[0], monikers[0], identities[0], details[0], websites[0])
+	gateway2 := NewGateway(owners[1], monikers[1], identities[1], details[1], websites[1])
 
 	// create gateways
 	keeper.SetGateway(ctx, gateway1)
@@ -318,14 +292,10 @@ func TestQueryGatewayKeeper(t *testing.T) {
 
 	// query all gateways
 	var gateways3 []Gateway
-	iter3 := keeper.GetAllGateways(ctx)
-	defer iter3.Close()
-
-	for ; iter3.Valid(); iter3.Next() {
-		var gateway Gateway
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter3.Value(), &gateway)
-		gateways3 = append(gateways3, gateway)
-	}
+	keeper.IterateGateways(ctx, func(gw Gateway) (stop bool) {
+		gateways3 = append(gateways3, gw)
+		return false
+	})
 
 	require.Equal(t, []Gateway{gateway2, gateway1}, gateways3)
 }
@@ -393,13 +363,7 @@ func TestTransferGatewayKeeper(t *testing.T) {
 	website := "website"
 
 	// construct a test gateway
-	gateway := Gateway{
-		Owner:    originOwner.GetAddress(),
-		Moniker:  moniker,
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
+	gateway := NewGateway(originOwner.GetAddress(), moniker, identity, details, website)
 
 	// create a gateway
 	keeper.SetGateway(ctx, gateway)
