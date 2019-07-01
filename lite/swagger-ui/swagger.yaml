@@ -3352,12 +3352,12 @@ paths:
       tags:
         - Asset
       parameters:
-      - in: query
-        name: owner
-        description: the owner address to be queried
-        required: false
-        schema:
-          type: string
+        - in: query
+          name: owner
+          description: the owner address to be queried
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -3660,7 +3660,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/KVPair'
-        coin-flow-record:
+        timestamp:
+          type: string
+          example: '2006-01-02T15:04:05Z07:00'
+        coin_flow:
           type: array
           items:
             type: string
