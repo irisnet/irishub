@@ -370,7 +370,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (
 	}
 
 	if !msg.SrcOwner.Equals(token.Owner) {
-		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.SrcOwner, token.Owner))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.SrcOwner.String(), msg.TokenId))
 	}
 
 	token.Owner = msg.DstOwner
@@ -413,7 +413,7 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 	}
 
 	if !token.Owner.Equals(msg.Owner) {
-		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenId))
 	}
 
 	if !token.Mintable {

@@ -410,7 +410,7 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer-token-owner",
-		Short:   "build an unsigned tx to transfer the owner of a token",
+		Short:   "transfer the owner of a token to a new owner",
 		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -437,9 +437,6 @@ func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-
-			// enable generate-only
-			cliCtx.GenerateOnly = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
