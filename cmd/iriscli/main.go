@@ -270,7 +270,8 @@ func main() {
 
 	assetCmd.AddCommand(
 		client.GetCommands(
-			assetcmd.GetCmdQueryAsset(cdc),
+			assetcmd.GetCmdQueryToken(cdc),
+			assetcmd.GetCmdQueryTokens(cdc),
 			assetcmd.GetCmdQueryGateway(cdc),
 			assetcmd.GetCmdQueryGateways(cdc),
 			assetcmd.GetCmdQueryFee(cdc),

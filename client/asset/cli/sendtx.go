@@ -110,7 +110,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsAssetIssue)
+	cmd.Flags().AddFlagSet(FsTokenIssue)
 	cmd.MarkFlagRequired(FlagFamily)
 	cmd.MarkFlagRequired(FlagSource)
 	cmd.MarkFlagRequired(FlagSymbol)

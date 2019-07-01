@@ -32,7 +32,8 @@ const (
 
 var (
 	FsEditToken            = flag.NewFlagSet("", flag.ContinueOnError)
-	FsAssetIssue           = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTokenIssue           = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTokensQuery          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayCreate        = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
@@ -42,17 +43,21 @@ var (
 )
 
 func init() {
-	FsAssetIssue.String(FlagFamily, "", "the asset family, valid values can be fungible and non-fungible")
-	FsAssetIssue.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
-	FsAssetIssue.String(FlagGateway, "", "the gateway name of gateway asset. required if --source=gateway")
-	FsAssetIssue.String(FlagSymbol, "", "the asset symbol. Once created, it cannot be modified")
-	FsAssetIssue.String(FlagSymbolAtSource, "", "the source symbol of a gateway or external asset")
-	FsAssetIssue.String(FlagName, "", "the asset name, e.g. IRIS Network")
-	FsAssetIssue.Uint8(FlagDecimal, 0, "the asset decimal. The maximum value is 18")
-	FsAssetIssue.String(FlagSymbolMinAlias, "", "the asset symbol minimum alias")
-	FsAssetIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of asset")
-	FsAssetIssue.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply token of asset")
-	FsAssetIssue.Bool(FlagMintable, false, "whether the asset can be minted, default false")
+	FsTokenIssue.String(FlagFamily, "", "the asset family, valid values can be fungible and non-fungible")
+	FsTokenIssue.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
+	FsTokenIssue.String(FlagGateway, "", "the gateway name of gateway token. required if --source=gateway")
+	FsTokenIssue.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
+	FsTokenIssue.String(FlagSymbolAtSource, "", "the source symbol of a gateway or external token")
+	FsTokenIssue.String(FlagName, "", "the token name, e.g. IRIS Network")
+	FsTokenIssue.Uint8(FlagDecimal, 0, "the token decimal. The maximum value is 18")
+	FsTokenIssue.String(FlagSymbolMinAlias, "", "the token symbol minimum alias")
+	FsTokenIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of token")
+	FsTokenIssue.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply of the token")
+	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")
+
+	FsTokensQuery.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
+	FsTokensQuery.String(FlagGateway, "", "the gateway name of gateway token. required if --source=gateway")
+	FsTokensQuery.String(FlagOwner, "", "the owner address to be queried")
 
 	FsGatewayCreate.String(FlagMoniker, "", "the unique gateway name")
 	FsGatewayCreate.String(FlagIdentity, "", "the gateway identity")
