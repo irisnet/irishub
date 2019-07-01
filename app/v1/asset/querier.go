@@ -124,7 +124,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var tokens []FungibleToken
+	var tokens Tokens
 
 	// Add iris to the list
 	if source == NATIVE && owner.Empty() {
