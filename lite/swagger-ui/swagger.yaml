@@ -3493,7 +3493,7 @@ paths:
                 name:
                   type: string
                   example: 'BTC Token'
-  '/asset/tokens/mint/{token-id}':
+  '/asset/tokens/{token-id}/mint':
     post:
       summary: The asset owner and operator can directly mint tokens to a specified address
       parameters:
@@ -3560,7 +3560,7 @@ paths:
                   type: int
                   example: '21000000'
 
-  '/asset/tokens/transfer-owner/{token-id}':
+  '/asset/tokens/{token-id}/transfer-owner':
     post:
       summary: transfer the owner of a token to a new owner
       parameters:

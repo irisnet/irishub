@@ -38,13 +38,13 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// transfer owner
 	r.HandleFunc(
-		"/asset/tokens/transfer-owner/{token-id}",
+		"/asset/tokens/{token-id}/transfer-owner",
 		transferOwnerHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// mint token
 	r.HandleFunc(
-		"/asset/tokens/mint/{token-id}",
+		"/asset/tokens/{token-id}/mint",
 		mintTokenHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
