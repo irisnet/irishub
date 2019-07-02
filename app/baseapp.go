@@ -833,12 +833,13 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 			if abort {
 				return result
 			}
+
+			// accumulate gasWanted
+			gasWanted = gasWanted + result.GasWanted
 		}
 
 		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte*sdk.Gas(len(txBytes)), "blockstore")
-
 		msCache.Write()
-		gasWanted = result.GasWanted
 	}
 
 	if mode == RunTxModeCheck {
