@@ -795,9 +795,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 
 	// run the ante handlers
 	if len(anteHandlers) > 0 {
-		var newCtx sdk.Context
-		var result sdk.Result
-
 		var anteCtx sdk.Context
 		var msCache sdk.CacheMultiStore
 
@@ -809,8 +806,12 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		// performance benefits, but it'll be more difficult to get right.
 		anteCtx, msCache = app.cacheTxContext(ctx, txBytes)
 
+		var newCtx sdk.Context
+		var result sdk.Result
+		var abort bool
+
 		for index, anteHandler := range anteHandlers {
-			newCtx, result, abort := anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
+			newCtx, result, abort = anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
 
 			if !newCtx.IsZero() {
 				// At this point, newCtx.MultiStore() is cache-wrapped, or something else
@@ -827,7 +828,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 				return result
 			}
 
-			// continue with the new ante ctx if updated, previous ante ctx otherwise
+			// continue with the new ctx if updated, previous ante ctx otherwise
 			if index < len(anteHandlers)-1 && !newCtx.IsZero() {
 				anteCtx = newCtx
 			}
