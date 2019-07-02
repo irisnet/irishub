@@ -26,6 +26,9 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 
 	// TODO: init tokens with data.Tokens
+	for _, token := range data.Tokens {
+		k.IssueToken(ctx, token)
+	}
 }
 
 // ExportGenesis - output genesis parameters
@@ -37,8 +40,11 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		return false
 	})
 
-	var tokens []FungibleToken // TODO: extract existing tokens from app state
-
+	var tokens []FungibleToken
+	k.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
+		tokens = append(tokens, token)
+		return false
+	})
 	return GenesisState{
 		Params:   k.GetParamSet(ctx),
 		Tokens:   tokens,

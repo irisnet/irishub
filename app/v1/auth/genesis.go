@@ -9,14 +9,16 @@ type GenesisState struct {
 	CollectedFees sdk.Coins `json:"collected_fee"`
 	FeeAuth       FeeAuth   `json:"data"`
 	Params        Params    `json:"params"`
+	TotalSupply   sdk.Coins `json:"total_supply"`
 }
 
 // Create a new genesis state
-func NewGenesisState(collectedFees sdk.Coins, feeAuth FeeAuth, params Params) GenesisState {
+func NewGenesisState(collectedFees, totalSupply sdk.Coins, feeAuth FeeAuth, params Params) GenesisState {
 	return GenesisState{
 		CollectedFees: collectedFees,
 		FeeAuth:       feeAuth,
 		Params:        params,
+		TotalSupply:   totalSupply,
 	}
 }
 
@@ -40,14 +42,22 @@ func InitGenesis(ctx sdk.Context, keeper FeeKeeper, accountKeeper AccountKeeper,
 
 	keeper.SetFeeAuth(ctx, data.FeeAuth)
 	keeper.SetParamSet(ctx, data.Params)
+	for _, coin := range data.TotalSupply {
+		accountKeeper.SetTotalSupply(ctx, coin)
+	}
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper
-func ExportGenesis(ctx sdk.Context, keeper FeeKeeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, keeper FeeKeeper, ak AccountKeeper) GenesisState {
 	collectedFees := keeper.GetCollectedFees(ctx)
 	feeAuth := keeper.GetFeeAuth(ctx)
 	params := keeper.GetParamSet(ctx)
-	return NewGenesisState(collectedFees, feeAuth, params)
+	var totalSupply sdk.Coins
+	ak.IterateTotalSupply(ctx, func(coin sdk.Coin) (stop bool) {
+		totalSupply = append(totalSupply, coin)
+		return false
+	})
+	return NewGenesisState(collectedFees, totalSupply, feeAuth, params)
 }
 
 func ValidateGenesis(data GenesisState) error {

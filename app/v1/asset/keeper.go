@@ -364,6 +364,23 @@ func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop 
 	}
 }
 
+// IterateTokens iterates through all existing tokens
+func (k Keeper) IterateTokens(ctx sdk.Context, op func(token FungibleToken) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var token FungibleToken
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &token)
+
+		if stop := op(token); stop {
+			break
+		}
+	}
+}
+
 func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, DefaultParams())
 }

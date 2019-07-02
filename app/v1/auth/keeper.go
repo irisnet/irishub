@@ -278,6 +278,20 @@ func TotalSupplyStoreKey(denom string) []byte {
 	return append(totalSupplyKeyPrefix, keyId...)
 }
 
+func (am AccountKeeper) IterateTotalSupply(ctx sdk.Context, op func(coin sdk.Coin) (stop bool)) {
+	store := ctx.KVStore(am.key)
+
+	iterator := sdk.KVStorePrefixIterator(store, totalSupplyKeyPrefix)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var coin sdk.Coin
+		am.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &coin)
+		if stop := op(coin); stop {
+			break
+		}
+	}
+}
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
 	// parameter checking
 	if coin == (sdk.Coin{}) || !coin.IsPositive() {
