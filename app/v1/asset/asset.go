@@ -159,6 +159,15 @@ func (ft FungibleToken) String() string {
 		ft.Decimal, initSupply, maxSupply, ft.Mintable, owner)
 }
 
+func (ft FungibleToken) Sanitize() FungibleToken {
+	ft.Gateway = strings.ToLower(strings.TrimSpace(ft.Gateway))
+	ft.Symbol = strings.ToLower(strings.TrimSpace(ft.Symbol))
+	ft.SymbolAtSource = strings.ToLower(strings.TrimSpace(ft.SymbolAtSource))
+	ft.SymbolMinAlias = strings.ToLower(strings.TrimSpace(ft.SymbolMinAlias))
+	ft.Name = strings.TrimSpace(ft.Name)
+	return ft
+}
+
 type Tokens []FungibleToken
 
 func (tokens Tokens) String() string {
@@ -179,8 +188,9 @@ func (tokens Tokens) Validate() sdk.Error {
 	}
 
 	for _, token := range tokens {
-		initialSupply := uint64(token.InitialSupply.Int64())
-		maxSupply := uint64(token.MaxSupply.Int64())
+		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
+		initialSupply := uint64(token.InitialSupply.Div(exp).Int64())
+		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
 		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.SymbolAtSource, token.Name, token.Decimal, token.SymbolMinAlias, initialSupply, maxSupply, token.Mintable, token.Owner, nil)
 		if err := msg.ValidateBasic(); err != nil {
 			return err
