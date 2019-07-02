@@ -1,6 +1,9 @@
 package protocol
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/crypto"
+)
 
 const (
 	// all store name
@@ -51,4 +54,6 @@ var (
 	KeyGuardian = sdk.NewKVStoreKey(GuardianStore)
 	KeyUpgrade  = sdk.NewKVStoreKey(UpgradeStore)
 	KeyAsset    = sdk.NewKVStoreKey(AssetStore)
+
+	BurnedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
 )

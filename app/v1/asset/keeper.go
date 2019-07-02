@@ -40,46 +40,7 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // IssueToken issue a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
-	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
-	if err != nil {
-		return nil, err
-	}
-	if k.HasToken(ctx, tokenId) {
-		return nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
-	}
-
-	var owner sdk.AccAddress
-	if token.GetSource() == GATEWAY {
-		gateway, err := k.GetGateway(ctx, token.GetGateway())
-		if err != nil {
-			return nil, err
-		}
-		if !gateway.Owner.Equals(token.GetOwner()) {
-			return nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
-				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
-					gateway.Moniker, gateway.Owner, token.GetOwner()))
-		}
-
-		owner = gateway.Owner
-	} else if token.GetSource() == NATIVE {
-		owner = token.GetOwner()
-		token.SymbolAtSource = ""
-		token.Gateway = ""
-	}
-
-	err = k.SetToken(ctx, token)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set token to be prefixed with owner and source
-	err = k.SetTokens(ctx, owner, token)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set token to be prefixed with source
-	err = k.SetTokens(ctx, sdk.AccAddress{}, token)
+	token, owner, err := k.AddToken(ctx, token)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +68,54 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 	)
 
 	return createTags, nil
+}
+
+// save a new token to keystore
+func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, sdk.AccAddress, sdk.Error) {
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	if err != nil {
+		return token, nil, err
+	}
+	if k.HasToken(ctx, tokenId) {
+		return token, nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
+	}
+
+	var owner sdk.AccAddress
+	if token.GetSource() == GATEWAY {
+		gateway, err := k.GetGateway(ctx, token.GetGateway())
+		if err != nil {
+			return token, nil, err
+		}
+		if !gateway.Owner.Equals(token.GetOwner()) {
+			return token, nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
+				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
+					gateway.Moniker, gateway.Owner, token.GetOwner()))
+		}
+
+		owner = gateway.Owner
+	} else if token.GetSource() == NATIVE {
+		owner = token.GetOwner()
+		token.SymbolAtSource = ""
+		token.Gateway = ""
+	}
+
+	err = k.SetToken(ctx, token)
+	if err != nil {
+		return token, nil, err
+	}
+
+	// Set token to be prefixed with owner and source
+	err = k.SetTokens(ctx, owner, token)
+	if err != nil {
+		return token, nil, err
+	}
+
+	// Set token to be prefixed with source
+	err = k.SetTokens(ctx, sdk.AccAddress{}, token)
+	if err != nil {
+		return token, nil, err
+	}
+	return token, owner, nil
 }
 
 func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {

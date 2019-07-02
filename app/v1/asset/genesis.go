@@ -6,9 +6,9 @@ import (
 
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
-	Params   Params          `json:"params"`   // asset params
-	Tokens   []FungibleToken `json:"tokens"`   // issued tokens
-	Gateways []Gateway       `json:"gateways"` // created gateways
+	Params   Params    `json:"params"`   // asset params
+	Tokens   Tokens    `json:"tokens"`   // issued tokens
+	Gateways []Gateway `json:"gateways"` // created gateways
 }
 
 // InitGenesis - store genesis parameters
@@ -25,9 +25,12 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		k.SetOwnerGateway(ctx, gateway.Owner, gateway.Moniker)
 	}
 
-	// TODO: init tokens with data.Tokens
+	//init tokens
 	for _, token := range data.Tokens {
-		k.IssueToken(ctx, token)
+		_, _, err := k.AddToken(ctx, token)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 }
 
@@ -40,7 +43,8 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		return false
 	})
 
-	var tokens []FungibleToken
+	// export created token
+	var tokens Tokens
 	k.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
 		tokens = append(tokens, token)
 		return false
@@ -79,8 +83,11 @@ func ValidateGenesis(data GenesisState) error {
 	}
 
 	// validate gateways
-	err = validateGateways(data.Gateways)
-	if err != nil {
+	if err := validateGateways(data.Gateways); err != nil {
+		return err
+	}
+	// validate tokens
+	if err := data.Tokens.Validate(); err != nil {
 		return err
 	}
 

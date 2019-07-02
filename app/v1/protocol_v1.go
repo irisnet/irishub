@@ -377,7 +377,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	})
 
 	// init system accounts
-	p.bankKeeper.AddCoins(ctx, bank.BurnedCoinsAccAddr, sdk.Coins{})
+	p.bankKeeper.AddCoins(ctx, protocol.BurnedCoinsAccAddr, sdk.Coins{})
 	p.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, sdk.Coins{})
 
 	// load the accounts

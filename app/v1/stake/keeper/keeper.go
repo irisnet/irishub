@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/protocol"
 	"strconv"
 
 	"github.com/irisnet/irishub/codec"
@@ -158,7 +159,7 @@ func (k Keeper) BondDenom() string {
 }
 
 func (k Keeper) UpdateMetrics(ctx sdk.Context) {
-	burnedCoins := k.bankKeeper.GetCoins(ctx, bank.BurnedCoinsAccAddr)
+	burnedCoins := k.bankKeeper.GetCoins(ctx, protocol.BurnedCoinsAccAddr)
 	burnedAmount, err := strconv.ParseFloat(sdk.NewDecFromInt(burnedCoins.AmountOf(types.StakeDenom)).QuoInt(sdk.AttoPrecision).String(), 64)
 	if err == nil {
 		k.metrics.BurnedToken.Set(burnedAmount)

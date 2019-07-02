@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/protocol"
 
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -75,7 +76,9 @@ func (am AccountKeeper) GetAccount(ctx sdk.Context, addr sdk.AccAddress) Account
 
 // Implements sdk.AccountKeeper.
 func (am AccountKeeper) SetGenesisAccount(ctx sdk.Context, acc Account) {
-	am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
+	if !acc.GetAddress().Equals(protocol.BurnedCoinsAccAddr) {
+		am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
+	}
 	am.SetAccount(ctx, acc)
 }
 

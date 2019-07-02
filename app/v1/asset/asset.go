@@ -173,6 +173,22 @@ func (tokens Tokens) String() string {
 	return out[:len(out)-1]
 }
 
+func (tokens Tokens) Validate() sdk.Error {
+	if len(tokens) == 0 {
+		return nil
+	}
+
+	for _, token := range tokens {
+		initialSupply := uint64(token.InitialSupply.Int64())
+		maxSupply := uint64(token.MaxSupply.Int64())
+		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.SymbolAtSource, token.Name, token.Decimal, token.SymbolMinAlias, initialSupply, maxSupply, token.Mintable, token.Owner, nil)
+		if err := msg.ValidateBasic(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // -----------------------------
 
 func GetTokenID(source AssetSource, symbol string, gateway string) (string, types.Error) {
