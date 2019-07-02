@@ -835,7 +835,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 			}
 
 			// accumulate gasWanted
-			gasWanted = gasWanted + result.GasWanted
+			gasWanted += result.GasWanted
 		}
 
 		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte*sdk.Gas(len(txBytes)), "blockstore")
