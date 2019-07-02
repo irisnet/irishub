@@ -3265,30 +3265,62 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
-  '/asset/tokens/{id}':
-    get:
-      summary: Query the token with the specified id
+  '/asset/tokens':
+    post:
+      summary: Generate an unsigned token issue tx
       tags:
         - Asset
-      parameters:
-        - in: path
-          name: id
-          description: the unique id of the destination token
-          required: true
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                family:
+                  type: string
+                  example: 'fungible'
+                source:
+                  type: string
+                  example: 'native'
+                gateway:
+                  type: string
+                  example: ''
+                name:
+                  type: string
+                  example: 'Hello Kitty'
+                symbol:
+                  type: string
+                  example: 'cat'
+                symbol_at_source:
+                  type: string
+                  example: ''
+                symbol_min_alias:
+                  type: string
+                  example: 'kitty'
+                initial_supply:
+                  type: string
+                  example: '1000000000'
+                max_supply:
+                  type: string
+                  example: '2000000000'
+                decimal:
+                  type: integer
+                  example: 18
+                mintable:
+                  type: boolean
+                  example: true
+        required: true
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
+          description: Unsigned Tx
         '400':
           description: Invalid token id
         '500':
           description: Internal Server Error
-  '/asset/tokens':
     get:
       summary: Query the token with the specified params
       tags:
@@ -3323,6 +3355,105 @@ paths:
           description: Invalid token id
         '500':
           description: Internal Server Error
+  '/asset/tokens/{id}':
+    get:
+      summary: Query the token with the specified id
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: id
+          description: the unique id of the destination token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+  '/asset/tokens/{token-id}':
+    put:
+      summary: edit token information
+      parameters:
+        - in: path
+          name: token-id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: async
+          description: 'if true, broadcast transaction asynchronously'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: commit
+          description: >-
+            if true, response will be returned after the transaction is included
+            in a block.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: simulate
+          description: >-
+            if true, ignore the gas field and perform a simulation of a
+            transaction, but don't broadcast it
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: generate-only
+          description: 'if true, build an unsigned transaction and write it back'
+          required: false
+          schema:
+            type: boolean
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BroadcastTxCommitResult'
+        '401':
+          description: Key password is wrong
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                symbol_at_source:
+                  type: string
+                  example: 'btc'
+                symbol_min_alias:
+                  type: string
+                  example: 'satoshi'
+                max_supply:
+                  type: int
+                  example: '21000000'
+                mintable:
+                  type: boolean
+                  example: false
+                name:
+                  type: string
+                  example: 'BTC Token'
   '/asset/gateways/{moniker}':
     get:
       summary: Query the gateway with the specified moniker
@@ -3417,83 +3548,6 @@ paths:
           description: Invalid id
         '500':
           description: Internal Server Error
-  '/asset/tokens/{token-id}':
-    put:
-      summary: edit token information
-      parameters:
-        - in: path
-          name: token-id
-          description: unique id of token
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
-      tags:
-        - Asset
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
-        '401':
-          description: Key password is wrong
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                owner:
-                  $ref: '#/components/schemas/Address'
-                symbol_at_source:
-                  type: string
-                  example: 'btc'
-                symbol_min_alias:
-                  type: string
-                  example: 'satoshi'
-                max_supply:
-                  type: int
-                  example: '21000000'
-                mintable:
-                  type: boolean
-                  example: false
-                name:
-                  type: string
-                  example: 'BTC Token'
-
 
 components:
   requestBodies:
@@ -4119,8 +4173,6 @@ components:
         symbol_min_alias:
           type: string
         initial_supply:
-          type: string
-        total_supply:
           type: string
         max_supply:
           type: string

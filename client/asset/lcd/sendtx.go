@@ -30,11 +30,33 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		transferGatewayOwnerHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
+	// issue a token
+	r.HandleFunc(
+		"/asset/tokens",
+		issueTokenHandlerFn(cdc, cliCtx),
+	).Methods("POST")
+
 	// edit a token
 	r.HandleFunc(
 		"/asset/tokens/{token-id}",
 		editTokenHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
+}
+
+type issueTokenReq struct {
+	BaseTx         utils.BaseTx      `json:"base_tx"`
+	Owner          sdk.AccAddress    `json:"owner"` //  Owner of the token
+	Family         asset.AssetFamily `json:"family"`
+	Source         asset.AssetSource `json:"source"`
+	Gateway        string            `json:"gateway"`
+	Symbol         string            `json:"symbol"`
+	SymbolAtSource string            `json:"symbol_at_source"`
+	Name           string            `json:"name"`
+	Decimal        uint8             `json:"decimal"`
+	SymbolMinAlias string            `json:"symbol_min_alias"`
+	InitialSupply  uint64            `json:"initial_supply"`
+	MaxSupply      uint64            `json:"max_supply"`
+	Mintable       bool              `json:"mintable"`
 }
 
 type createGatewayReq struct {
@@ -158,6 +180,32 @@ func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
+func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req issueTokenReq
+		err := utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
+		}
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w, cliCtx) {
+			return
+		}
+
+		// create the MsgEditGateway message
+		msg := asset.NewMsgIssueToken(req.Family, req.Source, req.Gateway, req.Symbol, req.SymbolAtSource, req.Name, req.Decimal, req.SymbolMinAlias, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner)
+		err = msg.ValidateBasic()
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		cliCtx.GenerateOnly = true
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+	}
+}
+
 func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -174,7 +222,7 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		// create the MsgEditGateway message
+		// create the MsgEditToken message
 		msg := asset.NewMsgEditToken(req.Name, req.SymbolAtSource, req.SymbolMinAlias, tokenId, req.MaxSupply, req.Mintable, req.Owner)
 		err = msg.ValidateBasic()
 		if err != nil {
