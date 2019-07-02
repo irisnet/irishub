@@ -12,10 +12,17 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
 
-		// get the payer
-		payer := auth.GetSigners(ctx)[0]
+		// get the signing accouts
+		signerAccs := auth.GetSigners(ctx)
+		if len(signerAccs) == 0 {
+			return ctx, sdk.Result{}, true
+		}
 
-		var totalFee sdk.Coins
+		// get the payer
+		payer := signerAccs[0]
+
+		// initial total fee
+		totalFee := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.ZeroInt())}
 
 		for _, msg := range tx.GetMsgs() {
 			// only check consecutive msgs which are routed to asset from the beginning
