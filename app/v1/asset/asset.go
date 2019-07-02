@@ -159,6 +159,20 @@ func (ft FungibleToken) String() string {
 		ft.Decimal, initSupply, maxSupply, ft.Mintable, owner)
 }
 
+type Tokens []FungibleToken
+
+func (tokens Tokens) String() string {
+	if len(tokens) == 0 {
+		return ""
+	}
+
+	out := ""
+	for _, token := range tokens {
+		out += fmt.Sprintf("%v \n", token.String())
+	}
+	return out[:len(out)-1]
+}
+
 // -----------------------------
 
 func GetTokenID(source AssetSource, symbol string, gateway string) (string, types.Error) {

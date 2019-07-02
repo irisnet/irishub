@@ -110,7 +110,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsAssetIssue)
+	cmd.Flags().AddFlagSet(FsTokenIssue)
 	cmd.MarkFlagRequired(FlagFamily)
 	cmd.MarkFlagRequired(FlagSource)
 	cmd.MarkFlagRequired(FlagSymbol)
@@ -289,7 +289,7 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "transfer-gateway-owner",
-		Short: "build an unsigned tx to transfer the owner of a gateway",
+		Short: "transfer the owner of a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -318,9 +318,6 @@ func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-
-			// enable generate-only
-			cliCtx.GenerateOnly = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -371,6 +368,32 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			var prompt = "The token mint transaction will consume extra fee"
+
+			if !viper.GetBool(client.FlagGenerateOnly) {
+				tokenId, _ := sdk.ConvertIdToTokenKeyId(args[0])
+				// query fee
+				fee, err1 := queryTokenFees(cliCtx, tokenId)
+				if err1 != nil {
+					return fmt.Errorf("failed to query token mint fee: %s", err1.Error())
+				}
+
+				// append mint fee to prompt
+				mintFeeMainUnit := sdk.Coins{fee.MintFee}.MainUnitString()
+				prompt += fmt.Sprintf(": %s", mintFeeMainUnit)
+			}
+
+			// a confirmation is needed
+			prompt += "\nAre you sure to proceed?"
+			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
+			if err != nil {
+				return err
+			}
+
+			if !confirmed {
+				return fmt.Errorf("operation aborted")
+			}
+
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -384,7 +407,7 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer-token-owner",
-		Short:   "build an unsigned tx to transfer the owner of a token",
+		Short:   "transfer the owner of a token to a new owner",
 		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -411,9 +434,6 @@ func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-
-			// enable generate-only
-			cliCtx.GenerateOnly = true
 
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},

@@ -126,7 +126,12 @@ func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page,
 		}
 	}
 
-	info, err := FormatTxResults(cdc, res.Txs)
+	resBlocks, err := getBlocksForTxResults(cliCtx, res.Txs)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := FormatTxResults(cdc, res.Txs, resBlocks)
 	if err != nil {
 		return nil, err
 	}
@@ -135,11 +140,11 @@ func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page,
 }
 
 // parse the indexed txs into an array of Info
-func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx) ([]Info, error) {
+func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx, resBlocks map[int64]*ctypes.ResultBlock) ([]Info, error) {
 	var err error
 	out := make([]Info, len(res))
 	for i := range res {
-		out[i], err = formatTxResult(cdc, res[i])
+		out[i], err = formatTxResult(cdc, res[i], resBlocks[res[i].Height])
 		if err != nil {
 			return nil, err
 		}

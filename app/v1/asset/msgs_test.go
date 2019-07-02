@@ -357,7 +357,7 @@ func TestMsgTransferGatewayOwnerGetSigners(t *testing.T) {
 
 	res := msg.GetSigners()
 
-	expected := "[6F776E6572 6E65774F776E6572]"
+	expected := "[6F776E6572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 

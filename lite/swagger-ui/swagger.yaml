@@ -3322,7 +3322,7 @@ paths:
         '500':
           description: Internal Server Error
     get:
-      summary: Query the token with the specified params
+      summary: Query tokens by condition
       tags:
         - Asset
       parameters:
@@ -3357,13 +3357,13 @@ paths:
           description: Internal Server Error
   '/asset/tokens/{id}':
     get:
-      summary: Query the token with the specified id
+      summary: Query token by unique id
       tags:
         - Asset
       parameters:
         - in: path
           name: id
-          description: the unique id of the destination token
+          description: the unique id of the token
           required: true
           schema:
             type: string
@@ -3378,12 +3378,11 @@ paths:
           description: Invalid token id
         '500':
           description: Internal Server Error
-  '/asset/tokens/{token-id}':
     put:
-      summary: edit token information
+      summary: Edit token information
       parameters:
         - in: path
-          name: token-id
+          name: id
           description: unique id of token
           required: true
           schema:
@@ -3454,6 +3453,136 @@ paths:
                 name:
                   type: string
                   example: 'BTC Token'
+  '/asset/tokens/{id}/mint':
+    post:
+      summary: The asset owner and operator can directly mint tokens to a specified address
+      parameters:
+        - in: path
+          name: id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: async
+          description: 'if true, broadcast transaction asynchronously'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: commit
+          description: >-
+            if true, response will be returned after the transaction is included
+            in a block.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: simulate
+          description: >-
+            if true, ignore the gas field and perform a simulation of a
+            transaction, but don't broadcast it
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: generate-only
+          description: 'if true, build an unsigned transaction and write it back'
+          required: false
+          schema:
+            type: boolean
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BroadcastTxCommitResult'
+        '401':
+          description: Key password is wrong
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                to:
+                  $ref: '#/components/schemas/Address'
+                amount:
+                  type: int
+                  example: '21000000'
+
+  '/asset/tokens/{id}/transfer-owner':
+    post:
+      summary: Transfer token to a new owner
+      parameters:
+        - in: path
+          name: id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: async
+          description: 'if true, broadcast transaction asynchronously'
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: commit
+          description: >-
+            if true, response will be returned after the transaction is included
+            in a block.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: simulate
+          description: >-
+            if true, ignore the gas field and perform a simulation of a
+            transaction, but don't broadcast it
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: generate-only
+          description: 'if true, build an unsigned transaction and write it back'
+          required: false
+          schema:
+            type: boolean
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BroadcastTxCommitResult'
+        '401':
+          description: Key password is wrong
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                src_owner:
+                  $ref: '#/components/schemas/Address'
+                dst_owner:
+                  $ref: '#/components/schemas/Address'
   '/asset/gateways/{moniker}':
     get:
       summary: Query the gateway with the specified moniker
@@ -3483,12 +3612,12 @@ paths:
       tags:
         - Asset
       parameters:
-      - in: query
-        name: owner
-        description: the owner address to be queried
-        required: false
-        schema:
-          type: string
+        - in: query
+          name: owner
+          description: the owner address to be queried
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -3714,7 +3843,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/KVPair'
-        coin-flow-record:
+        timestamp:
+          type: string
+          example: '2006-01-02T15:04:05Z07:00'
+        coin_flow:
           type: array
           items:
             type: string
