@@ -35,7 +35,7 @@ const (
 	CodeAssetNotExists                sdk.CodeType = 122
 	CodeAssetNotMintable              sdk.CodeType = 123
 
-	CodeInsufficientCoin sdk.CodeType = 130
+	CodeInsufficientCoins sdk.CodeType = 130
 )
 
 //----------------------------------------
@@ -142,6 +142,6 @@ func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) s
 //----------------------------------------
 // fee error constructor
 
-func ErrInsufficientCoin(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInsufficientCoin, msg)
+func ErrInsufficientCoins(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInsufficientCoins, msg)
 }

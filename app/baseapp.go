@@ -810,7 +810,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		var result sdk.Result
 		var abort bool
 
-		for index, anteHandler := range anteHandlers {
+		for _, anteHandler := range anteHandlers {
 			newCtx, result, abort = anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
 
 			if !newCtx.IsZero() {
@@ -822,15 +822,16 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 				// the instantiated gas meter in the ante handler, so we update the context
 				// prior to returning.
 				ctx = newCtx.WithMultiStore(ms)
+
+				// iterate with the new ctx
+				anteCtx = newCtx
+			} else {
+				// follow the sdk.AnteHandler specification
+				newCtx = anteCtx
 			}
 
 			if abort {
 				return result
-			}
-
-			// continue with the new ctx if updated, previous ante ctx otherwise
-			if index < len(anteHandlers)-1 && !newCtx.IsZero() {
-				anteCtx = newCtx
 			}
 		}
 

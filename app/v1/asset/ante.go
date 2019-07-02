@@ -11,11 +11,13 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
+		// new ctx
+		newCtx = sdk.Context{}
 
 		// get the signing accouts
 		signerAccs := auth.GetSigners(ctx)
 		if len(signerAccs) == 0 {
-			return ctx, sdk.Result{}, true
+			return newCtx, sdk.Result{}, true
 		}
 
 		// get the payer
@@ -65,10 +67,10 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 
 		if !totalFee.IsAllLT(payer.GetCoins()) {
 			// return error result and abort
-			return ctx, ErrInsufficientCoin(DefaultCodespace, "insufficient asset fee").Result(), true
+			return newCtx, ErrInsufficientCoins(DefaultCodespace, "insufficient coins for asset fee").Result(), true
 		}
 
 		// continue
-		return ctx, sdk.Result{}, false
+		return newCtx, sdk.Result{}, false
 	}
 }
