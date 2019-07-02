@@ -790,11 +790,17 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}
 
-	anteHandler := app.Engine.GetCurrentProtocol().GetAnteHandler()
-	// run the ante handler
-	if anteHandler != nil {
+	// get ante handlers
+	anteHandlers := app.Engine.GetCurrentProtocol().GetAnteHandlers()
+
+	// run the ante handlers
+	if len(anteHandlers) > 0 {
+		var newCtx sdk.Context
+		var result sdk.Result
+
 		var anteCtx sdk.Context
 		var msCache sdk.CacheMultiStore
+
 		// Cache wrap context before anteHandler call in case it aborts.
 		// This is required for both CheckTx and DeliverTx.
 		// https://github.com/cosmos/cosmos-sdk/issues/2772
@@ -803,20 +809,28 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		// performance benefits, but it'll be more difficult to get right.
 		anteCtx, msCache = app.cacheTxContext(ctx, txBytes)
 
-		newCtx, result, abort := anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
-		if !newCtx.IsZero() {
-			// At this point, newCtx.MultiStore() is cache-wrapped, or something else
-			// replaced by the ante handler. We want the original multistore, not one
-			// which was cache-wrapped for the ante handler.
-			//
-			// Also, in the case of the tx aborting, we need to track gas consumed via
-			// the instantiated gas meter in the ante handler, so we update the context
-			// prior to returning.
-			ctx = newCtx.WithMultiStore(ms)
-		}
+		for index, anteHandler := range anteHandlers {
+			newCtx, result, abort := anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
 
-		if abort {
-			return result
+			if !newCtx.IsZero() {
+				// At this point, newCtx.MultiStore() is cache-wrapped, or something else
+				// replaced by the ante handler. We want the original multistore, not one
+				// which was cache-wrapped for the ante handler.
+				//
+				// Also, in the case of the tx aborting, we need to track gas consumed via
+				// the instantiated gas meter in the ante handler, so we update the context
+				// prior to returning.
+				ctx = newCtx.WithMultiStore(ms)
+			}
+
+			if abort {
+				return result
+			}
+
+			// continue with the new ante ctx if updated, previous ante ctx otherwise
+			if index < len(anteHandlers)-1 && !newCtx.IsZero() {
+				anteCtx = newCtx
+			}
 		}
 
 		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte*sdk.Gas(len(txBytes)), "blockstore")
