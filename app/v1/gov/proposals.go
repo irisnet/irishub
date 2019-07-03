@@ -3,6 +3,7 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"strings"
 	"time"
 
@@ -52,25 +53,12 @@ type Proposal interface {
 	GetTaxUsage() TaxUsage
 	SetTaxUsage(TaxUsage)
 
-	String() string
-}
+	GetProposalLevel() ProposalLevel
+	GetProposer() sdk.AccAddress
 
-// checks if two proposals are equal
-func ProposalEqual(proposalA Proposal, proposalB Proposal) bool {
-	if proposalA.GetProposalID() == proposalB.GetProposalID() &&
-		proposalA.GetTitle() == proposalB.GetTitle() &&
-		proposalA.GetDescription() == proposalB.GetDescription() &&
-		proposalA.GetProposalType() == proposalB.GetProposalType() &&
-		proposalA.GetStatus() == proposalB.GetStatus() &&
-		proposalA.GetTallyResult().Equals(proposalB.GetTallyResult()) &&
-		proposalA.GetSubmitTime().Equal(proposalB.GetSubmitTime()) &&
-		proposalA.GetDepositEndTime().Equal(proposalB.GetDepositEndTime()) &&
-		proposalA.GetTotalDeposit().IsEqual(proposalB.GetTotalDeposit()) &&
-		proposalA.GetVotingStartTime().Equal(proposalB.GetVotingStartTime()) &&
-		proposalA.GetVotingEndTime().Equal(proposalB.GetVotingEndTime()) {
-		return true
-	}
-	return false
+	String() string
+	Validate(ctx sdk.Context, k Keeper) sdk.Error
+	Execute(ctx sdk.Context, gk Keeper) (err error)
 }
 
 //-----------------------------------------------------------
@@ -90,12 +78,14 @@ type BasicProposal struct {
 
 	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
 	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+	Proposer        sdk.AccAddress
 }
 
 func (bp BasicProposal) String() string {
 	return fmt.Sprintf(`Proposal %d:
   Title:              %s
   Type:               %s
+  Proposer:           %s
   Status:             %s
   Submit Time:        %s
   Deposit End Time:   %s
@@ -103,7 +93,7 @@ func (bp BasicProposal) String() string {
   Voting Start Time:  %s
   Voting End Time:    %s
   Description:        %s`,
-		bp.ProposalID, bp.Title, bp.ProposalType,
+		bp.ProposalID, bp.Title, bp.ProposalType, bp.Proposer.String(),
 		bp.Status, bp.SubmitTime, bp.DepositEndTime,
 		bp.TotalDeposit.MainUnitString(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
 	)
@@ -130,40 +120,57 @@ func (p Proposals) String() string {
 var _ Proposal = (*BasicProposal)(nil)
 
 // nolint
-func (tp BasicProposal) GetProposalID() uint64                      { return tp.ProposalID }
-func (tp *BasicProposal) SetProposalID(proposalID uint64)           { tp.ProposalID = proposalID }
-func (tp BasicProposal) GetTitle() string                           { return tp.Title }
-func (tp *BasicProposal) SetTitle(title string)                     { tp.Title = title }
-func (tp BasicProposal) GetDescription() string                     { return tp.Description }
-func (tp *BasicProposal) SetDescription(description string)         { tp.Description = description }
-func (tp BasicProposal) GetProposalType() ProposalKind              { return tp.ProposalType }
-func (tp *BasicProposal) SetProposalType(proposalType ProposalKind) { tp.ProposalType = proposalType }
-func (tp BasicProposal) GetStatus() ProposalStatus                  { return tp.Status }
-func (tp *BasicProposal) SetStatus(status ProposalStatus)           { tp.Status = status }
-func (tp BasicProposal) GetTallyResult() TallyResult                { return tp.TallyResult }
-func (tp *BasicProposal) SetTallyResult(tallyResult TallyResult)    { tp.TallyResult = tallyResult }
-func (tp BasicProposal) GetSubmitTime() time.Time                   { return tp.SubmitTime }
-func (tp *BasicProposal) SetSubmitTime(submitTime time.Time)        { tp.SubmitTime = submitTime }
-func (tp BasicProposal) GetDepositEndTime() time.Time               { return tp.DepositEndTime }
-func (tp *BasicProposal) SetDepositEndTime(depositEndTime time.Time) {
-	tp.DepositEndTime = depositEndTime
+func (bp BasicProposal) GetProposalID() uint64                      { return bp.ProposalID }
+func (bp *BasicProposal) SetProposalID(proposalID uint64)           { bp.ProposalID = proposalID }
+func (bp BasicProposal) GetTitle() string                           { return bp.Title }
+func (bp *BasicProposal) SetTitle(title string)                     { bp.Title = title }
+func (bp BasicProposal) GetDescription() string                     { return bp.Description }
+func (bp *BasicProposal) SetDescription(description string)         { bp.Description = description }
+func (bp BasicProposal) GetProposalType() ProposalKind              { return bp.ProposalType }
+func (bp *BasicProposal) SetProposalType(proposalType ProposalKind) { bp.ProposalType = proposalType }
+func (bp BasicProposal) GetStatus() ProposalStatus                  { return bp.Status }
+func (bp *BasicProposal) SetStatus(status ProposalStatus)           { bp.Status = status }
+func (bp BasicProposal) GetTallyResult() TallyResult                { return bp.TallyResult }
+func (bp *BasicProposal) SetTallyResult(tallyResult TallyResult)    { bp.TallyResult = tallyResult }
+func (bp BasicProposal) GetSubmitTime() time.Time                   { return bp.SubmitTime }
+func (bp *BasicProposal) SetSubmitTime(submitTime time.Time)        { bp.SubmitTime = submitTime }
+func (bp BasicProposal) GetDepositEndTime() time.Time               { return bp.DepositEndTime }
+func (bp *BasicProposal) SetDepositEndTime(depositEndTime time.Time) {
+	bp.DepositEndTime = depositEndTime
 }
-func (tp BasicProposal) GetTotalDeposit() sdk.Coins              { return tp.TotalDeposit }
-func (tp *BasicProposal) SetTotalDeposit(totalDeposit sdk.Coins) { tp.TotalDeposit = totalDeposit }
-func (tp BasicProposal) GetVotingStartTime() time.Time           { return tp.VotingStartTime }
-func (tp *BasicProposal) SetVotingStartTime(votingStartTime time.Time) {
-	tp.VotingStartTime = votingStartTime
+func (bp BasicProposal) GetTotalDeposit() sdk.Coins              { return bp.TotalDeposit }
+func (bp *BasicProposal) SetTotalDeposit(totalDeposit sdk.Coins) { bp.TotalDeposit = totalDeposit }
+func (bp BasicProposal) GetVotingStartTime() time.Time           { return bp.VotingStartTime }
+func (bp *BasicProposal) SetVotingStartTime(votingStartTime time.Time) {
+	bp.VotingStartTime = votingStartTime
 }
-func (tp BasicProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
-func (tp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
-	tp.VotingEndTime = votingEndTime
+func (bp BasicProposal) GetVotingEndTime() time.Time { return bp.VotingEndTime }
+func (bp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
+	bp.VotingEndTime = votingEndTime
 }
-func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
+func (bp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
 	return sdk.ProtocolDefinition{}
 }
-func (tp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
-func (tp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
-func (tp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
+func (bp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
+func (bp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
+func (bp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
+func (bp *BasicProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
+	pLevel := bp.ProposalType.GetProposalLevel()
+	if num, ok := pLevel.HasReachedTheMaxProposalNum(ctx, k); ok {
+		return ErrMoreThanMaxProposal(k.codespace, num, pLevel.string())
+	}
+	return nil
+}
+func (bp *BasicProposal) GetProposalLevel() ProposalLevel {
+	return bp.ProposalType.GetProposalLevel()
+}
+
+func (bp *BasicProposal) GetProposer() sdk.AccAddress {
+	return bp.Proposer
+}
+func (bp *BasicProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+	return bp.Validate(ctx, gk)
+}
 
 //-----------------------------------------------------------
 // ProposalQueue
@@ -271,6 +278,73 @@ func (pt ProposalKind) String() string {
 	}
 }
 
+func (pt ProposalKind) NewProposal(content Context) Proposal {
+	var textProposal = BasicProposal{
+		Title:        content.GetTitle(),
+		Description:  content.GetDescription(),
+		ProposalType: content.GetProposalType(),
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		Proposer:     content.GetProposer(),
+	}
+	var proposal Proposal
+	switch pt {
+	case ProposalTypePlainText:
+		proposal = &PlainTextProposal{
+			textProposal,
+		}
+		break
+	case ProposalTypeParameterChange:
+		proposal = &ParameterProposal{
+			textProposal,
+			content.GetParams(),
+		}
+		break
+	case ProposalTypeSystemHalt:
+		proposal = &SystemHaltProposal{
+			textProposal,
+		}
+		break
+	case ProposalTypeTxTaxUsage:
+		taxMsg := content.(MsgSubmitTxTaxUsageProposal)
+		proposal = &TaxUsageProposal{
+			textProposal,
+			TaxUsage{
+				taxMsg.Usage,
+				taxMsg.DestAddress,
+				taxMsg.Percent},
+		}
+		break
+	case ProposalTypeSoftwareUpgrade:
+		upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
+		proposal = &SoftwareUpgradeProposal{
+			textProposal,
+			sdk.ProtocolDefinition{
+				Version:   upgradeMsg.Version,
+				Software:  upgradeMsg.Software,
+				Height:    upgradeMsg.SwitchHeight,
+				Threshold: upgradeMsg.Threshold},
+		}
+		break
+	case ProposalTypeAddToken:
+		addTokenMsg := content.(MsgSubmitAddTokenProposal)
+		decimal := int(addTokenMsg.Decimal)
+		initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
+		maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
+
+		fToken := asset.NewFungibleToken(asset.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.SymbolAtSource, addTokenMsg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
+		proposal = &AddTokenProposal{
+			textProposal,
+			fToken,
+		}
+		break
+	default:
+		panic(fmt.Sprintf("invaid proposal type %s", pt))
+	}
+	return proposal
+}
+
 // For Printf / Sprintf, returns bech32 when using %s
 // nolint: errcheck
 func (pt ProposalKind) Format(s fmt.State, verb rune) {
@@ -280,6 +354,21 @@ func (pt ProposalKind) Format(s fmt.State, verb rune) {
 	default:
 		// TODO: Do this conversion more directly
 		s.Write([]byte(fmt.Sprintf("%v", byte(pt))))
+	}
+}
+
+func (pt ProposalKind) GetProposalLevel() ProposalLevel {
+	switch pt {
+	case ProposalTypeTxTaxUsage, ProposalTypePlainText:
+		return ProposalLevelNormal
+	case ProposalTypeParameterChange, ProposalTypeAddToken:
+		return ProposalLevelImportant
+	case ProposalTypeSystemHalt:
+		return ProposalLevelCritical
+	case ProposalTypeSoftwareUpgrade:
+		return ProposalLevelCritical
+	default:
+		return ProposalLevelNil
 	}
 }
 
