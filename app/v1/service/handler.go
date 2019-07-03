@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/service/tags"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -222,7 +222,7 @@ func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) s
 	if !found {
 		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
 	}
-	_, err := k.ck.SendCoins(ctx, bank.ServiceTaxCoinsAccAddr, msg.DestAddress, msg.Amount)
+	_, err := k.ck.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, msg.DestAddress, msg.Amount)
 	if err != nil {
 		return err.Result()
 	}
@@ -259,7 +259,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 			slashCoins = slashCoins.Sort()
 
-			_, err := keeper.ck.BurnCoins(ctx, bank.ServiceDepositCoinsAccAddr, slashCoins)
+			_, err := keeper.ck.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
 			if err != nil {
 				panic(err)
 			}

@@ -2,8 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/protocol"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -16,6 +14,14 @@ var (
 	TotalLoosenTokenKey    = []byte("totalLoosenToken")
 	//BurnedTokenKey = []byte("burnedToken")
 	totalSupplyKeyPrefix = []byte("totalSupply:")
+
+	//system default special address
+	BurnedCoinsAccAddr         = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
+	GovDepositCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
+	ServiceDepositCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
+	ServiceRequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
+	CommunityTaxCoinsAccAddr   = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
+	ServiceTaxCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -76,7 +82,7 @@ func (am AccountKeeper) GetAccount(ctx sdk.Context, addr sdk.AccAddress) Account
 
 // Implements sdk.AccountKeeper.
 func (am AccountKeeper) SetGenesisAccount(ctx sdk.Context, acc Account) {
-	if !acc.GetAddress().Equals(protocol.BurnedCoinsAccAddr) {
+	if !acc.GetAddress().Equals(BurnedCoinsAccAddr) {
 		am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
 	}
 	am.SetAccount(ctx, acc)

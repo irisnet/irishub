@@ -3,7 +3,6 @@ package stake
 import (
 	"bytes"
 	"fmt"
-	"github.com/irisnet/irishub/app/protocol"
 	"runtime/debug"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -68,7 +67,7 @@ func SupplyInvariants(ck bank.Keeper, k Keeper,
 		bonded := sdk.ZeroDec()
 		am.IterateAccounts(ctx, func(acc auth.Account) bool {
 			// loose tokens not contain burned tokens
-			if acc.GetAddress().Equals(protocol.BurnedCoinsAccAddr) {
+			if acc.GetAddress().Equals(auth.BurnedCoinsAccAddr) {
 				return false
 			}
 			loose = loose.Add(sdk.NewDecFromInt(acc.GetCoins().AmountOf(types.StakeDenom)))
