@@ -65,7 +65,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 			totalFee = totalFee.Plus(sdk.Coins{msgFee})
 		}
 
-		if !totalFee.IsAllLT(payer.GetCoins()) {
+		if !totalFee.IsAllLTE(payer.GetCoins()) {
 			// return error result and abort
 			return newCtx, ErrInsufficientCoins(DefaultCodespace, "insufficient coins for asset fee").Result(), true
 		}
