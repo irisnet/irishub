@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -23,8 +25,8 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 		// get the payer
 		payer := signerAccs[0]
 
-		// initial total fee
-		totalFee := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.ZeroInt())}
+		// total fee
+		totalFee := sdk.Coins{}
 
 		for _, msg := range tx.GetMsgs() {
 			// only check consecutive msgs which are routed to asset from the beginning
@@ -47,6 +49,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 				}
 
 				break
+
 			case MsgMintToken:
 				prefix, symbol := GetTokenIDParts(msg.TokenId)
 
@@ -67,7 +70,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 
 		if !totalFee.IsAllLTE(payer.GetCoins()) {
 			// return error result and abort
-			return newCtx, ErrInsufficientCoins(DefaultCodespace, "insufficient coins for asset fee").Result(), true
+			return newCtx, ErrInsufficientCoins(DefaultCodespace, fmt.Sprintf("insufficient coins for asset fee: %s needed", totalFee.MainUnitString())).Result(), true
 		}
 
 		// continue
