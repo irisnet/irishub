@@ -1,6 +1,8 @@
 package protocol
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	sdk "github.com/irisnet/irishub/types"
+)
 
 const (
 	// all store name

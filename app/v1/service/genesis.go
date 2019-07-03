@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -56,7 +56,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 	for ; bindingIterator.Valid(); bindingIterator.Next() {
 		var binding SvcBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bindingIterator.Value(), &binding)
-		k.ck.SendCoins(ctx, bank.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
+		k.ck.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
 	}
 
 	// refund service fee from all active request
@@ -65,7 +65,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 	for ; requestIterator.Valid(); requestIterator.Next() {
 		var request SvcRequest
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(requestIterator.Value(), &request)
-		k.ck.SendCoins(ctx, bank.ServiceRequestCoinsAccAddr, request.Consumer, request.ServiceFee)
+		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, request.Consumer, request.ServiceFee)
 	}
 
 	// refund all incoming fee
@@ -74,7 +74,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 	for ; incomingFeeIterator.Valid(); incomingFeeIterator.Next() {
 		var incomingFee IncomingFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(incomingFeeIterator.Value(), &incomingFee)
-		k.ck.SendCoins(ctx, bank.ServiceRequestCoinsAccAddr, incomingFee.Address, incomingFee.Coins)
+		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, incomingFee.Address, incomingFee.Coins)
 	}
 
 	// refund all return fee
@@ -83,7 +83,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 	for ; returnedFeeIterator.Valid(); returnedFeeIterator.Next() {
 		var returnedFee ReturnedFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(returnedFeeIterator.Value(), &returnedFee)
-		k.ck.SendCoins(ctx, bank.ServiceRequestCoinsAccAddr, returnedFee.Address, returnedFee.Coins)
+		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, returnedFee.Address, returnedFee.Coins)
 	}
 }
 

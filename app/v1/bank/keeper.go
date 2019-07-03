@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 const (
@@ -21,14 +20,7 @@ const (
 	costAddCoins       sdk.Gas = 10
 )
 
-var GovDepositCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
-var ServiceDepositCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
-var ServiceRequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
-
-var CommunityTaxCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
-var ServiceTaxCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
-
-var BurnedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
+//var BurnedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
 
 // Keeper defines a module interface that facilitates the transfer of coins
 // between accounts.
@@ -122,7 +114,7 @@ func (keeper BaseKeeper) DecreaseLoosenToken(
 func (keeper BaseKeeper) BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error) {
 	ctx.GasMeter().ConsumeGas(costBurnCoins, "burnCoins")
 
-	if _, err := keeper.SendCoins(ctx, fromAddr, BurnedCoinsAccAddr, amt); err != nil {
+	if _, err := keeper.SendCoins(ctx, fromAddr, auth.BurnedCoinsAccAddr, amt); err != nil {
 		return nil, err
 	}
 
@@ -164,12 +156,12 @@ func (keeper BaseKeeper) Init(ctx sdk.Context) {
 	// If someone send coins to BurnedCoinsAccAddr in protocol v0,
 	// It is handled as burned coins in protocol v1.
 	// Subtract all BurnedCoinsAccAddr coins in v0 from looseToken.
-	v0burnedCoins := keeper.GetCoins(ctx, BurnedCoinsAccAddr)
+	v0burnedCoins := keeper.GetCoins(ctx, auth.BurnedCoinsAccAddr)
 	if !v0burnedCoins.Empty() {
 		keeper.DecreaseLoosenToken(ctx, v0burnedCoins)
 	}
 
-	keeper.AddCoins(ctx, BurnedCoinsAccAddr, burnedCoins)
+	keeper.AddCoins(ctx, auth.BurnedCoinsAccAddr, burnedCoins)
 }
 
 //______________________________________________________________________________________________
@@ -349,7 +341,7 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 	err := setCoins(ctx, am, addr, newCoins)
 
 	// adding coins to BurnedCoinsAccAddr is equivalent to burning coins
-	if addr.Equals(BurnedCoinsAccAddr) {
+	if addr.Equals(auth.BurnedCoinsAccAddr) {
 		for _, coin := range amt {
 			if coin.Denom == sdk.NativeTokenMinDenom {
 				// Decrease total loose token for iris

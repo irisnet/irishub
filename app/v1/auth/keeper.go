@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -15,6 +14,14 @@ var (
 	TotalLoosenTokenKey    = []byte("totalLoosenToken")
 	//BurnedTokenKey = []byte("burnedToken")
 	totalSupplyKeyPrefix = []byte("totalSupply:")
+
+	//system default special address
+	BurnedCoinsAccAddr         = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
+	GovDepositCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
+	ServiceDepositCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
+	ServiceRequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
+	CommunityTaxCoinsAccAddr   = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
+	ServiceTaxCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
 )
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -75,7 +82,9 @@ func (am AccountKeeper) GetAccount(ctx sdk.Context, addr sdk.AccAddress) Account
 
 // Implements sdk.AccountKeeper.
 func (am AccountKeeper) SetGenesisAccount(ctx sdk.Context, acc Account) {
-	am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
+	if !acc.GetAddress().Equals(BurnedCoinsAccAddr) {
+		am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
+	}
 	am.SetAccount(ctx, acc)
 }
 
@@ -278,6 +287,20 @@ func TotalSupplyStoreKey(denom string) []byte {
 	return append(totalSupplyKeyPrefix, keyId...)
 }
 
+func (am AccountKeeper) IterateTotalSupply(ctx sdk.Context, op func(coin sdk.Coin) (stop bool)) {
+	store := ctx.KVStore(am.key)
+
+	iterator := sdk.KVStorePrefixIterator(store, totalSupplyKeyPrefix)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var coin sdk.Coin
+		am.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &coin)
+		if stop := op(coin); stop {
+			break
+		}
+	}
+}
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
 	// parameter checking
 	if coin == (sdk.Coin{}) || !coin.IsPositive() {

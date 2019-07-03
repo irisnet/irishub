@@ -606,7 +606,7 @@ func (msg MsgMintToken) ValidateBasic() sdk.Error {
 	}
 
 	if msg.Amount <= 0 || msg.Amount > MaximumAssetMaxSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
 	}
 
 	return CheckTokenID(msg.TokenId)
