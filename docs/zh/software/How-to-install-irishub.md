@@ -42,7 +42,7 @@ source ~/.bash_profile
 
 确认Go是否安装成功：
 ```bash
-go verison
+go version
 ```
 
 ::: tip
