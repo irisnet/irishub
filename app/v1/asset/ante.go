@@ -17,7 +17,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 		// get the signing accouts
 		signerAccs := auth.GetSigners(ctx)
 		if len(signerAccs) == 0 {
-			return newCtx, sdk.Result{}, true
+			return newCtx, ErrSignersMissingInContext(DefaultCodespace, "signers missing in context").Result(), true
 		}
 
 		// get the payer
