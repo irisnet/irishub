@@ -67,7 +67,7 @@ func SupplyInvariants(ck bank.Keeper, k Keeper,
 		bonded := sdk.ZeroDec()
 		am.IterateAccounts(ctx, func(acc auth.Account) bool {
 			// loose tokens not contain burned tokens
-			if acc.GetAddress().Equals(bank.BurnedCoinsAccAddr) {
+			if acc.GetAddress().Equals(auth.BurnedCoinsAccAddr) {
 				return false
 			}
 			loose = loose.Add(sdk.NewDecFromInt(acc.GetCoins().AmountOf(types.StakeDenom)))

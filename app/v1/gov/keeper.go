@@ -2,6 +2,7 @@ package gov
 
 import (
 	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -522,8 +523,8 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, depositorAddr.String(), bank.GovDepositCoinsAccAddr.String(), depositAmount.String(), sdk.GovDepositFlow, "")
-	_, err := keeper.ck.SendCoins(ctx, depositorAddr, bank.GovDepositCoinsAccAddr, depositAmount)
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, depositorAddr.String(), auth.GovDepositCoinsAccAddr.String(), depositAmount.String(), sdk.GovDepositFlow, "")
+	_, err := keeper.ck.SendCoins(ctx, depositorAddr, auth.GovDepositCoinsAccAddr, depositAmount)
 	if err != nil {
 		return err, false
 	}
@@ -585,16 +586,16 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 		RefundSumInt = RefundSumInt.Add(RefundAmountInt)
 		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, RefundAmountInt)}
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, bank.GovDepositCoinsAccAddr.String(), deposit.Depositor.String(), deposit.Amount.String(), sdk.GovDepositRefundFlow, "")
-		_, err := keeper.ck.SendCoins(ctx, bank.GovDepositCoinsAccAddr, deposit.Depositor, deposit.Amount)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.GovDepositCoinsAccAddr.String(), deposit.Depositor.String(), deposit.Amount.String(), sdk.GovDepositRefundFlow, "")
+		_, err := keeper.ck.SendCoins(ctx, auth.GovDepositCoinsAccAddr, deposit.Depositor, deposit.Amount)
 		if err != nil {
 			panic(err)
 		}
 	}
 
 	burnCoin := sdk.NewCoin(stakeTypes.StakeDenom, DepositSumInt.Sub(RefundSumInt))
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, bank.GovDepositCoinsAccAddr.String(), "", burnCoin.String(), sdk.GovDepositBurnFlow, "")
-	_, err := keeper.ck.BurnCoins(ctx, bank.GovDepositCoinsAccAddr, sdk.Coins{burnCoin})
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.GovDepositCoinsAccAddr.String(), "", burnCoin.String(), sdk.GovDepositBurnFlow, "")
+	_, err := keeper.ck.BurnCoins(ctx, auth.GovDepositCoinsAccAddr, sdk.Coins{burnCoin})
 	if err != nil {
 		panic(err)
 	}
@@ -611,8 +612,8 @@ func (keeper Keeper) DeleteDeposits(ctx sdk.Context, proposalID uint64) {
 		deposit := &Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, bank.GovDepositCoinsAccAddr.String(), "", deposit.Amount.String(), sdk.GovDepositBurnFlow, "")
-		_, err := keeper.ck.BurnCoins(ctx, bank.GovDepositCoinsAccAddr, deposit.Amount)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.GovDepositCoinsAccAddr.String(), "", deposit.Amount.String(), sdk.GovDepositBurnFlow, "")
+		_, err := keeper.ck.BurnCoins(ctx, auth.GovDepositCoinsAccAddr, deposit.Amount)
 		if err != nil {
 			panic(err)
 		}

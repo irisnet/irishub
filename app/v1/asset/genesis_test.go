@@ -54,6 +54,12 @@ func TestExportGatewayGenesis(t *testing.T) {
 		keeper.SetOwnerGateway(ctx, owners[i], monikers[i])
 	}
 
+	// add token
+	addr := sdk.AccAddress([]byte("addr1"))
+	acc := ak.NewAccountWithAddress(ctx, addr)
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	keeper.AddToken(ctx, ft)
+
 	// query all gateways
 	var storedGateways []Gateway
 	keeper.IterateGateways(ctx, func(g Gateway) bool {
@@ -61,7 +67,15 @@ func TestExportGatewayGenesis(t *testing.T) {
 		return false
 	})
 
+	// query all token
+	var tokens Tokens
+	keeper.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
+		tokens = append(tokens, token)
+		return false
+	})
+
 	require.Equal(t, len(gateways), len(storedGateways))
+	require.Equal(t, len(tokens), 1)
 
 	// export gateways
 	genesisState := ExportGenesis(ctx, keeper)
@@ -71,5 +85,9 @@ func TestExportGatewayGenesis(t *testing.T) {
 	require.Equal(t, len(storedGateways), len(exportedGateways))
 	for i, eg := range exportedGateways {
 		require.Equal(t, storedGateways[i], eg)
+	}
+
+	for _, token := range genesisState.Tokens {
+		require.Equal(t, token, ft)
 	}
 }

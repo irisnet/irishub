@@ -55,11 +55,10 @@ type MsgIssueToken struct {
 	MaxSupply      uint64         `json:"max_supply"`
 	Mintable       bool           `json:"mintable"`
 	Owner          sdk.AccAddress `json:"owner"`
-	Fee            sdk.Coins      `json:"fee"`
 }
 
 // NewMsgIssueToken - construct asset issue msg.
-func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress, fee sdk.Coins) MsgIssueToken {
+func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress) MsgIssueToken {
 	return MsgIssueToken{
 		Family:         family,
 		Source:         source,
@@ -73,7 +72,6 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 		MaxSupply:      maxSupply,
 		Mintable:       mintable,
 		Owner:          owner,
-		Fee:            fee,
 	}
 }
 
@@ -608,7 +606,7 @@ func (msg MsgMintToken) ValidateBasic() sdk.Error {
 	}
 
 	if msg.Amount <= 0 || msg.Amount > MaximumAssetMaxSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
+		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
 	}
 
 	return CheckTokenID(msg.TokenId)
