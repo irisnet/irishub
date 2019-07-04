@@ -8,6 +8,7 @@ import (
 
 var (
 	PrefixGateway = []byte("gateways:") // prefix for the gateway store
+	PrefixToken   = []byte("token:")    // prefix for the token store
 )
 
 // KeyToken returns the key of the specified token source and id

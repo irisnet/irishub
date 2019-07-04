@@ -3,11 +3,11 @@ package asset
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"math"
 	"strconv"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v1/bank"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -67,7 +67,7 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	burnedCoin := fee.Minus(communityTaxCoin)
 
 	// send community tax
-	if _, err := k.bk.SendCoins(ctx, feeAcc, bank.CommunityTaxCoinsAccAddr, sdk.Coins{communityTaxCoin}); err != nil {
+	if _, err := k.bk.SendCoins(ctx, feeAcc, auth.CommunityTaxCoinsAccAddr, sdk.Coins{communityTaxCoin}); err != nil {
 		return err
 	}
 

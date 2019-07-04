@@ -2,6 +2,7 @@ package bank
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -79,7 +80,7 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 
 	if params.TokenId == "" { // query all
 		looseTokens = bk.GetLoosenCoins(ctx)
-		burnedTokens = bk.GetCoins(ctx, BurnedCoinsAccAddr)
+		burnedTokens = bk.GetCoins(ctx, auth.BurnedCoinsAccAddr)
 		iter := bk.am.GetTotalSupplies(ctx)
 		defer iter.Close()
 		for ; iter.Valid(); iter.Next() {
@@ -90,13 +91,13 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 
 	} else if params.TokenId == sdk.NativeTokenName { // query iris
 		looseTokens = bk.GetLoosenCoins(ctx)
-		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom))}
+		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom))}
 	} else { // query !iris
 		denom, err := sdk.GetCoinDenom(params.TokenId)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
 		}
-		burnedTokens = sdk.Coins{sdk.NewCoin(denom, bk.GetCoins(ctx, BurnedCoinsAccAddr).AmountOf(denom))}
+		burnedTokens = sdk.Coins{sdk.NewCoin(denom, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(denom))}
 
 		ts, found := bk.GetTotalSupply(ctx, denom)
 		if !found {

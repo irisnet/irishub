@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
@@ -143,7 +143,7 @@ func (k Keeper) Init(ctx sdk.Context) {
 	feePool := k.GetFeePool(ctx)
 
 	communityTaxCoins, change := feePool.CommunityPool.TruncateDecimal()
-	k.bankKeeper.AddCoins(ctx, bank.CommunityTaxCoinsAccAddr, communityTaxCoins)
+	k.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, communityTaxCoins)
 
 	feePool.CommunityPool = types.NewDecCoins(sdk.Coins{})
 	feePool.ValPool = feePool.ValPool.Plus(change)
