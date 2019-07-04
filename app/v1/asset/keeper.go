@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/asset/tags"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -241,9 +242,14 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
 	}
 
+	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
+	if !found {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
+	}
+
 	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(token.Decimal))
-	if maxSupply.GT(sdk.ZeroInt()) && (token.InitialSupply.GT(maxSupply) || maxSupply.GT(token.MaxSupply)) {
-		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max_supply must be greater than %s and less than %s", token.InitialSupply.String(), token.MaxSupply.String()))
+	if maxSupply.GT(sdk.ZeroInt()) && (maxSupply.LT(hasIssuedAmt.Amount) || maxSupply.GT(token.MaxSupply)) {
+		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.Amount.String(), token.MaxSupply.String()))
 	}
 
 	if msg.Name != DoNotModify {
@@ -404,7 +410,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (
 	}
 
 	if token.Source != NATIVE {
-		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the source of the token is native can be transferd,but current the source of the token is %s", token.Source.String()))
+		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the token of which the source is native can be transferred,but the source of the current token is %s", token.Source.String()))
 	}
 
 	if !msg.SrcOwner.Equals(token.Owner) {
@@ -458,21 +464,21 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 		return nil, ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
 	}
 
-	hasIssueAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
+	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
 	if !found {
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
 	}
 
 	//check the denom
 	expDenom := token.GetDenom()
-	if expDenom != hasIssueAmt.Denom {
-		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssueAmt.Denom))
+	if expDenom != hasIssuedAmt.Denom {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssuedAmt.Denom))
 	}
 
 	mintAmt := sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Decimal))
-	if mintAmt.Add(hasIssueAmt.Amount).GT(token.MaxSupply) {
+	if mintAmt.Add(hasIssuedAmt.Amount).GT(token.MaxSupply) {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
-		canAmt := token.MaxSupply.Sub(hasIssueAmt.Amount).Div(exp)
+		canAmt := token.MaxSupply.Sub(hasIssuedAmt.Amount).Div(exp)
 		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
 	}
 
