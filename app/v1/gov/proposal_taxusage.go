@@ -129,7 +129,7 @@ func (tp *TaxUsageProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 	return nil
 }
 
-func (tp *TaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+func (tp *TaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	logger := ctx.Logger()
 	if err := tp.Validate(ctx, gk); err != nil {
 		logger.Error("Execute TaxUsageProposal Failure", "info",
@@ -141,5 +141,5 @@ func (tp *TaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
 		burn = true
 	}
 	gk.dk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Percent, burn)
-	return
+	return nil
 }

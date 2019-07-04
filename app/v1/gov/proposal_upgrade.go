@@ -43,7 +43,7 @@ func (sp *SoftwareUpgradeProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error
 	return nil
 }
 
-func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	if _, ok := gk.protocolKeeper.GetUpgradeConfig(ctx); ok {
 		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
 			fmt.Sprintf("Software Upgrade Switch Period is in process."))

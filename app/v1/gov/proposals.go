@@ -47,18 +47,12 @@ type Proposal interface {
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
 
-	GetProtocolDefinition() sdk.ProtocolDefinition
-	SetProtocolDefinition(sdk.ProtocolDefinition)
-
-	GetTaxUsage() TaxUsage
-	SetTaxUsage(TaxUsage)
-
 	GetProposalLevel() ProposalLevel
 	GetProposer() sdk.AccAddress
 
 	String() string
-	Validate(ctx sdk.Context, k Keeper) sdk.Error
-	Execute(ctx sdk.Context, gk Keeper) (err error)
+	Validate(ctx sdk.Context, gk Keeper) sdk.Error
+	Execute(ctx sdk.Context, gk Keeper) sdk.Error
 }
 
 //-----------------------------------------------------------
@@ -76,9 +70,9 @@ type BasicProposal struct {
 	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
 	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
-	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
-	Proposer        sdk.AccAddress
+	VotingStartTime time.Time      `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingEndTime   time.Time      `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+	Proposer        sdk.AccAddress `json:"proposer"`
 }
 
 func (bp BasicProposal) String() string {
@@ -168,7 +162,7 @@ func (bp *BasicProposal) GetProposalLevel() ProposalLevel {
 func (bp *BasicProposal) GetProposer() sdk.AccAddress {
 	return bp.Proposer
 }
-func (bp *BasicProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+func (bp *BasicProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	return bp.Validate(ctx, gk)
 }
 

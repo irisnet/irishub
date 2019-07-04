@@ -20,7 +20,7 @@ func (pp *SystemHaltProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 	return nil
 }
 
-func (pp *SystemHaltProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+func (pp *SystemHaltProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	logger := ctx.Logger()
 
 	if err := pp.Validate(ctx, gk); err != nil {

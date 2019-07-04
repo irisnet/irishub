@@ -32,13 +32,13 @@ func (atp *AddTokenProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 	return nil
 }
 
-func (atp *AddTokenProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+func (atp *AddTokenProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	logger := ctx.Logger()
 	if err := atp.Validate(ctx, gk); err != nil {
 		logger.Error("Execute AddTokenProposal failed", "height", ctx.BlockHeight(), "proposalId", atp.ProposalID, "token_id", atp.FToken.Id, "err", err.Error())
 		return err
 	}
-	_, err = gk.ak.IssueToken(ctx, atp.FToken)
+	_, err := gk.ak.IssueToken(ctx, atp.FToken)
 	if err != nil {
 		logger.Error("Execute AddTokenProposal failed", "height", ctx.BlockHeight(), "proposalId", atp.ProposalID, "token_id", atp.FToken.Id, "err", err.Error())
 		return err

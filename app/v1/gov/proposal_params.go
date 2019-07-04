@@ -39,13 +39,13 @@ func (pp *ParameterProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 	return nil
 }
 
-func (pp *ParameterProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+func (pp *ParameterProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	ctx.Logger().Info("Execute ParameterProposal begin")
 	//check again
 	if len(pp.Params) != 1 {
 		ctx.Logger().Error("Execute ParameterProposal Failure", "info",
 			"the length of ParameterProposal's param should be one", "ProposalId", pp.ProposalID)
-		return
+		return nil
 	}
 	param := pp.Params[0]
 	paramSet, _ := gk.paramsKeeper.GetParamSet(param.Subspace)
@@ -59,5 +59,5 @@ func (pp *ParameterProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
 		ctx.Logger().Info("Execute ParameterProposal Failed", "key", param.Key, "value", param.Value)
 	}
 
-	return
+	return nil
 }
