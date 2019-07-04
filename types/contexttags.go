@@ -21,6 +21,7 @@ const (
 	ServiceDepositFlow       = "ServiceDeposit"
 	ServiceDepositRefundFlow = "ServiceDepositRefund"
 	MintTokenFlow            = "MintToken"
+	IssueTokenFlow           = "IssueToken"
 
 	//Trigger: transaction hash, module endBlock
 	GovEndBlocker     = "govEndBlocker"

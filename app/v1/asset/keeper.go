@@ -57,6 +57,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 
 		// Set total supply
 		k.bk.SetTotalSupply(ctx, initialSupply)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, owner.String(), owner.String(), initialSupply.String(), sdk.IssueTokenFlow, "")
 	}
 
 	createTags := sdk.NewTags(
