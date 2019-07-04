@@ -509,5 +509,6 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 	if err != nil {
 		return nil, err
 	}
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), mintAcc.String(), mintCoin.Amount.String(), sdk.MintToken, "")
 	return tags, nil
 }
