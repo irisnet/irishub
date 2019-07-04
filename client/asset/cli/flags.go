@@ -25,9 +25,8 @@ const (
 	FlagWebsite  = "website"
 	FlagTo       = "to"
 
-	FlagSubject = "subject"
-	FlagID      = "id"
-	FlagAmount  = "amount"
+	FlagToken  = "token"
+	FlagAmount = "amount"
 )
 
 var (
@@ -72,9 +71,8 @@ func init() {
 	FsGatewayOwnerTransfer.String(FlagMoniker, "", "the unique name of the gateway to be transferred")
 	FsGatewayOwnerTransfer.String(FlagTo, "", "the new owner")
 
-	FsFeeQuery.String(FlagSubject, "", "the fee type to be queried")
-	FsFeeQuery.String(FlagMoniker, "", "the gateway name, required if the subject is gateway")
-	FsFeeQuery.String(FlagID, "", "the token id, required if the subject is token")
+	FsFeeQuery.String(FlagGateway, "", "the gateway moniker")
+	FsFeeQuery.String(FlagToken, "", "the token id")
 
 	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
 	FsEditToken.String(FlagSymbolAtSource, "[do-not-modify]", "the source symbol of a gateway or external token")
