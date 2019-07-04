@@ -3,7 +3,6 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"strings"
 	"time"
 
@@ -175,12 +174,6 @@ type ProposalQueue []uint64
 
 // Type that represents Proposal Type as a byte
 type ProposalKind byte
-type createProposalHandler func(content Context) Proposal
-type pTypeInfo struct {
-	Type    ProposalKind
-	Level   ProposalLevel
-	Handler createProposalHandler
-}
 
 //nolint
 const (
@@ -200,123 +193,6 @@ var pTypeMap = map[string]pTypeInfo{
 	"SystemHalt":      createSystemHaltInfo(),
 	"TxTaxUsage":      createTxTaxUsageInfo(),
 	"AddToken":        createAddTokenInfo(),
-}
-
-func createPlainTextInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypePlainText,
-		ProposalLevelNormal,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
-				return &PlainTextProposal{
-					p,
-				}
-			})
-		},
-	}
-}
-func createParameterChangeInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypeParameterChange,
-		ProposalLevelImportant,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
-				return &ParameterProposal{
-					p,
-					content.GetParams(),
-				}
-			})
-		},
-	}
-}
-func createSoftwareUpgradeInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypeSoftwareUpgrade,
-		ProposalLevelCritical,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
-				upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
-				proposal := &SoftwareUpgradeProposal{
-					p,
-					sdk.ProtocolDefinition{
-						Version:   upgradeMsg.Version,
-						Software:  upgradeMsg.Software,
-						Height:    upgradeMsg.SwitchHeight,
-						Threshold: upgradeMsg.Threshold},
-				}
-				return proposal
-			})
-		},
-	}
-}
-
-func createSystemHaltInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypeSystemHalt,
-		ProposalLevelCritical,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
-				return &SystemHaltProposal{
-					p,
-				}
-			})
-		},
-	}
-}
-
-func createTxTaxUsageInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypeTxTaxUsage,
-		ProposalLevelNormal,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
-				taxMsg := content.(MsgSubmitTxTaxUsageProposal)
-				proposal := &TaxUsageProposal{
-					p,
-					TaxUsage{
-						taxMsg.Usage,
-						taxMsg.DestAddress,
-						taxMsg.Percent},
-				}
-				return proposal
-			})
-		},
-	}
-}
-
-func createAddTokenInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypeAddToken,
-		ProposalLevelImportant,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
-				addTokenMsg := content.(MsgSubmitAddTokenProposal)
-				decimal := int(addTokenMsg.Decimal)
-				initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
-				maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
-
-				fToken := asset.NewFungibleToken(asset.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.SymbolAtSource, addTokenMsg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
-				proposal := &AddTokenProposal{
-					p,
-					fToken,
-				}
-				return proposal
-			})
-		},
-	}
-}
-
-func buildProposal(content Context, callback func(p BasicProposal, content Context) Proposal) Proposal {
-	var p = BasicProposal{
-		Title:        content.GetTitle(),
-		Description:  content.GetDescription(),
-		ProposalType: content.GetProposalType(),
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		Proposer:     content.GetProposer(),
-	}
-	return callback(p, content)
 }
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -376,12 +252,12 @@ func (pt ProposalKind) String() string {
 	return ""
 }
 
-func (pt ProposalKind) NewProposal(content Context) Proposal {
+func (pt ProposalKind) NewProposal(content Context) (Proposal, sdk.Error) {
 	typInfo, ok := pTypeMap[pt.String()]
 	if !ok {
-		return nil
+		return nil, ErrInvalidProposalType(DefaultCodespace, pt)
 	}
-	return typInfo.Handler(content)
+	return typInfo.createProposal(content), nil
 }
 
 // For Printf / Sprintf, returns bech32 when using %s

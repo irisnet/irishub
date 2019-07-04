@@ -87,9 +87,11 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk.Error) {
 	content := msg.(Context)
 
-	proposalType := content.GetProposalType()
 	// construct a proposal
-	proposal := proposalType.NewProposal(content)
+	proposal, err := content.GetProposalType().NewProposal(content)
+	if err != nil {
+		return nil, err
+	}
 	pLevel := proposal.GetProposalLevel()
 
 	// validate MinInitialDeposit
