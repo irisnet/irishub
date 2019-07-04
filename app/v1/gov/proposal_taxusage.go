@@ -114,3 +114,32 @@ func (tp TaxUsageProposal) GetTaxUsage() TaxUsage { return tp.TaxUsage }
 func (tp *TaxUsageProposal) SetTaxUsage(taxUsage TaxUsage) {
 	tp.TaxUsage = taxUsage
 }
+
+func (tp *TaxUsageProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
+	if err := tp.BasicProposal.Validate(ctx, k); err != nil {
+		return err
+	}
+
+	if tp.TaxUsage.Usage != UsageTypeBurn {
+		_, found := k.guardianKeeper.GetTrustee(ctx, tp.TaxUsage.DestAddress)
+		if !found {
+			return ErrNotTrustee(k.codespace, tp.TaxUsage.DestAddress)
+		}
+	}
+	return nil
+}
+
+func (tp *TaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) (err error) {
+	logger := ctx.Logger()
+	if err := tp.Validate(ctx, gk); err != nil {
+		logger.Error("Execute TaxUsageProposal Failure", "info",
+			"the destination address is not a trustee now", "destinationAddress", tp.TaxUsage.DestAddress)
+		return err
+	}
+	burn := false
+	if tp.TaxUsage.Usage == UsageTypeBurn {
+		burn = true
+	}
+	gk.dk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Percent, burn)
+	return
+}

@@ -93,7 +93,7 @@ func (keeper Keeper) NewProposal(ctx sdk.Context, title string, description stri
 // =====================================================
 // Proposals
 
-// Creates a NewProposal
+// Creates a SubmitProposal
 
 func (keeper Keeper) NewParametersProposal(ctx sdk.Context, title string, description string, proposalType ProposalKind, params Params) Proposal {
 	proposalID, err := keeper.getNewProposalID(ctx)

@@ -12,6 +12,16 @@ const MsgRoute = "gov"
 
 var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitTxTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
 
+type Context interface {
+	sdk.Msg
+	GetTitle() string
+	GetDescription() string
+	GetProposalType() ProposalKind
+	GetProposer() sdk.AccAddress
+	GetInitialDeposit() sdk.Coins
+	GetParams() Params
+}
+
 //-----------------------------------------------------------
 // MsgSubmitProposal
 type MsgSubmitProposal struct {
@@ -32,6 +42,25 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		InitialDeposit: initialDeposit,
 		Params:         params,
 	}
+}
+
+func (msg MsgSubmitProposal) GetTitle() string {
+	return msg.Title
+}
+func (msg MsgSubmitProposal) GetDescription() string {
+	return msg.Description
+}
+func (msg MsgSubmitProposal) GetProposalType() ProposalKind {
+	return msg.ProposalType
+}
+func (msg MsgSubmitProposal) GetProposer() sdk.AccAddress {
+	return msg.Proposer
+}
+func (msg MsgSubmitProposal) GetInitialDeposit() sdk.Coins {
+	return msg.InitialDeposit
+}
+func (msg MsgSubmitProposal) GetParams() Params {
+	return msg.Params
 }
 
 //nolint
