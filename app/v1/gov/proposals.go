@@ -175,9 +175,11 @@ type ProposalQueue []uint64
 
 // Type that represents Proposal Type as a byte
 type ProposalKind byte
+type createProposalHandler func(content Context) Proposal
 type pTypeInfo struct {
-	Type  ProposalKind
-	Level ProposalLevel
+	Type    ProposalKind
+	Level   ProposalLevel
+	Handler createProposalHandler
 }
 
 //nolint
@@ -192,14 +194,129 @@ const (
 )
 
 var pTypeMap = map[string]pTypeInfo{
-	"PlainText":       {ProposalTypePlainText, ProposalLevelNormal},
-	"ParameterChange": {ProposalTypeParameterChange, ProposalLevelImportant},
-	"SoftwareUpgrade": {ProposalTypeSoftwareUpgrade,
-		ProposalLevelCritical},
-	"SystemHalt": {ProposalTypeSystemHalt,
-		ProposalLevelCritical},
-	"TxTaxUsage": {ProposalTypeTxTaxUsage, ProposalLevelNormal},
-	"AddToken":   {ProposalTypeAddToken, ProposalLevelImportant},
+	"PlainText":       createPlainTextInfo(),
+	"ParameterChange": createParameterChangeInfo(),
+	"SoftwareUpgrade": createSoftwareUpgradeInfo(),
+	"SystemHalt":      createSystemHaltInfo(),
+	"TxTaxUsage":      createTxTaxUsageInfo(),
+	"AddToken":        createAddTokenInfo(),
+}
+
+func createPlainTextInfo() pTypeInfo {
+	return pTypeInfo{
+		ProposalTypePlainText,
+		ProposalLevelNormal,
+		func(content Context) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+				return &PlainTextProposal{
+					p,
+				}
+			})
+		},
+	}
+}
+func createParameterChangeInfo() pTypeInfo {
+	return pTypeInfo{
+		ProposalTypeParameterChange,
+		ProposalLevelImportant,
+		func(content Context) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+				return &ParameterProposal{
+					p,
+					content.GetParams(),
+				}
+			})
+		},
+	}
+}
+func createSoftwareUpgradeInfo() pTypeInfo {
+	return pTypeInfo{
+		ProposalTypeSoftwareUpgrade,
+		ProposalLevelCritical,
+		func(content Context) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+				upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
+				proposal := &SoftwareUpgradeProposal{
+					p,
+					sdk.ProtocolDefinition{
+						Version:   upgradeMsg.Version,
+						Software:  upgradeMsg.Software,
+						Height:    upgradeMsg.SwitchHeight,
+						Threshold: upgradeMsg.Threshold},
+				}
+				return proposal
+			})
+		},
+	}
+}
+
+func createSystemHaltInfo() pTypeInfo {
+	return pTypeInfo{
+		ProposalTypeSystemHalt,
+		ProposalLevelCritical,
+		func(content Context) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+				return &SystemHaltProposal{
+					p,
+				}
+			})
+		},
+	}
+}
+
+func createTxTaxUsageInfo() pTypeInfo {
+	return pTypeInfo{
+		ProposalTypeTxTaxUsage,
+		ProposalLevelNormal,
+		func(content Context) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+				taxMsg := content.(MsgSubmitTxTaxUsageProposal)
+				proposal := &TaxUsageProposal{
+					p,
+					TaxUsage{
+						taxMsg.Usage,
+						taxMsg.DestAddress,
+						taxMsg.Percent},
+				}
+				return proposal
+			})
+		},
+	}
+}
+
+func createAddTokenInfo() pTypeInfo {
+	return pTypeInfo{
+		ProposalTypeAddToken,
+		ProposalLevelImportant,
+		func(content Context) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+				addTokenMsg := content.(MsgSubmitAddTokenProposal)
+				decimal := int(addTokenMsg.Decimal)
+				initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
+				maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
+
+				fToken := asset.NewFungibleToken(asset.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.SymbolAtSource, addTokenMsg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
+				proposal := &AddTokenProposal{
+					p,
+					fToken,
+				}
+				return proposal
+			})
+		},
+	}
+}
+
+func buildProposal(content Context, callback func(p BasicProposal, content Context) Proposal) Proposal {
+	var p = BasicProposal{
+		Title:        content.GetTitle(),
+		Description:  content.GetDescription(),
+		ProposalType: content.GetProposalType(),
+		Status:       StatusDepositPeriod,
+		TallyResult:  EmptyTallyResult(),
+		TotalDeposit: sdk.Coins{},
+		Proposer:     content.GetProposer(),
+	}
+	return callback(p, content)
 }
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -260,70 +377,11 @@ func (pt ProposalKind) String() string {
 }
 
 func (pt ProposalKind) NewProposal(content Context) Proposal {
-	var textProposal = BasicProposal{
-		Title:        content.GetTitle(),
-		Description:  content.GetDescription(),
-		ProposalType: content.GetProposalType(),
-		Status:       StatusDepositPeriod,
-		TallyResult:  EmptyTallyResult(),
-		TotalDeposit: sdk.Coins{},
-		Proposer:     content.GetProposer(),
+	typInfo, ok := pTypeMap[pt.String()]
+	if !ok {
+		return nil
 	}
-	var proposal Proposal
-	switch pt {
-	case ProposalTypePlainText:
-		proposal = &PlainTextProposal{
-			textProposal,
-		}
-		break
-	case ProposalTypeParameterChange:
-		proposal = &ParameterProposal{
-			textProposal,
-			content.GetParams(),
-		}
-		break
-	case ProposalTypeSystemHalt:
-		proposal = &SystemHaltProposal{
-			textProposal,
-		}
-		break
-	case ProposalTypeTxTaxUsage:
-		taxMsg := content.(MsgSubmitTxTaxUsageProposal)
-		proposal = &TaxUsageProposal{
-			textProposal,
-			TaxUsage{
-				taxMsg.Usage,
-				taxMsg.DestAddress,
-				taxMsg.Percent},
-		}
-		break
-	case ProposalTypeSoftwareUpgrade:
-		upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
-		proposal = &SoftwareUpgradeProposal{
-			textProposal,
-			sdk.ProtocolDefinition{
-				Version:   upgradeMsg.Version,
-				Software:  upgradeMsg.Software,
-				Height:    upgradeMsg.SwitchHeight,
-				Threshold: upgradeMsg.Threshold},
-		}
-		break
-	case ProposalTypeAddToken:
-		addTokenMsg := content.(MsgSubmitAddTokenProposal)
-		decimal := int(addTokenMsg.Decimal)
-		initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
-		maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
-
-		fToken := asset.NewFungibleToken(asset.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.SymbolAtSource, addTokenMsg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
-		proposal = &AddTokenProposal{
-			textProposal,
-			fToken,
-		}
-		break
-	default:
-		panic(fmt.Sprintf("invaid proposal type %s", pt))
-	}
-	return proposal
+	return typInfo.Handler(content)
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
