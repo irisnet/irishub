@@ -175,6 +175,10 @@ type ProposalQueue []uint64
 
 // Type that represents Proposal Type as a byte
 type ProposalKind byte
+type pTypeInfo struct {
+	Type  ProposalKind
+	Level ProposalLevel
+}
 
 //nolint
 const (
@@ -187,37 +191,30 @@ const (
 	ProposalTypeAddToken        ProposalKind = 0x06
 )
 
+var pTypeMap = map[string]pTypeInfo{
+	"PlainText":       {ProposalTypePlainText, ProposalLevelNormal},
+	"ParameterChange": {ProposalTypeParameterChange, ProposalLevelImportant},
+	"SoftwareUpgrade": {ProposalTypeSoftwareUpgrade,
+		ProposalLevelCritical},
+	"SystemHalt": {ProposalTypeSystemHalt,
+		ProposalLevelCritical},
+	"TxTaxUsage": {ProposalTypeTxTaxUsage, ProposalLevelNormal},
+	"AddToken":   {ProposalTypeAddToken, ProposalLevelImportant},
+}
+
 // String to proposalType byte.  Returns ff if invalid.
 func ProposalTypeFromString(str string) (ProposalKind, error) {
-	switch str {
-	case "PlainText":
-		return ProposalTypePlainText, nil
-	case "ParameterChange":
-		return ProposalTypeParameterChange, nil
-	case "SoftwareUpgrade":
-		return ProposalTypeSoftwareUpgrade, nil
-	case "SystemHalt":
-		return ProposalTypeSystemHalt, nil
-	case "TxTaxUsage":
-		return ProposalTypeTxTaxUsage, nil
-	case "AddToken":
-		return ProposalTypeAddToken, nil
-	default:
+	kind, ok := pTypeMap[str]
+	if !ok {
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
+	return kind.Type, nil
 }
 
 // is defined ProposalType?
 func ValidProposalType(pt ProposalKind) bool {
-	if pt == ProposalTypeParameterChange ||
-		pt == ProposalTypeSoftwareUpgrade ||
-		pt == ProposalTypeSystemHalt ||
-		pt == ProposalTypeTxTaxUsage ||
-		pt == ProposalTypePlainText ||
-		pt == ProposalTypeAddToken {
-		return true
-	}
-	return false
+	_, ok := pTypeMap[pt.String()]
+	return ok
 }
 
 // Marshal needed for protobuf compatibility
@@ -254,22 +251,12 @@ func (pt *ProposalKind) UnmarshalJSON(data []byte) error {
 
 // Turns VoteOption byte to String
 func (pt ProposalKind) String() string {
-	switch pt {
-	case ProposalTypePlainText:
-		return "PlainText"
-	case ProposalTypeParameterChange:
-		return "ParameterChange"
-	case ProposalTypeSoftwareUpgrade:
-		return "SoftwareUpgrade"
-	case ProposalTypeSystemHalt:
-		return "SystemHalt"
-	case ProposalTypeTxTaxUsage:
-		return "TxTaxUsage"
-	case ProposalTypeAddToken:
-		return "AddToken"
-	default:
-		return ""
+	for k, v := range pTypeMap {
+		if v.Type == pt {
+			return k
+		}
 	}
+	return ""
 }
 
 func (pt ProposalKind) NewProposal(content Context) Proposal {
@@ -352,18 +339,7 @@ func (pt ProposalKind) Format(s fmt.State, verb rune) {
 }
 
 func (pt ProposalKind) GetProposalLevel() ProposalLevel {
-	switch pt {
-	case ProposalTypeTxTaxUsage, ProposalTypePlainText:
-		return ProposalLevelNormal
-	case ProposalTypeParameterChange, ProposalTypeAddToken:
-		return ProposalLevelImportant
-	case ProposalTypeSystemHalt:
-		return ProposalLevelCritical
-	case ProposalTypeSoftwareUpgrade:
-		return ProposalLevelCritical
-	default:
-		return ProposalLevelNil
-	}
+	return pTypeMap[pt.String()].Level
 }
 
 //-----------------------------------------------------------
@@ -381,33 +357,26 @@ const (
 	StatusRejected      ProposalStatus = 0x04
 )
 
+var pStatusMap = map[string]ProposalStatus{
+	"DepositPeriod": StatusDepositPeriod,
+	"VotingPeriod":  StatusVotingPeriod,
+	"Passed":        StatusPassed,
+	"Rejected":      StatusRejected,
+}
+
 // ProposalStatusToString turns a string into a ProposalStatus
 func ProposalStatusFromString(str string) (ProposalStatus, error) {
-	switch str {
-	case "DepositPeriod":
-		return StatusDepositPeriod, nil
-	case "VotingPeriod":
-		return StatusVotingPeriod, nil
-	case "Passed":
-		return StatusPassed, nil
-	case "Rejected":
-		return StatusRejected, nil
-	case "":
-		return StatusNil, nil
-	default:
+	status, ok := pStatusMap[str]
+	if !ok {
 		return ProposalStatus(0xff), errors.Errorf("'%s' is not a valid proposal status", str)
 	}
+	return status, nil
 }
 
 // is defined ProposalType?
 func ValidProposalStatus(status ProposalStatus) bool {
-	if status == StatusDepositPeriod ||
-		status == StatusVotingPeriod ||
-		status == StatusPassed ||
-		status == StatusRejected {
-		return true
-	}
-	return false
+	_, ok := pStatusMap[status.String()]
+	return ok
 }
 
 // Marshal needed for protobuf compatibility
@@ -444,18 +413,12 @@ func (status *ProposalStatus) UnmarshalJSON(data []byte) error {
 
 // Turns VoteStatus byte to String
 func (status ProposalStatus) String() string {
-	switch status {
-	case StatusDepositPeriod:
-		return "DepositPeriod"
-	case StatusVotingPeriod:
-		return "VotingPeriod"
-	case StatusPassed:
-		return "Passed"
-	case StatusRejected:
-		return "Rejected"
-	default:
-		return ""
+	for k, v := range pStatusMap {
+		if v == status {
+			return k
+		}
 	}
+	return ""
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
