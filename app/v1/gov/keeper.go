@@ -1,8 +1,10 @@
 package gov
 
 import (
+	"encoding/json"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/gov/tags"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -82,7 +84,7 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 
 // =====================================================
 // Proposals
-func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (Proposal, bool, sdk.Error) {
+func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk.Error) {
 	content := msg.(Context)
 
 	proposalType := content.GetProposalType()
@@ -94,18 +96,18 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (Proposal, boo
 	initialDeposit := content.GetInitialDeposit()
 	minInitialDeposit := keeper.getMinInitialDeposit(ctx, pLevel)
 	if !initialDeposit.IsAllGTE(minInitialDeposit) {
-		return nil, false, ErrNotEnoughInitialDeposit(DefaultCodespace, initialDeposit, minInitialDeposit)
+		return nil, ErrNotEnoughInitialDeposit(DefaultCodespace, initialDeposit, minInitialDeposit)
 	}
 
 	// validate proposal
 	if err := proposal.Validate(ctx, keeper); err != nil {
-		return nil, false, err
+		return nil, err
 	}
 
 	//fill proposal field
 	proposalID, err := keeper.getNewProposalID(ctx)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 	proposal.SetProposalID(proposalID)
 	proposal.SetSubmitTime(ctx.BlockHeader().Time)
@@ -120,11 +122,35 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (Proposal, boo
 	//store init deposit
 	err, votingStarted := keeper.AddDeposit(ctx, proposal.GetProposalID(), proposal.GetProposer(), initialDeposit)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 
+	//add proposal number
 	pLevel.AddProposalNum(ctx, keeper, proposal.GetProposalID())
-	return proposal, votingStarted, nil
+
+	//return tag
+	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
+	resTags := sdk.NewTags(
+		tags.Proposer, []byte(proposal.GetProposer().String()),
+		tags.ProposalID, proposalIDBytes,
+	)
+	if votingStarted {
+		resTags = resTags.AppendTag(tags.VotingPeriodStart, proposalIDBytes)
+	}
+
+	switch proposal.GetProposalType() {
+	case ProposalTypeParameterChange:
+		var paramBytes []byte
+		paramBytes, _ = json.Marshal(content.GetParams())
+		resTags = resTags.AppendTag(tags.Param, paramBytes)
+	case ProposalTypeTxTaxUsage:
+		msg := msg.(MsgSubmitTxTaxUsageProposal)
+		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
+	case ProposalTypeAddToken:
+		tokenId := proposal.(*AddTokenProposal).FToken.GetUniqueID()
+		resTags = resTags.AppendTag(tags.TokenId, []byte(tokenId))
+	}
+	return resTags, nil
 }
 
 // Get Proposal from store by ProposalID
