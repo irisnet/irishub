@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Query the asset-related fees, including gateway creation and token issuance and minting
+Query the asset related fees, including gateway creation and token issuance and minting
 
 ## Usage
 
@@ -19,15 +19,14 @@ iriscli asset query-fee --help
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --subject           | string | true     | ""       | the fee type, only "gateway" and "token" allowed       |
-| --moniker           | string | false    | ""       | the gateway name, required if the subject is "gateway" |
-| --id                | string | false    | ""       | the token id, required if the subject is "token"       |
+| --gateway           | string | false    | ""       | the gateway moniker, required for querying gateway fee |
+| --token             | string | false    | ""       | the token id, required for querying token fees         |
 
 
 ## Examples
 
 ```
-iriscli asset query-fee --subject gateway --moniker tgw
+iriscli asset query-fee --gateway=tgw
 ```
 
 Output:
@@ -41,6 +40,31 @@ Fee: 600000iris
   "fee": {
     "denom": "iris",
     "amount": "600000"
+  }
+}
+```
+
+```
+iriscli asset query-fee --token=i.sym
+```
+
+Output:
+```txt
+Fees:
+  IssueFee: 300000iris
+  MintFee:  30000iris
+```
+
+```json
+{
+  "Exist": false,
+  "issue_fee": {
+    "denom": "iris",
+    "amount": "300000"
+  },
+  "mint_fee": {
+    "denom": "iris",
+    "amount": "30000"
   }
 }
 ```
