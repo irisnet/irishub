@@ -99,12 +99,8 @@ func GetCmdQueryGateway(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			moniker := viper.GetString(FlagMoniker)
-			if len(moniker) < asset.MinimumGatewayMonikerSize || len(moniker) > asset.MaximumGatewayMonikerSize {
-				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the length of the moniker must be [%d,%d]", asset.MinimumGatewayMonikerSize, asset.MaximumGatewayMonikerSize))
-			}
-
-			if !asset.IsAlpha(moniker) {
-				return asset.ErrInvalidMoniker(asset.DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+			if err := asset.ValidateMoniker(moniker); err != nil {
+				return err
 			}
 
 			params := asset.QueryGatewayParams{
@@ -188,21 +184,20 @@ func GetCmdQueryGateways(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryFee implements the query asset-related fees command.
+// GetCmdQueryFee implements the query asset related fees command.
 func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-fee",
-		Short:   "Query the asset-related fees",
-		Example: "iriscli asset query-fee --subject=<gateway|token> --moniker=<gateway moniker> --id=<token id>",
+		Short:   "Query the asset related fees",
+		Example: "iriscli asset query-fee --gateway=<gateway moniker>|--token=<token id>",
 		PreRunE: preQueryFeeCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			// subject validity is checked in PreRunE
-			subject := viper.GetString(FlagSubject)
-
-			if subject == "gateway" {
-				moniker := viper.GetString(FlagMoniker)
+			flags := cmd.Flags()
+			if flags.Changed(FlagGateway) {
+				// query gateway fee
+				moniker := viper.GetString(FlagGateway)
 				if err := asset.ValidateMoniker(moniker); err != nil {
 					return err
 				}
@@ -220,12 +215,13 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 				return cliCtx.PrintOutput(fee)
 
 			} else {
-				id := viper.GetString(FlagID)
-				if err := asset.CheckTokenID(id); err != nil {
+				// query token fees
+				tokenID := viper.GetString(FlagToken)
+				if err := asset.CheckTokenID(tokenID); err != nil {
 					return err
 				}
 
-				fees, err := queryTokenFees(cliCtx, id)
+				fees, err := queryTokenFees(cliCtx, tokenID)
 				if err != nil {
 					return err
 				}
@@ -246,23 +242,18 @@ func GetCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsFeeQuery)
-	cmd.MarkFlagRequired(FlagSubject)
 
 	return cmd
 }
 
-// preQueryFeeCmd is used to check if the subject is valid and the corresponding flag to the subject is provided
+// preQueryFeeCmd is used to check if the specified flags are valid
 func preQueryFeeCmd(cmd *cobra.Command, args []string) error {
-	subject := viper.GetString(FlagSubject)
+	flags := cmd.Flags()
 
-	if subject != "gateway" && subject != "token" {
-		return fmt.Errorf("the subject must be gateway or token")
-	}
-
-	if subject == "gateway" {
-		cmd.MarkFlagRequired(FlagMoniker)
-	} else if subject == "token" {
-		cmd.MarkFlagRequired(FlagID)
+	if flags.Changed(FlagGateway) && flags.Changed(FlagToken) {
+		return fmt.Errorf("only one flag is allowed among the gateway and token")
+	} else if !flags.Changed(FlagGateway) && !flags.Changed(FlagToken) {
+		return fmt.Errorf("must specify the gateway or token to be queried")
 	}
 
 	return nil
