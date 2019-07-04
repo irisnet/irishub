@@ -53,7 +53,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 			case MsgMintToken:
 				prefix, symbol := GetTokenIDParts(msg.TokenId)
 
-				if prefix == "i" {
+				if prefix == "" || prefix == "i" {
 					msgFee = getTokenMintFee(ctx, k, symbol)
 				} else if prefix != "x" {
 					msgFee = getGatewayTokenMintFee(ctx, k, symbol)
