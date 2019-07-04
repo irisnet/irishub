@@ -53,7 +53,7 @@ func TestIrisCLIToken(t *testing.T) {
 	spStr += fmt.Sprintf(" --gateway=%s", gateway)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
-	require.True(t, executeWrite(t, spStr, "y", sdk.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// TODO: check balance
@@ -97,10 +97,6 @@ func TestIrisCLIGateway(t *testing.T) {
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
-
-	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
-	barCoin := convertToIrisBaseAccount(t, barAcc)
-	require.Equal(t, "50iris", barCoin)
 
 	gatewayQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli asset query-gateway --moniker=uniquenm %v", flags), "")
 	//TODO
@@ -153,7 +149,7 @@ func TestIrisCLIGateway(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	gateway = executeGetGateway(t, fmt.Sprintf("iriscli asset query-gateway --moniker=%s %v", moniker, flags))
-	require.Equal(t, barAddr.String(), gateway.Owner)
+	require.Equal(t, barAddr.String(), gateway.Owner.String())
 
 	gateways = executeGetGateways(t, fmt.Sprintf("iriscli asset query-gateways --owner=%s %v", barAddr.String(), flags))
 	require.Equal(t, 1, len(gateways))
