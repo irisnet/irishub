@@ -72,7 +72,7 @@ Print：
         "MsgSubmitProposal": {
           "title": "test",
           "description": "test",
-          "proposal_type": "TxTaxUsage",
+          "proposal_type": "CommunityTaxUsage",
           "proposer": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx",
           "initial_deposit": [
             {

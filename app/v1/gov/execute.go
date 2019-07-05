@@ -13,11 +13,11 @@ func Execute(ctx sdk.Context, gk Keeper, p Proposal) (err error) {
 		return ParameterProposalExecute(ctx, gk, p.(*ParameterProposal))
 	case ProposalTypeSystemHalt:
 		return SystemHaltProposalExecute(ctx, gk)
-	case ProposalTypeTxTaxUsage:
+	case ProposalTypeCommunityTaxUsage:
 		return TaxUsageProposalExecute(ctx, gk, p.(*TaxUsageProposal))
 	case ProposalTypeSoftwareUpgrade:
 		return SoftwareUpgradeProposalExecute(ctx, gk, p.(*SoftwareUpgradeProposal))
-	case ProposalTypeAddToken:
+	case ProposalTypeTokenAddition:
 		return AddTokenProposalExecute(ctx, gk, p.(*AddTokenProposal))
 	}
 	return nil

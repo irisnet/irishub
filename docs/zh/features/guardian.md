@@ -8,7 +8,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     2. 使用`profiling`模式发起服务调用，`profiling`模式会免除服务费。
     
 * Trustee的权益
-    1. 通过`TxTaxUsage`治理取回交易税费时，只能使用Trustee address作为取回地址。
+    1. 通过`CommunityTaxUsage`治理取回交易税费时，只能使用Trustee address作为取回地址。
     2. 发起`withdraw-tax`交易可以从`iService`服务费税池中提取代币到指定账户。
     
 * Genesis Profiler/Genesis Trustee的权益（在创世的genesis.json中定义）
@@ -50,7 +50,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     iriscli service call --def-chain-id=<def-chain-id> --service-name=<service_name> --method-id=<method_id> --bind-chain-id=<bind-chain-id> --provider=<provider_address> --service-fee=1iris --request-data=<request_data> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --profiling=true
     ```
 
-5. 通过`TxTaxUsage`治理取回交易税费
+5. 通过`CommunityTaxUsage`治理取回交易税费
 
     详细参考[governance](governance.md#proposals-on-transaction-fee-community-tax-usage)
     
