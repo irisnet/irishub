@@ -124,7 +124,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	} else {
 		logger.Info("Grant community tax to account", "grant_amount", allocatedCoins.String(), "grant_address", destAddr.String())
 		if !allocatedCoins.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocatedCoins.String(), sdk.CommunityTaxUseFlow, "")
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocatedCoins.String(), sdk.CommunityTaxFlow, "")
 		}
 		_, err := k.bankKeeper.SendCoins(ctx, auth.CommunityTaxCoinsAccAddr, destAddr, allocatedCoins)
 		if err != nil {

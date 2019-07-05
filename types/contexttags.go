@@ -14,7 +14,7 @@ const (
 	ValidatorCommissionFlow  = "ValidatorCommission"
 	DelegatorRewardFlow      = "DelegatorReward"
 	BurnFlow                 = "Burn"
-	CommunityTaxUseFlow      = "CommunityTaxUse"
+	CommunityTaxFlow         = "CommunityTaxUse"
 	GovDepositFlow           = "GovDeposit"
 	GovDepositBurnFlow       = "GovDepositBurn"
 	GovDepositRefundFlow     = "GovDepositRefund"
