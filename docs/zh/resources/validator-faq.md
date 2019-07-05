@@ -77,7 +77,7 @@ IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通�
 ### IRISnet Profiler账户
 只有Profiler账户可以提交链上软件升级SoftwareUpgrade/停止共识Halt提议。
 ### IRISnet Trustee账户
-只有Trustee账户能够发起链上治理中的TxTaxUsage提议，把社区资金转移给Trustee账户使用
+只有Trustee账户能够发起链上治理中的CommunityTaxUsage提议，把社区资金转移给Trustee账户使用
 
 
 

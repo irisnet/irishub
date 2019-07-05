@@ -75,7 +75,7 @@ func createSystemHaltInfo() pTypeInfo {
 
 func createTxTaxUsageInfo() pTypeInfo {
 	return pTypeInfo{
-		ProposalTypeTxTaxUsage,
+		ProposalTypeCommunityTaxUsage,
 		ProposalLevelImportant,
 		func(content Context) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
@@ -95,7 +95,7 @@ func createTxTaxUsageInfo() pTypeInfo {
 
 func createAddTokenInfo() pTypeInfo {
 	return pTypeInfo{
-		ProposalTypeAddToken,
+		ProposalTypeTokenAddition,
 		ProposalLevelImportant,
 		func(content Context) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Context) Proposal {

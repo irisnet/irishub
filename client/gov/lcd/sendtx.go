@@ -78,7 +78,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 
 		// create the message
 		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, gov.Params{req.Param})
-		if msg.ProposalType == gov.ProposalTypeTxTaxUsage {
+		if msg.ProposalType == gov.ProposalTypeCommunityTaxUsage {
 			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -94,7 +94,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 				return
 			}
 		}
-		if msg.ProposalType == gov.ProposalTypeAddToken {
+		if msg.ProposalType == gov.ProposalTypeTokenAddition {
 			token := req.Token
 			tokenMsg := gov.NewMsgSubmitAddTokenProposal(msg, token.Symbol, token.SymbolAtSource, token.Name, token.SymbolMinAlias, token.Decimal, token.InitialSupply)
 			if tokenMsg.ValidateBasic() != nil {

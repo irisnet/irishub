@@ -177,22 +177,22 @@ type ProposalKind byte
 
 //nolint
 const (
-	ProposalTypeNil             ProposalKind = 0x00
-	ProposalTypeParameterChange ProposalKind = 0x01
-	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
-	ProposalTypeSystemHalt      ProposalKind = 0x03
-	ProposalTypeTxTaxUsage      ProposalKind = 0x04
-	ProposalTypePlainText       ProposalKind = 0x05
-	ProposalTypeAddToken        ProposalKind = 0x06
+	ProposalTypeNil               ProposalKind = 0x00
+	ProposalTypeParameterChange   ProposalKind = 0x01
+	ProposalTypeSoftwareUpgrade   ProposalKind = 0x02
+	ProposalTypeSystemHalt        ProposalKind = 0x03
+	ProposalTypeCommunityTaxUsage ProposalKind = 0x04
+	ProposalTypePlainText         ProposalKind = 0x05
+	ProposalTypeTokenAddition     ProposalKind = 0x06
 )
 
 var pTypeMap = map[string]pTypeInfo{
-	"PlainText":       createPlainTextInfo(),
-	"ParameterChange": createParameterChangeInfo(),
-	"SoftwareUpgrade": createSoftwareUpgradeInfo(),
-	"SystemHalt":      createSystemHaltInfo(),
-	"TxTaxUsage":      createTxTaxUsageInfo(),
-	"AddToken":        createAddTokenInfo(),
+	"PlainText":         createPlainTextInfo(),
+	"ParameterChange":   createParameterChangeInfo(),
+	"SoftwareUpgrade":   createSoftwareUpgradeInfo(),
+	"SystemHalt":        createSystemHaltInfo(),
+	"CommunityTaxUsage": createTxTaxUsageInfo(),
+	"TokenAddition":     createAddTokenInfo(),
 }
 
 // String to proposalType byte.  Returns ff if invalid.
