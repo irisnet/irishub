@@ -57,7 +57,7 @@ iriscli发送的交易默认是sync模式。如果想用其他模式发送交易
 例子：使用generate-only以生成未签名的交易
 
 ```
-iriscli gov submit-proposal --chain-id=<chain-id> --from=<user> --fee=0.3iris --description="test" --title="test" --usage="Burn" --percent=0.0000000001 --type="TxTaxUsage" --deposit=1000iris --generate-only
+iriscli gov submit-proposal --chain-id=<chain-id> --from=<user> --fee=0.3iris --description="test" --title="test" --usage="Burn" --percent=0.0000000001 --type="CommunityTaxUsage" --deposit=1000iris --generate-only
 ```
 
 返回：
@@ -71,7 +71,7 @@ iriscli gov submit-proposal --chain-id=<chain-id> --from=<user> --fee=0.3iris --
         "MsgSubmitProposal": {
           "title": "test",
           "description": "test",
-          "proposal_type": "TxTaxUsage",
+          "proposal_type": "CommunityTaxUsage",
           "proposer": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx",
           "initial_deposit": [
             {

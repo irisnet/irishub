@@ -193,7 +193,7 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 		return ProposalTypeSoftwareUpgrade, nil
 	case "SystemHalt":
 		return ProposalTypeSystemHalt, nil
-	case "TxTaxUsage":
+	case "CommunityTaxUsage":
 		return ProposalTypeTxTaxUsage, nil
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
@@ -253,7 +253,7 @@ func (pt ProposalKind) String() string {
 	case ProposalTypeSystemHalt:
 		return "SystemHalt"
 	case ProposalTypeTxTaxUsage:
-		return "TxTaxUsage"
+		return "CommunityTaxUsage"
 	default:
 		return ""
 	}

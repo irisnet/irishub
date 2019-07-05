@@ -14,7 +14,7 @@
 Specific Proposal for different levels：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
 - Important：`ParameterChange`
-- Normal：`TxTaxUsage`,`PlainText`
+- Normal：`CommunityTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
 
@@ -102,13 +102,13 @@ There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning t
 
 ```shell
 # Submit Burn usage proposal
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Submit Distribute usage proposal
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Submit Grant usage proposal
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 ```
 
 ### Proposals on system halting
