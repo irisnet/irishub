@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/asset/tags"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -57,6 +58,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.
 
 		// Set total supply
 		k.bk.SetTotalSupply(ctx, initialSupply)
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, owner.String(), owner.String(), initialSupply.String(), sdk.IssueTokenFlow, "")
 	}
 
 	createTags := sdk.NewTags(
@@ -106,9 +108,11 @@ func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, s
 	}
 
 	// Set token to be prefixed with owner and source
-	err = k.SetTokens(ctx, owner, token)
-	if err != nil {
-		return token, nil, err
+	if token.GetSource() == NATIVE {
+		err = k.SetTokens(ctx, owner, token)
+		if err != nil {
+			return token, nil, err
+		}
 	}
 
 	// Set token to be prefixed with source
@@ -116,6 +120,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, s
 	if err != nil {
 		return token, nil, err
 	}
+
 	return token, owner, nil
 }
 
@@ -125,6 +130,10 @@ func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 }
 
 func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
+	if token.GetSource() == GATEWAY {
+		token.Owner = nil
+	}
+
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
@@ -237,13 +246,23 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
+	if token.Source == GATEWAY {
+		gateway, _ := k.GetGateway(ctx, token.Gateway)
+		token.Owner = gateway.Owner
+	}
+
 	if !msg.Owner.Equals(token.Owner) {
-		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.TokenId))
+	}
+
+	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
+	if !found {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
 	}
 
 	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(token.Decimal))
-	if maxSupply.GT(sdk.ZeroInt()) && (token.InitialSupply.GT(maxSupply) || maxSupply.GT(token.MaxSupply)) {
-		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max_supply must be greater than %s and less than %s", token.InitialSupply.String(), token.MaxSupply.String()))
+	if maxSupply.GT(sdk.ZeroInt()) && (maxSupply.LT(hasIssuedAmt.Amount) || maxSupply.GT(token.MaxSupply)) {
+		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.Amount.String(), token.MaxSupply.String()))
 	}
 
 	if msg.Name != DoNotModify {
@@ -404,7 +423,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (
 	}
 
 	if token.Source != NATIVE {
-		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the source of the token is native can be transferd,but current the source of the token is %s", token.Source.String()))
+		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the token of which the source is native can be transferred,but the source of the current token is %s", token.Source.String()))
 	}
 
 	if !msg.SrcOwner.Equals(token.Owner) {
@@ -450,7 +469,12 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
-	if !token.Owner.Equals(msg.Owner) {
+	if token.Source == GATEWAY {
+		gateway, _ := k.GetGateway(ctx, token.Gateway)
+		token.Owner = gateway.Owner
+	}
+
+	if !msg.Owner.Equals(token.Owner) {
 		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenId))
 	}
 
@@ -458,21 +482,21 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 		return nil, ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
 	}
 
-	hasIssueAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
+	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
 	if !found {
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
 	}
 
 	//check the denom
 	expDenom := token.GetDenom()
-	if expDenom != hasIssueAmt.Denom {
-		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssueAmt.Denom))
+	if expDenom != hasIssuedAmt.Denom {
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssuedAmt.Denom))
 	}
 
 	mintAmt := sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Decimal))
-	if mintAmt.Add(hasIssueAmt.Amount).GT(token.MaxSupply) {
+	if mintAmt.Add(hasIssuedAmt.Amount).GT(token.MaxSupply) {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
-		canAmt := token.MaxSupply.Sub(hasIssueAmt.Amount).Div(exp)
+		canAmt := token.MaxSupply.Sub(hasIssuedAmt.Amount).Div(exp)
 		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
 	}
 
@@ -509,5 +533,6 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 	if err != nil {
 		return nil, err
 	}
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), mintAcc.String(), mintCoin.String(), sdk.MintTokenFlow, "")
 	return tags, nil
 }

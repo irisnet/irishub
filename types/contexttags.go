@@ -14,12 +14,15 @@ const (
 	ValidatorCommissionFlow  = "ValidatorCommission"
 	DelegatorRewardFlow      = "DelegatorReward"
 	BurnFlow                 = "Burn"
+	CommunityTaxCollectFlow  = "CommunityTaxCollect"
 	CommunityTaxUseFlow      = "CommunityTaxUse"
 	GovDepositFlow           = "GovDeposit"
 	GovDepositBurnFlow       = "GovDepositBurn"
 	GovDepositRefundFlow     = "GovDepositRefund"
 	ServiceDepositFlow       = "ServiceDeposit"
 	ServiceDepositRefundFlow = "ServiceDepositRefund"
+	MintTokenFlow            = "MintToken"
+	IssueTokenFlow           = "IssueToken"
 
 	//Trigger: transaction hash, module endBlock
 	GovEndBlocker     = "govEndBlocker"

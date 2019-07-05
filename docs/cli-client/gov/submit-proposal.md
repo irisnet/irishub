@@ -24,7 +24,7 @@ iriscli gov submit-proposal --help
 | --description    |                            | Description of proposal                                                                                                                     | Yes      |
 | --param          |                            | Parameter of proposal,eg. mint/Inflation=0.050                                                                                 |          |
 | --title          |                            | Title of proposal                                                                                                                           | Yes      |
-| --type           |                            | ProposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage/AddToken                                                           | Yes      |
+| --type           |                            | ProposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition                                                           | Yes      |
 | --version           |            0                | the version of the new protocol                                                                            |       |
 | --software           |           " "                 | the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | the switch height of the new protocol                                                         |       |
@@ -56,10 +56,10 @@ iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --des
 
 In this case, 'title'、 'type' and 'description' of the proposal is required parameters, also you should back up your proposal-id which is the only way to retrieve your proposal.
 
-### Submit a `AddToken` type proposal
+### Submit a `TokenAddition` type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000
+iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=TokenAddition --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000
 ```
 
 ###  How to query proposal

@@ -63,7 +63,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 			msg := gov.NewMsgSubmitProposal(title, description, proposalType, fromAddr, amount, params)
-			if proposalType == gov.ProposalTypeTxTaxUsage {
+			if proposalType == gov.ProposalTypeCommunityTaxUsage {
 				usageStr := viper.GetString(flagUsage)
 				usage, err := gov.UsageTypeFromString(usageStr)
 				if err != nil {
@@ -111,7 +111,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 
-			if proposalType == gov.ProposalTypeAddToken {
+			if proposalType == gov.ProposalTypeTokenAddition {
 				symbol := viper.GetString(flagTokenSymbol)
 				symbolAtSource := viper.GetString(flagTokenSymbolAtSource)
 				name := viper.GetString(flagTokenName)
@@ -128,7 +128,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/TxTaxUsage/AddToken")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/CommunityTaxUsage/TokenAddition")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")

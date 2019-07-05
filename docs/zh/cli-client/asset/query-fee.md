@@ -19,15 +19,14 @@ iriscli asset query-fee --help
 
 | 命令, 速记     | 类型   | 是否必须 | 默认值  | 描述                                          |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --subject           | string | 是     | ""      | 费用类型, 取值为gateway或者token         |
-| --moniker           | string | 否    | ""       | 网关名字; 如果subject为gateway,则必须指定 |
-| --id                | string | 否    | ""       | Token ID; 如果subject为token,则必须指定  |
+| --gateway           | string | 否    | ""       | 网关名字; 如果查询网关费用,则必须指定 |
+| --token             | string | 否    | ""       | Token ID; 如果查询Token费用,则必须指定  |
 
 
 ## 示例
 
 ```
-iriscli asset query-fee --subject gateway --moniker tgw
+iriscli asset query-fee --gateway=tgw
 ```
 
 输出信息:
@@ -41,6 +40,31 @@ Fee: 600000iris
   "fee": {
     "denom": "iris",
     "amount": "600000"
+  }
+}
+```
+
+```
+iriscli asset query-fee --token=i.sym
+```
+
+输出信息:
+```txt
+Fees:
+  IssueFee: 300000iris
+  MintFee:  30000iris
+```
+
+```json
+{
+  "Exist": false,
+  "issue_fee": {
+    "denom": "iris",
+    "amount": "300000"
+  },
+  "mint_fee": {
+    "denom": "iris",
+    "amount": "30000"
   }
 }
 ```
