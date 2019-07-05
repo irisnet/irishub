@@ -177,13 +177,13 @@ type ProposalKind byte
 
 //nolint
 const (
-	ProposalTypeNil             ProposalKind = 0x00
-	ProposalTypeParameterChange ProposalKind = 0x01
-	ProposalTypeSoftwareUpgrade ProposalKind = 0x02
-	ProposalTypeSystemHalt      ProposalKind = 0x03
-	ProposalTypeTxTaxUsage      ProposalKind = 0x04
-	ProposalTypePlainText       ProposalKind = 0x05
-	ProposalTypeAddToken        ProposalKind = 0x06
+	ProposalTypeNil               ProposalKind = 0x00
+	ProposalTypeParameterChange   ProposalKind = 0x01
+	ProposalTypeSoftwareUpgrade   ProposalKind = 0x02
+	ProposalTypeSystemHalt        ProposalKind = 0x03
+	ProposalTypeCommunityTaxUsage ProposalKind = 0x04
+	ProposalTypePlainText         ProposalKind = 0x05
+	ProposalTypeTokenAddition     ProposalKind = 0x06
 )
 
 // String to proposalType byte.  Returns ff if invalid.
@@ -197,10 +197,10 @@ func ProposalTypeFromString(str string) (ProposalKind, error) {
 		return ProposalTypeSoftwareUpgrade, nil
 	case "SystemHalt":
 		return ProposalTypeSystemHalt, nil
-	case "TxTaxUsage":
-		return ProposalTypeTxTaxUsage, nil
-	case "AddToken":
-		return ProposalTypeAddToken, nil
+	case "CommunityTaxUsage":
+		return ProposalTypeCommunityTaxUsage, nil
+	case "TokenAddition":
+		return ProposalTypeTokenAddition, nil
 	default:
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
@@ -211,9 +211,9 @@ func ValidProposalType(pt ProposalKind) bool {
 	if pt == ProposalTypeParameterChange ||
 		pt == ProposalTypeSoftwareUpgrade ||
 		pt == ProposalTypeSystemHalt ||
-		pt == ProposalTypeTxTaxUsage ||
+		pt == ProposalTypeCommunityTaxUsage ||
 		pt == ProposalTypePlainText ||
-		pt == ProposalTypeAddToken {
+		pt == ProposalTypeTokenAddition {
 		return true
 	}
 	return false
@@ -262,10 +262,10 @@ func (pt ProposalKind) String() string {
 		return "SoftwareUpgrade"
 	case ProposalTypeSystemHalt:
 		return "SystemHalt"
-	case ProposalTypeTxTaxUsage:
-		return "TxTaxUsage"
-	case ProposalTypeAddToken:
-		return "AddToken"
+	case ProposalTypeCommunityTaxUsage:
+		return "CommunityTaxUsage"
+	case ProposalTypeTokenAddition:
+		return "TokenAddition"
 	default:
 		return ""
 	}

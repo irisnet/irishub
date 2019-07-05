@@ -14,7 +14,7 @@
 不同级别对应的具体 Proposal：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
 - Important：`ParameterChange`
-- Normal：`TxTaxUsage`,`PlainText`
+- Normal：`CommunityTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` 和 `SystemHalt Proposal` 只能由profiler发起。
 
@@ -97,13 +97,13 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 有三种使用方式: `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标受托人账户转移代币，然后受托人将这些代币分发或赠给其他账户。
 ```shell
 # 提交 Burn 提议
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="TxTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # 提交 Distribute 提议
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="TxTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # 提交 Grant 提议 
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="TxTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 ```
 
 ### 系统终止提议
