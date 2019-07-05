@@ -22,7 +22,7 @@ iriscli gov submit-proposal --help
 | --description    |                            | 提议的描述                                                                                                           | Yes      |
 | --param          |                            | 提议参数,例如: mint/Inflation=0.050                                                                                |          |
 | --title          |                            | 提议标题                                                                                                                           | Yes      |
-| --type           |                            | 提议类型,例如:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/TxTaxUsage/AddToken                                                                  | Yes      |
+| --type           |                            | 提议类型,例如:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/AddToken                                                                  | Yes      |
 | --version           |            0                | 新协议的版本信息                                                                           |       |
 | --software           |           " "                 |  新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     |  新版本协议升级的高度                                                     |       |
