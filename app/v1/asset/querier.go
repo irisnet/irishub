@@ -150,6 +150,12 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		if !found {
 			continue
 		}
+
+		if token.Source == GATEWAY {
+			gateway, _ := keeper.GetGateway(ctx, token.Gateway)
+			token.Owner = gateway.Owner
+		}
+
 		tokens = append(tokens, token)
 	}
 

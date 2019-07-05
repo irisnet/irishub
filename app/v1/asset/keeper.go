@@ -94,7 +94,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, s
 					gateway.Moniker, gateway.Owner, token.GetOwner()))
 		}
 
-		owner = gateway.Owner
+		owner = nil
 	} else if token.GetSource() == NATIVE {
 		owner = token.GetOwner()
 		token.SymbolAtSource = ""
@@ -238,8 +238,16 @@ func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Erro
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
-	if !msg.Owner.Equals(token.Owner) {
-		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, token.Owner))
+	var tokenOwner sdk.AccAddress
+	if token.Source == GATEWAY {
+		gateway, _ := k.GetGateway(ctx, token.Gateway)
+		tokenOwner = gateway.Owner
+	} else {
+		tokenOwner = token.Owner
+	}
+
+	if !msg.Owner.Equals(tokenOwner) {
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.TokenId))
 	}
 
 	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
@@ -456,7 +464,15 @@ func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Erro
 		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
-	if !token.Owner.Equals(msg.Owner) {
+	var tokenOwner sdk.AccAddress
+	if token.Source == GATEWAY {
+		gateway, _ := k.GetGateway(ctx, token.Gateway)
+		tokenOwner = gateway.Owner
+	} else {
+		tokenOwner = token.Owner
+	}
+
+	if !token.Owner.Equals(tokenOwner) {
 		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenId))
 	}
 
