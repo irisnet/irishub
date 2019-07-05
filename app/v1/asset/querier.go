@@ -64,6 +64,11 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		if !found {
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 		}
+
+		if token.Source == GATEWAY {
+			gateway, _ := keeper.GetGateway(ctx, token.Gateway)
+			token.Owner = gateway.Owner
+		}
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
