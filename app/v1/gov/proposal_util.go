@@ -76,7 +76,7 @@ func createSystemHaltInfo() pTypeInfo {
 func createTxTaxUsageInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeTxTaxUsage,
-		ProposalLevelNormal,
+		ProposalLevelImportant,
 		func(content Context) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
 				taxMsg := content.(MsgSubmitTxTaxUsageProposal)
