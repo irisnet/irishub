@@ -92,7 +92,7 @@ func tally(ctx sdk.Context, keeper Keeper, proposal Proposal) (result ProposalRe
 		totalVotingPower = totalVotingPower.Add(votingPower)
 	}
 
-	tallyingProcedure := proposal.GetProposalLevel().GetTallyingProcedure(ctx, keeper)
+	tallyingProcedure := keeper.GetTallyingProcedure(ctx, proposal.GetProposalLevel())
 
 	tallyResults = TallyResult{
 		Yes:               results[OptionYes].QuoInt(sdk.AttoPrecision),

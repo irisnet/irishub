@@ -113,7 +113,7 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk
 	}
 	proposal.SetProposalID(proposalID)
 	proposal.SetSubmitTime(ctx.BlockHeader().Time)
-	depositPeriod := pLevel.GetDepositProcedure(ctx, keeper).MaxDepositPeriod
+	depositPeriod := keeper.GetDepositProcedure(ctx, pLevel).MaxDepositPeriod
 	proposal.SetDepositEndTime(proposal.GetSubmitTime().Add(depositPeriod))
 
 	// store proposal
@@ -128,7 +128,7 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk
 	}
 
 	//add proposal number
-	pLevel.AddProposalNum(ctx, keeper, proposal.GetProposalID())
+	keeper.AddProposalNum(ctx, pLevel, proposal.GetProposalID())
 
 	//return tag
 	proposalIDBytes := []byte(strconv.FormatUint(proposal.GetProposalID(), 10))
@@ -279,7 +279,7 @@ func (keeper Keeper) peekCurrentProposalID(ctx sdk.Context) (proposalID uint64, 
 
 func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 	proposal.SetVotingStartTime(ctx.BlockHeader().Time)
-	votingPeriod := proposal.GetProposalLevel().GetVotingProcedure(ctx, keeper).VotingPeriod
+	votingPeriod := keeper.GetVotingProcedure(ctx, proposal.GetProposalLevel()).VotingPeriod
 	proposal.SetVotingEndTime(proposal.GetVotingStartTime().Add(votingPeriod))
 	proposal.SetStatus(StatusVotingPeriod)
 	keeper.SetProposal(ctx, proposal)
@@ -412,7 +412,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	// Check if deposit tipped proposal into voting period
 	// Active voting period if so
 	activatedVotingPeriod := false
-	if proposal.GetTotalDeposit().IsAllGTE(proposal.GetProposalLevel().GetDepositProcedure(ctx, keeper).MinDeposit) {
+	if proposal.GetTotalDeposit().IsAllGTE(keeper.GetDepositProcedure(ctx, proposal.GetProposalLevel()).MinDeposit) {
 		keeper.activateVotingPeriod(ctx, proposal)
 		activatedVotingPeriod = true
 	}
@@ -452,7 +452,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	}
 
 	proposal := keeper.GetProposal(ctx, proposalID)
-	BurnAmountDec := sdk.NewDecFromInt(proposal.GetProposalLevel().GetDepositProcedure(ctx, keeper).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(BurnRate)
+	BurnAmountDec := sdk.NewDecFromInt(keeper.GetDepositProcedure(ctx, proposal.GetProposalLevel()).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(BurnRate)
 	DepositSumInt := depositSum.AmountOf(stakeTypes.StakeDenom)
 	rate := BurnAmountDec.Quo(sdk.NewDecFromInt(DepositSumInt))
 	RefundSumInt := sdk.NewInt(0)
@@ -690,7 +690,144 @@ func (keeper Keeper) SetParamSet(ctx sdk.Context, params GovParams) {
 }
 
 func (keeper Keeper) getMinInitialDeposit(ctx sdk.Context, proposalLevel ProposalLevel) sdk.Coins {
-	minDeposit := proposalLevel.GetDepositProcedure(ctx, keeper).MinDeposit
+	minDeposit := keeper.GetDepositProcedure(ctx, proposalLevel).MinDeposit
 	minDepositInt := sdk.NewDecFromInt(minDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(MinDepositRate).RoundInt()
 	return sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, minDepositInt)}
+}
+
+// Returns the current Deposit Procedure from the global param store
+func (keeper Keeper) GetDepositProcedure(ctx sdk.Context, p ProposalLevel) DepositProcedure {
+	params := keeper.GetParamSet(ctx)
+	switch p {
+	case ProposalLevelCritical:
+		return DepositProcedure{
+			MinDeposit:       params.CriticalMinDeposit,
+			MaxDepositPeriod: params.CriticalDepositPeriod,
+		}
+	case ProposalLevelImportant:
+		return DepositProcedure{
+			MinDeposit:       params.ImportantMinDeposit,
+			MaxDepositPeriod: params.ImportantDepositPeriod,
+		}
+	case ProposalLevelNormal:
+		return DepositProcedure{
+			MinDeposit:       params.NormalMinDeposit,
+			MaxDepositPeriod: params.NormalDepositPeriod,
+		}
+	default:
+		panic("There is no level for this proposal which type is " + p.string())
+	}
+}
+
+// Returns the current Voting Procedure from the global param store
+func (keeper Keeper) GetVotingProcedure(ctx sdk.Context, p ProposalLevel) VotingProcedure {
+	params := keeper.GetParamSet(ctx)
+	switch p {
+	case ProposalLevelCritical:
+		return VotingProcedure{
+			VotingPeriod: params.CriticalVotingPeriod,
+		}
+	case ProposalLevelImportant:
+		return VotingProcedure{
+			VotingPeriod: params.ImportantVotingPeriod,
+		}
+	case ProposalLevelNormal:
+		return VotingProcedure{
+			VotingPeriod: params.NormalVotingPeriod,
+		}
+	default:
+		panic("There is no level for this proposal which type is " + p.string())
+	}
+}
+
+func (keeper Keeper) GetMaxNumByProposalLevel(ctx sdk.Context, p ProposalLevel) uint64 {
+	params := keeper.GetParamSet(ctx)
+	switch p {
+	case ProposalLevelCritical:
+		return params.CriticalMaxNum
+
+	case ProposalLevelImportant:
+		return params.ImportantMaxNum
+
+	case ProposalLevelNormal:
+		return params.NormalMaxNum
+	default:
+		panic("There is no level for this proposal which type is " + p.string())
+	}
+}
+
+// Returns the current Tallying Procedure from the global param store
+func (keeper Keeper) GetTallyingProcedure(ctx sdk.Context, p ProposalLevel) TallyingProcedure {
+	params := keeper.GetParamSet(ctx)
+	switch p {
+	case ProposalLevelCritical:
+		return TallyingProcedure{
+			Threshold:     params.CriticalThreshold,
+			Veto:          params.CriticalVeto,
+			Participation: params.CriticalParticipation,
+			Penalty:       params.CriticalPenalty,
+		}
+	case ProposalLevelImportant:
+		return TallyingProcedure{
+			Threshold:     params.ImportantThreshold,
+			Veto:          params.ImportantVeto,
+			Participation: params.ImportantParticipation,
+			Penalty:       params.ImportantPenalty,
+		}
+	case ProposalLevelNormal:
+		return TallyingProcedure{
+			Threshold:     params.NormalThreshold,
+			Veto:          params.NormalVeto,
+			Participation: params.NormalParticipation,
+			Penalty:       params.NormalPenalty,
+		}
+	default:
+		panic("There is no level for this proposal which type is " + p.string())
+	}
+}
+
+func (keeper Keeper) AddProposalNum(ctx sdk.Context, p ProposalLevel, args ...interface{}) {
+	switch p {
+	case ProposalLevelCritical:
+		proposalID := args[0].(uint64)
+		keeper.AddCriticalProposalNum(ctx, proposalID)
+	case ProposalLevelImportant:
+		keeper.AddImportantProposalNum(ctx)
+	case ProposalLevelNormal:
+		keeper.AddNormalProposalNum(ctx)
+	default:
+		panic("There is no level for this proposal which type is " + p.string())
+	}
+}
+
+func (keeper Keeper) SubProposalNum(ctx sdk.Context, p ProposalLevel) {
+	switch p {
+	case ProposalLevelCritical:
+		keeper.SubCriticalProposalNum(ctx)
+	case ProposalLevelImportant:
+		keeper.SubImportantProposalNum(ctx)
+	case ProposalLevelNormal:
+		keeper.SubNormalProposalNum(ctx)
+	default:
+		panic("There is no level for this proposal which type is " + p.string())
+	}
+}
+
+func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, p ProposalLevel) (uint64, bool) {
+	ctx.Logger().Debug("Proposals Distribution",
+		"CriticalProposalNum", keeper.GetCriticalProposalNum(ctx),
+		"ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
+		"NormalProposalNum", keeper.GetNormalProposalNum(ctx))
+
+	maxNum := keeper.GetMaxNumByProposalLevel(ctx, p)
+	switch p {
+	case ProposalLevelCritical:
+		return keeper.GetCriticalProposalNum(ctx), keeper.GetCriticalProposalNum(ctx) == maxNum
+	case ProposalLevelImportant:
+		return keeper.GetImportantProposalNum(ctx), keeper.GetImportantProposalNum(ctx) == maxNum
+	case ProposalLevelNormal:
+		return keeper.GetNormalProposalNum(ctx), keeper.GetNormalProposalNum(ctx) == maxNum
+	default:
+		panic("There is no level for this proposal")
+	}
 }

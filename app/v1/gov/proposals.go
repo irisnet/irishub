@@ -149,7 +149,7 @@ func (bp BasicProposal) GetTaxUsage() TaxUsage                         { return 
 func (bp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
 func (bp *BasicProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 	pLevel := bp.ProposalType.GetProposalLevel()
-	if num, ok := pLevel.HasReachedTheMaxProposalNum(ctx, k); ok {
+	if num, ok := k.HasReachedTheMaxProposalNum(ctx, pLevel); ok {
 		return ErrMoreThanMaxProposal(k.codespace, num, pLevel.string())
 	}
 	return nil

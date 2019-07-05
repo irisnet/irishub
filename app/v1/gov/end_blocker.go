@@ -25,7 +25,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		var proposalID uint64
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(inactiveIterator.Value(), &proposalID)
 		inactiveProposal := keeper.GetProposal(ctx, proposalID)
-		inactiveProposal.GetProposalLevel().SubProposalNum(ctx, keeper)
+		keeper.SubProposalNum(ctx, inactiveProposal.GetProposalLevel())
 		keeper.DeleteDeposits(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
 
@@ -34,7 +34,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		keeper.RemoveFromInactiveProposalQueue(ctx, inactiveProposal.GetDepositEndTime(), inactiveProposal.GetProposalID())
 		ctx.Logger().Info("Proposal didn't meet minimum deposit; deleted", "ProposalID",
-			inactiveProposal.GetProposalID(), "MinDeposit", inactiveProposal.GetProposalLevel().GetDepositProcedure(ctx, keeper).MinDeposit,
+			inactiveProposal.GetProposalID(), "MinDeposit", keeper.GetDepositProcedure(ctx, inactiveProposal.GetProposalLevel()).MinDeposit,
 			"ActualDeposit", inactiveProposal.GetTotalDeposit(),
 		)
 	}
@@ -80,12 +80,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						val.GetConsAddr(),
 						ctx.BlockHeight(),
 						val.GetPower().RoundInt64(),
-						activeProposal.GetProposalLevel().GetTallyingProcedure(ctx, keeper).Penalty)
+						keeper.GetTallyingProcedure(ctx, activeProposal.GetProposalLevel()).Penalty)
 				}
 			}
 		}
 
-		activeProposal.GetProposalLevel().SubProposalNum(ctx, keeper)
+		keeper.SubProposalNum(ctx, activeProposal.GetProposalLevel())
 		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
 	}
 	return resTags
