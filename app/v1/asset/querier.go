@@ -114,7 +114,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		}
 	}
 
-	if len(params.Owner) > 0 && source != EXTERNAL { // ignore owner if source == EXTERNAL
+	if len(params.Owner) > 0 && source == NATIVE { // ignore owner if source != NATIVE
 		owner, err = sdk.AccAddressFromBech32(params.Owner)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)

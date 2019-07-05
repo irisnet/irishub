@@ -2,7 +2,6 @@ package asset
 
 import (
 	"fmt"
-	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -22,17 +21,6 @@ func KeyToken(tokenId string) []byte {
 func KeyTokens(owner sdk.AccAddress, tokenId string) []byte {
 	if owner.Empty() {
 		return []byte(fmt.Sprintf("tokens:%s", tokenId))
-	}
-
-	var prefix string
-	if strings.Contains(tokenId, ".") {
-		prefix, _ = GetTokenIDParts(tokenId)
-	} else {
-		prefix = tokenId
-	}
-
-	if len(prefix) > 1 {
-		return []byte(fmt.Sprintf("tokens:%s", prefix))
 	}
 
 	return []byte(fmt.Sprintf("ownerTokens:%s:%s", owner, tokenId))

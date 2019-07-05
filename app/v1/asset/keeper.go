@@ -107,9 +107,11 @@ func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, s
 	}
 
 	// Set token to be prefixed with owner and source
-	err = k.SetTokens(ctx, owner, token)
-	if err != nil {
-		return token, nil, err
+	if token.GetSource() == NATIVE {
+		err = k.SetTokens(ctx, owner, token)
+		if err != nil {
+			return token, nil, err
+		}
 	}
 
 	// Set token to be prefixed with source
@@ -117,6 +119,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, s
 	if err != nil {
 		return token, nil, err
 	}
+
 	return token, owner, nil
 }
 
@@ -126,7 +129,7 @@ func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 }
 
 func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
-	if token.Source == GATEWAY {
+	if token.GetSource() == GATEWAY {
 		token.Owner = nil
 	}
 
