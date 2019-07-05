@@ -52,7 +52,7 @@ type ProtocolV0 struct {
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
 
-	anteHandler          sdk.AnteHandler          // ante handler for fee and auth
+	anteHandlers         []sdk.AnteHandler        // ante handlers for fee and auth
 	feeRefundHandler     sdk.FeeRefundHandler     // fee handler for fee refund
 	feePreprocessHandler sdk.FeePreprocessHandler // fee handler for fee preprocessor
 
@@ -279,7 +279,7 @@ func (p *ProtocolV0) configRouters() {
 
 // configure all Stores
 func (p *ProtocolV0) configFeeHandlers() {
-	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
+	p.anteHandlers = []sdk.AnteHandler{auth.NewAnteHandler(p.accountMapper, p.feeKeeper)}
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
@@ -430,8 +430,8 @@ func (p *ProtocolV0) GetRouter() protocol.Router {
 func (p *ProtocolV0) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
-func (p *ProtocolV0) GetAnteHandler() sdk.AnteHandler {
-	return p.anteHandler
+func (p *ProtocolV0) GetAnteHandlers() []sdk.AnteHandler {
+	return p.anteHandlers
 }
 func (p *ProtocolV0) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler
