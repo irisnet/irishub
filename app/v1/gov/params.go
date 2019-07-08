@@ -22,7 +22,7 @@ const (
 	UPPER_BOUND_AMOUNT    = 10000
 	STABLE_CRITIACAL_NUM  = 1
 	DEFAULT_IMPORTANT_NUM = 5
-	DEFAULT_NORMAL_NUM    = 2
+	DEFAULT_NORMAL_NUM    = 7
 	MIN_IMPORTANT_NUM     = 1
 	MIN_NORMAL_NUM        = 1
 )
@@ -265,27 +265,27 @@ func DefaultParams() GovParams {
 			CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
 			CriticalVotingPeriod:  time.Duration(sdk.FiveDays),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
-			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
+			CriticalThreshold:     sdk.NewDecWithPrec(75, 2),
 			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
-			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
+			CriticalParticipation: sdk.NewDecWithPrec(50, 2),
 			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
 			ImportantVotingPeriod:  time.Duration(sdk.FiveDays),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
-			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
+			ImportantThreshold:     sdk.NewDecWithPrec(67, 2),
 			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
-			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
+			ImportantParticipation: sdk.NewDecWithPrec(50, 2),
 			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
 			NormalVotingPeriod:  time.Duration(sdk.FiveDays),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
-			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
+			NormalThreshold:     sdk.NewDecWithPrec(50, 2),
 			NormalVeto:          sdk.NewDecWithPrec(334, 3),
-			NormalParticipation: sdk.NewDecWithPrec(75, 2),
+			NormalParticipation: sdk.NewDecWithPrec(50, 2),
 			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    20000,
 		}
