@@ -19,7 +19,7 @@ Query the token statistic, including total loose tokens, total burned token and 
 | --height       | Int    | False    |                       | Block height to query, omit to get most recent provable block |
 | --indent       | String | False    |                       | Add indent to JSON response                                  |
 | --ledger       | String | False    |                       | Use a connected Ledger device                                |
-| --node         | String | False    | tcp://localhost:26657 | <host>:<port> to tendermint rpc interface for this chain     |
+| --node         | String | False    | tcp://localhost:26657 | `<host>:<port>`to tendermint rpc interface for this chain     |
 | --trust-node   | String | False    | True                  | Don't verify proofs for responses                            |
 
 
