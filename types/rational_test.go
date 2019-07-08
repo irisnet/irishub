@@ -397,8 +397,3 @@ func TestImmutabilityRat(t *testing.T) {
 	}
 
 }
-
-func TestNewRat(t *testing.T) {
-	num, _ := NewRatFromDecimal("0.875", 4)
-	println(num.String())
-}
