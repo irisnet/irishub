@@ -68,42 +68,42 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 
 - **资产**
 
-  - [发行资产](../cli-client/asset/issue-token)
+  - [发行资产](../cli-client/asset/issue-token.md)
 
-    - [发行原生资产](../cli-client/asset/issue-token#发行原生资产)
+    - [发行原生资产](../cli-client/asset/issue-token.md#发行原生资产)
 
-    - [发行网关资产](../cli-client/asset/issue-token#发行网关资产)
+    - [发行网关资产](../cli-client/asset/issue-token.md#发行网关资产)
 
-    - [转账](../cli-client/asset/issue-token#转账)
+    - [转账](../cli-client/asset/issue-token.md#转账)
 
-  - [查询资产](../cli-client/asset/query-token)
+  - [查询资产](../cli-client/asset/query-token.md)
 
-  - [查询资产列表](../cli-client/asset/query-tokens)
+  - [查询资产列表](../cli-client/asset/query-tokens.md)
 
-  - [编辑资产信息](../cli-client/asset/edit-token)
+  - [编辑资产信息](../cli-client/asset/edit-token.md)
 
-  - [增发](../cli-client/asset/mint-token)
+  - [增发](../cli-client/asset/mint-token.md)
 
-  - [销毁](../cli-client/bank/burn)
+  - [销毁](../cli-client/bank/burn.md)
 
-  - [转让所有权](../cli-client/asset/transfer-token-owner)
+  - [转让所有权](../cli-client/asset/transfer-token-owner.md)
 
 - **网关**
 
-  - [创建网关](../cli-client/asset/create-gateway)
+  - [创建网关](../cli-client/asset/create-gateway.md)
 
-  - [查询网关](../cli-client/asset/query-gateway)
+  - [查询网关](../cli-client/asset/query-gateway.md)
 
-  - [查询网关列表](../cli-client/asset/query-gateways)
+  - [查询网关列表](../cli-client/asset/query-gateways.md)
 
-  - [编辑网关信息](../cli-client/asset/edit-gateway)
+  - [编辑网关信息](../cli-client/asset/edit-gateway.md)
 
-  - [转让所有权](../cli-client/asset/transfer-gateway-owner)
+  - [转让所有权](../cli-client/asset/transfer-gateway-owner.md)
 
 - **费用**
 
-  - [查询网关创建费用](../cli-client/asset/query-fee#查询网关创建费用)
+  - [查询网关创建费用](../cli-client/asset/query-fee.md#查询网关创建费用)
 
-  - [查询原生资产发行费用](../cli-client/asset/query-fee#查询发行/增发原生资产费用)
+  - [查询原生资产发行费用](../cli-client/asset/query-fee.md#查询发行/增发原生资产费用)
 
-  - [查询网关资产发行费用](../cli-client/asset/query-fee#查询发行/增发网关资产费用)
+  - [查询网关资产发行费用](../cli-client/asset/query-fee.md#查询发行/增发网关资产费用)

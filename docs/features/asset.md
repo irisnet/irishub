@@ -68,42 +68,42 @@ Note: The parameters above are all consensus parameters.
 
 - **Tokens**
 
-  - [Issue Token](../cli-client/asset/issue-token)
+  - [Issue Token](../cli-client/asset/issue-token.md)
 
-    - [Issue a native token](../cli-client/asset/issue-token#Issue-a-native-token)
+    - [Issue a native token](../cli-client/asset/issue-token.md#Issue-a-native-token)
 
-    - [Issue a gateway token](../cli-client/asset/issue-token#Issue-a-gateway-token)
+    - [Issue a gateway token](../cli-client/asset/issue-token.md#Issue-a-gateway-token)
 
-    - [Send tokens](../cli-client/asset/issue-token#Send-tokens)
+    - [Send tokens](../cli-client/asset/issue-token.md#Send-tokens)
 
-  - [Query Token](../cli-client/asset/query-token)
+  - [Query Token](../cli-client/asset/query-token.md)
 
-  - [Query Tokens](../cli-client/asset/query-tokens)
+  - [Query Tokens](../cli-client/asset/query-tokens.md)
 
-  - [Edit Token](../cli-client/asset/edit-token)
+  - [Edit Token](../cli-client/asset/edit-token.md)
 
-  - [Mint Token](../cli-client/asset/mint-token)
+  - [Mint Token](../cli-client/asset/mint-token.md)
 
-  - [Burn Token](../cli-client/bank/burn)
+  - [Burn Token](../cli-client/bank/burn.md)
 
-  - [Transfer Ownership](../cli-client/asset/transfer-token-owner)
+  - [Transfer Ownership](../cli-client/asset/transfer-token-owner.md)
 
 - **Gateways**
 
-  - [Create Gateway](../cli-client/asset/create-gateway)
+  - [Create Gateway](../cli-client/asset/create-gateway.md)
 
-  - [Query Gateway](../cli-client/asset/query-gateway)
+  - [Query Gateway](../cli-client/asset/query-gateway.md)
 
-  - [Query Gateways](../cli-client/asset/query-gateways)
+  - [Query Gateways](../cli-client/asset/query-gateways.md)
 
-  - [Edit Gateway](../cli-client/asset/edit-gateway)
+  - [Edit Gateway](../cli-client/asset/edit-gateway.md)
 
-  - [Transfer Ownership](../cli-client/asset/transfer-gateway-owner)
+  - [Transfer Ownership](../cli-client/asset/transfer-gateway-owner.md)
 
 - **Fees**
 
-  - [Query Gateway Fee](../cli-client/asset/query-fee#Query-fee-of-creating-a-gateway)
+  - [Query Gateway Fee](../cli-client/asset/query-fee.md#Query-fee-of-creating-a-gateway)
 
-  - [Query Native Token Fee](../cli-client/asset/query-fee#Query-fee-of-issuing-and-minting-a-native-token)
+  - [Query Native Token Fee](../cli-client/asset/query-fee.md#Query-fee-of-issuing-and-minting-a-native-token)
 
-  - [Query Gateway Token Fee](../cli-client/asset/query-fee#Query-fee-of-issuing-and-minting-a-gateway-token)
+  - [Query Gateway Token Fee](../cli-client/asset/query-fee.md#Query-fee-of-issuing-and-minting-a-gateway-token)
