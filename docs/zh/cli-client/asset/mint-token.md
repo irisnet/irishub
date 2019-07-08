@@ -6,43 +6,19 @@
 
 ## 使用方式
 
-```shell
+```bash
 iriscli asset mint-token <token-id> [flags]
 ```
 
 ## 特有的标志
 
-| Name | Type | Required | Default | Description                                              |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --to    | string | 否 | "" | address of mint token to |
-| --amount | uint64 | 是 | 0 | amount of mint token |
-
+| 命令，缩写         | 类型    | 是否必须 | 默认值        | 描述                                                         |
+| ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
+| --to    | string | 否 | "" | 接收增发的账户，默认为自己 |
+| --amount | uint64 | 是 | 0 | 增发数量 |
 
 ## 示例
 
-```shell
-iriscli asset mint-token btc --amount=1000000 --from=node0 --chain-id=irishub-test --fee=0.4iris
-```
-
-输出信息:
-```json
- {
-   "code": 0,
-   "data": null,
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 50000,
-   "gas_used": 6632,
-   "codespace": "",
-   "tags": [
-     {
-       "key": "action",
-       "value": "mint_token"
-     },
-     {
-       "key": "recipient",
-       "value": "faa1sf4xrfq3p45hlelp5pnw5rf4llsfg4st07mhjc"
-     }
-   ]
- }
+```bash
+iriscli asset mint-token kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.4iris
 ```

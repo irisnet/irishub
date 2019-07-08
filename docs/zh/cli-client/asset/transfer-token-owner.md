@@ -2,51 +2,22 @@
 
 ## 描述
 
-转移Token的控制权
+转移Token的所有权
 
 ## 使用方式
 
-```shell
-iriscli asset transfer-token-owner <token-id> --to=<new owner>
+```bash
+iriscli asset transfer-token-owner <token-id> [flags]
 ```
 
 ## 标志
 
-| Name | Type | Required | Default | Description                                              |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --to           | string | Shishi | "" | Destination address |
+| 命令, 速记     | 类型   | 是否必须 | 默认值   | 描述                                                       |
+| --------------------| -----  | -------- | --------|-------------------------------------------------------- |
+| --to           | string | 是 | "" | 资产的新 Owner |
 
 ## 示例
 
-```shell
-iriscli asset transfer-token-owner btc --to=faa1ze4nx2k4ehsu83hk3texpktrt07gsff24mjq8d --from=node0 --chain-id=irishub-test --fee=0.4iris --commit
+```bash
+iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
 ```
-
-输出:
-
-```json
-{
-   "code": 0,
-   "data": null,
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 50000,
-   "gas_used": 5120,
-   "codespace": "",
-   "tags": [
-     {
-       "key": "action",
-       "value": "transfer_token_owner"
-     },
-     {
-       "key": "token-id",
-       "value": "btc"
-     }
-   ]
- })
-```
-
-
-
-
-
