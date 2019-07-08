@@ -2,49 +2,22 @@
 
 ## Description
 
-Transfer control of the token
+Transfer the ownership of a token
 
 ## Usage
 
-```shell
-iriscli asset transfer-token-owner <token-id> --to=<new owner>
+```bash
+iriscli asset transfer-token-owner <token-id> [flags]
 ```
 
 ## Flags
 
 | Name | Type | Required | Default | Description                                              |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --to           | string | Yes | "" | Destination address |
+| --to           | string | True | "" | the new owner address |
 
 ## Example
 
-```shell
-iriscli asset transfer-token-owner btc --to=faa1ze4nx2k4ehsu83hk3texpktrt07gsff24mjq8d --from=node0 --chain-id=irishub-test --fee=0.4iris --commit
+```bash
+iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
 ```
-
-The output:
-
-```json
-{
-   "code": 0,
-   "data": null,
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 50000,
-   "gas_used": 5120,
-   "codespace": "",
-   "tags": [
-     {
-       "key": "action",
-       "value": "transfer_token_owner"
-     },
-     {
-       "key": "token-id",
-       "value": "btc"
-     }
-   ]
- })
-```
-
-
-

@@ -11,11 +11,11 @@ iriscli asset query-token <token-id>
 ```
 
 ### Global Unique Token ID Generation Rule
-    
+
 - When Source is native: ID = [Symbol], e.g. iris
-    
+
 - When Source is external: ID = x.[Symbol], e.g. x.btc
-    
+
 - When Source is gateway: ID = [Gateway].[Symbol], e.g. cats.kitty
 
 ## Examples
