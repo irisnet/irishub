@@ -1,7 +1,8 @@
-package asset
+package keeper
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -47,17 +48,17 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var token FungibleToken
+	var token types.FungibleToken
 	if params.TokenId == sdk.NativeTokenName {
 		initSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.InitialIssue).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(MaximumAssetMaxSupply))).String())
+		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token = NewFungibleToken(NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token = types.NewFungibleToken(types.NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 	} else {
 		var found bool
 		token, found = keeper.getToken(ctx, params.TokenId)
@@ -65,7 +66,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 		}
 
-		if token.Source == GATEWAY {
+		if token.Source == types.GATEWAY {
 			gateway, _ := keeper.GetGateway(ctx, token.Gateway)
 			token.Owner = gateway.Owner
 		}
@@ -93,28 +94,28 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	source := NATIVE
+	source := types.NATIVE
 	gateway := ""
 	owner := sdk.AccAddress{}
 	nonSymbolTokenId := ""
 
 	if len(params.Source) > 0 { // if source is specified
-		source, err = AssetSourceFromString(params.Source)
+		source, err = types.AssetSourceFromString(params.Source)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
 		}
 	} else if len(params.Gateway) > 0 { // if source is not specified, and gateway is specified
-		source = GATEWAY
+		source = types.GATEWAY
 	}
 
-	if source == GATEWAY { // ignore gateway moniker if source != GATEWAY
+	if source == types.GATEWAY { // ignore gateway moniker if source != GATEWAY
 		gateway = params.Gateway
 		if len(gateway) == 0 {
 			return nil, sdk.ErrUnknownRequest("gateway moniker is required for querying gateway tokens")
 		}
 	}
 
-	if len(params.Owner) > 0 && source == NATIVE { // ignore owner if source != NATIVE
+	if len(params.Owner) > 0 && source == types.NATIVE { // ignore owner if source != NATIVE
 		owner, err = sdk.AccAddressFromBech32(params.Owner)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
@@ -122,26 +123,26 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	if len(params.Source) > 0 || len(params.Gateway) > 0 {
-		nonSymbolTokenId, err = GetTokenID(source, "", gateway)
+		nonSymbolTokenId, err = types.GetTokenID(source, "", gateway)
 	}
 
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var tokens Tokens
+	var tokens types.Tokens
 
 	// Add iris to the list
-	if source == NATIVE && owner.Empty() {
+	if source == types.NATIVE && owner.Empty() {
 		initSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.InitialIssue).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(MaximumAssetMaxSupply))).String())
+		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token := NewFungibleToken(NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token := types.NewFungibleToken(types.NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 		tokens = append(tokens, token)
 	}
 
@@ -156,7 +157,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 			continue
 		}
 
-		if token.Source == GATEWAY {
+		if token.Source == types.GATEWAY {
 			gateway, _ := keeper.GetGateway(ctx, token.Gateway)
 			token.Owner = gateway.Owner
 		}
@@ -165,7 +166,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	if len(tokens) == 0 {
-		tokens = make([]FungibleToken, 0)
+		tokens = make([]types.FungibleToken, 0)
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
@@ -188,7 +189,7 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	if err := ValidateMoniker(params.Moniker); err != nil {
+	if err := types.ValidateMoniker(params.Moniker); err != nil {
 		return nil, err
 	}
 
@@ -216,7 +217,7 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var gateways []Gateway
+	var gateways []types.Gateway
 
 	if len(params.Owner) != 0 {
 		// if the owner provided
@@ -233,8 +234,8 @@ func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 	return bz, nil
 }
 
-func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) []Gateway {
-	var gateways = make([]Gateway, 0)
+func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) []types.Gateway {
+	var gateways = make([]types.Gateway, 0)
 
 	gatewaysIterator := keeper.GetGateways(ctx, owner)
 	defer gatewaysIterator.Close()
@@ -254,10 +255,10 @@ func queryGatewaysByOwner(ctx sdk.Context, owner sdk.AccAddress, keeper Keeper) 
 	return gateways
 }
 
-func queryAllGateways(ctx sdk.Context, keeper Keeper) []Gateway {
-	var gateways = make([]Gateway, 0)
+func queryAllGateways(ctx sdk.Context, keeper Keeper) []types.Gateway {
+	var gateways = make([]types.Gateway, 0)
 
-	keeper.IterateGateways(ctx, func(gw Gateway) (stop bool) {
+	keeper.IterateGateways(ctx, func(gw types.Gateway) (stop bool) {
 		gateways = append(gateways, gw)
 		return false
 	})
@@ -289,13 +290,13 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	}
 
 	moniker := params.Moniker
-	if err := ValidateMoniker(moniker); err != nil {
+	if err := types.ValidateMoniker(moniker); err != nil {
 		return nil, err
 	}
 
 	fee := GatewayFeeOutput{
 		Exist: keeper.HasGateway(ctx, moniker),
-		Fee:   getGatewayCreateFee(ctx, keeper, moniker),
+		Fee:   GetGatewayCreateFee(ctx, keeper, moniker),
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fee)
@@ -319,11 +320,11 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	}
 
 	id := params.ID
-	if err := CheckTokenID(id); err != nil {
+	if err := types.CheckTokenID(id); err != nil {
 		return nil, err
 	}
 
-	prefix, symbol := GetTokenIDParts(id)
+	prefix, symbol := types.GetTokenIDParts(id)
 
 	var (
 		issueFee sdk.Coin
@@ -333,11 +334,11 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	if prefix == "x" {
 		return nil, sdk.ErrUnknownRequest("unsupported token source: external")
 	} else if prefix == "" || prefix == "i" {
-		issueFee = getTokenIssueFee(ctx, keeper, symbol)
-		mintFee = getTokenMintFee(ctx, keeper, symbol)
+		issueFee = GetTokenIssueFee(ctx, keeper, symbol)
+		mintFee = GetTokenMintFee(ctx, keeper, symbol)
 	} else {
-		issueFee = getGatewayTokenIssueFee(ctx, keeper, symbol)
-		mintFee = getGatewayTokenMintFee(ctx, keeper, symbol)
+		issueFee = GetGatewayTokenIssueFee(ctx, keeper, symbol)
+		mintFee = GetGatewayTokenMintFee(ctx, keeper, symbol)
 	}
 
 	fees := TokenFeesOutput{

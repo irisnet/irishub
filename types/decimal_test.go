@@ -361,3 +361,8 @@ func TestDecMulInt(t *testing.T) {
 		require.Equal(t, tc.want, got, "Incorrect result on test case %d", i)
 	}
 }
+
+func TestNewDecWithPrec(t *testing.T) {
+	num := NewDecWithPrec(50, 2)
+	println(num.String())
+}

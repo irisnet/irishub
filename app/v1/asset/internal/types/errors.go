@@ -1,5 +1,5 @@
 //nolint
-package asset
+package types
 
 import (
 	sdk "github.com/irisnet/irishub/types"

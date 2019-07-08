@@ -1,6 +1,8 @@
-package asset
+package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"testing"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -16,10 +18,10 @@ import (
 
 // TestAssetAnteHandler tests the ante handler of asset
 func TestAssetAnteHandler(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := asset.setupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -27,7 +29,7 @@ func TestAssetAnteHandler(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := keeper2.NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// init params
 	keeper.Init(ctx)
@@ -39,16 +41,16 @@ func TestAssetAnteHandler(t *testing.T) {
 	acc2 := ak.NewAccountWithAddress(ctx, addr2)
 
 	// get asset fees
-	gatewayCreateFee := getGatewayCreateFee(ctx, keeper, "mon")
-	nativeTokenIssueFee := getTokenIssueFee(ctx, keeper, "sym")
-	gatewayTokenIssueFee := getGatewayTokenIssueFee(ctx, keeper, "sym")
-	nativeTokenMintFee := getTokenMintFee(ctx, keeper, "sym")
+	gatewayCreateFee := keeper2.getGatewayCreateFee(ctx, keeper, "mon")
+	nativeTokenIssueFee := keeper2.getTokenIssueFee(ctx, keeper, "sym")
+	gatewayTokenIssueFee := keeper2.getGatewayTokenIssueFee(ctx, keeper, "sym")
+	nativeTokenMintFee := keeper2.getTokenMintFee(ctx, keeper, "sym")
 
 	// construct msgs
-	msgCreateGateway := NewMsgCreateGateway(addr1, "mon", "i", "d", "w")
-	msgIssueNativeToken := MsgIssueToken{Source: AssetSource(0x00), Symbol: "sym"}
-	msgIssueGatewayToken := MsgIssueToken{Source: AssetSource(0x02), Symbol: "sym"}
-	msgMintNativeToken := MsgMintToken{TokenId: "i.sym"}
+	msgCreateGateway := types.NewMsgCreateGateway(addr1, "mon", "i", "d", "w")
+	msgIssueNativeToken := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym"}
+	msgIssueGatewayToken := types.MsgIssueToken{Source: types.AssetSource(0x02), Symbol: "sym"}
+	msgMintNativeToken := types.MsgMintToken{TokenId: "i.sym"}
 	msgNonAsset1 := sdk.NewTestMsg(addr1)
 	msgNonAsset2 := sdk.NewTestMsg(addr2)
 
@@ -59,7 +61,7 @@ func TestAssetAnteHandler(t *testing.T) {
 
 	// set signers and construct an ante handler
 	newCtx := auth.WithSigners(ctx, []auth.Account{acc1, acc2})
-	anteHandler := NewAnteHandler(keeper)
+	anteHandler := keeper2.NewAnteHandler(keeper)
 
 	// assert that the ante handler will return with `abort` set to true
 	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Plus(nativeTokenIssueFee)})

@@ -1,6 +1,8 @@
 package asset
 
 import (
+	keeper2 "github.com/irisnet/irishub/app/v1/asset/internal/keeper"
+	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"testing"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -15,10 +17,10 @@ import (
 )
 
 func TestExportGatewayGenesis(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := keeper2.setupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -26,7 +28,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := keeper2.NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// init params
 	keeper.Init(ctx)
@@ -43,11 +45,11 @@ func TestExportGatewayGenesis(t *testing.T) {
 	details := []string{"details1", "details2", "details3", "details4"}
 	websites := []string{"website1", "website2", "website3", "website4"}
 
-	var gateways []Gateway
+	var gateways []types.Gateway
 
 	// construct and store gateways with data above
 	for i := 0; i < 4; i++ {
-		gateway := NewGateway(owners[i], monikers[i], identities[i], details[i], websites[i])
+		gateway := types.NewGateway(owners[i], monikers[i], identities[i], details[i], websites[i])
 		gateways = append(gateways, gateway)
 
 		keeper.SetGateway(ctx, gateway)
@@ -57,19 +59,19 @@ func TestExportGatewayGenesis(t *testing.T) {
 	// add token
 	addr := sdk.AccAddress([]byte("addr1"))
 	acc := ak.NewAccountWithAddress(ctx, addr)
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	keeper.AddToken(ctx, ft)
 
 	// query all gateways
-	var storedGateways []Gateway
-	keeper.IterateGateways(ctx, func(g Gateway) bool {
+	var storedGateways []types.Gateway
+	keeper.IterateGateways(ctx, func(g types.Gateway) bool {
 		storedGateways = append(storedGateways, g)
 		return false
 	})
 
 	// query all token
-	var tokens Tokens
-	keeper.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
+	var tokens types.Tokens
+	keeper.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 		tokens = append(tokens, token)
 		return false
 	})

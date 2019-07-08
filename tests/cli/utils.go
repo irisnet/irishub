@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	types2 "github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"io/ioutil"
 	"os"
@@ -364,27 +365,27 @@ func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	return feesOutput
 }
 
-func executeGetToken(t *testing.T, cmdStr string) asset.FungibleToken {
+func executeGetToken(t *testing.T, cmdStr string) types2.FungibleToken {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var token asset.FungibleToken
+	var token types2.FungibleToken
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &token)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return token
 }
 
-func executeGetGateway(t *testing.T, cmdStr string) asset.Gateway {
+func executeGetGateway(t *testing.T, cmdStr string) types2.Gateway {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var gateway asset.Gateway
+	var gateway types2.Gateway
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &gateway)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return gateway
 }
 
-func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
+func executeGetGateways(t *testing.T, cmdStr string) []types2.Gateway {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var gateways []asset.Gateway
+	var gateways []types2.Gateway
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &gateways)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
