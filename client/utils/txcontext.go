@@ -21,8 +21,6 @@ import (
 // BaseReq defines a structure that can be embedded in other request structures
 // that all share common "base" fields.
 type BaseTx struct {
-	Name          string `json:"name"`
-	Password      string `json:"password"`
 	ChainID       string `json:"chain_id"`
 	AccountNumber uint64 `json:"account_number"`
 	Sequence      uint64 `json:"sequence"`
@@ -35,8 +33,6 @@ type BaseTx struct {
 // Sanitize performs basic sanitization on a BaseReq object.
 func (br BaseTx) Sanitize() BaseTx {
 	return BaseTx{
-		Name:          strings.TrimSpace(br.Name),
-		Password:      strings.TrimSpace(br.Password),
 		ChainID:       strings.TrimSpace(br.ChainID),
 		Gas:           strings.TrimSpace(br.Gas),
 		Fee:           strings.TrimSpace(br.Fee),
@@ -50,19 +46,8 @@ func (br BaseTx) Sanitize() BaseTx {
 // ValidateBasic performs basic validation of a BaseReq. If custom validation
 // logic is needed, the implementing request handler should perform those
 // checks manually.
-func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx context.CLIContext) bool {
-	switch {
-	case !cliCtx.GenerateOnly && len(br.Name) == 0:
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("name required but not specified"))
-		return false
-
-	case !cliCtx.DryRun && !cliCtx.GenerateOnly && len(br.Password) == 0:
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("password required but not specified"))
-		return false
-
-	case len(br.ChainID) == 0:
+func (br BaseTx) ValidateBasic(w http.ResponseWriter) bool {
+	if len(br.ChainID) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("chainID required but not specified"))
 		return false
