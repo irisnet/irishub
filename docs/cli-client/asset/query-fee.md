@@ -6,13 +6,8 @@ Query the asset related fees, including gateway creation and token issuance and 
 
 ## Usage
 
-```
+```bash
 iriscli asset query-fee [flags]
-```
-
-Print help messages:
-```
-iriscli asset query-fee --help
 ```
 
 ## Unique Flags
@@ -22,49 +17,22 @@ iriscli asset query-fee --help
 | --gateway           | string | false    | ""       | the gateway moniker, required for querying gateway fee |
 | --token             | string | false    | ""       | the token id, required for querying token fees         |
 
-
 ## Examples
 
-```
-iriscli asset query-fee --gateway=tgw
+### Query fee of creating a gateway
+
+```bash
+iriscli asset query-fee --gateway=cats
 ```
 
-Output:
-```txt
-Fee: 600000iris
+### Query fee of issuing and minting a native token
+
+```bash
+iriscli asset query-fee --token=kitty
 ```
 
-```json
-{
-  "exist": false,
-  "fee": {
-    "denom": "iris",
-    "amount": "600000"
-  }
-}
-```
+### Query fee of issuing and minting a gateway token
 
-```
-iriscli asset query-fee --token=i.sym
-```
-
-Output:
-```txt
-Fees:
-  IssueFee: 300000iris
-  MintFee:  30000iris
-```
-
-```json
-{
-  "Exist": false,
-  "issue_fee": {
-    "denom": "iris",
-    "amount": "300000"
-  },
-  "mint_fee": {
-    "denom": "iris",
-    "amount": "30000"
-  }
-}
+```bash
+iriscli asset query-fee --token=cats.kitty
 ```
