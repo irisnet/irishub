@@ -64,6 +64,11 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		if !found {
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
 		}
+
+		if token.Source == GATEWAY {
+			gateway, _ := keeper.GetGateway(ctx, token.Gateway)
+			token.Owner = gateway.Owner
+		}
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
@@ -109,7 +114,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		}
 	}
 
-	if len(params.Owner) > 0 && source != EXTERNAL { // ignore owner if source == EXTERNAL
+	if len(params.Owner) > 0 && source == NATIVE { // ignore owner if source != NATIVE
 		owner, err = sdk.AccAddressFromBech32(params.Owner)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
@@ -150,6 +155,12 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		if !found {
 			continue
 		}
+
+		if token.Source == GATEWAY {
+			gateway, _ := keeper.GetGateway(ctx, token.Gateway)
+			token.Owner = gateway.Owner
+		}
+
 		tokens = append(tokens, token)
 	}
 
