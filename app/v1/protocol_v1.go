@@ -101,6 +101,9 @@ func (p *ProtocolV1) Init(ctx sdk.Context) {
 
 	// move community pool balance to AccAddress
 	p.distrKeeper.Init(ctx)
+
+	// modify gov params
+	p.govKeeper.Init(ctx)
 }
 
 func (p *ProtocolV1) GetCodec() *codec.Codec {

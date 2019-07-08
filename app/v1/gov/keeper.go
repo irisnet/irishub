@@ -840,3 +840,7 @@ func (keeper Keeper) DeleteValidatorSet(ctx sdk.Context, proposalID uint64) {
 	store := ctx.KVStore(keeper.storeKey)
 	store.Delete(KeyValidatorSet(proposalID))
 }
+
+func (keeper Keeper) Init(ctx sdk.Context) {
+	keeper.SetParamSet(ctx, DefaultParams())
+}
