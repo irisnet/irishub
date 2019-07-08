@@ -6,13 +6,8 @@
 
 ## 使用方式
 
-```
+```bash
 iriscli asset query-fee [flags]
-```
-
-打印帮助信息:
-```
-iriscli asset query-fee --help
 ```
 
 ## 特有的标志
@@ -22,49 +17,22 @@ iriscli asset query-fee --help
 | --gateway           | string | 否    | ""       | 网关名字; 如果查询网关费用,则必须指定 |
 | --token             | string | 否    | ""       | Token ID; 如果查询Token费用,则必须指定  |
 
-
 ## 示例
 
-```
-iriscli asset query-fee --gateway=tgw
+### 查询网关创建费用
+
+```bash
+iriscli asset query-fee --gateway=cats
 ```
 
-输出信息:
-```txt
-Fee: 600000iris
+### 查询发行/增发原生资产费用
+
+```bash
+iriscli asset query-fee --token=kitty
 ```
 
-```json
-{
-  "exist": false,
-  "fee": {
-    "denom": "iris",
-    "amount": "600000"
-  }
-}
-```
+### 查询发行/增发网关资产费用
 
-```
-iriscli asset query-fee --token=i.sym
-```
-
-输出信息:
-```txt
-Fees:
-  IssueFee: 300000iris
-  MintFee:  30000iris
-```
-
-```json
-{
-  "Exist": false,
-  "issue_fee": {
-    "denom": "iris",
-    "amount": "300000"
-  },
-  "mint_fee": {
-    "denom": "iris",
-    "amount": "30000"
-  }
-}
+```bash
+iriscli asset query-fee --token=cats.kitty
 ```

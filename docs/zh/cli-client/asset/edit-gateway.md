@@ -6,13 +6,8 @@
 
 ## 使用方式
 
-```
+```bash
 iriscli asset edit-gateway [flags]
-```
-
-打印帮助信息:
-```
-iriscli asset edit-gateway --help
 ```
 
 ## 特有的标志
@@ -24,32 +19,8 @@ iriscli asset edit-gateway --help
 | --details           | string | 否    | ""       | 可选的描述, 最大280个字符|
 | --website           | string | 否    | ""       | 可选的外部网址, 最大128个字符|
 
-
 ## 示例
 
-```
-iriscli asset edit-gateway --moniker=tgw --identity=exchange --details=test --website=http://gateway.io --from=node0 --chain-id=irishub --fee=0.4iris --home=iriscli --commit
-```
-
-输出信息:
-```json
-{
-   "code": 0,
-   "data": null,
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 50000,
-   "gas_used": 4654,
-   "codespace": "",
-   "tags": [
-     {
-       "key": "action",
-       "value": "edit_gateway"
-     },
-     {
-       "key": "moniker",
-       "value": "tgw"
-     }
-   ]
-}
+```bash
+iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tokens" --website="http://www.example.com" --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
 ```
