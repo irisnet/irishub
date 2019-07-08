@@ -2,13 +2,10 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/irisnet/irishub/app/v1/auth"
+	sdk "github.com/irisnet/irishub/types"
 	"math"
 	"strconv"
-	"strings"
-
-	sdk "github.com/irisnet/irishub/types"
 )
 
 // fee factor formula: (ln(len({name}))/ln{base})^{exp}
@@ -182,44 +179,4 @@ func convertFeeToInt(fee sdk.Dec) sdk.Int {
 	} else {
 		return sdk.NewInt(1).Mul(sdk.NewIntWithDecimal(1, 18))
 	}
-}
-
-// GatewayFeeOutput is for the gateway fee query output
-type GatewayFeeOutput struct {
-	Exist bool     `json:"exist"` // indicate if the gateway has existed
-	Fee   sdk.Coin `json:"fee"`   // creation fee
-}
-
-// String implements stringer
-func (gfo GatewayFeeOutput) String() string {
-	var out strings.Builder
-	if gfo.Exist {
-		out.WriteString("The gateway moniker has existed\n")
-	}
-
-	out.WriteString(fmt.Sprintf("Fee: %s", gfo.Fee.String()))
-
-	return out.String()
-}
-
-// TokenFeesOutput is for the token fees query output
-type TokenFeesOutput struct {
-	Exist    bool     `exist`            // indicate if the token has existed
-	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
-	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
-}
-
-// String implements stringer
-func (tfo TokenFeesOutput) String() string {
-	var out strings.Builder
-	if tfo.Exist {
-		out.WriteString("The token id has existed\n")
-	}
-
-	out.WriteString(fmt.Sprintf(`Fees:
-  IssueFee: %s
-  MintFee:  %s`,
-		tfo.IssueFee.String(), tfo.MintFee.String()))
-
-	return out.String()
 }

@@ -9,26 +9,18 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-const (
-	QueryToken    = "token"
-	QueryTokens   = "tokens"
-	QueryGateway  = "gateway"
-	QueryGateways = "gateways"
-	QueryFees     = "fees"
-)
-
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryToken:
+		case types.QueryToken:
 			return queryToken(ctx, req, k)
-		case QueryTokens:
+		case types.QueryTokens:
 			return queryTokens(ctx, req, k)
-		case QueryGateway:
+		case types.QueryGateway:
 			return queryGateway(ctx, req, k)
-		case QueryGateways:
+		case types.QueryGateways:
 			return queryGateways(ctx, req, k)
-		case QueryFees:
+		case types.QueryFees:
 			return queryFees(ctx, path[1:], req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
@@ -36,13 +28,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-// QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
-type QueryTokenParams struct {
-	TokenId string
-}
-
 func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryTokenParams
+	var params types.QueryTokenParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -80,15 +67,8 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	return bz, nil
 }
 
-// QueryTokensParams is the query parameters for 'custom/asset/tokens'
-type QueryTokensParams struct {
-	Source  string
-	Gateway string
-	Owner   string
-}
-
 func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryTokensParams
+	var params types.QueryTokensParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -177,13 +157,8 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	return bz, nil
 }
 
-// QueryGatewayParams is the query parameters for 'custom/asset/gateway'
-type QueryGatewayParams struct {
-	Moniker string
-}
-
 func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryGatewayParams
+	var params types.QueryGatewayParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -205,13 +180,8 @@ func queryGateway(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	return bz, nil
 }
 
-// QueryGatewaysParams is the query parameters for 'custom/asset/gateways'
-type QueryGatewaysParams struct {
-	Owner sdk.AccAddress
-}
-
 func queryGateways(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryGatewaysParams
+	var params types.QueryGatewaysParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -277,13 +247,8 @@ func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 	}
 }
 
-// QueryGatewayFeeParams is the query parameters for 'custom/asset/fees/gateways'
-type QueryGatewayFeeParams struct {
-	Moniker string
-}
-
 func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryGatewayFeeParams
+	var params types.QueryGatewayFeeParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -294,7 +259,7 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 		return nil, err
 	}
 
-	fee := GatewayFeeOutput{
+	fee := types.GatewayFeeOutput{
 		Exist: keeper.HasGateway(ctx, moniker),
 		Fee:   GetGatewayCreateFee(ctx, keeper, moniker),
 	}
@@ -307,13 +272,8 @@ func queryGatewayFee(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	return bz, nil
 }
 
-// QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
-type QueryTokenFeesParams struct {
-	ID string
-}
-
 func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryTokenFeesParams
+	var params types.QueryTokenFeesParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -341,7 +301,7 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		mintFee = GetGatewayTokenMintFee(ctx, keeper, symbol)
 	}
 
-	fees := TokenFeesOutput{
+	fees := types.TokenFeesOutput{
 		Exist:    keeper.HasToken(ctx, id),
 		IssueFee: issueFee,
 		MintFee:  mintFee,

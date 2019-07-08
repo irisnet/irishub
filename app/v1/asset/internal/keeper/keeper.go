@@ -74,7 +74,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 
 // save a new token to keystore
 func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.FungibleToken, sdk.AccAddress, sdk.Error) {
-	token = token.Sanitize()
+	token.Sanitize()
 	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return token, nil, err

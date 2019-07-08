@@ -20,16 +20,17 @@ type (
 	FungibleToken           = types.FungibleToken
 	AssetFamily             = types.AssetFamily
 	AssetSource             = types.AssetSource
+	QueryTokenParams        = types.QueryTokenParams
+	QueryTokensParams       = types.QueryTokensParams
+	QueryGatewayParams      = types.QueryGatewayParams
+	QueryGatewaysParams     = types.QueryGatewaysParams
+	QueryGatewayFeeParams   = types.QueryGatewayFeeParams
+	QueryTokenFeesParams    = types.QueryTokenFeesParams
+	GatewayFeeOutput        = types.GatewayFeeOutput
+	TokenFeesOutput         = types.TokenFeesOutput
+	GenesisState            = types.GenesisState
 
-	Keeper                = keeper.Keeper
-	GatewayFeeOutput      = keeper.GatewayFeeOutput
-	TokenFeesOutput       = keeper.TokenFeesOutput
-	QueryTokenParams      = keeper.QueryTokenParams
-	QueryTokensParams     = keeper.QueryTokensParams
-	QueryGatewayParams    = keeper.QueryGatewayParams
-	QueryGatewaysParams   = keeper.QueryGatewaysParams
-	QueryGatewayFeeParams = keeper.QueryGatewayFeeParams
-	QueryTokenFeesParams  = keeper.QueryTokenFeesParams
+	Keeper = keeper.Keeper
 )
 
 var (
@@ -64,11 +65,11 @@ var (
 	DefaultParamsForTest       = types.DefaultParamsForTest
 	ValidateParams             = types.ValidateParams
 
-	QueryToken                  = keeper.QueryToken
-	QueryTokens                 = keeper.QueryTokens
-	QueryGateway                = keeper.QueryGateway
-	QueryGateways               = keeper.QueryGateways
-	QueryFees                   = keeper.QueryFees
+	QueryToken                  = types.QueryToken
+	QueryTokens                 = types.QueryTokens
+	QueryGateway                = types.QueryGateway
+	QueryGateways               = types.QueryGateways
+	QueryFees                   = types.QueryFees
 	NewKeeper                   = keeper.NewKeeper
 	TokenIssueFeeHandler        = keeper.TokenIssueFeeHandler
 	GatewayTokenIssueFeeHandler = keeper.GatewayTokenIssueFeeHandler

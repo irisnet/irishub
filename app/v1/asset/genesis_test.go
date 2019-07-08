@@ -1,8 +1,6 @@
 package asset
 
 import (
-	keeper2 "github.com/irisnet/irishub/app/v1/asset/internal/keeper"
-	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"testing"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -10,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -17,10 +16,10 @@ import (
 )
 
 func TestExportGatewayGenesis(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := keeper2.setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	types.RegisterCodec(cdc)
+	RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -28,7 +27,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := keeper2.NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// init params
 	keeper.Init(ctx)
@@ -45,11 +44,11 @@ func TestExportGatewayGenesis(t *testing.T) {
 	details := []string{"details1", "details2", "details3", "details4"}
 	websites := []string{"website1", "website2", "website3", "website4"}
 
-	var gateways []types.Gateway
+	var gateways []Gateway
 
 	// construct and store gateways with data above
 	for i := 0; i < 4; i++ {
-		gateway := types.NewGateway(owners[i], monikers[i], identities[i], details[i], websites[i])
+		gateway := NewGateway(owners[i], monikers[i], identities[i], details[i], websites[i])
 		gateways = append(gateways, gateway)
 
 		keeper.SetGateway(ctx, gateway)
@@ -59,19 +58,19 @@ func TestExportGatewayGenesis(t *testing.T) {
 	// add token
 	addr := sdk.AccAddress([]byte("addr1"))
 	acc := ak.NewAccountWithAddress(ctx, addr)
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	keeper.AddToken(ctx, ft)
 
 	// query all gateways
-	var storedGateways []types.Gateway
-	keeper.IterateGateways(ctx, func(g types.Gateway) bool {
+	var storedGateways []Gateway
+	keeper.IterateGateways(ctx, func(g Gateway) bool {
 		storedGateways = append(storedGateways, g)
 		return false
 	})
 
 	// query all token
-	var tokens types.Tokens
-	keeper.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
+	var tokens Tokens
+	keeper.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
 		tokens = append(tokens, token)
 		return false
 	})
