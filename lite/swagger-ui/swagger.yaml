@@ -584,8 +584,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
-        '401':
-          description: Key password is wrong
         '500':
           description: Server internal error
       requestBody:
@@ -621,8 +619,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
-        '401':
-          description: Key password is wrong
         '500':
           description: Server internal error
       requestBody:
@@ -781,8 +777,6 @@ paths:
       responses:
         '200':
           description: Updated password
-        '401':
-          description: Key password is wrong
         '404':
           description: Key doesn't exist
       requestBody:
@@ -806,8 +800,6 @@ paths:
       responses:
         '200':
           description: Removed account
-        '401':
-          description: Key password is wrong
         '404':
           description: Key doesn't exist
       requestBody:
@@ -856,8 +848,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -912,8 +902,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -971,8 +959,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1361,8 +1347,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid validator address or base_tx
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1378,8 +1362,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1469,8 +1451,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal id or deposit body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1529,8 +1509,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal id or vote body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1698,8 +1676,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1750,8 +1726,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1822,8 +1796,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service define body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1927,8 +1899,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service bind body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2140,8 +2110,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding update body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2204,8 +2172,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding disable body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2240,8 +2206,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding enable body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2286,8 +2250,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding deposit refund body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2303,8 +2265,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service request body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2423,8 +2383,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service response body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2553,8 +2511,6 @@ paths:
           description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service fees refund body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2576,9 +2532,7 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service fees withdraw body
-        '401':
-          description: Key password is wrong
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2636,7 +2590,7 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid token id
+          description: Invalid parameters
         '500':
           description: Internal Server Error
     get:
@@ -2710,8 +2664,8 @@ paths:
       responses:
         '200':
           description: Unsigned tx was succesfully generated
-        '401':
-          description: Key password is wrong
+        '400':
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2754,8 +2708,8 @@ paths:
       responses:
         '200':
           description: Unsigned tx was succesfully generated
-        '401':
-          description: Key password is wrong
+        '400':
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2773,7 +2727,6 @@ paths:
                 amount:
                   type: int
                   example: '21000000'
-
   '/asset/tokens/{id}/transfer-owner':
     post:
       summary: Transfer token to a new owner
@@ -2789,8 +2742,8 @@ paths:
       responses:
         '200':
           description: Unsigned tx was succesfully generated
-        '401':
-          description: Key password is wrong
+        '400':
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2828,6 +2781,40 @@ paths:
           description: Invalid moniker
         '500':
           description: Internal Server Error
+    put:
+      summary: Edit an existing gateway
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                identity:
+                  type: string
+                details:
+                  type: string
+                website:
+                  type: string
   '/asset/gateways':
     get:
       summary: Get all the gateways with an optional owner
@@ -2850,9 +2837,69 @@ paths:
                 items:
                   $ref: '#/components/schemas/Gateway'
         '400':
-          description: Invalid owner address if owner given
+          description: Invalid owner address if the owner is given
         '500':
           description: Internal Server Error
+    post:
+      summary: Create a gateway
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                moniker:
+                  type: string
+                identity:
+                  type: string
+                details:
+                  type: string
+                website:
+                  type: string
+  '/asset/gateways/{moniker}/transfer':
+    post:
+      summary: Transfer the owner of a gateway
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                to:
+                  $ref: '#/components/schemas/Address'
   '/asset/fees/gateways/{moniker}':
     get:
       summary: Query the fee for the creation of the gateway with the given moniker
