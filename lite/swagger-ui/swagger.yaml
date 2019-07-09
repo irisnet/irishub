@@ -2532,7 +2532,7 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid parameters
+          description: Invalid service fees withdraw body
         '500':
           description: Internal Server Error
       requestBody:
