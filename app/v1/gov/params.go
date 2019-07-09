@@ -266,7 +266,7 @@ func DefaultParams() GovParams {
 			CriticalVotingPeriod:  time.Duration(sdk.FiveDays),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
 			CriticalThreshold:     sdk.NewDecWithPrec(75, 2),
-			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
+			CriticalVeto:          sdk.NewDecWithPrec(33, 2),
 			CriticalParticipation: sdk.NewDecWithPrec(50, 2),
 			CriticalPenalty:       sdk.ZeroDec(),
 
@@ -275,7 +275,7 @@ func DefaultParams() GovParams {
 			ImportantVotingPeriod:  time.Duration(sdk.FiveDays),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
 			ImportantThreshold:     sdk.NewDecWithPrec(67, 2),
-			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
+			ImportantVeto:          sdk.NewDecWithPrec(33, 2),
 			ImportantParticipation: sdk.NewDecWithPrec(50, 2),
 			ImportantPenalty:       sdk.ZeroDec(),
 
@@ -284,7 +284,7 @@ func DefaultParams() GovParams {
 			NormalVotingPeriod:  time.Duration(sdk.FiveDays),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
 			NormalThreshold:     sdk.NewDecWithPrec(50, 2),
-			NormalVeto:          sdk.NewDecWithPrec(334, 3),
+			NormalVeto:          sdk.NewDecWithPrec(33, 2),
 			NormalParticipation: sdk.NewDecWithPrec(50, 2),
 			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    20000,
@@ -296,7 +296,7 @@ func DefaultParams() GovParams {
 			CriticalVotingPeriod:  time.Duration(2 * time.Minute),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
 			CriticalThreshold:     sdk.NewDecWithPrec(75, 2),
-			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
+			CriticalVeto:          sdk.NewDecWithPrec(33, 2),
 			CriticalParticipation: sdk.NewDecWithPrec(50, 2),
 			CriticalPenalty:       sdk.ZeroDec(),
 
@@ -305,7 +305,7 @@ func DefaultParams() GovParams {
 			ImportantVotingPeriod:  time.Duration(2 * time.Minute),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
 			ImportantThreshold:     sdk.NewDecWithPrec(67, 2),
-			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
+			ImportantVeto:          sdk.NewDecWithPrec(33, 2),
 			ImportantParticipation: sdk.NewDecWithPrec(50, 2),
 			ImportantPenalty:       sdk.ZeroDec(),
 
@@ -314,7 +314,7 @@ func DefaultParams() GovParams {
 			NormalVotingPeriod:  time.Duration(2 * time.Minute),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
 			NormalThreshold:     sdk.NewDecWithPrec(50, 2),
-			NormalVeto:          sdk.NewDecWithPrec(334, 3),
+			NormalVeto:          sdk.NewDecWithPrec(33, 2),
 			NormalParticipation: sdk.NewDecWithPrec(50, 2),
 			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    60,
