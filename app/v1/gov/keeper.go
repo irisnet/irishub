@@ -1,7 +1,7 @@
 package gov
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/exported"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"time"
 
@@ -54,7 +54,7 @@ type Keeper struct {
 
 	metrics *Metrics
 
-	ak asset.Keeper
+	ak AssetKeeper
 }
 
 // NewProtocolKeeper returns a governance keeper. It handles:
@@ -62,7 +62,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics, ak asset.Keeper) Keeper {
+func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics, ak AssetKeeper) Keeper {
 	return Keeper{
 		key,
 		cdc,
@@ -250,9 +250,9 @@ func (keeper Keeper) NewAddTokenProposal(ctx sdk.Context, msg MsgSubmitAddTokenP
 
 	decimal := int(msg.Decimal)
 	initialSupply := sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal)
-	maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
+	maxSupply := sdk.NewIntWithDecimal(int64(exported.MaximumAssetMaxSupply), decimal)
 
-	fToken := asset.NewFungibleToken(asset.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
+	fToken := exported.NewFungibleToken(exported.EXTERNAL, "", msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
 	var proposal Proposal = &AddTokenProposal{
 		textProposal,
 		fToken,

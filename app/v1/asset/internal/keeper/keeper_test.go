@@ -1,83 +1,68 @@
-package asset
+package keeper
 
 import (
 	"encoding/json"
+	"github.com/irisnet/irishub/tests"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
-	db := dbm.NewMemDB()
-	accountKey := sdk.NewKVStoreKey("accountKey")
-	assetKey := sdk.NewKVStoreKey("assetKey")
-	paramskey := sdk.NewKVStoreKey("params")
-	paramsTkey := sdk.NewTransientStoreKey("transient_params")
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(assetKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(paramsTkey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
-	return ms, accountKey, assetKey, paramskey, paramsTkey
-}
-
 func TestKeeper_IssueToken(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
 	assert.True(t, keeper.HasToken(ctx, "btc"))
 
-	asset, found := keeper.getToken(ctx, "btc")
+	token, found := keeper.getToken(ctx, "btc")
 	assert.True(t, found)
 
-	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
+	assert.Equal(t, ft.GetDenom(), token.GetDenom())
 	assert.Equal(t, ft.Owner, ft.Owner)
 
 	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(asset)
+	assetJson, _ := json.Marshal(token)
 	assert.Equal(t, msgJson, assetJson)
 }
 
 func TestKeeper_IssueGatewayToken(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 
 	owner := ak.NewAccountWithAddress(ctx, []byte("owner"))
 	gatewayOwner := ak.NewAccountWithAddress(ctx, []byte("gatewayOwner"))
@@ -87,35 +72,35 @@ func TestKeeper_IssueGatewayToken(t *testing.T) {
 	details := "details"
 	website := "website"
 
-	gateway := NewGateway(gatewayOwner.GetAddress(), moniker, identity, details, website)
-	gatewayToken := NewFungibleToken(GATEWAY, "test", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner.GetAddress())
-	gatewayToken1 := NewFungibleToken(GATEWAY, "moniker", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner.GetAddress())
+	gateway := types.NewGateway(gatewayOwner.GetAddress(), moniker, identity, details, website)
+	gatewayToken := types.NewFungibleToken(types.GATEWAY, "test", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, owner.GetAddress())
+	gatewayToken1 := types.NewFungibleToken(types.GATEWAY, "moniker", "btc", "btc", 1, "btc", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, gatewayOwner.GetAddress())
 
 	// unknown gateway moniker
 	_, err := keeper.IssueToken(ctx, gatewayToken)
 	assert.Error(t, err)
-	asset, found := keeper.getToken(ctx, "test.btc")
+	token, found := keeper.getToken(ctx, "test.btc")
 	assert.False(t, found)
 
 	// unauthorized creator
 	keeper.SetGateway(ctx, gateway)
 	_, err = keeper.IssueToken(ctx, gatewayToken)
 	assert.Error(t, err)
-	asset, found = keeper.getToken(ctx, "moniker.btc")
+	token, found = keeper.getToken(ctx, "moniker.btc")
 	assert.False(t, found)
 
 	_, err = keeper.IssueToken(ctx, gatewayToken1)
 	assert.NoError(t, err)
-	asset, found = keeper.getToken(ctx, "moniker.btc")
+	token, found = keeper.getToken(ctx, "moniker.btc")
 	assert.True(t, found)
-	assert.Equal(t, "moniker.btc", asset.GetUniqueID())
+	assert.Equal(t, "moniker.btc", token.GetUniqueID())
 }
 
 func TestCreateGatewayKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -123,7 +108,7 @@ func TestCreateGatewayKeeper(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	owner := ak.NewAccountWithAddress(ctx, []byte("owner"))
@@ -133,7 +118,7 @@ func TestCreateGatewayKeeper(t *testing.T) {
 	website := "website"
 
 	// construct a test gateway
-	gateway := NewGateway(owner.GetAddress(), moniker, identity, details, website)
+	gateway := types.NewGateway(owner.GetAddress(), moniker, identity, details, website)
 
 	// assert the gateway of the given moniker does not exist at the beginning
 	require.False(t, keeper.HasGateway(ctx, moniker))
@@ -148,10 +133,10 @@ func TestCreateGatewayKeeper(t *testing.T) {
 }
 
 func TestEditGatewayKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -159,7 +144,7 @@ func TestEditGatewayKeeper(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	owner := ak.NewAccountWithAddress(ctx, []byte("owner")).GetAddress()
@@ -172,7 +157,7 @@ func TestEditGatewayKeeper(t *testing.T) {
 	newWebsite := "new website"
 
 	// build a MsgCreateGateway
-	createMsg := NewMsgCreateGateway(owner, moniker, identity, details, website)
+	createMsg := types.NewMsgCreateGateway(owner, moniker, identity, details, website)
 
 	// create a gateway and assert that the gateway exists now
 	_, err := keeper.CreateGateway(ctx, createMsg)
@@ -186,7 +171,7 @@ func TestEditGatewayKeeper(t *testing.T) {
 	require.Equal(t, website, res.Website)
 
 	// build a MsgEditGateway
-	editMsg := NewMsgEditGateway(owner, moniker, newIdentity, newDetails, newWebsite)
+	editMsg := types.NewMsgEditGateway(owner, moniker, newIdentity, newDetails, newWebsite)
 
 	// edit the gateway
 	_, err = keeper.EditGateway(ctx, editMsg)
@@ -199,7 +184,7 @@ func TestEditGatewayKeeper(t *testing.T) {
 	require.Equal(t, newWebsite, res.Website)
 
 	// build another MsgEditGateway with details and website not updated
-	editMsg = NewMsgEditGateway(owner, moniker, identity, DoNotModify, DoNotModify)
+	editMsg = types.NewMsgEditGateway(owner, moniker, identity, types.DoNotModify, types.DoNotModify)
 
 	// edit the gateway again
 	_, err = keeper.EditGateway(ctx, editMsg)
@@ -213,10 +198,10 @@ func TestEditGatewayKeeper(t *testing.T) {
 }
 
 func TestQueryGatewayKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -224,7 +209,7 @@ func TestQueryGatewayKeeper(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	var (
@@ -236,8 +221,8 @@ func TestQueryGatewayKeeper(t *testing.T) {
 	)
 
 	// construct gateways
-	gateway1 := NewGateway(owners[0], monikers[0], identities[0], details[0], websites[0])
-	gateway2 := NewGateway(owners[1], monikers[1], identities[1], details[1], websites[1])
+	gateway1 := types.NewGateway(owners[0], monikers[0], identities[0], details[0], websites[0])
+	gateway2 := types.NewGateway(owners[1], monikers[1], identities[1], details[1], websites[1])
 
 	// create gateways
 	keeper.SetGateway(ctx, gateway1)
@@ -254,7 +239,7 @@ func TestQueryGatewayKeeper(t *testing.T) {
 	require.Equal(t, gateway2, res2)
 
 	// query gateways with a specified owner
-	var gateways1 []Gateway
+	var gateways1 []types.Gateway
 	iter1 := keeper.GetGateways(ctx, gateway1.Owner)
 	defer iter1.Close()
 
@@ -270,9 +255,9 @@ func TestQueryGatewayKeeper(t *testing.T) {
 		gateways1 = append(gateways1, gateway)
 	}
 
-	require.Equal(t, []Gateway{gateway1}, gateways1)
+	require.Equal(t, []types.Gateway{gateway1}, gateways1)
 
-	var gateways2 []Gateway
+	var gateways2 []types.Gateway
 	iter2 := keeper.GetGateways(ctx, gateway2.Owner)
 	defer iter2.Close()
 
@@ -288,64 +273,64 @@ func TestQueryGatewayKeeper(t *testing.T) {
 		gateways2 = append(gateways2, gateway)
 	}
 
-	require.Equal(t, []Gateway{gateway2}, gateways2)
+	require.Equal(t, []types.Gateway{gateway2}, gateways2)
 
 	// query all gateways
-	var gateways3 []Gateway
-	keeper.IterateGateways(ctx, func(gw Gateway) (stop bool) {
+	var gateways3 []types.Gateway
+	keeper.IterateGateways(ctx, func(gw types.Gateway) (stop bool) {
 		gateways3 = append(gateways3, gw)
 		return false
 	})
 
-	require.Equal(t, []Gateway{gateway2, gateway1}, gateways3)
+	require.Equal(t, []types.Gateway{gateway2, gateway1}, gateways3)
 }
 
 //TODO:finish the test
 func TestKeeper_EditToken(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
 
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
 	assert.True(t, keeper.HasToken(ctx, "i.btc"))
 
-	asset, found := keeper.getToken(ctx, "i.btc")
+	token, found := keeper.getToken(ctx, "i.btc")
 	assert.True(t, found)
 
-	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
-	assert.Equal(t, ft.Owner, asset.Owner)
+	assert.Equal(t, ft.GetDenom(), token.GetDenom())
+	assert.Equal(t, ft.Owner, token.Owner)
 
 	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(asset)
+	assetJson, _ := json.Marshal(token)
 	assert.Equal(t, msgJson, assetJson)
 
 	//TODO:finish the edit token
 	mintable := false
-	msgEditToken := NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, &mintable, acc.GetAddress())
+	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, &mintable, acc.GetAddress())
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
 }
 
 func TestTransferGatewayKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -353,7 +338,7 @@ func TestTransferGatewayKeeper(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	originOwner := ak.NewAccountWithAddress(ctx, []byte("originOwner"))
@@ -363,7 +348,7 @@ func TestTransferGatewayKeeper(t *testing.T) {
 	website := "website"
 
 	// construct a test gateway
-	gateway := NewGateway(originOwner.GetAddress(), moniker, identity, details, website)
+	gateway := types.NewGateway(originOwner.GetAddress(), moniker, identity, details, website)
 
 	// create a gateway
 	keeper.SetGateway(ctx, gateway)
@@ -374,7 +359,7 @@ func TestTransferGatewayKeeper(t *testing.T) {
 
 	// build a msg for transferring the gateway owner
 	newOwner := ak.NewAccountWithAddress(ctx, []byte("newOwner"))
-	transferMsg := NewMsgTransferGatewayOwner(originOwner.GetAddress(), moniker, newOwner.GetAddress())
+	transferMsg := types.NewMsgTransferGatewayOwner(originOwner.GetAddress(), moniker, newOwner.GetAddress())
 
 	// transfer
 	_, err := keeper.TransferGatewayOwner(ctx, transferMsg)
@@ -392,17 +377,17 @@ func TestTransferGatewayKeeper(t *testing.T) {
 }
 
 func TestMintTokenKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	keeper.Init(ctx)
 
 	addr := sdk.AccAddress([]byte("addr1"))
@@ -413,23 +398,23 @@ func TestMintTokenKeeper(t *testing.T) {
 	bk.AddCoins(ctx, addr, coin)
 	ak.IncreaseTotalLoosenToken(ctx, coin)
 
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
 	assert.True(t, keeper.HasToken(ctx, "btc"))
 
-	asset, found := keeper.getToken(ctx, "btc")
+	token, found := keeper.getToken(ctx, "btc")
 	assert.True(t, found)
 
-	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
+	assert.Equal(t, ft.GetDenom(), token.GetDenom())
 	assert.Equal(t, ft.Owner, ft.Owner)
 
 	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(asset)
+	assetJson, _ := json.Marshal(token)
 	assert.Equal(t, msgJson, assetJson)
 
-	msgMintToken := NewMsgMintToken("btc", acc.GetAddress(), nil, 1000)
+	msgMintToken := types.NewMsgMintToken("btc", acc.GetAddress(), nil, 1000)
 	_, err = keeper.MintToken(ctx, msgMintToken)
 	assert.NoError(t, err)
 
@@ -439,41 +424,41 @@ func TestMintTokenKeeper(t *testing.T) {
 }
 
 func TestTransferOwnerKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
-	RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, DefaultCodespace, pk.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 
 	srcOwner := sdk.AccAddress([]byte("TokenSrcOwner"))
 
 	acc := ak.NewAccountWithAddress(ctx, srcOwner)
 
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
 
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
 	assert.True(t, keeper.HasToken(ctx, "i.btc"))
 
-	asset, found := keeper.getToken(ctx, "i.btc")
+	token, found := keeper.getToken(ctx, "i.btc")
 	assert.True(t, found)
 
-	assert.Equal(t, ft.GetDenom(), asset.GetDenom())
-	assert.Equal(t, ft.Owner, asset.Owner)
+	assert.Equal(t, ft.GetDenom(), token.GetDenom())
+	assert.Equal(t, ft.Owner, token.Owner)
 
 	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(asset)
+	assetJson, _ := json.Marshal(token)
 	assert.Equal(t, msgJson, assetJson)
 
 	dstOwner := sdk.AccAddress([]byte("TokenDstOwner"))
-	msg := MsgTransferTokenOwner{
+	msg := types.MsgTransferTokenOwner{
 		SrcOwner: srcOwner,
 		DstOwner: dstOwner,
 		TokenId:  "btc",
@@ -481,7 +466,7 @@ func TestTransferOwnerKeeper(t *testing.T) {
 	_, err = keeper.TransferTokenOwner(ctx, msg)
 	assert.NoError(t, err)
 
-	asset, found = keeper.getToken(ctx, "i.btc")
+	token, found = keeper.getToken(ctx, "i.btc")
 	assert.True(t, found)
-	assert.Equal(t, dstOwner, asset.Owner)
+	assert.Equal(t, dstOwner, token.Owner)
 }

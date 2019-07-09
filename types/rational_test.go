@@ -322,20 +322,20 @@ func TestStringOverflowRational(t *testing.T) {
 // it is safe to use randomness in the tests
 func TestArithRat(t *testing.T) {
 	for i := 0; i < 20; i++ {
-		n1 :=  NewInt(int64(rand.Int31()))
-		d1 :=  NewInt(int64(rand.Int31()))
+		n1 := NewInt(int64(rand.Int31()))
+		d1 := NewInt(int64(rand.Int31()))
 		rat1 := NewRatFromInt(n1, d1)
 
-		n2 :=  NewInt(int64(rand.Int31()))
-		d2 :=  NewInt(int64(rand.Int31()))
+		n2 := NewInt(int64(rand.Int31()))
+		d2 := NewInt(int64(rand.Int31()))
 		rat2 := NewRatFromInt(n2, d2)
 
 		n1d2 := n1.Mul(d2)
 		n2d1 := n2.Mul(d1)
 
 		cases := []struct {
-			nres  Int
-			dres  Int
+			nres Int
+			dres Int
 			rres Rat
 		}{
 			{n1d2.Add(n2d1), d1.Mul(d2), rat1.Add(rat2)},
@@ -352,12 +352,12 @@ func TestArithRat(t *testing.T) {
 
 func TestCompRat(t *testing.T) {
 	for i := 0; i < 20; i++ {
-		n1 :=  NewInt(int64(rand.Int31()))
-		d1 :=  NewInt(int64(rand.Int31()))
+		n1 := NewInt(int64(rand.Int31()))
+		d1 := NewInt(int64(rand.Int31()))
 		rat1 := NewRatFromInt(n1, d1)
 
-		n2 :=  NewInt(int64(rand.Int31()))
-		d2 :=  NewInt(int64(rand.Int31()))
+		n2 := NewInt(int64(rand.Int31()))
+		d2 := NewInt(int64(rand.Int31()))
 		rat2 := NewRatFromInt(n2, d2)
 
 		n1d2 := n1.Mul(d2)

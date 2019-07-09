@@ -2,8 +2,8 @@ package gov
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/app/v1/asset"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
