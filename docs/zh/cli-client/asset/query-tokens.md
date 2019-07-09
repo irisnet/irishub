@@ -21,16 +21,16 @@ iriscli asset query-tokens [flags]
 ## 查询规则
 
 - 当 source 为 native 时
-    - gateway 会被忽略
-    - owner 可选
+  - gateway 会被忽略
+  - owner 可选
 - 当 source 为 gateway 时
-    - gateway 必填
-    - owner 会被忽略（因为 gateway tokens 全部属于 gateway 的 owner ）
+  - gateway 必填
+  - owner 会被忽略（因为 gateway tokens 全部属于 gateway 的 owner ）
 - 当 source 为 external 时
-    - gateway 和 owner 都会被忽略
+  - gateway 和 owner 都会被忽略
 - 当 gateway 不为空时
-    - source 可选    
-    
+  - source 可选
+
 ## 示例
 
 ### 查询全部资产

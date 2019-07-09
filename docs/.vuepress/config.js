@@ -68,7 +68,8 @@ module.exports = {
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
                             ['guardian.md', 'Guardian'],
-                            ['mint.md', 'Mint']
+                            ['mint.md', 'Mint'],
+                            ['asset.md', 'Asset']
                         ]
                     }],
                     '/cli-client/': [{
@@ -140,6 +141,13 @@ module.exports = {
                         children: [
                             ['service/', 'iriscli service']
                         ]
+                    },
+                    {
+                        title: 'Asset',
+                        collapsable: false,
+                        children: [
+                            ['asset/', 'iriscli asset']
+                        ]
                     }],
                     '/resources/': [
                         ['validator-faq.md', 'Validator FAQ'],
@@ -205,7 +213,8 @@ module.exports = {
                             ['upgrade.md', '升级'],
                             ['distribution.md', '收益分配'],
                             ['guardian.md', '系统用户'],
-                            ['mint.md', '通胀']
+                            ['mint.md', '通胀'],
+                            ['asset.md', '资产管理']
                         ]
                     }],
                     '/zh/cli-client/': [{
@@ -276,6 +285,13 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['service/', 'iriscli service']
+                        ]
+                    },
+                    {
+                        title: '资产管理',
+                        collapsable: false,
+                        children: [
+                            ['asset/', 'iriscli asset']
                         ]
                     }],
                     '/zh/resources/': [

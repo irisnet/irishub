@@ -34,6 +34,9 @@ const (
 	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
 	CodeAssetNotExists                sdk.CodeType = 122
 	CodeAssetNotMintable              sdk.CodeType = 123
+
+	CodeInsufficientCoins       sdk.CodeType = 130
+	CodeSignersMissingInContext sdk.CodeType = 131
 )
 
 //----------------------------------------
@@ -135,4 +138,15 @@ func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
+}
+
+//----------------------------------------
+// misc
+
+func ErrInsufficientCoins(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInsufficientCoins, msg)
+}
+
+func ErrSignersMissingInContext(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeSignersMissingInContext, msg)
 }

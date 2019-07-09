@@ -6,8 +6,8 @@ Edit token informations
 
 ## Usage
 
-```shell
-iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-source> --symbol-min-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris
+```bash
+iriscli asset edit-token [flags]
 ```
 
 ## Flags
@@ -20,34 +20,10 @@ iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-
 | --max-supply | uint | No | 0 | the max supply of the token |
 | --mintable | bool | No | false | whether the token can be minted, default false |
 
-
 ## Example
 
-```shell
-iriscli asset edit-token eth --name="ETH TOKEN" --symbol-at-source="ETH" --symbol-min-alias=atto --max-supply=100000000000 --mintable=true --from=node0 --chain-id=irishub-test --fee=0.4iris  --home=$iris_root_path --commit
-```
+`max-supply` can only be reduced and no less than the current total supply
 
-Output:
-```txt
-Password to sign with 'node0':
-Committed at block 502 (tx hash: 3D131F2D1E0B200206E8023E70C9442142DA27EBC42675451E39BF84B6343C6F, response:
- {
-   "code": 0,
-   "data": null,
-   "log": "Msg 0: ",
-   "info": "",
-   "gas_wanted": 50000,
-   "gas_used": 5350,
-   "codespace": "",
-   "tags": [
-     {
-       "key": "action",
-       "value": "edit_token"
-     },
-     {
-       "key": "token-id",
-       "value": "eth"
-     }
-   ]
- })
+```bash
+iriscli asset edit-token cat --name="Cat Token" --symbol-at-source="cat" --symbol-min-alias=kitty --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
 ```

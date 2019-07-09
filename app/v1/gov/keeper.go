@@ -831,3 +831,7 @@ func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, p ProposalLeve
 		panic("There is no level for this proposal")
 	}
 }
+
+func (keeper Keeper) Init(ctx sdk.Context) {
+	keeper.SetParamSet(ctx, DefaultParams())
+}

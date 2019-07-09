@@ -54,7 +54,7 @@ type ProtocolV1 struct {
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
 
-	anteHandler          sdk.AnteHandler          // ante handler for fee and auth
+	anteHandlers         []sdk.AnteHandler        // ante handlers for fee and auth
 	feeRefundHandler     sdk.FeeRefundHandler     // fee handler for fee refund
 	feePreprocessHandler sdk.FeePreprocessHandler // fee handler for fee preprocessor
 
@@ -101,6 +101,9 @@ func (p *ProtocolV1) Init(ctx sdk.Context) {
 
 	// move community pool balance to AccAddress
 	p.distrKeeper.Init(ctx)
+
+	// modify gov params
+	p.govKeeper.Init(ctx)
 }
 
 func (p *ProtocolV1) GetCodec() *codec.Codec {
@@ -297,7 +300,10 @@ func (p *ProtocolV1) configRouters() {
 
 // configure all FeeHandlers
 func (p *ProtocolV1) configFeeHandlers() {
-	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
+	authAnteHandler := auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
+	assetAnteHandler := asset.NewAnteHandler(p.assetKeeper)
+
+	p.anteHandlers = []sdk.AnteHandler{authAnteHandler, assetAnteHandler}
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
@@ -452,8 +458,8 @@ func (p *ProtocolV1) GetRouter() protocol.Router {
 func (p *ProtocolV1) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
-func (p *ProtocolV1) GetAnteHandler() sdk.AnteHandler {
-	return p.anteHandler
+func (p *ProtocolV1) GetAnteHandlers() []sdk.AnteHandler {
+	return p.anteHandlers
 }
 func (p *ProtocolV1) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler

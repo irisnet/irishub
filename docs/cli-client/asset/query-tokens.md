@@ -12,7 +12,6 @@ iriscli asset query-tokens [flags]
 
 ## Unique Flags
 
-
 | Name      | Type   | Required | Default | Description                                                  |
 | --------- | ------ | -------- | ------- | ------------------------------------------------------------ |
 | --source  | string | false    | all     | Token Source: native / gateway / external                    |
@@ -22,16 +21,16 @@ iriscli asset query-tokens [flags]
 ## Query rules
 
 - when source is native
-    - gateway will be ignored
-    - owner optional
+  - gateway will be ignored
+  - owner optional
 - When source is gateway
-    - gateway required
-    - owner will be ignored (because gateway tokens are all owned by the gateway)
+  - gateway required
+  - owner will be ignored (because gateway tokens are all owned by the gateway)
 - when source is external
-    - gateway and owner are ignored
+  - gateway and owner are ignored
 - when the gateway is not empty
-    - source optional
-    
+  - source optional
+
 ## Examples
 
 ### Query all tokens

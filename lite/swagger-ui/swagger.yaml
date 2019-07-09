@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation, signing, and
     broadcast.
-  version: "0.15.0-dev"
+  version: "0.15.0-rc0"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -568,39 +568,11 @@ paths:
           description: Server internel error
   '/bank/accounts/{address}/send':
     post:
-      summary: Send coins (build -> sign -> send)
-      description: Send coins (build -> sign -> send)
+      summary: Send coins
+      description: Send coins
       tags:
         - Bank
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: Account address in bech32 format
@@ -609,11 +581,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Tx was send and will probably be added to the next block
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
         '401':
@@ -642,34 +610,6 @@ paths:
       tags:
         - Bank
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: Account address in bech32 format
@@ -678,11 +618,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Tx was send and will probably be added to the next block
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
         '401':
@@ -913,44 +849,11 @@ paths:
           description: Internal Server Error
     post:
       summary: Submit delegation
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Stake
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
         '401':
@@ -1002,44 +905,11 @@ paths:
           description: Internal Server Error
     post:
       summary: Submit unbonding
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Stake
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
         '401':
@@ -1094,44 +964,11 @@ paths:
           description: Internal Server Error
     post:
       summary: Submit redelegation
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Stake
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
         '401':
@@ -1513,34 +1350,6 @@ paths:
       tags:
         - Slashing
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - description: Bech32 validator operator address
           name: validatorAddr
           required: true
@@ -1549,11 +1358,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid validator address or base_tx
         '401':
@@ -1568,42 +1373,9 @@ paths:
       description: Send transaction to submit a proposal
       tags:
         - Gov
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
         '401':
@@ -1686,34 +1458,6 @@ paths:
       tags:
         - Gov
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - description: proposal id
           name: proposalId
           required: true
@@ -1722,11 +1466,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal id or deposit body
         '401':
@@ -1778,34 +1518,6 @@ paths:
       tags:
         - Gov
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - description: proposal id
           name: proposalId
           required: true
@@ -1814,11 +1526,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal id or vote body
         '401':
@@ -1985,42 +1693,9 @@ paths:
       summary: Set withdraw address
       tags:
         - Distribution
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
         '401':
@@ -2070,42 +1745,9 @@ paths:
       summary: Withdraw rewards
       tags:
         - Distribution
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
         '401':
@@ -2175,42 +1817,9 @@ paths:
       description: Send transaction to define a service
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service define body
         '401':
@@ -2313,42 +1922,9 @@ paths:
       description: Send transaction to add a binding to a service definition
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service bind body
         '401':
@@ -2541,34 +2117,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2589,11 +2137,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding update body
         '401':
@@ -2637,34 +2181,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2685,11 +2201,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding disable body
         '401':
@@ -2705,34 +2217,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2753,11 +2237,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding enable body
         '401':
@@ -2783,34 +2263,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2831,11 +2283,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding deposit refund body
         '401':
@@ -2850,42 +2298,9 @@ paths:
       description: Send transaction to call a method of service which a provider bound it
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service request body
         '401':
@@ -3003,42 +2418,9 @@ paths:
       description: Send transaction to respond a service call
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service response body
         '401':
@@ -3160,34 +2542,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: address of consumer
@@ -3196,11 +2550,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service fees refund body
         '401':
@@ -3216,34 +2566,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: address of provider
@@ -3252,11 +2574,7 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service fees withdraw body
         '401':
@@ -3267,7 +2585,7 @@ paths:
         $ref: '#/components/requestBodies/Unjailbody'
   '/asset/tokens':
     post:
-      summary: Generate an unsigned token issue tx
+      summary: Issue a token
       tags:
         - Asset
       requestBody:
@@ -3316,7 +2634,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Unsigned Tx
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid token id
         '500':
@@ -3387,43 +2705,11 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Asset
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '401':
           description: Key password is wrong
         '500':
@@ -3463,43 +2749,11 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Asset
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '401':
           description: Key password is wrong
         '500':
@@ -3530,43 +2784,11 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Asset
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '401':
           description: Key password is wrong
         '500':
@@ -4083,12 +3305,6 @@ components:
     BaseTx:
       type: object
       properties:
-        name:
-          type: string
-          example: faucet
-        password:
-          type: string
-          example: '1234567890'
         chain_id:
           type: string
           example: irishub-test
