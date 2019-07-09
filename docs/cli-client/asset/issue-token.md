@@ -10,7 +10,6 @@ This command is used to issue a new token on IRIS Hub.
 iriscli asset issue-token [flags]
 ```
 
-
 ## Flags
 
 | Name,shorthand     | Type    | Required | Default       | Description                                                  |
@@ -49,4 +48,12 @@ iriscli asset create-gateway --moniker=cats --identity=<identity> --details=<det
 
 ```bash
 iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --symbol-at-source=cat --name="Kitty Token" --symbol=kitty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true  --fee=1iris --from=<key-name> --commit
+```
+
+### Send tokens
+
+You can send any tokens you have just like [sending iris](../bank/send)
+
+```bash
+iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub
 ```

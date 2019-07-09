@@ -41,6 +41,17 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 // IssueToken issue a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags, sdk.Error) {
+	if token.GetSource() == types.GATEWAY {
+		gateway, err := k.GetGateway(ctx, token.GetGateway())
+		if err != nil {
+			return nil, err
+		}
+		if !gateway.Owner.Equals(token.GetOwner()) {
+			return nil, types.ErrUnauthorizedIssueGatewayAsset(k.codespace,
+				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
+					gateway.Moniker, gateway.Owner, token.GetOwner()))
+		}
+	}
 	token, owner, err := k.AddToken(ctx, token)
 	if err != nil {
 		return nil, err
@@ -89,12 +100,6 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		if err != nil {
 			return token, nil, err
 		}
-		if !gateway.Owner.Equals(token.GetOwner()) {
-			return token, nil, types.ErrUnauthorizedIssueGatewayAsset(k.codespace,
-				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
-					gateway.Moniker, gateway.Owner, token.GetOwner()))
-		}
-
 		owner = gateway.Owner
 	} else if token.GetSource() == types.NATIVE {
 		owner = token.GetOwner()
