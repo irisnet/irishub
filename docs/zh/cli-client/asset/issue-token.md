@@ -6,7 +6,7 @@
 
 ## 使用方式
 
-```
+```bash
 iriscli asset issue-token [flags]
 ```
 
@@ -28,12 +28,11 @@ iriscli asset issue-token [flags]
 
 ## 示例
 
-### 发行本地资产
+### 发行原生资产
 
-```
+```bash
 iriscli asset issue-token --family=fungible --source=native --name="Kitty Token" --symbol=kitty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true --fee=1iris --from=<key-name> --commit
 ```
-
 
 ### 发行网关资产
 
@@ -49,4 +48,12 @@ iriscli asset create-gateway --moniker=cats --identity=<identity> --details=<det
 
 ```bash
 iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --symbol-at-source=cat --name="Kitty Token" --symbol=kitty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true  --fee=1iris --from=<key-name> --commit
+```
+
+### 转账
+
+你可以像[交易iris](../bank/send)一样，交易你所拥有的任何代币
+
+```bash
+iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub
 ```

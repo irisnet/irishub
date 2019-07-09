@@ -11,11 +11,11 @@ iriscli asset query-token <token-id>
 ```
 
 ### 全局唯一 Token ID 生成规则
-    
+
 - Source 为 native 时：ID = [Symbol]，例：iris
-    
+
 - Source 为 external 时：ID = x.[Symbol]，例：x.btc
-    
+
 - Source 为 gateway 时：ID = [Gateway].[Symbol]，例：cats.kitty
 
 ## 示例
