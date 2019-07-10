@@ -1,7 +1,7 @@
 package gov
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -102,9 +102,9 @@ func createAddTokenInfo() pTypeInfo {
 				addTokenMsg := content.(MsgSubmitAddTokenProposal)
 				decimal := int(addTokenMsg.Decimal)
 				initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
-				maxSupply := sdk.NewIntWithDecimal(int64(asset.MaximumAssetMaxSupply), decimal)
+				maxSupply := sdk.NewIntWithDecimal(int64(exported.MaximumAssetMaxSupply), decimal)
 
-				fToken := asset.NewFungibleToken(asset.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.SymbolAtSource, addTokenMsg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
+				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.SymbolAtSource, addTokenMsg.SymbolMinAlias, initialSupply, maxSupply, false, nil)
 				proposal := &AddTokenProposal{
 					p,
 					fToken,

@@ -2,7 +2,7 @@ package gov
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -10,7 +10,7 @@ var _ Proposal = (*AddTokenProposal)(nil)
 
 type AddTokenProposal struct {
 	BasicProposal
-	FToken asset.FungibleToken `json:"f_token"`
+	FToken exported.FungibleToken `json:"f_token"`
 }
 
 func (atp AddTokenProposal) String() string {
@@ -27,7 +27,7 @@ func (atp *AddTokenProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 
 	tokenId := atp.FToken.GetUniqueID()
 	if k.ak.HasToken(ctx, tokenId) {
-		return asset.ErrAssetAlreadyExists(k.codespace, tokenId)
+		return exported.ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", tokenId))
 	}
 	return nil
 }
