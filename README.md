@@ -10,10 +10,10 @@ IRIS network (a.k.a. IRISnet) aims to establish a technology foundation to facil
 As the centerpiece of IRISnet, IRIS Hub (a.k.a. IRIShub) will be the first regional hub connecting to the main Cosmos Hub, thus making IRISnet an inseparable part of the whole Cosmos network.
 
 
-## Fuxi Testnet
+## IRIS Hub Mainnet
 
-To use Fuxi testnet for testing LCD/iriscli, follow 
-[this guide](./docs/get-started/Join-the-Testnet.md).
+To join the mainnet, follow
+[this guide](./docs/get-started/Join-the-Mainnet.md).
 
 ## Install
 
@@ -22,8 +22,8 @@ See the
 
 ## Resources
 
-* Explorer：https://testnet.irisplorer.io 
-* Faucet：https://testnet.irisplorer.io/#/faucet
+* Explorer: https://www.irisplorer.io/#/home
+* Riot chat: #irisvalidators:matrix.org
 
 ## How To Contribute
 
