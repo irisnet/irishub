@@ -35,6 +35,7 @@ func Commands(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			// query all
 			if len(moduleStr) == 0 {
 				var paramSets params.ParamSets
 				if err := cdc.UnmarshalJSON(res, &paramSets); err != nil {
@@ -42,13 +43,12 @@ func Commands(cdc *codec.Codec) *cobra.Command {
 				}
 				return cliCtx.PrintOutput(paramSets)
 			}
+			// query by module
 			var paramSet params.ParamSet
 			if err := cdc.UnmarshalJSON(res, &paramSet); err != nil {
 				return err
 			}
-
 			return cliCtx.PrintOutput(paramSet)
-			return nil
 		},
 	}
 
