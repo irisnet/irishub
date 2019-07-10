@@ -1,8 +1,7 @@
-package asset
+package types
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -139,7 +138,7 @@ func DefaultParamsForTest() Params {
 	}
 }
 
-func validateParams(p Params) error {
+func ValidateParams(p Params) error {
 	if err := validateAssetTaxRate(p.AssetTaxRate); err != nil {
 		return err
 	}
@@ -184,16 +183,4 @@ func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
 		)
 	}
 	return nil
-}
-
-// get asset params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) Params {
-	var p Params
-	k.paramSpace.GetParamSet(ctx, &p)
-	return p
-}
-
-// set asset params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
 }
