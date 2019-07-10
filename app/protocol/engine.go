@@ -23,7 +23,7 @@ func NewProtocolEngine(protocolKeeper sdk.ProtocolKeeper) ProtocolEngine {
 	return engine
 }
 
-func (pe *ProtocolEngine) LoadInitProtocol(version uint64) {
+func (pe *ProtocolEngine) LoadProtocol(version uint64) {
 	p, flag := pe.protocols[version]
 	if flag == false {
 		panic("unknown protocol version!!!")
