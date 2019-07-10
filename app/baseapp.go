@@ -315,9 +315,11 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	stateJSON := req.AppStateBytes
 	var genesisFileState v0.GenesisFileState
 	v0.MakeCodec().MustUnmarshalJSON(stateJSON, &genesisFileState)
-	initProtocol := genesisFileState.UpgradeData.GenesisVersion.UpgradeInfo.Protocol.Version
-	app.Engine.LoadProtocol(initProtocol)
-	app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
+	genesisProtocol := genesisFileState.UpgradeData.GenesisVersion.UpgradeInfo.Protocol.Version
+	if genesisProtocol != app.Engine.GetCurrentVersion() {
+		app.Engine.LoadProtocol(genesisProtocol)
+		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
+	}
 
 	initChainer := app.Engine.GetCurrentProtocol().GetInitChainer()
 	if initChainer == nil {
