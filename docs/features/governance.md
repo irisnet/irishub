@@ -29,7 +29,7 @@ Different levels correspond to different parameters：
 | govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
 | govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
+| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
 
 
 * `MinDeposit`  The minimum of  deposit
