@@ -328,7 +328,7 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
 }
 
 // application updates every end block

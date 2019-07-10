@@ -39,11 +39,11 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Asset Params:
-  Asset Tax Rate:                              %s
-  Base Fee for Issuing Token:                  %s
-  Fee Ratio for Minting (vs Issuing) Token:    %s
-  Base Fee for Creating Gateway:               %s
-  Fee Ratio for Gateway (vs Native) Token:     %s`,
+  asset/AssetTaxRate:          %s
+  asset/IssueTokenBaseFee:     %s
+  asset/MintTokenFeeRatio:     %s
+  asset/CreateGatewayBaseFee:  %s
+  asset/GatewayAssetFeeRatio:  %s`,
 		p.AssetTaxRate.String(), p.IssueTokenBaseFee.String(), p.MintTokenFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
 }
 
@@ -111,6 +111,10 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	return "", fmt.Errorf("this method is not implemented")
+}
+
+func (p *Params) ReadOnly() bool {
+	return false
 }
 
 // default asset module params
