@@ -2,16 +2,15 @@ package utils
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/crypto/keys/keyerror"
-	sdk "github.com/irisnet/irishub/types"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -204,81 +203,6 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 	cliCtx.DryRun = HasDryRunArg(r)
 	cliCtx.Commit = CommitOnlyArg(r)
 	return cliCtx
-}
-
-// SendOrReturnUnsignedTx implements a utility function that facilitates
-// sending a series of messages in a signed transaction given a TxBuilder and a
-// QueryContext. It ensures that the account exists, has a proper number and
-// sequence set. In addition, it builds and signs a transaction with the
-// supplied messages. Finally, it broadcasts the signed transaction to a node.
-//
-// NOTE: Also see SendOrPrintTx.
-// NOTE: Also see x/stake/client/rest/tx.go delegationsRequestHandlerFn.
-func SendOrReturnUnsignedTx(w http.ResponseWriter, cliCtx context.CLIContext, baseTx BaseTx, msgs []sdk.Msg) {
-
-	simulateGas, gas, err := client.ReadGasFlag(baseTx.Gas)
-	if err != nil {
-		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	adjustment, ok := ParseFloat64OrReturnBadRequest(w, baseTx.GasAdjustment, client.DefaultGasAdjustment)
-	if !ok {
-		return
-	}
-
-	txCtx := TxContext{
-		Codec:         cliCtx.Codec,
-		Gas:           gas,
-		Fee:           baseTx.Fee,
-		GasAdjustment: adjustment,
-		SimulateGas:   simulateGas,
-		ChainID:       baseTx.ChainID,
-		AccountNumber: baseTx.AccountNumber,
-		Sequence:      baseTx.Sequence,
-		Memo:          baseTx.Memo,
-	}
-	txCtx = txCtx.WithCliCtx(cliCtx)
-
-	if cliCtx.GenerateOnly {
-		WriteGenerateStdTxResponse(w, txCtx, msgs)
-		return
-	}
-
-	if cliCtx.DryRun || txCtx.SimulateGas {
-		newTxCtx, result, err := EnrichCtxWithGas(txCtx, cliCtx, baseTx.Name, msgs)
-		if err != nil {
-			WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		if cliCtx.DryRun {
-			WriteSimulationResponse(w, cliCtx, newTxCtx.Gas, result)
-			return
-		}
-
-		txCtx = newTxCtx
-	}
-
-	txBytes, err := txCtx.BuildAndSign(baseTx.Name, baseTx.Password, msgs)
-	if keyerror.IsErrKeyNotFound(err) {
-		WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		return
-	} else if keyerror.IsErrWrongPassword(err) {
-		WriteErrorResponse(w, http.StatusUnauthorized, err.Error())
-		return
-	} else if err != nil {
-		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	res, err := cliCtx.BroadcastTx(txBytes)
-	if err != nil {
-		WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 }
 
 // PostProcessResponse performs post process for rest response
