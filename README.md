@@ -13,12 +13,12 @@ As the centerpiece of IRISnet, IRIS Hub (a.k.a. IRIShub) will be the first regio
 ## IRIS Hub Mainnet
 
 To join the mainnet, follow
-[this guide](https://www.irisnet.org/docs/zh/get-started/Join-the-Mainnet.html).
+[this guide](https://www.irisnet.org/docs/get-started/Join-the-Mainnet.html).
 
 ## Install
 
 See the 
-[install instructions](https://www.irisnet.org/docs/zh/software/How-to-install-irishub.html).
+[install instructions](https://www.irisnet.org/docs/software/How-to-install-irishub.html).
 
 ## Resources
 
