@@ -48,19 +48,6 @@ func (coin Coin) String() string {
 	return fmt.Sprintf("%v%v", coin.Amount, coin.Denom)
 }
 
-func (coin Coin) MainUnitString() string {
-	out := ""
-	if coin.Denom == NativeTokenMinDenom {
-		destCoinStr, err := IRIS.Convert(coin.String(), NativeTokenName)
-		if err == nil {
-			out += fmt.Sprintf("%v", destCoinStr)
-			return out
-		}
-	}
-	out += fmt.Sprintf("%v,", coin.String())
-	return out
-}
-
 // SameDenomAs returns true if the two coins are the same denom
 func (coin Coin) SameDenomAs(other Coin) bool {
 	return (coin.Denom == other.Denom)
