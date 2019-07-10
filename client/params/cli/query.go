@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"strings"
 )
 
 const flagModule = "module"
@@ -18,7 +19,7 @@ func Commands(cdc *codec.Codec) *cobra.Command {
 		Short:   "query parameter",
 		Example: "iriscli params --module=<module name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			moduleStr := viper.GetString(flagModule)
+			moduleStr := strings.TrimSpace(viper.GetString(flagModule))
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 

@@ -137,7 +137,6 @@ func main() {
 			govcmd.GetCmdQueryDeposit(cdc),
 			govcmd.GetCmdQueryDeposits(cdc),
 			govcmd.GetCmdQueryTally(cdc),
-			govcmd.GetCmdQueryGovConfig(cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
