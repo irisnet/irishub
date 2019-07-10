@@ -197,7 +197,7 @@ func validateIssueTokenBaseFee(coin sdk.Coin) sdk.Error {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidIssueTokenBaseFee,
-			fmt.Sprintf("Base fee for issuing token [%s] should not be negative", coin.String()),
+			fmt.Sprintf("Base fee for issuing token should not be negative"),
 		)
 	}
 	return nil
@@ -208,7 +208,7 @@ func validateCreateGatewayBaseFee(coin sdk.Coin) sdk.Error {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidCreateGatewayBaseFee,
-			fmt.Sprintf("Base fee for create gateway [%s] should not be negative", coin.String()),
+			fmt.Sprintf("Base fee for creating gateway should not be negative"),
 		)
 	}
 	return nil
