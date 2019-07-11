@@ -20,6 +20,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/prometheus/client_golang/prometheus"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -85,6 +86,7 @@ func NewProtocolV1(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkI
 
 // load the configuration of this Protocol
 func (p *ProtocolV1) Load() {
+	prometheus.DefaultRegisterer = prometheus.NewRegistry()
 	p.configCodec()
 	p.configKeepers()
 	p.configRouters()
@@ -93,6 +95,8 @@ func (p *ProtocolV1) Load() {
 }
 
 func (p *ProtocolV1) Init(ctx sdk.Context) {
+	p.InitMetrics(ctx.MultiStore())
+
 	// initialize asset params
 	p.assetKeeper.Init(ctx)
 
@@ -110,7 +114,7 @@ func (p *ProtocolV1) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
-func (p *ProtocolV1) InitMetrics(store sdk.CommitMultiStore) {
+func (p *ProtocolV1) InitMetrics(store sdk.MultiStore) {
 	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
 	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
@@ -328,7 +332,7 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
 }
 
 // application updates every end block

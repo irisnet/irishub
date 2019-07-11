@@ -46,7 +46,7 @@ The proposer should deposit at least 30% of `MinDeposit` to submit a proposal,  
 iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --param='mint/Inflation=0.050' --type=ParameterChange --description=<proposal_description> --from=<key_name> --fee=0.3iris --deposit="3000iris" 
 ```
 
-Note: in this case, --path and --param cannot be both empty.
+Note: in this case, --path and --param cannot be both empty,param's value can be queried by `iriscli params`,detailed in [parms](../params/README.md)
 
 ### Submit a `SoftwareUpgrade` type proposal
 
