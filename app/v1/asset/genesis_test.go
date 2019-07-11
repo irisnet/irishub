@@ -30,7 +30,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// init params
-	keeper.Init(ctx)
+	keeper.SetParamSet(ctx, DefaultParams())
 
 	// define variables
 	owners := []sdk.AccAddress{
@@ -76,7 +76,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 	})
 
 	require.Equal(t, len(gateways), len(storedGateways))
-	require.Equal(t, len(tokens), 3)
+	require.Equal(t, len(tokens), 1)
 
 	// export gateways
 	genesisState := ExportGenesis(ctx, keeper)
@@ -89,8 +89,6 @@ func TestExportGatewayGenesis(t *testing.T) {
 	}
 
 	for _, token := range genesisState.Tokens {
-		if token.Symbol == "bch" {
-			require.Equal(t, token, ft)
-		}
+		require.Equal(t, token, ft)
 	}
 }
