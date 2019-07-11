@@ -6,5 +6,4 @@ const (
 	RestVoter          = "voter"
 	RestProposalStatus = "status"
 	RestNumLimit       = "limit"
-	Module             = "module"
 )

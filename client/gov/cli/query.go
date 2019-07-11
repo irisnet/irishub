@@ -5,7 +5,6 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/gov"
-	paramsType "github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
@@ -323,43 +322,5 @@ func GetCmdQueryTally(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal is being tallied")
 
-	return cmd
-}
-
-func GetCmdQueryGovConfig(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "query-params",
-		Short:   "query parameter proposal's config",
-		Example: "iriscli gov query-params --module=<module name>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			moduleStr := viper.GetString(flagModule)
-
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			params := paramsType.QueryModuleParams{
-				Module: moduleStr,
-			}
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/module", protocol.ParamsRoute), bz)
-			if err != nil {
-				return err
-			}
-
-			var paramSet paramsType.ParamSet
-			if err := cdc.UnmarshalJSON(res, &paramSet); err != nil {
-				return err
-			}
-
-			return cliCtx.PrintOutput(paramSet)
-			return nil
-		},
-	}
-
-	cmd.Flags().String(flagModule, "", "module name")
-	cmd.MarkFlagRequired(flagModule)
 	return cmd
 }
