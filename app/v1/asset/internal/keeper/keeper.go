@@ -416,19 +416,21 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 }
 
 func (k Keeper) Init(ctx sdk.Context) {
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "Init").With("module", "iris/asset"))
+
 	k.SetParamSet(ctx, types.DefaultParams())
 
 	//Initialize external tokens BTC and ETH
 	maxSupply := sdk.NewIntWithDecimal(21000000, 8)
-	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "BTC Token", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, false, nil)
+	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, false, nil)
 	if _, err := k.IssueToken(ctx, btc); err != nil {
-		panic(fmt.Errorf("initialize external tokens BTC failed:%s", err.Error()))
+		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
 	}
 
 	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
-	eth := types.NewFungibleToken(types.EXTERNAL, "", "ETH", "ETH Token", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
+	eth := types.NewFungibleToken(types.EXTERNAL, "", "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
 	if _, err := k.IssueToken(ctx, eth); err != nil {
-		panic(fmt.Errorf("initialize external tokens ETH failed:%s", err.Error()))
+		ctx.Logger().Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
 	}
 }
 
