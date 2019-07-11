@@ -10,8 +10,6 @@ import (
 // NewHandler returns a handler for "coinswap" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
-		ctx = ctx.WithEventManager(sdk.NewEventManager())
-
 		switch msg := msg.(type) {
 		case MsgSwapOrder:
 			return HandleMsgSwapOrder(ctx, msg, k)
@@ -108,8 +106,8 @@ func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.R
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
 	// TODO: verify
-	amtToMint := (liquidityCoinBalance.Mul(msg.DepositAmount)).Quo(nativeBalance)
-	coinAmountDeposited := (liquidityCoinBalance.Mul(msg.DepositAmount)).Quo(nativeBalance)
+	amtToMint := (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+	coinAmountDeposited := (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
 	nativeCoinDeposited := sdk.NewCoin(nativeDenom, msg.DepositAmount)
 	coinDeposited := sdk.NewCoin(msg.Deposit.Denom, coinAmountDeposited)
 
@@ -153,8 +151,8 @@ func HandleMsgRemoveLiquidity(ctx sdk.Context, msg MsgRemoveLiquidity, k Keeper)
 	// calculate amount of UNI to be burned for sender
 	// and coin amount to be returned
 	// TODO: verify, add amt burned
-	nativeWithdrawn := msg.WithdrawAmount.Mul(nativeBalance).Quo(liquidityCoinBalance)
-	coinWithdrawn := msg.WithdrawAmount.Mul(coinBalance).Quo(liquidityCoinBalance)
+	nativeWithdrawn := msg.WithdrawAmount.Mul(nativeBalance).Div(liquidityCoinBalance)
+	coinWithdrawn := msg.WithdrawAmount.Mul(coinBalance).Div(liquidityCoinBalance)
 	nativeCoin := sdk.NewCoin(nativeDenom, nativeWithdrawn)
 	exchangeCoin := sdk.NewCoin(msg.Withdraw.Denom, coinWithdrawn)
 	amtBurned := exchangeCoin.Amount

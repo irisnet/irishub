@@ -20,7 +20,7 @@ func TestCreateReservePool(t *testing.T) {
 	ctx, keeper, _ := createTestInput(t, sdk.NewInt(0), 0)
 
 	moduleAcc := keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
-	require.Nil(t, moduleAcc)
+	require.True(t, true, moduleAcc.Empty())
 
 	keeper.CreateReservePool(ctx, moduleName)
 	moduleAcc = keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
@@ -66,7 +66,7 @@ func TestGetReservePool(t *testing.T) {
 	reservePool, found = keeper.GetReservePool(ctx, moduleName)
 	require.True(t, found)
 
-	keeper.bk.SendCoins(ctx, accs[0].GetAddress(), auth.SwapPoolAccAddr, sdk.NewCoins(sdk.NewCoin(sdk.NativeTokenMinDenom, amt)))
+	keeper.bk.SendCoins(ctx, accs[0].GetAddress(), auth.SwapPoolAccAddr, sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, amt)})
 	reservePool, found = keeper.GetReservePool(ctx, moduleName)
 	reservePool, found = keeper.GetReservePool(ctx, moduleName)
 	require.True(t, found)

@@ -54,13 +54,13 @@ func (msg MsgSwapOrder) Type() string { return "swap_order" }
 
 // ValidateBasic Implements Msg.
 func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
-	if !msg.Input.IsValid() {
+	if !msg.Input.IsPositive() {
 		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.String())
 	}
 	if msg.Input.IsZero() {
 		return sdk.ErrInvalidCoins("input coin is zero: " + msg.Input.String())
 	}
-	if !msg.Output.IsValid() {
+	if !msg.Output.IsPositive() {
 		return sdk.ErrInvalidCoins("output coin is invalid: " + msg.Output.String())
 	}
 	if msg.Output.IsZero() {
@@ -127,7 +127,7 @@ func (msg MsgAddLiquidity) Type() string { return "add_liquidity" }
 
 // ValidateBasic Implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
-	if !msg.Deposit.IsValid() {
+	if !msg.Deposit.IsPositive() {
 		return sdk.ErrInvalidCoins("coin is invalid: " + msg.Deposit.String())
 	}
 	if msg.Deposit.IsZero() {
@@ -197,7 +197,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if !msg.WithdrawAmount.IsPositive() {
 		return ErrNotPositive(DefaultCodespace, "withdraw amount is not positive")
 	}
-	if !msg.Withdraw.IsValid() {
+	if !msg.Withdraw.IsPositive() {
 		return sdk.ErrInvalidCoins("coin is invalid: " + msg.Withdraw.String())
 	}
 	if msg.Withdraw.IsZero() {

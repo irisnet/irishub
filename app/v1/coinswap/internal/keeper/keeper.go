@@ -30,7 +30,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, paramSpace pa
 		storeKey:   key,
 		bk:         bk,
 		cdc:        cdc,
-		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
+		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
 }
 
@@ -38,10 +38,10 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, paramSpace pa
 // ModuleAccount with minting and burning permissions.
 func (keeper Keeper) CreateReservePool(ctx sdk.Context, moduleName string) {
 	moduleAcc := keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
-	if moduleAcc != nil {
+	if !moduleAcc.Empty() {
 		panic(fmt.Sprintf("reserve pool for %s already exists", moduleName))
 	}
-	keeper.bk.AddCoins(ctx, auth.SwapPoolAccAddr, moduleAcc)
+	keeper.bk.AddCoins(ctx, auth.SwapPoolAccAddr, sdk.Coins{})
 }
 
 // HasCoins returns whether or not an account has at least coins.
@@ -52,7 +52,7 @@ func (keeper Keeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, coins ...sdk
 // BurnCoins burns liquidity coins from the ModuleAccount at moduleName. The
 // moduleName and denomination of the liquidity coins are the same.
 func (keeper Keeper) BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Int) {
-	_, err := keeper.bk.BurnCoins(ctx, auth.SwapPoolAccAddr, sdk.NewCoins(sdk.NewCoin(moduleName, amt)))
+	_, err := keeper.bk.BurnCoins(ctx, auth.SwapPoolAccAddr, sdk.Coins{sdk.NewCoin(moduleName, amt)})
 	if err != nil {
 		panic(err)
 	}
@@ -94,14 +94,19 @@ func (keeper Keeper) GetReservePool(ctx sdk.Context, moduleName string) (coins s
 // GetNativeDenom returns the native denomination for this module from the
 // global param store.
 func (keeper Keeper) GetNativeDenom(ctx sdk.Context) (nativeDenom string) {
-	keeper.paramSpace.Get(ctx, types.KeyNativeDenom, &nativeDenom)
-	return
+	return keeper.GetParams(ctx).NativeDenom
 }
 
 // GetFeeParam returns the current FeeParam from the global param store
 func (keeper Keeper) GetFeeParam(ctx sdk.Context) (feeParam types.FeeParam) {
-	keeper.paramSpace.Get(ctx, types.KeyFee, &feeParam)
-	return
+	return keeper.GetParams(ctx).Fee
+}
+
+// GetParams gets the parameters for the coinswap module.
+func (keeper Keeper) GetParams(ctx sdk.Context) types.Params {
+	var swapParams types.Params
+	keeper.paramSpace.GetParamSet(ctx, &swapParams)
+	return swapParams
 }
 
 // SetParams sets the parameters for the coinswap module.

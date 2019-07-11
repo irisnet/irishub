@@ -6,9 +6,9 @@ import (
 
 // RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgSwapOrder{}, "cosmos-sdk/MsgSwapOrder", nil)
-	cdc.RegisterConcrete(MsgAddLiquidity{}, "cosmos-sdk/MsgAddLiquidity", nil)
-	cdc.RegisterConcrete(MsgRemoveLiquidity{}, "cosmos-sdk/MsgRemoveLiquidity", nil)
+	cdc.RegisterConcrete(MsgSwapOrder{}, "irishub/coinswap/MsgSwapOrder", nil)
+	cdc.RegisterConcrete(MsgAddLiquidity{}, "irishub/coinswap/MsgAddLiquidity", nil)
+	cdc.RegisterConcrete(MsgRemoveLiquidity{}, "irishub/coinswap/MsgRemoveLiquidity", nil)
 }
 
 // ModuleCdc generic sealed codec to be used throughout module

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/protocol"
 	"testing"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -14,8 +15,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
 	"github.com/irisnet/irishub/app/v1/params"
-	supplyKeeper "github.com/irisnet/irishub/app/v1/supply/keeper"
-	supply "github.com/irisnet/irishub/app/v1/supply/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
@@ -27,7 +26,6 @@ func makeTestCodec() *codec.Codec {
 
 	bank.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
-	supply.RegisterCodec(cdc)
 	types.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
@@ -36,10 +34,9 @@ func makeTestCodec() *codec.Codec {
 }
 
 func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, []auth.Account) {
-	keyAcc := sdk.NewKVStoreKey(auth.StoreKey)
-	keyParams := sdk.NewKVStoreKey(params.StoreKey)
-	tkeyParams := sdk.NewTransientStoreKey(params.TStoreKey)
-	keySupply := sdk.NewKVStoreKey(supply.StoreKey)
+	keyAcc := protocol.KeyAccount
+	keyParams := protocol.KeyParams
+	tkeyParams := protocol.TkeyParams
 	keyCoinswap := sdk.NewKVStoreKey(types.StoreKey)
 
 	db := dbm.NewMemDB()
@@ -47,7 +44,6 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
-	ms.MountStoreWithDB(keySupply, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyCoinswap, sdk.StoreTypeIAVL, db)
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
@@ -55,15 +51,14 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	cdc := makeTestCodec()
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "coinswap-chain"}, false, log.NewNopLogger())
 
-	pk := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
-	ak := auth.NewAccountKeeper(cdc, keyAcc, pk.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
-	bk := bank.NewBaseKeeper(ak, pk.Subspace(bank.DefaultParamspace), bank.DefaultCodespace)
+	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
+	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
 
-	initialCoins := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, amt))
+	initialCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, amt)}
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
 
-	sk := supplyKeeper.NewKeeper(cdc, keySupply, ak, bk, supplyKeeper.DefaultCodespace, []string{supply.Basic}, []string{supply.Minter}, []string{supply.Burner})
-	keeper := NewKeeper(cdc, keyCoinswap, bk, sk, pk.Subspace(types.DefaultParamspace))
+	keeper := NewKeeper(cdc, keyCoinswap, bk, pk.Subspace(types.DefaultParamSpace))
 	keeper.SetParams(ctx, types.DefaultParams())
 
 	return ctx, keeper, accs

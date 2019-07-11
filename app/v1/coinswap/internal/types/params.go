@@ -2,11 +2,10 @@ package types
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 const (
@@ -15,8 +14,8 @@ const (
 
 // Parameter store keys
 var (
-	KeyNativeDenom = []byte("nativeDenom")
-	KeyFee         = []byte("fee")
+	nativeDenomKey = []byte("nativeDenom")
+	feeKey         = []byte("fee")
 )
 
 // Params defines the fee and native denomination for coinswap
@@ -49,16 +48,8 @@ func NewFeeParam(numerator, denominator sdk.Int) FeeParam {
 }
 
 // ParamKeyTable returns the KeyTable for coinswap module
-func ParamKeyTable() params.KeyTable {
-	return params.NewKeyTable().RegisterParamSet(&Params{})
-}
-
-// Implements params.ParamSet.
-func (p *Params) ParamSetPairs() params.ParamSetPairs {
-	return params.ParamSetPairs{
-		{KeyNativeDenom, &p.NativeDenom},
-		{KeyFee, &p.Fee},
-	}
+func ParamTypeTable() params.TypeTable {
+	return params.NewTypeTable().RegisterParamSet(&Params{})
 }
 
 // String returns a human readable string representation of the parameters.
@@ -76,31 +67,13 @@ func (p *Params) GetParamSpace() string {
 
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
-		{gasPriceThresholdKey, &p.GasPriceThreshold},
-		{TxSizeLimitKey, &p.TxSizeLimit},
+		{nativeDenomKey, &p.NativeDenom},
+		{feeKey, &p.Fee},
 	}
 }
 
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
-	case string(gasPriceThresholdKey):
-		threshold, ok := sdk.NewIntFromString(value)
-		if !ok {
-			return nil, params.ErrInvalidString(value)
-		}
-		if !threshold.GT(MinimumGasPrice) || threshold.GT(MaximumGasPrice) {
-			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidGasPriceThreshold, fmt.Sprintf("Gas price threshold (%s) should be (0, 10^18iris-atto]", value))
-		}
-		return threshold, nil
-	case string(TxSizeLimitKey):
-		txsize, err := strconv.ParseUint(value, 10, 64)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if txsize < MinimumTxSizeLimit || txsize > MaximumTxSizeLimit {
-			return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidTxSizeLimit, fmt.Sprintf("Tx size limit (%s) should be [500, 1500]", value))
-		}
-		return txsize, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -108,13 +81,35 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	switch key {
-	case string(gasPriceThresholdKey):
-		err := cdc.UnmarshalJSON(bytes, &p.GasPriceThreshold)
-		return p.GasPriceThreshold.String(), err
-	case string(TxSizeLimitKey):
-		err := cdc.UnmarshalJSON(bytes, &p.TxSizeLimit)
-		return strconv.FormatUint(uint64(p.TxSizeLimit), 10), err
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
+}
+
+// DefaultParams returns the default coinswap module parameters
+func DefaultParams() Params {
+	feeParam := NewFeeParam(sdk.NewInt(997), sdk.NewInt(1000))
+
+	return Params{
+		NativeDenom: sdk.NativeTokenMinDenom,
+		Fee:         feeParam,
+	}
+}
+
+// ValidateParams validates a set of params
+func ValidateParams(p Params) error {
+	// TODO: ensure equivalent sdk.validateDenom validation
+	if strings.TrimSpace(p.NativeDenom) != "" {
+		return fmt.Errorf("native denomination must not be empty")
+	}
+	if !p.Fee.Numerator.IsPositive() {
+		return fmt.Errorf("fee numerator is not positive: %v", p.Fee.Numerator)
+	}
+	if !p.Fee.Denominator.IsPositive() {
+		return fmt.Errorf("fee denominator is not positive: %v", p.Fee.Denominator)
+	}
+	if p.Fee.Numerator.GTE(p.Fee.Denominator) {
+		return fmt.Errorf("fee numerator is greater than or equal to fee numerator")
+	}
+	return nil
 }

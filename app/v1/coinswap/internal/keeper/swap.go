@@ -42,7 +42,7 @@ func (k Keeper) GetInputAmount(ctx sdk.Context, outputAmt sdk.Int, inputDenom, o
 
 	numerator := inputBalance.Mul(outputBalance).Mul(fee.Denominator)
 	denominator := (outputBalance.Sub(outputAmt)).Mul(fee.Numerator)
-	return numerator.Quo(denominator).Add(sdk.OneInt())
+	return numerator.Div(denominator).Add(sdk.OneInt())
 }
 
 // GetOutputAmount returns the amount of coins bought (calculated) given the input amount being sold (exact)
@@ -65,7 +65,7 @@ func (k Keeper) GetOutputAmount(ctx sdk.Context, inputAmt sdk.Int, inputDenom, o
 	inputAmtWithFee := inputAmt.Mul(fee.Numerator)
 	numerator := inputAmtWithFee.Mul(outputBalance)
 	denominator := inputBalance.Mul(fee.Denominator).Add(inputAmtWithFee)
-	return numerator.Quo(denominator)
+	return numerator.Div(denominator)
 }
 
 // IsDoubleSwap returns true if the trade requires a double swap.
