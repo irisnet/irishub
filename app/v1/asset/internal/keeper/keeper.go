@@ -417,6 +417,16 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 
 func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, types.DefaultParams())
+
+	//Initialize external tokens BTC and ETH
+	maxSupply := sdk.NewIntWithDecimal(21000000, 8)
+	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "BTC Token", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, false, nil)
+	k.IssueToken(ctx, btc)
+
+	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
+	eth := types.NewFungibleToken(types.EXTERNAL, "", "ETH", "ETH Token", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
+	k.IssueToken(ctx, eth)
+
 }
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
