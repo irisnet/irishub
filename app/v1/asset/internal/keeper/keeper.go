@@ -421,8 +421,8 @@ func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, types.DefaultParams())
 
 	//Initialize external tokens BTC and ETH
-	maxSupply := sdk.NewIntWithDecimal(21000000, 8)
-	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, false, nil)
+	maxSupply := sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 8)
+	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
 	if _, err := k.IssueToken(ctx, btc); err != nil {
 		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
 	}
