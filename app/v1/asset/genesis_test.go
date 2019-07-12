@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
@@ -23,11 +22,10 @@ func TestExportGatewayGenesis(t *testing.T) {
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	guardianKeeper := guardian.Keeper{}
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// init params
 	keeper.Init(ctx)
