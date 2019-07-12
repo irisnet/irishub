@@ -3,19 +3,15 @@ package keeper
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/asset/internal/types"
-
-	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	bk       bank.Keeper
-	gk       guardian.Keeper
+	bk       types.BankKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
@@ -23,12 +19,11 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		bk:         bk,
-		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
