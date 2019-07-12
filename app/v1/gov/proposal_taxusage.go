@@ -115,8 +115,8 @@ func (tp *TaxUsageProposal) SetTaxUsage(taxUsage TaxUsage) {
 	tp.TaxUsage = taxUsage
 }
 
-func (tp *TaxUsageProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
-	if err := tp.BasicProposal.Validate(ctx, k); err != nil {
+func (tp *TaxUsageProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+	if err := tp.BasicProposal.Validate(ctx, k, verify); err != nil {
 		return err
 	}
 
@@ -131,7 +131,7 @@ func (tp *TaxUsageProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 
 func (tp *TaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	logger := ctx.Logger()
-	if err := tp.Validate(ctx, gk); err != nil {
+	if err := tp.Validate(ctx, gk, false); err != nil {
 		logger.Error("Execute TaxUsageProposal Failure", "info",
 			"the destination address is not a trustee now", "destinationAddress", tp.TaxUsage.DestAddress)
 		return err

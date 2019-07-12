@@ -19,8 +19,8 @@ func (sp *SoftwareUpgradeProposal) SetProtocolDefinition(upgrade sdk.ProtocolDef
 	sp.ProtocolDefinition = upgrade
 }
 
-func (sp *SoftwareUpgradeProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
-	if err := sp.BasicProposal.Validate(ctx, k); err != nil {
+func (sp *SoftwareUpgradeProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+	if err := sp.BasicProposal.Validate(ctx, k, verify); err != nil {
 		return err
 	}
 

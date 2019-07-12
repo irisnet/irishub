@@ -29,7 +29,7 @@ func (p Params) String() string {
 	return fmt.Sprintf(`Distribution Params:
   distr/CommunityTax:        %s
   distr/BaseProposerReward:  %s
-  distr/CommunityTax:        %s`,
+  distr/BonusProposerReward:        %s`,
 		p.CommunityTax.String(), p.BaseProposerReward.String(), p.BonusProposerReward.String())
 }
 

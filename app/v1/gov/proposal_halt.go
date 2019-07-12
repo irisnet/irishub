@@ -8,8 +8,8 @@ type SystemHaltProposal struct {
 	BasicProposal
 }
 
-func (pp *SystemHaltProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
-	if err := pp.BasicProposal.Validate(ctx, k); err != nil {
+func (pp *SystemHaltProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+	if err := pp.BasicProposal.Validate(ctx, k, verify); err != nil {
 		return err
 	}
 
@@ -23,15 +23,17 @@ func (pp *SystemHaltProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
 func (pp *SystemHaltProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	logger := ctx.Logger()
 
-	if err := pp.Validate(ctx, gk); err != nil {
+	if err := pp.Validate(ctx, gk, false); err != nil {
 		logger.Error("Execute SystemHaltProposal failed", "height", ctx.BlockHeight(), "proposalId", pp.ProposalID, "err", err.Error())
 		return err
 	}
-	if gk.GetSystemHaltHeight(ctx) == -1 {
-		gk.SetSystemHaltHeight(ctx, ctx.BlockHeight()+gk.GetSystemHaltPeriod(ctx))
-		logger.Info("Execute SystemHaltProposal begin", "SystemHaltHeight", gk.GetSystemHaltHeight(ctx))
+	var height = gk.GetSystemHaltHeight(ctx)
+	if height == -1 {
+		haltHeight := gk.GetSystemHaltPeriod(ctx) + ctx.BlockHeight()
+		gk.SetSystemHaltHeight(ctx, haltHeight)
+		logger.Info("Execute SystemHaltProposal begin", "SystemHaltHeight", haltHeight)
 	} else {
-		logger.Info("SystemHalt Period is in process", "SystemHaltHeight", gk.GetSystemHaltHeight(ctx))
+		logger.Info("SystemHalt Period is in process", "SystemHaltHeight", height)
 
 	}
 	return nil

@@ -50,7 +50,7 @@ type Proposal interface {
 	GetProposer() sdk.AccAddress
 
 	String() string
-	Validate(ctx sdk.Context, gk Keeper) sdk.Error
+	Validate(ctx sdk.Context, gk Keeper, isVerifyPropNum bool) sdk.Error
 	Execute(ctx sdk.Context, gk Keeper) sdk.Error
 }
 
@@ -147,7 +147,10 @@ func (bp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
 func (bp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
 func (bp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
 func (bp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
-func (bp *BasicProposal) Validate(ctx sdk.Context, k Keeper) sdk.Error {
+func (bp *BasicProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+	if !verify {
+		return nil
+	}
 	pLevel := bp.ProposalType.GetProposalLevel()
 	if num, ok := k.HasReachedTheMaxProposalNum(ctx, pLevel); ok {
 		return ErrMoreThanMaxProposal(k.codespace, num, pLevel.string())
@@ -162,7 +165,7 @@ func (bp *BasicProposal) GetProposer() sdk.AccAddress {
 	return bp.Proposer
 }
 func (bp *BasicProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
-	return bp.Validate(ctx, gk)
+	return sdk.MarshalResultErr(errors.New("BasicProposal can not execute 'Execute' method"))
 }
 
 //-----------------------------------------------------------

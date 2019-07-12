@@ -101,7 +101,7 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk
 	}
 
 	// validate proposal
-	if err := proposal.Validate(ctx, keeper); err != nil {
+	if err := proposal.Validate(ctx, keeper, true); err != nil {
 		return nil, err
 	}
 
