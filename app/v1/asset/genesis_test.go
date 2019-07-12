@@ -28,7 +28,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 	keeper := NewKeeper(cdc, assetKey, bk, DefaultCodespace, paramsKeeper.Subspace(DefaultParamSpace))
 
 	// init params
-	keeper.Init(ctx)
+	keeper.SetParamSet(ctx, DefaultParams())
 
 	// define variables
 	owners := []sdk.AccAddress{
@@ -56,7 +56,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 	// add token
 	addr := sdk.AccAddress([]byte("addr1"))
 	acc := ak.NewAccountWithAddress(ctx, addr)
-	ft := NewFungibleToken(NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := NewFungibleToken(NATIVE, "", "bch", "bch", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	keeper.AddToken(ctx, ft)
 
 	// query all gateways
