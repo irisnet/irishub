@@ -19,13 +19,13 @@ const (
 func TestCreateReservePool(t *testing.T) {
 	ctx, keeper, _ := createTestInput(t, sdk.NewInt(0), 0)
 
-	moduleAcc := keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
-	require.True(t, true, moduleAcc.Empty())
+	moduleAcc := keeper.ak.GetAccount(ctx, auth.SwapPoolAccAddr)
+	require.Nil(t, moduleAcc)
 
 	keeper.CreateReservePool(ctx, moduleName)
-	moduleAcc = keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
+	moduleAcc = keeper.ak.GetAccount(ctx, auth.SwapPoolAccAddr)
 	require.NotNil(t, moduleAcc)
-	require.Equal(t, sdk.Coins{}, moduleAcc, "module account has non zero balance after creation")
+	require.Equal(t, true, moduleAcc.GetCoins().Empty(), "module account has non zero balance after creation")
 
 	// attempt to recreate existing ModuleAccount
 	require.Panics(t, func() { keeper.CreateReservePool(ctx, moduleName) })

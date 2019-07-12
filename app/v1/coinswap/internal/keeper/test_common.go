@@ -58,7 +58,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	initialCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, amt)}
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
 
-	keeper := NewKeeper(cdc, keyCoinswap, bk, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, keyCoinswap, bk, ak, pk.Subspace(types.DefaultParamSpace))
 	keeper.SetParams(ctx, types.DefaultParams())
 
 	return ctx, keeper, accs
@@ -74,6 +74,7 @@ func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *au
 		acc.PubKey = pubKey
 		acc.AccountNumber = uint64(i)
 		ak.SetAccount(ctx, &acc)
+		accs = append(accs, &acc)
 	}
 	return
 }

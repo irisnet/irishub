@@ -18,6 +18,7 @@ type Keeper struct {
 	cdc        *codec.Codec
 	storeKey   sdk.StoreKey
 	bk         bank.Keeper
+	ak         auth.AccountKeeper
 	paramSpace params.Subspace
 }
 
@@ -25,10 +26,11 @@ type Keeper struct {
 // - creating new ModuleAccounts for each trading pair
 // - burning minting liquidity coins
 // - sending to and from ModuleAccounts
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, ak auth.AccountKeeper, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		bk:         bk,
+		ak:         ak,
 		cdc:        cdc,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
@@ -37,8 +39,8 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, paramSpace pa
 // CreateReservePool initializes a new reserve pool by creating a
 // ModuleAccount with minting and burning permissions.
 func (keeper Keeper) CreateReservePool(ctx sdk.Context, moduleName string) {
-	moduleAcc := keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
-	if !moduleAcc.Empty() {
+	moduleAcc := keeper.ak.GetAccount(ctx, auth.SwapPoolAccAddr)
+	if moduleAcc != nil {
 		panic(fmt.Sprintf("reserve pool for %s already exists", moduleName))
 	}
 	keeper.bk.AddCoins(ctx, auth.SwapPoolAccAddr, sdk.Coins{})
@@ -87,8 +89,11 @@ func (keeper Keeper) RecieveCoins(ctx sdk.Context, addr sdk.AccAddress, moduleNa
 // GetReservePool returns the total balance of an reserve pool at the
 // provided denomination.
 func (keeper Keeper) GetReservePool(ctx sdk.Context, moduleName string) (coins sdk.Coins, found bool) {
-	acc := keeper.bk.GetCoins(ctx, auth.SwapPoolAccAddr)
-	return acc, false
+	acc := keeper.ak.GetAccount(ctx, auth.SwapPoolAccAddr)
+	if acc == nil {
+		return nil, false
+	}
+	return acc.GetCoins(), true
 }
 
 // GetNativeDenom returns the native denomination for this module from the
