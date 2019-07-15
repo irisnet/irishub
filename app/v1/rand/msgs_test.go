@@ -21,9 +21,7 @@ func TestNewMsgRequestRand(t *testing.T) {
 
 func TestMsgRequestRandRoute(t *testing.T) {
 	// build a MsgRequestRand
-	msg := NewMsgRequestRand{
-		Consumer: testAddr,
-	}
+	msg := NewMsgRequestRand(testAddr)
 
 	require.Equal(t, "rand", msg.Route())
 }
@@ -52,7 +50,7 @@ func TestMsgRequestRandGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRand(testAddr)
 	res := msg.GetSignBytes()
 
-	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"consumer\":\"faa1damkuetjqqah8w\"}}"
+	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\"}}"
 	require.Equal(t, expected, string(res))
 }
 
@@ -60,6 +58,6 @@ func TestMsgRequestRandGetSigners(t *testing.T) {
 	var msg = NewMsgRequestRand(testAddr)
 	res := msg.GetSigners()
 
-	expected := "[6F776E6572]"
+	expected := "[7465737441646472]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }

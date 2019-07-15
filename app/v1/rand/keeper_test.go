@@ -24,7 +24,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.K
 }
 
 func TestRandKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
+	// ms, accountKey, assetKey, paramskey, paramsTkey := setupMultiStore()
 
 	// TODO
 }
