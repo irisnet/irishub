@@ -9,6 +9,6 @@ var (
 	ActionRequestRand = []byte("request_rand")
 
 	Action   = sdk.TagAction
-	ReqId    = "request-id"
+	ReqID    = "request-id"
 	Consumer = "consumer"
 )

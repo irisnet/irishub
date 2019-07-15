@@ -1,4 +1,4 @@
-package random
+package rand
 
 import (
 	"bytes"
@@ -12,11 +12,8 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/mock"
 	"github.com/irisnet/irishub/app/v1/stake"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -27,43 +24,52 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	stake.RegisterCodec(mapp.Cdc)
 	RegisterCodec(mapp.Cdc)
 
-	keyService := sdk.NewKVStoreKey("asset")
-	keyGuardian := sdk.NewKVStoreKey("guardian")
+	keyRand := sdk.NewKVStoreKey("rand")
 
-	ck := bank.NewBaseKeeper(mapp.Cdc, mapp.AccountKeeper)
-	gk := guardian.NewKeeper(mapp.Cdc, keyGuardian, guardian.DefaultCodespace)
 	sk := stake.NewKeeper(
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 		stake.NopMetrics())
-	ik := NewKeeper(mapp.Cdc, keyService, ck, gk, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace))
+	rk := NewKeeper(mapp.Cdc, keyRand, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace))
 
-	mapp.Router().AddRoute("asset", []*sdk.KVStoreKey{keyService}, NewHandler(ik))
+	mapp.Router().AddRoute("rand", []*sdk.KVStoreKey{keyRand}, NewHandler(rk))
 
+	mapp.SetBeginBlocker(getBeginBlocker(rk))
 	mapp.SetEndBlocker(getEndBlocker())
-	mapp.SetInitChainer(getInitChainer(mapp, ik, sk))
+	mapp.SetInitChainer(getInitChainer(mapp, rk, sk))
 
-	require.NoError(t, mapp.CompleteSetup(keyService))
+	require.NoError(t, mapp.CompleteSetup(keyRand))
 
-	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
+	coin, _ := sdk.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)
 
-	return mapp, ik, sk, addrs, pubKeys, privKeys
+	return mapp, rk, sk, addrs, pubKeys, privKeys
 }
 
-// gov and stake endblocker
+// rand endblocker
 func getEndBlocker() sdk.EndBlocker {
 	return func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 		return abci.ResponseEndBlock{}
 	}
 }
 
-// gov and stake initchainer
-func getInitChainer(mapp *mock.App, assetKeeper Keeper, stakeKeeper stake.Keeper) sdk.InitChainer {
+// rand beginblocker
+func getBeginBlocker(randKeeper Keeper) sdk.BeginBlocker {
+	return func(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+		tags := BeginBlocker(ctx, req, randKeeper)
+
+		return abci.ResponseBeginBlock{
+			Tags: tags,
+		}
+	}
+}
+
+// rand initchainer
+func getInitChainer(mapp *mock.App, randKeeper Keeper, stakeKeeper stake.Keeper) sdk.InitChainer {
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 		mapp.InitChainer(ctx, req)
 
@@ -74,7 +80,7 @@ func getInitChainer(mapp *mock.App, assetKeeper Keeper, stakeKeeper stake.Keeper
 			panic(err)
 		}
 
-		InitGenesis(ctx, assetKeeper, DefaultGenesisState())
+		InitGenesis(ctx, randKeeper, DefaultGenesisState())
 		return abci.ResponseInitChain{
 			Validators: validators,
 		}

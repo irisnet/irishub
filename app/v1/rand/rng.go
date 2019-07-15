@@ -1,8 +1,6 @@
 package rand
 
 import (
-	"crypto/sha256"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -13,13 +11,13 @@ type RNG interface {
 
 // PRNG represents a pseudo-random number implementation based on block related data for RNG
 type PRNG struct {
-	BlockHash       []byte
-	Blocktimestampt int64
-	TxInitiator     sdk.AccAddress
+	BlockHash      []byte
+	BlockTimestamp int64
+	TxInitiator    sdk.AccAddress
 }
 
 // MakePRNG constructs a PRNG
-func MakePRNG(blockHash []byte, blockTimestamp int64, txInitiator sdk.AccAddress) {
+func MakePRNG(blockHash []byte, blockTimestamp int64, txInitiator sdk.AccAddress) PRNG {
 	return PRNG{
 		BlockHash:      blockHash,
 		BlockTimestamp: blockTimestamp,
@@ -29,6 +27,9 @@ func MakePRNG(blockHash []byte, blockTimestamp int64, txInitiator sdk.AccAddress
 
 // GetRand implements RNG
 func (p PRNG) GetRand() sdk.Dec {
-	seed := p.BlockTimestamp + uint64(sdk.Int(p.BlockHash)/Int(p.BlockTimestamp)) + uint64(sdk.Int(sha256.Sum256([]byte(p.TxInitiator))/sdk.Int(p.BlockTimestampt)))
-	return sdk.NewDec(seed - seed/1000*1000)
+	// TODO
+	// seed := p.BlockTimestamp + uint64(sdk.Int(p.BlockHash)/Int(p.BlockTimestamp)) + uint64(sdk.Int(sha256.Sum256([]byte(p.TxInitiator))/sdk.Int(p.BlockTimestampt)))
+	// return sdk.NewDec(seed - seed/1000*1000)
+
+	return sdk.ZeroDec()
 }

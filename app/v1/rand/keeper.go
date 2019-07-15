@@ -1,11 +1,8 @@
 package rand
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v1/rand/tags"
 	"github.com/irisnet/irishub/codec"
@@ -40,18 +37,18 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 // RequestRand requests a random number
 func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress) (sdk.Tags, sdk.Error) {
 	currentHeight := ctx.BlockHeight()
-	destHeight := currentHeight + BlockNumsAfter
+	destHeight := currentHeight + BlockNumAfter
 
 	// build a request
 	request := NewRequest(currentHeight, consumer)
 	// generate the request id
 	reqID := generateRequestID(request)
-	
+
 	// set the initial rand
-	k.SetRand(ctx,reqID, NewRand(destHeight, sdk.ZeroDec()))
+	k.SetRand(ctx, reqID, NewRand(destHeight, sdk.ZeroDec()))
 
 	// set the request
-	k.SetRandRequest(ctx, reqID, request))
+	k.SetRandRequest(ctx, reqID, request)
 
 	// add to the queue
 	k.EnqueueRandRequest(ctx, destHeight, reqID)
@@ -60,7 +57,7 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress) (sdk.Tags,
 		tags.ReqID, []byte(reqID),
 		tags.Consumer, consumer,
 	)
-	
+
 	return reqTags, nil
 }
 
@@ -89,7 +86,7 @@ func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID string) 
 }
 
 // DequeueRandRequest removes the random number request by the specified height and request id
-func (k Keeper) DequeueRandRequest(ctx sdk.Context, height uint64, reqID string) {
+func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID string) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete the key
@@ -133,13 +130,13 @@ func (k Keeper) IterateRandRequestQueueByHeight(ctx sdk.Context, height int64) s
 }
 
 // IterateRands iterates through all the random numbers
-func (k Keeper) IterateRands(ctx sdk.Context, func op(r Rand) (stop bool)) {
+func (k Keeper) IterateRands(ctx sdk.Context, op func(r Rand) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixRand)
 	defer iterator.Close()
 
-	for ; iterator.Valid(); iterator.Next(); {
+	for ; iterator.Valid(); iterator.Next() {
 		var rand Rand
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &rand)
 
@@ -150,13 +147,13 @@ func (k Keeper) IterateRands(ctx sdk.Context, func op(r Rand) (stop bool)) {
 }
 
 // IterateRandRequests iterates through all the random number requests
-func (k Keeper) IterateRandRequests(ctx sdk.Context, func op(r Request) (stop bool)) {
+func (k Keeper) IterateRandRequests(ctx sdk.Context, op func(r Request) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixRandRequest)
 	defer iterator.Close()
 
-	for ; iterator.Valid(); iterator.Next(); {
+	for ; iterator.Valid(); iterator.Next() {
 		var request Request
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
@@ -167,17 +164,17 @@ func (k Keeper) IterateRandRequests(ctx sdk.Context, func op(r Request) (stop bo
 }
 
 // IterateRandRequestQueue iterates through the random number request queue
-func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, func op(r Request) (stop bool)) {
+func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(r Request) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixRandRequestQueue)
 	defer iterator.Close()
-	
-	for ; iterator.Valid(); iterator.Next(); {
-		var reqID string
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(),&reqID)
 
-		request, err := k.GetRandRequest(reqID)
+	for ; iterator.Valid(); iterator.Next() {
+		var reqID string
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &reqID)
+
+		request, err := k.GetRandRequest(ctx, reqID)
 		if err != nil {
 			continue
 		}
@@ -186,4 +183,9 @@ func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, func op(r Request) (sto
 			break
 		}
 	}
+}
+
+// Init initializes the keeper
+func (k Keeper) Init(ctx sdk.Context) {
+	k.SetParamSet(ctx, DefaultParams())
 }

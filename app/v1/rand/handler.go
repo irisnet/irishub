@@ -1,7 +1,11 @@
 package rand
 
 import (
+	"fmt"
+	"strconv"
+
 	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // handle all "rand" type messages.
@@ -33,16 +37,17 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 // BeginBlocker handles block beginning logic for rand
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
+	tags = sdk.NewTags("height", []byte(strconv.FormatInt(req.Header.Height, 10)))
 
 	// get data of the last block
 	lastBlockHeight := ctx.BlockHeight() - 1
-	lastBlockTimestamp := ctx.BlockHeader().GetTime().Unix()
-	lastBlockHash := []byte(ctx.BlockHeader().GetLastBlockId().Hash)
-	
+	lastBlockTimestamp := ctx.BlockHeader().Time.Unix()
+	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+
 	// get pending random number requests for lastBloskHeight
 	iterator := k.IterateRandRequestQueueByHeight(ctx, lastBlockHeight)
 	defer iterator.Close()
-	
+
 	handledRandReqNum := 0
 	for ; iterator.Valid(); iterator.Next() {
 		var reqID string
@@ -52,16 +57,17 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		if err != nil {
 			continue
 		}
-		
+
 		// generate a random number
 		randNum := MakePRNG(lastBlockHash, lastBlockTimestamp, request.Consumer).GetRand()
-		k.SetRand(ctx, NewRand(lastBlockHeight, sdk.NewDec(randNum))
-		
+		k.SetRand(ctx, reqID, NewRand(lastBlockHeight, randNum))
+
 		// remove the request
-		K.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
 
 		handledRandReqNum += 1
 	}
 
 	ctx.Logger().Info(fmt.Sprintf("the count of handled rand requests is %d", handledRandReqNum))
+	return
 }

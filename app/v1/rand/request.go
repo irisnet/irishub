@@ -1,6 +1,8 @@
 package rand
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -35,8 +37,11 @@ func (r Request) String() string {
 
 // generateRequestID generates a request id
 func generateRequestID(request Request) string {
-	reqIDSlice := make([]byte, 0)
-	reqIDSlice = append(reqIDSlice, []byte(request.Height)..., []byte(request.Consumer)...)
+	reqIDBytes := make([]byte, 0)
 
-	return hex.EncodeToString(sha256.Sum256(reqIDSlice))
+	reqIDBytes = append(reqIDBytes, sdk.Uint64ToBigEndian(uint64(request.Height))...)
+	reqIDBytes = append(reqIDBytes, []byte(request.Consumer)...)
+
+	hash := sha256.Sum256(reqIDBytes)
+	return hex.EncodeToString(hash[:])
 }
