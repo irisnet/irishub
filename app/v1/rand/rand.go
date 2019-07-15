@@ -14,7 +14,7 @@ type Rand struct {
 
 // NewRand constructs a Rand
 func NewRand(height int64, value sdk.Dec) Rand {
-	return RandomNumber{
+	return Rand{
 		Height: height,
 		Value:  value,
 	}

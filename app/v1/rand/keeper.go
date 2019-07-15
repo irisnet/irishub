@@ -7,7 +7,7 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/app/v1/random/tags"
+	"github.com/irisnet/irishub/app/v1/rand/tags"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 )

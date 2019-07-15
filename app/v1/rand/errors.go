@@ -5,7 +5,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// Random errors reserve 100 ~ 199.
+// Rand errors reserve 100 ~ 199.
 const (
 	DefaultCodespace sdk.CodespaceType = "rand"
 
@@ -14,7 +14,7 @@ const (
 )
 
 //----------------------------------------
-// Random error constructors
+// Rand error constructors
 
 func ErrInvalidConsumer(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidConsumer, msg)
