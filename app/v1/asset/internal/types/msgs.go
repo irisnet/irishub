@@ -79,9 +79,7 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 func (msg MsgIssueToken) Route() string { return MsgRoute }
 func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
-// Implements Msg.
-func (msg MsgIssueToken) ValidateBasic() sdk.Error {
-
+func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 	msg.Gateway = strings.ToLower(strings.TrimSpace(msg.Gateway))
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
 	msg.SymbolAtSource = strings.ToLower(strings.TrimSpace(msg.SymbolAtSource))
@@ -107,7 +105,9 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 
 		break
 	case EXTERNAL:
-		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
+		if verifySource {
+			return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
+		}
 	case GATEWAY:
 		// require gateway moniker for gateway asset
 		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {
@@ -158,8 +158,12 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	if msg.Decimal > MaximumAssetDecimal {
 		return ErrInvalidAssetDecimal(DefaultCodespace, fmt.Sprintf("invalid token decimal %d, only accepts value [0, %d]", msg.Decimal, MaximumAssetDecimal))
 	}
-
 	return nil
+}
+
+// Implements Msg.
+func (msg MsgIssueToken) ValidateBasic() sdk.Error {
+	return ValidateMsgIssueToken(&msg, true)
 }
 
 // Implements Msg.
