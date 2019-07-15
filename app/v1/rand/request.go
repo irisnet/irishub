@@ -30,7 +30,7 @@ func (r Request) Validate() sdk.Error {
 // String implements fmt.Stringer
 func (r Request) String() string {
 	return fmt.Sprintf(`Request:
-  Height:            %s
+  Height:            %d
   Consumer:          %s`,
 		r.Height, r.Consumer.String())
 }

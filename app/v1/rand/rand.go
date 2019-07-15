@@ -28,7 +28,7 @@ func (r Rand) Validate() sdk.Error {
 // String implements fmt.Stringer
 func (r Rand) String() string {
 	return fmt.Sprintf(`Rand:
-  Height:            %s
+  Height:            %d
   Value:             %s`,
 		r.Height, r.Value.String())
 }
