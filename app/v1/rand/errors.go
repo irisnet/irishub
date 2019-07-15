@@ -7,7 +7,7 @@ import (
 
 // Random errors reserve 100 ~ 199.
 const (
-	DefaultCodespace sdk.CodespaceType = "asset"
+	DefaultCodespace sdk.CodespaceType = "rand"
 
 	CodeInvalidConsumer sdk.CodeType = 100
 	CodeInvalidReqID    sdk.CodeType = 101
