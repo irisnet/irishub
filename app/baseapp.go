@@ -311,13 +311,15 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
 
-	// load initial protocol with the upgrade info defined in the genesis file
+	// Load the protocol defined in the genesis file, for Class4 upgrade or to test any protocol version.
 	stateJSON := req.AppStateBytes
 	var genesisFileState v0.GenesisFileState
 	v0.MakeCodec().MustUnmarshalJSON(stateJSON, &genesisFileState)
-	initProtocol := genesisFileState.UpgradeData.GenesisVersion.UpgradeInfo.Protocol.Version
-	app.Engine.LoadInitProtocol(initProtocol)
-	app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
+	genesisProtocol := genesisFileState.UpgradeData.GenesisVersion.UpgradeInfo.Protocol.Version
+	if genesisProtocol != app.Engine.GetCurrentVersion() {
+		app.Engine.LoadProtocol(genesisProtocol)
+		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
+	}
 
 	initChainer := app.Engine.GetCurrentProtocol().GetInitChainer()
 	if initChainer == nil {
@@ -329,6 +331,9 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 		WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 
 	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
+
+	// There may be some application state in the genesis file, so always init the metrics.
+	app.Engine.GetCurrentProtocol().InitMetrics(app.cms)
 
 	// NOTE: we don't commit, but BeginBlock for block 1
 	// starts from this deliverState

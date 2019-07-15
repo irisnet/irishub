@@ -14,6 +14,7 @@ import (
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	paramscmd "github.com/irisnet/irishub/client/params/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
@@ -136,7 +137,6 @@ func main() {
 			govcmd.GetCmdQueryDeposit(cdc),
 			govcmd.GetCmdQueryDeposits(cdc),
 			govcmd.GetCmdQueryTally(cdc),
-			govcmd.GetCmdQueryGovConfig(cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -281,10 +281,13 @@ func main() {
 		assetCmd,
 	)
 
+	paramsCmd := client.GetCommands(paramscmd.Commands(cdc))[0]
+
 	//Add keys and version commands
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
+		paramsCmd,
 		client.LineBreak,
 		version.ServeVersionCommand(cdc),
 	)

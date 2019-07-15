@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation, signing, and
     broadcast.
-  version: "0.15.0-rc0"
+  version: "0.15.0-rc1"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -1640,24 +1640,6 @@ paths:
           description: Found no vote
         '500':
           description: Internal Server Error
-  /gov/params/{module}:
-    get:
-      summary: Query governance parameters
-      description: Query governance parameters
-      tags:
-        - Gov
-      parameters:
-        - description: module name
-          name: module
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-        '500':
-          description: Internal Server Error
 
   '/distribution/{delegatorAddr}/withdraw-address':
     parameters:
@@ -2944,6 +2926,23 @@ paths:
                 $ref: '#/components/schemas/TokenFeesOutput'
         '400':
           description: Invalid id
+        '500':
+          description: Internal Server Error
+  '/params':
+    get:
+      summary: Get the system params with an optional module
+      tags:
+        - Params
+      parameters:
+        - in: query
+          name: module
+          description: the name of the module,options:stake/mint/distr/slashing/service/asset/auth
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
         '500':
           description: Internal Server Error
 

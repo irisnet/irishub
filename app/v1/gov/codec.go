@@ -22,6 +22,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&SystemHaltProposal{}, "irishub/gov/SystemHaltProposal", nil)
 	cdc.RegisterConcrete(&TaxUsageProposal{}, "irishub/gov/TaxUsageProposal", nil)
 	cdc.RegisterConcrete(&Vote{}, "irishub/gov/Vote", nil)
+	cdc.RegisterConcrete(&GovParams{}, "irishub/gov/Params", nil)
 }
 
 var msgCdc = codec.New()
