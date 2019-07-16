@@ -29,8 +29,7 @@ iriscli gov --help
 | [query-votes](query-votes.md)         | Query votes on a proposal                                       |
 | [query-deposit](query-deposit.md)     | Query details of a deposit                                      |
 | [query-deposits](query-deposits.md)   | Query deposits on a proposal                                    |
-| [query-tally](query-tally.md)         | Get the tally of a proposal vote                                |
-| [query-params](query-params.md)       | Query parameter proposal's config                               |
+| [query-tally](query-tally.md)         | Get the tally of a proposal vote                                |                             |
 | [submit-proposal](submit-proposal.md) | Submit a proposal along with an initial deposit                          |
 | [deposit](deposit.md)                 | Deposit tokens for active proposal                            |
 | [vote](vote.md)                       | vote for an active proposal, options: Yes/No/NoWithVeto/Abstain |

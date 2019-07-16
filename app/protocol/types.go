@@ -27,5 +27,5 @@ type Protocol interface {
 	Load()
 	Init(ctx sdk.Context)
 	GetCodec() *codec.Codec
-	InitMetrics(store sdk.CommitMultiStore) // init metrics
+	InitMetrics(store sdk.MultiStore) // init metrics
 }

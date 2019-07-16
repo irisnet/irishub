@@ -156,11 +156,12 @@ func (keeper BaseKeeper) Init(ctx sdk.Context) {
 	// If someone send coins to BurnedCoinsAccAddr in protocol v0,
 	// It is handled as burned coins in protocol v1.
 	// Subtract all BurnedCoinsAccAddr coins in v0 from looseToken.
-	v0burnedCoins := keeper.GetCoins(ctx, auth.BurnedCoinsAccAddr)
-	if !v0burnedCoins.Empty() {
-		keeper.DecreaseLoosenToken(ctx, v0burnedCoins)
+	v0burnedAddrCoins := keeper.GetCoins(ctx, auth.BurnedCoinsAccAddr)
+	if !v0burnedAddrCoins.Empty() {
+		keeper.DecreaseLoosenToken(ctx, v0burnedAddrCoins)
 	}
 
+	keeper.IncreaseLoosenToken(ctx, burnedCoins)
 	keeper.AddCoins(ctx, auth.BurnedCoinsAccAddr, burnedCoins)
 }
 
