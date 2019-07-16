@@ -1,7 +1,6 @@
 package rand
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 
@@ -37,11 +36,10 @@ func (r Request) String() string {
 
 // generateRequestID generates a request id
 func generateRequestID(request Request) string {
-	reqIDBytes := make([]byte, 0)
+	reqID := make([]byte, 0)
 
-	reqIDBytes = append(reqIDBytes, sdk.Uint64ToBigEndian(uint64(request.Height))...)
-	reqIDBytes = append(reqIDBytes, []byte(request.Consumer)...)
+	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(request.Height))...)
+	reqID = append(reqID, []byte(request.Consumer)...)
 
-	hash := sha256.Sum256(reqIDBytes)
-	return hex.EncodeToString(hash[:])
+	return hex.EncodeToString(sdk.SHA256(reqID))
 }
