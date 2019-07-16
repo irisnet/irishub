@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/client/human"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
@@ -448,12 +449,12 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 // PrintOutput prints output while respecting output and indent flags
 // NOTE: pass in marshalled structs that have been unmarshaled
 // because this function will panic on marshaling errors
-func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
+func (ctx CLIContext) PrintOutput(toPrint human.Stringer) (err error) {
 	var out []byte
 
 	switch ctx.OutputFormat {
 	case "text":
-		out = []byte(toPrint.String())
+		out = []byte(toPrint.HumanString(ctx))
 
 	case "json":
 		if ctx.Indent {

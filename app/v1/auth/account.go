@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/irisnet/irishub/client/human"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -54,7 +55,7 @@ type BaseAccount struct {
 }
 
 // String implements fmt.Stringer
-func (acc BaseAccount) String() string {
+func (acc BaseAccount) HumanString(assetConvert human.AssetConvert) string {
 	var pubkey string
 
 	if acc.PubKey != nil {
@@ -67,7 +68,7 @@ func (acc BaseAccount) String() string {
   Coins:           %s
   Account Number:  %d
   Sequence:        %d`,
-		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
+		acc.Address, pubkey, assetConvert.ToMainUnit(acc.Coins), acc.AccountNumber, acc.Sequence,
 	)
 }
 
