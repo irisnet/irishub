@@ -55,6 +55,24 @@ type BaseAccount struct {
 }
 
 // String implements fmt.Stringer
+func (acc BaseAccount) String() string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d`,
+		acc.Address, pubkey, acc.Coins.String(), acc.AccountNumber, acc.Sequence,
+	)
+}
+
+// String implements human.Stringer
 func (acc BaseAccount) HumanString(assetConvert human.AssetConvert) string {
 	var pubkey string
 
