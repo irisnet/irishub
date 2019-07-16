@@ -45,7 +45,7 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress) (sdk.Tags,
 	reqID := generateRequestID(request)
 
 	// set the initial rand
-	k.SetRand(ctx, reqID, NewRand(destHeight, sdk.ZeroDec()))
+	k.SetRand(ctx, reqID, NewRand(destHeight, consumer, sdk.ZeroDec()))
 
 	// set the request
 	k.SetRandRequest(ctx, reqID, request)

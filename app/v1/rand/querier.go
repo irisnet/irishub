@@ -75,8 +75,7 @@ func queryRands(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	op := func(r Rand) bool {
 		if len(params.Consumer) == 0 {
 			rands = append(rands, r)
-		} else {
-			// TODO: query the rands by the consumer
+		} else if r.Consumer.Equals(params.Consumer) {
 			rands = append(rands, r)
 		}
 
@@ -135,10 +134,8 @@ func queryRandRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([
 	op := func(r Request) bool {
 		if len(params.Consumer) == 0 {
 			requests = append(requests, r)
-		} else {
-			if r.Consumer.Equals(params.Consumer) {
-				requests = append(requests, r)
-			}
+		} else if r.Consumer.Equals(params.Consumer) {
+			requests = append(requests, r)
 		}
 
 		return false

@@ -8,15 +8,17 @@ import (
 
 // Rand represents a random number related to a height
 type Rand struct {
-	Height int64   `json:"height"` // the height of the block, of which the hash is used to generate the random number
-	Value  sdk.Dec `json:"value"`  // the random number
+	Height   int64          `json:"height"`   // the height of the block used to generate the random number
+	Consumer sdk.AccAddress `json:"consumer"` // the address requesting the random number
+	Value    sdk.Dec        `json:"value"`    // the random number
 }
 
 // NewRand constructs a Rand
-func NewRand(height int64, value sdk.Dec) Rand {
+func NewRand(height int64, consumer sdk.AccAddress, value sdk.Dec) Rand {
 	return Rand{
-		Height: height,
-		Value:  value,
+		Height:   height,
+		Consumer: consumer,
+		Value:    value,
 	}
 }
 
@@ -28,7 +30,8 @@ func (r Rand) Validate() sdk.Error {
 // String implements fmt.Stringer
 func (r Rand) String() string {
 	return fmt.Sprintf(`Rand:
-  Height:            %d
+  Height:            %d,
+  Consumer:          %s,
   Value:             %s`,
-		r.Height, r.Value.String())
+		r.Height, r.Consumer.String(), r.Value.String())
 }
