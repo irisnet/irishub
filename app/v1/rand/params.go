@@ -20,7 +20,8 @@ func ParamTypeTable() params.TypeTable {
 }
 
 // rand params
-type Params struct{}
+type Params struct {
+}
 
 func (p Params) String() string {
 	return ""
@@ -44,6 +45,10 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	return "", fmt.Errorf("this method is not implemented")
+}
+
+func (p *Params) ReadOnly() bool {
+	return false
 }
 
 // default rand module params
