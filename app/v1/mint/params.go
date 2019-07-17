@@ -33,7 +33,7 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Mint Params:
-  mint/Inflation:  %s`,
+  Inflation:    %s`,
 		p.Inflation.String())
 }
 
@@ -72,10 +72,6 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
-}
-
-func (p *Params) ReadOnly() bool {
-	return false
 }
 
 // default minting module parameters

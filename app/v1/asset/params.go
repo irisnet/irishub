@@ -1,7 +1,8 @@
-package types
+package asset
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -38,11 +39,11 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Asset Params:
-  asset/AssetTaxRate:          %s
-  asset/IssueTokenBaseFee:     %s
-  asset/MintTokenFeeRatio:     %s
-  asset/CreateGatewayBaseFee:  %s
-  asset/GatewayAssetFeeRatio:  %s`,
+  Asset Tax Rate:                              %s
+  Base Fee for Issuing Token:                  %s
+  Fee Ratio for Minting (vs Issuing) Token:    %s
+  Base Fee for Creating Gateway:               %s
+  Fee Ratio for Gateway (vs Native) Token:     %s`,
 		p.AssetTaxRate.String(), p.IssueTokenBaseFee.String(), p.MintTokenFeeRatio.String(), p.CreateGatewayBaseFee.String(), p.GatewayAssetFeeRatio.String())
 }
 
@@ -77,9 +78,6 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil || fee.Denom != sdk.NativeTokenMinDenom {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateIssueTokenBaseFee(fee); err != nil {
-			return nil, err
-		}
 		return fee, nil
 	case string(KeyMintTokenFeeRatio):
 		ratio, err := sdk.NewDecFromStr(value)
@@ -95,9 +93,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		if err != nil || fee.Denom != sdk.NativeTokenMinDenom {
 			return nil, params.ErrInvalidString(value)
 		}
-		if err := validateCreateGatewayBaseFee(fee); err != nil {
-			return nil, err
-		}
+
 		return fee, nil
 	case string(KeyGatewayAssetFeeRatio):
 		ratio, err := sdk.NewDecFromStr(value)
@@ -117,17 +113,13 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	return "", fmt.Errorf("this method is not implemented")
 }
 
-func (p *Params) ReadOnly() bool {
-	return false
-}
-
 // default asset module params
 func DefaultParams() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(60000, 18)),
+		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(300000, 18)),
 		MintTokenFeeRatio:    sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(120000, 18)),
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(600000, 18)),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
@@ -143,7 +135,7 @@ func DefaultParamsForTest() Params {
 	}
 }
 
-func ValidateParams(p Params) error {
+func validateParams(p Params) error {
 	if err := validateAssetTaxRate(p.AssetTaxRate); err != nil {
 		return err
 	}
@@ -153,67 +145,51 @@ func ValidateParams(p Params) error {
 	if err := validateGatewayAssetFeeRatio(p.GatewayAssetFeeRatio); err != nil {
 		return err
 	}
-	if err := validateIssueTokenBaseFee(p.IssueTokenBaseFee); err != nil {
-		return err
-	}
-	if err := validateCreateGatewayBaseFee(p.CreateGatewayBaseFee); err != nil {
-		return err
-	}
 
 	return nil
 }
 
 func validateAssetTaxRate(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDec(1)) || v.LT(sdk.ZeroDec()) {
+	if v.GT(sdk.NewDec(1)) || v.LTE(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidAssetTaxRate,
-			fmt.Sprintf("Asset tax rate [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Asset Tax Rate [%s] should be between (0, 1]", v.String()),
 		)
 	}
 	return nil
 }
 
 func validateMintTokenFeeRatio(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDec(1)) || v.LT(sdk.ZeroDec()) {
+	if v.GTE(sdk.NewDec(1)) || v.LTE(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidMintTokenFeeRatio,
-			fmt.Sprintf("Fee ratio for minting tokens [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Fee Ratio for Minting Tokens [%s] should be between (0, 1)", v.String()),
 		)
 	}
 	return nil
 }
 
 func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
-	if v.GT(sdk.NewDec(1)) || v.LT(sdk.ZeroDec()) {
+	if v.GTE(sdk.NewDec(1)) || v.LTE(sdk.ZeroDec()) {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidGatewayAssetFeeRatio,
-			fmt.Sprintf("Fee ratio for gateway tokens [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Fee Ratio for Gateway Tokens [%s] should be between (0, 1)", v.String()),
 		)
 	}
 	return nil
 }
 
-func validateIssueTokenBaseFee(coin sdk.Coin) sdk.Error {
-	if !coin.IsNotNegative() {
-		return sdk.NewError(
-			params.DefaultCodespace,
-			params.CodeInvalidIssueTokenBaseFee,
-			fmt.Sprintf("Base fee for issuing token should not be negative"),
-		)
-	}
-	return nil
+// get asset params from the global param store
+func (k Keeper) GetParamSet(ctx sdk.Context) Params {
+	var p Params
+	k.paramSpace.GetParamSet(ctx, &p)
+	return p
 }
 
-func validateCreateGatewayBaseFee(coin sdk.Coin) sdk.Error {
-	if !coin.IsNotNegative() {
-		return sdk.NewError(
-			params.DefaultCodespace,
-			params.CodeInvalidCreateGatewayBaseFee,
-			fmt.Sprintf("Base fee for creating gateway should not be negative"),
-		)
-	}
-	return nil
+// set asset params from the global param store
+func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
+	k.paramSpace.SetParamSet(ctx, &params)
 }

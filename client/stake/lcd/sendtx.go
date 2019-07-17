@@ -71,8 +71,7 @@ type (
 // If not, we can just use CompleteAndBroadcastTxREST.
 func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32delegator := vars["delegatorAddr"]
 
@@ -84,7 +83,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		}
 
 		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 
@@ -111,8 +110,8 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			DelegatorAddr: delAddr,
 			ValidatorAddr: valAddr,
 			Delegation:    delegationToken}
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		// Broadcast or return unsigned transaction
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
@@ -122,8 +121,7 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 // If not, we can just use CompleteAndBroadcastTxREST.
 func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32delegator := vars["delegatorAddr"]
 
@@ -135,7 +133,7 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 		}
 
 		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 
@@ -172,7 +170,7 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 			SharesAmount:     sharesAmount,
 		}
 
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
@@ -182,8 +180,7 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 // If not, we can just use CompleteAndBroadcastTxREST.
 func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32delegator := vars["delegatorAddr"]
 
@@ -195,7 +192,7 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 		}
 
 		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
 
@@ -226,6 +223,6 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 			SharesAmount:  sharesAmount,
 		}
 
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }

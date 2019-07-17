@@ -108,6 +108,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     7. `GET /gov/proposals/{proposalId}`: Query a proposal
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
+    10. `GET /gov/params`: Query governance parameters
 
 7. Slashing module APIs
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: Get sign info of given validator
@@ -156,10 +157,6 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
 
     1. `GET /version`: Version of IRISLCD
     2. `GET /node-version`: Version of the connected node
-
-12. Params module APIs
-    
-    1. `GET /params`: Query system params
 
 ## Special Parameters
 

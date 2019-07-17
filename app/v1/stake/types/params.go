@@ -46,8 +46,8 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Stake Params:
-  stake/UnbondingTime:  %s
-  stake/MaxValidators:  %d`,
+  Unbonding Time:         %s
+  Max Validators:         %d`,
 		p.UnbondingTime, p.MaxValidators)
 }
 
@@ -99,10 +99,6 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
-}
-
-func (p *Params) ReadOnly() bool {
-	return false
 }
 
 // Equal returns a boolean determining if two Param types are identical.

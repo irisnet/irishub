@@ -1,7 +1,6 @@
 package gov
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/gov"
@@ -16,7 +15,7 @@ import (
 var ParamSets = make(map[string]params.ParamSet)
 
 func init() {
-	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
+	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
 }
 
 // Deposit
@@ -76,9 +75,6 @@ func NormalizeProposalStatus(status string) string {
 
 func ValidateParam(param gov.Param) error {
 	if p, ok := ParamSets[param.Subspace]; ok {
-		if p.ReadOnly() {
-			return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
-		}
 		if _, err := p.Validate(param.Key, param.Value); err != nil {
 			return err
 		}

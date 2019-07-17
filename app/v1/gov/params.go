@@ -22,7 +22,7 @@ const (
 	UPPER_BOUND_AMOUNT    = 10000
 	STABLE_CRITIACAL_NUM  = 1
 	DEFAULT_IMPORTANT_NUM = 5
-	DEFAULT_NORMAL_NUM    = 7
+	DEFAULT_NORMAL_NUM    = 2
 	MIN_IMPORTANT_NUM     = 1
 	MIN_NORMAL_NUM        = 1
 )
@@ -104,26 +104,26 @@ type GovParams struct {
 }
 
 func (p GovParams) String() string {
-	return fmt.Sprintf(`Gov Params:
-System Halt Period:     %v
-Proposal Parameter:    [Critical]         [Important]        [Normal]
-  DepositPeriod:        %v         %v        %v
-  MinDeposit:           %s         %s        %s
-  Voting Period:        %v         %v        %v
-  Max Num:              %v         %v        %v
-  Threshold:            %s         %s        %s
-  Veto:                 %s         %s        %s
-  Participation:        %s         %s        %s
-  Penalty:              %s         %s        %s
+	return fmt.Sprintf(`System Halt Period: %v
+
+Proposal Parameter:    [Critical]    [Important]    [Normal]
+  DepositPeriod:        %v    %v    %v
+  MinDeposit:           %s    %s    %s
+  Voting Period:        %v    %v    %v
+  Max Num:              %v    %v    %v
+  Threshold:            %s    %s    %s
+  Veto:                 %s    %s    %s
+  Participation:        %s    %s    %s
+  Penalty:              %s    %s    %s
 `, p.SystemHaltPeriod,
 		p.CriticalDepositPeriod, p.ImportantDepositPeriod, p.NormalDepositPeriod,
-		p.CriticalMinDeposit.String(), p.ImportantMinDeposit.String(), p.NormalMinDeposit.String(),
+		p.CriticalMinDeposit, p.ImportantMinDeposit, p.NormalMinDeposit,
 		p.CriticalVotingPeriod, p.ImportantVotingPeriod, p.NormalVotingPeriod,
 		p.CriticalMaxNum, p.ImportantMaxNum, p.NormalMaxNum,
-		p.CriticalThreshold.String(), p.ImportantThreshold.String(), p.NormalThreshold.String(),
-		p.CriticalVeto.String(), p.ImportantVeto.String(), p.NormalVeto.String(),
-		p.CriticalParticipation.String(), p.ImportantParticipation.String(), p.NormalParticipation.String(),
-		p.CriticalPenalty.String(), p.ImportantPenalty.String(), p.NormalPenalty.String())
+		p.CriticalThreshold, p.ImportantThreshold, p.NormalThreshold,
+		p.CriticalVeto, p.ImportantVeto, p.NormalVeto,
+		p.CriticalParticipation, p.ImportantParticipation, p.NormalParticipation,
+		p.CriticalPenalty, p.ImportantPenalty, p.NormalPenalty)
 }
 
 // Implements params.ParamStruct
@@ -253,10 +253,6 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 	}
 }
 
-func (p *GovParams) ReadOnly() bool {
-	return true
-}
-
 // default minting module parameters
 func DefaultParams() GovParams {
 	var criticalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeTokenName))
@@ -269,27 +265,27 @@ func DefaultParams() GovParams {
 			CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
 			CriticalVotingPeriod:  time.Duration(sdk.FiveDays),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
-			CriticalThreshold:     sdk.NewDecWithPrec(75, 2),
-			CriticalVeto:          sdk.NewDecWithPrec(33, 2),
-			CriticalParticipation: sdk.NewDecWithPrec(50, 2),
+			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
+			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
+			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
 			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
 			ImportantVotingPeriod:  time.Duration(sdk.FiveDays),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
-			ImportantThreshold:     sdk.NewDecWithPrec(67, 2),
-			ImportantVeto:          sdk.NewDecWithPrec(33, 2),
-			ImportantParticipation: sdk.NewDecWithPrec(50, 2),
+			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
+			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
+			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
 			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
 			NormalVotingPeriod:  time.Duration(sdk.FiveDays),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
-			NormalThreshold:     sdk.NewDecWithPrec(50, 2),
-			NormalVeto:          sdk.NewDecWithPrec(33, 2),
-			NormalParticipation: sdk.NewDecWithPrec(50, 2),
+			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
+			NormalVeto:          sdk.NewDecWithPrec(334, 3),
+			NormalParticipation: sdk.NewDecWithPrec(75, 2),
 			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    20000,
 		}
@@ -299,27 +295,27 @@ func DefaultParams() GovParams {
 			CriticalMinDeposit:    sdk.Coins{criticalMinDeposit},
 			CriticalVotingPeriod:  time.Duration(2 * time.Minute),
 			CriticalMaxNum:        STABLE_CRITIACAL_NUM,
-			CriticalThreshold:     sdk.NewDecWithPrec(75, 2),
-			CriticalVeto:          sdk.NewDecWithPrec(33, 2),
-			CriticalParticipation: sdk.NewDecWithPrec(50, 2),
+			CriticalThreshold:     sdk.NewDecWithPrec(857, 3),
+			CriticalVeto:          sdk.NewDecWithPrec(334, 3),
+			CriticalParticipation: sdk.NewDecWithPrec(875, 3),
 			CriticalPenalty:       sdk.ZeroDec(),
 
 			ImportantDepositPeriod: time.Duration(sdk.Day),
 			ImportantMinDeposit:    sdk.Coins{importantMinDeposit},
 			ImportantVotingPeriod:  time.Duration(2 * time.Minute),
 			ImportantMaxNum:        DEFAULT_IMPORTANT_NUM,
-			ImportantThreshold:     sdk.NewDecWithPrec(67, 2),
-			ImportantVeto:          sdk.NewDecWithPrec(33, 2),
-			ImportantParticipation: sdk.NewDecWithPrec(50, 2),
+			ImportantThreshold:     sdk.NewDecWithPrec(8, 1),
+			ImportantVeto:          sdk.NewDecWithPrec(334, 3),
+			ImportantParticipation: sdk.NewDecWithPrec(834, 3),
 			ImportantPenalty:       sdk.ZeroDec(),
 
 			NormalDepositPeriod: time.Duration(sdk.Day),
 			NormalMinDeposit:    sdk.Coins{normalMinDeposit},
 			NormalVotingPeriod:  time.Duration(2 * time.Minute),
 			NormalMaxNum:        DEFAULT_NORMAL_NUM,
-			NormalThreshold:     sdk.NewDecWithPrec(50, 2),
-			NormalVeto:          sdk.NewDecWithPrec(33, 2),
-			NormalParticipation: sdk.NewDecWithPrec(50, 2),
+			NormalThreshold:     sdk.NewDecWithPrec(667, 3),
+			NormalVeto:          sdk.NewDecWithPrec(334, 3),
+			NormalParticipation: sdk.NewDecWithPrec(75, 2),
 			NormalPenalty:       sdk.ZeroDec(),
 			SystemHaltPeriod:    60,
 		}

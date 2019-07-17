@@ -1,4 +1,4 @@
-package types
+package asset
 
 import (
 	"encoding/json"
@@ -10,17 +10,17 @@ import (
 type AssetFamily byte
 
 const (
-	FUNGIBLE AssetFamily = 0x00
+	FUNGIBLE     AssetFamily = 0x00
 	//NON_FUNGIBLE AssetFamily = 0x01
 )
 
 var (
 	AssetFamilyToStringMap = map[AssetFamily]string{
-		FUNGIBLE: "fungible",
+		FUNGIBLE:     "fungible",
 		//NON_FUNGIBLE: "non-fungible",
 	}
 	StringToAssetFamilyMap = map[string]AssetFamily{
-		"fungible": FUNGIBLE,
+		"fungible":     FUNGIBLE,
 		//"non-fungible": NON_FUNGIBLE,
 	}
 )

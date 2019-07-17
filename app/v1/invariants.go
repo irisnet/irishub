@@ -34,10 +34,10 @@ func (p *ProtocolV1) assertRuntimeInvariants(ctx sdk.Context) {
 	}
 	invariants := p.runtimeInvariants()
 	ctx = ctx.WithLogger(ctx.Logger().With("module", "iris/invariant"))
-	for i, inv := range invariants {
+	for _, inv := range invariants {
 		if err := inv(ctx); err != nil {
 			if p.invariantLevel == sdk.InvariantPanic {
-				panic(fmt.Errorf("invariant[%d] broken: %s", i, err))
+				panic(fmt.Errorf("invariant broken: %s", err))
 			} else {
 				p.metrics.InvariantFailure.With("error", err.Error()).Add(float64(1))
 				p.logger.Error(fmt.Sprintf("Invariant broken: height %d, reason %s", ctx.BlockHeight(), err.Error()))

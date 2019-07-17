@@ -27,9 +27,9 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Distribution Params:
-  distr/CommunityTax:        %s
-  distr/BaseProposerReward:  %s
-  distr/BonusProposerReward:        %s`,
+  Community Tax:            %s
+  Base Proposer Reward:     %s
+  Bonus Proposer Reward:    %s`,
 		p.CommunityTax.String(), p.BaseProposerReward.String(), p.BonusProposerReward.String())
 }
 
@@ -94,10 +94,6 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
-}
-
-func (p *Params) ReadOnly() bool {
-	return false
 }
 
 // default distribution module params

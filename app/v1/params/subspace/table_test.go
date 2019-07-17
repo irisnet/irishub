@@ -43,10 +43,6 @@ func (p *testparams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte)
 	return "", nil
 }
 
-func (p *testparams) ReadOnly() bool {
-	return false
-}
-
 func TestTypeTable(t *testing.T) {
 	table := NewTypeTable()
 

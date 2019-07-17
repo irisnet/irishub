@@ -1,8 +1,7 @@
-package keeper
+package asset
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
@@ -20,7 +19,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 		// get the signing accouts
 		signerAccs := auth.GetSigners(ctx)
 		if len(signerAccs) == 0 {
-			return newCtx, types.ErrSignersMissingInContext(types.DefaultCodespace, "signers missing in context").Result(), true
+			return newCtx, ErrSignersMissingInContext(DefaultCodespace, "signers missing in context").Result(), true
 		}
 
 		// get the payer
@@ -31,33 +30,33 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 
 		for _, msg := range tx.GetMsgs() {
 			// only check consecutive msgs which are routed to asset from the beginning
-			if msg.Route() != types.MsgRoute {
+			if msg.Route() != MsgRoute {
 				break
 			}
 
 			var msgFee sdk.Coin
 
 			switch msg := msg.(type) {
-			case types.MsgCreateGateway:
-				msgFee = GetGatewayCreateFee(ctx, k, msg.Moniker)
+			case MsgCreateGateway:
+				msgFee = getGatewayCreateFee(ctx, k, msg.Moniker)
 				break
 
-			case types.MsgIssueToken:
-				if msg.Source == types.NATIVE {
-					msgFee = GetTokenIssueFee(ctx, k, msg.Symbol)
-				} else if msg.Source == types.GATEWAY {
-					msgFee = GetGatewayTokenIssueFee(ctx, k, msg.Symbol)
+			case MsgIssueToken:
+				if msg.Source == NATIVE {
+					msgFee = getTokenIssueFee(ctx, k, msg.Symbol)
+				} else if msg.Source == GATEWAY {
+					msgFee = getGatewayTokenIssueFee(ctx, k, msg.Symbol)
 				}
 
 				break
 
-			case types.MsgMintToken:
-				prefix, symbol := types.GetTokenIDParts(msg.TokenId)
+			case MsgMintToken:
+				prefix, symbol := GetTokenIDParts(msg.TokenId)
 
 				if prefix == "" || prefix == "i" {
-					msgFee = GetTokenMintFee(ctx, k, symbol)
+					msgFee = getTokenMintFee(ctx, k, symbol)
 				} else if prefix != "x" {
-					msgFee = GetGatewayTokenMintFee(ctx, k, symbol)
+					msgFee = getGatewayTokenMintFee(ctx, k, symbol)
 				}
 
 				break
@@ -71,7 +70,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 
 		if !totalFee.IsAllLTE(payer.GetCoins()) {
 			// return error result and abort
-			return newCtx, types.ErrInsufficientCoins(types.DefaultCodespace, fmt.Sprintf("insufficient coins for asset fee: %s needed", totalFee.MainUnitString())).Result(), true
+			return newCtx, ErrInsufficientCoins(DefaultCodespace, fmt.Sprintf("insufficient coins for asset fee: %s needed", totalFee.MainUnitString())).Result(), true
 		}
 
 		// continue

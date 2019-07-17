@@ -20,9 +20,7 @@ type setWithdrawAddressBody struct {
 // nolint: gocyclo
 func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// build tx context
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
+		// Init context and read request parameters
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
 		delegatorAddress, err := sdk.AccAddressFromBech32(bech32addr)
@@ -31,20 +29,20 @@ func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			return
 		}
 
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		var m setWithdrawAddressBody
 		err = utils.ReadPostBody(w, r, cdc, &m)
 		if err != nil {
 			return
 		}
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
-
 		// Build message
 		msg := types.NewMsgSetWithdrawAddress(delegatorAddress, m.WithdrawAddress)
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		// Broadcast or return unsigned transaction
+		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
 	}
 }
 
@@ -56,9 +54,7 @@ type withdrawRewardsBody struct {
 
 func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// build tx context
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
+		// Init context and read request parameters
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
 		delegatorAddress, err := sdk.AccAddressFromBech32(bech32addr)
@@ -67,16 +63,16 @@ func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 			return
 		}
 
+		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		var m withdrawRewardsBody
 		err = utils.ReadPostBody(w, r, cdc, &m)
 		if err != nil {
 			return
 		}
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		if !baseReq.ValidateBasic(w, cliCtx) {
 			return
 		}
-
 		// Build message
 		onlyFromVal := m.ValidatorAddress
 		isVal := m.IsValidator
@@ -95,7 +91,7 @@ func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		default:
 			msg = types.NewMsgWithdrawDelegatorRewardsAll(delegatorAddress)
 		}
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		// Broadcast or return unsigned transaction
+		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
 	}
 }

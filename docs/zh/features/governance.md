@@ -21,15 +21,15 @@
 不同级别对应的参数不同：
 
 | Gov参数 | Critical | Important | Normal |Range|
-| ------ | ------ | ------ | ------|------|
+| ------ | ------ | ------ | ------|------| 
 | govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 5 | 7 |Critical==1, other(1,)|
-| govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
-| govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
+| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critical==1, other(1,)|
+| govTallyingProcedure/Participation | 7/8 | 5/6 | 3/4 |(0,1)|
+| govTallyingProcedure/Threshold | 6/7 | 4/5 | 2/3 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
+| govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
 
 
 * `MinDeposit`  最小抵押金额

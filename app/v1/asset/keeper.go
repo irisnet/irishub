@@ -1,17 +1,21 @@
-package keeper
+package asset
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset/internal/types"
+
+	"github.com/irisnet/irishub/app/v1/asset/tags"
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	bk       types.BankKeeper
+	bk       bank.Keeper
+	gk       guardian.Keeper
 
 	// codespace
 	codespace sdk.CodespaceType
@@ -19,13 +23,14 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		bk:         bk,
+		gk:         gk,
 		codespace:  codespace,
-		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
+		paramSpace: paramSpace.WithTypeTable(ParamTypeTable()),
 	}
 }
 
@@ -35,14 +40,14 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 }
 
 // IssueToken issue a new token
-func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags, sdk.Error) {
-	if token.GetSource() == types.GATEWAY {
+func (k Keeper) IssueToken(ctx sdk.Context, token FungibleToken) (sdk.Tags, sdk.Error) {
+	if token.GetSource() == GATEWAY {
 		gateway, err := k.GetGateway(ctx, token.GetGateway())
 		if err != nil {
 			return nil, err
 		}
 		if !gateway.Owner.Equals(token.GetOwner()) {
-			return nil, types.ErrUnauthorizedIssueGatewayAsset(k.codespace,
+			return nil, ErrUnauthorizedIssueGatewayAsset(k.codespace,
 				fmt.Sprintf("Gateway %s token can only be created by %s, unauthorized creator %s",
 					gateway.Moniker, gateway.Owner, token.GetOwner()))
 		}
@@ -68,35 +73,35 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 	}
 
 	createTags := sdk.NewTags(
-		types.TagId, []byte(token.GetUniqueID()),
-		types.TagDenom, []byte(token.GetDenom()),
-		types.TagSource, []byte(token.GetSource().String()),
-		types.TagGateway, []byte(token.GetGateway()),
-		types.TagOwner, []byte(token.GetOwner().String()),
+		tags.Id, []byte(token.GetUniqueID()),
+		tags.Denom, []byte(token.GetDenom()),
+		tags.Source, []byte(token.GetSource().String()),
+		tags.Gateway, []byte(token.GetGateway()),
+		tags.Owner, []byte(token.GetOwner().String()),
 	)
 
 	return createTags, nil
 }
 
 // save a new token to keystore
-func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.FungibleToken, sdk.AccAddress, sdk.Error) {
-	token.Sanitize()
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+func (k Keeper) AddToken(ctx sdk.Context, token FungibleToken) (FungibleToken, sdk.AccAddress, sdk.Error) {
+	token = token.Sanitize()
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return token, nil, err
 	}
 	if k.HasToken(ctx, tokenId) {
-		return token, nil, types.ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
+		return token, nil, ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
 	}
 
 	var owner sdk.AccAddress
-	if token.GetSource() == types.GATEWAY {
+	if token.GetSource() == GATEWAY {
 		gateway, err := k.GetGateway(ctx, token.GetGateway())
 		if err != nil {
 			return token, nil, err
 		}
 		owner = gateway.Owner
-	} else if token.GetSource() == types.NATIVE {
+	} else if token.GetSource() == NATIVE {
 		owner = token.GetOwner()
 		token.SymbolAtSource = ""
 		token.Gateway = ""
@@ -108,7 +113,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 	}
 
 	// Set token to be prefixed with owner and source
-	if token.GetSource() == types.NATIVE {
+	if token.GetSource() == NATIVE {
 		err = k.SetTokens(ctx, owner, token)
 		if err != nil {
 			return token, nil, err
@@ -129,15 +134,15 @@ func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 	return store.Has(KeyToken(tokenId))
 }
 
-func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
-	if token.GetSource() == types.GATEWAY {
+func (k Keeper) SetToken(ctx sdk.Context, token FungibleToken) sdk.Error {
+	if token.GetSource() == GATEWAY {
 		token.Owner = nil
 	}
 
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
@@ -146,10 +151,10 @@ func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	return nil
 }
 
-func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
+func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
@@ -160,7 +165,7 @@ func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.Fun
 	return nil
 }
 
-func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token types.FungibleToken, found bool) {
+func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token FungibleToken, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(KeyToken(tokenId))
 	if bz == nil {
@@ -177,13 +182,13 @@ func (k Keeper) getTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenI
 }
 
 // CreateGateway creates a gateway
-func (k Keeper) CreateGateway(ctx sdk.Context, msg types.MsgCreateGateway) (sdk.Tags, sdk.Error) {
+func (k Keeper) CreateGateway(ctx sdk.Context, msg MsgCreateGateway) (sdk.Tags, sdk.Error) {
 	// check if the moniker already exists
 	if k.HasGateway(ctx, msg.Moniker) {
-		return nil, types.ErrGatewayAlreadyExists(k.codespace, fmt.Sprintf("the moniker already exists:%s", msg.Moniker))
+		return nil, ErrGatewayAlreadyExists(k.codespace, fmt.Sprintf("the moniker already exists:%s", msg.Moniker))
 	}
 
-	var gateway = types.Gateway{
+	var gateway = Gateway{
 		Owner:    msg.Owner,
 		Moniker:  msg.Moniker,
 		Identity: msg.Identity,
@@ -204,7 +209,7 @@ func (k Keeper) CreateGateway(ctx sdk.Context, msg types.MsgCreateGateway) (sdk.
 }
 
 // EditGateway edits the specified gateway
-func (k Keeper) EditGateway(ctx sdk.Context, msg types.MsgEditGateway) (sdk.Tags, sdk.Error) {
+func (k Keeper) EditGateway(ctx sdk.Context, msg MsgEditGateway) (sdk.Tags, sdk.Error) {
 	// get the destination gateway
 	gateway, err := k.GetGateway(ctx, msg.Moniker)
 	if err != nil {
@@ -213,17 +218,17 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg types.MsgEditGateway) (sdk.Tags
 
 	// check if the given owner matches with the owner of the destination gateway
 	if !msg.Owner.Equals(gateway.Owner) {
-		return nil, types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the gateway %s", msg.Owner, msg.Moniker))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the gateway %s", msg.Owner, msg.Moniker))
 	}
 
 	// update the gateway
-	if msg.Identity != types.DoNotModify {
+	if msg.Identity != DoNotModify {
 		gateway.Identity = msg.Identity
 	}
-	if msg.Details != types.DoNotModify {
+	if msg.Details != DoNotModify {
 		gateway.Details = msg.Details
 	}
-	if msg.Website != types.DoNotModify {
+	if msg.Website != DoNotModify {
 		gateway.Website = msg.Website
 	}
 
@@ -239,39 +244,39 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg types.MsgEditGateway) (sdk.Tags
 }
 
 // EditToken edits the specified token
-func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sdk.Error) {
+func (k Keeper) EditToken(ctx sdk.Context, msg MsgEditToken) (sdk.Tags, sdk.Error) {
 	// get the destination token
 	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
-		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
-	if token.Source == types.GATEWAY {
+	if token.Source == GATEWAY {
 		gateway, _ := k.GetGateway(ctx, token.Gateway)
 		token.Owner = gateway.Owner
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
-		return nil, types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.TokenId))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.TokenId))
 	}
 
 	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
 	if !found {
-		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
 	}
 
 	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(token.Decimal))
 	if maxSupply.GT(sdk.ZeroInt()) && (maxSupply.LT(hasIssuedAmt.Amount) || maxSupply.GT(token.MaxSupply)) {
-		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.Amount.String(), token.MaxSupply.String()))
+		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.Amount.String(), token.MaxSupply.String()))
 	}
 
-	if msg.Name != types.DoNotModify {
+	if msg.Name != DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != types.DoNotModify {
+	if msg.SymbolAtSource != DoNotModify {
 		token.SymbolAtSource = msg.SymbolAtSource
 	}
-	if msg.SymbolMinAlias != types.DoNotModify {
+	if msg.SymbolMinAlias != DoNotModify {
 		token.SymbolMinAlias = msg.SymbolMinAlias
 	}
 	if maxSupply.GT(sdk.ZeroInt()) {
@@ -286,14 +291,14 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	}
 
 	editTags := sdk.NewTags(
-		types.TagId, []byte(msg.TokenId),
+		tags.Id, []byte(msg.TokenId),
 	)
 
 	return editTags, nil
 }
 
 // TransferGatewayOwner transfers the owner of the specified gateway to a new one
-func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg types.MsgTransferGatewayOwner) (sdk.Tags, sdk.Error) {
+func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg MsgTransferGatewayOwner) (sdk.Tags, sdk.Error) {
 	// get the destination gateway
 	gateway, err := k.GetGateway(ctx, msg.Moniker)
 	if err != nil {
@@ -302,7 +307,7 @@ func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg types.MsgTransferGatew
 
 	// check if the given owner matches with the owner of the destination gateway
 	if !msg.Owner.Equals(gateway.Owner) {
-		return nil, types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the gateway %s", msg.Owner, msg.Moniker))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the gateway %s", msg.Owner, msg.Moniker))
 	}
 
 	// change the ownership
@@ -321,14 +326,14 @@ func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg types.MsgTransferGatew
 }
 
 // GetGateway retrieves the gateway of the given moniker
-func (k Keeper) GetGateway(ctx sdk.Context, moniker string) (types.Gateway, sdk.Error) {
+func (k Keeper) GetGateway(ctx sdk.Context, moniker string) (Gateway, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(KeyGateway(moniker))
 	if bz == nil {
-		return types.Gateway{}, types.ErrUnkwownGateway(k.codespace, fmt.Sprintf("unknown gateway moniker:%s", moniker))
+		return Gateway{}, ErrUnkwownGateway(k.codespace, fmt.Sprintf("unknown gateway moniker:%s", moniker))
 	}
 
-	var gateway types.Gateway
+	var gateway Gateway
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &gateway)
 
 	return gateway, nil
@@ -341,7 +346,7 @@ func (k Keeper) HasGateway(ctx sdk.Context, moniker string) bool {
 }
 
 // SetGateway stores the given gateway into the underlying storage
-func (k Keeper) SetGateway(ctx sdk.Context, gateway types.Gateway) {
+func (k Keeper) SetGateway(ctx sdk.Context, gateway Gateway) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gateway)
 
@@ -377,14 +382,14 @@ func (k Keeper) GetGateways(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator 
 }
 
 // IterateGateways iterates through all existing gateways
-func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway types.Gateway) (stop bool)) {
+func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixGateway)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var gateway types.Gateway
+		var gateway Gateway
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &gateway)
 
 		if stop := op(gateway); stop {
@@ -394,14 +399,14 @@ func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway types.Gateway) 
 }
 
 // IterateTokens iterates through all existing tokens
-func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken) (stop bool)) {
+func (k Keeper) IterateTokens(ctx sdk.Context, op func(token FungibleToken) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var token types.FungibleToken
+		var token FungibleToken
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &token)
 
 		if stop := op(token); stop {
@@ -411,38 +416,23 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 }
 
 func (k Keeper) Init(ctx sdk.Context) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "Init").With("module", "iris/asset"))
-
-	k.SetParamSet(ctx, types.DefaultParams())
-
-	//Initialize external tokens BTC and ETH
-	maxSupply := sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 8)
-	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
-	if _, err := k.IssueToken(ctx, btc); err != nil {
-		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
-	}
-
-	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
-	eth := types.NewFungibleToken(types.EXTERNAL, "", "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
-	if _, err := k.IssueToken(ctx, eth); err != nil {
-		ctx.Logger().Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
-	}
+	k.SetParamSet(ctx, DefaultParams())
 }
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
-func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
+func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
 	// get the destination token
 	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
-		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
-	if token.Source != types.NATIVE {
-		return nil, types.ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the token of which the source is native can be transferred,but the source of the current token is %s", token.Source.String()))
+	if token.Source != NATIVE {
+		return nil, ErrInvalidAssetSource(k.codespace, fmt.Sprintf("only the token of which the source is native can be transferred,but the source of the current token is %s", token.Source.String()))
 	}
 
 	if !msg.SrcOwner.Equals(token.Owner) {
-		return nil, types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.SrcOwner.String(), msg.TokenId))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.SrcOwner.String(), msg.TokenId))
 	}
 
 	token.Owner = msg.DstOwner
@@ -457,17 +447,17 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 		return nil, err
 	}
 	tags := sdk.NewTags(
-		types.TagId, []byte(msg.TokenId),
+		tags.Id, []byte(msg.TokenId),
 	)
 
 	return tags, nil
 }
 
 // reset all index by DstOwner of token for query-token command
-func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.FungibleToken) sdk.Error {
+func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg MsgTransferTokenOwner, token FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
 	if err != nil {
 		return err
 	}
@@ -478,51 +468,51 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransfe
 	return k.SetTokens(ctx, msg.DstOwner, token)
 }
 
-func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sdk.Error) {
+func (k Keeper) MintToken(ctx sdk.Context, msg MsgMintToken) (sdk.Tags, sdk.Error) {
 	token, exist := k.getToken(ctx, msg.TokenId)
 	if !exist {
-		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
 	}
 
-	if token.Source == types.GATEWAY {
+	if token.Source == GATEWAY {
 		gateway, _ := k.GetGateway(ctx, token.Gateway)
 		token.Owner = gateway.Owner
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
-		return nil, types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenId))
+		return nil, ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenId))
 	}
 
 	if !token.Mintable {
-		return nil, types.ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
+		return nil, ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
 	}
 
 	hasIssuedAmt, found := k.bk.GetTotalSupply(ctx, token.GetDenom())
 	if !found {
-		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("token denom %s does not exist", token.GetDenom()))
 	}
 
 	//check the denom
 	expDenom := token.GetDenom()
 	if expDenom != hasIssuedAmt.Denom {
-		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssuedAmt.Denom))
+		return nil, ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of mint token is not equal issued token,expected:%s,actual:%s", expDenom, hasIssuedAmt.Denom))
 	}
 
 	mintAmt := sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Decimal))
 	if mintAmt.Add(hasIssuedAmt.Amount).GT(token.MaxSupply) {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
 		canAmt := token.MaxSupply.Sub(hasIssuedAmt.Amount).Div(exp)
-		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
+		return nil, ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
 	}
 
 	switch token.Source {
-	case types.NATIVE:
+	case NATIVE:
 		// handle fee for native token
 		if err := TokenMintFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
 			return nil, err
 		}
 		break
-	case types.GATEWAY:
+	case GATEWAY:
 		// handle fee for gateway token
 		if err := GatewayTokenMintFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
 			return nil, err
@@ -550,16 +540,4 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 	}
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), mintAcc.String(), mintCoin.String(), sdk.MintTokenFlow, "")
 	return tags, nil
-}
-
-// get asset params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
-	var p types.Params
-	k.paramSpace.GetParamSet(ctx, &p)
-	return p
-}
-
-// set asset params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
 }

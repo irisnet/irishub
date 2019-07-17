@@ -21,15 +21,15 @@ Specific Proposal for different levels：
 Different levels correspond to different parameters：
 
 | GovParams | Critical | Important | Normal |Range|
-| ------ | ------ | ------ | ------|------|
+| ------ | ------ | ------ | ------|------| 
 | govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 5 | 7 |Critical==1, other(1,)|
-| govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
-| govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
+| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critical==1, other(1,)|
+| govTallyingProcedure/Participation | 7/8 | 5/6 | 3/4 |(0,1)|
+| govTallyingProcedure/Threshold | 6/7 | 4/5 | 2/3 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
+| govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
 
 
 * `MinDeposit`  The minimum of  deposit
@@ -53,7 +53,7 @@ Only the validator and delegator can vote , and they can't vote twice for one pr
 There are three tallying results: `PASS`，`REJECT`，`REJECTVETO`。
 
 On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`,if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`. 
-
+ 
 
 ### Burning Mechanism
 

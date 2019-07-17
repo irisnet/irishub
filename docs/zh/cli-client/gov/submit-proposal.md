@@ -46,8 +46,6 @@ iriscli gov submit-proposal --help
 iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --param='mint/Inflation=0.050' --type=ParameterChange --description=<proposal_description> --from=<key_name> --fee=0.3iris --deposit="3000iris" 
 ```
 
-param的值可以通过 `iriscli params`查询(Gov模块本身参数不可以修改),详细[请参考](../params/README.md)
-
 ### 提交一个`SoftwareUpgrade`类型的提议
 
 ```shell

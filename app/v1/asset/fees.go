@@ -1,11 +1,14 @@
 //nolint
-package keeper
+package asset
 
 import (
+	"fmt"
 	"github.com/irisnet/irishub/app/v1/auth"
-	sdk "github.com/irisnet/irishub/types"
 	"math"
 	"strconv"
+	"strings"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // fee factor formula: (ln(len({name}))/ln{base})^{exp}
@@ -17,7 +20,7 @@ const (
 // GatewayCreateFeeHandler performs fee handling for creating a gateway
 func GatewayCreateFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker string) sdk.Error {
 	// get the required creation fee
-	fee := GetGatewayCreateFee(ctx, k, moniker)
+	fee := getGatewayCreateFee(ctx, k, moniker)
 
 	return feeHandler(ctx, k, owner, fee)
 }
@@ -25,7 +28,7 @@ func GatewayCreateFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, mo
 // TokenIssueFeeHandler performs fee handling for issuing token
 func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
-	fee := GetTokenIssueFee(ctx, k, symbol)
+	fee := getTokenIssueFee(ctx, k, symbol)
 
 	return feeHandler(ctx, k, owner, fee)
 }
@@ -33,7 +36,7 @@ func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbo
 // TokenMintFeeHandler performs fee handling for minting token
 func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
-	fee := GetTokenMintFee(ctx, k, symbol)
+	fee := getTokenMintFee(ctx, k, symbol)
 
 	return feeHandler(ctx, k, owner, fee)
 }
@@ -41,7 +44,7 @@ func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol
 // GatewayTokenIssueFeeHandler performs fee handling for issuing gateway token
 func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
-	fee := GetGatewayTokenIssueFee(ctx, k, symbol)
+	fee := getGatewayTokenIssueFee(ctx, k, symbol)
 
 	return feeHandler(ctx, k, owner, fee)
 }
@@ -49,7 +52,7 @@ func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress
 // GatewayTokenMintFeeHandler performs fee handling for minting gateway token
 func GatewayTokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
-	fee := GetGatewayTokenMintFee(ctx, k, symbol)
+	fee := getGatewayTokenMintFee(ctx, k, symbol)
 
 	return feeHandler(ctx, k, owner, fee)
 }
@@ -78,8 +81,8 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	return nil
 }
 
-// GetGatewayCreateFee returns the gateway creation fee
-func GetGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Coin {
+// getGatewayCreateFee returns the gateway creation fee
+func getGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
 	gatewayBaseFee := params.CreateGatewayBaseFee
@@ -91,7 +94,7 @@ func GetGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Coin {
 }
 
 // getTokenIssueFee returns the token issurance fee
-func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
+func getTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
 	issueTokenBaseFee := params.IssueTokenBaseFee
@@ -103,39 +106,39 @@ func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 }
 
 // getTokenMintFee returns the token mint fee
-func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
+func getTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
 	mintTokenFeeRatio := params.MintTokenFeeRatio
 
 	// compute the issurance fee and mint fee
-	issueFee := GetTokenIssueFee(ctx, k, symbol)
+	issueFee := getTokenIssueFee(ctx, k, symbol)
 	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
 
 	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(mintFee))
 }
 
 // getGatewayTokenIssueFee returns the gateway token issurance fee
-func GetGatewayTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
+func getGatewayTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
 	gatewayAssetFeeRatio := params.GatewayAssetFeeRatio
 
 	// compute the native token issurance fee and gateway token issurance fee
-	nativeTokenIssueFee := GetTokenIssueFee(ctx, k, symbol)
+	nativeTokenIssueFee := getTokenIssueFee(ctx, k, symbol)
 	gatewayTokenIssueFee := sdk.NewDecFromInt(nativeTokenIssueFee.Amount).Mul(gatewayAssetFeeRatio)
 
 	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(gatewayTokenIssueFee))
 }
 
 // getGatewayTokenMintFee returns the gateway token mint fee
-func GetGatewayTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
+func getGatewayTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
 	gatewayAssetFeeRatio := params.GatewayAssetFeeRatio
 
 	// compute the native token mint fee and gateway token mint fee
-	nativeTokenMintFee := GetTokenMintFee(ctx, k, symbol)
+	nativeTokenMintFee := getTokenMintFee(ctx, k, symbol)
 	gatewayTokenMintFee := sdk.NewDecFromInt(nativeTokenMintFee.Amount).Mul(gatewayAssetFeeRatio)
 
 	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(gatewayTokenMintFee))
@@ -179,4 +182,44 @@ func convertFeeToInt(fee sdk.Dec) sdk.Int {
 	} else {
 		return sdk.NewInt(1).Mul(sdk.NewIntWithDecimal(1, 18))
 	}
+}
+
+// GatewayFeeOutput is for the gateway fee query output
+type GatewayFeeOutput struct {
+	Exist bool     `json:"exist"` // indicate if the gateway has existed
+	Fee   sdk.Coin `json:"fee"`   // creation fee
+}
+
+// String implements stringer
+func (gfo GatewayFeeOutput) String() string {
+	var out strings.Builder
+	if gfo.Exist {
+		out.WriteString("The gateway moniker has existed\n")
+	}
+
+	out.WriteString(fmt.Sprintf("Fee: %s", gfo.Fee.String()))
+
+	return out.String()
+}
+
+// TokenFeesOutput is for the token fees query output
+type TokenFeesOutput struct {
+	Exist    bool     `exist`            // indicate if the token has existed
+	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
+	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
+}
+
+// String implements stringer
+func (tfo TokenFeesOutput) String() string {
+	var out strings.Builder
+	if tfo.Exist {
+		out.WriteString("The token id has existed\n")
+	}
+
+	out.WriteString(fmt.Sprintf(`Fees:
+  IssueFee: %s
+  MintFee:  %s`,
+		tfo.IssueFee.String(), tfo.MintFee.String()))
+
+	return out.String()
 }

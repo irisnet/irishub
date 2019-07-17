@@ -2,18 +2,16 @@ package tests
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/store"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	amino "github.com/tendermint/go-amino"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	rpcclient "github.com/tendermint/tendermint/rpc/lib/client"
 	"strings"
+
 )
 
 // Wait for the next tendermint block from the Tendermint RPC
@@ -204,19 +202,4 @@ var cdc = amino.NewCodec()
 
 func init() {
 	ctypes.RegisterAmino(cdc)
-}
-
-func SetupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
-	db := dbm.NewMemDB()
-	accountKey := sdk.NewKVStoreKey("accountKey")
-	assetKey := sdk.NewKVStoreKey("assetKey")
-	paramskey := sdk.NewKVStoreKey("params")
-	paramsTkey := sdk.NewTransientStoreKey("transient_params")
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(assetKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(paramsTkey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
-	return ms, accountKey, assetKey, paramskey, paramsTkey
 }

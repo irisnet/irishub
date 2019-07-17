@@ -47,13 +47,13 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Service Params:
-  service/MaxRequestTimeout:     %d
-  service/MinDepositMultiple:    %d
-  service/ServiceFeeTax:         %s
-  service/SlashFraction:         %s
-  service/ComplaintRetrospect:   %s
-  service/ArbitrationTimeLimit:  %s
-  service/TxSizeLimit:           %d`,
+  Max Request Timeout:         %d
+  Min Deposit Multiple:        %d
+  Service Fee Tax:             %s
+  Slash Fraction:              %s
+  Complaint Retrospect:        %s
+  Arbitration Time Limit:      %s
+  Tx Size Limit:               %d`,
 		p.MaxRequestTimeout, p.MinDepositMultiple, p.ServiceFeeTax.String(), p.SlashFraction.String(),
 		p.ComplaintRetrospect, p.ArbitrationTimeLimit, p.TxSizeLimit)
 }
@@ -171,10 +171,6 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
-}
-
-func (p *Params) ReadOnly() bool {
-	return false
 }
 
 // default service module params

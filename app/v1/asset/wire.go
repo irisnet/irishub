@@ -1,4 +1,4 @@
-package types
+package asset
 
 import (
 	"github.com/irisnet/irishub/codec"
