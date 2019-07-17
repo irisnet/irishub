@@ -269,7 +269,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != types.DoNotModify {
+	if msg.SymbolAtSource != types.DoNotModify && token.Source != types.NATIVE {
 		token.SymbolAtSource = msg.SymbolAtSource
 	}
 	if msg.SymbolMinAlias != types.DoNotModify {
