@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -230,4 +231,9 @@ func (ctx CLIContext) WithUseLedger(useLedger bool) CLIContext {
 func (ctx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
 	ctx.Verifier = verifier
 	return ctx
+}
+
+func (ctx CLIContext) ToMainUnit(coins types.Coins) string {
+	ss, _ := ctx.ConvertCoinToMainUnit(coins.String())
+	return strings.Join(ss, ",")
 }

@@ -255,10 +255,15 @@ func (d Dec) IsInteger() bool {
 }
 
 func (d Dec) String() string {
-	bz, err := d.Int.MarshalText()
-	if err != nil {
-		return ""
+	var bz []byte
+	if d.Int != nil {
+		b, err := d.Int.MarshalText()
+		if err != nil {
+			return ""
+		}
+		bz = b
 	}
+
 	var bzWDec []byte
 	inputSize := len(bz)
 	// TODO: Remove trailing zeros

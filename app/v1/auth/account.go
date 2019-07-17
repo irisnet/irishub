@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -68,6 +69,24 @@ func (acc BaseAccount) String() string {
   Account Number:  %d
   Sequence:        %d`,
 		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
+	)
+}
+
+// String implements human.Stringer
+func (acc BaseAccount) HumanString(assetConvert human.AssetConvert) string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d`,
+		acc.Address, pubkey, assetConvert.ToMainUnit(acc.Coins), acc.AccountNumber, acc.Sequence,
 	)
 }
 
