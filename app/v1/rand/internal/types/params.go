@@ -1,4 +1,4 @@
-package rand
+package types
 
 import (
 	"fmt"
@@ -61,18 +61,6 @@ func DefaultParamsForTest() Params {
 	return Params{}
 }
 
-func validateParams(p Params) error {
+func ValidateParams(p Params) error {
 	return nil
-}
-
-// get rand params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) Params {
-	var p Params
-	k.paramSpace.GetParamSet(ctx, &p)
-	return p
-}
-
-// set asset params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
 }

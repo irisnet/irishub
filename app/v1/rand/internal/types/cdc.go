@@ -1,4 +1,4 @@
-package rand
+package types
 
 import (
 	"github.com/irisnet/irishub/codec"

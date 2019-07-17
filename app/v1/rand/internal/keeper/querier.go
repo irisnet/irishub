@@ -1,31 +1,24 @@
-package rand
+package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v1/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-const (
-	QueryRand             = "rand"
-	QueryRands            = "rands"
-	QueryRandRequest      = "request"
-	QueryRandRequests     = "requests"
-	QueryRandRequestQueue = "queue"
-)
-
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryRand:
+		case types.QueryRand:
 			return queryRand(ctx, req, k)
-		case QueryRands:
+		case types.QueryRands:
 			return queryRands(ctx, req, k)
-		case QueryRandRequest:
+		case types.QueryRandRequest:
 			return queryRandRequest(ctx, req, k)
-		case QueryRandRequests:
+		case types.QueryRandRequests:
 			return queryRandRequests(ctx, req, k)
-		case QueryRandRequestQueue:
+		case types.QueryRandRequestQueue:
 			return queryRandRequestQueue(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown rand query endpoint")
@@ -33,13 +26,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-// QueryRandParams is the query parameters for 'custom/rand/rand'
-type QueryRandParams struct {
-	ReqID string
-}
-
 func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryRandParams
+	var params types.QueryRandParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -58,21 +46,16 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	return bz, nil
 }
 
-// QueryRandsParams is the query parameters for 'custom/rand/rands'
-type QueryRandsParams struct {
-	Consumer sdk.AccAddress
-}
-
 func queryRands(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryRandsParams
+	var params types.QueryRandsParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var rands []Rand
+	var rands []types.Rand
 
-	op := func(r Rand) bool {
+	op := func(r types.Rand) bool {
 		if len(params.Consumer) == 0 {
 			rands = append(rands, r)
 		} else if r.Consumer.Equals(params.Consumer) {
@@ -92,13 +75,8 @@ func queryRands(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	return bz, nil
 }
 
-// QueryRandRequestParams is the query parameters for 'custom/rand/request'
-type QueryRandRequestParams struct {
-	ReqID string
-}
-
 func queryRandRequest(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryRandRequestParams
+	var params types.QueryRandRequestParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -117,21 +95,16 @@ func queryRandRequest(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]
 	return bz, nil
 }
 
-// QueryRandRequestsParams is the query parameters for 'custom/rand/requests'
-type QueryRandRequestsParams struct {
-	Consumer sdk.AccAddress
-}
-
 func queryRandRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryRandRequestsParams
+	var params types.QueryRandRequestsParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var requests []Request
+	var requests []types.Request
 
-	op := func(r Request) bool {
+	op := func(r types.Request) bool {
 		if len(params.Consumer) == 0 {
 			requests = append(requests, r)
 		} else if r.Consumer.Equals(params.Consumer) {
@@ -151,19 +124,14 @@ func queryRandRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([
 	return bz, nil
 }
 
-// QueryRandRequestQueueParams is the query parameters for 'custom/rand/queue'
-type QueryRandRequestQueueParams struct {
-	Height int64
-}
-
 func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params QueryRandRequestQueueParams
+	var params types.QueryRandRequestQueueParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var requests []Request
+	var requests []types.Request
 
 	if params.Height == 0 {
 		// query all pending requests
@@ -181,8 +149,8 @@ func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper
 	return bz, nil
 }
 
-func queryRandRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keeper) []Request {
-	var requests = make([]Request, 0)
+func queryRandRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keeper) []types.Request {
+	var requests = make([]types.Request, 0)
 
 	iterator := keeper.IterateRandRequestQueueByHeight(ctx, height)
 	defer iterator.Close()
@@ -202,10 +170,10 @@ func queryRandRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keeper)
 	return requests
 }
 
-func queryAllRandRequestsInQueue(ctx sdk.Context, keeper Keeper) []Request {
-	var requests = make([]Request, 0)
+func queryAllRandRequestsInQueue(ctx sdk.Context, keeper Keeper) []types.Request {
+	var requests = make([]types.Request, 0)
 
-	keeper.IterateRandRequestQueue(ctx, func(r Request) (stop bool) {
+	keeper.IterateRandRequestQueue(ctx, func(r types.Request) (stop bool) {
 		requests = append(requests, r)
 		return false
 	})

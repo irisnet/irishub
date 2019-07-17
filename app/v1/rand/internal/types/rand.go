@@ -1,4 +1,4 @@
-package rand
+package types
 
 import (
 	"fmt"

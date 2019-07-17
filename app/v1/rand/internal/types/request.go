@@ -1,4 +1,4 @@
-package rand
+package types
 
 import (
 	"encoding/hex"
@@ -34,8 +34,8 @@ func (r Request) String() string {
 		r.Height, r.Consumer.String())
 }
 
-// generateRequestID generates a request id
-func generateRequestID(request Request) string {
+// GenerateRequestID generates a request id
+func GenerateRequestID(request Request) string {
 	reqID := make([]byte, 0)
 
 	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(request.Height))...)

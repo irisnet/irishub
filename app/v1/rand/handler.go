@@ -8,7 +8,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// handle all "rand" type messages.
+// NewHandler handles all "rand" messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
@@ -51,7 +51,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 	handledRandReqNum := 0
 	for ; iterator.Valid(); iterator.Next() {
 		var reqID string
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &reqID)
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &reqID)
 
 		request, err := k.GetRandRequest(ctx, reqID)
 		if err != nil {
@@ -65,7 +65,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		// remove the request
 		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
 
-		handledRandReqNum += 1
+		handledRandReqNum++
 	}
 
 	ctx.Logger().Info(fmt.Sprintf("the count of handled rand requests is %d", handledRandReqNum))

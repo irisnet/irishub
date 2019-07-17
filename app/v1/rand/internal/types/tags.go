@@ -1,5 +1,5 @@
 // nolint
-package tags
+package types
 
 import (
 	sdk "github.com/irisnet/irishub/types"
@@ -8,7 +8,7 @@ import (
 var (
 	ActionRequestRand = []byte("request_rand")
 
-	Action   = sdk.TagAction
-	ReqID    = "request-id"
-	Consumer = "consumer"
+	TagAction   = sdk.TagAction
+	TagReqID    = "request-id"
+	TagConsumer = "consumer"
 )

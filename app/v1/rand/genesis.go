@@ -4,11 +4,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// GenesisState contains all rand state that must be provided at genesis
-type GenesisState struct {
-	Params Params `json:"params"` // rand params
-}
-
 // InitGenesis stores genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
@@ -42,7 +37,7 @@ func DefaultGenesisStateForTest() GenesisState {
 // ValidateGenesis validates the provided rand genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
+	err := ValidateParams(data.Params)
 	if err != nil {
 		return err
 	}

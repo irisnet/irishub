@@ -1,4 +1,4 @@
-package rand
+package types
 
 import (
 	sdk "github.com/irisnet/irishub/types"
@@ -6,8 +6,7 @@ import (
 
 const (
 	// MsgRoute identifies transaction types
-	MsgRoute      = "rand"
-	BlockNumAfter = 10 // block interval after which the requested random number will be generated
+	MsgRoute = "rand"
 )
 
 var _ sdk.Msg = &MsgRequestRand{}
