@@ -222,7 +222,7 @@ func TestIrisCLIEditToken(t *testing.T) {
 	token := executeGetToken(t, fmt.Sprintf("iriscli asset query-token %s --output=json %v", strings.ToLower(strings.TrimSpace(symbol)), flags))
 
 	require.Equal(t, "BTC_Token", token.Name)
-	require.Equal(t, "btc1", token.CanonicalSymbol)
+	require.Equal(t, CanonicalSymbol, token.CanonicalSymbol)
 	require.Equal(t, sdk.NewIntWithDecimal(int64(200000000), decimal), token.MaxSupply)
 	require.Equal(t, true, token.Mintable)
 }
