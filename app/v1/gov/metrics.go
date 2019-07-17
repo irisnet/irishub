@@ -6,6 +6,7 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	distr "github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/app/v1/mint"
+	promutil "github.com/irisnet/irishub/tools/prometheus"
 	sdk "github.com/irisnet/irishub/types"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	cfg "github.com/tendermint/tendermint/config"
@@ -30,25 +31,34 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
 		return NopMetrics()
 	}
+
+	proposalStatusVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
+		Namespace: config.Namespace,
+		Subsystem: MetricsSubsystem,
+		Name:      "proposal_status",
+		Help:      "the status of the proposal",
+	}, []string{ProposalIDLabel})
+
+	voteVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
+		Namespace: config.Namespace,
+		Subsystem: MetricsSubsystem,
+		Name:      "vote",
+		Help:      "validator vote the proposal",
+	}, []string{ValidatorLabel, ProposalIDLabel})
+
+	paramVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
+		Namespace: config.Namespace,
+		Subsystem: MetricsSubsystem,
+		Name:      "parameter",
+		Help:      "parameter changes",
+	}, []string{ParamKeyLabel})
+
+	promutil.RegisterMetrics(proposalStatusVec, voteVec, paramVec)
+
 	return &Metrics{
-		ProposalStatus: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "proposal_status",
-			Help:      "the status of the proposal",
-		}, []string{ProposalIDLabel}),
-		Vote: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "vote",
-			Help:      "validator vote the proposal",
-		}, []string{ValidatorLabel, ProposalIDLabel}),
-		Param: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "parameter",
-			Help:      "parameter changes",
-		}, []string{ParamKeyLabel}),
+		ProposalStatus: prometheus.NewGauge(proposalStatusVec),
+		Vote:           prometheus.NewGauge(voteVec),
+		Param:          prometheus.NewGauge(paramVec),
 	}
 }
 
