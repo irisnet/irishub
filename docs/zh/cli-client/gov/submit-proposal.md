@@ -31,7 +31,7 @@ iriscli gov submit-proposal --help
 | --token-symbol |  | 代币符号 | |
 | --token-name |  | 代币名称 | |
 | --token-decimal |  | 代币最大精度 | |
-| --token-min-unit-alias |  | 代币最小单温别名 | |
+| --token-min-unit-alias |  | 代币最小单位别名 | |
 | --token-initial-supply |  | 代币初始总量 | |
 
 ## 例子
