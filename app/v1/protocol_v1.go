@@ -20,7 +20,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/prometheus/client_golang/prometheus"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -86,7 +85,6 @@ func NewProtocolV1(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkI
 
 // load the configuration of this Protocol
 func (p *ProtocolV1) Load() {
-	prometheus.DefaultRegisterer = prometheus.NewRegistry()
 	p.configCodec()
 	p.configKeepers()
 	p.configRouters()
