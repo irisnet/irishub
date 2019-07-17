@@ -13,6 +13,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
 	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
@@ -51,6 +52,7 @@ type ProtocolV1 struct {
 	guardianKeeper guardian.Keeper
 	upgradeKeeper  upgrade.Keeper
 	assetKeeper    asset.Keeper
+	randKeeper     rand.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -138,6 +140,7 @@ func MakeCodec() *codec.Codec {
 	auth.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	asset.RegisterCodec(cdc)
+	rand.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
 }
@@ -277,6 +280,8 @@ func (p *ProtocolV1) configKeepers() {
 		gov.PrometheusMetrics(p.config),
 		p.assetKeeper,
 	)
+
+	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace, p.paramsKeeper.Subspace(rand.DefaultParamSpace))
 }
 
 // configure all Routers
@@ -289,7 +294,8 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.GovRoute, gov.NewHandler(p.govKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
-		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper))
+		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper)).
+		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
@@ -299,7 +305,9 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
 		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
-		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper))
+		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper)).
+		AddRoute(protocol.RandRoute, rand.NewQuerier(p.randKeeper))
+
 }
 
 // configure all FeeHandlers
@@ -327,15 +335,16 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyService,
 		protocol.KeyGuardian,
 		protocol.KeyAsset,
+		protocol.KeyRand,
 	}
 }
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{}, &rand.Params{})
 }
 
-// application updates every end block
+// application updates every begin block
 func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	// mint new tokens for this new block
 	tags := mint.BeginBlocker(ctx, p.mintKeeper)
@@ -344,6 +353,9 @@ func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	distr.BeginBlocker(ctx, req, p.distrKeeper)
 
 	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
+
+	// handle pending random number requests
+	rand.BeginBlocker(ctx, req, p.randKeeper)
 
 	ctx.CoinFlowTags().TagWrite()
 
@@ -413,6 +425,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
+	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)
